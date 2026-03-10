@@ -26,16 +26,14 @@
 libs/domain          # 最下層（外部依存を最小化）
 libs/usecase         # domain を利用
 libs/infrastructure  # domain を利用（実装詳細）
-apps/api             # usecase を利用
-apps/server          # composition root（api/usecase/infrastructure/domain を束ねる）
+apps/cli             # CLI エントリーポイント + composition root（usecase/infrastructure/domain を束ねる）
 ```
 
 ### 依存ルール（強制）
 
-- `domain` は `usecase/infrastructure/api/server` へ依存してはいけない
-- `usecase` は `infrastructure/api/server` へ依存してはいけない
-- `api` は `infrastructure/server/domain` へ依存してはいけない
-- `infrastructure` は `api/server` へ依存してはいけない
+- `domain` は `usecase/infrastructure/cli` へ依存してはいけない
+- `usecase` は `infrastructure/cli` へ依存してはいけない
+- `infrastructure` は `usecase/cli` へ依存してはいけない
 - `deny.toml` と `scripts/check_layers.py` は `docs/architecture-rules.json` と同期させる
 - ルール検証: `cargo make check-layers` と `cargo make deny`
 

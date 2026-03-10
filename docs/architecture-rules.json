@@ -13,7 +13,7 @@
       "may_depend_on": [
         "domain"
       ],
-      "deny_reason": "Usecase crate must only be consumed by api and server layers."
+      "deny_reason": "Usecase crate must only be consumed by the cli layer."
     },
     {
       "crate": "infrastructure",
@@ -24,18 +24,9 @@
       "deny_reason": "Infrastructure implementations must be wired only at composition root."
     },
     {
-      "crate": "api",
-      "path": "apps/api",
+      "crate": "cli",
+      "path": "apps/cli",
       "may_depend_on": [
-        "usecase"
-      ],
-      "deny_reason": "API crate must be instantiated by server only."
-    },
-    {
-      "crate": "server",
-      "path": "apps/server",
-      "may_depend_on": [
-        "api",
         "domain",
         "infrastructure",
         "usecase"

@@ -1,9 +1,11 @@
 [package]
-name = "api"
+name = "cli"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
 [dependencies]
+domain = { path = "../../libs/domain" }
+infrastructure = { path = "../../libs/infrastructure" }
 usecase = { path = "../../libs/usecase" }

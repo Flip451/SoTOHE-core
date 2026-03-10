@@ -172,8 +172,7 @@ The default template uses `apps/` and `libs/`, but other roots are allowed when 
 ```text
 Cargo.toml                  # workspace definition
 apps/
-├── api/                    # entry layer
-└── server/                 # composition root
+└── cli/                    # CLI entry point + composition root
 libs/
 ├── domain/                 # domain layer
 ├── usecase/                # use case layer
