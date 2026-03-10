@@ -1,0 +1,22 @@
+## Task Summary: Migrate workspace to CLI architecture
+
+**Track:** no-track
+**Task:** /architecture-customizer による Web→CLI アーキテクチャ移行
+**Date:** 2026-03-11
+
+### Changes
+
+- apps/api/: deleted (HTTP handler layer removed)
+- apps/server/: deleted (TCP server composition root removed)
+- apps/cli/: created (CLI entry point + composition root)
+- Cargo.toml: workspace members updated
+- docs/architecture-rules.json: api/server → cli
+- deny.toml: wrappers updated to cli
+- CLAUDE.md: workspace map updated
+- track/tech-stack.md: workspace structure and dependency rules updated
+
+### Why
+
+SoTOHE-core is a CLI tool, not a web server. The previous api/server crate
+structure was inherited from the web template and unnecessary. The new layout
+uses a single apps/cli crate as both entry point and composition root.
