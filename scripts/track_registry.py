@@ -102,7 +102,14 @@ def render_registry(tracks: list[TrackMetadataV2]) -> str:
     else:
         lines.append("- Latest active track: `None yet`")
         lines.append("- Next recommended command: `/track:plan <feature>`")
-        lines.append("- Last updated: `YYYY-MM-DD`")
+        # Use the most recently updated track date even when no active tracks remain.
+        all_sorted = sorted(tracks, key=lambda m: m.updated_at, reverse=True)
+        if all_sorted:
+            lines.append(
+                f"- Last updated: `{_format_date(all_sorted[0].updated_at)}`"
+            )
+        else:
+            lines.append("- Last updated: `YYYY-MM-DD`")
     lines.append("")
 
     # Active Tracks

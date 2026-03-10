@@ -1,5 +1,5 @@
 # Generated from `rustfmt --print-config default` using `rustfmt 1.8.0`
-# from the Docker toolchain Rust `1.93.1`.
+# from the Docker toolchain Rust `1.94.0`.
 # If `Dockerfile` ARG `RUST_VERSION` or `Cargo.toml` `rust-version` changes,
 # regenerate this catalog and update the snapshot in `scripts/test_verify_scripts.py`.
 # Keep the current rustfmt option catalog in this file so AI agents can edit

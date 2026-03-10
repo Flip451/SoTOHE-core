@@ -6,8 +6,8 @@ provider: claude
 model: claude-opus-4-6
 language: ja
 project:
-  name: Rust SDD Template
-  description: Specification-Driven Development for Rust projects
+  name: SoTOHE-core
+  description: SoT指向のRust開発向けハーネスの核となるCLI
 tasks_dir: .takt/tasks
 personas:
   spec-reader:

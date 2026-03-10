@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-RUSTFMT_CATALOG_SOURCE_RUST_VERSION = "1.93.1"
+RUSTFMT_CATALOG_SOURCE_RUST_VERSION = "1.94.0"
 RUSTFMT_CATALOG_SOURCE_RUSTFMT_VERSION = "1.8.0"
 
 RUSTFMT_PRINT_CONFIG_DEFAULT_SNAPSHOT = """\
@@ -2340,9 +2340,34 @@ class VerifyScriptsTest(unittest.TestCase):
         cargo_toml = (PROJECT_ROOT / "Cargo.toml").read_text(encoding="utf-8")
         cargo_match = re.search(r'^rust-version = "([^"]+)"$', cargo_toml, re.MULTILINE)
         self.assertIsNotNone(cargo_match)
+        rust_version = cargo_match.group(1)
+        # rust-version reflects MSRV from tech-stack.md, not Dockerfile toolchain version.
+        # Enforce valid semver format.
+        self.assertRegex(
+            rust_version,
+            r"^\d+\.\d+(\.\d+)?$",
+            f"rust-version must be numeric major.minor[.patch]: {rust_version}",
+        )
+        # Verify rust-version matches MSRV declared in tech-stack.md (SSoT).
+        tech_stack = (PROJECT_ROOT / "track" / "tech-stack.md").read_text(
+            encoding="utf-8"
+        )
+        msrv_match = re.search(
+            r"^\- \*\*MSRV\*\*:\s*(\d+\.\d+(?:\.\d+)?)", tech_stack, re.MULTILINE
+        )
+        self.assertIsNotNone(msrv_match, "tech-stack.md must declare MSRV")
         self.assertEqual(
-            cargo_match.group(1),
-            ".".join(RUSTFMT_CATALOG_SOURCE_RUST_VERSION.split(".")[:2]),
+            rust_version,
+            msrv_match.group(1),
+            "Cargo.toml rust-version must match tech-stack.md MSRV",
+        )
+        # Docker toolchain must be >= MSRV so container CI can build the workspace.
+        docker_version = tuple(int(x) for x in docker_match.group(1).split("."))
+        msrv_tuple = tuple(int(x) for x in rust_version.split("."))
+        self.assertGreaterEqual(
+            docker_version[:2],
+            msrv_tuple[:2],
+            f"Dockerfile RUST_VERSION ({docker_match.group(1)}) must be >= MSRV ({rust_version})",
         )
 
         def extract_first_toml_block(path: Path) -> list[str]:
