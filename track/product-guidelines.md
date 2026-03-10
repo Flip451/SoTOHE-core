@@ -5,14 +5,14 @@
 
 ## Design Principles
 
-1. **TODO: 原則 1**: TODO: 説明
-2. **TODO: 原則 2**: TODO: 説明
-3. **TODO: 原則 3**: TODO: 説明
+1. **SoT + CQRS**: 限られた SoT からビューとなる md ファイルを生成する。ビューへの直接書き込みは禁じる
+2. **CLI ファースト**: 操作はすべて CLI コマンドで完結する
+3. **AST ベースの厳格なガードレール**: hooks で AST を用いた検証を提供する
 
 ## API Design Guidelines
 
-- TODO: API設計のガイドライン 1
-- TODO: API設計のガイドライン 2
+- 出力は基本 JSON 形式とする
+- md ファイルなどのビュー用ファイル出力も行う
 
 ## Error Handling Guidelines
 
@@ -22,8 +22,7 @@
 
 ## Performance Guidelines
 
-- TODO: パフォーマンス基準 1
-- TODO: パフォーマンス基準 2
+- CLI コマンドの応答は 500ms 以内
 
 ## Security Guidelines
 

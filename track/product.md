@@ -5,34 +5,34 @@
 
 ## Product Name
 
-TODO: プロダクト名
+SoTOHE-core
 
 ## Vision
 
-TODO: プロダクトのビジョン（一文）
+SoT（真実の源泉）指向のRust開発向けハーネスの核となるCLIを提供する
 
 ## Target Users
 
-TODO: 主要なユーザー層と課題
+Rust で中〜大規模プロジェクトを開発するチーム。仕様・設計・実装の乖離が起きやすく、真実の源泉が散在する問題を抱えている
 
 ## Core Features
 
-1. TODO: 主要機能 1
-2. TODO: 主要機能 2
-3. TODO: 主要機能 3
+1. track ワークフロー管理 CLI
+2. メタデータ駆動の状態遷移エンジン
+3. CI 連携バリデーション
 
 ## Success Criteria
 
-- TODO: 成功指標 1（定量）
-- TODO: 成功指標 2
+- track コマンド経由で仕様→実装→レビューの全工程を完結できる
+- CI ゲート通過率 100% を維持
 
 ## Out of Scope
 
-- TODO: 対象外の機能・要件 1
-- TODO: 対象外の機能・要件 2
+- GUI / Web ダッシュボード
 
 ## Stakeholders
 
 | Role | Responsibility |
 |------|---------------|
-| TODO: 役割 | TODO: 責任 |
+| プロジェクトオーナー | 仕様承認・優先度決定 |
+| 開発者 | CLI 実装・テスト |

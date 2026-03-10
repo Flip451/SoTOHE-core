@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
-ARG RUST_VERSION=1.93.1
+ARG RUST_VERSION=1.94.0
 ARG BUILD_ENV=local
-ARG CARGO_CHEF_VERSION=0.1.76
+ARG CARGO_CHEF_VERSION=0.1.77
 
 # 1. Base image with cargo-chef
 # For production: pin with @sha256:<digest> after RUST_VERSION for reproducibility.
