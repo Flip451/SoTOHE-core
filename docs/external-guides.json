@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "usage_policy": {
+    "goal": "Keep useful long-form external guidance available with minimal context usage.",
+    "read_order": [
+      "Read this registry entry first.",
+      "Use summary, trigger keywords, and project usage notes to decide relevance.",
+      "Open the cached raw document only when the summary is insufficient."
+    ],
+    "copyright_notes": [
+      "Do not commit fetched raw documents into git.",
+      "Do not quote long passages in project documents or AI responses.",
+      "Prefer paraphrase plus source attribution.",
+      "Follow the source license terms recorded in each entry."
+    ]
+  },
+  "guides": []
+}

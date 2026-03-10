@@ -1,0 +1,23 @@
+# Ignore everything by default
+*
+
+# This file itself
+!.gitignore
+
+# Project configuration
+!config.yaml
+!tasks.yaml
+
+# Facets and pieces (version-controlled)
+!pieces/
+!pieces/**
+!personas/
+!personas/**
+!policies/
+!policies/**
+!knowledge/
+!knowledge/**
+!instructions/
+!instructions/**
+!output-contracts/
+!output-contracts/**

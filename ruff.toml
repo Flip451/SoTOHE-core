@@ -1,0 +1,18 @@
+# Ruff configuration for Python scripts and hooks.
+# Runs as PostToolUse hook for sub-100ms feedback and in CI.
+
+line-length = 88
+target-version = "py312"
+
+[lint]
+# Default (E4, E7, E9, F) + recommended additions:
+#   I   = isort (import sorting)
+#   B   = flake8-bugbear (common bug patterns)
+#   UP  = pyupgrade (modernize syntax)
+#   RUF = ruff-specific rules
+select = ["E4", "E7", "E9", "F", "I", "B", "UP", "RUF"]
+ignore = [
+    "E402",    # module-import-not-at-top (intentional: sys.path manipulation before import)
+    "RUF001",  # ambiguous-unicode-character-string (intentional: Japanese text in strings)
+    "RUF005",  # collection-literal-concatenation (list + [x] is clearer than [*list, x] in context)
+]

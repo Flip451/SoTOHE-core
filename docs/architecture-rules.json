@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "Domain dependencies are controlled by layer boundaries."
+    },
+    {
+      "crate": "usecase",
+      "path": "libs/usecase",
+      "may_depend_on": [
+        "domain"
+      ],
+      "deny_reason": "Usecase crate must only be consumed by api and server layers."
+    },
+    {
+      "crate": "infrastructure",
+      "path": "libs/infrastructure",
+      "may_depend_on": [
+        "domain"
+      ],
+      "deny_reason": "Infrastructure implementations must be wired only at composition root."
+    },
+    {
+      "crate": "api",
+      "path": "apps/api",
+      "may_depend_on": [
+        "usecase"
+      ],
+      "deny_reason": "API crate must be instantiated by server only."
+    },
+    {
+      "crate": "server",
+      "path": "apps/server",
+      "may_depend_on": [
+        "api",
+        "domain",
+        "infrastructure",
+        "usecase"
+      ],
+      "deny_reason": ""
+    }
+  ]
+}

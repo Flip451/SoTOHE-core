@@ -1,0 +1,19 @@
+services:
+  app:
+    # This service is a local bacon watcher, not the production runtime server.
+    image: rust-sdd-template-dev:latest
+    build:
+      context: .
+      target: dev
+    working_dir: /workspace
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    volumes:
+      - .:/workspace
+      - ${SCCACHE_HOST_DIR:-./.cache/sccache}:/workspace/.cache/sccache
+    environment:
+      CARGO_TERM_COLOR: always
+      HOME: /workspace/.cache/home
+      CARGO_HOME: /workspace/.cache/cargo
+      CARGO_TARGET_DIR: /workspace/target
+      SCCACHE_DIR: /workspace/.cache/sccache
+    command: bash -c 'exec /usr/local/cargo/bin/bacon "$${BACON_JOB:-run}" --headless'

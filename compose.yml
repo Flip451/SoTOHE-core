@@ -1,0 +1,22 @@
+services:
+  tools:
+    image: rust-sdd-template-tools:latest
+    build:
+      context: .
+      target: tools
+    working_dir: /workspace
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    volumes:
+      - .:/workspace
+      - ${SCCACHE_HOST_DIR:-./.cache/sccache}:/workspace/.cache/sccache
+    environment:
+      CARGO_TERM_COLOR: always
+      HOME: /workspace/.cache/home
+      CARGO_HOME: /workspace/.cache/cargo
+      CARGO_TARGET_DIR: /workspace/target
+      SCCACHE_DIR: /workspace/.cache/sccache
+
+  tools-daemon:
+    extends:
+      service: tools
+    command: sleep infinity
