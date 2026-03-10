@@ -1,0 +1,22 @@
+## Task Summary: Dockerfile toolchain update and project bootstrap
+
+**Track:** dockerfile-update-2026-03-11
+**Task:** Dockerfile の ARG 更新 + プロジェクト初期設定
+**Date:** 2026-03-11
+
+### Changes
+
+- Dockerfile: RUST_VERSION 1.93.1→1.94.0, CARGO_CHEF_VERSION 0.1.76→0.1.77
+- Cargo.toml: rust-version を MSRV 1.85 に設定
+- rustfmt.toml: バージョンコメント更新
+- scripts/test_verify_scripts.py: MSRV 検証テスト + Docker toolchain >= MSRV ガードレール追加
+- scripts/track_registry.py: active track 不在時の Last updated プレースホルダバグ修正
+- .claude/agent-profiles.json: reviewer テンプレートを codex exec review に修正
+- track/product.md, product-guidelines.md, tech-stack.md: 全 TODO 解消
+- .takt/config.yaml: プロジェクト名・説明を SoTOHE-core に更新
+
+### Why
+
+Version baseline 調査（2026-03-11）に基づき Docker ツールチェーンを最新安定版に更新し、
+プロジェクトの product/tech-stack ドキュメントを初期化した。
+MSRV と Docker toolchain バージョンの分離を明確にし、CI ガードレールを強化した。
