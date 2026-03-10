@@ -1,0 +1,50 @@
+# --- Rust ---
+target/
+**/*.rs.bk
+
+# Keep Cargo.lock for application projects.
+# Uncomment the next line if this template is used for a library crate.
+# Cargo.lock
+
+# --- Tooling caches / outputs ---
+.takt/runs/
+.claude/logs/
+
+# --- Environment / secrets ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Project-specific sensitive directories (see project-docs/conventions/security.md) ---
+private/
+config/secrets/
+
+# --- Editor / OS ---
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# --- Legacy local cache ---
+__pycache__/
+*.pyc
+
+# --- Temp / local scratch ---
+tmp/
+.track-template-dev
+repomix-output.txt
+repomix-output.xml
+
+# --- Local Claude Code settings override (not version-controlled) ---
+.claude/settings.local.json
+
+# --- Local cached external reference guides (not version-controlled) ---
+.cache/external-guides/
+.cache/cargo/
+.cache/home/
+.cache/pytest/
+.cache/sccache/

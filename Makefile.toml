@@ -1,0 +1,693 @@
+[config]
+skip_core_tasks = true
+default_to_workspace = false
+
+[env]
+DOCKER_BUILDKIT = "1"
+COMPOSE_DOCKER_CLI_BUILD = "1"
+TAKT_PYTHON = { script = ["if [ -n \"${PYTHON_BIN:-}\" ]; then echo \"$PYTHON_BIN\"; elif [ -x .venv/bin/python ]; then echo .venv/bin/python; else echo python3; fi"] }
+
+[tasks.prepare-local-cache-dirs]
+private = true
+description = "[internal] Prepare host-owned cache directories for compose bind mounts"
+script_runner = "@shell"
+script = ['mkdir -p target .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home .cache/pytest']
+
+[tasks.help]
+description = "Show available tasks with category labels: [wrapper] [fast] [gate] [internal]"
+command = "cargo"
+args = ["make", "--list-all-steps"]
+
+[tasks.guides-list]
+description = "[wrapper] List external long-form guide registry entries"
+command = "python3"
+args = ["scripts/external_guides.py", "list"]
+
+[tasks.guides-fetch]
+description = "[wrapper] Fetch external long-form guides into local cache (not git-managed)"
+command = "python3"
+args = ["scripts/external_guides.py", "fetch", "${@}"]
+
+[tasks.guides-usage]
+description = "[wrapper] Show minimal-context usage policy for external guides"
+command = "python3"
+args = ["scripts/external_guides.py", "usage"]
+
+[tasks.guides-setup]
+description = "[wrapper] Show the recommended setup flow for external long-form guides"
+command = "python3"
+args = ["scripts/external_guides.py", "setup"]
+
+[tasks.guides-clean]
+description = "[wrapper] Remove cached external guide files (all or by id)"
+command = "python3"
+args = ["scripts/external_guides.py", "clean", "${@}"]
+
+[tasks.guides-add]
+description = "[wrapper] Add an external long-form guide entry"
+command = "python3"
+args = ["scripts/external_guides.py", "add", "${@}"]
+
+[tasks.conventions-add]
+description = "[wrapper] Add a project convention document and update index"
+command = "python3"
+args = ["scripts/convention_docs.py", "add", "${@}"]
+
+[tasks.conventions-update-index]
+description = "[wrapper] Regenerate project convention README index"
+command = "python3"
+args = ["scripts/convention_docs.py", "update-index"]
+
+[tasks.conventions-verify-index]
+description = "[wrapper] Verify project convention README index is in sync"
+command = "python3"
+args = ["scripts/convention_docs.py", "verify-index"]
+
+[tasks.architecture-rules-workspace-members]
+description = "[wrapper] List workspace members from architecture rule source of truth"
+command = "python3"
+args = ["scripts/architecture_rules.py", "workspace-members"]
+
+[tasks.architecture-rules-direct-checks]
+description = "[wrapper] Emit direct cargo-deny check pairs from architecture rules"
+command = "python3"
+args = ["scripts/architecture_rules.py", "direct-checks"]
+
+[tasks.architecture-rules-verify-sync]
+description = "[wrapper] Verify architecture rules sync with Cargo.toml and deny.toml"
+command = "python3"
+args = ["scripts/architecture_rules.py", "verify-sync"]
+
+[tasks.architecture-rules-verify-claude-workspace-map]
+description = "[wrapper] Verify CLAUDE.md workspace map includes all workspace members"
+command = "python3"
+args = ["scripts/architecture_rules.py", "verify-claude-workspace-map"]
+
+[tasks.takt-failure-report]
+description = "[wrapper] Generate .takt/debug-report.md from captured failure output"
+command = "python3"
+args = ["scripts/takt_failure_report.py", "${@}"]
+
+[tasks.guides-selftest-local]
+private = true
+description = "[internal] Run self-tests for the external guides helper"
+command = "pytest"
+args = ["-q", "-o", "cache_dir=.cache/pytest", "scripts/test_external_guides.py"]
+
+[tasks.guides-selftest]
+description = "[wrapper] Run self-tests for the external guides helper (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "guides-selftest-local"]
+
+[tasks.scripts-selftest-local]
+private = true
+description = "[internal] Run verify and helper script regression tests"
+command = "pytest"
+args = [
+  "-q",
+  "-o",
+  "cache_dir=.cache/pytest",
+  "scripts/test_architecture_rules.py",
+  "scripts/test_check_layers.py",
+  "scripts/test_verify_scripts.py",
+  "scripts/test_convention_docs.py",
+  "scripts/test_external_guides.py",
+  "scripts/test_git_ops.py",
+  "scripts/test_make_wrappers.py",
+  "scripts/test_takt_failure_report.py",
+  "scripts/test_takt_profile.py",
+  "scripts/test_track_schema.py",
+  "scripts/test_track_markdown.py",
+  "scripts/test_track_state_machine.py",
+  "scripts/test_track_registry.py",
+  "scripts/test_takt_personas.py",
+]
+
+[tasks.scripts-selftest]
+description = "[wrapper] Run verify and helper script regression tests"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "scripts-selftest-local"]
+
+[tasks.python-lint-local]
+private = true
+description = "[internal] Run ruff lint on Python scripts and hooks"
+script_runner = "@shell"
+script = ['ruff check scripts/ .claude/hooks/']
+
+[tasks.hooks-selftest-local]
+private = true
+description = "[internal] Run Claude hook Python self-tests"
+command = "pytest"
+args = [
+  "-q",
+  "-o",
+  "cache_dir=.cache/pytest",
+  ".claude/hooks",
+]
+
+[tasks.takt-add]
+description = "[wrapper] Add a task to takt queue (piece selected interactively)"
+env = { TAKT_SESSION = "1" }
+script_runner = "@shell"
+script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py add-task "$CARGO_MAKE_TASK_ARGS"']
+
+[tasks.takt-run]
+description = "[wrapper] Run pending tasks from .takt/tasks.yaml"
+env = { TAKT_SESSION = "1" }
+script_runner = "@shell"
+script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py run-queue']
+
+[tasks.takt-render-personas]
+description = "[wrapper] Render takt runtime personas from the active profile"
+env = { TAKT_SESSION = "1" }
+script_runner = "@shell"
+script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py render-personas']
+
+[tasks.takt-full-cycle]
+description = "[wrapper] Run full-cycle piece directly with guardrails"
+env = { TAKT_SESSION = "1" }
+script_runner = "@shell"
+script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py run-piece full-cycle "$CARGO_MAKE_TASK_ARGS"']
+
+[tasks.takt-spec-to-impl]
+description = "[wrapper] Run spec-to-impl piece directly with guardrails"
+env = { TAKT_SESSION = "1" }
+script_runner = "@shell"
+script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py run-piece spec-to-impl "$CARGO_MAKE_TASK_ARGS"']
+
+[tasks.takt-impl-review]
+description = "[wrapper] Run impl-review piece directly with guardrails"
+env = { TAKT_SESSION = "1" }
+script_runner = "@shell"
+script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py run-piece impl-review "$CARGO_MAKE_TASK_ARGS"']
+
+[tasks.takt-tdd-cycle]
+description = "[wrapper] Run tdd-cycle piece directly with guardrails"
+env = { TAKT_SESSION = "1" }
+script_runner = "@shell"
+script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py run-piece tdd-cycle "$CARGO_MAKE_TASK_ARGS"']
+
+[tasks.takt-clean-queue]
+description = "[wrapper] Remove non-pending tasks from takt queue"
+script_runner = "@shell"
+script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py clean-queue']
+
+[tasks.bootstrap]
+description = "[gate] Set up host Python venv, build Docker images, and run CI"
+script_runner = "@shell"
+script = ['''
+set -e
+echo "=== Bootstrap: development environment setup ==="
+
+# 1. Check prerequisites
+echo ""
+echo "--- Step 1/4: Check prerequisites ---"
+if ! command -v docker >/dev/null 2>&1; then
+  echo "[FAIL] docker not found. Install Docker first."
+  exit 1
+fi
+if ! docker compose version >/dev/null 2>&1; then
+  echo "[FAIL] docker compose not found. Install Docker Compose V2."
+  exit 1
+fi
+echo "[OK] docker and docker compose available"
+
+if ! command -v uv >/dev/null 2>&1; then
+  echo "[FAIL] uv not found. Install: curl -LsSf https://astral.sh/uv/install.sh | sh"
+  exit 1
+fi
+echo "[OK] uv available"
+
+# 2. Python venv + dependencies
+echo ""
+echo "--- Step 2/4: Python venv + dependencies ---"
+if [ ! -d .venv ]; then
+  echo "Creating .venv ..."
+  uv venv .venv
+fi
+echo "Installing Python dependencies from requirements-python.txt ..."
+uv pip install --python .venv/bin/python -r requirements-python.txt
+echo "[OK] Python dependencies installed"
+
+# 3. Docker images
+echo ""
+echo "--- Step 3/4: Build Docker images ---"
+mkdir -p target .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home .cache/pytest
+docker compose build tools
+echo "[OK] Docker tools image built"
+
+# 4. CI
+echo ""
+echo "--- Step 4/4: Run CI ---"
+docker compose run --rm tools cargo make --allow-private ci-local
+echo "[OK] CI passed"
+
+echo ""
+echo "=== Bootstrap complete ==="
+''']
+
+[tasks.build-tools]
+description = "[wrapper] Build tools image"
+command = "docker"
+args = ["compose", "build", "tools"]
+
+[tasks.build-dev]
+description = "[wrapper] Build dev watcher image for compose.dev overlay"
+command = "docker"
+args = ["compose", "-f", "compose.yml", "-f", "compose.dev.yml", "build", "app"]
+
+[tasks.up]
+description = "[wrapper] Start dev watcher with compose.dev overlay (default)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "-f", "compose.yml", "-f", "compose.dev.yml", "up", "-d", "app"]
+
+[tasks.down]
+description = "[wrapper] Stop compose stack with compose.dev overlay (default)"
+command = "docker"
+args = ["compose", "-f", "compose.yml", "-f", "compose.dev.yml", "down"]
+
+[tasks.logs]
+description = "[wrapper] Show dev watcher logs with compose.dev overlay (default)"
+command = "docker"
+args = ["compose", "-f", "compose.yml", "-f", "compose.dev.yml", "logs", "-f", "app"]
+
+[tasks.ps]
+description = "[wrapper] Show compose services with compose.dev overlay (default)"
+command = "docker"
+args = ["compose", "-f", "compose.yml", "-f", "compose.dev.yml", "ps"]
+
+[tasks.shell]
+description = "[wrapper] Open shell in tools container"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "bash"]
+
+[tasks.tools-up]
+description = "[fast] Start resident tools-daemon container for exec-based feedback"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "up", "-d", "tools-daemon"]
+
+[tasks.tools-down]
+description = "[fast] Stop resident tools-daemon container"
+command = "docker"
+args = ["compose", "stop", "tools-daemon"]
+
+# Daemon-exec wrappers (fast TDD loop — requires tools-daemon running: cargo make tools-up)
+[tasks.fmt-exec]
+description = "[fast] Run fmt via tools-daemon exec (requires tools-up)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "exec", "-T", "tools-daemon", "cargo", "make", "--allow-private", "fmt-local"]
+
+[tasks.clippy-exec]
+description = "[fast] Run clippy via tools-daemon exec (requires tools-up)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "exec", "-T", "tools-daemon", "cargo", "make", "--allow-private", "clippy-local"]
+
+[tasks.test-exec]
+description = "[fast] Run all tests via tools-daemon exec (requires tools-up)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "exec", "-T", "tools-daemon", "cargo", "make", "--allow-private", "test-local"]
+
+[tasks.test-one-exec]
+description = "[fast] Run a single nextest test via tools-daemon exec (requires tools-up)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "exec", "-T", "tools-daemon", "cargo", "nextest", "run", "--locked", "${@}"]
+
+[tasks.check-exec]
+description = "[fast] Run cargo check via tools-daemon exec (requires tools-up)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "exec", "-T", "tools-daemon", "cargo", "make", "--allow-private", "check-local"]
+
+[tasks.machete-exec]
+description = "[fast] Run cargo-machete via tools-daemon exec (requires tools-up)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "exec", "-T", "tools-daemon", "cargo", "make", "--allow-private", "machete-local"]
+
+[tasks.deny-exec]
+description = "[fast] Run cargo-deny via tools-daemon exec (requires tools-up)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "exec", "-T", "tools-daemon", "cargo", "make", "--allow-private", "deny-local"]
+
+[tasks.llvm-cov-exec]
+description = "[fast] Generate HTML coverage via tools-daemon exec (requires tools-up)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "exec", "-T", "tools-daemon", "cargo", "make", "--allow-private", "llvm-cov-local"]
+
+# Local quality tasks (executed inside container by default)
+[tasks.fmt-local]
+private = true
+description = "[internal] Format all Rust code"
+command = "cargo"
+args = ["fmt", "--all"]
+
+[tasks.fmt-check-local]
+private = true
+description = "[internal] Check formatting"
+command = "cargo"
+args = ["fmt", "--all", "--", "--check"]
+
+[tasks.clippy-local]
+private = true
+description = "[internal] Run clippy with warnings denied"
+command = "cargo"
+args = ["clippy", "--locked", "--all-targets", "--all-features", "--", "-D", "warnings"]
+
+[tasks.test-local]
+private = true
+description = "[internal] Run tests with nextest"
+command = "cargo"
+args = ["nextest", "run", "--locked", "--all-targets", "--all-features", "--no-tests=warn"]
+
+[tasks.test-doc-local]
+private = true
+description = "[internal] Run documentation tests"
+command = "cargo"
+args = ["test", "--locked", "--doc", "--all-features"]
+
+[tasks.test-nocapture-local]
+private = true
+description = "[internal] Run tests with stdout/stderr shown"
+command = "cargo"
+args = ["test", "--locked", "--all-features", "--", "--nocapture"]
+
+[tasks.check-local]
+private = true
+description = "[internal] Run cargo check"
+command = "cargo"
+args = ["check", "--locked", "--all-targets", "--all-features"]
+
+[tasks.deny-local]
+private = true
+description = "[internal] Run dependency policy checks"
+command = "cargo"
+args = ["deny", "--locked", "check"]
+
+[tasks.machete-local]
+private = true
+description = "[internal] Find unused dependencies"
+command = "cargo"
+args = ["machete"]
+
+[tasks.clippy-tests-local]
+private = true
+description = "[internal] Run clippy for test targets"
+command = "cargo"
+args = ["clippy", "--locked", "--tests", "--all-features", "--", "-D", "warnings"]
+
+[tasks.llvm-cov-local]
+private = true
+description = "[internal] Generate HTML coverage report"
+command = "cargo"
+args = ["llvm-cov", "--html", "--all-features"]
+
+[tasks.check-layers-local]
+private = true
+description = "[internal] Check architectural layer dependencies"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/check_layers.py']
+
+[tasks.verify-arch-docs-local]
+private = true
+description = "[internal] Verify workspace architecture docs are in sync"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/verify_architecture_docs.py']
+
+[tasks.verify-plan-progress-local]
+private = true
+description = "[internal] Verify track plan status consistency"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/verify_plan_progress.py']
+
+[tasks.verify-track-metadata-local]
+private = true
+description = "[internal] Verify track metadata.json: schema, task graph, and status validation"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/verify_track_metadata.py']
+
+[tasks.verify-tech-stack-local]
+private = true
+description = "[internal] Verify tech stack decisions are fully resolved"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/verify_tech_stack_ready.py']
+
+[tasks.verify-orchestra-local]
+private = true
+description = "[internal] Verify orchestra hooks, delegation, and agent definitions"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/verify_orchestra_guardrails.py']
+
+[tasks.verify-track-registry-local]
+private = true
+description = "[internal] Verify track registry.md is in sync with metadata.json"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/verify_track_registry.py']
+
+[tasks.verify-latest-track-local]
+private = true
+description = "[internal] Verify latest track has spec.md, plan.md, and verification.md"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/verify_latest_track_files.py']
+
+[tasks.hooks-selftest]
+description = "[wrapper] Run Claude hook Python self-tests (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "hooks-selftest-local"]
+
+[tasks.ci-rust-local]
+private = true
+description = "[internal] Run Rust-only CI checks (fmt + clippy + test + deny + check-layers)"
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "check-layers-local"]
+
+[tasks.ci-local]
+private = true
+description = "[internal] Run local CI checks"
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-latest-track-local"]
+
+# Compose wrappers
+[tasks.fmt]
+description = "[wrapper] Format all Rust code (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "fmt-local"]
+
+[tasks.fmt-check]
+description = "[gate] Check formatting (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "fmt-check-local"]
+
+[tasks.clippy]
+description = "[gate] Run clippy (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "clippy-local"]
+
+[tasks.test]
+description = "[gate] Run tests (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "test-local"]
+
+[tasks.test-doc]
+description = "[wrapper] Run documentation tests (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "test-doc-local"]
+
+[tasks.test-nocapture]
+description = "[wrapper] Run tests with stdout/stderr shown (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "test-nocapture-local"]
+
+[tasks.bacon]
+description = "[wrapper] Run bacon watcher (compose.dev overlay app service)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "-f", "compose.yml", "-f", "compose.dev.yml", "run", "--rm", "app", "bacon"]
+
+[tasks.bacon-test]
+description = "[wrapper] Run bacon test watcher headlessly (compose.dev overlay app service)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "-f", "compose.yml", "-f", "compose.dev.yml", "run", "--rm", "app", "bacon", "test", "--headless"]
+
+[tasks.check]
+description = "[gate] Run cargo check (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "check-local"]
+
+[tasks.deny]
+description = "[gate] Run cargo-deny (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "deny-local"]
+
+[tasks.machete]
+description = "[gate] Run cargo-machete (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "machete-local"]
+
+[tasks.clippy-tests]
+description = "[wrapper] Run clippy for test targets (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "clippy-tests-local"]
+
+[tasks.llvm-cov]
+description = "[wrapper] Generate HTML coverage report (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "llvm-cov-local"]
+
+[tasks.check-layers]
+description = "[gate] Check layer dependencies (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "check-layers-local"]
+
+[tasks.verify-arch-docs]
+description = "[gate] Verify workspace architecture docs sync (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-arch-docs-local"]
+
+[tasks.verify-plan-progress]
+description = "[gate] Verify track plan status consistency (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-plan-progress-local"]
+
+[tasks.verify-track-metadata]
+description = "[gate] Verify track metadata.json presence and required keys (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-track-metadata-local"]
+
+[tasks.verify-tech-stack]
+description = "[gate] Verify tech stack TODOs are fully resolved (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-tech-stack-local"]
+
+[tasks.verify-orchestra]
+description = "[gate] Verify orchestra hooks and agent definitions (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-orchestra-local"]
+
+# Note: unlike verify-orchestra (docker compose), this task runs directly on the
+# host because it only uses bash/find and needs no Rust toolchain. When called via
+# ci-local, it already runs inside the Docker container that ci-local executes in.
+[tasks.verify-track-registry]
+description = "[gate] Verify track registry.md sync (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-track-registry-local"]
+
+[tasks.verify-latest-track]
+description = "[gate] Verify latest track files (host, no docker; uses bash/find only)"
+command = "cargo"
+args = ["make", "--allow-private", "verify-latest-track-local"]
+
+[tasks.ci-rust]
+description = "[gate] Run Rust-only CI checks (docker compose) — inner loop for app developers"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "ci-rust-local"]
+
+# Host-side convenience lint. Graceful skip when ruff is not installed.
+# The authoritative gate is python-lint-local (runs inside Docker via ci-local).
+[tasks.python-lint]
+description = "[optional] Run ruff lint on Python scripts and hooks (host, no docker)"
+script_runner = "@shell"
+script = ['RUFF="${RUFF_BIN:-.venv/bin/ruff}"; if [ -x "$RUFF" ] || command -v ruff >/dev/null 2>&1; then RUFF="${RUFF_BIN:-$(command -v ruff 2>/dev/null || echo .venv/bin/ruff)}"; "$RUFF" check scripts/ .claude/hooks/; else echo "[python-lint] ruff not found, skipping (install: uv tool install ruff)"; fi']
+
+[tasks.ci]
+description = "[gate] Run CI checks (docker compose + host python-lint)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "ci-local"]
+
+[tasks.add]
+description = "[wrapper] Stage files for commit (use instead of git add)"
+command = "git"
+args = ["add", "${@}"]
+
+[tasks.add-all]
+description = "[wrapper] Stage all worktree changes except transient .takt pending files"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py add-all']
+
+[tasks.add-pending-paths]
+description = "[wrapper] Stage paths listed in .takt/pending-add-paths.txt and delete the pending file"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py add-from-file .takt/pending-add-paths.txt --cleanup']
+
+[tasks.track-add-paths]
+description = "[wrapper] Stage paths listed in tmp/track-commit/add-paths.txt and delete the scratch file"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py add-from-file tmp/track-commit/add-paths.txt --cleanup']
+
+[tasks.commit]
+description = "[gate] Run CI then commit"
+dependencies = ["ci"]
+script_runner = "@shell"
+script = ['git commit -m "$CARGO_MAKE_TASK_ARGS"']
+
+[tasks.commit-pending-message]
+description = "[wrapper] Run CI then commit using .takt/pending-commit-message.txt"
+dependencies = ["ci"]
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py commit-from-file .takt/pending-commit-message.txt --cleanup']
+
+[tasks.track-commit-message]
+description = "[wrapper] Run CI then commit using tmp/track-commit/commit-message.txt"
+dependencies = ["ci"]
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py commit-from-file tmp/track-commit/commit-message.txt --cleanup']
+
+[tasks.note]
+description = "[git] Attach a git note to HEAD (usage: cargo make note '<note text>')"
+script_runner = "@shell"
+script = ['git notes add -f -m "$CARGO_MAKE_TASK_ARGS" HEAD']
+
+[tasks.note-pending]
+description = "[wrapper] Attach a git note from .takt/pending-note.md and delete the pending file"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py note-from-file .takt/pending-note.md --cleanup']
+
+[tasks.track-note]
+description = "[wrapper] Attach a git note from tmp/track-commit/note.md and delete the scratch file"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py note-from-file tmp/track-commit/note.md --cleanup']
+
+[tasks.track-transition]
+description = "[wrapper] Transition a task status and sync rendered views"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/track_state_machine.py transition $CARGO_MAKE_TASK_ARGS']
+
+[tasks.track-sync-views]
+description = "[wrapper] Render plan.md and registry.md from metadata.json"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/track_state_machine.py sync-views $CARGO_MAKE_TASK_ARGS']
+
+[tasks.clean]
+description = "[wrapper] Remove compose resources"
+command = "docker"
+args = ["compose", "down", "--volumes", "--remove-orphans"]

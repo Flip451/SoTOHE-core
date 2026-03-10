@@ -1,0 +1,114 @@
+name: full-cycle
+description: |
+  Full SDD cycle: spec reading -> planning -> TDD implementation -> quality check -> code review.
+  Use for new features defined in track/items/.
+max_movements: 25
+initial_movement: spec-reader
+
+movements:
+  - name: spec-reader
+    persona: spec-reader
+    edit: false
+    allowed_tools:
+      - Read
+      - Glob
+      - Grep
+      - Bash
+    rules:
+      - condition: "Specification is clear and actionable"
+        next: rust-planner
+      - condition: "Specification is unclear or blocking"
+        next: ABORT
+
+  - name: rust-planner
+    persona: rust-planner
+    edit: true
+    allowed_tools:
+      - Read
+      - Glob
+      - Grep
+      - Write
+      - Edit
+      - Bash
+    rules:
+      - condition: "Plan written to track/items/<id>/plan.md"
+        next: rust-implementer
+
+  - name: rust-implementer
+    persona: rust-implementer
+    edit: true
+    required_permission_mode: edit
+    allowed_tools:
+      - Read
+      - Glob
+      - Grep
+      - Write
+      - Edit
+      - Bash
+    rules:
+      - condition: "All tests pass (cargo make test succeeded)"
+        next: quality-checker
+      - condition: "Blocked by design issue requiring re-planning"
+        next: rust-planner
+      - condition: "Compilation errors unresolved after analysis"
+        next: debug-research-phase
+      - condition: "Tests failing after 3 implementation attempts"
+        next: debug-research-phase
+
+  - name: debug-research-phase
+    persona: rust-debugger
+    edit: true
+    required_permission_mode: edit
+    allowed_tools:
+      - Read
+      - Glob
+      - Grep
+      - Write
+      - Edit
+      - Bash
+    rules:
+      - condition: "Root cause identified and implementation can continue safely"
+        next: rust-implementer
+      - condition: "Root cause requires plan or spec changes"
+        next: rust-planner
+      - condition: "Still blocked after debug and targeted research"
+        next: ABORT
+
+  - name: quality-checker
+    persona: quality-checker
+    edit: true
+    allowed_tools:
+      - Bash
+      - Read
+    rules:
+      - condition: "All checks pass: cargo make ci (fmt-check, clippy, test, test-doc, deny, scripts-selftest, hooks-selftest, check-layers, verify-arch-docs, verify-plan-progress, verify-track-metadata, verify-track-registry, verify-tech-stack, verify-orchestra, verify-latest-track)"
+        next: rust-reviewer
+      - condition: "Issues found (formatting/clippy/test/verification failures)"
+        next: rust-implementer
+
+  - name: rust-reviewer
+    persona: rust-reviewer
+    edit: false
+    allowed_tools:
+      - Read
+      - Glob
+      - Grep
+      - Bash
+    rules:
+      - condition: "Approved or only minor nitpicks"
+        next: note-writer
+      - condition: "Significant issues requiring fixes"
+        next: rust-implementer
+
+  - name: note-writer
+    persona: note-writer
+    edit: true
+    allowed_tools:
+      - Read
+      - Glob
+      - Grep
+      - Write
+      - Bash
+    rules:
+      - condition: "Note written to .takt/pending-note.md"
+        next: COMPLETE

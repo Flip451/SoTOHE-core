@@ -1,0 +1,261 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/agent-router.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-codex-before-write.py\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "WebSearch|WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/suggest-gemini-research.py\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-direct-git-ops.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-codex-after-plan.py\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/error-to-codex.py\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-test-analysis.py\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/log-cli-tools.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/lint-on-save.py\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/python-lint-on-save.py\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-implementation-review.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\": {\"feedback\": \"Before going idle: (1) Check the shared task list for pending tasks. If all tasks are complete, verify results. (2) IMPORTANT: Write your work log to .claude/logs/agent-teams/{team-name}/{your-teammate-name}.md. Use available tools (Write or Edit) to create the parent directory first if it does not exist, then write the file. The work log must include: Summary, Tasks Completed, Files Modified, Key Decisions, and Issues Encountered. (3) Report to the team lead.\"}}'"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\": {\"additionalContext\": \"Context compaction triggered. Key context: Check CLAUDE.md for project rules and workflow. Check track/tech-stack.md for Rust stack. Check track/items/ for current feature specs and plans. Check .claude/docs/DESIGN.md for architecture decisions. Check .claude/rules/ for Rust coding standards. Check project-docs/conventions/README.md for project-specific implementation rules. Run cargo make ci to verify quality before commits.\"}}'"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Read(./**)",
+      "Edit(./**)",
+      "Write(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Task(*)",
+      "Skill(*)",
+      "TodoWrite(*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch --list:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git show:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git notes show:*)",
+      "Bash(git notes list:*)",
+      "Bash(cargo make help)",
+      "Bash(cargo make bootstrap)",
+      "Bash(cargo make build-tools)",
+      "Bash(cargo make build-dev)",
+      "Bash(cargo make up)",
+      "Bash(cargo make down)",
+      "Bash(cargo make logs)",
+      "Bash(cargo make ps)",
+      "Bash(cargo make shell)",
+      "Bash(cargo make tools-up)",
+      "Bash(cargo make tools-down)",
+      "Bash(cargo make fmt-exec)",
+      "Bash(cargo make clippy-exec)",
+      "Bash(cargo make test-exec)",
+      "Bash(cargo make test-one-exec:*)",
+      "Bash(cargo make check-exec)",
+      "Bash(cargo make machete-exec)",
+      "Bash(cargo make deny-exec)",
+      "Bash(cargo make llvm-cov-exec)",
+      "Bash(cargo make fmt)",
+      "Bash(cargo make fmt-check)",
+      "Bash(cargo make clippy)",
+      "Bash(cargo make test)",
+      "Bash(cargo make test-doc)",
+      "Bash(cargo make test-nocapture)",
+      "Bash(cargo make bacon)",
+      "Bash(cargo make bacon-test)",
+      "Bash(cargo make check)",
+      "Bash(cargo make deny)",
+      "Bash(cargo make machete)",
+      "Bash(cargo make clippy-tests)",
+      "Bash(cargo make llvm-cov)",
+      "Bash(cargo make check-layers)",
+      "Bash(cargo make verify-arch-docs)",
+      "Bash(cargo make verify-plan-progress)",
+      "Bash(cargo make verify-track-metadata)",
+      "Bash(cargo make verify-tech-stack)",
+      "Bash(cargo make verify-orchestra)",
+      "Bash(cargo make verify-latest-track)",
+      "Bash(cargo make verify-track-registry)",
+      "Bash(cargo make scripts-selftest)",
+      "Bash(cargo make hooks-selftest)",
+      "Bash(cargo make guides-selftest)",
+      "Bash(cargo make ci-rust)",
+      "Bash(cargo make ci)",
+      "Bash(cargo make add-all)",
+      "Bash(cargo make add-pending-paths)",
+      "Bash(cargo make track-add-paths)",
+      "Bash(cargo make commit-pending-message)",
+      "Bash(cargo make note-pending)",
+      "Bash(cargo make track-commit-message)",
+      "Bash(cargo make track-note)",
+      "Bash(cargo make python-lint)",
+      "Bash(cargo make track-transition:*)",
+      "Bash(cargo make track-sync-views:*)",
+      "Bash(gemini:*)",
+      "Bash(codex:*)",
+      "Bash(tree:*)",
+      "Bash(which:*)",
+      "Bash(cargo make architecture-rules-workspace-members)",
+      "Bash(cargo make architecture-rules-direct-checks)",
+      "Bash(cargo make architecture-rules-verify-sync)",
+      "Bash(cargo make architecture-rules-verify-claude-workspace-map)",
+      "Bash(cargo make conventions-add:*)",
+      "Bash(cargo make conventions-update-index)",
+      "Bash(cargo make conventions-verify-index)",
+      "Bash(cargo make guides-add:*)",
+      "Bash(cargo make guides-list)",
+      "Bash(cargo make guides-fetch:*)",
+      "Bash(cargo make guides-clean:*)",
+      "Bash(cargo make guides-usage)",
+      "Bash(cargo make guides-setup)",
+      "Bash(cargo make takt-failure-report:*)",
+      "Bash(cargo make takt-add:*)",
+      "Bash(cargo make takt-run)",
+      "Bash(cargo make takt-render-personas)",
+      "Bash(cargo make takt-full-cycle:*)",
+      "Bash(cargo make takt-spec-to-impl:*)",
+      "Bash(cargo make takt-impl-review:*)",
+      "Bash(cargo make takt-tdd-cycle:*)",
+      "Bash(cargo make takt-clean-queue)",
+      "Bash(true)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./.cache/cargo/**)",
+      "Grep(./.cache/cargo/**)",
+      "Read(./.cache/home/**)",
+      "Grep(./.cache/home/**)",
+      "Read(./.cache/pytest/**)",
+      "Grep(./.cache/pytest/**)",
+      "Read(./.cache/sccache/**)",
+      "Grep(./.cache/sccache/**)",
+      "Read(./.cache/takt-uv/**)",
+      "Grep(./.cache/takt-uv/**)",
+      "Read(./.cache/uv/**)",
+      "Grep(./.cache/uv/**)",
+      "Read(./**/*.db)",
+      "Grep(./**/*.db)",
+      "Read(./**/*.sqlite)",
+      "Grep(./**/*.sqlite)",
+      "Read(./**/*.pem)",
+      "Read(./**/*.key)",
+      "Read(./**/credentials*)",
+      "Read(./**/*secret*)",
+      "Read(./private/**)",
+      "Grep(./private/**)",
+      "Read(./config/secrets/**)",
+      "Grep(./config/secrets/**)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~)",
+      "Bash(cargo make --allow-private:*)"
+    ]
+  },
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-opus-4-6"
+  }
+}

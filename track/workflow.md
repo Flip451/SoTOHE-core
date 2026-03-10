@@ -1,0 +1,267 @@
+# Project Workflow (Rust)
+
+## Guiding Principles
+
+`START_HERE_HUMAN.md` は人間向けの最初の入口として扱う。
+
+1. **仕様が真実の源泉**: すべての作業は `track/items/<id>/spec.md` から始まる
+2. **型が嘘をつかない**: 実装前に型設計（ドメイン型・エラー型・トレイト）を確定する
+3. **テスト駆動**: 実装前にテストを書く（TDD: Red → Green → Refactor）
+4. **Tech Stack 厳守**: `track/tech-stack.md` の `TODO:` を0件にしてから実装を開始する
+5. **Context 効率**: specialist capability（`planner` / `researcher` / `reviewer` / `debugger` / `multimodal_reader`）を活用して主コンテキストを汚染しない
+6. **CI グリーン**: `cargo make ci`（docker compose内実行）が通らない限りコミットしない
+7. **No Panics in Production**: `unwrap()` は本番コードでは使用しない
+8. **Rust Edition 2024**: 新規コードは Rust Edition 2024 前提で作成する
+9. **Layer 強制**: workspace の層依存ルールは `docs/architecture-rules.json` を真実の源泉として常に維持する
+10. **外部長文ガイドの節約参照**: 深い外部指針が必要な時は `docs/external-guides.json` と `docs/EXTERNAL_GUIDES.md` を先に確認し、必要時だけ原文キャッシュを読む
+11. **自己修復優先**: 実装が 3 回以上詰まった時は即 ABORT せず、debug/research フェーズで原因を切り分ける
+
+## Task Workflow
+
+Specialist capability の実体は `.claude/agent-profiles.json` で決まる。既定 profile では `planner` / `reviewer` / `debugger` が Codex、`researcher` / `multimodal_reader` が Gemini、`implementer` が Claude Code に割り当てられる。
+
+### Standard Task Process
+
+1. **タスク選択**: `track/items/<id>/plan.md` の次のタスクを選ぶ
+2. **Tech Stack 完了確認**: `track/tech-stack.md` の `TODO:` が残っていないことを確認する
+3. **型・インターフェース設計**: 実装前にドメイン型とトレイトを設計する
+4. **テスト作成（Red）**: テストを書き、失敗を確認する
+5. **実装（Green）**: テストを通す最小限のコードを書く
+6. **リファクタリング**: `cargo make fmt` と `cargo make clippy` を適用する
+7. **詰まりの切り分け**: コンパイルエラーや失敗テストが続く場合は active profile の `debugger` / `researcher` capability と外部ガイド要約を使って debug/research を行う
+8. **品質ゲート**: `cargo make ci` を通す
+9. **コミット**: `/track:commit <message>` を使う
+
+`metadata.json` SSoT のタスク状態遷移や takt 実行との対応は
+`TAKT_TRACK_TRACEABILITY.md` を参照する。
+
+`track/registry.md` の更新タイミングも `TAKT_TRACK_TRACEABILITY.md` に従う。
+
+### Project Bootstrap Process (初回または技術選定変更時)
+
+1. `/track:catchup` で環境構築 + track setup + プロジェクト状態確認をまとめて行う
+2. `/track:plan <feature>` で技術調査・version baseline・tech-stack.md 確定・計画作成・承認後のトラック成果物作成までを行う
+3. `track/tech-stack.md` の `TODO:` は `/track:plan` 内で解消する
+4. 承認後に自動的にトラック成果物が作成され、実装フェーズへ進む
+
+補足:
+
+- `/track:plan`, `/track:implement`, `/track:review`, `/track:full-cycle` では、ユーザープロンプトと最新トラックの `spec.md` / `plan.md` を走査し、`docs/external-guides.json` の `trigger_keywords` に一致した要約が自動で追加コンテキストに注入される
+- 層依存ルールを変更する場合は `docs/architecture-rules.json` を起点に `deny.toml` と `scripts/check_layers.py` を更新する
+
+### トラック成果物の作成
+
+`/track:plan <feature>` はユーザー承認後に `track/items/<id>/` にトラック成果物を作成する：
+- `metadata.json` (SSoT), `plan.md` (rendered view), `spec.md`, `verification.md`
+- `cargo make ci` は `verify-track-metadata` と `verify-tech-stack` を実行する
+- そのため、テンプレート例として空のサンプルトラックをコミットしてはいけない
+- `track/tech-stack.md` の `TODO:` を解消してからトラック成果物を作成する
+
+### Phase Checkpoint (必要に応じて)
+
+- `cargo make ci`（docker compose内実行）で全チェック通過を確認する
+- ユーザーに手動検証手順を提示して確認を求める
+- 結果を `track/items/<id>/verification.md` に追記する
+- チェックポイントコミットを作成: `track(checkpoint): End of Phase X`
+
+## Quality Gates
+
+コミット前に必ず `cargo make ci` を通す。
+
+`cargo make ci` では少なくとも次を検証する：
+
+- [ ] `cargo make fmt-check` passes
+- [ ] `cargo make clippy` passes (no warnings)
+- [ ] `cargo make test` passes (all tests)
+- [ ] `cargo make test-doc` passes (doc tests)
+- [ ] `cargo make deny` passes
+- [ ] `cargo make scripts-selftest` passes
+- [ ] `cargo make hooks-selftest` passes
+- [ ] `cargo make check-layers` passes
+- [ ] `cargo make verify-arch-docs` passes
+- [ ] `cargo make verify-plan-progress` passes
+- [ ] `cargo make verify-track-metadata` passes
+- [ ] `cargo make verify-track-registry` passes
+- [ ] `cargo make verify-tech-stack` passes
+- [ ] `cargo make verify-orchestra` passes
+- [ ] `cargo make verify-latest-track` passes
+
+`/track:commit <message>` はユーザー向けの正規コミット経路で、必要なら git note 適用まで含めて処理する。
+
+`cargo make commit` は terminal 直実行用の低レベル代替で、`cargo make ci`（上記すべてを含む）を通したあと `git commit` を実行するが、git note の自動適用は行わない。
+
+自動化用途では exact wrapper も使える。
+`cargo make add-all` は worktree 全体を stage し、`.takt/pending-note.md` や `tmp/track-commit/add-paths.txt` などの transient pending file は除外する。
+選択的 staging が必要な場合は `.takt/pending-add-paths.txt` に path list を書いて `cargo make add-pending-paths`、または `tmp/track-commit/add-paths.txt` に path list を書いて `cargo make track-add-paths` を使う。
+`cargo make commit-pending-message` は `.takt/pending-commit-message.txt` を commit message として使い、成功後にそのファイルを削除する。
+`cargo make note-pending` は `.takt/pending-note.md` を git note として適用し、成功後にそのファイルを削除する。
+`/track:commit` が takt を使わない通常経路で scratch file を置く場合は `tmp/track-commit/commit-message.txt` と `tmp/track-commit/note.md` を使い、
+`cargo make track-commit-message` / `cargo make track-note` で適用する。
+
+補足: `cargo make check` はローカルの高速な型確認用で、`cargo make ci` には含まれない。`cargo make machete` は依存整理時の補助監査として個別に実行する。
+
+アプリ開発の内側ループでは `cargo make ci-rust`（fmt-check + clippy + test + deny + check-layers のみ）を使い、コミット前の最終ゲートは必ず `cargo make ci`（全体 CI）を通す。テンプレート基盤（hooks / scripts）を変更した場合も `cargo make ci` を使う。
+
+## Track Commands
+
+```bash
+/track:catchup                 # 環境構築 + 初期化 + 状態ブリーフィング（初回・新規参入時）
+/track:setup                  # track ワークフロー初期化のみ（catchup 内で自動実行される）
+/track:plan <feature>         # 調査・設計・plan 作成・承認後にトラック成果物作成
+/track:full-cycle <task>      # 自律実装フルサイクル
+/track:implement              # 並列実装（対話型）
+/track:review                 # 実装レビュー
+/track:revert                 # 直近変更の安全な取り消し計画
+/track:ci                     # 標準CIチェック
+/track:commit <message>       # ガード付きコミット
+/track:archive <id>           # 完了トラックをアーカイブ
+/track:status                 # 現在の進捗確認
+/architecture-customizer      # アーキテクチャ変更専用入口（/track:* とは別系列）
+/conventions:add <name>       # Project Conventions に規約文書を追加
+```
+
+## plan.md と metadata.json SSoT
+
+`metadata.json`（`schema_version: 2`）がタスク状態の唯一の真実の源泉（SSoT）。
+`plan.md` は `scripts/track_markdown.py` の `render_plan()` で `metadata.json` から生成される **読み取り専用ビュー** であり、直接編集してはならない。
+
+### 二段階ライフサイクル
+
+`plan.md` と `metadata.json` には初回作成と以降の更新で扱いが異なる：
+
+1. **初回作成**（`/track:plan` の承認後）: `metadata.json` を作成し、`plan.md` は `render_plan()` で生成する。初回から SSoT モデルに従う
+2. **以降の更新**: タスク状態の変更は `transition_task()` / `add_task()` / `set_track_override()` 経由で `metadata.json` を更新し、`plan.md` は `render_plan()` で再生成する。直接編集は禁止
+
+### 状態遷移 API
+
+状態遷移は `scripts/track_state_machine.py` の API を経由する：
+- `transition_task()`: タスクの状態遷移（todo → in_progress → done / skipped）
+- `add_task()`: 新タスクの追加
+- `set_track_override()`: トラック全体のブロック/キャンセル
+
+CI（`verify-plan-progress`）は `plan.md` と `metadata.json` からのレンダリング結果が一致することを検証する。
+
+### 関連ファイル
+
+- `scripts/track_schema.py`: データモデル・バリデーション
+- `scripts/track_state_machine.py`: 状態遷移 API
+- `scripts/track_markdown.py`: plan.md レンダラー
+
+詳細な更新タイミングと commit 前チェックは `TAKT_TRACK_TRACEABILITY.md` を参照する。
+
+## verification.md
+
+各トラックは `verification.md` を持ち、少なくとも次を記録する。
+
+- 手動検証したスコープ
+- 実施手順
+- 結果（pass / fail / unresolved）
+- 未解決事項
+- 検証日時
+
+## Mermaid Diagram Convention
+
+アーキテクチャや依存関係の図示にはMermaidを使う：
+
+```mermaid
+graph TD
+    A[API Layer] --> B[UseCase Layer]
+    B --> C{Domain Layer}
+    D[Infra Layer] --> C
+```
+
+## Integration with takt
+
+```bash
+cargo make takt-full-cycle "task summary"   # 自動フルサイクル
+cargo make takt-spec-to-impl "task summary" # 仕様→実装
+cargo make takt-impl-review "review scope"  # 実装→レビュー
+cargo make takt-tdd-cycle "target scope"    # TDDサイクル（単一機能）
+cargo make takt-render-personas             # active profile から runtime persona を再生成
+
+# もしくはキュー運用
+cargo make takt-add "task summary"
+cargo make takt-run
+```
+
+`cargo make takt-*` は active profile を使って runtime persona と host/provider を自動適用する。
+profile-aware な `takt` 実行の正式導線は wrapper のみとする。
+
+Queue 運用の最短手順:
+
+1. `cargo make takt-add "task summary"`
+2. `cargo make takt-run`
+3. queue に複数 profile snapshot が混在していたら、整理してから再実行する
+
+## Git Notes (実装トレーサビリティ)
+
+コミットに構造化メモを付与することで、コミットハッシュを変えずに実装の文脈を記録できる。
+
+### 自動生成フロー（takt 経由）
+
+takt の全ピース（`full-cycle`, `spec-to-impl`, `impl-review`, `tdd-cycle`）は
+最終ステップで `note-writer` ペルソナが動作し `.takt/pending-note.md` を生成する。
+
+`/track:commit <message>` フローでは、pending-note.md が存在すれば
+その内容を git note として付与し、適用後にファイルを削除する。
+
+### 手動生成
+
+```bash
+# takt 経由: pending-note.md をそのまま適用して削除
+cargo make note-pending
+
+# /track:commit 経由: scratch file を適用して削除
+cargo make track-note
+
+# 低レベル: 短い inline text を直接適用（terminal 直実行用）
+cargo make note "note text here"
+```
+
+`cargo make note-pending` と `cargo make track-note` は file-based wrapper（`git_ops.py note-from-file`）経由で note を適用する。
+`cargo make note` は低レベル経路で `git notes add -f -m "$CARGO_MAKE_TASK_ARGS" HEAD` を直接実行する。
+自動化フローでは file-based wrapper を優先すること。
+
+選択的 staging を自動化する場合は `.takt/pending-add-paths.txt` または `tmp/track-commit/add-paths.txt` に
+repo-relative path を 1 行ずつ書き、`cargo make add-pending-paths` または `cargo make track-add-paths` を使う。
+`cargo make add <files>` は terminal 直実行用の低レベル staging として扱う。
+
+`cargo make commit` を terminal から直接実行した場合は、必要に応じて `cargo make note ...` を別途実行する。
+自動化フローでは `.takt/pending-commit-message.txt` を用意して `cargo make commit-pending-message` を使ってよい。
+`/track:commit` の非-takt 経路では `tmp/track-commit/commit-message.txt` と `tmp/track-commit/note.md` を使うので `.takt/` を前提にしない。
+
+### note フォーマット
+
+```markdown
+## Task Summary: <brief task description>
+**Track:** <track-id>
+**Task:** <task name from [x] item in plan.md>
+**Date:** YYYY-MM-DD
+### Changes
+- <filename>: <what changed and why — one line per key file, max 10 bullets>
+### Why
+<1–3 sentences from spec.md or plan.md rationale>
+```
+
+### チーム間での notes 共有
+
+git notes はデフォルトで `git fetch` / `git push` に含まれない。
+チーム開発やマシン間で notes を共有するには以下を設定する:
+
+```bash
+# clone ごとに一度実行（fetch 時に notes を自動取得）
+git config --add remote.origin.fetch "+refs/notes/*:refs/notes/*"
+
+# notes を remote に push
+git push origin "refs/notes/*"
+```
+
+notes はトレーサビリティの補助情報であり、失われてもワークフローは壊れない。
+
+### 参照コマンド
+
+```bash
+git notes list                 # note 一覧
+git notes show <commit>        # 特定 commit の note 表示
+git log --show-notes           # log に note を含めて表示
+```

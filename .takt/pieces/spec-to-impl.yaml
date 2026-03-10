@@ -1,0 +1,107 @@
+name: spec-to-impl
+description: |
+  Read spec.md from track/items/, create an implementation plan,
+  and implement using TDD (Red -> Green -> Refactor).
+  Designed for Rust Hexagonal Architecture projects.
+max_movements: 15
+initial_movement: spec-reader
+
+movements:
+  - name: spec-reader
+    persona: spec-reader
+    edit: false
+    allowed_tools:
+      - Read
+      - Glob
+      - Grep
+      - Bash
+    rules:
+      - condition: "Specification is clear and all requirements are actionable"
+        next: rust-planner
+      - condition: "Specification is ambiguous or incomplete in a blocking way"
+        next: ABORT
+
+  - name: rust-planner
+    persona: rust-planner
+    edit: true
+    allowed_tools:
+      - Read
+      - Glob
+      - Grep
+      - Write
+      - Edit
+      - Bash
+    rules:
+      - condition: "Implementation plan created and written to track/items/<id>/plan.md"
+        next: rust-implementer
+      - condition: "Plan creation failed or blocked by missing information"
+        next: ABORT
+
+  - name: rust-implementer
+    persona: rust-implementer
+    edit: true
+    required_permission_mode: edit
+    allowed_tools:
+      - Read
+      - Glob
+      - Grep
+      - Write
+      - Edit
+      - Bash
+    rules:
+      - condition: "All tests pass (cargo make test succeeded with 0 failures)"
+        next: quality-checker
+      - condition: "Compilation errors that cannot be resolved after analysis"
+        next: debug-research-phase
+      - condition: "Tests failing after 3 implementation attempts"
+        next: debug-research-phase
+
+  - name: debug-research-phase
+    persona: rust-debugger
+    edit: true
+    required_permission_mode: edit
+    allowed_tools:
+      - Read
+      - Glob
+      - Grep
+      - Write
+      - Edit
+      - Bash
+    rules:
+      - condition: "Root cause identified and implementation can continue safely"
+        next: rust-implementer
+      - condition: "Root cause requires plan changes"
+        next: rust-planner
+      - condition: "Still blocked after debug and targeted research"
+        next: ABORT
+
+  - name: quality-checker
+    persona: quality-checker
+    edit: true
+    allowed_tools:
+      - Bash
+      - Read
+    rules:
+      - condition: "All checks pass: cargo make ci (fmt-check, clippy, test, test-doc, deny, scripts-selftest, hooks-selftest, check-layers, verify-arch-docs, verify-plan-progress, verify-track-metadata, verify-track-registry, verify-tech-stack, verify-orchestra, verify-latest-track)"
+        next: note-writer
+      - condition: "Formatting or clippy issues found"
+        next: rust-implementer
+      - condition: "Test or doc-test failures found"
+        next: rust-implementer
+      - condition: "Dependency, layer, or selftest failures (deny/check-layers/scripts-selftest/hooks-selftest)"
+        next: rust-implementer
+      - condition: "Verification failures (plan-progress/track-metadata/track-registry/tech-stack/orchestra/latest-track/arch-docs)"
+        next: rust-implementer
+
+  - name: note-writer
+    persona: note-writer
+    edit: true
+    allowed_tools:
+      - Read
+      - Glob
+      - Grep
+      - Write
+      - Bash
+    rules:
+      - condition: "Note written to .takt/pending-note.md"
+        next: COMPLETE

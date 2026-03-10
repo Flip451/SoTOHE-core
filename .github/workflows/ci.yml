@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_HOST_DIR: /home/runner/.cache/sccache
+  CARGO_PROFILE_DEV_DEBUG: 0
+  CARGO_PROFILE_TEST_DEBUG: 0
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Export host UID/GID for compose
+        run: |
+          echo "HOST_UID=$(id -u)" >> "$GITHUB_ENV"
+          echo "HOST_GID=$(id -g)" >> "$GITHUB_ENV"
+
+      - name: Cache sccache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.SCCACHE_HOST_DIR }}
+          key: ${{ runner.os }}-sccache-${{ hashFiles('Dockerfile', '**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-sccache-
+
+      - name: Prepare sccache directory
+        run: mkdir -p ${{ env.SCCACHE_HOST_DIR }}
+
+      - name: Prepare repo-local cache directories
+        run: mkdir -p target .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home .cache/pytest
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build tools image with cache
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: tools
+          push: false
+          load: true
+          tags: rust-sdd-template-tools:latest
+          build-args: |
+            BUILD_ENV=ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Start CI container
+        run: |
+          docker compose run -d \
+            --name ci-runner \
+            tools tail -f /dev/null
+
+      - name: Run CI suite
+        run: docker exec ci-runner cargo make ci-local
+
+      - name: Show sccache stats
+        if: always()
+        run: docker exec ci-runner sccache --show-stats || true
+
+      - name: Stop CI container
+        if: always()
+        run: docker rm -f ci-runner || true
+
+      - name: Fix cache permissions
+        if: always()
+        run: sudo chown -R $(id -u):$(id -g) ${{ env.SCCACHE_HOST_DIR }} || true

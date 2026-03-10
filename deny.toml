@@ -1,0 +1,37 @@
+[graph]
+targets = []
+all-features = false
+no-default-features = false
+
+[output]
+feature-depth = 1
+
+[advisories]
+ignore = []
+
+[licenses]
+allow = ["MIT", "Apache-2.0", "Unicode-3.0"]
+confidence-threshold = 0.8
+exceptions = []
+
+[licenses.private]
+ignore = true
+
+[bans]
+multiple-versions = "warn"
+wildcards = "allow"
+highlight = "all"
+workspace-default-features = "allow"
+external-default-features = "allow"
+allow-workspace = false
+skip = [
+]
+
+# Enforce layered architecture boundaries for this template workspace.
+# Crate names can be changed, but wrappers must reflect your composition root.
+deny = [
+    { crate = "infrastructure", wrappers = ["server"], reason = "Infrastructure implementations must be wired only at composition root." },
+    { crate = "api", wrappers = ["server"], reason = "API crate must be instantiated by server only." },
+    { crate = "usecase", wrappers = ["api", "server"], reason = "Usecase crate must only be consumed by api and server layers." },
+    { crate = "domain", wrappers = ["usecase", "infrastructure", "server"], reason = "Domain dependencies are controlled by layer boundaries." },
+]

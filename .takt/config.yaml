@@ -1,0 +1,33 @@
+# Track-facing artifacts (`spec.md`, `plan.md`, `verification.md`) are written in Japanese.
+# `.claude/docs/DESIGN.md` stays in English for cross-provider compatibility.
+# Any diagram emitted into `plan.md` or design docs must use Mermaid `flowchart TD`.
+piece: full-cycle
+provider: claude
+model: claude-opus-4-6
+language: ja
+project:
+  name: Rust SDD Template
+  description: Specification-Driven Development for Rust projects
+tasks_dir: .takt/tasks
+personas:
+  spec-reader:
+    description: Reads and analyzes spec.md files from track/items/
+    file: .takt/runtime/personas/spec-reader.md
+  rust-planner:
+    description: Creates detailed Rust implementation plans
+    file: .takt/runtime/personas/rust-planner.md
+  rust-implementer:
+    description: "Implements Rust code following TDD: Red -> Green -> Refactor"
+    file: .takt/runtime/personas/rust-implementer.md
+  rust-reviewer:
+    description: Reviews Rust code for correctness, idioms, safety
+    file: .takt/runtime/personas/rust-reviewer.md
+  rust-debugger:
+    description: Recovers stuck Rust implementations with targeted diagnosis and research
+    file: .takt/runtime/personas/rust-debugger.md
+  quality-checker:
+    description: Runs cargo fmt, clippy, test and reports results
+    file: .takt/runtime/personas/quality-checker.md
+  note-writer:
+    description: Writes a pending git note summary for /track:commit
+    file: .takt/runtime/personas/note-writer.md
