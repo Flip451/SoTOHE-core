@@ -1,6 +1,16 @@
 //! Domain layer for the SoTOHE-core track state machine.
+#![deny(
+    clippy::indexing_slicing,
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::panic,
+    clippy::unreachable,
+    clippy::todo,
+    clippy::unimplemented
+)]
 
 mod error;
+pub mod guard;
 mod ids;
 pub mod lock;
 mod plan;
@@ -17,6 +27,7 @@ pub use track::{
 };
 
 #[cfg(test)]
+#[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
 

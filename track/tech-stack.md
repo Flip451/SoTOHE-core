@@ -69,6 +69,7 @@ apps/cli             # CLI エントリーポイント + composition root（usec
 - **シリアライゼーション**: `serde` + `serde_json`
 - **設定管理**: `config` 0.15
 - **ファイルロック**: `fd-lock` latest（infrastructure 層: クロスプロセス flock、RwLock API で `&`/`&mut` セマンティクスにマッピング）
+- **シェルパース**: `conch-parser` 0.1.1（vendored, patched — domain 層: POSIX シェル AST パース、ガードポリシー用）
 - **モック**: `mockall` 0.14（dev-dependency）
 
 ## 認証・セキュリティ
@@ -88,3 +89,4 @@ apps/cli             # CLI エントリーポイント + composition root（usec
 |------|---------|------|
 | 2026-02-28 | テンプレート初期化（対話入力型に変更） | 固定値ではなくプロジェクト開始時に合意形成するため |
 | 2026-03-11 | 技術選定完了（同期CLI, clap, reqwest, config, mockall） | SoTOHE-core プロジェクト開始 |
+| 2026-03-11 | conch-parser 0.1.1 追加（vendored, patched） | domain 層シェル AST パース（ガードポリシー用） |

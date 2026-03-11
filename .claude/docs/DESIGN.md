@@ -29,6 +29,7 @@ flowchart TD
 |--------------|------|-----------|
 | `domain` | Domain logic, Ports | `TrackId`, `TaskId`, `CommitHash`, `TrackMetadata`, `TrackTask`, `TaskStatus`, `TaskTransition`, `TrackStatus`, `StatusOverride`, `PlanView`, `PlanSection`, `TrackRepository` |
 | `domain::lock` | File lock domain types, Ports | `FilePath`, `AgentId`, `LockMode`, `LockEntry`, `FileGuard`, `LockError`, `FileLockManager` |
+| `domain::guard` | Shell command guard (pure computation) | `Decision`, `GuardVerdict`, `ParseError`, `SimpleCommand`, `split_shell()`, `check()` |
 | `usecase` | Application services | `SaveTrackUseCase`, `LoadTrackUseCase`, `TransitionTaskUseCase` |
 | `infrastructure` | Infrastructure adapters | `InMemoryTrackRepository` |
 | `infrastructure::lock` | File lock infrastructure | `FsFileLockManager` |
@@ -60,6 +61,9 @@ Note: See `.claude/agent-profiles.json` for which provider handles each capabili
 | Lexicographic path ordering for deadlock prevention | Simple total ordering; no lock upgrading allowed | Wait-for graph, lock-free design | 2026-03-11 |
 | Fail-closed hook error handling | Lock acquire hook blocks tool on any error (CLI not found, timeout, unexpected exception); never proceeds unlocked | Fail-open (silently skip locking on error) | 2026-03-11 |
 | AlreadyHeld immediate rejection | Same-agent reacquire returns AlreadyHeld immediately even with timeout; logic errors should not be retried | Retry until timeout (masks the real error) | 2026-03-11 |
+| Shell guard in domain layer (no trait) | Pure computation, no I/O, no implementation variability | tree-sitter-bash (C dep), domain trait (over-engineering) | 2026-03-11 |
+| conch-parser for shell AST (vendored, patched) | Full POSIX AST, minimal deps (void only), structural env var/command separation | Hand-written parser (edge case proliferation), tree-sitter-bash (C dep), brush-parser (heavy deps) | 2026-03-11 |
+| Guard policy: ban edge-case-producing patterns | Unconditionally block patterns that create bypass vectors but are unnecessary in the template workflow: (1) `env` command → immediate block, (2) `$VAR`/`$(cmd)`/`` `cmd` `` in **any position** (argv + redirect texts including heredoc bodies) → immediate block, (3) `.exe` suffix → stripped in basename, (4) if effective command ≠ `git` and any argv/redirect token contains "git" (case-insensitive) → block. Rules (2) and (4) together eliminate ALL per-tool nesting analysis with argv/redirect-level checks. | Per-pattern recursive parsing and validation (complex, error-prone, ~200 lines of per-tool option parsing) | 2026-03-11 |
 
 ## Crate Selection
 
@@ -585,6 +589,98 @@ pub enum LockCommand {
 }
 ```
 
+### Shell Command Guard (guard-cli-2026-03-11)
+
+```text
+libs/domain/src/guard/
+├── mod.rs          # re-exports
+├── verdict.rs      # Decision, GuardVerdict, ParseError
+├── parser.rs       # split_shell() — shell command splitter
+└── policy.rs       # check() — guard policy rules
+
+apps/cli/src/commands/
+├── mod.rs          # (existing, add guard module)
+└── guard.rs        # guard check subcommand
+```
+
+```rust
+// domain/src/guard/verdict.rs
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Decision {
+    Allow,
+    Block,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GuardVerdict {
+    pub decision: Decision,
+    pub reason: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+pub enum ParseError {
+    #[error("nesting depth exceeded maximum of {max}")]
+    NestingDepthExceeded { max: usize },
+    #[error("unmatched quote in command")]
+    UnmatchedQuote,
+}
+```
+
+```rust
+// domain/src/guard/parser.rs
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SimpleCommand {
+    pub argv: Vec<String>,
+}
+
+/// Splits a shell command string into individual simple commands.
+///
+/// # Errors
+/// Returns `ParseError` on nesting depth exceeded or unmatched quotes.
+pub fn split_shell(input: &str) -> Result<Vec<SimpleCommand>, ParseError>;
+```
+
+```rust
+// domain/src/guard/policy.rs
+/// Checks a shell command against the guard policy.
+/// On parse failure, returns Block (fail-closed).
+pub fn check(input: &str) -> GuardVerdict;
+```
+
+```rust
+// CLI subcommand (apps/cli/src/commands/guard.rs)
+#[derive(Debug, clap::Subcommand)]
+pub enum GuardCommand {
+    Check {
+        #[arg(long)]
+        command: String,
+    },
+}
+```
+
+```mermaid
+flowchart TD
+    A[Agent calls Bash tool] --> B[PreToolUse Hook fires]
+    B --> C[Python: extract command from JSON stdin]
+    C --> D[Python invokes: sotp guard check\n--command 'git add .']
+    D --> E{Rust CLI: parse & check}
+    E -->|split_shell| F[Split by control operators]
+    F --> G[For each SimpleCommand]
+    G --> H[Skip env/launcher prefixes]
+    H --> I{Effective command?}
+    I -->|git| J[Extract git subcommand]
+    J --> K{Protected subcommand?}
+    K -->|add/commit/push| L[Block verdict]
+    K -->|other| M[Allow verdict]
+    I -->|non-git with 'git' in argv| L2[Block: git reference in args]
+    I -->|other| M
+    L2 --> O
+    L --> O[JSON stdout + exit 1]
+    M --> P[JSON stdout + exit 0]
+    O --> Q[Python hook: exit 2 — block tool]
+    P --> R[Python hook: exit 0 — allow tool]
+```
+
 ## Open Questions
 
 _None at this time._
@@ -595,3 +691,4 @@ _None at this time._
 |------|---------|
 | 2026-03-11 | Initial design: DMMF track state machine domain model (Codex planner) |
 | 2026-03-11 | File lock manager: ownership-based concurrent file access control (Codex planner) |
+| 2026-03-11 | Shell command guard: deterministic shell parsing + git operation blocking in domain layer |

@@ -1,3 +1,13 @@
+#![deny(
+    clippy::indexing_slicing,
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::panic,
+    clippy::unreachable,
+    clippy::todo,
+    clippy::unimplemented
+)]
+
 use std::process::ExitCode;
 use std::sync::Arc;
 
@@ -28,6 +38,11 @@ enum CliCommand {
         #[arg(long, default_value = ".locks")]
         locks_dir: String,
     },
+    /// Shell command guard for git operation blocking.
+    Guard {
+        #[command(subcommand)]
+        cmd: commands::guard::GuardCommand,
+    },
     /// Run the example track state machine demo.
     Demo,
 }
@@ -37,6 +52,7 @@ fn main() -> ExitCode {
 
     match cli.command {
         Some(CliCommand::Lock { cmd, locks_dir }) => commands::lock::execute(cmd, &locks_dir),
+        Some(CliCommand::Guard { cmd }) => commands::guard::execute(cmd),
         Some(CliCommand::Demo) | None => run_demo(),
     }
 }
@@ -97,6 +113,7 @@ fn example_track() -> Result<TrackMetadata, DomainError> {
 }
 
 #[cfg(test)]
+#[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use std::sync::Arc;
 

@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| guard-cli-2026-03-11 | Done | 2026-03-11 |
 | ownership-file-lock-2026-03-11 | Done | 2026-03-11 |
 | track-state-machine-2026-03-11 | Done | 2026-03-11 |
 | dockerfile-update-2026-03-11 | Done | 2026-03-10 |
