@@ -884,6 +884,48 @@ def check_command(command: str) -> tuple[bool, str]:
     return False, ""
 
 
+CLI_BINARY_VAR = "SOTP_CLI_BINARY"
+
+
+def _cli_binary() -> str:
+    return os.environ.get(CLI_BINARY_VAR, "sotp")
+
+
+def _try_cli_guard(command: str) -> tuple[bool, str] | None:
+    """Try to check the command via the Rust CLI guard.
+
+    Returns (should_block, message) on success, or None if CLI is unavailable.
+    """
+    import subprocess as _subprocess
+
+    cli = _cli_binary()
+    try:
+        result = _subprocess.run(
+            [cli, "guard", "check", "--command", command],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except FileNotFoundError:
+        return None  # CLI binary not found — fall back to Python
+    except _subprocess.TimeoutExpired:
+        return None  # CLI hung — fall back to Python
+    except Exception:
+        return None  # Any other error — fall back to Python
+
+    try:
+        import json as _json
+
+        verdict = _json.loads(result.stdout)
+    except Exception:
+        return None  # Malformed output — fall back to Python
+
+    if verdict.get("decision") == "block":
+        reason = verdict.get("reason", "blocked by guard CLI")
+        return True, reason
+    return False, ""
+
+
 def main() -> None:
     try:
         data = load_stdin_json()
@@ -891,7 +933,14 @@ def main() -> None:
             sys.exit(0)
 
         command = tool_input(data).get("command", "")
-        should_block, message = check_command(command)
+
+        # Try Rust CLI first; fall back to Python check_command if unavailable
+        cli_result = _try_cli_guard(command)
+        if cli_result is not None:
+            should_block, message = cli_result
+        else:
+            should_block, message = check_command(command)
+
         if not should_block:
             sys.exit(0)
 

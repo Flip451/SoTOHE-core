@@ -81,7 +81,26 @@ pub fn new(email: &str) -> Result<User, DomainError> { ... }
 
 ## No Panics in Library Code
 
+テスト（`#[cfg(test)]`）以外のコードでパニックを起こしうる構文は**禁止**:
+
+| 禁止パターン | 安全な代替 |
+|---|---|
+| `slice[i]` / `str[range]` | `.get(i)` / `.get(range)` |
+| `.unwrap()` | `?` / `.unwrap_or()` / `if let` |
+| `.expect("...")` | `?` / `.unwrap_or()` / `if let` |
+| `assert!()` / `assert_eq!()` | `if !cond { return Err(...) }` |
+| `panic!()` / `unreachable!()` | `return Err(...)` |
+| `todo!()` / `unimplemented!()` | コンパイルエラーにするか `return Err(...)` |
+
 ```rust
+// Bad: panics on multi-byte UTF-8 or out-of-range
+let suffix = &name[name.len() - 4..];
+
+// Good: safe byte-level check
+if name.as_bytes().get(name.len().wrapping_sub(4)..).map_or(false, |b| b.eq_ignore_ascii_case(b".exe")) {
+    // strip .exe
+}
+
 // Bad: panics
 pub fn divide(a: i32, b: i32) -> i32 { a / b }
 

@@ -1,4 +1,13 @@
 //! Use case layer for the SoTOHE-core track state machine.
+#![deny(
+    clippy::indexing_slicing,
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::panic,
+    clippy::unreachable,
+    clippy::todo,
+    clippy::unimplemented
+)]
 
 use std::sync::Arc;
 
@@ -80,6 +89,7 @@ impl<R: TrackRepository> TransitionTaskUseCase<R> {
 }
 
 #[cfg(test)]
+#[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use std::collections::HashMap;
     use std::sync::{Arc, Mutex};

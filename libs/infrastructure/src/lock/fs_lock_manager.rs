@@ -384,6 +384,7 @@ fn is_pid_alive(pid: u32) -> bool {
 }
 
 #[cfg(test)]
+#[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use std::time::Duration;
 
