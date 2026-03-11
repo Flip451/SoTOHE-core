@@ -1,0 +1,22 @@
+## Task Summary: Container security hardening with .git ro mount and tmpfs overlays
+
+**Track:** container-vcs-readonly-2026-03-11
+**Task:** Mount .git read-only, mask sensitive dirs with tmpfs, add track ID reserved segment validation
+**Date:** 2026-03-12
+
+### Changes
+
+- compose.yml: added .git:/workspace/.git:ro volume overlay and tmpfs for private/, config/secrets/
+- compose.dev.yml: same security mount changes as compose.yml
+- project-docs/conventions/security.md: documented container-level enforcement scope
+- scripts/track_schema.py: added RESERVED_ID_SEGMENTS validation for track IDs
+- scripts/test_track_schema.py: added TestReservedIdWords test class (4 tests)
+- track/items/container-vcs-readonly-2026-03-11/: renamed from container-git-readonly to avoid guard hook false positives
+
+### Why
+
+Codex workspace-write sandbox and cargo make shell bypass Claude Code hooks, allowing direct
+git operations and sensitive file reads from inside containers. This commit enforces security
+at OS level: .git becomes read-only (EROFS on write), and sensitive directories appear empty
+via tmpfs overlays. The track ID validation prevents future guard hook false positives from
+track names containing reserved words like "git".
