@@ -9,7 +9,11 @@ services:
     user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     volumes:
       - .:/workspace
+      - ./.git:/workspace/.git:ro
       - ${SCCACHE_HOST_DIR:-./.cache/sccache}:/workspace/.cache/sccache
+    tmpfs:
+      - /workspace/private:size=1m
+      - /workspace/config/secrets:size=1m
     environment:
       CARGO_TERM_COLOR: always
       HOME: /workspace/.cache/home

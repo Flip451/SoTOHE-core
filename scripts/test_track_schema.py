@@ -489,6 +489,41 @@ class TestValidateMetadataV2(unittest.TestCase):
         self.assertTrue(any("empty title" in e.lower() for e in errors))
 
 
+class TestReservedIdWords(unittest.TestCase):
+    """Track IDs containing reserved words (e.g. 'git') must be rejected."""
+
+    def test_rejects_id_containing_git(self) -> None:
+        data = _make_valid_v2()
+        data["id"] = "container-git-readonly-2026-03-11"
+        errors = validate_metadata_v2(
+            data, track_dir_name="container-git-readonly-2026-03-11"
+        )
+        self.assertTrue(any("reserved segment" in e.lower() for e in errors))
+
+    def test_rejects_id_containing_git_case_insensitive(self) -> None:
+        data = _make_valid_v2()
+        data["id"] = "my-Git-track"
+        errors = validate_metadata_v2(data, track_dir_name="my-Git-track")
+        self.assertTrue(any("reserved segment" in e.lower() for e in errors))
+
+    def test_accepts_id_without_reserved_words(self) -> None:
+        data = _make_valid_v2()
+        data["id"] = "container-vcs-readonly-2026-03-11"
+        errors = validate_metadata_v2(
+            data, track_dir_name="container-vcs-readonly-2026-03-11"
+        )
+        self.assertEqual(errors, [])
+
+    def test_accepts_id_with_git_substring_in_word(self) -> None:
+        """IDs like 'legit-cleanup' should not be rejected (git is not a segment)."""
+        data = _make_valid_v2()
+        data["id"] = "legit-cleanup-2026-03-11"
+        errors = validate_metadata_v2(
+            data, track_dir_name="legit-cleanup-2026-03-11"
+        )
+        self.assertEqual(errors, [])
+
+
 class TestCommitHashRegex(unittest.TestCase):
     def test_valid_7_char_hash(self) -> None:
         self.assertIsNotNone(COMMIT_HASH_RE.match("abc1234"))

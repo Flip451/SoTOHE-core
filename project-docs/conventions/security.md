@@ -10,6 +10,16 @@ not be committed to version control and must not be read by Claude Code.
 > (`workspace-write` sandbox) or when Gemini CLI accesses the filesystem directly — see
 > `.claude/rules/02-codex-delegation.md` for details. When using Codex with `workspace-write`,
 > instruct it explicitly not to read files under `private/` or `config/secrets/`.
+>
+> **Container-level enforcement**: Docker Compose services enforce these rules at OS level:
+> - `.git` is mounted read-only (`:ro`), preventing `git add/commit` from containers (EROFS).
+>   Note: `git push` may still succeed as it primarily reads `.git`; network-level controls
+>   or hook-based blocking should be used if push prevention is required.
+> - `private/` and `config/secrets/` are masked by empty tmpfs overlays, making them appear empty
+>   inside containers regardless of host contents
+>
+> This covers Codex `workspace-write` subprocesses and `cargo make shell` sessions that bypass
+> Claude Code hooks. See `compose.yml` and `compose.dev.yml` for the mount configuration.
 
 ### `private/`
 

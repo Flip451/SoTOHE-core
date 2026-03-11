@@ -44,6 +44,12 @@ COMMIT_HASH_RE = re.compile(r"^[0-9a-f]{7,40}$")
 
 TRACK_ITEMS_DIR = "track/items"
 
+# Reserved words that must not appear as hyphen-delimited segments in track IDs.
+# The guard hook's broad "git" substring match blocks Bash commands whose arguments
+# contain these words, causing false positives for track operations.
+# Checked per-segment (split on '-') so IDs like "legit-cleanup" are allowed.
+RESERVED_ID_SEGMENTS: list[str] = ["git"]
+
 REQUIRED_V2_FIELDS = [
     "schema_version",
     "id",
@@ -196,6 +202,16 @@ def validate_metadata_v2(data: dict, *, track_dir_name: str) -> list[str]:
         errors.append(
             f"metadata id '{data['id']}' does not match directory '{track_dir_name}'"
         )
+
+    # Reserved segment check — guard hook blocks Bash commands containing these words
+    track_id_segments = set(data["id"].lower().split("-"))
+    for word in RESERVED_ID_SEGMENTS:
+        if word in track_id_segments:
+            errors.append(
+                f"Track id '{data['id']}' contains reserved segment '{word}'. "
+                f"This causes false positives in the guard hook. "
+                f"Use an alternative (e.g. 'vcs' instead of 'git')."
+            )
 
     # schema_version
     if data.get("schema_version") != 2:
