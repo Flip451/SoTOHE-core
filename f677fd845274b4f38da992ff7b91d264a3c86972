@@ -1,0 +1,21 @@
+## Task Summary: Atomic write standardization for Python scripts
+
+**Track:** atomic-write-standard-2026-03-11
+**Task:** Expose Rust atomic_write_file as CLI and migrate Python script file writes
+**Date:** 2026-03-11
+
+### Changes
+
+- apps/cli/src/commands/file.rs: new `sotp file write-atomic` CLI subcommand (stdin → atomic write via infrastructure)
+- apps/cli/src/main.rs: added File command variant and dispatch
+- scripts/atomic_write.py: new shared helper with multi-candidate capability probe and fallback
+- scripts/external_guides.py: save_registry() migrated to atomic_write
+- scripts/track_state_machine.py: plan.md/registry.md writes migrated to atomic_write
+- scripts/track_registry.py: write_registry() migrated to atomic_write
+- apps/cli/tests/file_write_atomic.rs: 4 integration tests (create, overwrite, cleanup, error)
+
+### Why
+
+Python scripts (external_guides.py, track_state_machine.py, track_registry.py) used direct
+write_text/open('w') for critical files, risking partial writes on crash. This standardizes
+all critical file writes on the Rust atomic_write_file pattern (tmp + fsync + rename + parent fsync).
