@@ -9,14 +9,17 @@
     clippy::unimplemented
 )]
 
+mod decision;
 mod error;
 pub mod guard;
+pub mod hook;
 mod ids;
 pub mod lock;
 mod plan;
 mod repository;
 mod track;
 
+pub use decision::Decision;
 pub use error::{DomainError, RepositoryError, TransitionError, ValidationError};
 pub use ids::{CommitHash, TaskId, TrackId};
 pub use plan::{PlanSection, PlanView};

@@ -1,24 +1,6 @@
 //! Guard verdict types for shell command checking.
 
-use std::fmt;
-
-/// The decision of a guard check.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Decision {
-    /// The command is allowed to proceed.
-    Allow,
-    /// The command is blocked.
-    Block,
-}
-
-impl fmt::Display for Decision {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Decision::Allow => write!(f, "allow"),
-            Decision::Block => write!(f, "block"),
-        }
-    }
-}
+use crate::Decision;
 
 /// The result of checking a shell command against the guard policy.
 #[derive(Debug, Clone, PartialEq, Eq)]

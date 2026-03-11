@@ -2,7 +2,8 @@
 
 use std::process::ExitCode;
 
-use domain::guard::{Decision, policy};
+use domain::Decision;
+use domain::guard::policy;
 
 /// Guard subcommands for shell command checking.
 #[derive(Debug, clap::Subcommand)]

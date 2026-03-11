@@ -8,4 +8,4 @@ pub mod policy;
 mod verdict;
 
 pub use parser::{SimpleCommand, extract_command_substitutions, split_shell, tokenize};
-pub use verdict::{Decision, GuardVerdict, ParseError};
+pub use verdict::{GuardVerdict, ParseError};

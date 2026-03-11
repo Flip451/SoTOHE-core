@@ -2,62 +2,62 @@
   "schema_version": 2,
   "id": "hook-fail-closed-2026-03-11",
   "title": "Hook Fail-Closed: Rust hook dispatcher + Python advisory warn-and-log",
-  "status": "planned",
+  "status": "done",
   "created_at": "2026-03-11T12:00:00Z",
-  "updated_at": "2026-03-11T13:00:00Z",
+  "updated_at": "2026-03-11T12:10:57.372057+00:00",
   "tasks": [
     {
       "id": "T1",
       "description": "domain::decision — Extract shared Decision enum to domain root (used by guard and hook)",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T2",
       "description": "domain::hook — HookName, HookContext, HookEnvelope, HookToolInput, HookVerdict, HookError type definitions",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T3",
       "description": "domain::guard::verdict — Refactor GuardVerdict to use shared Decision enum",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T4",
       "description": "usecase::hook — HookHandler trait (OCP: each hook implements independently)",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T5",
       "description": "usecase::hook — GuardHookHandler implementation (delegates to domain::guard::policy::check)",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T6",
       "description": "usecase::hook — LockAcquireHookHandler and LockReleaseHookHandler implementations",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T7",
       "description": "apps/cli/commands/hook.rs — HookCommand with CliHookName (clap::ValueEnum), stdin JSON parsing, exit code mapping",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T8",
       "description": "Python hooks — block-direct-git-ops.py becomes thin sotp hook dispatch launcher; advisory hooks get warn-and-log pattern via _shared.py",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T9",
       "description": "Tests — Rust unit tests for hook dispatch + Python selftest for launcher and warn-and-log behavior",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     }
   ],
@@ -77,7 +77,11 @@
           "Define hook-specific types in domain::hook module.",
           "No framework dependencies (clap, serde_json::Value) in domain — use re-export or infra-side parsing."
         ],
-        "task_ids": ["T1", "T2", "T3"]
+        "task_ids": [
+          "T1",
+          "T2",
+          "T3"
+        ]
       },
       {
         "id": "S2",
@@ -87,7 +91,11 @@
           "GuardHookHandler delegates to existing domain::guard::policy::check.",
           "LockAcquire/ReleaseHookHandler delegates to existing domain::lock::FileLockManager."
         ],
-        "task_ids": ["T4", "T5", "T6"]
+        "task_ids": [
+          "T4",
+          "T5",
+          "T6"
+        ]
       },
       {
         "id": "S3",
@@ -96,7 +104,9 @@
           "HookCommand with clap::ValueEnum for hook name (CLI layer only).",
           "Reads JSON from stdin, dispatches to HookHandler, emits JSON to stdout, sets exit code."
         ],
-        "task_ids": ["T7"]
+        "task_ids": [
+          "T7"
+        ]
       },
       {
         "id": "S4",
@@ -105,7 +115,9 @@
           "Security hooks become thin launchers: exec sotp hook dispatch, propagate exit code.",
           "Advisory hooks get warn-and-log pattern in _shared.py."
         ],
-        "task_ids": ["T8"]
+        "task_ids": [
+          "T8"
+        ]
       },
       {
         "id": "S5",
@@ -114,7 +126,9 @@
           "Rust: hook dispatch unit tests, HookHandler mock tests.",
           "Python: launcher integration test, warn-and-log behavior test."
         ],
-        "task_ids": ["T9"]
+        "task_ids": [
+          "T9"
+        ]
       }
     ]
   }
