@@ -31,6 +31,11 @@
 | **比較検討** | 「Arc vs Rc どちらがいい？」「async-trait vs RPITIT?」 |
 | **コードレビュー** | 「このRustコードをレビューして」 |
 
+## Default Timeout
+
+Codex CLI 呼び出しのデフォルトタイムアウトは **600 秒**。
+`timeout 600 codex exec ...` を標準とする。
+
 ## How to Consult When Assigned
 
 `{model}` is resolved at runtime from `agent-profiles.json`:
