@@ -1,80 +1,157 @@
-use thiserror::Error;
+//! Domain layer for the SoTOHE-core track state machine.
 
-/// Opaque user identifier. Construct via [`new_user`], which validates
-/// that the underlying string is non-empty and non-whitespace-only.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct UserId(String);
+mod error;
+mod ids;
+mod plan;
+mod repository;
+mod track;
 
-impl UserId {
-    /// Returns the underlying string slice.
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct User {
-    id: UserId,
-}
-
-impl User {
-    /// Returns the user's ID as a string slice.
-    #[must_use]
-    pub fn id(&self) -> &str {
-        self.id.as_str()
-    }
-}
-
-/// Domain errors. Does not derive `PartialEq`/`Eq` so that variants can
-/// wrap external error types (e.g., `sqlx::Error`) via `#[from]` in the future.
-#[derive(Debug, Error)]
-pub enum DomainError {
-    #[error("invalid user id")]
-    InvalidUserId,
-    #[error("internal error")]
-    Internal,
-}
-
-/// Persists domain users.
-///
-/// # Errors
-/// Returns a [`DomainError`] when the repository cannot persist `user`.
-pub trait UserRepository: Send + Sync {
-    fn save(&self, user: &User) -> Result<(), DomainError>;
-}
-
-/// Creates a user with the given ID.
-///
-/// # Errors
-/// Returns [`DomainError::InvalidUserId`] if `id` is blank or whitespace-only.
-pub fn new_user(id: &str) -> Result<User, DomainError> {
-    if id.trim().is_empty() {
-        return Err(DomainError::InvalidUserId);
-    }
-    Ok(User { id: UserId(id.to_owned()) })
-}
+pub use error::{DomainError, RepositoryError, TransitionError, ValidationError};
+pub use ids::{CommitHash, TaskId, TrackId};
+pub use plan::{PlanSection, PlanView};
+pub use repository::TrackRepository;
+pub use track::{
+    StatusOverride, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata, TrackStatus,
+    TrackTask,
+};
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_new_user_with_valid_id_returns_user() {
-        let result = new_user("user-1");
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap().id(), "user-1");
+    fn task(id: &str, description: &str) -> TrackTask {
+        TrackTask::new(TaskId::new(id).unwrap(), description).unwrap()
+    }
+
+    fn section(id: &str, title: &str, task_ids: &[&str]) -> PlanSection {
+        PlanSection::new(
+            id,
+            title,
+            Vec::new(),
+            task_ids.iter().map(|task_id| TaskId::new(*task_id).unwrap()).collect(),
+        )
+        .unwrap()
+    }
+
+    fn plan(task_ids: &[&str]) -> PlanView {
+        PlanView::new(Vec::new(), vec![section("S1", "Build", task_ids)])
     }
 
     #[test]
-    fn test_new_user_with_blank_id_returns_invalid_user_id_error() {
-        let result = new_user("   ");
-        assert!(matches!(result, Err(DomainError::InvalidUserId)));
+    fn track_id_rejects_non_slug_values() {
+        let result = TrackId::new("Not A Slug");
+
+        assert!(matches!(
+            result,
+            Err(ValidationError::InvalidTrackId(value)) if value == "Not A Slug"
+        ));
     }
 
     #[test]
-    fn test_user_id_accessor_returns_original_id() {
-        let user = new_user("user-2").unwrap();
-        assert_eq!(user.id(), "user-2");
+    fn commit_hash_requires_lowercase_hex_between_seven_and_forty_chars() {
+        let result = CommitHash::new("abc123");
+
+        assert!(matches!(
+            result,
+            Err(ValidationError::InvalidCommitHash(value)) if value == "abc123"
+        ));
+    }
+
+    #[test]
+    fn task_transition_accepts_only_reference_state_machine_edges() {
+        let mut task = task("T1", "Implement transition logic");
+
+        task.transition(TaskTransition::Start).unwrap();
+        task.transition(TaskTransition::Complete { commit_hash: None }).unwrap();
+
+        assert!(matches!(
+            task.transition(TaskTransition::Skip),
+            Err(TransitionError::InvalidTaskTransition { .. })
+        ));
+        assert_eq!(task.status().kind(), TaskStatusKind::Done);
+    }
+
+    #[test]
+    fn track_status_is_derived_from_task_states() {
+        let mut track = TrackMetadata::new(
+            TrackId::new("track-state-machine").unwrap(),
+            "Track state machine",
+            vec![task("T1", "Write domain model"), task("T2", "Write tests")],
+            plan(&["T1", "T2"]),
+            None,
+        )
+        .unwrap();
+
+        assert_eq!(track.status(), TrackStatus::Planned);
+
+        track.transition_task(&TaskId::new("T1").unwrap(), TaskTransition::Start).unwrap();
+        assert_eq!(track.status(), TrackStatus::InProgress);
+
+        track
+            .transition_task(
+                &TaskId::new("T1").unwrap(),
+                TaskTransition::Complete { commit_hash: None },
+            )
+            .unwrap();
+        track.transition_task(&TaskId::new("T2").unwrap(), TaskTransition::Start).unwrap();
+        track
+            .transition_task(
+                &TaskId::new("T2").unwrap(),
+                TaskTransition::Complete { commit_hash: None },
+            )
+            .unwrap();
+
+        assert_eq!(track.status(), TrackStatus::Done);
+    }
+
+    #[test]
+    fn resolving_every_task_auto_clears_override() {
+        let mut track = TrackMetadata::new(
+            TrackId::new("track-state-machine").unwrap(),
+            "Track state machine",
+            vec![task("T1", "Write domain model")],
+            plan(&["T1"]),
+            Some(StatusOverride::blocked("waiting on review")),
+        )
+        .unwrap();
+
+        assert_eq!(track.status(), TrackStatus::Blocked);
+
+        track.transition_task(&TaskId::new("T1").unwrap(), TaskTransition::Start).unwrap();
+        track
+            .transition_task(
+                &TaskId::new("T1").unwrap(),
+                TaskTransition::Complete { commit_hash: None },
+            )
+            .unwrap();
+
+        assert_eq!(track.status_override(), None);
+        assert_eq!(track.status(), TrackStatus::Done);
+    }
+
+    #[test]
+    fn task_id_rejects_non_digit_after_prefix() {
+        assert!(matches!(TaskId::new("Ta"), Err(ValidationError::InvalidTaskId(_))));
+        assert!(matches!(TaskId::new("T-1"), Err(ValidationError::InvalidTaskId(_))));
+        assert!(matches!(TaskId::new("T"), Err(ValidationError::InvalidTaskId(_))));
+        assert!(TaskId::new("T1").is_ok());
+        assert!(TaskId::new("T123").is_ok());
+    }
+
+    #[test]
+    fn plan_must_reference_each_task_exactly_once() {
+        let track = TrackMetadata::new(
+            TrackId::new("track-state-machine").unwrap(),
+            "Track state machine",
+            vec![task("T1", "Write domain model"), task("T2", "Write tests")],
+            plan(&["T1"]),
+            None,
+        );
+
+        assert!(matches!(
+            track,
+            Err(DomainError::Validation(ValidationError::UnreferencedTask(task_id)))
+                if task_id == "T2"
+        ));
     }
 }
