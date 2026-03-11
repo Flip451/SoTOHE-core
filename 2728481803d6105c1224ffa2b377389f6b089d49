@@ -1,0 +1,28 @@
+## Task Summary: Shell Command Guard CLI with conch-parser AST parsing
+
+**Track:** guard-cli-2026-03-11
+**Task:** Replace Python hook regex/shlex parsing with deterministic Rust shell AST parsing
+**Date:** 2026-03-11
+
+### Changes
+
+- libs/domain/src/guard/parser.rs: conch-parser adapter for POSIX shell AST parsing with redirect_texts extraction
+- libs/domain/src/guard/policy.rs: guard policy with env block, expansion detection, argv-level git reference detection
+- libs/domain/src/guard/verdict.rs: Decision, GuardVerdict, ParseError type definitions
+- apps/cli/src/commands/guard.rs: CLI guard check subcommand with JSON output
+- .claude/hooks/block-direct-git-ops.py: simplified to thin CLI delegation wrapper
+- vendor/conch-parser/: vendored and patched conch-parser 0.1.1
+- libs/domain/src/lib.rs: clippy no-panic lint enforcement (#![deny])
+- libs/usecase/src/lib.rs: clippy no-panic lint enforcement
+- libs/infrastructure/src/lib.rs: clippy no-panic lint enforcement
+- apps/cli/src/main.rs: clippy no-panic lint enforcement
+- .claude/rules/04-coding-principles.md: no-panic prohibition table
+- track/items/guard-cli-2026-03-11/spec.md: updated scope and constraints
+
+### Why
+
+Python hook used fragile regex/shlex parsing vulnerable to bypass via nested quoting,
+subshells, and variable expansion. Replaced with deterministic conch-parser AST walking
+in Rust domain layer. Policy uses fail-closed design banning entire edge-case categories
+(env command, shell expansion anywhere, argv-level git references) instead of per-case handling.
+Clippy restriction lints enforce no-panic rules at compile time across all crates.
