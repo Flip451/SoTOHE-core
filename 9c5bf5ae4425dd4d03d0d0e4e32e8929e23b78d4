@@ -1,0 +1,24 @@
+## Task Summary: Hook fail-closed Rust dispatcher with thin Python launchers
+
+**Track:** hook-fail-closed-2026-03-11
+**Task:** ERR-06 fix — migrate security-critical hooks to Rust fail-closed design
+**Date:** 2026-03-11
+
+### Changes
+
+- libs/domain/src/decision.rs: shared Decision enum (SRP, used by guard and hook)
+- libs/domain/src/hook/: HookName, HookContext, HookInput, HookVerdict, HookError types
+- libs/domain/src/guard/verdict.rs: migrated GuardVerdict to shared Decision
+- libs/usecase/src/hook.rs: HookHandler trait (OCP), Guard/LockAcquire/LockRelease handlers, resolve_lock_mode
+- apps/cli/src/commands/hook.rs: HookCommand dispatch, stdin JSON parsing, exit code mapping
+- .claude/hooks/block-direct-git-ops.py: thin launcher for sotp hook dispatch
+- .claude/hooks/file-lock-acquire.py: thin launcher with no cwd fallback
+- .claude/hooks/file-lock-release.py: thin launcher (PostToolUse, cannot block)
+- .claude/hooks/_shared.py: warn_and_log advisory hook helper
+- scripts/verify_orchestra_guardrails.py: marker updated for os._exit(2)
+
+### Why
+
+Python hooks had fail-open exception handling (ERR-06). Security-critical hooks now
+delegate to Rust `sotp hook dispatch` where the type system and Result type structurally
+guarantee fail-closed behavior. 3-round Codex review converged to zero findings.
