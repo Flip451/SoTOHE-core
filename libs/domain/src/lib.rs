@@ -20,10 +20,12 @@ mod repository;
 mod track;
 
 pub use decision::Decision;
-pub use error::{DomainError, RepositoryError, TransitionError, ValidationError};
+pub use error::{
+    DomainError, RepositoryError, TrackReadError, TrackWriteError, TransitionError, ValidationError,
+};
 pub use ids::{CommitHash, TaskId, TrackId};
 pub use plan::{PlanSection, PlanView};
-pub use repository::TrackRepository;
+pub use repository::{TrackReader, TrackWriter};
 pub use track::{
     StatusOverride, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata, TrackStatus,
     TrackTask,
@@ -168,5 +170,38 @@ mod tests {
             Err(DomainError::Validation(ValidationError::UnreferencedTask(task_id)))
                 if task_id == "T2"
         ));
+    }
+
+    #[test]
+    fn track_read_error_converts_from_repository_error() {
+        let repo_err = RepositoryError::TrackNotFound("test-track".to_string());
+        let read_err: TrackReadError = repo_err.into();
+        assert!(
+            matches!(read_err, TrackReadError::Repository(RepositoryError::TrackNotFound(id)) if id == "test-track")
+        );
+    }
+
+    #[test]
+    fn track_write_error_converts_from_repository_error() {
+        let repo_err = RepositoryError::Message("disk full".to_string());
+        let write_err: TrackWriteError = repo_err.into();
+        assert!(
+            matches!(write_err, TrackWriteError::Repository(RepositoryError::Message(msg)) if msg == "disk full")
+        );
+    }
+
+    #[test]
+    fn track_write_error_converts_from_domain_error() {
+        let domain_err = DomainError::Validation(ValidationError::EmptyTrackTitle);
+        let write_err: TrackWriteError = domain_err.into();
+        assert!(matches!(
+            write_err,
+            TrackWriteError::Domain(DomainError::Validation(ValidationError::EmptyTrackTitle))
+        ));
+    }
+
+    #[test]
+    fn track_status_archived_displays_correctly() {
+        assert_eq!(TrackStatus::Archived.to_string(), "archived");
     }
 }

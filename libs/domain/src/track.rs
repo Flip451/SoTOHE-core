@@ -11,6 +11,7 @@ pub enum TrackStatus {
     Done,
     Blocked,
     Cancelled,
+    Archived,
 }
 
 impl fmt::Display for TrackStatus {
@@ -21,6 +22,7 @@ impl fmt::Display for TrackStatus {
             Self::Done => "done",
             Self::Blocked => "blocked",
             Self::Cancelled => "cancelled",
+            Self::Archived => "archived",
         };
         f.write_str(value)
     }
@@ -150,7 +152,7 @@ impl TrackTask {
         Self::with_status(id, description, TaskStatus::Todo)
     }
 
-    pub(crate) fn with_status(
+    pub fn with_status(
         id: TaskId,
         description: impl Into<String>,
         status: TaskStatus,

@@ -2,15 +2,13 @@ use thiserror::Error;
 
 use crate::{TaskStatusKind, TrackStatus};
 
-/// Top-level domain error encompassing validation, transition, and repository errors.
+/// Top-level domain error encompassing validation and transition errors.
 #[derive(Debug, Error)]
 pub enum DomainError {
     #[error(transparent)]
     Validation(#[from] ValidationError),
     #[error(transparent)]
     Transition(#[from] TransitionError),
-    #[error(transparent)]
-    Repository(#[from] RepositoryError),
 }
 
 /// Validation errors for domain invariants.
@@ -60,4 +58,21 @@ pub enum RepositoryError {
     TrackNotFound(String),
     #[error("repository error: {0}")]
     Message(String),
+}
+
+/// Error type for `TrackReader` port operations.
+#[derive(Debug, Error)]
+pub enum TrackReadError {
+    #[error(transparent)]
+    Repository(#[from] RepositoryError),
+}
+
+/// Error type for `TrackWriter` port operations.
+#[derive(Debug, Error)]
+pub enum TrackWriteError {
+    #[error(transparent)]
+    Domain(#[from] DomainError),
+
+    #[error(transparent)]
+    Repository(#[from] RepositoryError),
 }

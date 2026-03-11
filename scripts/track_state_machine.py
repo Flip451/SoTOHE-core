@@ -7,6 +7,8 @@ top-level status, then optionally render plan.md.
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
@@ -151,6 +153,54 @@ def add_task(
     return task_id
 
 
+def _try_sotp_transition(
+    track_dir: Path,
+    task_id: str,
+    new_status: str,
+    *,
+    commit_hash: str | None = None,
+) -> bool:
+    """Try to delegate transition to sotp CLI for atomic locking.
+
+    Returns True if delegation succeeded, False if sotp is unavailable
+    (not installed or missing the ``track`` subcommand).
+    Raises TransitionError if sotp ran a recognized transition but failed.
+    """
+    sotp = shutil.which("sotp")
+    if sotp is None:
+        return False
+
+    # Validate commit_hash type before building argv (R2-3).
+    if commit_hash is not None and not isinstance(commit_hash, str):
+        raise TransitionError(
+            f"commit_hash must be a string, got {type(commit_hash).__name__}"
+        )
+
+    items_dir = track_dir.parent  # track/items/<id> -> track/items/
+    track_id = track_dir.name
+    locks_dir = str(track_dir.parent.parent.parent / ".locks")
+
+    cmd = [
+        sotp, "track", "transition",
+        "--items-dir", str(items_dir),
+        "--locks-dir", locks_dir,
+        track_id, task_id, new_status,
+    ]
+    if commit_hash is not None:
+        cmd.extend(["--commit-hash", commit_hash])
+
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        stderr = result.stderr.strip()
+        # If the sotp binary does not support the ``track`` subcommand
+        # (e.g. an older version), treat it as "sotp unavailable" so the
+        # caller falls back to the Python implementation.
+        if "unrecognized subcommand" in stderr or "unknown subcommand" in stderr:
+            return False
+        raise TransitionError(f"sotp transition failed: {stderr}")
+    return True
+
+
 def transition_task(
     track_dir: Path,
     task_id: str,
@@ -159,7 +209,36 @@ def transition_task(
     commit_hash: str | None = None,
     now: datetime | None = None,
 ) -> None:
-    """Transition a task to a new status. Raises TransitionError on invalid transition."""
+    """Transition a task to a new status. Raises TransitionError on invalid transition.
+
+    When ``now`` is None (production path), delegates to ``sotp track transition``
+    for atomic read-modify-write with file locking.  Falls back to the Python
+    implementation if ``sotp`` is not available or ``now`` is explicitly set
+    (test determinism).
+    """
+    # Delegate to Rust CLI for atomic locking when available.
+    # Skip delegation when `now` is provided (tests need deterministic timestamps).
+    if now is None:
+        if _try_sotp_transition(
+            track_dir, task_id, new_status, commit_hash=commit_hash
+        ):
+            return
+        # sotp not found — use Python implementation (no fallback on CLI errors).
+
+    _transition_task_python(
+        track_dir, task_id, new_status, commit_hash=commit_hash, now=now
+    )
+
+
+def _transition_task_python(
+    track_dir: Path,
+    task_id: str,
+    new_status: str,
+    *,
+    commit_hash: str | None = None,
+    now: datetime | None = None,
+) -> None:
+    """Python implementation of task transition (original logic)."""
     data = _load_metadata(track_dir)
 
     # Find task (guard against non-dict/non-list entries)
