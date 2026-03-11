@@ -58,6 +58,30 @@ cargo make ci
 コンテナ内の toolchain バージョンと一致しない可能性がある。
 再現性を保つため、常に compose ラッパー（非 `-local` タスク）を使うこと。
 
+## Parallel Worker Isolation (WORKER_ID)
+
+Agent Teams で複数ワーカーが同時にビルドする場合、`WORKER_ID` 環境変数で
+`CARGO_TARGET_DIR` を分離して build lock 競合を防ぐ：
+
+```bash
+# Worker ごとに固有の ID を設定
+WORKER_ID=w1 cargo make test-exec   # → target-w1/
+WORKER_ID=w2 cargo make clippy-exec # → target-w2/
+
+# デフォルト（WORKER_ID 未設定）は従来通り target/ を使用
+cargo make test-exec                # → target/
+```
+
+| 項目 | 動作 |
+|------|------|
+| `WORKER_ID` 未設定 | `CARGO_TARGET_DIR=/workspace/target`（従来互換） |
+| `WORKER_ID=w1` | `CARGO_TARGET_DIR=/workspace/target-w1` |
+| sccache | ワーカー間で共有（`SCCACHE_DIR` は共通） |
+| 対象タスク | `-exec` サフィックス付きタスク（`test-exec`, `clippy-exec` 等） |
+
+**注意**: `run --rm` ラッパー（`cargo make ci` 等）はホスト側で `CARGO_TARGET_DIR_RELATIVE`
+環境変数を設定することで分離可能（例: `CARGO_TARGET_DIR_RELATIVE=target-w1 cargo make test`）。
+
 ## Project Bootstrap (Version Research)
 
 プロジェクト開始時に active `researcher` capability で最新版を調査する。
