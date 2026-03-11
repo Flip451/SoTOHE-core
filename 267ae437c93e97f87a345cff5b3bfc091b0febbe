@@ -1,0 +1,17 @@
+## Task Summary: Security hardening design with 10-round Codex review
+
+**Track:** hook-fail-closed-2026-03-11, filelock-migration-2026-03-11, +4 tracks
+**Task:** Complete DESIGN.md Security Hardening section with iterative Codex review convergence
+**Date:** 2026-03-11
+
+### Changes
+
+- .claude/docs/DESIGN.md: Added 592-line Security Hardening section with Canonical Blocks (Decision, HookName, HookContext, HookInput, HookEnvelope, HookVerdict, HookError, TrackReadError/TrackWriteError, TrackReader/TrackWriter, HookHandler, HookCommand, FsTrackStore, atomic_write_file, TrackDocumentV2, Python launcher pattern, UseCase migration, hook output JSON mapping)
+- track/items/hook-fail-closed-2026-03-11/spec.md: Fail-closed hook dispatcher spec with 12 acceptance criteria
+- track/items/filelock-migration-2026-03-11/spec.md: TrackReader/TrackWriter ISP spec with 11 acceptance criteria
+- track/items/{container-git-readonly,per-worker-target-dir,atomic-write-standard,security-control-tests}-2026-03-11/: Track artifacts for remaining security hardening phases
+- track/registry.md: 6 active planned tracks registered
+
+### Why
+
+Resolves the design phase for critical security and concurrency issues (ERR-06 fail-open, CON-01 metadata.json races). 10 iterative Codex review rounds (R1-R10) resolved 33 findings across severity levels, converging to LOW-only. Key design decisions: typed port errors (no anyhow), DIP for HookInput, PreToolUse/PostToolUse exit code split, explicit PID propagation from Python launcher, per-hook context validation, CLI-arg-only --pid.
