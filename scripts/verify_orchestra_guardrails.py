@@ -277,7 +277,7 @@ EXPECTED_DENY = {
 }
 
 BLOCK_HOOK_MARKERS = {
-    "sys.exit(2)": "hard block via sys.exit(2) confirmed",
+    "os._exit(2)": "hard block via os._exit(2) confirmed (thin launcher fail-closed)",
     "GIT_ADD_MESSAGE": "git add block confirmed",
     "GIT_COMMIT_MESSAGE": "git commit block confirmed",
     "GIT_BRANCH_DELETE_MESSAGE": "git branch delete block confirmed",

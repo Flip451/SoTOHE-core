@@ -8,8 +8,6 @@ import re
 import shlex
 import sys
 
-from _shared import load_stdin_json, print_hook_error, tool_input
-
 GIT_POLICY_PREFIX = "[Git Policy]"
 GIT_COMMIT_MESSAGE = (
     f"{GIT_POLICY_PREFIX} Direct `git commit` is blocked.\n"
@@ -927,29 +925,53 @@ def _try_cli_guard(command: str) -> tuple[bool, str] | None:
 
 
 def main() -> None:
+    """Thin launcher: delegates to `sotp hook dispatch block-direct-git-ops`.
+
+    PreToolUse hook — fail-closed:
+    - CLI missing, crash, or timeout → os._exit(2) (block)
+    - except BaseException → os._exit(2) (block)
+    - stdout/stderr flushed before os._exit()
+    """
+    import subprocess as _subprocess
+
     try:
-        data = load_stdin_json()
+        stdin_data = sys.stdin.buffer.read()
+
+        import json as _json
+
+        try:
+            data = _json.loads(stdin_data)
+        except Exception:
+            sys.stderr.write("error: failed to parse hook JSON\n")
+            sys.stderr.flush()
+            sys.stdout.flush()
+            os._exit(2)
+
         if data.get("tool_name", "") != "Bash":
-            sys.exit(0)
+            os._exit(0)
 
-        command = tool_input(data).get("command", "")
+        cli = _cli_binary()
+        result = _subprocess.run(
+            [cli, "hook", "dispatch", "block-direct-git-ops"],
+            input=stdin_data,
+            capture_output=True,
+            timeout=10,
+        )
 
-        # Try Rust CLI first; fall back to Python check_command if unavailable
-        cli_result = _try_cli_guard(command)
-        if cli_result is not None:
-            should_block, message = cli_result
-        else:
-            should_block, message = check_command(command)
+        if result.stdout:
+            sys.stdout.buffer.write(result.stdout)
+        if result.stderr:
+            sys.stderr.buffer.write(result.stderr)
 
-        if not should_block:
-            sys.exit(0)
+        sys.stdout.flush()
+        sys.stderr.flush()
+        os._exit(result.returncode)
 
-        print(message)
-        sys.exit(2)
-
-    except Exception as err:
-        print_hook_error(err)
-        sys.exit(0)
+    except BaseException as err:
+        sys.stderr.write(f"error: hook launcher failed: {err}\n")
+        sys.stderr.flush()
+        sys.stdout.flush()
+        os._exit(2)
 
 
 if __name__ == "__main__":

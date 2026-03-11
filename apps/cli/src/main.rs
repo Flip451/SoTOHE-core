@@ -43,6 +43,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::guard::GuardCommand,
     },
+    /// Security-critical hook dispatch (Rust fail-closed).
+    Hook {
+        #[command(subcommand)]
+        cmd: commands::hook::HookCommand,
+    },
     /// Run the example track state machine demo.
     Demo,
 }
@@ -53,6 +58,7 @@ fn main() -> ExitCode {
     match cli.command {
         Some(CliCommand::Lock { cmd, locks_dir }) => commands::lock::execute(cmd, &locks_dir),
         Some(CliCommand::Guard { cmd }) => commands::guard::execute(cmd),
+        Some(CliCommand::Hook { cmd }) => commands::hook::execute(cmd),
         Some(CliCommand::Demo) | None => run_demo(),
     }
 }

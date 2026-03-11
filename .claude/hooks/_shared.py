@@ -79,3 +79,13 @@ def project_dir() -> str:
 
 def print_hook_error(err: Exception) -> None:
     print(f"Hook error: {err}", file=sys.stderr)
+
+
+def warn_and_log(hook_name: str, err: Exception) -> None:
+    """Advisory hook error handler: log warning to stderr and continue.
+
+    Advisory hooks (non-security) should never block the tool operation.
+    This function logs the error and returns without raising, so the hook
+    exits cleanly with exit code 0.
+    """
+    print(f"[{hook_name}] advisory hook warning: {err}", file=sys.stderr)

@@ -2,28 +2,20 @@
 """
 PreToolUse hook: Acquire a file lock before Edit/Write/Read tool executions.
 
-Edit/Write → exclusive lock (≈ &mut T)
-Read       → shared lock (≈ &T)
+Thin launcher — delegates to `sotp hook dispatch file-lock-acquire`.
+PreToolUse: fail-closed (exit 2 on any error).
 
 Controlled by SOTP_LOCK_ENABLED env var (default: disabled).
-Agent ID derived from SOTP_AGENT_ID env var or fallback to PID.
 """
 
-import json
 import os
-import subprocess
 import sys
-from pathlib import Path
 
-from _shared import load_stdin_json, print_hook_error, project_dir, tool_input
-
-# Lock is opt-in: set SOTP_LOCK_ENABLED=1 to activate.
 LOCK_ENABLED_VAR = "SOTP_LOCK_ENABLED"
+CLI_BINARY_VAR = "SOTP_CLI_BINARY"
 AGENT_ID_VAR = "SOTP_AGENT_ID"
 LOCKS_DIR_VAR = "SOTP_LOCKS_DIR"
-CLI_BINARY_VAR = "SOTP_CLI_BINARY"
 DEFAULT_LOCKS_DIR = ".locks"
-DEFAULT_TIMEOUT_MS = "5000"
 
 # Tools that require exclusive (write) access.
 EXCLUSIVE_TOOLS = {"Edit", "Write"}
@@ -35,153 +27,101 @@ def _is_enabled() -> bool:
     return os.environ.get(LOCK_ENABLED_VAR, "") == "1"
 
 
-def _agent_id() -> str:
-    # Use parent PID (Claude Code process) so Pre and Post hooks share the
-    # same fallback agent ID despite being separate subprocesses.
-    return os.environ.get(AGENT_ID_VAR, f"pid-{os.getppid()}")
-
-
-def _locks_dir() -> str:
-    return os.environ.get(
-        LOCKS_DIR_VAR, os.path.join(project_dir(), DEFAULT_LOCKS_DIR)
-    )
-
-
 def _cli_binary() -> str:
     return os.environ.get(CLI_BINARY_VAR, "sotp")
 
 
-def _extract_file_path(data: dict) -> str | None:
-    ti = tool_input(data)
-    fp = ti.get("file_path")
-    if isinstance(fp, str) and fp:
-        return fp
-    cmd = ti.get("command", "")
-    if isinstance(cmd, str) and cmd:
-        return None
+def _agent_id() -> str:
+    return os.environ.get(AGENT_ID_VAR, f"pid-{os.getppid()}")
+
+
+def _locks_dir() -> str | None:
+    explicit = os.environ.get(LOCKS_DIR_VAR)
+    if explicit:
+        return explicit
+    project = os.environ.get("CLAUDE_PROJECT_DIR")
+    if project:
+        return os.path.join(project, DEFAULT_LOCKS_DIR)
+    # No cwd fallback — fail-closed: caller must treat None as missing.
     return None
 
 
 def main() -> None:
+    """Thin launcher: delegates to `sotp hook dispatch file-lock-acquire`.
+
+    PreToolUse hook — fail-closed:
+    - CLI missing, crash, or timeout → os._exit(2) (block)
+    - except BaseException → os._exit(2) (block)
+    - stdout/stderr flushed before os._exit()
+    """
+    import json as _json
+    import subprocess as _subprocess
+
     if not _is_enabled():
         return
 
     try:
-        data = load_stdin_json()
-    except (json.JSONDecodeError, Exception) as exc:
-        # Malformed hook input — block to avoid fail-open.
-        print_hook_error(exc)
-        print(
-            json.dumps(
-                {
-                    "hookSpecificOutput": {
-                        "decision": "block",
-                        "reason": f"File lock hook input error: {exc}",
-                    }
-                }
-            )
-        )
-        sys.exit(2)
+        stdin_data = sys.stdin.buffer.read()
 
-    tool_name = data.get("tool_name", "")
-    if tool_name in EXCLUSIVE_TOOLS:
-        mode = "exclusive"
-    elif tool_name in SHARED_TOOLS:
-        mode = "shared"
-    else:
-        return
+        # Quick filter: only Edit/Write/Read need locking.
+        try:
+            data = _json.loads(stdin_data)
+        except Exception:
+            sys.stderr.write("error: failed to parse hook JSON\n")
+            sys.stderr.flush()
+            sys.stdout.flush()
+            os._exit(2)
 
-    file_path = _extract_file_path(data)
-    if not file_path:
-        return
+        tool_name = data.get("tool_name", "")
+        if tool_name not in EXCLUSIVE_TOOLS and tool_name not in SHARED_TOOLS:
+            os._exit(0)
 
-    # Pass the path as-is; FilePath::new handles parent-directory
-    # canonicalization for files that don't exist yet (create-new-file flow).
-    resolved = str(Path(file_path))
+        # Compute pid and agent in Python (sotp's getppid() would be this process).
+        pid = str(os.getppid())
+        agent = _agent_id()
+        locks_dir = _locks_dir()
 
-    agent = _agent_id()
-    # Pass parent PID (Claude Code) so the lock entry references a long-lived
-    # process and is not immediately reaped by stale detection.
-    pid = str(os.getppid())
-    cli = _cli_binary()
-    locks_dir = _locks_dir()
+        # Fail-closed: no locks_dir means no CLAUDE_PROJECT_DIR and no SOTP_LOCKS_DIR.
+        if locks_dir is None:
+            sys.stderr.write("error: locks_dir not set (no CLAUDE_PROJECT_DIR or SOTP_LOCKS_DIR)\n")
+            sys.stderr.flush()
+            sys.stdout.flush()
+            os._exit(2)
 
-    try:
-        result = subprocess.run(
+        cli = _cli_binary()
+        result = _subprocess.run(
             [
                 cli,
-                "lock",
+                "hook",
+                "dispatch",
+                "file-lock-acquire",
                 "--locks-dir",
                 locks_dir,
-                "acquire",
-                "--mode",
-                mode,
-                "--path",
-                resolved,
                 "--agent",
                 agent,
                 "--pid",
                 pid,
-                "--timeout-ms",
-                DEFAULT_TIMEOUT_MS,
             ],
+            input=stdin_data,
             capture_output=True,
-            text=True,
             timeout=10,
         )
-        if result.returncode != 0:
-            error_msg = result.stderr.strip() or result.stdout.strip()
-            print(
-                json.dumps(
-                    {
-                        "hookSpecificOutput": {
-                            "decision": "block",
-                            "reason": f"File lock conflict: {error_msg}",
-                        }
-                    }
-                )
-            )
-            sys.exit(2)
-    except FileNotFoundError:
-        # CLI binary not found — block to avoid fail-open.
-        print(
-            json.dumps(
-                {
-                    "hookSpecificOutput": {
-                        "decision": "block",
-                        "reason": "File lock CLI binary not found; cannot acquire lock",
-                    }
-                }
-            )
-        )
-        sys.exit(2)
-    except subprocess.TimeoutExpired:
-        # Lock backend hung — block to avoid fail-open.
-        print(
-            json.dumps(
-                {
-                    "hookSpecificOutput": {
-                        "decision": "block",
-                        "reason": "File lock acquire timed out (subprocess)",
-                    }
-                }
-            )
-        )
-        sys.exit(2)
-    except Exception as exc:
-        # Any other subprocess error — block to avoid fail-open.
-        print_hook_error(exc)
-        print(
-            json.dumps(
-                {
-                    "hookSpecificOutput": {
-                        "decision": "block",
-                        "reason": f"File lock acquire failed: {exc}",
-                    }
-                }
-            )
-        )
-        sys.exit(2)
+
+        if result.stdout:
+            sys.stdout.buffer.write(result.stdout)
+        if result.stderr:
+            sys.stderr.buffer.write(result.stderr)
+
+        sys.stdout.flush()
+        sys.stderr.flush()
+        os._exit(result.returncode)
+
+    except BaseException as err:
+        # PreToolUse: any error → block (fail-closed).
+        sys.stderr.write(f"error: hook launcher failed: {err}\n")
+        sys.stderr.flush()
+        sys.stdout.flush()
+        os._exit(2)
 
 
 if __name__ == "__main__":

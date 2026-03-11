@@ -117,6 +117,7 @@ dependencies = [
  "clap",
  "domain",
  "infrastructure",
+ "serde",
  "serde_json",
  "usecase",
 ]

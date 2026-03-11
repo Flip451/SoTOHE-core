@@ -9,6 +9,8 @@
     clippy::unimplemented
 )]
 
+pub mod hook;
+
 use std::sync::Arc;
 
 use domain::{

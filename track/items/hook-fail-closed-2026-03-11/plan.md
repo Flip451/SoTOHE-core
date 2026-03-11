@@ -12,9 +12,9 @@ Extract Decision to domain root for reuse by guard and hook subdomains.
 Define hook-specific types in domain::hook module.
 No framework dependencies (clap, serde_json::Value) in domain — use re-export or infra-side parsing.
 
-- [ ] domain::decision — Extract shared Decision enum to domain root (used by guard and hook)
-- [ ] domain::hook — HookName, HookContext, HookEnvelope, HookToolInput, HookVerdict, HookError type definitions
-- [ ] domain::guard::verdict — Refactor GuardVerdict to use shared Decision enum
+- [x] domain::decision — Extract shared Decision enum to domain root (used by guard and hook)
+- [x] domain::hook — HookName, HookContext, HookEnvelope, HookToolInput, HookVerdict, HookError type definitions
+- [x] domain::guard::verdict — Refactor GuardVerdict to use shared Decision enum
 
 ## UseCase Layer (OCP)
 
@@ -22,27 +22,27 @@ HookHandler trait enables adding new hooks without modifying dispatch logic.
 GuardHookHandler delegates to existing domain::guard::policy::check.
 LockAcquire/ReleaseHookHandler delegates to existing domain::lock::FileLockManager.
 
-- [ ] usecase::hook — HookHandler trait (OCP: each hook implements independently)
-- [ ] usecase::hook — GuardHookHandler implementation (delegates to domain::guard::policy::check)
-- [ ] usecase::hook — LockAcquireHookHandler and LockReleaseHookHandler implementations
+- [x] usecase::hook — HookHandler trait (OCP: each hook implements independently)
+- [x] usecase::hook — GuardHookHandler implementation (delegates to domain::guard::policy::check)
+- [x] usecase::hook — LockAcquireHookHandler and LockReleaseHookHandler implementations
 
 ## CLI Integration
 
 HookCommand with clap::ValueEnum for hook name (CLI layer only).
 Reads JSON from stdin, dispatches to HookHandler, emits JSON to stdout, sets exit code.
 
-- [ ] apps/cli/commands/hook.rs — HookCommand with CliHookName (clap::ValueEnum), stdin JSON parsing, exit code mapping
+- [x] apps/cli/commands/hook.rs — HookCommand with CliHookName (clap::ValueEnum), stdin JSON parsing, exit code mapping
 
 ## Python Hook Migration
 
 Security hooks become thin launchers: exec sotp hook dispatch, propagate exit code.
 Advisory hooks get warn-and-log pattern in _shared.py.
 
-- [ ] Python hooks — block-direct-git-ops.py becomes thin sotp hook dispatch launcher; advisory hooks get warn-and-log pattern via _shared.py
+- [x] Python hooks — block-direct-git-ops.py becomes thin sotp hook dispatch launcher; advisory hooks get warn-and-log pattern via _shared.py
 
 ## Tests
 
 Rust: hook dispatch unit tests, HookHandler mock tests.
 Python: launcher integration test, warn-and-log behavior test.
 
-- [ ] Tests — Rust unit tests for hook dispatch + Python selftest for launcher and warn-and-log behavior
+- [x] Tests — Rust unit tests for hook dispatch + Python selftest for launcher and warn-and-log behavior

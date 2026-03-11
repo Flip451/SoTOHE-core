@@ -17,7 +17,6 @@
 |------|--------|------|---------|
 | atomic-write-standard-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
 | filelock-migration-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
-| hook-fail-closed-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
 | container-git-readonly-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
 | per-worker-target-dir-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
 | security-control-tests-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
@@ -26,6 +25,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| hook-fail-closed-2026-03-11 | Done | 2026-03-11 |
 | guard-cli-2026-03-11 | Done | 2026-03-11 |
 | ownership-file-lock-2026-03-11 | Done | 2026-03-11 |
 | track-state-machine-2026-03-11 | Done | 2026-03-11 |
