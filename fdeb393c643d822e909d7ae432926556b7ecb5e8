@@ -1,0 +1,25 @@
+## Task Summary: Locked track store with ISP port split
+
+**Track:** filelock-migration-2026-03-11
+**Task:** T1-T9: TrackReader/TrackWriter ISP split, FsTrackStore with file locking, Python CLI delegation
+**Date:** 2026-03-11
+
+### Changes
+
+- libs/domain/src/repository.rs: Split TrackRepository into TrackReader + TrackWriter ports
+- libs/domain/src/error.rs: Added TrackReadError, TrackWriteError typed port errors
+- libs/domain/src/track.rs: Added TrackStatus::Archived, made TrackTask::with_status pub
+- libs/infrastructure/src/track/codec.rs: TrackDocumentV2 serde types with Python schema compat
+- libs/infrastructure/src/track/atomic_write.rs: Crash-safe tmp+fsync+rename write
+- libs/infrastructure/src/track/fs_store.rs: FsTrackStore with FileLockManager exclusive access
+- libs/usecase/src/lib.rs: Migrated use cases to TrackReader/TrackWriter
+- apps/cli/src/commands/track.rs: sotp track transition subcommand with status-aware resolve
+- scripts/track_state_machine.py: Python delegates to sotp CLI for locked transitions
+- libs/infrastructure/tests/concurrency.rs: Parallel update serialization tests
+- libs/infrastructure/tests/schema_compat.rs: Rust-Python round-trip compatibility tests
+
+### Why
+
+CON-01/INF-04: Replace racy find/save with locked read-modify-write on metadata.json.
+TrackWriter::update<F> expresses atomic mutation at the port level while keeping locking
+as an infrastructure concern. Python transitions delegate to sotp CLI for consistency.
