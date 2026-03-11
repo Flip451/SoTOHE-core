@@ -68,6 +68,7 @@ apps/cli             # CLI エントリーポイント + composition root（usec
 - **時刻**: `chrono` (`features = ["serde"]`)
 - **シリアライゼーション**: `serde` + `serde_json`
 - **設定管理**: `config` 0.15
+- **ファイルロック**: `fd-lock` latest（infrastructure 層: クロスプロセス flock、RwLock API で `&`/`&mut` セマンティクスにマッピング）
 - **モック**: `mockall` 0.14（dev-dependency）
 
 ## 認証・セキュリティ

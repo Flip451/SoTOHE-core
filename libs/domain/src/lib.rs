@@ -2,6 +2,7 @@
 
 mod error;
 mod ids;
+pub mod lock;
 mod plan;
 mod repository;
 mod track;

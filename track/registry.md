@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `ownership-file-lock-2026-03-11`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-11`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| ownership-file-lock-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| ownership-file-lock-2026-03-11 | Done | 2026-03-11 |
 | track-state-machine-2026-03-11 | Done | 2026-03-11 |
 | dockerfile-update-2026-03-11 | Done | 2026-03-10 |
 
