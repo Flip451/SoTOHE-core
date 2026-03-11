@@ -33,6 +33,9 @@ Thumbs.db
 __pycache__/
 *.pyc
 
+# --- Lock registry (runtime state, not version-controlled) ---
+.locks/
+
 # --- Temp / local scratch ---
 tmp/
 .track-template-dev
