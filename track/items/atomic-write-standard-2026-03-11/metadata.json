@@ -2,38 +2,38 @@
   "schema_version": 2,
   "id": "atomic-write-standard-2026-03-11",
   "title": "Atomic Write Standardization: reuse Rust atomic_write_file across Python scripts",
-  "status": "planned",
+  "status": "done",
   "created_at": "2026-03-11T12:00:00Z",
-  "updated_at": "2026-03-11T13:00:00Z",
+  "updated_at": "2026-03-11T14:29:18.355517+00:00",
   "tasks": [
     {
       "id": "T1",
       "description": "sotp file write-atomic CLI subcommand — expose infrastructure::track::atomic_write_file as CLI tool for Python scripts",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T2",
       "description": "Migrate external_guides.py save_registry() to use sotp file write-atomic",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T3",
       "description": "Migrate track_markdown.py plan.md/registry.md writes to use sotp file write-atomic",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T4",
       "description": "Verify metadata.json writes already use atomic pattern via FsTrackStore (from filelock-migration track)",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T5",
       "description": "Tests — verify atomic write CLI produces complete files and cleans up on failure",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     }
   ],
@@ -52,7 +52,9 @@
           "sotp file write-atomic --path <path> reads content from stdin and writes atomically.",
           "Reuses infrastructure::track::atomic_write_file."
         ],
-        "task_ids": ["T1"]
+        "task_ids": [
+          "T1"
+        ]
       },
       {
         "id": "S2",
@@ -61,7 +63,10 @@
           "Replace direct write_text/open('w') with subprocess call to sotp file write-atomic.",
           "external_guides.py and track_markdown.py are primary targets."
         ],
-        "task_ids": ["T2", "T3"]
+        "task_ids": [
+          "T2",
+          "T3"
+        ]
       },
       {
         "id": "S3",
@@ -70,7 +75,10 @@
           "Confirm FsTrackStore already covers metadata.json.",
           "Test CLI atomic write for crash-safety."
         ],
-        "task_ids": ["T4", "T5"]
+        "task_ids": [
+          "T4",
+          "T5"
+        ]
       }
     ]
   }

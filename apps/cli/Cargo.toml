@@ -12,6 +12,9 @@ path = "src/main.rs"
 [lints]
 workspace = true
 
+[dev-dependencies]
+tempfile = "3.27.0"
+
 [dependencies]
 clap = { version = "4.5.60", features = ["derive", "env"] }
 domain = { path = "../../libs/domain" }

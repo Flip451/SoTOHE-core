@@ -7,7 +7,7 @@
 
 ## Current Focus
 
-- Latest active track: `atomic-write-standard-2026-03-11`
+- Latest active track: `container-git-readonly-2026-03-11`
 - Next recommended command: `/track:implement`
 - Last updated: `2026-03-11`
 
@@ -15,7 +15,6 @@
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| atomic-write-standard-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
 | container-git-readonly-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
 | per-worker-target-dir-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
 | security-control-tests-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
@@ -24,6 +23,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| atomic-write-standard-2026-03-11 | Done | 2026-03-11 |
 | clippy-zero-warnings-2026-03-11 | Done | 2026-03-11 |
 | filelock-migration-2026-03-11 | Done | 2026-03-11 |
 | hook-fail-closed-2026-03-11 | Done | 2026-03-11 |

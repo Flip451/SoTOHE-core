@@ -35,9 +35,10 @@ def load_registry() -> dict:
 
 
 def save_registry(registry: dict) -> None:
-    with open(registry_path(), "w", encoding="utf-8") as handle:
-        json.dump(registry, handle, ensure_ascii=False, indent=2)
-        handle.write("\n")
+    from atomic_write import atomic_write_file
+
+    content = json.dumps(registry, ensure_ascii=False, indent=2) + "\n"
+    atomic_write_file(registry_path(), content)
 
 
 def cache_abspath(guide: dict) -> Path:

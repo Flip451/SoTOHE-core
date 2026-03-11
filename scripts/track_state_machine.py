@@ -384,7 +384,9 @@ def sync_rendered_views(
         plan_file = track_dir / "plan.md"
         old_plan = plan_file.read_text(encoding="utf-8") if plan_file.exists() else None
         if old_plan != plan_content:
-            plan_file.write_text(plan_content, encoding="utf-8")
+            from atomic_write import atomic_write_file as _atomic_write
+
+            _atomic_write(plan_file, plan_content)
             changed.append(plan_file)
 
     # Render registry.md (always uses all tracks, regardless of track_id filter)
@@ -396,7 +398,9 @@ def sync_rendered_views(
         registry_path.read_text(encoding="utf-8") if registry_path.exists() else None
     )
     if old_content != registry_content:
-        registry_path.write_text(registry_content, encoding="utf-8")
+        from atomic_write import atomic_write_file as _atomic_write_reg
+
+        _atomic_write_reg(registry_path, registry_content)
         changed.append(registry_path)
 
     return changed

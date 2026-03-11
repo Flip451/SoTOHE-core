@@ -43,6 +43,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::track::TrackCommand,
     },
+    /// File utility operations (atomic write, etc.).
+    File {
+        #[command(subcommand)]
+        cmd: commands::file::FileCommand,
+    },
     /// Run the example track state machine demo.
     Demo,
 }
@@ -55,6 +60,7 @@ fn main() -> ExitCode {
         Some(CliCommand::Guard { cmd }) => commands::guard::execute(cmd),
         Some(CliCommand::Hook { cmd }) => commands::hook::execute(cmd),
         Some(CliCommand::Track { cmd }) => commands::track::execute(cmd),
+        Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
         Some(CliCommand::Demo) | None => run_demo(),
     }
 }
