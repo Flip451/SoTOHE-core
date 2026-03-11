@@ -1,13 +1,4 @@
 //! Infrastructure layer for the SoTOHE-core track state machine.
-#![deny(
-    clippy::indexing_slicing,
-    clippy::unwrap_used,
-    clippy::expect_used,
-    clippy::panic,
-    clippy::unreachable,
-    clippy::todo,
-    clippy::unimplemented
-)]
 
 pub mod lock;
 pub mod track;

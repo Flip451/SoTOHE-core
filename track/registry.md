@@ -24,6 +24,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| clippy-zero-warnings-2026-03-11 | Done | 2026-03-11 |
 | filelock-migration-2026-03-11 | Done | 2026-03-11 |
 | hook-fail-closed-2026-03-11 | Done | 2026-03-11 |
 | guard-cli-2026-03-11 | Done | 2026-03-11 |

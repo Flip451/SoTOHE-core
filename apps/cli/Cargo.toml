@@ -9,6 +9,9 @@ publish.workspace = true
 name = "sotp"
 path = "src/main.rs"
 
+[lints]
+workspace = true
+
 [dependencies]
 clap = { version = "4.5.60", features = ["derive", "env"] }
 domain = { path = "../../libs/domain" }

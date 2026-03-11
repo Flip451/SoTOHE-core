@@ -34,6 +34,10 @@
 
 #![doc(html_root_url = "https://docs.rs/conch-parser/0.1")]
 
+// Vendored crate (Rust 2015 edition): suppress all warnings to avoid noise
+// from bare_trait_objects, deprecated methods, mismatched_lifetime_syntaxes, etc.
+#![allow(warnings)]
+
 #![cfg_attr(all(not(test), feature = "cargo-clippy"), deny(print_stdout))]
 #![cfg_attr(feature = "cargo-clippy", deny(wrong_self_convention))]
 
