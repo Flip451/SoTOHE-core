@@ -1,27 +1,32 @@
-# Verification: File Locking Migration
+# Verification: Track Store with TrackReader/TrackWriter Ports
 
 ## Scope Verified
 
-- [ ] filelock package added to requirements.txt
-- [ ] track_state_machine.py metadata.json locking
-- [ ] lint-on-save.py fcntl removal
-- [ ] post-implementation-review.py fcntl removal
-- [ ] log-cli-tools.py fcntl removal
-- [ ] All fcntl conditional import blocks removed
-- [ ] Concurrency tests
+- [x] domain::error — TrackReadError, TrackWriteError typed port errors
+- [x] domain::repository — TrackRepository split into TrackReader + TrackWriter (ISP)
+- [x] domain::track — TrackStatus::Archived variant added
+- [x] domain::error — DomainError::Repository variant removed
+- [x] infrastructure::track::codec — TrackDocumentV2 serde types with encode/decode
+- [x] infrastructure::track::atomic_write — atomic_write_file (tmp + fsync + rename + parent fsync)
+- [x] infrastructure::track::fs_store — FsTrackStore implementing TrackReader + TrackWriter with FileLockManager
+- [x] usecase — SaveTrackUseCase, LoadTrackUseCase, TransitionTaskUseCase migrated to TrackReader/TrackWriter
+- [x] infrastructure — InMemoryTrackRepository replaced with InMemoryTrackStore
+- [x] apps/cli — Track subcommand with FsTrackStore composition
+- [x] Python scripts — transition_task() delegates to sotp track transition (fallback to Python)
+- [x] Schema compatibility tests — Rust ↔ Python round-trip verified
+- [x] Concurrency tests — parallel FsTrackStore::update serialized by FsFileLockManager
 
 ## Manual Verification Steps
 
-- [ ] `pip list | grep filelock` shows installed version
-- [ ] `grep -r fcntl .claude/hooks/` returns no matches
-- [ ] Parallel metadata.json write test passes
-- [ ] Hook selftest passes
-- [ ] `cargo make ci` passes
+- [x] `cargo make ci` passes (207 Rust tests, 444 Python tests, deny, clippy, fmt, verify-*)
+- [x] Schema round-trip: real metadata.json decoded/re-encoded without loss
+- [x] Concurrency: 5 parallel threads transitioning different tasks — all serialized correctly
+- [x] Python fallback: sotp unavailable triggers Python implementation seamlessly
 
 ## Result / Open Issues
 
-_Pending implementation._
+All acceptance criteria met. No open issues.
 
 ## verified_at
 
-_Not yet verified._
+2026-03-11

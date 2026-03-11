@@ -15,7 +15,7 @@ use clap::{Parser, Subcommand};
 use domain::{
     DomainError, PlanSection, PlanView, TaskId, TaskTransition, TrackId, TrackMetadata, TrackTask,
 };
-use infrastructure::InMemoryTrackRepository;
+use infrastructure::InMemoryTrackStore;
 use usecase::{SaveTrackUseCase, TransitionTaskUseCase};
 
 mod commands;
@@ -48,6 +48,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::hook::HookCommand,
     },
+    /// Track operations (transition, etc.) with file-system persistence.
+    Track {
+        #[command(subcommand)]
+        cmd: commands::track::TrackCommand,
+    },
     /// Run the example track state machine demo.
     Demo,
 }
@@ -59,14 +64,15 @@ fn main() -> ExitCode {
         Some(CliCommand::Lock { cmd, locks_dir }) => commands::lock::execute(cmd, &locks_dir),
         Some(CliCommand::Guard { cmd }) => commands::guard::execute(cmd),
         Some(CliCommand::Hook { cmd }) => commands::hook::execute(cmd),
+        Some(CliCommand::Track { cmd }) => commands::track::execute(cmd),
         Some(CliCommand::Demo) | None => run_demo(),
     }
 }
 
 fn run_demo() -> ExitCode {
-    let repo = Arc::new(InMemoryTrackRepository::new());
-    let save = SaveTrackUseCase::new(Arc::clone(&repo));
-    let transition = TransitionTaskUseCase::new(Arc::clone(&repo));
+    let store = Arc::new(InMemoryTrackStore::new());
+    let save = SaveTrackUseCase::new(Arc::clone(&store));
+    let transition = TransitionTaskUseCase::new(Arc::clone(&store));
 
     let track = match example_track() {
         Ok(track) => track,
@@ -124,16 +130,16 @@ mod tests {
     use std::sync::Arc;
 
     use domain::{TaskId, TaskTransition, TrackStatus};
-    use infrastructure::InMemoryTrackRepository;
+    use infrastructure::InMemoryTrackStore;
     use usecase::{SaveTrackUseCase, TransitionTaskUseCase};
 
     use super::example_track;
 
     #[test]
     fn example_cli_flow_moves_track_into_in_progress() {
-        let repo = Arc::new(InMemoryTrackRepository::new());
-        let save = SaveTrackUseCase::new(Arc::clone(&repo));
-        let transition = TransitionTaskUseCase::new(Arc::clone(&repo));
+        let store = Arc::new(InMemoryTrackStore::new());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let transition = TransitionTaskUseCase::new(Arc::clone(&store));
         let track = example_track().unwrap();
         let task_id = TaskId::new("T1").unwrap();
 
