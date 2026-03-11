@@ -7,15 +7,20 @@
 
 ## Current Focus
 
-- Latest active track: `None yet`
-- Next recommended command: `/track:plan <feature>`
+- Latest active track: `atomic-write-standard-2026-03-11`
+- Next recommended command: `/track:implement`
 - Last updated: `2026-03-11`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| _No active tracks yet_ | - | `/track:plan <feature>` | - |
+| atomic-write-standard-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
+| filelock-migration-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
+| hook-fail-closed-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
+| container-git-readonly-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
+| per-worker-target-dir-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
+| security-control-tests-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
 
 ## Completed Tracks
 

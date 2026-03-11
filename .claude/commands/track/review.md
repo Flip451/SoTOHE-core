@@ -43,7 +43,7 @@ Build a review briefing that includes:
 
 For the Codex provider, if the briefing exceeds ~1KB:
 - Write it to `tmp/codex-briefing.md` (file-based briefing pattern from `codex-system` skill).
-- Use `timeout 300 codex exec --model {model} --sandbox read-only --full-auto "Read tmp/codex-briefing.md and perform the task described there." 2>&1`.
+- Use `timeout 600 codex exec --model {model} --sandbox read-only --full-auto "Read tmp/codex-briefing.md and perform the task described there." 2>&1`.
 
 For short briefings, use inline prompts.
 
@@ -54,7 +54,7 @@ For short briefings, use inline prompts.
 Invoke the reviewer capability:
 
 ```bash
-timeout 300 codex exec --model {model} --sandbox read-only --full-auto "
+timeout 600 codex exec --model {model} --sandbox read-only --full-auto "
 Review {feature}. Report ONLY bugs or logic errors. Be concise.
 
 ## Design
@@ -88,7 +88,7 @@ For each finding:
 After fixes are applied, invoke the reviewer again:
 
 ```bash
-timeout 300 codex exec --model {model} --sandbox read-only --full-auto "
+timeout 600 codex exec --model {model} --sandbox read-only --full-auto "
 Previous review found: {finding summary}.
 Fixed by: {fix description}. Tests added: {test names if any}.
 Verify the fixes in {changed files}. Any remaining bugs or new issues?
