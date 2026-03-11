@@ -1,24 +1,32 @@
-# Verification: Atomic Write Standardization
+# Verification: atomic-write-standard-2026-03-11
 
 ## Scope Verified
 
-- [ ] atomic_write_text() helper function
-- [ ] external_guides.py save_registry() migration
-- [ ] track_markdown.py write migration
-- [ ] track_state_machine.py _save_metadata migration
-- [ ] Crash-safety tests
+- [x] CLI subcommand `sotp file write-atomic`
+- [x] external_guides.py save_registry() 移行
+- [x] track_state_machine.py / track_registry.py 書き込み移行
+- [x] FsTrackStore が metadata.json をアトミック書き込みしていることの確認
+- [x] CLI 統合テスト追加
 
 ## Manual Verification Steps
 
-- [ ] `atomic_write_text()` writes to .tmp then os.replace
-- [ ] No partial files remain after simulated interruption
-- [ ] All script file writes use atomic pattern
-- [ ] `cargo make ci` passes
+1. [x] `sotp file write-atomic --path <path>` が stdin からアトミック書き込みを実行 — **PASS** (4 integration tests)
+2. [x] `external_guides.py` が `atomic_write` モジュール経由で書き込み — **PASS**
+3. [x] `track_state_machine.py` が `atomic_write` モジュール経由で plan.md/registry.md を書き込み — **PASS**
+4. [x] `track_registry.py` の `write_registry()` が `atomic_write` モジュール経由 — **PASS**
+5. [x] `FsTrackStore.write_track()` が `atomic_write_file()` + `FileLockManager` 使用 — **PASS** (コード確認)
+6. [x] 存在しない親ディレクトリへの書き込みでエラー終了 — **PASS** (test_write_atomic_fails_for_nonexistent_parent)
+7. [x] 成功後に一時ファイルが残らない — **PASS** (test_write_atomic_no_temp_files_remain)
+8. [x] `cargo make ci` 全ゲートパス — **PASS** (218 tests, all verifiers)
 
-## Result / Open Issues
+## Result
 
-_Pending implementation._
+- **PASS** — 全 acceptance criteria 達成
+
+## Open Issues
+
+- `scripts/atomic_write.py` の `_find_sotp()` binary selection ロジックに Python ユニットテストがない（Codex review Round 4 で指摘）。将来 hardening として: (1) 非互換 PATH binary + 互換 local binary → local 選択、(2) 互換 binary なし → `write_text()` フォールバック、(3) probe 結果キャッシュ — の 3 ケースをカバーするテスト追加を推奨
 
 ## verified_at
 
-_Not yet verified._
+- 2026-03-11

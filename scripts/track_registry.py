@@ -161,9 +161,11 @@ def render_registry(tracks: list[TrackMetadataV2]) -> str:
 
 def write_registry(root: Path) -> Path:
     """Collect metadata, render registry.md, and write it. Returns the path."""
+    from atomic_write import atomic_write_file
+
     tracks = collect_track_metadata(root)
     content = render_registry(tracks)
     registry_path = root / "track" / "registry.md"
     registry_path.parent.mkdir(parents=True, exist_ok=True)
-    registry_path.write_text(content, encoding="utf-8")
+    atomic_write_file(registry_path, content)
     return registry_path

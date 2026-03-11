@@ -11,20 +11,20 @@ metadata.json writes already handled by FsTrackStore; this track covers remainin
 sotp file write-atomic --path <path> reads content from stdin and writes atomically.
 Reuses infrastructure::track::atomic_write_file.
 
-- [ ] sotp file write-atomic CLI subcommand — expose infrastructure::track::atomic_write_file as CLI tool for Python scripts
+- [x] sotp file write-atomic CLI subcommand — expose infrastructure::track::atomic_write_file as CLI tool for Python scripts
 
 ## Python Script Migration
 
 Replace direct write_text/open('w') with subprocess call to sotp file write-atomic.
 external_guides.py and track_markdown.py are primary targets.
 
-- [ ] Migrate external_guides.py save_registry() to use sotp file write-atomic
-- [ ] Migrate track_markdown.py plan.md/registry.md writes to use sotp file write-atomic
+- [x] Migrate external_guides.py save_registry() to use sotp file write-atomic
+- [x] Migrate track_markdown.py plan.md/registry.md writes to use sotp file write-atomic
 
 ## Verification
 
 Confirm FsTrackStore already covers metadata.json.
 Test CLI atomic write for crash-safety.
 
-- [ ] Verify metadata.json writes already use atomic pattern via FsTrackStore (from filelock-migration track)
-- [ ] Tests — verify atomic write CLI produces complete files and cleans up on failure
+- [x] Verify metadata.json writes already use atomic pattern via FsTrackStore (from filelock-migration track)
+- [x] Tests — verify atomic write CLI produces complete files and cleans up on failure
