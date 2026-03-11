@@ -43,7 +43,7 @@ Note:
 
 4. Review phase (choose one)
    ├── cargo make takt-impl-review "<task>"  # Automated review workflow
-   └── /track:review                         # Parallel review via Agent Teams
+   └── /track:review                         # Review → fix → review cycle (zero findings gate)
 
 5. Completion
    └── /track:status                         # Check progress

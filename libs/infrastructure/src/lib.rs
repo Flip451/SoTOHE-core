@@ -1,5 +1,7 @@
 //! Infrastructure layer for the SoTOHE-core track state machine.
 
+pub mod lock;
+
 use std::collections::HashMap;
 use std::sync::Mutex;
 

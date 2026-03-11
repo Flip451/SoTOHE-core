@@ -1,13 +1,47 @@
 use std::process::ExitCode;
 use std::sync::Arc;
 
+use clap::{Parser, Subcommand};
 use domain::{
     DomainError, PlanSection, PlanView, TaskId, TaskTransition, TrackId, TrackMetadata, TrackTask,
 };
 use infrastructure::InMemoryTrackRepository;
 use usecase::{SaveTrackUseCase, TransitionTaskUseCase};
 
+mod commands;
+
+/// SoTOHE-core CLI: track state machine and file lock management.
+#[derive(Parser)]
+#[command(name = "sotp", version, about)]
+struct Cli {
+    #[command(subcommand)]
+    command: Option<CliCommand>,
+}
+
+#[derive(Subcommand)]
+enum CliCommand {
+    /// File lock management for agent concurrent access.
+    Lock {
+        #[command(subcommand)]
+        cmd: commands::lock::LockCommand,
+        /// Directory for lock registry files.
+        #[arg(long, default_value = ".locks")]
+        locks_dir: String,
+    },
+    /// Run the example track state machine demo.
+    Demo,
+}
+
 fn main() -> ExitCode {
+    let cli = Cli::parse();
+
+    match cli.command {
+        Some(CliCommand::Lock { cmd, locks_dir }) => commands::lock::execute(cmd, &locks_dir),
+        Some(CliCommand::Demo) | None => run_demo(),
+    }
+}
+
+fn run_demo() -> ExitCode {
     let repo = Arc::new(InMemoryTrackRepository::new());
     let save = SaveTrackUseCase::new(Arc::clone(&repo));
     let transition = TransitionTaskUseCase::new(Arc::clone(&repo));
