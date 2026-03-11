@@ -1,0 +1,18 @@
+## Task Summary: per-worker CARGO_TARGET_DIR isolation
+
+**Track:** per-worker-target-dir-2026-03-11
+**Task:** Add WORKER_ID-based CARGO_TARGET_DIR separation for parallel Agent Teams builds
+**Date:** 2026-03-12
+
+### Changes
+
+- compose.yml: CARGO_TARGET_DIR uses CARGO_TARGET_DIR_RELATIVE env var with "target" default
+- compose.dev.yml: same CARGO_TARGET_DIR_RELATIVE change
+- Makefile.toml: -exec tasks converted to script_runner with WORKER_ID-aware CARGO_TARGET_DIR override; prepare-local-cache-dirs creates worker-specific target dir
+- .gitignore: added target-*/ pattern
+- .claude/rules/07-dev-environment.md: added Parallel Worker Isolation (WORKER_ID) section
+- scripts/test_verify_scripts.py: updated assertions for new compose env format and script-based test-one-exec
+
+### Why
+
+Parallel Agent Teams workers sharing a single tools-daemon container deadlock on target/ build locks. WORKER_ID env var enables per-worker CARGO_TARGET_DIR separation while keeping sccache shared for compilation cache efficiency. Default behavior (no WORKER_ID) remains unchanged.
