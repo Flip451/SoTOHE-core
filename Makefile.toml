@@ -11,7 +11,13 @@ TAKT_PYTHON = { script = ["if [ -n \"${PYTHON_BIN:-}\" ]; then echo \"$PYTHON_BI
 private = true
 description = "[internal] Prepare host-owned cache directories for compose bind mounts"
 script_runner = "@shell"
-script = ['mkdir -p target .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home .cache/pytest']
+script = ['''
+TARGET_DIR="target"
+if [ -n "${WORKER_ID:-}" ]; then
+  TARGET_DIR="target-${WORKER_ID}"
+fi
+mkdir -p "$TARGET_DIR" .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home .cache/pytest
+''']
 
 [tasks.help]
 description = "Show available tasks with category labels: [wrapper] [fast] [gate] [internal]"
@@ -297,53 +303,102 @@ command = "docker"
 args = ["compose", "stop", "tools-daemon"]
 
 # Daemon-exec wrappers (fast TDD loop — requires tools-daemon running: cargo make tools-up)
+# When WORKER_ID is set, each exec gets its own CARGO_TARGET_DIR to prevent build lock contention.
 [tasks.fmt-exec]
 description = "[fast] Run fmt via tools-daemon exec (requires tools-up)"
 dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "exec", "-T", "tools-daemon", "cargo", "make", "--allow-private", "fmt-local"]
+script_runner = "@shell"
+script = ['''
+WORKER_ENV=""
+if [ -n "${WORKER_ID:-}" ]; then
+  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+fi
+docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private fmt-local
+''']
 
 [tasks.clippy-exec]
 description = "[fast] Run clippy via tools-daemon exec (requires tools-up)"
 dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "exec", "-T", "tools-daemon", "cargo", "make", "--allow-private", "clippy-local"]
+script_runner = "@shell"
+script = ['''
+WORKER_ENV=""
+if [ -n "${WORKER_ID:-}" ]; then
+  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+fi
+docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private clippy-local
+''']
 
 [tasks.test-exec]
 description = "[fast] Run all tests via tools-daemon exec (requires tools-up)"
 dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "exec", "-T", "tools-daemon", "cargo", "make", "--allow-private", "test-local"]
+script_runner = "@shell"
+script = ['''
+WORKER_ENV=""
+if [ -n "${WORKER_ID:-}" ]; then
+  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+fi
+docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private test-local
+''']
 
 [tasks.test-one-exec]
 description = "[fast] Run a single nextest test via tools-daemon exec (requires tools-up)"
 dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "exec", "-T", "tools-daemon", "cargo", "nextest", "run", "--locked", "${@}"]
+script_runner = "@shell"
+script = ['''
+WORKER_ENV=""
+if [ -n "${WORKER_ID:-}" ]; then
+  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+fi
+docker compose exec -T $WORKER_ENV tools-daemon cargo nextest run --locked "$CARGO_MAKE_TASK_ARGS"
+''']
 
 [tasks.check-exec]
 description = "[fast] Run cargo check via tools-daemon exec (requires tools-up)"
 dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "exec", "-T", "tools-daemon", "cargo", "make", "--allow-private", "check-local"]
+script_runner = "@shell"
+script = ['''
+WORKER_ENV=""
+if [ -n "${WORKER_ID:-}" ]; then
+  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+fi
+docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private check-local
+''']
 
 [tasks.machete-exec]
 description = "[fast] Run cargo-machete via tools-daemon exec (requires tools-up)"
 dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "exec", "-T", "tools-daemon", "cargo", "make", "--allow-private", "machete-local"]
+script_runner = "@shell"
+script = ['''
+WORKER_ENV=""
+if [ -n "${WORKER_ID:-}" ]; then
+  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+fi
+docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private machete-local
+''']
 
 [tasks.deny-exec]
 description = "[fast] Run cargo-deny via tools-daemon exec (requires tools-up)"
 dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "exec", "-T", "tools-daemon", "cargo", "make", "--allow-private", "deny-local"]
+script_runner = "@shell"
+script = ['''
+WORKER_ENV=""
+if [ -n "${WORKER_ID:-}" ]; then
+  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+fi
+docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private deny-local
+''']
 
 [tasks.llvm-cov-exec]
-description = "[fast] Generate HTML coverage via tools-daemon exec (requires tools-up)"
+description = "[fast] Run HTML coverage via tools-daemon exec (requires tools-up)"
 dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "exec", "-T", "tools-daemon", "cargo", "make", "--allow-private", "llvm-cov-local"]
+script_runner = "@shell"
+script = ['''
+WORKER_ENV=""
+if [ -n "${WORKER_ID:-}" ]; then
+  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+fi
+docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private llvm-cov-local
+''']
 
 # Local quality tasks (executed inside container by default)
 [tasks.fmt-local]

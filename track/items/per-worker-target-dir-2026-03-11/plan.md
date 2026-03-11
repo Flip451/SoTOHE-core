@@ -11,19 +11,19 @@ sccache remains shared across workers for compilation cache efficiency.
 Add WORKER_ID env var support: CARGO_TARGET_DIR=/workspace/target-${WORKER_ID:-default}.
 Each worker gets isolated target directory while sharing source and sccache.
 
-- [ ] compose.yml: Add CARGO_TARGET_DIR override support via WORKER_ID environment variable
+- [x] compose.yml: Add CARGO_TARGET_DIR override support via WORKER_ID environment variable
 
 ## Makefile Integration
 
 Add WORKER_ID passthrough to -exec tasks.
 Default (no WORKER_ID) uses /workspace/target for backward compatibility.
 
-- [ ] Makefile.toml: Add worker-aware -exec tasks that pass WORKER_ID to container
+- [x] Makefile.toml: Add worker-aware -exec tasks that pass WORKER_ID to container
 
 ## Documentation and Validation
 
 Document worker isolation pattern.
 Verify sccache hit rates remain high with separated target dirs.
 
-- [ ] Document parallel worker usage pattern and WORKER_ID convention
-- [ ] Verify sccache sharing works correctly across isolated target directories
+- [x] Document parallel worker usage pattern and WORKER_ID convention
+- [x] Verify sccache sharing works correctly across isolated target directories

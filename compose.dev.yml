@@ -18,6 +18,6 @@ services:
       CARGO_TERM_COLOR: always
       HOME: /workspace/.cache/home
       CARGO_HOME: /workspace/.cache/cargo
-      CARGO_TARGET_DIR: /workspace/target
+      CARGO_TARGET_DIR: /workspace/${CARGO_TARGET_DIR_RELATIVE:-target}
       SCCACHE_DIR: /workspace/.cache/sccache
     command: bash -c 'exec /usr/local/cargo/bin/bacon "$${BACON_JOB:-run}" --headless'

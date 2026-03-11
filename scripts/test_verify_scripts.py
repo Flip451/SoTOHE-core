@@ -1277,7 +1277,7 @@ class VerifyScriptsTest(unittest.TestCase):
             self.assertIn('user: "${HOST_UID:-1000}:${HOST_GID:-1000}"', content)
             self.assertIn("HOME: /workspace/.cache/home", content)
             self.assertIn("CARGO_HOME: /workspace/.cache/cargo", content)
-            self.assertIn("CARGO_TARGET_DIR: /workspace/target", content)
+            self.assertIn("CARGO_TARGET_DIR: /workspace/${CARGO_TARGET_DIR_RELATIVE:-target}", content)
             self.assertIn("${SCCACHE_HOST_DIR:-./.cache/sccache}", content)
             self.assertNotIn("target_cache:/workspace/target", content)
             self.assertNotIn("cargo_registry_cache:/usr/local/cargo/registry", content)
@@ -2106,7 +2106,7 @@ class VerifyScriptsTest(unittest.TestCase):
             'args = ["check", "--locked", "--all-targets", "--all-features"]',
             'args = ["deny", "--locked", "check"]',
             'args = ["clippy", "--locked", "--tests", "--all-features", "--", "-D", "warnings"]',
-            'args = ["compose", "exec", "-T", "tools-daemon", "cargo", "nextest", "run", "--locked", "${@}"]',
+            'cargo nextest run --locked "$CARGO_MAKE_TASK_ARGS"',  # test-one-exec preserves arg quoting
         ):
             self.assertIn(snippet, makefile)
 
