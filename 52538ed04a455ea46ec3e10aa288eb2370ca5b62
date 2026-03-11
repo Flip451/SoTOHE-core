@@ -1,0 +1,19 @@
+## Task Summary: Centralize clippy lint policy
+
+**Track:** clippy-zero-warnings-2026-03-11
+**Task:** Centralize duplicated #![deny(...)] blocks into [workspace.lints] and add clippy.toml
+**Date:** 2026-03-11
+
+### Changes
+
+- Cargo.toml: added [workspace.lints.rust] and [workspace.lints.clippy] sections
+- apps/cli/Cargo.toml, libs/*/Cargo.toml: added [lints] workspace = true
+- apps/cli/src/main.rs, libs/*/src/lib.rs: removed duplicated #![deny(...)] blocks
+- vendor/conch-parser/src/lib.rs: added #![allow(warnings)] to suppress vendored crate noise
+- clippy.toml: new file with msrv=1.85 and threshold defaults
+
+### Why
+
+Lint configuration was duplicated across 4 crate roots with identical #![deny(...)] blocks.
+Centralizing into [workspace.lints] makes the policy single-sourced and easier to maintain.
+Vendored conch-parser (Rust 2015 edition) emitted 198 warnings that obscured real issues.
