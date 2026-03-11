@@ -2,9 +2,9 @@
   "schema_version": 2,
   "id": "track-state-machine-2026-03-11",
   "title": "Track state machine: DMMF domain model",
-  "status": "planned",
+  "status": "done",
   "created_at": "2026-03-11T00:00:00Z",
-  "updated_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:36:31.831786+00:00",
   "plan": {
     "summary": [
       "Implement a DMMF-style Rust domain model for the track state machine.",
@@ -24,7 +24,9 @@
           "PlanView/PlanSection with plan-task referential integrity.",
           "TrackRepository trait (port)."
         ],
-        "task_ids": ["T1"]
+        "task_ids": [
+          "T1"
+        ]
       },
       {
         "id": "S2",
@@ -32,7 +34,9 @@
         "description": [
           "SaveTrackUseCase, LoadTrackUseCase, TransitionTaskUseCase."
         ],
-        "task_ids": ["T2"]
+        "task_ids": [
+          "T2"
+        ]
       },
       {
         "id": "S3",
@@ -40,7 +44,9 @@
         "description": [
           "InMemoryTrackRepository implementing TrackRepository with Mutex<HashMap>."
         ],
-        "task_ids": ["T3"]
+        "task_ids": [
+          "T3"
+        ]
       },
       {
         "id": "S4",
@@ -49,7 +55,9 @@
           "Update CLI main.rs to use new domain model.",
           "Unit tests for domain, usecase, infrastructure, and CLI."
         ],
-        "task_ids": ["T4"]
+        "task_ids": [
+          "T4"
+        ]
       }
     ]
   },
@@ -57,26 +65,26 @@
     {
       "id": "T1",
       "description": "Implement domain layer: IDs, errors, track/task types, state machine, repository trait",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "d17fd41"
     },
     {
       "id": "T2",
       "description": "Implement usecase layer: Save, Load, TransitionTask use cases",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "d17fd41"
     },
     {
       "id": "T3",
       "description": "Implement infrastructure layer: InMemoryTrackRepository",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "d17fd41"
     },
     {
       "id": "T4",
       "description": "Update CLI and add comprehensive tests across all layers",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "d17fd41"
     }
   ]
 }

@@ -15,23 +15,23 @@ TrackMetadata aggregate with derived status and StatusOverride.
 PlanView/PlanSection with plan-task referential integrity.
 TrackRepository trait (port).
 
-- [ ] Implement domain layer: IDs, errors, track/task types, state machine, repository trait
+- [x] Implement domain layer: IDs, errors, track/task types, state machine, repository trait d17fd41
 
 ## Usecase layer: track operations
 
 SaveTrackUseCase, LoadTrackUseCase, TransitionTaskUseCase.
 
-- [ ] Implement usecase layer: Save, Load, TransitionTask use cases
+- [x] Implement usecase layer: Save, Load, TransitionTask use cases d17fd41
 
 ## Infrastructure layer: in-memory repository
 
 InMemoryTrackRepository implementing TrackRepository with Mutex<HashMap>.
 
-- [ ] Implement infrastructure layer: InMemoryTrackRepository
+- [x] Implement infrastructure layer: InMemoryTrackRepository d17fd41
 
 ## CLI integration and tests
 
 Update CLI main.rs to use new domain model.
 Unit tests for domain, usecase, infrastructure, and CLI.
 
-- [ ] Update CLI and add comprehensive tests across all layers
+- [x] Update CLI and add comprehensive tests across all layers d17fd41
