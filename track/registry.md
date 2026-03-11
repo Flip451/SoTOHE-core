@@ -7,15 +7,16 @@
 
 ## Current Focus
 
-- Latest active track: `None yet`
-- Next recommended command: `/track:plan <feature>`
-- Last updated: `2026-03-10`
+- Latest active track: `ownership-file-lock-2026-03-11`
+- Next recommended command: `/track:implement`
+- Last updated: `2026-03-11`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| _No active tracks yet_ | - | `/track:plan <feature>` | - |
+| ownership-file-lock-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
+| track-state-machine-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
 
 ## Completed Tracks
 
