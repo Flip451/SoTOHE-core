@@ -1,0 +1,10 @@
+# Clippy configuration for SoTOHE-core workspace
+# https://doc.rust-lang.org/clippy/lint_configuration.html
+
+# Align with workspace rust-version in Cargo.toml
+msrv = "1.85"
+
+# Threshold defaults (made explicit for visibility)
+cognitive-complexity-threshold = 25
+too-many-arguments-threshold = 7
+type-complexity-threshold = 250

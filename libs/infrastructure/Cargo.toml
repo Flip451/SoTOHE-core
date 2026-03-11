@@ -5,6 +5,9 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 chrono = { version = "0.4.44", features = ["serde"] }
 domain = { path = "../domain" }

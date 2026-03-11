@@ -17,5 +17,17 @@ publish = false
 [workspace.dependencies]
 thiserror = "2"
 
+[workspace.lints.rust]
+warnings = "deny"
+
+[workspace.lints.clippy]
+indexing_slicing = "deny"
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+unreachable = "deny"
+todo = "deny"
+unimplemented = "deny"
+
 [patch.crates-io]
 conch-parser = { path = "vendor/conch-parser" }
