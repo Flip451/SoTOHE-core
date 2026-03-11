@@ -1,0 +1,22 @@
+## Task Summary: Ownership-based file lock manager
+
+**Track:** ownership-file-lock-2026-03-11
+**Task:** Implement file lock manager with Rust ownership semantics for Agent Teams concurrency
+**Date:** 2026-03-11
+
+### Changes
+
+- libs/domain/src/lock/: FilePath, AgentId, LockMode, LockEntry, LockError, FileGuard, FileLockManager trait
+- libs/infrastructure/src/lock/fs_lock_manager.rs: FsFileLockManager with flock + registry.json, PID/TTL stale reaping
+- apps/cli/src/commands/lock.rs: acquire/release/status/cleanup/extend subcommands
+- .claude/hooks/file-lock-acquire.py: PreToolUse hook (exclusive for Edit/Write, shared for Read)
+- .claude/hooks/file-lock-release.py: PostToolUse hook (release on Edit/Write/Read)
+- .claude/docs/DESIGN.md: fail-closed and AlreadyHeld design decisions
+- .claude/commands/track/review.md: enhanced review→fix→review cycle with Codex
+
+### Why
+
+Agent Teams parallel execution can cause file conflicts when multiple agents read/write the same file.
+This lock manager maps Rust ownership semantics to file access: exclusive locks for writes, shared
+locks for reads. Hooks intercept tool calls to transparently acquire/release locks via CLI subprocess.
+Reviewed through 8 Codex rounds achieving zero findings with consistent stale-entry handling.
