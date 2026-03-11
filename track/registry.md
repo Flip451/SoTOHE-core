@@ -16,12 +16,12 @@
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
 | ownership-file-lock-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
-| track-state-machine-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| track-state-machine-2026-03-11 | Done | 2026-03-11 |
 | dockerfile-update-2026-03-11 | Done | 2026-03-10 |
 
 ## Archived Tracks
