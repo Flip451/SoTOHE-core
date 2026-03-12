@@ -1,0 +1,25 @@
+## Task Summary: Track branch enforcement guard implementation
+
+**Track:** track-branch-guard-2026-03-12
+**Task:** System-level guarantee that track operations run on the correct branch (T001-T009)
+**Date:** 2026-03-12
+
+### Changes
+
+- libs/domain/src/ids.rs: Add TrackBranch value object with track/<slug> validation
+- libs/domain/src/track.rs: Add branch: Option<TrackBranch> field to TrackMetadata
+- libs/infrastructure/src/track/codec.rs: Serialize/deserialize branch field in metadata.json
+- apps/cli/src/commands/track.rs: Add branch guard + --skip-branch-check to sotp track transition
+- scripts/track_branch_guard.py: New verify_track_branch() guard function
+- scripts/track_state_machine.py: Centralize branch guard in _save_metadata()
+- scripts/git_ops.py: Add commit-time branch guard via track-dir.txt
+- scripts/track_resolution.py: Distinguish detached HEAD sentinel from non-repo
+- scripts/test_track_branch_guard.py: 7 Python tests for guard function
+- libs/domain/src/lib.rs: 6 Rust tests for TrackBranch and TrackMetadata.branch
+
+### Why
+
+Track operations (commit, transition, add_task, set_override) must be rejected when the
+current git branch does not match the track's metadata.json branch field. This prevents
+accidental cross-track mutations. Enforcement is system-level via Rust value objects,
+Python guard functions, and cargo make task wrappers — not prompt-based.
