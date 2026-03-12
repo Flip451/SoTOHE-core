@@ -157,6 +157,8 @@ EXPECTED_CARGO_MAKE_ALLOW = {
     "Bash(cargo make track-pr-push)": "cargo make track-pr-push permission",
     "Bash(cargo make track-pr-ensure)": "cargo make track-pr-ensure permission",
     "Bash(cargo make track-pr-review)": "cargo make track-pr-review permission",
+    "Bash(cargo make track-pr-merge:*)": "cargo make track-pr-merge permission",
+    "Bash(cargo make track-pr-status:*)": "cargo make track-pr-status permission",
 }
 
 EXPECTED_ALLOW = {

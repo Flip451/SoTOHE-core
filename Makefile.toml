@@ -744,6 +744,16 @@ description = "[wrapper] Run full PR review cycle: push, ensure PR, trigger @cod
 script_runner = "@shell"
 script = ['"${PYTHON_BIN:-python3}" scripts/pr_review.py run']
 
+[tasks.track-pr-merge]
+description = "[wrapper] Wait for PR checks to pass, then merge"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/pr_merge.py wait-and-merge ${@}']
+
+[tasks.track-pr-status]
+description = "[wrapper] Show PR check status"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/pr_merge.py status ${@}']
+
 [tasks.track-add-paths]
 description = "[wrapper] Stage paths listed in tmp/track-commit/add-paths.txt and delete the scratch file"
 script_runner = "@shell"
