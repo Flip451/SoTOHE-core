@@ -43,6 +43,7 @@
 - Manual verification steps require a live GitHub repository with Codex Cloud GitHub App installed.
 - All automated tests pass (44 tests). Manual E2E testing deferred to first real PR review run.
 - Implementation review: 2 sessions (8 rounds total), all findings resolved.
+- E2E test: /track:pr-review live execution test on GitHub.
 
 ## verified_at
 
