@@ -1135,6 +1135,113 @@ class VerifyScriptsTest(unittest.TestCase):
         # Should not crash with TypeError; non-string status treated as non-archived
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_verify_latest_track_todo_inside_code_block_passes(self) -> None:
+        def setup(root: Path) -> None:
+            track_dir = root / "track" / "items" / "demo"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "metadata.json").write_text(
+                json.dumps({"updated_at": "2026-03-02"}) + "\n",
+                encoding="utf-8",
+            )
+            (track_dir / "spec.md").write_text(
+                "\n".join(
+                    [
+                        "Feature description here.",
+                        "",
+                        "```rust",
+                        "// TODO: implement this later",
+                        "fn placeholder() {}",
+                        "```",
+                        "",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            (track_dir / "plan.md").write_text(
+                "- [ ] implement feature\n", encoding="utf-8"
+            )
+            (track_dir / "verification.md").write_text(
+                "Verified manually.\n", encoding="utf-8"
+            )
+
+        result = self.run_python_script("verify_latest_track_files.py", setup)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertNotIn("placeholders", result.stdout)
+
+    def test_verify_latest_track_todo_outside_code_block_fails(self) -> None:
+        def setup(root: Path) -> None:
+            track_dir = root / "track" / "items" / "demo"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "metadata.json").write_text(
+                json.dumps({"updated_at": "2026-03-02"}) + "\n",
+                encoding="utf-8",
+            )
+            (track_dir / "spec.md").write_text(
+                "\n".join(
+                    [
+                        "Feature description here.",
+                        "",
+                        "```rust",
+                        "// TODO: this is inside a fence and should be ignored",
+                        "```",
+                        "",
+                        "TODO: this is outside and should be flagged",
+                        "",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            (track_dir / "plan.md").write_text(
+                "- [ ] implement feature\n", encoding="utf-8"
+            )
+            (track_dir / "verification.md").write_text(
+                "Verified manually.\n", encoding="utf-8"
+            )
+
+        result = self.run_python_script("verify_latest_track_files.py", setup)
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("spec.md still contains placeholders", result.stdout)
+
+    def test_verify_latest_track_japanese_scaffold_headings_detected(self) -> None:
+        def setup(root: Path) -> None:
+            track_dir = root / "track" / "items" / "demo"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "metadata.json").write_text(
+                json.dumps({"updated_at": "2026-03-02"}) + "\n",
+                encoding="utf-8",
+            )
+            (track_dir / "spec.md").write_text("実装対象の概要\n", encoding="utf-8")
+            (track_dir / "plan.md").write_text(
+                "- [ ] implement feature\n", encoding="utf-8"
+            )
+            (track_dir / "verification.md").write_text(
+                "\n".join(
+                    [
+                        "## Scope",
+                        "- 検証範囲",
+                        "## Steps",
+                        "- 手動検証手順",
+                        "## Results",
+                        "- 結果 / 未解決事項",
+                        "## Date",
+                        "- 検証日",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+        result = self.run_python_script("verify_latest_track_files.py", setup)
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn(
+            "verification.md still contains scaffold placeholders", result.stdout
+        )
+
     def test_verify_tech_stack_fails_by_default_without_tracks(self) -> None:
         def setup(root: Path) -> None:
             track_dir = root / "track"
@@ -1142,6 +1249,12 @@ class VerifyScriptsTest(unittest.TestCase):
             (track_dir / "tech-stack.md").write_text(
                 "- **DB**: `TODO: PostgreSQL / SQLite / MySQL / なし`\n",
                 encoding="utf-8",
+            )
+            # Add an in_progress track so the planning-phase bypass does not fire
+            items_dir = track_dir / "items" / "task-a"
+            items_dir.mkdir(parents=True, exist_ok=True)
+            (items_dir / "metadata.json").write_text(
+                '{"status": "in_progress"}', encoding="utf-8"
             )
 
         result = self.run_python_script("verify_tech_stack_ready.py", setup)
@@ -1160,8 +1273,16 @@ class VerifyScriptsTest(unittest.TestCase):
                 encoding="utf-8",
             )
             (root / ".track-template-dev").write_text("", encoding="utf-8")
-            (root / "track" / "items" / "a").mkdir(parents=True, exist_ok=True)
-            (root / "track" / "items" / "b").mkdir(parents=True, exist_ok=True)
+            items_a = root / "track" / "items" / "a"
+            items_a.mkdir(parents=True, exist_ok=True)
+            (items_a / "metadata.json").write_text(
+                '{"status": "in_progress"}', encoding="utf-8"
+            )
+            items_b = root / "track" / "items" / "b"
+            items_b.mkdir(parents=True, exist_ok=True)
+            (items_b / "metadata.json").write_text(
+                '{"status": "planned"}', encoding="utf-8"
+            )
 
         result = self.run_python_script("verify_tech_stack_ready.py", setup)
 
@@ -1190,6 +1311,11 @@ class VerifyScriptsTest(unittest.TestCase):
             (track_dir / "tech-stack.md").write_text(
                 "- **DB**: TODO: PostgreSQL / SQLite\n", encoding="utf-8"
             )
+            items_dir = track_dir / "items" / "task-a"
+            items_dir.mkdir(parents=True, exist_ok=True)
+            (items_dir / "metadata.json").write_text(
+                '{"status": "in_progress"}', encoding="utf-8"
+            )
 
         result = self.run_python_script("verify_tech_stack_ready.py", setup)
 
@@ -1203,6 +1329,11 @@ class VerifyScriptsTest(unittest.TestCase):
             (track_dir / "tech-stack.md").write_text(
                 "| DB | TODO: decide |\n", encoding="utf-8"
             )
+            items_dir = track_dir / "items" / "task-a"
+            items_dir.mkdir(parents=True, exist_ok=True)
+            (items_dir / "metadata.json").write_text(
+                '{"status": "in_progress"}', encoding="utf-8"
+            )
 
         result = self.run_python_script("verify_tech_stack_ready.py", setup)
 
@@ -1215,6 +1346,11 @@ class VerifyScriptsTest(unittest.TestCase):
             track_dir.mkdir(parents=True, exist_ok=True)
             (track_dir / "tech-stack.md").write_text(
                 "理由: TODO: 未決定\n", encoding="utf-8"
+            )
+            items_dir = track_dir / "items" / "task-a"
+            items_dir.mkdir(parents=True, exist_ok=True)
+            (items_dir / "metadata.json").write_text(
+                '{"status": "in_progress"}', encoding="utf-8"
             )
 
         result = self.run_python_script("verify_tech_stack_ready.py", setup)
@@ -1270,6 +1406,150 @@ class VerifyScriptsTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("Template development mode is enabled", result.stdout)
+
+    def test_verify_tech_stack_todo_allowed_when_all_planned(self) -> None:
+        def setup(root: Path) -> None:
+            track_dir = root / "track"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "tech-stack.md").write_text(
+                "- **DB**: `TODO: PostgreSQL / SQLite / MySQL / なし`\n",
+                encoding="utf-8",
+            )
+            items_dir = track_dir / "items" / "task-a"
+            items_dir.mkdir(parents=True, exist_ok=True)
+            (items_dir / "metadata.json").write_text(
+                '{"status": "planned"}', encoding="utf-8"
+            )
+
+        result = self.run_python_script("verify_tech_stack_ready.py", setup)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("All tracks are in 'planned' status", result.stdout)
+
+    def test_verify_tech_stack_todo_blocked_when_in_progress(self) -> None:
+        def setup(root: Path) -> None:
+            track_dir = root / "track"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "tech-stack.md").write_text(
+                "- **DB**: `TODO: PostgreSQL / SQLite / MySQL / なし`\n",
+                encoding="utf-8",
+            )
+            items_dir = track_dir / "items" / "task-a"
+            items_dir.mkdir(parents=True, exist_ok=True)
+            (items_dir / "metadata.json").write_text(
+                '{"status": "in_progress"}', encoding="utf-8"
+            )
+
+        result = self.run_python_script("verify_tech_stack_ready.py", setup)
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Unresolved tech stack TODOs found", result.stdout)
+
+    def test_verify_tech_stack_todo_blocked_when_done(self) -> None:
+        def setup(root: Path) -> None:
+            track_dir = root / "track"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "tech-stack.md").write_text(
+                "- **DB**: `TODO: PostgreSQL / SQLite / MySQL / なし`\n",
+                encoding="utf-8",
+            )
+            items_dir = track_dir / "items" / "task-a"
+            items_dir.mkdir(parents=True, exist_ok=True)
+            (items_dir / "metadata.json").write_text(
+                '{"status": "done"}', encoding="utf-8"
+            )
+
+        result = self.run_python_script("verify_tech_stack_ready.py", setup)
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Unresolved tech stack TODOs found", result.stdout)
+
+    def test_verify_tech_stack_fail_closed_missing_metadata(self) -> None:
+        def setup(root: Path) -> None:
+            track_dir = root / "track"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "tech-stack.md").write_text(
+                "- **DB**: `TODO: PostgreSQL / SQLite / MySQL / なし`\n",
+                encoding="utf-8",
+            )
+            # Create track dir without metadata.json
+            (track_dir / "items" / "task-a").mkdir(parents=True, exist_ok=True)
+
+        result = self.run_python_script("verify_tech_stack_ready.py", setup)
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Cannot read track metadata", result.stdout)
+
+    def test_verify_tech_stack_fail_closed_corrupt_metadata(self) -> None:
+        def setup(root: Path) -> None:
+            track_dir = root / "track"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "tech-stack.md").write_text(
+                "- **DB**: `TODO: PostgreSQL / SQLite / MySQL / なし`\n",
+                encoding="utf-8",
+            )
+            items_dir = track_dir / "items" / "task-a"
+            items_dir.mkdir(parents=True, exist_ok=True)
+            (items_dir / "metadata.json").write_text(
+                "not valid json{{{", encoding="utf-8"
+            )
+
+        result = self.run_python_script("verify_tech_stack_ready.py", setup)
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Cannot read track metadata", result.stdout)
+
+    def test_verify_tech_stack_fail_closed_non_object_metadata(self) -> None:
+        def setup(root: Path) -> None:
+            track_dir = root / "track"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "tech-stack.md").write_text(
+                "- **DB**: `TODO: PostgreSQL / SQLite / MySQL / なし`\n",
+                encoding="utf-8",
+            )
+            items_dir = track_dir / "items" / "task-a"
+            items_dir.mkdir(parents=True, exist_ok=True)
+            (items_dir / "metadata.json").write_text("[]", encoding="utf-8")
+
+        result = self.run_python_script("verify_tech_stack_ready.py", setup)
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Cannot read track metadata", result.stdout)
+
+    def test_verify_tech_stack_archived_only_blocks_todo(self) -> None:
+        def setup(root: Path) -> None:
+            track_dir = root / "track"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "tech-stack.md").write_text(
+                "- **DB**: `TODO: PostgreSQL / SQLite / MySQL / なし`\n",
+                encoding="utf-8",
+            )
+            items_dir = track_dir / "items" / "task-a"
+            items_dir.mkdir(parents=True, exist_ok=True)
+            (items_dir / "metadata.json").write_text(
+                '{"status": "archived"}', encoding="utf-8"
+            )
+
+        result = self.run_python_script("verify_tech_stack_ready.py", setup)
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Unresolved tech stack TODOs found", result.stdout)
+
+    def test_verify_tech_stack_resolved_passes_with_bad_metadata(self) -> None:
+        def setup(root: Path) -> None:
+            track_dir = root / "track"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "tech-stack.md").write_text(
+                "- **DB**: PostgreSQL\n", encoding="utf-8"
+            )
+            items_dir = track_dir / "items" / "task-a"
+            items_dir.mkdir(parents=True, exist_ok=True)
+            (items_dir / "metadata.json").write_text("[]", encoding="utf-8")
+
+        result = self.run_python_script("verify_tech_stack_ready.py", setup)
+
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("no blocking TODO placeholders", result.stdout)
 
     def test_compose_uses_host_uid_gid_and_repo_local_build_caches(self) -> None:
         for rel_path in ("compose.yml", "compose.dev.yml"):
@@ -1356,7 +1636,7 @@ class VerifyScriptsTest(unittest.TestCase):
             "mkdir -p target .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home .cache/pytest",
             workflow,
         )
-        self.assertIn("docker exec ci-runner cargo make ci-local", workflow)
+        self.assertIn("docker exec ci-runner cargo make ci-container", workflow)
         self.assertNotIn("TRACK_TEMPLATE_DEV=1", workflow)
 
     def test_verify_architecture_docs_skips_conventions_checks_when_not_bootstrapped(

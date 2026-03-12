@@ -60,7 +60,7 @@ jobs:
             tools tail -f /dev/null
 
       - name: Run CI suite
-        run: docker exec ci-runner cargo make ci-local
+        run: docker exec ci-runner cargo make ci-container
 
       - name: Show sccache stats
         if: always()
