@@ -1,0 +1,19 @@
+## Task Summary: Plan track branch enforcement guard
+
+**Track:** track-branch-guard-2026-03-12
+**Task:** Plan feature with 4-round Codex design review
+**Date:** 2026-03-12
+
+### Changes
+
+- metadata.json: 9 tasks (T001-T009) covering Rust domain, CLI, Python guard, cargo make integration
+- spec.md: Goal, scope, skip policy table, TOCTOU acceptance, acceptance criteria
+- plan.md: Auto-rendered from metadata.json (4 sections: S1-S4)
+- verification.md: Initialized with scope checklist and manual steps
+- registry.md: Active track row added
+
+### Why
+
+Track operations were executed on main instead of the track branch during pr-review-cycle.
+This plan defines system-level enforcement (not prompt-based) to guarantee branch correctness
+for all track mutations: transitions, commits, add_task, set_override.
