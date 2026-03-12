@@ -47,8 +47,10 @@ def verify_track_branch(
 
     try:
         data = json.loads(metadata_file.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return  # corrupt / unreadable → let downstream handle
+    except (json.JSONDecodeError, OSError) as e:
+        raise BranchGuardError(
+            f"Cannot read or parse metadata.json in {track_dir}: {e}"
+        ) from e
 
     expected_branch = data.get("branch")
     if expected_branch is None:

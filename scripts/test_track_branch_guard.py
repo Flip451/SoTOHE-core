@@ -76,3 +76,11 @@ def test_missing_metadata_skips(tmp_path: Path) -> None:
     track_dir.mkdir(parents=True)
     # No metadata.json → skip guard silently
     verify_track_branch(track_dir, current_branch="main")
+
+
+def test_corrupt_metadata_raises(tmp_path: Path) -> None:
+    track_dir = tmp_path / "corrupt-track"
+    track_dir.mkdir(parents=True)
+    (track_dir / "metadata.json").write_text("not valid json", encoding="utf-8")
+    with pytest.raises(BranchGuardError, match="Cannot read or parse"):
+        verify_track_branch(track_dir, current_branch="main")
