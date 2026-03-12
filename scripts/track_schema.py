@@ -61,6 +61,10 @@ REQUIRED_V2_FIELDS = [
     "plan",
 ]
 
+REQUIRED_V3_FIELDS = REQUIRED_V2_FIELDS + ["branch"]
+
+BRANCH_PREFIX = "track/"
+
 
 def _as_list(value: object) -> list:
     """Coerce a value to list. Returns value if already a list, else empty list."""
@@ -99,6 +103,7 @@ class TrackStatusOverride:
 class TrackMetadataV2:
     schema_version: int
     id: str
+    branch: str | None
     title: str
     status: str  # TrackStatus
     created_at: str
@@ -149,6 +154,7 @@ def parse_metadata_v2(data: dict) -> TrackMetadataV2:
     return TrackMetadataV2(
         schema_version=data.get("schema_version", 2),
         id=data.get("id", ""),
+        branch=data.get("branch"),
         title=data.get("title", ""),
         status=data.get("status", ""),
         created_at=data.get("created_at", ""),
@@ -214,8 +220,24 @@ def validate_metadata_v2(data: dict, *, track_dir_name: str) -> list[str]:
             )
 
     # schema_version
-    if data.get("schema_version") != 2:
-        errors.append(f"Expected schema_version=2, got {data.get('schema_version')}")
+    sv = data.get("schema_version")
+    if sv not in (2, 3):
+        errors.append(f"Expected schema_version=2 or 3, got {sv}")
+
+    # branch validation (v3 requires branch for non-archived tracks)
+    branch = data.get("branch")
+    if sv == 3:
+        if branch is not None:
+            if not isinstance(branch, str) or not branch.strip():
+                errors.append("'branch' must be a non-empty string for v3")
+            elif not branch.startswith(BRANCH_PREFIX):
+                errors.append(
+                    f"'branch' must start with '{BRANCH_PREFIX}', got '{branch}'"
+                )
+        elif data["status"] != "archived":
+            errors.append(
+                "'branch' is required for v3 tracks with non-archived status"
+            )
 
     # status value check
     if data["status"] not in VALID_TRACK_STATUSES:

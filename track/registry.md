@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `branch-strategy-2026-03-12`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-12`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| branch-strategy-2026-03-12 | planned | `/track:implement` | 2026-03-12 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| branch-strategy-2026-03-12 | Done | 2026-03-12 |
 | security-control-tests-2026-03-11 | Done | 2026-03-11 |
 | per-worker-target-dir-2026-03-11 | Done | 2026-03-11 |
 | container-vcs-readonly-2026-03-11 | Done | 2026-03-11 |

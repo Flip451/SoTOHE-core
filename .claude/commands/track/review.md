@@ -14,7 +14,8 @@ Arguments:
 
 ## Step 0: Gather context
 
-- Read the latest active track's `spec.md`, `plan.md`, and `metadata.json`.
+- Resolve the current track: if the current git branch matches `track/<id>`, use that track. Otherwise, fall back to the latest active track by `updated_at`.
+- Read the current track's `spec.md`, `plan.md`, and `metadata.json`.
 - Read every convention file listed in the `## Related Conventions (Required Reading)` section of `plan.md`.
 - For exact type signatures, trait definitions, module trees, and Mermaid diagrams, use `## Canonical Blocks` in `plan.md` and `.claude/docs/DESIGN.md` as the source of truth when reviewing implementation correctness.
 - Use any auto-injected external guide summaries from `docs/external-guides.json` before opening cached raw guide documents.

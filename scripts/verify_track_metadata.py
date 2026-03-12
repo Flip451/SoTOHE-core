@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Verify each track has required metadata.json with v2 schema.
+Verify each track has required metadata.json with v2 or v3 schema.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ def validate_metadata(metadata_file: Path) -> list[str]:
     """Return a list of result lines for one metadata.json file.
 
     Lines prefixed with ``[ERROR]`` indicate failures; ``[OK]`` indicates success.
-    All tracks must use schema_version 2.
+    All tracks must use schema_version 2 or 3.
     """
     try:
         with open(metadata_file, encoding="utf-8") as handle:
@@ -34,8 +34,8 @@ def validate_metadata(metadata_file: Path) -> list[str]:
         return [f"  [ERROR] metadata.json root must be an object: {metadata_file}"]
 
     sv = data.get("schema_version")
-    if sv != 2:
-        return [f"  [ERROR] schema_version must be 2 (got {sv!r}) in {metadata_file}"]
+    if sv not in (2, 3):
+        return [f"  [ERROR] schema_version must be 2 or 3 (got {sv!r}) in {metadata_file}"]
 
     track_dir_name = metadata_file.parent.name
     schema_errors = validate_metadata_v2(data, track_dir_name=track_dir_name)

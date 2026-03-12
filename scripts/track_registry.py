@@ -56,7 +56,7 @@ def collect_track_metadata(root: Path) -> list[TrackMetadataV2]:
             data = json.loads(metadata_file.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError):
             continue
-        if not isinstance(data, dict) or data.get("schema_version") != 2:
+        if not isinstance(data, dict) or data.get("schema_version") not in (2, 3):
             continue
         results.append(parse_metadata_v2(data))
 

@@ -8,7 +8,8 @@ Arguments:
 - Use `$ARGUMENTS` as optional scope notes (target module, constraints, priority).
 
 Execution:
-- Read the latest active track's `spec.md`, `plan.md`, and `metadata.json` before implementation.
+- Resolve the current track: if the current git branch matches `track/<id>`, use that track. Otherwise, fall back to the latest active track by `updated_at`.
+- Read the current track's `spec.md`, `plan.md`, and `metadata.json` before implementation.
 - Read every convention file listed in the `## Related Conventions (Required Reading)` section of `plan.md` before writing code.
 - For exact type signatures, trait definitions, module trees, and Mermaid diagrams, prefer `## Canonical Blocks` in `plan.md` and `.claude/docs/DESIGN.md` over surrounding prose.
 - Identify the target task(s) from the approved plan. If `$ARGUMENTS` is provided, map it to the relevant plan scope.

@@ -2,62 +2,62 @@
   "schema_version": 2,
   "id": "branch-strategy-2026-03-12",
   "title": "Feature branch strategy for track workflow",
-  "status": "planned",
+  "status": "done",
   "created_at": "2026-03-12T12:00:00Z",
-  "updated_at": "2026-03-12T12:00:00Z",
+  "updated_at": "2026-03-12T01:46:17.630751+00:00",
   "tasks": [
     {
       "id": "T0",
       "description": "Permission and wrapper prerequisites: add git switch/checkout -b/branch to .claude/settings.json allowedCommands, mirror entries in .claude/permission-extensions.json, add Makefile.toml track-branch-create/track-branch-switch wrapper tasks, update block-direct-git-ops.py to whitelist these wrappers, update verify_orchestra_guardrails.py hardcoded allowlists to accept new wrappers",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T1",
       "description": "metadata.json schema v3: add branch field, dual-read v2/v3 in parse_metadata_v2() and validate_metadata_v2() (accept schema_version 2 or 3), update render_plan()/render_registry()/sync_rendered_views() for v3 compatibility, update verify_latest_track_files.py validation",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T2",
       "description": "Branch-aware track resolution: replace all latest_track_dir() consumers (verify_latest_track_files.py, external_guides.py) and update all command prompts that reference 'latest track' (.claude/commands/track/commit.md, status.md, revert.md, review.md, implement.md, full-cycle.md, catchup.md) with resolve_track_dir() that distinguishes 'current track' (branch-bound, for interactive ops) from 'latest track' (global, for CI/reporting). Add find_track_by_branch(), current_git_branch() helpers",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T3",
       "description": "sotp track branch CLI subcommand: create and switch track branches via Makefile.toml wrapper tasks (depends on T0 permission setup)",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T4",
       "description": "Guard policy update: block merge/rebase/cherry-pick/reset in Rust policy and Python hook",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T5",
       "description": "/track:plan update: auto-create and switch to track branch after approval using T0 wrappers, write branch field to metadata.json (depends on T0, T1)",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T6",
       "description": "/track:commit and registry update: branch-context-aware commit flow and registry rendering. Update track_registry.py render_registry() to prefer current-branch track for Current Focus. Ensure /track:status, /track:review, /track:implement, /track:ci also use current-track resolution",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T7",
       "description": "Notes refspec bootstrap: auto-configure fetch refspec in cargo make bootstrap",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     },
     {
       "id": "T8",
       "description": "Migration and docs: legacy track fallback, workflow docs update, DEVELOPER_AI_WORKFLOW.md update",
-      "status": "todo",
+      "status": "done",
       "commit_hash": null
     }
   ],

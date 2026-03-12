@@ -9,7 +9,8 @@ Arguments:
 
 Execution:
 - Read `track/registry.md`.
-- If any track exists, identify the latest active track directory under `track/items/`.
+- Resolve the current track: if the current git branch matches `track/<id>`, use that track. Otherwise, fall back to the latest active track by `updated_at`.
+- If any track exists, identify the current track directory under `track/items/`.
 - Read that track's `metadata.json`, `spec.md`, and `plan.md` when present.
 - Inspect recent git history and diff to identify the safest revert target.
 - Summarize the recommended revert scope before applying anything destructive.

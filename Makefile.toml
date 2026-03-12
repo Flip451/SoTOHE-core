@@ -210,7 +210,7 @@ echo "=== Bootstrap: development environment setup ==="
 
 # 1. Check prerequisites
 echo ""
-echo "--- Step 1/4: Check prerequisites ---"
+echo "--- Step 1/5: Check prerequisites ---"
 if ! command -v docker >/dev/null 2>&1; then
   echo "[FAIL] docker not found. Install Docker first."
   exit 1
@@ -229,7 +229,7 @@ echo "[OK] uv available"
 
 # 2. Python venv + dependencies
 echo ""
-echo "--- Step 2/4: Python venv + dependencies ---"
+echo "--- Step 2/5: Python venv + dependencies ---"
 if [ ! -d .venv ]; then
   echo "Creating .venv ..."
   uv venv .venv
@@ -240,16 +240,30 @@ echo "[OK] Python dependencies installed"
 
 # 3. Docker images
 echo ""
-echo "--- Step 3/4: Build Docker images ---"
+echo "--- Step 3/5: Build Docker images ---"
 mkdir -p target .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home .cache/pytest
 docker compose build tools
 echo "[OK] Docker tools image built"
 
 # 4. CI
 echo ""
-echo "--- Step 4/4: Run CI ---"
+echo "--- Step 4/5: Run CI ---"
 docker compose run --rm tools cargo make --allow-private ci-local
 echo "[OK] CI passed"
+
+# 5. Git notes fetch refspec
+echo ""
+echo "--- Step 5/5: Configure git notes fetch refspec ---"
+if git remote get-url origin >/dev/null 2>&1; then
+  if git config --get-all remote.origin.fetch | grep -q 'refs/notes'; then
+    echo "[OK] git notes refspec already configured"
+  else
+    git config --add remote.origin.fetch "+refs/notes/*:refs/notes/*"
+    echo "[OK] git notes refspec added to origin"
+  fi
+else
+  echo "[SKIP] no origin remote found; git notes refspec not configured"
+fi
 
 echo ""
 echo "=== Bootstrap complete ==="
@@ -694,6 +708,16 @@ script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py add-all']
 description = "[wrapper] Stage paths listed in .takt/pending-add-paths.txt and delete the pending file"
 script_runner = "@shell"
 script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py add-from-file .takt/pending-add-paths.txt --cleanup']
+
+[tasks.track-branch-create]
+description = "[wrapper] Create a track branch from main and switch to it (usage: cargo make track-branch-create '<track-id>')"
+script_runner = "@shell"
+script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; git switch -c "track/${TRACK_ID}" main']
+
+[tasks.track-branch-switch]
+description = "[wrapper] Switch to an existing track branch (usage: cargo make track-branch-switch '<track-id>')"
+script_runner = "@shell"
+script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; git switch "track/${TRACK_ID}"']
 
 [tasks.track-add-paths]
 description = "[wrapper] Stage paths listed in tmp/track-commit/add-paths.txt and delete the scratch file"

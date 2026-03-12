@@ -20,15 +20,19 @@ Execution:
 After approval — create track artifacts:
 - Remind the user that unresolved `track/tech-stack.md` `TODO:` entries will fail CI.
 - Create a new directory under `track/items/` using a safe slug and timestamp/id as needed to avoid collisions.
-- Create `metadata.json` (SSoT) with schema_version 2 and all required fields:
-  - `schema_version`: 2
+- Create `metadata.json` (SSoT) with schema_version 3 and all required fields:
+  - `schema_version`: 3
   - `id` (must exactly match the created track directory name)
+  - `branch`: `"track/<track-id>"`
   - `title`
   - `status`: `"planned"`
   - `created_at` (ISO 8601)
   - `updated_at` (ISO 8601)
   - `tasks`: array of task objects (`{id, description, status, commit_hash}`)
   - `plan`: `{summary, sections}` where sections reference task IDs
+- After writing metadata.json, create and switch to the track branch:
+  - Run `cargo make track-branch-create '<track-id>'` to create branch `track/<track-id>` and switch to it.
+  - If branch creation fails (e.g. branch already exists), switch to it with `cargo make track-branch-switch '<track-id>'` instead.
 - Generate `plan.md` from `metadata.json` via `scripts/track_markdown.py` `render_plan()`. Do NOT write `plan.md` directly — it is a read-only view rendered from metadata.json.
 - Include a `## Related Conventions (Required Reading)` section in `plan.md` listing repo-relative paths to relevant `project-docs/conventions/*.md` files. If none apply, write `None`. Do not use `- [ ]` checkbox format (conflicts with task parser).
 - If `plan.md` needs an architecture or dependency diagram, use Mermaid `flowchart TD`.

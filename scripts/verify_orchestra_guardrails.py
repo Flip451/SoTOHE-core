@@ -131,6 +131,8 @@ EXPECTED_CARGO_MAKE_ALLOW = {
     "Bash(cargo make track-note)": "cargo make track-note permission",
     "Bash(cargo make track-transition:*)": "cargo make track-transition permission",
     "Bash(cargo make track-sync-views:*)": "cargo make track-sync-views permission",
+    "Bash(cargo make track-branch-create:*)": "cargo make track-branch-create permission",
+    "Bash(cargo make track-branch-switch:*)": "cargo make track-branch-switch permission",
     "Bash(cargo make architecture-rules-workspace-members)": "architecture rules workspace-members permission",
     "Bash(cargo make architecture-rules-direct-checks)": "architecture rules direct-checks permission",
     "Bash(cargo make architecture-rules-verify-claude-workspace-map)": "architecture rules claude workspace map permission",
@@ -282,6 +284,11 @@ BLOCK_HOOK_MARKERS = {
     "GIT_COMMIT_MESSAGE": "git commit block confirmed",
     "GIT_BRANCH_DELETE_MESSAGE": "git branch delete block confirmed",
     "GIT_PUSH_MESSAGE": "git push block confirmed",
+    "GIT_SWITCH_MESSAGE": "git switch/checkout -b block confirmed",
+    "GIT_MERGE_MESSAGE": "git merge block confirmed",
+    "GIT_REBASE_MESSAGE": "git rebase block confirmed",
+    "GIT_CHERRY_PICK_MESSAGE": "git cherry-pick block confirmed",
+    "GIT_RESET_MESSAGE": "git reset block confirmed",
 }
 
 # Phrases that must appear in the TeammateIdle feedback to prevent drift.

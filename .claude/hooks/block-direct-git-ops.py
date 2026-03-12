@@ -27,6 +27,27 @@ GIT_PUSH_MESSAGE = (
     f"{GIT_POLICY_PREFIX} Direct `git push` is blocked.\n"
     "Pushing must be done manually by the user, not by AI agents."
 )
+GIT_SWITCH_MESSAGE = (
+    f"{GIT_POLICY_PREFIX} Direct `git switch` / `git checkout -b` is blocked.\n"
+    "Use `cargo make track-branch-create '<track-id>'` to create a track branch, "
+    "or `cargo make track-branch-switch '<track-id>'` to switch to an existing one."
+)
+GIT_MERGE_MESSAGE = (
+    f"{GIT_POLICY_PREFIX} Direct `git merge` is blocked.\n"
+    "Merging must be done manually by the user via PR workflow, not by AI agents."
+)
+GIT_REBASE_MESSAGE = (
+    f"{GIT_POLICY_PREFIX} Direct `git rebase` is blocked.\n"
+    "Rebasing must be done manually by the user, not by AI agents."
+)
+GIT_CHERRY_PICK_MESSAGE = (
+    f"{GIT_POLICY_PREFIX} Direct `git cherry-pick` is blocked.\n"
+    "Cherry-picking must be done manually by the user, not by AI agents."
+)
+GIT_RESET_MESSAGE = (
+    f"{GIT_POLICY_PREFIX} Direct `git reset` is blocked.\n"
+    "Resetting must be done manually by the user, not by AI agents."
+)
 SHELL_COMMAND_FLAGS = {"-c", "-lc"}
 KNOWN_SHELLS = {"bash", "sh", "zsh", "dash", "ksh"}
 KNOWN_PYTHONS = {"python", "python3"}
@@ -108,7 +129,7 @@ GIT_VARIABLE_BYPASS_MESSAGE = (
     "Potential bypass of git operation guardrails detected. Use literal `git` commands through "
     "approved cargo-make wrappers."
 )
-_PROTECTED_GIT_SUBCOMMANDS = {"add", "commit", "push"}
+_PROTECTED_GIT_SUBCOMMANDS = {"add", "commit", "push", "switch", "merge", "rebase", "cherry-pick", "reset"}
 # Regex fallback for when bashlex is unavailable.
 # Match expansion tokens ($VAR, ${VAR}, $(cmd), `cmd`) followed by protected git subcommands.
 # Anchored to command position: start of string or after shell control operators (;, &&, ||, |).
@@ -117,7 +138,7 @@ _VARIABLE_BYPASS_FALLBACK_RE = re.compile(
     r"(?:^|(?:&&|\|\||[;|])\s*)"
     r"""(?:(?:env\s+|[A-Za-z_][A-Za-z0-9_]*=(?:[^\s]*|"[^"]*"|'[^']*')\s+)*)"""
     r"""(?:"?\$\([^)]*\)"?|"?`[^`]*`"?|"?\$[A-Za-z_{][^\s"]*"?)"""
-    r"""\s+"?(add|commit|push)\b"?"""
+    r"""\s+"?(add|commit|push|switch|merge|rebase|cherry-pick|reset)\b"?"""
 )
 
 # bashlex (GPLv3+) is optional — install manually for higher-accuracy AST detection.
@@ -199,14 +220,18 @@ def _check_variable_git_bypass_regex(command: str) -> bool:
 
 
 SHELL_CONTROL_OPERATORS = {"&&", "||", ";", "&", "|", "(", ")", "\n"}
+_PROTECTED_SUBCMDS_PATTERN = r"add|commit|push|switch|merge|rebase|cherry-pick|reset"
 PYTHON_GIT_COMMAND_PATTERNS = (
-    re.compile(r"\bgit\s+(add|commit|push)\b", re.IGNORECASE),
+    re.compile(rf"\bgit\s+({_PROTECTED_SUBCMDS_PATTERN})\b", re.IGNORECASE),
     re.compile(r"\bgit\s+branch\s+(-d|-D|--delete)\b", re.IGNORECASE),
     # Bare name: subprocess.run(["git", "commit", ...])
-    re.compile(r"['\"]git['\"]\s*,\s*['\"](add|commit|push)['\"]", re.IGNORECASE),
+    re.compile(
+        rf"['\"]git['\"]\s*,\s*['\"]({_PROTECTED_SUBCMDS_PATTERN})['\"]", re.IGNORECASE
+    ),
     # Absolute/relative path: subprocess.run(["/usr/bin/git", "commit", ...])
     re.compile(
-        r"['\"][^'\"]*[/\\]git['\"]\s*,\s*['\"](add|commit|push)['\"]", re.IGNORECASE
+        rf"['\"][^'\"]*[/\\]git['\"]\s*,\s*['\"]({_PROTECTED_SUBCMDS_PATTERN})['\"]",
+        re.IGNORECASE,
     ),
     # List-form branch delete: ["git", "branch", "-D", ...]
     re.compile(
@@ -875,6 +900,29 @@ def check_command(command: str) -> tuple[bool, str]:
 
     if subcommand == "push":
         return True, GIT_PUSH_MESSAGE
+
+    if subcommand == "switch":
+        return True, GIT_SWITCH_MESSAGE
+
+    if subcommand == "checkout":
+        # Block checkout -b / checkout -B / checkout --orphan (branch creation)
+        tokens = _tokenize(command)
+        for token in tokens:
+            if token in {"-b", "-B", "--orphan"}:
+                return True, GIT_SWITCH_MESSAGE
+        # Allow other checkout uses (file restore, etc.) — they're read-only
+
+    if subcommand == "merge":
+        return True, GIT_MERGE_MESSAGE
+
+    if subcommand == "rebase":
+        return True, GIT_REBASE_MESSAGE
+
+    if subcommand == "cherry-pick":
+        return True, GIT_CHERRY_PICK_MESSAGE
+
+    if subcommand == "reset":
+        return True, GIT_RESET_MESSAGE
 
     if subcommand == "branch" and _is_git_branch_delete(command):
         return True, GIT_BRANCH_DELETE_MESSAGE

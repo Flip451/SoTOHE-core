@@ -376,7 +376,7 @@ def sync_rendered_views(
             continue
 
         data = _load_metadata(track_dir)
-        if data.get("schema_version") != 2:
+        if data.get("schema_version") not in (2, 3):
             continue
 
         meta = parse_metadata_v2(data)

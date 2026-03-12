@@ -784,5 +784,74 @@ class PolicyHooksTest(unittest.TestCase):
         )
 
 
+    # -- Branch strategy: new blocked subcommands --
+
+    def test_git_switch_is_blocked(self) -> None:
+        should_block, message = block_direct_git_ops.check_command("git switch feature")
+        self.assertTrue(should_block)
+        self.assertEqual(message, block_direct_git_ops.GIT_SWITCH_MESSAGE)
+
+    def test_git_switch_create_is_blocked(self) -> None:
+        should_block, message = block_direct_git_ops.check_command(
+            "git switch -c new-branch"
+        )
+        self.assertTrue(should_block)
+        self.assertEqual(message, block_direct_git_ops.GIT_SWITCH_MESSAGE)
+
+    def test_git_checkout_b_is_blocked(self) -> None:
+        should_block, message = block_direct_git_ops.check_command(
+            "git checkout -b new-branch"
+        )
+        self.assertTrue(should_block)
+        self.assertEqual(message, block_direct_git_ops.GIT_SWITCH_MESSAGE)
+
+    def test_git_checkout_upper_b_is_blocked(self) -> None:
+        should_block, message = block_direct_git_ops.check_command(
+            "git checkout -B new-branch"
+        )
+        self.assertTrue(should_block)
+        self.assertEqual(message, block_direct_git_ops.GIT_SWITCH_MESSAGE)
+
+    def test_git_checkout_file_restore_is_allowed(self) -> None:
+        should_block, _ = block_direct_git_ops.check_command("git checkout -- file.txt")
+        self.assertFalse(should_block)
+
+    def test_git_merge_is_blocked(self) -> None:
+        should_block, message = block_direct_git_ops.check_command("git merge feature")
+        self.assertTrue(should_block)
+        self.assertEqual(message, block_direct_git_ops.GIT_MERGE_MESSAGE)
+
+    def test_git_rebase_is_blocked(self) -> None:
+        should_block, message = block_direct_git_ops.check_command("git rebase main")
+        self.assertTrue(should_block)
+        self.assertEqual(message, block_direct_git_ops.GIT_REBASE_MESSAGE)
+
+    def test_git_cherry_pick_is_blocked(self) -> None:
+        should_block, message = block_direct_git_ops.check_command(
+            "git cherry-pick abc1234"
+        )
+        self.assertTrue(should_block)
+        self.assertEqual(message, block_direct_git_ops.GIT_CHERRY_PICK_MESSAGE)
+
+    def test_git_reset_is_blocked(self) -> None:
+        should_block, message = block_direct_git_ops.check_command("git reset HEAD~1")
+        self.assertTrue(should_block)
+        self.assertEqual(message, block_direct_git_ops.GIT_RESET_MESSAGE)
+
+    def test_git_reset_hard_is_blocked(self) -> None:
+        should_block, message = block_direct_git_ops.check_command(
+            "git reset --hard HEAD~1"
+        )
+        self.assertTrue(should_block)
+        self.assertEqual(message, block_direct_git_ops.GIT_RESET_MESSAGE)
+
+    def test_git_checkout_orphan_is_blocked(self) -> None:
+        should_block, message = block_direct_git_ops.check_command(
+            "git checkout --orphan new-branch"
+        )
+        self.assertTrue(should_block)
+        self.assertEqual(message, block_direct_git_ops.GIT_SWITCH_MESSAGE)
+
+
 if __name__ == "__main__":
     unittest.main()
