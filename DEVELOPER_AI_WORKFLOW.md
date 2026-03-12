@@ -64,9 +64,11 @@ flowchart TD
     E --> G["実装完了"]
     F --> G
     G --> H{"レビューする?"}
-    H -->|Yes| I["/track:review"]
+    H -->|"ローカル"| I["/track:review"]
+    H -->|"GitHub PR"| I2["/track:pr-review"]
     H -->|No| J["/track:ci"]
     I --> J
+    I2 --> J
     J --> K["/track:commit <message>"]
 ```
 
@@ -81,7 +83,8 @@ flowchart TD
 | `/track:plan <feature>` | 調査・設計・plan 作成・トラック成果物作成 | 実装前に tech-stack と計画を固め、承認後にトラックを作る時 |
 | `/track:full-cycle <task>` | 自律実装 | 承認後にまとめて進めたい時 |
 | `/track:implement` | 対話型並列実装 | 実装中に途中判断を挟みたい時 |
-| `/track:review` | 実装レビュー | 実装内容を確認したい時 |
+| `/track:review` | 実装レビュー（ローカル） | 実装内容を確認したい時 |
+| `/track:pr-review` | GitHub PR レビュー（Codex Cloud） | PR 上で非同期レビューしたい時（要: Codex Cloud GitHub App） |
 | `/track:revert` | 直近変更の安全な取り消し計画 | 変更を戻す前に影響を整理したい時 |
 | `/track:ci` | 品質ゲート一括実行 | レビュー前・コミット前 |
 | `/track:commit <message>` | ガード付きコミット + 必要時の note 適用 | ユーザー向けの正規コミット経路として使う時 |

@@ -154,6 +154,9 @@ EXPECTED_CARGO_MAKE_ALLOW = {
     "Bash(cargo make takt-impl-review:*)": "cargo make takt-impl-review permission",
     "Bash(cargo make takt-tdd-cycle:*)": "cargo make takt-tdd-cycle permission",
     "Bash(cargo make takt-clean-queue)": "cargo make takt-clean-queue permission",
+    "Bash(cargo make track-pr-push)": "cargo make track-pr-push permission",
+    "Bash(cargo make track-pr-ensure)": "cargo make track-pr-ensure permission",
+    "Bash(cargo make track-pr-review)": "cargo make track-pr-review permission",
 }
 
 EXPECTED_ALLOW = {

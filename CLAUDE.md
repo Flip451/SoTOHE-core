@@ -69,6 +69,7 @@ Primary commands:
 - `/track:full-cycle <task>`
 - `/track:implement`
 - `/track:review`
+- `/track:pr-review`
 - `/track:revert`
 - `/track:ci`
 - `/track:commit <message>`
