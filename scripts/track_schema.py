@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Literal
 
 TaskStatus = Literal["todo", "in_progress", "done", "skipped"]
@@ -43,6 +44,18 @@ LEGACY_STATE_MAP: dict[str, str] = {
 COMMIT_HASH_RE = re.compile(r"^[0-9a-f]{7,40}$")
 
 TRACK_ITEMS_DIR = "track/items"
+TRACK_ARCHIVE_DIR = "track/archive"
+
+
+def all_track_directories(root: Path) -> list[Path]:
+    """Return all track directories from both active and archive locations, sorted by name."""
+    dirs: list[Path] = []
+    for base in (TRACK_ITEMS_DIR, TRACK_ARCHIVE_DIR):
+        base_path = root / base
+        if base_path.is_dir():
+            dirs.extend(p for p in base_path.iterdir() if p.is_dir())
+    return sorted(dirs, key=lambda p: p.name)
+
 
 # Reserved words that must not appear as hyphen-delimited segments in track IDs.
 # The guard hook's broad "git" substring match blocks Bash commands whose arguments

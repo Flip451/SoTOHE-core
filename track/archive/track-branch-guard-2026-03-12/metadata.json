@@ -1,0 +1,131 @@
+{
+  "schema_version": 3,
+  "id": "track-branch-guard-2026-03-12",
+  "branch": "track/track-branch-guard-2026-03-12",
+  "title": "Track Branch Enforcement Guard — system-level guarantee that track operations run on the correct branch",
+  "status": "archived",
+  "created_at": "2026-03-12T12:00:00Z",
+  "updated_at": "2026-03-12T14:03:42.170927+00:00",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Add TrackBranch value object to Rust domain (libs/domain/src/ids.rs) with track/<slug> format validation",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Add branch field to TrackMetadata in Rust domain (track.rs) and update constructors/accessors",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "Update infrastructure codec (codec.rs) to serialize/deserialize branch field in metadata.json",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "Add branch validation to sotp track transition CLI — auto-detect current git branch and reject mismatch with metadata.json branch",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T005",
+      "description": "Add verify_track_branch() guard function in Python (track_branch_guard.py) — compare current git branch with metadata.json branch; define skip policy for branch=null, detached HEAD, and --skip-branch-check flag. Extend current_git_branch() to distinguish detached HEAD (returns sentinel 'HEAD') from non-repo (returns None)",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T006",
+      "description": "Centralize branch guard in _save_metadata() to cover all mutation paths: transition_task(), add_task(), set_track_override(). Add skip_branch_check parameter for test/planning bypass",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "Integrate branch guard into git_ops.py commit_from_file() — add --track-dir CLI option; /track:commit skill writes tmp/track-commit/track-dir.txt alongside commit-message.txt; commit_from_file() reads track-dir.txt, validates it is a repo-relative path under track/items/<id> with existing metadata.json, then rejects on branch mismatch; track-dir.txt is cleaned up (deleted) on both success and failure alongside commit-message.txt; add track-dir.txt to TRANSIENT_AUTOMATION_FILES",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T008",
+      "description": "Update cargo make tasks: track-commit-message reads tmp/track-commit/track-dir.txt for explicit track context (written by /track:commit skill); track-transition passes track context via existing track_dir argument; commit-pending-message (takt path) uses branch-based auto-detection as fallback",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T009",
+      "description": "Add comprehensive tests: Rust unit tests for TrackBranch, Python tests for guard function (mismatch, null branch, detached HEAD, skip flag), integration points, cargo make CI validation",
+      "status": "done",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "Track operations (commit, transition, add_task, set_override) must be rejected when the current git branch does not match the track's metadata.json branch field.",
+      "Enforcement is system-level: Rust value objects + Python guard functions + cargo make task wrappers.",
+      "No prompt-based enforcement — all guards are deterministic checks in code.",
+      "Branch guard skip policy: (1) branch=null in metadata.json → guard skips (legacy/planning phase compatibility), (2) detached HEAD → guard rejects (ambiguous state), (3) --skip-branch-check flag → guard skips (test/CI escape hatch), (4) now parameter set (test determinism) → guard skips in Python path.",
+      "TOCTOU acceptance: branch check is a best-effort precondition, not a git-level lock. The residual race between check and git-commit is accepted as the window is sub-second and the threat model is accidental misuse, not adversarial."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Rust Domain Layer — TrackBranch value object and TrackMetadata branch field",
+        "description": [
+          "Add TrackBranch validated value object to ids.rs with track/<slug> format.",
+          "Add branch: Option<TrackBranch> to TrackMetadata.",
+          "Update codec to round-trip branch field."
+        ],
+        "task_ids": [
+          "T001",
+          "T002",
+          "T003"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Rust CLI — sotp track transition branch guard",
+        "description": [
+          "Auto-detect current git branch before transition.",
+          "Read branch from metadata.json and reject if mismatch.",
+          "Add --skip-branch-check flag for CI/testing escape hatch."
+        ],
+        "task_ids": [
+          "T004"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Python Guard Layer — verify_track_branch() and centralized enforcement",
+        "description": [
+          "Add verify_track_branch() that compares current git branch with metadata.json branch. Extend current_git_branch() to return 'HEAD' sentinel for detached HEAD (distinct from None for non-repo).",
+          "Centralize guard in _save_metadata() to cover ALL mutation paths (transition_task, add_task, set_track_override).",
+          "Integrate into commit_from_file() via explicit track-dir.txt file: /track:commit skill writes tmp/track-commit/track-dir.txt, commit_from_file() reads it, validates path (repo-relative under track/items/<id> with existing metadata.json), rejects on branch mismatch, and cleans up track-dir.txt on both success and failure. Add track-dir.txt to TRANSIENT_AUTOMATION_FILES. When track-dir.txt is absent (non-track commits like takt), fall back to branch-based auto-detection.",
+          "Update cargo make tasks: track-commit-message and commit-pending-message both support the track-dir.txt → branch guard flow."
+        ],
+        "task_ids": [
+          "T005",
+          "T006",
+          "T007",
+          "T008"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Testing and Validation",
+        "description": [
+          "Rust unit tests for TrackBranch validation.",
+          "Python tests for guard function: mismatch rejection, null branch skip, detached HEAD rejection, --skip-branch-check bypass.",
+          "Integration test: cargo make ci passes."
+        ],
+        "task_ids": [
+          "T009"
+        ]
+      }
+    ]
+  },
+  "status_override": null
+}

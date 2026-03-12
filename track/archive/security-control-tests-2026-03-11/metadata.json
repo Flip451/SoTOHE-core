@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "id": "security-control-tests-2026-03-11",
+  "title": "Security Control Tests: CI validation for new hardening measures",
+  "status": "archived",
+  "created_at": "2026-03-11T12:00:00Z",
+  "updated_at": "2026-03-12T14:03:42.170927+00:00",
+  "tasks": [
+    {
+      "id": "T1",
+      "description": "Add CI test verifying .git is read-only inside tools container (docker compose exec git status should fail to write)",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T2",
+      "description": "Add CI test verifying private/ and config/secrets/ are empty/inaccessible inside container",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T3",
+      "description": "Add hook selftest for fail-closed behavior in block-direct-git-ops.py error paths",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T4",
+      "description": "Add selftest for filelock-based metadata.json locking (concurrent write detection)",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T5",
+      "description": "Integrate new security tests into cargo make ci pipeline",
+      "status": "done",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "Regression tests and CI validation for all hardening measures from the other 5 tracks.",
+      "Ensure security controls cannot silently degrade without CI detection.",
+      "This track should be implemented last, after the other 5 tracks complete."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Container Security Tests",
+        "description": [
+          "Verify .git read-only mount and sensitive directory exclusion are enforced."
+        ],
+        "task_ids": [
+          "T1",
+          "T2"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Hook Behavior Tests",
+        "description": [
+          "Verify fail-closed error handling in security-critical hooks."
+        ],
+        "task_ids": [
+          "T3"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Concurrency Tests",
+        "description": [
+          "Verify file locking prevents metadata.json corruption under concurrent access."
+        ],
+        "task_ids": [
+          "T4"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "CI Integration",
+        "description": [
+          "Wire all new tests into the cargo make ci pipeline."
+        ],
+        "task_ids": [
+          "T5"
+        ]
+      }
+    ]
+  }
+}

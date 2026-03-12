@@ -59,11 +59,10 @@ def validate_convention_paths(plan_text: str, root: Path) -> list[str]:
 
 
 def track_dirs(root: Path | None = None) -> list[Path]:
+    from track_schema import all_track_directories
+
     repo_root = root or project_root()
-    track_root = repo_root / "track" / "items"
-    if not track_root.exists():
-        return []
-    return sorted(path for path in track_root.iterdir() if path.is_dir())
+    return all_track_directories(repo_root)
 
 
 def validate_track(dir_path: Path) -> list[str]:

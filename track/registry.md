@@ -9,7 +9,7 @@
 
 - Latest active track: `None yet`
 - Next recommended command: `/track:plan <feature>`
-- Last updated: `2026-03-12`
+- Last updated: `2026-03-13`
 
 ## Active Tracks
 
@@ -21,27 +21,28 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
-| ci-verification-hardening-2026-03-12 | Done | 2026-03-12 |
-| track-branch-guard-2026-03-12 | Done | 2026-03-12 |
-| pr-review-cycle-2026-03-12 | Done | 2026-03-12 |
-| branch-strategy-2026-03-12 | Done | 2026-03-12 |
-| security-control-tests-2026-03-11 | Done | 2026-03-11 |
-| per-worker-target-dir-2026-03-11 | Done | 2026-03-11 |
-| container-vcs-readonly-2026-03-11 | Done | 2026-03-11 |
-| atomic-write-standard-2026-03-11 | Done | 2026-03-11 |
-| clippy-zero-warnings-2026-03-11 | Done | 2026-03-11 |
-| filelock-migration-2026-03-11 | Done | 2026-03-11 |
-| hook-fail-closed-2026-03-11 | Done | 2026-03-11 |
-| guard-cli-2026-03-11 | Done | 2026-03-11 |
-| ownership-file-lock-2026-03-11 | Done | 2026-03-11 |
-| track-state-machine-2026-03-11 | Done | 2026-03-11 |
-| dockerfile-update-2026-03-11 | Done | 2026-03-10 |
+| _No completed tracks yet_ | - | - |
 
 ## Archived Tracks
 
 | Track | Result | Archived |
 |------|--------|----------|
-| _No archived tracks yet_ | - | - |
+| archive-context-pollution-2026-03-12 | Archived | 2026-03-13 |
+| atomic-write-standard-2026-03-11 | Archived | 2026-03-12 |
+| branch-strategy-2026-03-12 | Archived | 2026-03-12 |
+| ci-verification-hardening-2026-03-12 | Archived | 2026-03-12 |
+| clippy-zero-warnings-2026-03-11 | Archived | 2026-03-12 |
+| container-vcs-readonly-2026-03-11 | Archived | 2026-03-12 |
+| dockerfile-update-2026-03-11 | Archived | 2026-03-12 |
+| filelock-migration-2026-03-11 | Archived | 2026-03-12 |
+| guard-cli-2026-03-11 | Archived | 2026-03-12 |
+| hook-fail-closed-2026-03-11 | Archived | 2026-03-12 |
+| ownership-file-lock-2026-03-11 | Archived | 2026-03-12 |
+| per-worker-target-dir-2026-03-11 | Archived | 2026-03-12 |
+| pr-review-cycle-2026-03-12 | Archived | 2026-03-12 |
+| security-control-tests-2026-03-11 | Archived | 2026-03-12 |
+| track-branch-guard-2026-03-12 | Archived | 2026-03-12 |
+| track-state-machine-2026-03-11 | Archived | 2026-03-12 |
 
 ---
 

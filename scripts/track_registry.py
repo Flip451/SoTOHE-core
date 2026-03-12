@@ -41,14 +41,10 @@ def _format_date(iso_timestamp: str) -> str:
 
 def collect_track_metadata(root: Path) -> list[TrackMetadataV2]:
     """Collect and parse all v2 track metadata, sorted by updated_at descending."""
-    track_root = root / "track" / "items"
-    if not track_root.is_dir():
-        return []
+    from track_schema import all_track_directories
 
     results: list[TrackMetadataV2] = []
-    for track_dir in sorted(track_root.iterdir()):
-        if not track_dir.is_dir():
-            continue
+    for track_dir in all_track_directories(root):
         metadata_file = track_dir / "metadata.json"
         if not metadata_file.exists():
             continue

@@ -188,11 +188,16 @@ track/
 ├── tech-stack.md           # technology decisions
 ├── workflow.md             # workflow rules
 ├── registry.md             # track registry
-└── items/<id>/
-    ├── spec.md             # what to build
-    ├── plan.md             # read-only view (rendered from metadata.json)
-    ├── verification.md     # manual verification record
-    └── metadata.json       # SSoT: task state, plan structure, track status
+├── items/<id>/             # active tracks (planned / in_progress / done)
+│   ├── spec.md             # what to build
+│   ├── plan.md             # read-only view (rendered from metadata.json)
+│   ├── verification.md     # manual verification record
+│   └── metadata.json       # SSoT: task state, plan structure, track status
+└── archive/<id>/           # archived tracks (excluded from AI search via deny rules)
+    ├── spec.md
+    ├── plan.md
+    ├── verification.md
+    └── metadata.json
 ```
 
 ## 8. Guardrails
@@ -208,6 +213,20 @@ Core guardrails:
 - Before committing code changes, run the `reviewer` capability review cycle
   (review → fix → review → ... → no findings). Do not commit until the reviewer
   reports zero findings. The reviewer provider is resolved via `.claude/agent-profiles.json`.
+
+Hook constraint — `block-direct-git-ops` content scanning:
+
+The `block-direct-git-ops.py` hook (via `sotp hook dispatch`) scans the **entire Bash command string**
+for git operation keywords. This blocks commands even when protected keywords appear inside string
+literals, prompt text, or heredocs. To avoid wasted retries:
+
+- **`python3 -c`**: Do not embed code containing git keywords (`add`, `commit`, `push`, `switch`,
+  `checkout`, `merge`, `rebase`, `cherry-pick`, `reset`). Write a `.py` file with the Write tool,
+  then `python3 file.py`.
+- **`codex exec`** / **`gemini -p`**: Do not embed prompts containing git keywords. Write the prompt
+  to a file with the Write tool, then reference the file in the command.
+- **heredoc / `cat >`**: Also scanned. Use the Write tool instead.
+- **Fallback**: When `codex exec` review is blocked, perform inline Claude Code review.
 
 Operational details live in:
 

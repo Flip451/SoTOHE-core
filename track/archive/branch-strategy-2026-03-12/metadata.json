@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "id": "branch-strategy-2026-03-12",
+  "title": "Feature branch strategy for track workflow",
+  "status": "archived",
+  "created_at": "2026-03-12T12:00:00Z",
+  "updated_at": "2026-03-12T14:03:42.170927+00:00",
+  "tasks": [
+    {
+      "id": "T0",
+      "description": "Permission and wrapper prerequisites: add git switch/checkout -b/branch to .claude/settings.json allowedCommands, mirror entries in .claude/permission-extensions.json, add Makefile.toml track-branch-create/track-branch-switch wrapper tasks, update block-direct-git-ops.py to whitelist these wrappers, update verify_orchestra_guardrails.py hardcoded allowlists to accept new wrappers",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T1",
+      "description": "metadata.json schema v3: add branch field, dual-read v2/v3 in parse_metadata_v2() and validate_metadata_v2() (accept schema_version 2 or 3), update render_plan()/render_registry()/sync_rendered_views() for v3 compatibility, update verify_latest_track_files.py validation",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T2",
+      "description": "Branch-aware track resolution: replace all latest_track_dir() consumers (verify_latest_track_files.py, external_guides.py) and update all command prompts that reference 'latest track' (.claude/commands/track/commit.md, status.md, revert.md, review.md, implement.md, full-cycle.md, catchup.md) with resolve_track_dir() that distinguishes 'current track' (branch-bound, for interactive ops) from 'latest track' (global, for CI/reporting). Add find_track_by_branch(), current_git_branch() helpers",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T3",
+      "description": "sotp track branch CLI subcommand: create and switch track branches via Makefile.toml wrapper tasks (depends on T0 permission setup)",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T4",
+      "description": "Guard policy update: block merge/rebase/cherry-pick/reset in Rust policy and Python hook",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T5",
+      "description": "/track:plan update: auto-create and switch to track branch after approval using T0 wrappers, write branch field to metadata.json (depends on T0, T1)",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T6",
+      "description": "/track:commit and registry update: branch-context-aware commit flow and registry rendering. Update track_registry.py render_registry() to prefer current-branch track for Current Focus. Ensure /track:status, /track:review, /track:implement, /track:ci also use current-track resolution",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T7",
+      "description": "Notes refspec bootstrap: auto-configure fetch refspec in cargo make bootstrap",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T8",
+      "description": "Migration and docs: legacy track fallback, workflow docs update, DEVELOPER_AI_WORKFLOW.md update",
+      "status": "done",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "Introduce per-track feature branches to isolate parallel track work from main.",
+      "Replace global timestamp-based track resolution with branch-aware resolution.",
+      "Distinguish 'current track' (branch-bound, interactive) from 'latest track' (global, CI/reporting).",
+      "Add optional worktree support for Agent Teams parallel workers on the same track.",
+      "Auto-configure git notes refspec on bootstrap."
+    ],
+    "sections": [
+      {
+        "id": "S0",
+        "title": "Permission and Wrapper Prerequisites",
+        "description": [
+          "Add git branch/switch/checkout permissions to .claude/settings.json and .claude/permission-extensions.json, add Makefile.toml wrappers, update hook whitelist and verify_orchestra_guardrails.py before any branch-creating task."
+        ],
+        "task_ids": [
+          "T0"
+        ]
+      },
+      {
+        "id": "S1",
+        "title": "Schema and Track Resolution",
+        "description": [
+          "Add branch field to metadata.json (schema v3) with dual v2/v3 validation and rendering.",
+          "Replace all latest_track_dir() consumers with branch-aware resolution that distinguishes current track from latest track."
+        ],
+        "task_ids": [
+          "T1",
+          "T2"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Branch Lifecycle CLI",
+        "description": [
+          "Implement sotp track branch subcommand for creating and switching track branches via Makefile.toml wrappers."
+        ],
+        "task_ids": [
+          "T3"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Guard Policy Extension",
+        "description": [
+          "Block history-mutating operations (merge, rebase, cherry-pick, reset) in guard hooks."
+        ],
+        "task_ids": [
+          "T4"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Workflow Integration",
+        "description": [
+          "Update /track:plan, /track:commit, and registry rendering for branch-aware operation."
+        ],
+        "task_ids": [
+          "T5",
+          "T6"
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "Bootstrap and Migration",
+        "description": [
+          "Auto-configure notes refspec, migrate legacy tracks, update documentation."
+        ],
+        "task_ids": [
+          "T7",
+          "T8"
+        ]
+      }
+    ]
+  }
+}

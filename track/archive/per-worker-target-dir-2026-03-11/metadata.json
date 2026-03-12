@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "id": "per-worker-target-dir-2026-03-11",
+  "title": "Build Isolation: per-worker CARGO_TARGET_DIR separation",
+  "status": "archived",
+  "created_at": "2026-03-11T12:00:00Z",
+  "updated_at": "2026-03-12T14:03:42.170927+00:00",
+  "tasks": [
+    {
+      "id": "T1",
+      "description": "compose.yml: Add CARGO_TARGET_DIR override support via WORKER_ID environment variable",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T2",
+      "description": "Makefile.toml: Add worker-aware -exec tasks that pass WORKER_ID to container",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T3",
+      "description": "Document parallel worker usage pattern and WORKER_ID convention",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T4",
+      "description": "Verify sccache sharing works correctly across isolated target directories",
+      "status": "done",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "CON-05: Single tools-daemon + single target/ causes deadlock with parallel builds.",
+      "Introduce WORKER_ID-based CARGO_TARGET_DIR separation for parallel Agent Teams workers.",
+      "Default behavior unchanged (single worker), opt-in for parallel isolation.",
+      "sccache remains shared across workers for compilation cache efficiency."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Compose Configuration",
+        "description": [
+          "Add WORKER_ID env var support: CARGO_TARGET_DIR=/workspace/target-${WORKER_ID:-default}.",
+          "Each worker gets isolated target directory while sharing source and sccache."
+        ],
+        "task_ids": [
+          "T1"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Makefile Integration",
+        "description": [
+          "Add WORKER_ID passthrough to -exec tasks.",
+          "Default (no WORKER_ID) uses /workspace/target for backward compatibility."
+        ],
+        "task_ids": [
+          "T2"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Documentation and Validation",
+        "description": [
+          "Document worker isolation pattern.",
+          "Verify sccache hit rates remain high with separated target dirs."
+        ],
+        "task_ids": [
+          "T3",
+          "T4"
+        ]
+      }
+    ]
+  }
+}

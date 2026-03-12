@@ -32,11 +32,10 @@ def project_root() -> Path:
 
 
 def track_dirs(root: Path | None = None) -> list[Path]:
+    from track_schema import all_track_directories
+
     repo_root = root or project_root()
-    track_root = repo_root / "track" / "items"
-    if not track_root.exists():
-        return []
-    return sorted(path for path in track_root.iterdir() if path.is_dir())
+    return all_track_directories(repo_root)
 
 
 def display_path(path: Path, root: Path | None = None) -> str:
@@ -124,10 +123,18 @@ def latest_track_dir(root: Path | None = None) -> tuple[Path | None, list[str]]:
     if not dirs:
         return None, []
 
+    repo_root = root or project_root()
+    archive_root = (repo_root / "track" / "archive").resolve()
     latest_dir: Path | None = None
     latest_updated_at = datetime.min.replace(tzinfo=UTC)
     errors: list[str] = []
     for dir_path in dirs:
+        # Skip tracks in track/archive/ by path regardless of metadata content.
+        try:
+            dir_path.resolve().relative_to(archive_root)
+            continue
+        except ValueError:
+            pass
         updated_at, status, track_errors = load_track_metadata(dir_path, root)
         if track_errors:
             errors.extend(track_errors)
