@@ -5,6 +5,7 @@ Verify that tech stack decisions are fully resolved.
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import sys
@@ -46,6 +47,39 @@ def has_track_dirs(root: Path) -> bool:
     return any(p for p in track_root.iterdir() if p.is_dir())
 
 
+def all_tracks_planned(root: Path) -> bool | None:
+    """Check if all tracks are in 'planned' status.
+
+    Returns True if all tracks are planned, False if any is not,
+    None if metadata cannot be read (fail-closed signal).
+    """
+    track_root = root / TRACK_ROOT
+    if not track_root.is_dir():
+        return False  # no tracks = no planning-phase bypass
+
+    dirs = [p for p in track_root.iterdir() if p.is_dir()]
+    if not dirs:
+        return False
+
+    for track_dir in dirs:
+        meta = track_dir / "metadata.json"
+        if not meta.is_file():
+            return None  # fail closed: can't determine status
+        try:
+            data = json.loads(meta.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            return None  # fail closed
+        if not isinstance(data, dict):
+            return None  # fail closed: non-object JSON
+        status = data.get("status", "")
+        if not isinstance(status, str):
+            return None  # fail closed
+        if status != "planned":
+            return False  # found a non-planned track
+
+    return True
+
+
 def main(argv: list[str] | None = None) -> int:
     _ = argv
     root = project_root()
@@ -71,14 +105,28 @@ def main(argv: list[str] | None = None) -> int:
         for line in tech_stack.read_text(encoding="utf-8").splitlines()
         if _UNRESOLVED_RE.match(line)
     ]
-    if unresolved:
-        print(f"[ERROR] Unresolved tech stack TODOs found in {TECH_STACK_FILE}:")
-        for line in unresolved:
-            print(f"  {line}")
-        return 1
 
-    print("[OK] Tech stack has no blocking TODO placeholders.")
-    return 0
+    if not unresolved:
+        print("[OK] Tech stack has no blocking TODO placeholders.")
+        return 0
+
+    # Planning-phase bypass: allow TODO when all tracks are still in planning
+    planned_result = all_tracks_planned(root)
+    if planned_result is None:
+        # Cannot determine track statuses — fail closed
+        print("[ERROR] Cannot read track metadata; refusing to skip tech stack check")
+        return 1
+    if planned_result:
+        print(
+            "[OK] All tracks are in 'planned' status. "
+            "Tech stack TODOs are allowed during planning phase."
+        )
+        return 0
+
+    print(f"[ERROR] Unresolved tech stack TODOs found in {TECH_STACK_FILE}:")
+    for line in unresolved:
+        print(f"  {line}")
+    return 1
 
 
 if __name__ == "__main__":

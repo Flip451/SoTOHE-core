@@ -19,6 +19,11 @@ VERIFICATION_SCAFFOLD_LINES = {
     "manual verification steps",
     "result / open issues",
     "verified_at",
+    # Japanese equivalents
+    "検証範囲",
+    "手動検証手順",
+    "結果 / 未解決事項",
+    "検証日",
 }
 
 
@@ -143,7 +148,14 @@ def latest_track_dir(root: Path | None = None) -> tuple[Path | None, list[str]]:
 
 def placeholder_lines(text: str) -> list[tuple[int, str]]:
     found: list[tuple[int, str]] = []
+    in_fence = False
     for line_number, line in enumerate(text.splitlines(), start=1):
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
         if PLACEHOLDER_LINE_RE.search(line):
             found.append((line_number, line))
     return found
@@ -179,7 +191,9 @@ def scaffold_placeholder_lines(text: str) -> list[tuple[int, str]]:
     found: list[tuple[int, str]] = []
     for line_number, line in enumerate(text.splitlines(), start=1):
         stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
+        if not stripped:
+            continue
+        if stripped.startswith("#"):
             continue
         if normalize_scaffold_line(line) in VERIFICATION_SCAFFOLD_LINES:
             found.append((line_number, line))
