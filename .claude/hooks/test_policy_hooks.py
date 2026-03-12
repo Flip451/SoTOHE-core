@@ -720,5 +720,69 @@ class PolicyHooksTest(unittest.TestCase):
         )
 
 
+    # --- Fail-closed behavior tests ---
+
+    def test_main_exits_2_on_invalid_json(self) -> None:
+        """JSON parse failure branch must lead to os._exit(2) within the inner except block."""
+        import inspect
+        import re
+
+        source = inspect.getsource(block_direct_git_ops.main)
+        # Match "failed to parse hook JSON" → "os._exit(2)" and verify
+        # the match does NOT cross the outer "except BaseException" boundary.
+        # This ensures the inner except block has its own os._exit(2).
+        match = re.search(
+            r"failed to parse hook JSON.*?os\._exit\(2\)",
+            source,
+            re.DOTALL,
+        )
+        self.assertIsNotNone(
+            match,
+            "main() must os._exit(2) after 'failed to parse hook JSON' (in sequence)",
+        )
+        self.assertNotIn(
+            "except BaseException",
+            match.group(0),
+            "os._exit(2) for JSON parse failure must be in the inner except block, "
+            "not rely on the outer except BaseException handler",
+        )
+
+    def test_main_function_has_fail_closed_os_exit(self) -> None:
+        """except BaseException branch must lead to os._exit(2) in sequence."""
+        import inspect
+        import re
+
+        source = inspect.getsource(block_direct_git_ops.main)
+        # Verify structural ordering: "except BaseException" is followed
+        # by "os._exit(2)" in the same code region.
+        match = re.search(
+            r"except BaseException.*?os\._exit\(2\)",
+            source,
+            re.DOTALL,
+        )
+        self.assertIsNotNone(
+            match,
+            "main() must os._exit(2) after 'except BaseException' (in sequence)",
+        )
+
+    def test_main_function_exits_0_for_non_bash_tool(self) -> None:
+        """Non-Bash tool_name check must use != (not ==) and lead to os._exit(0)."""
+        import inspect
+        import re
+
+        source = inspect.getsource(block_direct_git_ops.main)
+        # Verify the guard uses != "Bash" (not == "Bash") followed by os._exit(0).
+        # This catches condition-inversion bugs where the security gate is flipped.
+        match = re.search(
+            r'!=\s*"Bash".*?os\._exit\(0\)',
+            source,
+            re.DOTALL,
+        )
+        self.assertIsNotNone(
+            match,
+            'main() must use != "Bash" (not ==) before os._exit(0) for non-Bash early exit',
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `security-control-tests-2026-03-11`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-11`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| security-control-tests-2026-03-11 | planned | `/track:implement` | 2026-03-11 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| security-control-tests-2026-03-11 | Done | 2026-03-11 |
 | per-worker-target-dir-2026-03-11 | Done | 2026-03-11 |
 | container-vcs-readonly-2026-03-11 | Done | 2026-03-11 |
 | atomic-write-standard-2026-03-11 | Done | 2026-03-11 |
