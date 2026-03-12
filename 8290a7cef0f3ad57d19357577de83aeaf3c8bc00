@@ -1,0 +1,18 @@
+## Task Summary: CI verification hardening — 4 issues fixed
+
+**Track:** ci-verification-hardening-2026-03-12
+**Task:** WF-23, WF-09, WF-11, WF-13 — container entry points, code-block fence skip, planning-phase bypass, i18n scaffold detection
+**Date:** 2026-03-12
+
+### Changes
+
+- Makefile.toml: added public ci-container and ci-rust-container tasks
+- .github/workflows/ci.yml: switched from ci-local to ci-container
+- scripts/verify_latest_track_files.py: fenced code block skip in placeholder_lines(), Japanese scaffold body-line equivalents
+- scripts/verify_tech_stack_ready.py: all_tracks_planned() with fail-closed semantics, planning-phase bypass, non-object JSON guard
+- scripts/test_verify_scripts.py: 11 new regression tests
+- scripts/test_make_wrappers.py: 1 new test for ci-container task existence
+
+### Why
+
+Four CI verification issues (WF-23, WF-09, WF-11, WF-13) were causing false positives, blocking valid workflows, or requiring workarounds. This commit resolves all four while maintaining backward compatibility and fail-closed policy.
