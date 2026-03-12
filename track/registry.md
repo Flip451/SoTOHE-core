@@ -9,7 +9,7 @@
 
 - Latest active track: `None yet`
 - Next recommended command: `/track:plan <feature>`
-- Last updated: `2026-03-12`
+- Last updated: `2026-03-13`
 
 ## Active Tracks
 
@@ -21,12 +21,13 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
-| archive-context-pollution-2026-03-12 | Done | 2026-03-12 |
+| _No completed tracks yet_ | - | - |
 
 ## Archived Tracks
 
 | Track | Result | Archived |
 |------|--------|----------|
+| archive-context-pollution-2026-03-12 | Archived | 2026-03-13 |
 | atomic-write-standard-2026-03-11 | Archived | 2026-03-12 |
 | branch-strategy-2026-03-12 | Archived | 2026-03-12 |
 | ci-verification-hardening-2026-03-12 | Archived | 2026-03-12 |
