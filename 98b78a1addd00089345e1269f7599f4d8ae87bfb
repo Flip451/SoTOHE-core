@@ -1,0 +1,28 @@
+## Task Summary: Implement archived track context pollution prevention
+
+**Track:** archive-context-pollution-2026-03-12
+**Task:** WF-07: Physical move to track/archive/ with script and deny rule updates
+**Date:** 2026-03-12
+
+### Changes
+
+- scripts/track_schema.py: Added TRACK_ARCHIVE_DIR constant and all_track_directories() helper
+- scripts/verify_plan_progress.py: track_dirs() delegates to all_track_directories()
+- scripts/verify_track_metadata.py: main() uses all_track_directories()
+- scripts/verify_latest_track_files.py: Path-based archive skip in latest_track_dir()
+- scripts/track_registry.py: collect_track_metadata() scans both directories
+- scripts/verify_tech_stack_ready.py: Path-based archive skip in all_tracks_planned()
+- .claude/commands/track/archive.md: Added git mv step and updated Behavior section
+- .claude/settings.json: Added deny rules for track/archive/** (Read, Grep, Glob)
+- CLAUDE.md: Updated Workspace Map and added hook constraint block
+- scripts/test_track_schema.py: 5 new unit tests for all_track_directories()
+- scripts/test_track_registry.py: 3 new tests for archive directory collection
+- scripts/test_verify_scripts.py: 5 new tests (archive dir scanning + P1 regression)
+- track/archive/: 15 completed tracks moved from track/items/ via git mv
+
+### Why
+
+Archived tracks in track/items/ polluted AI search context (Read, Grep, Glob).
+Physical move to track/archive/ combined with Claude Code deny rules prevents
+archived content from appearing in search results while keeping CI validation
+intact via the shared all_track_directories() helper.
