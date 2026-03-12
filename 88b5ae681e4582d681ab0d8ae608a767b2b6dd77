@@ -1,0 +1,24 @@
+## Task Summary: Add /track:pr-review for GitHub PR-based review cycle
+
+**Track:** pr-review-cycle-2026-03-12
+**Task:** GitHub PR-based review cycle via Codex Cloud @codex review
+**Date:** 2026-03-12
+
+### Changes
+
+- scripts/pr_review.py: PR orchestration script (push/ensure-pr/trigger-review/poll-review/run) with paginated JSON parsing, server-timestamp correlation, RFC1918/secret sanitization
+- scripts/test_pr_review.py: 44 tests covering all code paths
+- AGENTS.md: Codex Cloud review guidelines (coding rules, severity policy)
+- .claude/commands/track/pr-review.md: Command prompt for /track:pr-review
+- Makefile.toml: 3 wrapper tasks (track-pr-push/ensure/review) + selftest entry
+- .claude/settings.json: Permission allow entries for PR wrapper tasks
+- scripts/verify_orchestra_guardrails.py: Matching allowlist entries
+- CLAUDE.md: Added /track:pr-review to command list
+- track/workflow.md: PR review section with async flow documentation
+- DEVELOPER_AI_WORKFLOW.md: /track:pr-review in command table and flowchart
+
+### Why
+
+Adds async GitHub PR-based review capability using Codex Cloud's @codex review feature,
+complementing the existing local /track:review workflow. Enables review cycles on GitHub
+PRs with automatic polling, stale review filtering, and result parsing.
