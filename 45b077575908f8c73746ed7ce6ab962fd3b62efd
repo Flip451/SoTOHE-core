@@ -1,0 +1,29 @@
+## Task Summary: Implement branch-per-track strategy
+
+**Track:** branch-strategy-2026-03-12
+**Task:** All 9 tasks (T0-T8): schema v3, branch-aware resolution, CLI branch commands, guard extensions, workflow integration, bootstrap, migration
+**Date:** 2026-03-12
+
+### Changes
+
+- scripts/track_schema.py: add schema v3 with branch field, dual v2/v3 validation
+- scripts/track_resolution.py: new module for branch-aware track resolution
+- scripts/track_registry.py: accept schema v3 in collect_track_metadata
+- scripts/track_state_machine.py: accept v3 in sync_rendered_views
+- apps/cli/src/commands/track.rs: add Branch subcommand (create from main, switch)
+- libs/domain/src/guard/policy.rs: block merge/rebase/cherry-pick/reset/orphan
+- .claude/hooks/block-direct-git-ops.py: extend guards for new subcommands in regex fallback and Python patterns
+- .claude/hooks/test_policy_hooks.py: 11 new hook tests
+- Dockerfile: add COPY vendor/ to cargo chef cook stages
+- Makefile.toml: add track-branch-create/switch wrappers, notes refspec bootstrap
+- .claude/commands/track/*.md: 7 command prompts updated for branch-aware resolution
+- scripts/verify_*.py: accept schema v3
+- scripts/test_verify_scripts.py: update tests for v3 acceptance
+- track/workflow.md: add Branch Strategy section
+- DEVELOPER_AI_WORKFLOW.md: add feature branch section
+
+### Why
+
+Introduce per-track feature branches to eliminate code interference between parallel tracks.
+Replace global timestamp-based track resolution with branch-aware resolution that distinguishes
+"current track" (branch-bound, interactive) from "latest track" (global, CI/reporting).
