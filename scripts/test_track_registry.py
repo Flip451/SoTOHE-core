@@ -493,5 +493,83 @@ class TestVerifyRegistryMain(unittest.TestCase):
             self.assertFalse(has_error)
 
 
+class TestCollectFromArchiveDirectory(unittest.TestCase):
+    """Verify collect_track_metadata() scans track/archive/ in addition to track/items/."""
+
+    def test_archived_track_in_archive_dir_is_collected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            archive_dir = root / "track" / "archive" / "old-feat"
+            archive_dir.mkdir(parents=True)
+            (archive_dir / "metadata.json").write_text(
+                json.dumps({
+                    "schema_version": 2,
+                    "id": "old-feat",
+                    "title": "Old Feature",
+                    "status": "archived",
+                    "created_at": "2026-01-01T00:00:00Z",
+                    "updated_at": "2026-01-01T00:00:00Z",
+                    "tasks": [],
+                    "plan": {"summary": [], "sections": []},
+                    "status_override": None,
+                })
+            )
+            result = collect_track_metadata(root)
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].id, "old-feat")
+        self.assertEqual(result[0].status, "archived")
+
+    def test_both_items_and_archive_are_collected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _make_track(root, "active-feat", status="planned")
+            archive_dir = root / "track" / "archive" / "done-feat"
+            archive_dir.mkdir(parents=True)
+            (archive_dir / "metadata.json").write_text(
+                json.dumps({
+                    "schema_version": 2,
+                    "id": "done-feat",
+                    "title": "Done Feature",
+                    "status": "archived",
+                    "created_at": "2026-01-01T00:00:00Z",
+                    "updated_at": "2026-01-02T00:00:00Z",
+                    "tasks": [],
+                    "plan": {"summary": [], "sections": []},
+                    "status_override": None,
+                })
+            )
+            result = collect_track_metadata(root)
+
+        ids = {m.id for m in result}
+        self.assertIn("active-feat", ids)
+        self.assertIn("done-feat", ids)
+
+    def test_registry_renders_archived_from_archive_dir(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            archive_dir = root / "track" / "archive" / "old-feat"
+            archive_dir.mkdir(parents=True)
+            (archive_dir / "metadata.json").write_text(
+                json.dumps({
+                    "schema_version": 2,
+                    "id": "old-feat",
+                    "title": "Old Feature",
+                    "status": "archived",
+                    "created_at": "2026-01-01T00:00:00Z",
+                    "updated_at": "2026-01-01T00:00:00Z",
+                    "tasks": [],
+                    "plan": {"summary": [], "sections": []},
+                    "status_override": None,
+                })
+            )
+            tracks = collect_track_metadata(root)
+            rendered = render_registry(tracks)
+
+        self.assertIn("old-feat", rendered)
+        self.assertIn("## Archived Tracks", rendered)
+        self.assertNotIn("_No archived tracks yet_", rendered)
+
+
 if __name__ == "__main__":
     unittest.main()

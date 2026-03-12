@@ -2,9 +2,9 @@
   "schema_version": 2,
   "id": "track-state-machine-2026-03-11",
   "title": "Track state machine: DMMF domain model",
-  "status": "done",
+  "status": "archived",
   "created_at": "2026-03-11T00:00:00Z",
-  "updated_at": "2026-03-11T00:36:31.831786+00:00",
+  "updated_at": "2026-03-12T14:03:42.170927+00:00",
   "plan": {
     "summary": [
       "Implement a DMMF-style Rust domain model for the track state machine.",

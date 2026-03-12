@@ -188,11 +188,16 @@ track/
 ├── tech-stack.md           # technology decisions
 ├── workflow.md             # workflow rules
 ├── registry.md             # track registry
-└── items/<id>/
-    ├── spec.md             # what to build
-    ├── plan.md             # read-only view (rendered from metadata.json)
-    ├── verification.md     # manual verification record
-    └── metadata.json       # SSoT: task state, plan structure, track status
+├── items/<id>/             # active tracks (planned / in_progress / done)
+│   ├── spec.md             # what to build
+│   ├── plan.md             # read-only view (rendered from metadata.json)
+│   ├── verification.md     # manual verification record
+│   └── metadata.json       # SSoT: task state, plan structure, track status
+└── archive/<id>/           # archived tracks (excluded from AI search via deny rules)
+    ├── spec.md
+    ├── plan.md
+    ├── verification.md
+    └── metadata.json
 ```
 
 ## 8. Guardrails

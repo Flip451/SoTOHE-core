@@ -249,6 +249,9 @@
       "Bash(true)"
     ],
     "deny": [
+      "Read(./track/archive/**)",
+      "Grep(./track/archive/**)",
+      "Glob(./track/archive/**)",
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./.cache/cargo/**)",
