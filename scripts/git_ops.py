@@ -188,6 +188,11 @@ def _verify_commit_branch(track_dir: Path) -> int:
         return 1
 
     try:
+        # Ensure scripts/ is on sys.path so these modules resolve regardless
+        # of whether git_ops is invoked as a script or imported as a package.
+        _scripts_dir = str(Path(__file__).resolve().parent)
+        if _scripts_dir not in sys.path:
+            sys.path.insert(0, _scripts_dir)
         from track_branch_guard import BranchGuardError, verify_track_branch
         from track_resolution import current_git_branch
     except ImportError as e:

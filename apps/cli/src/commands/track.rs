@@ -137,11 +137,13 @@ fn execute_transition(
         }
     };
 
+    // Preserve items_dir for branch guard before moving into FsTrackStore.
+    let repo_dir = items_dir.clone();
     let store = Arc::new(FsTrackStore::new(items_dir, lock_manager, DEFAULT_LOCK_TIMEOUT));
 
     // Branch guard: reject if current git branch does not match metadata.json branch.
     if !skip_branch_check {
-        if let Err(msg) = verify_branch_guard(&*store, &track_id) {
+        if let Err(msg) = verify_branch_guard(&*store, &track_id, &repo_dir) {
             eprintln!("branch guard: {msg}");
             return ExitCode::FAILURE;
         }
@@ -230,11 +232,15 @@ fn execute_branch(action: BranchAction) -> ExitCode {
 
 /// Returns the current git branch name, or `"HEAD"` for detached HEAD.
 ///
+/// Resolves the branch relative to the given directory so that the command
+/// works even when `sotp` is launched from outside the repository.
+///
 /// # Errors
 /// Returns an error message if `git` cannot be executed or fails.
-fn current_git_branch() -> Result<String, String> {
+fn current_git_branch(cwd: &std::path::Path) -> Result<String, String> {
     let output = std::process::Command::new("git")
         .args(["rev-parse", "--abbrev-ref", "HEAD"])
+        .current_dir(cwd)
         .output()
         .map_err(|e| format!("failed to run git: {e}"))?;
 
@@ -256,7 +262,11 @@ fn current_git_branch() -> Result<String, String> {
 ///
 /// # Errors
 /// Returns an error message describing the branch mismatch or detection failure.
-fn verify_branch_guard<R: TrackReader>(reader: &R, track_id: &TrackId) -> Result<(), String> {
+fn verify_branch_guard<R: TrackReader>(
+    reader: &R,
+    track_id: &TrackId,
+    repo_dir: &std::path::Path,
+) -> Result<(), String> {
     let track = reader
         .find(track_id)
         .map_err(|e| format!("failed to read track: {e}"))?
@@ -267,7 +277,7 @@ fn verify_branch_guard<R: TrackReader>(reader: &R, track_id: &TrackId) -> Result
         None => return Ok(()), // branch=null → skip guard
     };
 
-    let actual = current_git_branch()?;
+    let actual = current_git_branch(repo_dir)?;
 
     // Detached HEAD → reject (ambiguous state).
     if actual == "HEAD" {
