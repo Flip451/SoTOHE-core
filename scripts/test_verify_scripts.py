@@ -528,6 +528,52 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("Status drift", result.stdout)
 
+    def test_verify_track_metadata_scans_archive_directory(self) -> None:
+        """verify_track_metadata should validate tracks in track/archive/ as well."""
+
+        def setup(root: Path) -> None:
+            track_dir = root / "track" / "archive" / "old-feat"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "metadata.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 2,
+                        "id": "old-feat",
+                        "title": "Old Feature",
+                        "status": "archived",
+                        "created_at": "2026-01-01T00:00:00Z",
+                        "updated_at": "2026-03-01T00:00:00Z",
+                        "status_override": None,
+                        "tasks": [
+                            {
+                                "id": "T001",
+                                "description": "task",
+                                "status": "done",
+                                "commit_hash": "abc1234",
+                            }
+                        ],
+                        "plan": {
+                            "summary": [],
+                            "sections": [
+                                {
+                                    "id": "s1",
+                                    "title": "Section",
+                                    "description": [],
+                                    "task_ids": ["T001"],
+                                }
+                            ],
+                        },
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+        result = self.run_python_script("verify_track_metadata.py", setup)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("v2 schema validation passed", result.stdout)
+
     def test_verify_plan_progress_v2_plan_in_sync(self) -> None:
         """v2 track with plan.md matching metadata.json should pass."""
 
@@ -629,6 +675,58 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertIn("Read-only violation", result.stdout)
         self.assertIn("SSoT guidance", result.stdout)
         self.assertIn("transition_task()", result.stdout)
+
+    def test_verify_plan_progress_scans_archive_directory(self) -> None:
+        """verify_plan_progress should validate tracks in track/archive/ as well."""
+
+        def setup(root: Path) -> None:
+            import sys
+
+            sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
+            from track_markdown import render_plan
+            from track_schema import parse_metadata_v2
+
+            meta = {
+                "schema_version": 2,
+                "id": "old-feat",
+                "title": "Old Feature",
+                "status": "archived",
+                "created_at": "2026-01-01T00:00:00Z",
+                "updated_at": "2026-03-01T00:00:00Z",
+                "status_override": None,
+                "tasks": [
+                    {
+                        "id": "T001",
+                        "description": "archived task",
+                        "status": "done",
+                        "commit_hash": "abc1234",
+                    }
+                ],
+                "plan": {
+                    "summary": ["Archived feature summary"],
+                    "sections": [
+                        {
+                            "id": "s1",
+                            "title": "Archive Section",
+                            "description": [],
+                            "task_ids": ["T001"],
+                        }
+                    ],
+                },
+            }
+            track_dir = root / "track" / "archive" / "old-feat"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "metadata.json").write_text(
+                json.dumps(meta) + "\n", encoding="utf-8"
+            )
+            parsed = parse_metadata_v2(meta)
+            plan_text = render_plan(parsed)
+            (track_dir / "plan.md").write_text(plan_text, encoding="utf-8")
+            (track_dir / "spec.md").write_text("# spec\n", encoding="utf-8")
+
+        result = self.run_python_script("verify_plan_progress.py", setup)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_verify_track_metadata_rejects_unsupported_schema_version(self) -> None:
         """schema_version other than 2 or 3 should be rejected."""
@@ -1112,6 +1210,77 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("No tracks yet", result.stdout)
 
+    def test_verify_latest_track_skips_tracks_in_archive_directory(self) -> None:
+        """Tracks physically in track/archive/ should be skipped as archived."""
+
+        def setup(root: Path) -> None:
+            # Track in track/archive/ — should be skipped (no status check needed)
+            archived_dir = root / "track" / "archive" / "old-feat"
+            archived_dir.mkdir(parents=True, exist_ok=True)
+            (archived_dir / "metadata.json").write_text(
+                json.dumps({"updated_at": "2026-03-08T00:00:00Z", "status": "archived"})
+                + "\n",
+                encoding="utf-8",
+            )
+
+            # Active track in track/items/ — should be selected and pass
+            active_dir = root / "track" / "items" / "active-feat"
+            active_dir.mkdir(parents=True, exist_ok=True)
+            (active_dir / "metadata.json").write_text(
+                json.dumps(
+                    {"updated_at": "2026-03-07T00:00:00Z", "status": "in_progress"}
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            (active_dir / "spec.md").write_text("active spec\n", encoding="utf-8")
+            (active_dir / "plan.md").write_text(
+                "- [ ] active task\n", encoding="utf-8"
+            )
+            (active_dir / "verification.md").write_text(
+                "pending verification\n", encoding="utf-8"
+            )
+
+        result = self.run_python_script("verify_latest_track_files.py", setup)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("track/items/active-feat", result.stdout)
+        self.assertNotIn("old-feat", result.stdout)
+
+    def test_verify_latest_track_archive_dir_with_malformed_metadata_does_not_fail(
+        self,
+    ) -> None:
+        """Malformed metadata.json in track/archive/ must not cause verify to fail."""
+
+        def setup(root: Path) -> None:
+            # Malformed metadata in track/archive/ — must be skipped by path
+            bad_arch = root / "track" / "archive" / "bad-arch"
+            bad_arch.mkdir(parents=True, exist_ok=True)
+            (bad_arch / "metadata.json").write_text("{not json}\n", encoding="utf-8")
+
+            # Valid active track in track/items/
+            active_dir = root / "track" / "items" / "active-feat"
+            active_dir.mkdir(parents=True, exist_ok=True)
+            (active_dir / "metadata.json").write_text(
+                json.dumps(
+                    {"updated_at": "2026-03-07T00:00:00Z", "status": "in_progress"}
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            (active_dir / "spec.md").write_text("active spec\n", encoding="utf-8")
+            (active_dir / "plan.md").write_text(
+                "- [ ] active task\n", encoding="utf-8"
+            )
+            (active_dir / "verification.md").write_text(
+                "pending verification\n", encoding="utf-8"
+            )
+
+        result = self.run_python_script("verify_latest_track_files.py", setup)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("track/items/active-feat", result.stdout)
+
     def test_verify_latest_track_handles_non_string_status_gracefully(self) -> None:
         def setup(root: Path) -> None:
             track_dir = root / "track" / "items" / "bad-status"
@@ -1387,16 +1556,13 @@ class VerifyScriptsTest(unittest.TestCase):
             root = Path(tmp_dir)
             scripts_dir = root / "scripts"
             scripts_dir.mkdir(parents=True, exist_ok=True)
-            target_script = scripts_dir / "verify_tech_stack_ready.py"
-            target_script.write_text(
-                (PROJECT_ROOT / "scripts" / "verify_tech_stack_ready.py").read_text(
-                    encoding="utf-8"
-                ),
-                encoding="utf-8",
-            )
+            for source_path in (PROJECT_ROOT / "scripts").glob("*.py"):
+                (scripts_dir / source_path.name).write_text(
+                    source_path.read_text(encoding="utf-8"), encoding="utf-8"
+                )
             setup(root)
             result = subprocess.run(
-                [sys.executable, str(target_script)],
+                [sys.executable, str(scripts_dir / "verify_tech_stack_ready.py")],
                 cwd=root,
                 env={**os.environ, "TRACK_TEMPLATE_DEV": "1"},
                 text=True,
@@ -1419,6 +1585,36 @@ class VerifyScriptsTest(unittest.TestCase):
             items_dir.mkdir(parents=True, exist_ok=True)
             (items_dir / "metadata.json").write_text(
                 '{"status": "planned"}', encoding="utf-8"
+            )
+
+        result = self.run_python_script("verify_tech_stack_ready.py", setup)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("All tracks are in 'planned' status", result.stdout)
+
+    def test_verify_tech_stack_todo_allowed_when_planned_with_archived_history(
+        self,
+    ) -> None:
+        """Archived tracks in track/archive/ must not block the planning-phase bypass."""
+
+        def setup(root: Path) -> None:
+            track_dir = root / "track"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "tech-stack.md").write_text(
+                "- **DB**: `TODO: PostgreSQL / SQLite / MySQL / なし`\n",
+                encoding="utf-8",
+            )
+            # New active track in planned status
+            items_dir = track_dir / "items" / "new-track"
+            items_dir.mkdir(parents=True, exist_ok=True)
+            (items_dir / "metadata.json").write_text(
+                '{"status": "planned"}', encoding="utf-8"
+            )
+            # Old track already archived in track/archive/ — must be ignored
+            arch_dir = track_dir / "archive" / "old-track"
+            arch_dir.mkdir(parents=True, exist_ok=True)
+            (arch_dir / "metadata.json").write_text(
+                '{"status": "archived"}', encoding="utf-8"
             )
 
         result = self.run_python_script("verify_tech_stack_ready.py", setup)

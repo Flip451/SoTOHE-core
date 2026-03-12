@@ -49,12 +49,9 @@ def main(argv: list[str] | None = None) -> int:
     root = project_root()
     print("--- Verify track metadata ---")
 
-    track_root = root / "track" / "items"
-    if not track_root.is_dir():
-        print("[OK] No track directories found. Skipping metadata checks.")
-        return 0
+    from track_schema import all_track_directories
 
-    track_dirs = sorted(p for p in track_root.iterdir() if p.is_dir())
+    track_dirs = all_track_directories(root)
     if not track_dirs:
         print("[OK] No track directories found. Skipping metadata checks.")
         return 0

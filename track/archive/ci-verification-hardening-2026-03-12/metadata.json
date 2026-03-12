@@ -3,9 +3,9 @@
   "id": "ci-verification-hardening-2026-03-12",
   "branch": "track/ci-verification-hardening-2026-03-12",
   "title": "CI Verification Hardening — container entry points, placeholder false-positive fix, planning-phase bypass, i18n scaffold detection",
-  "status": "done",
+  "status": "archived",
   "created_at": "2026-03-12T09:00:00Z",
-  "updated_at": "2026-03-12T12:01:54.679259+00:00",
+  "updated_at": "2026-03-12T14:03:42.170927+00:00",
   "tasks": [
     {
       "id": "T001",
