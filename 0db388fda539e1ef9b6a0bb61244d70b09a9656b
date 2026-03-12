@@ -1,0 +1,18 @@
+## Task Summary: Archive WF-07 track and fix branch guard
+
+**Track:** archive-context-pollution-2026-03-12
+**Task:** Archive completed track + fix branch guard archive scanning
+**Date:** 2026-03-13
+
+### Changes
+
+- track/items/archive-context-pollution-2026-03-12: moved to track/archive/ via git mv
+- track/registry.md: regenerated with track in Archived section
+- scripts/git_ops.py: branch guard now scans track/archive/ for archived tracks
+- scripts/test_git_ops.py: 2 new tests for archive branch guard behavior
+
+### Why
+
+After archiving a track, the branch guard could not find the track in track/items/
+and rejected commits on the track branch. Fixed by scanning track/archive/ for
+tracks with status "archived" whose branch matches the current branch.
