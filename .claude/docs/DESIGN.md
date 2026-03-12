@@ -1262,6 +1262,40 @@ PostToolUse launcher (lock-release) differences:
 | `TrackStatus::Archived` missing in Rust domain | Python schema incompatibility | Add `Archived` variant to `TrackStatus` enum in domain layer |
 | `DomainError::Repository` leaks into `TrackWriteError::Domain` | Ambiguous error path | Remove `DomainError::Repository` variant when migrating to `TrackReader`/`TrackWriter` |
 
+## Feature Branch Strategy (branch-strategy-2026-03-12)
+
+Full design with Canonical Blocks: `.claude/docs/research/planner-branch-strategy-2026-03-12.md`
+
+### Canonical Blocks Reference
+
+The following blocks are defined verbatim in the research artifact above (§ Canonical Blocks):
+
+- **Branch naming convention**: `track/<track-id>`
+- **`metadata.json` schema v3**: adds `branch` field binding track to feature branch
+- **Python function signatures**: `current_git_branch()`, `find_track_by_branch()`, `resolve_track_dir()`, `latest_legacy_track_dir()`
+- **Rust function signatures**: `allow_agent_git_operation()`, `is_protected_history_mutation()`
+- **Mermaid flowchart**: branch lifecycle from `/track:plan` approval through PR merge
+
+### Branch Lifecycle
+
+```mermaid
+flowchart TD
+    A["/track:plan <feature> approved"] --> B["Create track/items/<id>/metadata.json"]
+    B --> C["Create branch track/<id> from main"]
+    C --> D["Switch workspace to track/<id>"]
+    D --> E["Implement, review, /track:ci, /track:commit"]
+    E --> F{"Track status done?"}
+    F -->|No| E
+    F -->|Yes| G["Push track/<id> and open PR to main"]
+    G --> H["GitHub Actions runs on PR"]
+    H --> I{"PR approved and green?"}
+    I -->|No| E
+    I -->|Yes| J["User merges PR to main"]
+    J --> K["Update local main"]
+    K --> L["Optional: archive track"]
+    L --> M["Optional: delete merged branch"]
+```
+
 ## Open Questions
 
 _None at this time._
@@ -1284,3 +1318,4 @@ _None at this time._
 | 2026-03-11 | Codex review R8 fixes: HookError::Input exit code per event type, launcher pid guidance acquire-only, --pid doc scoped to lock-acquire |
 | 2026-03-11 | Codex review R9 fixes: serde parse failure per event type, risk table per-event exit code, --pid CLI-arg-only (no env var) |
 | 2026-03-11 | Codex review R10 fixes: risk table tool_name per-event, HookContext.project_dir Optional (guard works without CLAUDE_PROJECT_DIR) |
+| 2026-03-12 | Feature branch strategy: per-track branches, branch-aware resolution, guard policy extension (Codex planner) |
