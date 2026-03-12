@@ -1,0 +1,22 @@
+## Task Summary: Security control regression tests for CI hardening
+
+**Track:** security-control-tests-2026-03-11
+**Task:** CI validation for all 5 security hardening tracks
+**Date:** 2026-03-12
+
+### Changes
+
+- .claude/hooks/test_policy_hooks.py: 3 fail-closed behavior tests (JSON parse, BaseException, non-Bash exit)
+- scripts/test_verify_scripts.py: compose .git:ro mount and tmpfs masking assertions
+- scripts/test_atomic_write.py: _find_sotp() binary selection, probe caching, fallback tests
+- Makefile.toml: added test_atomic_write.py to scripts-selftest-local
+- track/items/security-control-tests-2026-03-11/: status → done, verification complete
+- track/items/atomic-write-standard-2026-03-11/verification.md: resolved open issue
+- track/registry.md: moved track to Completed
+
+### Why
+
+Ensures all security hardening measures (container .git read-only, sensitive dir masking,
+hook fail-closed behavior, filelock concurrency, atomic writes) have CI regression tests
+that detect silent degradation. Codex review cycle (2 rounds) hardened regex precision
+for source-inspection tests.
