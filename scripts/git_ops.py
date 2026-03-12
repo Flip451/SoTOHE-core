@@ -165,6 +165,12 @@ def commit_from_file(path: Path, *, cleanup: bool, track_dir: Path | None = None
             if cleanup and track_dir_file is not None:
                 track_dir_file.unlink(missing_ok=True)
             return code
+    else:
+        # Fallback: auto-detect track from current branch when no explicit
+        # track directory is provided (e.g. takt commit-pending-message path).
+        code = _verify_branch_by_auto_detection()
+        if code != 0:
+            return code
 
     code = run_git(["commit", "-F", str(path)])
     # Cleanup both commit message and track-dir.txt on success or failure.
@@ -176,20 +182,31 @@ def commit_from_file(path: Path, *, cleanup: bool, track_dir: Path | None = None
     return code
 
 
-def _verify_commit_branch(track_dir: Path) -> int:
-    """Validate that the track directory is valid and branch matches."""
-    # Validate path: must be under track/items/<id> with metadata.json
-    if not track_dir.is_dir():
-        print(f"[ERROR] Track directory not found: {track_dir}", file=sys.stderr)
-        return 1
-    metadata_file = track_dir / "metadata.json"
-    if not metadata_file.is_file():
-        print(f"[ERROR] metadata.json not found in: {track_dir}", file=sys.stderr)
-        return 1
+def _repo_root() -> Path:
+    """Return the repository root (directory containing this script's parent)."""
+    return Path(__file__).resolve().parent.parent
 
+
+def _safe_repo_items_dir() -> tuple[Path, Path] | None:
+    """Return (resolved_repo_root, resolved_items_dir) if track/items is canonical.
+
+    Returns None if track/items resolves to anything other than the literal
+    ``<repo_root>/track/items`` path (rejects symlinks that redirect the tree).
+    """
+    repo_root = _repo_root().resolve()
+    canonical = repo_root / "track" / "items"
+    items_dir = (_repo_root() / "track" / "items").resolve()
+    if items_dir != canonical:
+        return None
+    return repo_root, items_dir
+
+
+def _ensure_branch_guard_imports() -> tuple[int, object, object, object]:
+    """Import branch guard dependencies, returning (code, BranchGuardError, verify, current_branch).
+
+    Returns (0, ...) on success, (1, None, None, None) on import failure.
+    """
     try:
-        # Ensure scripts/ is on sys.path so these modules resolve regardless
-        # of whether git_ops is invoked as a script or imported as a package.
         _scripts_dir = str(Path(__file__).resolve().parent)
         if _scripts_dir not in sys.path:
             sys.path.insert(0, _scripts_dir)
@@ -197,11 +214,145 @@ def _verify_commit_branch(track_dir: Path) -> int:
         from track_resolution import current_git_branch
     except ImportError as e:
         print(f"[ERROR] Branch guard import failed: {e}", file=sys.stderr)
+        return 1, None, None, None
+    return 0, BranchGuardError, verify_track_branch, current_git_branch
+
+
+def _verify_commit_branch(track_dir: Path) -> int:
+    """Validate that the track directory is valid and branch matches."""
+    # Validate path: must be under track/items/<id> with metadata.json
+    if not track_dir.is_dir():
+        print(f"[ERROR] Track directory not found: {track_dir}", file=sys.stderr)
         return 1
 
+    # Enforce that track_dir resolves to a path under the repo's own
+    # track/items/ directory.  This prevents bypass via external directories
+    # (e.g. /tmp/.../track/items/fake) or symlinked track/items/ itself.
+    safe = _safe_repo_items_dir()
+    if safe is None:
+        print(
+            "[ERROR] track/items/ resolves outside the repository root",
+            file=sys.stderr,
+        )
+        return 1
+    _, repo_items_dir = safe
+    resolved = track_dir.resolve()
+    # Must be exactly track/items/<id> — one level deep, no nesting.
+    if resolved.parent != repo_items_dir:
+        print(
+            f"[ERROR] Track directory must be exactly track/items/<id>: {track_dir}",
+            file=sys.stderr,
+        )
+        return 1
+
+    metadata_file = track_dir / "metadata.json"
+    if not metadata_file.is_file():
+        print(f"[ERROR] metadata.json not found in: {track_dir}", file=sys.stderr)
+        return 1
+
+    code, BranchGuardError, verify_track_branch, current_git_branch = (
+        _ensure_branch_guard_imports()
+    )
+    if code:
+        return code
+
     try:
-        root = track_dir.parent.parent.parent  # track/items/<id> -> project root
+        root = _repo_root()
         branch = current_git_branch(root)
+        verify_track_branch(track_dir, current_branch=branch)
+    except BranchGuardError as e:
+        print(f"[ERROR] Branch guard: {e}", file=sys.stderr)
+        return 1
+    except Exception as e:
+        print(f"[ERROR] Branch guard check failed: {e}", file=sys.stderr)
+        return 1
+
+    return 0
+
+
+def _verify_branch_by_auto_detection() -> int:
+    """Fallback branch guard: auto-detect track from current branch and verify.
+
+    Used when no explicit track_dir or track-dir.txt is provided (e.g. takt path).
+    If the current branch matches track/<id>, resolve the track directory and
+    run the branch guard.  If not on a track branch, skip silently (no guard).
+    Returns 0 on pass/skip, 1 on guard failure.
+    """
+    code, BranchGuardError, verify_track_branch, current_git_branch = (
+        _ensure_branch_guard_imports()
+    )
+    if code:
+        return code
+
+    root = _repo_root()
+    branch = current_git_branch(root)
+    if branch is None:
+        # Cannot determine branch (not a git repo or git unavailable).
+        # Fail closed: reject rather than silently skip.
+        print("[ERROR] Branch guard: cannot determine current git branch", file=sys.stderr)
+        return 1
+    if branch == "HEAD":
+        # Detached HEAD — fail closed per branch guard policy.
+        print("[ERROR] Branch guard: detached HEAD — cannot verify track branch", file=sys.stderr)
+        return 1
+    if not branch.startswith("track/"):
+        return 0  # not on a track branch — nothing to guard
+
+    # Scan all tracks for branch ownership: reject duplicates and
+    # directory-name-only matches (branch=null resolved by fallback).
+    import json as _json
+
+    safe = _safe_repo_items_dir()
+    if safe is None:
+        print(
+            "[ERROR] track/items/ resolves outside the repository root",
+            file=sys.stderr,
+        )
+        return 1
+    _, resolved_items_dir = safe
+
+    track_items_dir = root / "track" / "items"
+    matches: list[str] = []
+    if track_items_dir.is_dir():
+        for candidate in sorted(track_items_dir.iterdir()):
+            if not candidate.is_dir():
+                continue
+            # Must resolve to exactly track/items/<id> (direct child, no nesting).
+            resolved_candidate = candidate.resolve()
+            if resolved_candidate.parent != resolved_items_dir:
+                continue
+            meta = candidate / "metadata.json"
+            if not meta.is_file():
+                continue
+            try:
+                data = _json.loads(meta.read_text(encoding="utf-8"))
+            except (ValueError, OSError):
+                continue
+            if data.get("branch") == branch:
+                matches.append(candidate.name)
+
+    if len(matches) == 0:
+        # No track explicitly claims this branch in metadata.json.
+        # find_track_by_branch() may resolve via directory-name fallback,
+        # but that track has branch=null — fail closed rather than skip.
+        print(
+            f"[ERROR] Branch guard: on branch '{branch}' but no track claims "
+            f"this branch in metadata.json",
+            file=sys.stderr,
+        )
+        return 1
+    if len(matches) > 1:
+        print(
+            f"[ERROR] Branch guard: multiple tracks claim branch '{branch}': "
+            f"{', '.join(matches)}",
+            file=sys.stderr,
+        )
+        return 1
+
+    # Exactly one track claims this branch — resolve and verify.
+    track_dir = track_items_dir / matches[0]
+
+    try:
         verify_track_branch(track_dir, current_branch=branch)
     except BranchGuardError as e:
         print(f"[ERROR] Branch guard: {e}", file=sys.stderr)
