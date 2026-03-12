@@ -1,0 +1,18 @@
+## Task Summary: Add pr-review-cycle track plan
+
+**Track:** pr-review-cycle-2026-03-12
+**Task:** GitHub PR-based review cycle planning with Codex Cloud @codex review
+**Date:** 2026-03-12
+
+### Changes
+
+- metadata.json: Track SSoT with 10 tasks (T0-T9), 4 sections, schema v3
+- spec.md: Goal, prerequisites, scope, constraints, acceptance criteria for Codex Cloud async review
+- plan.md: Read-only rendered view from metadata.json
+- verification.md: 13 scope items + 8 manual verification steps
+- planner-pr-review-cycle-2026-03-12.md: Codex planner research output with canonical blocks
+- track/registry.md: Added pr-review-cycle-2026-03-12 as active track
+
+### Why
+
+Design a /track:pr-review command that leverages Codex Cloud's @codex review for async GitHub-native code review. The plan covers push → PR → trigger → poll → parse flow with stale review correlation, GitHub App detection, and fail-closed for non-structured providers.
