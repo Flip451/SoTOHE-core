@@ -1,7 +1,10 @@
 use std::collections::{HashMap, HashSet};
 use std::fmt;
 
-use crate::{CommitHash, DomainError, PlanView, TaskId, TrackId, TransitionError, ValidationError};
+use crate::{
+    CommitHash, DomainError, PlanView, TaskId, TrackBranch, TrackId, TransitionError,
+    ValidationError,
+};
 
 /// Derived status of a track, computed from its task states and optional override.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -214,6 +217,7 @@ impl TrackTask {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TrackMetadata {
     id: TrackId,
+    branch: Option<TrackBranch>,
     title: String,
     tasks: Vec<TrackTask>,
     plan: PlanView,
@@ -232,6 +236,21 @@ impl TrackMetadata {
         plan: PlanView,
         status_override: Option<StatusOverride>,
     ) -> Result<Self, DomainError> {
+        Self::with_branch(id, None, title, tasks, plan, status_override)
+    }
+
+    /// Creates a new `TrackMetadata` with an optional branch field.
+    ///
+    /// # Errors
+    /// Returns `DomainError` on empty title, duplicate tasks/sections, or plan-task mismatch.
+    pub fn with_branch(
+        id: TrackId,
+        branch: Option<TrackBranch>,
+        title: impl Into<String>,
+        tasks: Vec<TrackTask>,
+        plan: PlanView,
+        status_override: Option<StatusOverride>,
+    ) -> Result<Self, DomainError> {
         let title = title.into();
         if title.trim().is_empty() {
             return Err(ValidationError::EmptyTrackTitle.into());
@@ -239,7 +258,7 @@ impl TrackMetadata {
 
         validate_plan_invariants(&tasks, &plan)?;
 
-        let track = Self { id, title, tasks, plan, status_override };
+        let track = Self { id, branch, title, tasks, plan, status_override };
         track.ensure_override_is_compatible()?;
 
         Ok(track)
@@ -248,6 +267,11 @@ impl TrackMetadata {
     #[must_use]
     pub fn id(&self) -> &TrackId {
         &self.id
+    }
+
+    #[must_use]
+    pub fn branch(&self) -> Option<&TrackBranch> {
+        self.branch.as_ref()
     }
 
     #[must_use]
