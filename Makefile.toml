@@ -754,6 +754,11 @@ description = "[wrapper] Show PR check status"
 script_runner = "@shell"
 script = ['"${PYTHON_BIN:-python3}" scripts/pr_merge.py status ${@}']
 
+[tasks.track-switch-main]
+description = "[wrapper] Switch to main branch and pull latest"
+script_runner = "@shell"
+script = ['"${PYTHON_BIN:-python3}" scripts/branch_switch.py switch-and-pull main']
+
 [tasks.track-add-paths]
 description = "[wrapper] Stage paths listed in tmp/track-commit/add-paths.txt and delete the scratch file"
 script_runner = "@shell"
