@@ -565,21 +565,17 @@ class TestArchivedStatusValidation(unittest.TestCase):
 
 
 class TrackItemsDirConsistencyTest(unittest.TestCase):
-    """Verify all production scripts use the same track/items path as track_schema.TRACK_ITEMS_DIR."""
+    """Verify production scripts reference track paths via track_schema constants."""
 
     def test_track_items_dir_matches_production_scripts(self) -> None:
+        """Scripts that still directly reference track/items must use the canonical constant."""
         import re
         from pathlib import Path
 
         from track_schema import TRACK_ITEMS_DIR
 
-        # Production scripts that reference track/items
+        # Scripts that directly reference track/items (not yet migrated to all_track_directories)
         scripts_with_track_items = [
-            "verify_tech_stack_ready.py",
-            "verify_latest_track_files.py",
-            "verify_plan_progress.py",
-            "verify_track_metadata.py",
-            "track_registry.py",
             "track_state_machine.py",
             "external_guides.py",
         ]
@@ -595,6 +591,99 @@ class TrackItemsDirConsistencyTest(unittest.TestCase):
                 f"{script_name} does not reference 'track/items' — "
                 f"canonical value is TRACK_ITEMS_DIR = {TRACK_ITEMS_DIR!r}",
             )
+
+    def test_migrated_scripts_use_all_track_directories(self) -> None:
+        """Scripts migrated to all_track_directories() must import it from track_schema."""
+        from pathlib import Path
+
+        migrated_scripts = [
+            "verify_plan_progress.py",
+            "verify_track_metadata.py",
+            "verify_latest_track_files.py",
+            "track_registry.py",
+            "verify_tech_stack_ready.py",
+        ]
+        scripts_dir = Path(__file__).parent
+
+        for script_name in migrated_scripts:
+            script_path = scripts_dir / script_name
+            self.assertTrue(script_path.is_file(), f"Missing: {script_name}")
+            content = script_path.read_text(encoding="utf-8")
+            self.assertIn(
+                "all_track_directories",
+                content,
+                f"{script_name} must use all_track_directories() from track_schema",
+            )
+
+
+class AllTrackDirectoriesTest(unittest.TestCase):
+    """Unit tests for the all_track_directories() helper."""
+
+    def test_returns_empty_when_no_directories(self) -> None:
+        import tempfile
+        from pathlib import Path
+
+        from track_schema import all_track_directories
+
+        with tempfile.TemporaryDirectory() as tmp:
+            result = all_track_directories(Path(tmp))
+        self.assertEqual(result, [])
+
+    def test_returns_items_only_when_no_archive(self) -> None:
+        import tempfile
+        from pathlib import Path
+
+        from track_schema import all_track_directories
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "track" / "items" / "feat-a").mkdir(parents=True)
+            (root / "track" / "items" / "feat-b").mkdir(parents=True)
+            result = all_track_directories(root)
+
+        self.assertEqual([p.name for p in result], ["feat-a", "feat-b"])
+
+    def test_returns_archive_only_when_no_items(self) -> None:
+        import tempfile
+        from pathlib import Path
+
+        from track_schema import all_track_directories
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "track" / "archive" / "old-feat").mkdir(parents=True)
+            result = all_track_directories(root)
+
+        self.assertEqual([p.name for p in result], ["old-feat"])
+
+    def test_merges_and_sorts_both_directories(self) -> None:
+        import tempfile
+        from pathlib import Path
+
+        from track_schema import all_track_directories
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "track" / "items" / "feat-b").mkdir(parents=True)
+            (root / "track" / "archive" / "feat-a").mkdir(parents=True)
+            result = all_track_directories(root)
+
+        self.assertEqual([p.name for p in result], ["feat-a", "feat-b"])
+
+    def test_skips_files_in_base_directories(self) -> None:
+        import tempfile
+        from pathlib import Path
+
+        from track_schema import all_track_directories
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "track" / "items").mkdir(parents=True)
+            (root / "track" / "items" / "not-a-track.txt").write_text("x")
+            (root / "track" / "items" / "real-track").mkdir()
+            result = all_track_directories(root)
+
+        self.assertEqual([p.name for p in result], ["real-track"])
 
 
 if __name__ == "__main__":

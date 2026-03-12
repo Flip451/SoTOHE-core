@@ -1,0 +1,136 @@
+{
+  "schema_version": 3,
+  "id": "pr-review-cycle-2026-03-12",
+  "branch": "track/pr-review-cycle-2026-03-12",
+  "title": "GitHub PR-based review cycle",
+  "status": "archived",
+  "created_at": "2026-03-12T15:00:00Z",
+  "updated_at": "2026-03-12T14:03:42.170927+00:00",
+  "tasks": [
+    {
+      "id": "T0",
+      "description": "Permissions and guardrails: add wrapper allow entries (track-pr-push, track-pr-ensure, track-pr-review) to .claude/settings.json, update verify_orchestra_guardrails.py allowlists, keep raw gh and git push blocked",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T1",
+      "description": "Makefile wrappers: add track-pr-push, track-pr-ensure, track-pr-review wrapper tasks invoking scripts/pr_review.py subcommands",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T2",
+      "description": "AGENTS.md setup: create AGENTS.md with Review guidelines section (coding rules from .claude/rules/04-06, security convention, severity policy P0/P1 only). Document Codex Cloud GitHub App prerequisite in spec.md",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T3",
+      "description": "PR orchestration script skeleton: create scripts/pr_review.py with push/ensure-pr/trigger-review/poll-review/run subcommands, track context resolution. trigger-review posts '@codex review' comment via gh api. Non-structured reviewer providers fail closed",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T4",
+      "description": "PR lifecycle: implement gh pr list/create/view for deterministic PR discovery and creation (one track = one PR, create or reuse)",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T5",
+      "description": "Review polling and result collection: poll GitHub API for new review from Codex bot after trigger, with configurable interval (default 15s) and timeout (default 10min). Correlate review to current trigger by filtering reviews created after trigger timestamp (reject stale pre-existing reviews). Detect review completion by checking latest review author and state. On timeout, distinguish GitHub App not installed (no Codex bot activity on PR) from bot-busy (comment posted but review pending) with distinct error messages",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T6",
+      "description": "Review result parsing: fetch completed Codex review via gh api (review body + inline comments), normalize into ReviewFinding types, count actionable findings (P0/P1), determine pass/fail status",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T7",
+      "description": "/track:pr-review command prompt: create .claude/commands/track/pr-review.md with track resolution, push/ensure-pr/trigger/poll/parse flow, async handling guidance, summary output with PR URL and finding counts",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T8",
+      "description": "Tests: PR lifecycle via mocked gh, trigger comment posting, poll timeout/success (including stale review rejection and GitHub App missing detection), review result parsing, fail-closed for non-structured providers, path sanitization (absolute paths, secrets, internal env info), guardrail allowlist sync, /track:review regression (existing local review unaffected)",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T9",
+      "description": "Documentation: update CLAUDE.md (command list, Codex Cloud prerequisite), track/workflow.md (pr-review section with async flow), DEVELOPER_AI_WORKFLOW.md (GitHub review workflow)",
+      "status": "done",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "Add /track:pr-review command for GitHub PR-based review cycle using Codex Cloud @codex review.",
+      "Push track branch, create/reuse PR to main, post @codex review comment to trigger Codex Cloud review.",
+      "Poll GitHub API for review completion, parse findings from the posted review.",
+      "Review -> fix locally -> push -> trigger again loop until zero findings.",
+      "Route all git/GitHub operations through cargo make wrappers (no direct gh or git push).",
+      "Keep existing /track:review unchanged as fast local reviewer loop.",
+      "Requires Codex Cloud GitHub App installed on the repository."
+    ],
+    "sections": [
+      {
+        "id": "S0",
+        "title": "Permissions, Wrappers, and AGENTS.md",
+        "description": [
+          "Establish permissions and guardrails before any wrapper execution.",
+          "Add Makefile.toml wrapper tasks for PR operations.",
+          "Create AGENTS.md with review guidelines for Codex Cloud."
+        ],
+        "task_ids": [
+          "T0",
+          "T1",
+          "T2"
+        ]
+      },
+      {
+        "id": "S1",
+        "title": "PR Orchestration and Lifecycle",
+        "description": [
+          "Create scripts/pr_review.py with push, ensure-pr, trigger-review, poll-review, and run subcommands.",
+          "Implement PR lifecycle management (discover, create, reuse)."
+        ],
+        "task_ids": [
+          "T3",
+          "T4"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Async Review Polling and Result Parsing",
+        "description": [
+          "Poll GitHub API for Codex Cloud review completion after trigger.",
+          "Parse review body and inline comments into normalized finding types."
+        ],
+        "task_ids": [
+          "T5",
+          "T6"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Command, Tests, and Documentation",
+        "description": [
+          "Create /track:pr-review command prompt with async flow guidance.",
+          "Add tests for all components.",
+          "Update workflow and developer documentation."
+        ],
+        "task_ids": [
+          "T7",
+          "T8",
+          "T9"
+        ]
+      }
+    ]
+  }
+}

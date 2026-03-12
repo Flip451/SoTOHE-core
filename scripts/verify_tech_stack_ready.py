@@ -12,7 +12,6 @@ import sys
 from pathlib import Path
 
 TECH_STACK_FILE = Path("track/tech-stack.md")
-TRACK_ROOT = Path("track/items")
 TEMPLATE_DEV_MARKER_FILE = Path(".track-template-dev")
 
 # Matches structured placeholder lines containing TODO: markers.
@@ -41,10 +40,9 @@ def is_template_dev_mode(root: Path) -> bool:
 
 
 def has_track_dirs(root: Path) -> bool:
-    track_root = root / TRACK_ROOT
-    if not track_root.is_dir():
-        return False
-    return any(p for p in track_root.iterdir() if p.is_dir())
+    from track_schema import all_track_directories
+
+    return bool(all_track_directories(root))
 
 
 def all_tracks_planned(root: Path) -> bool | None:
@@ -53,15 +51,21 @@ def all_tracks_planned(root: Path) -> bool | None:
     Returns True if all tracks are planned, False if any is not,
     None if metadata cannot be read (fail-closed signal).
     """
-    track_root = root / TRACK_ROOT
-    if not track_root.is_dir():
-        return False  # no tracks = no planning-phase bypass
+    from track_schema import all_track_directories
 
-    dirs = [p for p in track_root.iterdir() if p.is_dir()]
+    dirs = all_track_directories(root)
     if not dirs:
         return False
 
+    archive_root = (root / "track" / "archive").resolve()
+    found_any = False
     for track_dir in dirs:
+        # Archived tracks in track/archive/ are excluded from the planning check.
+        try:
+            track_dir.resolve().relative_to(archive_root)
+            continue
+        except ValueError:
+            pass
         meta = track_dir / "metadata.json"
         if not meta.is_file():
             return None  # fail closed: can't determine status
@@ -76,8 +80,9 @@ def all_tracks_planned(root: Path) -> bool | None:
             return None  # fail closed
         if status != "planned":
             return False  # found a non-planned track
+        found_any = True
 
-    return True
+    return found_any
 
 
 def main(argv: list[str] | None = None) -> int:
