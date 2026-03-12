@@ -1,0 +1,15 @@
+## Task Summary: Harden branch guard path validation and fail-closed policy
+
+**Track:** track-branch-guard-2026-03-12
+**Task:** Fix review findings: repo-root path validation, auto-detection fallback, fail-closed policy
+**Date:** 2026-03-12
+
+### Changes
+
+- scripts/git_ops.py: Add _safe_repo_items_dir() canonical check, _verify_branch_by_auto_detection() fallback, enforce exact track/items/<id> depth, fail closed on detached HEAD / unknown branch / duplicate claims
+- scripts/track_branch_guard.py: Fail closed on corrupt metadata.json (raise BranchGuardError instead of silent return)
+- scripts/test_track_branch_guard.py: Add test_corrupt_metadata_raises test case
+
+### Why
+
+Codex review (10 rounds) identified path validation bypass vectors and missing branch guard coverage on the takt commit path. All findings addressed: external directory bypass, symlink attacks, nested path exploits, fail-open on detached HEAD, and missing auto-detection fallback for commit-pending-message.
