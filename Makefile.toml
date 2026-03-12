@@ -127,6 +127,7 @@ args = [
   "scripts/test_track_schema.py",
   "scripts/test_track_markdown.py",
   "scripts/test_track_state_machine.py",
+  "scripts/test_track_branch_guard.py",
   "scripts/test_track_registry.py",
   "scripts/test_takt_personas.py",
   "scripts/test_pr_review.py",

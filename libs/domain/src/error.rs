@@ -20,6 +20,8 @@ pub enum ValidationError {
     InvalidTaskId(String),
     #[error("commit hash '{0}' must be 7 to 40 lowercase hex characters")]
     InvalidCommitHash(String),
+    #[error("track branch '{0}' must match the pattern track/<slug>")]
+    InvalidTrackBranch(String),
     #[error("track title must not be empty")]
     EmptyTrackTitle,
     #[error("task description must not be empty")]

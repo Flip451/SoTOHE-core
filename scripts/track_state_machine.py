@@ -13,6 +13,7 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
+from track_branch_guard import verify_track_branch
 from track_markdown import render_plan
 from track_registry import collect_track_metadata, render_registry
 from track_schema import (
@@ -23,6 +24,9 @@ from track_schema import (
     effective_track_status,
     parse_metadata_v2,
 )
+
+_SENTINEL = object()
+"""Sentinel for 'current_branch not provided' in _save_metadata()."""
 
 
 class TransitionError(Exception):
@@ -46,7 +50,27 @@ def _load_metadata(track_dir: Path) -> dict:
     return json.loads(metadata_file.read_text(encoding="utf-8"))
 
 
-def _save_metadata(track_dir: Path, data: dict, *, now: datetime | None = None) -> None:
+def _save_metadata(
+    track_dir: Path,
+    data: dict,
+    *,
+    now: datetime | None = None,
+    skip_branch_check: bool = False,
+    current_branch: str | None = _SENTINEL,
+) -> None:
+    # Branch guard: skip when now is set (test determinism) or explicitly skipped.
+    if now is None and not skip_branch_check:
+        if current_branch is _SENTINEL:
+            from track_resolution import current_git_branch
+
+            current_branch = current_git_branch(track_dir.parent.parent.parent)
+        try:
+            verify_track_branch(
+                track_dir, current_branch=current_branch, skip_branch_check=False
+            )
+        except Exception as e:
+            raise TransitionError(str(e)) from e
+
     if now is None:
         now = datetime.now(UTC)
     data["updated_at"] = now.isoformat()
