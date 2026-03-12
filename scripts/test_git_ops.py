@@ -236,6 +236,71 @@ class GitOpsTest(unittest.TestCase):
 
         self.assertEqual(code, 1)
 
+    def test_branch_guard_allows_archived_track_in_archive_dir(self) -> None:
+        """Branch guard should pass when the track is in track/archive/ with status archived."""
+        import json
+
+        # Need an initial commit so git rev-parse works
+        (self.root / "dummy.txt").write_text("init\n", encoding="utf-8")
+        self.run_git("add", "dummy.txt")
+        self.run_git("commit", "-m", "initial")
+
+        archive_dir = self.root / "track" / "archive" / "my-feat"
+        archive_dir.mkdir(parents=True, exist_ok=True)
+        (archive_dir / "metadata.json").write_text(
+            json.dumps({
+                "schema_version": 3,
+                "id": "my-feat",
+                "branch": "track/my-feat",
+                "status": "archived",
+            })
+            + "\n",
+            encoding="utf-8",
+        )
+        # track/items/ exists but is empty — no track claims the branch there
+        items_dir = self.root / "track" / "items"
+        items_dir.mkdir(parents=True, exist_ok=True)
+
+        self.run_git("checkout", "-b", "track/my-feat")
+
+        with patch.object(git_ops, "_repo_root", return_value=self.root), \
+             patch.object(git_ops, "_safe_repo_items_dir", return_value=(self.root, items_dir.resolve())):
+            code = git_ops._verify_branch_by_auto_detection()
+
+        self.assertEqual(code, 0)
+
+    def test_branch_guard_rejects_non_archived_track_in_archive_dir(self) -> None:
+        """Branch guard should reject track in track/archive/ that is not status archived."""
+        import json
+
+        # Need an initial commit so git rev-parse works
+        (self.root / "dummy.txt").write_text("init\n", encoding="utf-8")
+        self.run_git("add", "dummy.txt")
+        self.run_git("commit", "-m", "initial")
+
+        archive_dir = self.root / "track" / "archive" / "bad-feat"
+        archive_dir.mkdir(parents=True, exist_ok=True)
+        (archive_dir / "metadata.json").write_text(
+            json.dumps({
+                "schema_version": 3,
+                "id": "bad-feat",
+                "branch": "track/bad-feat",
+                "status": "done",
+            })
+            + "\n",
+            encoding="utf-8",
+        )
+        items_dir = self.root / "track" / "items"
+        items_dir.mkdir(parents=True, exist_ok=True)
+
+        self.run_git("checkout", "-b", "track/bad-feat")
+
+        with patch.object(git_ops, "_repo_root", return_value=self.root), \
+             patch.object(git_ops, "_safe_repo_items_dir", return_value=(self.root, items_dir.resolve())):
+            code = git_ops._verify_branch_by_auto_detection()
+
+        self.assertEqual(code, 1)
+
 
 if __name__ == "__main__":
     unittest.main()

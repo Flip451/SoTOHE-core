@@ -332,9 +332,25 @@ def _verify_branch_by_auto_detection() -> int:
                 matches.append(candidate.name)
 
     if len(matches) == 0:
-        # No track explicitly claims this branch.  Check for a directory-name
-        # match with branch=null (legacy/planning phase) — those tracks skip
-        # the guard by design, consistent with verify_track_branch() semantics.
+        # No track explicitly claims this branch in track/items/.
+        # Check track/archive/ — an archived track on its own branch is
+        # allowed (e.g. the archive commit itself).
+        track_archive_dir = root / "track" / "archive"
+        if track_archive_dir.is_dir():
+            for candidate in sorted(track_archive_dir.iterdir()):
+                if not candidate.is_dir():
+                    continue
+                meta = candidate / "metadata.json"
+                if not meta.is_file():
+                    continue
+                try:
+                    data = _json.loads(meta.read_text(encoding="utf-8"))
+                except (ValueError, OSError):
+                    continue
+                if data.get("branch") == branch and data.get("status") == "archived":
+                    return 0  # archived track on its branch — allow
+
+        # Fallback: directory-name match with branch=null (legacy/planning).
         if branch.startswith("track/"):
             slug = branch[len("track/"):]
             null_candidate = track_items_dir / slug
