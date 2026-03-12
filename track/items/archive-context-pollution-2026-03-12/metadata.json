@@ -1,0 +1,149 @@
+{
+  "schema_version": 3,
+  "id": "archive-context-pollution-2026-03-12",
+  "branch": "track/archive-context-pollution-2026-03-12",
+  "title": "WF-07: Archived track context pollution prevention — physical move to track/archive/ with script and deny rule updates",
+  "status": "planned",
+  "created_at": "2026-03-12T14:00:00Z",
+  "updated_at": "2026-03-12T14:00:00Z",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Add TRACK_ARCHIVE_DIR constant and all_track_directories() helper to track_schema.py",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Update verify_plan_progress.py track_dirs() to use all_track_directories()",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "Update verify_track_metadata.py main() to use all_track_directories()",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "Update verify_latest_track_files.py track_dirs() to use all_track_directories()",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T005",
+      "description": "Update track_registry.py collect_track_metadata() to scan both directories",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T006",
+      "description": "Update verify_tech_stack_ready.py has_track_dirs() and all_tracks_planned() for both directories",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "Update /track:archive command to mkdir -p track/archive/ and git mv track dir to track/archive/<id>/",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T008",
+      "description": "Add deny rules for track/archive/** in .claude/settings.json (Read, Grep, Glob)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T009",
+      "description": "Update CLAUDE.md Workspace Map and archive command Behavior section for track/archive/",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T010",
+      "description": "Update test_track_schema.py: TRACK_ARCHIVE_DIR consistency test for scripts referencing track/archive, and all_track_directories() unit tests",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T011",
+      "description": "Add archive directory tests in test_track_registry.py and test_verify_scripts.py",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T012",
+      "description": "Move all existing archived tracks to track/archive/ and run cargo make ci for full validation",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "Prevent archived track directories from polluting AI search context by physically moving them to track/archive/ and adding Claude Code deny rules.",
+      "All verify scripts and registry rendering updated to scan both track/items/ and track/archive/ via a shared helper.",
+      "No Rust code changes. Python scripts + command definitions + settings only.",
+      "Backward compatible: existing CI validation continues to cover archived tracks."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Core Infrastructure",
+        "description": [
+          "Add TRACK_ARCHIVE_DIR constant and all_track_directories() helper to track_schema.py.",
+          "This shared helper returns sorted track directories from both track/items/ and track/archive/."
+        ],
+        "task_ids": ["T001"]
+      },
+      {
+        "id": "S2",
+        "title": "Script Updates",
+        "description": [
+          "Update 5 verify/registry scripts to scan both directories via the new helper.",
+          "verify_plan_progress, verify_track_metadata, verify_latest_track_files, track_registry, verify_tech_stack_ready."
+        ],
+        "task_ids": ["T002", "T003", "T004", "T005", "T006"]
+      },
+      {
+        "id": "S3",
+        "title": "Archive Command Update",
+        "description": [
+          "Update /track:archive command definition to add physical move step.",
+          "After metadata update, mkdir -p track/archive/ and git mv track/items/<id>/ to track/archive/<id>/."
+        ],
+        "task_ids": ["T007"]
+      },
+      {
+        "id": "S4",
+        "title": "Search Exclusion",
+        "description": [
+          "Add deny rules to .claude/settings.json to block Read/Grep/Glob on track/archive/**.",
+          "Verify scripts run via Bash and are unaffected by deny rules."
+        ],
+        "task_ids": ["T008"]
+      },
+      {
+        "id": "S5",
+        "title": "Documentation and Tests",
+        "description": [
+          "Update CLAUDE.md Workspace Map to include track/archive/.",
+          "Update archive command Behavior section.",
+          "Add unit tests for all_track_directories() and integration tests for archive directory scanning."
+        ],
+        "task_ids": ["T009", "T010", "T011"]
+      },
+      {
+        "id": "S6",
+        "title": "Integration Validation",
+        "description": [
+          "Physically move all 15 existing archived tracks to track/archive/.",
+          "Run cargo make ci to validate all scripts, views, and tests pass."
+        ],
+        "task_ids": ["T012"]
+      }
+    ]
+  },
+  "status_override": null
+}
