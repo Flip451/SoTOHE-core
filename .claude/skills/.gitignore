@@ -5,7 +5,12 @@
 # Template-distributed skills
 !.gitignore
 !architecture-customizer/
+!architecture-customizer/**
 !codex-system/
+!codex-system/**
 !gemini-system/
+!gemini-system/**
 !repomix-snapshot/
+!repomix-snapshot/**
 !track-plan/
+!track-plan/**

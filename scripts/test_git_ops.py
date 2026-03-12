@@ -3,6 +3,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from scripts import git_ops
 
@@ -197,7 +198,10 @@ class GitOpsTest(unittest.TestCase):
         message_path.parent.mkdir(parents=True, exist_ok=True)
         message_path.write_text("Commit from file\n\nbody\n", encoding="utf-8")
 
-        code = git_ops.main(["commit-from-file", str(message_path), "--cleanup"])
+        # Mock _repo_root so the branch guard resolves inside the tmpdir
+        # (avoids detached HEAD in CI where the outer repo is checked out headless).
+        with patch.object(git_ops, "_repo_root", return_value=self.root):
+            code = git_ops.main(["commit-from-file", str(message_path), "--cleanup"])
 
         self.assertEqual(code, 0)
         self.assertFalse(message_path.exists())

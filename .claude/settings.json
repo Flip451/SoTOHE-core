@@ -243,6 +243,8 @@
       "Bash(cargo make track-pr-push)",
       "Bash(cargo make track-pr-ensure)",
       "Bash(cargo make track-pr-review)",
+      "Bash(cargo make track-pr-merge:*)",
+      "Bash(cargo make track-pr-status:*)",
       "Bash(true)"
     ],
     "deny": [
