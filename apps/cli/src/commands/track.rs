@@ -6,7 +6,9 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use clap::Subcommand;
-use domain::{CommitHash, TaskId, TaskStatusKind, TaskTransition, TrackId, TrackWriter};
+use domain::{
+    CommitHash, TaskId, TaskStatusKind, TaskTransition, TrackId, TrackReader, TrackWriter,
+};
 use infrastructure::lock::FsFileLockManager;
 use infrastructure::track::fs_store::FsTrackStore;
 
@@ -37,6 +39,10 @@ pub enum TrackCommand {
         /// Commit hash (required when target_status is "done", optional).
         #[arg(long)]
         commit_hash: Option<String>,
+
+        /// Skip branch validation (escape hatch for CI/testing).
+        #[arg(long, default_value_t = false)]
+        skip_branch_check: bool,
     },
 
     /// Create or switch to a track branch.
@@ -70,9 +76,16 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             task_id,
             target_status,
             commit_hash,
-        } => {
-            execute_transition(items_dir, locks_dir, track_id, task_id, target_status, commit_hash)
-        }
+            skip_branch_check,
+        } => execute_transition(
+            items_dir,
+            locks_dir,
+            track_id,
+            task_id,
+            target_status,
+            commit_hash,
+            skip_branch_check,
+        ),
         TrackCommand::Branch { action } => execute_branch(action),
     }
 }
@@ -84,6 +97,7 @@ fn execute_transition(
     task_id: String,
     target_status: String,
     commit_hash: Option<String>,
+    skip_branch_check: bool,
 ) -> ExitCode {
     // Validate inputs.
     let track_id = match TrackId::new(&track_id) {
@@ -124,6 +138,14 @@ fn execute_transition(
     };
 
     let store = Arc::new(FsTrackStore::new(items_dir, lock_manager, DEFAULT_LOCK_TIMEOUT));
+
+    // Branch guard: reject if current git branch does not match metadata.json branch.
+    if !skip_branch_check {
+        if let Err(msg) = verify_branch_guard(&*store, &track_id) {
+            eprintln!("branch guard: {msg}");
+            return ExitCode::FAILURE;
+        }
+    }
 
     // Validate target_status before entering the locked update section.
     if !["todo", "in_progress", "done", "skipped"].contains(&target_status.as_str()) {
@@ -204,6 +226,61 @@ fn execute_branch(action: BranchAction) -> ExitCode {
             ExitCode::FAILURE
         }
     }
+}
+
+/// Returns the current git branch name, or `"HEAD"` for detached HEAD.
+///
+/// # Errors
+/// Returns an error message if `git` cannot be executed or fails.
+fn current_git_branch() -> Result<String, String> {
+    let output = std::process::Command::new("git")
+        .args(["rev-parse", "--abbrev-ref", "HEAD"])
+        .output()
+        .map_err(|e| format!("failed to run git: {e}"))?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!("git rev-parse failed: {stderr}"));
+    }
+
+    let branch = String::from_utf8_lossy(&output.stdout).trim().to_owned();
+    Ok(branch)
+}
+
+/// Verifies that the current git branch matches the track's expected branch.
+///
+/// Skip policy:
+/// - branch=None in metadata → skip (legacy/planning phase)
+/// - detached HEAD (`"HEAD"`) → reject (ambiguous state)
+/// - mismatch → reject
+///
+/// # Errors
+/// Returns an error message describing the branch mismatch or detection failure.
+fn verify_branch_guard<R: TrackReader>(reader: &R, track_id: &TrackId) -> Result<(), String> {
+    let track = reader
+        .find(track_id)
+        .map_err(|e| format!("failed to read track: {e}"))?
+        .ok_or_else(|| format!("track '{track_id}' not found"))?;
+
+    let expected_branch = match track.branch() {
+        Some(branch) => branch,
+        None => return Ok(()), // branch=null → skip guard
+    };
+
+    let actual = current_git_branch()?;
+
+    // Detached HEAD → reject (ambiguous state).
+    if actual == "HEAD" {
+        return Err(format!("detached HEAD — expected branch '{expected_branch}', cannot verify"));
+    }
+
+    if actual != expected_branch.as_str() {
+        return Err(format!(
+            "current branch '{actual}' does not match expected '{expected_branch}'"
+        ));
+    }
+
+    Ok(())
 }
 
 /// Resolves the correct `TaskTransition` based on target status and current task status.

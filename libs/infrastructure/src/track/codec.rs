@@ -1,8 +1,8 @@
 //! Serde types for metadata.json (TrackDocumentV2) matching Python track_schema.py.
 
 use domain::{
-    CommitHash, DomainError, PlanSection, PlanView, StatusOverride, TaskId, TaskStatus, TrackId,
-    TrackMetadata, TrackTask,
+    CommitHash, DomainError, PlanSection, PlanView, StatusOverride, TaskId, TaskStatus,
+    TrackBranch, TrackId, TrackMetadata, TrackTask,
 };
 
 /// Codec error for metadata.json serialization/deserialization.
@@ -22,6 +22,8 @@ pub enum CodecError {
 pub struct TrackDocumentV2 {
     pub schema_version: u32,
     pub id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub branch: Option<String>,
     pub title: String,
     pub status: String,
     pub created_at: String,
@@ -101,6 +103,9 @@ pub fn encode(track: &TrackMetadata, meta: &DocumentMeta) -> Result<String, Code
 fn track_metadata_from_document(doc: TrackDocumentV2) -> Result<TrackMetadata, CodecError> {
     let id = TrackId::new(&doc.id).map_err(DomainError::from)?;
 
+    let branch =
+        doc.branch.map(TrackBranch::new).transpose().map_err(|e| CodecError::Domain(e.into()))?;
+
     let tasks: Vec<TrackTask> = doc
         .tasks
         .into_iter()
@@ -117,7 +122,7 @@ fn track_metadata_from_document(doc: TrackDocumentV2) -> Result<TrackMetadata, C
     let status_override =
         doc.status_override.map(|o| parse_status_override(&o.status, o.reason)).transpose()?;
 
-    let track = TrackMetadata::new(id, doc.title, tasks, plan, status_override)?;
+    let track = TrackMetadata::with_branch(id, branch, doc.title, tasks, plan, status_override)?;
     Ok(track)
 }
 
@@ -132,6 +137,7 @@ fn document_from_track_metadata(track: &TrackMetadata, meta: &DocumentMeta) -> T
     TrackDocumentV2 {
         schema_version: meta.schema_version,
         id: track.id().to_string(),
+        branch: track.branch().map(|b| b.to_string()),
         title: track.title().to_string(),
         status,
         created_at: meta.created_at.clone(),

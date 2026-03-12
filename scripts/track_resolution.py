@@ -14,7 +14,13 @@ BRANCH_PREFIX = "track/"
 
 
 def current_git_branch(root: Path) -> str | None:
-    """Return the current git branch name, or None if detached/not a repo."""
+    """Return the current git branch name.
+
+    Returns:
+        Branch name string for normal branches.
+        ``"HEAD"`` sentinel for detached HEAD (distinct from ``None``).
+        ``None`` when not inside a git repository or git is unavailable.
+    """
     try:
         result = subprocess.run(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"],
@@ -23,7 +29,7 @@ def current_git_branch(root: Path) -> str | None:
         if result.returncode != 0:
             return None
         branch = result.stdout.strip()
-        return None if branch == "HEAD" else branch  # "HEAD" means detached
+        return branch  # "HEAD" for detached, actual name otherwise
     except (OSError, FileNotFoundError):
         return None
 
@@ -124,9 +130,9 @@ def resolve_track_dir(
         warnings.append(f"Track '{track_id}' not found")
         return None, warnings
 
-    # 2. Branch-based resolution
+    # 2. Branch-based resolution (skip "HEAD" sentinel — detached HEAD)
     branch = git_branch or current_git_branch(root)
-    if branch is not None and branch.startswith(BRANCH_PREFIX):
+    if branch is not None and branch != "HEAD" and branch.startswith(BRANCH_PREFIX):
         found = find_track_by_branch(root, branch)
         if found is not None:
             return found, warnings

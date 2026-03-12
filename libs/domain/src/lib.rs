@@ -14,7 +14,7 @@ pub use decision::Decision;
 pub use error::{
     DomainError, RepositoryError, TrackReadError, TrackWriteError, TransitionError, ValidationError,
 };
-pub use ids::{CommitHash, TaskId, TrackId};
+pub use ids::{CommitHash, TaskId, TrackBranch, TrackId};
 pub use plan::{PlanSection, PlanView};
 pub use repository::{TrackReader, TrackWriter};
 pub use track::{
@@ -194,5 +194,60 @@ mod tests {
     #[test]
     fn track_status_archived_displays_correctly() {
         assert_eq!(TrackStatus::Archived.to_string(), "archived");
+    }
+
+    #[test]
+    fn track_branch_accepts_valid_format() {
+        let branch = TrackBranch::new("track/my-feature").unwrap();
+        assert_eq!(branch.as_str(), "track/my-feature");
+        assert_eq!(branch.to_string(), "track/my-feature");
+    }
+
+    #[test]
+    fn track_branch_rejects_missing_prefix() {
+        assert!(matches!(
+            TrackBranch::new("main"),
+            Err(ValidationError::InvalidTrackBranch(v)) if v == "main"
+        ));
+    }
+
+    #[test]
+    fn track_branch_rejects_invalid_slug_after_prefix() {
+        assert!(matches!(
+            TrackBranch::new("track/Not Valid"),
+            Err(ValidationError::InvalidTrackBranch(_))
+        ));
+    }
+
+    #[test]
+    fn track_branch_rejects_empty_slug() {
+        assert!(matches!(TrackBranch::new("track/"), Err(ValidationError::InvalidTrackBranch(_))));
+    }
+
+    #[test]
+    fn track_metadata_with_branch_stores_branch() {
+        let track = TrackMetadata::with_branch(
+            TrackId::new("my-track").unwrap(),
+            Some(TrackBranch::new("track/my-track").unwrap()),
+            "My Track",
+            vec![task("T1", "Task one")],
+            plan(&["T1"]),
+            None,
+        )
+        .unwrap();
+        assert_eq!(track.branch().unwrap().as_str(), "track/my-track");
+    }
+
+    #[test]
+    fn track_metadata_without_branch_returns_none() {
+        let track = TrackMetadata::new(
+            TrackId::new("my-track").unwrap(),
+            "My Track",
+            vec![task("T1", "Task one")],
+            plan(&["T1"]),
+            None,
+        )
+        .unwrap();
+        assert!(track.branch().is_none());
     }
 }

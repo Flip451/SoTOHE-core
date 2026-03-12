@@ -93,6 +93,40 @@ impl fmt::Display for CommitHash {
     }
 }
 
+/// A validated track branch name (format: `track/<valid-track-id>`).
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct TrackBranch(String);
+
+impl TrackBranch {
+    /// Branch name prefix.
+    const PREFIX: &str = "track/";
+
+    /// Creates a new `TrackBranch` from the given value.
+    ///
+    /// # Errors
+    /// Returns `ValidationError::InvalidTrackBranch` if the value does not match `track/<slug>`.
+    pub fn new(value: impl Into<String>) -> Result<Self, ValidationError> {
+        let value = value.into();
+        if let Some(slug) = value.strip_prefix(Self::PREFIX) {
+            if is_valid_track_id(slug) {
+                return Ok(Self(value));
+            }
+        }
+        Err(ValidationError::InvalidTrackBranch(value))
+    }
+
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl fmt::Display for TrackBranch {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
 fn is_valid_track_id(value: &str) -> bool {
     let mut chars = value.chars();
     match chars.next() {
