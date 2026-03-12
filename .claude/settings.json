@@ -240,6 +240,9 @@
       "Bash(cargo make takt-impl-review:*)",
       "Bash(cargo make takt-tdd-cycle:*)",
       "Bash(cargo make takt-clean-queue)",
+      "Bash(cargo make track-pr-push)",
+      "Bash(cargo make track-pr-ensure)",
+      "Bash(cargo make track-pr-review)",
       "Bash(true)"
     ],
     "deny": [

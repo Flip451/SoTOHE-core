@@ -110,7 +110,8 @@ Specialist capability の実体は `.claude/agent-profiles.json` で決まる。
 /track:plan <feature>         # 調査・設計・plan 作成・承認後にトラック成果物作成
 /track:full-cycle <task>      # 自律実装フルサイクル
 /track:implement              # 並列実装（対話型）
-/track:review                 # 実装レビュー
+/track:review                 # 実装レビュー（ローカル Codex CLI）
+/track:pr-review              # GitHub PR レビュー（Codex Cloud @codex review）
 /track:revert                 # 直近変更の安全な取り消し計画
 /track:ci                     # 標準CIチェック
 /track:commit <message>       # ガード付きコミット
@@ -223,6 +224,29 @@ Queue 運用の最短手順:
 4. CI が通過することを確認する
 5. PR をマージする
 6. `/track:archive <id>` でトラックをアーカイブする
+
+### PR ベースレビュー（Codex Cloud）
+
+`/track:pr-review` は GitHub PR 上で Codex Cloud の `@codex review` を使った非同期レビューサイクルを実行する。
+
+**前提条件:**
+- Codex Cloud GitHub App がリポジトリにインストール済み
+- `gh` CLI が認証済み
+
+**フロー:**
+1. `cargo make track-pr-push` — トラックブランチを origin に push
+2. `cargo make track-pr-ensure` — PR を作成 or 再利用
+3. `cargo make track-pr-review` — `@codex review` コメント投稿 → ポーリング → 結果パース
+
+**非同期ポーリング:**
+- `@codex review` コメント投稿後、GitHub API をポーリング（デフォルト: 15秒間隔、10分タイムアウト）
+- トリガータイムスタンプ以降のレビューのみを検出（古いレビューの誤検出を防止）
+- タイムアウト時: bot activity 有無で「GitHub App 未インストール」と「レビュー進行中」を区別
+
+**既存ワークフローとの関係:**
+- `/track:review` はローカルの高速レビューループとして引き続き利用可能
+- `/track:pr-review` は PR ベースの非同期レビュー（GitHub 上でレビュー履歴が残る）
+- 両者は独立しており、用途に応じて使い分ける
 
 ### ガードポリシー
 
