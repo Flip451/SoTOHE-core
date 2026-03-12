@@ -629,6 +629,58 @@ class MakeWrappersTest(unittest.TestCase):
             task_body,
         )
 
+    def test_ci_container_tasks_exist_and_are_public(self) -> None:
+        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
+
+        def extract_task_body(task_name: str) -> str:
+            header = f"[tasks.{task_name}]"
+            start = makefile.index(header)
+            next_task = makefile.find("\n[tasks.", start + len(header))
+            return makefile[start:] if next_task == -1 else makefile[start:next_task]
+
+        # ci-container should exist and NOT be private
+        ci_container_body = extract_task_body("ci-container")
+        self.assertNotIn("private = true", ci_container_body)
+        self.assertIn(
+            '[gate] Run CI checks inside a pre-existing container (no docker compose)',
+            ci_container_body,
+        )
+
+        # ci-rust-container should exist and NOT be private
+        ci_rust_container_body = extract_task_body("ci-rust-container")
+        self.assertNotIn("private = true", ci_rust_container_body)
+        self.assertIn(
+            '[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)',
+            ci_rust_container_body,
+        )
+
+        # ci-container should have the same dependencies as ci-local
+        ci_local_body = extract_task_body("ci-local")
+        self.assertIn("private = true", ci_local_body)
+        # Extract dependencies line from ci-local
+        for line in ci_local_body.splitlines():
+            if line.strip().startswith("dependencies"):
+                ci_local_deps = line.strip()
+                break
+        for line in ci_container_body.splitlines():
+            if line.strip().startswith("dependencies"):
+                ci_container_deps = line.strip()
+                break
+        self.assertEqual(ci_local_deps, ci_container_deps)
+
+        # ci-rust-container should have the same dependencies as ci-rust-local
+        ci_rust_local_body = extract_task_body("ci-rust-local")
+        self.assertIn("private = true", ci_rust_local_body)
+        for line in ci_rust_local_body.splitlines():
+            if line.strip().startswith("dependencies"):
+                ci_rust_local_deps = line.strip()
+                break
+        for line in ci_rust_container_body.splitlines():
+            if line.strip().startswith("dependencies"):
+                ci_rust_container_deps = line.strip()
+                break
+        self.assertEqual(ci_rust_local_deps, ci_rust_container_deps)
+
     def test_docker_wrappers_smoke(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
