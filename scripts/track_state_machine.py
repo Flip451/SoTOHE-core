@@ -64,9 +64,12 @@ def _save_metadata(
             from track_resolution import current_git_branch
 
             current_branch = current_git_branch(track_dir.parent.parent.parent)
-        verify_track_branch(
-            track_dir, current_branch=current_branch, skip_branch_check=False
-        )
+        try:
+            verify_track_branch(
+                track_dir, current_branch=current_branch, skip_branch_check=False
+            )
+        except Exception as e:
+            raise TransitionError(str(e)) from e
 
     if now is None:
         now = datetime.now(UTC)

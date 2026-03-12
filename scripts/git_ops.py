@@ -161,6 +161,9 @@ def commit_from_file(path: Path, *, cleanup: bool, track_dir: Path | None = None
     if effective_track_dir is not None:
         code = _verify_commit_branch(effective_track_dir)
         if code != 0:
+            # Clean up track-dir.txt even on guard failure to prevent stale context.
+            if cleanup and track_dir_file is not None:
+                track_dir_file.unlink(missing_ok=True)
             return code
 
     code = run_git(["commit", "-F", str(path)])
@@ -187,7 +190,11 @@ def _verify_commit_branch(track_dir: Path) -> int:
     try:
         from track_branch_guard import BranchGuardError, verify_track_branch
         from track_resolution import current_git_branch
+    except ImportError as e:
+        print(f"[ERROR] Branch guard import failed: {e}", file=sys.stderr)
+        return 1
 
+    try:
         root = track_dir.parent.parent.parent  # track/items/<id> -> project root
         branch = current_git_branch(root)
         verify_track_branch(track_dir, current_branch=branch)
