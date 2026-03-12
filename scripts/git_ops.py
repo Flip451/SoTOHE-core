@@ -343,8 +343,14 @@ def _verify_branch_by_auto_detection() -> int:
                 if meta.is_file():
                     try:
                         d = _json.loads(meta.read_text(encoding="utf-8"))
-                    except (ValueError, OSError):
-                        d = {}
+                    except (ValueError, OSError) as e:
+                        # Fail closed: corrupt metadata cannot be trusted.
+                        print(
+                            f"[ERROR] Branch guard: cannot read metadata.json "
+                            f"in {null_candidate}: {e}",
+                            file=sys.stderr,
+                        )
+                        return 1
                     if d.get("branch") is None:
                         # branch=null → skip guard (legacy/planning phase)
                         return 0
