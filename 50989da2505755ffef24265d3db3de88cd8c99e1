@@ -1,0 +1,22 @@
+## Task Summary: Plan branch-strategy track with design-reviewed decomposition
+
+**Track:** branch-strategy-2026-03-12
+**Task:** Feature branch strategy planning — T0-T8 task decomposition with 3-round Codex design review
+**Date:** 2026-03-12
+
+### Changes
+
+- track/items/branch-strategy-2026-03-12/metadata.json: SSoT with 9 tasks (T0-T8) in 6 sections, schema v2
+- track/items/branch-strategy-2026-03-12/spec.md: goal, scope, constraints (current/latest track distinction), 8 acceptance criteria
+- track/items/branch-strategy-2026-03-12/plan.md: read-only view rendered from metadata.json
+- track/items/branch-strategy-2026-03-12/verification.md: verification checklist scaffold
+- .claude/docs/research/planner-branch-strategy-2026-03-12.md: full Codex planner output with canonical blocks
+- .claude/docs/DESIGN.md: added Feature Branch Strategy section with canonical blocks reference
+- track/registry.md: updated Current Focus and Active Tracks for new track
+
+### Why
+
+Resolves WF-21 (HIGH), WF-04 (MEDIUM), WF-05 (LOW) from TODO.md. Introduces per-track feature branches
+to isolate parallel track work, replace timestamp-based resolution with branch-aware resolution, and
+distinguish current track (branch-bound) from latest track (global CI). Plan underwent 3-round Codex
+design review addressing schema migration, permission prerequisites, and consumer mapping gaps.
