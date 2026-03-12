@@ -332,9 +332,22 @@ def _verify_branch_by_auto_detection() -> int:
                 matches.append(candidate.name)
 
     if len(matches) == 0:
-        # No track explicitly claims this branch in metadata.json.
-        # find_track_by_branch() may resolve via directory-name fallback,
-        # but that track has branch=null — fail closed rather than skip.
+        # No track explicitly claims this branch.  Check for a directory-name
+        # match with branch=null (legacy/planning phase) — those tracks skip
+        # the guard by design, consistent with verify_track_branch() semantics.
+        if branch.startswith("track/"):
+            slug = branch[len("track/"):]
+            null_candidate = track_items_dir / slug
+            if null_candidate.is_dir():
+                meta = null_candidate / "metadata.json"
+                if meta.is_file():
+                    try:
+                        d = _json.loads(meta.read_text(encoding="utf-8"))
+                    except (ValueError, OSError):
+                        d = {}
+                    if d.get("branch") is None:
+                        # branch=null → skip guard (legacy/planning phase)
+                        return 0
         print(
             f"[ERROR] Branch guard: on branch '{branch}' but no track claims "
             f"this branch in metadata.json",
