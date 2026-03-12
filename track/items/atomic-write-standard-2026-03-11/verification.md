@@ -25,7 +25,7 @@
 
 ## Open Issues
 
-- `scripts/atomic_write.py` の `_find_sotp()` binary selection ロジックに Python ユニットテストがない（Codex review Round 4 で指摘）。将来 hardening として: (1) 非互換 PATH binary + 互換 local binary → local 選択、(2) 互換 binary なし → `write_text()` フォールバック、(3) probe 結果キャッシュ — の 3 ケースをカバーするテスト追加を推奨
+None. (Resolved: `scripts/test_atomic_write.py` added in security-control-tests-2026-03-11 track — covers `_find_sotp()` binary selection, probe caching, `atomic_write_file()` fallback, and `_probe_supports_file_write_atomic()` error handling)
 
 ## verified_at
 

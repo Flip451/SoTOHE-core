@@ -115,6 +115,7 @@ args = [
   "-o",
   "cache_dir=.cache/pytest",
   "scripts/test_architecture_rules.py",
+  "scripts/test_atomic_write.py",
   "scripts/test_check_layers.py",
   "scripts/test_verify_scripts.py",
   "scripts/test_convention_docs.py",

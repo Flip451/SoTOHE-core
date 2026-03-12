@@ -1298,6 +1298,54 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertIn(".cache/pytest/", gitignore)
         self.assertIn(".cache/sccache/", gitignore)
 
+    def test_compose_mounts_git_readonly(self) -> None:
+        """Security: every compose service with volumes must mount .git read-only."""
+        import yaml
+
+        for rel_path in ("compose.yml", "compose.dev.yml"):
+            content = (PROJECT_ROOT / rel_path).read_text(encoding="utf-8")
+            data = yaml.safe_load(content)
+            services = data.get("services", {})
+            for svc_name, svc_cfg in services.items():
+                # Services using 'extends' inherit parent volumes; check resolved config.
+                volumes = svc_cfg.get("volumes") if svc_cfg else None
+                if volumes is None:
+                    # Service inherits from parent (e.g., extends); skip.
+                    continue
+                git_ro_found = any(
+                    ".git:/workspace/.git:ro" in str(v) for v in volumes
+                )
+                self.assertTrue(
+                    git_ro_found,
+                    f"{rel_path}/{svc_name}: .git must be mounted read-only (:ro)",
+                )
+
+    def test_compose_masks_sensitive_dirs_with_tmpfs(self) -> None:
+        """Security: every compose service with volumes must mask private/ and config/secrets/ via tmpfs."""
+        import yaml
+
+        for rel_path in ("compose.yml", "compose.dev.yml"):
+            content = (PROJECT_ROOT / rel_path).read_text(encoding="utf-8")
+            data = yaml.safe_load(content)
+            services = data.get("services", {})
+            for svc_name, svc_cfg in services.items():
+                # Services using 'extends' inherit parent tmpfs; skip if no own volumes.
+                volumes = svc_cfg.get("volumes") if svc_cfg else None
+                if volumes is None:
+                    continue
+                tmpfs_list = svc_cfg.get("tmpfs", [])
+                tmpfs_str = " ".join(str(t) for t in tmpfs_list)
+                self.assertIn(
+                    "/workspace/private",
+                    tmpfs_str,
+                    f"{rel_path}/{svc_name}: private/ must be masked by tmpfs",
+                )
+                self.assertIn(
+                    "/workspace/config/secrets",
+                    tmpfs_str,
+                    f"{rel_path}/{svc_name}: config/secrets/ must be masked by tmpfs",
+                )
+
     def test_ci_uses_host_uid_gid_without_forcing_track_template_dev(self) -> None:
         workflow = (PROJECT_ROOT / ".github" / "workflows" / "ci.yml").read_text(
             encoding="utf-8"
