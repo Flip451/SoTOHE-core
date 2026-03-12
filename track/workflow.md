@@ -193,6 +193,42 @@ Queue 運用の最短手順:
 2. `cargo make takt-run`
 3. queue に複数 profile snapshot が混在していたら、整理してから再実行する
 
+## Branch Strategy (Branch-per-Track モデル)
+
+### 概要
+
+各トラックは専用のフィーチャーブランチ `track/<track-id>` で作業を行う。
+`main` ブランチへの直接変更は避け、PR ベースのマージワークフローを採用する。
+
+### 現在のトラック解決ロジック
+
+- `track/*` ブランチにいる場合: ブランチ名から対応するトラックを自動解決する（branch-bound）
+- `main` ブランチにいる場合: `updated_at` タイムスタンプによる legacy fallback で最新トラックを解決する
+- 解決ロジックの実体は `scripts/track_resolution.py` の `resolve_track_dir()` にある
+
+### ブランチの作成
+
+- **自動**: `/track:plan <feature>` がトラック成果物作成時にブランチ `track/<track-id>` を自動作成する
+- **手動**: `cargo make track-branch-create '<id>'` で既存トラックに対してブランチを作成できる
+
+### ブランチの切り替え
+
+- `cargo make track-branch-switch '<id>'` で対象トラックのブランチに切り替える
+
+### マージワークフロー
+
+1. トラックブランチで作業を完了する
+2. ブランチを remote に push する
+3. `main` に対する PR を作成する
+4. CI が通過することを確認する
+5. PR をマージする
+6. `/track:archive <id>` でトラックをアーカイブする
+
+### ガードポリシー
+
+直接の `git merge` / `git rebase` / `git cherry-pick` / `git reset` / `git switch` はフックでブロックされる。
+ブランチ操作はワークフローラッパー（`cargo make track-branch-*` や `/track:*` コマンド）を経由すること。
+
 ## Git Notes (実装トレーサビリティ)
 
 コミットに構造化メモを付与することで、コミットハッシュを変えずに実装の文脈を記録できる。

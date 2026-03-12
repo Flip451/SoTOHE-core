@@ -76,6 +76,7 @@ ENV RUSTC_WRAPPER=/usr/local/cargo/bin/sccache \
     SCCACHE_DIR=/opt/sccache \
     SCCACHE_IDLE_TIMEOUT=600
 COPY --from=planner /workspace/recipe.json recipe.json
+COPY vendor/ vendor/
 RUN --mount=type=cache,target=${CARGO_HOME}/registry,sharing=locked \
     --mount=type=cache,target=${CARGO_HOME}/git,sharing=locked \
     --mount=type=cache,target=/workspace/target,sharing=locked \
@@ -92,6 +93,9 @@ COPY --from=planner /workspace/recipe.json recipe.json
 
 # Local dev: keep BuildKit cache mounts for fast rebuild
 FROM dev-base-build AS dev-base-local
+# vendor/ contains path dependencies (e.g. conch-parser) that cargo chef cook
+# needs to resolve. Copy it before cooking so the source is available.
+COPY vendor/ vendor/
 RUN --mount=type=cache,target=${CARGO_HOME}/registry,sharing=locked \
     --mount=type=cache,target=${CARGO_HOME}/git,sharing=locked \
     --mount=type=cache,target=/workspace/target,sharing=locked \
@@ -102,6 +106,7 @@ RUN --mount=type=cache,target=${CARGO_HOME}/registry,sharing=locked \
 FROM dev-base-build AS dev-base-ci
 ENV CARGO_PROFILE_DEV_DEBUG=0 \
     CARGO_PROFILE_TEST_DEBUG=0
+COPY vendor/ vendor/
 RUN --mount=type=cache,target=/opt/sccache,sharing=shared \
     cargo chef cook --check --recipe-path recipe.json --all-targets --all-features && \
     cargo chef cook --recipe-path recipe.json --all-targets --all-features

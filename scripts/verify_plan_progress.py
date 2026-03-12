@@ -2,7 +2,7 @@
 """
 Verify track plan.md is in sync with metadata.json (SSoT).
 
-All tracks must use schema_version 2. plan.md is a read-only view
+All tracks must use schema_version 2 or 3. plan.md is a read-only view
 rendered from metadata.json via render_plan().
 """
 
@@ -91,9 +91,9 @@ def validate_track(dir_path: Path) -> list[str]:
         ]
 
     sv = data.get("schema_version")
-    if sv != 2:
+    if sv not in (2, 3):
         return [
-            f"  [ERROR] schema_version must be 2 (got {sv!r}) in {metadata_file.as_posix()}"
+            f"  [ERROR] schema_version must be 2 or 3 (got {sv!r}) in {metadata_file.as_posix()}"
         ]
 
     # Full v2 schema validation

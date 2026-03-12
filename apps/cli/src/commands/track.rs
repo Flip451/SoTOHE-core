@@ -38,6 +38,27 @@ pub enum TrackCommand {
         #[arg(long)]
         commit_hash: Option<String>,
     },
+
+    /// Create or switch to a track branch.
+    Branch {
+        #[command(subcommand)]
+        action: BranchAction,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum BranchAction {
+    /// Create a new branch `track/<track-id>` from `main` and switch to it.
+    Create {
+        /// Track ID used to form the branch name `track/<track-id>`.
+        track_id: String,
+    },
+
+    /// Switch to an existing branch `track/<track-id>`.
+    Switch {
+        /// Track ID used to form the branch name `track/<track-id>`.
+        track_id: String,
+    },
 }
 
 pub fn execute(cmd: TrackCommand) -> ExitCode {
@@ -52,6 +73,7 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         } => {
             execute_transition(items_dir, locks_dir, track_id, task_id, target_status, commit_hash)
         }
+        TrackCommand::Branch { action } => execute_branch(action),
     }
 }
 
@@ -139,6 +161,46 @@ fn execute_transition(
         }
         Err(err) => {
             eprintln!("transition failed: {err}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn execute_branch(action: BranchAction) -> ExitCode {
+    let (track_id, create) = match &action {
+        BranchAction::Create { track_id } => (track_id.as_str(), true),
+        BranchAction::Switch { track_id } => (track_id.as_str(), false),
+    };
+
+    if let Err(err) = TrackId::new(track_id) {
+        eprintln!("invalid track id: {err}");
+        return ExitCode::FAILURE;
+    }
+
+    let branch_name = format!("track/{track_id}");
+
+    let mut cmd = std::process::Command::new("git");
+    if create {
+        cmd.args(["switch", "-c", &branch_name, "main"]);
+    } else {
+        cmd.args(["switch", &branch_name]);
+    }
+
+    match cmd.status() {
+        Ok(status) if status.success() => {
+            if create {
+                println!("[OK] Created and switched to branch: {branch_name}");
+            } else {
+                println!("[OK] Switched to branch: {branch_name}");
+            }
+            ExitCode::SUCCESS
+        }
+        Ok(_) => {
+            eprintln!("git switch failed for branch: {branch_name}");
+            ExitCode::FAILURE
+        }
+        Err(err) => {
+            eprintln!("failed to run git: {err}");
             ExitCode::FAILURE
         }
     }

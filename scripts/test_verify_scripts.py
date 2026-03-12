@@ -631,20 +631,20 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertIn("transition_task()", result.stdout)
 
     def test_verify_track_metadata_rejects_unsupported_schema_version(self) -> None:
-        """schema_version other than 2 should be rejected."""
+        """schema_version other than 2 or 3 should be rejected."""
 
         def setup(root: Path) -> None:
             track_dir = root / "track" / "items" / "demo"
             track_dir.mkdir(parents=True, exist_ok=True)
             (track_dir / "metadata.json").write_text(
-                json.dumps({"schema_version": 3, "id": "demo"}) + "\n",
+                json.dumps({"schema_version": 99, "id": "demo"}) + "\n",
                 encoding="utf-8",
             )
 
         result = self.run_python_script("verify_track_metadata.py", setup)
 
         self.assertEqual(result.returncode, 1)
-        self.assertIn("schema_version must be 2", result.stdout)
+        self.assertIn("schema_version must be 2 or 3", result.stdout)
 
     def test_verify_track_metadata_rejects_non_dict_json(self) -> None:
         """metadata.json with array root should be rejected."""
@@ -660,13 +660,13 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertIn("root must be an object", result.stdout)
 
     def test_verify_plan_progress_rejects_unsupported_schema_version(self) -> None:
-        """schema_version=3 should produce an error, not fall through to v1."""
+        """schema_version other than 2 or 3 should produce an error."""
 
         def setup(root: Path) -> None:
             track_dir = root / "track" / "items" / "demo"
             track_dir.mkdir(parents=True, exist_ok=True)
             (track_dir / "metadata.json").write_text(
-                json.dumps({"schema_version": 3, "id": "demo"}) + "\n",
+                json.dumps({"schema_version": 99, "id": "demo"}) + "\n",
                 encoding="utf-8",
             )
             (track_dir / "spec.md").write_text("# spec\n", encoding="utf-8")
@@ -675,7 +675,7 @@ class VerifyScriptsTest(unittest.TestCase):
         result = self.run_python_script("verify_plan_progress.py", setup)
 
         self.assertEqual(result.returncode, 1)
-        self.assertIn("schema_version must be 2", result.stdout)
+        self.assertIn("schema_version must be 2 or 3", result.stdout)
 
     def test_verify_plan_progress_rejects_non_dict_json(self) -> None:
         """metadata.json with array root should produce an error."""

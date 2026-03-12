@@ -78,6 +78,21 @@ const GIT_PUSH_MESSAGE: &str =
 const GIT_BRANCH_DELETE_MESSAGE: &str = "[Git Policy] Direct `git branch -d/-D/--delete` is blocked. Branch deletion must be done \
      manually by the user.";
 
+const GIT_SWITCH_MESSAGE: &str = "[Git Policy] Direct `git switch` / `git checkout -b` is blocked. \
+     Use `cargo make track-branch-create '<track-id>'` or `cargo make track-branch-switch '<track-id>'`.";
+
+const GIT_MERGE_MESSAGE: &str = "[Git Policy] Direct `git merge` is blocked. Merging must be done \
+     manually by the user via PR workflow.";
+
+const GIT_REBASE_MESSAGE: &str = "[Git Policy] Direct `git rebase` is blocked. Rebasing must be \
+     done manually by the user.";
+
+const GIT_CHERRY_PICK_MESSAGE: &str = "[Git Policy] Direct `git cherry-pick` is blocked. \
+     Cherry-picking must be done manually by the user.";
+
+const GIT_RESET_MESSAGE: &str = "[Git Policy] Direct `git reset` is blocked. Resetting must be \
+     done manually by the user.";
+
 const GIT_VARIABLE_BYPASS_MESSAGE: &str = "[Git Policy] Shell variable or command substitution is blocked. \
      Use literal values only. This pattern is not needed in the template workflow.";
 
@@ -166,6 +181,18 @@ fn check_git_command(argv: &[String], git_index: usize) -> GuardVerdict {
         Some("add") => GuardVerdict::block(GIT_ADD_MESSAGE),
         Some("commit") => GuardVerdict::block(GIT_COMMIT_MESSAGE),
         Some("push") => GuardVerdict::block(GIT_PUSH_MESSAGE),
+        Some("switch") => GuardVerdict::block(GIT_SWITCH_MESSAGE),
+        Some("merge") => GuardVerdict::block(GIT_MERGE_MESSAGE),
+        Some("rebase") => GuardVerdict::block(GIT_REBASE_MESSAGE),
+        Some("cherry-pick") => GuardVerdict::block(GIT_CHERRY_PICK_MESSAGE),
+        Some("reset") => GuardVerdict::block(GIT_RESET_MESSAGE),
+        Some("checkout") => {
+            if is_checkout_branch_create(argv, git_index) {
+                GuardVerdict::block(GIT_SWITCH_MESSAGE)
+            } else {
+                GuardVerdict::allow()
+            }
+        }
         Some("branch") => {
             if is_branch_delete(argv, git_index) {
                 GuardVerdict::block(GIT_BRANCH_DELETE_MESSAGE)
@@ -250,6 +277,56 @@ fn is_branch_delete(argv: &[String], git_index: usize) -> bool {
         if token.starts_with('-') && !token.starts_with("--") && token.len() > 2 {
             let flag_chars = &token[1..];
             if flag_chars.contains('d') || flag_chars.contains('D') {
+                return true;
+            }
+        }
+    }
+
+    false
+}
+
+/// Checks if a `git checkout` command includes a branch-create flag (-b or -B).
+fn is_checkout_branch_create(argv: &[String], git_index: usize) -> bool {
+    let mut i = git_index + 1;
+    let mut found_checkout = false;
+
+    while i < argv.len() {
+        let token = &argv[i];
+        if token == "--" {
+            i += 1;
+            break;
+        }
+        if GIT_OPTIONS_WITH_ARG.contains(&token.as_str()) {
+            i += 2;
+            continue;
+        }
+        if token.starts_with('-') {
+            i += 1;
+            continue;
+        }
+        if token.to_lowercase() == "checkout" {
+            found_checkout = true;
+            i += 1;
+            break;
+        }
+        break;
+    }
+
+    if !found_checkout {
+        return false;
+    }
+
+    for token in &argv[i..] {
+        if token == "--" {
+            break;
+        }
+        if matches!(token.as_str(), "-b" | "-B" | "--orphan") {
+            return true;
+        }
+        // Detect bundled short flags containing 'b' or 'B', e.g. `-fb`, `-tB`
+        if token.starts_with('-') && !token.starts_with("--") && token.len() > 2 {
+            let flag_chars = &token[1..];
+            if flag_chars.contains('b') || flag_chars.contains('B') {
                 return true;
             }
         }
@@ -851,6 +928,83 @@ mod tests {
     fn test_git_branch_double_dash_dev_is_allowed() {
         let v = check("git branch -- -dev");
         assert!(!v.is_blocked(), "git branch -- -dev should be allowed (branch name, not flag)");
+    }
+
+    // -- Branch strategy: new blocked subcommands --
+
+    #[test]
+    fn test_git_switch_is_blocked() {
+        let v = check("git switch feature");
+        assert!(v.is_blocked());
+        assert!(v.reason.contains("switch"));
+    }
+
+    #[test]
+    fn test_git_switch_create_is_blocked() {
+        let v = check("git switch -c new-branch");
+        assert!(v.is_blocked());
+        assert!(v.reason.contains("switch"));
+    }
+
+    #[test]
+    fn test_git_checkout_b_is_blocked() {
+        let v = check("git checkout -b new-branch");
+        assert!(v.is_blocked());
+        assert!(v.reason.contains("switch") || v.reason.contains("checkout"));
+    }
+
+    #[test]
+    fn test_git_checkout_upper_b_is_blocked() {
+        let v = check("git checkout -B new-branch");
+        assert!(v.is_blocked());
+    }
+
+    #[test]
+    fn test_git_checkout_file_restore_is_allowed() {
+        let v = check("git checkout -- file.txt");
+        assert!(!v.is_blocked());
+    }
+
+    #[test]
+    fn test_git_merge_is_blocked() {
+        let v = check("git merge feature");
+        assert!(v.is_blocked());
+        assert!(v.reason.contains("merge"));
+    }
+
+    #[test]
+    fn test_git_rebase_is_blocked() {
+        let v = check("git rebase main");
+        assert!(v.is_blocked());
+        assert!(v.reason.contains("rebase"));
+    }
+
+    #[test]
+    fn test_git_cherry_pick_is_blocked() {
+        let v = check("git cherry-pick abc1234");
+        assert!(v.is_blocked());
+        assert!(v.reason.contains("cherry-pick"));
+    }
+
+    #[test]
+    fn test_git_reset_is_blocked() {
+        let v = check("git reset HEAD~1");
+        assert!(v.is_blocked());
+        assert!(v.reason.contains("reset"));
+    }
+
+    #[test]
+    fn test_git_reset_hard_is_blocked() {
+        let v = check("git reset --hard HEAD~1");
+        assert!(v.is_blocked());
+        assert!(v.reason.contains("reset"));
+    }
+
+    #[test]
+    fn test_git_checkout_orphan_is_blocked() {
+        let v = check("git checkout --orphan new-branch");
+        assert!(v.is_blocked());
+        assert!(v.reason.contains("switch") || v.reason.contains("checkout"));
     }
 
     // -- Helper function tests --

@@ -26,10 +26,11 @@ This delegates all setup checks to setup.md — do not duplicate them here.
 
 Summarize the current project state for the newcomer:
 1. Read `track/registry.md` — list active and completed tracks
-2. Read the latest active track's `spec.md` and `plan.md` if one exists
-3. Read `track/tech-stack.md` — highlight any unresolved `TODO:` items
-4. Show recent git log (last 10 commits) for context
-5. Read `project-docs/conventions/README.md` — list active convention docs
+2. Resolve the current track: if the current git branch matches `track/<id>`, use that track. Otherwise, fall back to the latest active track by `updated_at`.
+3. Read the current track's `spec.md` and `plan.md` if one exists
+4. Read `track/tech-stack.md` — highlight any unresolved `TODO:` items
+5. Show recent git log (last 10 commits) for context
+6. Read `project-docs/conventions/README.md` — list active convention docs
 
 ### Phase 4: External guides setup (optional)
 

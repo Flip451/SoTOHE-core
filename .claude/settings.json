@@ -212,6 +212,8 @@
       "Bash(cargo make python-lint)",
       "Bash(cargo make track-transition:*)",
       "Bash(cargo make track-sync-views:*)",
+      "Bash(cargo make track-branch-create:*)",
+      "Bash(cargo make track-branch-switch:*)",
       "Bash(gemini:*)",
       "Bash(codex:*)",
       "Bash(tree:*)",
