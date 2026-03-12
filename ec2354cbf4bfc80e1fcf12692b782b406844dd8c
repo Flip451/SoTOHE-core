@@ -1,0 +1,20 @@
+## Task Summary: Plan WF-07 archived track context pollution prevention
+
+**Track:** archive-context-pollution-2026-03-12
+**Task:** Plan track artifacts for WF-07
+**Date:** 2026-03-12
+
+### Changes
+
+- metadata.json: 12 tasks across 6 sections (S1-S6), schema v3
+- spec.md: goal, scope, constraints, acceptance criteria
+- plan.md: rendered view from metadata.json
+- verification.md: manual verification checklist (4 sections)
+- registry.md: new active track row added
+- CLAUDE.md: hook constraint documentation added to Guardrails section
+
+### Why
+
+Archived tracks remaining in track/items/ pollute AI search context. This plan
+introduces physical move to track/archive/, shared helper for verify scripts,
+and Claude Code deny rules to eliminate context noise while maintaining CI coverage.
