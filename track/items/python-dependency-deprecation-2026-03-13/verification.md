@@ -13,21 +13,24 @@
 - [x] local git workflow wrappers (`add-paths`, `commit-from-file`, `note-from-file`, `switch-main`) are moved from Python wrappers to Rust CLI
 - [x] PR status / merge wrappers (`track-pr-status`, `track-pr-merge`) no longer depend on `pr_merge.py`
 - [x] `git` / `gh` / repo-root adapter boundaries are explicit infrastructure modules instead of CLI-local subprocess helpers
+- [x] track metadata branch-claim discovery now lives in infrastructure instead of CLI-local filesystem scans
+- [x] `pr_review.py` and verification scripts are classified by required-path status in `verification-boundary-classification.md`
 
 ## Manual Verification Steps
 
 1. Read `migration-map.md`
 2. Read `phase1-rust-direct-hooks-diff-plan.md`
-3. Verify this track's `metadata.json`, `spec.md`, and `plan.md` align
-4. Confirm the current branch matches `track/python-dependency-deprecation-2026-03-13`
-5. Run `timeout 600 codex exec review --uncommitted --json --model gpt-5.4 --full-auto` until findings are `0`
-6. Run `python3 -m json.tool .claude/settings.json`
-7. Run `python3 scripts/verify_orchestra_guardrails.py`
-8. Run `pytest -q -o cache_dir=.cache/pytest scripts/test_track_state_machine.py scripts/test_make_wrappers.py`
-9. Run `cargo test -p infrastructure -- --nocapture`
-10. Run `cargo run --quiet -p cli -- track views validate --project-root .`
-11. Run `cargo make track-sync-views`
-12. Run `cargo make ci`
+3. Read `verification-boundary-classification.md`
+4. Verify this track's `metadata.json`, `spec.md`, and `plan.md` align
+5. Confirm the current branch matches `track/python-dependency-deprecation-2026-03-13`
+6. Run `timeout 600 codex exec review --uncommitted --json --model gpt-5.4 --full-auto` until findings are `0`
+7. Run `python3 -m json.tool .claude/settings.json`
+8. Run `python3 scripts/verify_orchestra_guardrails.py`
+9. Run `pytest -q -o cache_dir=.cache/pytest scripts/test_track_state_machine.py scripts/test_make_wrappers.py`
+10. Run `cargo test -p infrastructure -- --nocapture`
+11. Run `cargo run --quiet -p cli -- track views validate --project-root .`
+12. Run `cargo make track-sync-views`
+13. Run `cargo make ci`
 
 ## Result
 
@@ -37,7 +40,7 @@ Pass
 
 `cargo deny` reports an existing duplicate `windows-sys` warning, but the CI task still passes and this track did not change Rust dependencies.
 Legacy archive generated views with relaxed schema fields are now normalized by Rust `track-sync-views`; this changed one archived `plan.md` as a consistency fix.
-Track metadata branch-claim discovery still reads directly from CLI and is not yet a dedicated infrastructure adapter; that remains part of `T007`.
+`verification-boundary-classification.md` is a design classification artifact only; the remaining rollout gate definition still belongs to `T008`.
 
 ## Review Notes
 
@@ -65,6 +68,13 @@ Track metadata branch-claim discovery still reads directly from CLI and is not y
 - Latest focused verification for the adapter extraction slice: `cargo test -p infrastructure -- --nocapture`, `cargo test -p cli git -- --nocapture`, `cargo test -p cli pr -- --nocapture`, `cargo clippy --locked -p cli --all-targets --all-features -- -D warnings`, `cargo make track-sync-views`, and `cargo make ci` passed.
 - A subsequent `/track:review` pass found one P1 coverage gap after the extraction: `libs/infrastructure/src/gh_cli.rs` owned fail-closed `gh` transport behavior without direct regression tests for non-zero JSON handling, stderr surfacing, and merge failure propagation.
 - Fixed that gap by extracting testable helper seams inside `gh_cli.rs` and adding infrastructure regression tests for all three transport contracts; the re-review verdict was `No findings.` and `cargo make ci-rust` plus `cargo make ci` passed afterward.
+- `T007` moved track branch-claim discovery from `apps/cli/src/commands/git.rs` into `libs/infrastructure/src/git_cli.rs`, so CLI no longer scans `track/items` / `track/archive` directly.
+- Added `verification-boundary-classification.md` to classify `pr_review.py`, `check_layers.py`, `verify_orchestra_guardrails.py`, and the remaining `verify_*` scripts into required Rust path, deferred-until-SSoT-redesign, and optional Python utility buckets.
+- Focused verification for the `T007` slice: `cargo test -p infrastructure git_cli -- --nocapture`, `cargo test -p cli git -- --nocapture`, `pytest -q -o cache_dir=.cache/pytest scripts/test_make_wrappers.py`, `cargo clippy --locked -p cli --all-targets --all-features -- -D warnings`, `cargo make track-sync-views`, and `cargo make ci` passed.
+- A follow-up `/track:review` pass for T007 found one P1 in `libs/infrastructure/src/git_cli.rs`: `collect_track_branch_claims()` swallowed malformed `metadata.json` files and could misreport branch ownership instead of failing closed.
+- Fixed that review finding by propagating `read_metadata()` errors from `collect_track_branch_claims()` and adding a regression test for invalid track metadata.
+- Latest reviewer verdict for the T007 fix was `No findings.` after re-checking `apps/cli/src/commands/git.rs` and `libs/infrastructure/src/git_cli.rs`.
+- Latest focused verification for the review fix: `cargo test -p infrastructure git_cli -- --nocapture`, `cargo test -p usecase git_workflow`, `cargo make ci-rust`, and `cargo make ci` passed.
 
 ## In Progress
 
