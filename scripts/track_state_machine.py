@@ -27,6 +27,8 @@ from track_schema import (
 
 _SENTINEL = object()
 """Sentinel for 'current_branch not provided' in _save_metadata()."""
+_SOTP_TRACK_SYNC_BINARY: str | None = None
+_SOTP_TRACK_SYNC_SEARCHED = False
 
 
 class TransitionError(Exception):
@@ -225,6 +227,86 @@ def _try_sotp_transition(
     return True
 
 
+def _probe_supports_track_views_sync(binary: str) -> bool:
+    """Return True if the binary supports `track views sync`."""
+    try:
+        probe = subprocess.run(
+            [binary, "track", "views", "sync", "--help"],
+            capture_output=True,
+            timeout=5,
+        )
+        return probe.returncode == 0
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+
+
+def _find_sotp_for_track_views_sync() -> str | None:
+    """Find a compatible sotp binary for `track views sync`."""
+    global _SOTP_TRACK_SYNC_BINARY, _SOTP_TRACK_SYNC_SEARCHED
+    if _SOTP_TRACK_SYNC_SEARCHED:
+        return _SOTP_TRACK_SYNC_BINARY
+    _SOTP_TRACK_SYNC_SEARCHED = True
+
+    candidates: list[str] = []
+    from os import environ
+
+    if environ.get("SOTP_CLI_BINARY"):
+        candidates.append(environ["SOTP_CLI_BINARY"])
+
+    project_root = Path(__file__).resolve().parent.parent
+    for build_path in ("target/debug/sotp", "target/release/sotp"):
+        candidate = project_root / build_path
+        if candidate.is_file():
+            candidates.append(str(candidate))
+
+    path_sotp = shutil.which("sotp")
+    if path_sotp:
+        candidates.append(path_sotp)
+
+    for candidate in candidates:
+        if _probe_supports_track_views_sync(candidate):
+            _SOTP_TRACK_SYNC_BINARY = candidate
+            return _SOTP_TRACK_SYNC_BINARY
+
+    return None
+
+
+def _try_sotp_sync_views(
+    root: Path, *, track_id: str | None = None
+) -> list[Path] | None:
+    """Try to delegate sync-views to sotp CLI.
+
+    Returns a list of changed paths if delegation succeeded, or `None`
+    if sotp is unavailable (not installed or missing the required subcommand).
+    Raises TransitionError if sotp ran a recognized command but failed.
+    """
+    sotp = _find_sotp_for_track_views_sync()
+    if sotp is None:
+        return None
+
+    cmd = [sotp, "track", "views", "sync", "--project-root", str(root)]
+    if track_id is not None:
+        cmd.extend(["--track-id", track_id])
+
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        stderr = result.stderr.strip()
+        if "unrecognized subcommand" in stderr or "unknown subcommand" in stderr:
+            return None
+        raise TransitionError(f"sotp sync-views failed: {stderr}")
+
+    changed: list[Path] = []
+    stdout = result.stdout.splitlines()
+    for line in stdout:
+        text = line.strip()
+        if text.startswith("[OK] Rendered: "):
+            rel = text.removeprefix("[OK] Rendered: ").strip()
+            changed.append(root / rel)
+        elif text:
+            print(text)
+    return changed
+
+
 def transition_task(
     track_dir: Path,
     task_id: str,
@@ -382,6 +464,10 @@ def sync_rendered_views(
     track_id: str | None = None,
 ) -> list[Path]:
     """Render plan.md and registry.md from metadata.json for specified or all tracks."""
+    delegated = _try_sotp_sync_views(root, track_id=track_id)
+    if delegated is not None:
+        return delegated
+
     changed: list[Path] = []
     track_root = root / "track" / "items"
 

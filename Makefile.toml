@@ -810,7 +810,7 @@ script = ['"${PYTHON_BIN:-python3}" scripts/track_state_machine.py transition $C
 [tasks.track-sync-views]
 description = "[wrapper] Render plan.md and registry.md from metadata.json"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/track_state_machine.py sync-views $CARGO_MAKE_TASK_ARGS']
+script = ['cargo run --quiet -p cli -- track views sync --project-root . $CARGO_MAKE_TASK_ARGS']
 
 [tasks.clean]
 description = "[wrapper] Remove compose resources"
