@@ -1,0 +1,19 @@
+## Task Summary: Extract PR workflow policy from CLI adapters
+
+**Track:** python-dependency-deprecation-2026-03-13
+**Task:** CLI 層へ流出した PR workflow policy を usecase / infrastructure へ戻す前段スパイクとして、PR check evaluation・pending/failed 判定・wait-and-merge polling policy を `apps/cli/src/commands/pr.rs` から切り出す設計と差分を固める
+**Date:** 2026-03-13
+
+### Changes
+
+- apps/cli/src/commands/pr.rs: GitHub JSON の正規化、`gh` 実行、sleep、表示だけを持つ薄い adapter に整理した
+- libs/usecase/src/pr_workflow.rs: PR check 要約と wait/timeout 判定を usecase 層へ切り出した
+- libs/usecase/src/lib.rs: `pr_workflow` モジュールを公開した
+- track/items/python-dependency-deprecation-2026-03-13/metadata.json: `T006` の進捗と timestamp を更新した
+- track/items/python-dependency-deprecation-2026-03-13/plan.md: generated view を同期した
+- track/items/python-dependency-deprecation-2026-03-13/verification.md: review loop と focused/full verification の証跡を追記した
+
+### Why
+
+Python 依存脱却の一環として、PR status / merge wrapper の Rust 化だけでなく、判定ロジック自体も CLI adapter から分離する必要があった。
+これにより、GitHub transport 表現に引きずられない usecase を定義でき、CLI 層は I/O と表示に責務を絞れる。
