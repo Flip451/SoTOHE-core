@@ -1,24 +1,15 @@
 //! CLI subcommands for guarded local git workflow wrappers.
 
-use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 
 use clap::{Args, Subcommand};
 use serde::Deserialize;
-
-const TRANSIENT_AUTOMATION_FILES: &[&str] = &[
-    ".takt/pending-add-paths.txt",
-    ".takt/pending-note.md",
-    ".takt/pending-commit-message.txt",
-    "tmp/track-commit/add-paths.txt",
-    "tmp/track-commit/commit-message.txt",
-    "tmp/track-commit/note.md",
-    "tmp/track-commit/track-dir.txt",
-];
-const TRANSIENT_AUTOMATION_DIRS: &[&str] = &[".takt/handoffs", "tmp"];
-const GLOB_MAGIC_CHARS: &[char] = &['*', '?', '[', ']'];
+use usecase::git_workflow::{
+    ExplicitTrackBranch, TRANSIENT_AUTOMATION_DIRS, TRANSIENT_AUTOMATION_FILES, TrackBranchClaim,
+    validate_stage_path_entries, verify_auto_detected_branch, verify_explicit_track_branch,
+};
 
 #[derive(Debug, Subcommand)]
 pub enum GitCommand {
@@ -134,68 +125,15 @@ fn ensure_existing_nonempty_file(path: &Path, label: &str) -> Result<(), String>
 fn load_stage_paths(path: &Path) -> Result<Vec<String>, String> {
     ensure_existing_nonempty_file(path, "stage path list file")?;
 
-    let transient_paths: HashSet<PathBuf> =
-        TRANSIENT_AUTOMATION_FILES.iter().map(PathBuf::from).collect();
-    let transient_dirs: HashSet<PathBuf> =
-        TRANSIENT_AUTOMATION_DIRS.iter().map(PathBuf::from).collect();
-    let mut stage_paths = Vec::new();
-    let mut seen = HashSet::new();
-
     let content = fs::read_to_string(path)
         .map_err(|err| format!("failed to read stage path list {}: {err}", path.display()))?;
-    for raw_line in content.lines() {
-        let entry = raw_line.trim();
-        if entry.is_empty() || entry.starts_with('#') || !seen.insert(entry.to_owned()) {
-            continue;
+    validate_stage_path_entries(content.lines()).map_err(|err| {
+        if err == "Stage path list file has no usable entries" {
+            format!("{err}: {}", path.display())
+        } else {
+            err
         }
-
-        let entry_path = PathBuf::from(entry);
-        if entry_path.is_absolute() {
-            return Err(format!("Stage path list must use repo-relative paths: {entry}"));
-        }
-        if entry_path
-            .components()
-            .any(|component| matches!(component, std::path::Component::ParentDir))
-        {
-            return Err(format!("Stage path list cannot escape the repo root: {entry}"));
-        }
-        if matches!(entry, "." | "./") {
-            return Err(format!("Stage path list cannot use whole-worktree pathspecs: {entry}"));
-        }
-        if entry.starts_with(':') {
-            return Err(format!(
-                "Stage path list cannot use git pathspec magic or shorthand: {entry}"
-            ));
-        }
-        if entry.chars().any(|ch| GLOB_MAGIC_CHARS.contains(&ch)) {
-            return Err(format!("Stage path list cannot use glob patterns: {entry}"));
-        }
-        if transient_paths
-            .iter()
-            .any(|transient| entry_path == *transient || transient.starts_with(&entry_path))
-        {
-            return Err(format!(
-                "Stage path list cannot include transient automation files or their parent directories: {entry}"
-            ));
-        }
-        if transient_dirs.iter().any(|transient_dir| {
-            entry_path == *transient_dir
-                || entry_path.starts_with(transient_dir)
-                || transient_dir.starts_with(&entry_path)
-        }) {
-            return Err(format!(
-                "Stage path list cannot include transient automation directories or their contents: {entry}"
-            ));
-        }
-
-        stage_paths.push(entry.to_owned());
-    }
-
-    if stage_paths.is_empty() {
-        return Err(format!("Stage path list file has no usable entries: {}", path.display()));
-    }
-
-    Ok(stage_paths)
+    })
 }
 
 fn add_all() -> ExitCode {
@@ -424,38 +362,19 @@ fn verify_commit_branch(root: &Path, track_dir: &Path) -> Result<(), String> {
     }
 
     let metadata = read_metadata(&track_dir.join("metadata.json"))?;
-    let Some(expected_branch) = metadata.branch else {
-        return Ok(());
-    };
-
-    match current_git_branch(root)? {
-        None => Err(format!("Cannot determine current git branch — expected '{expected_branch}'")),
-        Some(branch) if branch == "HEAD" => {
-            Err(format!("Detached HEAD — expected branch '{expected_branch}', cannot verify"))
-        }
-        Some(branch) if branch != expected_branch => {
-            Err(format!("Current branch '{branch}' does not match expected '{expected_branch}'"))
-        }
-        Some(_) => Ok(()),
-    }
+    verify_explicit_track_branch(
+        current_git_branch(root)?.as_deref(),
+        &ExplicitTrackBranch {
+            display_path: track_dir.display().to_string(),
+            expected_branch: metadata.branch,
+        },
+    )
 }
 
 fn verify_branch_by_auto_detection(root: &Path) -> Result<(), String> {
-    let branch = match current_git_branch(root)? {
-        Some(branch) => branch,
-        None => return Err("cannot determine current git branch".to_owned()),
-    };
-    if branch == "HEAD" {
-        return Err("detached HEAD — cannot verify track branch".to_owned());
-    }
-    if !branch.starts_with("track/") {
-        return Ok(());
-    }
-
     let items_root = root.join("track/items");
     let archive_root = root.join("track/archive");
-
-    let mut matches = Vec::new();
+    let mut claims = Vec::new();
     if items_root.is_dir() {
         for entry in read_directories(&items_root)? {
             let metadata_path = entry.join("metadata.json");
@@ -463,58 +382,39 @@ fn verify_branch_by_auto_detection(root: &Path) -> Result<(), String> {
                 continue;
             }
             if let Ok(metadata) = read_metadata(&metadata_path) {
-                if metadata.branch.as_deref() == Some(branch.as_str()) {
-                    matches.push(entry);
-                }
+                claims.push(TrackBranchClaim {
+                    track_name: entry
+                        .file_name()
+                        .and_then(|name| name.to_str())
+                        .unwrap_or_default()
+                        .to_owned(),
+                    branch: metadata.branch,
+                    status: metadata.status,
+                });
+            }
+        }
+    }
+    if archive_root.is_dir() {
+        for entry in read_directories(&archive_root)? {
+            let metadata_path = entry.join("metadata.json");
+            if !metadata_path.is_file() {
+                continue;
+            }
+            if let Ok(metadata) = read_metadata(&metadata_path) {
+                claims.push(TrackBranchClaim {
+                    track_name: entry
+                        .file_name()
+                        .and_then(|name| name.to_str())
+                        .unwrap_or_default()
+                        .to_owned(),
+                    branch: metadata.branch,
+                    status: metadata.status,
+                });
             }
         }
     }
 
-    if matches.is_empty() {
-        if archive_root.is_dir() {
-            for entry in read_directories(&archive_root)? {
-                let metadata_path = entry.join("metadata.json");
-                if !metadata_path.is_file() {
-                    continue;
-                }
-                if let Ok(metadata) = read_metadata(&metadata_path) {
-                    if metadata.branch.as_deref() == Some(branch.as_str())
-                        && metadata.status.as_deref() == Some("archived")
-                    {
-                        return Ok(());
-                    }
-                }
-            }
-        }
-
-        let slug = branch.trim_start_matches("track/");
-        let fallback_dir = items_root.join(slug);
-        let fallback_metadata = fallback_dir.join("metadata.json");
-        if fallback_metadata.is_file() {
-            let metadata = read_metadata(&fallback_metadata)?;
-            if metadata.branch.is_none() {
-                return Ok(());
-            }
-        }
-
-        return Err(format!(
-            "on branch '{branch}' but no track claims this branch in metadata.json"
-        ));
-    }
-
-    if matches.len() > 1 {
-        let names = matches
-            .iter()
-            .filter_map(|path| path.file_name().and_then(|name| name.to_str()))
-            .collect::<Vec<_>>()
-            .join(", ");
-        return Err(format!("multiple tracks claim branch '{branch}': {names}"));
-    }
-
-    match matches.first() {
-        Some(track_dir) => verify_commit_branch(root, track_dir),
-        None => Err("internal error: expected exactly one branch match".to_owned()),
-    }
+    verify_auto_detected_branch(current_git_branch(root)?.as_deref(), &claims)
 }
 
 fn read_directories(root: &Path) -> Result<Vec<PathBuf>, String> {

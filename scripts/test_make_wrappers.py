@@ -333,6 +333,23 @@ class MakeWrappersTest(unittest.TestCase):
                 )
                 self.assertIn(expected, task_body)
 
+    def test_track_pr_wrappers_delegate_to_rust_cli(self) -> None:
+        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
+
+        for task_header, expected in (
+            ("[tasks.track-pr-merge]", 'cargo run --quiet -p cli -- pr wait-and-merge ${@}'),
+            ("[tasks.track-pr-status]", 'cargo run --quiet -p cli -- pr status ${@}'),
+        ):
+            with self.subTest(task=task_header):
+                task_start = makefile.index(task_header)
+                next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+                task_body = (
+                    makefile[task_start:]
+                    if next_task == -1
+                    else makefile[task_start:next_task]
+                )
+                self.assertIn(expected, task_body)
+
     def test_verify_orchestra_local_honors_python_bin_override(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
