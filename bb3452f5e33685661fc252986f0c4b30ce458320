@@ -1,0 +1,24 @@
+## Task Summary: Compress CLAUDE.md and add workspace-tree commands
+
+**Track:** claude-md-compression-2026-03-13
+**Task:** CLAUDE.md 50行以下圧縮 + workspace-tree コマンド化 + 07-dev-environment.md 追記
+**Date:** 2026-03-13
+
+### Changes
+
+- CLAUDE.md: Compressed from 243 lines to 47 lines (minimal pointer file)
+- .claude/rules/08-orchestration.md: Extracted orchestration, SSoT, and delegation rules
+- .claude/rules/09-maintainer-checklist.md: Extracted maintainer checklist
+- .claude/rules/10-guardrails.md: Extracted guardrails and hook constraint
+- docs/architecture-rules.json: Added extra_dirs for non-crate directories
+- scripts/architecture_rules.py: Added workspace-tree/workspace-tree-full, removed verify_claude_workspace_map
+- Makefile.toml: Added workspace-tree tasks, removed verify-claude-workspace-map task
+- .claude/settings.json: Updated allowlist for new tasks
+- scripts/test_*.py, verify_*.py: Updated tests and verifiers to match
+
+### Why
+
+CLAUDE.md is auto-injected into every conversation context, so minimizing its size
+reduces token consumption. Detailed rules were moved to .claude/rules/ (also auto-injected)
+with no behavior change. The static Workspace Map was replaced with dynamic workspace-tree
+commands sourced from architecture-rules.json (SSoT).
