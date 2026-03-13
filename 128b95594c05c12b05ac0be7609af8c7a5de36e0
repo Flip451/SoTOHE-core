@@ -1,0 +1,18 @@
+## Task Summary: Classify verification boundaries and harden git metadata discovery
+
+**Track:** python-dependency-deprecation-2026-03-13
+**Task:** Reclassify verification utilities and move track branch-claim discovery to fail-closed infrastructure adapters
+**Date:** 2026-03-13
+
+### Changes
+
+- `apps/cli/src/commands/git.rs`: delegated branch-claim loading to infrastructure helpers instead of scanning metadata locally
+- `libs/infrastructure/src/git_cli.rs`: added explicit track branch loading and claim collection with fail-closed metadata parsing
+- `track/items/python-dependency-deprecation-2026-03-13/metadata.json`: marked `T007` done and advanced the track timestamp
+- `track/items/python-dependency-deprecation-2026-03-13/plan.md`: rendered `T007` completion in the generated plan view
+- `track/items/python-dependency-deprecation-2026-03-13/verification.md`: recorded review rounds, fail-closed fix, and validation evidence
+- `track/items/python-dependency-deprecation-2026-03-13/verification-boundary-classification.md`: classified verification and PR-review Python utilities by migration bucket
+
+### Why
+
+The Python dependency deprecation track needs clear adapter boundaries so CLI code does not own repository metadata scanning. It also needs an explicit classification of which verification utilities are already off the required path, which remain Python until their source of truth is redesigned, and which are only optional repository-policy helpers.
