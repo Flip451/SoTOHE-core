@@ -599,10 +599,8 @@ WORKFLOW_TEMPLATE = (
     "For autonomous full cycle in Claude Code: `/track:full-cycle <task>`. "
     "For interactive parallel implementation/review: `/track:implement` / `/track:review`. "
     "For validation and commit: `/track:ci` / `/track:commit <message>`. "
-    'For automated workflow: `cargo make takt-full-cycle "<task>"` / '
-    '`cargo make takt-spec-to-impl "<task>"` / '
-    '`cargo make takt-impl-review "<task>"` / '
-    '`cargo make takt-tdd-cycle "<task>"`.'
+    "For PR lifecycle helpers after a branch is pushed: "
+    "`cargo make track-pr-status` / `cargo make track-pr-review` / `cargo make track-pr-merge`."
 )
 EXTERNAL_GUIDES_PREFIX = "[External Guide Context]"
 EXTERNAL_GUIDES_COMMAND_TRIGGERS = [

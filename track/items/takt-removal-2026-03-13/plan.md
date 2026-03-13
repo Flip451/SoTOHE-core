@@ -13,8 +13,8 @@ project-docs/conventions/security.md
 
 ## Inventory and public workflow rewrite
 
-- [ ] 現行の takt 依存面を棚卸しし、`.takt/` ディレクトリ、`cargo make takt-*` wrapper、`scripts/takt_profile.py`、`.claude/commands/**`、`.claude/rules/**`、`.claude/docs/WORKFLOW.md`、`START_HERE_HUMAN.md`、agent routing/profile 設定、traceability 文書、CI/guardrail の接点を inventory と cutover 原則として固定する
-- [ ] `/track:*` を公開インターフェースとして維持したまま、`.claude/commands/track/full-cycle.md`、`.claude/commands/track/setup.md`、`.claude/docs/WORKFLOW.md`、`START_HERE_HUMAN.md`、agent-router の案内文を含む workflow 文書・運用ガイド・agent profile 説明から takt を実行レイヤとして外し、Claude Code + Agent Teams + Rust CLI を前提にした新しい orchestration 記述へ置き換える
+- [x] 現行の takt 依存面を棚卸しし、`.takt/` ディレクトリ、`cargo make takt-*` wrapper、`scripts/takt_profile.py`、`.claude/commands/**`、`.claude/rules/**`、`.claude/docs/WORKFLOW.md`、`START_HERE_HUMAN.md`、agent routing/profile 設定、traceability 文書、CI/guardrail の接点を inventory と cutover 原則として固定する
+- [x] `/track:*` を公開インターフェースとして維持したまま、`.claude/commands/track/full-cycle.md`、`.claude/commands/track/setup.md`、`.claude/docs/WORKFLOW.md`、`START_HERE_HUMAN.md`、agent-router の案内文を含む workflow 文書・運用ガイド・agent profile 説明から takt を実行レイヤとして外し、Claude Code + Agent Teams + Rust CLI を前提にした新しい orchestration 記述へ置き換える
 
 ## Artifact and runtime removal design
 
