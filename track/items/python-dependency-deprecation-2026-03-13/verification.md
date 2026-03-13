@@ -55,6 +55,11 @@ Current Rust migration leaves non-trivial workflow policy in CLI adapters (`apps
 - Added a usecase regression test for archived null-branch fallback rejection, and re-verified the Rust PR wrapper behavior with focused CLI tests.
 - Latest focused test evidence: `cargo test -p usecase -- --nocapture`, `cargo test -p cli -- --nocapture`, `cargo test -p cli pr -- --nocapture`, `cargo clippy --locked -p cli --all-targets --all-features -- -D warnings`, and `pytest -q -o cache_dir=.cache/pytest scripts/test_make_wrappers.py` passed after the fixes.
 - Latest CI evidence for T005/T004 review closeout: `cargo make ci` passed on the final uncommitted diff.
+- Current `/track:review` loop for T006 started with three P1 findings: `pr_workflow` still depended on GitHub transport strings, the CLI adapter lost meaningful wrapper coverage after extraction, and `metadata.json` had `updated_at` earlier than `created_at`.
+- Fixed T006 by normalizing GitHub check state in CLI before crossing into `usecase`, adding injectable seams for `gh` execution and sleep behavior in `pr.rs`, adding CLI regression tests for non-zero JSON handling, stderr propagation, merge invocation, and timeout behavior, and correcting the track timestamp ordering.
+- Latest reviewer verdict for T006: `No P0/P1 findings in the remaining diff.`
+- Latest focused verification for T006: `cargo test -p usecase pr_workflow -- --nocapture`, `cargo test -p cli pr -- --nocapture`, `cargo clippy --locked -p cli --all-targets --all-features -- -D warnings`, `cargo make track-sync-views`, and `cargo make ci-rust` passed after the fixes.
+- Latest full CI evidence for T006 review closeout: `cargo make ci` passed on the final uncommitted diff.
 
 ## In Progress
 
@@ -66,6 +71,9 @@ Current Rust migration leaves non-trivial workflow policy in CLI adapters (`apps
 - Started `T005` by extracting stage path policy and branch guard decision logic from CLI into `libs/usecase/src/git_workflow.rs`.
 - `apps/cli/src/commands/git.rs` now delegates pure stage-path validation and branch-claim evaluation to the usecase layer; filesystem access and subprocess execution remain in CLI for now.
 - Focused verification for the `T005` slice: `cargo test -p usecase -- --nocapture` and `cargo test -p cli git -- --nocapture` passed.
+- Started `T006` by adding `libs/usecase/src/pr_workflow.rs` for pure PR check summarization and wait/timeout decisions.
+- `apps/cli/src/commands/pr.rs` now keeps `gh` execution, JSON decode, output, and sleep mechanics in CLI while delegating pass/fail/pending and wait-and-merge decisions to the usecase layer.
+- Focused verification for the `T006` slice: `cargo test -p usecase pr_workflow -- --nocapture`, `cargo test -p cli pr -- --nocapture`, `cargo clippy --locked -p cli --all-targets --all-features -- -D warnings`, `cargo make track-sync-views`, and `cargo make ci` passed.
 
 ## Verified At
 
