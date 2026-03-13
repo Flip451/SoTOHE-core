@@ -1,5 +1,23 @@
 {
   "version": 1,
+  "extra_dirs": [
+    {
+      "path": "project-docs/conventions",
+      "label": "project-specific engineering rules"
+    },
+    {
+      "path": "track",
+      "label": "track workflow state and planning artifacts"
+    },
+    {
+      "path": "track/items/<id>",
+      "label": "active track directory"
+    },
+    {
+      "path": "track/archive/<id>",
+      "label": "archived track directory"
+    }
+  ],
   "layers": [
     {
       "crate": "domain",

@@ -68,10 +68,6 @@ def main(argv: list[str] | None = None) -> int:
     if architecture_rules.run_verify_sync() != 0:
         failed = True
 
-    # Verify CLAUDE.md Workspace Map covers all workspace members.
-    if architecture_rules.run_verify_claude_workspace_map() != 0:
-        failed = True
-
     # Verify each workspace member is mentioned in Cargo.toml and tech-stack.md.
     try:
         rules = architecture_rules.load_rules()

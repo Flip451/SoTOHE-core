@@ -6,7 +6,6 @@ Architecture rule helpers shared by validation scripts.
 from __future__ import annotations
 
 import json
-import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -31,10 +30,6 @@ def cargo_toml_path() -> Path:
 
 def deny_toml_path() -> Path:
     return project_root() / "deny.toml"
-
-
-def claude_md_path() -> Path:
-    return project_root() / "CLAUDE.md"
 
 
 def load_toml_text(text: str, *, source_name: str) -> dict[str, Any]:
@@ -113,6 +108,34 @@ def layer_rules(rules: dict) -> list[dict]:
 
 def workspace_members(rules: dict) -> list[str]:
     return [layer["path"] for layer in layer_rules(rules)]
+
+
+def extra_dirs(rules: dict) -> list[dict[str, str]]:
+    raw_extra_dirs = rules.get("extra_dirs", [])
+    if raw_extra_dirs is None:
+        return []
+    if not isinstance(raw_extra_dirs, list):
+        raise ValueError("architecture rules 'extra_dirs' must be an array")
+
+    normalized: list[dict[str, str]] = []
+    layer_paths = set(workspace_members(rules))
+    seen_paths: set[str] = set()
+    for entry in raw_extra_dirs:
+        if not isinstance(entry, dict):
+            raise ValueError("each extra_dirs entry must be an object")
+        path = entry.get("path")
+        label = entry.get("label", "")
+        if not isinstance(path, str) or not path:
+            raise ValueError("extra_dirs entry must define a non-empty 'path'")
+        if not isinstance(label, str):
+            raise ValueError(f"extra_dirs entry '{path}' has invalid 'label'")
+        if path in layer_paths:
+            raise ValueError(f"extra_dirs path duplicates layer path: {path}")
+        if path in seen_paths:
+            raise ValueError(f"duplicate extra_dirs path in architecture rules: {path}")
+        seen_paths.add(path)
+        normalized.append({"path": path, "label": label})
+    return normalized
 
 
 def crate_names(rules: dict) -> list[str]:
@@ -214,117 +237,81 @@ def parse_deny_rules(deny_text: str) -> list[dict]:
     return rules
 
 
-def extract_workspace_map_block(claude_text: str) -> list[str]:
-    lines = claude_text.splitlines()
-    in_section = False
-    in_code_block = False
-    block: list[str] = []
-
-    for line in lines:
-        stripped = line.strip()
-        if not in_section:
-            if stripped == "## 7. Workspace Map":
-                in_section = True
-            continue
-
-        if not in_code_block:
-            if stripped == "```text":
-                in_code_block = True
-                continue
-            if stripped.startswith("## "):
-                break
-            continue
-
-        if stripped == "```":
-            return block
-        block.append(line.rstrip("\n"))
-
-    if not in_section:
-        raise ValueError("CLAUDE.md is missing the '## 7. Workspace Map' section")
-    if not in_code_block:
-        raise ValueError(
-            "CLAUDE.md Workspace Map section is missing a ```text code block"
-        )
-    raise ValueError("CLAUDE.md Workspace Map code block is not closed")
+def _path_depth(path: str) -> int:
+    return len(path.split("/"))
 
 
-WORKSPACE_TREE_ENTRY_PATTERN = re.compile(
-    r"^(?P<prefix>(?:(?:│   )|(?:    ))*)(?P<branch>├── |└── )(?P<entry>.+)$"
-)
+def _render_line(
+    path: str,
+    *,
+    label: str,
+    depth: int,
+    parent_has_next: list[bool],
+    is_last: bool,
+) -> str:
+    name = path.split("/")[-1]
+    if depth == 0:
+        line = f"{name}/"
+    else:
+        prefix = "".join("│   " if has_next else "    " for has_next in parent_has_next)
+        branch = "└── " if is_last else "├── "
+        line = f"{prefix}{branch}{name}/"
+    if label:
+        padding = max(1, 24 - len(line))
+        line = f"{line}{' ' * padding}# {label}"
+    return line
 
 
-def claude_workspace_map_paths(claude_text: str) -> set[str]:
-    block = extract_workspace_map_block(claude_text)
-    stack: list[str] = []
-    paths: set[str] = set()
-
-    for raw_line in block:
-        content = raw_line.split("#", 1)[0].rstrip()
-        if not content.strip():
-            continue
-
-        tree_match = WORKSPACE_TREE_ENTRY_PATTERN.match(content)
-        if tree_match:
-            entry = tree_match.group("entry").strip()
-            depth = len(tree_match.group("prefix")) // 4 + 1
-        else:
-            entry = content.strip()
-            depth = 0
-
-        if not entry.endswith("/"):
-            if depth == 0:
-                stack = []
-            continue
-
-        directory = entry[:-1]
-        if depth == 0:
-            stack = [directory]
-        else:
-            if len(stack) < depth:
-                raise ValueError(
-                    f"CLAUDE.md Workspace Map has an invalid tree structure near '{raw_line.strip()}'"
-                )
-            stack = stack[:depth]
-            stack.append(directory)
-
-        paths.add("/".join(stack))
-
-    return paths
-
-
-def verify_claude_workspace_map(root: Path | None = None) -> list[str]:
-    repo_root = root or project_root()
-    claude_file = repo_root / "CLAUDE.md"
-    rules_file = repo_root / "docs" / "architecture-rules.json"
-
-    errors: list[str] = []
-    try:
-        claude_text = claude_file.read_text(encoding="utf-8")
-    except OSError as err:
-        return [f"Failed to read CLAUDE.md: {err}"]
-
-    try:
-        with open(rules_file, encoding="utf-8") as handle:
-            rules = json.load(handle)
-        expected_members = workspace_members(rules)
-    except (OSError, json.JSONDecodeError, ValueError) as err:
-        return [f"Failed to load architecture rules: {err}"]
-
-    try:
-        workspace_map_paths = claude_workspace_map_paths(claude_text)
-    except ValueError as err:
-        return [str(err)]
-
-    missing = [
-        member for member in expected_members if member not in workspace_map_paths
+def render_workspace_tree(rules: dict, *, include_extra_dirs: bool) -> str:
+    entries = [
+        {"path": layer["path"], "label": f"{layer['crate']} crate"}
+        for layer in layer_rules(rules)
     ]
-    if missing:
-        errors.append(
-            "CLAUDE.md Workspace Map is missing workspace members: "
-            + ", ".join(missing)
-        )
+    if include_extra_dirs:
+        entries.extend(extra_dirs(rules))
 
-    return errors
+    labels = {entry["path"]: entry["label"] for entry in entries}
+    all_paths: set[str] = set()
+    for entry in entries:
+        parts = entry["path"].split("/")
+        for index in range(1, len(parts) + 1):
+            all_paths.add("/".join(parts[:index]))
+
+    sorted_paths = sorted(all_paths, key=lambda item: (_path_depth(item), item))
+    children: dict[str | None, list[str]] = {}
+    for path in sorted_paths:
+        parent = path.rsplit("/", 1)[0] if "/" in path else None
+        children.setdefault(parent, []).append(path)
+        children.setdefault(path, [])
+
+    lines = ["Cargo.toml                # workspace definition"]
+
+    def visit(path: str, parent_flags: list[bool]) -> None:
+        siblings = children[path.rsplit("/", 1)[0] if "/" in path else None]
+        is_last = siblings[-1] == path
+        depth = _path_depth(path) - 1
+        lines.append(
+            _render_line(
+                path,
+                label=labels.get(path, ""),
+                depth=depth,
+                parent_has_next=parent_flags,
+                is_last=is_last,
+            )
+        )
+        child_paths = children[path]
+        for child in child_paths:
+            child_parent_flags = (
+                []
+                if depth == 0
+                else [*parent_flags, not is_last]
+            )
+            visit(child, child_parent_flags)
+
+    for top_level in children[None]:
+        visit(top_level, [])
+
+    return "\n".join(lines)
 
 
 def verify_sync(root: Path | None = None) -> list[str]:
@@ -396,6 +383,11 @@ def print_direct_checks(rules: dict) -> int:
     return 0
 
 
+def print_workspace_tree(rules: dict, *, include_extra_dirs: bool) -> int:
+    print(render_workspace_tree(rules, include_extra_dirs=include_extra_dirs))
+    return 0
+
+
 def run_verify_sync() -> int:
     errors = verify_sync()
     if errors:
@@ -406,22 +398,13 @@ def run_verify_sync() -> int:
     return 0
 
 
-def run_verify_claude_workspace_map() -> int:
-    errors = verify_claude_workspace_map()
-    if errors:
-        for error in errors:
-            print(f"[ERROR] {error}", file=sys.stderr)
-        return 1
-    print("[OK] CLAUDE.md Workspace Map covers all workspace members")
-    return 0
-
-
 def show_help() -> int:
     print("Usage:")
     print("  cargo make architecture-rules-workspace-members")
+    print("  cargo make workspace-tree")
+    print("  cargo make workspace-tree-full")
     print("  cargo make architecture-rules-direct-checks")
     print("  cargo make architecture-rules-verify-sync")
-    print("  cargo make architecture-rules-verify-claude-workspace-map")
     return 0
 
 
@@ -433,12 +416,14 @@ def main(argv: list[str] | None = None) -> int:
     command = args[1]
     if command == "verify-sync":
         return run_verify_sync()
-    if command == "verify-claude-workspace-map":
-        return run_verify_claude_workspace_map()
 
     rules = load_rules()
     if command == "workspace-members":
         return print_workspace_members(rules)
+    if command == "workspace-tree":
+        return print_workspace_tree(rules, include_extra_dirs=False)
+    if command == "workspace-tree-full":
+        return print_workspace_tree(rules, include_extra_dirs=True)
     if command == "direct-checks":
         return print_direct_checks(rules)
 
