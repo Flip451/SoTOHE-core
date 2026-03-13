@@ -1,0 +1,19 @@
+## Task Summary: Define primary scratch contract for pending artifacts
+
+**Track:** takt-removal-2026-03-13
+**Task:** takt 由来の pending artifact と handoff/debug scratch の扱いを再設計し、通常 workflow と commit traceability が `tmp/` で完結するように移行計画を固める
+**Date:** 2026-03-13
+
+### Changes
+
+- `track/items/takt-removal-2026-03-13/pending-artifact-cutover.md`: fixed `tmp/track-commit/*` as the primary guarded scratch contract and demoted `.takt/pending-*` to migration-only compatibility paths.
+- `.claude/commands/track/commit.md`: changed `/track:commit` guidance so generated `tmp/track-commit/note.md` is the normal git-note path and legacy pending notes are fallback only.
+- `track/workflow.md`: rewrote staging, commit, and note guidance to prefer `track-*` wrappers over `.takt/pending-*` wrappers.
+- `scripts/git_ops.py`: clarified the transient file grouping around primary track scratch versus legacy takt compatibility paths.
+- `scripts/test_git_ops.py`: moved happy-path commit/note tests to `tmp/track-commit/*` and kept a targeted legacy pending-note compatibility test.
+- `apps/cli/src/commands/git.rs`: updated nested-path git helper tests to use `tmp/track-commit/note.md` as the canonical repo-relative note path.
+- `track/items/takt-removal-2026-03-13/metadata.json`: marked T003 done and refreshed the rendered plan/verification artifacts.
+
+### Why
+
+The takt-removal track needs a single non-`takt` scratch contract before wrapper/runtime deletion can proceed safely. Freezing `tmp/track-commit/*` as the primary path keeps guarded staging, commit, and traceability flows aligned with the intended Claude Code + Rust CLI workflow while preserving a narrow compatibility window for remaining `takt` wrappers.
