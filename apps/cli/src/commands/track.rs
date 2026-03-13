@@ -11,9 +11,25 @@ use domain::{
 };
 use infrastructure::lock::FsFileLockManager;
 use infrastructure::track::fs_store::FsTrackStore;
+use infrastructure::track::render;
 
 /// Default timeout for lock acquisition during track operations.
 const DEFAULT_LOCK_TIMEOUT: Duration = Duration::from_millis(5000);
+
+fn resolve_project_root(items_dir: &std::path::Path) -> Result<PathBuf, String> {
+    let items_name = items_dir.file_name().and_then(|name| name.to_str());
+    let track_dir = items_dir.parent();
+    let track_name = track_dir.and_then(std::path::Path::file_name).and_then(|name| name.to_str());
+    let project_root = track_dir.and_then(std::path::Path::parent);
+
+    match (items_name, track_name, project_root) {
+        (Some("items"), Some("track"), Some(root)) => Ok(root.to_path_buf()),
+        _ => Err(format!(
+            "--items-dir must point to '<project-root>/track/items'; got {}",
+            items_dir.display()
+        )),
+    }
+}
 
 #[derive(Debug, Subcommand)]
 pub enum TrackCommand {
@@ -50,6 +66,12 @@ pub enum TrackCommand {
         #[command(subcommand)]
         action: BranchAction,
     },
+
+    /// Validate track metadata and/or regenerate rendered views from metadata.json.
+    Views {
+        #[command(subcommand)]
+        action: ViewAction,
+    },
 }
 
 #[derive(Debug, Subcommand)]
@@ -64,6 +86,27 @@ pub enum BranchAction {
     Switch {
         /// Track ID used to form the branch name `track/<track-id>`.
         track_id: String,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum ViewAction {
+    /// Validate metadata.json files under the repository.
+    Validate {
+        /// Project root containing `track/items` and `track/archive`.
+        #[arg(long, default_value = ".")]
+        project_root: PathBuf,
+    },
+
+    /// Render `plan.md` and `registry.md` from metadata.json.
+    Sync {
+        /// Project root containing `track/items` and `track/archive`.
+        #[arg(long, default_value = ".")]
+        project_root: PathBuf,
+
+        /// Sync only one active track's `plan.md`.
+        #[arg(long)]
+        track_id: Option<String>,
     },
 }
 
@@ -87,6 +130,45 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             skip_branch_check,
         ),
         TrackCommand::Branch { action } => execute_branch(action),
+        TrackCommand::Views { action } => execute_views(action),
+    }
+}
+
+fn execute_views(action: ViewAction) -> ExitCode {
+    match action {
+        ViewAction::Validate { project_root } => {
+            match render::validate_track_snapshots(&project_root) {
+                Ok(()) => {
+                    println!("[OK] Track metadata is valid");
+                    ExitCode::SUCCESS
+                }
+                Err(err) => {
+                    eprintln!("track metadata validation failed: {err}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
+        ViewAction::Sync { project_root, track_id } => {
+            match render::sync_rendered_views(&project_root, track_id.as_deref()) {
+                Ok(changed) => {
+                    if changed.is_empty() {
+                        println!("[OK] All views already up to date");
+                    } else {
+                        for path in changed {
+                            match path.strip_prefix(&project_root) {
+                                Ok(relative) => println!("[OK] Rendered: {}", relative.display()),
+                                Err(_) => println!("[OK] Rendered: {}", path.display()),
+                            }
+                        }
+                    }
+                    ExitCode::SUCCESS
+                }
+                Err(err) => {
+                    eprintln!("sync-views failed: {err}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
     }
 }
 
@@ -155,6 +237,13 @@ fn execute_transition(
         return ExitCode::FAILURE;
     }
 
+    let project_root = match resolve_project_root(&repo_dir) {
+        Ok(path) => path,
+        Err(err) => {
+            eprintln!("{err}");
+            return ExitCode::FAILURE;
+        }
+    };
     // Use TrackWriter::update directly to resolve the correct transition
     // based on current task status (e.g., "in_progress" from "done" is Reopen, not Start).
     match store.update(&track_id, |track| {
@@ -181,7 +270,21 @@ fn execute_transition(
                 target_status,
                 track.status()
             );
-            ExitCode::SUCCESS
+            match render::sync_rendered_views(&project_root, Some(track_id.as_str())) {
+                Ok(changed) => {
+                    for path in changed {
+                        match path.strip_prefix(&project_root) {
+                            Ok(relative) => println!("[OK] Rendered: {}", relative.display()),
+                            Err(_) => println!("[OK] Rendered: {}", path.display()),
+                        }
+                    }
+                    ExitCode::SUCCESS
+                }
+                Err(err) => {
+                    eprintln!("warning: transition persisted but sync-views failed: {err}");
+                    ExitCode::SUCCESS
+                }
+            }
         }
         Err(err) => {
             eprintln!("transition failed: {err}");
@@ -309,5 +412,27 @@ fn resolve_transition(
         "todo" => Ok(TaskTransition::ResetToTodo),
         "skipped" => Ok(TaskTransition::Skip),
         other => Err(format!("unsupported target status: {other}")),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::resolve_project_root;
+    use std::path::Path;
+
+    #[test]
+    fn resolve_project_root_accepts_standard_track_items_layout() {
+        assert_eq!(
+            resolve_project_root(Path::new("repo/track/items")),
+            Ok(std::path::PathBuf::from("repo"))
+        );
+    }
+
+    #[test]
+    fn resolve_project_root_rejects_non_standard_layout() {
+        assert!(matches!(
+            resolve_project_root(Path::new("repo/custom-items")),
+            Err(err) if err.contains("track/items")
+        ));
     }
 }

@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from datetime import UTC, datetime
 from pathlib import Path
+from unittest.mock import patch
 
 from track_state_machine import (
     TransitionError,
@@ -687,6 +688,94 @@ class TestSyncRenderedViews(unittest.TestCase):
             plan_content = (track_dir / "plan.md").read_text(encoding="utf-8")
             self.assertIn("<!-- Generated from metadata.json", plan_content)
             self.assertIn("- [ ] Task T001", plan_content)
+
+    def test_delegates_to_sotp_and_returns_changed_paths(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            track_dir = root / "track" / "items" / "demo"
+            track_dir.mkdir(parents=True)
+            _write_v2_metadata(
+                track_dir,
+                tasks=[_task("T001", "todo")],
+                sections=[_section("s1", ["T001"])],
+            )
+
+            with (
+                patch(
+                    "track_state_machine._find_sotp_for_track_views_sync",
+                    return_value="/tmp/sotp",
+                ),
+                patch(
+                    "track_state_machine.subprocess.run",
+                    return_value=unittest.mock.Mock(
+                        returncode=0,
+                        stdout="[OK] Rendered: track/items/demo/plan.md\n[OK] Rendered: track/registry.md\n",
+                    ),
+                ),
+            ):
+                changed = sync_rendered_views(root, track_id="demo")
+
+            self.assertEqual(
+                changed,
+                [root / "track/items/demo/plan.md", root / "track/registry.md"],
+            )
+
+    def test_falls_back_when_sotp_sync_views_is_unavailable(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            track_dir = root / "track" / "items" / "demo"
+            track_dir.mkdir(parents=True)
+            _write_v2_metadata(
+                track_dir,
+                tasks=[_task("T001", "todo")],
+                sections=[_section("s1", ["T001"])],
+            )
+
+            with (
+                patch(
+                    "track_state_machine._find_sotp_for_track_views_sync",
+                    return_value="/tmp/sotp",
+                ),
+                patch("atomic_write._find_sotp", return_value=None),
+                patch(
+                    "track_state_machine.subprocess.run",
+                    return_value=unittest.mock.Mock(
+                        returncode=1,
+                        stderr="unrecognized subcommand 'views'",
+                    ),
+                ),
+            ):
+                changed = sync_rendered_views(root, track_id="demo")
+
+            self.assertTrue(any("plan.md" in str(path) for path in changed))
+            self.assertTrue((track_dir / "plan.md").exists())
+
+    def test_raises_when_sotp_sync_views_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            track_dir = root / "track" / "items" / "demo"
+            track_dir.mkdir(parents=True)
+            _write_v2_metadata(
+                track_dir,
+                tasks=[_task("T001", "todo")],
+                sections=[_section("s1", ["T001"])],
+            )
+
+            with (
+                patch(
+                    "track_state_machine._find_sotp_for_track_views_sync",
+                    return_value="/tmp/sotp",
+                ),
+                patch(
+                    "track_state_machine.subprocess.run",
+                    return_value=unittest.mock.Mock(
+                        returncode=1,
+                        stderr="permission denied",
+                    ),
+                ),
+            ):
+                with self.assertRaises(TransitionError):
+                    sync_rendered_views(root, track_id="demo")
 
 
 class TestNextOpenTask(unittest.TestCase):
