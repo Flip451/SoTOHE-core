@@ -1,0 +1,17 @@
+## Task Summary: Define rollout DoD for Python dependency deprecation
+
+**Track:** python-dependency-deprecation-2026-03-13
+**Task:** finalize `.venv`-independent rollout gates and complete the track
+**Date:** 2026-03-13
+
+### Changes
+
+- track/items/python-dependency-deprecation-2026-03-13/metadata.json: marked `T008` done and closed the track as `done`
+- track/items/python-dependency-deprecation-2026-03-13/plan.md: rendered the final completion state from metadata
+- track/items/python-dependency-deprecation-2026-03-13/verification.md: recorded T008 verification, review closeout, and interpretation guidance
+- track/items/python-dependency-deprecation-2026-03-13/rollout-definition-of-done.md: defined required-path matrix, M1-M4 exit criteria, verification procedures, rollout order, and blockers
+- track/registry.md: moved the track out of active work and recorded that no active tracks remain
+
+### Why
+
+This freezes the rollout definition of done for Python dependency deprecation in a committed artifact instead of tmp notes. It also makes the current temporary Python boundary explicit alongside the eventual migration target so the completed track is internally consistent.
