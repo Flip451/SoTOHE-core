@@ -72,7 +72,7 @@ traceability source:
 ### 3b. Use legacy pending note only as compatibility fallback
 
 If `.takt/pending-note.md` exists and you intentionally need to consume a still-generated legacy
-pending note during the migration window:
+pending note during the migration window for a residual compatibility wrapper:
 
 1. Run: `cargo make note-pending`
 2. The wrapper deletes `.takt/pending-note.md` after successful application.
