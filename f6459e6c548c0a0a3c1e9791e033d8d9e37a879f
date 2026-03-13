@@ -1,0 +1,22 @@
+## Task Summary: Remove takt baseline assumptions from guardrails and workflow docs
+
+**Track:** takt-removal-2026-03-13
+**Task:** T005 guardrails, profile schema, and workflow docs migration
+**Date:** 2026-03-13
+
+### Changes
+
+- .claude/settings.json: removed baseline `takt-*` permissions and `.cache/takt-uv/**` deny rules.
+- scripts/verify_orchestra_guardrails.py: aligned the expected baseline with `/track:*` and Rust-centric orchestration.
+- .claude/agent-profiles.json: switched canonical host keys to `workflow_host_provider` and `workflow_host_model`.
+- .claude/hooks/_agent_profiles.py: added workflow-host helpers while preserving `takt_host_*` compatibility aliases for residual runtime surfaces.
+- .claude/hooks/agent-router.py: stopped injecting external-guide context for legacy `cargo make takt-*` commands.
+- DEVELOPER_AI_WORKFLOW.md: rewrote the operator-facing workflow guidance so takt is no longer documented as the normal execution layer.
+- LOCAL_DEVELOPMENT.md: removed takt wrapper onboarding from the main developer path.
+- TAKT_TRACK_TRACEABILITY.md: reframed traceability around track workflow state transitions and primary `tmp/track-commit/*` scratch files.
+- track/workflow.md: documented takt runtime surfaces as migration compatibility only.
+- track/items/takt-removal-2026-03-13/verification.md: recorded the T005 implementation and verification evidence.
+
+### Why
+
+The takt removal track needs guardrails, profile schema, and public workflow docs to stop treating `takt` as baseline behavior before the remaining runtime surfaces can be deleted safely. This slice makes `/track:*`, Rust CLI helpers, and `tmp/track-commit/*` the documented default while preserving only the minimum compatibility hooks needed for later removal steps.
