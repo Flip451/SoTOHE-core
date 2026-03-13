@@ -25,7 +25,8 @@ Check `.claude/agent-profiles.json` first. Use this skill only when the target c
 Before invoking Codex, read `.claude/agent-profiles.json` to resolve the model:
 
 ```
-providers.codex.default_model  →  {model}  (e.g. "gpt-5.3-codex")
+profiles.<active_profile>.provider_model_overrides.codex  →  {model}
+fallback: providers.codex.default_model  →  {model}
 ```
 
 All templates below use `{model}` as a placeholder. Replace it with the actual value from `agent-profiles.json`.
@@ -274,7 +275,7 @@ Verify the fix in {file}:{line range}. Any remaining bugs?
 
 ## Execution Tips
 
-- **Model flag**: read `providers.codex.default_model` from `.claude/agent-profiles.json` and pass as `--model {model}`
+- **Model flag**: resolve `profiles.<active_profile>.provider_model_overrides.codex` first, then fall back to `providers.codex.default_model`, and pass the result as `--model {model}`
 - **Foreground preferred**: `2>&1` captures both stdout and stderr reliably; `2>/dev/null` may hide useful diagnostics
 - **Long prompts**: always use the file-based briefing pattern — inline prompts over ~1KB risk shell escaping issues
 - **Short prompts**: inline is fine for 1–2 paragraph queries
