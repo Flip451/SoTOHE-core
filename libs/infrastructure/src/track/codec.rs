@@ -4,6 +4,7 @@ use domain::{
     CommitHash, DomainError, PlanSection, PlanView, StatusOverride, TaskId, TaskStatus,
     TrackBranch, TrackId, TrackMetadata, TrackTask,
 };
+use serde::{Deserialize, Deserializer};
 
 /// Codec error for metadata.json serialization/deserialization.
 #[derive(Debug, thiserror::Error)]
@@ -28,6 +29,7 @@ pub struct TrackDocumentV2 {
     pub status: String,
     pub created_at: String,
     pub updated_at: String,
+    #[serde(default)]
     pub tasks: Vec<TrackTaskDocument>,
     pub plan: PlanDocument,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -45,7 +47,9 @@ pub struct TrackTaskDocument {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PlanDocument {
+    #[serde(default, deserialize_with = "deserialize_string_vec_relaxed")]
     pub summary: Vec<String>,
+    #[serde(default)]
     pub sections: Vec<PlanSectionDocument>,
 }
 
@@ -53,7 +57,9 @@ pub struct PlanDocument {
 pub struct PlanSectionDocument {
     pub id: String,
     pub title: String,
+    #[serde(default, deserialize_with = "deserialize_string_vec_relaxed")]
     pub description: Vec<String>,
+    #[serde(default)]
     pub task_ids: Vec<String>,
 }
 
@@ -72,6 +78,27 @@ pub struct DocumentMeta {
     /// Original JSON status string, preserved for values the domain model
     /// cannot compute (e.g., "archived" which is a workflow-level state).
     pub original_status: Option<String>,
+}
+
+fn deserialize_string_vec_relaxed<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value = serde_json::Value::deserialize(deserializer)?;
+    match value {
+        serde_json::Value::Null => Ok(Vec::new()),
+        serde_json::Value::String(s) => Ok(vec![s]),
+        serde_json::Value::Array(values) => values
+            .into_iter()
+            .map(|value| match value {
+                serde_json::Value::String(s) => Ok(s),
+                other => {
+                    Err(serde::de::Error::custom(format!("expected string item, got {other}")))
+                }
+            })
+            .collect(),
+        other => Err(serde::de::Error::custom(format!("expected string or sequence, got {other}"))),
+    }
 }
 
 /// Decodes a JSON string into a domain `TrackMetadata` and infrastructure `DocumentMeta`.
@@ -321,6 +348,71 @@ mod tests {
         let (track, _meta) = decode(json).unwrap();
         assert_eq!(track.status(), TrackStatus::Blocked);
         assert!(track.status_override().is_some());
+    }
+
+    #[test]
+    fn test_decode_accepts_missing_section_description() {
+        let json = r#"{
+  "schema_version": 3,
+  "id": "compat-track",
+  "branch": "track/compat-track",
+  "title": "Compat Track",
+  "status": "planned",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z",
+  "tasks": [
+    {
+      "id": "T1",
+      "description": "First task",
+      "status": "todo"
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Section 1",
+        "task_ids": ["T1"]
+      }
+    ]
+  }
+        }"#;
+
+        let (track, _) = decode(json).unwrap();
+        assert!(track.plan().sections()[0].description().is_empty());
+    }
+
+    #[test]
+    fn test_decode_accepts_string_summary() {
+        let json = r#"{
+  "schema_version": 2,
+  "id": "string-summary-track",
+  "title": "String Summary Track",
+  "status": "planned",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z",
+  "tasks": [
+    {
+      "id": "T1",
+      "description": "First task",
+      "status": "todo"
+    }
+  ],
+  "plan": {
+    "summary": "single summary line",
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Section 1",
+        "task_ids": ["T1"]
+      }
+    ]
+  }
+}"#;
+
+        let (track, _) = decode(json).unwrap();
+        assert_eq!(track.plan().summary(), &["single summary line".to_owned()]);
     }
 
     #[test]

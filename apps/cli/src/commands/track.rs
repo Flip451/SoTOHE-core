@@ -11,6 +11,7 @@ use domain::{
 };
 use infrastructure::lock::FsFileLockManager;
 use infrastructure::track::fs_store::FsTrackStore;
+use infrastructure::track::render;
 
 /// Default timeout for lock acquisition during track operations.
 const DEFAULT_LOCK_TIMEOUT: Duration = Duration::from_millis(5000);
@@ -50,6 +51,12 @@ pub enum TrackCommand {
         #[command(subcommand)]
         action: BranchAction,
     },
+
+    /// Validate track metadata and/or regenerate rendered views from metadata.json.
+    Views {
+        #[command(subcommand)]
+        action: ViewAction,
+    },
 }
 
 #[derive(Debug, Subcommand)]
@@ -64,6 +71,27 @@ pub enum BranchAction {
     Switch {
         /// Track ID used to form the branch name `track/<track-id>`.
         track_id: String,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+pub enum ViewAction {
+    /// Validate metadata.json files under the repository.
+    Validate {
+        /// Project root containing `track/items` and `track/archive`.
+        #[arg(long, default_value = ".")]
+        project_root: PathBuf,
+    },
+
+    /// Render `plan.md` and `registry.md` from metadata.json.
+    Sync {
+        /// Project root containing `track/items` and `track/archive`.
+        #[arg(long, default_value = ".")]
+        project_root: PathBuf,
+
+        /// Sync only one active track's `plan.md`.
+        #[arg(long)]
+        track_id: Option<String>,
     },
 }
 
@@ -87,6 +115,45 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             skip_branch_check,
         ),
         TrackCommand::Branch { action } => execute_branch(action),
+        TrackCommand::Views { action } => execute_views(action),
+    }
+}
+
+fn execute_views(action: ViewAction) -> ExitCode {
+    match action {
+        ViewAction::Validate { project_root } => {
+            match render::validate_track_snapshots(&project_root) {
+                Ok(()) => {
+                    println!("[OK] Track metadata is valid");
+                    ExitCode::SUCCESS
+                }
+                Err(err) => {
+                    eprintln!("track metadata validation failed: {err}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
+        ViewAction::Sync { project_root, track_id } => {
+            match render::sync_rendered_views(&project_root, track_id.as_deref()) {
+                Ok(changed) => {
+                    if changed.is_empty() {
+                        println!("[OK] All views already up to date");
+                    } else {
+                        for path in changed {
+                            match path.strip_prefix(&project_root) {
+                                Ok(relative) => println!("[OK] Rendered: {}", relative.display()),
+                                Err(_) => println!("[OK] Rendered: {}", path.display()),
+                            }
+                        }
+                    }
+                    ExitCode::SUCCESS
+                }
+                Err(err) => {
+                    eprintln!("sync-views failed: {err}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
     }
 }
 
