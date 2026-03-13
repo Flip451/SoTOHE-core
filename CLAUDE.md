@@ -1,243 +1,40 @@
 # CLAUDE.md
 
-このファイルは、このテンプレートを扱う Claude Code 向けの保守者リファレンスです。
-初見ユーザー向けの操作導線は `DEVELOPER_AI_WORKFLOW.md` を参照すること。
+このファイルは保守者向けの最小インデックス。初見ユーザー向け導線は `DEVELOPER_AI_WORKFLOW.md`。
 
-## 1. Primary Role
-
-Claude Code is the orchestrator.
-
-- User-facing interface: `/track:*`
-- Context management: `track/`
-- Execution workflows: `takt`
-- Capability routing: `.claude/agent-profiles.json`
-- Default specialist profile:
-  - `planner` / `reviewer` / `debugger`: Codex CLI
-  - `researcher` / `multimodal_reader`: Gemini CLI
-  - `implementer`: Claude Code
-- Parallel execution: Agent Teams
-
-Host orchestration stays in Claude Code.
-Specialist capabilities may switch as models evolve, but the public `/track:*` interface should remain stable.
-
-用語:
-
-- `track`: `metadata.json`（SSoT） / `spec.md` / `plan.md`（読み取り専用ビュー） / `verification.md` / 進捗を管理する文脈管理レイヤー
-- `takt`: 実装やレビューを進める実行ワークフロー
-
-## 2. Source Of Truth
-
-Read these first before planning or implementation:
-
+優先参照:
 - `track/tech-stack.md`
 - `track/workflow.md`
 - `track/registry.md`
-- `project-docs/conventions/README.md`
-- `track/items/<id>/metadata.json` (SSoT for task state)
+- `track/items/<id>/metadata.json`
 - `track/items/<id>/spec.md`
-- `track/items/<id>/plan.md` (read-only view rendered from metadata.json)
+- `track/items/<id>/plan.md`
 - `track/items/<id>/verification.md`
-- `TAKT_TRACK_TRACEABILITY.md`
 - `.claude/docs/DESIGN.md`
+- `.claude/docs/WORKFLOW.md`
+- `.claude/agent-profiles.json`
 - `.claude/rules/`
+- `project-docs/conventions/README.md`
+- `project-docs/conventions/`
+- `docs/architecture-rules.json`
 - `docs/EXTERNAL_GUIDES.md`
 - `docs/external-guides.json`
-- `docs/architecture-rules.json`
+- `TAKT_TRACK_TRACEABILITY.md`
 
-Operational split:
+運用要点:
+- 公開 UI は `/track:*`
+- 旧 alias より `/track:*` を優先
+- `plan.md` は `metadata.json` から render される read-only view
+- `docs/architecture-rules.json` が workspace 構造と layer policy の SSoT
+- workspace tree は `cargo make workspace-tree` / `cargo make workspace-tree-full`
+- `track/tech-stack.md` に未解決 `TODO:` がある間は実装開始禁止
+- `project-docs/conventions/` への参照を維持すること
+- 変更前に `.claude/rules/08-orchestration.md` `09-maintainer-checklist.md` `10-guardrails.md` を読むこと
 
-- `DEVELOPER_AI_WORKFLOW.md`: user-facing operating guide
-- `CLAUDE.md`: maintainer/reference guide
-- `track/workflow.md`: day-to-day workflow rules
-- `project-docs/conventions/`: project-specific engineering rules and implementation policies
-- `TAKT_TRACK_TRACEABILITY.md`: `plan.md` state transitions and registry update rules
-- `docs/external-guides.json`: registry for long-form external guides cached outside git
-- `docs/EXTERNAL_GUIDES.md`: operating policy for external long-form guides
-- `docs/architecture-rules.json`: machine-readable layer dependency source of truth for `deny.toml` and `scripts/check_layers.py`
-- `.claude/agent-profiles.json`: capability-to-provider mapping source of truth
-
-## 3. Canonical User Interface
-
-Public interface is `/track:*`.
-Do not prefer older aliases or direct internal names in user-facing guidance.
-
-Primary commands:
-
-- `/track:setup`
-- `/track:catchup`
-- `/track:plan <feature>`
-- `/track:full-cycle <task>`
-- `/track:implement`
-- `/track:review`
-- `/track:pr-review`
-- `/track:revert`
-- `/track:ci`
-- `/track:commit <message>`
-- `/track:archive <id>`
-- `/track:status`
-
-Detailed command semantics live in:
-
-- `track/workflow.md`
-- `.claude/docs/WORKFLOW.md`
-- `.claude/commands/track/*.md`
-
-Note: For workspace architecture migration (crate map, dependency direction, enforcement rules),
-use `/architecture-customizer` — a separate, dedicated entry point outside the `/track:*` namespace.
-
-For adding project-specific convention docs under `project-docs/conventions/`,
-use `/conventions:add <name>` — a separate formal entry point outside the `/track:*` namespace for project-specific implementation rules.
-
-## 4. Delegation Rules
-
-Use the minimum capable capability first, then resolve it via `.claude/agent-profiles.json`.
-
-- Claude Code (`orchestrator` host):
-  - normal edits
-  - workflow control
-  - file synchronization
-  - user interaction
-- specialist capabilities:
-  - `planner`: architecture design, trait/module planning, trade-off evaluation
-  - `researcher`: crate research, codebase-wide analysis, external research
-  - `implementer`: difficult Rust implementation, refactoring, performance-oriented edits
-  - `reviewer`: code review, correctness analysis, idiomatic Rust checks
-  - `debugger`: compile-error diagnosis, failing test analysis
-  - `multimodal_reader`: PDF / image / audio / video understanding
-- provider resolution:
-  - default profile maps `planner` / `reviewer` / `debugger` to Codex CLI
-  - default profile maps `researcher` / `multimodal_reader` to Gemini CLI
-  - default profile maps `implementer` to Claude Code
-- Agent Teams:
-  - `/track:implement`
-  - `/track:review`
-- takt:
-  - autonomous implementation / review workflows driven by `.takt/pieces/`
-
-If unsure:
-
-1. Workflow control or user interaction → Claude Code
-2. Research or multimodal need → `researcher` / `multimodal_reader`
-3. Design, review, or debugging need → `planner` / `reviewer` / `debugger`
-4. Deterministic workflow execution → takt
-5. Implementation work → `implementer`
-
-## 5. Workflow Reference
-
-Maintainer summary:
-
-- day-to-day workflow and gates: `track/workflow.md`
-- project-specific coding rules: `project-docs/conventions/README.md`
-- Claude-side execution model: `.claude/docs/WORKFLOW.md`
-- state transitions and registry rules: `TAKT_TRACK_TRACEABILITY.md`
-- implementation must not start while `track/tech-stack.md` still has unresolved `TODO:` entries
-- strict tech-stack guardrails are on by default; template maintainers may disable them locally only for template work
-
-## 6. Maintainer Checklist
-
-When changing workflow or architecture, update all affected layers together.
-
-Host prerequisite:
-
-- `python3` is required for `.claude/hooks/*.py` and `scripts/external_guides.py`
-
-Always consider:
-
-- user-facing docs:
-  - `DEVELOPER_AI_WORKFLOW.md`
-  - `.claude/docs/WORKFLOW.md`
-- track docs:
-  - `track/workflow.md`
-  - `track/tech-stack.md`
-  - `track/registry.md`
-  - `TAKT_TRACK_TRACEABILITY.md`
-- enforcement:
-  - `Makefile.toml`
-  - `scripts/verify_*.py`
-  - `scripts/track_schema.py` / `track_state_machine.py` / `track_markdown.py`
-  - `.claude/settings.json`
-  - `.claude/hooks/`
-  - `scripts/external_guides.py`
-- takt definitions:
-  - `.takt/config.yaml`
-  - `.takt/pieces/`
-  - `.takt/personas/`
-
-After such changes, run `cargo make ci`.
-
-## 7. Workspace Map
-
-This tree should mirror the current workspace member paths from `docs/architecture-rules.json`.
-The default template uses `apps/` and `libs/`, but other roots are allowed when this map stays in sync.
-
-```text
-Cargo.toml                  # workspace definition
-apps/
-└── cli/                    # CLI entry point + composition root
-libs/
-├── domain/                 # domain layer
-├── usecase/                # use case layer
-└── infrastructure/         # infrastructure layer
-project-docs/
-└── conventions/
-    ├── README.md           # project-specific rule index
-    └── *.md                # project-specific rules chosen by the project
-track/
-├── product.md              # product goals
-├── product-guidelines.md   # product constraints
-├── tech-stack.md           # technology decisions
-├── workflow.md             # workflow rules
-├── registry.md             # track registry
-├── items/<id>/             # active tracks (planned / in_progress / done)
-│   ├── spec.md             # what to build
-│   ├── plan.md             # read-only view (rendered from metadata.json)
-│   ├── verification.md     # manual verification record
-│   └── metadata.json       # SSoT: task state, plan structure, track status
-└── archive/<id>/           # archived tracks (excluded from AI search via deny rules)
-    ├── spec.md
-    ├── plan.md
-    ├── verification.md
-    └── metadata.json
-```
-
-## 8. Guardrails
-
-Core guardrails:
-
-- Prefer `/track:*` in user-facing guidance
-- Do not use direct `git add` / `git commit`
-- Do not tell users to run `*-local` tasks directly
-- Keep `track/tech-stack.md` free of blocking `TODO:` before implementation
-- Keep `track/registry.md`, `spec.md`, `plan.md`, and `verification.md` synchronized
-- Keep `cargo make ci`, `cargo make deny`, and `cargo make verify-*` as reproducible final gates (`run --rm`)
-- Before committing code changes, run the `reviewer` capability review cycle
-  (review → fix → review → ... → no findings). Do not commit until the reviewer
-  reports zero findings. The reviewer provider is resolved via `.claude/agent-profiles.json`.
-
-Hook constraint — `block-direct-git-ops` content scanning:
-
-The `block-direct-git-ops.py` hook (via `sotp hook dispatch`) scans the **entire Bash command string**
-for git operation keywords. This blocks commands even when protected keywords appear inside string
-literals, prompt text, or heredocs. To avoid wasted retries:
-
-- **`python3 -c`**: Do not embed code containing git keywords (`add`, `commit`, `push`, `switch`,
-  `checkout`, `merge`, `rebase`, `cherry-pick`, `reset`). Write a `.py` file with the Write tool,
-  then `python3 file.py`.
-- **`codex exec`** / **`gemini -p`**: Do not embed prompts containing git keywords. Write the prompt
-  to a file with the Write tool, then reference the file in the command.
-- **heredoc / `cat >`**: Also scanned. Use the Write tool instead.
-- **Fallback**: When `codex exec` review is blocked, perform inline Claude Code review.
-
-Operational details live in:
-
-- `track/workflow.md`
-- `.claude/docs/WORKFLOW.md`
-- `.claude/settings.json`
-- `.claude/hooks/`
-
-## 9. Key References
-
-- `.claude/docs/WORKFLOW.md`
+詳細:
+- orchestration / delegation: `.claude/rules/08-orchestration.md`
+- maintainer checklist: `.claude/rules/09-maintainer-checklist.md`
+- guardrails: `.claude/rules/10-guardrails.md`
 - `.claude/docs/DESIGN.md`
 - `.claude/agent-profiles.json`
 - `.claude/rules/02-codex-delegation.md`
