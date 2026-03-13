@@ -48,6 +48,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::git::GitCommand,
     },
+    /// Pull-request workflow wrappers.
+    Pr {
+        #[command(subcommand)]
+        cmd: commands::pr::PrCommand,
+    },
     /// File utility operations (atomic write, etc.).
     File {
         #[command(subcommand)]
@@ -66,6 +71,7 @@ fn main() -> ExitCode {
         Some(CliCommand::Hook { cmd }) => commands::hook::execute(cmd),
         Some(CliCommand::Track { cmd }) => commands::track::execute(cmd),
         Some(CliCommand::Git { cmd }) => commands::git::execute(cmd),
+        Some(CliCommand::Pr { cmd }) => commands::pr::execute(cmd),
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
         Some(CliCommand::Demo) | None => run_demo(),
     }

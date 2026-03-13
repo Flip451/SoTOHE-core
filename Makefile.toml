@@ -752,12 +752,12 @@ script = ['"${PYTHON_BIN:-python3}" scripts/pr_review.py run']
 [tasks.track-pr-merge]
 description = "[wrapper] Wait for PR checks to pass, then merge"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/pr_merge.py wait-and-merge ${@}']
+script = ['cargo run --quiet -p cli -- pr wait-and-merge ${@}']
 
 [tasks.track-pr-status]
 description = "[wrapper] Show PR check status"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/pr_merge.py status ${@}']
+script = ['cargo run --quiet -p cli -- pr status ${@}']
 
 [tasks.track-switch-main]
 description = "[wrapper] Switch to main branch and pull latest"
