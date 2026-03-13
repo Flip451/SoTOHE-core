@@ -1,0 +1,17 @@
+## Task Summary: Plan takt removal track
+
+**Track:** takt-removal-2026-03-13
+**Task:** create the planning track and define the takt removal scope
+**Date:** 2026-03-13
+
+### Changes
+
+- track/items/takt-removal-2026-03-13/metadata.json: created the SSoT plan with six tasks covering inventory, workflow rewrite, artifact migration, runtime removal, docs/guardrails, and rollout DoD
+- track/items/takt-removal-2026-03-13/plan.md: rendered the planning view from metadata and included required conventions
+- track/items/takt-removal-2026-03-13/spec.md: defined the takt removal goal, constraints, non-goals, and acceptance criteria
+- track/items/takt-removal-2026-03-13/verification.md: recorded the planning verification scope and review-driven coverage checks
+- track/registry.md: registered the new track as the latest active planned track
+
+### Why
+
+This locks the takt retirement work into a dedicated track before implementation starts. It also makes the hidden workflow dependencies explicit, including `.claude` command/rule surfaces and transient artifact paths that would otherwise break `/track:*` behavior during takt removal.
