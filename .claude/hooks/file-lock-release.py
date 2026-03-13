@@ -4,6 +4,7 @@ PostToolUse hook: Release file lock after Edit/Write/Read tool executions.
 
 Thin launcher — delegates to `sotp hook dispatch file-lock-release`.
 PostToolUse: cannot block (exit 0 on any error, warning to stderr).
+Deprecated launcher retained for rollback while settings.json calls `sotp` directly.
 
 Controlled by SOTP_LOCK_ENABLED env var (default: disabled).
 """

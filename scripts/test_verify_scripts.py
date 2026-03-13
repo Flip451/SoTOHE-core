@@ -2113,6 +2113,42 @@ class VerifyScriptsTest(unittest.TestCase):
         )
         self.assertIn("verify_orchestra_guardrails FAILED", result.stdout)
 
+    def test_verify_orchestra_guardrails_rejects_missing_direct_hook_dispatch_commands(
+        self,
+    ) -> None:
+        replacements = {
+            "block-direct-git-ops": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-direct-git-ops.py\"",
+            "file-lock-acquire": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/file-lock-acquire.py\"",
+            "file-lock-release": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/file-lock-release.py\"",
+        }
+
+        for hook_name, replacement in replacements.items():
+            with self.subTest(hook=hook_name):
+                def setup(
+                    root: Path,
+                    hook_name: str = hook_name,
+                    replacement: str = replacement,
+                ) -> None:
+                    self.setup_verify_orchestra_fixture(root, minified=True)
+                    settings_path = root / ".claude" / "settings.json"
+                    settings = json.loads(settings_path.read_text(encoding="utf-8"))
+                    for bindings in settings["hooks"].values():
+                        for binding in bindings:
+                            for hook in binding.get("hooks", []):
+                                command = hook.get("command")
+                                if isinstance(command, str) and hook_name in command:
+                                    hook["command"] = replacement
+                    settings_path.write_text(
+                        json.dumps(settings, separators=(",", ":")) + "\n",
+                        encoding="utf-8",
+                    )
+
+                result = self.run_python_script("verify_orchestra_guardrails.py", setup)
+
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("Missing in .claude/settings.json:", result.stdout)
+                self.assertIn("verify_orchestra_guardrails FAILED", result.stdout)
+
     def test_verify_orchestra_guardrails_rejects_missing_cache_deny_entry(self) -> None:
         def setup(root: Path) -> None:
             self.setup_verify_orchestra_fixture(root, minified=True)
