@@ -7,15 +7,15 @@
 
 ## Current Focus
 
-- Latest active track: `subagent-model-config-2026-03-13`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-13`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| subagent-model-config-2026-03-13 | planned | `/track:implement` | 2026-03-13 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
