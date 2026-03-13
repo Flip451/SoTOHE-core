@@ -32,7 +32,7 @@ Specialist capability の実体は `.claude/agent-profiles.json` で決まる。
 8. **品質ゲート**: `cargo make ci` を通す
 9. **コミット**: `/track:commit <message>` を使う
 
-`metadata.json` SSoT のタスク状態遷移や takt 実行との対応は
+`metadata.json` SSoT のタスク状態遷移や workflow traceability は
 `TAKT_TRACK_TRACEABILITY.md` を参照する。
 
 `track/registry.md` の更新タイミングも `TAKT_TRACK_TRACEABILITY.md` に従う。
@@ -170,28 +170,12 @@ graph TD
     D[Infra Layer] --> C
 ```
 
-## Integration with takt
+## Legacy Runtime Compatibility
 
-```bash
-cargo make takt-full-cycle "task summary"   # 自動フルサイクル
-cargo make takt-spec-to-impl "task summary" # 仕様→実装
-cargo make takt-impl-review "review scope"  # 実装→レビュー
-cargo make takt-tdd-cycle "target scope"    # TDDサイクル（単一機能）
-cargo make takt-render-personas             # active profile から runtime persona を再生成
-
-# もしくはキュー運用
-cargo make takt-add "task summary"
-cargo make takt-run
-```
-
-`cargo make takt-*` は active profile を使って runtime persona と host/provider を自動適用する。
-profile-aware な `takt` 実行の正式導線は wrapper のみとする。
-
-Queue 運用の最短手順:
-
-1. `cargo make takt-add "task summary"`
-2. `cargo make takt-run`
-3. queue に複数 profile snapshot が混在していたら、整理してから再実行する
+残存している `takt-*` wrapper、`.takt/**` runtime asset、`.takt/pending-*` scratch file は
+廃止トラックの migration compatibility surface としてのみ扱う。
+通常の `/track:*` workflow、PR lifecycle、git note traceability はそれらに依存しない。
+削除順序は `track/items/takt-removal-2026-03-13/takt-runtime-removal-sequence.md` を参照する。
 
 ## Branch Strategy (Branch-per-Track モデル)
 

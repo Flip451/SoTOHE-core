@@ -608,10 +608,6 @@ EXTERNAL_GUIDES_COMMAND_TRIGGERS = [
     "/track:implement",
     "/track:review",
     "/track:full-cycle",
-    "cargo make takt-full-cycle",
-    "cargo make takt-spec-to-impl",
-    "cargo make takt-impl-review",
-    "cargo make takt-tdd-cycle",
 ]
 CAPABILITY_DESCRIPTIONS = {
     "planner": "planning, design, ownership/lifetime analysis, and architecture decisions",

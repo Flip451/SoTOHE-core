@@ -161,8 +161,8 @@ class AgentRouterTest(unittest.TestCase):
         self.assertNotIn("takt-full-cycle", message)
         self.assertIn("track-pr-review", message)
 
-    def test_takt_command_still_triggers_external_guides_during_migration(self) -> None:
-        self.assertTrue(
+    def test_takt_command_no_longer_triggers_external_guides(self) -> None:
+        self.assertFalse(
             agent_router.should_inject_external_guides(
                 'cargo make takt-full-cycle "postgres refactor"'
             )

@@ -49,10 +49,6 @@ cargo make track-branch-create    # main からトラックブランチを作成
 cargo make track-branch-switch    # 既存トラックブランチに切替
 cargo make scripts-selftest       # verify / helper スクリプトの回帰テスト
 cargo make hooks-selftest         # Claude hook Python セルフテスト
-cargo make takt-full-cycle "<task>"    # full-cycle piece を直接実行（ガードレール付き）
-cargo make takt-spec-to-impl "<task>"  # spec-to-impl piece を直接実行
-cargo make takt-impl-review "<task>"   # impl-review piece を直接実行
-cargo make takt-tdd-cycle "<task>"     # tdd-cycle piece を直接実行
 cargo make help                   # カテゴリ付きタスク一覧表示
 cargo make shell                  # tools コンテナ内でシェルを開く
 cargo make check                  # cargo check（docker compose 経由）

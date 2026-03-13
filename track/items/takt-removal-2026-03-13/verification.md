@@ -15,6 +15,9 @@
 - [x] `/track:commit` and `track/workflow.md` now describe generated `tmp/track-commit/note.md` as the normal git-note path rather than preferring `.takt/pending-note.md`
 - [x] Rust/Python guarded git helper tests use `tmp/track-commit/*` as the happy path while preserving one legacy `.takt/pending-note.md` compatibility case
 - [x] `takt-runtime-removal-sequence.md` fixes deletion phases for `takt-*` wrappers, `.takt/**` runtime assets, `scripts/takt_profile.py`, and the related test/CI fallout
+- [x] `.claude/settings.json` and `verify_orchestra_guardrails.py` no longer treat `takt-*` wrappers or `.cache/takt-uv/**` as baseline guardrail surfaces
+- [x] `.claude/agent-profiles.json` now uses `workflow_host_provider` / `workflow_host_model` as the canonical host schema, while hooks keep `takt_host_*` as migration compatibility aliases
+- [x] public docs and traceability rules now describe `takt-*` and `.takt/pending-*` as legacy migration compatibility only, not as the normal execution path
 
 ## Manual Verification Steps
 
@@ -45,11 +48,10 @@ Pass
 
 This is a planning track only; no code, docs, or workflow behavior has been removed yet.
 The repo still contains `takt` wrappers, `.takt/` runtime assets, and traceability rules that assume takt-generated pending files.
-The repo also still contains command docs, rule docs, agent routing/profile helpers, and guarded git transient-path logic that directly mention or depend on takt, and those are now explicitly in scope for removal planning.
+The repo still contains residual `takt` wrappers, `.takt/**` runtime assets, and legacy queue/profile tests because T004 only fixed the deletion order, not the removal itself.
 T001 fixes inventory scope only; no runtime/doc/guardrail deletion has started yet.
-`track/workflow.md`, `.claude/rules/**`, profile schema, and guardrail verifier/tests still contain `takt` references and are intentionally deferred to later tasks in this track.
 Legacy `.takt/pending-*` and `.takt/handoffs` compatibility paths still exist by design until T004 removes the remaining wrappers and runtime assets.
-The runtime/wrapper removal plan is fixed, but the actual deletion is intentionally deferred to the next implementation slice so guardrails, profile schema, and CI can move in lockstep.
+The runtime/wrapper removal plan is fixed, but the actual deletion is intentionally deferred to the next implementation slice so Makefile tasks, `.takt/**`, and their Python/runtime tests can move in lockstep.
 
 ## Progress Notes
 
@@ -67,6 +69,11 @@ The runtime/wrapper removal plan is fixed, but the actual deletion is intentiona
 - Added `takt-runtime-removal-sequence.md` to lock the removal order for `TAKT_PYTHON`, `takt-*` wrappers, `.takt/pieces/**`, `.takt/personas/**`, queue assets, and the corresponding `test_takt_*` suites.
 - The removal plan now separates four phases: doc/rule cleanup, runtime execution deletion, failure-report delete-or-generalize, and CI/test cleanup.
 - Latest verification for T004 planning slice: read `Makefile.toml`, `scripts/takt_profile.py`, and the current wrapper/test inventory, then ran `cargo run --quiet -p cli -- track views validate --project-root .`.
+- T005 removed baseline `takt-*` permissions and `.cache/takt-uv/**` deny rules from `.claude/settings.json`, then aligned `scripts/verify_orchestra_guardrails.py` and its selftests with the new baseline.
+- T005 changed `.claude/agent-profiles.json` to canonical `workflow_host_provider` / `workflow_host_model` keys, while `.claude/hooks/_agent_profiles.py` now accepts legacy `takt_host_*` keys as compatibility aliases for the remaining migration-era runtime.
+- T005 narrowed `.claude/hooks/agent-router.py` so external-guide injection is keyed to `/track:*` commands only, and updated the related hook regression tests.
+- T005 rewrote `LOCAL_DEVELOPMENT.md`, `DEVELOPER_AI_WORKFLOW.md`, `track/workflow.md`, `TAKT_TRACK_TRACEABILITY.md`, `.claude/rules/07-dev-environment.md`, and `.claude/commands/track/commit.md` so `takt` is documented as legacy compatibility rather than the normal execution layer.
+- Latest verification for T005 implementation: `python3 -m pytest -q .claude/hooks/test_agent_profiles.py .claude/hooks/test_agent_router.py scripts/test_verify_scripts.py scripts/test_takt_profile.py`, `cargo run --quiet -p cli -- track views validate --project-root .`, and `cargo make ci` passed on the final uncommitted diff.
 
 ## Verified At
 

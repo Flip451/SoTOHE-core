@@ -9,10 +9,8 @@ Read `START_HERE_HUMAN.md` first if you are new to this repository.
 - Python 3.11+ is required on the host machine.
 - host-side Python package management should use `uv`.
 - `.tool-versions` は `python 3.12.8` を pin しており、asdf 利用時は `python3` 解決に使われる。
-- `takt-*` をホストで使う場合は `uv venv .venv && uv pip install --python .venv/bin/python -r requirements-python.txt` で Python 依存を入れておく。
-- `takt-*` を `.venv` で実行する時は `PYTHON_BIN=.venv/bin/python cargo make takt-run` のように interpreter を明示する。
 - Docker compose 実行は `HOST_UID` / `HOST_GID` を使ってホスト user に寄せる。Linux で uid/gid が `1000:1000` 以外なら `export HOST_UID=$(id -u) HOST_GID=$(id -g)` を shell profile に入れる。
-- `guides-*` / `conventions-*` / `architecture-rules-*` / `takt-failure-report` / `takt-*` は `cargo make` wrapper で内部的に `python3` を実行する。
+- `guides-*` / `conventions-*` / `architecture-rules-*` などの Python helper は `cargo make` wrapper で内部的に `python3` を実行する。
 - ホスト側の検証スクリプト（`scripts/check_layers.py`, `scripts/verify_architecture_docs.py`, `scripts/verify_track_metadata.py`, `scripts/verify_latest_track_files.py`）と `cargo make --allow-private verify-orchestra-local` は `PYTHON_BIN=/path/to/python3.12 ...` で上書きできる。
 - Python test は Docker 経由で実行する（`cargo make guides-selftest`, `cargo make scripts-selftest`, `cargo make hooks-selftest`）。
 - `*-local` タスクは内部専用（private）で、直接実行しない。
@@ -89,20 +87,12 @@ cargo make tools-down
 - External guide setup flow: `cargo make guides-setup`
 - External guide registry: `cargo make guides-list`
 - Fetch one external guide locally: `cargo make guides-fetch <guide-id>`
-- Run takt full-cycle directly: `cargo make takt-full-cycle "task summary"`
-- Queue a takt task interactively: `cargo make takt-add "task summary"` then `cargo make takt-run`
-- Re-render takt runtime personas after profile changes: `cargo make takt-render-personas`
+- Push the active track branch: `cargo make track-pr-push`
+- Create or reuse the active track PR: `cargo make track-pr-ensure`
+- Run the PR review helper: `cargo make track-pr-review`
 
 外部長文ガイドの運用ルールは `docs/EXTERNAL_GUIDES.md` を参照する。
-takt wrapper (`cargo make takt-*`) は active profile を使って runtime persona と host/provider を自動適用する。
-profile-aware な `takt` 実行の正式導線は wrapper のみとし、direct `takt` は補助用途に限る。
-`takt-*` の host 実行では `requirements-python.txt` の PyYAML が必要になる。導入は `uv` を使う。wrapper は `PYTHON_BIN` を最優先し、未指定なら `.venv/bin/python`、最後に `python3` を使う。
-
-Queue 運用の最短手順:
-
-1. `cargo make takt-add "task summary"`
-2. `cargo make takt-run`
-3. pending task に複数 profile snapshot が混在していたら、queue を整理してから再実行する
+`.claude/agent-profiles.json` の `workflow_host_provider` / `workflow_host_model` は、残存 migration compatibility surface が消えるまで host-side workflow provider を表す設定である。
 
 ## Git Notes (Optional)
 

@@ -24,9 +24,22 @@ REQUIRED_CAPABILITIES = (
     "multimodal_reader",
 )
 ORCHESTRATOR_PROVIDER = "claude"
-TAKT_HOST_PROVIDER_KEY = "takt_host_provider"
-TAKT_HOST_MODEL_KEY = "takt_host_model"
-TAKT_SUPPORTED_HOST_PROVIDERS = ("claude", "codex")
+WORKFLOW_HOST_PROVIDER_KEY = "workflow_host_provider"
+WORKFLOW_HOST_MODEL_KEY = "workflow_host_model"
+LEGACY_TAKT_HOST_PROVIDER_KEY = "takt_host_provider"
+LEGACY_TAKT_HOST_MODEL_KEY = "takt_host_model"
+WORKFLOW_HOST_PROVIDER_ALIASES = (
+    WORKFLOW_HOST_PROVIDER_KEY,
+    LEGACY_TAKT_HOST_PROVIDER_KEY,
+)
+WORKFLOW_HOST_MODEL_ALIASES = (
+    WORKFLOW_HOST_MODEL_KEY,
+    LEGACY_TAKT_HOST_MODEL_KEY,
+)
+SUPPORTED_WORKFLOW_HOST_PROVIDERS = ("claude", "codex")
+TAKT_HOST_PROVIDER_KEY = LEGACY_TAKT_HOST_PROVIDER_KEY
+TAKT_HOST_MODEL_KEY = LEGACY_TAKT_HOST_MODEL_KEY
+TAKT_SUPPORTED_HOST_PROVIDERS = SUPPORTED_WORKFLOW_HOST_PROVIDERS
 PLACEHOLDER_KEYS = ("task", "path", "model")
 
 
@@ -332,27 +345,31 @@ def validate_profiles(profiles: dict[str, Any]) -> None:
                         f"provider_model_overrides in profile)"
                     )
 
-        takt_host_provider_name = mapping.get(TAKT_HOST_PROVIDER_KEY)
+        takt_host_provider_name = _profile_string_value(
+            mapping, WORKFLOW_HOST_PROVIDER_ALIASES
+        )
         if not isinstance(takt_host_provider_name, str) or not takt_host_provider_name:
             raise AgentProfilesError(
-                f"Profile '{profile_name}' must define a non-empty {TAKT_HOST_PROVIDER_KEY}"
+                f"Profile '{profile_name}' must define a non-empty "
+                f"{WORKFLOW_HOST_PROVIDER_KEY}"
             )
-        if takt_host_provider_name not in TAKT_SUPPORTED_HOST_PROVIDERS:
-            supported_hosts = ", ".join(TAKT_SUPPORTED_HOST_PROVIDERS)
+        if takt_host_provider_name not in SUPPORTED_WORKFLOW_HOST_PROVIDERS:
+            supported_hosts = ", ".join(SUPPORTED_WORKFLOW_HOST_PROVIDERS)
             raise AgentProfilesError(
-                f"Profile '{profile_name}' {TAKT_HOST_PROVIDER_KEY} must be one of: "
+                f"Profile '{profile_name}' {WORKFLOW_HOST_PROVIDER_KEY} must be one of: "
                 f"{supported_hosts}"
             )
         if takt_host_provider_name not in providers:
             raise AgentProfilesError(
-                f"Profile '{profile_name}' {TAKT_HOST_PROVIDER_KEY} references unknown provider "
+                f"Profile '{profile_name}' {WORKFLOW_HOST_PROVIDER_KEY} references unknown provider "
                 f"'{takt_host_provider_name}'"
             )
 
-        takt_host_model = mapping.get(TAKT_HOST_MODEL_KEY)
+        takt_host_model = _profile_string_value(mapping, WORKFLOW_HOST_MODEL_ALIASES)
         if not isinstance(takt_host_model, str) or not takt_host_model.strip():
             raise AgentProfilesError(
-                f"Profile '{profile_name}' must define a non-empty {TAKT_HOST_MODEL_KEY}"
+                f"Profile '{profile_name}' must define a non-empty "
+                f"{WORKFLOW_HOST_MODEL_KEY}"
             )
 
         model_overrides = mapping.get("provider_model_overrides")
@@ -533,29 +550,66 @@ def profile_value(
     return value
 
 
+def _profile_string_value(mapping: dict[str, Any], keys: tuple[str, ...]) -> str | None:
+    for key in keys:
+        value = mapping.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return None
+
+
+def workflow_host_provider(
+    profiles: dict[str, Any] | None = None, path: str | Path | None = None
+) -> str:
+    profile = active_profile(profiles=profiles, path=path)
+    provider_name = _profile_string_value(profile, WORKFLOW_HOST_PROVIDER_ALIASES)
+    if provider_name is None:
+        raise AgentProfilesError(
+            f"Profile key '{WORKFLOW_HOST_PROVIDER_KEY}' is not configured in the active profile"
+        )
+    if provider_name not in SUPPORTED_WORKFLOW_HOST_PROVIDERS:
+        supported_hosts = ", ".join(SUPPORTED_WORKFLOW_HOST_PROVIDERS)
+        raise AgentProfilesError(
+            f"Active profile {WORKFLOW_HOST_PROVIDER_KEY} must be one of: {supported_hosts}"
+        )
+    return provider_name
+
+
+def workflow_host_model(
+    profiles: dict[str, Any] | None = None, path: str | Path | None = None
+) -> str:
+    profile = active_profile(profiles=profiles, path=path)
+    model = _profile_string_value(profile, WORKFLOW_HOST_MODEL_ALIASES)
+    if model is None:
+        raise AgentProfilesError(
+            f"Profile key '{WORKFLOW_HOST_MODEL_KEY}' is not configured in the active profile"
+        )
+    return model
+
+
+def workflow_host_label(
+    profiles: dict[str, Any] | None = None, path: str | Path | None = None
+) -> str:
+    provider_name = workflow_host_provider(profiles=profiles, path=path)
+    return provider_label_for_name(provider_name, profiles=profiles, path=path)
+
+
 def takt_host_provider(
     profiles: dict[str, Any] | None = None, path: str | Path | None = None
 ) -> str:
-    provider_name = profile_value(TAKT_HOST_PROVIDER_KEY, profiles=profiles, path=path)
-    if provider_name not in TAKT_SUPPORTED_HOST_PROVIDERS:
-        supported_hosts = ", ".join(TAKT_SUPPORTED_HOST_PROVIDERS)
-        raise AgentProfilesError(
-            f"Active profile {TAKT_HOST_PROVIDER_KEY} must be one of: {supported_hosts}"
-        )
-    return provider_name
+    return workflow_host_provider(profiles=profiles, path=path)
 
 
 def takt_host_model(
     profiles: dict[str, Any] | None = None, path: str | Path | None = None
 ) -> str:
-    return profile_value(TAKT_HOST_MODEL_KEY, profiles=profiles, path=path)
+    return workflow_host_model(profiles=profiles, path=path)
 
 
 def takt_host_label(
     profiles: dict[str, Any] | None = None, path: str | Path | None = None
 ) -> str:
-    provider_name = takt_host_provider(profiles=profiles, path=path)
-    return provider_label_for_name(provider_name, profiles=profiles, path=path)
+    return workflow_host_label(profiles=profiles, path=path)
 
 
 def provider_command_prefixes(
