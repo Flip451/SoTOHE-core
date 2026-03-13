@@ -296,6 +296,24 @@ class MakeWrappersTest(unittest.TestCase):
         )
         self.assertNotIn("verify_orchestra_guardrails.sh", task_body)
 
+    def test_track_transition_wrapper_preserves_track_dir_contract(self) -> None:
+        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
+        task_header = "[tasks.track-transition]"
+        task_start = makefile.index(task_header)
+        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+        task_body = (
+            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
+        )
+
+        self.assertIn('TRACK_DIR="${1:-}"', task_body)
+        self.assertIn('TRACK_ITEMS_DIR="$(dirname "$TRACK_DIR")"', task_body)
+        self.assertIn('TRACK_ID="$(basename "$TRACK_DIR")"', task_body)
+        self.assertIn('--items-dir "$TRACK_ITEMS_DIR"', task_body)
+        self.assertIn(
+            'usage: cargo make track-transition <track_dir> <task_id> <status> [--commit-hash <hash>]',
+            task_body,
+        )
+
     def test_verify_orchestra_local_honors_python_bin_override(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
