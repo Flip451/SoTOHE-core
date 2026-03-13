@@ -1,0 +1,16 @@
+## Task Summary: Define takt runtime removal sequence
+
+**Track:** takt-removal-2026-03-13
+**Task:** `takt-*` wrapper、`.takt/` runtime asset、`scripts/takt_profile.py` とそのテスト群を廃止または置換する差分の削除順序と互換境界を定義する
+**Date:** 2026-03-13
+
+### Changes
+
+- `track/items/takt-removal-2026-03-13/takt-runtime-removal-sequence.md`: fixed the phased deletion order for `TAKT_PYTHON`, `takt-*` wrappers, `.takt/**` runtime assets, failure-report handling, and CI/test cleanup.
+- `track/items/takt-removal-2026-03-13/metadata.json`: marked T004 done and refreshed the track update timestamp.
+- `track/items/takt-removal-2026-03-13/plan.md`: rendered the runtime-removal design task as complete in the read-only plan view.
+- `track/items/takt-removal-2026-03-13/verification.md`: recorded the removal-sequence artifact, its verification step, and the defer-to-next-slice boundary.
+
+### Why
+
+The takt-removal track needed a fixed deletion order before touching wrappers, runtime assets, and CI expectations. Locking the runtime-removal sequence now lets the next slice update guardrails, docs, profile schema, and actual deletions without re-deciding the compatibility boundary each time.
