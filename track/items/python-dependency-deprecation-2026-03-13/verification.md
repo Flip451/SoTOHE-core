@@ -10,6 +10,7 @@
 - [x] `cargo make track-sync-views` no longer depends on Python
 - [x] `cargo make track-transition` no longer depends on Python and post-syncs rendered views
 - [x] track validation gates now execute via Rust CLI instead of Python verify wrappers
+- [x] local git workflow wrappers (`add-paths`, `commit-from-file`, `note-from-file`, `switch-main`) are moved from Python wrappers to Rust CLI
 
 ## Manual Verification Steps
 
@@ -42,6 +43,16 @@ Legacy archive generated views with relaxed schema fields are now normalized by 
 - Verified that `sotp track transition` now treats rendered view sync as warning-only after persistence, so callers are not told the transition failed after `metadata.json` was already updated.
 - Latest review evidence: `timeout 600 codex exec --model gpt-5.4 --sandbox read-only --full-auto ...` returned `No findings`.
 - Latest CI evidence: `cargo make ci` passed on the final uncommitted diff.
+- Current `/track:review` loop for T004 found and fixed two issues before re-verification: repo-root resolution for nested `cwd` calls, and unresolved relative `track-dir.txt` entries weakening branch-guard validation.
+- Added nested-`cwd` Rust tests for `add-all`, `add-from-file`, `commit-from-file`, `note-from-file`, `switch-and-pull`, and `track-dir.txt` resolution to cover the new `sotp git` surface.
+- Latest focused test evidence: `cargo test -p cli git -- --nocapture` passed with 10 tests after the fixes.
+- Latest CI evidence for T004: `cargo make ci` passed after the branch-guard and coverage fixes.
+
+## In Progress
+
+- Added `sotp git` subcommands for `add-all`, `add-from-file`, `commit-from-file`, `note-from-file`, and `switch-and-pull`.
+- Switched the local git-oriented cargo-make wrappers away from `scripts/git_ops.py` / `scripts/branch_switch.py` to Rust CLI entry points.
+- Added wrapper assertions in `scripts/test_make_wrappers.py` and Rust unit coverage for stage path list validation.
 
 ## Verified At
 
