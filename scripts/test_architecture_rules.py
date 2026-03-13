@@ -379,144 +379,107 @@ class ArchitectureRulesTest(unittest.TestCase):
 
             self.assertEqual(architecture_rules.verify_sync(root), [])
 
-    def test_claude_workspace_map_paths_extract_workspace_members_from_tree(
-        self,
-    ) -> None:
-        claude_text = "\n".join(
-            [
-                "## 7. Workspace Map",
-                "",
-                "```text",
-                "Cargo.toml",
-                "apps/",
-                "├── api/",
-                "│   └── src/",
-                "└── server/",
-                "libs/",
-                "├── domain/",
-                "├── usecase/",
-                "└── infrastructure/",
-                "track/",
-                "└── items/<id>/",
-                "```",
-            ]
-        )
+    def test_extra_dirs_accepts_optional_entries(self) -> None:
+        rules = {
+            "version": 1,
+            "layers": [
+                {
+                    "crate": "domain",
+                    "path": "libs/domain",
+                    "may_depend_on": [],
+                    "deny_reason": "domain",
+                }
+            ],
+            "extra_dirs": [
+                {"path": "track", "label": "workflow state"},
+                {"path": "track/items/<id>"},
+            ],
+        }
 
         self.assertEqual(
-            architecture_rules.claude_workspace_map_paths(claude_text),
-            {
-                "apps",
-                "apps/api",
-                "apps/api/src",
-                "apps/server",
-                "libs",
-                "libs/domain",
-                "libs/usecase",
-                "libs/infrastructure",
-                "track",
-                "track/items/<id>",
-            },
+            architecture_rules.extra_dirs(rules),
+            [
+                {"path": "track", "label": "workflow state"},
+                {"path": "track/items/<id>", "label": ""},
+            ],
         )
 
-    def test_verify_claude_workspace_map_accepts_matching_tree(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            root = Path(tmp_dir)
-            docs_dir = root / "docs"
-            docs_dir.mkdir(parents=True, exist_ok=True)
-            (docs_dir / "architecture-rules.json").write_text(
-                json.dumps(
-                    {
-                        "version": 1,
-                        "layers": [
-                            {
-                                "crate": "domain",
-                                "path": "libs/domain",
-                                "may_depend_on": [],
-                                "deny_reason": "domain",
-                            },
-                            {
-                                "crate": "api",
-                                "path": "apps/api",
-                                "may_depend_on": ["domain"],
-                                "deny_reason": "",
-                            },
-                        ],
-                    },
-                    ensure_ascii=False,
-                    indent=2,
-                )
-                + "\n",
-                encoding="utf-8",
-            )
-            (root / "CLAUDE.md").write_text(
-                "\n".join(
-                    [
-                        "## 7. Workspace Map",
-                        "",
-                        "```text",
-                        "apps/",
-                        "└── api/",
-                        "libs/",
-                        "└── domain/",
-                        "```",
-                    ]
-                )
-                + "\n",
-                encoding="utf-8",
-            )
+    def test_extra_dirs_rejects_duplicate_layer_path(self) -> None:
+        rules = {
+            "version": 1,
+            "layers": [
+                {
+                    "crate": "cli",
+                    "path": "apps/cli",
+                    "may_depend_on": [],
+                    "deny_reason": "",
+                }
+            ],
+            "extra_dirs": [{"path": "apps/cli", "label": "duplicate"}],
+        }
 
-            self.assertEqual(architecture_rules.verify_claude_workspace_map(root), [])
+        with self.assertRaisesRegex(ValueError, "duplicates layer path"):
+            architecture_rules.extra_dirs(rules)
 
-    def test_verify_claude_workspace_map_reports_missing_workspace_member(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            root = Path(tmp_dir)
-            docs_dir = root / "docs"
-            docs_dir.mkdir(parents=True, exist_ok=True)
-            (docs_dir / "architecture-rules.json").write_text(
-                json.dumps(
-                    {
-                        "version": 1,
-                        "layers": [
-                            {
-                                "crate": "domain",
-                                "path": "libs/domain",
-                                "may_depend_on": [],
-                                "deny_reason": "domain",
-                            },
-                            {
-                                "crate": "api",
-                                "path": "apps/api",
-                                "may_depend_on": ["domain"],
-                                "deny_reason": "",
-                            },
-                        ],
-                    },
-                    ensure_ascii=False,
-                    indent=2,
-                )
-                + "\n",
-                encoding="utf-8",
-            )
-            (root / "CLAUDE.md").write_text(
-                "\n".join(
-                    [
-                        "## 7. Workspace Map",
-                        "",
-                        "```text",
-                        "libs/",
-                        "└── domain/",
-                        "```",
-                    ]
-                )
-                + "\n",
-                encoding="utf-8",
-            )
+    def test_render_workspace_tree_renders_crates_only_by_default(self) -> None:
+        rules = {
+            "version": 1,
+            "layers": [
+                {
+                    "crate": "domain",
+                    "path": "libs/domain",
+                    "may_depend_on": [],
+                    "deny_reason": "domain layer",
+                },
+                {
+                    "crate": "api",
+                    "path": "apps/api",
+                    "may_depend_on": ["domain"],
+                    "deny_reason": "",
+                },
+            ],
+        }
 
-            errors = architecture_rules.verify_claude_workspace_map(root)
+        rendered = architecture_rules.render_workspace_tree(
+            rules, include_extra_dirs=False
+        )
 
-        self.assertEqual(len(errors), 1)
-        self.assertIn("Workspace Map is missing workspace members", errors[0])
-        self.assertIn("apps/api", errors[0])
+        self.assertIn("Cargo.toml", rendered)
+        self.assertIn("apps/", rendered)
+        self.assertIn("└── api/", rendered)
+        self.assertIn("libs/", rendered)
+        self.assertIn("# domain crate", rendered)
+        self.assertIn("# api crate", rendered)
+        self.assertNotIn("track/", rendered)
+
+    def test_render_workspace_tree_full_includes_extra_dirs(self) -> None:
+        rules = {
+            "version": 1,
+            "layers": [
+                {
+                    "crate": "domain",
+                    "path": "libs/domain",
+                    "may_depend_on": [],
+                    "deny_reason": "domain layer",
+                }
+            ],
+            "extra_dirs": [
+                {"path": "project-docs/conventions", "label": "project rules"},
+                {"path": "track/items/<id>", "label": "active track"},
+            ],
+        }
+
+        rendered = architecture_rules.render_workspace_tree(
+            rules, include_extra_dirs=True
+        )
+
+        self.assertIn("project-docs/", rendered)
+        self.assertIn("└── conventions/", rendered)
+        self.assertIn("# domain crate", rendered)
+        self.assertIn("# project rules", rendered)
+        self.assertIn("track/", rendered)
+        self.assertIn("└── items/", rendered)
+        self.assertIn("└── <id>/", rendered)
 
     def test_parse_deny_rules_accepts_reordered_fields(self) -> None:
         deny_text = "\n".join(

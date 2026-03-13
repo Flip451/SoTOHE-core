@@ -146,32 +146,8 @@ class VerifyScriptsTest(unittest.TestCase):
                 check=False,
             )
 
-    def claude_workspace_map_fixture(self) -> str:
-        return (
-            "\n".join(
-                [
-                    "project-docs/conventions/",
-                    "",
-                    "## 7. Workspace Map",
-                    "",
-                    "```text",
-                    "Cargo.toml",
-                    "apps/",
-                    "├── api/",
-                    "└── server/",
-                    "libs/",
-                    "├── domain/",
-                    "├── usecase/",
-                    "└── infrastructure/",
-                    "project-docs/",
-                    "└── conventions/",
-                    "track/",
-                    "└── items/<id>/",
-                    "```",
-                ]
-            )
-            + "\n"
-        )
+    def claude_fixture(self) -> str:
+        return "project-docs/conventions/\n"
 
     def setup_verify_orchestra_fixture(
         self, root: Path, *, minified: bool = False
@@ -323,7 +299,7 @@ class VerifyScriptsTest(unittest.TestCase):
             encoding="utf-8",
         )
         (root / "CLAUDE.md").write_text(
-            self.claude_workspace_map_fixture(), encoding="utf-8"
+            self.claude_fixture(), encoding="utf-8"
         )
         (root / ".codex").mkdir(parents=True, exist_ok=True)
         (root / ".codex" / "instructions.md").write_text(
@@ -1883,26 +1859,6 @@ class VerifyScriptsTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 1)
         self.assertIn("deny.toml layer policy mismatch", result.stdout + result.stderr)
-        self.assertIn("verify_architecture_docs FAILED", result.stdout)
-
-    def test_verify_architecture_docs_rejects_missing_claude_workspace_member(
-        self,
-    ) -> None:
-        def setup(root: Path) -> None:
-            self.setup_verify_architecture_docs_fixture(root)
-            claude_path = root / "CLAUDE.md"
-            claude_path.write_text(
-                claude_path.read_text(encoding="utf-8").replace("└── server/\n", ""),
-                encoding="utf-8",
-            )
-
-        result = self.run_python_script("verify_architecture_docs.py", setup)
-
-        self.assertEqual(result.returncode, 1)
-        self.assertIn(
-            "Workspace Map is missing workspace members", result.stdout + result.stderr
-        )
-        self.assertIn("apps/server", result.stdout + result.stderr)
         self.assertIn("verify_architecture_docs FAILED", result.stdout)
 
     def test_verify_architecture_docs_accepts_fully_bootstrapped_conventions(
