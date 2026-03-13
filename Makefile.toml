@@ -717,12 +717,12 @@ args = ["add", "${@}"]
 [tasks.add-all]
 description = "[wrapper] Stage all worktree changes except transient .takt pending files"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py add-all']
+script = ['cargo run --quiet -p cli -- git add-all']
 
 [tasks.add-pending-paths]
 description = "[wrapper] Stage paths listed in .takt/pending-add-paths.txt and delete the pending file"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py add-from-file .takt/pending-add-paths.txt --cleanup']
+script = ['cargo run --quiet -p cli -- git add-from-file .takt/pending-add-paths.txt --cleanup']
 
 [tasks.track-branch-create]
 description = "[wrapper] Create a track branch from main and switch to it (usage: cargo make track-branch-create '<track-id>')"
@@ -762,12 +762,12 @@ script = ['"${PYTHON_BIN:-python3}" scripts/pr_merge.py status ${@}']
 [tasks.track-switch-main]
 description = "[wrapper] Switch to main branch and pull latest"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/branch_switch.py switch-and-pull main']
+script = ['cargo run --quiet -p cli -- git switch-and-pull main']
 
 [tasks.track-add-paths]
 description = "[wrapper] Stage paths listed in tmp/track-commit/add-paths.txt and delete the scratch file"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py add-from-file tmp/track-commit/add-paths.txt --cleanup']
+script = ['cargo run --quiet -p cli -- git add-from-file tmp/track-commit/add-paths.txt --cleanup']
 
 [tasks.commit]
 description = "[gate] Run CI then commit"
@@ -779,13 +779,13 @@ script = ['git commit -m "$CARGO_MAKE_TASK_ARGS"']
 description = "[wrapper] Run CI then commit using .takt/pending-commit-message.txt"
 dependencies = ["ci"]
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py commit-from-file .takt/pending-commit-message.txt --cleanup']
+script = ['cargo run --quiet -p cli -- git commit-from-file .takt/pending-commit-message.txt --cleanup']
 
 [tasks.track-commit-message]
 description = "[wrapper] Run CI then commit using tmp/track-commit/commit-message.txt"
 dependencies = ["ci"]
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py commit-from-file tmp/track-commit/commit-message.txt --cleanup']
+script = ['cargo run --quiet -p cli -- git commit-from-file tmp/track-commit/commit-message.txt --cleanup']
 
 [tasks.note]
 description = "[git] Attach a git note to HEAD (usage: cargo make note '<note text>')"
@@ -795,12 +795,12 @@ script = ['git notes add -f -m "$CARGO_MAKE_TASK_ARGS" HEAD']
 [tasks.note-pending]
 description = "[wrapper] Attach a git note from .takt/pending-note.md and delete the pending file"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py note-from-file .takt/pending-note.md --cleanup']
+script = ['cargo run --quiet -p cli -- git note-from-file .takt/pending-note.md --cleanup']
 
 [tasks.track-note]
 description = "[wrapper] Attach a git note from tmp/track-commit/note.md and delete the scratch file"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py note-from-file tmp/track-commit/note.md --cleanup']
+script = ['cargo run --quiet -p cli -- git note-from-file tmp/track-commit/note.md --cleanup']
 
 [tasks.track-transition]
 description = "[wrapper] Transition a task status and sync rendered views"
