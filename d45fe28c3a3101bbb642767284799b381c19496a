@@ -1,0 +1,17 @@
+## Task Summary: Define takt removal rollout completion gates
+
+**Track:** takt-removal-2026-03-13
+**Task:** takt 廃止後の Definition of Done を固定し、cargo make ci、PR workflow、/track:commit、/track:review、archive/registry 更新が takt 無しで閉じることを検証する rollout 順と最終撤去条件を明文化する
+**Date:** 2026-03-13
+
+### Changes
+
+- track/items/takt-removal-2026-03-13/takt-removal-definition-of-done.md: Added the post-takt completion gate, required-path matrix, milestone rollout gates, and remaining blockers.
+- track/items/takt-removal-2026-03-13/metadata.json: Marked T006 and the planning track itself as done.
+- track/items/takt-removal-2026-03-13/plan.md: Re-rendered the track view with all tasks completed.
+- track/items/takt-removal-2026-03-13/verification.md: Recorded the DoD artifact, completion-specific registry check, and final validation steps.
+- track/registry.md: Moved the track from Active Tracks to Completed Tracks and cleared Current Focus.
+
+### Why
+
+The takt-removal planning track needed an explicit end-state definition so the repository can prove that planning, review, commit, PR, and closeout flows no longer depend on takt as an execution layer. This completion slice fixes the rollout gates and registry state without deleting runtime assets yet.
