@@ -296,6 +296,60 @@ class MakeWrappersTest(unittest.TestCase):
         )
         self.assertNotIn("verify_orchestra_guardrails.sh", task_body)
 
+    def test_track_transition_wrapper_preserves_track_dir_contract(self) -> None:
+        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
+        task_header = "[tasks.track-transition]"
+        task_start = makefile.index(task_header)
+        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+        task_body = (
+            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
+        )
+
+        self.assertIn('TRACK_DIR="${1:-}"', task_body)
+        self.assertIn('TRACK_ITEMS_DIR="$(dirname "$TRACK_DIR")"', task_body)
+        self.assertIn('TRACK_ID="$(basename "$TRACK_DIR")"', task_body)
+        self.assertIn('--items-dir "$TRACK_ITEMS_DIR"', task_body)
+        self.assertIn(
+            'usage: cargo make track-transition <track_dir> <task_id> <status> [--commit-hash <hash>]',
+            task_body,
+        )
+
+    def test_track_git_wrappers_delegate_to_rust_cli(self) -> None:
+        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
+
+        for task_header, expected in (
+            ("[tasks.track-switch-main]", 'cargo run --quiet -p cli -- git switch-and-pull main'),
+            ("[tasks.track-add-paths]", 'cargo run --quiet -p cli -- git add-from-file tmp/track-commit/add-paths.txt --cleanup'),
+            ("[tasks.track-commit-message]", 'cargo run --quiet -p cli -- git commit-from-file tmp/track-commit/commit-message.txt --cleanup'),
+            ("[tasks.track-note]", 'cargo run --quiet -p cli -- git note-from-file tmp/track-commit/note.md --cleanup'),
+        ):
+            with self.subTest(task=task_header):
+                task_start = makefile.index(task_header)
+                next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+                task_body = (
+                    makefile[task_start:]
+                    if next_task == -1
+                    else makefile[task_start:next_task]
+                )
+                self.assertIn(expected, task_body)
+
+    def test_track_pr_wrappers_delegate_to_rust_cli(self) -> None:
+        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
+
+        for task_header, expected in (
+            ("[tasks.track-pr-merge]", 'cargo run --quiet -p cli -- pr wait-and-merge ${@}'),
+            ("[tasks.track-pr-status]", 'cargo run --quiet -p cli -- pr status ${@}'),
+        ):
+            with self.subTest(task=task_header):
+                task_start = makefile.index(task_header)
+                next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+                task_body = (
+                    makefile[task_start:]
+                    if next_task == -1
+                    else makefile[task_start:next_task]
+                )
+                self.assertIn(expected, task_body)
+
     def test_verify_orchestra_local_honors_python_bin_override(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
@@ -555,7 +609,7 @@ class MakeWrappersTest(unittest.TestCase):
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
         self.assertIn(
-            "script = ['\"${PYTHON_BIN:-python3}\" scripts/git_ops.py add-all']",
+            "script = ['cargo run --quiet -p cli -- git add-all']",
             task_body,
         )
 
@@ -566,7 +620,7 @@ class MakeWrappersTest(unittest.TestCase):
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
         self.assertIn(
-            "script = ['\"${PYTHON_BIN:-python3}\" scripts/git_ops.py add-from-file .takt/pending-add-paths.txt --cleanup']",
+            "script = ['cargo run --quiet -p cli -- git add-from-file .takt/pending-add-paths.txt --cleanup']",
             task_body,
         )
 
@@ -577,7 +631,7 @@ class MakeWrappersTest(unittest.TestCase):
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
         self.assertIn(
-            "script = ['\"${PYTHON_BIN:-python3}\" scripts/git_ops.py add-from-file tmp/track-commit/add-paths.txt --cleanup']",
+            "script = ['cargo run --quiet -p cli -- git add-from-file tmp/track-commit/add-paths.txt --cleanup']",
             task_body,
         )
 
@@ -589,7 +643,7 @@ class MakeWrappersTest(unittest.TestCase):
         )
         self.assertIn('dependencies = ["ci"]', task_body)
         self.assertIn(
-            "script = ['\"${PYTHON_BIN:-python3}\" scripts/git_ops.py commit-from-file .takt/pending-commit-message.txt --cleanup']",
+            "script = ['cargo run --quiet -p cli -- git commit-from-file .takt/pending-commit-message.txt --cleanup']",
             task_body,
         )
 
@@ -600,7 +654,7 @@ class MakeWrappersTest(unittest.TestCase):
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
         self.assertIn(
-            "script = ['\"${PYTHON_BIN:-python3}\" scripts/git_ops.py note-from-file .takt/pending-note.md --cleanup']",
+            "script = ['cargo run --quiet -p cli -- git note-from-file .takt/pending-note.md --cleanup']",
             task_body,
         )
 
@@ -612,7 +666,7 @@ class MakeWrappersTest(unittest.TestCase):
         )
         self.assertIn('dependencies = ["ci"]', task_body)
         self.assertIn(
-            "script = ['\"${PYTHON_BIN:-python3}\" scripts/git_ops.py commit-from-file tmp/track-commit/commit-message.txt --cleanup']",
+            "script = ['cargo run --quiet -p cli -- git commit-from-file tmp/track-commit/commit-message.txt --cleanup']",
             task_body,
         )
 
@@ -623,7 +677,7 @@ class MakeWrappersTest(unittest.TestCase):
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
         self.assertIn(
-            "script = ['\"${PYTHON_BIN:-python3}\" scripts/git_ops.py note-from-file tmp/track-commit/note.md --cleanup']",
+            "script = ['cargo run --quiet -p cli -- git note-from-file tmp/track-commit/note.md --cleanup']",
             task_body,
         )
 

@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| python-dependency-deprecation-2026-03-13 | Done | 2026-03-13 |
 | subagent-model-config-2026-03-13 | Done | 2026-03-13 |
 | claude-md-compression-2026-03-13 | Done | 2026-03-12 |
 

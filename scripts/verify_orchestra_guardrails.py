@@ -36,7 +36,6 @@ EXPECTED_HOOK_PATHS = {
     ".claude/hooks/agent-router.py": "agent-router hook",
     ".claude/hooks/check-codex-before-write.py": "codex-before-write hook",
     ".claude/hooks/suggest-gemini-research.py": "gemini-research hook",
-    ".claude/hooks/block-direct-git-ops.py": "direct git ops block hook",
     ".claude/hooks/error-to-codex.py": "error-to-codex hook",
     ".claude/hooks/post-test-analysis.py": "post-test-analysis hook",
     ".claude/hooks/check-codex-after-plan.py": "codex-after-plan hook",
@@ -44,6 +43,30 @@ EXPECTED_HOOK_PATHS = {
     ".claude/hooks/lint-on-save.py": "lint-on-save hook",
     ".claude/hooks/python-lint-on-save.py": "python-lint-on-save hook",
     ".claude/hooks/post-implementation-review.py": "post-implementation-review hook",
+}
+
+EXPECTED_HOOK_COMMANDS = {
+    "direct git ops block hook": [
+        "SOTP_CLI_BINARY:-sotp",
+        "hook dispatch block-direct-git-ops",
+        "|| exit 2",
+    ],
+    "file-lock-acquire hook": [
+        "SOTP_LOCK_ENABLED:-",
+        "SOTP_CLI_BINARY:-sotp",
+        "hook dispatch file-lock-acquire",
+        "SOTP_AGENT_ID:-pid-$PPID",
+        "--pid \"$PPID\"",
+        "|| exit 2",
+    ],
+    "file-lock-release hook": [
+        "SOTP_LOCK_ENABLED:-",
+        "SOTP_CLI_BINARY:-sotp",
+        "hook dispatch file-lock-release",
+        "SOTP_AGENT_ID:-pid-$PPID",
+        "warning: file-lock-release launcher failed",
+        "exit 0",
+    ],
 }
 
 EXPECTED_OTHER_ALLOW = {
@@ -510,6 +533,16 @@ def verify_hook_paths(commands: list[str]) -> bool:
             emit_ok(f"{hook_path}: file exists")
         else:
             emit_error(f"Missing hook file: {hook_path}")
+            failed = True
+
+    for label, fragments in EXPECTED_HOOK_COMMANDS.items():
+        if any(all(fragment in command for fragment in fragments) for command in commands):
+            emit_ok(f"{SETTINGS_PATH}: {label}")
+        else:
+            emit_error(
+                f"Missing in {SETTINGS_PATH}: {label} "
+                f"(expected fragments: {', '.join(fragments)})"
+            )
             failed = True
     return failed
 

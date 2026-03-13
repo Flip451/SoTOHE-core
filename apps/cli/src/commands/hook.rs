@@ -95,15 +95,15 @@ pub enum HookCommand {
         locks_dir: Option<PathBuf>,
 
         /// Agent ID (for file-lock hooks). Required for lock hooks.
-        /// MUST be passed explicitly by the Python launcher (same reason as pid:
-        /// sotp's ppid is the Python launcher PID, not Claude Code's).
+        /// MUST be passed explicitly by the hook command, because the `sotp`
+        /// process cannot infer Claude Code's parent pid reliably.
         #[arg(long, env = "SOTP_AGENT_ID")]
         agent: Option<String>,
 
         /// Process ID of the lock holder (required for lock-acquire only).
         /// Not needed for lock-release (release API uses path + agent only).
         /// Not needed for guard hooks (block-direct-git-ops).
-        /// CLI-arg-only (no env var — must be explicitly passed by launcher).
+        /// CLI-arg-only (no env var — must be explicitly passed by hook command).
         #[arg(long)]
         pid: Option<u32>,
     },
