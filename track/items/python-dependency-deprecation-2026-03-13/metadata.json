@@ -3,20 +3,20 @@
   "id": "python-dependency-deprecation-2026-03-13",
   "branch": "track/python-dependency-deprecation-2026-03-13",
   "title": "Python 依存脱却計画",
-  "status": "planned",
+  "status": "in_progress",
   "created_at": "2026-03-13T12:30:00Z",
-  "updated_at": "2026-03-13T12:30:00Z",
+  "updated_at": "2026-03-13T04:47:08.544321+00:00",
   "tasks": [
     {
       "id": "T001",
       "description": "確定版 migration map を基に、Python エントリポイントを security-critical / workflow core / verification / auxiliary に分類し、各エントリポイントの移行先を固定する",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "2d5da09ff310a854d6b0462e949f0a53146234b4"
     },
     {
       "id": "T002",
       "description": "Phase 1 として security-critical hooks（block-direct-git-ops, file-lock-acquire, file-lock-release）を Python launcher から Rust direct invocation へ切り替える差分を実装し、settings.json・guardrail検証・selftest を更新する",
-      "status": "todo",
+      "status": "in_progress",
       "commit_hash": null
     },
     {
@@ -54,17 +54,26 @@
       {
         "id": "S001",
         "title": "Phase 0-1: Inventory and security-critical hooks",
-        "task_ids": ["T001", "T002"]
+        "task_ids": [
+          "T001",
+          "T002"
+        ]
       },
       {
         "id": "S002",
         "title": "Phase 2-4: Workflow core and wrapper migration",
-        "task_ids": ["T003", "T004"]
+        "task_ids": [
+          "T003",
+          "T004"
+        ]
       },
       {
         "id": "S003",
         "title": "Phase 5-6: Verification boundary and rollout",
-        "task_ids": ["T005", "T006"]
+        "task_ids": [
+          "T005",
+          "T006"
+        ]
       }
     ]
   }

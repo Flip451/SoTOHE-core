@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
 PreToolUse hook: Block direct git add/commit/push and git branch delete commands.
+
+Deprecated launcher retained for rollback and policy self-tests.
 """
 
 import os

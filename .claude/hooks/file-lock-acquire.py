@@ -4,6 +4,7 @@ PreToolUse hook: Acquire a file lock before Edit/Write/Read tool executions.
 
 Thin launcher — delegates to `sotp hook dispatch file-lock-acquire`.
 PreToolUse: fail-closed (exit 2 on any error).
+Deprecated launcher retained for rollback while settings.json calls `sotp` directly.
 
 Controlled by SOTP_LOCK_ENABLED env var (default: disabled).
 """

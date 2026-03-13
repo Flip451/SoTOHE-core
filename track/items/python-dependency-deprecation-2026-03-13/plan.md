@@ -7,8 +7,8 @@ verify / PR / auxiliary utility は必須経路と補助経路に分け、移行
 
 ## Phase 0-1: Inventory and security-critical hooks
 
-- [ ] 確定版 migration map を基に、Python エントリポイントを security-critical / workflow core / verification / auxiliary に分類し、各エントリポイントの移行先を固定する
-- [ ] Phase 1 として security-critical hooks（block-direct-git-ops, file-lock-acquire, file-lock-release）を Python launcher から Rust direct invocation へ切り替える差分を実装し、settings.json・guardrail検証・selftest を更新する
+- [x] 確定版 migration map を基に、Python エントリポイントを security-critical / workflow core / verification / auxiliary に分類し、各エントリポイントの移行先を固定する 2d5da09ff310a854d6b0462e949f0a53146234b4
+- [~] Phase 1 として security-critical hooks（block-direct-git-ops, file-lock-acquire, file-lock-release）を Python launcher から Rust direct invocation へ切り替える差分を実装し、settings.json・guardrail検証・selftest を更新する
 
 ## Phase 2-4: Workflow core and wrapper migration
 
