@@ -21,7 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
-| _No completed tracks yet_ | - | - |
+| subagent-model-config-2026-03-13 | Done | 2026-03-13 |
 
 ## Archived Tracks
 

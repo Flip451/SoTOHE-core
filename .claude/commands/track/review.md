@@ -25,7 +25,7 @@ Arguments:
 
 - Read `.claude/agent-profiles.json`.
 - Look up `profiles.<active_profile>.reviewer` to determine the provider (e.g., `codex`).
-- Read the provider's `default_model` to get `{model}`.
+- Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.<provider>` first, then fall back to `providers.<provider>.default_model`.
 - If the reviewer is `claude`, perform the review inline (no subprocess). Skip to Step 2 using Claude Code's own analysis.
 
 ## Step 2: Prepare review briefing
