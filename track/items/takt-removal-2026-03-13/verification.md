@@ -14,6 +14,7 @@
 - [x] `pending-artifact-cutover.md` fixes `tmp/track-commit/` as the primary scratch contract and demotes `.takt/pending-*` to migration-only compatibility inputs
 - [x] `/track:commit` and `track/workflow.md` now describe generated `tmp/track-commit/note.md` as the normal git-note path rather than preferring `.takt/pending-note.md`
 - [x] Rust/Python guarded git helper tests use `tmp/track-commit/*` as the happy path while preserving one legacy `.takt/pending-note.md` compatibility case
+- [x] `takt-runtime-removal-sequence.md` fixes deletion phases for `takt-*` wrappers, `.takt/**` runtime assets, `scripts/takt_profile.py`, and the related test/CI fallout
 
 ## Manual Verification Steps
 
@@ -34,6 +35,7 @@
 15. Run `cargo test -p cli git -- --nocapture`
 16. Run `pytest -q -o cache_dir=.cache/pytest scripts/test_git_ops.py scripts/test_make_wrappers.py`
 17. Run `cargo run --quiet -p cli -- track views validate --project-root .`
+18. Read `track/items/takt-removal-2026-03-13/takt-runtime-removal-sequence.md` and confirm each remaining wrapper/runtime/test surface is assigned to a named deletion phase
 
 ## Result
 
@@ -47,6 +49,7 @@ The repo also still contains command docs, rule docs, agent routing/profile help
 T001 fixes inventory scope only; no runtime/doc/guardrail deletion has started yet.
 `track/workflow.md`, `.claude/rules/**`, profile schema, and guardrail verifier/tests still contain `takt` references and are intentionally deferred to later tasks in this track.
 Legacy `.takt/pending-*` and `.takt/handoffs` compatibility paths still exist by design until T004 removes the remaining wrappers and runtime assets.
+The runtime/wrapper removal plan is fixed, but the actual deletion is intentionally deferred to the next implementation slice so guardrails, profile schema, and CI can move in lockstep.
 
 ## Progress Notes
 
@@ -61,6 +64,9 @@ Legacy `.takt/pending-*` and `.takt/handoffs` compatibility paths still exist by
 - Updated `.claude/commands/track/commit.md` and `track/workflow.md` so `/track:commit` and git-note guidance now treat generated `tmp/track-commit/note.md` as the normal path and legacy `.takt/pending-note.md` only as a compatibility fallback.
 - Rebased Rust/Python guarded git helper tests onto `tmp/track-commit/*` for their success paths while keeping a targeted legacy `.takt/pending-note.md` compatibility test.
 - Latest verification for T003 implementation: `cargo test -p usecase git_workflow -- --nocapture`, `cargo test -p cli git -- --nocapture`, `pytest -q -o cache_dir=.cache/pytest scripts/test_git_ops.py scripts/test_make_wrappers.py`, and `cargo run --quiet -p cli -- track views validate --project-root .` passed on the final uncommitted diff.
+- Added `takt-runtime-removal-sequence.md` to lock the removal order for `TAKT_PYTHON`, `takt-*` wrappers, `.takt/pieces/**`, `.takt/personas/**`, queue assets, and the corresponding `test_takt_*` suites.
+- The removal plan now separates four phases: doc/rule cleanup, runtime execution deletion, failure-report delete-or-generalize, and CI/test cleanup.
+- Latest verification for T004 planning slice: read `Makefile.toml`, `scripts/takt_profile.py`, and the current wrapper/test inventory, then ran `cargo run --quiet -p cli -- track views validate --project-root .`.
 
 ## Verified At
 

@@ -19,7 +19,7 @@ project-docs/conventions/security.md
 ## Artifact and runtime removal design
 
 - [x] takt 由来の pending artifact（`.takt/pending-add-paths.txt`, `.takt/pending-commit-message.txt`, `.takt/pending-note.md`）と handoff/debug scratch の扱いを再設計し、`libs/usecase/src/git_workflow.rs`、`scripts/git_ops.py`、関連テストの transient path 契約も含めて、通常 workflow と commit traceability が `tmp/` または別管理経路だけで完結するように移行計画を固める
-- [ ] `Makefile.toml` の `takt-*` / `takt-failure-report` wrapper、`.takt/config.yaml` / `pieces/` / `personas/`、`scripts/takt_profile.py` とそのテスト群を廃止または置換する差分を設計し、削除順序と互換境界を定義する
+- [x] `Makefile.toml` の `takt-*` / `takt-failure-report` wrapper、`.takt/config.yaml` / `pieces/` / `personas/`、`scripts/takt_profile.py` とそのテスト群を廃止または置換する差分を設計し、削除順序と互換境界を定義する
 
 ## Guardrails, docs, and rollout definition
 
