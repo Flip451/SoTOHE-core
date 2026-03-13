@@ -1,0 +1,15 @@
+Task Summary: Extract git and gh adapters into infrastructure
+
+Track: python-dependency-deprecation-2026-03-13
+Date: 2026-03-13
+
+Changes:
+- moved git subprocess and repo-root handling into `libs/infrastructure/src/git_cli.rs`
+- moved gh subprocess and PR transport decoding into `libs/infrastructure/src/gh_cli.rs`
+- reduced `apps/cli/src/commands/git.rs` and `apps/cli/src/commands/pr.rs` to thinner adapters over usecase and infrastructure
+- updated track metadata, plan, and verification to mark T005/T006 done and record review/verification evidence
+
+Why:
+- keep subprocess transport concerns out of the CLI layer
+- preserve the intended split of workflow policy in usecase and adapters in infrastructure
+- continue the Python dependency deprecation track without regressing review or CI guarantees
