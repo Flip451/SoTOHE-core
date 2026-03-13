@@ -74,6 +74,16 @@ description = "[wrapper] List workspace members from architecture rule source of
 command = "python3"
 args = ["scripts/architecture_rules.py", "workspace-members"]
 
+[tasks.workspace-tree]
+description = "[wrapper] Render crate-only workspace tree from architecture rule source of truth"
+command = "python3"
+args = ["scripts/architecture_rules.py", "workspace-tree"]
+
+[tasks.workspace-tree-full]
+description = "[wrapper] Render workspace tree including extra non-crate directories"
+command = "python3"
+args = ["scripts/architecture_rules.py", "workspace-tree-full"]
+
 [tasks.architecture-rules-direct-checks]
 description = "[wrapper] Emit direct cargo-deny check pairs from architecture rules"
 command = "python3"
@@ -83,11 +93,6 @@ args = ["scripts/architecture_rules.py", "direct-checks"]
 description = "[wrapper] Verify architecture rules sync with Cargo.toml and deny.toml"
 command = "python3"
 args = ["scripts/architecture_rules.py", "verify-sync"]
-
-[tasks.architecture-rules-verify-claude-workspace-map]
-description = "[wrapper] Verify CLAUDE.md workspace map includes all workspace members"
-command = "python3"
-args = ["scripts/architecture_rules.py", "verify-claude-workspace-map"]
 
 [tasks.takt-failure-report]
 description = "[wrapper] Generate .takt/debug-report.md from captured failure output"
