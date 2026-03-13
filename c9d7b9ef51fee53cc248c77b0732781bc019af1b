@@ -1,0 +1,18 @@
+## Task Summary: finalize the UX-first track plan activation design
+
+**Track:** track-plan-activation-2026-03-14
+**Task:** Canonicalize the planning track for `plan-only` / `activate` and close the planning review loop
+**Date:** 2026-03-14
+
+### Changes
+
+- `track/items/track-plan-activation-2026-03-14/metadata.json`: captured the final task breakdown and acceptance criteria scope for the planning track
+- `track/items/track-plan-activation-2026-03-14/spec.md`: finalized the UX-first public path, guardrails, and executor coverage requirements
+- `track/items/track-plan-activation-2026-03-14/design.md`: moved the canonical design out of `tmp/` and into the tracked planning artifact
+- `track/items/track-plan-activation-2026-03-14/plan.md`: regenerated the rendered plan from metadata after scope updates
+- `track/items/track-plan-activation-2026-03-14/verification.md`: aligned the verification checklist with the final design and placeholder-free CI rules
+- `track/registry.md`: refreshed the rendered registry entry for the active planning track
+
+### Why
+
+The planning artifacts needed to stand on their own without depending on scratch notes under `tmp/`, and the UX-first `plan-only` / `activate` flow needed to be fully scoped before implementation starts. This commit closes the planning review loop with a tracked spec, design, verification checklist, and registry state that pass the repository guardrails.
