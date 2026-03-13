@@ -1,0 +1,19 @@
+## Task Summary: Rewrite public track workflow guidance away from takt
+
+**Track:** takt-removal-2026-03-13
+**Task:** Rewrite `/track:*` workflow docs and routing guidance to remove `takt` as the public execution layer while preserving migration compatibility.
+**Date:** 2026-03-13
+
+### Changes
+
+- `.claude/commands/track/full-cycle.md`: rewrote the command contract as a Claude Code-native autonomous loop using track transitions, review, and CI.
+- `.claude/commands/track/setup.md`: removed `.takt/config.yaml` setup guidance and marked `.takt/**` as legacy migration-only assets.
+- `.claude/docs/WORKFLOW.md`: replaced `takt` execution-layer framing with Claude Code + Agent Teams + Rust CLI orchestration guidance.
+- `.claude/hooks/agent-router.py`: removed `takt` workflow recommendations from the workflow hint while keeping external-guide injection for legacy `takt-*` entry points during migration.
+- `.claude/hooks/test_agent_router.py`: added regression coverage for the updated workflow hint and retained external-guide injection.
+- `START_HERE_HUMAN.md`: updated onboarding and safety guidance to stop directing humans toward `takt` execution.
+- `track/items/takt-removal-2026-03-13/*`: recorded inventory, task completion, verification steps, and review-loop evidence for T001/T002.
+
+### Why
+
+The takt-removal track requires user-facing `/track:*` guidance to stop treating `takt` as the canonical execution layer before wrapper and runtime removal starts. This keeps public workflow guidance aligned with the intended Claude Code + Rust CLI orchestration model while preserving compatibility for still-existing legacy entry points during the migration window.
