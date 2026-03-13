@@ -8,14 +8,14 @@
 ## Current Focus
 
 - Latest active track: `takt-removal-2026-03-13`
-- Next recommended command: `/track:implement`
+- Next recommended command: `/track:full-cycle <task>`
 - Last updated: `2026-03-13`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| takt-removal-2026-03-13 | planned | `/track:implement` | 2026-03-13 |
+| takt-removal-2026-03-13 | in_progress | `/track:full-cycle <task>` | 2026-03-13 |
 
 ## Completed Tracks
 
