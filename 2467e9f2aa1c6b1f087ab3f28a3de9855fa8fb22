@@ -1,0 +1,22 @@
+## Task Summary: Direct sotp dispatch for security-critical hooks
+
+**Track:** python-dependency-deprecation-2026-03-13
+**Task:** Implement Phase 1 direct dispatch for block-direct-git-ops and file lock hooks, with guardrail/test updates.
+**Date:** 2026-03-13
+
+### Changes
+
+- .claude/settings.json: switch security-critical hooks to direct `sotp hook dispatch` commands and preserve PreToolUse/PostToolUse exit semantics in shell.
+- apps/cli/src/commands/hook.rs: update CLI documentation to describe explicit pid/agent propagation from the hook command.
+- scripts/verify_orchestra_guardrails.py: verify direct dispatch command fragments instead of Python launcher wiring.
+- scripts/test_verify_scripts.py: add regression coverage for missing direct dispatch commands.
+- .claude/hooks/block-direct-git-ops.py: mark the Python launcher as deprecated but retained for rollback and policy self-tests.
+- .claude/hooks/file-lock-acquire.py: mark the Python launcher as deprecated but retained for rollback.
+- .claude/hooks/file-lock-release.py: mark the Python launcher as deprecated but retained for rollback.
+- track/items/python-dependency-deprecation-2026-03-13/metadata.json: mark T001 done and keep T002 in_progress for this implementation slice.
+- track/items/python-dependency-deprecation-2026-03-13/verification.md: record focused verification, review loop, and CI results.
+- track/registry.md: reflect the track status as in_progress.
+
+### Why
+
+Phase 1 removes Python from the mandatory launcher path for the security-critical hooks while preserving the documented fail-closed and warning-only contracts. The guardrail verifier and tests now enforce the direct-dispatch configuration so the migration cannot silently regress.
