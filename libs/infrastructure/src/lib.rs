@@ -1,5 +1,7 @@
 //! Infrastructure layer for the SoTOHE-core track state machine.
 
+pub mod gh_cli;
+pub mod git_cli;
 pub mod lock;
 pub mod track;
 

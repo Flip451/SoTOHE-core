@@ -12,6 +12,7 @@
 - [x] track validation gates now execute via Rust CLI instead of Python verify wrappers
 - [x] local git workflow wrappers (`add-paths`, `commit-from-file`, `note-from-file`, `switch-main`) are moved from Python wrappers to Rust CLI
 - [x] PR status / merge wrappers (`track-pr-status`, `track-pr-merge`) no longer depend on `pr_merge.py`
+- [x] `git` / `gh` / repo-root adapter boundaries are explicit infrastructure modules instead of CLI-local subprocess helpers
 
 ## Manual Verification Steps
 
@@ -36,7 +37,7 @@ Pass
 
 `cargo deny` reports an existing duplicate `windows-sys` warning, but the CI task still passes and this track did not change Rust dependencies.
 Legacy archive generated views with relaxed schema fields are now normalized by Rust `track-sync-views`; this changed one archived `plan.md` as a consistency fix.
-Current Rust migration leaves non-trivial workflow policy in CLI adapters (`apps/cli/src/commands/git.rs`, `apps/cli/src/commands/pr.rs`); next phase should extract stage path policy, branch guard, PR check evaluation, and git/gh execution boundaries into usecase/infrastructure.
+Track metadata branch-claim discovery still reads directly from CLI and is not yet a dedicated infrastructure adapter; that remains part of `T007`.
 
 ## Review Notes
 
@@ -60,6 +61,10 @@ Current Rust migration leaves non-trivial workflow policy in CLI adapters (`apps
 - Latest reviewer verdict for T006: `No P0/P1 findings in the remaining diff.`
 - Latest focused verification for T006: `cargo test -p usecase pr_workflow -- --nocapture`, `cargo test -p cli pr -- --nocapture`, `cargo clippy --locked -p cli --all-targets --all-features -- -D warnings`, `cargo make track-sync-views`, and `cargo make ci-rust` passed after the fixes.
 - Latest full CI evidence for T006 review closeout: `cargo make ci` passed on the final uncommitted diff.
+- Follow-up implementation moved `gh` execution / PR JSON decode into `libs/infrastructure/src/gh_cli.rs` and `git` execution / repo-root resolution into `libs/infrastructure/src/git_cli.rs`, leaving `apps/cli/src/commands/pr.rs` and `apps/cli/src/commands/git.rs` as thinner adapters around usecase + infrastructure.
+- Latest focused verification for the adapter extraction slice: `cargo test -p infrastructure -- --nocapture`, `cargo test -p cli git -- --nocapture`, `cargo test -p cli pr -- --nocapture`, `cargo clippy --locked -p cli --all-targets --all-features -- -D warnings`, `cargo make track-sync-views`, and `cargo make ci` passed.
+- A subsequent `/track:review` pass found one P1 coverage gap after the extraction: `libs/infrastructure/src/gh_cli.rs` owned fail-closed `gh` transport behavior without direct regression tests for non-zero JSON handling, stderr surfacing, and merge failure propagation.
+- Fixed that gap by extracting testable helper seams inside `gh_cli.rs` and adding infrastructure regression tests for all three transport contracts; the re-review verdict was `No findings.` and `cargo make ci-rust` plus `cargo make ci` passed afterward.
 
 ## In Progress
 
@@ -68,12 +73,10 @@ Current Rust migration leaves non-trivial workflow policy in CLI adapters (`apps
 - Switched the local git-oriented cargo-make wrappers away from `scripts/git_ops.py` / `scripts/branch_switch.py` to Rust CLI entry points.
 - Switched `track-pr-status` / `track-pr-merge` away from `scripts/pr_merge.py` to Rust CLI entry points.
 - Added wrapper assertions in `scripts/test_make_wrappers.py` and Rust unit coverage for git/PR wrapper logic.
-- Started `T005` by extracting stage path policy and branch guard decision logic from CLI into `libs/usecase/src/git_workflow.rs`.
-- `apps/cli/src/commands/git.rs` now delegates pure stage-path validation and branch-claim evaluation to the usecase layer; filesystem access and subprocess execution remain in CLI for now.
-- Focused verification for the `T005` slice: `cargo test -p usecase -- --nocapture` and `cargo test -p cli git -- --nocapture` passed.
-- Started `T006` by adding `libs/usecase/src/pr_workflow.rs` for pure PR check summarization and wait/timeout decisions.
-- `apps/cli/src/commands/pr.rs` now keeps `gh` execution, JSON decode, output, and sleep mechanics in CLI while delegating pass/fail/pending and wait-and-merge decisions to the usecase layer.
-- Focused verification for the `T006` slice: `cargo test -p usecase pr_workflow -- --nocapture`, `cargo test -p cli pr -- --nocapture`, `cargo clippy --locked -p cli --all-targets --all-features -- -D warnings`, `cargo make track-sync-views`, and `cargo make ci` passed.
+- Completed `T005` by extracting stage path policy and branch guard decision logic into `libs/usecase/src/git_workflow.rs`, and moving `git` execution plus repo-root resolution into `libs/infrastructure/src/git_cli.rs`.
+- `apps/cli/src/commands/git.rs` now delegates pure validation to usecase and subprocess/path resolution to infrastructure; CLI keeps file cleanup and user-facing exit code translation.
+- Completed `T006` by keeping PR check summarization and wait/timeout decisions in `libs/usecase/src/pr_workflow.rs`, while moving `gh` execution and PR JSON decode into `libs/infrastructure/src/gh_cli.rs`.
+- `apps/cli/src/commands/pr.rs` now normalizes infrastructure records into usecase statuses and keeps only presentation / polling glue.
 
 ## Verified At
 

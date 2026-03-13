@@ -5,7 +5,7 @@
   "title": "Python 依存脱却計画",
   "status": "in_progress",
   "created_at": "2026-03-13T12:30:00Z",
-  "updated_at": "2026-03-13T12:47:39Z",
+  "updated_at": "2026-03-13T12:59:00Z",
   "tasks": [
     {
       "id": "T001",
@@ -33,12 +33,12 @@
     {
       "id": "T005",
       "description": "CLI 層へ流出した git workflow policy を usecase / infrastructure へ戻す前段スパイクとして、stage path policy・commit cleanup orchestration・branch guard の責務を分離し、`apps/cli/src/commands/git.rs` を薄い adapter に寄せる設計と差分を固める",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": "T006",
       "description": "CLI 層へ流出した PR workflow policy を usecase / infrastructure へ戻す前段スパイクとして、PR check evaluation・pending/failed 判定・wait-and-merge polling policy を `apps/cli/src/commands/pr.rs` から切り出す設計と差分を固める",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": "T007",

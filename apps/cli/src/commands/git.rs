@@ -2,9 +2,10 @@
 
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::process::{Command, ExitCode};
+use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
+use infrastructure::git_cli::{GitRepository, SystemGitRepo, resolve_repo_path};
 use serde::Deserialize;
 use usecase::git_workflow::{
     ExplicitTrackBranch, TRANSIENT_AUTOMATION_DIRS, TRANSIENT_AUTOMATION_FILES, TrackBranchClaim,
@@ -64,49 +65,8 @@ pub fn execute(cmd: GitCommand) -> ExitCode {
     }
 }
 
-fn repo_root() -> Result<PathBuf, String> {
-    let cwd = std::env::current_dir()
-        .map_err(|err| format!("failed to determine current directory: {err}"))?;
-    let output = Command::new("git")
-        .args(["rev-parse", "--show-toplevel"])
-        .current_dir(&cwd)
-        .output()
-        .map_err(|err| format!("failed to run git rev-parse --show-toplevel: {err}"))?;
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
-        return Err(if stderr.is_empty() {
-            "failed to resolve repository root".to_owned()
-        } else {
-            format!("failed to resolve repository root: {stderr}")
-        });
-    }
-
-    let root = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-    if root.is_empty() {
-        return Err("git rev-parse --show-toplevel returned an empty path".to_owned());
-    }
-    Ok(PathBuf::from(root))
-}
-
-fn resolve_repo_path(root: &Path, path: &Path) -> PathBuf {
-    if path.is_absolute() { path.to_path_buf() } else { root.join(path) }
-}
-
-fn run_git(args: &[&str], root: &Path) -> Result<i32, String> {
-    let status = Command::new("git")
-        .args(args)
-        .current_dir(root)
-        .status()
-        .map_err(|err| format!("failed to run git {}: {err}", args.join(" ")))?;
-    Ok(status.code().unwrap_or(1))
-}
-
-fn run_git_output(args: &[&str], root: &Path) -> Result<std::process::Output, String> {
-    Command::new("git")
-        .args(args)
-        .current_dir(root)
-        .output()
-        .map_err(|err| format!("failed to run git {}: {err}", args.join(" ")))
+fn repo() -> Result<SystemGitRepo, String> {
+    SystemGitRepo::discover()
 }
 
 fn ensure_existing_nonempty_file(path: &Path, label: &str) -> Result<(), String> {
@@ -137,8 +97,8 @@ fn load_stage_paths(path: &Path) -> Result<Vec<String>, String> {
 }
 
 fn add_all() -> ExitCode {
-    let root = match repo_root() {
-        Ok(root) => root,
+    let repo = match repo() {
+        Ok(repo) => repo,
         Err(err) => {
             eprintln!("[ERROR] {err}");
             return ExitCode::FAILURE;
@@ -150,7 +110,7 @@ fn add_all() -> ExitCode {
     owned_args.extend(TRANSIENT_AUTOMATION_DIRS.iter().map(|path| format!(":(exclude){path}")));
     let args: Vec<&str> = owned_args.iter().map(String::as_str).collect();
 
-    match run_git(&args, &root) {
+    match repo.status(&args) {
         Ok(0) => ExitCode::SUCCESS,
         Ok(_) => ExitCode::FAILURE,
         Err(err) => {
@@ -161,14 +121,14 @@ fn add_all() -> ExitCode {
 }
 
 fn add_from_file(path: &Path, cleanup: bool) -> ExitCode {
-    let root = match repo_root() {
-        Ok(root) => root,
+    let repo = match repo() {
+        Ok(repo) => repo,
         Err(err) => {
             eprintln!("[ERROR] {err}");
             return ExitCode::FAILURE;
         }
     };
-    let path = resolve_repo_path(&root, path);
+    let path = repo.resolve_path(path);
     let stage_paths = match load_stage_paths(&path) {
         Ok(paths) => paths,
         Err(err) => {
@@ -180,7 +140,7 @@ fn add_from_file(path: &Path, cleanup: bool) -> ExitCode {
     let mut owned_args = vec!["add".to_owned(), "--".to_owned()];
     owned_args.extend(stage_paths);
     let args: Vec<&str> = owned_args.iter().map(String::as_str).collect();
-    match run_git(&args, &root) {
+    match repo.status(&args) {
         Ok(0) => {
             if cleanup {
                 let _ = fs::remove_file(path);
@@ -196,14 +156,14 @@ fn add_from_file(path: &Path, cleanup: bool) -> ExitCode {
 }
 
 fn commit_from_file(path: &Path, cleanup: bool, track_dir: Option<&Path>) -> ExitCode {
-    let root = match repo_root() {
-        Ok(root) => root,
+    let repo = match repo() {
+        Ok(repo) => repo,
         Err(err) => {
             eprintln!("[ERROR] {err}");
             return ExitCode::FAILURE;
         }
     };
-    let path = resolve_repo_path(&root, path);
+    let path = repo.resolve_path(path);
 
     if let Err(err) = ensure_existing_nonempty_file(&path, "commit message file") {
         eprintln!("[ERROR] {err}");
@@ -216,13 +176,13 @@ fn commit_from_file(path: &Path, cleanup: bool, track_dir: Option<&Path>) -> Exi
         None
     };
     let effective_track_dir = track_dir
-        .map(|track_dir| resolve_repo_path(&root, track_dir))
-        .or_else(|| load_optional_track_dir(&root, track_dir_file.as_deref()));
+        .map(|track_dir| repo.resolve_path(track_dir))
+        .or_else(|| load_optional_track_dir(repo.root(), track_dir_file.as_deref()));
 
     let guard_result = if let Some(track_dir) = effective_track_dir.as_deref() {
-        verify_commit_branch(&root, track_dir)
+        verify_commit_branch(repo.root(), track_dir, &repo)
     } else {
-        verify_branch_by_auto_detection(&root)
+        verify_branch_by_auto_detection(&repo)
     };
     if let Err(err) = guard_result {
         eprintln!("[ERROR] Branch guard: {err}");
@@ -235,7 +195,7 @@ fn commit_from_file(path: &Path, cleanup: bool, track_dir: Option<&Path>) -> Exi
     }
 
     let path_str = path.to_string_lossy().into_owned();
-    match run_git(&["commit", "-F", path_str.as_str()], &root) {
+    match repo.status(&["commit", "-F", path_str.as_str()]) {
         Ok(0) => {
             if cleanup {
                 let _ = fs::remove_file(path);
@@ -261,20 +221,20 @@ fn commit_from_file(path: &Path, cleanup: bool, track_dir: Option<&Path>) -> Exi
 }
 
 fn note_from_file(path: &Path, cleanup: bool) -> ExitCode {
-    let root = match repo_root() {
-        Ok(root) => root,
+    let repo = match repo() {
+        Ok(repo) => repo,
         Err(err) => {
             eprintln!("[ERROR] {err}");
             return ExitCode::FAILURE;
         }
     };
-    let path = resolve_repo_path(&root, path);
+    let path = repo.resolve_path(path);
     if let Err(err) = ensure_existing_nonempty_file(&path, "git note file") {
         eprintln!("[ERROR] {err}");
         return ExitCode::FAILURE;
     }
     let path_str = path.to_string_lossy().into_owned();
-    match run_git(&["notes", "add", "-f", "-F", path_str.as_str(), "HEAD"], &root) {
+    match repo.status(&["notes", "add", "-f", "-F", path_str.as_str(), "HEAD"]) {
         Ok(0) => {
             if cleanup {
                 let _ = fs::remove_file(path);
@@ -290,8 +250,8 @@ fn note_from_file(path: &Path, cleanup: bool) -> ExitCode {
 }
 
 fn switch_and_pull(branch: &str) -> ExitCode {
-    let root = match repo_root() {
-        Ok(root) => root,
+    let repo = match repo() {
+        Ok(repo) => repo,
         Err(err) => {
             eprintln!("[ERROR] {err}");
             return ExitCode::FAILURE;
@@ -299,7 +259,7 @@ fn switch_and_pull(branch: &str) -> ExitCode {
     };
 
     println!("Switching to {branch}...");
-    match run_git(&["checkout", branch], &root) {
+    match repo.status(&["checkout", branch]) {
         Ok(0) => {}
         Ok(code) => {
             eprintln!("[ERROR] Failed to checkout {branch}");
@@ -312,7 +272,7 @@ fn switch_and_pull(branch: &str) -> ExitCode {
     }
 
     println!("Pulling latest from origin/{branch}...");
-    match run_git(&["pull", "--ff-only"], &root) {
+    match repo.status(&["pull", "--ff-only"]) {
         Ok(0) => {
             println!("[OK] On {branch}, up to date.");
             ExitCode::SUCCESS
@@ -335,15 +295,11 @@ fn load_optional_track_dir(root: &Path, path: Option<&Path>) -> Option<PathBuf> 
     if trimmed.is_empty() { None } else { Some(resolve_repo_path(root, Path::new(trimmed))) }
 }
 
-fn current_git_branch(root: &Path) -> Result<Option<String>, String> {
-    let output = run_git_output(&["rev-parse", "--abbrev-ref", "HEAD"], root)?;
-    if !output.status.success() {
-        return Ok(None);
-    }
-    Ok(Some(String::from_utf8_lossy(&output.stdout).trim().to_owned()))
-}
-
-fn verify_commit_branch(root: &Path, track_dir: &Path) -> Result<(), String> {
+fn verify_commit_branch(
+    root: &Path,
+    track_dir: &Path,
+    repo: &impl GitRepository,
+) -> Result<(), String> {
     if !track_dir.is_dir() {
         return Err(format!("Track directory not found: {}", track_dir.display()));
     }
@@ -363,7 +319,7 @@ fn verify_commit_branch(root: &Path, track_dir: &Path) -> Result<(), String> {
 
     let metadata = read_metadata(&track_dir.join("metadata.json"))?;
     verify_explicit_track_branch(
-        current_git_branch(root)?.as_deref(),
+        repo.current_branch()?.as_deref(),
         &ExplicitTrackBranch {
             display_path: track_dir.display().to_string(),
             expected_branch: metadata.branch,
@@ -371,9 +327,9 @@ fn verify_commit_branch(root: &Path, track_dir: &Path) -> Result<(), String> {
     )
 }
 
-fn verify_branch_by_auto_detection(root: &Path) -> Result<(), String> {
-    let items_root = root.join("track/items");
-    let archive_root = root.join("track/archive");
+fn verify_branch_by_auto_detection(repo: &impl GitRepository) -> Result<(), String> {
+    let items_root = repo.root().join("track/items");
+    let archive_root = repo.root().join("track/archive");
     let mut claims = Vec::new();
     if items_root.is_dir() {
         for entry in read_directories(&items_root)? {
@@ -414,7 +370,7 @@ fn verify_branch_by_auto_detection(root: &Path) -> Result<(), String> {
         }
     }
 
-    verify_auto_detected_branch(current_git_branch(root)?.as_deref(), &claims)
+    verify_auto_detected_branch(repo.current_branch()?.as_deref(), &claims)
 }
 
 fn read_directories(root: &Path) -> Result<Vec<PathBuf>, String> {
@@ -443,9 +399,10 @@ fn read_metadata(path: &Path) -> Result<BranchMetadata, String> {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::{
-        add_all, add_from_file, commit_from_file, current_git_branch, load_optional_track_dir,
-        load_stage_paths, note_from_file, repo_root, resolve_repo_path, switch_and_pull,
+        add_all, add_from_file, commit_from_file, load_optional_track_dir, load_stage_paths,
+        note_from_file, repo, switch_and_pull,
     };
+    use infrastructure::git_cli::{GitRepository, resolve_repo_path};
     use std::fs;
     use std::path::{Path, PathBuf};
     use std::process::{Command, ExitCode};
@@ -525,7 +482,9 @@ mod tests {
 
         let _guard = CurrentDirGuard::change_to(&nested);
 
-        assert_eq!(repo_root().unwrap(), dir.path());
+        let repo = repo().unwrap();
+
+        assert_eq!(repo.root(), dir.path());
     }
 
     #[test]
@@ -645,7 +604,7 @@ mod tests {
         );
         assert!(!commit_message.exists());
         assert!(!track_dir_file.exists());
-        assert_eq!(current_git_branch(dir.path()).unwrap().as_deref(), Some("track/example"));
+        assert_eq!(repo().unwrap().current_branch().unwrap().as_deref(), Some("track/example"));
         assert_eq!(
             run_git_output(dir.path(), &["log", "-1", "--pretty=%s"]).trim(),
             "Track commit"
@@ -689,6 +648,6 @@ mod tests {
         let _guard = CurrentDirGuard::change_to(&nested);
 
         assert_eq!(switch_and_pull("main"), ExitCode::SUCCESS);
-        assert_eq!(current_git_branch(dir.path()).unwrap().as_deref(), Some("main"));
+        assert_eq!(repo().unwrap().current_branch().unwrap().as_deref(), Some("main"));
     }
 }
