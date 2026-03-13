@@ -10,15 +10,18 @@ import subprocess
 import sys
 from pathlib import Path, PurePosixPath
 
-TRANSIENT_AUTOMATION_FILES = (
-    ".takt/pending-add-paths.txt",
-    ".takt/pending-note.md",
-    ".takt/pending-commit-message.txt",
+PRIMARY_TRACK_COMMIT_FILES = (
     "tmp/track-commit/add-paths.txt",
     "tmp/track-commit/commit-message.txt",
     "tmp/track-commit/note.md",
     "tmp/track-commit/track-dir.txt",
 )
+LEGACY_TAKT_PENDING_FILES = (
+    ".takt/pending-add-paths.txt",
+    ".takt/pending-note.md",
+    ".takt/pending-commit-message.txt",
+)
+TRANSIENT_AUTOMATION_FILES = PRIMARY_TRACK_COMMIT_FILES + LEGACY_TAKT_PENDING_FILES
 TRANSIENT_AUTOMATION_DIRS = (
     ".takt/handoffs",
     "tmp",

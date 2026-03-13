@@ -11,6 +11,9 @@
 - [x] `takt-touchpoint-inventory.md` fixes runtime, docs, routing, guardrail, and scratch-path cutover principles in one artifact
 - [x] `/track:full-cycle` is now documented as a Claude Code-native autonomous workflow rather than a `takt` wrapper
 - [x] setup, onboarding, and agent-router workflow hints no longer direct users to `cargo make takt-*`
+- [x] `pending-artifact-cutover.md` fixes `tmp/track-commit/` as the primary scratch contract and demotes `.takt/pending-*` to migration-only compatibility inputs
+- [x] `/track:commit` and `track/workflow.md` now describe generated `tmp/track-commit/note.md` as the normal git-note path rather than preferring `.takt/pending-note.md`
+- [x] Rust/Python guarded git helper tests use `tmp/track-commit/*` as the happy path while preserving one legacy `.takt/pending-note.md` compatibility case
 
 ## Manual Verification Steps
 
@@ -25,6 +28,12 @@
 9. Verify this track's `metadata.json`, `spec.md`, and `plan.md` align
 10. Confirm `track/registry.md` lists this track as the latest active track
 11. Read `.claude/commands/track/full-cycle.md`, `.claude/commands/track/setup.md`, `.claude/docs/WORKFLOW.md`, `START_HERE_HUMAN.md`, and `.claude/hooks/agent-router.py` and confirm they describe Claude Code + Agent Teams + Rust CLI orchestration rather than `takt` execution
+12. Read `track/items/takt-removal-2026-03-13/pending-artifact-cutover.md` and confirm it defines `tmp/track-commit/*` as the primary scratch area and `.takt/pending-*` as migration-only compatibility input
+13. Read `.claude/commands/track/commit.md` and `track/workflow.md` and confirm they prefer `cargo make track-note` / `cargo make track-commit-message` over legacy `.takt/pending-*` wrappers
+14. Run `cargo test -p usecase git_workflow -- --nocapture`
+15. Run `cargo test -p cli git -- --nocapture`
+16. Run `pytest -q -o cache_dir=.cache/pytest scripts/test_git_ops.py scripts/test_make_wrappers.py`
+17. Run `cargo run --quiet -p cli -- track views validate --project-root .`
 
 ## Result
 
@@ -37,6 +46,7 @@ The repo still contains `takt` wrappers, `.takt/` runtime assets, and traceabili
 The repo also still contains command docs, rule docs, agent routing/profile helpers, and guarded git transient-path logic that directly mention or depend on takt, and those are now explicitly in scope for removal planning.
 T001 fixes inventory scope only; no runtime/doc/guardrail deletion has started yet.
 `track/workflow.md`, `.claude/rules/**`, profile schema, and guardrail verifier/tests still contain `takt` references and are intentionally deferred to later tasks in this track.
+Legacy `.takt/pending-*` and `.takt/handoffs` compatibility paths still exist by design until T004 removes the remaining wrappers and runtime assets.
 
 ## Progress Notes
 
@@ -47,6 +57,10 @@ T001 fixes inventory scope only; no runtime/doc/guardrail deletion has started y
 - Current `/track:review` loop for T002 found and fixed two doc/runtime mismatches: `.claude/docs/WORKFLOW.md` incorrectly implied `cargo make track-pr-review` only works after a PR already exists, and the agent-router stopped injecting external-guide context for still-supported `cargo make takt-*` commands during the migration window.
 - Follow-up cleanup removed a duplicate external-guide bullet from `.claude/commands/track/full-cycle.md` and added regression coverage in `.claude/hooks/test_agent_router.py`.
 - Latest verification for the T002 review closeout: `python3 -m pytest -q .claude/hooks/test_agent_router.py`, `cargo make ci-rust`, and `cargo make ci` passed on the final uncommitted diff.
+- Added `pending-artifact-cutover.md` to freeze the cutover from `.takt/pending-*` to `tmp/track-commit/*` and to separate primary scratch from migration-only compatibility paths.
+- Updated `.claude/commands/track/commit.md` and `track/workflow.md` so `/track:commit` and git-note guidance now treat generated `tmp/track-commit/note.md` as the normal path and legacy `.takt/pending-note.md` only as a compatibility fallback.
+- Rebased Rust/Python guarded git helper tests onto `tmp/track-commit/*` for their success paths while keeping a targeted legacy `.takt/pending-note.md` compatibility test.
+- Latest verification for T003 implementation: `cargo test -p usecase git_workflow -- --nocapture`, `cargo test -p cli git -- --nocapture`, `pytest -q -o cache_dir=.cache/pytest scripts/test_git_ops.py scripts/test_make_wrappers.py`, and `cargo run --quiet -p cli -- track views validate --project-root .` passed on the final uncommitted diff.
 
 ## Verified At
 

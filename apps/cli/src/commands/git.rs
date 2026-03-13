@@ -416,8 +416,8 @@ mod tests {
         let root = Path::new("/repo/root");
 
         assert_eq!(
-            resolve_repo_path(root, Path::new(".takt/pending-note.md")),
-            PathBuf::from("/repo/root/.takt/pending-note.md")
+            resolve_repo_path(root, Path::new("tmp/track-commit/note.md")),
+            PathBuf::from("/repo/root/tmp/track-commit/note.md")
         );
         assert_eq!(
             resolve_repo_path(root, Path::new("/tmp/note.md")),
@@ -536,21 +536,21 @@ mod tests {
     }
 
     #[test]
-    fn note_from_file_reads_repo_relative_path_from_nested_directory() {
+    fn note_from_file_reads_track_commit_scratch_from_nested_directory() {
         let _lock = cwd_lock().lock().unwrap();
         let dir = init_repo();
         fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
         run_git(dir.path(), &["add", "tracked.txt"]);
         run_git(dir.path(), &["commit", "-m", "initial"]);
-        fs::create_dir_all(dir.path().join(".takt")).unwrap();
-        let note = dir.path().join(".takt/pending-note.md");
+        fs::create_dir_all(dir.path().join("tmp/track-commit")).unwrap();
+        let note = dir.path().join("tmp/track-commit/note.md");
         fs::write(&note, "note line 1\nnote line 2\n").unwrap();
 
         let nested = dir.path().join("nested");
         fs::create_dir_all(&nested).unwrap();
         let _guard = CurrentDirGuard::change_to(&nested);
 
-        assert_eq!(note_from_file(Path::new(".takt/pending-note.md"), true), ExitCode::SUCCESS);
+        assert_eq!(note_from_file(Path::new("tmp/track-commit/note.md"), true), ExitCode::SUCCESS);
         assert!(!note.exists());
         assert_eq!(
             run_git_output(dir.path(), &["notes", "show", "HEAD"]),

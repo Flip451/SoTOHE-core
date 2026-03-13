@@ -5,7 +5,7 @@
   "title": "takt 廃止計画",
   "status": "in_progress",
   "created_at": "2026-03-13T13:06:37Z",
-  "updated_at": "2026-03-13T13:36:29Z",
+  "updated_at": "2026-03-13T13:59:35Z",
   "tasks": [
     {
       "id": "T001",
@@ -20,7 +20,7 @@
     {
       "id": "T003",
       "description": "takt 由来の pending artifact（`.takt/pending-add-paths.txt`, `.takt/pending-commit-message.txt`, `.takt/pending-note.md`）と handoff/debug scratch の扱いを再設計し、`libs/usecase/src/git_workflow.rs`、`scripts/git_ops.py`、関連テストの transient path 契約も含めて、通常 workflow と commit traceability が `tmp/` または別管理経路だけで完結するように移行計画を固める",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T004",
