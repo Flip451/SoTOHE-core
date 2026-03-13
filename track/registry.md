@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| subagent-model-config-2026-03-13 | Done | 2026-03-13 |
 | claude-md-compression-2026-03-13 | Done | 2026-03-12 |
 
 ## Archived Tracks

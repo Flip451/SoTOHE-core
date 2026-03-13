@@ -285,6 +285,45 @@ EXPECTED_DENY = {
     "Bash(cargo make --allow-private:*)": "host allow-private deny rule",
 }
 
+SUBAGENT_MODEL_ALLOWLIST = {
+    "claude-sonnet-4-6",
+    "claude-opus-4-6",
+    "claude-haiku-4-5-20251001",
+}
+
+HARDCODED_CODEX_MODEL_RE = re.compile(r"gpt-\d+")
+
+MODEL_RESOLUTION_TARGETS = {
+    Path(".claude/skills/codex-system/SKILL.md"): "codex-system override-first resolution",
+    Path(".claude/skills/track-plan/SKILL.md"): "track-plan override-first resolution",
+    Path(".claude/commands/track/review.md"): "track review override-first resolution",
+}
+
+EXPECTED_MODEL_RESOLUTION_SNIPPETS = {
+    Path(".claude/skills/codex-system/SKILL.md"): [
+        "profiles.<active_profile>.provider_model_overrides.codex  →  {model}",
+        "fallback: providers.codex.default_model  →  {model}",
+    ],
+    Path(".claude/skills/track-plan/SKILL.md"): [
+        "Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.codex` first, then `providers.codex.default_model`",
+    ],
+    Path(".claude/commands/track/review.md"): [
+        "Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.<provider>` first, then fall back to `providers.<provider>.default_model`.",
+    ],
+}
+
+FORBIDDEN_DEFAULT_MODEL_ONLY_SNIPPETS = {
+    Path(".claude/skills/codex-system/SKILL.md"): [
+        "read `providers.codex.default_model` from `.claude/agent-profiles.json` and pass as `--model {model}`",
+    ],
+    Path(".claude/skills/track-plan/SKILL.md"): [
+        'codex exec --model gpt-5.3-codex --sandbox read-only --full-auto "',
+    ],
+    Path(".claude/commands/track/review.md"): [
+        "Read the provider's `default_model` to get `{model}`.",
+    ],
+}
+
 BLOCK_HOOK_MARKERS = {
     "os._exit(2)": "hard block via os._exit(2) confirmed (thin launcher fail-closed)",
     "GIT_ADD_MESSAGE": "git add block confirmed",
@@ -529,13 +568,25 @@ def verify_env(settings: dict[str, Any]) -> bool:
     if not isinstance(env, dict):
         emit_error(f"{SETTINGS_PATH} is missing env configuration")
         return True
+    failed = False
 
     if env.get("CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS") == "1":
         emit_ok(f"{SETTINGS_PATH}: agent teams enabled")
-        return False
+    else:
+        emit_error(f"Missing in {SETTINGS_PATH}: agent teams enabled")
+        failed = True
 
-    emit_error(f"Missing in {SETTINGS_PATH}: agent teams enabled")
-    return True
+    model = env.get("CLAUDE_CODE_SUBAGENT_MODEL")
+    if model in SUBAGENT_MODEL_ALLOWLIST:
+        emit_ok(f"{SETTINGS_PATH}: CLAUDE_CODE_SUBAGENT_MODEL allowlisted ({model})")
+    else:
+        emit_error(
+            f"{SETTINGS_PATH}: CLAUDE_CODE_SUBAGENT_MODEL must be one of "
+            f"{sorted(SUBAGENT_MODEL_ALLOWLIST)}, got {model!r}"
+        )
+        failed = True
+
+    return failed
 
 
 def verify_block_hook() -> bool:
@@ -582,6 +633,61 @@ def verify_agent_definitions() -> bool:
         else:
             emit_error(f"Missing required agent definition: {AGENTS_DIR}/{required}")
             failed = True
+    return failed
+
+
+def verify_no_hardcoded_codex_model_literals() -> bool:
+    failed = False
+    for root in (Path(".claude/skills"), Path(".claude/commands")):
+        if not root.is_dir():
+            continue
+        for path in sorted(root.rglob("*")):
+            if not path.is_file():
+                continue
+            if "__pycache__" in path.parts:
+                continue
+            content = path.read_text(encoding="utf-8")
+            if HARDCODED_CODEX_MODEL_RE.search(content):
+                emit_error(
+                    f"{path} contains hardcoded Codex model literal matching "
+                    f"{HARDCODED_CODEX_MODEL_RE.pattern}"
+                )
+                failed = True
+    if not failed:
+        emit_ok(
+            f".claude/skills/ and .claude/commands/: no hardcoded Codex model literals "
+            f"matching {HARDCODED_CODEX_MODEL_RE.pattern}"
+        )
+    return failed
+
+
+def verify_override_first_model_resolution() -> bool:
+    failed = False
+    for path, label in MODEL_RESOLUTION_TARGETS.items():
+        if not path.is_file():
+            emit_error(f"Missing model resolution target: {path}")
+            failed = True
+            continue
+        content = path.read_text(encoding="utf-8")
+        missing_snippets = [
+            snippet
+            for snippet in EXPECTED_MODEL_RESOLUTION_SNIPPETS.get(path, [])
+            if snippet not in content
+        ]
+        if not missing_snippets:
+            emit_ok(f"{path}: {label}")
+        else:
+            emit_error(
+                f"{path} is missing canonical override-first guidance for {label}: "
+                + "; ".join(missing_snippets)
+            )
+            failed = True
+        for forbidden in FORBIDDEN_DEFAULT_MODEL_ONLY_SNIPPETS.get(path, []):
+            if forbidden in content:
+                emit_error(
+                    f"{path} still contains stale default_model-only guidance: {forbidden}"
+                )
+                failed = True
     return failed
 
 
@@ -643,6 +749,8 @@ def main() -> int:
     failed = verify_block_hook() or failed
     failed = verify_teammate_idle_feedback(settings) or failed
     failed = verify_agent_definitions() or failed
+    failed = verify_no_hardcoded_codex_model_literals() or failed
+    failed = verify_override_first_model_resolution() or failed
     failed = verify_no_local_settings_committed() or failed
 
     if failed:
