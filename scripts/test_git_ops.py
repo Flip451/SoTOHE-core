@@ -187,14 +187,14 @@ class GitOpsTest(unittest.TestCase):
 
         self.assertEqual(code, 1)
 
-    def test_commit_from_file_uses_message_and_cleans_up(self) -> None:
+    def test_commit_from_file_uses_track_commit_scratch_and_cleans_up(self) -> None:
         (self.root / "tracked.txt").write_text("base\n", encoding="utf-8")
         self.run_git("add", "tracked.txt")
         self.run_git("commit", "-m", "initial")
 
         (self.root / "tracked.txt").write_text("changed\n", encoding="utf-8")
         self.run_git("add", "tracked.txt")
-        message_path = self.root / ".takt" / "pending-commit-message.txt"
+        message_path = self.root / "tmp" / "track-commit" / "commit-message.txt"
         message_path.parent.mkdir(parents=True, exist_ok=True)
         message_path.write_text("Commit from file\n\nbody\n", encoding="utf-8")
 
@@ -209,12 +209,12 @@ class GitOpsTest(unittest.TestCase):
             self.run_git("log", "-1", "--pretty=%s").strip(), "Commit from file"
         )
 
-    def test_note_from_file_uses_contents_and_cleans_up(self) -> None:
+    def test_note_from_file_uses_track_commit_scratch_and_cleans_up(self) -> None:
         (self.root / "tracked.txt").write_text("base\n", encoding="utf-8")
         self.run_git("add", "tracked.txt")
         self.run_git("commit", "-m", "initial")
 
-        note_path = self.root / ".takt" / "pending-note.md"
+        note_path = self.root / "tmp" / "track-commit" / "note.md"
         note_path.parent.mkdir(parents=True, exist_ok=True)
         note_path.write_text("note line 1\nnote line 2\n", encoding="utf-8")
 
@@ -225,6 +225,21 @@ class GitOpsTest(unittest.TestCase):
         self.assertEqual(
             self.run_git("notes", "show", "HEAD"), "note line 1\nnote line 2\n"
         )
+
+    def test_note_from_file_accepts_legacy_takt_pending_note_during_migration(self) -> None:
+        (self.root / "tracked.txt").write_text("base\n", encoding="utf-8")
+        self.run_git("add", "tracked.txt")
+        self.run_git("commit", "-m", "initial")
+
+        note_path = self.root / ".takt" / "pending-note.md"
+        note_path.parent.mkdir(parents=True, exist_ok=True)
+        note_path.write_text("legacy note\n", encoding="utf-8")
+
+        code = git_ops.main(["note-from-file", str(note_path), "--cleanup"])
+
+        self.assertEqual(code, 0)
+        self.assertFalse(note_path.exists())
+        self.assertEqual(self.run_git("notes", "show", "HEAD"), "legacy note\n")
 
     def test_commit_from_file_rejects_missing_file(self) -> None:
         code = git_ops.main(["commit-from-file", ".takt/missing-message.txt"])

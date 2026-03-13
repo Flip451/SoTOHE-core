@@ -3,7 +3,7 @@
 Detailed development workflow for this project.
 
 - `track`: context management layer — `spec.md` / `plan.md` / `verification.md` / progress tracking
-- `takt`: execution workflow — implementation and review progression
+- `Claude Code + Agent Teams + Rust CLI`: execution layer for implementation, review, and guarded git/PR workflow
 
 ## Spec-Driven Development Cycle
 
@@ -30,9 +30,7 @@ Version Baseline (Phase 1) required steps:
 - Update `track/tech-stack.md` MSRV and changelog
 
 3. Implementation phase (choose one)
-   ├── /track:full-cycle <task>              # Autonomous full cycle (via Claude Code)
-   ├── cargo make takt-full-cycle "<task>"   # Autonomous full cycle (direct terminal)
-   ├── cargo make takt-spec-to-impl "<task>" # Spec to implementation only
+   ├── /track:full-cycle <task>              # Autonomous full cycle inside Claude Code
    ├── /track:implement                      # Parallel implementation via Agent Teams
    └── Manual implementation (TDD cycle)
 
@@ -42,48 +40,35 @@ Note:
   and only read `.cache/external-guides/` raw content when necessary
 
 4. Review phase (choose one)
-   ├── cargo make takt-impl-review "<task>"  # Automated review workflow
-   └── /track:review                         # Review → fix → review cycle (zero findings gate)
+   ├── /track:review                         # Review → fix → review cycle (zero findings gate)
+   └── PR review workflow (`cargo make track-pr-review`) when a GitHub PR is needed or already exists
 
 5. Completion
    └── /track:status                         # Check progress
    └── /track:commit <message>               # Guarded commit
 ```
 
-## takt Workflow Details
+## Autonomous Workflow Details
 
-### Pieces (Workflows)
+### `/track:full-cycle <task>`
 
-| Piece | Description |
-|-------|-------------|
-| `full-cycle` | Spec → plan → implement → review (full cycle) |
-| `spec-to-impl` | Spec reading → plan → implement |
-| `impl-review` | Quality check (cargo) → code review |
-| `tdd-cycle` | Red (failing test) → Green (implement) → Refactor |
+`/track:full-cycle` is the canonical autonomous implementation path.
+It keeps the public `/track:*` interface stable while running the full loop inside Claude Code:
 
-### Movement Flow (spec-to-impl)
+1. Resolve the current track and map `<task>` to approved scope in `metadata.json`
+2. Mark the target task `in_progress`
+3. Read `spec.md`, rendered `plan.md`, `verification.md`, and required conventions
+4. Implement with Agent Teams and focused validation
+5. Run the local review loop until findings are zero
+6. Run `cargo make ci`
+7. Update `verification.md` and mark the task `done`
 
-```
-spec-reader
-  → requirements clear → rust-planner
-  → requirements unclear → ABORT
+This replaces legacy `takt` piece execution. There is no second autonomous queue/orchestrator to keep in sync.
 
-rust-planner
-  → plan ready → rust-implementer
+### `/track:implement`
 
-rust-implementer
-  → tests pass → quality-checker
-  → compile/test blockers → debug-research
-
-debug-research
-  → fix path clear → rust-implementer
-  → plan/spec mismatch → rust-planner
-  → still blocked → ABORT
-
-quality-checker
-  → all checks pass → COMPLETE
-  → issues found → rust-implementer
-```
+Use this when the user wants interactive progress updates, narrower task ownership, or staged implementation.
+It shares the same SSoT (`metadata.json`) and verification contract as `/track:full-cycle`.
 
 ## TDD Cycle (Manual)
 
@@ -149,7 +134,7 @@ cargo make machete             # Unused dependency audit
 ```bash
 /track:setup                  # Project initialization
 /track:plan <feature>         # Research, design, plan, and create track artifacts after approval
-/track:full-cycle <task>      # Autonomous full-cycle implementation
+/track:full-cycle <task>      # Autonomous full-cycle implementation in Claude Code
 /track:implement              # Parallel implementation (interactive)
 /track:review                 # Implementation review
 /track:revert                 # Safe revert planning
@@ -166,6 +151,8 @@ cargo make machete             # Unused dependency audit
 
 Specialist capability providers are defined in `.claude/agent-profiles.json`.
 Default profile: `planner` / `reviewer` / `debugger` = Codex, `researcher` / `multimodal_reader` = Gemini.
+
+Execution orchestration stays in Claude Code. Agent profiles select which provider handles a capability, but they do not configure a separate `takt` host runtime.
 
 | Context Size | Recommended Approach |
 |-------------|---------------------|

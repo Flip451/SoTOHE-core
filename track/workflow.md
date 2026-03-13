@@ -32,7 +32,7 @@ Specialist capability の実体は `.claude/agent-profiles.json` で決まる。
 8. **品質ゲート**: `cargo make ci` を通す
 9. **コミット**: `/track:commit <message>` を使う
 
-`metadata.json` SSoT のタスク状態遷移や takt 実行との対応は
+`metadata.json` SSoT のタスク状態遷移や workflow traceability は
 `TAKT_TRACK_TRACEABILITY.md` を参照する。
 
 `track/registry.md` の更新タイミングも `TAKT_TRACK_TRACEABILITY.md` に従う。
@@ -91,12 +91,11 @@ Specialist capability の実体は `.claude/agent-profiles.json` で決まる。
 `cargo make commit` は terminal 直実行用の低レベル代替で、`cargo make ci`（上記すべてを含む）を通したあと `git commit` を実行するが、git note の自動適用は行わない。
 
 自動化用途では exact wrapper も使える。
-`cargo make add-all` は worktree 全体を stage し、`.takt/pending-note.md` や `tmp/track-commit/add-paths.txt` などの transient pending file は除外する。
-選択的 staging が必要な場合は `.takt/pending-add-paths.txt` に path list を書いて `cargo make add-pending-paths`、または `tmp/track-commit/add-paths.txt` に path list を書いて `cargo make track-add-paths` を使う。
-`cargo make commit-pending-message` は `.takt/pending-commit-message.txt` を commit message として使い、成功後にそのファイルを削除する。
-`cargo make note-pending` は `.takt/pending-note.md` を git note として適用し、成功後にそのファイルを削除する。
-`/track:commit` が takt を使わない通常経路で scratch file を置く場合は `tmp/track-commit/commit-message.txt` と `tmp/track-commit/note.md` を使い、
-`cargo make track-commit-message` / `cargo make track-note` で適用する。
+`cargo make add-all` は worktree 全体を stage し、`tmp/track-commit/*` と migration-era の `.takt/pending-*` / `.takt/handoffs` を含む transient scratch file は除外する。
+選択的 staging が必要な場合の正規経路は `tmp/track-commit/add-paths.txt` に path list を書いて `cargo make track-add-paths` を使うこと。
+`cargo make track-commit-message` は `tmp/track-commit/commit-message.txt` を commit message として使い、成功後にそのファイルを削除する。
+`cargo make track-note` は `tmp/track-commit/note.md` を git note として適用し、成功後にそのファイルを削除する。
+`cargo make add-pending-paths` / `cargo make commit-pending-message` / `cargo make note-pending` は、残存 `takt-*` wrapper のための migration compatibility 経路としてのみ扱う。
 
 補足: `cargo make check` はローカルの高速な型確認用で、`cargo make ci` には含まれない。`cargo make machete` は依存整理時の補助監査として個別に実行する。
 
@@ -171,28 +170,12 @@ graph TD
     D[Infra Layer] --> C
 ```
 
-## Integration with takt
+## Legacy Runtime Compatibility
 
-```bash
-cargo make takt-full-cycle "task summary"   # 自動フルサイクル
-cargo make takt-spec-to-impl "task summary" # 仕様→実装
-cargo make takt-impl-review "review scope"  # 実装→レビュー
-cargo make takt-tdd-cycle "target scope"    # TDDサイクル（単一機能）
-cargo make takt-render-personas             # active profile から runtime persona を再生成
-
-# もしくはキュー運用
-cargo make takt-add "task summary"
-cargo make takt-run
-```
-
-`cargo make takt-*` は active profile を使って runtime persona と host/provider を自動適用する。
-profile-aware な `takt` 実行の正式導線は wrapper のみとする。
-
-Queue 運用の最短手順:
-
-1. `cargo make takt-add "task summary"`
-2. `cargo make takt-run`
-3. queue に複数 profile snapshot が混在していたら、整理してから再実行する
+残存している `takt-*` wrapper、`.takt/**` runtime asset、`.takt/pending-*` scratch file は
+廃止トラックの migration compatibility surface としてのみ扱う。
+通常の `/track:*` workflow、PR lifecycle、git note traceability はそれらに依存しない。
+削除順序は `track/items/takt-removal-2026-03-13/takt-runtime-removal-sequence.md` を参照する。
 
 ## Branch Strategy (Branch-per-Track モデル)
 
@@ -257,38 +240,43 @@ Queue 運用の最短手順:
 
 コミットに構造化メモを付与することで、コミットハッシュを変えずに実装の文脈を記録できる。
 
-### 自動生成フロー（takt 経由）
+### 自動生成フロー（現在の正規経路）
 
-takt の全ピース（`full-cycle`, `spec-to-impl`, `impl-review`, `tdd-cycle`）は
-最終ステップで `note-writer` ペルソナが動作し `.takt/pending-note.md` を生成する。
+`/track:commit <message>` は track context から note を生成し、
+`tmp/track-commit/note.md` を `cargo make track-note` で適用する。
+この経路が通常の traceability フローであり、`takt` を前提にしない。
 
-`/track:commit <message>` フローでは、pending-note.md が存在すれば
-その内容を git note として付与し、適用後にファイルを削除する。
+### 互換 fallback（移行期間のみ）
+
+残存している `takt` の全ピース（`full-cycle`, `spec-to-impl`, `impl-review`, `tdd-cycle`）は
+最終ステップで `.takt/pending-note.md` を生成しうる。
+このファイルは migration compatibility input であり、残っている wrapper を消すまでの一時的な fallback とみなす。
 
 ### 手動生成
 
 ```bash
-# takt 経由: pending-note.md をそのまま適用して削除
-cargo make note-pending
-
-# /track:commit 経由: scratch file を適用して削除
+# 正規経路: /track:commit が生成した scratch file を適用して削除
 cargo make track-note
+
+# 互換 fallback: takt 由来の pending-note.md を適用して削除
+cargo make note-pending
 
 # 低レベル: 短い inline text を直接適用（terminal 直実行用）
 cargo make note "note text here"
 ```
 
-`cargo make note-pending` と `cargo make track-note` は file-based wrapper（`git_ops.py note-from-file`）経由で note を適用する。
+`cargo make track-note` と `cargo make note-pending` は file-based wrapper（`git_ops.py note-from-file`）経由で note を適用する。
 `cargo make note` は低レベル経路で `git notes add -f -m "$CARGO_MAKE_TASK_ARGS" HEAD` を直接実行する。
-自動化フローでは file-based wrapper を優先すること。
+自動化フローでは `tmp/track-commit/` を使う file-based wrapper を優先すること。
 
-選択的 staging を自動化する場合は `.takt/pending-add-paths.txt` または `tmp/track-commit/add-paths.txt` に
-repo-relative path を 1 行ずつ書き、`cargo make add-pending-paths` または `cargo make track-add-paths` を使う。
+選択的 staging を自動化する場合は `tmp/track-commit/add-paths.txt` に
+repo-relative path を 1 行ずつ書き、`cargo make track-add-paths` を使う。
+`.takt/pending-add-paths.txt` と `cargo make add-pending-paths` は migration compatibility 用としてのみ残っている。
 `cargo make add <files>` は terminal 直実行用の低レベル staging として扱う。
 
 `cargo make commit` を terminal から直接実行した場合は、必要に応じて `cargo make note ...` を別途実行する。
-自動化フローでは `.takt/pending-commit-message.txt` を用意して `cargo make commit-pending-message` を使ってよい。
-`/track:commit` の非-takt 経路では `tmp/track-commit/commit-message.txt` と `tmp/track-commit/note.md` を使うので `.takt/` を前提にしない。
+自動化フローの正規経路では `tmp/track-commit/commit-message.txt` を用意して `cargo make track-commit-message` を使う。
+`.takt/pending-commit-message.txt` と `cargo make commit-pending-message` は legacy compatibility としてのみ残っている。
 
 ### note フォーマット
 

@@ -1,4 +1,7 @@
 //! Pure workflow rules for guarded git operations.
+//!
+//! `tmp/track-commit/*` is the primary scratch contract. Legacy `.takt/pending-*`
+//! entries remain here only until the remaining takt wrappers are removed.
 
 use std::path::PathBuf;
 

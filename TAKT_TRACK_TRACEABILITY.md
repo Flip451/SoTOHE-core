@@ -1,6 +1,6 @@
-# Takt / Track Traceability Rules
+# Track Workflow Traceability Rules
 
-This document defines the mapping rules between takt execution logs and `track/items/<id>/plan.md` updates.
+This document defines the mapping rules between track workflow state transitions and rendered track views.
 
 ## 1. Responsibility Split (Fixed)
 
@@ -8,8 +8,6 @@ This document defines the mapping rules between takt execution logs and `track/i
   - Single source of truth for specs (`spec.md`) and progress state
   - **`metadata.json` is the SSoT (Single Source of Truth)**: task state and track status are managed in `metadata.json`
   - `plan.md` is a **read-only view** generated from `metadata.json` via `render_plan()` (direct editing forbidden)
-- `takt`:
-  - Execution guardrails (progression control via piece/movement)
 - `Makefile/CI`:
   - Final enforcement of quality gates
 
@@ -17,14 +15,14 @@ This document defines the mapping rules between takt execution logs and `track/i
 
 `metadata.json` is the SSoT for task state. State transitions go through `scripts/track_state_machine.py` API (`transition_task()`, `add_task()`, `set_track_override()`).
 
-1. When implementation starts in takt, update state with `transition_task(track_dir, task_id, "in_progress")`
+1. When implementation starts, update state with `transition_task(track_dir, task_id, "in_progress")`
 2. Completed tasks: `transition_task(track_dir, task_id, "done", commit_hash=hash)`
 3. Unnecessary tasks: `transition_task(track_dir, task_id, "skipped")` (`[-]` in `plan.md`)
 4. Regenerate `plan.md` via `render_plan()` (never edit directly)
 5. `metadata.json` is always the SSoT for plan data:
    - **Initial creation** (`/track:plan` after approval): create `metadata.json` first, then generate `plan.md` via `render_plan()`
    - **Subsequent updates**: update `metadata.json` via state machine API, regenerate `plan.md` via `render_plan()` (direct editing forbidden)
-   - If spec changes are needed during takt execution, update `spec.md` and `metadata.json` in the same turn and regenerate `plan.md`
+   - If spec changes are needed during execution, update `spec.md` and `metadata.json` in the same turn and regenerate `plan.md`
 6. Before commit, `verify-plan-progress` validates that `plan.md` and `metadata.json` are in sync
 7. Track status is auto-derived from task states (`effective_track_status()`). Both `done` and `skipped` are treated as "resolved"; when all tasks are resolved, the track becomes `done`
 8. Use `set_track_override()` for blocking/cancelling
@@ -83,22 +81,20 @@ For day-to-day workflow and quality gate overview, see `track/workflow.md`.
 
 ## 6. Git Notes (Implementation Traceability)
 
-All takt pieces (`full-cycle`, `spec-to-impl`, `impl-review`, `tdd-cycle`) generate `.takt/pending-note.md` via the `note-writer` persona in the final step.
-
-In the `/track:commit` flow, if pending-note.md exists, its content is applied as a git note.
+The normal `/track:commit` flow generates `tmp/track-commit/note.md` from current track context and applies it via `cargo make track-note`.
+Legacy `.takt/pending-note.md` remains a migration-only fallback while residual wrapper surfaces still exist.
 
 When running `cargo make commit` directly from the terminal, follow up with `cargo make note ...` as needed:
 
 ```bash
-cargo make note "$(cat .takt/pending-note.md)"   # from takt output (preferred)
+cargo make track-note                            # apply tmp/track-commit/note.md and delete it
 cargo make note "note text here"                 # inline text
-cargo make note-pending                          # apply .takt/pending-note.md and delete it
+cargo make note-pending                          # apply legacy .takt/pending-note.md and delete it
 ```
 
 `cargo make note` uses `git notes add -f -m "$CARGO_MAKE_TASK_ARGS" HEAD` to pass text directly.
-Both inline text and `$(cat .takt/pending-note.md)` use the same path.
-Automation flows may create `.takt/pending-commit-message.txt` and use `cargo make commit-pending-message`.
-The `/track:commit` non-takt path uses `tmp/track-commit/commit-message.txt` / `tmp/track-commit/note.md` as scratch files.
+Automation flows use `tmp/track-commit/commit-message.txt` / `tmp/track-commit/note.md` as the primary scratch files.
+Legacy `.takt/pending-commit-message.txt` and `.takt/pending-note.md` remain compatibility inputs only until the residual wrapper/runtime surfaces are deleted.
 
 ### Sharing Git Notes Across Machines
 
@@ -120,29 +116,15 @@ Note format follows the "Git Notes" section in `track/workflow.md`.
 ## 7. Reference Commands
 
 ```bash
-# Direct piece execution
-cargo make takt-full-cycle "task summary"
-cargo make takt-spec-to-impl "task summary"
-cargo make takt-impl-review "review scope"
-cargo make takt-tdd-cycle "target scope"
-
-# Queue-based execution
-cargo make takt-add "task summary"
-cargo make takt-run
-
 # Traceability / consistency checks
 cargo make ci
 cargo make verify-plan-progress
 cargo make verify-latest-track
 
 # Git notes
-cargo make note "$(cat .takt/pending-note.md)"  # from takt output (preferred)
+cargo make track-note                           # primary scratch note path
 cargo make note "note text here"                # inline text
-cargo make note-pending                         # apply .takt/pending-note.md and delete it
-cargo make track-note                           # apply tmp/track-commit/note.md and delete it
+cargo make note-pending                         # apply legacy .takt/pending-note.md and delete it
 git notes show HEAD
 git notes list
 ```
-
-`cargo make takt-add` saves an active profile snapshot in the task entry.
-`cargo make takt-run` reproduces host/provider from that snapshot and aborts if pending tasks have mixed snapshots (to avoid provider drift).
