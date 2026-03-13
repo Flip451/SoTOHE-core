@@ -1,0 +1,86 @@
+{
+  "schema_version": 3,
+  "id": "takt-removal-2026-03-13",
+  "branch": "track/takt-removal-2026-03-13",
+  "title": "takt 廃止計画",
+  "status": "planned",
+  "created_at": "2026-03-13T13:06:37Z",
+  "updated_at": "2026-03-13T13:06:37Z",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "現行の takt 依存面を棚卸しし、`.takt/` ディレクトリ、`cargo make takt-*` wrapper、`scripts/takt_profile.py`、`.claude/commands/**`、`.claude/rules/**`、`.claude/docs/WORKFLOW.md`、`START_HERE_HUMAN.md`、agent routing/profile 設定、traceability 文書、CI/guardrail の接点を inventory と cutover 原則として固定する",
+      "status": "todo"
+    },
+    {
+      "id": "T002",
+      "description": "`/track:*` を公開インターフェースとして維持したまま、`.claude/commands/track/full-cycle.md`、`.claude/commands/track/setup.md`、`.claude/docs/WORKFLOW.md`、`START_HERE_HUMAN.md`、agent-router の案内文を含む workflow 文書・運用ガイド・agent profile 説明から takt を実行レイヤとして外し、Claude Code + Agent Teams + Rust CLI を前提にした新しい orchestration 記述へ置き換える",
+      "status": "todo"
+    },
+    {
+      "id": "T003",
+      "description": "takt 由来の pending artifact（`.takt/pending-add-paths.txt`, `.takt/pending-commit-message.txt`, `.takt/pending-note.md`）と handoff/debug scratch の扱いを再設計し、`libs/usecase/src/git_workflow.rs`、`scripts/git_ops.py`、関連テストの transient path 契約も含めて、通常 workflow と commit traceability が `tmp/` または別管理経路だけで完結するように移行計画を固める",
+      "status": "todo"
+    },
+    {
+      "id": "T004",
+      "description": "`Makefile.toml` の `takt-*` / `takt-failure-report` wrapper、`.takt/config.yaml` / `pieces/` / `personas/`、`scripts/takt_profile.py` とそのテスト群を廃止または置換する差分を設計し、削除順序と互換境界を定義する",
+      "status": "todo"
+    },
+    {
+      "id": "T005",
+      "description": "`.claude/settings.json`、`.claude/agent-profiles.json`、`.claude/hooks/_agent_profiles.py`、`.claude/hooks/agent-router.py`、`scripts/verify_orchestra_guardrails.py`、関連 selftest、`DEVELOPER_AI_WORKFLOW.md`、`LOCAL_DEVELOPMENT.md`、`track/workflow.md`、`TAKT_TRACK_TRACEABILITY.md`、`.claude/rules/07-dev-environment.md`、`.claude/commands/track/commit.md` を takt 非依存の整合した状態へ更新する実装計画を作り、必要なら後継文書へ再編する",
+      "status": "todo"
+    },
+    {
+      "id": "T006",
+      "description": "takt 廃止後の Definition of Done を固定し、`cargo make ci`、PR workflow、`/track:commit`、`/track:review`、archive/registry 更新が takt 無しで閉じることを検証する rollout 順と最終撤去条件を明文化する",
+      "status": "todo"
+    }
+  ],
+  "plan": {
+    "summary": [
+      "`takt` を段階的縮退ではなく最終的に廃止し、公開操作面は `/track:*` のまま維持する。",
+      "実行オーケストレーション、pending scratch、traceability、CI/guardrail を Claude Code + Rust CLI 前提へ再設計する。",
+      "削除対象と代替経路を先に固定し、workflow・ドキュメント・検証を同期させながら `takt` 依存を repo から外す。"
+    ],
+    "sections": [
+      {
+        "id": "S000",
+        "title": "Related Conventions (Required Reading)",
+        "description": [
+          "project-docs/conventions/README.md",
+          "project-docs/conventions/security.md"
+        ],
+        "task_ids": []
+      },
+      {
+        "id": "S001",
+        "title": "Inventory and public workflow rewrite",
+        "description": [],
+        "task_ids": [
+          "T001",
+          "T002"
+        ]
+      },
+      {
+        "id": "S002",
+        "title": "Artifact and runtime removal design",
+        "description": [],
+        "task_ids": [
+          "T003",
+          "T004"
+        ]
+      },
+      {
+        "id": "S003",
+        "title": "Guardrails, docs, and rollout definition",
+        "description": [],
+        "task_ids": [
+          "T005",
+          "T006"
+        ]
+      }
+    ]
+  }
+}

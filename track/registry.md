@@ -7,15 +7,15 @@
 
 ## Current Focus
 
-- Latest active track: `None yet`
-- Next recommended command: `/track:plan <feature>`
+- Latest active track: `takt-removal-2026-03-13`
+- Next recommended command: `/track:implement`
 - Last updated: `2026-03-13`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| _No active tracks yet_ | - | `/track:plan <feature>` | - |
+| takt-removal-2026-03-13 | planned | `/track:implement` | 2026-03-13 |
 
 ## Completed Tracks
 
