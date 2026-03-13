@@ -5,8 +5,10 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
-use infrastructure::git_cli::{GitRepository, SystemGitRepo, resolve_repo_path};
-use serde::Deserialize;
+use infrastructure::git_cli::{
+    GitRepository, SystemGitRepo, collect_track_branch_claims, load_explicit_track_branch,
+    resolve_repo_path,
+};
 use usecase::git_workflow::{
     ExplicitTrackBranch, TRANSIENT_AUTOMATION_DIRS, TRANSIENT_AUTOMATION_FILES, TrackBranchClaim,
     validate_stage_path_entries, verify_auto_detected_branch, verify_explicit_track_branch,
@@ -45,12 +47,6 @@ pub struct CommitFromFileArgs {
 #[derive(Debug, Args)]
 pub struct SwitchAndPullArgs {
     pub branch: String,
-}
-
-#[derive(Debug, Deserialize)]
-struct BranchMetadata {
-    branch: Option<String>,
-    status: Option<String>,
 }
 
 pub fn execute(cmd: GitCommand) -> ExitCode {
@@ -300,99 +296,27 @@ fn verify_commit_branch(
     track_dir: &Path,
     repo: &impl GitRepository,
 ) -> Result<(), String> {
-    if !track_dir.is_dir() {
-        return Err(format!("Track directory not found: {}", track_dir.display()));
-    }
-
-    let repo_items_dir = root.join("track/items").canonicalize().map_err(|err| {
-        format!("track/items/ resolves outside the repository root or is unavailable: {err}")
-    })?;
-    let resolved = track_dir.canonicalize().map_err(|err| {
-        format!("failed to resolve track directory {}: {err}", track_dir.display())
-    })?;
-    if resolved.parent() != Some(repo_items_dir.as_path()) {
-        return Err(format!(
-            "Track directory must be exactly track/items/<id>: {}",
-            track_dir.display()
-        ));
-    }
-
-    let metadata = read_metadata(&track_dir.join("metadata.json"))?;
+    let metadata = load_explicit_track_branch(root, track_dir)?;
     verify_explicit_track_branch(
         repo.current_branch()?.as_deref(),
         &ExplicitTrackBranch {
-            display_path: track_dir.display().to_string(),
+            display_path: metadata.display_path,
             expected_branch: metadata.branch,
         },
     )
 }
 
 fn verify_branch_by_auto_detection(repo: &impl GitRepository) -> Result<(), String> {
-    let items_root = repo.root().join("track/items");
-    let archive_root = repo.root().join("track/archive");
-    let mut claims = Vec::new();
-    if items_root.is_dir() {
-        for entry in read_directories(&items_root)? {
-            let metadata_path = entry.join("metadata.json");
-            if !metadata_path.is_file() {
-                continue;
-            }
-            if let Ok(metadata) = read_metadata(&metadata_path) {
-                claims.push(TrackBranchClaim {
-                    track_name: entry
-                        .file_name()
-                        .and_then(|name| name.to_str())
-                        .unwrap_or_default()
-                        .to_owned(),
-                    branch: metadata.branch,
-                    status: metadata.status,
-                });
-            }
-        }
-    }
-    if archive_root.is_dir() {
-        for entry in read_directories(&archive_root)? {
-            let metadata_path = entry.join("metadata.json");
-            if !metadata_path.is_file() {
-                continue;
-            }
-            if let Ok(metadata) = read_metadata(&metadata_path) {
-                claims.push(TrackBranchClaim {
-                    track_name: entry
-                        .file_name()
-                        .and_then(|name| name.to_str())
-                        .unwrap_or_default()
-                        .to_owned(),
-                    branch: metadata.branch,
-                    status: metadata.status,
-                });
-            }
-        }
-    }
+    let claims = collect_track_branch_claims(repo.root())?
+        .into_iter()
+        .map(|claim| TrackBranchClaim {
+            track_name: claim.track_name,
+            branch: claim.branch,
+            status: claim.status,
+        })
+        .collect::<Vec<_>>();
 
     verify_auto_detected_branch(repo.current_branch()?.as_deref(), &claims)
-}
-
-fn read_directories(root: &Path) -> Result<Vec<PathBuf>, String> {
-    let mut dirs = Vec::new();
-    for entry in fs::read_dir(root)
-        .map_err(|err| format!("failed to read directory {}: {err}", root.display()))?
-    {
-        let entry = entry.map_err(|err| format!("failed to read directory entry: {err}"))?;
-        if entry.path().is_dir() {
-            dirs.push(entry.path());
-        }
-    }
-    dirs.sort();
-    Ok(dirs)
-}
-
-fn read_metadata(path: &Path) -> Result<BranchMetadata, String> {
-    let content = fs::read_to_string(path).map_err(|err| {
-        format!("Cannot read or parse metadata.json in {}: {err}", path.display())
-    })?;
-    serde_json::from_str(&content)
-        .map_err(|err| format!("Cannot read or parse metadata.json in {}: {err}", path.display()))
 }
 
 #[cfg(test)]
