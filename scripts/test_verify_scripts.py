@@ -178,6 +178,18 @@ class VerifyScriptsTest(unittest.TestCase):
                 source_path.read_text(encoding="utf-8"), encoding="utf-8"
             )
 
+        for skill_path in (PROJECT_ROOT / ".claude" / "skills").rglob("SKILL.md"):
+            target = root / skill_path.relative_to(PROJECT_ROOT)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(skill_path.read_text(encoding="utf-8"), encoding="utf-8")
+
+        for command_path in (PROJECT_ROOT / ".claude" / "commands").rglob("*.md"):
+            target = root / command_path.relative_to(PROJECT_ROOT)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(
+                command_path.read_text(encoding="utf-8"), encoding="utf-8"
+            )
+
     def setup_verify_architecture_docs_fixture(self, root: Path) -> None:
         scripts_dir = root / "scripts"
         (scripts_dir / "convention_docs.py").write_text(
@@ -1925,7 +1937,163 @@ class VerifyScriptsTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("agent teams enabled", result.stdout)
+        self.assertIn("CLAUDE_CODE_SUBAGENT_MODEL allowlisted", result.stdout)
+        self.assertIn("no hardcoded Codex model literals", result.stdout)
         self.assertIn("verify_orchestra_guardrails PASSED", result.stdout)
+
+    def test_verify_orchestra_guardrails_rejects_non_allowlisted_subagent_model(
+        self,
+    ) -> None:
+        def setup(root: Path) -> None:
+            self.setup_verify_orchestra_fixture(root, minified=True)
+            settings_path = root / ".claude" / "settings.json"
+            settings = json.loads(settings_path.read_text(encoding="utf-8"))
+            settings["env"]["CLAUDE_CODE_SUBAGENT_MODEL"] = "claude-unknown"
+            settings_path.write_text(
+                json.dumps(settings, separators=(",", ":")) + "\n", encoding="utf-8"
+            )
+
+        result = self.run_python_script("verify_orchestra_guardrails.py", setup)
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("CLAUDE_CODE_SUBAGENT_MODEL must be one of", result.stdout)
+        self.assertIn("verify_orchestra_guardrails FAILED", result.stdout)
+
+    def test_verify_orchestra_guardrails_rejects_hardcoded_codex_model_literal(
+        self,
+    ) -> None:
+        def setup(root: Path) -> None:
+            self.setup_verify_orchestra_fixture(root, minified=True)
+            skill_path = root / ".claude" / "skills" / "codex-system" / "SKILL.md"
+            skill_path.write_text(
+                skill_path.read_text(encoding="utf-8") + "\nmodel: gpt-9\n",
+                encoding="utf-8",
+            )
+
+        result = self.run_python_script("verify_orchestra_guardrails.py", setup)
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("contains hardcoded Codex model literal", result.stdout)
+        self.assertIn("verify_orchestra_guardrails FAILED", result.stdout)
+
+    def test_verify_orchestra_guardrails_rejects_default_model_only_guidance(
+        self,
+    ) -> None:
+        replacements = {
+            Path(".claude/commands/track/review.md"): (
+                "Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.<provider>` first, then fall back to `providers.<provider>.default_model`.",
+                "Read the provider's `default_model` to get `{model}`.",
+            ),
+            Path(".claude/skills/codex-system/SKILL.md"): (
+                "profiles.<active_profile>.provider_model_overrides.codex  →  {model}\nfallback: providers.codex.default_model  →  {model}",
+                "providers.codex.default_model  →  {model}",
+            ),
+            Path(".claude/skills/track-plan/SKILL.md"): (
+                "Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.codex` first, then `providers.codex.default_model`",
+                "Resolve `{model}` from `providers.codex.default_model`",
+            ),
+        }
+
+        for relative_path, (old, new) in replacements.items():
+            with self.subTest(path=str(relative_path)):
+                def setup(
+                    root: Path,
+                    relative_path: Path = relative_path,
+                    old: str = old,
+                    new: str = new,
+                ) -> None:
+                    self.setup_verify_orchestra_fixture(root, minified=True)
+                    target_path = root / relative_path
+                    target_path.write_text(
+                        target_path.read_text(encoding="utf-8").replace(old, new),
+                        encoding="utf-8",
+                    )
+
+                result = self.run_python_script("verify_orchestra_guardrails.py", setup)
+
+                self.assertEqual(result.returncode, 1)
+                self.assertIn(
+                    "missing canonical override-first guidance", result.stdout
+                )
+                self.assertIn("verify_orchestra_guardrails FAILED", result.stdout)
+
+    def test_verify_orchestra_guardrails_rejects_missing_default_model_fallback(
+        self,
+    ) -> None:
+        replacements = {
+            Path(".claude/commands/track/review.md"): (
+                " then fall back to `providers.<provider>.default_model`.",
+                "",
+            ),
+            Path(".claude/skills/codex-system/SKILL.md"): (
+                "\nfallback: providers.codex.default_model  →  {model}",
+                "",
+            ),
+            Path(".claude/skills/track-plan/SKILL.md"): (
+                " then `providers.codex.default_model`",
+                "",
+            ),
+        }
+
+        for relative_path, (old, new) in replacements.items():
+            with self.subTest(path=str(relative_path)):
+                def setup(
+                    root: Path,
+                    relative_path: Path = relative_path,
+                    old: str = old,
+                    new: str = new,
+                ) -> None:
+                    self.setup_verify_orchestra_fixture(root, minified=True)
+                    target_path = root / relative_path
+                    target_path.write_text(
+                        target_path.read_text(encoding="utf-8").replace(old, new),
+                        encoding="utf-8",
+                    )
+
+                result = self.run_python_script("verify_orchestra_guardrails.py", setup)
+
+                self.assertEqual(result.returncode, 1)
+                self.assertIn(
+                    "missing canonical override-first guidance", result.stdout
+                )
+                self.assertIn("verify_orchestra_guardrails FAILED", result.stdout)
+
+    def test_verify_orchestra_guardrails_rejects_stale_default_model_only_guidance(
+        self,
+    ) -> None:
+        stale_lines = {
+            Path(".claude/commands/track/review.md"): (
+                "\nRead the provider's `default_model` to get `{model}`.\n"
+            ),
+            Path(".claude/skills/codex-system/SKILL.md"): (
+                "\nread `providers.codex.default_model` from `.claude/agent-profiles.json` and pass as `--model {model}`\n"
+            ),
+            Path(".claude/skills/track-plan/SKILL.md"): (
+                '\ncodex exec --model gpt-5.3-codex --sandbox read-only --full-auto "\n'
+            ),
+        }
+
+        for relative_path, stale_line in stale_lines.items():
+            with self.subTest(path=str(relative_path)):
+                def setup(
+                    root: Path,
+                    relative_path: Path = relative_path,
+                    stale_line: str = stale_line,
+                ) -> None:
+                    self.setup_verify_orchestra_fixture(root, minified=True)
+                    target_path = root / relative_path
+                    target_path.write_text(
+                        target_path.read_text(encoding="utf-8") + stale_line,
+                        encoding="utf-8",
+                    )
+
+                result = self.run_python_script("verify_orchestra_guardrails.py", setup)
+
+                self.assertEqual(result.returncode, 1)
+                self.assertIn(
+                    "still contains stale default_model-only guidance", result.stdout
+                )
+                self.assertIn("verify_orchestra_guardrails FAILED", result.stdout)
 
     def test_verify_orchestra_guardrails_rejects_missing_allow_entry(self) -> None:
         def setup(root: Path) -> None:
