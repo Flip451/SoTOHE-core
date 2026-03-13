@@ -2794,7 +2794,7 @@ class VerifyScriptsTest(unittest.TestCase):
         ):
             self.assertIn(snippet, makefile)
 
-    def test_takt_wrappers_use_python_bin_and_wrapper_only_guidance(self) -> None:
+    def test_takt_wrappers_are_legacy_compatibility_surfaces(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
         for task_name in (
             "takt-add",
@@ -2830,8 +2830,7 @@ class VerifyScriptsTest(unittest.TestCase):
             "track/workflow.md",
         ):
             content = (PROJECT_ROOT / rel_path).read_text(encoding="utf-8")
-            self.assertIn("profile-aware", content)
-            self.assertIn("wrapper", content)
+            self.assertIn("migration compatibility", content)
             self.assertNotIn("`takt prompt` を直接使う場合だけ", content)
         self.assertIn(
             "Python 3.11+",
@@ -2855,29 +2854,6 @@ class VerifyScriptsTest(unittest.TestCase):
         )
         self.assertIn(
             "PYTHON_BIN",
-            (PROJECT_ROOT / "DEVELOPER_AI_WORKFLOW.md").read_text(encoding="utf-8"),
-        )
-        self.assertIn(
-            "requirements-python.txt",
-            (PROJECT_ROOT / "LOCAL_DEVELOPMENT.md").read_text(encoding="utf-8"),
-        )
-        self.assertIn(
-            "requirements-python.txt",
-            (PROJECT_ROOT / "DEVELOPER_AI_WORKFLOW.md").read_text(encoding="utf-8"),
-        )
-        self.assertIn(
-            "uv", (PROJECT_ROOT / "LOCAL_DEVELOPMENT.md").read_text(encoding="utf-8")
-        )
-        self.assertIn(
-            "uv",
-            (PROJECT_ROOT / "DEVELOPER_AI_WORKFLOW.md").read_text(encoding="utf-8"),
-        )
-        self.assertIn(
-            ".venv/bin/python",
-            (PROJECT_ROOT / "LOCAL_DEVELOPMENT.md").read_text(encoding="utf-8"),
-        )
-        self.assertIn(
-            ".venv/bin/python",
             (PROJECT_ROOT / "DEVELOPER_AI_WORKFLOW.md").read_text(encoding="utf-8"),
         )
 

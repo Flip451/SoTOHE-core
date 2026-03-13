@@ -13,13 +13,11 @@
 
 - 必須: Docker + docker compose
 - 必須: Python 3.11+
-- `takt-*` をホストで使う場合の Python package 管理は `uv`
 - 任意: asdf（`.tool-versions` の `python 3.12.8` を使う場合）
 - Linux で uid/gid が `1000:1000` 以外なら `HOST_UID=$(id -u)` / `HOST_GID=$(id -g)` を export してから compose wrapper を使う
 - 必須: Claude Code が利用可能
 - 既定 profile（`default`）を使う場合は Codex CLI が必須
 - 既定 profile（`default`）を使う場合は Gemini CLI が必須
-- 任意: `takt`（`/track:full-cycle` を使う場合のみ必要）
 
 補足:
 
@@ -28,10 +26,7 @@
   - Codex: `planner` / `reviewer` / `debugger`
   - Gemini: `researcher` / `multimodal_reader`
   - Claude Code: `implementer`
-- `guides-*` / `conventions-*` / `architecture-rules-*` / `takt-failure-report` / `takt-*` は `cargo make` wrapper 経由で実行する。
-- `takt-*` を host で使う場合は `requirements-python.txt` の PyYAML が必要。
-- host 側セットアップは `uv venv .venv && uv pip install --python .venv/bin/python -r requirements-python.txt` を使う。
-- `takt-*` wrapper の Python 解決順は `PYTHON_BIN` → `.venv/bin/python` → `python3`。
+- `guides-*` / `conventions-*` / `architecture-rules-*` は `cargo make` wrapper 経由で実行する。
 - ローカルの `python3` 解決が不安定な場合は `.tool-versions` の Python 3.12.8 を使うか、ホスト側の検証スクリプトと `cargo make --allow-private verify-orchestra-local` に対して `PYTHON_BIN=/path/to/python3.12 ...` を使う。
 - Python test（`guides-selftest` / `scripts-selftest` / `hooks-selftest`）は Docker 経由で `pytest` を実行する。
 - `*-local` タスクは内部専用（private）。
@@ -103,7 +98,7 @@ flowchart TD
 - `/track:*` を入口にして、仕様から計画、実装、レビュー、コミットまでを一貫して進める
 - `track/items/` の `spec.md` / `plan.md` / `verification.md` を常に最新の正式な状態に保つ
 - `project-docs/conventions/` にプロジェクト固有の実装規約を集約し、テンプレート共通ルールと分離する
-- Claude Code を主操作面にしつつ、必要なときだけ内部で specialist capability と takt を使う
+- Claude Code を主操作面にしつつ、必要なときだけ内部で specialist capability と Agent Teams を使う
 - ローカル実行は `docker compose` 前提で統一する
 - compose 実行は host UID/GID に寄せ、repo bind mount の `target/` と `./.cache/cargo/` を共有する
 
@@ -141,7 +136,7 @@ flowchart TD
 - AI:
   - `/track:*` コマンドに沿って仕様、計画、実装、検証、更新を進める
   - 必要に応じて `planner` / `researcher` / `implementer` / `reviewer` / `debugger` / `multimodal_reader` を内部的に使う（実体は `.claude/agent-profiles.json` と §5 を参照）
-  - Agent Teams / takt も必要に応じて使う
+  - Agent Teams も必要に応じて使う
   - 実行後に関連ドキュメントと進捗状態を同期する
 
 ## 3. `/track:*` ベースの運用フロー
@@ -186,7 +181,7 @@ flowchart TD
 2. Claude Code が `track/registry.md`, `track/items/<id>/spec.md`, `track/items/<id>/plan.md`, `track/items/<id>/verification.md` を読んで状況を整理し、次に使うべきコマンドを提案する
    - 例: `/track:plan`, `/track:implement`, `/track:review`, `/track:ci`
 3. 開発者が提案を採用するか、別の進め方を指示する
-4. Claude Code がコマンドを実行し、必要なら active profile に応じて specialist capability / takt / Agent Teams を使う
+4. Claude Code がコマンドを実行し、必要なら active profile に応じて specialist capability / Agent Teams を使う
 5. 実行後に `plan.md` と関連ドキュメントを更新する
 6. 1 に戻る
 
@@ -212,7 +207,7 @@ cargo make build-dev    # dev watcher イメージを事前ビルド（任意）
 cargo make up           # 開発用 compose サービスを起動（bacon watcher）
 cargo make logs         # dev watcher ログを表示
 cargo make down         # 開発用 compose サービスを停止
-cargo make tools-up     # tools-daemon を起動（exec 系タスク・takt 用）
+cargo make tools-up     # tools-daemon を起動（exec 系タスク用）
 cargo make tools-down   # tools-daemon を停止
 ```
 
@@ -222,29 +217,18 @@ cargo make tools-down   # tools-daemon を停止
 - `apps/server` の runtime バイナリは最小 HTTP サーバーで、`GET /health` と `GET /` を返すテンプレート実装
 - `cargo make` の compose wrapper は `target/`, `./.cache/cargo/`, `./.cache/home/`, `./.cache/sccache/` を host 側所有で使う前提なので、Linux では `HOST_UID` / `HOST_GID` を合わせる
 
-#### takt-* コマンド（`/track:full-cycle` の内部でも使われる）
-
-注: 実行前に `cargo make tools-up` で tools-daemon を起動しておくこと。
+#### Track / PR helper
 
 ```bash
-cargo make takt-full-cycle "<task>"    # 設計〜実装〜レビュー〜CIを自律実行
-cargo make takt-spec-to-impl "<task>"  # spec から実装まで自律実行
-cargo make takt-impl-review "<task>"   # 実装〜レビューを自律実行
-cargo make takt-tdd-cycle "<task>"     # TDD サイクルを自律実行
-cargo make takt-add "<task>"           # タスクをキューに積む
-cargo make takt-run                    # キュー内のタスクを順次実行
-cargo make takt-render-personas        # active profile から runtime persona を再生成
+cargo make track-pr-push            # 現在の track branch を push
+cargo make track-pr-ensure          # PR を作成または再利用
+cargo make track-pr-review          # PR review helper を実行
+cargo make track-pr-status <pr>     # checks 状態を表示
+cargo make track-pr-merge <pr> --method merge
 ```
 
-`cargo make takt-*` は active profile を使って runtime persona と host/provider を自動適用する。
-profile-aware な `takt` 実行の正式導線は wrapper のみとし、direct `takt` は補助用途に限る。
-host 側 wrapper は `PYTHON_BIN` を最優先し、未指定なら `.venv/bin/python`、最後に `python3` を使う。
-
-Queue 運用の最短手順:
-
-1. `cargo make takt-add "<task>"`
-2. `cargo make takt-run`
-3. queue に複数 profile snapshot が混在していたら、整理してから再実行する
+`/track:full-cycle` は Claude Code 内で閉じる orchestration として扱い、`cargo make takt-*` を前提にしない。
+残存 `takt-*` wrapper は migration compatibility surface であり、通常導線としては案内しない。
 
 #### 高速確認（exec 系）
 

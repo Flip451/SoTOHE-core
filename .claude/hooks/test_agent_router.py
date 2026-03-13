@@ -155,6 +155,19 @@ class AgentRouterTest(unittest.TestCase):
             ),
         )
 
+    def test_workflow_message_no_longer_mentions_takt_commands(self) -> None:
+        message = agent_router.build_workflow_message("track")
+
+        self.assertNotIn("takt-full-cycle", message)
+        self.assertIn("track-pr-review", message)
+
+    def test_takt_command_no_longer_triggers_external_guides(self) -> None:
+        self.assertFalse(
+            agent_router.should_inject_external_guides(
+                'cargo make takt-full-cycle "postgres refactor"'
+            )
+        )
+
     def test_external_guide_message_is_empty_without_matches(self) -> None:
         self.assertEqual(agent_router.build_external_guides_message([]), "")
 
