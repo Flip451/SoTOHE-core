@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `python-dependency-deprecation-2026-03-13`
-- Next recommended command: `/track:full-cycle <task>`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-13`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| python-dependency-deprecation-2026-03-13 | in_progress | `/track:full-cycle <task>` | 2026-03-13 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| python-dependency-deprecation-2026-03-13 | Done | 2026-03-13 |
 | subagent-model-config-2026-03-13 | Done | 2026-03-13 |
 | claude-md-compression-2026-03-13 | Done | 2026-03-12 |
 
