@@ -18,6 +18,7 @@
 - [x] `.claude/settings.json` and `verify_orchestra_guardrails.py` no longer treat `takt-*` wrappers or `.cache/takt-uv/**` as baseline guardrail surfaces
 - [x] `.claude/agent-profiles.json` now uses `workflow_host_provider` / `workflow_host_model` as the canonical host schema, while hooks keep `takt_host_*` as migration compatibility aliases
 - [x] public docs and traceability rules now describe `takt-*` and `.takt/pending-*` as legacy migration compatibility only, not as the normal execution path
+- [x] `takt-removal-definition-of-done.md` fixes the post-`takt` required-path matrix, milestone gates, rollout order, and final blockers in one artifact
 
 ## Manual Verification Steps
 
@@ -30,7 +31,7 @@
 7. Inspect `libs/usecase/src/git_workflow.rs`, `scripts/git_ops.py`, and `scripts/test_git_ops.py`
 8. Read `takt-touchpoint-inventory.md` and confirm each remaining task maps to one or more inventory sections
 9. Verify this track's `metadata.json`, `spec.md`, and `plan.md` align
-10. Confirm `track/registry.md` lists this track as the latest active track
+10. Confirm `track/registry.md` lists this track in `Completed Tracks` and shows no remaining active track when this completion slice is rendered
 11. Read `.claude/commands/track/full-cycle.md`, `.claude/commands/track/setup.md`, `.claude/docs/WORKFLOW.md`, `START_HERE_HUMAN.md`, and `.claude/hooks/agent-router.py` and confirm they describe Claude Code + Agent Teams + Rust CLI orchestration rather than `takt` execution
 12. Read `track/items/takt-removal-2026-03-13/pending-artifact-cutover.md` and confirm it defines `tmp/track-commit/*` as the primary scratch area and `.takt/pending-*` as migration-only compatibility input
 13. Read `.claude/commands/track/commit.md` and `track/workflow.md` and confirm they prefer `cargo make track-note` / `cargo make track-commit-message` over legacy `.takt/pending-*` wrappers
@@ -39,6 +40,8 @@
 16. Run `pytest -q -o cache_dir=.cache/pytest scripts/test_git_ops.py scripts/test_make_wrappers.py`
 17. Run `cargo run --quiet -p cli -- track views validate --project-root .`
 18. Read `track/items/takt-removal-2026-03-13/takt-runtime-removal-sequence.md` and confirm each remaining wrapper/runtime/test surface is assigned to a named deletion phase
+19. Read `track/items/takt-removal-2026-03-13/takt-removal-definition-of-done.md` and confirm it aligns with the inventory, removal sequence, `/track:*` flow, PR workflow, and CI gate expectations
+20. Run `cargo make ci`
 
 ## Result
 
@@ -52,6 +55,7 @@ The repo still contains residual `takt` wrappers, `.takt/**` runtime assets, and
 T001 fixes inventory scope only; no runtime/doc/guardrail deletion has started yet.
 Legacy `.takt/pending-*` and `.takt/handoffs` compatibility paths still exist by design until T004 removes the remaining wrappers and runtime assets.
 The runtime/wrapper removal plan is fixed, but the actual deletion is intentionally deferred to the next implementation slice so Makefile tasks, `.takt/**`, and their Python/runtime tests can move in lockstep.
+This track now fixes the rollout gate and end-state definition, but it does not itself delete `takt` runtime assets.
 
 ## Progress Notes
 
@@ -74,6 +78,9 @@ The runtime/wrapper removal plan is fixed, but the actual deletion is intentiona
 - T005 narrowed `.claude/hooks/agent-router.py` so external-guide injection is keyed to `/track:*` commands only, and updated the related hook regression tests.
 - T005 rewrote `LOCAL_DEVELOPMENT.md`, `DEVELOPER_AI_WORKFLOW.md`, `track/workflow.md`, `TAKT_TRACK_TRACEABILITY.md`, `.claude/rules/07-dev-environment.md`, and `.claude/commands/track/commit.md` so `takt` is documented as legacy compatibility rather than the normal execution layer.
 - Latest verification for T005 implementation: `python3 -m pytest -q .claude/hooks/test_agent_profiles.py .claude/hooks/test_agent_router.py scripts/test_verify_scripts.py scripts/test_takt_profile.py`, `cargo run --quiet -p cli -- track views validate --project-root .`, and `cargo make ci` passed on the final uncommitted diff.
+- T006 added `takt-removal-definition-of-done.md` to define the global post-`takt` completion gate, interpretation rule, required-path matrix, M1-M4 rollout gates, and remaining blockers.
+- The DoD explicitly fixes success criteria for `/track:implement`, `/track:review`, `/track:commit`, PR flow, archive/registry updates, and the full `cargo make ci` gate without `takt` as a required execution layer.
+- Latest verification for T006 implementation: read `takt-touchpoint-inventory.md`, `takt-runtime-removal-sequence.md`, and `takt-removal-definition-of-done.md`, then ran `cargo run --quiet -p cli -- track views validate --project-root .` and `cargo make ci`.
 
 ## Verified At
 
