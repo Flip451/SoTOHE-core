@@ -1,0 +1,19 @@
+## Task Summary: Rust track workflow validation migration
+
+**Track:** python-dependency-deprecation-2026-03-13
+**Task:** Rust 化した track validation / sync / transition workflow の確定
+**Date:** 2026-03-13
+
+### Changes
+
+- Makefile.toml: `track views validate` と `track-transition` wrapper を Rust CLI 前提に整理し、`<track_dir>` 契約を維持
+- apps/cli/src/commands/track.rs: `track transition` の project root 解決を追加し、post-sync failure を warning 扱いに修正
+- libs/infrastructure/src/track/render.rs: metadata validation と rendered view drift 検査を Rust に集約し、single-track sync の partial write を防止
+- scripts/test_make_wrappers.py: wrapper contract の回帰テストを追加
+- track/items/python-dependency-deprecation-2026-03-13/*: T003 完了と review / CI 結果を verification に反映
+
+### Why
+
+track workflow と CI の必須経路から Python 依存を外し、`.venv` 未構築でも
+状態遷移と rendered view の整合検証が壊れない構成に寄せるためです。
+今回のコミットで `/track:plan` 相当の workflow core を Rust validation / sync に集約する差分を完了しました。
