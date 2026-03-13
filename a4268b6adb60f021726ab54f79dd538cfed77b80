@@ -1,0 +1,20 @@
+## Task Summary: Switch the default Claude subagent model to Sonnet and harden override-first guardrails
+
+**Track:** subagent-model-config-2026-03-13
+**Task:** Change CLAUDE_CODE_SUBAGENT_MODEL to Sonnet and add regression guards for override-first model resolution
+**Date:** 2026-03-13
+
+### Changes
+
+- `.claude/settings.json`: switched `CLAUDE_CODE_SUBAGENT_MODEL` from Opus to Sonnet
+- `.claude/rules/11-subagent-model.md`: added default/override guidance for Sonnet, Opus, and Haiku
+- `.claude/skills/codex-system/SKILL.md`: documented override-first model resolution with active-profile fallback
+- `.claude/skills/track-plan/SKILL.md`: removed hardcoded model guidance and aligned planner lookup with active-profile overrides
+- `.claude/commands/track/review.md`: updated reviewer model resolution to use override-first lookup
+- `scripts/verify_orchestra_guardrails.py`: added allowlist, hardcoded-model scan, and canonical override-first checks
+- `scripts/test_verify_scripts.py`: added regression tests for allowlist and override-first guardrails
+- `track/items/subagent-model-config-2026-03-13/*`: recorded completed track plan and verification
+
+### Why
+
+Claude Code subagents should default to Sonnet for normal work while preserving explicit override guidance for harder tasks. The guardrails and tests now enforce the canonical override-first model resolution so future skill or command edits cannot silently regress to stale hardcoded or default-only guidance.
