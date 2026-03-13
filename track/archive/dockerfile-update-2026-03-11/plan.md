@@ -1,6 +1,8 @@
 <!-- Generated from metadata.json — DO NOT EDIT DIRECTLY -->
 # Dockerfile の更新
 
+Dockerfile 内の Rust toolchain と cargo-chef のバージョンを最新安定版に更新する
+
 ## バージョン更新
 
 - [x] Dockerfile の ARG 更新（RUST_VERSION 1.93.1→1.94.0, CARGO_CHEF_VERSION 0.1.76→0.1.77）

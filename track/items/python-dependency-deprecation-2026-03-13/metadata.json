@@ -5,7 +5,7 @@
   "title": "Python 依存脱却計画",
   "status": "in_progress",
   "created_at": "2026-03-13T12:30:00Z",
-  "updated_at": "2026-03-13T05:21:52.407592+00:00",
+  "updated_at": "2026-03-13T06:12:44Z",
   "tasks": [
     {
       "id": "T001",
@@ -22,26 +22,23 @@
     {
       "id": "T003",
       "description": "/track:plan 相当の workflow から Python 依存を除去するため、track_state_machine.py / track_schema.py / track_markdown.py が担う metadata validation・rendered view generation・sync-views を Rust subcommand へ集約する設計と差分を作る",
-      "status": "in_progress",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "57decaf7e62f182dbf1e7d1fb0129a15cb479c5f"
     },
     {
       "id": "T004",
       "description": "git workflow wrapper（git_ops.py, branch_switch.py, pr_merge.py）を Rust CLI に統合する移行計画を固め、commit/note/branch/pr 系の主要 wrapper を Python 非依存にする",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T005",
       "description": "pr_review.py と verify_* / check_layers / verify_orchestra_guardrails の役割を再分類し、Rust 化するもの・データ源泉見直し後に整理するもの・optional utility に残すものを明文化する",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T006",
       "description": ".venv 非依存で hook fail-closed、track workflow、CI の必須経路が成立することを Definition of Done とし、M1-M4 の検証手順と rollout 順を固定する",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     }
   ],
   "plan": {
@@ -54,6 +51,7 @@
       {
         "id": "S001",
         "title": "Phase 0-1: Inventory and security-critical hooks",
+        "description": [],
         "task_ids": [
           "T001",
           "T002"
@@ -62,6 +60,7 @@
       {
         "id": "S002",
         "title": "Phase 2-4: Workflow core and wrapper migration",
+        "description": [],
         "task_ids": [
           "T003",
           "T004"
@@ -70,6 +69,7 @@
       {
         "id": "S003",
         "title": "Phase 5-6: Verification boundary and rollout",
+        "description": [],
         "task_ids": [
           "T005",
           "T006"

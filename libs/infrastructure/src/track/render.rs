@@ -9,10 +9,18 @@ use super::codec::{self, DocumentMeta};
 
 const TRACK_ITEMS_DIR: &str = "track/items";
 const TRACK_ARCHIVE_DIR: &str = "track/archive";
+const RESERVED_ID_SEGMENTS: &[&str] = &["git"];
+const VALID_TRACK_STATUSES: &[&str] =
+    &["planned", "in_progress", "done", "blocked", "cancelled", "archived"];
+
+fn rendered_matches(actual: &str, expected: &str) -> bool {
+    actual == expected || actual.trim_end_matches('\n') == expected.trim_end_matches('\n')
+}
 
 /// Track aggregate plus metadata-only fields required for view rendering.
 #[derive(Debug, Clone)]
 pub struct TrackSnapshot {
+    pub dir: PathBuf,
     pub track: TrackMetadata,
     pub meta: DocumentMeta,
 }
@@ -44,6 +52,15 @@ pub enum RenderError {
         #[source]
         source: codec::CodecError,
     },
+
+    #[error("rendered view out of sync at {path}: {reason}")]
+    OutOfSync { path: PathBuf, reason: String },
+
+    #[error("unsupported schema_version {schema_version} at {path}")]
+    UnsupportedSchemaVersion { path: PathBuf, schema_version: u32 },
+
+    #[error("invalid track metadata at {path}: {reason}")]
+    InvalidTrackMetadata { path: PathBuf, reason: String },
 }
 
 /// Collects all valid track snapshots from active and archive directories.
@@ -81,13 +98,19 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
                 source: codec::CodecError::Json(source),
             })?;
         if !matches!(parsed.schema_version, 2 | 3) {
-            continue;
+            return Err(RenderError::UnsupportedSchemaVersion {
+                path: metadata_path,
+                schema_version: parsed.schema_version,
+            });
         }
+        validate_track_document(&metadata_path, track_dir.file_name(), &parsed)?;
 
-        let (track, meta) = codec::decode(&json).map_err(|source| {
-            RenderError::InvalidMetadata { path: metadata_path.clone(), source }
+        let decoded = codec::decode(&json).map_err(|source| RenderError::InvalidMetadata {
+            path: metadata_path.clone(),
+            source,
         })?;
-        snapshots.push(TrackSnapshot { track, meta });
+        let (track, meta) = decoded;
+        snapshots.push(TrackSnapshot { dir: track_dir, track, meta });
     }
 
     snapshots.sort_by(|a, b| b.updated_at().cmp(a.updated_at()));
@@ -268,7 +291,100 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
 /// # Errors
 /// Returns `RenderError` if any metadata file cannot be read or decoded.
 pub fn validate_track_snapshots(root: &Path) -> Result<(), RenderError> {
-    let _ = collect_track_snapshots(root)?;
+    let snapshots = collect_track_snapshots(root)?;
+    for snapshot in &snapshots {
+        let plan_path = snapshot.dir.join("plan.md");
+        let actual = std::fs::read_to_string(&plan_path)?;
+        let expected = render_plan(&snapshot.track);
+        if !rendered_matches(&actual, &expected) {
+            return Err(RenderError::OutOfSync {
+                path: plan_path,
+                reason: "plan.md does not match metadata.json".to_owned(),
+            });
+        }
+    }
+
+    let registry_path = root.join("track/registry.md");
+    let actual_registry = std::fs::read_to_string(&registry_path)?;
+    let expected_registry = render_registry(&snapshots);
+    if !rendered_matches(&actual_registry, &expected_registry) {
+        return Err(RenderError::OutOfSync {
+            path: registry_path,
+            reason: "registry.md does not match metadata.json".to_owned(),
+        });
+    }
+    Ok(())
+}
+
+fn validate_track_document(
+    metadata_path: &Path,
+    dir_name: Option<&std::ffi::OsStr>,
+    doc: &codec::TrackDocumentV2,
+) -> Result<(), RenderError> {
+    let Some(dir_name) = dir_name.and_then(std::ffi::OsStr::to_str) else {
+        return Err(RenderError::InvalidTrackMetadata {
+            path: metadata_path.to_path_buf(),
+            reason: "track directory name is not valid UTF-8".to_owned(),
+        });
+    };
+
+    if doc.id != dir_name {
+        return Err(RenderError::InvalidTrackMetadata {
+            path: metadata_path.to_path_buf(),
+            reason: format!("metadata id '{}' does not match directory '{}'", doc.id, dir_name),
+        });
+    }
+
+    let segments = doc.id.split('-').collect::<Vec<_>>();
+    for reserved in RESERVED_ID_SEGMENTS {
+        if segments.iter().any(|segment| segment.eq_ignore_ascii_case(reserved)) {
+            return Err(RenderError::InvalidTrackMetadata {
+                path: metadata_path.to_path_buf(),
+                reason: format!("Track id '{}' contains reserved segment '{}'", doc.id, reserved),
+            });
+        }
+    }
+
+    if !VALID_TRACK_STATUSES.contains(&doc.status.as_str()) {
+        return Err(RenderError::InvalidTrackMetadata {
+            path: metadata_path.to_path_buf(),
+            reason: format!("Invalid track status '{}'", doc.status),
+        });
+    }
+
+    let (track, meta) = codec::decode(
+        &std::fs::read_to_string(metadata_path).map_err(RenderError::Io)?,
+    )
+    .map_err(|source| RenderError::InvalidMetadata { path: metadata_path.to_path_buf(), source })?;
+
+    let derived = track.status().to_string();
+    if doc.status == "archived" {
+        if derived != "done" {
+            return Err(RenderError::InvalidTrackMetadata {
+                path: metadata_path.to_path_buf(),
+                reason: format!(
+                    "Status drift: archived track must have all tasks resolved (done/skipped), but derived='{derived}'"
+                ),
+            });
+        }
+    } else if doc.status != derived {
+        return Err(RenderError::InvalidTrackMetadata {
+            path: metadata_path.to_path_buf(),
+            reason: format!(
+                "Status drift: metadata.status='{}' but derived='{}'",
+                doc.status, derived
+            ),
+        });
+    }
+
+    if doc.schema_version == 3 && doc.branch.is_none() && doc.status != "archived" {
+        return Err(RenderError::InvalidTrackMetadata {
+            path: metadata_path.to_path_buf(),
+            reason: "'branch' is required for v3 tracks with non-archived status".to_owned(),
+        });
+    }
+
+    let _ = meta;
     Ok(())
 }
 
@@ -281,22 +397,26 @@ pub fn sync_rendered_views(
     track_id: Option<&str>,
 ) -> Result<Vec<PathBuf>, RenderError> {
     let mut changed = Vec::new();
-    let items_root = root.join(TRACK_ITEMS_DIR);
-
+    let snapshots = collect_track_snapshots(root)?;
+    let rendered_registry = render_registry(&snapshots);
+    let registry_path = root.join("track/registry.md");
     let track_dirs: Vec<PathBuf> = if let Some(track_id) = track_id {
-        vec![items_root.join(track_id)]
-    } else if items_root.is_dir() {
+        vec![root.join(TRACK_ITEMS_DIR).join(track_id)]
+    } else {
         let mut dirs = Vec::new();
-        for entry in std::fs::read_dir(&items_root)? {
-            let entry = entry?;
-            if entry.path().is_dir() {
-                dirs.push(entry.path());
+        for base in [root.join(TRACK_ITEMS_DIR), root.join(TRACK_ARCHIVE_DIR)] {
+            if !base.is_dir() {
+                continue;
+            }
+            for entry in std::fs::read_dir(base)? {
+                let entry = entry?;
+                if entry.path().is_dir() {
+                    dirs.push(entry.path());
+                }
             }
         }
         dirs.sort();
         dirs
-    } else {
-        Vec::new()
     };
 
     for track_dir in track_dirs {
@@ -311,7 +431,10 @@ pub fn sync_rendered_views(
                 source: codec::CodecError::Json(source),
             })?;
         if !matches!(parsed.schema_version, 2 | 3) {
-            continue;
+            return Err(RenderError::UnsupportedSchemaVersion {
+                path: metadata_path,
+                schema_version: parsed.schema_version,
+            });
         }
         let (track, _) = codec::decode(&json).map_err(|source| RenderError::InvalidMetadata {
             path: metadata_path.clone(),
@@ -320,20 +443,18 @@ pub fn sync_rendered_views(
         let rendered = render_plan(&track);
         let plan_path = track_dir.join("plan.md");
         let old = std::fs::read_to_string(&plan_path).ok();
-        if old.as_deref() != Some(rendered.as_str()) {
+        if old.as_deref().is_none_or(|existing| !rendered_matches(existing, rendered.as_str())) {
             atomic_write_file(&plan_path, rendered.as_bytes())?;
             changed.push(plan_path);
         }
     }
 
-    let snapshots = collect_track_snapshots(root)?;
-    let rendered_registry = render_registry(&snapshots);
-    let registry_path = root.join("track/registry.md");
     if let Some(parent) = registry_path.parent() {
         std::fs::create_dir_all(parent)?;
     }
     let old = std::fs::read_to_string(&registry_path).ok();
-    if old.as_deref() != Some(rendered_registry.as_str()) {
+    if old.as_deref().is_none_or(|existing| !rendered_matches(existing, rendered_registry.as_str()))
+    {
         atomic_write_file(&registry_path, rendered_registry.as_bytes())?;
         changed.push(registry_path);
     }
@@ -441,9 +562,21 @@ mod tests {
         let (done_track, done_meta) = codec::decode(&done_json).unwrap();
         let (archived_track, archived_meta) = codec::decode(&archived_json).unwrap();
         let rendered = render_registry(&[
-            TrackSnapshot { track: active_track, meta: active_meta },
-            TrackSnapshot { track: done_track, meta: done_meta },
-            TrackSnapshot { track: archived_track, meta: archived_meta },
+            TrackSnapshot {
+                dir: PathBuf::from("track/items/track-a"),
+                track: active_track,
+                meta: active_meta,
+            },
+            TrackSnapshot {
+                dir: PathBuf::from("track/items/track-b"),
+                track: done_track,
+                meta: done_meta,
+            },
+            TrackSnapshot {
+                dir: PathBuf::from("track/archive/track-c"),
+                track: archived_track,
+                meta: archived_meta,
+            },
         ]);
 
         assert!(rendered.contains("| track-a | planned | `/track:implement` | 2026-03-13 |"));
@@ -482,6 +615,51 @@ mod tests {
     }
 
     #[test]
+    fn sync_rendered_views_single_track_rejects_unrelated_invalid_metadata() {
+        let dir = tempfile::tempdir().unwrap();
+        let good_track = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&good_track).unwrap();
+        std::fs::write(
+            good_track.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[
+    {
+      "id": "T001",
+      "description": "First task",
+      "status": "todo"
+    }
+  ]"#,
+            ),
+        )
+        .unwrap();
+
+        let bad_track = dir.path().join("track/items/bad-track");
+        std::fs::create_dir_all(&bad_track).unwrap();
+        std::fs::write(
+            bad_track.join("metadata.json"),
+            r#"{
+  "schema_version": 99,
+  "id": "bad-track",
+  "title": "Bad Track",
+  "status": "planned",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T00:00:00Z",
+  "tasks": [],
+  "plan": { "summary": [], "sections": [] }
+}"#,
+        )
+        .unwrap();
+
+        let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
+        assert!(matches!(err, RenderError::UnsupportedSchemaVersion { .. }));
+        assert!(!good_track.join("plan.md").exists());
+        assert!(!dir.path().join("track/registry.md").exists());
+    }
+
+    #[test]
     fn validate_track_snapshots_rejects_invalid_metadata() {
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/bad-track");
@@ -490,5 +668,122 @@ mod tests {
 
         let err = validate_track_snapshots(dir.path()).unwrap_err();
         assert!(err.to_string().contains("invalid metadata"));
+    }
+
+    #[test]
+    fn validate_track_snapshots_rejects_unsupported_schema_version() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/bad-schema");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            r#"{
+  "schema_version": 99,
+  "id": "bad-schema",
+  "title": "Bad Schema",
+  "status": "planned",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T00:00:00Z",
+  "tasks": [],
+  "plan": { "summary": [], "sections": [] }
+}"#,
+        )
+        .unwrap();
+
+        let err = validate_track_snapshots(dir.path()).unwrap_err();
+        assert!(err.to_string().contains("unsupported schema_version 99"));
+    }
+
+    #[test]
+    fn validate_track_snapshots_rejects_out_of_sync_plan() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[
+    {
+      "id": "T001",
+      "description": "First task",
+      "status": "todo"
+    }
+  ]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("plan.md"), "# stale\n").unwrap();
+        std::fs::create_dir_all(dir.path().join("track")).unwrap();
+        std::fs::write(dir.path().join("track/registry.md"), "# registry\n").unwrap();
+
+        let err = validate_track_snapshots(dir.path()).unwrap_err();
+        assert!(err.to_string().contains("plan.md does not match metadata.json"));
+    }
+
+    #[test]
+    fn validate_track_snapshots_rejects_metadata_id_directory_mismatch() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "other-track",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[
+    {
+      "id": "T001",
+      "description": "First task",
+      "status": "todo"
+    }
+  ]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("plan.md"), "# stale\n").unwrap();
+        std::fs::create_dir_all(dir.path().join("track")).unwrap();
+        std::fs::write(dir.path().join("track/registry.md"), "# registry\n").unwrap();
+
+        let err = validate_track_snapshots(dir.path()).unwrap_err();
+        assert!(
+            err.to_string()
+                .contains("metadata id 'other-track' does not match directory 'track-a'")
+        );
+    }
+
+    #[test]
+    fn validate_track_snapshots_rejects_out_of_sync_registry() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[
+    {
+      "id": "T001",
+      "description": "First task",
+      "status": "todo"
+    }
+  ]"#,
+            ),
+        )
+        .unwrap();
+        let (track, _) =
+            codec::decode(&std::fs::read_to_string(track_dir.join("metadata.json")).unwrap())
+                .unwrap();
+        std::fs::write(track_dir.join("plan.md"), render_plan(&track)).unwrap();
+        std::fs::create_dir_all(dir.path().join("track")).unwrap();
+        std::fs::write(dir.path().join("track/registry.md"), "# stale registry\n").unwrap();
+
+        let err = validate_track_snapshots(dir.path()).unwrap_err();
+        assert!(err.to_string().contains("registry.md does not match metadata.json"));
     }
 }

@@ -505,13 +505,13 @@ script = ['"${PYTHON_BIN:-python3}" scripts/verify_architecture_docs.py']
 private = true
 description = "[internal] Verify track plan status consistency"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/verify_plan_progress.py']
+script = ['cargo run --quiet -p cli -- track views validate --project-root .']
 
 [tasks.verify-track-metadata-local]
 private = true
 description = "[internal] Verify track metadata.json: schema, task graph, and status validation"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/verify_track_metadata.py']
+script = ['cargo run --quiet -p cli -- track views validate --project-root .']
 
 [tasks.verify-tech-stack-local]
 private = true
@@ -529,7 +529,7 @@ script = ['"${PYTHON_BIN:-python3}" scripts/verify_orchestra_guardrails.py']
 private = true
 description = "[internal] Verify track registry.md is in sync with metadata.json"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/verify_track_registry.py']
+script = ['cargo run --quiet -p cli -- track views validate --project-root .']
 
 [tasks.verify-latest-track-local]
 private = true
@@ -805,7 +805,7 @@ script = ['"${PYTHON_BIN:-python3}" scripts/git_ops.py note-from-file tmp/track-
 [tasks.track-transition]
 description = "[wrapper] Transition a task status and sync rendered views"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/track_state_machine.py transition $CARGO_MAKE_TASK_ARGS']
+script = ['TRACK_DIR="${1:-}"; TASK_ID="${2:-}"; TARGET_STATUS="${3:-}"; shift 3 || true; if [ -z "$TRACK_DIR" ] || [ -z "$TASK_ID" ] || [ -z "$TARGET_STATUS" ]; then echo "error: usage: cargo make track-transition <track_dir> <task_id> <status> [--commit-hash <hash>]" >&2; exit 1; fi; TRACK_ITEMS_DIR="$(dirname "$TRACK_DIR")"; TRACK_ID="$(basename "$TRACK_DIR")"; cargo run --quiet -p cli -- track transition --items-dir "$TRACK_ITEMS_DIR" --locks-dir .locks "$TRACK_ID" "$TASK_ID" "$TARGET_STATUS" "$@"', "${@}"]
 
 [tasks.track-sync-views]
 description = "[wrapper] Render plan.md and registry.md from metadata.json"

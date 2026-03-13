@@ -12,7 +12,7 @@ verify / PR / auxiliary utility は必須経路と補助経路に分け、移行
 
 ## Phase 2-4: Workflow core and wrapper migration
 
-- [~] /track:plan 相当の workflow から Python 依存を除去するため、track_state_machine.py / track_schema.py / track_markdown.py が担う metadata validation・rendered view generation・sync-views を Rust subcommand へ集約する設計と差分を作る
+- [x] /track:plan 相当の workflow から Python 依存を除去するため、track_state_machine.py / track_schema.py / track_markdown.py が担う metadata validation・rendered view generation・sync-views を Rust subcommand へ集約する設計と差分を作る 57decaf7e62f182dbf1e7d1fb0129a15cb479c5f
 - [ ] git workflow wrapper（git_ops.py, branch_switch.py, pr_merge.py）を Rust CLI に統合する移行計画を固め、commit/note/branch/pr 系の主要 wrapper を Python 非依存にする
 
 ## Phase 5-6: Verification boundary and rollout
