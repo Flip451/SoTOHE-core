@@ -15,22 +15,24 @@
 - [x] `git` / `gh` / repo-root adapter boundaries are explicit infrastructure modules instead of CLI-local subprocess helpers
 - [x] track metadata branch-claim discovery now lives in infrastructure instead of CLI-local filesystem scans
 - [x] `pr_review.py` and verification scripts are classified by required-path status in `verification-boundary-classification.md`
+- [x] `.venv`-independent Definition of Done and M1-M4 rollout verification are defined in `rollout-definition-of-done.md`
 
 ## Manual Verification Steps
 
 1. Read `migration-map.md`
 2. Read `phase1-rust-direct-hooks-diff-plan.md`
 3. Read `verification-boundary-classification.md`
-4. Verify this track's `metadata.json`, `spec.md`, and `plan.md` align
-5. Confirm the current branch matches `track/python-dependency-deprecation-2026-03-13`
-6. Run `timeout 600 codex exec review --uncommitted --json --model gpt-5.4 --full-auto` until findings are `0`
-7. Run `python3 -m json.tool .claude/settings.json`
-8. Run `python3 scripts/verify_orchestra_guardrails.py`
-9. Run `pytest -q -o cache_dir=.cache/pytest scripts/test_track_state_machine.py scripts/test_make_wrappers.py`
-10. Run `cargo test -p infrastructure -- --nocapture`
-11. Run `cargo run --quiet -p cli -- track views validate --project-root .`
-12. Run `cargo make track-sync-views`
-13. Run `cargo make ci`
+4. Read `rollout-definition-of-done.md`
+5. Verify this track's `metadata.json`, `spec.md`, and `plan.md` align
+6. Confirm the current branch matches `track/python-dependency-deprecation-2026-03-13`
+7. Run `timeout 600 codex exec review --uncommitted --json --model gpt-5.4 --full-auto` until findings are `0`
+8. Run `python3 -m json.tool .claude/settings.json`
+9. Run `python3 scripts/verify_orchestra_guardrails.py`
+10. Run `pytest -q -o cache_dir=.cache/pytest scripts/test_track_state_machine.py scripts/test_make_wrappers.py`
+11. Run `cargo test -p infrastructure -- --nocapture`
+12. Run `cargo run --quiet -p cli -- track views validate --project-root .`
+13. Run `cargo make track-sync-views`
+14. Run `cargo make ci`
 
 ## Result
 
@@ -40,7 +42,8 @@ Pass
 
 `cargo deny` reports an existing duplicate `windows-sys` warning, but the CI task still passes and this track did not change Rust dependencies.
 Legacy archive generated views with relaxed schema fields are now normalized by Rust `track-sync-views`; this changed one archived `plan.md` as a consistency fix.
-`verification-boundary-classification.md` is a design classification artifact only; the remaining rollout gate definition still belongs to `T008`.
+`rollout-definition-of-done.md` fixes the rollout gate definition, but it is still a track artifact rather than an enforced machine-readable policy.
+`migration-map.md` records eventual migration targets, while `verification-boundary-classification.md` records the temporary current-state Python boundary; `rollout-definition-of-done.md` now makes that distinction explicit.
 
 ## Review Notes
 
@@ -75,6 +78,12 @@ Legacy archive generated views with relaxed schema fields are now normalized by 
 - Fixed that review finding by propagating `read_metadata()` errors from `collect_track_branch_claims()` and adding a regression test for invalid track metadata.
 - Latest reviewer verdict for the T007 fix was `No findings.` after re-checking `apps/cli/src/commands/git.rs` and `libs/infrastructure/src/git_cli.rs`.
 - Latest focused verification for the review fix: `cargo test -p infrastructure git_cli -- --nocapture`, `cargo test -p usecase git_workflow`, `cargo make ci-rust`, and `cargo make ci` passed.
+- `T008` added `rollout-definition-of-done.md` to define the `.venv`-independent required-path matrix, exact M1-M4 exit criteria, verification procedures, and rollout order.
+- Verification for the T008 documentation slice: `cargo run --quiet -p cli -- track views validate --project-root .`, `cargo make track-sync-views`, and `cargo make ci` passed after the new rollout artifact was added.
+- A follow-up `/track:review` pass for T008 found one P1 inconsistency: `rollout-definition-of-done.md` described migration-map, verification-boundary classification, and DoD as if they shared the same current-state bucket model, even though `migration-map.md` records eventual targets while the others describe temporary Python boundaries.
+- Fixed that review finding by adding an explicit interpretation rule to `rollout-definition-of-done.md` and recording the distinction in `verification.md`.
+- Latest reviewer verdict for the T008 fix was `No findings.`
+- Latest focused verification for the review fix: `cargo run --quiet -p cli -- track views validate --project-root .` and `cargo make ci-rust` passed.
 
 ## In Progress
 

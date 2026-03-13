@@ -3,9 +3,9 @@
   "id": "python-dependency-deprecation-2026-03-13",
   "branch": "track/python-dependency-deprecation-2026-03-13",
   "title": "Python 依存脱却計画",
-  "status": "in_progress",
+  "status": "done",
   "created_at": "2026-03-13T12:30:00Z",
-  "updated_at": "2026-03-13T13:20:00Z",
+  "updated_at": "2026-03-13T12:41:21Z",
   "tasks": [
     {
       "id": "T001",
@@ -48,7 +48,7 @@
     {
       "id": "T008",
       "description": ".venv 非依存で hook fail-closed、track workflow、CI の必須経路が成立することを Definition of Done とし、M1-M4 の検証手順と rollout 順を固定する",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "plan": {
