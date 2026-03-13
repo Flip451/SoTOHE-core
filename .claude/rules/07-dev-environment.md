@@ -26,6 +26,8 @@ cargo make ci-rust      # Rust専用CI（fmt-check + clippy + test + deny + chec
 cargo make ci           # 全体CI（ci-rust + scripts/hooks selftest + verify-* すべて）コミット前ゲート
 cargo make check-layers     # レイヤー依存関係チェック（標準CIに含む）
 cargo make verify-arch-docs # ドキュメント乖離チェック（標準CIに含む）
+cargo make workspace-tree   # crate のみの workspace tree を表示
+cargo make workspace-tree-full  # crate + 非 crate ディレクトリを含む workspace tree を表示
 cargo make add <files>            # 手動の低レベル staging（terminal 直実行用）
 cargo make add-all                # worktree 全体を stage（transient scratch file は除外）
 cargo make add-pending-paths      # .takt/pending-add-paths.txt から選択的に stage
@@ -37,6 +39,25 @@ cargo make track-commit-message   # tmp/track-commit/commit-message.txt から c
 cargo make track-note             # tmp/track-commit/note.md から note を適用して削除
 cargo make track-transition       # タスク状態遷移 + ビュー自動再生成
 cargo make track-sync-views       # plan.md + registry.md を metadata.json から再生成
+cargo make track-pr-push          # 現在のトラックブランチを origin にプッシュ
+cargo make track-pr-ensure        # PR 作成（既存なら再利用）
+cargo make track-pr-merge <pr> --method <merge|squash|rebase>  # CI 待ち → マージ
+cargo make track-pr-status <pr>   # PR チェック状況表示
+cargo make track-pr-review        # PR レビューサイクル（push + PR作成 + @codex review）
+cargo make track-switch-main      # main に切替 + pull
+cargo make track-branch-create    # main からトラックブランチを作成して切替
+cargo make track-branch-switch    # 既存トラックブランチに切替
+cargo make scripts-selftest       # verify / helper スクリプトの回帰テスト
+cargo make hooks-selftest         # Claude hook Python セルフテスト
+cargo make takt-full-cycle "<task>"    # full-cycle piece を直接実行（ガードレール付き）
+cargo make takt-spec-to-impl "<task>"  # spec-to-impl piece を直接実行
+cargo make takt-impl-review "<task>"   # impl-review piece を直接実行
+cargo make takt-tdd-cycle "<task>"     # tdd-cycle piece を直接実行
+cargo make help                   # カテゴリ付きタスク一覧表示
+cargo make shell                  # tools コンテナ内でシェルを開く
+cargo make check                  # cargo check（docker compose 経由）
+cargo make test-doc               # ドキュメントテスト
+cargo make python-lint            # ruff lint（Python scripts / hooks）
 ```
 
 ### `-local` タスクについて

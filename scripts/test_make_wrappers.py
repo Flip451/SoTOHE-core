@@ -402,12 +402,10 @@ class MakeWrappersTest(unittest.TestCase):
 
             cases = (
                 ("architecture-rules-workspace-members", ["workspace-members"]),
+                ("workspace-tree", ["workspace-tree"]),
+                ("workspace-tree-full", ["workspace-tree-full"]),
                 ("architecture-rules-direct-checks", ["direct-checks"]),
                 ("architecture-rules-verify-sync", ["verify-sync"]),
-                (
-                    "architecture-rules-verify-claude-workspace-map",
-                    ["verify-claude-workspace-map"],
-                ),
             )
             for task, expected in cases:
                 result = self.run_make(root, task)
