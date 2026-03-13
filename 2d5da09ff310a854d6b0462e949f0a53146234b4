@@ -1,0 +1,19 @@
+## Task Summary: Python dependency deprecation planning track
+
+**Track:** python-dependency-deprecation-2026-03-13
+**Task:** Add planning artifacts, committed migration map, and verification notes for Python dependency deprecation.
+**Date:** 2026-03-13
+
+### Changes
+
+- track/items/python-dependency-deprecation-2026-03-13/metadata.json: define the planning track, tasks, and phase structure.
+- track/items/python-dependency-deprecation-2026-03-13/spec.md: capture goals, scope, constraints, and acceptance criteria for Python dependency removal.
+- track/items/python-dependency-deprecation-2026-03-13/plan.md: render the plan view from metadata.json.
+- track/items/python-dependency-deprecation-2026-03-13/migration-map.md: commit the migration inventory that classifies Python entry points and rollout milestones.
+- track/items/python-dependency-deprecation-2026-03-13/phase1-rust-direct-hooks-diff-plan.md: record the Phase 1 Rust-direct-hook migration diff plan.
+- track/items/python-dependency-deprecation-2026-03-13/verification.md: capture review loop and CI verification results.
+- track/registry.md: register the new active planning track and next command.
+
+### Why
+
+The Python dependency deprecation effort needed a track-local, committed plan so the migration strategy can be reviewed and executed without relying on gitignored scratch files. This commit makes the planning artifacts self-contained and keeps the registry aligned with the active track.
