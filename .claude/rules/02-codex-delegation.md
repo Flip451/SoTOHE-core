@@ -33,20 +33,33 @@
 
 ## Default Timeout
 
-Codex CLI 呼び出しのデフォルトタイムアウトは **600 秒**。
-`timeout 600 codex exec ...` を標準とする。
+Codex CLI 呼び出しと repo-owned local reviewer wrapper のデフォルトタイムアウトは **600 秒**。
+direct CLI では `timeout 600 codex exec ...`、local reviewer では `cargo make track-local-review ...` を標準とする。
 
 ## How to Consult When Assigned
 
 `{model}` is resolved at runtime from `agent-profiles.json`:
 profile `provider_model_overrides` > provider `default_model`.
 
-### `planner` / `reviewer` 向け Read-only 例
+### `planner` 向け Read-only 例
 
 ```bash
 codex exec --model {model} --sandbox read-only --full-auto \
   "Review this Rust trait design: {description}" 2>/dev/null
 ```
+
+### `reviewer` 向け local review 例
+
+```bash
+cargo make track-local-review -- --model {model} --prompt \
+  "Review this Rust implementation: {description}"
+```
+
+local reviewer wrapper は `--output-schema` で final message の JSON shape を固定し、
+wrapper 側でも verdict/findings の整合性を fail-closed で検証する。
+`zero_findings` は `{"verdict":"zero_findings","findings":[]}`、
+findings がある場合は `{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}` を返す前提で扱う。
+object field はすべて required なので、severity / file / line が不明な場合も field 自体は省略せず `null` を使う。
 
 ### `implementer` 向け With file access 例
 

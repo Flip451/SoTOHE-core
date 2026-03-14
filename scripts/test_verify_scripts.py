@@ -164,6 +164,29 @@ class VerifyScriptsTest(unittest.TestCase):
         )
         settings_path.write_text(serialized + "\n", encoding="utf-8")
 
+        agent_profiles_path = root / ".claude" / "agent-profiles.json"
+        agent_profiles_path.parent.mkdir(parents=True, exist_ok=True)
+        agent_profiles_path.write_text(
+            (PROJECT_ROOT / ".claude" / "agent-profiles.json").read_text(
+                encoding="utf-8"
+            ),
+            encoding="utf-8",
+        )
+        research_doc_path = (
+            root / ".claude" / "docs" / "research" / "planner-pr-review-cycle-2026-03-12.md"
+        )
+        research_doc_path.parent.mkdir(parents=True, exist_ok=True)
+        research_doc_path.write_text(
+            (
+                PROJECT_ROOT
+                / ".claude"
+                / "docs"
+                / "research"
+                / "planner-pr-review-cycle-2026-03-12.md"
+            ).read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+
         hooks_dir = root / ".claude" / "hooks"
         hooks_dir.mkdir(parents=True, exist_ok=True)
         for source_path in (PROJECT_ROOT / ".claude" / "hooks").glob("*.py"):
@@ -189,6 +212,11 @@ class VerifyScriptsTest(unittest.TestCase):
             target.write_text(
                 command_path.read_text(encoding="utf-8"), encoding="utf-8"
             )
+
+        for rule_path in (PROJECT_ROOT / ".claude" / "rules").glob("*.md"):
+            target = root / rule_path.relative_to(PROJECT_ROOT)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(rule_path.read_text(encoding="utf-8"), encoding="utf-8")
 
     def setup_verify_architecture_docs_fixture(self, root: Path) -> None:
         scripts_dir = root / "scripts"
@@ -2100,7 +2128,7 @@ class VerifyScriptsTest(unittest.TestCase):
             self.setup_verify_orchestra_fixture(root, minified=True)
             settings_path = root / ".claude" / "settings.json"
             settings = json.loads(settings_path.read_text(encoding="utf-8"))
-            settings["permissions"]["allow"].remove("Bash(codex:*)")
+            settings["permissions"]["allow"].remove("Bash(cargo make track-local-review:*)")
             settings_path.write_text(
                 json.dumps(settings, separators=(",", ":")) + "\n", encoding="utf-8"
             )
@@ -2109,9 +2137,211 @@ class VerifyScriptsTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 1)
         self.assertIn(
-            "Missing in .claude/settings.json: codex permission", result.stdout
+            "Missing in .claude/settings.json: cargo make track-local-review permission",
+            result.stdout,
         )
         self.assertIn("verify_orchestra_guardrails FAILED", result.stdout)
+
+    def test_verify_orchestra_guardrails_rejects_stale_raw_reviewer_command_guidance(
+        self,
+    ) -> None:
+        stale_lines = {
+            Path(".claude/agent-profiles.json"): (
+                '\n        "reviewer": "codex exec review --uncommitted --json --model {model} --full-auto",\n'
+            ),
+            Path(".claude/commands/track/review.md"): (
+                '\ntimeout 180 codex exec --model {model} --sandbox read-only --full-auto "\n'
+            ),
+            Path(".claude/skills/codex-system/SKILL.md"): (
+                '\ntimeout 180 codex exec --model {model} --sandbox read-only --full-auto \\\n  "Review this Rust implementation: {description}"\n'
+            ),
+            Path(".claude/rules/02-codex-delegation.md"): (
+                '\ntimeout 180 codex exec --model {model} --sandbox read-only --full-auto \\\n  "Review this Rust implementation: {description}"\n'
+            ),
+            Path(".claude/docs/research/planner-pr-review-cycle-2026-03-12.md"): (
+                "\ncodex exec review --uncommitted --json --model {model} --full-auto\n"
+            ),
+        }
+
+        for relative_path, stale_line in stale_lines.items():
+            with self.subTest(path=str(relative_path)):
+                def setup(
+                    root: Path,
+                    relative_path: Path = relative_path,
+                    stale_line: str = stale_line,
+                ) -> None:
+                    self.setup_verify_orchestra_fixture(root, minified=True)
+                    target_path = root / relative_path
+                    target_path.write_text(
+                        target_path.read_text(encoding="utf-8") + stale_line,
+                        encoding="utf-8",
+                    )
+
+                result = self.run_python_script("verify_orchestra_guardrails.py", setup)
+
+                self.assertEqual(result.returncode, 1)
+                self.assertIn(
+                    "still contains stale reviewer command guidance", result.stdout
+                )
+                self.assertIn("verify_orchestra_guardrails FAILED", result.stdout)
+
+    def test_verify_orchestra_guardrails_rejects_timeout_600_raw_reviewer_guidance(
+        self,
+    ) -> None:
+        stale_lines = {
+            Path(".claude/commands/track/review.md"): (
+                '\ntimeout 600 codex exec --model {model} --sandbox read-only --full-auto "\n'
+            ),
+            Path(".claude/skills/codex-system/SKILL.md"): (
+                '\ntimeout 600 codex exec --model {model} --sandbox read-only --full-auto \\\n  "Review this Rust implementation: {description}"\n'
+            ),
+            Path(".claude/rules/02-codex-delegation.md"): (
+                '\ntimeout 600 codex exec --model {model} --sandbox read-only --full-auto \\\n  "Review this Rust implementation: {description}"\n'
+            ),
+        }
+
+        for relative_path, stale_line in stale_lines.items():
+            with self.subTest(path=str(relative_path)):
+                def setup(
+                    root: Path,
+                    relative_path: Path = relative_path,
+                    stale_line: str = stale_line,
+                ) -> None:
+                    self.setup_verify_orchestra_fixture(root, minified=True)
+                    target_path = root / relative_path
+                    target_path.write_text(
+                        target_path.read_text(encoding="utf-8") + stale_line,
+                        encoding="utf-8",
+                    )
+
+                result = self.run_python_script("verify_orchestra_guardrails.py", setup)
+
+                self.assertEqual(result.returncode, 1)
+                self.assertIn(
+                    "still contains stale reviewer command guidance", result.stdout
+                )
+                self.assertIn("verify_orchestra_guardrails FAILED", result.stdout)
+
+    def test_verify_orchestra_guardrails_rejects_raw_review_subcommand_guidance(
+        self,
+    ) -> None:
+        stale_lines = {
+            Path(".claude/agent-profiles.json"): (
+                '\n        "reviewer": "codex exec review --uncommitted --json --model {model} --full-auto",\n'
+            ),
+            Path(".claude/rules/02-codex-delegation.md"): (
+                '\ncodex exec review --uncommitted --json --model {model} --full-auto\n'
+            ),
+        }
+
+        for relative_path, stale_line in stale_lines.items():
+            with self.subTest(path=str(relative_path)):
+                def setup(
+                    root: Path,
+                    relative_path: Path = relative_path,
+                    stale_line: str = stale_line,
+                ) -> None:
+                    self.setup_verify_orchestra_fixture(root, minified=True)
+                    target_path = root / relative_path
+                    target_path.write_text(
+                        target_path.read_text(encoding="utf-8") + stale_line,
+                        encoding="utf-8",
+                    )
+
+                result = self.run_python_script("verify_orchestra_guardrails.py", setup)
+
+                self.assertEqual(result.returncode, 1)
+                self.assertIn(
+                    "still contains stale reviewer command guidance", result.stdout
+                )
+                self.assertIn("verify_orchestra_guardrails FAILED", result.stdout)
+
+    def test_verify_orchestra_guardrails_rejects_missing_reviewer_json_contract(
+        self,
+    ) -> None:
+        targets = {
+            Path(".claude/commands/track/review.md"): [
+                '{"verdict":"zero_findings","findings":[]}',
+                '{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}',
+                "Every object field is required by the output schema.",
+                "use `null` for that field instead of omitting it.",
+            ],
+            Path(".claude/skills/codex-system/SKILL.md"): [
+                '{"verdict":"zero_findings","findings":[]}',
+                '{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}',
+                "Every object field is required by the output schema.",
+                "use `null` for that field instead of omitting it.",
+            ],
+            Path(".claude/rules/02-codex-delegation.md"): [
+                '{"verdict":"zero_findings","findings":[]}',
+                '{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}',
+                "field 自体は省略せず `null` を使う。",
+            ],
+        }
+
+        for relative_path, snippets in targets.items():
+            for snippet in snippets:
+                with self.subTest(path=str(relative_path), snippet=snippet):
+                    def setup(
+                        root: Path,
+                        relative_path: Path = relative_path,
+                        snippet: str = snippet,
+                    ) -> None:
+                        self.setup_verify_orchestra_fixture(root, minified=True)
+                        target_path = root / relative_path
+                        target_path.write_text(
+                            target_path.read_text(encoding="utf-8").replace(snippet, ""),
+                            encoding="utf-8",
+                        )
+
+                    result = self.run_python_script("verify_orchestra_guardrails.py", setup)
+
+                    self.assertEqual(result.returncode, 1)
+                    self.assertIn("missing reviewer wrapper guidance", result.stdout)
+                    self.assertIn("verify_orchestra_guardrails FAILED", result.stdout)
+
+    def test_verify_orchestra_guardrails_rejects_missing_make_separator_in_reviewer_examples(
+        self,
+    ) -> None:
+        replacements = {
+            Path(".claude/agent-profiles.json"): (
+                'cargo make track-local-review -- --model {model} --prompt \\"{task}\\"',
+                'cargo make track-local-review --model {model} --prompt \\"{task}\\"',
+            ),
+            Path(".claude/commands/track/review.md"): (
+                "cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md",
+                "cargo make track-local-review --model {model} --briefing-file tmp/codex-briefing.md",
+            ),
+            Path(".claude/skills/codex-system/SKILL.md"): (
+                'cargo make track-local-review -- --model {model} --prompt "',
+                'cargo make track-local-review --model {model} --prompt "',
+            ),
+            Path(".claude/rules/02-codex-delegation.md"): (
+                "cargo make track-local-review -- --model {model} --prompt \\",
+                "cargo make track-local-review --model {model} --prompt \\",
+            ),
+        }
+
+        for relative_path, (expected, stale) in replacements.items():
+            with self.subTest(path=str(relative_path)):
+                def setup(
+                    root: Path,
+                    relative_path: Path = relative_path,
+                    expected: str = expected,
+                    stale: str = stale,
+                ) -> None:
+                    self.setup_verify_orchestra_fixture(root, minified=True)
+                    target_path = root / relative_path
+                    target_path.write_text(
+                        target_path.read_text(encoding="utf-8").replace(expected, stale),
+                        encoding="utf-8",
+                    )
+
+                result = self.run_python_script("verify_orchestra_guardrails.py", setup)
+
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("missing reviewer wrapper guidance", result.stdout)
+                self.assertIn("verify_orchestra_guardrails FAILED", result.stdout)
 
     def test_verify_orchestra_guardrails_rejects_missing_direct_hook_dispatch_commands(
         self,

@@ -35,7 +35,7 @@
         "planner": "codex exec --model {model} --sandbox read-only --full-auto \"{task}\"",
         "researcher": "codex exec --model {model} --sandbox read-only --full-auto \"Research this Rust topic: {task}\"",
         "implementer": "codex exec --model {model} --sandbox workspace-write --full-auto \"{task}\"",
-        "reviewer": "codex exec review --uncommitted --json --model {model} --full-auto",
+        "reviewer": "cargo make track-local-review -- --model {model} --prompt \"{task}\"",
         "debugger": "codex exec --model {model} --sandbox read-only --full-auto \"{task}\""
       }
     },

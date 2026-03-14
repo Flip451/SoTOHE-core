@@ -44,9 +44,28 @@ Build a review briefing that includes:
 
 For the Codex provider, if the briefing exceeds ~1KB:
 - Write it to `tmp/codex-briefing.md` (file-based briefing pattern from `codex-system` skill).
-- Use `timeout 600 codex exec --model {model} --sandbox read-only --full-auto "Read tmp/codex-briefing.md and perform the task described there." 2>&1`.
+- Use `cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md`.
 
-For short briefings, use inline prompts.
+For short briefings, use inline prompts via the same wrapper.
+
+The wrapper passes a machine-readable `--output-schema` automatically. The final reviewer
+message must be a single JSON object, and the wrapper additionally rejects semantically
+inconsistent payloads fail-closed:
+
+```json
+{"verdict":"zero_findings","findings":[]}
+```
+
+or
+
+```json
+{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}
+```
+
+Every object field is required by the output schema. When a finding does not have a concrete
+severity, file, or line, use `null` for that field instead of omitting it.
+`zero_findings` must use an empty `findings` array, and `findings_remain` must include at least
+one finding. The wrapper prints that final JSON payload as the last stdout line.
 
 ## Step 3: Review → Fix → Review loop
 
@@ -55,7 +74,7 @@ For short briefings, use inline prompts.
 Invoke the reviewer capability:
 
 ```bash
-timeout 600 codex exec --model {model} --sandbox read-only --full-auto "
+cargo make track-local-review -- --model {model} --prompt "
 Review {feature}. Report ONLY bugs or logic errors. Be concise.
 
 ## Design
@@ -66,14 +85,15 @@ Review {feature}. Report ONLY bugs or logic errors. Be concise.
 
 Check for: logic errors, doc-code inconsistencies, edge cases, security issues,
 architecture violations, test coverage gaps.
-" 2>&1
+"
 ```
 
 Or use the file-based briefing if content is large.
 
 Parse the reviewer output:
-- If **zero findings**: proceed to Step 4 (done).
-- If **findings exist**: proceed to fix phase.
+- If the wrapper exits `0` and reports `zero_findings`: proceed to Step 4 (done).
+- If the wrapper exits `2` and reports `findings_remain`: read the returned JSON payload and proceed to fix phase.
+- If the wrapper fails for `timeout` / `process_failed` / `last_message_missing`: stop and report the reviewer execution failure before continuing. Malformed or ambiguous JSON belongs here.
 
 ### Fix phase
 
@@ -89,16 +109,17 @@ For each finding:
 After fixes are applied, invoke the reviewer again:
 
 ```bash
-timeout 600 codex exec --model {model} --sandbox read-only --full-auto "
+cargo make track-local-review -- --model {model} --prompt "
 Previous review found: {finding summary}.
 Fixed by: {fix description}. Tests added: {test names if any}.
 Verify the fixes in {changed files}. Any remaining bugs or new issues?
-" 2>&1
+"
 ```
 
 Parse the output:
-- If **zero findings**: proceed to Step 4.
-- If **new findings**: repeat fix phase → Round N+1.
+- If the wrapper exits `0` with `zero_findings`: proceed to Step 4.
+- If the wrapper exits `2` with `findings_remain`: use the JSON findings payload, then repeat fix phase → Round N+1.
+- Otherwise, stop and report the reviewer execution failure.
 
 ### Loop guard
 

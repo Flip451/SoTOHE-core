@@ -759,6 +759,11 @@ description = "[wrapper] Show PR check status"
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- pr status ${@}']
 
+[tasks.track-local-review]
+description = "[wrapper] Run the local Codex reviewer through the repo-owned Rust wrapper"
+script_runner = "@shell"
+script = ['if [ "${1:-}" = "--" ]; then shift; fi; cargo run --quiet -p cli -- review codex-local "$@"']
+
 [tasks.track-switch-main]
 description = "[wrapper] Switch to main branch and pull latest"
 script_runner = "@shell"
