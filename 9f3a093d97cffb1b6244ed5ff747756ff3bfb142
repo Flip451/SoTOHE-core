@@ -1,0 +1,18 @@
+## Task Summary: Add repo-owned local reviewer wrapper
+
+**Track:** reviewer-process-termination-2026-03-14
+**Task:** local reviewer の child process lifecycle と最終 verdict 判定を repo-owned Rust wrapper に集約し、`/track:review` を同じ wrapper 契約へ同期する
+**Date:** 2026-03-14
+
+### Changes
+
+- apps/cli/src/commands/review.rs: added `review codex-local` wrapper with read-only Codex execution, timeout handling, process termination, output-schema wiring, and fail-closed verdict rendering
+- libs/usecase/src/review_workflow.rs: added pure JSON payload parsing and semantic validation for `zero_findings` / `findings_remain` normalization
+- Makefile.toml and .claude/settings.json: exposed `cargo make track-local-review` as the runnable wrapper path
+- .claude/commands/track/review.md, .claude/skills/codex-system/SKILL.md, .claude/rules/02-codex-delegation.md, and .claude/agent-profiles.json: synchronized reviewer guidance onto the wrapper path and structured JSON contract
+- scripts/test_verify_scripts.py, scripts/verify_orchestra_guardrails.py, scripts/test_make_wrappers.py, and .claude/hooks/test_agent_profiles.py: added regression coverage for stale guidance, wrapper invocation, and reviewer contract drift
+- track/items/reviewer-process-termination-2026-03-14/* and track/registry.md: recorded the completed track plan, design, verification, and registry state
+
+### Why
+
+The local reviewer path had drifted across raw `codex exec` patterns, leaving timeout behavior, final message parsing, and read-only guarantees outside repo control. This change centralizes the reviewer contract in a Rust wrapper, makes malformed or ambiguous reviewer output fail closed, and keeps docs, runnable paths, and regression checks aligned.
