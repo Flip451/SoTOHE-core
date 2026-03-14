@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
 
 from track_markdown import render_plan, summarize_plan
 from track_schema import (
     TrackMetadataV2,
     parse_metadata_v2,
 )
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 # ================================================================
 # Checkbox normalization tests (legacy parser)
@@ -204,6 +207,18 @@ class TestSummarizePlanEdgeCases(unittest.TestCase):
         text = "- [~] a\n- [ ~] b\n- [~ ] c"
         summary = summarize_plan(text)
         self.assertEqual(summary.in_progress_count, 3)
+
+
+class TestTrackDocsReviewerContract(unittest.TestCase):
+    """Regression checks for reviewer JSON contract examples in track docs."""
+
+    def test_track_docs_do_not_reference_stale_zero_findings_payload(self) -> None:
+        matches = sorted(
+            str(path.relative_to(PROJECT_ROOT))
+            for path in (PROJECT_ROOT / "track" / "items").rglob("*.md")
+            if '{"verdict":"zero_findings"}' in path.read_text(encoding="utf-8")
+        )
+        self.assertEqual(matches, [])
 
 
 # ================================================================
