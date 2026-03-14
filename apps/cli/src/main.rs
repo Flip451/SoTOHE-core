@@ -53,6 +53,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::pr::PrCommand,
     },
+    /// Local review workflow wrappers.
+    Review {
+        #[command(subcommand)]
+        cmd: commands::review::ReviewCommand,
+    },
     /// File utility operations (atomic write, etc.).
     File {
         #[command(subcommand)]
@@ -72,6 +77,7 @@ fn main() -> ExitCode {
         Some(CliCommand::Track { cmd }) => commands::track::execute(cmd),
         Some(CliCommand::Git { cmd }) => commands::git::execute(cmd),
         Some(CliCommand::Pr { cmd }) => commands::pr::execute(cmd),
+        Some(CliCommand::Review { cmd }) => commands::review::execute(cmd),
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
         Some(CliCommand::Demo) | None => run_demo(),
     }

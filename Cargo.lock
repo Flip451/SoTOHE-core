@@ -162,6 +162,7 @@ dependencies = [
  "clap",
  "domain",
  "infrastructure",
+ "libc",
  "serde",
  "serde_json",
  "tempfile",
@@ -577,6 +578,8 @@ name = "usecase"
 version = "0.1.0"
 dependencies = [
  "domain",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

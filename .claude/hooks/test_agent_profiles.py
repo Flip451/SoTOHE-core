@@ -57,6 +57,10 @@ class AgentProfilesTest(unittest.TestCase):
         self.assertIn(
             "codex exec", agent_profiles.provider_example("planner", profiles=profiles)
         )
+        self.assertIn(
+            "cargo make track-local-review -- --model",
+            agent_profiles.provider_example("reviewer", profiles=profiles),
+        )
         self.assertEqual(
             agent_profiles.workflow_host_provider(profiles=profiles), "claude"
         )
