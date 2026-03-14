@@ -1,0 +1,11 @@
+Track: track-plan-activation-2026-03-14
+
+Summary:
+- add planning-only track schema/materialization flow
+- add /track:plan-only and /track:activate command surface
+- add activation guards and resolver/routing updates
+
+Verification:
+- cargo make ci
+- cargo make track-local-review -- --model gpt-5.4 --timeout-seconds 1800 --briefing-file tmp/codex-briefing.md
+- reviewer verdict: {"verdict":"zero_findings","findings":[]}
