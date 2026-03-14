@@ -350,6 +350,20 @@ class MakeWrappersTest(unittest.TestCase):
                 )
                 self.assertIn(expected, task_body)
 
+    def test_track_local_review_wrapper_delegates_to_rust_cli(self) -> None:
+        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
+        task_header = "[tasks.track-local-review]"
+        task_start = makefile.index(task_header)
+        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+        task_body = (
+            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
+        )
+
+        self.assertIn('script_runner = "@shell"', task_body)
+        self.assertIn('if [ "${1:-}" = "--" ]; then shift; fi;', task_body)
+        self.assertIn('cargo run --quiet -p cli -- review codex-local "$@"', task_body)
+        self.assertNotIn(', "${@}"', task_body)
+
     def test_verify_orchestra_local_honors_python_bin_override(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)

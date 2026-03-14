@@ -129,10 +129,10 @@ Output:
 
 Embed design intent and change summary directly in the prompt; let Codex read files for details.
 This avoids Codex spending time searching the codebase while keeping the prompt concise.
-Use `timeout 180` to prevent indefinite hangs (Codex file exploration can exceed 120s).
+For the local reviewer loop, prefer the repo-owned wrapper so timeout and final verdict stay under repo control.
 
 ```bash
-timeout 180 codex exec --model {model} --sandbox read-only --full-auto "
+cargo make track-local-review -- --model {model} --prompt "
 Review {feature name}. Report ONLY bugs or logic errors. Be concise.
 
 ## Design
@@ -145,10 +145,29 @@ Review {feature name}. Report ONLY bugs or logic errors. Be concise.
 {short code snippet of the core logic change}
 
 Check for: logic errors, doc-code inconsistencies, edge cases, security issues.
-" 2>&1
+"
 ```
 
 For larger diffs, use the file-based briefing pattern (see below) instead of inlining.
+
+The local reviewer wrapper passes a machine-readable `--output-schema` automatically. The final
+message must be a single JSON object, and the wrapper additionally rejects semantically
+inconsistent payloads fail-closed:
+
+```json
+{"verdict":"zero_findings","findings":[]}
+```
+
+or
+
+```json
+{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}
+```
+
+Every object field is required by the output schema. When a finding does not have a concrete
+severity, file, or line, use `null` for that field instead of omitting it.
+`zero_findings` must use an empty `findings` array, and `findings_remain` must include at least
+one finding. The wrapper prints that final JSON payload as the last stdout line.
 
 ## File-Based Briefing Pattern
 
@@ -171,6 +190,14 @@ Prefer writing content to a file over inline embedding when:
    ```
 
 2. **Run Codex with a file reference**
+
+   For the local reviewer loop, use the wrapper:
+
+   ```bash
+   cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md
+   ```
+
+   For other read-only Codex consultations, direct `codex exec` is still fine:
 
    ```bash
    timeout 180 codex exec --model {model} --sandbox read-only --full-auto \
@@ -242,7 +269,7 @@ For review-fix-review cycles ("修正→レビュー→修正→…→指摘な�
 ### Round 1 template (hybrid prompt)
 
 ```bash
-timeout 180 codex exec --model {model} --sandbox read-only --full-auto "
+cargo make track-local-review -- --model {model} --prompt "
 Review {feature}. Report ONLY bugs or logic errors.
 
 ## Design
@@ -258,16 +285,15 @@ Check for: {checklist}
 ### Round N template (fix verification)
 
 ```bash
-timeout 180 codex exec --model {model} --sandbox read-only --full-auto "
+cargo make track-local-review -- --model {model} --prompt "
 Previous review found: {finding summary}. Fixed by {fix description}. Test added.
 Verify the fix in {file}:{line range}. Any remaining bugs?
-" 2>&1
+" 
 ```
 
 ### Tips
 
-- Always use `timeout 180` — Codex file exploration can exceed 120s
-- Prefer `2>&1` over `2>/dev/null` to capture diagnostics
+- The wrapper owns timeout and final verdict normalization; use it for local review loops
 - Instruct Codex "do not run Python code" if you want text-only analysis (faster)
 - Codex may run code in `read-only` sandbox to verify edge cases — this is fine and often produces better findings
 - Each round's prompt should reference only the delta, not the full history
