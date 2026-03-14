@@ -1,0 +1,16 @@
+## Task Summary: Consolidate task slices after reviewer convergence
+
+**Track:** track-plan-activation-2026-03-14
+**Task:** Restructure remaining slices (T004+T005+T006 → T004+T005) and resolve all reviewer findings
+**Date:** 2026-03-15
+
+### Changes
+
+- design.md: Merge T005/T006 into unified T004, add Slice Boundary Rules, archived carve-out, /track:ci selector, /track:status 4-item contract, /track:merge clarification
+- metadata.json: Consolidate 7 tasks to 5 (T001-T005), update sections S002/S003, add activation safety to T003, add regression tests to T005
+- plan.md: Regenerated from metadata.json
+- spec.md: Add dirty-worktree rejection, /track:ci track-agnostic rule, /track:status 4-item output, archived branch=null carve-out, unified docs acceptance criterion
+
+### Why
+
+23-round reviewer cycle revealed fundamental sequencing mismatches between resolver/docs/registry splits. Merging these surfaces into a single task (T004) eliminates the boundary issues while keeping guard/executor (T003) and regression tests (T005) isolated.
