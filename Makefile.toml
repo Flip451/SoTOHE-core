@@ -725,14 +725,19 @@ script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- git add-from-file .takt/pending-add-paths.txt --cleanup']
 
 [tasks.track-branch-create]
-description = "[wrapper] Create a track branch from main and switch to it (usage: cargo make track-branch-create '<track-id>')"
+description = "[wrapper] Materialize branch metadata, create a track branch from main, and switch to it (usage: cargo make track-branch-create '<track-id>')"
 script_runner = "@shell"
-script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; git switch -c "track/${TRACK_ID}" main']
+script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; cargo run --quiet -p cli -- track branch create --items-dir track/items "$TRACK_ID"']
 
 [tasks.track-branch-switch]
-description = "[wrapper] Switch to an existing track branch (usage: cargo make track-branch-switch '<track-id>')"
+description = "[wrapper] Materialize branch metadata if needed, then switch to an existing track branch (usage: cargo make track-branch-switch '<track-id>')"
 script_runner = "@shell"
-script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; git switch "track/${TRACK_ID}"']
+script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; cargo run --quiet -p cli -- track branch switch --items-dir track/items "$TRACK_ID"']
+
+[tasks.track-activate]
+description = "[wrapper] Materialize a planning-only track and switch to its track branch (usage: cargo make track-activate '<track-id>')"
+script_runner = "@shell"
+script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; cargo run --quiet -p cli -- track activate --items-dir track/items "$TRACK_ID"']
 
 [tasks.track-pr-push]
 description = "[wrapper] Push current track branch to origin"

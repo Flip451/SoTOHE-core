@@ -102,6 +102,22 @@ class ExternalGuidesTest(unittest.TestCase):
             root = Path(tmp_dir)
             track_dir = root / "track" / "items" / "demo"
             track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "metadata.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 3,
+                        "id": "demo",
+                        "title": "Demo",
+                        "status": "planned",
+                        "branch": None,
+                        "created_at": "2026-03-08T00:00:00Z",
+                        "updated_at": "2026-03-08T00:00:00Z",
+                        "tasks": [],
+                        "plan": {"summary": [], "sections": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
             (track_dir / "spec.md").write_text(
                 "Schema work touches alpha tables.\n", encoding="utf-8"
             )
@@ -143,6 +159,41 @@ class ExternalGuidesTest(unittest.TestCase):
             )
 
             self.assertEqual(external_guides.latest_track_dir(root), newer)
+
+    def test_latest_track_dir_prefers_materialized_active_over_newer_plan_only(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            materialized = root / "track" / "items" / "materialized"
+            plan_only = root / "track" / "items" / "plan-only"
+            materialized.mkdir(parents=True, exist_ok=True)
+            plan_only.mkdir(parents=True, exist_ok=True)
+
+            (materialized / "metadata.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 3,
+                        "status": "in_progress",
+                        "branch": "track/materialized",
+                        "updated_at": "2025-06-01",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (plan_only / "metadata.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 3,
+                        "status": "planned",
+                        "branch": None,
+                        "updated_at": "2025-06-15",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            self.assertEqual(external_guides.latest_track_dir(root), materialized)
 
     def test_latest_track_dir_falls_back_to_epoch_when_metadata_missing(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -223,11 +274,50 @@ class ExternalGuidesTest(unittest.TestCase):
 
             self.assertIsNone(external_guides.latest_track_dir(root))
 
+    def test_latest_track_dir_returns_none_when_only_v3_tracks_are_invalid(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            root = Path(tmp_dir)
+            broken = root / "track" / "items" / "broken-v3"
+            broken.mkdir(parents=True, exist_ok=True)
+            (broken / "metadata.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 3,
+                        "id": "broken-v3",
+                        "title": "Broken",
+                        "status": "planned",
+                        "created_at": "2026-03-08T00:00:00Z",
+                        "updated_at": "2026-03-08T00:00:00Z",
+                        "tasks": [],
+                        "plan": {"summary": [], "sections": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            self.assertIsNone(external_guides.latest_track_dir(root))
+
     def test_latest_track_context_reads_available_spec_without_plan(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
             track_dir = root / "track" / "items" / "demo"
             track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "metadata.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 3,
+                        "id": "demo",
+                        "title": "Demo",
+                        "status": "planned",
+                        "branch": None,
+                        "created_at": "2026-03-08T00:00:00Z",
+                        "updated_at": "2026-03-08T00:00:00Z",
+                        "tasks": [],
+                        "plan": {"summary": [], "sections": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
             (track_dir / "spec.md").write_text("spec only\n", encoding="utf-8")
 
             self.assertEqual(external_guides.latest_track_context(root), "spec only\n")

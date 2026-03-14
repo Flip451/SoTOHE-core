@@ -2,15 +2,19 @@
 description: Run the autonomous implementation full-cycle for a track task.
 ---
 
-Canonical wrapper for autonomous implementation in this template.
+Compatibility wrapper for autonomous implementation while legacy `takt` surfaces still exist.
 
 Arguments:
 - Use `$ARGUMENTS` as the task summary.
 - If empty, ask for a short task summary and stop.
 
 Execution:
-- Resolve the current track: if the current git branch matches `track/<id>`, use that track. Otherwise, fall back to the latest active track by `updated_at`.
+- Resolve the current track in this order:
+  1. If the current git branch matches `track/<id>`, use that track.
+  2. Otherwise, use the latest materialized active track (non-archived, non-done, `branch != null`).
+  3. If no materialized active track exists, fall back to the latest branchless planning-only track (`status=planned`, `branch=null`).
 - Read the current track's `spec.md`, `plan.md`, `metadata.json`, and `verification.md` before implementation.
+- If the resolved track is branchless planning-only (`status=planned`, `branch=null`), stop and return `/track:activate <track-id>` as the next command. Do not use this command to bypass activation.
 - Read every convention file listed in the `## Related Conventions (Required Reading)` section of `plan.md` before writing code.
 - Map `$ARGUMENTS` to one or more approved tasks in `metadata.json`.
 - Use `cargo make track-transition <track_dir> <task_id> in_progress` to mark selected tasks as `in_progress` and auto-render `plan.md` + `registry.md`. Do NOT edit `plan.md` directly.
@@ -21,8 +25,9 @@ Execution:
 - Use `cargo make track-transition <track_dir> <task_id> done --commit-hash <hash>` to mark completed tasks as `done`. If work remains blocked, keep tasks in `in_progress` and report the blocker.
 
 Behavior:
-- This is the canonical autonomous implementation path for `/track:*`.
-- It replaces legacy `takt`-driven full-cycle execution.
+- This command is transitional compatibility only. Prefer `/track:implement` for the primary implementation lane.
+- It must not add new workflow behavior beyond parity with the current track guardrails.
+- While this command remains in the repo, it must obey the same activation guard as `/track:implement`.
 - After execution, summarize:
   1. Result (success/failure)
   2. Key outputs or blockers

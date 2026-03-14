@@ -9,7 +9,22 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from track_schema import TrackMetadataV2, parse_metadata_v2
+try:
+    from scripts.track_schema import (
+        TrackMetadataV2,
+        parse_metadata_v2,
+        v3_branch_field_missing,
+        v3_branchless_track_invalid,
+        v3_non_null_branch_invalid,
+    )
+except ImportError:  # pragma: no cover - script execution path
+    from track_schema import (
+        TrackMetadataV2,
+        parse_metadata_v2,
+        v3_branch_field_missing,
+        v3_branchless_track_invalid,
+        v3_non_null_branch_invalid,
+    )
 
 # Status values that belong in the Active Tracks table
 _ACTIVE_STATUSES = {"planned", "in_progress", "blocked", "cancelled"}
@@ -19,17 +34,23 @@ _DONE_STATUSES = {"done"}
 _ARCHIVED_STATUSES = {"archived"}
 
 
-def _next_command_for_status(status: str) -> str:
+def _next_command_for_track(track: TrackMetadataV2) -> str:
     """Suggest the next /track:* command based on track status."""
-    if status == "planned":
+    if (
+        track.schema_version == 3
+        and track.status == "planned"
+        and track.branch is None
+    ):
+        return f"`/track:activate {track.id}`"
+    if track.status == "planned":
         return "`/track:implement`"
-    if status == "in_progress":
+    if track.status == "in_progress":
         return "`/track:full-cycle <task>`"
-    if status == "blocked":
+    if track.status == "blocked":
         return "`/track:status`"
-    if status == "cancelled":
+    if track.status == "cancelled":
         return "`/track:plan <feature>`"
-    if status == "archived":
+    if track.status == "archived":
         return "`/track:plan <feature>`"
     return "`/track:status`"
 
@@ -39,9 +60,16 @@ def _format_date(iso_timestamp: str) -> str:
     return iso_timestamp[:10] if len(iso_timestamp) >= 10 else iso_timestamp
 
 
+def _is_plan_only_track(track: TrackMetadataV2) -> bool:
+    return track.schema_version == 3 and track.status == "planned" and track.branch is None
+
+
 def collect_track_metadata(root: Path) -> list[TrackMetadataV2]:
     """Collect and parse all v2 track metadata, sorted by updated_at descending."""
-    from track_schema import all_track_directories
+    try:
+        from scripts.track_schema import all_track_directories
+    except ImportError:  # pragma: no cover - script execution path
+        from track_schema import all_track_directories
 
     results: list[TrackMetadataV2] = []
     for track_dir in all_track_directories(root):
@@ -54,6 +82,20 @@ def collect_track_metadata(root: Path) -> list[TrackMetadataV2]:
             continue
         if not isinstance(data, dict) or data.get("schema_version") not in (2, 3):
             continue
+        if v3_branch_field_missing(data):
+            raise ValueError(
+                f"Missing required field 'branch' in {metadata_file.relative_to(root).as_posix()}"
+            )
+        if v3_branchless_track_invalid(data):
+            raise ValueError(
+                "Illegal branchless v3 track in "
+                f"{metadata_file.relative_to(root).as_posix()}: "
+                "branch=null is only allowed for planning-only tracks"
+            )
+        if v3_non_null_branch_invalid(data):
+            raise ValueError(
+                f"Invalid v3 branch value in {metadata_file.relative_to(root).as_posix()}"
+            )
         results.append(parse_metadata_v2(data))
 
     # Sort by updated_at descending (most recently updated first)
@@ -67,6 +109,8 @@ def render_registry(tracks: list[TrackMetadataV2]) -> str:
     Output is deterministic: same input → same output.
     """
     active = [t for t in tracks if t.status in _ACTIVE_STATUSES]
+    active.sort(key=lambda t: t.updated_at, reverse=True)
+    active.sort(key=_is_plan_only_track)
     completed = [t for t in tracks if t.status in _DONE_STATUSES]
     archived = [t for t in tracks if t.status in _ARCHIVED_STATUSES]
 
@@ -76,7 +120,7 @@ def render_registry(tracks: list[TrackMetadataV2]) -> str:
     lines.append("# Track Registry")
     lines.append("")
     lines.append("> This file lists all tracks and their current status.")
-    lines.append("> Auto-updated by `/track:plan` (on approval) and `/track:commit`.")
+    lines.append("> Auto-updated by `/track:plan`, `/track:plan-only`, and `/track:commit`.")
     lines.append(
         "> `/track:status` uses this file as an entry point to summarize progress."
     )
@@ -92,7 +136,7 @@ def render_registry(tracks: list[TrackMetadataV2]) -> str:
         latest = active[0]
         lines.append(f"- Latest active track: `{latest.id}`")
         lines.append(
-            f"- Next recommended command: {_next_command_for_status(latest.status)}"
+            f"- Next recommended command: {_next_command_for_track(latest)}"
         )
         lines.append(f"- Last updated: `{_format_date(latest.updated_at)}`")
     else:
@@ -116,7 +160,7 @@ def render_registry(tracks: list[TrackMetadataV2]) -> str:
     if active:
         for t in active:
             lines.append(
-                f"| {t.id} | {t.status} | {_next_command_for_status(t.status)} | {_format_date(t.updated_at)} |"
+                f"| {t.id} | {t.status} | {_next_command_for_track(t)} | {_format_date(t.updated_at)} |"
             )
     else:
         lines.append("| _No active tracks yet_ | - | `/track:plan <feature>` | - |")
@@ -149,7 +193,9 @@ def render_registry(tracks: list[TrackMetadataV2]) -> str:
     # Footer
     lines.append("---")
     lines.append("")
-    lines.append("Use `/track:plan <feature>` to start a new feature or bugfix track.")
+    lines.append(
+        "Use `/track:plan <feature>` for the standard lane or `/track:plan-only <feature>` when planning should land before activation."
+    )
     lines.append("")
 
     return "\n".join(lines)

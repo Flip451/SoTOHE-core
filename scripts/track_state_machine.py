@@ -46,10 +46,26 @@ VALID_TRANSITIONS: set[tuple[str, str]] = {
     ("skipped", "todo"),
 }
 
+_IMPLEMENTATION_PHASE_STATUSES = {"in_progress", "done", "skipped"}
+
 
 def _load_metadata(track_dir: Path) -> dict:
     metadata_file = track_dir / "metadata.json"
     return json.loads(metadata_file.read_text(encoding="utf-8"))
+
+
+def _reject_branchless_implementation_transition(data: dict, task_id: str, new_status: str) -> None:
+    """Reject implementation-phase transitions for branch-null planning-only tracks."""
+    if new_status not in _IMPLEMENTATION_PHASE_STATUSES:
+        return
+    if data.get("schema_version") != 3:
+        return
+    if data.get("branch") is not None:
+        return
+    raise TransitionError(
+        f"Task '{task_id}' cannot enter '{new_status}' before activation; "
+        f"run /track:activate {data.get('id', '<track-id>')}"
+    )
 
 
 def _save_metadata(
@@ -358,6 +374,8 @@ def _transition_task_python(
 
     if task is None:
         raise TransitionError(f"Task '{task_id}' not found")
+
+    _reject_branchless_implementation_transition(data, task_id, new_status)
 
     old_status = task.get("status")
     if old_status is None:

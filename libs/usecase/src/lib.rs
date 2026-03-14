@@ -4,6 +4,7 @@ pub mod git_workflow;
 pub mod hook;
 pub mod pr_workflow;
 pub mod review_workflow;
+pub mod track_activation;
 
 use std::sync::Arc;
 

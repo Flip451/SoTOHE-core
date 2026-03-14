@@ -21,7 +21,11 @@ metadata:
 
 ```
 /track:plan <feature>      ← このスキル（計画 + トラック作成）
+    または
+/track:plan-only <feature> ← 計画だけ先に固めて main 側へ landing
     ↓ ユーザー承認後にトラック成果物を作成
+/track:activate <track-id> ← planning-only track を materialize
+    ↓
 /track:full-cycle <task>   ← 自動実装・レビュー
     または
 /track:implement           ← 並列実装
@@ -208,7 +212,7 @@ Rust TDD を前提としたタスク順序：
 
 ### 次のステップ
 - この計画で進めてよろしいですか？
-- 承認後にトラック成果物を作成し、`/track:full-cycle <task>` または `/track:implement` で実装を開始
+- 承認後に standard lane なら `/track:full-cycle <task>` または `/track:implement`、plan-only lane なら `/track:activate <track-id>` を経由して実装を開始
 ```
 
 ### Step 4: Create Track Artifacts（承認後）

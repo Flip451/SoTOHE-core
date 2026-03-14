@@ -3,24 +3,24 @@
   "id": "track-plan-activation-2026-03-14",
   "branch": "track/track-plan-activation-2026-03-14",
   "title": "track:plan plan-only / activate 導線",
-  "status": "planned",
+  "status": "in_progress",
   "created_at": "2026-03-13T15:16:25Z",
-  "updated_at": "2026-03-14T00:00:00Z",
+  "updated_at": "2026-03-14T05:20:51Z",
   "tasks": [
     {
       "id": "T001",
       "description": "planning-only track を正式な schema v3 状態として扱えるように、Python (`scripts/track_schema.py`) と Rust (`libs/infrastructure/src/track/render.rs` など) の両方の validation/render path を更新し、`status=planned` かつ未着手タスクだけは `branch=null` を許可しつつ、implementation-phase の branchless state は引き続き reject する",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T002",
       "description": "Rust domain / infrastructure / CLI と wrapper を更新し、UX-first の first-class command として `/track:plan-only <feature>` と `/track:activate <track-id>` を実際に提供する。`/track:plan-only` は既存 planning workflow を再利用しつつ承認後に branch を自動作成せず `branch=null` の planning-only artifact を作成し、activation 前に `/track:ci` と explicit `track-id` selector 付き review / commit / `/track:pr-review`、および explicit PR 番号付き `/track:merge <pr>` を含む PR flow で main 側へ landing できるようにする。`/track:activate` は planning-only (`branch=null`, `status=planned`, task 未着手) 以外の track では fail-closed で reject するが、branch create/switch 可能性を preflight で確認してから metadata を永続化し、永続化後に checkout だけ失敗した場合は `/track:activate <track-id>` の再実行で resume できる transaction として扱う。`cargo make track-branch-create '<id>'` と `cargo make track-branch-switch '<id>'` は git branch の create/switch だけでなく `metadata.json.branch` の materialization まで行えるようにするが、activation は track branch だけで完結する隠れ状態にせず、non-track branch からも観測できる永続化された activation transaction として扱う。あわせて `Makefile.toml`、`apps/cli/src/commands/pr.rs`、`scripts/pr_review.py`、`scripts/pr_merge.py` の PR executor、`apps/cli/src/commands/track.rs` の activation/status entrypoint、`apps/cli/src/commands/git.rs` / `scripts/git_ops.py` の guarded commit path を plan-only lane へ接続する",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T003",
       "description": "branch=null の planning-only track では implementation-phase の入口を fail-closed にし、`track-transition`、`/track:implement`、リポジトリ内に残っている間の `/track:full-cycle`、code-bearing review/commit/PR などの guarded path が activation 前に進めないことと、エラー文言が `/track:activate` または track branch activation を案内することを保証する。一方で planning artifact だけを扱う pre-activation `/track:ci` と review/commit/PR flow は main へ landing できるよう許可するが、non-track branch 上では materialized active track 優先の auto-detect を壊さないため `/track:review` / `/track:commit` / `/track:pr-review` では explicit `track-id` selector を必須にし、`/track:merge` では explicit PR 番号を canonical selector として要求する。許可 diff は `track/items/<id>/` 配下・`track/registry.md`・`track/tech-stack.md`・`.claude/docs/DESIGN.md` の planning-only allowlist に限定する。あわせて `scripts/track_branch_guard.py`、`Makefile.toml`、`apps/cli/src/commands/pr.rs`、`apps/cli/src/commands/track.rs`、`scripts/pr_review.py`、`scripts/pr_merge.py` を含む guard / executor surface と、non-track branch 上の current-track / current-focus 解決 (`scripts/track_resolution.py`, `scripts/track_registry.py`, `libs/infrastructure/src/track/render.rs`, `scripts/verify_latest_track_files.py`, `scripts/external_guides.py` など) や latest-track fallback を持つ interactive surface は、branch-null planning-only track が新しく作られても既存の materialized active track を押しのけないよう更新する",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T004",

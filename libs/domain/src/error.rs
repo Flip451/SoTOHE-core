@@ -42,6 +42,14 @@ pub enum ValidationError {
     UnreferencedTask(String),
     #[error("status override '{0}' is incompatible with all tasks resolved")]
     OverrideIncompatibleWithResolvedTasks(TrackStatus),
+    #[error("track '{track_id}' is not planning-only; current status is '{status}'")]
+    TrackActivationRequiresPlanningOnly { track_id: String, status: TrackStatus },
+    #[error(
+        "track '{track_id}' requires schema_version 3 for activation; current schema_version is {schema_version}"
+    )]
+    TrackActivationRequiresSchemaV3 { track_id: String, schema_version: u32 },
+    #[error("track '{track_id}' is already materialized on branch '{branch}'")]
+    TrackAlreadyMaterialized { track_id: String, branch: String },
 }
 
 /// Errors from invalid task state transitions.
