@@ -174,6 +174,7 @@ EXPECTED_CARGO_MAKE_ALLOW = {
     "Bash(cargo make track-pr-review)": "cargo make track-pr-review permission",
     "Bash(cargo make track-pr-merge:*)": "cargo make track-pr-merge permission",
     "Bash(cargo make track-pr-status:*)": "cargo make track-pr-status permission",
+    "Bash(cargo make track-local-review:*)": "cargo make track-local-review permission",
     "Bash(cargo make track-switch-main)": "cargo make track-switch-main permission",
 }
 
@@ -333,6 +334,68 @@ FORBIDDEN_DEFAULT_MODEL_ONLY_SNIPPETS = {
     ],
     Path(".claude/commands/track/review.md"): [
         "Read the provider's `default_model` to get `{model}`.",
+    ],
+}
+
+REVIEW_WRAPPER_TARGETS = {
+    Path(".claude/agent-profiles.json"): "agent profile reviewer wrapper path",
+    Path(".claude/commands/track/review.md"): "track review wrapper path",
+    Path(".claude/skills/codex-system/SKILL.md"): "codex-system reviewer wrapper path",
+    Path(".claude/rules/02-codex-delegation.md"): "codex delegation reviewer wrapper path",
+    Path(".claude/docs/research/planner-pr-review-cycle-2026-03-12.md"): "reviewer research doc wrapper path",
+}
+
+EXPECTED_REVIEW_WRAPPER_SNIPPETS = {
+    Path(".claude/agent-profiles.json"): [
+        'cargo make track-local-review -- --model {model} --prompt \\"{task}\\"',
+    ],
+    Path(".claude/commands/track/review.md"): [
+        "cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md",
+        "cargo make track-local-review -- --model {model} --prompt \"",
+        '{"verdict":"zero_findings","findings":[]}',
+        '{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}',
+        "Every object field is required by the output schema.",
+        "use `null` for that field instead of omitting it.",
+    ],
+    Path(".claude/skills/codex-system/SKILL.md"): [
+        "cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md",
+        "cargo make track-local-review -- --model {model} --prompt \"",
+        '{"verdict":"zero_findings","findings":[]}',
+        '{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}',
+        "Every object field is required by the output schema.",
+        "use `null` for that field instead of omitting it.",
+    ],
+    Path(".claude/rules/02-codex-delegation.md"): [
+        "cargo make track-local-review -- --model {model} --prompt \\",
+        '{"verdict":"zero_findings","findings":[]}',
+        '{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}',
+        "field 自体は省略せず `null` を使う。",
+    ],
+    Path(".claude/docs/research/planner-pr-review-cycle-2026-03-12.md"): [
+        "cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md",
+    ],
+}
+
+FORBIDDEN_STALE_REVIEWER_SNIPPETS = {
+    Path(".claude/agent-profiles.json"): [
+        "codex exec review --uncommitted --json --model {model} --full-auto",
+    ],
+    Path(".claude/commands/track/review.md"): [
+        "timeout 180 codex exec --model {model} --sandbox read-only --full-auto",
+        "timeout 600 codex exec --model {model} --sandbox read-only --full-auto",
+    ],
+    Path(".claude/skills/codex-system/SKILL.md"): [
+        'timeout 180 codex exec --model {model} --sandbox read-only --full-auto \\\n  "Review this Rust implementation: {description}"',
+        'timeout 600 codex exec --model {model} --sandbox read-only --full-auto \\\n  "Review this Rust implementation: {description}"',
+        "codex exec review --uncommitted --json --model {model} --full-auto",
+    ],
+    Path(".claude/rules/02-codex-delegation.md"): [
+        'timeout 180 codex exec --model {model} --sandbox read-only --full-auto \\\n  "Review this Rust implementation: {description}"',
+        'timeout 600 codex exec --model {model} --sandbox read-only --full-auto \\\n  "Review this Rust implementation: {description}"',
+        "codex exec review --uncommitted --json --model {model} --full-auto",
+    ],
+    Path(".claude/docs/research/planner-pr-review-cycle-2026-03-12.md"): [
+        "codex exec review --uncommitted --json --model {model} --full-auto",
     ],
 }
 
@@ -713,6 +776,36 @@ def verify_override_first_model_resolution() -> bool:
     return failed
 
 
+def verify_reviewer_wrapper_guidance() -> bool:
+    failed = False
+    for path, label in REVIEW_WRAPPER_TARGETS.items():
+        if not path.is_file():
+            emit_error(f"Missing reviewer wrapper target: {path}")
+            failed = True
+            continue
+        content = path.read_text(encoding="utf-8")
+        missing_snippets = [
+            snippet
+            for snippet in EXPECTED_REVIEW_WRAPPER_SNIPPETS.get(path, [])
+            if snippet not in content
+        ]
+        if not missing_snippets:
+            emit_ok(f"{path}: {label}")
+        else:
+            emit_error(
+                f"{path} is missing reviewer wrapper guidance for {label}: "
+                + "; ".join(missing_snippets)
+            )
+            failed = True
+        for forbidden in FORBIDDEN_STALE_REVIEWER_SNIPPETS.get(path, []):
+            if forbidden in content:
+                emit_error(
+                    f"{path} still contains stale reviewer command guidance: {forbidden}"
+                )
+                failed = True
+    return failed
+
+
 def verify_no_local_settings_committed() -> bool:
     """Fail if settings.local.json is tracked by git (should be gitignored)."""
     import subprocess
@@ -773,6 +866,7 @@ def main() -> int:
     failed = verify_agent_definitions() or failed
     failed = verify_no_hardcoded_codex_model_literals() or failed
     failed = verify_override_first_model_resolution() or failed
+    failed = verify_reviewer_wrapper_guidance() or failed
     failed = verify_no_local_settings_committed() or failed
 
     if failed:

@@ -56,16 +56,16 @@ Recommendation: keep the public surface small with three primary wrappers and le
 Use:
 
 ```text
-codex exec review --uncommitted --json --model {model} --full-auto
+cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md
 ```
 
 for the Codex reviewer path.
 
 Rationale:
 
-- it already matches `.claude/agent-profiles.json`
-- it is structured enough to parse deterministically
-- it can be extended to a PR diff flow without relying on brittle text parsing
+- it routes through the repo-owned wrapper instead of a raw reviewer subcommand
+- it enforces the read-only/timeout/output-schema contract in one place
+- it still returns structured findings for deterministic parsing
 
 For non-Codex reviewer providers:
 

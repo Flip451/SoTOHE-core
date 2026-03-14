@@ -9,7 +9,7 @@
 
 - Latest active track: `None yet`
 - Next recommended command: `/track:plan <feature>`
-- Last updated: `2026-03-13`
+- Last updated: `2026-03-14`
 
 ## Active Tracks
 
@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| reviewer-process-termination-2026-03-14 | Done | 2026-03-14 |
 | takt-removal-2026-03-13 | Done | 2026-03-13 |
 | python-dependency-deprecation-2026-03-13 | Done | 2026-03-13 |
 | subagent-model-config-2026-03-13 | Done | 2026-03-13 |
