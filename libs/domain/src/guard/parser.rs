@@ -916,42 +916,21 @@ fn extract_backtick(chars: &[char], start: usize) -> Result<(String, usize), Par
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use rstest::rstest;
+
     use super::*;
 
-    // -- tokenize tests --
+    // -- tokenize: success cases --
 
-    #[test]
-    fn test_tokenize_simple_command() {
-        let tokens = tokenize("git add .").unwrap();
-        assert_eq!(tokens, vec!["git", "add", "."]);
-    }
-
-    #[test]
-    fn test_tokenize_single_quotes() {
-        let tokens = tokenize("echo 'hello world'").unwrap();
-        assert_eq!(tokens, vec!["echo", "hello world"]);
-    }
-
-    #[test]
-    fn test_tokenize_double_quotes() {
-        let tokens = tokenize(r#"echo "hello world""#).unwrap();
-        assert_eq!(tokens, vec!["echo", "hello world"]);
-    }
-
-    #[test]
-    fn test_tokenize_backslash_escape() {
-        let tokens = tokenize(r"echo hello\ world").unwrap();
-        assert_eq!(tokens, vec!["echo", "hello world"]);
-    }
-
-    #[test]
-    fn test_tokenize_unmatched_single_quote_returns_error() {
-        assert!(matches!(tokenize("echo 'hello"), Err(ParseError::UnmatchedQuote)));
-    }
-
-    #[test]
-    fn test_tokenize_unmatched_double_quote_returns_error() {
-        assert!(matches!(tokenize(r#"echo "hello"#), Err(ParseError::UnmatchedQuote)));
+    #[rstest]
+    #[case::simple_command("git add .", vec!["git", "add", "."])]
+    #[case::single_quotes("echo 'hello world'", vec!["echo", "hello world"])]
+    #[case::double_quotes(r#"echo "hello world""#, vec!["echo", "hello world"])]
+    #[case::backslash_escape(r"echo hello\ world", vec!["echo", "hello world"])]
+    #[case::preserves_dollar_signs("echo $HOME", vec!["echo", "$HOME"])]
+    fn test_tokenize_success(#[case] input: &str, #[case] expected: Vec<&str>) {
+        let tokens = tokenize(input).unwrap();
+        assert_eq!(tokens, expected);
     }
 
     #[test]
@@ -960,13 +939,28 @@ mod tests {
         assert!(tokens.is_empty());
     }
 
-    #[test]
-    fn test_tokenize_preserves_dollar_signs() {
-        let tokens = tokenize("echo $HOME").unwrap();
-        assert_eq!(tokens, vec!["echo", "$HOME"]);
+    // -- tokenize: error cases --
+
+    #[rstest]
+    #[case::unmatched_single_quote("echo 'hello")]
+    #[case::unmatched_double_quote(r#"echo "hello"#)]
+    fn test_tokenize_unmatched_quote_returns_error(#[case] input: &str) {
+        assert!(matches!(tokenize(input), Err(ParseError::UnmatchedQuote)));
     }
 
-    // -- split_shell tests --
+    // -- split_shell: operator splitting --
+
+    #[rstest]
+    #[case::and_operator("cmd1 && cmd2", 2)]
+    #[case::or_operator("cmd1 || cmd2", 2)]
+    #[case::newline("echo a\necho b", 2)]
+    fn test_split_shell_binary_operator_produces_two_commands(
+        #[case] input: &str,
+        #[case] expected_count: usize,
+    ) {
+        let cmds = split_shell(input).unwrap();
+        assert_eq!(cmds.len(), expected_count);
+    }
 
     #[test]
     fn test_split_simple_command() {
@@ -984,29 +978,11 @@ mod tests {
     }
 
     #[test]
-    fn test_split_and_operator() {
-        let cmds = split_shell("cmd1 && cmd2").unwrap();
-        assert_eq!(cmds.len(), 2);
-    }
-
-    #[test]
-    fn test_split_or_operator() {
-        let cmds = split_shell("cmd1 || cmd2").unwrap();
-        assert_eq!(cmds.len(), 2);
-    }
-
-    #[test]
     fn test_split_pipe() {
         let cmds = split_shell("ls | grep foo").unwrap();
         assert_eq!(cmds.len(), 2);
         assert_eq!(cmds[0].argv, vec!["ls"]);
         assert_eq!(cmds[1].argv, vec!["grep", "foo"]);
-    }
-
-    #[test]
-    fn test_split_newline() {
-        let cmds = split_shell("echo a\necho b").unwrap();
-        assert_eq!(cmds.len(), 2);
     }
 
     #[test]
@@ -1016,25 +992,44 @@ mod tests {
         assert_eq!(cmds[0].argv, vec!["echo", "a && b"]);
     }
 
-    #[test]
-    fn test_split_command_substitution_extracted() {
-        let cmds = split_shell("echo $(git status)").unwrap();
-        // Should have: the outer "echo $(git status)" AND the nested "git status"
-        assert!(cmds.len() >= 2);
-        let nested = cmds.iter().find(|c| c.argv == vec!["git", "status"]);
-        assert!(nested.is_some());
+    // -- split_shell: command substitution extraction --
+
+    #[rstest]
+    #[case::dollar_paren("echo $(git status)", vec!["git", "status"])]
+    #[case::backtick("echo `git log`", vec!["git", "log"])]
+    #[case::redirect_target("echo hi > $(git add .)", vec!["git", "add", "."])]
+    #[case::subshell_redirect("(echo hi) > $(git add .)", vec!["git", "add", "."])]
+    #[case::for_iterator("for x in $(git add .); do echo hi; done", vec!["git", "add", "."])]
+    #[case::case_subject("case $(git add .) in foo) echo hi;; esac", vec!["git", "add", "."])]
+    fn test_split_shell_nested_command_is_extracted(
+        #[case] input: &str,
+        #[case] expected_nested_argv: Vec<&str>,
+    ) {
+        let cmds = split_shell(input).unwrap();
+        assert!(
+            cmds.len() >= 2,
+            "expected at least 2 commands (outer + nested) for {:?}, got {}",
+            input,
+            cmds.len()
+        );
+        let nested = cmds.iter().find(|c| c.argv == expected_nested_argv);
+        assert!(
+            nested.is_some(),
+            "expected nested command {:?} in {:?}",
+            expected_nested_argv,
+            input
+        );
     }
 
     #[test]
-    fn test_split_backtick_substitution_extracted() {
-        let cmds = split_shell("echo `git log`").unwrap();
-        let nested = cmds.iter().find(|c| c.argv == vec!["git", "log"]);
-        assert!(nested.is_some());
+    fn test_split_redirect_without_substitution() {
+        let cmds = split_shell("echo hi > /tmp/file.txt").unwrap();
+        assert_eq!(cmds.len(), 1);
+        assert_eq!(cmds[0].argv, vec!["echo", "hi"]);
     }
 
     #[test]
     fn test_nesting_depth_exceeded() {
-        // Build deeply nested command substitutions
         let mut cmd = "echo hello".to_string();
         for _ in 0..20 {
             cmd = format!("echo $({})", cmd);
@@ -1043,72 +1038,23 @@ mod tests {
         assert!(matches!(result, Err(ParseError::NestingDepthExceeded { .. })));
     }
 
-    // -- redirect command substitution extraction tests --
-
-    #[test]
-    fn test_split_redirect_with_command_substitution() {
-        // echo hi > $(git add .) should extract "git add ." as a nested command
-        let cmds = split_shell("echo hi > $(git add .)").unwrap();
-        let nested = cmds.iter().find(|c| c.argv == vec!["git", "add", "."]);
-        assert!(nested.is_some(), "expected nested git add from redirect target");
-    }
-
-    #[test]
-    fn test_split_redirect_without_substitution() {
-        // echo hi > /tmp/file.txt should NOT produce extra commands
-        let cmds = split_shell("echo hi > /tmp/file.txt").unwrap();
-        assert_eq!(cmds.len(), 1);
-        assert_eq!(cmds[0].argv, vec!["echo", "hi"]);
-    }
-
-    #[test]
-    fn test_split_subshell_redirect_with_command_substitution() {
-        // (echo hi) > $(git add .) should extract "git add ." from compound redirect
-        let cmds = split_shell("(echo hi) > $(git add .)").unwrap();
-        let nested = cmds.iter().find(|c| c.argv == vec!["git", "add", "."]);
-        assert!(nested.is_some(), "expected nested git add from subshell redirect target");
-    }
-
-    // -- For/Case iterator/subject command substitution tests --
-
-    #[test]
-    fn test_split_for_iterator_with_command_substitution() {
-        let cmds = split_shell("for x in $(git add .); do echo hi; done").unwrap();
-        let nested = cmds.iter().find(|c| c.argv == vec!["git", "add", "."]);
-        assert!(nested.is_some(), "expected nested git add from for iterator words");
-    }
-
-    #[test]
-    fn test_split_case_subject_with_command_substitution() {
-        let cmds = split_shell("case $(git add .) in foo) echo hi;; esac").unwrap();
-        let nested = cmds.iter().find(|c| c.argv == vec!["git", "add", "."]);
-        assert!(nested.is_some(), "expected nested git add from case subject word");
-    }
-
     // -- extract_command_substitutions tests --
 
-    #[test]
-    fn test_extract_dollar_paren() {
-        let subs = extract_command_substitutions("echo $(git status) done").unwrap();
-        assert_eq!(subs, vec!["git status"]);
-    }
-
-    #[test]
-    fn test_extract_backtick() {
-        let subs = extract_command_substitutions("echo `date` done").unwrap();
-        assert_eq!(subs, vec!["date"]);
+    #[rstest]
+    #[case::dollar_paren("echo $(git status) done", vec!["git status"])]
+    #[case::backtick("echo `date` done", vec!["date"])]
+    #[case::nested_dollar_paren("echo $(echo $(date))", vec!["echo $(date)"])]
+    fn test_extract_command_substitutions_success(
+        #[case] input: &str,
+        #[case] expected: Vec<&str>,
+    ) {
+        let subs = extract_command_substitutions(input).unwrap();
+        assert_eq!(subs, expected);
     }
 
     #[test]
     fn test_no_substitutions_in_single_quotes() {
         let subs = extract_command_substitutions("echo '$(git status)'").unwrap();
         assert!(subs.is_empty());
-    }
-
-    #[test]
-    fn test_extract_nested_dollar_paren() {
-        let subs = extract_command_substitutions("echo $(echo $(date))").unwrap();
-        // Only the outermost is extracted; inner nesting handled by recursive split_shell
-        assert_eq!(subs, vec!["echo $(date)"]);
     }
 }

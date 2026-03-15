@@ -71,6 +71,7 @@ apps/cli             # CLI エントリーポイント + composition root（usec
 - **ファイルロック**: `fd-lock` latest（infrastructure 層: クロスプロセス flock、RwLock API で `&`/`&mut` セマンティクスにマッピング）
 - **シェルパース**: `conch-parser` 0.1.1（vendored, patched — domain 層: POSIX シェル AST パース、ガードポリシー用）
 - **モック**: `mockall` 0.14（dev-dependency）
+- **パラメータ化テスト**: `rstest` 0.26（dev-dependency — `#[rstest]` + `#[case]` でパラメータ化テスト、`#[fixture]` で共通セットアップ注入）
 
 ## 認証・セキュリティ
 

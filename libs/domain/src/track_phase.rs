@@ -202,6 +202,8 @@ pub fn next_command(track: &TrackMetadata, schema_version: u32) -> String {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    use rstest::rstest;
+
     use super::*;
     use crate::{
         PlanSection, PlanView, StatusOverride, TaskId, TaskTransition, TrackBranch, TrackId,
@@ -322,60 +324,68 @@ mod tests {
 
     // --- resolve_phase_from_record ---
 
+    #[rstest]
+    #[case::branchless_v3_planned_returns_ready_to_activate(
+        "planned",
+        false,
+        3,
+        None,
+        TrackPhase::ReadyToActivate
+    )]
+    #[case::materialized_v3_planned_returns_planning(
+        "planned",
+        true,
+        3,
+        None,
+        TrackPhase::Planning
+    )]
+    #[case::v2_branchless_returns_planning("planned", false, 2, None, TrackPhase::Planning)]
+    #[case::in_progress_returns_in_progress("in_progress", true, 3, None, TrackPhase::InProgress)]
+    #[case::done_returns_ready_to_ship("done", true, 3, None, TrackPhase::ReadyToShip)]
+    #[case::blocked_returns_blocked(
+        "blocked",
+        true,
+        3,
+        Some("waiting on review"),
+        TrackPhase::Blocked
+    )]
+    #[case::cancelled_returns_cancelled(
+        "cancelled",
+        true,
+        3,
+        Some("scope changed"),
+        TrackPhase::Cancelled
+    )]
+    #[case::archived_returns_archived("archived", false, 3, None, TrackPhase::Archived)]
+    #[case::unknown_status_falls_back_to_in_progress(
+        "unknown",
+        true,
+        3,
+        None,
+        TrackPhase::InProgress
+    )]
+    fn resolve_phase_from_record_status_branch_matrix(
+        #[case] status: &str,
+        #[case] has_branch: bool,
+        #[case] schema_version: u32,
+        #[case] override_reason: Option<&str>,
+        #[case] expected_phase: TrackPhase,
+    ) {
+        let info =
+            resolve_phase_from_record("demo", status, has_branch, schema_version, override_reason);
+        assert_eq!(info.phase, expected_phase);
+    }
+
     #[test]
-    fn resolve_phase_from_record_branchless_v3_planned_returns_ready_to_activate() {
+    fn resolve_phase_from_record_branchless_v3_planned_next_command_is_activate() {
         let info = resolve_phase_from_record("demo", "planned", false, 3, None);
-        assert_eq!(info.phase, TrackPhase::ReadyToActivate);
         assert_eq!(info.next_command, "/track:activate demo");
     }
 
     #[test]
-    fn resolve_phase_from_record_materialized_v3_planned_returns_planning() {
-        let info = resolve_phase_from_record("demo", "planned", true, 3, None);
-        assert_eq!(info.phase, TrackPhase::Planning);
-    }
-
-    #[test]
-    fn resolve_phase_from_record_v2_branchless_returns_planning() {
-        let info = resolve_phase_from_record("demo", "planned", false, 2, None);
-        assert_eq!(info.phase, TrackPhase::Planning);
-    }
-
-    #[test]
-    fn resolve_phase_from_record_in_progress_returns_in_progress() {
-        let info = resolve_phase_from_record("demo", "in_progress", true, 3, None);
-        assert_eq!(info.phase, TrackPhase::InProgress);
-    }
-
-    #[test]
-    fn resolve_phase_from_record_done_returns_ready_to_ship() {
-        let info = resolve_phase_from_record("demo", "done", true, 3, None);
-        assert_eq!(info.phase, TrackPhase::ReadyToShip);
-    }
-
-    #[test]
-    fn resolve_phase_from_record_blocked_returns_blocked() {
+    fn resolve_phase_from_record_blocked_blocker_contains_reason() {
         let info = resolve_phase_from_record("demo", "blocked", true, 3, Some("waiting on review"));
-        assert_eq!(info.phase, TrackPhase::Blocked);
         assert!(info.blocker.unwrap().contains("waiting on review"));
-    }
-
-    #[test]
-    fn resolve_phase_from_record_cancelled_returns_cancelled() {
-        let info = resolve_phase_from_record("demo", "cancelled", true, 3, Some("scope changed"));
-        assert_eq!(info.phase, TrackPhase::Cancelled);
-    }
-
-    #[test]
-    fn resolve_phase_from_record_archived_returns_archived() {
-        let info = resolve_phase_from_record("demo", "archived", false, 3, None);
-        assert_eq!(info.phase, TrackPhase::Archived);
-    }
-
-    #[test]
-    fn resolve_phase_from_record_unknown_status_falls_back_to_in_progress() {
-        let info = resolve_phase_from_record("demo", "unknown", true, 3, None);
-        assert_eq!(info.phase, TrackPhase::InProgress);
     }
 
     // --- next_command ---

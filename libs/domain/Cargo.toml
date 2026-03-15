@@ -11,3 +11,6 @@ workspace = true
 [dependencies]
 conch-parser = "0.1.1"
 thiserror = { workspace = true }
+
+[dev-dependencies]
+rstest = { workspace = true }

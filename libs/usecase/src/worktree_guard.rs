@@ -71,37 +71,23 @@ pub fn ensure_clean_worktree(
 mod tests {
     use super::*;
 
+    use rstest::rstest;
+
     // --- parse_dirty_worktree_paths ---
 
-    #[test]
-    fn test_parse_dirty_worktree_paths_with_empty_output_returns_empty() {
-        let result = parse_dirty_worktree_paths("");
-        assert!(result.is_empty());
-    }
-
-    #[test]
-    fn test_parse_dirty_worktree_paths_with_modified_file_returns_path() {
-        let result = parse_dirty_worktree_paths(" M src/main.rs\n");
-        assert_eq!(result, vec!["src/main.rs"]);
-    }
-
-    #[test]
-    fn test_parse_dirty_worktree_paths_with_rename_returns_destination() {
-        let result = parse_dirty_worktree_paths("R  old.rs -> new.rs\n");
-        assert_eq!(result, vec!["new.rs"]);
-    }
-
-    #[test]
-    fn test_parse_dirty_worktree_paths_with_multiple_files_returns_all() {
-        let output = " M src/a.rs\n?? src/b.rs\nA  src/c.rs\n";
-        let result = parse_dirty_worktree_paths(output);
-        assert_eq!(result, vec!["src/a.rs", "src/b.rs", "src/c.rs"]);
-    }
-
-    #[test]
-    fn test_parse_dirty_worktree_paths_skips_short_lines() {
-        let result = parse_dirty_worktree_paths("ab\n M ok.rs\n");
-        assert_eq!(result, vec!["ok.rs"]);
+    #[rstest]
+    #[case::empty_output_returns_empty("", vec![])]
+    #[case::modified_file_returns_path(" M src/main.rs\n", vec!["src/main.rs"])]
+    #[case::rename_returns_destination("R  old.rs -> new.rs\n", vec!["new.rs"])]
+    #[case::multiple_files_returns_all(
+        " M src/a.rs\n?? src/b.rs\nA  src/c.rs\n",
+        vec!["src/a.rs", "src/b.rs", "src/c.rs"]
+    )]
+    #[case::skips_short_lines("ab\n M ok.rs\n", vec!["ok.rs"])]
+    fn test_parse_dirty_worktree_paths(#[case] input: &str, #[case] expected: Vec<&str>) {
+        let result = parse_dirty_worktree_paths(input);
+        let expected: Vec<String> = expected.into_iter().map(String::from).collect();
+        assert_eq!(result, expected);
     }
 
     // --- validate_clean_worktree ---
