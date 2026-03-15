@@ -699,6 +699,15 @@ description = "[wrapper] Create or reuse a PR for the current track/plan branch 
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- pr ensure-pr ${CARGO_MAKE_TASK_ARGS:+--track-id $CARGO_MAKE_TASK_ARGS}']
 
+[tasks.track-pr]
+description = "[wrapper] Push current branch and create/reuse a PR (push + ensure-pr in one step)"
+script_runner = "@shell"
+script = ['''
+TRACK_ARG="${CARGO_MAKE_TASK_ARGS:+--track-id $CARGO_MAKE_TASK_ARGS}"
+cargo run --quiet -p cli -- pr push $TRACK_ARG && \
+cargo run --quiet -p cli -- pr ensure-pr $TRACK_ARG
+''']
+
 [tasks.track-pr-review]
 description = "[wrapper] Run full PR review cycle: push, ensure PR, trigger @codex review, poll, parse"
 script_runner = "@shell"
