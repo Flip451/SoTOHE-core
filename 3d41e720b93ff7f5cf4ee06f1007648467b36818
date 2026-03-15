@@ -1,0 +1,24 @@
+## Task Summary: Update docs and registry for plan-only/activate model
+
+**Track:** track-plan-activation-2026-03-14
+**Task:** T004 — resolver/docs/registry/compatibility surface + T003 done 遷移 + T007 追加
+**Date:** 2026-03-15
+
+### Changes
+
+- DEVELOPER_AI_WORKFLOW.md: mermaid 図に plan-only 分岐追加、コマンド比較テーブル更新
+- .claude/docs/WORKFLOW.md: Planning phase に plan-only 代替追加、Track Commands 更新
+- track/workflow.md: Track Commands に plan-only/activate 追加、schema_version 修正
+- scripts/track_registry.py: registry header に /track:activate 追加
+- libs/infrastructure/src/track/render.rs: registry header に /track:activate 追加
+- .claude/commands/track/plan.md: plan-only cross-reference 追加
+- .claude/commands/track/done.md: next action に plan-only 追加
+- .claude/skills/track-plan/SKILL.md: schema_version 2 → 3
+- .claude/rules/07-dev-environment.md: track-activate/track-resolve タスク追加
+- Makefile.toml: track-transition の stray ${@} バグ修正
+- metadata.json: T003 done 遷移、T007 (plan branch) タスク追加
+
+### Why
+
+T004 は全 user-facing docs と registry rendering を plan-only/activate phase model に
+合わせる一括更新。docs と resolver の同時更新により sequencing mismatch を防ぐ。
