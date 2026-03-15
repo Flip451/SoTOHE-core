@@ -1,0 +1,17 @@
+## Task Summary: CI output suppression and add-all gitignore handling
+
+**Track:** workflow-ux-fixes-2026-03-15
+**Task:** T001 (CI output suppression) + T004 (add-all gitignore handling)
+**Date:** 2026-03-15
+
+### Changes
+
+- Makefile.toml: track-commit-message runs CI inside script with output redirected to tmp/ci-output.log
+- libs/infrastructure/src/git_cli.rs: new stage_all_excluding() trait method for gitignore-tolerant staging
+- apps/cli/src/commands/git.rs: add_all() reduced to thin adapter over stage_all_excluding()
+- scripts/test_make_wrappers.py: CI-before-commit safety assertions
+
+### Why
+
+track-commit-message output exceeded Claude Code Bash tool limits, making commit results invisible.
+add-all failed when gitignored transient dirs overlapped with exclude patterns.
