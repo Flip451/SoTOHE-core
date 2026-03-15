@@ -320,8 +320,9 @@ EXPECTED_MODEL_RESOLUTION_SNIPPETS = {
         "Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.codex` first, then `providers.codex.default_model`",
     ],
     Path(".claude/commands/track/review.md"): [
-        "profiles.<active_profile>.provider_model_overrides.<provider>",
-        "providers.<provider>.default_model",
+        "provider_model_overrides",
+        "providers.<reviewer_provider>.fast_model",
+        "providers.<reviewer_provider>.default_model",
     ],
 }
 
@@ -350,7 +351,7 @@ EXPECTED_REVIEW_WRAPPER_SNIPPETS = {
         'cargo make track-local-review -- --model {model} --prompt \\"{task}\\"',
     ],
     Path(".claude/commands/track/review.md"): [
-        "cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-",
+        "cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-",
         '{"verdict":"zero_findings","findings":[]}',
         '{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}',
         "Every object field is required by the output schema.",
