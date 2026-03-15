@@ -24,4 +24,4 @@ Behavior:
   2. Whether branch materialization happened now or was already present
   3. Whether an activation commit was created
   4. Current git branch after the command
-  5. Suggested next command (`/track:implement` or `/track:full-cycle <task>`)
+  5. Suggested next command (`/track:implement` → `/track:review` → `/track:commit`, or `/track:full-cycle <task>`)
