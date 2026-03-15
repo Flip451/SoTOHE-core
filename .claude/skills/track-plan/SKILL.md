@@ -21,7 +21,11 @@ metadata:
 
 ```
 /track:plan <feature>      ← このスキル（計画 + トラック作成）
+    または
+/track:plan-only <feature> ← plan/<id> ブランチで計画を作成し PR 経由で main に合流
     ↓ ユーザー承認後にトラック成果物を作成
+/track:activate <track-id> ← planning-only track を materialize
+    ↓
 /track:full-cycle <task>   ← 自動実装・レビュー
     または
 /track:implement           ← 並列実装
@@ -208,7 +212,7 @@ Rust TDD を前提としたタスク順序：
 
 ### 次のステップ
 - この計画で進めてよろしいですか？
-- 承認後にトラック成果物を作成し、`/track:full-cycle <task>` または `/track:implement` で実装を開始
+- 承認後に standard lane なら `/track:full-cycle <task>` または `/track:implement`、plan-only lane なら `/track:activate <track-id>` を経由して実装を開始
 ```
 
 ### Step 4: Create Track Artifacts（承認後）
@@ -216,7 +220,7 @@ Rust TDD を前提としたタスク順序：
 ユーザーが計画を承認したら、以下の成果物を作成する：
 
 1. `track/items/<id>/` ディレクトリを作成（safe slug + timestamp/id で衝突回避）
-2. `metadata.json` (SSoT) を作成（schema_version 2, tasks, plan sections）
+2. `metadata.json` (SSoT) を作成（schema_version 3, tasks, plan sections）
 3. `plan.md` を `metadata.json` から `render_plan()` で生成（直接書き込み禁止）
 4. `spec.md` を初期化（feature goal, scope, constraints, acceptance criteria）
 5. `verification.md` を初期化（scope verified, manual steps, result, verified_at）

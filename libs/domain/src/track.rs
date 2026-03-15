@@ -274,6 +274,10 @@ impl TrackMetadata {
         self.branch.as_ref()
     }
 
+    pub fn set_branch(&mut self, branch: Option<TrackBranch>) {
+        self.branch = branch;
+    }
+
     #[must_use]
     pub fn title(&self) -> &str {
         &self.title

@@ -594,6 +594,8 @@ WORKFLOW_PREFIX = "[Workflow Hint]"
 WORKFLOW_TEMPLATE = (
     "{prefix} Detected '{trigger}' -- consider using the appropriate tool: "
     "For planning + track creation: `/track:plan <feature>`. "
+    "For planning-only kickoff: `/track:plan-only <feature>`. "
+    "For activating a planning-only track: `/track:activate <track-id>`. "
     "For adding an external guide index entry: `/guide:add`. "
     "For a new project convention doc: `/conventions:add <name>`. "
     "For autonomous full cycle in Claude Code: `/track:full-cycle <task>`. "
@@ -605,6 +607,8 @@ WORKFLOW_TEMPLATE = (
 EXTERNAL_GUIDES_PREFIX = "[External Guide Context]"
 EXTERNAL_GUIDES_COMMAND_TRIGGERS = [
     "/track:plan",
+    "/track:plan-only",
+    "/track:activate",
     "/track:implement",
     "/track:review",
     "/track:full-cycle",

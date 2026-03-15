@@ -8,6 +8,7 @@ from track_schema import (
     COMMIT_HASH_RE,
     effective_track_status,
     parse_metadata_v2,
+    v3_branchless_track_invalid,
     validate_metadata_v2,
 )
 
@@ -60,6 +61,25 @@ def _make_valid_v2(
         "tasks": t,
         "plan": {"summary": [], "sections": s},
     }
+
+
+def _make_valid_v3(
+    *,
+    tasks: list[dict] | None = None,
+    sections: list[dict] | None = None,
+    status: str = "planned",
+    branch: str | None = "track/demo",
+    status_override: dict | None = None,
+) -> dict:
+    data = _make_valid_v2(
+        tasks=tasks,
+        sections=sections,
+        status=status,
+        status_override=status_override,
+    )
+    data["schema_version"] = 3
+    data["branch"] = branch
+    return data
 
 
 class TestEffectiveTrackStatus(unittest.TestCase):
@@ -488,6 +508,90 @@ class TestValidateMetadataV2(unittest.TestCase):
         errors = validate_metadata_v2(data, track_dir_name="demo")
         self.assertTrue(any("empty title" in e.lower() for e in errors))
 
+    def test_accepts_v3_planning_only_track_without_branch_when_tasks_empty(self) -> None:
+        data = _make_valid_v3(tasks=[], sections=[], branch=None)
+        errors = validate_metadata_v2(data, track_dir_name="demo")
+        self.assertEqual(errors, [])
+
+    def test_accepts_v3_planning_only_track_without_branch_when_all_tasks_todo(self) -> None:
+        data = _make_valid_v3(
+            tasks=[_make_task("T001", status="todo"), _make_task("T002", status="todo")],
+            sections=[_make_section(task_ids=["T001", "T002"])],
+            branch=None,
+        )
+        errors = validate_metadata_v2(data, track_dir_name="demo")
+        self.assertEqual(errors, [])
+
+    def test_rejects_v3_track_missing_branch_field_even_when_planning_only(self) -> None:
+        data = _make_valid_v3(branch=None)
+        del data["branch"]
+
+        errors = validate_metadata_v2(data, track_dir_name="demo")
+
+        self.assertTrue(any("Missing required field 'branch'" in e for e in errors))
+
+    def test_rejects_v3_in_progress_track_without_branch(self) -> None:
+        data = _make_valid_v3(
+            tasks=[
+                _make_task("T001", status="in_progress"),
+                _make_task("T002", status="todo"),
+            ],
+            sections=[_make_section(task_ids=["T001", "T002"])],
+            status="in_progress",
+            branch=None,
+        )
+        errors = validate_metadata_v2(data, track_dir_name="demo")
+        self.assertTrue(any("'branch' is required for v3 tracks" in e for e in errors))
+
+    def test_rejects_v3_done_track_without_branch(self) -> None:
+        data = _make_valid_v3(
+            tasks=[_make_task("T001", status="done", commit_hash="abc1234")],
+            sections=[_make_section(task_ids=["T001"])],
+            status="done",
+            branch=None,
+        )
+        errors = validate_metadata_v2(data, track_dir_name="demo")
+        self.assertTrue(any("'branch' is required for v3 tracks" in e for e in errors))
+
+    def test_rejects_v3_archived_track_without_branch(self) -> None:
+        data = _make_valid_v3(
+            tasks=[_make_task("T001", status="done", commit_hash="abc1234")],
+            sections=[_make_section(task_ids=["T001"])],
+            status="archived",
+            branch=None,
+        )
+        errors = validate_metadata_v2(data, track_dir_name="demo")
+        self.assertTrue(any("'branch' is required for v3 tracks unless the track is planning-only" in e for e in errors))
+
+    def test_v3_branchless_track_invalid_fail_closes_on_malformed_metadata(self) -> None:
+        self.assertTrue(
+            v3_branchless_track_invalid(
+                {
+                    "schema_version": 3,
+                    "id": "broken",
+                    "status": "planned",
+                    "branch": None,
+                }
+            )
+        )
+
+    def test_v3_branchless_track_invalid_rejects_schema_invalid_planning_only_shape(self) -> None:
+        self.assertTrue(
+            v3_branchless_track_invalid(
+                {
+                    "schema_version": 3,
+                    "id": "broken",
+                    "title": "Broken",
+                    "status": "planned",
+                    "branch": None,
+                    "created_at": "2026-03-14T00:00:00Z",
+                    "updated_at": "2026-03-14T00:00:00Z",
+                    "tasks": "oops",
+                    "plan": {"summary": [], "sections": []},
+                }
+            )
+        )
+
 
 class TestReservedIdWords(unittest.TestCase):
     """Track IDs containing reserved words (e.g. 'git') must be rejected."""
@@ -577,7 +681,6 @@ class TrackItemsDirConsistencyTest(unittest.TestCase):
         # Scripts that directly reference track/items (not yet migrated to all_track_directories)
         scripts_with_track_items = [
             "track_state_machine.py",
-            "external_guides.py",
         ]
         scripts_dir = Path(__file__).parent
         pattern = re.compile(r'"track"\s*/\s*"items"|["\']track/items["\']')

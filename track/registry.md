@@ -1,7 +1,7 @@
 # Track Registry
 
 > This file lists all tracks and their current status.
-> Auto-updated by `/track:plan` (on approval) and `/track:commit`.
+> Auto-updated by `/track:plan`, `/track:plan-only`, `/track:activate`, and `/track:commit`.
 > `/track:status` uses this file as an entry point to summarize progress.
 > Each track is expected to have `spec.md` / `plan.md` / `metadata.json` / `verification.md`.
 
@@ -9,7 +9,7 @@
 
 - Latest active track: `None yet`
 - Next recommended command: `/track:plan <feature>`
-- Last updated: `2026-03-14`
+- Last updated: `2026-03-15`
 
 ## Active Tracks
 
@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| track-plan-activation-2026-03-14 | Done | 2026-03-15 |
 | reviewer-process-termination-2026-03-14 | Done | 2026-03-14 |
 | takt-removal-2026-03-13 | Done | 2026-03-13 |
 | python-dependency-deprecation-2026-03-13 | Done | 2026-03-13 |
@@ -50,4 +51,4 @@
 
 ---
 
-Use `/track:plan <feature>` to start a new feature or bugfix track.
+Use `/track:plan <feature>` for the standard lane or `/track:plan-only <feature>` when planning should land before activation.

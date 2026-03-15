@@ -11,6 +11,19 @@ import sys
 from datetime import UTC, datetime, time
 from pathlib import Path
 
+try:
+    from scripts.track_schema import (
+        v3_branch_field_missing,
+        v3_branchless_track_invalid,
+        v3_non_null_branch_invalid,
+    )
+except ImportError:  # pragma: no cover - script execution path
+    from track_schema import (
+        v3_branch_field_missing,
+        v3_branchless_track_invalid,
+        v3_non_null_branch_invalid,
+    )
+
 PLACEHOLDER_LINE_RE = re.compile(r"TODO:|TEMPLATE STUB", re.IGNORECASE)
 TASK_LINE_RE = re.compile(r"^\s*(?:[-*]|\d+\.)\s+\[(?:[^\]])\]\s+.+")
 LIST_MARKER_RE = re.compile(r"^\s*(?:[-*]|\d+\.)\s+")
@@ -32,7 +45,10 @@ def project_root() -> Path:
 
 
 def track_dirs(root: Path | None = None) -> list[Path]:
-    from track_schema import all_track_directories
+    try:
+        from scripts.track_schema import all_track_directories
+    except ImportError:  # pragma: no cover - script execution path
+        from track_schema import all_track_directories
 
     repo_root = root or project_root()
     return all_track_directories(repo_root)
@@ -68,15 +84,28 @@ def parse_updated_at(raw_value: str) -> datetime:
 _SKIP_STATUSES = {"archived"}
 
 
+def selection_priority(status: str, branch: object, schema_version: int) -> int:
+    branch_name = branch.strip() if isinstance(branch, str) else ""
+    has_branch = bool(branch_name)
+    if has_branch and status != "done":
+        return 2
+    if not has_branch and schema_version != 3 and status not in {"done", "archived"}:
+        return 2
+    if not has_branch and status == "planned":
+        return 1
+    return 0
+
+
 def load_track_metadata(
     track_dir: Path, root: Path | None = None
-) -> tuple[datetime, str, list[str]]:
-    """Load track metadata and return (updated_at, status, errors)."""
+) -> tuple[datetime, str, object, list[str]]:
+    """Load track metadata and return (updated_at, status, branch, errors)."""
     metadata_file = track_dir / "metadata.json"
     if not metadata_file.is_file():
         return (
             datetime.min.replace(tzinfo=UTC),
             "",
+            None,
             [
                 f"[ERROR] Cannot determine latest track because metadata.json is missing: {display_path(metadata_file, root)}"
             ],
@@ -88,8 +117,47 @@ def load_track_metadata(
         return (
             datetime.min.replace(tzinfo=UTC),
             "",
+            None,
             [
                 f"[ERROR] Cannot determine latest track because metadata.json is invalid: {display_path(metadata_file, root)} ({err})"
+            ],
+        )
+    if not isinstance(data, dict):
+        return (
+            datetime.min.replace(tzinfo=UTC),
+            "",
+            None,
+            [
+                f"[ERROR] Cannot determine latest track because metadata.json is invalid: {display_path(metadata_file, root)} (metadata.json must be a JSON object)"
+            ],
+        )
+
+    if v3_branch_field_missing(data):
+        return (
+            datetime.min.replace(tzinfo=UTC),
+            "",
+            None,
+            [
+                f"[ERROR] Cannot determine latest track because branch is missing: {display_path(metadata_file, root)}"
+            ],
+        )
+    if v3_branchless_track_invalid(data):
+        return (
+            datetime.min.replace(tzinfo=UTC),
+            "",
+            None,
+            [
+                "[ERROR] Cannot determine latest track because branchless v3 metadata is only valid "
+                f"for planning-only tracks: {display_path(metadata_file, root)}"
+            ],
+        )
+    if v3_non_null_branch_invalid(data):
+        return (
+            datetime.min.replace(tzinfo=UTC),
+            "",
+            None,
+            [
+                f"[ERROR] Cannot determine latest track because branch is invalid: {display_path(metadata_file, root)}"
             ],
         )
 
@@ -98,6 +166,7 @@ def load_track_metadata(
         return (
             datetime.min.replace(tzinfo=UTC),
             "",
+            None,
             [
                 f"[ERROR] Cannot determine latest track because updated_at is missing or invalid: {display_path(metadata_file, root)}"
             ],
@@ -109,13 +178,17 @@ def load_track_metadata(
         return (
             datetime.min.replace(tzinfo=UTC),
             "",
+            None,
             [
                 f"[ERROR] Cannot determine latest track because updated_at is invalid: {display_path(metadata_file, root)} ({err})"
             ],
         )
     raw_status = data.get("status", "")
     status = raw_status if isinstance(raw_status, str) else ""
-    return parsed, status, []
+    schema_version = data.get("schema_version", 2)
+    if not isinstance(schema_version, int):
+        schema_version = 2
+    return parsed, status, (data.get("branch"), schema_version), []
 
 
 def latest_track_dir(root: Path | None = None) -> tuple[Path | None, list[str]]:
@@ -126,7 +199,7 @@ def latest_track_dir(root: Path | None = None) -> tuple[Path | None, list[str]]:
     repo_root = root or project_root()
     archive_root = (repo_root / "track" / "archive").resolve()
     latest_dir: Path | None = None
-    latest_updated_at = datetime.min.replace(tzinfo=UTC)
+    latest_rank = (-1, datetime.min.replace(tzinfo=UTC), "")
     errors: list[str] = []
     for dir_path in dirs:
         # Skip tracks in track/archive/ by path regardless of metadata content.
@@ -135,18 +208,17 @@ def latest_track_dir(root: Path | None = None) -> tuple[Path | None, list[str]]:
             continue
         except ValueError:
             pass
-        updated_at, status, track_errors = load_track_metadata(dir_path, root)
+        updated_at, status, branch_info, track_errors = load_track_metadata(dir_path, root)
         if track_errors:
             errors.extend(track_errors)
             continue
         if status in _SKIP_STATUSES:
             continue
-        if latest_dir is None or (updated_at, dir_path.name) > (
-            latest_updated_at,
-            latest_dir.name,
-        ):
+        branch, schema_version = branch_info
+        rank = (selection_priority(status, branch, schema_version), updated_at, dir_path.name)
+        if rank > latest_rank:
             latest_dir = dir_path
-            latest_updated_at = updated_at
+            latest_rank = rank
 
     if errors:
         return None, errors

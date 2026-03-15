@@ -8,8 +8,12 @@ Arguments:
 - Use `$ARGUMENTS` as optional scope notes (target module, constraints, priority).
 
 Execution:
-- Resolve the current track: if the current git branch matches `track/<id>`, use that track. Otherwise, fall back to the latest active track by `updated_at`.
+- Resolve the current track in this order:
+  1. If the current git branch matches `track/<id>`, use that track.
+  2. Otherwise, use the latest materialized active track (non-archived, non-done, `branch != null`).
+  3. If no materialized active track exists, fall back to the latest branchless planning-only track (`status=planned`, `branch=null`).
 - Read the current track's `spec.md`, `plan.md`, and `metadata.json` before implementation.
+- If the resolved track is branchless planning-only (`status=planned`, `branch=null`), stop immediately and instruct the user to run `/track:activate <track-id>`. Do not transition tasks, do not write implementation code, and do not treat this as an implicit branch-creation step.
 - Read every convention file listed in the `## Related Conventions (Required Reading)` section of `plan.md` before writing code.
 - For exact type signatures, trait definitions, module trees, and Mermaid diagrams, prefer `## Canonical Blocks` in `plan.md` and `.claude/docs/DESIGN.md` over surrounding prose.
 - Identify the target task(s) from the approved plan. If `$ARGUMENTS` is provided, map it to the relevant plan scope.
@@ -29,6 +33,7 @@ Execution:
 
 Behavior:
 - This command is the canonical replacement for legacy team-implement style flow.
+- Planning-only tracks must pass through `/track:activate <track-id>` first.
 - After execution, summarize:
   1. Implemented scope
   2. Updated `metadata.json` task states (todo → in_progress → done, or blocked in_progress)

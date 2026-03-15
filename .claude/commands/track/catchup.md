@@ -26,7 +26,7 @@ This delegates all setup checks to setup.md — do not duplicate them here.
 
 Summarize the current project state for the newcomer:
 1. Read `track/registry.md` — list active and completed tracks
-2. Resolve the current track: if the current git branch matches `track/<id>`, use that track. Otherwise, fall back to the latest active track by `updated_at`.
+2. Resolve the current track: if the current git branch matches `track/<id>`, use that track. Otherwise, use the latest materialized active track (non-archived, non-done, `branch != null`). If no materialized active track exists, fall back to the latest branchless planning-only track.
 3. Read the current track's `spec.md` and `plan.md` if one exists
 4. Read `track/tech-stack.md` — highlight any unresolved `TODO:` items
 5. Show recent git log (last 10 commits) for context

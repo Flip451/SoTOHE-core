@@ -26,7 +26,7 @@ After switching to main:
    - Number of active tracks remaining
 2. Recommend next action:
    - If active tracks remain: `/track:implement` or `/track:full-cycle <task>`
-   - If no active tracks: `/track:plan <feature>` to start new work
+   - If no active tracks: `/track:plan <feature>` or `/track:plan-only <feature>` to start new work
 
 ## Behavior
 

@@ -15,6 +15,15 @@ from datetime import UTC, datetime, time
 from pathlib import Path
 from urllib.parse import urlparse
 
+try:
+    from scripts.track_resolution import latest_legacy_track_dir
+    from scripts.verify_latest_track_files import (
+        latest_track_dir as latest_verified_track_dir,
+    )
+except ImportError:  # pragma: no cover - script execution path
+    from track_resolution import latest_legacy_track_dir
+    from verify_latest_track_files import latest_track_dir as latest_verified_track_dir
+
 MAX_DOWNLOAD_BYTES = 2 * 1024 * 1024
 USER_AGENT = "TaktAgent/1.0 (+https://github.com/anthropics)"
 FETCH_MAX_RETRIES = 3
@@ -169,15 +178,13 @@ def _track_updated_at(track_dir: Path) -> datetime:
 
 def latest_track_dir(root: Path | None = None) -> Path | None:
     repo_root = root or project_root()
-    track_root = repo_root / "track" / "items"
-    if not track_root.is_dir():
+    latest_dir, _warnings = latest_legacy_track_dir(repo_root)
+    if latest_dir is not None:
+        return latest_dir
+    latest_dir, errors = latest_verified_track_dir(repo_root)
+    if errors:
         return None
-
-    dirs = [path for path in track_root.iterdir() if path.is_dir()]
-    if not dirs:
-        return None
-
-    return max(dirs, key=lambda d: (_track_updated_at(d), d.name))
+    return latest_dir
 
 
 def latest_track_context(root: Path | None = None) -> str:

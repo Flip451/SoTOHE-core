@@ -104,6 +104,22 @@ impl<L: FileLockManager> FsTrackStore<L> {
     }
 }
 
+impl<L: FileLockManager> FsTrackStore<L> {
+    /// Read-only metadata load returning both domain model and document metadata.
+    ///
+    /// Unlike `TrackReader::find`, this also returns `DocumentMeta` (schema version,
+    /// timestamps, original status) needed by callers that inspect document-level fields.
+    ///
+    /// # Errors
+    /// Returns `TrackReadError` on I/O or decode failure.
+    pub fn find_with_meta(
+        &self,
+        id: &TrackId,
+    ) -> Result<Option<(TrackMetadata, DocumentMeta)>, TrackReadError> {
+        self.read_track(id).map_err(TrackReadError::from)
+    }
+}
+
 impl<L: FileLockManager> TrackReader for FsTrackStore<L> {
     fn find(&self, id: &TrackId) -> Result<Option<TrackMetadata>, TrackReadError> {
         self.read_track(id).map(|opt| opt.map(|(track, _meta)| track)).map_err(TrackReadError::from)
@@ -235,6 +251,24 @@ impl<L: FileLockManager> TrackWriter for FsTrackStore<L> {
 #[must_use]
 pub fn metadata_json_path(root: &Path, id: &TrackId) -> PathBuf {
     root.join(id.as_str()).join("metadata.json")
+}
+
+/// Read-only metadata load without requiring a lock manager.
+///
+/// Reads and decodes `metadata.json` for a given track ID directly from disk.
+/// Use this for read-only paths (e.g., `track resolve`) where constructing a
+/// full `FsTrackStore` with a lock manager would introduce unwanted side effects.
+///
+/// # Errors
+/// Returns a human-readable error message on I/O or decode failure.
+pub fn read_track_metadata(
+    items_dir: &Path,
+    id: &TrackId,
+) -> Result<(TrackMetadata, DocumentMeta), String> {
+    let path = items_dir.join(id.as_str()).join("metadata.json");
+    let json = std::fs::read_to_string(&path)
+        .map_err(|err| format!("cannot read {}: {err}", path.display()))?;
+    codec::decode(&json).map_err(|err| format!("cannot parse {}: {err}", path.display()))
 }
 
 #[cfg(test)]

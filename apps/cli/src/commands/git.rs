@@ -11,7 +11,8 @@ use infrastructure::git_cli::{
 };
 use usecase::git_workflow::{
     ExplicitTrackBranch, TRANSIENT_AUTOMATION_DIRS, TRANSIENT_AUTOMATION_FILES, TrackBranchClaim,
-    validate_stage_path_entries, verify_auto_detected_branch, verify_explicit_track_branch,
+    validate_planning_only_commit_paths, validate_stage_path_entries, verify_auto_detected_branch,
+    verify_explicit_track_branch,
 };
 
 #[derive(Debug, Subcommand)]
@@ -175,8 +176,37 @@ fn commit_from_file(path: &Path, cleanup: bool, track_dir: Option<&Path>) -> Exi
         .map(|track_dir| repo.resolve_path(track_dir))
         .or_else(|| load_optional_track_dir(repo.root(), track_dir_file.as_deref()));
 
-    let guard_result = if let Some(track_dir) = effective_track_dir.as_deref() {
-        verify_commit_branch(repo.root(), track_dir, &repo)
+    let explicit_track = match effective_track_dir
+        .as_deref()
+        .map(|track_dir| load_explicit_track(repo.root(), track_dir))
+        .transpose()
+    {
+        Ok(track) => track,
+        Err(err) => {
+            eprintln!("[ERROR] {err}");
+            if cleanup {
+                if let Some(track_dir_file) = track_dir_file.as_deref() {
+                    let _ = fs::remove_file(track_dir_file);
+                }
+            }
+            return ExitCode::FAILURE;
+        }
+    };
+
+    if let Err(err) =
+        require_explicit_track_selector_on_non_track_branch(&repo, explicit_track.as_ref())
+    {
+        eprintln!("[ERROR] {err}");
+        if cleanup {
+            if let Some(track_dir_file) = track_dir_file.as_deref() {
+                let _ = fs::remove_file(track_dir_file);
+            }
+        }
+        return ExitCode::FAILURE;
+    }
+
+    let guard_result = if let Some(explicit_track) = explicit_track.as_ref() {
+        verify_commit_branch(&repo, explicit_track)
     } else {
         verify_branch_by_auto_detection(&repo)
     };
@@ -188,6 +218,25 @@ fn commit_from_file(path: &Path, cleanup: bool, track_dir: Option<&Path>) -> Exi
             }
         }
         return ExitCode::FAILURE;
+    }
+
+    if let Some(explicit_track) = explicit_track.as_ref() {
+        let staged_paths = match staged_paths(&repo) {
+            Ok(paths) => paths,
+            Err(err) => {
+                eprintln!("[ERROR] {err}");
+                return ExitCode::FAILURE;
+            }
+        };
+        if let Err(err) = validate_planning_only_commit_paths(explicit_track, &staged_paths) {
+            eprintln!("[ERROR] {err}");
+            if cleanup {
+                if let Some(track_dir_file) = track_dir_file.as_deref() {
+                    let _ = fs::remove_file(track_dir_file);
+                }
+            }
+            return ExitCode::FAILURE;
+        }
     }
 
     let path_str = path.to_string_lossy().into_owned();
@@ -291,19 +340,59 @@ fn load_optional_track_dir(root: &Path, path: Option<&Path>) -> Option<PathBuf> 
     if trimmed.is_empty() { None } else { Some(resolve_repo_path(root, Path::new(trimmed))) }
 }
 
-fn verify_commit_branch(
-    root: &Path,
-    track_dir: &Path,
-    repo: &impl GitRepository,
-) -> Result<(), String> {
+fn load_explicit_track(root: &Path, track_dir: &Path) -> Result<ExplicitTrackBranch, String> {
     let metadata = load_explicit_track_branch(root, track_dir)?;
-    verify_explicit_track_branch(
-        repo.current_branch()?.as_deref(),
-        &ExplicitTrackBranch {
-            display_path: metadata.display_path,
-            expected_branch: metadata.branch,
-        },
-    )
+    Ok(ExplicitTrackBranch {
+        display_path: metadata.display_path,
+        expected_branch: metadata.branch,
+        status: metadata.status,
+        schema_version: metadata.schema_version,
+    })
+}
+
+fn staged_paths(repo: &impl GitRepository) -> Result<Vec<String>, String> {
+    let output = repo.output(&["diff", "--cached", "--name-only", "--diff-filter=ACMRD"])?;
+    if !output.status.success() {
+        return Err("git diff --cached --name-only failed".to_owned());
+    }
+    Ok(String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .map(str::trim)
+        .filter(|line| !line.is_empty())
+        .map(ToOwned::to_owned)
+        .collect())
+}
+
+fn verify_commit_branch(
+    repo: &impl GitRepository,
+    explicit_track: &ExplicitTrackBranch,
+) -> Result<(), String> {
+    verify_explicit_track_branch(repo.current_branch()?.as_deref(), explicit_track)
+}
+
+fn require_explicit_track_selector_on_non_track_branch(
+    repo: &impl GitRepository,
+    explicit_track: Option<&ExplicitTrackBranch>,
+) -> Result<(), String> {
+    if explicit_track.is_some() {
+        return Ok(());
+    }
+
+    match repo.current_branch()?.as_deref() {
+        Some(branch) if branch.starts_with("track/") => Ok(()),
+        Some("HEAD") => Err(
+            "detached HEAD requires an explicit track-id selector in tmp/track-commit/track-dir.txt"
+                .to_owned(),
+        ),
+        Some(_) => Err(
+            "non-track branch commits require an explicit track-id selector in tmp/track-commit/track-dir.txt"
+                .to_owned(),
+        ),
+        None => Err(
+            "cannot determine current git branch; provide an explicit track-id selector in tmp/track-commit/track-dir.txt"
+                .to_owned(),
+        ),
+    }
 }
 
 fn verify_branch_by_auto_detection(repo: &impl GitRepository) -> Result<(), String> {
@@ -313,6 +402,7 @@ fn verify_branch_by_auto_detection(repo: &impl GitRepository) -> Result<(), Stri
             track_name: claim.track_name,
             branch: claim.branch,
             status: claim.status,
+            schema_version: claim.schema_version,
         })
         .collect::<Vec<_>>();
 
@@ -533,6 +623,167 @@ mod tests {
             run_git_output(dir.path(), &["log", "-1", "--pretty=%s"]).trim(),
             "Track commit"
         );
+    }
+
+    #[test]
+    fn commit_from_file_rejects_non_artifact_changes_for_planning_only_track() {
+        let _lock = cwd_lock().lock().unwrap();
+        let dir = init_repo();
+        fs::create_dir_all(dir.path().join("track/items/example")).unwrap();
+        fs::write(
+            dir.path().join("track/items/example/metadata.json"),
+            r#"{"schema_version":3,"branch":null,"status":"planned"}"#,
+        )
+        .unwrap();
+        fs::write(dir.path().join("src.rs"), "fn main() {}\n").unwrap();
+        run_git(dir.path(), &["add", "src.rs"]);
+
+        let scratch = dir.path().join("tmp/track-commit");
+        fs::create_dir_all(&scratch).unwrap();
+        let commit_message = scratch.join("commit-message.txt");
+        let track_dir_file = scratch.join("track-dir.txt");
+        fs::write(&commit_message, "Planning-only commit\n").unwrap();
+        fs::write(&track_dir_file, "track/items/example\n").unwrap();
+
+        let nested = dir.path().join("nested");
+        fs::create_dir_all(&nested).unwrap();
+        let _guard = CurrentDirGuard::change_to(&nested);
+
+        assert_eq!(
+            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None),
+            ExitCode::FAILURE
+        );
+        assert!(commit_message.exists());
+        assert!(!track_dir_file.exists());
+        assert!(
+            run_git_output(dir.path(), &["diff", "--cached", "--name-only"]).contains("src.rs")
+        );
+    }
+
+    #[test]
+    fn commit_from_file_rejects_deletions_outside_planning_only_allowlist() {
+        let _lock = cwd_lock().lock().unwrap();
+        let dir = init_repo();
+        fs::create_dir_all(dir.path().join("track/items/example")).unwrap();
+        fs::write(
+            dir.path().join("track/items/example/metadata.json"),
+            r#"{"schema_version":3,"branch":null,"status":"planned"}"#,
+        )
+        .unwrap();
+        fs::write(dir.path().join("src.rs"), "fn main() {}\n").unwrap();
+        run_git(dir.path(), &["add", "src.rs"]);
+        run_git(dir.path(), &["commit", "-m", "initial"]);
+        fs::remove_file(dir.path().join("src.rs")).unwrap();
+        run_git(dir.path(), &["add", "-u", "src.rs"]);
+
+        let scratch = dir.path().join("tmp/track-commit");
+        fs::create_dir_all(&scratch).unwrap();
+        let commit_message = scratch.join("commit-message.txt");
+        let track_dir_file = scratch.join("track-dir.txt");
+        fs::write(&commit_message, "Planning-only commit\n").unwrap();
+        fs::write(&track_dir_file, "track/items/example\n").unwrap();
+
+        let nested = dir.path().join("nested");
+        fs::create_dir_all(&nested).unwrap();
+        let _guard = CurrentDirGuard::change_to(&nested);
+
+        assert_eq!(
+            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None),
+            ExitCode::FAILURE
+        );
+        assert!(commit_message.exists());
+        assert!(!track_dir_file.exists());
+        assert!(
+            run_git_output(dir.path(), &["diff", "--cached", "--name-status"])
+                .contains("D\tsrc.rs")
+        );
+    }
+
+    #[test]
+    fn commit_from_file_rejects_branchless_v3_track_selector_with_status_override() {
+        let _lock = cwd_lock().lock().unwrap();
+        let dir = init_repo();
+        fs::create_dir_all(dir.path().join("track/items/example")).unwrap();
+        fs::write(
+            dir.path().join("track/items/example/metadata.json"),
+            r#"{"schema_version":3,"branch":null,"status":"planned","tasks":[],"status_override":{"status":"blocked","reason":"waiting"}}"#,
+        )
+        .unwrap();
+
+        let scratch = dir.path().join("tmp/track-commit");
+        fs::create_dir_all(&scratch).unwrap();
+        let commit_message = scratch.join("commit-message.txt");
+        let track_dir_file = scratch.join("track-dir.txt");
+        fs::write(&commit_message, "Planning-only commit\n").unwrap();
+        fs::write(&track_dir_file, "track/items/example\n").unwrap();
+
+        let nested = dir.path().join("nested");
+        fs::create_dir_all(&nested).unwrap();
+        let _guard = CurrentDirGuard::change_to(&nested);
+
+        assert_eq!(
+            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None),
+            ExitCode::FAILURE
+        );
+        assert!(commit_message.exists());
+        assert!(!track_dir_file.exists());
+    }
+
+    #[test]
+    fn commit_from_file_rejects_branchless_v3_track_selector_missing_required_fields() {
+        let _lock = cwd_lock().lock().unwrap();
+        let dir = init_repo();
+        fs::create_dir_all(dir.path().join("track/items/example")).unwrap();
+        fs::write(
+            dir.path().join("track/items/example/metadata.json"),
+            r#"{"schema_version":3,"id":"example","status":"planned","branch":null,"created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]}}"#,
+        )
+        .unwrap();
+
+        let scratch = dir.path().join("tmp/track-commit");
+        fs::create_dir_all(&scratch).unwrap();
+        let commit_message = scratch.join("commit-message.txt");
+        let track_dir_file = scratch.join("track-dir.txt");
+        fs::write(&commit_message, "Planning-only commit\n").unwrap();
+        fs::write(&track_dir_file, "track/items/example\n").unwrap();
+
+        let nested = dir.path().join("nested");
+        fs::create_dir_all(&nested).unwrap();
+        let _guard = CurrentDirGuard::change_to(&nested);
+
+        assert_eq!(
+            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None),
+            ExitCode::FAILURE
+        );
+        assert!(commit_message.exists());
+        assert!(!track_dir_file.exists());
+    }
+
+    #[test]
+    fn commit_from_file_requires_explicit_selector_on_non_track_branch() {
+        let _lock = cwd_lock().lock().unwrap();
+        let dir = init_repo();
+        fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
+        run_git(dir.path(), &["add", "tracked.txt"]);
+        run_git(dir.path(), &["commit", "-m", "initial"]);
+
+        fs::write(dir.path().join("tracked.txt"), "changed\n").unwrap();
+        run_git(dir.path(), &["add", "tracked.txt"]);
+        let scratch = dir.path().join("tmp/track-commit");
+        fs::create_dir_all(&scratch).unwrap();
+        let commit_message = scratch.join("commit-message.txt");
+        fs::write(&commit_message, "Commit from main\n").unwrap();
+
+        let nested = dir.path().join("nested");
+        fs::create_dir_all(&nested).unwrap();
+        let _guard = CurrentDirGuard::change_to(&nested);
+
+        assert_eq!(
+            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None),
+            ExitCode::FAILURE
+        );
+        assert!(commit_message.exists());
+        assert_eq!(run_git_output(dir.path(), &["log", "-1", "--pretty=%s"]).trim(), "initial");
     }
 
     #[test]
