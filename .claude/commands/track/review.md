@@ -38,8 +38,12 @@ Arguments:
 
 - Read `.claude/agent-profiles.json`.
 - Look up `profiles.<active_profile>.reviewer` to determine the provider (e.g., `codex`).
-- Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.<provider>` first, then fall back to `providers.<provider>.default_model`.
-- If the reviewer is `claude`, perform the review inline (no subprocess). Skip to Step 2 using Claude Code's own analysis.
+- Resolve `{model}`:
+  1. Check `profiles.<active_profile>.provider_model_overrides.<provider>`.
+  2. Fall back to `providers.<provider>.default_model`.
+  3. If neither is set (e.g., `claude` provider has no `default_model`), `{model}` is not needed — skip the `--model` flag.
+- When the resolved provider has a CLI tool (e.g., Codex CLI), invoke via `cargo make track-local-review` (external subprocess).
+- When the resolved provider is `claude` (e.g., `claude-heavy` profile), invoke via Claude Code subagent with `subagent_type: "Explore"` using the same briefing files and JSON verdict format. No `--model` flag is needed. Do not perform inline review in the main conversation context.
 
 ## Step 2: Prepare review briefings (parallel observation split)
 
@@ -56,6 +60,7 @@ file to exactly one observation group:
 | **infra-domain** | Error type design, trait signatures, architecture direction | `libs/infrastructure/**`, `libs/domain/**` |
 | **usecase** | Workflow logic, error propagation, functional correctness | `libs/usecase/**` |
 | **cli** | CLI error handling, exit codes, user-facing messages, functional regressions | `apps/cli/**` |
+| **other** | Workflow docs, skill definitions, track artifacts, scripts, config | Everything else (`.claude/**`, `track/**`, `DEVELOPER_AI_WORKFLOW.md`, `scripts/**`, `Cargo.*`, etc.) |
 
 If a group has zero changed files, skip it (do not invoke a reviewer for empty scope).
 
@@ -97,14 +102,22 @@ DO NOT report findings about unchanged pre-existing code.
 
 ### 2c. Invoke reviewers in parallel
 
-Launch one `cargo make track-local-review` per non-empty group, **in parallel** using
-Agent Teams (the Agent tool with `run_in_background: true`):
+Launch one reviewer per non-empty group, **in parallel** using Agent Teams
+(the Agent tool with `run_in_background: true`).
+
+**When the provider has a CLI tool** (e.g., Codex CLI — the default profile):
 
 ```
 Agent 1: cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-infra-domain.md
 Agent 2: cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-usecase.md
 Agent 3: cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-cli.md
+Agent 4: cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-other.md
 ```
+
+**When the provider is `claude`** (e.g., `claude-heavy` profile):
+
+Launch one Claude Code subagent per group with `subagent_type: "Explore"`.
+Each subagent reads its briefing file and returns a JSON verdict in the same format.
 
 Wait for all agents to complete.
 
