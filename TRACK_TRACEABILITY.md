@@ -53,7 +53,7 @@ For day-to-day workflow and quality gate overview, see `track/workflow.md`.
 - `/track:commit <message>` = recommended path; applies `tmp/track-commit/note.md` if present
 - `cargo make commit` = `cargo make ci` + `git commit` low-level alternative (no extra gates, no auto note)
 - Exact automation wrappers:
-  - `cargo make add-all` = stage entire worktree (excludes `tmp/` dir, `.takt/handoffs` dir, and `.takt/pending-*` transient files)
+  - `cargo make add-all` = stage entire worktree (excludes `tmp/` dir)
   - `cargo make track-commit-message` = use `tmp/track-commit/commit-message.txt` as commit message, delete on success
   - `cargo make track-note` = apply `tmp/track-commit/note.md` as git note, delete on success
 - `cargo make machete` = auxiliary audit for dependency cleanup; not included in standard `ci`

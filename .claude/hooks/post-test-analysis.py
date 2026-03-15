@@ -20,7 +20,6 @@ TEST_BUILD_COMMANDS = [
     "cargo make ci",
     "cargo make clippy",
     "cargo make fmt",
-    "takt run",
 ]
 
 FAILURE_PATTERNS = [

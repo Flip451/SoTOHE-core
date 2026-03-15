@@ -64,44 +64,6 @@ ARCH_RULES_STUB = textwrap.dedent(
 )
 
 
-TAKT_FAILURE_STUB = textwrap.dedent(
-    """\
-    import json
-    import sys
-
-    print(
-        json.dumps(
-            {
-                "script": "takt_failure_report.py",
-                "argv": sys.argv[1:],
-                "python": sys.executable,
-            }
-        )
-    )
-    """
-)
-
-
-TAKT_STUB = textwrap.dedent(
-    """\
-    import json
-    import os
-    import sys
-
-    print(
-        json.dumps(
-            {
-                "script": "takt_profile.py",
-                "argv": sys.argv[1:],
-                "python": sys.executable,
-                "takt_session": os.environ.get("TAKT_SESSION"),
-                "wrapper_marker": os.environ.get("TAKT_WRAPPER_MARKER"),
-            }
-        )
-    )
-    """
-)
-
 
 VERIFY_ORCHESTRA_STUB = textwrap.dedent(
     """\
@@ -169,8 +131,6 @@ class MakeWrappersTest(unittest.TestCase):
         self.write_text(root / "scripts" / "external_guides.py", GUIDES_STUB)
         self.write_text(root / "scripts" / "convention_docs.py", CONVENTIONS_STUB)
         self.write_text(root / "scripts" / "architecture_rules.py", ARCH_RULES_STUB)
-        self.write_text(root / "scripts" / "takt_failure_report.py", TAKT_FAILURE_STUB)
-        self.write_text(root / "scripts" / "takt_profile.py", TAKT_STUB)
         self.write_text(
             root / "scripts" / "verify_orchestra_guardrails.py", VERIFY_ORCHESTRA_STUB
         )
@@ -183,8 +143,6 @@ class MakeWrappersTest(unittest.TestCase):
             "test_external_guides.py",
             "test_git_ops.py",
             "test_make_wrappers.py",
-            "test_takt_failure_report.py",
-            "test_takt_profile.py",
         ):
             self.write_text(root / "scripts" / test_name, PASSING_TEST)
 

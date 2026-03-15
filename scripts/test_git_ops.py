@@ -396,12 +396,12 @@ class GitOpsTest(unittest.TestCase):
         )
 
     def test_commit_from_file_rejects_missing_file(self) -> None:
-        code = git_ops.main(["commit-from-file", ".takt/missing-message.txt"])
+        code = git_ops.main(["commit-from-file", "tmp/nonexistent-message.txt"])
 
         self.assertEqual(code, 1)
 
     def test_note_from_file_rejects_missing_file(self) -> None:
-        code = git_ops.main(["note-from-file", ".takt/missing-note.txt"])
+        code = git_ops.main(["note-from-file", "tmp/nonexistent-note.txt"])
 
         self.assertEqual(code, 1)
 

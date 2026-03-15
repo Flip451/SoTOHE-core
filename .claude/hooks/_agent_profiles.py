@@ -28,11 +28,9 @@ WORKFLOW_HOST_PROVIDER_KEY = "workflow_host_provider"
 WORKFLOW_HOST_MODEL_KEY = "workflow_host_model"
 WORKFLOW_HOST_PROVIDER_ALIASES = (
     WORKFLOW_HOST_PROVIDER_KEY,
-    "takt_host_provider",
 )
 WORKFLOW_HOST_MODEL_ALIASES = (
     WORKFLOW_HOST_MODEL_KEY,
-    "takt_host_model",
 )
 SUPPORTED_WORKFLOW_HOST_PROVIDERS = ("claude", "codex")
 PLACEHOLDER_KEYS = ("task", "path", "model")
@@ -340,28 +338,28 @@ def validate_profiles(profiles: dict[str, Any]) -> None:
                         f"provider_model_overrides in profile)"
                     )
 
-        takt_host_provider_name = _profile_string_value(
+        host_provider_name = _profile_string_value(
             mapping, WORKFLOW_HOST_PROVIDER_ALIASES
         )
-        if not isinstance(takt_host_provider_name, str) or not takt_host_provider_name:
+        if not isinstance(host_provider_name, str) or not host_provider_name:
             raise AgentProfilesError(
                 f"Profile '{profile_name}' must define a non-empty "
                 f"{WORKFLOW_HOST_PROVIDER_KEY}"
             )
-        if takt_host_provider_name not in SUPPORTED_WORKFLOW_HOST_PROVIDERS:
+        if host_provider_name not in SUPPORTED_WORKFLOW_HOST_PROVIDERS:
             supported_hosts = ", ".join(SUPPORTED_WORKFLOW_HOST_PROVIDERS)
             raise AgentProfilesError(
                 f"Profile '{profile_name}' {WORKFLOW_HOST_PROVIDER_KEY} must be one of: "
                 f"{supported_hosts}"
             )
-        if takt_host_provider_name not in providers:
+        if host_provider_name not in providers:
             raise AgentProfilesError(
                 f"Profile '{profile_name}' {WORKFLOW_HOST_PROVIDER_KEY} references unknown provider "
-                f"'{takt_host_provider_name}'"
+                f"'{host_provider_name}'"
             )
 
-        takt_host_model = _profile_string_value(mapping, WORKFLOW_HOST_MODEL_ALIASES)
-        if not isinstance(takt_host_model, str) or not takt_host_model.strip():
+        host_model = _profile_string_value(mapping, WORKFLOW_HOST_MODEL_ALIASES)
+        if not isinstance(host_model, str) or not host_model.strip():
             raise AgentProfilesError(
                 f"Profile '{profile_name}' must define a non-empty "
                 f"{WORKFLOW_HOST_MODEL_KEY}"

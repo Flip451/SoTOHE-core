@@ -63,7 +63,6 @@ TARGETED_TEST_BUILD_COMMANDS = [
     "cargo make ci",
     "cargo make clippy",
     "cargo make fmt",
-    "takt run",
 ]
 MIN_OUTPUT_LENGTH = 20
 ERROR_PREFIX = "[Error Detected]"

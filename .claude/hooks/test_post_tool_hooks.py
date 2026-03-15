@@ -1079,26 +1079,6 @@ class PostToolHooksTest(unittest.TestCase):
         self.assertEqual(exc.exception.code, 0)
         self.assertEqual(stdout.getvalue(), "")
 
-    def test_python_lint_on_save_silent_during_takt_session(self) -> None:
-        data = {
-            "tool_name": "Edit",
-            "tool_input": {"file_path": "/repo/scripts/check.py"},
-        }
-
-        stdout = io.StringIO()
-        with mock.patch.dict(
-            python_lint_on_save.os.environ, {"TAKT_SESSION": "1"}, clear=False
-        ):
-            with mock.patch.object(
-                python_lint_on_save, "load_stdin_json", return_value=data
-            ):
-                with redirect_stdout(stdout):
-                    with self.assertRaises(SystemExit) as exc:
-                        python_lint_on_save.main()
-
-        self.assertEqual(exc.exception.code, 0)
-        self.assertEqual(stdout.getvalue(), "")
-
     def test_python_lint_on_save_skips_when_ruff_not_found(self) -> None:
         data = {
             "tool_name": "Edit",
