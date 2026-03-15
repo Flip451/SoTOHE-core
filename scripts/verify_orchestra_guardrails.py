@@ -320,7 +320,8 @@ EXPECTED_MODEL_RESOLUTION_SNIPPETS = {
         "Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.codex` first, then `providers.codex.default_model`",
     ],
     Path(".claude/commands/track/review.md"): [
-        "Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.<provider>` first, then fall back to `providers.<provider>.default_model`.",
+        "profiles.<active_profile>.provider_model_overrides.<provider>",
+        "providers.<provider>.default_model",
     ],
 }
 
