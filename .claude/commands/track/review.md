@@ -41,25 +41,82 @@ Arguments:
 - Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.<provider>` first, then fall back to `providers.<provider>.default_model`.
 - If the reviewer is `claude`, perform the review inline (no subprocess). Skip to Step 2 using Claude Code's own analysis.
 
-## Step 2: Prepare review briefing
+## Step 2: Prepare review briefings (parallel observation split)
 
-Build a review briefing that includes:
+Partition changed files into **observation groups** by architecture layer. Each group gets its own
+focused briefing and reviewer invocation. All groups run **in parallel** via Agent Teams.
 
-1. **Design intent** — 3-5 bullet points from `spec.md` / `plan.md` (invariants, constraints, key decisions).
-2. **Changed files** — list all files changed in the current track (use `git diff --name-only` against the last commit before the track, or list files from `metadata.json` task descriptions and current `git status`).
-3. **Review checklist** — derived from `.claude/rules/04-coding-principles.md`, `05-testing.md`, `06-security.md`, and `project-docs/conventions/`:
-   - Logic errors, edge cases, race conditions
-   - No panics in library code, proper error propagation
-   - Idiomatic Rust (naming, patterns)
-   - Architecture layer dependency violations, domain I/O purity
-   - Test coverage gaps
-   - Security (input validation, error information leakage)
+### 2a. Classify changed files into groups
 
-For the Codex provider, if the briefing exceeds ~1KB:
-- Write it to `tmp/codex-briefing.md` (file-based briefing pattern from `codex-system` skill).
-- Use `cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md`.
+Use `git diff main --name-only` (or equivalent) to get the full changed file list. Assign each
+file to exactly one observation group:
 
-For short briefings, use inline prompts via the same wrapper.
+| Group | Scope | Files matching |
+|-------|-------|----------------|
+| **infra-domain** | Error type design, trait signatures, architecture direction | `libs/infrastructure/**`, `libs/domain/**` |
+| **usecase** | Workflow logic, error propagation, functional correctness | `libs/usecase/**` |
+| **cli** | CLI error handling, exit codes, user-facing messages, functional regressions | `apps/cli/**` |
+
+If a group has zero changed files, skip it (do not invoke a reviewer for empty scope).
+
+If the total changed files are small (≤ 5 files across all groups), collapse into a single
+reviewer invocation instead of splitting — parallel overhead is not worthwhile.
+
+### 2b. Build per-group briefing
+
+For each non-empty group, build a briefing file at `tmp/reviewer-runtime/briefing-{group}.md`:
+
+```markdown
+# Review Briefing: {track-id} — {group} layer
+
+## Design Intent
+{3-5 bullet points from spec.md / plan.md}
+
+## Changed Files (this group only)
+{file list for this group}
+
+## Review Checklist
+- Logic errors, edge cases, race conditions
+- No panics in library code (no unwrap/expect outside #[cfg(test)])
+- Proper error propagation (thiserror, #[source], #[from])
+- Architecture layer dependency direction (domain ← usecase ← infrastructure ← cli)
+- Idiomatic Rust (naming, patterns)
+- Test coverage gaps
+- Security (input validation, error information leakage)
+
+## Known Accepted Deviations
+{any scope-specific notes, e.g. "lock.rs and hook.rs are intentionally unchanged"}
+
+Report findings as JSON:
+{"verdict":"zero_findings","findings":[]}
+or
+{"verdict":"findings_remain","findings":[{"message":"...","severity":"P1","file":"path","line":123}]}
+DO NOT report findings about test code using unwrap/expect — that is allowed.
+DO NOT report findings about unchanged pre-existing code.
+```
+
+### 2c. Invoke reviewers in parallel
+
+Launch one `cargo make track-local-review` per non-empty group, **in parallel** using
+Agent Teams (the Agent tool with `run_in_background: true`):
+
+```
+Agent 1: cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-infra-domain.md
+Agent 2: cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-usecase.md
+Agent 3: cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-cli.md
+```
+
+Wait for all agents to complete.
+
+### 2d. Aggregate verdicts
+
+Collect the JSON verdict from each reviewer agent. Apply fail-closed aggregation:
+
+- If **any** reviewer reports `findings_remain`: overall verdict is `findings_remain`.
+  Merge all findings arrays into a single list.
+- If **any** reviewer fails (timeout / process_failed / last_message_missing): report the
+  failure and treat overall verdict as `findings_remain` (fail-closed).
+- Only if **all** reviewers report `zero_findings`: overall verdict is `zero_findings`.
 
 The wrapper passes a machine-readable `--output-schema` automatically. The final reviewer
 message must be a single JSON object, and the wrapper additionally rejects semantically
@@ -84,54 +141,40 @@ one finding. The wrapper prints that final JSON payload as the last stdout line.
 
 ### Round 1 (initial review)
 
-Invoke the reviewer capability:
+Execute the parallel review as described in Step 2.
 
-```bash
-cargo make track-local-review -- --model {model} --prompt "
-Review {feature}. Report ONLY bugs or logic errors. Be concise.
-
-## Design
-{design invariants from Step 2}
-
-## Changed files
-{file list from Step 2}
-
-Check for: logic errors, doc-code inconsistencies, edge cases, security issues,
-architecture violations, test coverage gaps.
-"
-```
-
-Or use the file-based briefing if content is large.
-
-Parse the reviewer output:
-- If the wrapper exits `0` and reports `zero_findings`: proceed to Step 4 (done).
-- If the wrapper exits `2` and reports `findings_remain`: read the returned JSON payload and proceed to fix phase.
-- If the wrapper fails for `timeout` / `process_failed` / `last_message_missing`: stop and report the reviewer execution failure before continuing. Malformed or ambiguous JSON belongs here.
+Parse the aggregated verdict:
+- If `zero_findings`: proceed to Step 4 (done).
+- If `findings_remain`: read the merged findings list and proceed to fix phase.
+- If any reviewer execution failed: stop and report the failure before continuing.
 
 ### Fix phase
 
 For each finding:
-1. Assess severity (CRITICAL / HIGH / MEDIUM / LOW / INFO).
-2. INFO-level findings: note but do not fix (cosmetic, style preference).
-3. LOW and above: implement the fix.
+1. Assess severity (P1 / P2 / P3).
+2. P3 findings from pre-existing unchanged code: note but do not fix.
+3. P1 and P2: implement the fix.
 4. If the finding requires a new test, add it.
 5. Run `cargo make ci` (or `cargo make ci-rust` for fast inner loop) to verify fixes compile and pass.
 
 ### Round N (fix verification)
 
-After fixes are applied, invoke the reviewer again:
+After fixes are applied, invoke the reviewer again using the **same parallel pattern** from
+Step 2, but update each briefing to include:
 
-```bash
-cargo make track-local-review -- --model {model} --prompt "
-Previous review found: {finding summary}.
-Fixed by: {fix description}. Tests added: {test names if any}.
-Verify the fixes in {changed files}. Any remaining bugs or new issues?
-"
+```markdown
+## Previous Findings (Round N-1)
+{finding summary per group}
+
+## Fixes Applied
+{fix description, test names if any}
+
+Verify the fixes. Report any remaining bugs or new issues.
 ```
 
-Parse the output:
-- If the wrapper exits `0` with `zero_findings`: proceed to Step 4.
-- If the wrapper exits `2` with `findings_remain`: use the JSON findings payload, then repeat fix phase → Round N+1.
+Parse the aggregated output:
+- If `zero_findings`: proceed to Step 4.
+- If `findings_remain`: use the merged findings, then repeat fix phase → Round N+1.
 - Otherwise, stop and report the reviewer execution failure.
 
 ### Loop guard
@@ -149,8 +192,9 @@ After the reviewer reports zero findings:
 
 After execution, summarize:
 1. Total review rounds completed
-2. Findings per round (count and severity breakdown)
-3. Fixes applied (with file references)
-4. Final CI result
-5. Merge/commit readiness (Ready / Not ready with reason)
-6. Recommended next command (`/track:commit <message>`)
+2. Reviewer groups used and parallelization (e.g., "3 parallel groups: infra-domain, usecase, cli")
+3. Findings per round (count and severity breakdown, grouped by layer)
+4. Fixes applied (with file references)
+5. Final CI result
+6. Merge/commit readiness (Ready / Not ready with reason)
+7. Recommended next command (`/track:commit <message>`)
