@@ -4,7 +4,6 @@ PostToolUse hook: Targeted detector for Rust test/build command failures.
 """
 
 import json
-import os
 import re
 import sys
 
@@ -21,7 +20,6 @@ TEST_BUILD_COMMANDS = [
     "cargo make ci",
     "cargo make clippy",
     "cargo make fmt",
-    "takt run",
 ]
 
 FAILURE_PATTERNS = [
@@ -94,9 +92,6 @@ def build_debug_message(reason: str) -> str:
 
 def main() -> None:
     try:
-        if os.environ.get("TAKT_SESSION"):
-            sys.exit(0)
-
         data = load_stdin_json()
         if data.get("tool_name", "") != "Bash":
             sys.exit(0)

@@ -36,8 +36,7 @@ PDF/動画/音声/画像ファイルが登場したら、active profile の `mul
 gemini -p "Extract from /path/to/file.pdf: {what to extract}" 2>/dev/null
 ```
 
-> **Note**: path-in-prompt 形式を使う。stdin redirect (`< file`) は `takt_profile.py` の
-> command parser でブロックされるため、takt 経由の実行では使用できない。
+> **Note**: path-in-prompt 形式を使う。
 
 補足: どの capability が実際に Gemini を使うかは `.claude/agent-profiles.json` を正本とする。
 

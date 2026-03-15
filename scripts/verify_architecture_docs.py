@@ -239,7 +239,7 @@ def main(argv: list[str] | None = None) -> int:
     emit(
         _require_line(
             root,
-            "TAKT_TRACK_TRACEABILITY.md",
+            "TRACK_TRACEABILITY.md",
             "Responsibility Split (Fixed)",
             "traceability role section",
         )
@@ -247,7 +247,7 @@ def main(argv: list[str] | None = None) -> int:
     emit(
         _require_line(
             root,
-            "TAKT_TRACK_TRACEABILITY.md",
+            "TRACK_TRACEABILITY.md",
             "scripts-selftest-local",
             "traceability scripts selftest gate",
         )
@@ -255,7 +255,7 @@ def main(argv: list[str] | None = None) -> int:
     emit(
         _require_line(
             root,
-            "TAKT_TRACK_TRACEABILITY.md",
+            "TRACK_TRACEABILITY.md",
             "hooks-selftest-local",
             "traceability hooks selftest gate",
         )
@@ -263,7 +263,7 @@ def main(argv: list[str] | None = None) -> int:
     emit(
         _require_line(
             root,
-            "TAKT_TRACK_TRACEABILITY.md",
+            "TRACK_TRACEABILITY.md",
             "verify-latest-track-local",
             "traceability latest-track gate",
         )
@@ -271,7 +271,7 @@ def main(argv: list[str] | None = None) -> int:
     emit(
         _require_line(
             root,
-            "TAKT_TRACK_TRACEABILITY.md",
+            "TRACK_TRACEABILITY.md",
             "cargo make ci",
             "traceability ci overview",
         )

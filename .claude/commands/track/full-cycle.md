@@ -2,7 +2,7 @@
 description: Run the autonomous implementation full-cycle for a track task.
 ---
 
-Compatibility wrapper for autonomous implementation while legacy `takt` surfaces still exist.
+Autonomous implementation wrapper using Claude Code orchestration.
 
 Arguments:
 - Use `$ARGUMENTS` as the task summary.

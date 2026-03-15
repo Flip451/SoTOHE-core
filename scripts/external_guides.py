@@ -25,7 +25,7 @@ except ImportError:  # pragma: no cover - script execution path
     from verify_latest_track_files import latest_track_dir as latest_verified_track_dir
 
 MAX_DOWNLOAD_BYTES = 2 * 1024 * 1024
-USER_AGENT = "TaktAgent/1.0 (+https://github.com/anthropics)"
+USER_AGENT = "SoTOHE/1.0 (+https://github.com/anthropics)"
 FETCH_MAX_RETRIES = 3
 FETCH_BACKOFF_BASE = 1.0
 

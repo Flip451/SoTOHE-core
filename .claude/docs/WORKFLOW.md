@@ -69,7 +69,7 @@ It keeps the public `/track:*` interface stable while running the full loop insi
 6. Run `cargo make ci`
 7. Update `verification.md` and mark the task `done`
 
-This replaces legacy `takt` piece execution. There is no second autonomous queue/orchestrator to keep in sync.
+There is no second autonomous queue/orchestrator to keep in sync.
 
 ### `/track:implement`
 
@@ -159,8 +159,6 @@ cargo make machete             # Unused dependency audit
 
 Specialist capability providers are defined in `.claude/agent-profiles.json`.
 Default profile: `planner` / `reviewer` / `debugger` = Codex, `researcher` / `multimodal_reader` = Gemini.
-
-Execution orchestration stays in Claude Code. Agent profiles select which provider handles a capability, but they do not configure a separate `takt` host runtime.
 
 | Context Size | Recommended Approach |
 |-------------|---------------------|

@@ -32,27 +32,13 @@ class GitOpsTest(unittest.TestCase):
         )
         return result.stdout
 
-    def test_add_all_excludes_transient_pending_and_track_commit_files(self) -> None:
+    def test_add_all_excludes_transient_track_commit_files(self) -> None:
         (self.root / "tracked.txt").write_text("base\n", encoding="utf-8")
         self.run_git("add", "tracked.txt")
         self.run_git("commit", "-m", "initial")
 
         (self.root / "tracked.txt").write_text("changed\n", encoding="utf-8")
         (self.root / "new.txt").write_text("new\n", encoding="utf-8")
-        pending_dir = self.root / ".takt"
-        pending_dir.mkdir(parents=True, exist_ok=True)
-        (pending_dir / "pending-add-paths.txt").write_text(
-            "tracked.txt\n", encoding="utf-8"
-        )
-        (pending_dir / "pending-note.md").write_text("note\n", encoding="utf-8")
-        (pending_dir / "pending-commit-message.txt").write_text(
-            "message\n", encoding="utf-8"
-        )
-        handoffs_dir = pending_dir / "handoffs"
-        handoffs_dir.mkdir(parents=True, exist_ok=True)
-        (handoffs_dir / "handoff-my-task-20260308T120000Z.md").write_text(
-            "handoff\n", encoding="utf-8"
-        )
         track_commit_dir = self.root / "tmp" / "track-commit"
         track_commit_dir.mkdir(parents=True, exist_ok=True)
         (track_commit_dir / "add-paths.txt").write_text(
@@ -117,26 +103,6 @@ class GitOpsTest(unittest.TestCase):
         self.assertTrue(stage_list.exists())
         staged = set(self.run_git("diff", "--cached", "--name-only").splitlines())
         self.assertEqual(staged, set())
-
-    def test_add_from_file_rejects_transient_automation_dir_contents(self) -> None:
-        stage_list = self.root / "tmp" / "track-commit" / "add-paths.txt"
-        stage_list.parent.mkdir(parents=True, exist_ok=True)
-        stage_list.write_text(
-            ".takt/handoffs/handoff-task-20260308T120000Z.md\n", encoding="utf-8"
-        )
-
-        code = git_ops.main(["add-from-file", str(stage_list)])
-
-        self.assertEqual(code, 1)
-
-    def test_add_from_file_rejects_transient_automation_dir_itself(self) -> None:
-        stage_list = self.root / "tmp" / "track-commit" / "add-paths.txt"
-        stage_list.parent.mkdir(parents=True, exist_ok=True)
-        stage_list.write_text(".takt/handoffs\n", encoding="utf-8")
-
-        code = git_ops.main(["add-from-file", str(stage_list)])
-
-        self.assertEqual(code, 1)
 
     def test_add_from_file_rejects_git_pathspec_shorthand(self) -> None:
         (self.root / "tracked.txt").write_text("base\n", encoding="utf-8")
@@ -429,28 +395,13 @@ class GitOpsTest(unittest.TestCase):
             self.run_git("notes", "show", "HEAD"), "note line 1\nnote line 2\n"
         )
 
-    def test_note_from_file_accepts_legacy_takt_pending_note_during_migration(self) -> None:
-        (self.root / "tracked.txt").write_text("base\n", encoding="utf-8")
-        self.run_git("add", "tracked.txt")
-        self.run_git("commit", "-m", "initial")
-
-        note_path = self.root / ".takt" / "pending-note.md"
-        note_path.parent.mkdir(parents=True, exist_ok=True)
-        note_path.write_text("legacy note\n", encoding="utf-8")
-
-        code = git_ops.main(["note-from-file", str(note_path), "--cleanup"])
-
-        self.assertEqual(code, 0)
-        self.assertFalse(note_path.exists())
-        self.assertEqual(self.run_git("notes", "show", "HEAD"), "legacy note\n")
-
     def test_commit_from_file_rejects_missing_file(self) -> None:
-        code = git_ops.main(["commit-from-file", ".takt/missing-message.txt"])
+        code = git_ops.main(["commit-from-file", "tmp/nonexistent-message.txt"])
 
         self.assertEqual(code, 1)
 
     def test_note_from_file_rejects_missing_file(self) -> None:
-        code = git_ops.main(["note-from-file", ".takt/missing-note.txt"])
+        code = git_ops.main(["note-from-file", "tmp/nonexistent-note.txt"])
 
         self.assertEqual(code, 1)
 

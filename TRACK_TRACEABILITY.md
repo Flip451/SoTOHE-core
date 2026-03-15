@@ -50,12 +50,10 @@ For day-to-day workflow and quality gate overview, see `track/workflow.md`.
   - `verify-track-registry-local` — registry.md and metadata.json sync verification
   - `verify-orchestra-local` — hooks, permissions, agent definition verification
   - `verify-latest-track-local` — latest track spec.md / plan.md / verification.md completeness
-- `/track:commit <message>` = recommended path; applies pending-note if present
+- `/track:commit <message>` = recommended path; applies `tmp/track-commit/note.md` if present
 - `cargo make commit` = `cargo make ci` + `git commit` low-level alternative (no extra gates, no auto note)
 - Exact automation wrappers:
-  - `cargo make add-all` = stage entire worktree (excludes `.takt/pending-*` transient files)
-  - `cargo make commit-pending-message` = use `.takt/pending-commit-message.txt` as commit message, delete on success
-  - `cargo make note-pending` = apply `.takt/pending-note.md` as git note, delete on success
+  - `cargo make add-all` = stage entire worktree (excludes `tmp/` dir)
   - `cargo make track-commit-message` = use `tmp/track-commit/commit-message.txt` as commit message, delete on success
   - `cargo make track-note` = apply `tmp/track-commit/note.md` as git note, delete on success
 - `cargo make machete` = auxiliary audit for dependency cleanup; not included in standard `ci`
@@ -82,19 +80,16 @@ For day-to-day workflow and quality gate overview, see `track/workflow.md`.
 ## 6. Git Notes (Implementation Traceability)
 
 The normal `/track:commit` flow generates `tmp/track-commit/note.md` from current track context and applies it via `cargo make track-note`.
-Legacy `.takt/pending-note.md` remains a migration-only fallback while residual wrapper surfaces still exist.
 
 When running `cargo make commit` directly from the terminal, follow up with `cargo make note ...` as needed:
 
 ```bash
 cargo make track-note                            # apply tmp/track-commit/note.md and delete it
 cargo make note "note text here"                 # inline text
-cargo make note-pending                          # apply legacy .takt/pending-note.md and delete it
 ```
 
 `cargo make note` uses `git notes add -f -m "$CARGO_MAKE_TASK_ARGS" HEAD` to pass text directly.
 Automation flows use `tmp/track-commit/commit-message.txt` / `tmp/track-commit/note.md` as the primary scratch files.
-Legacy `.takt/pending-commit-message.txt` and `.takt/pending-note.md` remain compatibility inputs only until the residual wrapper/runtime surfaces are deleted.
 
 ### Sharing Git Notes Across Machines
 
@@ -124,7 +119,6 @@ cargo make verify-latest-track
 # Git notes
 cargo make track-note                           # primary scratch note path
 cargo make note "note text here"                # inline text
-cargo make note-pending                         # apply legacy .takt/pending-note.md and delete it
 git notes show HEAD
 git notes list
 ```

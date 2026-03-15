@@ -4,7 +4,6 @@ PreToolUse hook: Check if planner consultation is recommended before Write/Edit.
 """
 
 import json
-import os
 import sys
 
 from _agent_profiles import provider_label, render_provider_example
@@ -129,9 +128,6 @@ def build_consultation_message(reason: str) -> str:
 
 def main() -> None:
     try:
-        if os.environ.get("TAKT_SESSION"):
-            sys.exit(0)
-
         data = load_stdin_json()
         tool_input_data = tool_input(data)
         file_path = tool_input_data.get("file_path", "")
