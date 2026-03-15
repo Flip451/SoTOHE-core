@@ -1,0 +1,23 @@
+## Task Summary: Remove deprecated Python security hook launchers
+
+**Track:** python-hook-launcher-removal-2026-03-15
+**Task:** STRAT-03 Phase 1 — delete Python launcher files, update verification script and documentation
+**Date:** 2026-03-15
+
+### Changes
+
+- .claude/hooks/block-direct-git-ops.py: deleted (deprecated Python launcher)
+- .claude/hooks/file-lock-acquire.py: deleted (deprecated Python launcher)
+- .claude/hooks/file-lock-release.py: deleted (deprecated Python launcher)
+- .claude/hooks/test_policy_hooks.py: deleted (tests for deleted Python module)
+- scripts/verify_orchestra_guardrails.py: removed verify_block_hook() and related constants
+- .claude/rules/10-guardrails.md: updated hook reference to sotp direct invocation
+- .claude/rules/02-codex-delegation.md: updated Python hook references to sotp guard hook
+- .claude/docs/DESIGN.md: replaced Python launcher pattern section, updated Mermaid diagrams and doc comments
+- libs/domain/src/hook/types.rs: updated doc comments from Python launcher to shell hook model
+
+### Why
+
+settings.json was already migrated to invoke sotp hook dispatch directly via shell commands.
+The Python launchers were retained only for rollback safety. With stable operation confirmed,
+removing them eliminates the implicit .venv/python3 dependency from the security-critical hook path.
