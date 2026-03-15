@@ -14,7 +14,7 @@ Core guardrails:
 
 ## Hook Constraint
 
-`block-direct-git-ops.py` scans the entire Bash command string for protected git-operation keywords.
+The `sotp hook dispatch block-direct-git-ops` guard scans the entire Bash command string for protected git-operation keywords.
 This includes string literals, prompt text, and heredocs.
 
 To avoid unnecessary retries:

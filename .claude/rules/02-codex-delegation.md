@@ -82,7 +82,7 @@ Analyze root cause (ownership/lifetime/trait bound) and suggest a fix.
 
 ## Sandbox and Hook Coverage Warning
 
-Claude Code hooks (`block-direct-git-ops.py`, `check-codex-before-write.py`, etc.) only intercept
+Claude Code hooks (e.g. `sotp hook dispatch block-direct-git-ops`, `check-codex-before-write.py`, etc.) only intercept
 **Claude Code's own tool calls**. They do NOT apply to operations performed inside a Codex subprocess.
 
 | Sandbox | File writes | Git operations | Hook coverage |
@@ -92,7 +92,7 @@ Claude Code hooks (`block-direct-git-ops.py`, `check-codex-before-write.py`, etc
 
 **Consequences when using `workspace-write`:**
 
-- Codex can run `git add` / `git commit` / `git push` directly, bypassing `block-direct-git-ops.py`.
+- Codex can run `git add` / `git commit` / `git push` directly, bypassing the `sotp` guard hook.
 - Codex can write any file, bypassing `check-codex-before-write.py`.
 
 **Rules for `workspace-write` usage:**

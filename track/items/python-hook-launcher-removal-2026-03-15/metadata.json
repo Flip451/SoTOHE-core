@@ -37,34 +37,34 @@
     ]
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "done",
   "tasks": [
     {
       "description": ".claude/hooks/block-direct-git-ops.py, file-lock-acquire.py, file-lock-release.py を削除する",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "block-direct-git-ops.py の Python 関数に依存するテストファイル .claude/hooks/test_policy_hooks.py を削除する",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "BLOCK_HOOK_PATH, BLOCK_HOOK_MARKERS, verify_block_hook() を削除する。Rust テストが権威的実装",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "10-guardrails.md, 02-codex-delegation.md, .claude/docs/DESIGN.md, libs/domain/src/hook/types.rs の Python launcher 参照を sotp 直接呼び出し前提に更新する",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "cargo make ci が通ることを確認する",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "Python security hook launcher 除去",
-  "updated_at": "2026-03-15T06:38:21Z"
+  "updated_at": "2026-03-15T06:45:39Z"
 }
