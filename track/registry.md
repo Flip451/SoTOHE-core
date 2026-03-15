@@ -7,14 +7,15 @@
 
 ## Current Focus
 
-- Latest active track: `python-hook-launcher-removal-2026-03-15`
-- Next recommended command: `/track:activate python-hook-launcher-removal-2026-03-15`
+- Latest active track: `workflow-ux-fixes-2026-03-15`
+- Next recommended command: `/track:implement`
 - Last updated: `2026-03-15`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
+| workflow-ux-fixes-2026-03-15 | planned | `/track:implement` | 2026-03-15 |
 | python-hook-launcher-removal-2026-03-15 | planned | `/track:activate python-hook-launcher-removal-2026-03-15` | 2026-03-15 |
 
 ## Completed Tracks
