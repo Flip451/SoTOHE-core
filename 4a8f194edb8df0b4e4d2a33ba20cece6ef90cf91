@@ -1,0 +1,17 @@
+## Task Summary: Track ワークフロー UX 改善 — 計画成果物
+
+**Track:** workflow-ux-fixes-2026-03-15
+**Task:** Planning artifacts (metadata.json, spec.md, plan.md, verification.md)
+**Date:** 2026-03-15
+
+### Changes
+
+- metadata.json: 5 tasks (CI output suppression, Rust PR push/ensure-pr, Python delegation, add-all gitignore, CI gate)
+- spec.md: Feature scope, change targets, acceptance criteria with fail-closed requirements
+- plan.md: Rendered view from metadata.json
+- verification.md: Automated + manual verification with negative-case checks
+- registry.md: Updated active track entry
+
+### Why
+
+Fix 4 operational UX issues (CI output truncation, plan/ branch PR support, hook false positives, add-all gitignore failure) encountered in daily track workflow. New logic follows Rust-first principle per STRAT-03.
