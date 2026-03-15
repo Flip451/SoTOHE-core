@@ -1,0 +1,19 @@
+## Task Summary: Place sotp binary at bin/sotp
+
+**Track:** sotp-bin-placement-2026-03-15
+**Task:** Install sotp to bin/ via bootstrap, replace cargo run in host wrappers and hooks
+**Date:** 2026-03-15
+
+### Changes
+
+- bin/.gitkeep: New directory for sotp binary
+- .gitignore: Exclude /bin/sotp from git
+- Makefile.toml: build-sotp task, bootstrap Step 4/6, all host wrappers use bin/sotp
+- .claude/settings.json: Hook fallback chain (SOTP_CLI_BINARY → bin/sotp → sotp → cargo run)
+- .claude/agent-profiles.json: providers.codex.fast_model added
+- .claude/commands/track/review.md: Model escalation strategy
+- scripts/*: Updated test expectations
+
+### Why
+
+Replace cargo run overhead (~hundreds of ms per invocation) with pre-built bin/sotp. Hook fallback chain ensures fresh clones still work via cargo run. Bootstrap automatically builds and installs the binary.
