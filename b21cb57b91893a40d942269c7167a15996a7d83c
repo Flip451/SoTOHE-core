@@ -1,0 +1,18 @@
+## Task Summary: Add /track:review to post-plan workflow
+
+**Track:** plan-review-flow-2026-03-15
+**Task:** 計画完了後の推奨フローに /track:review を追加
+**Date:** 2026-03-15
+
+### Changes
+
+- .claude/commands/track/plan.md: 推奨次コマンドに /track:review 追加
+- .claude/commands/track/activate.md: 同上
+- .claude/commands/track/review.md: インラインレビュー禁止、other observation group 追加、claude provider 対応
+- DEVELOPER_AI_WORKFLOW.md: Mermaid フロー図に計画レビュー分岐・pr/merge/done 追加、§3.1 更新、コマンド一覧表に 3 コマンド追加
+- scripts/verify_orchestra_guardrails.py: スニペット期待値を新 review.md に合わせて更新
+- scripts/test_verify_scripts.py: 同上
+
+### Why
+
+/track:review が推奨フローから欠落しており、レビュースキップが発生しやすかった。計画レビュー（オプション）と実装レビュー（必須）を正規パスに明示し、DEVELOPER_AI_WORKFLOW.md のフロー図を commit → pr → merge → done まで完全化した。
