@@ -19,7 +19,7 @@
 - `docs/architecture-rules.json`
 - `docs/EXTERNAL_GUIDES.md`
 - `docs/external-guides.json`
-- `TAKT_TRACK_TRACEABILITY.md`
+- `TRACK_TRACEABILITY.md`
 
 運用要点:
 - 公開 UI は `/track:*`

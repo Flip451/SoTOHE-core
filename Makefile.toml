@@ -5,7 +5,7 @@ default_to_workspace = false
 [env]
 DOCKER_BUILDKIT = "1"
 COMPOSE_DOCKER_CLI_BUILD = "1"
-TAKT_PYTHON = { script = ["if [ -n \"${PYTHON_BIN:-}\" ]; then echo \"$PYTHON_BIN\"; elif [ -x .venv/bin/python ]; then echo .venv/bin/python; else echo python3; fi"] }
+
 
 [tasks.prepare-local-cache-dirs]
 private = true
@@ -94,11 +94,6 @@ description = "[wrapper] Verify architecture rules sync with Cargo.toml and deny
 command = "python3"
 args = ["scripts/architecture_rules.py", "verify-sync"]
 
-[tasks.takt-failure-report]
-description = "[wrapper] Generate .takt/debug-report.md from captured failure output"
-command = "python3"
-args = ["scripts/takt_failure_report.py", "${@}"]
-
 [tasks.guides-selftest-local]
 private = true
 description = "[internal] Run self-tests for the external guides helper"
@@ -127,14 +122,11 @@ args = [
   "scripts/test_external_guides.py",
   "scripts/test_git_ops.py",
   "scripts/test_make_wrappers.py",
-  "scripts/test_takt_failure_report.py",
-  "scripts/test_takt_profile.py",
   "scripts/test_track_schema.py",
   "scripts/test_track_markdown.py",
   "scripts/test_track_state_machine.py",
   "scripts/test_track_branch_guard.py",
   "scripts/test_track_registry.py",
-  "scripts/test_takt_personas.py",
   "scripts/test_pr_review.py",
 ]
 
@@ -160,53 +152,6 @@ args = [
   "cache_dir=.cache/pytest",
   ".claude/hooks",
 ]
-
-[tasks.takt-add]
-description = "[wrapper] Add a task to takt queue (piece selected interactively)"
-env = { TAKT_SESSION = "1" }
-script_runner = "@shell"
-script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py add-task "$CARGO_MAKE_TASK_ARGS"']
-
-[tasks.takt-run]
-description = "[wrapper] Run pending tasks from .takt/tasks.yaml"
-env = { TAKT_SESSION = "1" }
-script_runner = "@shell"
-script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py run-queue']
-
-[tasks.takt-render-personas]
-description = "[wrapper] Render takt runtime personas from the active profile"
-env = { TAKT_SESSION = "1" }
-script_runner = "@shell"
-script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py render-personas']
-
-[tasks.takt-full-cycle]
-description = "[wrapper] Run full-cycle piece directly with guardrails"
-env = { TAKT_SESSION = "1" }
-script_runner = "@shell"
-script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py run-piece full-cycle "$CARGO_MAKE_TASK_ARGS"']
-
-[tasks.takt-spec-to-impl]
-description = "[wrapper] Run spec-to-impl piece directly with guardrails"
-env = { TAKT_SESSION = "1" }
-script_runner = "@shell"
-script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py run-piece spec-to-impl "$CARGO_MAKE_TASK_ARGS"']
-
-[tasks.takt-impl-review]
-description = "[wrapper] Run impl-review piece directly with guardrails"
-env = { TAKT_SESSION = "1" }
-script_runner = "@shell"
-script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py run-piece impl-review "$CARGO_MAKE_TASK_ARGS"']
-
-[tasks.takt-tdd-cycle]
-description = "[wrapper] Run tdd-cycle piece directly with guardrails"
-env = { TAKT_SESSION = "1" }
-script_runner = "@shell"
-script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py run-piece tdd-cycle "$CARGO_MAKE_TASK_ARGS"']
-
-[tasks.takt-clean-queue]
-description = "[wrapper] Remove non-pending tasks from takt queue"
-script_runner = "@shell"
-script = ['exec "$TAKT_PYTHON" scripts/takt_profile.py clean-queue']
 
 [tasks.bootstrap]
 description = "[gate] Set up host Python venv, build Docker images, and run CI"
@@ -715,14 +660,9 @@ command = "git"
 args = ["add", "${@}"]
 
 [tasks.add-all]
-description = "[wrapper] Stage all worktree changes except transient .takt pending files"
+description = "[wrapper] Stage all worktree changes except transient automation scratch files"
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- git add-all']
-
-[tasks.add-pending-paths]
-description = "[wrapper] Stage paths listed in .takt/pending-add-paths.txt and delete the pending file"
-script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- git add-from-file .takt/pending-add-paths.txt --cleanup']
 
 [tasks.track-branch-create]
 description = "[wrapper] Materialize branch metadata, create a track branch from main, and switch to it (usage: cargo make track-branch-create '<track-id>')"
@@ -795,12 +735,6 @@ dependencies = ["ci"]
 script_runner = "@shell"
 script = ['git commit -m "$CARGO_MAKE_TASK_ARGS"']
 
-[tasks.commit-pending-message]
-description = "[wrapper] Run CI then commit using .takt/pending-commit-message.txt"
-dependencies = ["ci"]
-script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- git commit-from-file .takt/pending-commit-message.txt --cleanup']
-
 [tasks.track-commit-message]
 description = "[wrapper] Run CI then commit using tmp/track-commit/commit-message.txt"
 dependencies = ["ci"]
@@ -811,11 +745,6 @@ script = ['cargo run --quiet -p cli -- git commit-from-file tmp/track-commit/com
 description = "[git] Attach a git note to HEAD (usage: cargo make note '<note text>')"
 script_runner = "@shell"
 script = ['git notes add -f -m "$CARGO_MAKE_TASK_ARGS" HEAD']
-
-[tasks.note-pending]
-description = "[wrapper] Attach a git note from .takt/pending-note.md and delete the pending file"
-script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- git note-from-file .takt/pending-note.md --cleanup']
 
 [tasks.track-note]
 description = "[wrapper] Attach a git note from tmp/track-commit/note.md and delete the scratch file"

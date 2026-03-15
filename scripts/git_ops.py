@@ -11,22 +11,13 @@ import subprocess
 import sys
 from pathlib import Path, PurePosixPath
 
-PRIMARY_TRACK_COMMIT_FILES = (
+TRANSIENT_AUTOMATION_FILES = (
     "tmp/track-commit/add-paths.txt",
     "tmp/track-commit/commit-message.txt",
     "tmp/track-commit/note.md",
     "tmp/track-commit/track-dir.txt",
 )
-LEGACY_TAKT_PENDING_FILES = (
-    ".takt/pending-add-paths.txt",
-    ".takt/pending-note.md",
-    ".takt/pending-commit-message.txt",
-)
-TRANSIENT_AUTOMATION_FILES = PRIMARY_TRACK_COMMIT_FILES + LEGACY_TAKT_PENDING_FILES
-TRANSIENT_AUTOMATION_DIRS = (
-    ".takt/handoffs",
-    "tmp",
-)
+TRANSIENT_AUTOMATION_DIRS = ("tmp",)
 GLOB_MAGIC_CHARS = {"*", "?", "[", "]"}
 
 
@@ -185,7 +176,7 @@ def commit_from_file(path: Path, *, cleanup: bool, track_dir: Path | None = None
                 track_dir_file.unlink(missing_ok=True)
             return code
         # Fallback: auto-detect track from current branch when no explicit
-        # track directory is provided (e.g. takt commit-pending-message path).
+        # track directory is provided.
         code = _verify_branch_by_auto_detection()
         if code != 0:
             return code
@@ -401,7 +392,7 @@ def _validate_planning_only_commit_paths(track_dir: Path) -> int:
 def _verify_branch_by_auto_detection() -> int:
     """Fallback branch guard: auto-detect track from current branch and verify.
 
-    Used when no explicit track_dir or track-dir.txt is provided (e.g. takt path).
+    Used when no explicit track_dir or track-dir.txt is provided.
     If the current branch matches track/<id>, resolve the track directory and
     run the branch guard.  If not on a track branch, skip silently (no guard).
     Returns 0 on pass/skip, 1 on guard failure.

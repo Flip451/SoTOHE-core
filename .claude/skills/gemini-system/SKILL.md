@@ -88,7 +88,7 @@ gemini -p "Research security and compatibility of Rust crates:
 ### Multimodal File Reading
 
 ```bash
-# PDF — use path-in-prompt (stdin redirect is blocked by takt command parser)
+# PDF — use path-in-prompt format
 gemini -p "Extract the key technical specifications from /path/to/spec.pdf" 2>/dev/null
 
 # Image (architecture diagram)

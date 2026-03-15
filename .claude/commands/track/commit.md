@@ -87,15 +87,7 @@ traceability source:
 4. Generate the note text using the format below and write it to `tmp/track-commit/note.md`.
 5. Run: `cargo make track-note`
 
-### 3b. Use legacy pending note only as compatibility fallback
-
-If `.takt/pending-note.md` exists and you intentionally need to consume a still-generated legacy
-pending note during the migration window for a residual compatibility wrapper:
-
-1. Run: `cargo make note-pending`
-2. The wrapper deletes `.takt/pending-note.md` after successful application.
-
-### 3c. Skip note (no track and no generated scratch note)
+### 3b. Skip note (no track and no generated scratch note)
 
 If no track directory exists and no generated scratch note is available, skip note generation
 and mention this in the summary.
@@ -125,5 +117,5 @@ After execution, report:
 1. Commit result (success/failure) and commit hash
 2. Commit message used
 3. `track/registry.md` status: updated / already current / skipped (reason)
-4. Git note status: applied (source: generated tmp scratch file / legacy takt pending file) or skipped (reason)
+4. Git note status: applied (source: generated tmp scratch file) or skipped (reason)
 5. Next recommended action

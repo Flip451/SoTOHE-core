@@ -8,7 +8,6 @@ target-*/
 # Cargo.lock
 
 # --- Tooling caches / outputs ---
-.takt/runs/
 .claude/logs/
 
 # --- Environment / secrets ---

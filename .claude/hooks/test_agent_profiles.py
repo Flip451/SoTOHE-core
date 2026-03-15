@@ -70,7 +70,6 @@ class AgentProfilesTest(unittest.TestCase):
         self.assertEqual(
             agent_profiles.workflow_host_label(profiles=profiles), "Claude Code"
         )
-        self.assertEqual(agent_profiles.takt_host_provider(profiles=profiles), "claude")
 
     def test_load_profiles_rejects_missing_required_capability(self) -> None:
         def mutator(profiles: dict) -> None:
@@ -137,19 +136,6 @@ class AgentProfilesTest(unittest.TestCase):
             agent_profiles.AgentProfilesError, "workflow_host_model"
         ):
             agent_profiles.load_profiles(path)
-
-    def test_legacy_takt_host_keys_still_validate_for_migration(self) -> None:
-        def mutator(profiles: dict) -> None:
-            profile = profiles["profiles"]["default"]
-            profile["takt_host_provider"] = profile.pop("workflow_host_provider")
-            profile["takt_host_model"] = profile.pop("workflow_host_model")
-
-        path = self.write_mutated_profiles(mutator)
-
-        self.assertEqual(agent_profiles.workflow_host_provider(path=path), "claude")
-        self.assertEqual(
-            agent_profiles.workflow_host_model(path=path), "claude-opus-4-6"
-        )
 
     def test_provider_example_falls_back_to_default_template(self) -> None:
         def mutator(profiles: dict) -> None:

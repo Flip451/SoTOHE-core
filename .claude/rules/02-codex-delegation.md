@@ -103,8 +103,8 @@ Claude Code hooks (`block-direct-git-ops.py`, `check-codex-before-write.py`, etc
    - Do not run `git push` under any circumstance.
    - For selective staging, write repo-relative paths to `tmp/track-commit/add-paths.txt` and run `cargo make track-add-paths`.
    - For guarded commits, use `/track:commit` or the exact wrappers `cargo make track-commit-message` / `cargo make track-note`.
-3. Do not change `.takt/config.yaml` `provider` to `codex`. The takt provider must remain `claude`
-   so that hook protections apply to all operations performed during autonomous task execution.
+3. Hook protections apply to all operations performed during autonomous task execution.
+   Do not bypass hook coverage by routing through external subprocesses.
 
 ## Canonical Block Preservation
 

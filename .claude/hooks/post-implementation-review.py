@@ -174,9 +174,6 @@ def build_review_message(reason: str) -> str:
 
 def main() -> None:
     try:
-        if os.environ.get("TAKT_SESSION"):
-            sys.exit(0)
-
         data = load_stdin_json()
         if data.get("tool_name", "") not in ["Write", "Edit"]:
             sys.exit(0)

@@ -30,11 +30,8 @@ cargo make workspace-tree   # crate のみの workspace tree を表示
 cargo make workspace-tree-full  # crate + 非 crate ディレクトリを含む workspace tree を表示
 cargo make add <files>            # 手動の低レベル staging（terminal 直実行用）
 cargo make add-all                # worktree 全体を stage（transient scratch file は除外）
-cargo make add-pending-paths      # .takt/pending-add-paths.txt から選択的に stage
 cargo make track-add-paths        # tmp/track-commit/add-paths.txt から選択的に stage
 cargo make commit                 # 手動の低レベル commit（terminal 直実行用）
-cargo make commit-pending-message # .takt/pending-commit-message.txt から commit
-cargo make note-pending           # .takt/pending-note.md から note を適用して削除
 cargo make track-commit-message   # tmp/track-commit/commit-message.txt から commit
 cargo make track-note             # tmp/track-commit/note.md から note を適用して削除
 cargo make track-transition       # タスク状態遷移 + ビュー自動再生成
