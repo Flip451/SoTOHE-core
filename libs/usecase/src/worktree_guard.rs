@@ -6,7 +6,17 @@
 
 use std::collections::BTreeSet;
 
-use domain::WorktreeReader;
+use domain::{WorktreeError, WorktreeReader};
+use thiserror::Error;
+
+/// Errors returned by worktree guard functions.
+#[derive(Debug, Error)]
+pub enum WorktreeGuardError {
+    #[error("{0}")]
+    Validation(String),
+    #[error("{0}")]
+    WorktreeStatus(#[from] WorktreeError),
+}
 
 /// Parses `git status --porcelain` output into a list of dirty file paths.
 ///
@@ -19,7 +29,9 @@ pub fn parse_dirty_worktree_paths(porcelain_output: &str) -> Vec<String> {
         if line.len() < 4 {
             continue;
         }
-        let path = &line[3..];
+        let Some(path) = line.get(3..) else {
+            continue;
+        };
         let normalized = path.split_once(" -> ").map(|(_, after)| after).unwrap_or(path).trim();
         if !normalized.is_empty() {
             paths.push(normalized.to_owned());
@@ -34,18 +46,20 @@ pub fn parse_dirty_worktree_paths(porcelain_output: &str) -> Vec<String> {
 /// are no dirty paths at all.
 ///
 /// # Errors
-/// Returns an error message if any dirty path is not in the allowed set.
+/// Returns an error if any dirty path is not in the allowed set.
 pub fn validate_clean_worktree(
     dirty_paths: &[String],
     allowed_dirty_paths: &BTreeSet<String>,
-) -> Result<(), String> {
+) -> Result<(), WorktreeGuardError> {
     if dirty_paths.is_empty() {
         return Ok(());
     }
     if dirty_paths.iter().all(|path| allowed_dirty_paths.contains(path)) {
         return Ok(());
     }
-    Err("activation requires a clean worktree before metadata materialization".to_owned())
+    Err(WorktreeGuardError::Validation(
+        "activation requires a clean worktree before metadata materialization".to_owned(),
+    ))
 }
 
 /// Checks worktree cleanliness via a `WorktreeReader` port.
@@ -55,12 +69,12 @@ pub fn validate_clean_worktree(
 /// were previously split across CLI and usecase layers.
 ///
 /// # Errors
-/// Returns an error message if the worktree has disallowed dirty paths
+/// Returns an error if the worktree has disallowed dirty paths
 /// or if the porcelain status cannot be read.
 pub fn ensure_clean_worktree(
     reader: &impl WorktreeReader,
     allowed_dirty_paths: &BTreeSet<String>,
-) -> Result<(), String> {
+) -> Result<(), WorktreeGuardError> {
     let porcelain = reader.porcelain_status()?;
     let dirty_paths = parse_dirty_worktree_paths(&porcelain);
     validate_clean_worktree(&dirty_paths, allowed_dirty_paths)
@@ -111,7 +125,7 @@ mod tests {
         let dirty = vec!["src/main.rs".to_owned()];
         let allowed = BTreeSet::from(["track/items/x/metadata.json".to_owned()]);
         let result = validate_clean_worktree(&dirty, &allowed);
-        assert!(result.unwrap_err().contains("clean worktree"));
+        assert!(result.unwrap_err().to_string().contains("clean worktree"));
     }
 
     #[test]
@@ -129,7 +143,7 @@ mod tests {
     }
 
     impl domain::WorktreeReader for StubWorktreeReader {
-        fn porcelain_status(&self) -> Result<String, String> {
+        fn porcelain_status(&self) -> Result<String, domain::WorktreeError> {
             Ok(self.output.clone())
         }
     }
@@ -137,8 +151,8 @@ mod tests {
     struct FailingWorktreeReader;
 
     impl domain::WorktreeReader for FailingWorktreeReader {
-        fn porcelain_status(&self) -> Result<String, String> {
-            Err("git failed".to_owned())
+        fn porcelain_status(&self) -> Result<String, domain::WorktreeError> {
+            Err(domain::WorktreeError::StatusFailed("git failed".to_owned()))
         }
     }
 
@@ -161,13 +175,13 @@ mod tests {
     fn test_ensure_clean_worktree_with_disallowed_dirty_paths_returns_error() {
         let reader = StubWorktreeReader { output: " M src/main.rs\n".to_owned() };
         let result = ensure_clean_worktree(&reader, &BTreeSet::new());
-        assert!(result.unwrap_err().contains("clean worktree"));
+        assert!(result.unwrap_err().to_string().contains("clean worktree"));
     }
 
     #[test]
     fn test_ensure_clean_worktree_propagates_reader_error() {
         let reader = FailingWorktreeReader;
         let result = ensure_clean_worktree(&reader, &BTreeSet::new());
-        assert!(result.unwrap_err().contains("git failed"));
+        assert!(result.unwrap_err().to_string().contains("git failed"));
     }
 }

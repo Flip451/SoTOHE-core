@@ -3,6 +3,14 @@
 use serde::de::{self, MapAccess, Visitor};
 use serde::{Deserialize, Serialize};
 use std::fmt;
+use thiserror::Error;
+
+/// Errors returned by review workflow functions.
+#[derive(Debug, Error)]
+pub enum ReviewWorkflowError {
+    #[error("failed to serialize reviewer final payload: {0}")]
+    Serialize(#[from] serde_json::Error),
+}
 
 pub const REVIEW_OUTPUT_SCHEMA_JSON: &str = r##"{
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -152,9 +160,8 @@ pub fn classify_review_verdict(
     }
 }
 
-pub fn render_review_payload(payload: &ReviewFinalPayload) -> Result<String, String> {
-    serde_json::to_string(payload)
-        .map_err(|err| format!("failed to serialize reviewer final payload: {err}"))
+pub fn render_review_payload(payload: &ReviewFinalPayload) -> Result<String, ReviewWorkflowError> {
+    Ok(serde_json::to_string(payload)?)
 }
 
 fn validate_review_payload(payload: ReviewFinalPayload) -> Result<ReviewFinalPayload, String> {

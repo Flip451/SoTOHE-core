@@ -110,7 +110,12 @@ impl<W: TrackWriter> TransitionTaskUseCase<W> {
 
             let transition =
                 track_resolution::resolve_transition(target_status, current_kind, commit_hash)
-                    .map_err(ValidationError::UnsupportedTargetStatus)?;
+                    .map_err(|e| match e {
+                        track_resolution::TrackResolutionError::UnsupportedTargetStatus(s) => {
+                            ValidationError::UnsupportedTargetStatus(s)
+                        }
+                        other => ValidationError::UnsupportedTargetStatus(other.to_string()),
+                    })?;
 
             track.transition_task(task_id, transition)?;
             Ok(())

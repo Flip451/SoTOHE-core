@@ -1,4 +1,4 @@
-use crate::{DomainError, TrackId, TrackMetadata, TrackReadError, TrackWriteError};
+use crate::{DomainError, TrackId, TrackMetadata, TrackReadError, TrackWriteError, WorktreeError};
 
 /// Read-only port for track retrieval.
 pub trait TrackReader: Send + Sync {
@@ -17,8 +17,8 @@ pub trait WorktreeReader: Send + Sync {
     /// Returns the raw porcelain output from `git status --porcelain`.
     ///
     /// # Errors
-    /// Returns an error message on I/O failure.
-    fn porcelain_status(&self) -> Result<String, String>;
+    /// Returns [`WorktreeError`] on I/O failure.
+    fn porcelain_status(&self) -> Result<String, WorktreeError>;
 }
 
 /// Atomic mutation port for track persistence.

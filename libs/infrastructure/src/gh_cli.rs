@@ -2,6 +2,30 @@ use std::path::Path;
 use std::process::{Command, Output};
 
 use serde::Deserialize;
+use thiserror::Error;
+
+/// Structured error type for gh CLI operations.
+#[derive(Debug, Error)]
+pub enum GhError {
+    #[error("failed to run gh {command}: {source}")]
+    Spawn {
+        command: String,
+        #[source]
+        source: std::io::Error,
+    },
+    #[error("{}", if stderr.is_empty() { format!("gh {command} failed") } else { format!("gh {command} failed: {stderr}") })]
+    CommandFailed { command: String, stderr: String },
+    #[error("failed to decode gh pr checks JSON for PR #{pr}: {source}")]
+    JsonDecode {
+        pr: String,
+        #[source]
+        source: serde_json::Error,
+    },
+    #[error("body file path is not valid UTF-8: {0}")]
+    InvalidBodyPath(String),
+    #[error("gh pr create succeeded but could not determine PR number")]
+    PrNumberUnknown,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 pub struct PrCheckRecord {
@@ -14,14 +38,14 @@ pub struct PrCheckRecord {
 }
 
 pub trait GhClient {
-    fn pr_checks(&self, pr: &str) -> Result<Vec<PrCheckRecord>, String>;
+    fn pr_checks(&self, pr: &str) -> Result<Vec<PrCheckRecord>, GhError>;
     fn pr_url(&self, pr: &str) -> String;
-    fn merge_pr(&self, pr: &str, method: &str) -> Result<(), String>;
+    fn merge_pr(&self, pr: &str, method: &str) -> Result<(), GhError>;
 
     /// Find an open PR with the given head and base branches.
     ///
     /// Returns the PR number as a string if found, or None.
-    fn find_open_pr(&self, head: &str, base: &str) -> Result<Option<String>, String>;
+    fn find_open_pr(&self, head: &str, base: &str) -> Result<Option<String>, GhError>;
 
     /// Create a PR using a body file to avoid shell escaping / hook issues.
     ///
@@ -32,14 +56,14 @@ pub trait GhClient {
         base: &str,
         title: &str,
         body_file: &Path,
-    ) -> Result<String, String>;
+    ) -> Result<String, GhError>;
 }
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct SystemGhClient;
 
 impl GhClient for SystemGhClient {
-    fn pr_checks(&self, pr: &str) -> Result<Vec<PrCheckRecord>, String> {
+    fn pr_checks(&self, pr: &str) -> Result<Vec<PrCheckRecord>, GhError> {
         pr_checks_with(pr, &run_gh)
     }
 
@@ -47,11 +71,11 @@ impl GhClient for SystemGhClient {
         pr_url_with(pr, &run_gh)
     }
 
-    fn merge_pr(&self, pr: &str, method: &str) -> Result<(), String> {
+    fn merge_pr(&self, pr: &str, method: &str) -> Result<(), GhError> {
         merge_pr_with(pr, method, &run_gh)
     }
 
-    fn find_open_pr(&self, head: &str, base: &str) -> Result<Option<String>, String> {
+    fn find_open_pr(&self, head: &str, base: &str) -> Result<Option<String>, GhError> {
         find_open_pr_with(head, base, &run_gh)
     }
 
@@ -61,21 +85,21 @@ impl GhClient for SystemGhClient {
         base: &str,
         title: &str,
         body_file: &Path,
-    ) -> Result<String, String> {
+    ) -> Result<String, GhError> {
         create_pr_with(head, base, title, body_file, &run_gh)
     }
 }
 
-fn run_gh(args: &[&str]) -> Result<Output, String> {
+fn run_gh(args: &[&str]) -> Result<Output, GhError> {
     Command::new("gh")
         .args(args)
         .output()
-        .map_err(|err| format!("failed to run gh {}: {err}", args.join(" ")))
+        .map_err(|source| GhError::Spawn { command: args.join(" "), source })
 }
 
-fn pr_checks_with<F>(pr: &str, run_gh: &F) -> Result<Vec<PrCheckRecord>, String>
+fn pr_checks_with<F>(pr: &str, run_gh: &F) -> Result<Vec<PrCheckRecord>, GhError>
 where
-    F: Fn(&[&str]) -> Result<Output, String>,
+    F: Fn(&[&str]) -> Result<Output, GhError>,
 {
     let output = run_gh(&["pr", "checks", pr, "--json", "name,state,bucket,completedAt"])?;
     if !output.stdout.is_empty() {
@@ -85,16 +109,12 @@ where
         return Ok(Vec::new());
     }
     let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
-    Err(if stderr.is_empty() {
-        format!("gh pr checks {pr} failed")
-    } else {
-        format!("gh pr checks {pr} failed: {stderr}")
-    })
+    Err(GhError::CommandFailed { command: format!("pr checks {pr}"), stderr })
 }
 
 fn pr_url_with<F>(pr: &str, run_gh: &F) -> String
 where
-    F: Fn(&[&str]) -> Result<Output, String>,
+    F: Fn(&[&str]) -> Result<Output, GhError>,
 {
     let Ok(output) = run_gh(&["pr", "view", pr, "--json", "url", "-q", ".url"]) else {
         return format!("PR #{pr}");
@@ -106,26 +126,23 @@ where
     if url.is_empty() { format!("PR #{pr}") } else { url }
 }
 
-fn merge_pr_with<F>(pr: &str, method: &str, run_gh: &F) -> Result<(), String>
+fn merge_pr_with<F>(pr: &str, method: &str, run_gh: &F) -> Result<(), GhError>
 where
-    F: Fn(&[&str]) -> Result<Output, String>,
+    F: Fn(&[&str]) -> Result<Output, GhError>,
 {
-    let args = ["pr", "merge", pr, &format!("--{method}")];
+    let method_flag = format!("--{method}");
+    let args = ["pr", "merge", pr, &method_flag];
     let output = run_gh(&args)?;
     if output.status.success() {
         return Ok(());
     }
     let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
-    Err(if stderr.is_empty() {
-        format!("gh pr merge {pr} --{method} failed")
-    } else {
-        format!("gh pr merge {pr} --{method} failed: {stderr}")
-    })
+    Err(GhError::CommandFailed { command: format!("pr merge {pr} --{method}"), stderr })
 }
 
-fn find_open_pr_with<F>(head: &str, base: &str, run_gh: &F) -> Result<Option<String>, String>
+fn find_open_pr_with<F>(head: &str, base: &str, run_gh: &F) -> Result<Option<String>, GhError>
 where
-    F: Fn(&[&str]) -> Result<Output, String>,
+    F: Fn(&[&str]) -> Result<Output, GhError>,
 {
     let output = run_gh(&[
         "pr",
@@ -143,11 +160,7 @@ where
     ])?;
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
-        return Err(if stderr.is_empty() {
-            "gh pr list failed".to_owned()
-        } else {
-            format!("gh pr list failed: {stderr}")
-        });
+        return Err(GhError::CommandFailed { command: "pr list".to_owned(), stderr });
     }
     let number = String::from_utf8_lossy(&output.stdout).trim().to_owned();
     // gh pr list -q '.[0].number' returns "null" (literal) when no PR exists.
@@ -160,13 +173,13 @@ fn create_pr_with<F>(
     title: &str,
     body_file: &Path,
     run_gh: &F,
-) -> Result<String, String>
+) -> Result<String, GhError>
 where
-    F: Fn(&[&str]) -> Result<Output, String>,
+    F: Fn(&[&str]) -> Result<Output, GhError>,
 {
     let body_path = body_file
         .to_str()
-        .ok_or_else(|| format!("body file path is not valid UTF-8: {}", body_file.display()))?;
+        .ok_or_else(|| GhError::InvalidBodyPath(body_file.display().to_string()))?;
     let output = run_gh(&[
         "pr",
         "create",
@@ -181,11 +194,7 @@ where
     ])?;
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
-        return Err(if stderr.is_empty() {
-            "gh pr create failed".to_owned()
-        } else {
-            format!("gh pr create failed: {stderr}")
-        });
+        return Err(GhError::CommandFailed { command: "pr create".to_owned(), stderr });
     }
     let url = String::from_utf8_lossy(&output.stdout).trim().to_owned();
     // Extract PR number from URL (e.g., https://github.com/owner/repo/pull/14)
@@ -196,23 +205,15 @@ where
     let view = run_gh(&["pr", "view", head, "--json", "number", "-q", ".number"])?;
     if !view.status.success() {
         let stderr = String::from_utf8_lossy(&view.stderr).trim().to_owned();
-        return Err(if stderr.is_empty() {
-            "gh pr create succeeded but gh pr view failed".to_owned()
-        } else {
-            format!("gh pr create succeeded but gh pr view failed: {stderr}")
-        });
+        return Err(GhError::CommandFailed { command: format!("pr view {head}"), stderr });
     }
     let number = String::from_utf8_lossy(&view.stdout).trim().to_owned();
-    if number.is_empty() || number == "null" {
-        Err("gh pr create succeeded but could not determine PR number".to_owned())
-    } else {
-        Ok(number)
-    }
+    if number.is_empty() || number == "null" { Err(GhError::PrNumberUnknown) } else { Ok(number) }
 }
 
-fn decode_pr_checks(stdout: &[u8], pr: &str) -> Result<Vec<PrCheckRecord>, String> {
+fn decode_pr_checks(stdout: &[u8], pr: &str) -> Result<Vec<PrCheckRecord>, GhError> {
     serde_json::from_slice(stdout)
-        .map_err(|err| format!("failed to decode gh pr checks JSON for PR #{pr}: {err}"))
+        .map_err(|source| GhError::JsonDecode { pr: pr.to_owned(), source })
 }
 
 #[cfg(test)]
@@ -226,7 +227,7 @@ mod tests {
     use rstest::rstest;
 
     use super::{
-        PrCheckRecord, create_pr_with, decode_pr_checks, find_open_pr_with, merge_pr_with,
+        GhError, PrCheckRecord, create_pr_with, decode_pr_checks, find_open_pr_with, merge_pr_with,
         pr_checks_with,
     };
 
@@ -236,6 +237,14 @@ mod tests {
             stdout: stdout.as_bytes().to_vec(),
             stderr: stderr.as_bytes().to_vec(),
         }
+    }
+
+    fn fake_gh(
+        code: i32,
+        stdout: &'static str,
+        stderr: &'static str,
+    ) -> impl Fn(&[&str]) -> Result<Output, GhError> {
+        move |_args| Ok(output(code, stdout, stderr))
     }
 
     #[test]
@@ -269,17 +278,18 @@ mod tests {
 
     #[test]
     fn pr_checks_with_surfaces_stderr_when_no_json_is_present() {
-        let err = pr_checks_with("123", &|_| Ok(output(1, "", "gh exploded"))).unwrap_err();
+        let err = pr_checks_with("123", &fake_gh(1, "", "gh exploded")).unwrap_err().to_string();
 
-        assert_eq!(err, "gh pr checks 123 failed: gh exploded");
+        assert!(err.contains("gh exploded"), "got: {err}");
     }
 
     #[test]
     fn merge_pr_with_surfaces_stderr_on_failure() {
-        let err =
-            merge_pr_with("123", "squash", &|_| Ok(output(1, "", "merge exploded"))).unwrap_err();
+        let err = merge_pr_with("123", "squash", &fake_gh(1, "", "merge exploded"))
+            .unwrap_err()
+            .to_string();
 
-        assert_eq!(err, "gh pr merge 123 --squash failed: merge exploded");
+        assert!(err.contains("merge exploded"), "got: {err}");
     }
 
     // --- find_open_pr_with tests ---
@@ -312,15 +322,16 @@ mod tests {
     #[rstest]
     #[case::null_stdout("null\n")]
     #[case::empty_stdout("")]
-    fn find_open_pr_with_returns_none_for_absent_pr(#[case] stdout: &str) {
-        let result = find_open_pr_with("track/feat", "main", &|_| Ok(output(0, stdout, "")));
+    fn find_open_pr_with_returns_none_for_absent_pr(#[case] stdout: &'static str) {
+        let result = find_open_pr_with("track/feat", "main", &fake_gh(0, stdout, ""));
         assert_eq!(result.unwrap(), None);
     }
 
     #[test]
     fn find_open_pr_with_surfaces_stderr_on_failure() {
-        let err = find_open_pr_with("track/feat", "main", &|_| Ok(output(1, "", "auth error")))
-            .unwrap_err();
+        let err = find_open_pr_with("track/feat", "main", &fake_gh(1, "", "auth error"))
+            .unwrap_err()
+            .to_string();
         assert!(err.contains("auth error"), "got: {err}");
     }
 
@@ -328,9 +339,13 @@ mod tests {
 
     #[test]
     fn create_pr_with_extracts_pr_number_from_url() {
-        let result = create_pr_with("track/feat", "main", "title", Path::new("body.md"), &|_| {
-            Ok(output(0, "https://github.com/owner/repo/pull/99\n", ""))
-        });
+        let result = create_pr_with(
+            "track/feat",
+            "main",
+            "title",
+            Path::new("body.md"),
+            &fake_gh(0, "https://github.com/owner/repo/pull/99\n", ""),
+        );
         assert_eq!(result.unwrap(), "99");
     }
 
@@ -377,10 +392,15 @@ mod tests {
 
     #[test]
     fn create_pr_with_surfaces_stderr_on_create_failure() {
-        let err = create_pr_with("track/feat", "main", "title", Path::new("body.md"), &|_| {
-            Ok(output(1, "", "create error"))
-        })
-        .unwrap_err();
+        let err = create_pr_with(
+            "track/feat",
+            "main",
+            "title",
+            Path::new("body.md"),
+            &fake_gh(1, "", "create error"),
+        )
+        .unwrap_err()
+        .to_string();
         assert!(err.contains("create error"), "got: {err}");
     }
 
@@ -398,7 +418,8 @@ mod tests {
                 Ok(output(1, "", "view auth error"))
             }
         })
-        .unwrap_err();
+        .unwrap_err()
+        .to_string();
         assert!(err.contains("view auth error"), "got: {err}");
     }
 
@@ -410,7 +431,8 @@ mod tests {
             call_count.set(n + 1);
             if n == 0 { Ok(output(0, "not-a-url\n", "")) } else { Ok(output(0, "null\n", "")) }
         })
-        .unwrap_err();
+        .unwrap_err()
+        .to_string();
         assert!(err.contains("could not determine PR number"), "got: {err}");
     }
 }

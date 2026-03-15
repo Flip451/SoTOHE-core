@@ -1,5 +1,14 @@
 //! Pure workflow rules for pull-request status evaluation and merge polling.
 
+use thiserror::Error;
+
+/// Errors returned by PR workflow functions.
+#[derive(Debug, Error)]
+pub enum PrWorkflowError {
+    #[error("{0}")]
+    Message(String),
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PrCheckView {
     pub name: String,
@@ -104,10 +113,10 @@ pub struct PrBranchContext {
 pub fn resolve_pr_branch(
     branch: &str,
     explicit_track_id: Option<&str>,
-) -> Result<PrBranchContext, String> {
+) -> Result<PrBranchContext, PrWorkflowError> {
     if let Some(id) = branch.strip_prefix("track/") {
         if id.is_empty() {
-            return Err("track branch name is empty".to_owned());
+            return Err(PrWorkflowError::Message("track branch name is empty".to_owned()));
         }
         return Ok(PrBranchContext {
             branch: branch.to_owned(),
@@ -118,32 +127,32 @@ pub fn resolve_pr_branch(
 
     if let Some(id) = branch.strip_prefix("plan/") {
         if id.is_empty() {
-            return Err("plan branch name is empty".to_owned());
+            return Err(PrWorkflowError::Message("plan branch name is empty".to_owned()));
         }
         let track_id = match explicit_track_id {
             Some(tid) if !tid.is_empty() => {
                 if tid != id {
-                    return Err(format!(
+                    return Err(PrWorkflowError::Message(format!(
                         "--track-id '{tid}' does not match plan branch suffix '{id}'. \
                          The explicit selector must match the branch name."
-                    ));
+                    )));
                 }
                 tid.to_owned()
             }
             _ => {
-                return Err(format!(
+                return Err(PrWorkflowError::Message(format!(
                     "plan/{id} branch requires explicit --track-id argument. \
                      Auto-detection is not supported for non-track branches."
-                ));
+                )));
             }
         };
         return Ok(PrBranchContext { branch: branch.to_owned(), track_id, is_plan_branch: true });
     }
 
-    Err(format!(
+    Err(PrWorkflowError::Message(format!(
         "Not on a track or plan branch (current: {branch}). \
          PR operations require a track/<id> or plan/<id> branch."
-    ))
+    )))
 }
 
 /// Generate a PR title based on the branch context.
@@ -267,7 +276,7 @@ mod tests {
     #[test]
     fn resolve_pr_branch_requires_explicit_id_on_plan_branch() {
         let err = resolve_pr_branch("plan/my-plan", None).unwrap_err();
-        assert!(err.contains("--track-id"), "expected --track-id hint, got: {err}");
+        assert!(err.to_string().contains("--track-id"), "expected --track-id hint, got: {err}");
     }
 
     #[test]
@@ -286,25 +295,25 @@ mod tests {
     #[test]
     fn resolve_pr_branch_rejects_main_branch() {
         let err = resolve_pr_branch("main", None).unwrap_err();
-        assert!(err.contains("Not on a track or plan branch"), "got: {err}");
+        assert!(err.to_string().contains("Not on a track or plan branch"), "got: {err}");
     }
 
     #[test]
     fn resolve_pr_branch_rejects_empty_track_id() {
         let err = resolve_pr_branch("track/", None).unwrap_err();
-        assert!(err.contains("empty"), "got: {err}");
+        assert!(err.to_string().contains("empty"), "got: {err}");
     }
 
     #[test]
     fn resolve_pr_branch_rejects_mismatched_explicit_id_on_plan() {
         let err = resolve_pr_branch("plan/my-plan", Some("other-id")).unwrap_err();
-        assert!(err.contains("does not match"), "got: {err}");
+        assert!(err.to_string().contains("does not match"), "got: {err}");
     }
 
     #[test]
     fn resolve_pr_branch_rejects_empty_explicit_id_on_plan() {
         let err = resolve_pr_branch("plan/my-plan", Some("")).unwrap_err();
-        assert!(err.contains("--track-id"), "got: {err}");
+        assert!(err.to_string().contains("--track-id"), "got: {err}");
     }
 
     #[test]
