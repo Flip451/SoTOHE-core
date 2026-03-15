@@ -4,18 +4,44 @@ use std::process::ExitCode;
 use std::thread;
 use std::time::{Duration, Instant};
 
+use std::fs;
+use std::path::PathBuf;
+
 use clap::{Args, Subcommand};
 use infrastructure::gh_cli::{GhClient, PrCheckRecord, SystemGhClient};
+use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 use usecase::pr_workflow::{
-    CheckSummary, PrCheckStatus, PrCheckView, WaitDecision, decide_wait_action, summarize_checks,
+    CheckSummary, PrBranchContext, PrCheckStatus, PrCheckView, WaitDecision, decide_wait_action,
+    pr_body, pr_title, resolve_pr_branch, summarize_checks,
 };
 
 #[derive(Debug, Subcommand)]
 pub enum PrCommand {
+    /// Push the current track/plan branch to origin.
+    Push(PushArgs),
+    /// Create or reuse a PR for the current track/plan branch.
+    EnsurePr(EnsurePrArgs),
     /// Show current PR check status.
     Status(StatusArgs),
     /// Poll PR checks until they pass, then merge.
     WaitAndMerge(WaitAndMergeArgs),
+}
+
+#[derive(Debug, Args)]
+pub struct PushArgs {
+    /// Explicit track ID (required on plan/ branches, ignored on track/ branches).
+    #[arg(long)]
+    pub track_id: Option<String>,
+}
+
+#[derive(Debug, Args)]
+pub struct EnsurePrArgs {
+    /// Explicit track ID (required on plan/ branches, ignored on track/ branches).
+    #[arg(long)]
+    pub track_id: Option<String>,
+    /// Base branch for the PR.
+    #[arg(long, default_value = "main")]
+    pub base: String,
 }
 
 #[derive(Debug, Args)]
@@ -36,9 +62,101 @@ pub struct WaitAndMergeArgs {
 
 pub fn execute(cmd: PrCommand) -> ExitCode {
     match cmd {
+        PrCommand::Push(args) => push(args.track_id.as_deref()),
+        PrCommand::EnsurePr(args) => ensure_pr(args.track_id.as_deref(), &args.base),
         PrCommand::Status(args) => status(&args.pr),
         PrCommand::WaitAndMerge(args) => {
             wait_and_merge(&args.pr, args.interval, args.timeout, &args.method)
+        }
+    }
+}
+
+fn resolve_branch_context(explicit_track_id: Option<&str>) -> Result<PrBranchContext, String> {
+    let repo = SystemGitRepo::discover()?;
+    let branch =
+        repo.current_branch()?.ok_or_else(|| "could not determine current branch".to_owned())?;
+    resolve_pr_branch(&branch, explicit_track_id)
+}
+
+fn push(explicit_track_id: Option<&str>) -> ExitCode {
+    let ctx = match resolve_branch_context(explicit_track_id) {
+        Ok(ctx) => ctx,
+        Err(err) => {
+            eprintln!("[ERROR] {err}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let repo = match SystemGitRepo::discover() {
+        Ok(repo) => repo,
+        Err(err) => {
+            eprintln!("[ERROR] {err}");
+            return ExitCode::FAILURE;
+        }
+    };
+    println!("Pushing {} to origin...", ctx.branch);
+    match repo.push_branch(&ctx.branch) {
+        Ok(()) => {
+            println!("[OK] Pushed {}", ctx.branch);
+            ExitCode::SUCCESS
+        }
+        Err(err) => {
+            eprintln!("[ERROR] {err}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn ensure_pr(explicit_track_id: Option<&str>, base: &str) -> ExitCode {
+    let ctx = match resolve_branch_context(explicit_track_id) {
+        Ok(ctx) => ctx,
+        Err(err) => {
+            eprintln!("[ERROR] {err}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let client = SystemGhClient;
+    ensure_pr_with(&ctx, base, &client)
+}
+
+fn ensure_pr_with<C: GhClient>(ctx: &PrBranchContext, base: &str, client: &C) -> ExitCode {
+    // Check for existing PR
+    match client.find_open_pr(&ctx.branch, base) {
+        Ok(Some(pr)) => {
+            println!("[OK] Reusing existing PR #{pr}");
+            return ExitCode::SUCCESS;
+        }
+        Ok(None) => {} // create new
+        Err(err) => {
+            eprintln!("[ERROR] {err}");
+            return ExitCode::FAILURE;
+        }
+    }
+
+    // Write body to a uniquely-named temp file to avoid races.
+    let body_dir = PathBuf::from("tmp");
+    if let Err(err) = fs::create_dir_all(&body_dir) {
+        eprintln!("[ERROR] failed to create tmp dir: {err}");
+        return ExitCode::FAILURE;
+    }
+    let body_file = body_dir.join(format!("pr-body-{}.md", std::process::id()));
+    let body_text = pr_body(ctx);
+    if let Err(err) = fs::write(&body_file, &body_text) {
+        eprintln!("[ERROR] failed to write PR body file: {err}");
+        return ExitCode::FAILURE;
+    }
+
+    let title = pr_title(ctx);
+    match client.create_pr(&ctx.branch, base, &title, &body_file) {
+        Ok(pr) => {
+            // Clean up body file
+            let _ = fs::remove_file(&body_file);
+            println!("[OK] Created PR #{pr}");
+            ExitCode::SUCCESS
+        }
+        Err(err) => {
+            let _ = fs::remove_file(&body_file);
+            eprintln!("[ERROR] {err}");
+            ExitCode::FAILURE
         }
     }
 }
@@ -175,17 +293,35 @@ mod tests {
     use std::cell::RefCell;
     use std::process::ExitCode;
 
+    use std::path::Path;
+
     use super::{
-        CheckSummary, checks_summary, normalize_check_status, status_with, wait_and_merge_with,
+        CheckSummary, checks_summary, ensure_pr_with, normalize_check_status, status_with,
+        wait_and_merge_with,
     };
     use infrastructure::gh_cli::{GhClient, PrCheckRecord};
-    use usecase::pr_workflow::PrCheckStatus;
+    use usecase::pr_workflow::{PrBranchContext, PrCheckStatus};
 
     struct FakeGhClient {
         checks: RefCell<Vec<Result<Vec<PrCheckRecord>, String>>>,
         url: String,
         merge_calls: RefCell<Vec<(String, String)>>,
         merge_result: RefCell<Result<(), String>>,
+        find_pr_result: RefCell<Result<Option<String>, String>>,
+        create_pr_result: RefCell<Result<String, String>>,
+    }
+
+    impl FakeGhClient {
+        fn default_for_pr() -> Self {
+            Self {
+                checks: RefCell::new(Vec::new()),
+                url: String::new(),
+                merge_calls: RefCell::new(Vec::new()),
+                merge_result: RefCell::new(Ok(())),
+                find_pr_result: RefCell::new(Ok(None)),
+                create_pr_result: RefCell::new(Ok("42".to_owned())),
+            }
+        }
     }
 
     impl GhClient for FakeGhClient {
@@ -200,6 +336,20 @@ mod tests {
         fn merge_pr(&self, pr: &str, method: &str) -> Result<(), String> {
             self.merge_calls.borrow_mut().push((pr.to_owned(), method.to_owned()));
             self.merge_result.borrow().clone()
+        }
+
+        fn find_open_pr(&self, _head: &str, _base: &str) -> Result<Option<String>, String> {
+            self.find_pr_result.borrow().clone()
+        }
+
+        fn create_pr(
+            &self,
+            _head: &str,
+            _base: &str,
+            _title: &str,
+            _body_file: &Path,
+        ) -> Result<String, String> {
+            self.create_pr_result.borrow().clone()
         }
     }
 
@@ -221,6 +371,7 @@ mod tests {
             url: String::new(),
             merge_calls: RefCell::new(Vec::new()),
             merge_result: RefCell::new(Ok(())),
+            ..FakeGhClient::default_for_pr()
         };
 
         assert_eq!(status_with("123", &client), ExitCode::FAILURE);
@@ -248,6 +399,7 @@ mod tests {
             url: "https://example.invalid/pr/123".to_owned(),
             merge_calls: RefCell::new(Vec::new()),
             merge_result: RefCell::new(Ok(())),
+            ..FakeGhClient::default_for_pr()
         };
         let result = wait_and_merge_with("123", 15, 600, "squash", &client, &|_| {
             panic!("sleep should not be called")
@@ -264,6 +416,7 @@ mod tests {
             url: String::new(),
             merge_calls: RefCell::new(Vec::new()),
             merge_result: RefCell::new(Ok(())),
+            ..FakeGhClient::default_for_pr()
         };
         let result = wait_and_merge_with("123", 15, 600, "merge", &client, &|_| {
             panic!("sleep should not be called")
@@ -284,6 +437,7 @@ mod tests {
             url: String::new(),
             merge_calls: RefCell::new(Vec::new()),
             merge_result: RefCell::new(Ok(())),
+            ..FakeGhClient::default_for_pr()
         };
         let result = wait_and_merge_with("123", 15, 0, "merge", &client, &|duration| {
             sleeps.borrow_mut().push(duration)
@@ -291,5 +445,65 @@ mod tests {
 
         assert_eq!(result, ExitCode::FAILURE);
         assert!(sleeps.borrow().is_empty());
+    }
+
+    // --- ensure_pr_with tests ---
+
+    #[test]
+    fn ensure_pr_with_reuses_existing_pr() {
+        let client = FakeGhClient {
+            find_pr_result: RefCell::new(Ok(Some("99".to_owned()))),
+            ..FakeGhClient::default_for_pr()
+        };
+        let ctx = PrBranchContext {
+            branch: "track/my-feature".to_owned(),
+            track_id: "my-feature".to_owned(),
+            is_plan_branch: false,
+        };
+        assert_eq!(ensure_pr_with(&ctx, "main", &client), ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn ensure_pr_with_creates_new_pr_when_none_exists() {
+        let client = FakeGhClient {
+            find_pr_result: RefCell::new(Ok(None)),
+            create_pr_result: RefCell::new(Ok("42".to_owned())),
+            ..FakeGhClient::default_for_pr()
+        };
+        let ctx = PrBranchContext {
+            branch: "track/my-feature".to_owned(),
+            track_id: "my-feature".to_owned(),
+            is_plan_branch: false,
+        };
+        assert_eq!(ensure_pr_with(&ctx, "main", &client), ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn ensure_pr_with_returns_failure_on_find_error() {
+        let client = FakeGhClient {
+            find_pr_result: RefCell::new(Err("gh exploded".to_owned())),
+            ..FakeGhClient::default_for_pr()
+        };
+        let ctx = PrBranchContext {
+            branch: "track/my-feature".to_owned(),
+            track_id: "my-feature".to_owned(),
+            is_plan_branch: false,
+        };
+        assert_eq!(ensure_pr_with(&ctx, "main", &client), ExitCode::FAILURE);
+    }
+
+    #[test]
+    fn ensure_pr_with_returns_failure_on_create_error() {
+        let client = FakeGhClient {
+            find_pr_result: RefCell::new(Ok(None)),
+            create_pr_result: RefCell::new(Err("create failed".to_owned())),
+            ..FakeGhClient::default_for_pr()
+        };
+        let ctx = PrBranchContext {
+            branch: "track/my-feature".to_owned(),
+            track_id: "my-feature".to_owned(),
+            is_plan_branch: false,
+        };
+        assert_eq!(ensure_pr_with(&ctx, "main", &client), ExitCode::FAILURE);
     }
 }

@@ -76,12 +76,104 @@ pub fn decide_wait_action(
     }
 }
 
+/// Context resolved from the current git branch for PR operations.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PrBranchContext {
+    /// The git branch name (e.g., `track/my-feature` or `plan/my-feature`).
+    pub branch: String,
+    /// The track ID extracted from the branch name.
+    pub track_id: String,
+    /// Whether this is a planning-only branch (`plan/<id>`).
+    pub is_plan_branch: bool,
+}
+
+/// Resolve the current branch for PR operations.
+///
+/// # Rules
+///
+/// - `track/<id>` branches: auto-resolve `track_id` from branch name.
+///   `explicit_track_id` is ignored.
+/// - `plan/<id>` branches: require `explicit_track_id` (fail-closed).
+///   If missing, return error.
+/// - Other branches: return error (PR operations not supported).
+///
+/// # Errors
+///
+/// Returns an error description if the branch is not a `track/` or `plan/`
+/// branch, or if a `plan/` branch is used without an explicit track ID.
+pub fn resolve_pr_branch(
+    branch: &str,
+    explicit_track_id: Option<&str>,
+) -> Result<PrBranchContext, String> {
+    if let Some(id) = branch.strip_prefix("track/") {
+        if id.is_empty() {
+            return Err("track branch name is empty".to_owned());
+        }
+        return Ok(PrBranchContext {
+            branch: branch.to_owned(),
+            track_id: id.to_owned(),
+            is_plan_branch: false,
+        });
+    }
+
+    if let Some(id) = branch.strip_prefix("plan/") {
+        if id.is_empty() {
+            return Err("plan branch name is empty".to_owned());
+        }
+        let track_id = match explicit_track_id {
+            Some(tid) if !tid.is_empty() => {
+                if tid != id {
+                    return Err(format!(
+                        "--track-id '{tid}' does not match plan branch suffix '{id}'. \
+                         The explicit selector must match the branch name."
+                    ));
+                }
+                tid.to_owned()
+            }
+            _ => {
+                return Err(format!(
+                    "plan/{id} branch requires explicit --track-id argument. \
+                     Auto-detection is not supported for non-track branches."
+                ));
+            }
+        };
+        return Ok(PrBranchContext { branch: branch.to_owned(), track_id, is_plan_branch: true });
+    }
+
+    Err(format!(
+        "Not on a track or plan branch (current: {branch}). \
+         PR operations require a track/<id> or plan/<id> branch."
+    ))
+}
+
+/// Generate a PR title based on the branch context.
+pub fn pr_title(ctx: &PrBranchContext) -> String {
+    if ctx.is_plan_branch {
+        format!("Plan: {}", ctx.track_id)
+    } else {
+        format!("track: {}", ctx.track_id)
+    }
+}
+
+/// Generate a default PR body based on the branch context.
+pub fn pr_body(ctx: &PrBranchContext) -> String {
+    if ctx.is_plan_branch {
+        format!(
+            "Planning artifacts for `{}`.\n\n\
+             After merge, run `/track:activate {}` to create the implementation branch.",
+            ctx.track_id, ctx.track_id
+        )
+    } else {
+        format!("Track implementation for `{}`.\n\nCreated by `/track:pr-review`.", ctx.track_id)
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use super::{
-        CheckSummary, PrCheckStatus, PrCheckView, WaitDecision, decide_wait_action,
-        summarize_checks,
+        CheckSummary, PrBranchContext, PrCheckStatus, PrCheckView, WaitDecision,
+        decide_wait_action, pr_body, pr_title, resolve_pr_branch, summarize_checks,
     };
 
     #[test]
@@ -149,5 +241,99 @@ mod tests {
             decision,
             WaitDecision::Wait { pending: vec!["ci".to_owned()], delay_seconds: 5 }
         );
+    }
+
+    // --- resolve_pr_branch tests ---
+
+    #[test]
+    fn resolve_pr_branch_auto_resolves_track_branch() {
+        let ctx = resolve_pr_branch("track/my-feature", None).unwrap();
+        assert_eq!(
+            ctx,
+            PrBranchContext {
+                branch: "track/my-feature".to_owned(),
+                track_id: "my-feature".to_owned(),
+                is_plan_branch: false,
+            }
+        );
+    }
+
+    #[test]
+    fn resolve_pr_branch_ignores_explicit_id_on_track_branch() {
+        let ctx = resolve_pr_branch("track/my-feature", Some("other-id")).unwrap();
+        assert_eq!(ctx.track_id, "my-feature");
+    }
+
+    #[test]
+    fn resolve_pr_branch_requires_explicit_id_on_plan_branch() {
+        let err = resolve_pr_branch("plan/my-plan", None).unwrap_err();
+        assert!(err.contains("--track-id"), "expected --track-id hint, got: {err}");
+    }
+
+    #[test]
+    fn resolve_pr_branch_accepts_plan_branch_with_explicit_id() {
+        let ctx = resolve_pr_branch("plan/my-plan", Some("my-plan")).unwrap();
+        assert_eq!(
+            ctx,
+            PrBranchContext {
+                branch: "plan/my-plan".to_owned(),
+                track_id: "my-plan".to_owned(),
+                is_plan_branch: true,
+            }
+        );
+    }
+
+    #[test]
+    fn resolve_pr_branch_rejects_main_branch() {
+        let err = resolve_pr_branch("main", None).unwrap_err();
+        assert!(err.contains("Not on a track or plan branch"), "got: {err}");
+    }
+
+    #[test]
+    fn resolve_pr_branch_rejects_empty_track_id() {
+        let err = resolve_pr_branch("track/", None).unwrap_err();
+        assert!(err.contains("empty"), "got: {err}");
+    }
+
+    #[test]
+    fn resolve_pr_branch_rejects_mismatched_explicit_id_on_plan() {
+        let err = resolve_pr_branch("plan/my-plan", Some("other-id")).unwrap_err();
+        assert!(err.contains("does not match"), "got: {err}");
+    }
+
+    #[test]
+    fn resolve_pr_branch_rejects_empty_explicit_id_on_plan() {
+        let err = resolve_pr_branch("plan/my-plan", Some("")).unwrap_err();
+        assert!(err.contains("--track-id"), "got: {err}");
+    }
+
+    #[test]
+    fn pr_title_uses_plan_prefix_for_plan_branch() {
+        let ctx = PrBranchContext {
+            branch: "plan/my-plan".to_owned(),
+            track_id: "my-plan".to_owned(),
+            is_plan_branch: true,
+        };
+        assert_eq!(pr_title(&ctx), "Plan: my-plan");
+    }
+
+    #[test]
+    fn pr_title_uses_track_prefix_for_track_branch() {
+        let ctx = PrBranchContext {
+            branch: "track/my-feature".to_owned(),
+            track_id: "my-feature".to_owned(),
+            is_plan_branch: false,
+        };
+        assert_eq!(pr_title(&ctx), "track: my-feature");
+    }
+
+    #[test]
+    fn pr_body_includes_activate_hint_for_plan_branch() {
+        let ctx = PrBranchContext {
+            branch: "plan/my-plan".to_owned(),
+            track_id: "my-plan".to_owned(),
+            is_plan_branch: true,
+        };
+        assert!(pr_body(&ctx).contains("/track:activate my-plan"));
     }
 }
