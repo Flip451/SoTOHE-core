@@ -52,9 +52,14 @@ START_HERE_HUMAN.md
 
 ```mermaid
 flowchart TD
-    A["/track:catchup"] --> B["/track:plan <feature>"]
-    B --> D{実装方法を選ぶ}
-    D --> E["/track:full-cycle <task>"]
+    A["/track:catchup"] --> B{計画方法を選ぶ}
+    B -->|"標準"| P1["/track:plan &lt;feature&gt;"]
+    B -->|"計画だけ先に"| P2["/track:plan-only &lt;feature&gt;"]
+    P1 --> D{実装方法を選ぶ}
+    P2 --> PM["plan/&lt;id&gt; で PR → main にマージ"]
+    PM --> ACT["/track:activate &lt;track-id&gt;"]
+    ACT --> D
+    D --> E["/track:full-cycle &lt;task&gt;"]
     D --> F["/track:implement"]
     E --> G["実装完了"]
     F --> G
@@ -64,7 +69,7 @@ flowchart TD
     H -->|No| J["/track:ci"]
     I --> J
     I2 --> J
-    J --> K["/track:commit <message>"]
+    J --> K["/track:commit &lt;message&gt;"]
 ```
 
 注記: `/track:status` はどの段階でも実行できる。各コマンドの役割は §0.4、詳細な進め方は §3.1 参照。
@@ -83,6 +88,8 @@ flowchart TD
 | `/track:revert` | 直近変更の安全な取り消し計画 | 変更を戻す前に影響を整理したい時 |
 | `/track:ci` | 品質ゲート一括実行 | レビュー前・コミット前 |
 | `/track:commit <message>` | ガード付きコミット + 必要時の note 適用 | ユーザー向けの正規コミット経路として使う時 |
+| `/track:plan-only <feature>` | `plan/<id>` ブランチで計画のみ作成 | 計画を PR 経由でレビューしてから main に合流させたい時 |
+| `/track:activate <track-id>` | planning-only track を activate し track branch を作成 | plan-only で作成した計画を実装フェーズへ移行する時 |
 | `/track:archive <id>` | 完了トラックをアーカイブ | 完了済みトラックをレジストリから整理したい時 |
 | `/track:status` | 進捗確認 | 現在地を知りたい時 |
 | `/conventions:add <name>` | Project Conventions の正式ルールを追加・管理 | プロジェクト固有の実装規約を一次資料として残したい時 |
@@ -153,6 +160,13 @@ flowchart TD
    - ユーザー承認後に `track/items/<id>/` にトラック成果物（`metadata.json` / `plan.md` / `spec.md` / `verification.md`）を作成する
    - `cargo make ci` は `verify-track-metadata` と `verify-tech-stack` を通して track 状態と tech-stack の整合を検証する
    - そのため、tech stack 未確定のままサンプルトラックをテンプレートへ残してはいけない
+
+   **plan-only 代替レーン**: 計画を実装とは別のブランチでレビューしたい場合は次の手順を使う。
+   - `[Claude Code]` `/track:plan-only <feature>`: `plan/<id>` ブランチを作成し、計画 artifacts を作成（`status: planned`、`branch: null`）
+   - `[Terminal/GitHub]` `plan/<id>` ブランチを push して PR を作成、計画をレビュー
+   - `[GitHub]` PR マージ → 計画 artifacts が main に合流
+   - `[Claude Code]` `/track:activate <track-id>`: `track/<id>` 実装ブランチを作成して実装フェーズへ移行
+   - activate 後は標準フローの「3. 実装」以降と同じ流れで進める
 
 3. 実装
    - 以下のいずれかを選択して進める

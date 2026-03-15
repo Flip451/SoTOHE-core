@@ -16,6 +16,7 @@ def _make_track(
     root: Path,
     track_id: str,
     *,
+    schema_version: int = 2,
     title: str = "Test Track",
     status: str = "planned",
     updated_at: str = "2026-03-08T00:00:00Z",
@@ -23,6 +24,7 @@ def _make_track(
     tasks: list[dict] | None = None,
     sections: list[dict] | None = None,
     status_override: dict | None = None,
+    branch: str | None = None,
 ) -> Path:
     track_dir = root / "track" / "items" / track_id
     track_dir.mkdir(parents=True, exist_ok=True)
@@ -38,8 +40,9 @@ def _make_track(
     ]
 
     data = {
-        "schema_version": 2,
+        "schema_version": schema_version,
         "id": track_id,
+        "branch": branch,
         "title": title,
         "status": status,
         "created_at": created_at,
@@ -234,10 +237,141 @@ class TestRenderRegistry(unittest.TestCase):
                 "feat-planned",
                 status="planned",
                 updated_at="2026-03-08T00:00:00Z",
+                branch="track/feat-planned",
             )
             tracks = collect_track_metadata(root)
             output = render_registry(tracks)
             self.assertIn("/track:implement", output)
+
+    def test_render_registry_next_command_for_branchless_planning_only_track(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _make_track(
+                root,
+                "feat-plan-only",
+                schema_version=3,
+                status="planned",
+                updated_at="2026-03-08T00:00:00Z",
+                branch=None,
+            )
+            tracks = collect_track_metadata(root)
+            output = render_registry(tracks)
+            self.assertIn("/track:activate feat-plan-only", output)
+            self.assertIn("/track:plan-only <feature>", output)
+
+    def test_render_registry_keeps_legacy_v2_branchless_planned_track_on_implement(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _make_track(
+                root,
+                "feat-legacy-planned",
+                schema_version=2,
+                status="planned",
+                updated_at="2026-03-08T00:00:00Z",
+                branch=None,
+            )
+            tracks = collect_track_metadata(root)
+            output = render_registry(tracks)
+            self.assertIn("/track:implement", output)
+            self.assertNotIn("/track:activate feat-legacy-planned", output)
+
+    def test_collect_track_metadata_rejects_v3_track_missing_branch_field(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            track_dir = root / "track" / "items" / "broken-v3"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "metadata.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 3,
+                        "id": "broken-v3",
+                        "title": "Broken",
+                        "status": "planned",
+                        "created_at": "2026-03-08T00:00:00Z",
+                        "updated_at": "2026-03-08T00:00:00Z",
+                        "tasks": [],
+                        "plan": {"summary": [], "sections": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "Missing required field 'branch'"):
+                collect_track_metadata(root)
+
+    def test_collect_track_metadata_rejects_illegal_branchless_v3_track(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            track_dir = root / "track" / "items" / "broken-v3"
+            track_dir.mkdir(parents=True, exist_ok=True)
+            (track_dir / "metadata.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 3,
+                        "id": "broken-v3",
+                        "title": "Broken",
+                        "branch": None,
+                        "status": "in_progress",
+                        "created_at": "2026-03-08T00:00:00Z",
+                        "updated_at": "2026-03-08T00:00:00Z",
+                        "tasks": [{"id": "T001", "description": "x", "status": "todo"}],
+                        "plan": {"summary": [], "sections": []},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "Illegal branchless v3 track"):
+                collect_track_metadata(root)
+
+    def test_render_registry_prefers_materialized_active_track_in_current_focus(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _make_track(
+                root,
+                "plan-only-newer",
+                schema_version=3,
+                status="planned",
+                updated_at="2026-03-09T00:00:00Z",
+                branch=None,
+            )
+            _make_track(
+                root,
+                "materialized-older",
+                status="planned",
+                updated_at="2026-03-08T00:00:00Z",
+                branch="track/materialized-older",
+            )
+            tracks = collect_track_metadata(root)
+            output = render_registry(tracks)
+            self.assertIn("- Latest active track: `materialized-older`", output)
+            self.assertIn("- Next recommended command: `/track:implement`", output)
+
+    def test_render_registry_prefers_legacy_v2_planned_over_newer_plan_only(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            _make_track(
+                root,
+                "plan-only-newer",
+                schema_version=3,
+                status="planned",
+                updated_at="2026-03-09T00:00:00Z",
+                branch=None,
+            )
+            _make_track(
+                root,
+                "legacy-planned",
+                schema_version=2,
+                status="planned",
+                updated_at="2026-03-08T00:00:00Z",
+                branch=None,
+            )
+            tracks = collect_track_metadata(root)
+            output = render_registry(tracks)
+            self.assertIn("- Latest active track: `legacy-planned`", output)
+            self.assertIn("- Next recommended command: `/track:implement`", output)
 
 
 class TestWriteRegistry(unittest.TestCase):

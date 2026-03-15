@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 import tempfile
@@ -191,6 +192,14 @@ class GitOpsTest(unittest.TestCase):
         (self.root / "tracked.txt").write_text("base\n", encoding="utf-8")
         self.run_git("add", "tracked.txt")
         self.run_git("commit", "-m", "initial")
+        self.run_git("checkout", "-b", "track/example")
+
+        track_dir = self.root / "track" / "items" / "example"
+        track_dir.mkdir(parents=True, exist_ok=True)
+        (track_dir / "metadata.json").write_text(
+            '{"schema_version":3,"branch":"track/example","status":"in_progress"}',
+            encoding="utf-8",
+        )
 
         (self.root / "tracked.txt").write_text("changed\n", encoding="utf-8")
         self.run_git("add", "tracked.txt")
@@ -208,6 +217,200 @@ class GitOpsTest(unittest.TestCase):
         self.assertEqual(
             self.run_git("log", "-1", "--pretty=%s").strip(), "Commit from file"
         )
+
+    def test_commit_from_file_requires_explicit_selector_on_non_track_branch(self) -> None:
+        (self.root / "tracked.txt").write_text("base\n", encoding="utf-8")
+        self.run_git("add", "tracked.txt")
+        self.run_git("commit", "-m", "initial")
+
+        (self.root / "tracked.txt").write_text("changed\n", encoding="utf-8")
+        self.run_git("add", "tracked.txt")
+        message_path = self.root / "tmp" / "track-commit" / "commit-message.txt"
+        message_path.parent.mkdir(parents=True, exist_ok=True)
+        message_path.write_text("Commit from main\n", encoding="utf-8")
+
+        with patch.object(git_ops, "_repo_root", return_value=self.root):
+            code = git_ops.main(["commit-from-file", str(message_path), "--cleanup"])
+
+        self.assertEqual(code, 1)
+        self.assertTrue(message_path.exists())
+        self.assertEqual(self.run_git("log", "-1", "--pretty=%s").strip(), "initial")
+
+    def test_commit_from_file_rejects_non_artifact_changes_for_planning_only_track(
+        self,
+    ) -> None:
+        track_dir = self.root / "track" / "items" / "example"
+        track_dir.mkdir(parents=True, exist_ok=True)
+        (track_dir / "metadata.json").write_text(
+            '{"schema_version":3,"branch":null,"status":"planned"}',
+            encoding="utf-8",
+        )
+        (self.root / "src.rs").write_text("fn main() {}\n", encoding="utf-8")
+        self.run_git("add", "src.rs")
+        message_path = self.root / "tmp" / "track-commit" / "commit-message.txt"
+        track_dir_file = self.root / "tmp" / "track-commit" / "track-dir.txt"
+        message_path.parent.mkdir(parents=True, exist_ok=True)
+        message_path.write_text("Planning-only commit\n", encoding="utf-8")
+        track_dir_file.write_text("track/items/example\n", encoding="utf-8")
+
+        with patch.object(git_ops, "_repo_root", return_value=self.root):
+            code = git_ops.main(["commit-from-file", str(message_path), "--cleanup"])
+
+        self.assertEqual(code, 1)
+        self.assertTrue(message_path.exists())
+        self.assertFalse(track_dir_file.exists())
+        self.assertIn("src.rs", self.run_git("diff", "--cached", "--name-only"))
+
+    def test_commit_from_file_rejects_deletions_outside_planning_only_allowlist(self) -> None:
+        (self.root / "src.rs").write_text("fn main() {}\n", encoding="utf-8")
+        self.run_git("add", "src.rs")
+        self.run_git("commit", "-m", "initial")
+
+        track_dir = self.root / "track" / "items" / "example"
+        track_dir.mkdir(parents=True, exist_ok=True)
+        (track_dir / "metadata.json").write_text(
+            '{"schema_version":3,"branch":null,"status":"planned"}',
+            encoding="utf-8",
+        )
+
+        (self.root / "src.rs").unlink()
+        self.run_git("add", "-u", "src.rs")
+        message_path = self.root / "tmp" / "track-commit" / "commit-message.txt"
+        track_dir_file = self.root / "tmp" / "track-commit" / "track-dir.txt"
+        message_path.parent.mkdir(parents=True, exist_ok=True)
+        message_path.write_text("Planning-only commit\n", encoding="utf-8")
+        track_dir_file.write_text("track/items/example\n", encoding="utf-8")
+
+        with patch.object(git_ops, "_repo_root", return_value=self.root):
+            code = git_ops.main(["commit-from-file", str(message_path), "--cleanup"])
+
+        self.assertEqual(code, 1)
+        self.assertTrue(message_path.exists())
+        self.assertFalse(track_dir_file.exists())
+        self.assertIn("D\tsrc.rs", self.run_git("diff", "--cached", "--name-status"))
+
+    def test_commit_from_file_resolves_relative_track_dir_file_from_nested_directory(
+        self,
+    ) -> None:
+        (self.root / "tracked.txt").write_text("base\n", encoding="utf-8")
+        self.run_git("add", "tracked.txt")
+        self.run_git("commit", "-m", "initial")
+        self.run_git("checkout", "-b", "track/example")
+
+        track_dir = self.root / "track" / "items" / "example"
+        track_dir.mkdir(parents=True, exist_ok=True)
+        (track_dir / "metadata.json").write_text(
+            '{"schema_version":3,"branch":"track/example","status":"in_progress"}',
+            encoding="utf-8",
+        )
+
+        (self.root / "tracked.txt").write_text("changed\n", encoding="utf-8")
+        self.run_git("add", "tracked.txt")
+        scratch = self.root / "tmp" / "track-commit"
+        scratch.mkdir(parents=True, exist_ok=True)
+        message_path = scratch / "commit-message.txt"
+        track_dir_file = scratch / "track-dir.txt"
+        message_path.write_text("Nested commit\n", encoding="utf-8")
+        track_dir_file.write_text("track/items/example\n", encoding="utf-8")
+
+        nested = self.root / "nested"
+        nested.mkdir(parents=True, exist_ok=True)
+        current = Path.cwd()
+        try:
+            os.chdir(nested)
+            with patch.object(git_ops, "_repo_root", return_value=self.root):
+                code = git_ops.main(["commit-from-file", str(message_path), "--cleanup"])
+        finally:
+            os.chdir(current)
+
+        self.assertEqual(code, 0)
+        self.assertFalse(message_path.exists())
+        self.assertFalse(track_dir_file.exists())
+        self.assertEqual(self.run_git("log", "-1", "--pretty=%s").strip(), "Nested commit")
+
+    def test_commit_from_file_rejects_illegal_branchless_v3_track_selector(self) -> None:
+        track_dir = self.root / "track" / "items" / "example"
+        track_dir.mkdir(parents=True, exist_ok=True)
+        (track_dir / "metadata.json").write_text(
+            '{"schema_version":3,"branch":null,"status":"in_progress","tasks":[]}',
+            encoding="utf-8",
+        )
+        message_path = self.root / "tmp" / "track-commit" / "commit-message.txt"
+        track_dir_file = self.root / "tmp" / "track-commit" / "track-dir.txt"
+        message_path.parent.mkdir(parents=True, exist_ok=True)
+        message_path.write_text("Should fail\n", encoding="utf-8")
+        track_dir_file.write_text("track/items/example\n", encoding="utf-8")
+
+        with patch.object(git_ops, "_repo_root", return_value=self.root):
+            code = git_ops.main(["commit-from-file", str(message_path), "--cleanup"])
+
+        self.assertEqual(code, 1)
+        self.assertTrue(message_path.exists())
+        self.assertFalse(track_dir_file.exists())
+
+    def test_branch_guard_rejects_unactivated_planning_only_track_branch(self) -> None:
+        items_dir = self.root / "track" / "items"
+        items_dir.mkdir(parents=True, exist_ok=True)
+        track_dir = items_dir / "example"
+        track_dir.mkdir(parents=True, exist_ok=True)
+        (track_dir / "metadata.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": 3,
+                    "id": "example",
+                    "branch": None,
+                    "status": "planned",
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        (self.root / "tracked.txt").write_text("base\n", encoding="utf-8")
+        self.run_git("add", "tracked.txt")
+        self.run_git("commit", "-m", "initial")
+        self.run_git("checkout", "-b", "track/example")
+
+        message_path = self.root / "tmp" / "track-commit" / "commit-message.txt"
+        message_path.parent.mkdir(parents=True, exist_ok=True)
+        message_path.write_text("Should fail\n", encoding="utf-8")
+
+        with patch.object(git_ops, "_repo_root", return_value=self.root):
+            code = git_ops.main(["commit-from-file", str(message_path), "--cleanup"])
+
+        self.assertEqual(code, 1)
+        self.assertEqual(self.run_git("log", "-1", "--pretty=%s").strip(), "initial")
+
+    def test_branch_guard_rejects_illegal_branchless_v3_track_branch(self) -> None:
+        items_dir = self.root / "track" / "items"
+        items_dir.mkdir(parents=True, exist_ok=True)
+        track_dir = items_dir / "example"
+        track_dir.mkdir(parents=True, exist_ok=True)
+        (track_dir / "metadata.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": 3,
+                    "id": "example",
+                    "branch": None,
+                    "status": "in_progress",
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        (self.root / "tracked.txt").write_text("base\n", encoding="utf-8")
+        self.run_git("add", "tracked.txt")
+        self.run_git("commit", "-m", "initial")
+        self.run_git("checkout", "-b", "track/example")
+
+        message_path = self.root / "tmp" / "track-commit" / "commit-message.txt"
+        message_path.parent.mkdir(parents=True, exist_ok=True)
+        message_path.write_text("Should fail\n", encoding="utf-8")
+
+        with patch.object(git_ops, "_repo_root", return_value=self.root):
+            code = git_ops.main(["commit-from-file", str(message_path), "--cleanup"])
+
+        self.assertEqual(code, 1)
+        self.assertEqual(self.run_git("log", "-1", "--pretty=%s").strip(), "initial")
 
     def test_note_from_file_uses_track_commit_scratch_and_cleans_up(self) -> None:
         (self.root / "tracked.txt").write_text("base\n", encoding="utf-8")

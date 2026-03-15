@@ -9,6 +9,18 @@ pub trait TrackReader: Send + Sync {
     fn find(&self, id: &TrackId) -> Result<Option<TrackMetadata>, TrackReadError>;
 }
 
+/// Port for inspecting worktree cleanliness.
+///
+/// Returns raw `git status --porcelain` output so that the use case layer
+/// can parse and validate it without depending on infrastructure.
+pub trait WorktreeReader: Send + Sync {
+    /// Returns the raw porcelain output from `git status --porcelain`.
+    ///
+    /// # Errors
+    /// Returns an error message on I/O failure.
+    fn porcelain_status(&self) -> Result<String, String>;
+}
+
 /// Atomic mutation port for track persistence.
 /// Implementations provide locking internally.
 ///

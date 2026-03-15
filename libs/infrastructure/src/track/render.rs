@@ -12,6 +12,17 @@ const TRACK_ARCHIVE_DIR: &str = "track/archive";
 const RESERVED_ID_SEGMENTS: &[&str] = &["git"];
 const VALID_TRACK_STATUSES: &[&str] =
     &["planned", "in_progress", "done", "blocked", "cancelled", "archived"];
+const REQUIRED_V3_METADATA_FIELDS: &[&str] = &[
+    "schema_version",
+    "branch",
+    "id",
+    "title",
+    "status",
+    "created_at",
+    "updated_at",
+    "tasks",
+    "plan",
+];
 
 fn rendered_matches(actual: &str, expected: &str) -> bool {
     actual == expected || actual.trim_end_matches('\n') == expected.trim_end_matches('\n')
@@ -23,6 +34,7 @@ pub struct TrackSnapshot {
     pub dir: PathBuf,
     pub track: TrackMetadata,
     pub meta: DocumentMeta,
+    pub schema_version: u32,
 }
 
 impl TrackSnapshot {
@@ -110,7 +122,12 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
             source,
         })?;
         let (track, meta) = decoded;
-        snapshots.push(TrackSnapshot { dir: track_dir, track, meta });
+        snapshots.push(TrackSnapshot {
+            dir: track_dir,
+            track,
+            meta,
+            schema_version: parsed.schema_version,
+        });
     }
 
     snapshots.sort_by(|a, b| b.updated_at().cmp(a.updated_at()));
@@ -171,14 +188,9 @@ pub fn render_plan(track: &TrackMetadata) -> String {
     lines.join("\n")
 }
 
-fn next_command_for_status(status: &str) -> &'static str {
-    match status {
-        "planned" => "`/track:implement`",
-        "in_progress" => "`/track:full-cycle <task>`",
-        "blocked" => "`/track:status`",
-        "cancelled" | "archived" => "`/track:plan <feature>`",
-        _ => "`/track:status`",
-    }
+fn next_command_for_track(track: &TrackSnapshot) -> String {
+    let raw = domain::track_phase::next_command(&track.track, track.schema_version);
+    format!("`{raw}`")
 }
 
 fn format_date(iso_timestamp: &str) -> &str {
@@ -188,12 +200,15 @@ fn format_date(iso_timestamp: &str) -> &str {
 /// Renders `registry.md` content from all track snapshots.
 #[must_use]
 pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
-    let active: Vec<_> = tracks
+    let mut active: Vec<_> = tracks
         .iter()
         .filter(|track| {
             matches!(track.status().as_str(), "planned" | "in_progress" | "blocked" | "cancelled")
         })
         .collect();
+    active.sort_by_key(|track| {
+        track.schema_version == 3 && track.status() == "planned" && track.track.branch().is_none()
+    });
     let completed: Vec<_> = tracks.iter().filter(|track| track.status() == "done").collect();
     let archived: Vec<_> = tracks.iter().filter(|track| track.status() == "archived").collect();
 
@@ -201,7 +216,7 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
         "# Track Registry".to_owned(),
         String::new(),
         "> This file lists all tracks and their current status.".to_owned(),
-        "> Auto-updated by `/track:plan` (on approval) and `/track:commit`.".to_owned(),
+        "> Auto-updated by `/track:plan`, `/track:plan-only`, `/track:activate`, and `/track:commit`.".to_owned(),
         "> `/track:status` uses this file as an entry point to summarize progress.".to_owned(),
         "> Each track is expected to have `spec.md` / `plan.md` / `metadata.json` / `verification.md`.".to_owned(),
         String::new(),
@@ -210,9 +225,8 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
     ];
 
     if let Some(latest) = active.first() {
-        let status = latest.status();
         lines.push(format!("- Latest active track: `{}`", latest.track.id()));
-        lines.push(format!("- Next recommended command: {}", next_command_for_status(&status)));
+        lines.push(format!("- Next recommended command: {}", next_command_for_track(latest)));
         lines.push(format!("- Last updated: `{}`", format_date(latest.updated_at())));
     } else {
         lines.push("- Latest active track: `None yet`".to_owned());
@@ -238,7 +252,7 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
                 "| {} | {} | {} | {} |",
                 track.track.id(),
                 status,
-                next_command_for_status(&status),
+                next_command_for_track(track),
                 format_date(track.updated_at())
             ));
         }
@@ -280,7 +294,9 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
     lines.push(String::new());
     lines.push("---".to_owned());
     lines.push(String::new());
-    lines.push("Use `/track:plan <feature>` to start a new feature or bugfix track.".to_owned());
+    lines.push(
+        "Use `/track:plan <feature>` for the standard lane or `/track:plan-only <feature>` when planning should land before activation.".to_owned(),
+    );
     lines.push(String::new());
 
     lines.join("\n")
@@ -352,10 +368,30 @@ fn validate_track_document(
         });
     }
 
-    let (track, meta) = codec::decode(
-        &std::fs::read_to_string(metadata_path).map_err(RenderError::Io)?,
-    )
-    .map_err(|source| RenderError::InvalidMetadata { path: metadata_path.to_path_buf(), source })?;
+    let raw_json = std::fs::read_to_string(metadata_path).map_err(RenderError::Io)?;
+    let raw_doc: serde_json::Value = serde_json::from_str(&raw_json).map_err(|source| {
+        RenderError::InvalidMetadata { path: metadata_path.to_path_buf(), source: source.into() }
+    })?;
+    if doc.schema_version == 3 {
+        let Some(object) = raw_doc.as_object() else {
+            return Err(RenderError::InvalidTrackMetadata {
+                path: metadata_path.to_path_buf(),
+                reason: "metadata.json must be a JSON object".to_owned(),
+            });
+        };
+        if let Some(missing) =
+            REQUIRED_V3_METADATA_FIELDS.iter().find(|field| !object.contains_key(**field))
+        {
+            return Err(RenderError::InvalidTrackMetadata {
+                path: metadata_path.to_path_buf(),
+                reason: format!("Missing required field '{missing}'"),
+            });
+        }
+    }
+
+    let (track, meta) = codec::decode(&raw_json).map_err(|source| {
+        RenderError::InvalidMetadata { path: metadata_path.to_path_buf(), source }
+    })?;
 
     let derived = track.status().to_string();
     if doc.status == "archived" {
@@ -377,10 +413,14 @@ fn validate_track_document(
         });
     }
 
-    if doc.schema_version == 3 && doc.branch.is_none() && doc.status != "archived" {
+    if doc.schema_version == 3
+        && doc.branch.is_none()
+        && !(doc.status == "planned" && derived == "planned")
+    {
         return Err(RenderError::InvalidTrackMetadata {
             path: metadata_path.to_path_buf(),
-            reason: "'branch' is required for v3 tracks with non-archived status".to_owned(),
+            reason: "'branch' is required for v3 tracks unless the track is planning-only"
+                .to_owned(),
         });
     }
 
@@ -468,11 +508,43 @@ mod tests {
     use super::*;
 
     fn sample_metadata_json(id: &str, status: &str, updated_at: &str, tasks_json: &str) -> String {
+        sample_metadata_json_with_schema_and_branch(
+            3,
+            id,
+            status,
+            updated_at,
+            tasks_json,
+            Some(&format!("track/{id}")),
+        )
+    }
+
+    fn sample_metadata_json_with_branch(
+        id: &str,
+        status: &str,
+        updated_at: &str,
+        tasks_json: &str,
+        branch: Option<&str>,
+    ) -> String {
+        sample_metadata_json_with_schema_and_branch(3, id, status, updated_at, tasks_json, branch)
+    }
+
+    fn sample_metadata_json_with_schema_and_branch(
+        schema_version: u32,
+        id: &str,
+        status: &str,
+        updated_at: &str,
+        tasks_json: &str,
+        branch: Option<&str>,
+    ) -> String {
+        let branch_field = match branch {
+            Some(branch) => format!(r#""branch": "{branch}","#),
+            None => r#""branch": null,"#.to_owned(),
+        };
         format!(
             r#"{{
-  "schema_version": 3,
+  "schema_version": {schema_version},
   "id": "{id}",
-  "branch": "track/{id}",
+  {branch_field}
   "title": "Title {id}",
   "status": "{status}",
   "created_at": "2026-03-13T00:00:00Z",
@@ -566,22 +638,178 @@ mod tests {
                 dir: PathBuf::from("track/items/track-a"),
                 track: active_track,
                 meta: active_meta,
+                schema_version: 3,
             },
             TrackSnapshot {
                 dir: PathBuf::from("track/items/track-b"),
                 track: done_track,
                 meta: done_meta,
+                schema_version: 3,
             },
             TrackSnapshot {
                 dir: PathBuf::from("track/archive/track-c"),
                 track: archived_track,
                 meta: archived_meta,
+                schema_version: 3,
             },
         ]);
 
         assert!(rendered.contains("| track-a | planned | `/track:implement` | 2026-03-13 |"));
         assert!(rendered.contains("| track-b | Done | 2026-03-13 |"));
         assert!(rendered.contains("| track-c | Archived | 2026-03-13 |"));
+    }
+
+    #[test]
+    fn render_registry_routes_branchless_planning_track_to_activate() {
+        let plan_only_json = sample_metadata_json_with_branch(
+            "track-a",
+            "planned",
+            "2026-03-13T02:00:00Z",
+            r#"[
+    {
+      "id": "T001",
+      "description": "First task",
+      "status": "todo"
+    }
+  ]"#,
+            None,
+        );
+        let (plan_only_track, plan_only_meta) = codec::decode(&plan_only_json).unwrap();
+        let rendered = render_registry(&[TrackSnapshot {
+            dir: PathBuf::from("track/items/track-a"),
+            track: plan_only_track,
+            meta: plan_only_meta,
+            schema_version: 3,
+        }]);
+
+        assert!(rendered.contains("/track:activate track-a"));
+        assert!(rendered.contains("/track:plan-only <feature>"));
+    }
+
+    #[test]
+    fn render_registry_keeps_legacy_v2_branchless_planned_track_on_implement() {
+        let legacy_json = sample_metadata_json_with_schema_and_branch(
+            2,
+            "track-a",
+            "planned",
+            "2026-03-13T02:00:00Z",
+            r#"[
+    {
+      "id": "T001",
+      "description": "First task",
+      "status": "todo"
+    }
+  ]"#,
+            None,
+        );
+        let (legacy_track, legacy_meta) = codec::decode(&legacy_json).unwrap();
+        let rendered = render_registry(&[TrackSnapshot {
+            dir: PathBuf::from("track/items/track-a"),
+            track: legacy_track,
+            meta: legacy_meta,
+            schema_version: 2,
+        }]);
+
+        assert!(rendered.contains("/track:implement"));
+        assert!(!rendered.contains("/track:activate track-a"));
+    }
+
+    #[test]
+    fn render_registry_prefers_materialized_active_track_in_current_focus() {
+        let plan_only_json = sample_metadata_json_with_branch(
+            "track-plan-only",
+            "planned",
+            "2026-03-13T03:00:00Z",
+            r#"[
+    {
+      "id": "T001",
+      "description": "First task",
+      "status": "todo"
+    }
+  ]"#,
+            None,
+        );
+        let materialized_json = sample_metadata_json(
+            "track-materialized",
+            "planned",
+            "2026-03-13T02:00:00Z",
+            r#"[
+    {
+      "id": "T001",
+      "description": "First task",
+      "status": "todo"
+    }
+  ]"#,
+        );
+        let (plan_only_track, plan_only_meta) = codec::decode(&plan_only_json).unwrap();
+        let (materialized_track, materialized_meta) = codec::decode(&materialized_json).unwrap();
+        let rendered = render_registry(&[
+            TrackSnapshot {
+                dir: PathBuf::from("track/items/track-plan-only"),
+                track: plan_only_track,
+                meta: plan_only_meta,
+                schema_version: 3,
+            },
+            TrackSnapshot {
+                dir: PathBuf::from("track/items/track-materialized"),
+                track: materialized_track,
+                meta: materialized_meta,
+                schema_version: 3,
+            },
+        ]);
+
+        assert!(rendered.contains("- Latest active track: `track-materialized`"));
+        assert!(rendered.contains("- Next recommended command: `/track:implement`"));
+    }
+
+    #[test]
+    fn render_registry_prefers_legacy_v2_planned_track_over_newer_plan_only() {
+        let legacy_json = sample_metadata_json_with_schema_and_branch(
+            2,
+            "track-legacy",
+            "planned",
+            "2026-03-13T02:00:00Z",
+            r#"[
+    {
+      "id": "T001",
+      "description": "First task",
+      "status": "todo"
+    }
+  ]"#,
+            None,
+        );
+        let plan_only_json = sample_metadata_json_with_branch(
+            "track-plan-only",
+            "planned",
+            "2026-03-13T03:00:00Z",
+            r#"[
+    {
+      "id": "T001",
+      "description": "First task",
+      "status": "todo"
+    }
+  ]"#,
+            None,
+        );
+        let (legacy_track, legacy_meta) = codec::decode(&legacy_json).unwrap();
+        let (plan_only_track, plan_only_meta) = codec::decode(&plan_only_json).unwrap();
+        let rendered = render_registry(&[
+            TrackSnapshot {
+                dir: PathBuf::from("track/items/track-plan-only"),
+                track: plan_only_track,
+                meta: plan_only_meta,
+                schema_version: 3,
+            },
+            TrackSnapshot {
+                dir: PathBuf::from("track/items/track-legacy"),
+                track: legacy_track,
+                meta: legacy_meta,
+                schema_version: 2,
+            },
+        ]);
+
+        assert!(rendered.contains("- Latest active track: `track-legacy`"));
+        assert!(rendered.contains("- Next recommended command: `/track:implement`"));
     }
 
     #[test]
@@ -785,5 +1013,149 @@ mod tests {
 
         let err = validate_track_snapshots(dir.path()).unwrap_err();
         assert!(err.to_string().contains("registry.md does not match metadata.json"));
+    }
+
+    #[test]
+    fn validate_track_document_accepts_planning_only_v3_without_branch() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        std::fs::write(
+            &metadata_path,
+            sample_metadata_json_with_branch(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[
+    {
+      "id": "T001",
+      "description": "First task",
+      "status": "todo"
+    }
+  ]"#,
+                None,
+            ),
+        )
+        .unwrap();
+
+        let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+
+        let result = validate_track_document(&metadata_path, track_dir.file_name(), &doc);
+
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn validate_track_document_rejects_non_planning_v3_without_branch() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        std::fs::write(
+            &metadata_path,
+            sample_metadata_json_with_branch(
+                "track-a",
+                "in_progress",
+                "2026-03-13T02:00:00Z",
+                r#"[
+    {
+      "id": "T001",
+      "description": "First task",
+      "status": "in_progress"
+    }
+  ]"#,
+                None,
+            ),
+        )
+        .unwrap();
+
+        let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
+
+        assert!(
+            err.to_string()
+                .contains("'branch' is required for v3 tracks unless the track is planning-only")
+        );
+    }
+
+    #[test]
+    fn validate_track_document_rejects_v3_track_missing_branch_field() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        std::fs::write(
+            &metadata_path,
+            r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "title": "Track A",
+  "status": "planned",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T02:00:00Z",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "First task",
+      "status": "todo"
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Build",
+        "description": [],
+        "task_ids": ["T001"]
+      }
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+
+        let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
+
+        assert!(err.to_string().contains("Missing required field 'branch'"));
+    }
+
+    #[test]
+    fn validate_track_document_rejects_v3_track_missing_tasks_field() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        std::fs::write(
+            &metadata_path,
+            r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": null,
+  "title": "Track A",
+  "status": "planned",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T02:00:00Z",
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Build",
+        "description": [],
+        "task_ids": []
+      }
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+
+        let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
+
+        assert!(err.to_string().contains("Missing required field 'tasks'"));
     }
 }

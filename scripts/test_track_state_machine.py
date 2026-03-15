@@ -46,6 +46,34 @@ def _write_v2_metadata(
     )
 
 
+def _write_v3_metadata(
+    track_dir: Path,
+    *,
+    branch: str | None,
+    tasks: list[dict] | None = None,
+    sections: list[dict] | None = None,
+    status: str = "planned",
+    status_override: dict | None = None,
+) -> None:
+    t = tasks or []
+    s = sections or []
+    data = {
+        "schema_version": 3,
+        "id": track_dir.name,
+        "branch": branch,
+        "title": "Test Track",
+        "status": status,
+        "created_at": "2026-03-08T00:00:00Z",
+        "updated_at": "2026-03-08T00:00:00Z",
+        "status_override": status_override,
+        "tasks": t,
+        "plan": {"summary": [], "sections": s},
+    }
+    (track_dir / "metadata.json").write_text(
+        json.dumps(data, indent=2) + "\n", encoding="utf-8"
+    )
+
+
 def _read_metadata(track_dir: Path) -> dict:
     return json.loads((track_dir / "metadata.json").read_text(encoding="utf-8"))
 
@@ -435,6 +463,57 @@ class TestTransitionTaskValidation(unittest.TestCase):
 
             with self.assertRaises(TransitionError):
                 transition_task(track_dir, "T001", "done", commit_hash="not-a-hash!")
+
+    def test_branchless_planning_only_track_rejects_in_progress_transition(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            track_dir = Path(tmp) / "track" / "items" / "demo"
+            track_dir.mkdir(parents=True)
+            _write_v3_metadata(
+                track_dir,
+                branch=None,
+                tasks=[_task("T001", "todo")],
+                sections=[_section("s1", ["T001"])],
+                status="planned",
+            )
+
+            with self.assertRaises(TransitionError) as ctx:
+                transition_task(track_dir, "T001", "in_progress", now=datetime.now(UTC))
+
+            self.assertIn("/track:activate demo", str(ctx.exception))
+
+    def test_branchless_planning_only_track_rejects_skipped_transition(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            track_dir = Path(tmp) / "track" / "items" / "demo"
+            track_dir.mkdir(parents=True)
+            _write_v3_metadata(
+                track_dir,
+                branch=None,
+                tasks=[_task("T001", "todo")],
+                sections=[_section("s1", ["T001"])],
+                status="planned",
+            )
+
+            with self.assertRaises(TransitionError) as ctx:
+                transition_task(track_dir, "T001", "skipped", now=datetime.now(UTC))
+
+            self.assertIn("/track:activate demo", str(ctx.exception))
+
+    def test_materialized_v3_track_allows_in_progress_transition(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            track_dir = Path(tmp) / "track" / "items" / "demo"
+            track_dir.mkdir(parents=True)
+            _write_v3_metadata(
+                track_dir,
+                branch="track/demo",
+                tasks=[_task("T001", "todo")],
+                sections=[_section("s1", ["T001"])],
+                status="planned",
+            )
+
+            transition_task(track_dir, "T001", "in_progress", now=datetime.now(UTC))
+
+            data = _read_metadata(track_dir)
+            self.assertEqual(data["tasks"][0]["status"], "in_progress")
 
 
 class TestOverrideSurvivesTransition(unittest.TestCase):

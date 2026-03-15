@@ -164,7 +164,11 @@ def _resolve_track_context() -> tuple[str, str, Path]:
     result = _run_git(["rev-parse", "--abbrev-ref", "HEAD"])
     branch = result.stdout.strip()
     if not branch.startswith("track/"):
-        print("[ERROR] Not on a track branch (expected track/<id>)", file=sys.stderr)
+        print(
+            "[ERROR] Not on a track branch (expected track/<id>). "
+            "For planning-only tracks, run /track:activate <track-id> first.",
+            file=sys.stderr,
+        )
         raise SystemExit(1)
     track_id = branch[len("track/"):]
     track_dir = Path("track/items") / track_id

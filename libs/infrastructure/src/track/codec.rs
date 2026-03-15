@@ -123,7 +123,13 @@ pub fn decode(json: &str) -> Result<(TrackMetadata, DocumentMeta), CodecError> {
 /// Returns `CodecError` on JSON serialization failure.
 pub fn encode(track: &TrackMetadata, meta: &DocumentMeta) -> Result<String, CodecError> {
     let doc = document_from_track_metadata(track, meta);
-    let json = serde_json::to_string_pretty(&doc)?;
+    let mut value = serde_json::to_value(&doc)?;
+    if meta.schema_version == 3 && track.branch().is_none() {
+        if let serde_json::Value::Object(object) = &mut value {
+            object.insert("branch".to_owned(), serde_json::Value::Null);
+        }
+    }
+    let json = serde_json::to_string_pretty(&value)?;
     Ok(json)
 }
 
@@ -469,5 +475,33 @@ mod tests {
 
         // "archived" must be preserved, not rewritten to "done".
         assert_eq!(doc["status"].as_str().unwrap(), "archived");
+    }
+
+    #[test]
+    fn test_encode_v3_branchless_track_preserves_null_branch_field() {
+        let json = r#"{
+  "schema_version": 3,
+  "id": "plan-only-track",
+  "branch": null,
+  "title": "Plan Only Track",
+  "status": "planned",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z",
+  "tasks": [
+    {"id": "T1", "description": "Todo task", "status": "todo"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}
+    ]
+  }
+}"#;
+        let (track, meta) = decode(json).unwrap();
+        let re_encoded = encode(&track, &meta).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&re_encoded).unwrap();
+
+        assert!(doc.get("branch").is_some());
+        assert!(doc["branch"].is_null());
     }
 }

@@ -6,6 +6,7 @@ Git helper wrappers used by exact cargo-make tasks for automated flows.
 from __future__ import annotations
 
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path, PurePosixPath
@@ -32,6 +33,15 @@ GLOB_MAGIC_CHARS = {"*", "?", "[", "]"}
 def run_git(args: list[str]) -> int:
     result = subprocess.run(["git", *args], check=False)
     return result.returncode
+
+
+def run_git_capture(args: list[str]) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", *args],
+        check=False,
+        text=True,
+        capture_output=True,
+    )
 
 
 def ensure_existing_nonempty_file(path: Path, *, label: str) -> int:
@@ -159,7 +169,7 @@ def commit_from_file(path: Path, *, cleanup: bool, track_dir: Path | None = None
     if effective_track_dir is None and track_dir_file is not None and track_dir_file.is_file():
         raw = track_dir_file.read_text(encoding="utf-8").strip()
         if raw:
-            effective_track_dir = Path(raw)
+            effective_track_dir = _resolve_repo_relative_path(Path(raw))
 
     if effective_track_dir is not None:
         code = _verify_commit_branch(effective_track_dir)
@@ -169,10 +179,22 @@ def commit_from_file(path: Path, *, cleanup: bool, track_dir: Path | None = None
                 track_dir_file.unlink(missing_ok=True)
             return code
     else:
+        code = _require_explicit_track_selector_on_non_track_branch()
+        if code != 0:
+            if cleanup and track_dir_file is not None:
+                track_dir_file.unlink(missing_ok=True)
+            return code
         # Fallback: auto-detect track from current branch when no explicit
         # track directory is provided (e.g. takt commit-pending-message path).
         code = _verify_branch_by_auto_detection()
         if code != 0:
+            return code
+
+    if effective_track_dir is not None:
+        code = _validate_planning_only_commit_paths(effective_track_dir)
+        if code != 0:
+            if cleanup and track_dir_file is not None:
+                track_dir_file.unlink(missing_ok=True)
             return code
 
     code = run_git(["commit", "-F", str(path)])
@@ -188,6 +210,11 @@ def commit_from_file(path: Path, *, cleanup: bool, track_dir: Path | None = None
 def _repo_root() -> Path:
     """Return the repository root (directory containing this script's parent)."""
     return Path(__file__).resolve().parent.parent
+
+
+def _resolve_repo_relative_path(path: Path) -> Path:
+    """Resolve repo-relative selectors from tmp scratch files against the repo root."""
+    return path if path.is_absolute() else _repo_root() / path
 
 
 def _safe_repo_items_dir() -> tuple[Path, Path] | None:
@@ -252,6 +279,28 @@ def _verify_commit_branch(track_dir: Path) -> int:
     if not metadata_file.is_file():
         print(f"[ERROR] metadata.json not found in: {track_dir}", file=sys.stderr)
         return 1
+    try:
+        data = json.loads(metadata_file.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError, UnicodeDecodeError) as exc:
+        print(f"[ERROR] Cannot read metadata.json in {track_dir}: {exc}", file=sys.stderr)
+        return 1
+    if not isinstance(data, dict):
+        print(f"[ERROR] metadata.json is not an object in: {track_dir}", file=sys.stderr)
+        return 1
+    try:
+        from track_schema import v3_branch_field_missing, v3_branchless_track_invalid
+    except ImportError:  # pragma: no cover - script execution path
+        from scripts.track_schema import (
+            v3_branch_field_missing,
+            v3_branchless_track_invalid,
+        )
+
+    if v3_branch_field_missing(data) or v3_branchless_track_invalid(data):
+        print(
+            f"[ERROR] track '{track_dir.relative_to(_repo_root()).as_posix()}' is not activated yet; run /track:activate {track_dir.name}",
+            file=sys.stderr,
+        )
+        return 1
 
     code, BranchGuardError, verify_track_branch, current_git_branch = (
         _ensure_branch_guard_imports()
@@ -268,6 +317,82 @@ def _verify_commit_branch(track_dir: Path) -> int:
         return 1
     except Exception as e:
         print(f"[ERROR] Branch guard check failed: {e}", file=sys.stderr)
+        return 1
+
+    return 0
+
+
+def _require_explicit_track_selector_on_non_track_branch() -> int:
+    """Reject non-track-branch commits unless an explicit selector is present."""
+    code, _BranchGuardError, _verify_track_branch, current_git_branch = (
+        _ensure_branch_guard_imports()
+    )
+    if code:
+        return code
+
+    branch = current_git_branch(_repo_root())
+    if branch is not None and branch.startswith("track/"):
+        return 0
+
+    if branch == "HEAD":
+        print(
+            "[ERROR] detached HEAD requires an explicit track-id selector in tmp/track-commit/track-dir.txt",
+            file=sys.stderr,
+        )
+        return 1
+
+    if branch is None:
+        print(
+            "[ERROR] cannot determine current git branch; provide an explicit track-id selector in tmp/track-commit/track-dir.txt",
+            file=sys.stderr,
+        )
+        return 1
+
+    print(
+        "[ERROR] non-track branch commits require an explicit track-id selector in tmp/track-commit/track-dir.txt",
+        file=sys.stderr,
+    )
+    return 1
+
+
+def _validate_planning_only_commit_paths(track_dir: Path) -> int:
+    """Allow only planning artifacts for explicit branchless v3 planning-only commits."""
+    metadata_file = track_dir / "metadata.json"
+    try:
+        data = json.loads(metadata_file.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"[ERROR] Cannot read or parse metadata.json in {track_dir}: {e}", file=sys.stderr)
+        return 1
+
+    if (
+        data.get("schema_version", 2) != 3
+        or data.get("branch") is not None
+        or data.get("status") != "planned"
+    ):
+        return 0
+
+    result = run_git_capture(["diff", "--cached", "--name-only", "--diff-filter=ACMRD"])
+    if result.returncode != 0:
+        print("[ERROR] git diff --cached --name-only failed", file=sys.stderr)
+        return 1
+
+    repo_root = _repo_root()
+    try:
+        display_path = track_dir.resolve().relative_to(repo_root.resolve()).as_posix()
+    except ValueError:
+        display_path = track_dir.as_posix()
+    track_prefix = f"{display_path}/"
+    allowed = {"track/registry.md", "track/tech-stack.md", ".claude/docs/DESIGN.md"}
+    for raw in result.stdout.splitlines():
+        path = raw.strip()
+        if not path:
+            continue
+        if path == display_path or path.startswith(track_prefix) or path in allowed:
+            continue
+        print(
+            f"[ERROR] planning-only commit for '{display_path}' may not stage '{path}'; run /track:activate <track-id> before committing implementation files",
+            file=sys.stderr,
+        )
         return 1
 
     return 0
@@ -370,8 +495,12 @@ def _verify_branch_by_auto_detection() -> int:
                             file=sys.stderr,
                         )
                         return 1
-                    if d.get("branch") is None:
-                        # branch=null → skip guard (legacy/planning phase)
+                    if (
+                        d.get("branch") is None
+                        and d.get("schema_version", 2) != 3
+                        and d.get("status") != "archived"
+                    ):
+                        # Legacy branchless tracks may still resolve by directory name.
                         return 0
         print(
             f"[ERROR] Branch guard: on branch '{branch}' but no track claims "

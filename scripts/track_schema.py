@@ -195,12 +195,48 @@ def effective_track_status(meta: TrackMetadataV2) -> str:
     return "in_progress"
 
 
+def _allows_v3_branchless_track(meta: TrackMetadataV2) -> bool:
+    """Return True when a v3 track may legally keep branch=null."""
+    return meta.status == "planned" and effective_track_status(meta) == "planned"
+
+
+def v3_branch_field_missing(data: dict) -> bool:
+    """Return True when a v3 metadata dict omits the required branch field."""
+    return data.get("schema_version") == 3 and "branch" not in data
+
+
+def v3_branchless_track_invalid(data: dict) -> bool:
+    """Return True when a v3 metadata dict keeps branch=null outside legal states."""
+    if data.get("schema_version") != 3 or data.get("branch") is not None:
+        return False
+    if v3_branch_field_missing(data):
+        return False
+    track_dir_name = data.get("id") if isinstance(data.get("id"), str) else ""
+    if any(field not in data for field in REQUIRED_V3_FIELDS):
+        return True
+    if validate_metadata_v2(data, track_dir_name=track_dir_name):
+        return True
+    meta = parse_metadata_v2(data)
+    return not _allows_v3_branchless_track(meta)
+
+
+def v3_non_null_branch_invalid(data: dict) -> bool:
+    """Return True when a v3 metadata dict has an invalid non-null branch value."""
+    if data.get("schema_version") != 3:
+        return False
+    branch = data.get("branch")
+    if branch is None:
+        return False
+    return not isinstance(branch, str) or not branch.strip() or not branch.startswith(BRANCH_PREFIX)
+
+
 def validate_metadata_v2(data: dict, *, track_dir_name: str) -> list[str]:
     """Validate a v2 metadata.json dict. Returns list of error strings (empty = valid)."""
     errors: list[str] = []
 
     # Required fields
-    for field_name in REQUIRED_V2_FIELDS:
+    required_fields = REQUIRED_V3_FIELDS if data.get("schema_version") == 3 else REQUIRED_V2_FIELDS
+    for field_name in required_fields:
         if field_name not in data:
             errors.append(f"Missing required field '{field_name}'")
     if errors:
@@ -237,7 +273,7 @@ def validate_metadata_v2(data: dict, *, track_dir_name: str) -> list[str]:
     if sv not in (2, 3):
         errors.append(f"Expected schema_version=2 or 3, got {sv}")
 
-    # branch validation (v3 requires branch for non-archived tracks)
+    # branch validation for non-null v3 branch values
     branch = data.get("branch")
     if sv == 3:
         if branch is not None:
@@ -247,10 +283,6 @@ def validate_metadata_v2(data: dict, *, track_dir_name: str) -> list[str]:
                 errors.append(
                     f"'branch' must start with '{BRANCH_PREFIX}', got '{branch}'"
                 )
-        elif data["status"] != "archived":
-            errors.append(
-                "'branch' is required for v3 tracks with non-archived status"
-            )
 
     # status value check
     if data["status"] not in VALID_TRACK_STATUSES:
@@ -381,6 +413,11 @@ def validate_metadata_v2(data: dict, *, track_dir_name: str) -> list[str]:
     elif data["status"] != derived:
         errors.append(
             f"Status drift: metadata.status='{data['status']}' but derived='{derived}'"
+        )
+
+    if sv == 3 and branch is None and not _allows_v3_branchless_track(meta):
+        errors.append(
+            "'branch' is required for v3 tracks unless the track is planning-only"
         )
 
     return errors

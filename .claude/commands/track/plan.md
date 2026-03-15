@@ -55,4 +55,5 @@ Behavior:
   1. Plan summary
   2. Created track id/path
   3. Created/updated files
-  4. Suggested next command (`/track:full-cycle <task>` or `/track:implement`)
+  4. Suggested next command (`/track:implement` or `/track:full-cycle <task>`)
+  5. Alternative: use `/track:plan-only <feature>` to create planning artifacts on a `plan/<id>` review branch, PR to main, then `/track:activate <track-id>` when ready to implement
