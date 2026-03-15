@@ -134,25 +134,6 @@ class PostToolHooksTest(unittest.TestCase):
         self.assertIn(error_to_codex.ERROR_PREFIX, output)
         self.assertIn(error_to_codex.RUST_CONTEXT.strip(), output)
 
-    def test_error_to_codex_is_silent_during_takt_session(self) -> None:
-        data = {
-            "tool_name": "Bash",
-            "tool_input": {"command": "./scripts/custom-rust-check.sh"},
-            "tool_response": {"stderr": "error[E0502]: cannot borrow `x` as mutable"},
-        }
-        stdout = io.StringIO()
-
-        with mock.patch.dict(os.environ, {"TAKT_SESSION": "1"}, clear=False):
-            with mock.patch.object(
-                error_to_codex, "load_stdin_json", return_value=data
-            ):
-                with redirect_stdout(stdout):
-                    with self.assertRaises(SystemExit) as exc:
-                        error_to_codex.main()
-
-        self.assertEqual(exc.exception.code, 0)
-        self.assertEqual(stdout.getvalue(), "")
-
     def test_check_codex_after_plan_reads_content_blocks(self) -> None:
         tool_input = {
             "prompt": "Create implementation plan for this feature",

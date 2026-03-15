@@ -60,14 +60,16 @@
       "status": "done"
     },
     {
+      "commit_hash": "c63d9fe",
       "description": "Profile/Hook 互換エイリアス除去（Phase B 前提条件）— `.claude/hooks/_agent_profiles.py` の `takt_host_*` 互換エイリアスと公開関数を除去する。`.claude/hooks/agent-router.py` の `takt` keyword ルーティングを除去する。全 hook から `TAKT_SESSION` silence guard を除去する。関連する hook selftest を更新する。`cargo make ci` 通過を確認する",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "c63d9fe",
       "description": "ランタイム・failure-report・テスト/CI を atomic に一括削除する。`scripts/takt_profile.py`、`scripts/takt_failure_report.py`、`.takt/pieces/`、`.takt/personas/`、`.takt/runtime/`、`.takt/tasks*`、`.takt/runs/`、`.takt/persona_sessions.json` を削除。`Makefile.toml` から `takt-*` wrapper と `TAKT_PYTHON` を除去。`scripts/test_takt_*.py` を削除し `scripts-selftest-local` から除去。`cargo make ci` を実行し、失敗するテスト（`test_make_wrappers.py`、`test_verify_scripts.py`、`verify_orchestra_guardrails.py` 等）を修正して CI green にする",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Rust/Python transient path 清掃 — `git_workflow.rs` から `.takt/pending-*` / `.takt/handoffs` を除去。`git_ops.py` の `LEGACY_TAKT_PENDING_FILES` を除去。`Makefile.toml` の `add-pending-paths`、`commit-pending-message`、`note-pending` legacy wrapper を除去。`cargo make ci` を実行し、失敗するテストを修正して CI green にする",
@@ -81,5 +83,5 @@
     }
   ],
   "title": "takt 廃止実装",
-  "updated_at": "2026-03-15T03:40:14Z"
+  "updated_at": "2026-03-15T03:51:18Z"
 }

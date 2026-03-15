@@ -483,20 +483,6 @@ class MakeWrappersTest(unittest.TestCase):
                 self.assertEqual(payload["argv"], expected)
                 self.assertIn("python", str(payload["python"]))
 
-    def test_takt_failure_report_wrapper_smoke(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            root = Path(tmp_dir)
-            self.make_fixture(root)
-
-            result = self.run_make(
-                root, "takt-failure-report", "--", "--command", "cargo make test"
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            payload = self.parse_json_line(result.stdout)
-            self.assertEqual(payload["script"], "takt_failure_report.py")
-            self.assertEqual(payload["argv"], ["--", "--command", "cargo make test"])
-            self.assertIn("python", str(payload["python"]))
-
     def test_selftest_wrappers_smoke(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
@@ -513,105 +499,6 @@ class MakeWrappersTest(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 combined_output = result.stdout + result.stderr
                 self.assertIn("pytest stub:", combined_output)
-
-    def test_takt_wrappers_smoke(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            root = Path(tmp_dir)
-            self.make_fixture(root)
-
-            cases = (
-                ("takt-add", ("queue-task",), ["add-task", "queue-task"]),
-                ("takt-run", (), ["run-queue"]),
-                ("takt-render-personas", (), ["render-personas"]),
-                (
-                    "takt-full-cycle",
-                    ("smoke-task",),
-                    ["run-piece", "full-cycle", "smoke-task"],
-                ),
-                (
-                    "takt-spec-to-impl",
-                    ("smoke-task",),
-                    ["run-piece", "spec-to-impl", "smoke-task"],
-                ),
-                (
-                    "takt-impl-review",
-                    ("smoke-task",),
-                    ["run-piece", "impl-review", "smoke-task"],
-                ),
-                (
-                    "takt-tdd-cycle",
-                    ("smoke-task",),
-                    ["run-piece", "tdd-cycle", "smoke-task"],
-                ),
-            )
-            for task, args, expected in cases:
-                result = self.run_make(root, task, *args)
-                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-                payload = self.parse_json_line(result.stdout)
-                self.assertEqual(payload["script"], "takt_profile.py")
-                self.assertEqual(payload["argv"], expected)
-                self.assertIn("python", str(payload["python"]))
-                self.assertEqual(payload["takt_session"], "1")
-
-    def test_takt_wrapper_honors_python_bin_override(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            root = Path(tmp_dir)
-            self.make_fixture(root)
-
-            custom_python = root / "bin" / "custom-python"
-            self.write_text(
-                custom_python,
-                textwrap.dedent(
-                    f"""\
-                    #!/usr/bin/env bash
-                    export TAKT_WRAPPER_MARKER=custom-python
-                    exec "{sys.executable}" "$@"
-                    """
-                ),
-            )
-            os.chmod(custom_python, 0o755)
-
-            result = self.run_make(
-                root,
-                "takt-run",
-                env_updates={"PYTHON_BIN": str(custom_python)},
-            )
-
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            payload = self.parse_json_line(result.stdout)
-            self.assertEqual(payload["script"], "takt_profile.py")
-            self.assertEqual(payload["argv"], ["run-queue"])
-            self.assertEqual(payload["python"], str(sys.executable))
-            self.assertEqual(payload["takt_session"], "1")
-            self.assertEqual(payload["wrapper_marker"], "custom-python")
-
-    def test_takt_wrapper_prefers_repo_venv_python_when_present(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            root = Path(tmp_dir)
-            self.make_fixture(root)
-
-            venv_python = root / ".venv" / "bin" / "python"
-            self.write_text(
-                venv_python,
-                textwrap.dedent(
-                    f"""\
-                    #!/usr/bin/env bash
-                    export TAKT_WRAPPER_MARKER=repo-venv
-                    exec "{sys.executable}" "$@"
-                    """
-                ),
-            )
-            os.chmod(venv_python, 0o755)
-
-            result = self.run_make(root, "takt-run")
-
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            payload = self.parse_json_line(result.stdout)
-            self.assertEqual(payload["script"], "takt_profile.py")
-            self.assertEqual(payload["argv"], ["run-queue"])
-            self.assertEqual(payload["python"], str(sys.executable))
-            self.assertEqual(payload["takt_session"], "1")
-            self.assertEqual(payload["wrapper_marker"], "repo-venv")
 
     def test_git_ops_wrapper_tasks_are_exact_and_file_backed(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")

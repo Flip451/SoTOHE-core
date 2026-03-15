@@ -70,7 +70,6 @@ class AgentProfilesTest(unittest.TestCase):
         self.assertEqual(
             agent_profiles.workflow_host_label(profiles=profiles), "Claude Code"
         )
-        self.assertEqual(agent_profiles.takt_host_provider(profiles=profiles), "claude")
 
     def test_load_profiles_rejects_missing_required_capability(self) -> None:
         def mutator(profiles: dict) -> None:

@@ -4,7 +4,6 @@ PostToolUse hook: Broad Bash error detector that suggests the active debugger ca
 """
 
 import json
-import os
 import re
 import shlex
 import sys
@@ -121,9 +120,6 @@ def build_error_message(error_count: int, tool_output: str) -> str:
 
 def main() -> None:
     try:
-        if os.environ.get("TAKT_SESSION"):
-            sys.exit(0)
-
         data = load_stdin_json()
         if data.get("tool_name", "") != "Bash":
             sys.exit(0)

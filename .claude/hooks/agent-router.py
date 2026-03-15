@@ -10,7 +10,7 @@ Routing rules (Rust project):
 - Debugging / error diagnosis              -> debugger capability
 - Reviews                                  -> reviewer capability
 - Implementation / refactor work           -> implementer capability
-- takt / track related                     -> suggest appropriate workflow tool
+- track related                            -> suggest appropriate workflow tool
 """
 
 import json
@@ -279,15 +279,12 @@ WORKFLOW_TRIGGERS = {
         "仕様",
         "スペック",
         "spec",
-        "takt",
-        "ワークフロー実行",
         "track",
         "トラック",
     ],
     "en": [
         "spec",
         "specification",
-        "takt",
         "workflow",
         "track",
         "new track",

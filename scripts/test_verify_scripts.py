@@ -2979,37 +2979,6 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("git ls-files failed", result.stdout)
 
-    def test_takt_ci_descriptions_match_current_gate_list(self) -> None:
-        expected_condition = (
-            "All checks pass: cargo make ci (fmt-check, clippy, test, test-doc, deny, "
-            "scripts-selftest, hooks-selftest, check-layers, verify-arch-docs, "
-            "verify-plan-progress, verify-track-metadata, verify-track-registry, "
-            "verify-tech-stack, verify-orchestra, verify-latest-track)"
-        )
-        stale_condition = (
-            "All checks pass: cargo make ci (fmt-check, clippy, test, test-doc, deny, "
-            "check-layers, verify-arch-docs, verify-plan-progress, verify-track-metadata, "
-            "verify-track-registry, verify-tech-stack, verify-orchestra, verify-latest-track)"
-        )
-
-        for rel_path in (
-            ".takt/pieces/spec-to-impl.yaml",
-            ".takt/pieces/full-cycle.yaml",
-        ):
-            content = (PROJECT_ROOT / rel_path).read_text(encoding="utf-8")
-            self.assertIn(expected_condition, content)
-            self.assertNotIn(stale_condition, content)
-
-        quality_checker = (
-            PROJECT_ROOT / ".takt" / "personas" / "quality-checker.md"
-        ).read_text(encoding="utf-8")
-        self.assertNotIn("- `check`", quality_checker)
-        self.assertIn("- `scripts-selftest`", quality_checker)
-        self.assertIn("- `hooks-selftest`", quality_checker)
-        self.assertIn("- `verify-track-metadata`", quality_checker)
-        self.assertIn("- `verify-tech-stack`", quality_checker)
-        self.assertIn("spec.md, plan.md, and verification.md", quality_checker)
-
     def test_makefile_uses_locked_for_reproducible_validation_tasks(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
         for snippet in (
@@ -3023,68 +2992,6 @@ class VerifyScriptsTest(unittest.TestCase):
             'cargo nextest run --locked "$CARGO_MAKE_TASK_ARGS"',  # test-one-exec preserves arg quoting
         ):
             self.assertIn(snippet, makefile)
-
-    def test_takt_wrappers_are_legacy_compatibility_surfaces(self) -> None:
-        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
-        for task_name in (
-            "takt-add",
-            "takt-run",
-            "takt-render-personas",
-            "takt-full-cycle",
-            "takt-spec-to-impl",
-            "takt-impl-review",
-            "takt-tdd-cycle",
-        ):
-            self.assertIn(f"[tasks.{task_name}]", makefile)
-        self.assertIn("TAKT_PYTHON", makefile)
-        self.assertIn(".venv/bin/python", makefile)
-        self.assertIn('exec "$TAKT_PYTHON" scripts/takt_profile.py run-queue', makefile)
-        self.assertIn(
-            'exec "$TAKT_PYTHON" scripts/takt_profile.py render-personas', makefile
-        )
-        self.assertIn(
-            'exec "$TAKT_PYTHON" scripts/takt_profile.py add-task "$CARGO_MAKE_TASK_ARGS"',
-            makefile,
-        )
-        self.assertIn(
-            'exec "$TAKT_PYTHON" scripts/takt_profile.py run-piece full-cycle "$CARGO_MAKE_TASK_ARGS"',
-            makefile,
-        )
-        self.assertIn("scripts/takt_profile.py", makefile)
-        self.assertNotIn("scripts/run-python.sh", makefile)
-        self.assertNotIn('command = "/usr/bin/python3"', makefile)
-
-        for rel_path in (
-            "LOCAL_DEVELOPMENT.md",
-            "DEVELOPER_AI_WORKFLOW.md",
-            "track/workflow.md",
-        ):
-            content = (PROJECT_ROOT / rel_path).read_text(encoding="utf-8")
-            self.assertNotIn("`takt prompt` を直接使う場合だけ", content)
-        self.assertIn(
-            "Python 3.11+",
-            (PROJECT_ROOT / "LOCAL_DEVELOPMENT.md").read_text(encoding="utf-8"),
-        )
-        self.assertIn(
-            "Python 3.11+",
-            (PROJECT_ROOT / "DEVELOPER_AI_WORKFLOW.md").read_text(encoding="utf-8"),
-        )
-        self.assertIn(
-            ".tool-versions",
-            (PROJECT_ROOT / "LOCAL_DEVELOPMENT.md").read_text(encoding="utf-8"),
-        )
-        self.assertIn(
-            ".tool-versions",
-            (PROJECT_ROOT / "DEVELOPER_AI_WORKFLOW.md").read_text(encoding="utf-8"),
-        )
-        self.assertIn(
-            "PYTHON_BIN",
-            (PROJECT_ROOT / "LOCAL_DEVELOPMENT.md").read_text(encoding="utf-8"),
-        )
-        self.assertIn(
-            "PYTHON_BIN",
-            (PROJECT_ROOT / "DEVELOPER_AI_WORKFLOW.md").read_text(encoding="utf-8"),
-        )
 
     def test_human_onboarding_doc_exists_and_is_wired(self) -> None:
         onboarding = (PROJECT_ROOT / "START_HERE_HUMAN.md").read_text(encoding="utf-8")
@@ -3316,34 +3223,6 @@ class VerifyScriptsTest(unittest.TestCase):
             "requirements-python.txt must pin ruff with full semver (e.g. ruff==0.15.5)",
         )
 
-    def test_plan_language_and_diagram_policy_are_aligned(self) -> None:
-        plan_doc = (
-            PROJECT_ROOT / ".claude" / "commands" / "track" / "plan.md"
-        ).read_text(encoding="utf-8")
-        self.assertIn("Japanese", plan_doc)
-        self.assertIn("flowchart TD", plan_doc)
-        self.assertIn("DESIGN.md", plan_doc)
-
-        design_doc = (PROJECT_ROOT / ".claude" / "docs" / "DESIGN.md").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn("plan.md", design_doc)
-        self.assertIn("flowchart TD", design_doc)
-        self.assertIn("English", design_doc)
-
-        takt_config = (PROJECT_ROOT / ".takt" / "config.yaml").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn("language: ja", takt_config)
-        self.assertIn("plan.md", takt_config)
-        self.assertIn("flowchart TD", takt_config)
-
-        planner_template = (
-            PROJECT_ROOT / ".takt" / "personas" / "rust-planner.md"
-        ).read_text(encoding="utf-8")
-        self.assertIn("# Implementation Plan:", planner_template)
-        self.assertIn("flowchart TD", planner_template)
-
     # --- async-trait drift prevention ---
 
     # --- async-trait drift prevention ---
@@ -3430,18 +3309,6 @@ class VerifyScriptsTest(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn("--all-targets", content)
-
-    def test_handoff_uses_per_task_files_not_single_overwrite(self) -> None:
-        """takt_profile should use per-task handoff files in .takt/handoffs/ directory."""
-        from scripts import git_ops, takt_profile
-
-        # handoff_path should return a path under .takt/handoffs/
-        self.assertEqual(takt_profile.HANDOFFS_DIR, "handoffs")
-        self.assertFalse(hasattr(takt_profile, "PENDING_HANDOFF_FILE"))
-
-        # git_ops should exclude the handoffs directory, not a single file
-        self.assertNotIn(".takt/pending-handoff.md", git_ops.TRANSIENT_AUTOMATION_FILES)
-        self.assertIn(".takt/handoffs", git_ops.TRANSIENT_AUTOMATION_DIRS)
 
 
 if __name__ == "__main__":

@@ -26,20 +26,15 @@ REQUIRED_CAPABILITIES = (
 ORCHESTRATOR_PROVIDER = "claude"
 WORKFLOW_HOST_PROVIDER_KEY = "workflow_host_provider"
 WORKFLOW_HOST_MODEL_KEY = "workflow_host_model"
-LEGACY_TAKT_HOST_PROVIDER_KEY = "takt_host_provider"
-LEGACY_TAKT_HOST_MODEL_KEY = "takt_host_model"
 WORKFLOW_HOST_PROVIDER_ALIASES = (
     WORKFLOW_HOST_PROVIDER_KEY,
-    LEGACY_TAKT_HOST_PROVIDER_KEY,
+    "takt_host_provider",
 )
 WORKFLOW_HOST_MODEL_ALIASES = (
     WORKFLOW_HOST_MODEL_KEY,
-    LEGACY_TAKT_HOST_MODEL_KEY,
+    "takt_host_model",
 )
 SUPPORTED_WORKFLOW_HOST_PROVIDERS = ("claude", "codex")
-TAKT_HOST_PROVIDER_KEY = LEGACY_TAKT_HOST_PROVIDER_KEY
-TAKT_HOST_MODEL_KEY = LEGACY_TAKT_HOST_MODEL_KEY
-TAKT_SUPPORTED_HOST_PROVIDERS = SUPPORTED_WORKFLOW_HOST_PROVIDERS
 PLACEHOLDER_KEYS = ("task", "path", "model")
 
 
@@ -592,24 +587,6 @@ def workflow_host_label(
 ) -> str:
     provider_name = workflow_host_provider(profiles=profiles, path=path)
     return provider_label_for_name(provider_name, profiles=profiles, path=path)
-
-
-def takt_host_provider(
-    profiles: dict[str, Any] | None = None, path: str | Path | None = None
-) -> str:
-    return workflow_host_provider(profiles=profiles, path=path)
-
-
-def takt_host_model(
-    profiles: dict[str, Any] | None = None, path: str | Path | None = None
-) -> str:
-    return workflow_host_model(profiles=profiles, path=path)
-
-
-def takt_host_label(
-    profiles: dict[str, Any] | None = None, path: str | Path | None = None
-) -> str:
-    return workflow_host_label(profiles=profiles, path=path)
 
 
 def provider_command_prefixes(

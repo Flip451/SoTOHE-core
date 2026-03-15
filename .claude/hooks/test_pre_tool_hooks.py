@@ -1,8 +1,6 @@
-import io
 import os
 import tempfile
 import unittest
-from contextlib import redirect_stdout
 from unittest import mock
 
 from test_helpers import load_hook_module, write_agent_profiles
@@ -87,26 +85,6 @@ class PreToolHooksTest(unittest.TestCase):
         self.assertIn("Claude Code", message)
         self.assertIn("/track:plan <feature>", message)
         self.assertNotIn("codex exec", message)
-
-    def test_check_codex_before_write_is_silent_during_takt_session(self) -> None:
-        data = {
-            "tool_input": {
-                "file_path": "libs/domain/src/lib.rs",
-                "content": "pub trait UserRepo {}",
-            }
-        }
-        stdout = io.StringIO()
-
-        with mock.patch.dict(os.environ, {"TAKT_SESSION": "1"}, clear=False):
-            with mock.patch.object(
-                check_codex_before_write, "load_stdin_json", return_value=data
-            ):
-                with redirect_stdout(stdout):
-                    with self.assertRaises(SystemExit) as exc:
-                        check_codex_before_write.main()
-
-        self.assertEqual(exc.exception.code, 0)
-        self.assertEqual(stdout.getvalue(), "")
 
     def test_suggest_gemini_research_switches_to_active_research_provider(self) -> None:
         with self.with_profile("codex-heavy"):

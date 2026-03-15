@@ -18,11 +18,11 @@ track/items/takt-removal-2026-03-13/takt-touchpoint-inventory.md
 ## Phase A: Document and profile/hook cleanup (M1 preconditions)
 
 - [x] ドキュメント清書 — `.claude/rules/`、`.claude/commands/track/`、`.claude/docs/WORKFLOW.md`、`.claude/skills/gemini-system/SKILL.md`、`track/workflow.md`、`DEVELOPER_AI_WORKFLOW.md`、`LOCAL_DEVELOPMENT.md`、`TRACK_TRACEABILITY.md`（旧 `TAKT_TRACK_TRACEABILITY.md` からリネーム）、`START_HERE_HUMAN.md`、`CLAUDE.md` から takt の言及を完全除去し、Claude Code + Rust CLI 前提の記述に統一する。`cargo make ci` 通過を確認する f42a79c
-- [ ] Profile/Hook 互換エイリアス除去（Phase B 前提条件）— `.claude/hooks/_agent_profiles.py` の `takt_host_*` 互換エイリアスと公開関数を除去する。`.claude/hooks/agent-router.py` の `takt` keyword ルーティングを除去する。全 hook から `TAKT_SESSION` silence guard を除去する。関連する hook selftest を更新する。`cargo make ci` 通過を確認する
+- [x] Profile/Hook 互換エイリアス除去（Phase B 前提条件）— `.claude/hooks/_agent_profiles.py` の `takt_host_*` 互換エイリアスと公開関数を除去する。`.claude/hooks/agent-router.py` の `takt` keyword ルーティングを除去する。全 hook から `TAKT_SESSION` silence guard を除去する。関連する hook selftest を更新する。`cargo make ci` 通過を確認する c63d9fe
 
 ## Phase B+C+D: Runtime, failure-report, and test/CI removal (atomic)
 
-- [ ] ランタイム・failure-report・テスト/CI を atomic に一括削除する。`scripts/takt_profile.py`、`scripts/takt_failure_report.py`、`.takt/pieces/`、`.takt/personas/`、`.takt/runtime/`、`.takt/tasks*`、`.takt/runs/`、`.takt/persona_sessions.json` を削除。`Makefile.toml` から `takt-*` wrapper と `TAKT_PYTHON` を除去。`scripts/test_takt_*.py` を削除し `scripts-selftest-local` から除去。`cargo make ci` を実行し、失敗するテスト（`test_make_wrappers.py`、`test_verify_scripts.py`、`verify_orchestra_guardrails.py` 等）を修正して CI green にする
+- [x] ランタイム・failure-report・テスト/CI を atomic に一括削除する。`scripts/takt_profile.py`、`scripts/takt_failure_report.py`、`.takt/pieces/`、`.takt/personas/`、`.takt/runtime/`、`.takt/tasks*`、`.takt/runs/`、`.takt/persona_sessions.json` を削除。`Makefile.toml` から `takt-*` wrapper と `TAKT_PYTHON` を除去。`scripts/test_takt_*.py` を削除し `scripts-selftest-local` から除去。`cargo make ci` を実行し、失敗するテスト（`test_make_wrappers.py`、`test_verify_scripts.py`、`verify_orchestra_guardrails.py` 等）を修正して CI green にする c63d9fe
 
 ## Transient path cleanup and final sweep
 
