@@ -820,7 +820,7 @@ script = ['cargo run --quiet -p cli -- git note-from-file tmp/track-commit/note.
 [tasks.track-transition]
 description = "[wrapper] Transition a task status and sync rendered views"
 script_runner = "@shell"
-script = ['TRACK_DIR="${1:-}"; TASK_ID="${2:-}"; TARGET_STATUS="${3:-}"; shift 3 || true; if [ -z "$TRACK_DIR" ] || [ -z "$TASK_ID" ] || [ -z "$TARGET_STATUS" ]; then echo "error: usage: cargo make track-transition <track_dir> <task_id> <status> [--commit-hash <hash>]" >&2; exit 1; fi; TRACK_ITEMS_DIR="$(dirname "$TRACK_DIR")"; TRACK_ID="$(basename "$TRACK_DIR")"; cargo run --quiet -p cli -- track transition --items-dir "$TRACK_ITEMS_DIR" --locks-dir .locks "$TRACK_ID" "$TASK_ID" "$TARGET_STATUS" "$@"', "${@}"]
+script = ['TRACK_DIR="${1:-}"; TASK_ID="${2:-}"; TARGET_STATUS="${3:-}"; shift 3 || true; if [ -z "$TRACK_DIR" ] || [ -z "$TASK_ID" ] || [ -z "$TARGET_STATUS" ]; then echo "error: usage: cargo make track-transition <track_dir> <task_id> <status> [--commit-hash <hash>]" >&2; exit 1; fi; TRACK_ITEMS_DIR="$(dirname "$TRACK_DIR")"; TRACK_ID="$(basename "$TRACK_DIR")"; cargo run --quiet -p cli -- track transition --items-dir "$TRACK_ITEMS_DIR" --locks-dir .locks "$TRACK_ID" "$TASK_ID" "$TARGET_STATUS" "$@"']
 
 [tasks.track-sync-views]
 description = "[wrapper] Render plan.md and registry.md from metadata.json"

@@ -1,7 +1,7 @@
 # Track Registry
 
 > This file lists all tracks and their current status.
-> Auto-updated by `/track:plan`, `/track:plan-only`, and `/track:commit`.
+> Auto-updated by `/track:plan`, `/track:plan-only`, `/track:activate`, and `/track:commit`.
 > `/track:status` uses this file as an entry point to summarize progress.
 > Each track is expected to have `spec.md` / `plan.md` / `metadata.json` / `verification.md`.
 
@@ -9,13 +9,13 @@
 
 - Latest active track: `track-plan-activation-2026-03-14`
 - Next recommended command: `/track:implement`
-- Last updated: `2026-03-14`
+- Last updated: `2026-03-15`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| track-plan-activation-2026-03-14 | in_progress | `/track:implement` | 2026-03-14 |
+| track-plan-activation-2026-03-14 | in_progress | `/track:implement` | 2026-03-15 |
 
 ## Completed Tracks
 

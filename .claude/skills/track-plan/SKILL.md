@@ -220,7 +220,7 @@ Rust TDD を前提としたタスク順序：
 ユーザーが計画を承認したら、以下の成果物を作成する：
 
 1. `track/items/<id>/` ディレクトリを作成（safe slug + timestamp/id で衝突回避）
-2. `metadata.json` (SSoT) を作成（schema_version 2, tasks, plan sections）
+2. `metadata.json` (SSoT) を作成（schema_version 3, tasks, plan sections）
 3. `plan.md` を `metadata.json` から `render_plan()` で生成（直接書き込み禁止）
 4. `spec.md` を初期化（feature goal, scope, constraints, acceptance criteria）
 5. `verification.md` を初期化（scope verified, manual steps, result, verified_at）

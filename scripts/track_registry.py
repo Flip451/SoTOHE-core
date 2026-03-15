@@ -120,7 +120,7 @@ def render_registry(tracks: list[TrackMetadataV2]) -> str:
     lines.append("# Track Registry")
     lines.append("")
     lines.append("> This file lists all tracks and their current status.")
-    lines.append("> Auto-updated by `/track:plan`, `/track:plan-only`, and `/track:commit`.")
+    lines.append("> Auto-updated by `/track:plan`, `/track:plan-only`, `/track:activate`, and `/track:commit`.")
     lines.append(
         "> `/track:status` uses this file as an entry point to summarize progress."
     )

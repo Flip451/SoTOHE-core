@@ -12,13 +12,19 @@ Detailed development workflow for this project.
    └── /track:setup                         # One-time project initialization
 
 2. Planning phase (Claude Code Orchestra)
-   └── /track:plan <feature>                # tech-stack / version baseline / plan / track artifacts
-       ├── Phase 1: version baseline research via active `researcher` capability
-       ├── Phase 1.5: codebase analysis via active `researcher` capability + spec.md
-       ├── Phase 2: resolve track/tech-stack.md `TODO:` via user dialogue
-       ├── Phase 2.5: Agent Teams (Researcher ↔ Architect)
-       ├── Phase 3: plan creation → user approval
-       └── Phase 4: create track artifacts (metadata.json, plan.md, spec.md, verification.md, registry.md)
+   ├── /track:plan <feature>                # Standard lane: plan + branch creation
+   │   ├── Phase 1: version baseline research via active `researcher` capability
+   │   ├── Phase 1.5: codebase analysis via active `researcher` capability + spec.md
+   │   ├── Phase 2: resolve track/tech-stack.md `TODO:` via user dialogue
+   │   ├── Phase 2.5: Agent Teams (Researcher ↔ Architect)
+   │   ├── Phase 3: plan creation → user approval
+   │   └── Phase 4: create track artifacts (metadata.json, plan.md, spec.md, verification.md, registry.md)
+   │
+   └── Alternative (plan-only, no branch):
+       └── /track:plan-only <feature>       # Planning artifacts only (branch=null)
+           → /track:ci                      # Validate planning diff
+           → /track:commit <track-id> -- <message>  # Commit planning artifacts to main (explicit selector required)
+           → /track:activate <track-id>     # Materialize branch and switch to it
 
 Architecture-focused changes:
    └── /architecture-customizer             # crate map, dependency direction, enforcement rules
@@ -134,6 +140,8 @@ cargo make machete             # Unused dependency audit
 ```bash
 /track:setup                  # Project initialization
 /track:plan <feature>         # Research, design, plan, and create track artifacts after approval
+/track:plan-only <feature>   # Planning-only track creation (no branch); commit to main, then activate
+/track:activate <track-id>   # Materialize a planning-only track: create branch and switch
 /track:full-cycle <task>      # Autonomous full-cycle implementation in Claude Code
 /track:implement              # Parallel implementation (interactive)
 /track:review                 # Implementation review
