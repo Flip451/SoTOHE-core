@@ -1,0 +1,17 @@
+## Task Summary: Plan STRAT-03 Phase 2 track state machine Rust migration
+
+**Track:** statemachine-rust-2026-03-15
+**Task:** Planning artifacts for track state machine Python-to-Rust migration
+**Date:** 2026-03-15
+
+### Changes
+
+- metadata.json: 10 tasks (T001-T010) covering domain/usecase/CLI/Makefile/Python cleanup
+- spec.md: Feature goal, behavioral contracts (add-task, set-override, next-task, task-counts), acceptance criteria
+- plan.md: Auto-generated from metadata.json (5 sections)
+- verification.md: CLI + Makefile wrapper + Python removal verification steps
+- registry.md: Updated active track to statemachine-rust-2026-03-15
+
+### Why
+
+STRAT-03 Phase 2 migrates the remaining Python state machine operations (add-task, set-override, next-task, task-counts) to Rust CLI subcommands. This is a prerequisite for the /track:auto autonomous execution mode (MEMO-15) and continues the Python dependency reduction strategy.
