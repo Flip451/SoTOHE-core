@@ -51,7 +51,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "commit_hash": "f42a79c",
@@ -72,16 +72,18 @@
       "status": "done"
     },
     {
+      "commit_hash": "c63d9fe",
       "description": "Rust/Python transient path 清掃 — `git_workflow.rs` から `.takt/pending-*` / `.takt/handoffs` を除去。`git_ops.py` の `LEGACY_TAKT_PENDING_FILES` を除去。`Makefile.toml` の `add-pending-paths`、`commit-pending-message`、`note-pending` legacy wrapper を除去。`cargo make ci` を実行し、失敗するテストを修正して CI green にする",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "c63d9fe",
       "description": "最終清掃と検証 — `.takt/config.yaml`、`.takt/.gitignore`、残余ファイルを削除し `.takt/` ディレクトリ自体を除去する。`cargo make ci` で全ゲート通過を最終確認する。M1〜M4 の exit criteria を verification.md に記録する",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "takt 廃止実装",
-  "updated_at": "2026-03-15T03:51:18Z"
+  "updated_at": "2026-03-15T03:57:53Z"
 }

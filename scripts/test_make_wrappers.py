@@ -514,17 +514,6 @@ class MakeWrappersTest(unittest.TestCase):
             task_body,
         )
 
-        task_header = "[tasks.add-pending-paths]"
-        task_start = makefile.index(task_header)
-        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
-        task_body = (
-            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
-        )
-        self.assertIn(
-            "script = ['cargo run --quiet -p cli -- git add-from-file .takt/pending-add-paths.txt --cleanup']",
-            task_body,
-        )
-
         task_header = "[tasks.track-add-paths]"
         task_start = makefile.index(task_header)
         next_task = makefile.find("\n[tasks.", task_start + len(task_header))
@@ -533,29 +522,6 @@ class MakeWrappersTest(unittest.TestCase):
         )
         self.assertIn(
             "script = ['cargo run --quiet -p cli -- git add-from-file tmp/track-commit/add-paths.txt --cleanup']",
-            task_body,
-        )
-
-        task_header = "[tasks.commit-pending-message]"
-        task_start = makefile.index(task_header)
-        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
-        task_body = (
-            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
-        )
-        self.assertIn('dependencies = ["ci"]', task_body)
-        self.assertIn(
-            "script = ['cargo run --quiet -p cli -- git commit-from-file .takt/pending-commit-message.txt --cleanup']",
-            task_body,
-        )
-
-        task_header = "[tasks.note-pending]"
-        task_start = makefile.index(task_header)
-        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
-        task_body = (
-            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
-        )
-        self.assertIn(
-            "script = ['cargo run --quiet -p cli -- git note-from-file .takt/pending-note.md --cleanup']",
             task_body,
         )
 

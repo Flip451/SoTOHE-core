@@ -660,14 +660,9 @@ command = "git"
 args = ["add", "${@}"]
 
 [tasks.add-all]
-description = "[wrapper] Stage all worktree changes except transient .takt pending files"
+description = "[wrapper] Stage all worktree changes except transient automation scratch files"
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- git add-all']
-
-[tasks.add-pending-paths]
-description = "[wrapper] Stage paths listed in .takt/pending-add-paths.txt and delete the pending file"
-script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- git add-from-file .takt/pending-add-paths.txt --cleanup']
 
 [tasks.track-branch-create]
 description = "[wrapper] Materialize branch metadata, create a track branch from main, and switch to it (usage: cargo make track-branch-create '<track-id>')"
@@ -740,12 +735,6 @@ dependencies = ["ci"]
 script_runner = "@shell"
 script = ['git commit -m "$CARGO_MAKE_TASK_ARGS"']
 
-[tasks.commit-pending-message]
-description = "[wrapper] Run CI then commit using .takt/pending-commit-message.txt"
-dependencies = ["ci"]
-script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- git commit-from-file .takt/pending-commit-message.txt --cleanup']
-
 [tasks.track-commit-message]
 description = "[wrapper] Run CI then commit using tmp/track-commit/commit-message.txt"
 dependencies = ["ci"]
@@ -756,11 +745,6 @@ script = ['cargo run --quiet -p cli -- git commit-from-file tmp/track-commit/com
 description = "[git] Attach a git note to HEAD (usage: cargo make note '<note text>')"
 script_runner = "@shell"
 script = ['git notes add -f -m "$CARGO_MAKE_TASK_ARGS" HEAD']
-
-[tasks.note-pending]
-description = "[wrapper] Attach a git note from .takt/pending-note.md and delete the pending file"
-script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- git note-from-file .takt/pending-note.md --cleanup']
 
 [tasks.track-note]
 description = "[wrapper] Attach a git note from tmp/track-commit/note.md and delete the scratch file"

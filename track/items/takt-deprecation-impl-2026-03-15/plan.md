@@ -26,5 +26,5 @@ track/items/takt-removal-2026-03-13/takt-touchpoint-inventory.md
 
 ## Transient path cleanup and final sweep
 
-- [ ] Rust/Python transient path 清掃 — `git_workflow.rs` から `.takt/pending-*` / `.takt/handoffs` を除去。`git_ops.py` の `LEGACY_TAKT_PENDING_FILES` を除去。`Makefile.toml` の `add-pending-paths`、`commit-pending-message`、`note-pending` legacy wrapper を除去。`cargo make ci` を実行し、失敗するテストを修正して CI green にする
-- [ ] 最終清掃と検証 — `.takt/config.yaml`、`.takt/.gitignore`、残余ファイルを削除し `.takt/` ディレクトリ自体を除去する。`cargo make ci` で全ゲート通過を最終確認する。M1〜M4 の exit criteria を verification.md に記録する
+- [x] Rust/Python transient path 清掃 — `git_workflow.rs` から `.takt/pending-*` / `.takt/handoffs` を除去。`git_ops.py` の `LEGACY_TAKT_PENDING_FILES` を除去。`Makefile.toml` の `add-pending-paths`、`commit-pending-message`、`note-pending` legacy wrapper を除去。`cargo make ci` を実行し、失敗するテストを修正して CI green にする c63d9fe
+- [x] 最終清掃と検証 — `.takt/config.yaml`、`.takt/.gitignore`、残余ファイルを削除し `.takt/` ディレクトリ自体を除去する。`cargo make ci` で全ゲート通過を最終確認する。M1〜M4 の exit criteria を verification.md に記録する c63d9fe

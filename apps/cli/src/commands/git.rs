@@ -536,8 +536,6 @@ mod tests {
 
         fs::write(dir.path().join("tracked.txt"), "changed\n").unwrap();
         fs::write(dir.path().join("new.txt"), "new\n").unwrap();
-        fs::create_dir_all(dir.path().join(".takt")).unwrap();
-        fs::write(dir.path().join(".takt/pending-note.md"), "note\n").unwrap();
         fs::create_dir_all(dir.path().join("tmp/track-commit")).unwrap();
         fs::write(dir.path().join("tmp/track-commit/commit-message.txt"), "message\n").unwrap();
 

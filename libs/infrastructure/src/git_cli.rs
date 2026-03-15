@@ -362,8 +362,8 @@ mod tests {
         let root = std::path::Path::new("/repo/root");
 
         assert_eq!(
-            resolve_repo_path(root, std::path::Path::new(".takt/pending-note.md")),
-            PathBuf::from("/repo/root/.takt/pending-note.md")
+            resolve_repo_path(root, std::path::Path::new("tmp/track-commit/note.md")),
+            PathBuf::from("/repo/root/tmp/track-commit/note.md")
         );
         assert_eq!(
             resolve_repo_path(root, std::path::Path::new("/tmp/note.md")),

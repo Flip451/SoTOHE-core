@@ -1,21 +1,17 @@
 //! Pure workflow rules for guarded git operations.
 //!
-//! `tmp/track-commit/*` is the primary scratch contract. Legacy `.takt/pending-*`
-//! entries remain here only until the remaining takt wrappers are removed.
+//! `tmp/track-commit/*` is the primary scratch contract.
 
 use std::path::PathBuf;
 
 pub const TRANSIENT_AUTOMATION_FILES: &[&str] = &[
-    ".takt/pending-add-paths.txt",
-    ".takt/pending-note.md",
-    ".takt/pending-commit-message.txt",
     "tmp/track-commit/add-paths.txt",
     "tmp/track-commit/commit-message.txt",
     "tmp/track-commit/note.md",
     "tmp/track-commit/track-dir.txt",
 ];
 
-pub const TRANSIENT_AUTOMATION_DIRS: &[&str] = &[".takt/handoffs", "tmp"];
+pub const TRANSIENT_AUTOMATION_DIRS: &[&str] = &["tmp"];
 
 const GLOB_MAGIC_CHARS: &[char] = &['*', '?', '[', ']'];
 
