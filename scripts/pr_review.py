@@ -215,53 +215,35 @@ def _get_repo_nwo() -> str:
 
 
 def cmd_push() -> None:
-    """Push the current track branch to origin."""
-    branch, _track_id, _track_dir = _resolve_track_context()
-    print(f"Pushing {branch} to origin...")
-    _run_git(["push", "-u", "origin", branch])
-    print(f"[OK] Pushed {branch}")
+    """Push the current track/plan branch to origin.
+
+    Delegates to ``sotp pr push``. No new logic in Python.
+    """
+    _run_sotp_pr(["push"])
 
 
 def cmd_ensure_pr() -> str:
-    """Create or reuse a PR for the current track branch.
+    """Create or reuse a PR for the current track/plan branch.
 
-    Returns the PR number as a string.
+    Delegates to ``sotp pr ensure-pr``. Returns the PR number as a string.
     """
-    branch, track_id, _track_dir = _resolve_track_context()
+    result = _run_sotp_pr(["ensure-pr"])
+    # sotp prints "[OK] Created PR #N" or "[OK] Reusing existing PR #N"
+    pr_match = re.search(r"#(\d+)", result.stdout)
+    return pr_match.group(1) if pr_match else ""
 
-    # Check for existing PR
-    result = _run_gh([
-        "pr", "list",
-        "--head", branch,
-        "--base", "main",
-        "--state", "open",
-        "--json", "number",
-        "-q", ".[0].number",
-    ])
-    pr_number = result.stdout.strip()
-    if pr_number:
-        print(f"[OK] Reusing existing PR #{pr_number}")
-        return pr_number
 
-    # Create new PR
-    result = _run_gh([
-        "pr", "create",
-        "--head", branch,
-        "--base", "main",
-        "--title", f"track: {track_id}",
-        "--body", f"Track implementation for `{track_id}`.\n\nCreated by `/track:pr-review`.",
-    ])
-    # Extract PR number from URL
-    url = result.stdout.strip()
-    pr_match = re.search(r"/pull/(\d+)", url)
-    if pr_match:
-        pr_number = pr_match.group(1)
-    else:
-        # Try to get it from pr view
-        view_result = _run_gh(["pr", "view", branch, "--json", "number", "-q", ".number"])
-        pr_number = view_result.stdout.strip()
-    print(f"[OK] Created PR #{pr_number}: {url}")
-    return pr_number
+def _run_sotp_pr(args: list[str]) -> subprocess.CompletedProcess[str]:
+    """Run ``sotp pr <args>`` and raise SystemExit on failure."""
+    cmd = ["cargo", "run", "--quiet", "-p", "cli", "--", "pr", *args]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+    if result.stdout:
+        print(result.stdout, end="")
+    if result.stderr:
+        print(result.stderr, end="", file=sys.stderr)
+    if result.returncode != 0:
+        raise SystemExit(result.returncode)
+    return result
 
 
 def cmd_trigger_review(pr_number: str) -> datetime:

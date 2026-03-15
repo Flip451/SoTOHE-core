@@ -690,14 +690,23 @@ script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- track resolve $CARGO_MAKE_TASK_ARGS']
 
 [tasks.track-pr-push]
-description = "[wrapper] Push current track branch to origin"
+description = "[wrapper] Push current track/plan branch to origin (plan/ branches require track-id arg)"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/pr_review.py push']
+script = ['cargo run --quiet -p cli -- pr push ${CARGO_MAKE_TASK_ARGS:+--track-id $CARGO_MAKE_TASK_ARGS}']
 
 [tasks.track-pr-ensure]
-description = "[wrapper] Create or reuse a PR for the current track branch"
+description = "[wrapper] Create or reuse a PR for the current track/plan branch (plan/ branches require track-id arg)"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/pr_review.py ensure-pr']
+script = ['cargo run --quiet -p cli -- pr ensure-pr ${CARGO_MAKE_TASK_ARGS:+--track-id $CARGO_MAKE_TASK_ARGS}']
+
+[tasks.track-pr]
+description = "[wrapper] Push current branch and create/reuse a PR (push + ensure-pr in one step)"
+script_runner = "@shell"
+script = ['''
+TRACK_ARG="${CARGO_MAKE_TASK_ARGS:+--track-id $CARGO_MAKE_TASK_ARGS}"
+cargo run --quiet -p cli -- pr push $TRACK_ARG && \
+cargo run --quiet -p cli -- pr ensure-pr $TRACK_ARG
+''']
 
 [tasks.track-pr-review]
 description = "[wrapper] Run full PR review cycle: push, ensure PR, trigger @codex review, poll, parse"
@@ -736,10 +745,21 @@ script_runner = "@shell"
 script = ['git commit -m "$CARGO_MAKE_TASK_ARGS"']
 
 [tasks.track-commit-message]
-description = "[wrapper] Run CI then commit using tmp/track-commit/commit-message.txt"
-dependencies = ["ci"]
+description = "[wrapper] Run CI (output to tmp/ci-output.log) then commit using tmp/track-commit/commit-message.txt"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- git commit-from-file tmp/track-commit/commit-message.txt --cleanup']
+script = ['''
+mkdir -p tmp
+echo "[track-commit-message] Running CI..."
+if cargo make ci > tmp/ci-output.log 2>&1; then
+  echo "[track-commit-message] CI PASSED"
+else
+  CI_EXIT=$?
+  echo "[track-commit-message] CI FAILED (exit $CI_EXIT). Last 20 lines:"
+  tail -20 tmp/ci-output.log
+  exit $CI_EXIT
+fi
+cargo run --quiet -p cli -- git commit-from-file tmp/track-commit/commit-message.txt --cleanup
+''']
 
 [tasks.note]
 description = "[git] Attach a git note to HEAD (usage: cargo make note '<note text>')"
