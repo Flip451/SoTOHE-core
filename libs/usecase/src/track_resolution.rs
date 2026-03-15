@@ -4,7 +4,7 @@
 //! rather than CLI: track ID detection from branch names, task transition
 //! resolution, and activation guard checks.
 
-use domain::{CommitHash, TaskStatusKind, TaskTransition, TrackId};
+use domain::{CommitHash, TaskStatusKind, TaskTransition, TrackId, TrackReader};
 
 /// Resolves a track ID from the current git branch name.
 ///
@@ -40,7 +40,7 @@ pub fn resolve_transition(
         "done" => Ok(TaskTransition::Complete { commit_hash }),
         "todo" => Ok(TaskTransition::ResetToTodo),
         "skipped" => Ok(TaskTransition::Skip),
-        other => Err(format!("unsupported target status: {other}")),
+        other => Err(other.to_owned()),
     }
 }
 
@@ -69,6 +69,36 @@ pub fn reject_branchless_implementation_transition(
     }
 
     Ok(())
+}
+
+/// Autonomously checks the branchless activation guard using a `TrackReader` port.
+///
+/// Reads the track branch state from the reader and delegates to
+/// [`reject_branchless_implementation_transition`]. `schema_version` is passed
+/// separately because `TrackReader` does not expose document-level metadata
+/// (same pattern as `ActivateTrackUseCase::execute`).
+///
+/// # Errors
+/// Returns an error message if the transition is blocked or the track cannot be read.
+pub fn reject_branchless_guard(
+    reader: &impl TrackReader,
+    track_id: &TrackId,
+    target_status: &str,
+    schema_version: u32,
+) -> Result<(), String> {
+    if !matches!(target_status, "in_progress" | "done" | "skipped") {
+        return Ok(());
+    }
+    let track = reader
+        .find(track_id)
+        .map_err(|e| e.to_string())?
+        .ok_or_else(|| format!("track '{track_id}' not found"))?;
+    reject_branchless_implementation_transition(
+        schema_version,
+        track.branch().map(|b| b.as_str()),
+        track_id,
+        target_status,
+    )
 }
 
 #[cfg(test)]
@@ -136,9 +166,9 @@ mod tests {
     }
 
     #[test]
-    fn test_resolve_transition_with_unsupported_status_returns_error() {
+    fn test_resolve_transition_with_unsupported_status_returns_raw_token() {
         let result = resolve_transition("invalid", TaskStatusKind::Todo, None);
-        assert!(result.unwrap_err().contains("unsupported target status"));
+        assert_eq!(result.unwrap_err(), "invalid");
     }
 
     // --- reject_branchless_implementation_transition ---
@@ -184,5 +214,84 @@ mod tests {
         let id = TrackId::new("test").unwrap();
         let result = reject_branchless_implementation_transition(3, None, &id, "skipped");
         assert!(result.unwrap_err().contains("not activated yet"));
+    }
+
+    // --- reject_branchless_guard (with TrackReader) ---
+
+    use std::collections::HashMap;
+    use std::sync::Mutex;
+
+    use domain::{
+        PlanSection, PlanView, RepositoryError, TrackBranch, TrackMetadata, TrackReadError,
+        TrackReader, TrackTask,
+    };
+
+    #[derive(Default)]
+    struct StubReader {
+        tracks: Mutex<HashMap<TrackId, TrackMetadata>>,
+    }
+
+    impl TrackReader for StubReader {
+        fn find(&self, id: &TrackId) -> Result<Option<TrackMetadata>, TrackReadError> {
+            let tracks = self
+                .tracks
+                .lock()
+                .map_err(|_| RepositoryError::Message("lock error".to_owned()))?;
+            Ok(tracks.get(id).cloned())
+        }
+    }
+
+    fn sample_track(id: &str, branch: Option<&str>) -> TrackMetadata {
+        let task_id = domain::TaskId::new("T1").unwrap();
+        let task = TrackTask::new(task_id.clone(), "Implement feature").unwrap();
+        let section = PlanSection::new("S1", "Build", Vec::new(), vec![task_id]).unwrap();
+        let plan = PlanView::new(Vec::new(), vec![section]);
+        TrackMetadata::with_branch(
+            TrackId::new(id).unwrap(),
+            branch.map(|b| TrackBranch::new(b).unwrap()),
+            "Test Track",
+            vec![task],
+            plan,
+            None,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn test_reject_branchless_guard_allows_todo_target() {
+        let reader = StubReader::default();
+        let id = TrackId::new("test").unwrap();
+        let result = reject_branchless_guard(&reader, &id, "todo", 3);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_reject_branchless_guard_rejects_branchless_v3() {
+        let reader = StubReader::default();
+        let track = sample_track("test", None);
+        reader.tracks.lock().unwrap().insert(track.id().clone(), track);
+
+        let id = TrackId::new("test").unwrap();
+        let result = reject_branchless_guard(&reader, &id, "in_progress", 3);
+        assert!(result.unwrap_err().contains("not activated yet"));
+    }
+
+    #[test]
+    fn test_reject_branchless_guard_allows_materialized_v3() {
+        let reader = StubReader::default();
+        let track = sample_track("test", Some("track/test"));
+        reader.tracks.lock().unwrap().insert(track.id().clone(), track);
+
+        let id = TrackId::new("test").unwrap();
+        let result = reject_branchless_guard(&reader, &id, "in_progress", 3);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_reject_branchless_guard_returns_error_for_missing_track() {
+        let reader = StubReader::default();
+        let id = TrackId::new("missing").unwrap();
+        let result = reject_branchless_guard(&reader, &id, "in_progress", 3);
+        assert!(result.unwrap_err().contains("not found"));
     }
 }

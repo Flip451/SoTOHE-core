@@ -77,6 +77,16 @@ impl GitRepository for SystemGitRepo {
     }
 }
 
+impl domain::WorktreeReader for SystemGitRepo {
+    fn porcelain_status(&self) -> Result<String, String> {
+        let output = self.output(&["status", "--porcelain"])?;
+        if !output.status.success() {
+            return Err("git status --porcelain failed".to_owned());
+        }
+        Ok(String::from_utf8_lossy(&output.stdout).into_owned())
+    }
+}
+
 pub fn resolve_repo_path(root: &Path, path: &Path) -> PathBuf {
     if path.is_absolute() { path.to_path_buf() } else { root.join(path) }
 }

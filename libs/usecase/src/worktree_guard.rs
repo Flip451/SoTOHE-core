@@ -6,6 +6,8 @@
 
 use std::collections::BTreeSet;
 
+use domain::WorktreeReader;
+
 /// Parses `git status --porcelain` output into a list of dirty file paths.
 ///
 /// Each line of porcelain output has the format `XY path` (3-char prefix + path).
@@ -44,6 +46,24 @@ pub fn validate_clean_worktree(
         return Ok(());
     }
     Err("activation requires a clean worktree before metadata materialization".to_owned())
+}
+
+/// Checks worktree cleanliness via a `WorktreeReader` port.
+///
+/// Reads porcelain status from the reader, parses dirty paths, and validates
+/// against the allowed set. This integrates the I/O and validation steps that
+/// were previously split across CLI and usecase layers.
+///
+/// # Errors
+/// Returns an error message if the worktree has disallowed dirty paths
+/// or if the porcelain status cannot be read.
+pub fn ensure_clean_worktree(
+    reader: &impl WorktreeReader,
+    allowed_dirty_paths: &BTreeSet<String>,
+) -> Result<(), String> {
+    let porcelain = reader.porcelain_status()?;
+    let dirty_paths = parse_dirty_worktree_paths(&porcelain);
+    validate_clean_worktree(&dirty_paths, allowed_dirty_paths)
 }
 
 #[cfg(test)]
@@ -114,5 +134,54 @@ mod tests {
         let allowed = BTreeSet::from(["track/items/x/metadata.json".to_owned()]);
         let result = validate_clean_worktree(&dirty, &allowed);
         assert!(result.is_err());
+    }
+
+    // --- ensure_clean_worktree (with WorktreeReader) ---
+
+    struct StubWorktreeReader {
+        output: String,
+    }
+
+    impl domain::WorktreeReader for StubWorktreeReader {
+        fn porcelain_status(&self) -> Result<String, String> {
+            Ok(self.output.clone())
+        }
+    }
+
+    struct FailingWorktreeReader;
+
+    impl domain::WorktreeReader for FailingWorktreeReader {
+        fn porcelain_status(&self) -> Result<String, String> {
+            Err("git failed".to_owned())
+        }
+    }
+
+    #[test]
+    fn test_ensure_clean_worktree_with_clean_worktree_succeeds() {
+        let reader = StubWorktreeReader { output: String::new() };
+        let result = ensure_clean_worktree(&reader, &BTreeSet::new());
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_ensure_clean_worktree_with_allowed_dirty_paths_succeeds() {
+        let reader = StubWorktreeReader { output: " M track/items/x/metadata.json\n".to_owned() };
+        let allowed = BTreeSet::from(["track/items/x/metadata.json".to_owned()]);
+        let result = ensure_clean_worktree(&reader, &allowed);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_ensure_clean_worktree_with_disallowed_dirty_paths_returns_error() {
+        let reader = StubWorktreeReader { output: " M src/main.rs\n".to_owned() };
+        let result = ensure_clean_worktree(&reader, &BTreeSet::new());
+        assert!(result.unwrap_err().contains("clean worktree"));
+    }
+
+    #[test]
+    fn test_ensure_clean_worktree_propagates_reader_error() {
+        let reader = FailingWorktreeReader;
+        let result = ensure_clean_worktree(&reader, &BTreeSet::new());
+        assert!(result.unwrap_err().contains("git failed"));
     }
 }

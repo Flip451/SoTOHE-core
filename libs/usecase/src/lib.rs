@@ -12,8 +12,8 @@ pub mod worktree_guard;
 use std::sync::Arc;
 
 use domain::{
-    TaskId, TaskTransition, TrackId, TrackMetadata, TrackReadError, TrackReader, TrackWriteError,
-    TrackWriter,
+    CommitHash, TaskId, TaskTransition, TrackId, TrackMetadata, TrackReadError, TrackReader,
+    TrackWriteError, TrackWriter, TransitionError, ValidationError,
 };
 
 /// Persists a track aggregate.
@@ -80,6 +80,38 @@ impl<W: TrackWriter> TransitionTaskUseCase<W> {
         transition: TaskTransition,
     ) -> Result<TrackMetadata, TrackWriteError> {
         self.writer.update(track_id, |track| {
+            track.transition_task(task_id, transition)?;
+            Ok(())
+        })
+    }
+
+    /// Resolves a target status string to the correct transition and applies it.
+    ///
+    /// This is a higher-level entry point that encapsulates the
+    /// task-lookup → resolve-transition → transition-task flow so that the CLI
+    /// only needs to pass the raw `target_status` string and optional commit hash.
+    ///
+    /// # Errors
+    /// Returns `TrackWriteError` if the track/task is not found, the target status
+    /// is unrecognised, or the transition is invalid for the current task state.
+    pub fn execute_by_status(
+        &self,
+        track_id: &TrackId,
+        task_id: &TaskId,
+        target_status: &str,
+        commit_hash: Option<CommitHash>,
+    ) -> Result<TrackMetadata, TrackWriteError> {
+        self.writer.update(track_id, |track| {
+            let task =
+                track.tasks().iter().find(|t| *t.id() == *task_id).ok_or_else(|| {
+                    TransitionError::TaskNotFound { task_id: task_id.to_string() }
+                })?;
+            let current_kind = task.status().kind();
+
+            let transition =
+                track_resolution::resolve_transition(target_status, current_kind, commit_hash)
+                    .map_err(ValidationError::UnsupportedTargetStatus)?;
+
             track.transition_task(task_id, transition)?;
             Ok(())
         })
@@ -197,6 +229,59 @@ mod tests {
             result,
             Err(TrackWriteError::Repository(RepositoryError::TrackNotFound(_)))
         ));
+    }
+
+    #[test]
+    fn execute_by_status_resolves_and_transitions() {
+        let store = Arc::new(StubTrackStore::default());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let transition = TransitionTaskUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+        let task_id = TaskId::new("T1").unwrap();
+
+        save.execute(&track).unwrap();
+        let updated =
+            transition.execute_by_status(track.id(), &task_id, "in_progress", None).unwrap();
+
+        assert_eq!(updated.status(), TrackStatus::InProgress);
+    }
+
+    #[test]
+    fn execute_by_status_rejects_unsupported_status() {
+        let store = Arc::new(StubTrackStore::default());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let transition = TransitionTaskUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+        let task_id = TaskId::new("T1").unwrap();
+
+        save.execute(&track).unwrap();
+        let err = transition.execute_by_status(track.id(), &task_id, "invalid", None).unwrap_err();
+
+        let msg = err.to_string();
+        assert!(
+            msg.contains("unsupported target status"),
+            "expected 'unsupported target status' in: {msg}"
+        );
+        assert!(msg.contains("invalid"), "expected 'invalid' in: {msg}");
+        // Verify no double-prefixing
+        assert_eq!(msg.matches("unsupported target status").count(), 1, "double-prefix in: {msg}");
+    }
+
+    #[test]
+    fn execute_by_status_reopens_done_task() {
+        let store = Arc::new(StubTrackStore::default());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let transition = TransitionTaskUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+        let task_id = TaskId::new("T1").unwrap();
+
+        save.execute(&track).unwrap();
+        transition.execute_by_status(track.id(), &task_id, "in_progress", None).unwrap();
+        transition.execute_by_status(track.id(), &task_id, "done", None).unwrap();
+        let updated =
+            transition.execute_by_status(track.id(), &task_id, "in_progress", None).unwrap();
+
+        assert_eq!(updated.status(), TrackStatus::InProgress);
     }
 
     #[test]

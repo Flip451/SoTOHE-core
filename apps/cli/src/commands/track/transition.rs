@@ -59,11 +59,20 @@ pub(super) fn execute_transition(
 
     let store = Arc::new(FsTrackStore::new(items_dir.clone(), lock_manager, DEFAULT_LOCK_TIMEOUT));
 
-    if let Err(msg) = reject_branchless_implementation_transition(
-        &project_root,
-        &items_dir,
+    // Activation guard: read schema_version from DocumentMeta, then delegate to usecase.
+    let schema_version = match store.find_with_meta(&track_id) {
+        Ok(Some((_, meta))) => meta.schema_version,
+        Ok(None) => 2, // fallback for missing tracks; store.update will handle the error
+        Err(err) => {
+            eprintln!("failed to read track metadata: {err}");
+            return ExitCode::FAILURE;
+        }
+    };
+    if let Err(msg) = usecase::track_resolution::reject_branchless_guard(
+        &*store,
         &track_id,
         &target_status,
+        schema_version,
     ) {
         eprintln!("activation guard: {msg}");
         return ExitCode::FAILURE;
@@ -77,35 +86,9 @@ pub(super) fn execute_transition(
         }
     }
 
-    // Validate target_status before entering the locked update section.
-    if !["todo", "in_progress", "done", "skipped"].contains(&target_status.as_str()) {
-        eprintln!("unsupported target status: {target_status}");
-        return ExitCode::FAILURE;
-    }
-
-    // Use TrackWriter::update directly to resolve the correct transition
-    // based on current task status (e.g., "in_progress" from "done" is Reopen, not Start).
-    match store.update(&track_id, |track| {
-        let task = track.tasks().iter().find(|t| *t.id() == task_id).ok_or_else(|| {
-            domain::TransitionError::TaskNotFound { task_id: task_id.to_string() }
-        })?;
-        let current_kind = task.status().kind();
-
-        // target_status was validated above, so this branch is unreachable in practice.
-        let transition = match usecase::track_resolution::resolve_transition(
-            &target_status,
-            current_kind,
-            parsed_hash,
-        ) {
-            Ok(t) => t,
-            Err(msg) => {
-                return Err(domain::ValidationError::InvalidTrackId(msg).into());
-            }
-        };
-
-        track.transition_task(&task_id, transition)?;
-        Ok(())
-    }) {
+    // Delegate task-lookup → resolve-transition → transition-task to usecase.
+    let transition = usecase::TransitionTaskUseCase::new(Arc::clone(&store));
+    match transition.execute_by_status(&track_id, &task_id, &target_status, parsed_hash) {
         Ok(track) => {
             println!(
                 "[OK] {}: transitioned to {} (track status: {})",
@@ -136,25 +119,10 @@ pub(super) fn execute_transition(
     }
 }
 
-pub(super) fn reject_branchless_implementation_transition(
-    project_root: &std::path::Path,
-    items_dir: &std::path::Path,
-    track_id: &TrackId,
-    target_status: &str,
-) -> Result<(), String> {
-    // Short-circuit for non-implementation targets to avoid unnecessary I/O.
-    if !matches!(target_status, "in_progress" | "done" | "skipped") {
-        return Ok(());
-    }
-
-    let track = activate::load_track_branch_record(project_root, items_dir, track_id)?;
-    usecase::track_resolution::reject_branchless_implementation_transition(
-        track.schema_version,
-        track.branch.as_deref(),
-        track_id,
-        target_status,
-    )
-}
+// Note: reject_branchless_implementation_transition has been replaced by
+// usecase::track_resolution::reject_branchless_guard which reads branch
+// state autonomously through the TrackReader port. The CLI now calls it
+// directly in execute_transition with schema_version from DocumentMeta.
 
 fn verify_branch_guard<R: TrackReader>(
     reader: &R,

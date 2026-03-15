@@ -50,6 +50,8 @@ pub enum ValidationError {
     TrackActivationRequiresSchemaV3 { track_id: String, schema_version: u32 },
     #[error("track '{track_id}' is already materialized on branch '{branch}'")]
     TrackAlreadyMaterialized { track_id: String, branch: String },
+    #[error("unsupported target status: {0}")]
+    UnsupportedTargetStatus(String),
 }
 
 /// Errors from invalid task state transitions.

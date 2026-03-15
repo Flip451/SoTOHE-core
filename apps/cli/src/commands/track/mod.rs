@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use clap::{Args, Subcommand};
-use domain::{CommitHash, TaskId, TrackBranch, TrackId, TrackReader, TrackWriter};
+use domain::{CommitHash, TaskId, TrackBranch, TrackId, TrackReader};
 use infrastructure::git_cli::{
     GitRepository, SystemGitRepo, TrackBranchRecord, load_explicit_track_branch_from_items_dir,
 };

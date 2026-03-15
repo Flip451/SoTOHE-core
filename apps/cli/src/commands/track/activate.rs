@@ -638,11 +638,10 @@ fn activation_artifact_paths(
 }
 
 pub(super) fn ensure_clean_worktree(
-    repo: &impl GitRepository,
+    repo: &(impl GitRepository + domain::WorktreeReader),
     allowed_dirty_paths: &std::collections::BTreeSet<String>,
 ) -> Result<(), String> {
-    let dirty_paths = git_dirty_worktree_paths(repo)?;
-    usecase::worktree_guard::validate_clean_worktree(&dirty_paths, allowed_dirty_paths)
+    usecase::worktree_guard::ensure_clean_worktree(repo, allowed_dirty_paths)
 }
 
 fn activation_create_requires_main_branch(
@@ -806,12 +805,11 @@ mod tests {
     use std::fs;
     use std::os::unix::process::ExitStatusExt;
     use std::process::Output;
-    use std::sync::Mutex;
+    use std::sync::{Arc, Mutex};
 
     use domain::TrackId;
     use infrastructure::git_cli::GitRepository;
 
-    use super::super::transition::reject_branchless_implementation_transition;
     use super::super::{BranchMode, resolve_project_root};
     use super::load_track_branch_record;
     use super::{
@@ -852,6 +850,16 @@ mod tests {
         }
     }
 
+    impl domain::WorktreeReader for StubRepo {
+        fn porcelain_status(&self) -> Result<String, String> {
+            let key = vec!["status".to_owned(), "--porcelain".to_owned()];
+            match self.outputs.get(&key) {
+                Some(output) => Ok(String::from_utf8_lossy(&output.stdout).into_owned()),
+                None => Ok(String::new()),
+            }
+        }
+    }
+
     struct RecordingRepo {
         current_branch: Option<String>,
         outputs: HashMap<Vec<String>, Output>,
@@ -880,6 +888,16 @@ mod tests {
 
         fn current_branch(&self) -> Result<Option<String>, String> {
             Ok(self.current_branch.clone())
+        }
+    }
+
+    impl domain::WorktreeReader for RecordingRepo {
+        fn porcelain_status(&self) -> Result<String, String> {
+            let key = vec!["status".to_owned(), "--porcelain".to_owned()];
+            match self.outputs.get(&key) {
+                Some(output) => Ok(String::from_utf8_lossy(&output.stdout).into_owned()),
+                None => Ok(String::new()),
+            }
         }
     }
 
@@ -964,15 +982,26 @@ mod tests {
     }
 
     #[test]
-    fn reject_branchless_implementation_transition_blocks_planning_only_tracks() {
+    fn reject_branchless_guard_blocks_planning_only_tracks_via_fs_store() {
         let dir = tempfile::tempdir().unwrap();
         write_track_metadata(dir.path(), 3, None);
 
-        let err = reject_branchless_implementation_transition(
-            dir.path(),
-            &dir.path().join("track/items"),
+        let items_dir = dir.path().join("track/items");
+        let lock_manager = Arc::new(
+            infrastructure::lock::FsFileLockManager::new(dir.path().join(".locks")).unwrap(),
+        );
+        let store = infrastructure::track::fs_store::FsTrackStore::new(
+            items_dir,
+            lock_manager,
+            std::time::Duration::from_secs(5),
+        );
+        let (_, meta) = store.find_with_meta(&TrackId::new("demo").unwrap()).unwrap().unwrap();
+
+        let err = usecase::track_resolution::reject_branchless_guard(
+            &store,
             &TrackId::new("demo").unwrap(),
             "in_progress",
+            meta.schema_version,
         )
         .unwrap_err();
 
@@ -980,30 +1009,51 @@ mod tests {
     }
 
     #[test]
-    fn reject_branchless_implementation_transition_allows_materialized_tracks() {
+    fn reject_branchless_guard_allows_materialized_tracks_via_fs_store() {
         let dir = tempfile::tempdir().unwrap();
         write_track_metadata(dir.path(), 3, Some("track/demo"));
 
-        let result = reject_branchless_implementation_transition(
-            dir.path(),
-            &dir.path().join("track/items"),
+        let items_dir = dir.path().join("track/items");
+        let lock_manager = Arc::new(
+            infrastructure::lock::FsFileLockManager::new(dir.path().join(".locks")).unwrap(),
+        );
+        let store = infrastructure::track::fs_store::FsTrackStore::new(
+            items_dir,
+            lock_manager,
+            std::time::Duration::from_secs(5),
+        );
+        let (_, meta) = store.find_with_meta(&TrackId::new("demo").unwrap()).unwrap().unwrap();
+
+        let result = usecase::track_resolution::reject_branchless_guard(
+            &store,
             &TrackId::new("demo").unwrap(),
             "in_progress",
+            meta.schema_version,
         );
 
         assert!(result.is_ok());
     }
 
     #[test]
-    fn reject_branchless_implementation_transition_allows_legacy_v2_branchless_tracks() {
+    fn reject_branchless_guard_allows_legacy_v2_branchless_tracks_via_fs_store() {
         let dir = tempfile::tempdir().unwrap();
         write_track_metadata(dir.path(), 2, None);
 
-        let result = reject_branchless_implementation_transition(
-            dir.path(),
-            &dir.path().join("track/items"),
+        let items_dir = dir.path().join("track/items");
+        let lock_manager = Arc::new(
+            infrastructure::lock::FsFileLockManager::new(dir.path().join(".locks")).unwrap(),
+        );
+        let store = infrastructure::track::fs_store::FsTrackStore::new(
+            items_dir,
+            lock_manager,
+            std::time::Duration::from_secs(5),
+        );
+
+        let result = usecase::track_resolution::reject_branchless_guard(
+            &store,
             &TrackId::new("demo").unwrap(),
             "in_progress",
+            2,
         );
 
         assert!(result.is_ok());

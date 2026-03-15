@@ -17,7 +17,7 @@ pub use error::{
 };
 pub use ids::{CommitHash, TaskId, TrackBranch, TrackId};
 pub use plan::{PlanSection, PlanView};
-pub use repository::{TrackReader, TrackWriter};
+pub use repository::{TrackReader, TrackWriter, WorktreeReader};
 pub use track::{
     StatusOverride, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata, TrackStatus,
     TrackTask,
