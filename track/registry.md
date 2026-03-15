@@ -7,15 +7,15 @@
 
 ## Current Focus
 
-- Latest active track: `None yet`
-- Next recommended command: `/track:plan <feature>`
+- Latest active track: `cli-error-handling-2026-03-15`
+- Next recommended command: `/track:implement`
 - Last updated: `2026-03-15`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| _No active tracks yet_ | - | `/track:plan <feature>` | - |
+| cli-error-handling-2026-03-15 | planned | `/track:implement` | 2026-03-15 |
 
 ## Completed Tracks
 
