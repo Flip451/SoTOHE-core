@@ -1,0 +1,20 @@
+## Task Summary: Rust PR subcommands and Python delegation
+
+**Track:** workflow-ux-fixes-2026-03-15
+**Task:** T002 (sotp pr push/ensure-pr) + T003 (Python delegation) + T005 (CI)
+**Date:** 2026-03-15
+
+### Changes
+
+- libs/usecase/src/pr_workflow.rs: resolve_pr_branch(), pr_title(), pr_body(), PrBranchContext
+- libs/infrastructure/src/gh_cli.rs: find_open_pr, create_pr on GhClient trait + tests
+- libs/infrastructure/src/git_cli.rs: push_branch on GitRepository trait
+- apps/cli/src/commands/pr.rs: Push, EnsurePr subcommands + ensure_pr_with tests
+- scripts/pr_review.py: cmd_push/cmd_ensure_pr delegated to Rust CLI
+- Makefile.toml: track-pr-push/ensure wrappers call Rust CLI
+- track/workflow.md: plan/ branch PR workflow documented
+
+### Why
+
+PR push/ensure operations needed Rust-first implementation per STRAT-03. plan/ branches
+required explicit --track-id for fail-closed safety. Python wrappers shrunk to thin delegation.
