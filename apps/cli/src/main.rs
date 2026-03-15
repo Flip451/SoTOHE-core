@@ -9,6 +9,9 @@ use infrastructure::InMemoryTrackStore;
 use usecase::{SaveTrackUseCase, TransitionTaskUseCase};
 
 mod commands;
+mod error;
+
+pub use error::CliError;
 
 /// SoTOHE-core CLI: track state machine and file lock management.
 #[derive(Parser)]
@@ -79,47 +82,37 @@ fn main() -> ExitCode {
         Some(CliCommand::Pr { cmd }) => commands::pr::execute(cmd),
         Some(CliCommand::Review { cmd }) => commands::review::execute(cmd),
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
-        Some(CliCommand::Demo) | None => run_demo(),
+        Some(CliCommand::Demo) | None => match run_demo() {
+            Ok(code) => code,
+            Err(err) => {
+                eprintln!("{err}");
+                err.exit_code()
+            }
+        },
     }
 }
 
-fn run_demo() -> ExitCode {
+fn run_demo() -> Result<ExitCode, CliError> {
     let store = Arc::new(InMemoryTrackStore::new());
     let save = SaveTrackUseCase::new(Arc::clone(&store));
     let transition = TransitionTaskUseCase::new(Arc::clone(&store));
 
-    let track = match example_track() {
-        Ok(track) => track,
-        Err(err) => {
-            eprintln!("failed to build example track: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let track = example_track()
+        .map_err(|e| CliError::Message(format!("failed to build example track: {e}")))?;
     let track_id = track.id().clone();
 
-    if let Err(err) = save.execute(&track) {
-        eprintln!("failed to save example track: {err}");
-        return ExitCode::FAILURE;
-    }
+    save.execute(&track)
+        .map_err(|e| CliError::Message(format!("failed to save example track: {e}")))?;
 
-    let task_id = match TaskId::new("T1") {
-        Ok(task_id) => task_id,
-        Err(err) => {
-            eprintln!("failed to build example task id: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let task_id = TaskId::new("T1")
+        .map_err(|e| CliError::Message(format!("failed to build example task id: {e}")))?;
 
-    let updated = match transition.execute(&track_id, &task_id, TaskTransition::Start) {
-        Ok(track) => track,
-        Err(err) => {
-            eprintln!("failed to transition example task: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let updated = transition
+        .execute(&track_id, &task_id, TaskTransition::Start)
+        .map_err(|e| CliError::Message(format!("failed to transition example task: {e}")))?;
 
     println!("SoTOHE-core CLI stub: '{}' is {}", updated.id(), updated.status());
-    ExitCode::SUCCESS
+    Ok(ExitCode::SUCCESS)
 }
 
 fn example_track() -> Result<TrackMetadata, DomainError> {

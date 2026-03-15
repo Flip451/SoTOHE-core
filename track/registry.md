@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `cli-error-handling-2026-03-15`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-15`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| cli-error-handling-2026-03-15 | planned | `/track:implement` | 2026-03-15 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| cli-error-handling-2026-03-15 | Done | 2026-03-15 |
 | rstest-introduction-2026-03-15 | Done | 2026-03-15 |
 | python-hook-launcher-removal-2026-03-15 | Done | 2026-03-15 |
 | workflow-ux-fixes-2026-03-15 | Done | 2026-03-15 |

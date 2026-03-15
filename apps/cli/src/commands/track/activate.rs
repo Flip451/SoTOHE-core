@@ -1,6 +1,8 @@
+use crate::CliError;
+
 use super::*;
 
-pub(super) fn execute_branch(action: BranchAction) -> ExitCode {
+pub(super) fn execute_branch(action: BranchAction) -> Result<ExitCode, CliError> {
     match action {
         BranchAction::Create(args) => execute_activate(
             ActivateArgs {
@@ -21,99 +23,62 @@ pub(super) fn execute_branch(action: BranchAction) -> ExitCode {
     }
 }
 
-pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> ExitCode {
+pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<ExitCode, CliError> {
     let ActivateArgs { items_dir, locks_dir, track_id } = args;
 
-    let track_id = match TrackId::new(&track_id) {
-        Ok(id) => id,
-        Err(err) => {
-            eprintln!("invalid track id: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let track_id = TrackId::new(&track_id)
+        .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     let branch_name = format!("track/{track_id}");
 
-    let branch = match TrackBranch::new(&branch_name) {
-        Ok(branch) => branch,
-        Err(err) => {
-            eprintln!("invalid track branch: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let branch = TrackBranch::new(&branch_name)
+        .map_err(|err| CliError::Message(format!("invalid track branch: {err}")))?;
 
-    let project_root = match resolve_project_root(&items_dir) {
-        Ok(path) => path,
-        Err(err) => {
-            eprintln!("{err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let project_root = resolve_project_root(&items_dir).map_err(CliError::Message)?;
 
-    let repo = match SystemGitRepo::discover() {
-        Ok(repo) => repo,
-        Err(err) => {
-            eprintln!("failed to discover git repository: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let repo = SystemGitRepo::discover()
+        .map_err(|err| CliError::Message(format!("failed to discover git repository: {err}")))?;
 
-    let lock_manager = match FsFileLockManager::new(&locks_dir) {
-        Ok(lm) => Arc::new(lm),
-        Err(err) => {
-            eprintln!("failed to initialize lock manager: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let lock_manager = FsFileLockManager::new(&locks_dir)
+        .map(Arc::new)
+        .map_err(|err| CliError::Message(format!("failed to initialize lock manager: {err}")))?;
     let store = Arc::new(FsTrackStore::new(items_dir.clone(), lock_manager, DEFAULT_LOCK_TIMEOUT));
     let activation = ActivateTrackUseCase::new(Arc::clone(&store));
 
-    let track_record = match load_track_branch_record(&project_root, &items_dir, &track_id) {
-        Ok(record) => record,
-        Err(err) => {
-            eprintln!("activation failed: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let track_record = load_track_branch_record(&project_root, &items_dir, &track_id)
+        .map_err(|err| CliError::Message(format!("activation failed: {err}")))?;
 
     if uses_legacy_branch_mode(mode, track_record.schema_version) {
         return execute_legacy_branch_mode(&repo, &branch_name, mode);
     }
 
     let already_materialized = track_record.branch.is_some();
-    let current_branch = match repo.current_branch() {
-        Ok(branch) => branch,
-        Err(err) => {
-            eprintln!("failed to determine current branch before activation: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let current_branch = repo.current_branch().map_err(|err| {
+        CliError::Message(format!("failed to determine current branch before activation: {err}"))
+    })?;
     if !already_materialized && current_branch.as_deref() == Some(branch_name.as_str()) {
-        eprintln!(
+        return Err(CliError::Message(format!(
             "activation preflight failed: branch '{branch_name}' is already checked out; rerun /track:activate from a non-track branch so materialized metadata is committed before switching"
-        );
-        return ExitCode::FAILURE;
+        )));
     }
     if activation_rejects_invalid_source_branch(
         mode,
         already_materialized,
         current_branch.as_deref(),
     ) {
-        eprintln!(
-            "activation preflight failed: activation must start from a non-track source branch; switch to 'main' or another non-track branch and rerun"
-        );
-        return ExitCode::FAILURE;
+        return Err(CliError::Message(
+            "activation preflight failed: activation must start from a non-track source branch; switch to 'main' or another non-track branch and rerun".to_owned()
+        ));
     }
     if activation_create_requires_main_branch(mode, already_materialized, current_branch.as_deref())
     {
-        eprintln!(
+        return Err(CliError::Message(format!(
             "activation preflight failed: track branch creation must start from 'main'; switch to main or use /track:activate {track_id} instead"
-        );
-        return ExitCode::FAILURE;
+        )));
     }
 
     let resume_allowed = if already_materialized && mode == BranchMode::Auto {
-        match activation_resume_allowed(
+        activation_resume_allowed(
             &repo,
             &project_root,
             &items_dir,
@@ -121,22 +86,16 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> ExitCode
             &branch_name,
             track_record.status.as_deref().unwrap_or("planned"),
             current_branch.as_deref(),
-        ) {
-            Ok(allowed) => allowed,
-            Err(err) => {
-                eprintln!("activation preflight failed: {err}");
-                return ExitCode::FAILURE;
-            }
-        }
+        )
+        .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?
     } else {
         false
     };
 
     if already_materialized && !allow_materialized_activation(mode, resume_allowed) {
-        eprintln!(
+        return Err(CliError::Message(format!(
             "activation failed: track '{track_id}' is already materialized on branch '{branch_name}'; use that branch directly instead of rerunning /track:activate"
-        );
-        return ExitCode::FAILURE;
+        )));
     }
 
     let should_persist_side_effects =
@@ -151,20 +110,13 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> ExitCode
         resume_allowed,
     );
     if activation_requires_clean_worktree(mode, already_materialized, resume_allowed) {
-        if let Err(err) = ensure_clean_worktree(&repo, &allowed_dirty_paths) {
-            eprintln!("activation preflight failed: {err}");
-            return ExitCode::FAILURE;
-        }
+        ensure_clean_worktree(&repo, &allowed_dirty_paths)
+            .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
     }
 
     let branch_exists =
-        match preflight_branch_operation(&repo, &branch_name, mode, !already_materialized) {
-            Ok(exists) => exists,
-            Err(err) => {
-                eprintln!("activation preflight failed: {err}");
-                return ExitCode::FAILURE;
-            }
-        };
+        preflight_branch_operation(&repo, &branch_name, mode, !already_materialized)
+            .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
 
     let materialized_now = if already_materialized {
         false
@@ -172,72 +124,51 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> ExitCode
         match activation.execute(&track_id, &branch, track_record.schema_version) {
             Ok(ActivateTrackOutcome::Materialized(_)) => true,
             Err(err) => {
-                eprintln!("activation failed: {err}");
-                return ExitCode::FAILURE;
+                return Err(CliError::Message(format!("activation failed: {err}")));
             }
         }
     };
 
     let created_activation_commit = if should_persist_side_effects {
-        let rendered_paths =
-            match render::sync_rendered_views(&project_root, Some(track_id.as_str())) {
-                Ok(changed) => {
-                    for path in &changed {
-                        match path.strip_prefix(&project_root) {
-                            Ok(relative) => println!("[OK] Rendered: {}", relative.display()),
-                            Err(_) => println!("[OK] Rendered: {}", path.display()),
-                        }
-                    }
-                    changed
-                }
-                Err(err) => {
-                    eprintln!("activation persisted but sync-views failed: {err}");
-                    return ExitCode::FAILURE;
-                }
-            };
-
-        match persist_activation_commit(
-            &repo,
-            &project_root,
-            &items_dir,
-            &track_id,
-            &rendered_paths,
-        ) {
-            Ok(created) => created,
-            Err(err) => {
-                eprintln!("activation persisted but activation commit failed: {err}");
-                return ExitCode::FAILURE;
+        let rendered_paths = render::sync_rendered_views(&project_root, Some(track_id.as_str()))
+            .map_err(|err| {
+                CliError::Message(format!("activation persisted but sync-views failed: {err}"))
+            })?;
+        for path in &rendered_paths {
+            match path.strip_prefix(&project_root) {
+                Ok(relative) => println!("[OK] Rendered: {}", relative.display()),
+                Err(_) => println!("[OK] Rendered: {}", path.display()),
             }
         }
+
+        persist_activation_commit(&repo, &project_root, &items_dir, &track_id, &rendered_paths)
+            .map_err(|err| {
+                CliError::Message(format!(
+                    "activation persisted but activation commit failed: {err}"
+                ))
+            })?
     } else {
         false
     };
     let resume_marker_present = activation_resume_marker_exists(&project_root, &track_id);
     let resume_marker_armed =
         if mode == BranchMode::Auto && (materialized_now || created_activation_commit) {
-            if let Err(err) = write_activation_resume_marker(&project_root, &track_id) {
-                eprintln!("activation failed: {err}");
-                return ExitCode::FAILURE;
-            }
+            write_activation_resume_marker(&project_root, &track_id)
+                .map_err(|err| CliError::Message(format!("activation failed: {err}")))?;
             true
         } else {
             false
         };
 
-    let create_from = match activation_branch_create_base(
+    let create_from = activation_branch_create_base(
         &repo,
         &track_id,
         &branch_name,
         mode,
         branch_exists,
         materialized_now,
-    ) {
-        Ok(base) => base,
-        Err(err) => {
-            eprintln!("activation preflight failed: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    )
+    .map_err(|err| CliError::Message(format!("activation preflight failed: {err}")))?;
     let git_commands = activation_git_commands(
         mode,
         &branch_name,
@@ -251,26 +182,23 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> ExitCode
         match repo.status(&args) {
             Ok(0) => {}
             Ok(_) => {
-                eprintln!(
+                return Err(CliError::Message(format!(
                     "git {} failed after metadata materialization; rerun `cargo run --quiet -p cli -- track activate {track_id}` to resume",
                     args.join(" ")
-                );
-                return ExitCode::FAILURE;
+                )));
             }
             Err(err) => {
-                eprintln!(
+                return Err(CliError::Message(format!(
                     "failed to run git {} after metadata materialization: {err}. rerun `cargo run --quiet -p cli -- track activate {track_id}` to resume",
                     args.join(" ")
-                );
-                return ExitCode::FAILURE;
+                )));
             }
         }
     }
     if mode == BranchMode::Auto && (resume_marker_present || resume_marker_armed) {
-        if let Err(err) = clear_activation_resume_marker(&project_root, &track_id) {
-            eprintln!("activation succeeded but cleanup failed: {err}");
-            return ExitCode::FAILURE;
-        }
+        clear_activation_resume_marker(&project_root, &track_id).map_err(|err| {
+            CliError::Message(format!("activation succeeded but cleanup failed: {err}"))
+        })?;
     }
 
     if materialized_now {
@@ -290,28 +218,19 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> ExitCode
         ),
         branch_name
     );
-    ExitCode::SUCCESS
+    Ok(ExitCode::SUCCESS)
 }
 
 pub(super) fn execute_legacy_branch_mode(
     repo: &impl GitRepository,
     branch_name: &str,
     mode: BranchMode,
-) -> ExitCode {
-    let branch_exists = match preflight_branch_operation(repo, branch_name, mode, false) {
-        Ok(exists) => exists,
-        Err(err) => {
-            eprintln!("legacy branch preflight failed: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
-    let current_branch = match repo.current_branch() {
-        Ok(branch) => branch,
-        Err(err) => {
-            eprintln!("failed to determine current branch: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+) -> Result<ExitCode, CliError> {
+    let branch_exists = preflight_branch_operation(repo, branch_name, mode, false)
+        .map_err(|err| CliError::Message(format!("legacy branch preflight failed: {err}")))?;
+    let current_branch = repo
+        .current_branch()
+        .map_err(|err| CliError::Message(format!("failed to determine current branch: {err}")))?;
     let create_from = matches!(mode, BranchMode::Create).then_some("main");
     let git_commands = activation_git_commands(
         mode,
@@ -326,12 +245,13 @@ pub(super) fn execute_legacy_branch_mode(
         match repo.status(&args) {
             Ok(0) => {}
             Ok(_) => {
-                eprintln!("git {} failed", args.join(" "));
-                return ExitCode::FAILURE;
+                return Err(CliError::Message(format!("git {} failed", args.join(" "))));
             }
             Err(err) => {
-                eprintln!("failed to run git {}: {err}", args.join(" "));
-                return ExitCode::FAILURE;
+                return Err(CliError::Message(format!(
+                    "failed to run git {}: {err}",
+                    args.join(" ")
+                )));
             }
         }
     }
@@ -346,7 +266,7 @@ pub(super) fn execute_legacy_branch_mode(
         ),
         branch_name
     );
-    ExitCode::SUCCESS
+    Ok(ExitCode::SUCCESS)
 }
 
 pub(super) fn load_track_branch_record(
@@ -382,7 +302,7 @@ fn persist_activation_commit(
     let mut status_args = vec!["status".to_owned(), "--porcelain".to_owned(), "--".to_owned()];
     status_args.extend(staged_paths.iter().cloned());
     let status_refs = status_args.iter().map(String::as_str).collect::<Vec<_>>();
-    let status_output = repo.output(&status_refs)?;
+    let status_output = repo.output(&status_refs).map_err(|e| e.to_string())?;
     if !status_output.status.success() {
         return Err("git status failed while checking activation artifacts".to_owned());
     }
@@ -393,7 +313,7 @@ fn persist_activation_commit(
     let mut add_args = vec!["add".to_owned(), "--".to_owned()];
     add_args.extend(staged_paths.iter().cloned());
     let add_refs = add_args.iter().map(String::as_str).collect::<Vec<_>>();
-    if repo.status(&add_refs)? != 0 {
+    if repo.status(&add_refs).map_err(|e| e.to_string())? != 0 {
         return Err("git add failed while preparing activation commit".to_owned());
     }
 
@@ -402,7 +322,7 @@ fn persist_activation_commit(
         vec!["commit".to_owned(), "-m".to_owned(), message, "--only".to_owned(), "--".to_owned()];
     commit_args.extend(staged_paths);
     let commit_refs = commit_args.iter().map(String::as_str).collect::<Vec<_>>();
-    if repo.status(&commit_refs)? != 0 {
+    if repo.status(&commit_refs).map_err(|e| e.to_string())? != 0 {
         return Err("git commit failed while persisting activation materialization".to_owned());
     }
 
@@ -642,6 +562,7 @@ pub(super) fn ensure_clean_worktree(
     allowed_dirty_paths: &std::collections::BTreeSet<String>,
 ) -> Result<(), String> {
     usecase::worktree_guard::ensure_clean_worktree(repo, allowed_dirty_paths)
+        .map_err(|e| e.to_string())
 }
 
 fn activation_create_requires_main_branch(
@@ -674,7 +595,7 @@ pub(super) fn uses_legacy_branch_mode(mode: BranchMode, schema_version: u32) -> 
 
 /// Fetches dirty worktree paths via git, delegating parsing to the usecase layer.
 fn git_dirty_worktree_paths(repo: &impl GitRepository) -> Result<Vec<String>, String> {
-    let output = repo.output(&["status", "--porcelain"])?;
+    let output = repo.output(&["status", "--porcelain"]).map_err(|e| e.to_string())?;
     if !output.status.success() {
         return Err("git status --porcelain failed".to_owned());
     }
@@ -698,7 +619,9 @@ fn find_latest_activation_commit(
     track_id: &TrackId,
 ) -> Result<Option<String>, String> {
     let message = format!("^track: activate {track_id}$");
-    let output = repo.output(&["log", "-n", "1", "--format=%H", "--grep", message.as_str()])?;
+    let output = repo
+        .output(&["log", "-n", "1", "--format=%H", "--grep", message.as_str()])
+        .map_err(|e| e.to_string())?;
     if !output.status.success() {
         return Err("git log failed while locating activation commit".to_owned());
     }
@@ -712,7 +635,9 @@ fn is_ancestor(
     ancestor: &str,
     descendant: &str,
 ) -> Result<bool, String> {
-    let output = repo.output(&["merge-base", "--is-ancestor", ancestor, descendant])?;
+    let output = repo
+        .output(&["merge-base", "--is-ancestor", ancestor, descendant])
+        .map_err(|e| e.to_string())?;
     match output.status.code() {
         Some(0) => Ok(true),
         Some(1) => Ok(false),
@@ -741,13 +666,17 @@ fn activation_switch_label(
 }
 
 pub(super) fn branch_exists(repo: &impl GitRepository, branch_name: &str) -> Result<bool, String> {
-    let output = repo.output(&["rev-parse", "--verify", "--quiet", branch_name])?;
+    let output = repo
+        .output(&["rev-parse", "--verify", "--quiet", branch_name])
+        .map_err(|e| e.to_string())?;
     Ok(output.status.success())
 }
 
 fn rev_parse_oid(repo: &impl GitRepository, rev: &str) -> Result<Option<String>, String> {
     let spec = format!("{rev}^{{commit}}");
-    let output = repo.output(&["rev-parse", "--verify", "--quiet", spec.as_str()])?;
+    let output = repo
+        .output(&["rev-parse", "--verify", "--quiet", spec.as_str()])
+        .map_err(|e| e.to_string())?;
     if !output.status.success() {
         return Ok(None);
     }
@@ -763,7 +692,7 @@ fn reject_stale_or_divergent_branch(
         return Ok(());
     }
 
-    if repo.current_branch()?.as_deref() == Some(branch_name) {
+    if repo.current_branch().map_err(|e| e.to_string())?.as_deref() == Some(branch_name) {
         return Ok(());
     }
 
@@ -808,7 +737,7 @@ mod tests {
     use std::sync::{Arc, Mutex};
 
     use domain::TrackId;
-    use infrastructure::git_cli::GitRepository;
+    use infrastructure::git_cli::{GitError, GitRepository};
     use rstest::rstest;
 
     use super::super::{BranchMode, resolve_project_root};
@@ -835,24 +764,28 @@ mod tests {
             Path::new(".")
         }
 
-        fn status(&self, _args: &[&str]) -> Result<i32, String> {
+        fn status(&self, _args: &[&str]) -> Result<i32, GitError> {
             Ok(0)
         }
 
-        fn output(&self, args: &[&str]) -> Result<Output, String> {
+        fn output(&self, args: &[&str]) -> Result<Output, GitError> {
             self.outputs
                 .get(&args.iter().map(|arg| (*arg).to_owned()).collect::<Vec<_>>())
                 .cloned()
-                .ok_or_else(|| format!("unexpected git args: {}", args.join(" ")))
+                .ok_or_else(|| GitError::CommandFailed {
+                    command: args.join(" "),
+                    code: -1,
+                    stderr: format!("unexpected git args: {}", args.join(" ")),
+                })
         }
 
-        fn current_branch(&self) -> Result<Option<String>, String> {
+        fn current_branch(&self) -> Result<Option<String>, GitError> {
             Ok(self.current_branch.clone())
         }
     }
 
     impl domain::WorktreeReader for StubRepo {
-        fn porcelain_status(&self) -> Result<String, String> {
+        fn porcelain_status(&self) -> Result<String, domain::WorktreeError> {
             let key = vec!["status".to_owned(), "--porcelain".to_owned()];
             match self.outputs.get(&key) {
                 Some(output) => Ok(String::from_utf8_lossy(&output.stdout).into_owned()),
@@ -872,7 +805,7 @@ mod tests {
             Path::new(".")
         }
 
-        fn status(&self, args: &[&str]) -> Result<i32, String> {
+        fn status(&self, args: &[&str]) -> Result<i32, GitError> {
             self.status_calls
                 .lock()
                 .unwrap()
@@ -880,20 +813,24 @@ mod tests {
             Ok(0)
         }
 
-        fn output(&self, args: &[&str]) -> Result<Output, String> {
+        fn output(&self, args: &[&str]) -> Result<Output, GitError> {
             self.outputs
                 .get(&args.iter().map(|arg| (*arg).to_owned()).collect::<Vec<_>>())
                 .cloned()
-                .ok_or_else(|| format!("unexpected git args: {}", args.join(" ")))
+                .ok_or_else(|| GitError::CommandFailed {
+                    command: args.join(" "),
+                    code: -1,
+                    stderr: format!("unexpected git args: {}", args.join(" ")),
+                })
         }
 
-        fn current_branch(&self) -> Result<Option<String>, String> {
+        fn current_branch(&self) -> Result<Option<String>, GitError> {
             Ok(self.current_branch.clone())
         }
     }
 
     impl domain::WorktreeReader for RecordingRepo {
-        fn porcelain_status(&self) -> Result<String, String> {
+        fn porcelain_status(&self) -> Result<String, domain::WorktreeError> {
             let key = vec!["status".to_owned(), "--porcelain".to_owned()];
             match self.outputs.get(&key) {
                 Some(output) => Ok(String::from_utf8_lossy(&output.stdout).into_owned()),
@@ -1006,7 +943,7 @@ mod tests {
         )
         .unwrap_err();
 
-        assert!(err.contains("/track:activate demo"));
+        assert!(err.to_string().contains("/track:activate demo"));
     }
 
     #[test]

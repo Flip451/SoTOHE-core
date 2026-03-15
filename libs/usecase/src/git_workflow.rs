@@ -4,6 +4,8 @@
 
 use std::path::PathBuf;
 
+use thiserror::Error;
+
 pub const TRANSIENT_AUTOMATION_FILES: &[&str] = &[
     "tmp/track-commit/add-paths.txt",
     "tmp/track-commit/commit-message.txt",
@@ -14,6 +16,21 @@ pub const TRANSIENT_AUTOMATION_FILES: &[&str] = &[
 pub const TRANSIENT_AUTOMATION_DIRS: &[&str] = &["tmp"];
 
 const GLOB_MAGIC_CHARS: &[char] = &['*', '?', '[', ']'];
+
+/// Errors returned by git workflow validation functions.
+#[derive(Debug, Error)]
+pub enum GitWorkflowError {
+    #[error("{0}")]
+    Validation(String),
+    #[error("cannot determine current git branch")]
+    NoBranch,
+    #[error("detached HEAD — {0}")]
+    DetachedHead(String),
+    #[error("branch mismatch: current '{current}' does not match expected '{expected}'")]
+    BranchMismatch { current: String, expected: String },
+    #[error("{0}")]
+    Message(String),
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ExplicitTrackBranch {
@@ -31,7 +48,7 @@ pub struct TrackBranchClaim {
     pub schema_version: u32,
 }
 
-pub fn validate_stage_path_entries<'a, I>(entries: I) -> Result<Vec<String>, String>
+pub fn validate_stage_path_entries<'a, I>(entries: I) -> Result<Vec<String>, GitWorkflowError>
 where
     I: IntoIterator<Item = &'a str>,
 {
@@ -50,48 +67,58 @@ where
 
         let entry_path = PathBuf::from(entry);
         if entry_path.is_absolute() {
-            return Err(format!("Stage path list must use repo-relative paths: {entry}"));
+            return Err(GitWorkflowError::Validation(format!(
+                "Stage path list must use repo-relative paths: {entry}"
+            )));
         }
         if entry_path
             .components()
             .any(|component| matches!(component, std::path::Component::ParentDir))
         {
-            return Err(format!("Stage path list cannot escape the repo root: {entry}"));
+            return Err(GitWorkflowError::Validation(format!(
+                "Stage path list cannot escape the repo root: {entry}"
+            )));
         }
         if matches!(entry, "." | "./") {
-            return Err(format!("Stage path list cannot use whole-worktree pathspecs: {entry}"));
+            return Err(GitWorkflowError::Validation(format!(
+                "Stage path list cannot use whole-worktree pathspecs: {entry}"
+            )));
         }
         if entry.starts_with(':') {
-            return Err(format!(
+            return Err(GitWorkflowError::Validation(format!(
                 "Stage path list cannot use git pathspec magic or shorthand: {entry}"
-            ));
+            )));
         }
         if entry.chars().any(|ch| GLOB_MAGIC_CHARS.contains(&ch)) {
-            return Err(format!("Stage path list cannot use glob patterns: {entry}"));
+            return Err(GitWorkflowError::Validation(format!(
+                "Stage path list cannot use glob patterns: {entry}"
+            )));
         }
         if transient_paths
             .iter()
             .any(|transient| entry_path == *transient || transient.starts_with(&entry_path))
         {
-            return Err(format!(
+            return Err(GitWorkflowError::Validation(format!(
                 "Stage path list cannot include transient automation files or their parent directories: {entry}"
-            ));
+            )));
         }
         if transient_dirs.iter().any(|transient_dir| {
             entry_path == *transient_dir
                 || entry_path.starts_with(transient_dir)
                 || transient_dir.starts_with(&entry_path)
         }) {
-            return Err(format!(
+            return Err(GitWorkflowError::Validation(format!(
                 "Stage path list cannot include transient automation directories or their contents: {entry}"
-            ));
+            )));
         }
 
         stage_paths.push(entry.to_owned());
     }
 
     if stage_paths.is_empty() {
-        return Err("Stage path list file has no usable entries".to_owned());
+        return Err(GitWorkflowError::Validation(
+            "Stage path list file has no usable entries".to_owned(),
+        ));
     }
 
     Ok(stage_paths)
@@ -100,23 +127,22 @@ where
 pub fn verify_explicit_track_branch(
     current_branch: Option<&str>,
     explicit_track: &ExplicitTrackBranch,
-) -> Result<(), String> {
+) -> Result<(), GitWorkflowError> {
     if explicit_track.expected_branch.is_none()
         && explicit_track.schema_version == 3
         && explicit_track.status.as_deref() == Some("planned")
     {
         return match current_branch {
-            None => Err(
-                "Cannot determine current git branch — planning-only commits require a non-track branch with an explicit selector"
+            None => Err(GitWorkflowError::NoBranch),
+            Some("HEAD") => Err(GitWorkflowError::DetachedHead(
+                "planning-only commits require a non-track branch with an explicit selector"
                     .to_owned(),
-            ),
-            Some("HEAD") => Err(
-                "Detached HEAD — planning-only commits require a non-track branch with an explicit selector"
-                    .to_owned(),
-            ),
-            Some(branch) if branch.starts_with("track/") => Err(format!(
-                "Current branch '{branch}' is a track branch; planning-only commits require a non-track branch with an explicit selector"
             )),
+            Some(branch) if branch.starts_with("track/") => {
+                Err(GitWorkflowError::Validation(format!(
+                    "Current branch '{branch}' is a track branch; planning-only commits require a non-track branch with an explicit selector"
+                )))
+            }
             Some(_) => Ok(()),
         };
     }
@@ -126,13 +152,14 @@ pub fn verify_explicit_track_branch(
     };
 
     match current_branch {
-        None => Err(format!("Cannot determine current git branch — expected '{expected_branch}'")),
-        Some("HEAD") => {
-            Err(format!("Detached HEAD — expected branch '{expected_branch}', cannot verify"))
-        }
-        Some(branch) if branch != expected_branch => {
-            Err(format!("Current branch '{branch}' does not match expected '{expected_branch}'"))
-        }
+        None => Err(GitWorkflowError::NoBranch),
+        Some("HEAD") => Err(GitWorkflowError::DetachedHead(format!(
+            "expected branch '{expected_branch}', cannot verify"
+        ))),
+        Some(branch) if branch != expected_branch => Err(GitWorkflowError::BranchMismatch {
+            current: branch.to_owned(),
+            expected: expected_branch.to_owned(),
+        }),
         Some(_) => Ok(()),
     }
 }
@@ -140,7 +167,7 @@ pub fn verify_explicit_track_branch(
 pub fn validate_planning_only_commit_paths(
     explicit_track: &ExplicitTrackBranch,
     staged_paths: &[String],
-) -> Result<(), String> {
+) -> Result<(), GitWorkflowError> {
     if explicit_track.schema_version != 3
         || explicit_track.expected_branch.is_some()
         || explicit_track.status.as_deref() != Some("planned")
@@ -160,10 +187,10 @@ pub fn validate_planning_only_commit_paths(
             continue;
         }
 
-        return Err(format!(
+        return Err(GitWorkflowError::Validation(format!(
             "planning-only commit for '{}' may not stage '{}'; run /track:activate <track-id> before committing implementation files",
             explicit_track.display_path, path
-        ));
+        )));
     }
 
     Ok(())
@@ -172,13 +199,13 @@ pub fn validate_planning_only_commit_paths(
 pub fn verify_auto_detected_branch(
     current_branch: Option<&str>,
     claims: &[TrackBranchClaim],
-) -> Result<(), String> {
+) -> Result<(), GitWorkflowError> {
     let branch = match current_branch {
         Some(branch) => branch,
-        None => return Err("cannot determine current git branch".to_owned()),
+        None => return Err(GitWorkflowError::NoBranch),
     };
     if branch == "HEAD" {
-        return Err("detached HEAD — cannot verify track branch".to_owned());
+        return Err(GitWorkflowError::DetachedHead("cannot verify track branch".to_owned()));
     }
     if !branch.starts_with("track/") {
         return Ok(());
@@ -210,15 +237,17 @@ pub fn verify_auto_detected_branch(
             return Ok(());
         }
 
-        return Err(format!(
+        return Err(GitWorkflowError::Message(format!(
             "on branch '{branch}' but no track claims this branch in metadata.json"
-        ));
+        )));
     }
 
     if matches.len() > 1 {
         let names =
             matches.iter().map(|claim| claim.track_name.clone()).collect::<Vec<_>>().join(", ");
-        return Err(format!("multiple tracks claim branch '{branch}': {names}"));
+        return Err(GitWorkflowError::Message(format!(
+            "multiple tracks claim branch '{branch}': {names}"
+        )));
     }
 
     match matches.first() {
@@ -231,7 +260,9 @@ pub fn verify_auto_detected_branch(
                 schema_version: claim.schema_version,
             },
         ),
-        None => Err("internal error: expected exactly one branch match".to_owned()),
+        None => Err(GitWorkflowError::Message(
+            "internal error: expected exactly one branch match".to_owned(),
+        )),
     }
 }
 
@@ -239,8 +270,9 @@ pub fn verify_auto_detected_branch(
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::{
-        ExplicitTrackBranch, TrackBranchClaim, validate_planning_only_commit_paths,
-        validate_stage_path_entries, verify_auto_detected_branch, verify_explicit_track_branch,
+        ExplicitTrackBranch, GitWorkflowError, TrackBranchClaim,
+        validate_planning_only_commit_paths, validate_stage_path_entries,
+        verify_auto_detected_branch, verify_explicit_track_branch,
     };
 
     #[test]
@@ -256,7 +288,7 @@ mod tests {
     fn validate_stage_path_entries_rejects_transient_parent_directory() {
         let err = validate_stage_path_entries(["tmp/track-commit"]).unwrap_err();
 
-        assert!(err.contains("transient automation"));
+        assert!(err.to_string().contains("transient automation"));
     }
 
     #[test]
@@ -272,7 +304,7 @@ mod tests {
         )
         .unwrap_err();
 
-        assert!(err.contains("does not match expected"));
+        assert!(matches!(err, GitWorkflowError::BranchMismatch { .. }));
     }
 
     #[test]
@@ -288,7 +320,7 @@ mod tests {
         )
         .unwrap_err();
 
-        assert!(err.contains("non-track branch"));
+        assert!(err.to_string().contains("non-track branch"));
     }
 
     #[test]
@@ -304,7 +336,7 @@ mod tests {
         )
         .unwrap_err();
 
-        assert!(err.contains("Detached HEAD"));
+        assert!(matches!(err, GitWorkflowError::DetachedHead(_)));
     }
 
     #[test]
@@ -330,7 +362,7 @@ mod tests {
 
         let err = verify_auto_detected_branch(Some("track/example"), &claims).unwrap_err();
 
-        assert!(err.contains("no track claims this branch"));
+        assert!(err.to_string().contains("no track claims this branch"));
     }
 
     #[test]
@@ -344,7 +376,7 @@ mod tests {
 
         let err = verify_auto_detected_branch(Some("track/example"), &claims).unwrap_err();
 
-        assert!(err.contains("no track claims this branch"));
+        assert!(err.to_string().contains("no track claims this branch"));
     }
 
     #[test]
@@ -378,7 +410,7 @@ mod tests {
 
         let err = verify_auto_detected_branch(Some("track/example"), &claims).unwrap_err();
 
-        assert!(err.contains("multiple tracks claim branch"));
+        assert!(err.to_string().contains("multiple tracks claim branch"));
     }
 
     #[test]
@@ -394,7 +426,7 @@ mod tests {
         )
         .unwrap_err();
 
-        assert!(err.contains("run /track:activate"));
+        assert!(err.to_string().contains("run /track:activate"));
     }
 
     #[test]

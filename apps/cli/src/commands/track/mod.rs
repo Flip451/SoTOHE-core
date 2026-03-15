@@ -164,7 +164,9 @@ pub enum ViewAction {
 }
 
 pub fn execute(cmd: TrackCommand) -> ExitCode {
-    match cmd {
+    use crate::CliError;
+
+    let result: Result<ExitCode, CliError> = match cmd {
         TrackCommand::Transition {
             items_dir,
             locks_dir,
@@ -186,5 +188,12 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         TrackCommand::Activate(args) => activate::execute_activate(args, BranchMode::Auto),
         TrackCommand::Resolve(args) => resolve::execute_resolve(args),
         TrackCommand::Views { action } => views::execute_views(action),
+    };
+    match result {
+        Ok(code) => code,
+        Err(err) => {
+            eprintln!("{err}");
+            err.exit_code()
+        }
     }
 }

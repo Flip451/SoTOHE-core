@@ -15,6 +15,8 @@ use usecase::git_workflow::{
     verify_explicit_track_branch,
 };
 
+use crate::CliError;
+
 #[derive(Debug, Subcommand)]
 pub enum GitCommand {
     /// Stage the whole worktree except transient automation scratch files.
@@ -52,114 +54,114 @@ pub struct SwitchAndPullArgs {
 
 pub fn execute(cmd: GitCommand) -> ExitCode {
     match cmd {
-        GitCommand::AddAll => add_all(),
-        GitCommand::AddFromFile(args) => add_from_file(&args.path, args.cleanup),
+        GitCommand::AddAll => match add_all() {
+            Ok(code) => code,
+            Err(err) => {
+                eprintln!("{err}");
+                err.exit_code()
+            }
+        },
+        GitCommand::AddFromFile(args) => match add_from_file(&args.path, args.cleanup) {
+            Ok(code) => code,
+            Err(err) => {
+                eprintln!("{err}");
+                err.exit_code()
+            }
+        },
         GitCommand::CommitFromFile(args) => {
-            commit_from_file(&args.path, args.cleanup, args.track_dir.as_deref())
+            match commit_from_file(&args.path, args.cleanup, args.track_dir.as_deref()) {
+                Ok(code) => code,
+                Err(err) => {
+                    eprintln!("{err}");
+                    err.exit_code()
+                }
+            }
         }
-        GitCommand::NoteFromFile(args) => note_from_file(&args.path, args.cleanup),
-        GitCommand::SwitchAndPull(args) => switch_and_pull(&args.branch),
+        GitCommand::NoteFromFile(args) => match note_from_file(&args.path, args.cleanup) {
+            Ok(code) => code,
+            Err(err) => {
+                eprintln!("{err}");
+                err.exit_code()
+            }
+        },
+        GitCommand::SwitchAndPull(args) => match switch_and_pull(&args.branch) {
+            Ok(code) => code,
+            Err(err) => {
+                eprintln!("{err}");
+                err.exit_code()
+            }
+        },
     }
 }
 
-fn repo() -> Result<SystemGitRepo, String> {
-    SystemGitRepo::discover()
+fn repo() -> Result<SystemGitRepo, CliError> {
+    SystemGitRepo::discover().map_err(CliError::from)
 }
 
-fn ensure_existing_nonempty_file(path: &Path, label: &str) -> Result<(), String> {
+fn ensure_existing_nonempty_file(path: &Path, label: &str) -> Result<(), CliError> {
     if !path.is_file() {
-        return Err(format!("Missing {label}: {}", path.display()));
+        return Err(CliError::Message(format!("Missing {label}: {}", path.display())));
     }
 
-    let content = fs::read_to_string(path)
-        .map_err(|err| format!("failed to read {label} {}: {err}", path.display()))?;
+    let content = fs::read_to_string(path).map_err(|err| {
+        CliError::Message(format!("failed to read {label} {}: {err}", path.display()))
+    })?;
     if content.trim().is_empty() {
-        return Err(format!("{label} is empty: {}", path.display()));
+        return Err(CliError::Message(format!("{label} is empty: {}", path.display())));
     }
     Ok(())
 }
 
-fn load_stage_paths(path: &Path) -> Result<Vec<String>, String> {
+fn load_stage_paths(path: &Path) -> Result<Vec<String>, CliError> {
     ensure_existing_nonempty_file(path, "stage path list file")?;
 
-    let content = fs::read_to_string(path)
-        .map_err(|err| format!("failed to read stage path list {}: {err}", path.display()))?;
+    let content = fs::read_to_string(path).map_err(|err| {
+        CliError::Message(format!("failed to read stage path list {}: {err}", path.display()))
+    })?;
     validate_stage_path_entries(content.lines()).map_err(|err| {
-        if err == "Stage path list file has no usable entries" {
-            format!("{err}: {}", path.display())
+        let msg = err.to_string();
+        if msg == "Stage path list file has no usable entries" {
+            CliError::Message(format!("{msg}: {}", path.display()))
         } else {
-            err
+            CliError::Message(msg)
         }
     })
 }
 
-fn add_all() -> ExitCode {
-    let repo = match repo() {
-        Ok(repo) => repo,
-        Err(err) => {
-            eprintln!("[ERROR] {err}");
-            return ExitCode::FAILURE;
-        }
-    };
-
-    match repo.stage_all_excluding(TRANSIENT_AUTOMATION_FILES, TRANSIENT_AUTOMATION_DIRS) {
-        Ok(()) => ExitCode::SUCCESS,
-        Err(err) => {
-            eprintln!("[ERROR] {err}");
-            ExitCode::FAILURE
-        }
-    }
+fn add_all() -> Result<ExitCode, CliError> {
+    let repo = repo()?;
+    repo.stage_all_excluding(TRANSIENT_AUTOMATION_FILES, TRANSIENT_AUTOMATION_DIRS)?;
+    Ok(ExitCode::SUCCESS)
 }
 
-fn add_from_file(path: &Path, cleanup: bool) -> ExitCode {
-    let repo = match repo() {
-        Ok(repo) => repo,
-        Err(err) => {
-            eprintln!("[ERROR] {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+fn add_from_file(path: &Path, cleanup: bool) -> Result<ExitCode, CliError> {
+    let repo = repo()?;
     let path = repo.resolve_path(path);
-    let stage_paths = match load_stage_paths(&path) {
-        Ok(paths) => paths,
-        Err(err) => {
-            eprintln!("[ERROR] {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let stage_paths = load_stage_paths(&path)?;
 
     let mut owned_args = vec!["add".to_owned(), "--".to_owned()];
     owned_args.extend(stage_paths);
     let args: Vec<&str> = owned_args.iter().map(String::as_str).collect();
-    match repo.status(&args) {
-        Ok(0) => {
+    match repo.status(&args)? {
+        0 => {
             if cleanup {
                 let _ = fs::remove_file(path);
             }
-            ExitCode::SUCCESS
+            Ok(ExitCode::SUCCESS)
         }
-        Ok(_) => ExitCode::FAILURE,
-        Err(err) => {
-            eprintln!("[ERROR] {err}");
-            ExitCode::FAILURE
-        }
+        _ => Ok(ExitCode::FAILURE),
     }
 }
 
-fn commit_from_file(path: &Path, cleanup: bool, track_dir: Option<&Path>) -> ExitCode {
-    let repo = match repo() {
-        Ok(repo) => repo,
-        Err(err) => {
-            eprintln!("[ERROR] {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+fn commit_from_file(
+    path: &Path,
+    cleanup: bool,
+    track_dir: Option<&Path>,
+) -> Result<ExitCode, CliError> {
+    let repo = repo()?;
     let path = repo.resolve_path(path);
 
-    if let Err(err) = ensure_existing_nonempty_file(&path, "commit message file") {
-        eprintln!("[ERROR] {err}");
-        return ExitCode::FAILURE;
-    }
+    ensure_existing_nonempty_file(&path, "commit message file")?;
 
     let track_dir_file = if track_dir.is_none() {
         path.parent().map(|parent| parent.join("track-dir.txt"))
@@ -177,26 +179,24 @@ fn commit_from_file(path: &Path, cleanup: bool, track_dir: Option<&Path>) -> Exi
     {
         Ok(track) => track,
         Err(err) => {
-            eprintln!("[ERROR] {err}");
             if cleanup {
                 if let Some(track_dir_file) = track_dir_file.as_deref() {
                     let _ = fs::remove_file(track_dir_file);
                 }
             }
-            return ExitCode::FAILURE;
+            return Err(err);
         }
     };
 
     if let Err(err) =
         require_explicit_track_selector_on_non_track_branch(&repo, explicit_track.as_ref())
     {
-        eprintln!("[ERROR] {err}");
         if cleanup {
             if let Some(track_dir_file) = track_dir_file.as_deref() {
                 let _ = fs::remove_file(track_dir_file);
             }
         }
-        return ExitCode::FAILURE;
+        return Err(err);
     }
 
     let guard_result = if let Some(explicit_track) = explicit_track.as_ref() {
@@ -205,124 +205,85 @@ fn commit_from_file(path: &Path, cleanup: bool, track_dir: Option<&Path>) -> Exi
         verify_branch_by_auto_detection(&repo)
     };
     if let Err(err) = guard_result {
-        eprintln!("[ERROR] Branch guard: {err}");
         if cleanup {
             if let Some(track_dir_file) = track_dir_file.as_deref() {
                 let _ = fs::remove_file(track_dir_file);
             }
         }
-        return ExitCode::FAILURE;
+        return Err(CliError::Message(format!("Branch guard: {err}")));
     }
 
     if let Some(explicit_track) = explicit_track.as_ref() {
-        let staged_paths = match staged_paths(&repo) {
-            Ok(paths) => paths,
-            Err(err) => {
-                eprintln!("[ERROR] {err}");
-                return ExitCode::FAILURE;
-            }
-        };
-        if let Err(err) = validate_planning_only_commit_paths(explicit_track, &staged_paths) {
-            eprintln!("[ERROR] {err}");
+        let staged = staged_paths(&repo)?;
+        if let Err(err) = validate_planning_only_commit_paths(explicit_track, &staged) {
             if cleanup {
                 if let Some(track_dir_file) = track_dir_file.as_deref() {
                     let _ = fs::remove_file(track_dir_file);
                 }
             }
-            return ExitCode::FAILURE;
+            return Err(CliError::from(err));
         }
     }
 
     let path_str = path.to_string_lossy().into_owned();
-    match repo.status(&["commit", "-F", path_str.as_str()]) {
-        Ok(0) => {
+    match repo.status(&["commit", "-F", path_str.as_str()])? {
+        0 => {
             if cleanup {
                 let _ = fs::remove_file(path);
                 if let Some(track_dir_file) = track_dir_file.as_deref() {
                     let _ = fs::remove_file(track_dir_file);
                 }
             }
-            ExitCode::SUCCESS
+            Ok(ExitCode::SUCCESS)
         }
-        Ok(_) => {
+        _ => {
             if cleanup {
                 if let Some(track_dir_file) = track_dir_file.as_deref() {
                     let _ = fs::remove_file(track_dir_file);
                 }
             }
-            ExitCode::FAILURE
-        }
-        Err(err) => {
-            eprintln!("[ERROR] {err}");
-            ExitCode::FAILURE
+            Ok(ExitCode::FAILURE)
         }
     }
 }
 
-fn note_from_file(path: &Path, cleanup: bool) -> ExitCode {
-    let repo = match repo() {
-        Ok(repo) => repo,
-        Err(err) => {
-            eprintln!("[ERROR] {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+fn note_from_file(path: &Path, cleanup: bool) -> Result<ExitCode, CliError> {
+    let repo = repo()?;
     let path = repo.resolve_path(path);
-    if let Err(err) = ensure_existing_nonempty_file(&path, "git note file") {
-        eprintln!("[ERROR] {err}");
-        return ExitCode::FAILURE;
-    }
+    ensure_existing_nonempty_file(&path, "git note file")?;
     let path_str = path.to_string_lossy().into_owned();
-    match repo.status(&["notes", "add", "-f", "-F", path_str.as_str(), "HEAD"]) {
-        Ok(0) => {
+    match repo.status(&["notes", "add", "-f", "-F", path_str.as_str(), "HEAD"])? {
+        0 => {
             if cleanup {
                 let _ = fs::remove_file(path);
             }
-            ExitCode::SUCCESS
+            Ok(ExitCode::SUCCESS)
         }
-        Ok(_) => ExitCode::FAILURE,
-        Err(err) => {
-            eprintln!("[ERROR] {err}");
-            ExitCode::FAILURE
-        }
+        _ => Ok(ExitCode::FAILURE),
     }
 }
 
-fn switch_and_pull(branch: &str) -> ExitCode {
-    let repo = match repo() {
-        Ok(repo) => repo,
-        Err(err) => {
-            eprintln!("[ERROR] {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+fn switch_and_pull(branch: &str) -> Result<ExitCode, CliError> {
+    let repo = repo()?;
 
     println!("Switching to {branch}...");
-    match repo.status(&["checkout", branch]) {
-        Ok(0) => {}
-        Ok(code) => {
-            eprintln!("[ERROR] Failed to checkout {branch}");
-            return ExitCode::from(code as u8);
-        }
-        Err(err) => {
-            eprintln!("[ERROR] {err}");
-            return ExitCode::FAILURE;
+    match repo.status(&["checkout", branch])? {
+        0 => {}
+        code => {
+            eprintln!("Failed to checkout {branch}");
+            return Ok(ExitCode::from(code as u8));
         }
     }
 
     println!("Pulling latest from origin/{branch}...");
-    match repo.status(&["pull", "--ff-only"]) {
-        Ok(0) => {
+    match repo.status(&["pull", "--ff-only"])? {
+        0 => {
             println!("[OK] On {branch}, up to date.");
-            ExitCode::SUCCESS
+            Ok(ExitCode::SUCCESS)
         }
-        Ok(_) => {
+        _ => {
             println!("[WARN] Pull failed (may not have remote tracking branch)");
-            ExitCode::SUCCESS
-        }
-        Err(err) => {
-            eprintln!("[ERROR] {err}");
-            ExitCode::FAILURE
+            Ok(ExitCode::SUCCESS)
         }
     }
 }
@@ -334,8 +295,8 @@ fn load_optional_track_dir(root: &Path, path: Option<&Path>) -> Option<PathBuf> 
     if trimmed.is_empty() { None } else { Some(resolve_repo_path(root, Path::new(trimmed))) }
 }
 
-fn load_explicit_track(root: &Path, track_dir: &Path) -> Result<ExplicitTrackBranch, String> {
-    let metadata = load_explicit_track_branch(root, track_dir)?;
+fn load_explicit_track(root: &Path, track_dir: &Path) -> Result<ExplicitTrackBranch, CliError> {
+    let metadata = load_explicit_track_branch(root, track_dir).map_err(CliError::Message)?;
     Ok(ExplicitTrackBranch {
         display_path: metadata.display_path,
         expected_branch: metadata.branch,
@@ -344,10 +305,10 @@ fn load_explicit_track(root: &Path, track_dir: &Path) -> Result<ExplicitTrackBra
     })
 }
 
-fn staged_paths(repo: &impl GitRepository) -> Result<Vec<String>, String> {
+fn staged_paths(repo: &impl GitRepository) -> Result<Vec<String>, CliError> {
     let output = repo.output(&["diff", "--cached", "--name-only", "--diff-filter=ACMRD"])?;
     if !output.status.success() {
-        return Err("git diff --cached --name-only failed".to_owned());
+        return Err(CliError::Message("git diff --cached --name-only failed".to_owned()));
     }
     Ok(String::from_utf8_lossy(&output.stdout)
         .lines()
@@ -360,37 +321,39 @@ fn staged_paths(repo: &impl GitRepository) -> Result<Vec<String>, String> {
 fn verify_commit_branch(
     repo: &impl GitRepository,
     explicit_track: &ExplicitTrackBranch,
-) -> Result<(), String> {
+) -> Result<(), CliError> {
     verify_explicit_track_branch(repo.current_branch()?.as_deref(), explicit_track)
+        .map_err(CliError::from)
 }
 
 fn require_explicit_track_selector_on_non_track_branch(
     repo: &impl GitRepository,
     explicit_track: Option<&ExplicitTrackBranch>,
-) -> Result<(), String> {
+) -> Result<(), CliError> {
     if explicit_track.is_some() {
         return Ok(());
     }
 
     match repo.current_branch()?.as_deref() {
         Some(branch) if branch.starts_with("track/") => Ok(()),
-        Some("HEAD") => Err(
+        Some("HEAD") => Err(CliError::Message(
             "detached HEAD requires an explicit track-id selector in tmp/track-commit/track-dir.txt"
                 .to_owned(),
-        ),
-        Some(_) => Err(
+        )),
+        Some(_) => Err(CliError::Message(
             "non-track branch commits require an explicit track-id selector in tmp/track-commit/track-dir.txt"
                 .to_owned(),
-        ),
-        None => Err(
+        )),
+        None => Err(CliError::Message(
             "cannot determine current git branch; provide an explicit track-id selector in tmp/track-commit/track-dir.txt"
                 .to_owned(),
-        ),
+        )),
     }
 }
 
-fn verify_branch_by_auto_detection(repo: &impl GitRepository) -> Result<(), String> {
-    let claims = collect_track_branch_claims(repo.root())?
+fn verify_branch_by_auto_detection(repo: &impl GitRepository) -> Result<(), CliError> {
+    let claims = collect_track_branch_claims(repo.root())
+        .map_err(CliError::Message)?
         .into_iter()
         .map(|claim| TrackBranchClaim {
             track_name: claim.track_name,
@@ -400,7 +363,7 @@ fn verify_branch_by_auto_detection(repo: &impl GitRepository) -> Result<(), Stri
         })
         .collect::<Vec<_>>();
 
-    verify_auto_detected_branch(repo.current_branch()?.as_deref(), &claims)
+    verify_auto_detected_branch(repo.current_branch()?.as_deref(), &claims).map_err(CliError::from)
 }
 
 #[cfg(test)]
@@ -477,7 +440,7 @@ mod tests {
 
         let err = load_stage_paths(&list).unwrap_err();
 
-        assert!(err.contains("transient automation"));
+        assert!(err.to_string().contains("transient automation"));
     }
 
     #[test]
@@ -537,7 +500,7 @@ mod tests {
         fs::create_dir_all(&nested).unwrap();
         let _guard = CurrentDirGuard::change_to(&nested);
 
-        assert_eq!(add_all(), ExitCode::SUCCESS);
+        assert_eq!(add_all().unwrap(), ExitCode::SUCCESS);
         assert_eq!(
             run_git_output(dir.path(), &["diff", "--cached", "--name-only"])
                 .lines()
@@ -565,7 +528,7 @@ mod tests {
         let _guard = CurrentDirGuard::change_to(dir.path());
 
         // add_all must succeed despite gitignored tmp/ overlapping with exclude patterns
-        assert_eq!(add_all(), ExitCode::SUCCESS);
+        assert_eq!(add_all().unwrap(), ExitCode::SUCCESS);
 
         // Verify that tracked changes were actually staged
         let staged = run_git_output(dir.path(), &["diff", "--cached", "--name-only"]);
@@ -596,7 +559,7 @@ mod tests {
 
         let _guard = CurrentDirGuard::change_to(dir.path());
 
-        assert_eq!(add_all(), ExitCode::SUCCESS);
+        assert_eq!(add_all().unwrap(), ExitCode::SUCCESS);
 
         let staged = run_git_output(dir.path(), &["diff", "--cached", "--name-only"]);
         let staged_files: Vec<&str> = staged.lines().collect();
@@ -624,7 +587,7 @@ mod tests {
         let _guard = CurrentDirGuard::change_to(&nested);
 
         assert_eq!(
-            add_from_file(Path::new("tmp/track-commit/add-paths.txt"), true),
+            add_from_file(Path::new("tmp/track-commit/add-paths.txt"), true).unwrap(),
             ExitCode::SUCCESS
         );
         assert!(!add_paths.exists());
@@ -665,7 +628,7 @@ mod tests {
         let _guard = CurrentDirGuard::change_to(&nested);
 
         assert_eq!(
-            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None),
+            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None).unwrap(),
             ExitCode::SUCCESS
         );
         assert!(!commit_message.exists());
@@ -701,9 +664,8 @@ mod tests {
         fs::create_dir_all(&nested).unwrap();
         let _guard = CurrentDirGuard::change_to(&nested);
 
-        assert_eq!(
-            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None),
-            ExitCode::FAILURE
+        assert!(
+            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None).is_err()
         );
         assert!(commit_message.exists());
         assert!(!track_dir_file.exists());
@@ -739,9 +701,8 @@ mod tests {
         fs::create_dir_all(&nested).unwrap();
         let _guard = CurrentDirGuard::change_to(&nested);
 
-        assert_eq!(
-            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None),
-            ExitCode::FAILURE
+        assert!(
+            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None).is_err()
         );
         assert!(commit_message.exists());
         assert!(!track_dir_file.exists());
@@ -773,9 +734,8 @@ mod tests {
         fs::create_dir_all(&nested).unwrap();
         let _guard = CurrentDirGuard::change_to(&nested);
 
-        assert_eq!(
-            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None),
-            ExitCode::FAILURE
+        assert!(
+            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None).is_err()
         );
         assert!(commit_message.exists());
         assert!(!track_dir_file.exists());
@@ -803,9 +763,8 @@ mod tests {
         fs::create_dir_all(&nested).unwrap();
         let _guard = CurrentDirGuard::change_to(&nested);
 
-        assert_eq!(
-            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None),
-            ExitCode::FAILURE
+        assert!(
+            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None).is_err()
         );
         assert!(commit_message.exists());
         assert!(!track_dir_file.exists());
@@ -830,9 +789,8 @@ mod tests {
         fs::create_dir_all(&nested).unwrap();
         let _guard = CurrentDirGuard::change_to(&nested);
 
-        assert_eq!(
-            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None),
-            ExitCode::FAILURE
+        assert!(
+            commit_from_file(Path::new("tmp/track-commit/commit-message.txt"), true, None).is_err()
         );
         assert!(commit_message.exists());
         assert_eq!(run_git_output(dir.path(), &["log", "-1", "--pretty=%s"]).trim(), "initial");
@@ -853,7 +811,10 @@ mod tests {
         fs::create_dir_all(&nested).unwrap();
         let _guard = CurrentDirGuard::change_to(&nested);
 
-        assert_eq!(note_from_file(Path::new("tmp/track-commit/note.md"), true), ExitCode::SUCCESS);
+        assert_eq!(
+            note_from_file(Path::new("tmp/track-commit/note.md"), true).unwrap(),
+            ExitCode::SUCCESS
+        );
         assert!(!note.exists());
         assert_eq!(
             run_git_output(dir.path(), &["notes", "show", "HEAD"]),
@@ -874,7 +835,7 @@ mod tests {
         fs::create_dir_all(&nested).unwrap();
         let _guard = CurrentDirGuard::change_to(&nested);
 
-        assert_eq!(switch_and_pull("main"), ExitCode::SUCCESS);
+        assert_eq!(switch_and_pull("main").unwrap(), ExitCode::SUCCESS);
         assert_eq!(repo().unwrap().current_branch().unwrap().as_deref(), Some("main"));
     }
 }

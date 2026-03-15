@@ -379,7 +379,9 @@ fn run_codex_child(
     let raw_final_message = read_final_message(&output_last_message.path)?;
     let final_message_state = parse_review_final_message(raw_final_message.as_deref());
     let final_message = match &final_message_state {
-        ReviewFinalMessageState::Parsed(payload) => Some(render_review_payload(payload)?),
+        ReviewFinalMessageState::Parsed(payload) => {
+            Some(render_review_payload(payload).map_err(|e| e.to_string())?)
+        }
         _ => raw_final_message,
     };
     let verdict = classify_review_verdict(timed_out, exit_success, &final_message_state);

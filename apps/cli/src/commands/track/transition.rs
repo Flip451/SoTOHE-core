@@ -1,3 +1,5 @@
+use crate::CliError;
+
 use super::*;
 
 pub(super) fn execute_transition(
@@ -8,115 +10,80 @@ pub(super) fn execute_transition(
     target_status: String,
     commit_hash: Option<String>,
     skip_branch_check: bool,
-) -> ExitCode {
+) -> Result<ExitCode, CliError> {
     // Validate inputs.
-    let track_id = match TrackId::new(&track_id) {
-        Ok(id) => id,
-        Err(err) => {
-            eprintln!("invalid track id: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let track_id = TrackId::new(&track_id)
+        .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
-    let task_id = match TaskId::new(&task_id) {
-        Ok(id) => id,
-        Err(err) => {
-            eprintln!("invalid task id: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let task_id = TaskId::new(&task_id)
+        .map_err(|err| CliError::Message(format!("invalid task id: {err}")))?;
 
     // Validate commit_hash early if provided.
     let parsed_hash = match commit_hash {
-        Some(h) => match CommitHash::new(h) {
-            Ok(hash) => Some(hash),
-            Err(err) => {
-                eprintln!("invalid commit hash: {err}");
-                return ExitCode::FAILURE;
-            }
-        },
+        Some(h) => {
+            let hash = CommitHash::new(h)
+                .map_err(|err| CliError::Message(format!("invalid commit hash: {err}")))?;
+            Some(hash)
+        }
         None => None,
     };
 
     // Preserve items_dir for branch guard before moving into FsTrackStore.
     let repo_dir = items_dir.clone();
-    let project_root = match resolve_project_root(&repo_dir) {
-        Ok(path) => path,
-        Err(err) => {
-            eprintln!("{err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
     // Build FsTrackStore.
-    let lock_manager = match FsFileLockManager::new(&locks_dir) {
-        Ok(lm) => Arc::new(lm),
-        Err(err) => {
-            eprintln!("failed to initialize lock manager: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let lock_manager = FsFileLockManager::new(&locks_dir)
+        .map(Arc::new)
+        .map_err(|err| CliError::Message(format!("failed to initialize lock manager: {err}")))?;
 
     let store = Arc::new(FsTrackStore::new(items_dir.clone(), lock_manager, DEFAULT_LOCK_TIMEOUT));
 
     // Activation guard: read schema_version from DocumentMeta, then delegate to usecase.
-    let schema_version = match store.find_with_meta(&track_id) {
-        Ok(Some((_, meta))) => meta.schema_version,
-        Ok(None) => 2, // fallback for missing tracks; store.update will handle the error
-        Err(err) => {
-            eprintln!("failed to read track metadata: {err}");
-            return ExitCode::FAILURE;
-        }
+    let schema_version = match store.find_with_meta(&track_id)? {
+        Some((_, meta)) => meta.schema_version,
+        None => 2, // fallback for missing tracks; store.update will handle the error
     };
-    if let Err(msg) = usecase::track_resolution::reject_branchless_guard(
+    usecase::track_resolution::reject_branchless_guard(
         &*store,
         &track_id,
         &target_status,
         schema_version,
-    ) {
-        eprintln!("activation guard: {msg}");
-        return ExitCode::FAILURE;
-    }
+    )
+    .map_err(|msg| CliError::Message(format!("activation guard: {msg}")))?;
 
     // Branch guard: reject if current git branch does not match metadata.json branch.
     if !skip_branch_check {
-        if let Err(msg) = verify_branch_guard(&*store, &track_id, &repo_dir) {
-            eprintln!("branch guard: {msg}");
-            return ExitCode::FAILURE;
-        }
+        verify_branch_guard(&*store, &track_id, &repo_dir)
+            .map_err(|msg| CliError::Message(format!("branch guard: {msg}")))?;
     }
 
     // Delegate task-lookup → resolve-transition → transition-task to usecase.
     let transition = usecase::TransitionTaskUseCase::new(Arc::clone(&store));
-    match transition.execute_by_status(&track_id, &task_id, &target_status, parsed_hash) {
-        Ok(track) => {
-            println!(
-                "[OK] {}: transitioned to {} (track status: {})",
-                task_id,
-                target_status,
-                track.status()
-            );
-            match render::sync_rendered_views(&project_root, Some(track_id.as_str())) {
-                Ok(changed) => {
-                    for path in changed {
-                        match path.strip_prefix(&project_root) {
-                            Ok(relative) => println!("[OK] Rendered: {}", relative.display()),
-                            Err(_) => println!("[OK] Rendered: {}", path.display()),
-                        }
-                    }
-                    ExitCode::SUCCESS
-                }
-                Err(err) => {
-                    eprintln!("warning: transition persisted but sync-views failed: {err}");
-                    ExitCode::SUCCESS
+    let track = transition
+        .execute_by_status(&track_id, &task_id, &target_status, parsed_hash)
+        .map_err(|err| CliError::Message(format!("transition failed: {err}")))?;
+
+    println!(
+        "[OK] {}: transitioned to {} (track status: {})",
+        task_id,
+        target_status,
+        track.status()
+    );
+    match render::sync_rendered_views(&project_root, Some(track_id.as_str())) {
+        Ok(changed) => {
+            for path in changed {
+                match path.strip_prefix(&project_root) {
+                    Ok(relative) => println!("[OK] Rendered: {}", relative.display()),
+                    Err(_) => println!("[OK] Rendered: {}", path.display()),
                 }
             }
         }
         Err(err) => {
-            eprintln!("transition failed: {err}");
-            ExitCode::FAILURE
+            eprintln!("warning: transition persisted but sync-views failed: {err}");
         }
     }
+    Ok(ExitCode::SUCCESS)
 }
 
 // Note: reject_branchless_implementation_transition has been replaced by
