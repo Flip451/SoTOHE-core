@@ -51,7 +51,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "description": "planning-only track を schema v3 の正式な状態として扱えるようにする。Python (`scripts/track_schema.py`) と Rust (`libs/infrastructure/src/track/render.rs` など) の両方で、`status=planned` かつ全 task が未着手のときだけ `branch=null` を許可し、それ以外の active な branch なし状態はこれまでどおり拒否する。archived track の `branch=null` はこのトラックの scope 外",
@@ -94,9 +94,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "37d9ac8",
       "description": "回帰テストを追加・更新する。schema、branch の確定、activation の再開、review/commit/PR の selector、`/track:merge` の PR 番号ルール、`/track:status`、`track/registry.md`、resolver の優先順位、docs/router の guardrail を確認する。branch-null の planning-only track では `/track:status` と `track/registry.md` の両方が `/track:activate <track-id>` を返し、materialized された `planned` track では従来どおり implementation command を返すこと、同じ fixture を Python validator と Rust render / validate path の両方へ通して rendered guidance まで一致すること、planning-only track が activation 前に selector 付き review/commit/PR を使えること、allowlist 外の diff が activation 前の導線で reject されること、PR wrapper / script が hidden な `track/<id>` 前提を要求しないこと、`/track:merge` が current-branch auto-detect に戻らず PR 番号だけを受け付けること、stale / divergent branch を activation preflight が metadata 永続化前に止めること、activation 後に source branch へ戻っても materialized state が current-focus / latest-track resolver から観測できること、mixed-state repo で `/track:catchup`・`/track:revert`・`scripts/external_guides.py`・`scripts/verify_latest_track_files.py` が materialized active track を planning-only track より優先すること、materialized active track と branch-null planning-only track が同時にある non-track branch で、auto-detect が active track を優先しつつ explicit `track-id` selector が planning-only track へ正しくルーティングされ、active track に乗っ取られないことを確認すること、`/track:activate` が dirty worktree を reject することを確認すること、planning-only diff に対して `/track:ci` が activation 前でも正常に動作することを確認すること、`track-transition` による `todo -> in_progress` などの implementation-phase 状態遷移が activation 前に fail-closed であることを確認すること、archived branchless track が resolver priority 変更後も Current Focus / latest-track selection に再浮上しないことを確認すること、`/track:full-cycle` が activation guard を bypass しないことを確認し、最後に `cargo make ci` で既存の branch-per-track workflow を壊していないことを確かめる",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "commit_hash": "0931ef9",
@@ -106,5 +107,5 @@
     }
   ],
   "title": "track:plan plan-only / activate 導線",
-  "updated_at": "2026-03-15T02:30:44Z"
+  "updated_at": "2026-03-15T02:42:11Z"
 }

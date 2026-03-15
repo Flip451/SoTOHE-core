@@ -198,3 +198,199 @@ pub fn resolve_phase_from_record(
 pub fn next_command(track: &TrackMetadata, schema_version: u32) -> String {
     resolve_phase(track, schema_version).next_command
 }
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+    use crate::{
+        PlanSection, PlanView, StatusOverride, TaskId, TaskTransition, TrackBranch, TrackId,
+        TrackTask,
+    };
+
+    fn planned_track(id: &str, branch: Option<&str>) -> TrackMetadata {
+        let task_id = TaskId::new("T1").unwrap();
+        let task = TrackTask::new(task_id.clone(), "Implement feature").unwrap();
+        let section = PlanSection::new("S1", "Build", Vec::new(), vec![task_id]).unwrap();
+        let plan = PlanView::new(Vec::new(), vec![section]);
+        TrackMetadata::with_branch(
+            TrackId::new(id).unwrap(),
+            branch.map(|b| TrackBranch::new(b).unwrap()),
+            "Test Track",
+            vec![task],
+            plan,
+            None,
+        )
+        .unwrap()
+    }
+
+    // --- resolve_phase ---
+
+    #[test]
+    fn resolve_phase_branchless_v3_planned_returns_ready_to_activate() {
+        let track = planned_track("demo", None);
+        let info = resolve_phase(&track, 3);
+        assert_eq!(info.phase, TrackPhase::ReadyToActivate);
+        assert_eq!(info.next_command, "/track:activate demo");
+        assert!(info.blocker.is_some());
+    }
+
+    #[test]
+    fn resolve_phase_materialized_v3_planned_returns_planning() {
+        let track = planned_track("demo", Some("track/demo"));
+        let info = resolve_phase(&track, 3);
+        assert_eq!(info.phase, TrackPhase::Planning);
+        assert_eq!(info.next_command, "/track:implement");
+        assert!(info.blocker.is_none());
+    }
+
+    #[test]
+    fn resolve_phase_v2_branchless_planned_returns_planning_not_ready_to_activate() {
+        let track = planned_track("demo", None);
+        let info = resolve_phase(&track, 2);
+        assert_eq!(info.phase, TrackPhase::Planning);
+        assert_ne!(info.phase, TrackPhase::ReadyToActivate);
+    }
+
+    #[test]
+    fn resolve_phase_in_progress_returns_in_progress() {
+        let mut track = planned_track("demo", Some("track/demo"));
+        track.transition_task(&TaskId::new("T1").unwrap(), TaskTransition::Start).unwrap();
+        let info = resolve_phase(&track, 3);
+        assert_eq!(info.phase, TrackPhase::InProgress);
+        assert_eq!(info.next_command, "/track:implement");
+    }
+
+    #[test]
+    fn resolve_phase_done_returns_ready_to_ship() {
+        let mut track = planned_track("demo", Some("track/demo"));
+        track.transition_task(&TaskId::new("T1").unwrap(), TaskTransition::Start).unwrap();
+        track
+            .transition_task(
+                &TaskId::new("T1").unwrap(),
+                TaskTransition::Complete { commit_hash: None },
+            )
+            .unwrap();
+        let info = resolve_phase(&track, 3);
+        assert_eq!(info.phase, TrackPhase::ReadyToShip);
+        assert_eq!(info.next_command, "/track:done");
+    }
+
+    #[test]
+    fn resolve_phase_blocked_returns_blocked_with_reason() {
+        let track = TrackMetadata::with_branch(
+            TrackId::new("demo").unwrap(),
+            Some(TrackBranch::new("track/demo").unwrap()),
+            "Test",
+            vec![TrackTask::new(TaskId::new("T1").unwrap(), "task").unwrap()],
+            PlanView::new(
+                Vec::new(),
+                vec![
+                    PlanSection::new("S1", "Build", Vec::new(), vec![TaskId::new("T1").unwrap()])
+                        .unwrap(),
+                ],
+            ),
+            Some(StatusOverride::blocked("waiting on review")),
+        )
+        .unwrap();
+        let info = resolve_phase(&track, 3);
+        assert_eq!(info.phase, TrackPhase::Blocked);
+        assert!(info.blocker.unwrap().contains("waiting on review"));
+    }
+
+    #[test]
+    fn resolve_phase_cancelled_returns_cancelled() {
+        let track = TrackMetadata::with_branch(
+            TrackId::new("demo").unwrap(),
+            Some(TrackBranch::new("track/demo").unwrap()),
+            "Test",
+            vec![TrackTask::new(TaskId::new("T1").unwrap(), "task").unwrap()],
+            PlanView::new(
+                Vec::new(),
+                vec![
+                    PlanSection::new("S1", "Build", Vec::new(), vec![TaskId::new("T1").unwrap()])
+                        .unwrap(),
+                ],
+            ),
+            Some(StatusOverride::cancelled("scope changed")),
+        )
+        .unwrap();
+        let info = resolve_phase(&track, 3);
+        assert_eq!(info.phase, TrackPhase::Cancelled);
+        assert_eq!(info.next_command, "/track:plan <feature>");
+    }
+
+    // --- resolve_phase_from_record ---
+
+    #[test]
+    fn resolve_phase_from_record_branchless_v3_planned_returns_ready_to_activate() {
+        let info = resolve_phase_from_record("demo", "planned", false, 3, None);
+        assert_eq!(info.phase, TrackPhase::ReadyToActivate);
+        assert_eq!(info.next_command, "/track:activate demo");
+    }
+
+    #[test]
+    fn resolve_phase_from_record_materialized_v3_planned_returns_planning() {
+        let info = resolve_phase_from_record("demo", "planned", true, 3, None);
+        assert_eq!(info.phase, TrackPhase::Planning);
+    }
+
+    #[test]
+    fn resolve_phase_from_record_v2_branchless_returns_planning() {
+        let info = resolve_phase_from_record("demo", "planned", false, 2, None);
+        assert_eq!(info.phase, TrackPhase::Planning);
+    }
+
+    #[test]
+    fn resolve_phase_from_record_in_progress_returns_in_progress() {
+        let info = resolve_phase_from_record("demo", "in_progress", true, 3, None);
+        assert_eq!(info.phase, TrackPhase::InProgress);
+    }
+
+    #[test]
+    fn resolve_phase_from_record_done_returns_ready_to_ship() {
+        let info = resolve_phase_from_record("demo", "done", true, 3, None);
+        assert_eq!(info.phase, TrackPhase::ReadyToShip);
+    }
+
+    #[test]
+    fn resolve_phase_from_record_blocked_returns_blocked() {
+        let info = resolve_phase_from_record("demo", "blocked", true, 3, Some("waiting on review"));
+        assert_eq!(info.phase, TrackPhase::Blocked);
+        assert!(info.blocker.unwrap().contains("waiting on review"));
+    }
+
+    #[test]
+    fn resolve_phase_from_record_cancelled_returns_cancelled() {
+        let info = resolve_phase_from_record("demo", "cancelled", true, 3, Some("scope changed"));
+        assert_eq!(info.phase, TrackPhase::Cancelled);
+    }
+
+    #[test]
+    fn resolve_phase_from_record_archived_returns_archived() {
+        let info = resolve_phase_from_record("demo", "archived", false, 3, None);
+        assert_eq!(info.phase, TrackPhase::Archived);
+    }
+
+    #[test]
+    fn resolve_phase_from_record_unknown_status_falls_back_to_in_progress() {
+        let info = resolve_phase_from_record("demo", "unknown", true, 3, None);
+        assert_eq!(info.phase, TrackPhase::InProgress);
+    }
+
+    // --- next_command ---
+
+    #[test]
+    fn next_command_for_branchless_v3_returns_activate() {
+        let track = planned_track("demo", None);
+        let cmd = next_command(&track, 3);
+        assert_eq!(cmd, "/track:activate demo");
+    }
+
+    #[test]
+    fn next_command_for_materialized_planned_returns_implement() {
+        let track = planned_track("demo", Some("track/demo"));
+        let cmd = next_command(&track, 3);
+        assert_eq!(cmd, "/track:implement");
+    }
+}

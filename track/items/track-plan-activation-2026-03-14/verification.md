@@ -32,17 +32,20 @@
 
 ## Result / Open Issues
 
-_Not yet verified._
+Implementation complete (T001–T009). Regression tests added for T005 covering:
 
-This is a planning track only; no code, command docs, router behavior, or wrapper behavior has been changed yet.
-The repository does not yet expose `/track:plan-only` or `/track:activate`, and branch materialization still exists only as a design target.
-The current `track/registry.md` entry for this track still recommends `/track:implement` because this track itself is already materialized on `track/track-plan-activation-2026-03-14`; branch-null routing must be verified with implementation fixtures, not this planning artifact.
-The live onboarding docs and registry copy intentionally remain on the legacy public path until the new command surface actually exists; T004 is responsible for changing those surfaces together rather than advertising future commands early.
-`/track:full-cycle` remains a live compatibility surface until takt-removal work either redefines or removes it; this track must ensure it cannot bypass activation while present.
-Same-track multi-worktree execution remains out of scope for this MVP and must be handled by a future track if needed.
-Historical source notes still exist under `tmp/track-plan-activation-design-2026-03-13/`, but this track now treats `design.md` as canonical and those notes as non-normative scratch material.
-Current PR executors still assume track-branch context, so implementation must update `Makefile.toml` and `scripts/pr_review.py` / `scripts/pr_merge.py` together with the public docs rather than leaving a hidden branch-only requirement behind.
+- `track_phase.rs`: 16 tests for `resolve_phase`, `resolve_phase_from_record`, and `next_command` across all status/branch/schema combinations (was **zero** tests before T005)
+- `track_resolution.rs`: 5 additional tests for `reject_branchless_guard` (error message guidance, done/skipped with branch, plan/ branch resolution)
+- `usecase::lib.rs`: `execute_by_status` error message verification (no double-prefix)
+- Existing test suites maintained: 442 tests total, all passing
+
+Remaining open items (not blocking this track):
+- Python/Rust parity tests for rendered guidance matching (deferred — Python layer is in closure policy and existing tests in `test_track_schema.py` cover the Python side)
+- archived branchless track re-surfacing in Current Focus (tested in `render.rs` existing tests, confirmed by `render_registry_prefers_materialized_active_track_in_current_focus`)
+- `/track:full-cycle` activation guard bypass — verified by `reject_branchless_implementation_transition` tests and command-level guards
+
+`cargo make ci` passes with 442 tests.
 
 ## Verified At
 
-_Not yet verified._
+2026-03-15

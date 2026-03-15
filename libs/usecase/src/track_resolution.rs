@@ -294,4 +294,42 @@ mod tests {
         let result = reject_branchless_guard(&reader, &id, "in_progress", 3);
         assert!(result.unwrap_err().contains("not found"));
     }
+
+    #[test]
+    fn test_reject_branchless_guard_error_message_contains_activate_guidance() {
+        let reader = StubReader::default();
+        let track = sample_track("test", None);
+        reader.tracks.lock().unwrap().insert(track.id().clone(), track);
+
+        let id = TrackId::new("test").unwrap();
+        let err = reject_branchless_guard(&reader, &id, "done", 3).unwrap_err();
+        assert!(err.contains("/track:activate test"), "expected activate guidance in: {err}");
+    }
+
+    #[test]
+    fn test_reject_branchless_allows_done_with_branch_on_v3() {
+        let reader = StubReader::default();
+        let track = sample_track("test", Some("track/test"));
+        reader.tracks.lock().unwrap().insert(track.id().clone(), track);
+
+        let id = TrackId::new("test").unwrap();
+        assert!(reject_branchless_guard(&reader, &id, "done", 3).is_ok());
+    }
+
+    #[test]
+    fn test_reject_branchless_allows_skipped_with_branch_on_v3() {
+        let reader = StubReader::default();
+        let track = sample_track("test", Some("track/test"));
+        reader.tracks.lock().unwrap().insert(track.id().clone(), track);
+
+        let id = TrackId::new("test").unwrap();
+        assert!(reject_branchless_guard(&reader, &id, "skipped", 3).is_ok());
+    }
+
+    #[test]
+    fn test_resolve_track_id_from_plan_branch_returns_error() {
+        let result = resolve_track_id_from_branch(Some("plan/my-feature"));
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("not on a track branch"));
+    }
 }
