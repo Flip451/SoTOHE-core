@@ -38,6 +38,7 @@
           "T007",
           "T006",
           "T008",
+          "T009",
           "T005"
         ],
         "title": "Resolver, docs, and regression coverage"
@@ -87,6 +88,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "05d3d01",
       "description": "CLI 層に残ったビジネスロジックを適切なレイヤーへ移動する。(1) `auto_detect_track_id_from_branch` を usecase 層に `TrackResolution` として移動（track ID 解決は usecase の責務）。(2) `read_track_metadata` を infrastructure 層の `FsTrackStore` に `find_with_meta` read-only メソッドとして追加し、CLI の `codec::decode` 直接呼び出しを除去。(3) `resolve_transition` を usecase 層に移動（状態遷移の解決は usecase の責務）。(4) `reject_branchless_implementation_transition` を usecase 層に移動（guard ロジックは usecase の責務）。(5) `ensure_clean_worktree` / `dirty_worktree_paths` を usecase 層に移動（worktree 検証ロジック）。移動後も `cargo make ci` が通ることを確認する",
       "id": "T008",
       "status": "done"
@@ -94,6 +96,11 @@
     {
       "description": "回帰テストを追加・更新する。schema、branch の確定、activation の再開、review/commit/PR の selector、`/track:merge` の PR 番号ルール、`/track:status`、`track/registry.md`、resolver の優先順位、docs/router の guardrail を確認する。branch-null の planning-only track では `/track:status` と `track/registry.md` の両方が `/track:activate <track-id>` を返し、materialized された `planned` track では従来どおり implementation command を返すこと、同じ fixture を Python validator と Rust render / validate path の両方へ通して rendered guidance まで一致すること、planning-only track が activation 前に selector 付き review/commit/PR を使えること、allowlist 外の diff が activation 前の導線で reject されること、PR wrapper / script が hidden な `track/<id>` 前提を要求しないこと、`/track:merge` が current-branch auto-detect に戻らず PR 番号だけを受け付けること、stale / divergent branch を activation preflight が metadata 永続化前に止めること、activation 後に source branch へ戻っても materialized state が current-focus / latest-track resolver から観測できること、mixed-state repo で `/track:catchup`・`/track:revert`・`scripts/external_guides.py`・`scripts/verify_latest_track_files.py` が materialized active track を planning-only track より優先すること、materialized active track と branch-null planning-only track が同時にある non-track branch で、auto-detect が active track を優先しつつ explicit `track-id` selector が planning-only track へ正しくルーティングされ、active track に乗っ取られないことを確認すること、`/track:activate` が dirty worktree を reject することを確認すること、planning-only diff に対して `/track:ci` が activation 前でも正常に動作することを確認すること、`track-transition` による `todo -> in_progress` などの implementation-phase 状態遷移が activation 前に fail-closed であることを確認すること、archived branchless track が resolver priority 変更後も Current Focus / latest-track selection に再浮上しないことを確認すること、`/track:full-cycle` が activation guard を bypass しないことを確認し、最後に `cargo make ci` で既存の branch-per-track workflow を壊していないことを確かめる",
       "id": "T005",
+      "status": "todo"
+    },
+    {
+      "description": "CLI に残るオーケストレーションロジックを usecase 層に統合する。(1) `execute_transition` 内の store.update クロージャで行っているタスク検索 → resolve_transition → transition_task のフローを `TransitionTaskUseCase` に統合し、CLI は target_status 文字列と commit_hash を渡すだけにする。(2) `reject_branchless_implementation_transition` の CLI wrapper が I/O (load_track_branch_record) + usecase guard を結合している部分を、usecase が TrackReader ポートを通じて自律的にデータを取得する設計にリファクタリングする。(3) `ensure_clean_worktree` の CLI wrapper を usecase 層に統合し、GitRepository のポートトレイトを domain 層に定義して worktree 検証を usecase 内で完結させる。移動後も `cargo make ci` が通ることを確認する",
+      "id": "T009",
       "status": "todo"
     }
   ],
