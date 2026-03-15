@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| rstest-introduction-2026-03-15 | Done | 2026-03-15 |
 | python-hook-launcher-removal-2026-03-15 | Done | 2026-03-15 |
 | workflow-ux-fixes-2026-03-15 | Done | 2026-03-15 |
 | takt-deprecation-impl-2026-03-15 | Done | 2026-03-15 |

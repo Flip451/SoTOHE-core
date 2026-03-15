@@ -171,49 +171,31 @@ mod tests {
         assert_eq!(result.unwrap_err(), "invalid");
     }
 
+    use rstest::rstest;
+
     // --- reject_branchless_implementation_transition ---
 
-    #[test]
-    fn test_reject_branchless_allows_todo_target() {
-        let id = TrackId::new("test").unwrap();
-        let result = reject_branchless_implementation_transition(3, None, &id, "todo");
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn test_reject_branchless_rejects_in_progress_on_branchless_v3() {
-        let id = TrackId::new("test").unwrap();
-        let result = reject_branchless_implementation_transition(3, None, &id, "in_progress");
-        assert!(result.unwrap_err().contains("not activated yet"));
-    }
-
-    #[test]
-    fn test_reject_branchless_allows_in_progress_with_branch() {
+    #[rstest]
+    #[case::todo_target_is_allowed(3, None, "todo", true)]
+    #[case::in_progress_on_branchless_v3_is_rejected(3, None, "in_progress", false)]
+    #[case::in_progress_with_branch_is_allowed(3, Some("track/test"), "in_progress", true)]
+    #[case::in_progress_on_v2_is_allowed(2, None, "in_progress", true)]
+    #[case::done_on_branchless_v3_is_rejected(3, None, "done", false)]
+    #[case::skipped_on_branchless_v3_is_rejected(3, None, "skipped", false)]
+    fn test_reject_branchless_implementation_transition(
+        #[case] schema_version: u32,
+        #[case] branch: Option<&str>,
+        #[case] target_status: &str,
+        #[case] expect_ok: bool,
+    ) {
         let id = TrackId::new("test").unwrap();
         let result =
-            reject_branchless_implementation_transition(3, Some("track/test"), &id, "in_progress");
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn test_reject_branchless_allows_in_progress_on_v2() {
-        let id = TrackId::new("test").unwrap();
-        let result = reject_branchless_implementation_transition(2, None, &id, "in_progress");
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn test_reject_branchless_rejects_done_on_branchless_v3() {
-        let id = TrackId::new("test").unwrap();
-        let result = reject_branchless_implementation_transition(3, None, &id, "done");
-        assert!(result.unwrap_err().contains("not activated yet"));
-    }
-
-    #[test]
-    fn test_reject_branchless_rejects_skipped_on_branchless_v3() {
-        let id = TrackId::new("test").unwrap();
-        let result = reject_branchless_implementation_transition(3, None, &id, "skipped");
-        assert!(result.unwrap_err().contains("not activated yet"));
+            reject_branchless_implementation_transition(schema_version, branch, &id, target_status);
+        if expect_ok {
+            assert!(result.is_ok());
+        } else {
+            assert!(result.unwrap_err().contains("not activated yet"));
+        }
     }
 
     // --- reject_branchless_guard (with TrackReader) ---

@@ -1,0 +1,98 @@
+{
+  "branch": "track/rstest-introduction-2026-03-15",
+  "created_at": "2026-03-15",
+  "id": "rstest-introduction-2026-03-15",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "tech-stack.md 更新と Cargo.toml への rstest 追加。実装タスクの前提条件。"
+        ],
+        "id": "S001",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "技術決定・依存追加"
+      },
+      {
+        "description": [
+          "最大効果の guard/policy.rs を中心に、domain crate のテストをパラメータ化。"
+        ],
+        "id": "S002",
+        "task_ids": [
+          "T002",
+          "T003"
+        ],
+        "title": "domain crate テスト変換"
+      },
+      {
+        "description": [
+          "track_resolution, hook, worktree_guard 等のパラメータ化。"
+        ],
+        "id": "S003",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "usecase crate テスト変換"
+      },
+      {
+        "description": [
+          "infrastructure と cli crate の該当テストをパラメータ化。"
+        ],
+        "id": "S004",
+        "task_ids": [
+          "T005"
+        ],
+        "title": "infrastructure + cli crate テスト変換"
+      },
+      {
+        "description": [],
+        "id": "S005",
+        "task_ids": [
+          "T006"
+        ],
+        "title": "CI 検証"
+      }
+    ],
+    "summary": [
+      "rstest クレートを workspace 全体に導入し、繰り返しパターンの多いテストをパラメータ化テストに変換する。",
+      "全 4 crate (domain, usecase, infrastructure, cli) を対象とし、最大効果の guard/policy.rs (120 tests) から着手する。"
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "track/tech-stack.md に rstest を追記し、ルート Cargo.toml の [workspace.dependencies] に rstest を追加。各 crate の Cargo.toml に dev-dependencies として追加。cargo make ci-rust で確認。",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "libs/domain/src/guard/policy.rs の blocked テスト群 (~85) と allowed テスト群 (~20) を rstest #[case] でパラメータ化。ヘルパー関数テストも変換。",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "track_phase.rs (resolve_phase/resolve_phase_from_record マトリクス)、lib.rs の繰り返しパターンを rstest 化。guard/parser.rs も該当があれば変換。",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "track_resolution.rs の reject_branchless 系、hook.rs の resolve_lock_mode、worktree_guard.rs の parse_dirty_worktree_paths をパラメータ化。",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "infrastructure (track/codec.rs, track/render.rs 等) と cli (commands/review.rs 等) の繰り返しテストパターンをパラメータ化。",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "cargo make ci が通ることを確認。テスト数が変わらない (パラメータ展開で同等) ことを検証。",
+      "id": "T006",
+      "status": "done"
+    }
+  ],
+  "title": "rstest 導入 — 全 crate パラメータ化テスト移行",
+  "updated_at": "2026-03-15T07:33:27Z"
+}
