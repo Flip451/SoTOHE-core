@@ -809,6 +809,7 @@ mod tests {
 
     use domain::TrackId;
     use infrastructure::git_cli::GitRepository;
+    use rstest::rstest;
 
     use super::super::{BranchMode, resolve_project_root};
     use super::load_track_branch_record;
@@ -1059,43 +1060,26 @@ mod tests {
         assert!(result.is_ok());
     }
 
-    #[test]
-    fn uses_legacy_branch_mode_only_for_non_auto_v2_paths() {
-        assert!(uses_legacy_branch_mode(BranchMode::Create, 2));
-        assert!(uses_legacy_branch_mode(BranchMode::Switch, 2));
-        assert!(!uses_legacy_branch_mode(BranchMode::Auto, 2));
-        assert!(!uses_legacy_branch_mode(BranchMode::Create, 3));
+    #[rstest]
+    #[case::create_v2(BranchMode::Create, 2, true)]
+    #[case::switch_v2(BranchMode::Switch, 2, true)]
+    #[case::auto_v2(BranchMode::Auto, 2, false)]
+    #[case::create_v3(BranchMode::Create, 3, false)]
+    fn uses_legacy_branch_mode_only_for_non_auto_v2_paths(
+        #[case] mode: BranchMode,
+        #[case] schema_version: u32,
+        #[case] expected: bool,
+    ) {
+        assert_eq!(uses_legacy_branch_mode(mode, schema_version), expected);
     }
 
-    #[test]
-    fn activation_git_commands_fast_forward_existing_branch_after_materialization() {
-        let commands =
-            activation_git_commands(BranchMode::Auto, "track/demo", true, true, Some("main"), None);
-
-        assert_eq!(
-            commands,
-            vec![
-                vec![
-                    "branch".to_owned(),
-                    "-f".to_owned(),
-                    "track/demo".to_owned(),
-                    "HEAD".to_owned(),
-                ],
-                vec!["switch".to_owned(), "track/demo".to_owned()],
-            ]
-        );
-    }
-
-    #[test]
-    fn activation_git_commands_switch_fast_forwards_existing_branch_after_materialization() {
-        let commands = activation_git_commands(
-            BranchMode::Switch,
-            "track/demo",
-            true,
-            true,
-            Some("main"),
-            None,
-        );
+    #[rstest]
+    #[case::auto_mode(BranchMode::Auto)]
+    #[case::switch_mode(BranchMode::Switch)]
+    fn activation_git_commands_fast_forward_existing_branch_after_materialization(
+        #[case] mode: BranchMode,
+    ) {
+        let commands = activation_git_commands(mode, "track/demo", true, true, Some("main"), None);
 
         assert_eq!(
             commands,
@@ -1276,60 +1260,85 @@ mod tests {
         assert!(!activation_resume_marker_path(dir.path(), &track_id).exists());
     }
 
-    #[test]
-    fn allow_materialized_activation_only_allows_switch_or_auto_resume() {
-        assert!(allow_materialized_activation(BranchMode::Switch, false));
-        assert!(allow_materialized_activation(BranchMode::Auto, true));
-        assert!(allow_materialized_activation(BranchMode::Create, false));
-        assert!(!allow_materialized_activation(BranchMode::Auto, false));
+    #[rstest]
+    #[case::switch_not_resume(BranchMode::Switch, false, true)]
+    #[case::auto_resume(BranchMode::Auto, true, true)]
+    #[case::create_not_resume(BranchMode::Create, false, true)]
+    #[case::auto_not_resume(BranchMode::Auto, false, false)]
+    fn allow_materialized_activation_only_allows_switch_or_auto_resume(
+        #[case] mode: BranchMode,
+        #[case] resume_allowed: bool,
+        #[case] expected: bool,
+    ) {
+        assert_eq!(allow_materialized_activation(mode, resume_allowed), expected);
     }
 
-    #[test]
-    fn activation_side_effects_skip_for_materialized_switch() {
-        assert!(!should_persist_activation_side_effects(BranchMode::Switch, true, false,));
-        assert!(should_persist_activation_side_effects(BranchMode::Auto, true, true,));
-        assert!(should_persist_activation_side_effects(BranchMode::Auto, false, false,));
+    #[rstest]
+    #[case::switch_materialized_no_resume(BranchMode::Switch, true, false, false)]
+    #[case::auto_materialized_resume(BranchMode::Auto, true, true, true)]
+    #[case::auto_not_materialized(BranchMode::Auto, false, false, true)]
+    fn activation_side_effects_skip_for_materialized_switch(
+        #[case] mode: BranchMode,
+        #[case] already_materialized: bool,
+        #[case] resume_allowed: bool,
+        #[case] expected: bool,
+    ) {
+        assert_eq!(
+            should_persist_activation_side_effects(mode, already_materialized, resume_allowed),
+            expected
+        );
     }
 
-    #[test]
-    fn activation_resume_requires_clean_worktree() {
-        assert!(activation_requires_clean_worktree(BranchMode::Auto, false, false,));
-        assert!(activation_requires_clean_worktree(BranchMode::Auto, true, true,));
-        assert!(!activation_requires_clean_worktree(BranchMode::Auto, true, false,));
-        assert!(!activation_requires_clean_worktree(BranchMode::Switch, true, false,));
+    #[rstest]
+    #[case::auto_not_materialized(BranchMode::Auto, false, false, true)]
+    #[case::auto_materialized_resume(BranchMode::Auto, true, true, true)]
+    #[case::auto_materialized_no_resume(BranchMode::Auto, true, false, false)]
+    #[case::switch_materialized_no_resume(BranchMode::Switch, true, false, false)]
+    fn activation_resume_requires_clean_worktree(
+        #[case] mode: BranchMode,
+        #[case] already_materialized: bool,
+        #[case] resume_allowed: bool,
+        #[case] expected: bool,
+    ) {
+        assert_eq!(
+            activation_requires_clean_worktree(mode, already_materialized, resume_allowed),
+            expected
+        );
     }
 
-    #[test]
-    fn activation_auto_requires_non_track_source_branch() {
-        assert!(activation_rejects_invalid_source_branch(BranchMode::Auto, false, Some("HEAD"),));
-        assert!(activation_rejects_invalid_source_branch(
-            BranchMode::Auto,
-            false,
-            Some("track/other"),
-        ));
-        assert!(activation_rejects_invalid_source_branch(
-            BranchMode::Auto,
-            true,
-            Some("track/other"),
-        ));
-        assert!(activation_rejects_invalid_source_branch(BranchMode::Auto, false, None,));
-        assert!(!activation_rejects_invalid_source_branch(BranchMode::Auto, false, Some("main"),));
+    #[rstest]
+    #[case::auto_head(BranchMode::Auto, false, Some("HEAD"), true)]
+    #[case::auto_track_branch(BranchMode::Auto, false, Some("track/other"), true)]
+    #[case::auto_materialized_track_branch(BranchMode::Auto, true, Some("track/other"), true)]
+    #[case::auto_no_branch(BranchMode::Auto, false, None, true)]
+    #[case::auto_main(BranchMode::Auto, false, Some("main"), false)]
+    fn activation_auto_requires_non_track_source_branch(
+        #[case] mode: BranchMode,
+        #[case] already_materialized: bool,
+        #[case] current_branch: Option<&str>,
+        #[case] expected: bool,
+    ) {
+        assert_eq!(
+            activation_rejects_invalid_source_branch(mode, already_materialized, current_branch),
+            expected
+        );
     }
 
-    #[test]
-    fn activation_switch_requires_non_track_source_branch_when_materializing() {
-        assert!(activation_rejects_invalid_source_branch(BranchMode::Switch, false, Some("HEAD"),));
-        assert!(activation_rejects_invalid_source_branch(
-            BranchMode::Switch,
-            false,
-            Some("track/other"),
-        ));
-        assert!(!activation_rejects_invalid_source_branch(
-            BranchMode::Switch,
-            true,
-            Some("track/other"),
-        ));
-        assert!(!activation_rejects_invalid_source_branch(BranchMode::Switch, true, Some("main"),));
+    #[rstest]
+    #[case::switch_not_materialized_head(BranchMode::Switch, false, Some("HEAD"), true)]
+    #[case::switch_not_materialized_track(BranchMode::Switch, false, Some("track/other"), true)]
+    #[case::switch_materialized_track(BranchMode::Switch, true, Some("track/other"), false)]
+    #[case::switch_materialized_main(BranchMode::Switch, true, Some("main"), false)]
+    fn activation_switch_requires_non_track_source_branch_when_materializing(
+        #[case] mode: BranchMode,
+        #[case] already_materialized: bool,
+        #[case] current_branch: Option<&str>,
+        #[case] expected: bool,
+    ) {
+        assert_eq!(
+            activation_rejects_invalid_source_branch(mode, already_materialized, current_branch),
+            expected
+        );
     }
 
     #[test]
@@ -1708,16 +1717,21 @@ mod tests {
         assert_eq!(base, Some("abc1234".to_owned()));
     }
 
-    #[test]
-    fn activation_create_requires_main_branch_for_new_materialization() {
-        assert!(
-            activation_create_requires_main_branch(BranchMode::Create, false, Some("feature"),)
+    #[rstest]
+    #[case::create_not_materialized_non_main(BranchMode::Create, false, Some("feature"), true)]
+    #[case::create_not_materialized_main(BranchMode::Create, false, Some("main"), false)]
+    #[case::create_already_materialized(BranchMode::Create, true, Some("feature"), false)]
+    #[case::auto_not_materialized(BranchMode::Auto, false, Some("feature"), false)]
+    fn activation_create_requires_main_branch_for_new_materialization(
+        #[case] mode: BranchMode,
+        #[case] already_materialized: bool,
+        #[case] current_branch: Option<&str>,
+        #[case] expected: bool,
+    ) {
+        assert_eq!(
+            activation_create_requires_main_branch(mode, already_materialized, current_branch),
+            expected
         );
-        assert!(!activation_create_requires_main_branch(BranchMode::Create, false, Some("main"),));
-        assert!(
-            !activation_create_requires_main_branch(BranchMode::Create, true, Some("feature"),)
-        );
-        assert!(!activation_create_requires_main_branch(BranchMode::Auto, false, Some("feature"),));
     }
 
     #[test]

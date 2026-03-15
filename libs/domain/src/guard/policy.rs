@@ -457,29 +457,94 @@ fn has_expansion_marker(token: &str) -> bool {
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
+    use rstest::rstest;
 
-    // -- Acceptance criteria tests --
+    // -- Blocked git subcommands --
 
+    #[rstest]
+    #[case::git_add("git add .", "git add")]
+    #[case::git_push("git push", "git push")]
+    #[case::git_commit_via_env_nohup("env VAR=val nohup git commit -m msg", "env")]
+    #[case::git_branch_delete_upper_d("git branch -D feature", "branch")]
+    #[case::git_branch_d_lowercase("git branch -d feature", "branch")]
+    #[case::git_branch_delete_long_flag("git branch --delete feature", "branch")]
+    #[case::git_branch_dr_bundled("git branch -dr feature", "branch")]
+    #[case::git_branch_r_upper_d_bundled("git branch -rD feature", "branch")]
+    #[case::git_switch("git switch feature", "switch")]
+    #[case::git_switch_create("git switch -c new-branch", "switch")]
+    #[case::git_merge("git merge feature", "merge")]
+    #[case::git_rebase("git rebase main", "rebase")]
+    #[case::git_cherry_pick("git cherry-pick abc1234", "cherry-pick")]
+    #[case::git_reset("git reset HEAD~1", "reset")]
+    #[case::git_reset_hard("git reset --hard HEAD~1", "reset")]
+    fn test_blocked_git_subcommands_contain_reason(
+        #[case] cmd: &str,
+        #[case] reason_fragment: &str,
+    ) {
+        let v = check(cmd);
+        assert!(v.is_blocked(), "expected blocked: {cmd}");
+        assert!(
+            v.reason.contains(reason_fragment),
+            "reason {:?} should contain {:?} for cmd {:?}",
+            v.reason,
+            reason_fragment,
+            cmd
+        );
+    }
+
+    #[rstest]
+    #[case::git_push_plain("git push")]
+    #[case::git_with_global_options_add("git -C /tmp add .")]
+    #[case::semicolon_chained_git_commit("echo hi; git commit -m msg")]
+    #[case::and_chained_git_add("cargo test && git add .")]
+    #[case::piped_git_push("echo y | git push")]
+    #[case::timeout_git_commit("timeout 30 git commit -m msg")]
+    #[case::nice_git_add("nice -n 10 git add .")]
+    #[case::xargs_git_add("echo file.txt | xargs git add")]
+    #[case::sh_c_git_add("sh -c 'git add .'")]
+    #[case::zsh_c_git_commit("zsh -c 'git commit -m test'")]
+    #[case::find_exec_git_add("find . -exec git add {} \\;")]
+    #[case::find_exec_timeout_git_add("find . -exec timeout 30 git add {} \\;")]
+    #[case::find_exec_nice_git_commit("find . -exec nice -n 10 git commit -m msg {} \\;")]
+    #[case::xargs_nohup_git_push("echo file | xargs nohup git push")]
+    #[case::xargs_timeout_git_add("echo file | xargs timeout 30 git add")]
+    #[case::git_checkout_upper_b("git checkout -B new-branch")]
+    #[case::git_checkout_orphan("git checkout --orphan new-branch")]
+    #[case::git_exe_add("git.exe add .")]
+    #[case::absolute_path_git_exe("/usr/bin/git.exe add .")]
+    #[case::git_upper_exe("git.EXE add .")]
+    #[case::bash_exe_c_git_push("bash.exe -c 'git push'")]
+    #[case::bash_mixed_exe("bash.Exe -c 'git push'")]
+    #[case::bash_rcfile_c_git_add("bash --rcfile /dev/null -c 'git add .'")]
+    #[case::bash_init_file_c_git_push("bash --init-file /etc/profile -c 'git push'")]
+    #[case::timeout_signal_eq_kill_git_add("timeout --signal=KILL 30 git add .")]
+    #[case::taskset_c_git_add("taskset -c 0 git add .")]
+    #[case::taskset_plain_mask_git_add("taskset ff git add .")]
+    #[case::taskset_cpu_list_eq_git_add("taskset --cpu-list=0 git add .")]
+    #[case::taskset_cpu_list_git_add("taskset --cpu-list 0 git add .")]
+    #[case::ionice_c_git_add("ionice -c 3 git add .")]
+    #[case::command_p_git_add("command -p git add .")]
+    #[case::exec_c_git_add("exec -c git add .")]
+    #[case::exec_a_name_git_add("exec -a myname git add .")]
+    #[case::bash_heredoc_git_add("bash <<'SH'\ngit add .\nSH")]
+    #[case::python_heredoc_git_subprocess(
+        "python3 - <<'PY'\nimport subprocess; subprocess.run(['git','add','.'])\nPY"
+    )]
+    #[case::brace_group_heredoc_git_add("{ bash; } <<'SH'\ngit add .\nSH")]
+    #[case::subshell_heredoc_git_add("( bash ) <<'SH'\ngit add .\nSH")]
+    fn test_blocked_git_operations(#[case] cmd: &str) {
+        let v = check(cmd);
+        assert!(v.is_blocked(), "expected blocked: {cmd}");
+    }
+
+    // Special case: absolute_path_git has a label and different cmd value
     #[test]
-    fn test_git_add_is_blocked() {
-        let v = check("git add .");
+    fn test_absolute_path_git_is_blocked() {
+        let v = check("/usr/bin/git add .");
         assert!(v.is_blocked());
-        assert!(v.reason.contains("git add"));
     }
 
-    #[test]
-    fn test_git_status_is_allowed() {
-        let v = check("git status");
-        assert!(!v.is_blocked());
-    }
-
-    #[test]
-    fn test_env_nohup_git_commit_is_blocked() {
-        // env is unconditionally blocked regardless of what follows
-        let v = check("env VAR=val nohup git commit -m msg");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("env"));
-    }
+    // -- Blocked: bash -c with git reference --
 
     #[test]
     fn test_bash_c_git_push_is_blocked() {
@@ -488,822 +553,199 @@ mod tests {
         assert!(v.reason.contains("git reference"));
     }
 
-    #[test]
-    fn test_variable_substitution_bypass_is_blocked() {
-        let v = check("$CMD add");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("variable or command substitution"));
+    // -- Blocked: variable/command substitution --
+
+    #[rstest]
+    #[case::dollar_cmd_add("$CMD add")]
+    #[case::command_substitution_git("$(git_path) add .")]
+    #[case::dollar_cmd_status("$CMD status")]
+    #[case::which_ls_substitution("$(which ls) -la")]
+    #[case::backtick_substitution("`which cat` file.txt")]
+    #[case::redirect_to_cmd_sub_git_add("echo hi > $(git add .)")]
+    #[case::redirect_to_cmd_sub_git_push("cat foo >> $(git push)")]
+    #[case::find_exec_variable_bypass("find . -exec $CMD add \\;")]
+    #[case::xargs_variable_bypass("echo x | xargs $CMD commit")]
+    #[case::variable_bypass_branch_delete_uppercase("$CMD branch -D feature")]
+    #[case::variable_bypass_branch_delete_lowercase("$CMD branch -d feature")]
+    #[case::variable_bypass_branch_delete_long_flag("$CMD branch --delete feature")]
+    #[case::variable_bypass_branch_dr("$CMD branch -dr feature")]
+    #[case::variable_bypass_branch_double_dash("$CMD branch -- -dev")]
+    #[case::subshell_redirect_cmd_sub_git_add("(echo hi) > $(git add .)")]
+    #[case::for_iterator_cmd_sub_git_add("for x in $(git add .); do echo hi; done")]
+    #[case::case_subject_cmd_sub_git_add("case $(git add .) in foo) echo hi;; esac")]
+    fn test_blocked_variable_substitution(#[case] cmd: &str) {
+        let v = check(cmd);
+        assert!(v.is_blocked(), "expected blocked: {cmd}");
     }
 
-    #[test]
-    fn test_git_branch_delete_is_blocked() {
-        let v = check("git branch -D feature");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("branch"));
-    }
-
-    #[test]
-    fn test_cargo_make_test_is_allowed() {
-        let v = check("cargo make test");
-        assert!(!v.is_blocked());
-    }
-
-    #[test]
-    fn test_find_exec_git_add_is_blocked() {
-        let v = check("find . -exec git add {} \\;");
-        assert!(v.is_blocked());
-    }
-
-    // -- Additional coverage tests --
-
-    #[test]
-    fn test_git_push_is_blocked() {
-        let v = check("git push");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_git_diff_is_allowed() {
-        let v = check("git diff");
-        assert!(!v.is_blocked());
-    }
-
-    #[test]
-    fn test_git_log_is_allowed() {
-        let v = check("git log --oneline");
-        assert!(!v.is_blocked());
-    }
-
-    #[test]
-    fn test_git_with_global_options_add_is_blocked() {
-        let v = check("git -C /tmp add .");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_semicolon_chained_git_commit() {
-        let v = check("echo hi; git commit -m msg");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_and_chained_git_add() {
-        let v = check("cargo test && git add .");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_piped_git_push() {
-        let v = check("echo y | git push");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_timeout_git_commit() {
-        let v = check("timeout 30 git commit -m msg");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_nice_git_add() {
-        let v = check("nice -n 10 git add .");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_git_branch_create_is_allowed() {
-        let v = check("git branch feature-x");
-        assert!(!v.is_blocked());
-    }
-
-    #[test]
-    fn test_git_branch_d_lowercase() {
-        let v = check("git branch -d feature");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_git_branch_delete_long_flag() {
-        let v = check("git branch --delete feature");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_xargs_git_add_is_blocked() {
-        let v = check("echo file.txt | xargs git add");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_sh_c_git_add() {
-        let v = check("sh -c 'git add .'");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_zsh_c_git_commit() {
-        let v = check("zsh -c 'git commit -m test'");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_python_c_git_subprocess() {
-        let v = check(r#"python3 -c "import subprocess; subprocess.run(['git', 'add', '.'])""#);
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_command_substitution_git() {
-        let v = check("$(git_path) add .");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_empty_command_is_allowed() {
-        let v = check("");
-        assert!(!v.is_blocked());
-    }
-
-    #[test]
-    fn test_absolute_path_git() {
-        let v = check("/usr/bin/git add .");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_env_git_add() {
-        let v = check("env git add .");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("env"));
-    }
-
-    #[test]
-    fn test_var_assignment_git_commit() {
-        let v = check("GIT_AUTHOR_NAME=test git commit -m msg");
-        assert!(v.is_blocked());
-    }
-
-    // -- Review Fix: python versioned binary detection --
-
-    #[test]
-    fn test_python3_12_c_git_subprocess() {
-        let v = check(r#"python3.12 -c "import subprocess; subprocess.run(['git', 'add', '.'])""#);
-        assert!(v.is_blocked());
-    }
-
-    // -- Review Fix: absolute path git in Python code --
-
-    #[test]
-    fn test_python_c_absolute_path_git() {
-        let v = check(r#"python3 -c "subprocess.run(['/usr/bin/git', 'push'])""#);
-        assert!(v.is_blocked());
-    }
-
-    // -- Round 9 fixes: Python broad "git" match --
-
-    #[test]
-    fn test_python_c_git_exe_subprocess_is_blocked() {
-        let v = check(r#"python3 -c "subprocess.run(['git.exe', 'add', '.'])""#);
-        assert!(v.is_blocked(), "python git.exe subprocess should be blocked");
-    }
-
-    #[test]
-    fn test_python_c_no_git_reference_is_allowed() {
-        let v = check(r#"python3 -c "print('hello world')""#);
-        assert!(!v.is_blocked(), "python without git should be allowed");
-    }
-
-    // -- env unconditional block --
-
-    #[test]
-    fn test_env_s_git_add() {
-        let v = check("env -S 'git add .'");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("env"));
-    }
-
-    #[test]
-    fn test_env_split_string_git_push() {
-        let v = check("env --split-string 'git push'");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("env"));
-    }
-
-    #[test]
-    fn test_env_cargo_test_is_blocked() {
-        // env is unconditionally blocked regardless of payload
-        let v = check("env cargo test");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("env"));
-    }
-
-    #[test]
-    fn test_env_with_flags_is_blocked() {
-        let v = check("env -i FOO=bar ls");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("env"));
-    }
-
-    #[test]
-    fn test_timeout_env_is_blocked() {
-        let v = check("timeout 30 env git status");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("env"));
-    }
-
-    // -- Review Fix Round 2: find -exec / xargs with launchers --
-
-    #[test]
-    fn test_find_exec_timeout_git_add() {
-        let v = check("find . -exec timeout 30 git add {} \\;");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_find_exec_nice_git_commit() {
-        let v = check("find . -exec nice -n 10 git commit -m msg {} \\;");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_xargs_nohup_git_push() {
-        let v = check("echo file | xargs nohup git push");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_xargs_timeout_git_add() {
-        let v = check("echo file | xargs timeout 30 git add");
-        assert!(v.is_blocked());
-    }
-
-    // -- Finding 1: Redirect with command substitution --
-
-    #[test]
-    fn test_redirect_to_command_substitution_git_add() {
-        // echo hi > $(git add .) should be blocked
-        let v = check("echo hi > $(git add .)");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_redirect_to_command_substitution_git_push() {
-        let v = check("cat foo >> $(git push)");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_redirect_to_normal_file_is_allowed() {
-        let v = check("echo hi > /tmp/file.txt");
-        assert!(!v.is_blocked());
-    }
-
-    // -- Finding 2: find -exec/xargs with python -c and variable bypass --
-
-    #[test]
-    fn test_find_exec_python_c_git_add() {
-        let v = check(
-            r#"find . -exec python3 -c "import subprocess; subprocess.run(['git', 'add', '.'])" \;"#,
+    #[rstest]
+    #[case::dollar_cmd_add("$CMD add")]
+    #[case::command_substitution_git("$(git_path) add .")]
+    #[case::dollar_cmd_status("$CMD status")]
+    #[case::which_ls_substitution("$(which ls) -la")]
+    #[case::backtick_substitution("`which cat` file.txt")]
+    #[case::variable_bypass_branch_create("$CMD branch feature-x")]
+    fn test_blocked_variable_substitution_contains_reason(#[case] cmd: &str) {
+        let v = check(cmd);
+        assert!(v.is_blocked(), "expected blocked: {cmd}");
+        assert!(
+            v.reason.contains("variable or command substitution"),
+            "reason {:?} should contain 'variable or command substitution' for cmd {:?}",
+            v.reason,
+            cmd
         );
-        assert!(v.is_blocked());
+    }
+
+    // -- Blocked: env command (unconditional) --
+
+    #[rstest]
+    #[case::env_git_add("env git add .")]
+    #[case::env_s_git_add("env -S 'git add .'")]
+    #[case::env_split_string_git_push("env --split-string 'git push'")]
+    #[case::env_cargo_test("env cargo test")]
+    #[case::env_with_flags("env -i FOO=bar ls")]
+    #[case::timeout_env("timeout 30 env git status")]
+    #[case::env_with_combined_flags("env -iS'git add .'")]
+    #[case::env_with_escape("env -iSgit\\ push")]
+    #[case::env_with_separate_arg("env -iS 'git commit -m msg'")]
+    #[case::env_u_then_s_git_add("env -u FOO -S 'git add .'")]
+    #[case::env_c_dir("env -C /tmp git status")]
+    #[case::env_u_shell("env -uSHELL git status")]
+    #[case::env_u_s("env -uS git status")]
+    fn test_blocked_env_command_contains_reason(#[case] cmd: &str) {
+        let v = check(cmd);
+        assert!(v.is_blocked(), "expected blocked: {cmd}");
+        assert!(
+            v.reason.contains("env"),
+            "reason {:?} should contain 'env' for cmd {:?}",
+            v.reason,
+            cmd
+        );
+    }
+
+    // -- Blocked: python/shell with git reference --
+
+    #[rstest]
+    #[case::python3_c_git_subprocess(
+        r#"python3 -c "import subprocess; subprocess.run(['git', 'add', '.'])""#
+    )]
+    #[case::python3_12_c_git_subprocess(
+        r#"python3.12 -c "import subprocess; subprocess.run(['git', 'add', '.'])""#
+    )]
+    #[case::python_c_absolute_path_git(r#"python3 -c "subprocess.run(['/usr/bin/git', 'push'])""#)]
+    #[case::python_c_git_exe_subprocess(r#"python3 -c "subprocess.run(['git.exe', 'add', '.'])""#)]
+    #[case::xargs_python_c_git_push(
+        r#"echo x | xargs python3 -c "import os; os.system('git push')""#
+    )]
+    #[case::find_exec_python_c_git_add(
+        r#"find . -exec python3 -c "import subprocess; subprocess.run(['git', 'add', '.'])" \;"#
+    )]
+    #[case::python_c_git_branch_bundled_dr(
+        r#"python3 -c "subprocess.run(['git','branch','-dr','feature'])""#
+    )]
+    #[case::python_c_git_branch_bundled_r_upper_d(
+        r#"python3 -c "subprocess.run(['git','branch','-rD','feature'])""#
+    )]
+    #[case::python_c_git_branch_create(
+        r#"python3 -c "subprocess.run(['git','branch','feature'])""#
+    )]
+    #[case::python_c_git_branch_delete(
+        r#"python3 -c "subprocess.run(['git','branch','-D','feature'])""#
+    )]
+    #[case::python3_long_opt_c_git(
+        r#"python3 --check-hash-based-pycs always -c "import subprocess; subprocess.run(['git','add','.'])""#
+    )]
+    fn test_blocked_shell_with_git_reference(#[case] cmd: &str) {
+        let v = check(cmd);
+        assert!(v.is_blocked(), "expected blocked: {cmd}");
+    }
+
+    // -- Blocked: git checkout -b (branch create) --
+
+    #[rstest]
+    #[case::checkout_b("git checkout -b new-branch")]
+    #[case::checkout_upper_b("git checkout -B new-branch")]
+    #[case::checkout_orphan("git checkout --orphan new-branch")]
+    fn test_blocked_git_checkout_branch_create(#[case] cmd: &str) {
+        let v = check(cmd);
+        assert!(v.is_blocked(), "expected blocked: {cmd}");
     }
 
     #[test]
-    fn test_find_exec_variable_bypass() {
-        // $CMD contains expansion marker — blocked regardless of position
-        let v = check("find . -exec $CMD add \\;");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_xargs_python_c_git_push() {
-        let v = check(r#"echo x | xargs python3 -c "import os; os.system('git push')""#);
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_xargs_variable_bypass() {
-        // $CMD contains expansion marker — blocked regardless of position
-        let v = check("echo x | xargs $CMD commit");
-        assert!(v.is_blocked());
-    }
-
-    // -- Finding 3: Variable bypass with branch -d/-D --
-
-    #[test]
-    fn test_variable_bypass_branch_delete_uppercase() {
-        let v = check("$CMD branch -D feature");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_variable_bypass_branch_delete_lowercase() {
-        let v = check("$CMD branch -d feature");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_variable_bypass_branch_delete_long_flag() {
-        let v = check("$CMD branch --delete feature");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_variable_bypass_branch_create_is_blocked() {
-        // $CMD anything is blocked — variable expansion is not allowed
-        let v = check("$CMD branch feature-x");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("variable or command substitution"));
-    }
-
-    // -- env with various flag combinations --
-
-    #[test]
-    fn test_env_with_combined_flags_is_blocked() {
-        let v = check("env -iS'git add .'");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("env"));
-    }
-
-    #[test]
-    fn test_env_with_escape_is_blocked() {
-        let v = check("env -iSgit\\ push");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("env"));
-    }
-
-    #[test]
-    fn test_env_with_separate_arg_is_blocked() {
-        let v = check("env -iS 'git commit -m msg'");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("env"));
-    }
-
-    // -- taskset positional mask handling --
-
-    #[test]
-    fn test_taskset_c_git_add_is_blocked() {
-        // taskset -c 0 git add . — -c is no-arg flag, 0 is positional (mask/list)
-        let v = check("taskset -c 0 git add .");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_taskset_plain_mask_git_add_is_blocked() {
-        // taskset ff git add . — ff is positional mask, git add is the command
-        let v = check("taskset ff git add .");
-        assert!(v.is_blocked(), "taskset ff git add . should be blocked");
-    }
-
-    #[test]
-    fn test_taskset_git_status_is_allowed() {
-        let v = check("taskset -c 0 git status");
-        assert!(!v.is_blocked());
-    }
-
-    #[test]
-    fn test_taskset_plain_mask_git_status_is_allowed() {
-        let v = check("taskset ff git status");
-        assert!(!v.is_blocked());
-    }
-
-    #[test]
-    fn test_taskset_cpu_list_eq_git_add_is_blocked() {
-        // --cpu-list=0 embeds the value; git add should still be detected
-        let v = check("taskset --cpu-list=0 git add .");
-        assert!(v.is_blocked(), "taskset --cpu-list=0 git add . should be blocked");
-    }
-
-    #[test]
-    fn test_taskset_cpu_list_eq_git_status_is_allowed() {
-        let v = check("taskset --cpu-list=0 git status");
-        assert!(!v.is_blocked());
-    }
-
-    // -- Finding 1 (review round 2): For/Case iterator command substitutions --
-
-    #[test]
-    fn test_for_iterator_command_substitution_git_add_is_blocked() {
-        let v = check("for x in $(git add .); do echo hi; done");
-        assert!(v.is_blocked(), "for iterator with $(git add .) should be blocked");
-    }
-
-    #[test]
-    fn test_case_subject_command_substitution_git_add_is_blocked() {
-        let v = check("case $(git add .) in foo) echo hi;; esac");
-        assert!(v.is_blocked(), "case subject with $(git add .) should be blocked");
-    }
-
-    // -- Finding 2 (review round 2): Incomplete launcher-specific arg table --
-
-    #[test]
-    fn test_ionice_c_git_add_is_blocked() {
-        let v = check("ionice -c 3 git add .");
-        assert!(v.is_blocked(), "ionice -c 3 git add . should be blocked");
-    }
-
-    #[test]
-    fn test_taskset_cpu_list_git_add_is_blocked() {
-        let v = check("taskset --cpu-list 0 git add .");
-        assert!(v.is_blocked(), "taskset --cpu-list 0 git add . should be blocked");
-    }
-
-    // -- Finding 3 (review round 2): Python bundled branch-delete flags --
-
-    #[test]
-    fn test_python_c_git_branch_bundled_dr_is_blocked() {
-        let v = check(r#"python3 -c "subprocess.run(['git','branch','-dr','feature'])""#);
-        assert!(v.is_blocked(), "python git branch -dr should be blocked");
-    }
-
-    #[test]
-    fn test_python_c_git_branch_bundled_r_upper_d_is_blocked() {
-        let v = check(r#"python3 -c "subprocess.run(['git','branch','-rD','feature'])""#);
-        assert!(v.is_blocked(), "python git branch -rD should be blocked");
-    }
-
-    // -- Finding 4 (review round 2): Branch-delete false positive on `git branch -- -dev` --
-
-    #[test]
-    fn test_git_branch_double_dash_dev_is_allowed() {
-        let v = check("git branch -- -dev");
-        assert!(!v.is_blocked(), "git branch -- -dev should be allowed (branch name, not flag)");
-    }
-
-    // -- Branch strategy: new blocked subcommands --
-
-    #[test]
-    fn test_git_switch_is_blocked() {
-        let v = check("git switch feature");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("switch"));
-    }
-
-    #[test]
-    fn test_git_switch_create_is_blocked() {
-        let v = check("git switch -c new-branch");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("switch"));
-    }
-
-    #[test]
-    fn test_git_checkout_b_is_blocked() {
+    fn test_git_checkout_b_reason_contains_switch_or_checkout() {
         let v = check("git checkout -b new-branch");
         assert!(v.is_blocked());
         assert!(v.reason.contains("switch") || v.reason.contains("checkout"));
     }
 
     #[test]
-    fn test_git_checkout_upper_b_is_blocked() {
-        let v = check("git checkout -B new-branch");
-        assert!(v.is_blocked());
-    }
-
-    #[test]
-    fn test_git_checkout_file_restore_is_allowed() {
-        let v = check("git checkout -- file.txt");
-        assert!(!v.is_blocked());
-    }
-
-    #[test]
-    fn test_git_merge_is_blocked() {
-        let v = check("git merge feature");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("merge"));
-    }
-
-    #[test]
-    fn test_git_rebase_is_blocked() {
-        let v = check("git rebase main");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("rebase"));
-    }
-
-    #[test]
-    fn test_git_cherry_pick_is_blocked() {
-        let v = check("git cherry-pick abc1234");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("cherry-pick"));
-    }
-
-    #[test]
-    fn test_git_reset_is_blocked() {
-        let v = check("git reset HEAD~1");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("reset"));
-    }
-
-    #[test]
-    fn test_git_reset_hard_is_blocked() {
-        let v = check("git reset --hard HEAD~1");
-        assert!(v.is_blocked());
-        assert!(v.reason.contains("reset"));
-    }
-
-    #[test]
-    fn test_git_checkout_orphan_is_blocked() {
+    fn test_git_checkout_orphan_reason_contains_switch_or_checkout() {
         let v = check("git checkout --orphan new-branch");
         assert!(v.is_blocked());
         assert!(v.reason.contains("switch") || v.reason.contains("checkout"));
     }
 
-    // -- Helper function tests --
+    // -- Allowed commands --
 
-    #[test]
-    fn test_basename_extracts_name() {
-        assert_eq!(basename("/usr/bin/git"), "git");
-        assert_eq!(basename("git"), "git");
-        assert_eq!(basename("C:\\Program Files\\git"), "git");
+    #[rstest]
+    #[case::git_status("git status")]
+    #[case::git_diff("git diff")]
+    #[case::git_log_oneline("git log --oneline")]
+    #[case::git_branch_create("git branch feature-x")]
+    #[case::cargo_make_test("cargo make test")]
+    #[case::empty_command("")]
+    #[case::redirect_to_normal_file("echo hi > /tmp/file.txt")]
+    #[case::redirect_to_file_without_git("echo hello > /tmp/output.txt")]
+    #[case::git_checkout_file_restore("git checkout -- file.txt")]
+    #[case::git_branch_double_dash_dev("git branch -- -dev")]
+    #[case::taskset_git_status("taskset -c 0 git status")]
+    #[case::taskset_plain_mask_git_status("taskset ff git status")]
+    #[case::taskset_cpu_list_eq_git_status("taskset --cpu-list=0 git status")]
+    #[case::python_c_no_git_reference(r#"python3 -c "print('hello world')""#)]
+    #[case::bash_heredoc_without_git("bash <<'SH'\necho hello\nSH")]
+    #[case::taskset_trailing_option_no_panic("taskset -o")]
+    #[case::timeout_trailing_signal_no_panic("timeout -s")]
+    #[case::multibyte_utf8_command_no_panic("€aab")]
+    #[case::multibyte_utf8_with_exe_suffix_no_panic("日本語.exe add")]
+    fn test_allowed_commands(#[case] cmd: &str) {
+        let v = check(cmd);
+        assert!(!v.is_blocked(), "expected allowed: {cmd}");
     }
 
-    #[test]
-    fn test_is_var_assignment() {
-        assert!(is_var_assignment("FOO=bar"));
-        assert!(is_var_assignment("_VAR=val"));
-        assert!(!is_var_assignment("=bar"));
-        assert!(!is_var_assignment("git"));
-        assert!(!is_var_assignment("-c"));
+    // -- Helper: basename --
+
+    #[rstest]
+    #[case::absolute_path("/usr/bin/git", "git")]
+    #[case::plain("git", "git")]
+    #[case::windows_path("C:\\Program Files\\git", "git")]
+    #[case::exe_suffix("git.exe", "git")]
+    #[case::exe_suffix_with_path("/usr/bin/git.exe", "git")]
+    #[case::upper_exe_suffix("git.EXE", "git")]
+    #[case::mixed_exe_suffix("git.Exe", "git")]
+    fn test_basename(#[case] input: &str, #[case] expected: &str) {
+        assert_eq!(basename(input), expected);
     }
 
-    #[test]
-    fn test_has_expansion_marker() {
-        assert!(has_expansion_marker("$HOME"));
-        assert!(has_expansion_marker("$(cmd)"));
-        assert!(has_expansion_marker("`cmd`"));
-        assert!(!has_expansion_marker("git"));
+    // -- Helper: is_var_assignment --
+
+    #[rstest]
+    #[case::foo_bar("FOO=bar", true)]
+    #[case::underscore_var("_VAR=val", true)]
+    #[case::leading_eq("=bar", false)]
+    #[case::plain_word("git", false)]
+    #[case::flag("-c", false)]
+    fn test_is_var_assignment(#[case] input: &str, #[case] expected: bool) {
+        assert_eq!(is_var_assignment(input), expected);
     }
 
-    // -- Finding 1: Compound-command redirects --
+    // -- Helper: has_expansion_marker --
 
-    #[test]
-    fn test_subshell_redirect_command_substitution_git_add_is_blocked() {
-        let v = check("(echo hi) > $(git add .)");
-        assert!(v.is_blocked(), "subshell redirect with $(git add .) should be blocked");
-    }
-
-    // -- Finding 2: Launcher option parsing (command -p, exec -c) --
-
-    #[test]
-    fn test_command_p_git_add_is_blocked() {
-        // `command -p` is a no-arg flag; git add should still be detected
-        let v = check("command -p git add .");
-        assert!(v.is_blocked(), "command -p git add . should be blocked");
-    }
-
-    #[test]
-    fn test_exec_c_git_add_is_blocked() {
-        // `exec -c` is a no-arg flag; git add should still be detected
-        let v = check("exec -c git add .");
-        assert!(v.is_blocked(), "exec -c git add . should be blocked");
-    }
-
-    #[test]
-    fn test_exec_a_name_git_add_is_blocked() {
-        // `exec -a name` takes an argument; git add should still be detected
-        let v = check("exec -a myname git add .");
-        assert!(v.is_blocked(), "exec -a myname git add . should be blocked");
-    }
-
-    // -- Finding 3: Branch-delete bundled short flags --
-
-    #[test]
-    fn test_git_branch_dr_is_blocked() {
-        let v = check("git branch -dr feature");
-        assert!(v.is_blocked(), "git branch -dr should be blocked as delete");
-    }
-
-    #[test]
-    fn test_git_branch_r_upper_d_bundled_is_blocked() {
-        let v = check("git branch -rD feature");
-        assert!(v.is_blocked(), "git branch -rD should be blocked as delete");
-    }
-
-    #[test]
-    fn test_variable_bypass_branch_dr_is_blocked() {
-        let v = check("$CMD branch -dr feature");
-        assert!(v.is_blocked(), "$CMD branch -dr should be blocked");
-    }
-
-    // -- Finding 4: Python git branch create should be allowed --
-
-    #[test]
-    fn test_python_c_git_branch_create_is_blocked() {
-        // Any "git" reference in python -c is now blocked (broad match policy)
-        let v = check(r#"python3 -c "subprocess.run(['git','branch','feature'])""#);
-        assert!(v.is_blocked(), "python git branch create should be blocked (broad match)");
-    }
-
-    #[test]
-    fn test_python_c_git_branch_delete_is_still_blocked() {
-        let v = check(r#"python3 -c "subprocess.run(['git','branch','-D','feature'])""#);
-        assert!(v.is_blocked(), "python git branch -D should still be blocked");
-    }
-
-    // -- Round 6 fixes --
-
-    // env unconditional block
-    #[test]
-    fn test_env_unquoted_git_add_is_blocked() {
-        let v = check("env git add .");
-        assert!(v.is_blocked(), "env git add . should be blocked");
-        assert!(v.reason.contains("env"));
-    }
-
-    #[test]
-    fn test_variable_expansion_in_command_position_always_blocked() {
-        // Any expansion marker in any position is blocked
-        let v = check("$CMD status");
-        assert!(v.is_blocked(), "$CMD status should be blocked");
-        let v = check("$(which ls) -la");
-        assert!(v.is_blocked(), "$(which ls) should be blocked");
-        let v = check("`which cat` file.txt");
-        assert!(v.is_blocked(), "backtick should be blocked");
-    }
-
-    // Finding 2: .exe suffix bypass
-    #[test]
-    fn test_git_exe_add_is_blocked() {
-        let v = check("git.exe add .");
-        assert!(v.is_blocked(), "git.exe add . should be blocked");
-    }
-
-    #[test]
-    fn test_bash_exe_c_git_push_is_blocked() {
-        let v = check("bash.exe -c 'git push'");
-        assert!(v.is_blocked(), "bash.exe -c git push should be blocked");
-    }
-
-    // -- Round 11 fixes --
-
-    #[test]
-    fn test_bash_rcfile_c_git_add_is_blocked() {
-        // --rcfile takes a file argument; -c should still be found after it
-        let v = check("bash --rcfile /dev/null -c 'git add .'");
-        assert!(v.is_blocked(), "bash --rcfile /dev/null -c 'git add .' should be blocked");
-    }
-
-    #[test]
-    fn test_bash_init_file_c_git_push_is_blocked() {
-        let v = check("bash --init-file /etc/profile -c 'git push'");
-        assert!(v.is_blocked(), "bash --init-file /etc/profile -c should be blocked");
-    }
-
-    #[test]
-    fn test_python3_long_opt_c_git_is_blocked() {
-        let v = check(
-            r#"python3 --check-hash-based-pycs always -c "import subprocess; subprocess.run(['git','add','.'])""#,
-        );
-        assert!(v.is_blocked(), "python3 --check-hash-based-pycs always -c should be blocked");
-    }
-
-    #[test]
-    fn test_timeout_signal_eq_kill_git_add_is_blocked() {
-        // --signal=KILL should not regress timeout positional skip
-        let v = check("timeout --signal=KILL 30 git add .");
-        assert!(v.is_blocked(), "timeout --signal=KILL 30 git add . should be blocked");
-    }
-
-    #[test]
-    fn test_absolute_path_git_exe_is_blocked() {
-        let v = check("/usr/bin/git.exe add .");
-        assert!(v.is_blocked(), "absolute path git.exe should be blocked");
-    }
-
-    #[test]
-    fn test_basename_strips_exe_suffix() {
-        assert_eq!(basename("git.exe"), "git");
-        assert_eq!(basename("/usr/bin/git.exe"), "git");
-        assert_eq!(basename("git"), "git");
-    }
-
-    // Finding 4: variable bypass + branch unconditionally blocked
-    #[test]
-    fn test_variable_bypass_branch_double_dash_is_blocked() {
-        // $CMD branch -- -dev is blocked (variable bypass makes intent opaque)
-        let v = check("$CMD branch -- -dev");
-        assert!(v.is_blocked(), "$CMD branch -- -dev should be blocked");
-    }
-
-    // -- Round 7 fixes (env now unconditionally blocked) --
-
-    #[test]
-    fn test_env_u_then_s_git_add_is_blocked() {
-        // env is blocked regardless of flags
-        let v = check("env -u FOO -S 'git add .'");
-        assert!(v.is_blocked(), "env should be blocked");
-        assert!(v.reason.contains("env"));
-    }
-
-    #[test]
-    fn test_env_c_dir_is_blocked() {
-        let v = check("env -C /tmp git status");
-        assert!(v.is_blocked(), "env should be blocked");
-        assert!(v.reason.contains("env"));
-    }
-
-    #[test]
-    fn test_env_u_shell_is_blocked() {
-        // env -uSHELL is now blocked (env unconditional block)
-        let v = check("env -uSHELL git status");
-        assert!(v.is_blocked(), "env -uSHELL should be blocked");
-        assert!(v.reason.contains("env"));
-    }
-
-    #[test]
-    fn test_env_u_s_is_blocked() {
-        // env -uS is now blocked (env unconditional block)
-        let v = check("env -uS git status");
-        assert!(v.is_blocked(), "env -uS should be blocked");
-        assert!(v.reason.contains("env"));
-    }
-
-    // Finding 2: mixed-case .exe
-    #[test]
-    fn test_git_upper_exe_is_blocked() {
-        let v = check("git.EXE add .");
-        assert!(v.is_blocked(), "git.EXE add . should be blocked");
-    }
-
-    #[test]
-    fn test_bash_mixed_exe_is_blocked() {
-        let v = check("bash.Exe -c 'git push'");
-        assert!(v.is_blocked(), "bash.Exe should be blocked");
-    }
-
-    #[test]
-    fn test_basename_strips_mixed_case_exe() {
-        assert_eq!(basename("git.EXE"), "git");
-        assert_eq!(basename("git.Exe"), "git");
-        assert_eq!(basename("git.exe"), "git");
-        assert_eq!(basename("git"), "git");
-    }
-
-    // -- Heredoc bypass fix --
-
-    #[test]
-    fn test_bash_heredoc_git_add_is_blocked() {
-        let v = check("bash <<'SH'\ngit add .\nSH");
-        assert!(v.is_blocked(), "bash heredoc with git add should be blocked");
-    }
-
-    #[test]
-    fn test_python_heredoc_git_subprocess_is_blocked() {
-        let v = check("python3 - <<'PY'\nimport subprocess; subprocess.run(['git','add','.'])\nPY");
-        assert!(v.is_blocked(), "python heredoc with git subprocess should be blocked");
-    }
-
-    #[test]
-    fn test_bash_heredoc_without_git_is_allowed() {
-        let v = check("bash <<'SH'\necho hello\nSH");
-        assert!(!v.is_blocked(), "bash heredoc without git should be allowed");
-    }
-
-    #[test]
-    fn test_redirect_to_file_without_git_is_allowed() {
-        let v = check("echo hello > /tmp/output.txt");
-        assert!(!v.is_blocked());
-    }
-
-    #[test]
-    fn test_brace_group_heredoc_git_add_is_blocked() {
-        let v = check("{ bash; } <<'SH'\ngit add .\nSH");
-        assert!(v.is_blocked(), "brace group heredoc with git add should be blocked");
-    }
-
-    #[test]
-    fn test_subshell_heredoc_git_add_is_blocked() {
-        let v = check("( bash ) <<'SH'\ngit add .\nSH");
-        assert!(v.is_blocked(), "subshell heredoc with git add should be blocked");
-    }
-
-    // -- Malformed launcher input (no panic) --
-
-    #[test]
-    fn test_taskset_trailing_option_no_panic() {
-        // taskset -o has -o as option-with-arg but no following token
-        let v = check("taskset -o");
-        assert!(!v.is_blocked());
-    }
-
-    #[test]
-    fn test_timeout_trailing_signal_no_panic() {
-        // timeout -s has -s as option-with-arg but no following token
-        let v = check("timeout -s");
-        assert!(!v.is_blocked());
-    }
-
-    // -- UTF-8 safety --
-
-    #[test]
-    fn test_multibyte_utf8_command_no_panic() {
-        // €aab is 6 bytes (€=3 bytes), len-4 would be inside € without safe handling
-        let v = check("€aab");
-        assert!(!v.is_blocked());
-    }
-
-    #[test]
-    fn test_multibyte_utf8_with_exe_suffix_no_panic() {
-        let v = check("日本語.exe add");
-        assert!(!v.is_blocked());
+    #[rstest]
+    #[case::dollar_var("$HOME", true)]
+    #[case::dollar_paren("$(cmd)", true)]
+    #[case::backtick("`cmd`", true)]
+    #[case::plain_word("git", false)]
+    fn test_has_expansion_marker(#[case] input: &str, #[case] expected: bool) {
+        assert_eq!(has_expansion_marker(input), expected);
     }
 }

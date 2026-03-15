@@ -378,6 +378,8 @@ mod tests {
     use std::process::Command;
     use std::sync::{Mutex, OnceLock};
 
+    use rstest::rstest;
+
     use super::{
         GitRepository, SystemGitRepo, collect_track_branch_claims, load_explicit_track_branch,
         load_explicit_track_branch_from_items_dir, resolve_repo_path,
@@ -486,33 +488,27 @@ mod tests {
         assert_eq!(record.display_path, "custom/track/items/example");
     }
 
-    #[test]
-    fn load_explicit_track_branch_rejects_v3_track_missing_branch_field() {
+    #[rstest]
+    #[case::missing_branch(
+        r#"{"schema_version":3,"status":"planned"}"#,
+        "Missing required field 'branch'"
+    )]
+    #[case::missing_title(
+        r#"{"schema_version":3,"id":"example","status":"planned","branch":null,"created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]}}"#,
+        "Missing required field 'title'"
+    )]
+    fn load_explicit_track_branch_rejects_v3_track_missing_required_field(
+        #[case] metadata_json: &str,
+        #[case] expected_error: &str,
+    ) {
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/example");
         fs::create_dir_all(&track_dir).unwrap();
-        fs::write(track_dir.join("metadata.json"), "{\"schema_version\":3,\"status\":\"planned\"}")
-            .unwrap();
+        fs::write(track_dir.join("metadata.json"), metadata_json).unwrap();
 
         let err = load_explicit_track_branch(dir.path(), &track_dir).unwrap_err();
 
-        assert!(err.contains("Missing required field 'branch'"));
-    }
-
-    #[test]
-    fn load_explicit_track_branch_rejects_v3_track_missing_title_field() {
-        let dir = tempfile::tempdir().unwrap();
-        let track_dir = dir.path().join("track/items/example");
-        fs::create_dir_all(&track_dir).unwrap();
-        fs::write(
-            track_dir.join("metadata.json"),
-            r#"{"schema_version":3,"id":"example","status":"planned","branch":null,"created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]}}"#,
-        )
-        .unwrap();
-
-        let err = load_explicit_track_branch(dir.path(), &track_dir).unwrap_err();
-
-        assert!(err.contains("Missing required field 'title'"));
+        assert!(err.contains(expected_error));
     }
 
     #[test]
