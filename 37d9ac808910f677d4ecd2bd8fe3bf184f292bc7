@@ -1,0 +1,20 @@
+## Task Summary: Integrate CLI orchestration into usecase layer with domain ports
+
+**Track:** track-plan-activation-2026-03-14
+**Task:** T009 — CLI に残るオーケストレーションロジックを usecase 層に統合する
+**Date:** 2026-03-15
+
+### Changes
+
+- libs/domain/src/repository.rs: Added `WorktreeReader` port trait for worktree cleanliness inspection
+- libs/domain/src/error.rs: Added `UnsupportedTargetStatus` validation error variant
+- libs/infrastructure/src/git_cli.rs: Implemented `WorktreeReader` for `SystemGitRepo`
+- libs/usecase/src/lib.rs: Added `TransitionTaskUseCase::execute_by_status` consolidating task-lookup → resolve → transition
+- libs/usecase/src/track_resolution.rs: Added `reject_branchless_guard` reading branch state via `TrackReader` port
+- libs/usecase/src/worktree_guard.rs: Added `ensure_clean_worktree` reading porcelain status via `WorktreeReader` port
+- apps/cli/src/commands/track/transition.rs: Simplified to delegate to usecase functions
+- apps/cli/src/commands/track/activate.rs: `ensure_clean_worktree` delegates to usecase; test stubs implement `WorktreeReader`
+
+### Why
+
+CLI 層に流出していたオーケストレーションロジック（タスク遷移解決、activation guard、worktree 検証）を usecase 層に統合し、domain ポートを通じて usecase が自律的にデータを取得する設計にリファクタリングした。hexagonal architecture の依存方向を正しく維持しつつ、CLI は薄いアダプタに集約された。
