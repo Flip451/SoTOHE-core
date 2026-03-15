@@ -21,6 +21,24 @@ pub trait GitRepository {
         Ok(Some(String::from_utf8_lossy(&output.stdout).trim().to_owned()))
     }
 
+    /// Push the given branch to origin with tracking (`-u`).
+    ///
+    /// # Errors
+    ///
+    /// Returns an error description if `git push` fails.
+    fn push_branch(&self, branch: &str) -> Result<(), String> {
+        let output = self.output(&["push", "-u", "origin", branch])?;
+        if output.status.success() {
+            return Ok(());
+        }
+        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+        Err(if stderr.is_empty() {
+            format!("git push -u origin {branch} failed")
+        } else {
+            format!("git push -u origin {branch} failed: {stderr}")
+        })
+    }
+
     /// Stage all worktree changes using `git add -A`, excluding the given pathspecs.
     ///
     /// Tolerates gitignore warnings when the only stderr lines match a known
