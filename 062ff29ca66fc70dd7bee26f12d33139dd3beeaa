@@ -1,0 +1,25 @@
+## Task Summary: Eliminate stringly-typed errors across all layers
+
+**Track:** cli-error-handling-2026-03-15
+**Task:** ERR-09: Replace Result<_, String> with typed thiserror enums and introduce CliError
+**Date:** 2026-03-15
+
+### Changes
+
+- libs/infrastructure/src/git_cli.rs: Define GitError enum, migrate GitRepository trait methods
+- libs/infrastructure/src/gh_cli.rs: Define GhError enum, migrate GhClient trait methods
+- libs/infrastructure/src/track/fs_store.rs: read_track_metadata returns RepositoryError
+- libs/domain/src/error.rs: Add WorktreeError enum
+- libs/domain/src/repository.rs: WorktreeReader::porcelain_status returns WorktreeError
+- libs/usecase/src/track_resolution.rs: Define TrackResolutionError
+- libs/usecase/src/git_workflow.rs: Define GitWorkflowError
+- libs/usecase/src/pr_workflow.rs: Define PrWorkflowError
+- libs/usecase/src/worktree_guard.rs: Define WorktreeGuardError
+- libs/usecase/src/review_workflow.rs: Define ReviewWorkflowError
+- apps/cli/src/error.rs: New CliError enum aggregating all layer errors
+- apps/cli/src/commands/track/*.rs: Migrate to CliError + ? operator
+- apps/cli/src/commands/git.rs, pr.rs, file.rs, main.rs: Same migration
+
+### Why
+
+The codebase had 94+ instances of `eprintln!` + `ExitCode::FAILURE` boilerplate in CLI commands and pervasive `Result<_, String>` throughout infrastructure, domain, and usecase layers. This erased type information at every boundary, making error recovery, structured logging, and pattern matching impossible. Typed errors restore the error chain and reduce CLI boilerplate via the `?` operator.
