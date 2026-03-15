@@ -1,0 +1,91 @@
+{
+  "schema_version": 3,
+  "id": "sotp-bin-placement-2026-03-15",
+  "title": "sotp バイナリを bin/sotp に配置し cargo run を排除",
+  "status": "planned",
+  "branch": "track/sotp-bin-placement-2026-03-15",
+  "created_at": "2026-03-15T10:00:00Z",
+  "updated_at": "2026-03-15T10:00:00Z",
+  "plan": {
+    "summary": [
+      "sotp CLI バイナリのビルド成果物を bin/sotp に配置し、Makefile.toml のホスト側 wrapper タスクの cargo run --quiet -p cli 呼び出しと hook の SOTP_CLI_BINARY デフォルトを bin/sotp に統一する。",
+      "bootstrap タスクで自動ビルド+配置し、テンプレート利用者は cargo make bootstrap 後すぐに bin/sotp を使える。"
+    ],
+    "sections": [
+      {
+        "id": "S001",
+        "title": "bin/ ディレクトリと .gitignore 設定",
+        "description": ["bin/ ディレクトリを作成し、.gitignore に /bin/sotp を追加。bin/.gitkeep でディレクトリ構造を git 管理する。"],
+        "task_ids": ["T001"]
+      },
+      {
+        "id": "S002",
+        "title": "build-sotp タスク追加と bootstrap 統合",
+        "description": ["Makefile.toml に build-sotp タスク（cargo build -p cli --release + cp）を追加し、bootstrap の依存に組み込む。"],
+        "task_ids": ["T002"]
+      },
+      {
+        "id": "S003",
+        "title": "Makefile.toml の cargo run 置換",
+        "description": ["ホスト側 wrapper タスク（非 -local）の cargo run --quiet -p cli -- を bin/sotp に置換する。コンテナ内 -local タスクは対象外。"],
+        "task_ids": ["T003"]
+      },
+      {
+        "id": "S004",
+        "title": "hook の SOTP_CLI_BINARY デフォルト変更",
+        "description": [".claude/settings.json の SOTP_CLI_BINARY デフォルトを bin/sotp に変更する。"],
+        "task_ids": ["T004"]
+      },
+      {
+        "id": "S005",
+        "title": "ドキュメントと検証スクリプト更新",
+        "description": ["SOTP_CLI_BINARY 参照箇所のドキュメント更新、verify_orchestra_guardrails.py のスニペット更新。"],
+        "task_ids": ["T005"]
+      },
+      {
+        "id": "S006",
+        "title": "CI 検証",
+        "description": [],
+        "task_ids": ["T006"]
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "bin/ ディレクトリと .gitignore 設定",
+      "status": "todo",
+      "description": "bin/.gitkeep を作成。.gitignore に /bin/sotp を追加（bin/.gitkeep は追跡対象のまま）。"
+    },
+    {
+      "id": "T002",
+      "title": "build-sotp タスクと bootstrap 統合",
+      "status": "todo",
+      "description": "Makefile.toml に build-sotp タスクを追加: ホスト側で cargo build -p cli --release を実行し、target/release/sotp を bin/sotp にコピー。bootstrap スクリプト内の適切な位置で build-sotp を呼び出す。bootstrap の前提条件チェックに cargo/rustc の存在確認を追加する。前提: テンプレート利用者はホスト側に Rust toolchain を持つ（Rust テンプレートのため妥当）。"
+    },
+    {
+      "id": "T003",
+      "title": "Makefile.toml の cargo run 置換",
+      "status": "todo",
+      "description": "Makefile.toml 内のホスト側 wrapper タスク（非 -local）の 'cargo run --quiet -p cli --' を 'bin/sotp' に置換する。コンテナ内 -local タスクは対象外（引き続き cargo build 成果物を直接使用）。"
+    },
+    {
+      "id": "T004",
+      "title": "hook の SOTP_CLI_BINARY デフォルト変更",
+      "status": "todo",
+      "description": ".claude/settings.json の hook コマンドを変更: SOTP_CLI_BINARY env override は維持。デフォルトのフォールバックチェーンを SOTP_CLI_BINARY → $CLAUDE_PROJECT_DIR/bin/sotp → cargo run --quiet -p cli にする。パスは $CLAUDE_PROJECT_DIR で project root に固定し cwd 非依存にする。これにより fresh clone でも bootstrap 前に hook が動作する。"
+    },
+    {
+      "id": "T005",
+      "title": "ドキュメントと検証スクリプト更新",
+      "status": "todo",
+      "description": "SOTP_CLI_BINARY 参照箇所のドキュメント更新（.claude/docs/DESIGN.md 等）。verify_orchestra_guardrails.py と test_verify_scripts.py のスニペット期待値更新。scripts/test_make_wrappers.py の全ホスト側 wrapper タスク body 期待値を bin/sotp に更新し、未カバーの wrapper（track-branch-create, track-branch-switch, track-activate, track-resolve, track-pr-push, track-pr-ensure, track-pr, track-transition, track-sync-views 等）のテストも追加する。"
+    },
+    {
+      "id": "T006",
+      "title": "CI 検証",
+      "status": "todo",
+      "description": "cargo make ci が通ることを確認。bin/sotp が存在しない状態での bootstrap → CI フローを検証。"
+    }
+  ]
+}
