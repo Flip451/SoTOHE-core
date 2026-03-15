@@ -36,6 +36,14 @@
           "T005"
         ],
         "title": "CI 検証"
+      },
+      {
+        "description": [],
+        "id": "S005",
+        "task_ids": [
+          "T006"
+        ],
+        "title": "/track:pr スキル新設"
       }
     ],
     "summary": [
@@ -70,8 +78,13 @@
       "description": "cargo make ci が通ることを確認する",
       "id": "T005",
       "status": "done"
+    },
+    {
+      "description": "/track:pr スキルを新設し push + PR 作成を1コマンドで実行する。Makefile.toml に track-pr タスクを追加し .claude/commands/track/pr.md にスキル定義を作成する。settings.json の permissions.allow に追加する",
+      "id": "T006",
+      "status": "done"
     }
   ],
   "title": "Track ワークフロー UX 改善",
-  "updated_at": "2026-03-15T06:01:52Z"
+  "updated_at": "2026-03-15T06:30:05Z"
 }

@@ -20,3 +20,7 @@ track-commit-message の CI 出力抑制、plan/ ブランチ PR 対応、PR bod
 ## CI 検証
 
 - [x] cargo make ci が通ることを確認する
+
+## /track:pr スキル新設
+
+- [x] /track:pr スキルを新設し push + PR 作成を1コマンドで実行する。Makefile.toml に track-pr タスクを追加し .claude/commands/track/pr.md にスキル定義を作成する。settings.json の permissions.allow に追加する

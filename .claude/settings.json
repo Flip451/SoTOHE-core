@@ -232,6 +232,8 @@
       "Bash(cargo make guides-clean:*)",
       "Bash(cargo make guides-usage)",
       "Bash(cargo make guides-setup)",
+      "Bash(cargo make track-pr)",
+      "Bash(cargo make track-pr:*)",
       "Bash(cargo make track-pr-push)",
       "Bash(cargo make track-pr-ensure)",
       "Bash(cargo make track-pr-review)",

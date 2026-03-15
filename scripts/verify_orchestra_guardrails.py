@@ -169,6 +169,8 @@ EXPECTED_CARGO_MAKE_ALLOW = {
     "Bash(cargo make guides-clean:*)": "guides clean permission",
     "Bash(cargo make guides-usage)": "cargo make guides-usage permission",
     "Bash(cargo make guides-setup)": "cargo make guides-setup permission",
+    "Bash(cargo make track-pr)": "cargo make track-pr permission",
+    "Bash(cargo make track-pr:*)": "cargo make track-pr wildcard permission",
     "Bash(cargo make track-pr-push)": "cargo make track-pr-push permission",
     "Bash(cargo make track-pr-ensure)": "cargo make track-pr-ensure permission",
     "Bash(cargo make track-pr-review)": "cargo make track-pr-review permission",
