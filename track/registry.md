@@ -7,15 +7,15 @@
 
 ## Current Focus
 
-- Latest active track: `None yet`
-- Next recommended command: `/track:plan <feature>`
+- Latest active track: `python-hook-launcher-removal-2026-03-15`
+- Next recommended command: `/track:activate python-hook-launcher-removal-2026-03-15`
 - Last updated: `2026-03-15`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| _No active tracks yet_ | - | `/track:plan <feature>` | - |
+| python-hook-launcher-removal-2026-03-15 | planned | `/track:activate python-hook-launcher-removal-2026-03-15` | 2026-03-15 |
 
 ## Completed Tracks
 
