@@ -17,7 +17,7 @@ track/items/takt-removal-2026-03-13/takt-touchpoint-inventory.md
 
 ## Phase A: Document and profile/hook cleanup (M1 preconditions)
 
-- [ ] ドキュメント清書 — `.claude/rules/`、`.claude/commands/track/`、`.claude/docs/WORKFLOW.md`、`.claude/skills/gemini-system/SKILL.md`、`track/workflow.md`、`DEVELOPER_AI_WORKFLOW.md`、`LOCAL_DEVELOPMENT.md`、`TAKT_TRACK_TRACEABILITY.md`、`START_HERE_HUMAN.md`、`CLAUDE.md` から takt の言及を完全除去し、Claude Code + Rust CLI 前提の記述に統一する。`cargo make ci` 通過を確認する
+- [x] ドキュメント清書 — `.claude/rules/`、`.claude/commands/track/`、`.claude/docs/WORKFLOW.md`、`.claude/skills/gemini-system/SKILL.md`、`track/workflow.md`、`DEVELOPER_AI_WORKFLOW.md`、`LOCAL_DEVELOPMENT.md`、`TRACK_TRACEABILITY.md`（旧 `TAKT_TRACK_TRACEABILITY.md` からリネーム）、`START_HERE_HUMAN.md`、`CLAUDE.md` から takt の言及を完全除去し、Claude Code + Rust CLI 前提の記述に統一する。`cargo make ci` 通過を確認する f42a79c
 - [ ] Profile/Hook 互換エイリアス除去（Phase B 前提条件）— `.claude/hooks/_agent_profiles.py` の `takt_host_*` 互換エイリアスと公開関数を除去する。`.claude/hooks/agent-router.py` の `takt` keyword ルーティングを除去する。全 hook から `TAKT_SESSION` silence guard を除去する。関連する hook selftest を更新する。`cargo make ci` 通過を確認する
 
 ## Phase B+C+D: Runtime, failure-report, and test/CI removal (atomic)

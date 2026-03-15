@@ -15,7 +15,7 @@ Always consider:
   - `track/workflow.md`
   - `track/tech-stack.md`
   - `track/registry.md`
-  - `TAKT_TRACK_TRACEABILITY.md`
+  - `TRACK_TRACEABILITY.md`
 - enforcement:
   - `Makefile.toml`
   - `scripts/verify_*.py`
@@ -23,9 +23,5 @@ Always consider:
   - `.claude/settings.json`
   - `.claude/hooks/`
   - `scripts/external_guides.py`
-- takt definitions:
-  - `.takt/config.yaml`
-  - `.takt/pieces/`
-  - `.takt/personas/`
 
 After such changes, run `cargo make ci`.

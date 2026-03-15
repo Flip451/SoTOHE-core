@@ -241,9 +241,6 @@ cargo make track-pr-status <pr>     # checks 状態を表示
 cargo make track-pr-merge <pr> --method merge
 ```
 
-`/track:full-cycle` は Claude Code 内で閉じる orchestration として扱い、`cargo make takt-*` を前提にしない。
-残存 `takt-*` wrapper は migration compatibility surface であり、通常導線としては案内しない。
-
 #### 高速確認（exec 系）
 
 `tools-daemon` が起動していればコンテナ起動オーバーヘッドなしで実行できる。

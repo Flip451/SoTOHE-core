@@ -11,7 +11,7 @@
 - `scripts/takt_profile.py`、`scripts/takt_failure_report.py` と関連テスト群の削除
 - `.claude/hooks/` の `TAKT_SESSION` silence guard と `takt_host_*` 互換エイリアスの除去
 - `.claude/settings.json` の legacy pending permissions 除去
-- `.claude/rules/`、`track/workflow.md`、`DEVELOPER_AI_WORKFLOW.md`、`TAKT_TRACK_TRACEABILITY.md` の takt 言及除去
+- `.claude/rules/`、`track/workflow.md`、`DEVELOPER_AI_WORKFLOW.md`、`TRACK_TRACEABILITY.md` の takt 言及除去
 - `libs/usecase/src/git_workflow.rs`、`scripts/git_ops.py` の `.takt/pending-*` transient path 除去
 - `Makefile.toml` の `add-pending-paths`、`commit-pending-message`、`note-pending` legacy wrapper 除去
 - CI selftest / verify script の takt 前提除去

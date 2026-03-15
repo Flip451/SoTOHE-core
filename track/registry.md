@@ -15,7 +15,7 @@
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| takt-deprecation-impl-2026-03-15 | planned | `/track:implement` | 2026-03-15 |
+| takt-deprecation-impl-2026-03-15 | in_progress | `/track:implement` | 2026-03-15 |
 
 ## Completed Tracks
 

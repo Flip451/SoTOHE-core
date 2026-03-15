@@ -361,7 +361,7 @@ class VerifyScriptsTest(unittest.TestCase):
             + "\n",
             encoding="utf-8",
         )
-        (root / "TAKT_TRACK_TRACEABILITY.md").write_text(
+        (root / "TRACK_TRACEABILITY.md").write_text(
             "\n".join(
                 [
                     "Responsibility Split (Fixed)",
@@ -3060,7 +3060,6 @@ class VerifyScriptsTest(unittest.TestCase):
             "track/workflow.md",
         ):
             content = (PROJECT_ROOT / rel_path).read_text(encoding="utf-8")
-            self.assertIn("migration compatibility", content)
             self.assertNotIn("`takt prompt` を直接使う場合だけ", content)
         self.assertIn(
             "Python 3.11+",
@@ -3092,7 +3091,7 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertIn("人間と AI の責務境界", onboarding)
         self.assertIn("必須レビュー・承認ポイント", onboarding)
         self.assertIn("人間が修正してよい対象", onboarding)
-        self.assertIn("TAKT_TRACK_TRACEABILITY.md", onboarding)
+        self.assertIn("TRACK_TRACEABILITY.md", onboarding)
         self.assertIn("レビューや運用判断が必要なとき", onboarding)
         self.assertIn("2章（対応付けルール）", onboarding)
         self.assertIn("4章（Interactive Implementation Contract）", onboarding)
@@ -3105,7 +3104,6 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertIn(".claude/agents/**", onboarding)
         self.assertIn("CLAUDE.md", onboarding)
         self.assertIn("rustfmt.toml", onboarding)
-        self.assertIn(".takt/**", onboarding)
         self.assertIn(".cache/**", onboarding)
         self.assertIn("Cargo.lock", onboarding)
         conditional_idx = onboarding.index("条件付きで編集してよい:")
@@ -3144,7 +3142,7 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertIn("cargo make track-commit-message", commit_doc)
         self.assertIn("tmp/track-commit/note.md", commit_doc)
         self.assertIn("cargo make track-note", commit_doc)
-        self.assertIn("cargo make note-pending", commit_doc)
+        self.assertIn("cargo make track-note", commit_doc)
 
         # /track:plan now owns track artifact creation (Option C merge)
         plan_doc = (
@@ -3404,8 +3402,8 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertEqual(hits, [], "stdin redirect found for multimodal files")
         # Should reference agent-profiles.json as source of truth
         self.assertIn("agent-profiles.json", content)
-        # Should have takt parser note
-        self.assertIn("takt_profile.py", content)
+        # Should use path-in-prompt format
+        self.assertIn("path-in-prompt", content)
 
     def test_gemini_skill_uses_path_in_prompt(self) -> None:
         """gemini-system SKILL.md multimodal examples should use path-in-prompt."""

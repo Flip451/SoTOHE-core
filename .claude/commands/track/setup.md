@@ -12,7 +12,6 @@ Execution rules:
 - Ensure the track convention includes `track/items/<id>/metadata.json` and `verification.md` alongside `spec.md` and `plan.md`.
 - Confirm required top-level docs exist (`CLAUDE.md`, `.claude/docs/WORKFLOW.md`, `.claude/docs/DESIGN.md`).
 - Strict tech-stack guardrails are on by default. Only template maintainers may disable them locally for template work via `TRACK_TEMPLATE_DEV=1` or an untracked `.track-template-dev` marker.
-- Treat `.takt/**` as legacy implementation-detail assets during the removal migration. Do not require them for setup, and do not direct users to configure or regenerate them.
 - Do not start implementation work in this command.
 - Summarize what was initialized and what TODO items must be filled next.
 
