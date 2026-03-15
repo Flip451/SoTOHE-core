@@ -1,0 +1,25 @@
+## Task Summary: Introduce rstest and convert tests to parameterized tests
+
+**Track:** rstest-introduction-2026-03-15
+**Task:** T001-T006: Add rstest 0.26.1 workspace-wide, convert repetitive tests across all 4 crates
+**Date:** 2026-03-15
+
+### Changes
+
+- Cargo.toml: added rstest 0.26.1 to workspace dev-dependencies
+- libs/domain/Cargo.toml, libs/usecase/Cargo.toml, libs/infrastructure/Cargo.toml, apps/cli/Cargo.toml: added rstest dev-dep
+- libs/domain/src/guard/policy.rs: 120 tests → rstest parameterized groups (blocked/allowed/env/variable/helper)
+- libs/domain/src/guard/parser.rs: tokenize, split_shell, command substitution tests parameterized
+- libs/domain/src/track_phase.rs: resolve_phase_from_record status/branch matrix parameterized
+- libs/domain/src/lib.rs: task_id/track_branch rejection tests parameterized
+- libs/usecase/src/hook.rs: resolve_lock_mode 4 tests parameterized
+- libs/usecase/src/track_resolution.rs: reject_branchless 6 tests parameterized
+- libs/usecase/src/worktree_guard.rs: parse_dirty_worktree_paths 5 tests parameterized
+- libs/infrastructure/src/gh_cli.rs: find_open_pr null/empty cases parameterized
+- libs/infrastructure/src/git_cli.rs: load_explicit_track_branch reject cases parameterized
+- apps/cli/src/commands/track/activate.rs: multiple activation test groups parameterized
+- track/tech-stack.md: rstest entry added
+
+### Why
+
+Repetitive test patterns (especially guard/policy.rs with 120 near-identical tests) created maintenance burden and obscured test intent. rstest parameterized tests reduce boilerplate while preserving all test cases (469 baseline → 517 after expansion).
