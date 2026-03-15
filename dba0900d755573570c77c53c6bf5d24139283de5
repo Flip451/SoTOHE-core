@@ -1,0 +1,23 @@
+## Task Summary: Add plan/<id> branch model for planning-only review workflow
+
+**Track:** track-plan-activation-2026-03-14
+**Task:** T007 — plan-only に plan/<id> branch 作成
+**Date:** 2026-03-15
+
+### Changes
+
+- .claude/commands/track/plan-only.md: plan/<id> branch creation via cargo make track-plan-branch
+- DEVELOPER_AI_WORKFLOW.md: mermaid + command table + plan-only lane updated to plan branch model
+- .claude/docs/WORKFLOW.md: plan-only alternative updated to plan branch + PR flow
+- track/workflow.md: Track Commands + Branch Strategy updated
+- design.md: Plan-only lane rewritten for plan branch model
+- Makefile.toml: track-plan-branch wrapper task added
+- .claude/settings.json: track-plan-branch + track-resolve allowlist entries
+- .claude/hooks/block-direct-git-ops.py: remediation message includes track-plan-branch
+- scripts/verify_orchestra_guardrails.py: baseline allowlist updated
+- .claude/skills/track-plan/SKILL.md: plan-only description updated
+
+### Why
+
+Plan-only tracks need isolated review before merging to main. Creating a plan/<id>
+branch enables PR-based review of planning artifacts without committing directly to main.
