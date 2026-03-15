@@ -107,12 +107,16 @@ Launch one reviewer per non-empty group, **in parallel** using Agent Teams
 
 **When the provider has a CLI tool** (e.g., Codex CLI — the default profile):
 
+Use `{fast_model}` for iterative rounds and `{model}` for the final confirmation round (see Model escalation strategy).
+
 ```
-Agent 1: cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-infra-domain.md
-Agent 2: cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-usecase.md
-Agent 3: cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-cli.md
-Agent 4: cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-other.md
+Agent 1: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-infra-domain.md
+Agent 2: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-usecase.md
+Agent 3: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-cli.md
+Agent 4: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-other.md
 ```
+
+For the **final confirmation round**, replace `{fast_model}` with `{model}` in the commands above.
 
 **When the provider is `claude`** (e.g., `claude-heavy` profile):
 
@@ -157,7 +161,8 @@ one finding. The wrapper prints that final JSON payload as the last stdout line.
 Execute the parallel review as described in Step 2.
 
 Parse the aggregated verdict:
-- If `zero_findings`: proceed to Step 4 (done).
+- If `zero_findings` and this was a fast-model round: proceed to the final confirmation round (see Model escalation strategy).
+- If `zero_findings` and this was the full-model confirmation round: proceed to Step 4 (done).
 - If `findings_remain`: read the merged findings list and proceed to fix phase.
 - If any reviewer execution failed: stop and report the failure before continuing.
 
@@ -186,13 +191,29 @@ Verify the fixes. Report any remaining bugs or new issues.
 ```
 
 Parse the aggregated output:
-- If `zero_findings`: proceed to Step 4.
+- If `zero_findings` and this was a fast-model round: proceed to the final confirmation round (see Model escalation strategy).
+- If `zero_findings` and this was the full-model confirmation round: proceed to Step 4 (done).
 - If `findings_remain`: use the merged findings, then repeat fix phase → Round N+1.
 - Otherwise, stop and report the reviewer execution failure.
 
+### Model escalation strategy
+
+Use the reviewer provider's `fast_model` for iterative fix-verify rounds and escalate to `default_model` for final confirmation.
+
+Resolve models from `.claude/agent-profiles.json` using the `reviewer` capability:
+- `{fast_model}`: `provider_model_overrides` for reviewer, then `providers.<reviewer_provider>.fast_model`, then `default_model`. If none exist, skip `--model`.
+- `{model}`: `provider_model_overrides`, then `providers.<reviewer_provider>.default_model`. If none exist, skip `--model`.
+
+Execution:
+- **Iterative rounds (up to 5)**: Use the `reviewer` capability with `{fast_model}` for rapid feedback.
+- **Final round (confirmation)**: When the fast model reports `zero_findings`, run one more round with `{model}` to catch deeper design issues.
+- If the full model also reports `zero_findings`: proceed to Step 4.
+- If the full model finds new issues: fix and return to the fast model loop.
+
 ### Loop guard
 
-- Maximum 5 rounds. If findings persist after 5 rounds, stop and report remaining issues to the user for manual decision.
+- Maximum 5 rounds with the fast reviewer. If findings persist after 5 fast rounds, stop and report remaining issues to the user for manual decision.
+- The final full-model confirmation round does not count toward the loop guard limit.
 - Between rounds, always run `cargo make ci-rust` to ensure fixes don't break the build.
 
 ## Step 4: Final validation

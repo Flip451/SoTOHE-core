@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| sotp-bin-placement-2026-03-15 | Done | 2026-03-15 |
 | plan-review-flow-2026-03-15 | Done | 2026-03-15 |
 | cli-error-handling-2026-03-15 | Done | 2026-03-15 |
 | rstest-introduction-2026-03-15 | Done | 2026-03-15 |

@@ -162,7 +162,7 @@ echo "=== Bootstrap: development environment setup ==="
 
 # 1. Check prerequisites
 echo ""
-echo "--- Step 1/5: Check prerequisites ---"
+echo "--- Step 1/6: Check prerequisites ---"
 if ! command -v docker >/dev/null 2>&1; then
   echo "[FAIL] docker not found. Install Docker first."
   exit 1
@@ -173,6 +173,12 @@ if ! docker compose version >/dev/null 2>&1; then
 fi
 echo "[OK] docker and docker compose available"
 
+if ! command -v cargo >/dev/null 2>&1; then
+  echo "[FAIL] cargo not found. Install Rust: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+  exit 1
+fi
+echo "[OK] cargo available"
+
 if ! command -v uv >/dev/null 2>&1; then
   echo "[FAIL] uv not found. Install: curl -LsSf https://astral.sh/uv/install.sh | sh"
   exit 1
@@ -181,7 +187,7 @@ echo "[OK] uv available"
 
 # 2. Python venv + dependencies
 echo ""
-echo "--- Step 2/5: Python venv + dependencies ---"
+echo "--- Step 2/6: Python venv + dependencies ---"
 if [ ! -d .venv ]; then
   echo "Creating .venv ..."
   uv venv .venv
@@ -192,20 +198,26 @@ echo "[OK] Python dependencies installed"
 
 # 3. Docker images
 echo ""
-echo "--- Step 3/5: Build Docker images ---"
+echo "--- Step 3/6: Build Docker images ---"
 mkdir -p target .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home .cache/pytest
 docker compose build tools
 echo "[OK] Docker tools image built"
 
-# 4. CI
+# 4. Build sotp CLI binary
 echo ""
-echo "--- Step 4/5: Run CI ---"
+echo "--- Step 4/6: Build sotp CLI binary ---"
+cargo make build-sotp
+echo "[OK] bin/sotp built and installed"
+
+# 5. CI
+echo ""
+echo "--- Step 5/6: Run CI ---"
 docker compose run --rm tools cargo make --allow-private ci-local
 echo "[OK] CI passed"
 
-# 5. Git notes fetch refspec
+# 6. Git notes fetch refspec
 echo ""
-echo "--- Step 5/5: Configure git notes fetch refspec ---"
+echo "--- Step 6/6: Configure git notes fetch refspec ---"
 if git remote get-url origin >/dev/null 2>&1; then
   if git config --get-all remote.origin.fetch | grep -q 'refs/notes'; then
     echo "[OK] git notes refspec already configured"
@@ -220,6 +232,11 @@ fi
 echo ""
 echo "=== Bootstrap complete ==="
 ''']
+
+[tasks.build-sotp]
+description = "[host] Build sotp CLI binary and install to bin/sotp"
+script_runner = "@shell"
+script = ['TARGET_DIR="${CARGO_TARGET_DIR:-target}"; cargo build -p cli --release && mkdir -p bin && cp "$TARGET_DIR/release/sotp" bin/sotp && echo "[OK] bin/sotp built"']
 
 [tasks.build-tools]
 description = "[wrapper] Build tools image"
@@ -662,22 +679,22 @@ args = ["add", "${@}"]
 [tasks.add-all]
 description = "[wrapper] Stage all worktree changes except transient automation scratch files"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- git add-all']
+script = ['bin/sotp git add-all']
 
 [tasks.track-branch-create]
 description = "[wrapper] Materialize branch metadata, create a track branch from main, and switch to it (usage: cargo make track-branch-create '<track-id>')"
 script_runner = "@shell"
-script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; cargo run --quiet -p cli -- track branch create --items-dir track/items "$TRACK_ID"']
+script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; bin/sotp track branch create --items-dir track/items "$TRACK_ID"']
 
 [tasks.track-branch-switch]
 description = "[wrapper] Materialize branch metadata if needed, then switch to an existing track branch (usage: cargo make track-branch-switch '<track-id>')"
 script_runner = "@shell"
-script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; cargo run --quiet -p cli -- track branch switch --items-dir track/items "$TRACK_ID"']
+script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; bin/sotp track branch switch --items-dir track/items "$TRACK_ID"']
 
 [tasks.track-activate]
 description = "[wrapper] Materialize a planning-only track and switch to its track branch (usage: cargo make track-activate '<track-id>')"
 script_runner = "@shell"
-script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; cargo run --quiet -p cli -- track activate --items-dir track/items "$TRACK_ID"']
+script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; bin/sotp track activate --items-dir track/items "$TRACK_ID"']
 
 [tasks.track-plan-branch]
 description = "[wrapper] Create a plan/<track-id> branch from main for planning-only review (usage: cargo make track-plan-branch '<track-id>')"
@@ -687,25 +704,25 @@ script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "e
 [tasks.track-resolve]
 description = "[wrapper] Resolve current track phase, next command, and blocker"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- track resolve $CARGO_MAKE_TASK_ARGS']
+script = ['bin/sotp track resolve $CARGO_MAKE_TASK_ARGS']
 
 [tasks.track-pr-push]
 description = "[wrapper] Push current track/plan branch to origin (plan/ branches require track-id arg)"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- pr push ${CARGO_MAKE_TASK_ARGS:+--track-id $CARGO_MAKE_TASK_ARGS}']
+script = ['bin/sotp pr push ${CARGO_MAKE_TASK_ARGS:+--track-id $CARGO_MAKE_TASK_ARGS}']
 
 [tasks.track-pr-ensure]
 description = "[wrapper] Create or reuse a PR for the current track/plan branch (plan/ branches require track-id arg)"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- pr ensure-pr ${CARGO_MAKE_TASK_ARGS:+--track-id $CARGO_MAKE_TASK_ARGS}']
+script = ['bin/sotp pr ensure-pr ${CARGO_MAKE_TASK_ARGS:+--track-id $CARGO_MAKE_TASK_ARGS}']
 
 [tasks.track-pr]
 description = "[wrapper] Push current branch and create/reuse a PR (push + ensure-pr in one step)"
 script_runner = "@shell"
 script = ['''
 TRACK_ARG="${CARGO_MAKE_TASK_ARGS:+--track-id $CARGO_MAKE_TASK_ARGS}"
-cargo run --quiet -p cli -- pr push $TRACK_ARG && \
-cargo run --quiet -p cli -- pr ensure-pr $TRACK_ARG
+bin/sotp pr push $TRACK_ARG && \
+bin/sotp pr ensure-pr $TRACK_ARG
 ''']
 
 [tasks.track-pr-review]
@@ -716,27 +733,27 @@ script = ['"${PYTHON_BIN:-python3}" scripts/pr_review.py run']
 [tasks.track-pr-merge]
 description = "[wrapper] Wait for PR checks to pass, then merge"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- pr wait-and-merge ${@}']
+script = ['bin/sotp pr wait-and-merge ${@}']
 
 [tasks.track-pr-status]
 description = "[wrapper] Show PR check status"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- pr status ${@}']
+script = ['bin/sotp pr status ${@}']
 
 [tasks.track-local-review]
 description = "[wrapper] Run the local Codex reviewer through the repo-owned Rust wrapper"
 script_runner = "@shell"
-script = ['if [ "${1:-}" = "--" ]; then shift; fi; cargo run --quiet -p cli -- review codex-local "$@"']
+script = ['if [ "${1:-}" = "--" ]; then shift; fi; bin/sotp review codex-local "$@"']
 
 [tasks.track-switch-main]
 description = "[wrapper] Switch to main branch and pull latest"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- git switch-and-pull main']
+script = ['bin/sotp git switch-and-pull main']
 
 [tasks.track-add-paths]
 description = "[wrapper] Stage paths listed in tmp/track-commit/add-paths.txt and delete the scratch file"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- git add-from-file tmp/track-commit/add-paths.txt --cleanup']
+script = ['bin/sotp git add-from-file tmp/track-commit/add-paths.txt --cleanup']
 
 [tasks.commit]
 description = "[gate] Run CI then commit"
@@ -758,7 +775,7 @@ else
   tail -20 tmp/ci-output.log
   exit $CI_EXIT
 fi
-cargo run --quiet -p cli -- git commit-from-file tmp/track-commit/commit-message.txt --cleanup
+bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup
 ''']
 
 [tasks.note]
@@ -769,17 +786,17 @@ script = ['git notes add -f -m "$CARGO_MAKE_TASK_ARGS" HEAD']
 [tasks.track-note]
 description = "[wrapper] Attach a git note from tmp/track-commit/note.md and delete the scratch file"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- git note-from-file tmp/track-commit/note.md --cleanup']
+script = ['bin/sotp git note-from-file tmp/track-commit/note.md --cleanup']
 
 [tasks.track-transition]
 description = "[wrapper] Transition a task status and sync rendered views"
 script_runner = "@shell"
-script = ['TRACK_DIR="${1:-}"; TASK_ID="${2:-}"; TARGET_STATUS="${3:-}"; shift 3 || true; if [ -z "$TRACK_DIR" ] || [ -z "$TASK_ID" ] || [ -z "$TARGET_STATUS" ]; then echo "error: usage: cargo make track-transition <track_dir> <task_id> <status> [--commit-hash <hash>]" >&2; exit 1; fi; TRACK_ITEMS_DIR="$(dirname "$TRACK_DIR")"; TRACK_ID="$(basename "$TRACK_DIR")"; cargo run --quiet -p cli -- track transition --items-dir "$TRACK_ITEMS_DIR" --locks-dir .locks "$TRACK_ID" "$TASK_ID" "$TARGET_STATUS" "$@"']
+script = ['TRACK_DIR="${1:-}"; TASK_ID="${2:-}"; TARGET_STATUS="${3:-}"; shift 3 || true; if [ -z "$TRACK_DIR" ] || [ -z "$TASK_ID" ] || [ -z "$TARGET_STATUS" ]; then echo "error: usage: cargo make track-transition <track_dir> <task_id> <status> [--commit-hash <hash>]" >&2; exit 1; fi; TRACK_ITEMS_DIR="$(dirname "$TRACK_DIR")"; TRACK_ID="$(basename "$TRACK_DIR")"; bin/sotp track transition --items-dir "$TRACK_ITEMS_DIR" --locks-dir .locks "$TRACK_ID" "$TASK_ID" "$TARGET_STATUS" "$@"']
 
 [tasks.track-sync-views]
 description = "[wrapper] Render plan.md and registry.md from metadata.json"
 script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- track views sync --project-root . $CARGO_MAKE_TASK_ARGS']
+script = ['bin/sotp track views sync --project-root . $CARGO_MAKE_TASK_ARGS']
 
 [tasks.clean]
 description = "[wrapper] Remove compose resources"
