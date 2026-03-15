@@ -5,6 +5,7 @@ pub mod hook;
 pub mod pr_workflow;
 pub mod review_workflow;
 pub mod track_activation;
+pub mod track_phase;
 
 use std::sync::Arc;
 

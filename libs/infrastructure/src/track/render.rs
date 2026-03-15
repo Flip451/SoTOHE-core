@@ -189,16 +189,8 @@ pub fn render_plan(track: &TrackMetadata) -> String {
 }
 
 fn next_command_for_track(track: &TrackSnapshot) -> String {
-    match track.status().as_str() {
-        "planned" if track.schema_version == 3 && track.track.branch().is_none() => {
-            format!("`/track:activate {}`", track.track.id())
-        }
-        "planned" => "`/track:implement`".to_owned(),
-        "in_progress" => "`/track:full-cycle <task>`".to_owned(),
-        "blocked" => "`/track:status`".to_owned(),
-        "cancelled" | "archived" => "`/track:plan <feature>`".to_owned(),
-        _ => "`/track:status`".to_owned(),
-    }
+    let raw = domain::track_phase::next_command(&track.track, track.schema_version);
+    format!("`{raw}`")
 }
 
 fn format_date(iso_timestamp: &str) -> &str {

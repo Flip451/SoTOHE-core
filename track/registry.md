@@ -8,14 +8,14 @@
 ## Current Focus
 
 - Latest active track: `track-plan-activation-2026-03-14`
-- Next recommended command: `/track:full-cycle <task>`
+- Next recommended command: `/track:implement`
 - Last updated: `2026-03-14`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| track-plan-activation-2026-03-14 | in_progress | `/track:full-cycle <task>` | 2026-03-14 |
+| track-plan-activation-2026-03-14 | in_progress | `/track:implement` | 2026-03-14 |
 
 ## Completed Tracks
 

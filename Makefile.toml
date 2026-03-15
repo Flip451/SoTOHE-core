@@ -739,6 +739,11 @@ description = "[wrapper] Materialize a planning-only track and switch to its tra
 script_runner = "@shell"
 script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; cargo run --quiet -p cli -- track activate --items-dir track/items "$TRACK_ID"']
 
+[tasks.track-resolve]
+description = "[wrapper] Resolve current track phase, next command, and blocker"
+script_runner = "@shell"
+script = ['cargo run --quiet -p cli -- track resolve $CARGO_MAKE_TASK_ARGS']
+
 [tasks.track-pr-push]
 description = "[wrapper] Push current track branch to origin"
 script_runner = "@shell"

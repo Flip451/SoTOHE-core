@@ -45,7 +45,7 @@ def _next_command_for_track(track: TrackMetadataV2) -> str:
     if track.status == "planned":
         return "`/track:implement`"
     if track.status == "in_progress":
-        return "`/track:full-cycle <task>`"
+        return "`/track:implement`"
     if track.status == "blocked":
         return "`/track:status`"
     if track.status == "cancelled":

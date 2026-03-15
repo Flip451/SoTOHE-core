@@ -9,6 +9,7 @@ pub mod lock;
 mod plan;
 mod repository;
 mod track;
+pub mod track_phase;
 
 pub use decision::Decision;
 pub use error::{
