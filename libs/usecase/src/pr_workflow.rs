@@ -164,7 +164,7 @@ pub fn pr_body(ctx: &PrBranchContext) -> String {
             ctx.track_id, ctx.track_id
         )
     } else {
-        format!("Track implementation for `{}`.\n\nCreated by `/track:pr-review`.", ctx.track_id)
+        format!("Track implementation for `{}`.", ctx.track_id)
     }
 }
 
