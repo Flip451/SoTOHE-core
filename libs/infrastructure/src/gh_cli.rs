@@ -223,6 +223,8 @@ mod tests {
 
     use std::path::Path;
 
+    use rstest::rstest;
+
     use super::{
         PrCheckRecord, create_pr_with, decode_pr_checks, find_open_pr_with, merge_pr_with,
         pr_checks_with,
@@ -307,15 +309,11 @@ mod tests {
         assert_eq!(result.unwrap(), Some("42".to_owned()));
     }
 
-    #[test]
-    fn find_open_pr_with_returns_none_when_stdout_is_null() {
-        let result = find_open_pr_with("track/feat", "main", &|_| Ok(output(0, "null\n", "")));
-        assert_eq!(result.unwrap(), None);
-    }
-
-    #[test]
-    fn find_open_pr_with_returns_none_when_stdout_is_empty() {
-        let result = find_open_pr_with("track/feat", "main", &|_| Ok(output(0, "", "")));
+    #[rstest]
+    #[case::null_stdout("null\n")]
+    #[case::empty_stdout("")]
+    fn find_open_pr_with_returns_none_for_absent_pr(#[case] stdout: &str) {
+        let result = find_open_pr_with("track/feat", "main", &|_| Ok(output(0, stdout, "")));
         assert_eq!(result.unwrap(), None);
     }
 

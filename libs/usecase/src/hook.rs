@@ -310,25 +310,24 @@ mod tests {
         assert!(!matches!(result, Err(HookError::Input(_))), "lock-release should not require pid");
     }
 
-    #[test]
-    fn test_resolve_lock_mode_read_is_shared() {
-        assert_eq!(resolve_lock_mode("Read").unwrap(), LockMode::Shared);
-    }
+    use rstest::rstest;
 
-    #[test]
-    fn test_resolve_lock_mode_edit_is_exclusive() {
-        assert_eq!(resolve_lock_mode("Edit").unwrap(), LockMode::Exclusive);
-    }
-
-    #[test]
-    fn test_resolve_lock_mode_write_is_exclusive() {
-        assert_eq!(resolve_lock_mode("Write").unwrap(), LockMode::Exclusive);
-    }
-
-    #[test]
-    fn test_resolve_lock_mode_unknown_tool_returns_error() {
-        let result = resolve_lock_mode("Bash");
-        assert!(matches!(result, Err(HookError::Input(msg)) if msg.contains("unsupported tool")));
+    #[rstest]
+    #[case::read_is_shared("Read", Ok(LockMode::Shared))]
+    #[case::edit_is_exclusive("Edit", Ok(LockMode::Exclusive))]
+    #[case::write_is_exclusive("Write", Ok(LockMode::Exclusive))]
+    #[case::unknown_tool_returns_error("Bash", Err(()))]
+    fn test_resolve_lock_mode(#[case] tool_name: &str, #[case] expected_ok: Result<LockMode, ()>) {
+        let result = resolve_lock_mode(tool_name);
+        match expected_ok {
+            Ok(expected_mode) => assert_eq!(result.unwrap(), expected_mode),
+            Err(()) => {
+                assert!(
+                    matches!(result, Err(HookError::Input(ref msg)) if msg.contains("unsupported tool")),
+                    "expected unsupported tool error, got: {result:?}"
+                );
+            }
+        }
     }
 
     /// Stub lock manager for unit tests (validates field presence, not lock logic).

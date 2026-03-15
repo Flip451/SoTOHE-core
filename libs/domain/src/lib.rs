@@ -26,6 +26,8 @@ pub use track::{
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use rstest::rstest;
+
     use super::*;
 
     fn task(id: &str, description: &str) -> TrackTask {
@@ -138,13 +140,22 @@ mod tests {
         assert_eq!(track.status(), TrackStatus::Done);
     }
 
-    #[test]
-    fn task_id_rejects_non_digit_after_prefix() {
-        assert!(matches!(TaskId::new("Ta"), Err(ValidationError::InvalidTaskId(_))));
-        assert!(matches!(TaskId::new("T-1"), Err(ValidationError::InvalidTaskId(_))));
-        assert!(matches!(TaskId::new("T"), Err(ValidationError::InvalidTaskId(_))));
-        assert!(TaskId::new("T1").is_ok());
-        assert!(TaskId::new("T123").is_ok());
+    #[rstest]
+    #[case::letter_after_prefix_rejected("Ta", false)]
+    #[case::hyphen_digit_after_prefix_rejected("T-1", false)]
+    #[case::prefix_only_rejected("T", false)]
+    #[case::single_digit_accepted("T1", true)]
+    #[case::multi_digit_accepted("T123", true)]
+    fn task_id_rejects_non_digit_after_prefix(#[case] input: &str, #[case] should_pass: bool) {
+        let result = TaskId::new(input);
+        if should_pass {
+            assert!(result.is_ok(), "expected {input:?} to be valid");
+        } else {
+            assert!(
+                matches!(result, Err(ValidationError::InvalidTaskId(_))),
+                "expected {input:?} to be rejected"
+            );
+        }
     }
 
     #[test]
@@ -204,25 +215,15 @@ mod tests {
         assert_eq!(branch.to_string(), "track/my-feature");
     }
 
-    #[test]
-    fn track_branch_rejects_missing_prefix() {
-        assert!(matches!(
-            TrackBranch::new("main"),
-            Err(ValidationError::InvalidTrackBranch(v)) if v == "main"
-        ));
-    }
-
-    #[test]
-    fn track_branch_rejects_invalid_slug_after_prefix() {
-        assert!(matches!(
-            TrackBranch::new("track/Not Valid"),
-            Err(ValidationError::InvalidTrackBranch(_))
-        ));
-    }
-
-    #[test]
-    fn track_branch_rejects_empty_slug() {
-        assert!(matches!(TrackBranch::new("track/"), Err(ValidationError::InvalidTrackBranch(_))));
+    #[rstest]
+    #[case::missing_prefix("main")]
+    #[case::invalid_slug_after_prefix("track/Not Valid")]
+    #[case::empty_slug("track/")]
+    fn track_branch_rejects_invalid_input(#[case] input: &str) {
+        assert!(
+            matches!(TrackBranch::new(input), Err(ValidationError::InvalidTrackBranch(_))),
+            "expected {input:?} to be rejected"
+        );
     }
 
     #[test]
