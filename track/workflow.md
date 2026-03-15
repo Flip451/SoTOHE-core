@@ -107,7 +107,7 @@ Specialist capability の実体は `.claude/agent-profiles.json` で決まる。
 /track:catchup                 # 環境構築 + 初期化 + 状態ブリーフィング（初回・新規参入時）
 /track:setup                  # track ワークフロー初期化のみ（catchup 内で自動実行される）
 /track:plan <feature>         # 調査・設計・plan 作成・承認後にトラック成果物作成
-/track:plan-only <feature>    # 計画のみ作成（branch=null、実装ブランチは未作成）
+/track:plan-only <feature>    # plan/<id> ブランチで計画のみ作成（PR 経由で main に合流、実装ブランチは未作成）
 /track:activate <track-id>    # plan-only トラックを実体化してトラックブランチに切り替え
 /track:full-cycle <task>      # 自律実装フルサイクル
 /track:implement              # 並列実装（対話型）
@@ -195,7 +195,7 @@ graph TD
 ### ブランチの作成
 
 - **自動**: `/track:plan <feature>` がトラック成果物作成時にブランチ `track/<track-id>` を自動作成する
-- **plan-only**: `/track:plan-only <feature>` で作成したトラックは `branch=null` で保留状態となり、`/track:activate <track-id>` を実行するまでブランチは作成されない
+- **plan-only**: `/track:plan-only <feature>` は計画レビュー用の一時ブランチ `plan/<track-id>` を作成する。PR 経由で main にマージした後、`/track:activate <track-id>` で実装ブランチ `track/<track-id>` を作成する
 - **手動**: `cargo make track-branch-create '<id>'` で既存トラックに対してブランチを作成できる
 
 ### ブランチの切り替え

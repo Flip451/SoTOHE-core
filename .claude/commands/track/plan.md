@@ -56,4 +56,4 @@ Behavior:
   2. Created track id/path
   3. Created/updated files
   4. Suggested next command (`/track:implement` or `/track:full-cycle <task>`)
-  5. Alternative: use `/track:plan-only <feature>` to create planning artifacts without a branch, then `/track:activate <track-id>` when ready to implement
+  5. Alternative: use `/track:plan-only <feature>` to create planning artifacts on a `plan/<id>` review branch, PR to main, then `/track:activate <track-id>` when ready to implement

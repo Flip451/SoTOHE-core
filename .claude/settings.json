@@ -215,6 +215,8 @@
       "Bash(cargo make track-branch-create:*)",
       "Bash(cargo make track-branch-switch:*)",
       "Bash(cargo make track-activate:*)",
+      "Bash(cargo make track-plan-branch:*)",
+      "Bash(cargo make track-resolve:*)",
       "Bash(gemini:*)",
       "Bash(codex:*)",
       "Bash(tree:*)",

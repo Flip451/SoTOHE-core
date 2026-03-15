@@ -20,11 +20,11 @@ Detailed development workflow for this project.
    │   ├── Phase 3: plan creation → user approval
    │   └── Phase 4: create track artifacts (metadata.json, plan.md, spec.md, verification.md, registry.md)
    │
-   └── Alternative (plan-only, no branch):
-       └── /track:plan-only <feature>       # Planning artifacts only (branch=null)
-           → /track:ci                      # Validate planning diff
-           → /track:commit <track-id> -- <message>  # Commit planning artifacts to main (explicit selector required)
-           → /track:activate <track-id>     # Materialize branch and switch to it
+   └── Alternative (plan-only, separate review branch):
+       └── /track:plan-only <feature>       # Create plan/<id> branch + planning artifacts (branch=null in metadata)
+           → Push plan/<id> branch + PR     # Review planning artifacts via PR
+           → PR merge to main               # Planning artifacts land on main
+           → /track:activate <track-id>     # Create track/<id> implementation branch from main
 
 Architecture-focused changes:
    └── /architecture-customizer             # crate map, dependency direction, enforcement rules
@@ -140,7 +140,7 @@ cargo make machete             # Unused dependency audit
 ```bash
 /track:setup                  # Project initialization
 /track:plan <feature>         # Research, design, plan, and create track artifacts after approval
-/track:plan-only <feature>   # Planning-only track creation (no branch); commit to main, then activate
+/track:plan-only <feature>   # Create plan/<id> branch for planning artifacts; PR to main, then activate
 /track:activate <track-id>   # Materialize a planning-only track: create branch and switch
 /track:full-cycle <task>      # Autonomous full-cycle implementation in Claude Code
 /track:implement              # Parallel implementation (interactive)

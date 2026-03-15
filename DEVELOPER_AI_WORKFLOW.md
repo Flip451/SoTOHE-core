@@ -56,7 +56,7 @@ flowchart TD
     B -->|"標準"| P1["/track:plan &lt;feature&gt;"]
     B -->|"計画だけ先に"| P2["/track:plan-only &lt;feature&gt;"]
     P1 --> D{実装方法を選ぶ}
-    P2 --> PM["main で plan をコミット"]
+    P2 --> PM["plan/&lt;id&gt; で PR → main にマージ"]
     PM --> ACT["/track:activate &lt;track-id&gt;"]
     ACT --> D
     D --> E["/track:full-cycle &lt;task&gt;"]
@@ -88,7 +88,7 @@ flowchart TD
 | `/track:revert` | 直近変更の安全な取り消し計画 | 変更を戻す前に影響を整理したい時 |
 | `/track:ci` | 品質ゲート一括実行 | レビュー前・コミット前 |
 | `/track:commit <message>` | ガード付きコミット + 必要時の note 適用 | ユーザー向けの正規コミット経路として使う時 |
-| `/track:plan-only <feature>` | 計画のみ作成（branch なし） | 計画を先に main でコミットしておきたい時 |
+| `/track:plan-only <feature>` | `plan/<id>` ブランチで計画のみ作成 | 計画を PR 経由でレビューしてから main に合流させたい時 |
 | `/track:activate <track-id>` | planning-only track を activate し track branch を作成 | plan-only で作成した計画を実装フェーズへ移行する時 |
 | `/track:archive <id>` | 完了トラックをアーカイブ | 完了済みトラックをレジストリから整理したい時 |
 | `/track:status` | 進捗確認 | 現在地を知りたい時 |
@@ -161,10 +161,11 @@ flowchart TD
    - `cargo make ci` は `verify-track-metadata` と `verify-tech-stack` を通して track 状態と tech-stack の整合を検証する
    - そのため、tech stack 未確定のままサンプルトラックをテンプレートへ残してはいけない
 
-   **plan-only 代替レーン**: 計画だけを先に main ブランチでコミットしたい場合（例: 実装着手前に計画をレビューに出したい、track branch をまだ切りたくない）は次の手順を使う。
-   - `[Claude Code]` `/track:plan-only <feature>`: 計画のみ作成（`status: planned`、`branch: null`）
-   - `[Claude Code]` `/track:commit <track-id> -- <message>` で main に計画をコミット（explicit selector 必須）
-   - `[Claude Code]` `/track:activate <track-id>`: planning-only track を activate し、track branch を作成して実装フェーズへ移行する
+   **plan-only 代替レーン**: 計画を実装とは別のブランチでレビューしたい場合は次の手順を使う。
+   - `[Claude Code]` `/track:plan-only <feature>`: `plan/<id>` ブランチを作成し、計画 artifacts を作成（`status: planned`、`branch: null`）
+   - `[Terminal/GitHub]` `plan/<id>` ブランチを push して PR を作成、計画をレビュー
+   - `[GitHub]` PR マージ → 計画 artifacts が main に合流
+   - `[Claude Code]` `/track:activate <track-id>`: `track/<id>` 実装ブランチを作成して実装フェーズへ移行
    - activate 後は標準フローの「3. 実装」以降と同じ流れで進める
 
 3. 実装

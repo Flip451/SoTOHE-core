@@ -22,7 +22,7 @@ metadata:
 ```
 /track:plan <feature>      ← このスキル（計画 + トラック作成）
     または
-/track:plan-only <feature> ← 計画だけ先に固めて main 側へ landing
+/track:plan-only <feature> ← plan/<id> ブランチで計画を作成し PR 経由で main に合流
     ↓ ユーザー承認後にトラック成果物を作成
 /track:activate <track-id> ← planning-only track を materialize
     ↓

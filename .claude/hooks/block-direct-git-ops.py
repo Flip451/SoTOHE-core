@@ -32,7 +32,8 @@ GIT_PUSH_MESSAGE = (
 GIT_SWITCH_MESSAGE = (
     f"{GIT_POLICY_PREFIX} Direct `git switch` / `git checkout -b` is blocked.\n"
     "Use `cargo make track-branch-create '<track-id>'` to create a track branch, "
-    "or `cargo make track-branch-switch '<track-id>'` to switch to an existing one."
+    "`cargo make track-branch-switch '<track-id>'` to switch to an existing one, "
+    "or `cargo make track-plan-branch '<track-id>'` for a plan/<id> review branch."
 )
 GIT_MERGE_MESSAGE = (
     f"{GIT_POLICY_PREFIX} Direct `git merge` is blocked.\n"
