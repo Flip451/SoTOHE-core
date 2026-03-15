@@ -1,0 +1,19 @@
+## Task Summary: Move CLI business logic to usecase/infrastructure layers
+
+**Track:** track-plan-activation-2026-03-14
+**Task:** T008 — CLI 層に残ったビジネスロジックを適切なレイヤーへ移動する
+**Date:** 2026-03-15
+
+### Changes
+
+- libs/usecase/src/track_resolution.rs: new module — resolve_track_id_from_branch, resolve_transition, reject_branchless_implementation_transition with tests
+- libs/usecase/src/worktree_guard.rs: new module — parse_dirty_worktree_paths, validate_clean_worktree with tests
+- libs/infrastructure/src/track/fs_store.rs: added FsTrackStore::find_with_meta and standalone read_track_metadata
+- apps/cli/src/commands/track/resolve.rs: delegates branch parsing and metadata reads to usecase/infra
+- apps/cli/src/commands/track/transition.rs: delegates resolve_transition and branchless guard to usecase
+- apps/cli/src/commands/track/activate.rs: delegates worktree parsing/validation to usecase
+- apps/cli/src/commands/track/mod.rs: removed unused imports (TaskStatusKind, TaskTransition, codec)
+
+### Why
+
+CLI layer had accumulated business logic (branch name parsing, transition resolution, activation guards, worktree validation) that belongs in usecase/infrastructure per hexagonal architecture. Moving these functions to proper layers improves testability and maintains the usecase→domain only dependency constraint.
