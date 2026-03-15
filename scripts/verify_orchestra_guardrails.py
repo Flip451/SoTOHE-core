@@ -349,8 +349,7 @@ EXPECTED_REVIEW_WRAPPER_SNIPPETS = {
         'cargo make track-local-review -- --model {model} --prompt \\"{task}\\"',
     ],
     Path(".claude/commands/track/review.md"): [
-        "cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md",
-        "cargo make track-local-review -- --model {model} --prompt \"",
+        "cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-",
         '{"verdict":"zero_findings","findings":[]}',
         '{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}',
         "Every object field is required by the output schema.",

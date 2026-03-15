@@ -2309,8 +2309,8 @@ class VerifyScriptsTest(unittest.TestCase):
                 'cargo make track-local-review --model {model} --prompt \\"{task}\\"',
             ),
             Path(".claude/commands/track/review.md"): (
-                "cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md",
-                "cargo make track-local-review --model {model} --briefing-file tmp/codex-briefing.md",
+                "cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-",
+                "cargo make track-local-review --model {model} --briefing-file tmp/reviewer-runtime/briefing-",
             ),
             Path(".claude/skills/codex-system/SKILL.md"): (
                 'cargo make track-local-review -- --model {model} --prompt "',
