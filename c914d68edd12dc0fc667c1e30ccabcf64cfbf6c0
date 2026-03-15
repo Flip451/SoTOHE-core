@@ -1,0 +1,22 @@
+## Task Summary: Add track phase resolution and align guard/executor surface
+
+**Track:** track-plan-activation-2026-03-14
+**Task:** T003 — guard と executor をまとめて整える
+**Date:** 2026-03-15
+
+### Changes
+
+- libs/domain/src/track_phase.rs: TrackPhase enum, resolve_phase(), resolve_phase_from_record(), next_command()
+- libs/usecase/src/track_phase.rs: re-export from domain
+- libs/infrastructure/src/track/render.rs: delegate next_command_for_track to domain::track_phase
+- apps/cli/src/commands/track.rs: Resolve subcommand, auto_detect_track_id_from_branch, read_track_metadata, branchless v3 fail-closed guard
+- Makefile.toml: track-resolve task
+- scripts/pr_review.py: error message guidance for planning-only tracks
+- scripts/track_registry.py: in_progress next command aligned to /track:implement
+- track/items/.../metadata.json: T006 (CLI refactoring) task added between T004 and T005
+
+### Why
+
+T003 requires phase resolution logic in the domain layer to support status/catchup/revert CLI wiring.
+The next_command determination was previously duplicated in render.rs; extracting it to domain enables
+both the registry renderer and the new track resolve CLI to use the same logic.
