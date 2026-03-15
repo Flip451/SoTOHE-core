@@ -18,31 +18,19 @@ pub enum HookName {
 /// - `locks_dir`: `$SOTP_LOCKS_DIR` env var or `--locks-dir` CLI arg
 ///   (default: `$CLAUDE_PROJECT_DIR/.locks` — must be project-root-anchored)
 ///   If neither is set → exit 2 (fail-closed, prevents split-registry)
-/// - `agent`: `$SOTP_AGENT_ID` env var or `--agent` CLI arg — NO SAFE DEFAULT in sotp
-///   (same reason as pid: sotp's ppid is the Python launcher, not Claude Code).
-///   Python launcher MUST pass `--agent` explicitly (e.g., `f"pid-{os.getppid()}"`).
-/// - `pid`: `--pid` CLI arg — NO SAFE DEFAULT in sotp.
+/// - `agent`: `$SOTP_AGENT_ID` env var or `--agent` CLI arg — passed by the
+///   shell hook command in `.claude/settings.json`.
+/// - `pid`: `--pid` CLI arg — passed by the shell hook command (lock-acquire only).
 ///
 /// ## PID / Agent Propagation for Lock Hooks
 ///
-/// The Python launcher for lock hooks runs: Python → sotp (subprocess).
-/// If sotp uses `getppid()`, it gets the Python launcher PID (short-lived),
-/// not Claude Code's PID. This makes the lock immediately stale-reapable.
+/// Lock hooks are invoked directly via shell commands in `.claude/settings.json`.
+/// The shell hook command passes `--pid "$PPID"` (Claude Code's PID) and
+/// `--agent "$SOTP_AGENT_ID"` explicitly.
 ///
-/// Therefore, lock-acquire launchers MUST compute pid/agent in Python and
-/// pass them explicitly via `--pid` and `--agent` CLI args, exactly as
-/// the current `file-lock-acquire.py` does:
-///   pid = os.getppid()      # Claude Code PID (Python's parent)
-///   agent = f"pid-{pid}"    # or $SOTP_AGENT_ID
-///
-/// Lock-release launchers MUST pass `--agent` but `--pid` is optional
-/// (`FileLockManager::release` takes only `path` + `agent`).
-///
-/// For `block-direct-git-ops` (guard hook), pid/agent are irrelevant
-/// and can be omitted.
-///
-/// Python launchers pass `--locks-dir` and `--agent` via CLI args or env vars.
-/// `--pid` is CLI-arg-only (no env var — must be explicitly passed by launcher).
+/// - lock-acquire: `--agent` + `--pid` required
+/// - lock-release: `--agent` required, `--pid` optional
+/// - guard (block-direct-git-ops): pid/agent irrelevant, can be omitted
 ///
 /// All fields are `Option` because different hooks need different subsets.
 /// The CLI layer validates per-hook requirements:

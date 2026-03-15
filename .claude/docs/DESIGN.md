@@ -532,8 +532,8 @@ pub trait FileLockManager: Send + Sync {
 ```mermaid
 flowchart TD
     A[Agent calls Edit/Write tool] --> B[PreToolUse Hook fires]
-    B --> C[Python: extract file path from JSON stdin]
-    C --> D[Python invokes: sotp lock acquire\n--mode exclusive --path file.rs\n--agent agent-1 --pid PID]
+    B --> C[Shell hook: extract file path from JSON stdin]
+    C --> D[sotp lock acquire\n--mode exclusive --path file.rs\n--agent agent-1 --pid PID]
     D --> E{CLI: acquire lock}
     E -->|flock .locks/LOCK| F[Read .locks/registry.json]
     F --> G{Conflict?}
@@ -543,7 +543,7 @@ flowchart TD
     J --> K[Hook: exit 0 — allow tool]
     K --> L[Tool executes Edit/Write]
     L --> M[PostToolUse Hook fires]
-    M --> N[Python invokes: sotp lock release\n--path file.rs --agent agent-1]
+    M --> N[sotp lock release\n--path file.rs --agent agent-1]
     N --> O[CLI removes entry from registry]
     G -->|Conflict: exclusive held| Q[Exit 1 + error message]
     Q --> R[Hook: exit 2 — block tool]
@@ -661,8 +661,8 @@ pub enum GuardCommand {
 ```mermaid
 flowchart TD
     A[Agent calls Bash tool] --> B[PreToolUse Hook fires]
-    B --> C[Python: extract command from JSON stdin]
-    C --> D[Python invokes: sotp guard check\n--command 'git add .']
+    B --> C[Shell hook: extract command from JSON stdin]
+    C --> D[sotp guard check\n--command 'git add .']
     D --> E{Rust CLI: parse & check}
     E -->|split_shell| F[Split by control operators]
     F --> G[For each SimpleCommand]
@@ -677,17 +677,21 @@ flowchart TD
     L2 --> O
     L --> O[JSON stdout + exit 1]
     M --> P[JSON stdout + exit 0]
-    O --> Q[Python hook: exit 2 — block tool]
-    P --> R[Python hook: exit 0 — allow tool]
+    O --> Q[Hook: exit 2 — block tool]
+    P --> R[Hook: exit 0 — allow tool]
 ```
 
-## Security Hardening: Python-to-Rust Hybrid Migration (Phase 1-2)
+## Security Hardening: Rust Migration
 
-### Strategy: Option C — Rust for Critical Paths, Python for Advisory
+### Strategy: Rust for Critical Paths, Python for Advisory
+
+Security-critical hooks (`block-direct-git-ops`, `file-lock-acquire/release`) are now dispatched
+directly via `sotp hook dispatch` shell commands in `.claude/settings.json`. The deprecated Python
+launcher files have been removed (STRAT-03 Phase 1).
 
 | Layer | Rust (fail-closed by design) | Python (advisory, keep as-is) |
 |-------|------------------------------|-------------------------------|
-| Security hooks | `block-direct-git-ops`, `file-lock-acquire/release` | `suggest-*`, `lint-on-save`, `agent-router`, etc. |
+| Security hooks | `sotp hook dispatch` (direct shell invocation) | `suggest-*`, `lint-on-save`, `agent-router`, etc. |
 | Track state I/O | `metadata.json` read-modify-write | `plan.md` / `registry.md` rendering |
 | File writes | Atomic write for critical data | Log append (JSONL) |
 
@@ -761,31 +765,19 @@ pub enum HookName {
 /// - `locks_dir`: `$SOTP_LOCKS_DIR` env var or `--locks-dir` CLI arg
 ///   (default: `$CLAUDE_PROJECT_DIR/.locks` — must be project-root-anchored)
 ///   If neither is set → exit 2 (fail-closed, prevents split-registry)
-/// - `agent`: `$SOTP_AGENT_ID` env var or `--agent` CLI arg — NO SAFE DEFAULT in sotp
-///   (same reason as pid: sotp's ppid is the Python launcher, not Claude Code).
-///   Python launcher MUST pass `--agent` explicitly (e.g., `f"pid-{os.getppid()}"`).
-/// - `pid`: `--pid` CLI arg — NO SAFE DEFAULT in sotp.
+/// - `agent`: `$SOTP_AGENT_ID` env var or `--agent` CLI arg — passed by
+///   the shell hook command in `.claude/settings.json`.
+/// - `pid`: `--pid` CLI arg — passed by the shell hook command (lock-acquire only).
 ///
 /// ## PID / Agent Propagation for Lock Hooks
 ///
-/// The Python launcher for lock hooks runs: Python → sotp (subprocess).
-/// If sotp uses `getppid()`, it gets the Python launcher PID (short-lived),
-/// not Claude Code's PID. This makes the lock immediately stale-reapable.
+/// Lock hooks are invoked directly via shell commands in `.claude/settings.json`.
+/// The shell hook command passes `--pid "$PPID"` (Claude Code's PID) and
+/// `--agent "$SOTP_AGENT_ID"` explicitly.
 ///
-/// Therefore, lock-acquire launchers MUST compute pid/agent in Python and
-/// pass them explicitly via `--pid` and `--agent` CLI args, exactly as
-/// the current `file-lock-acquire.py` does:
-///   pid = os.getppid()      # Claude Code PID (Python's parent)
-///   agent = f"pid-{pid}"    # or $SOTP_AGENT_ID
-///
-/// Lock-release launchers MUST pass `--agent` but `--pid` is optional
-/// (`FileLockManager::release` takes only `path` + `agent`).
-///
-/// For `block-direct-git-ops` (guard hook), pid/agent are irrelevant
-/// and can be omitted.
-///
-/// Python launchers pass `--locks-dir` and `--agent` via CLI args or env vars.
-/// `--pid` is CLI-arg-only (no env var — must be explicitly passed by launcher).
+/// - lock-acquire: `--agent` + `--pid` required
+/// - lock-release: `--agent` required, `--pid` optional
+/// - guard (block-direct-git-ops): pid/agent irrelevant, can be omitted
 /// All fields are `Option` because different hooks need different subsets.
 /// The CLI layer validates per-hook requirements:
 /// - guard (block-direct-git-ops): only `project_dir` needed (for future use);
@@ -1077,17 +1069,14 @@ pub enum HookCommand {
         locks_dir: Option<std::path::PathBuf>,
 
         /// Agent ID (for file-lock hooks). Required for lock hooks.
-        /// MUST be passed explicitly by the Python launcher (same reason as pid:
-        /// sotp's ppid is the Python launcher PID, not Claude Code's).
+        /// Passed by the shell hook command in `.claude/settings.json`.
         /// Also read from `$SOTP_AGENT_ID`.
         #[arg(long, env = "SOTP_AGENT_ID")]
         agent: Option<String>,
 
         /// Process ID of the lock holder (required for lock-acquire only).
-        /// MUST be the long-lived Claude Code PID, passed explicitly by
-        /// the Python launcher. No safe default exists in the sotp process:
-        /// - std::process::id() = sotp PID (dies immediately)
-        /// - getppid() = Python launcher PID (dies immediately)
+        /// MUST be the long-lived Claude Code PID, passed via `--pid "$PPID"`
+        /// in the shell hook command.
         /// Not needed for lock-release (release API uses path + agent only).
         /// Not needed for guard hooks (block-direct-git-ops).
         #[arg(long)]
@@ -1114,12 +1103,12 @@ impl From<CliHookName> for domain::hook::HookName { ... }
 ```rust
 // apps/cli/src/commands/hook.rs — stdout JSON mapping for Claude Code hooks
 //
-// The Rust CLI outputs structured JSON that Python launchers forward to stdout.
-// These formats match the existing codebase patterns (file-lock-acquire.py, etc.)
+// The Rust CLI outputs structured JSON to stdout.
+// These formats match the Claude Code hook protocol.
 //
 // PreToolUse hooks (block-direct-git-ops):
 //   Allow:  exit 0, stdout = "" (empty)
-//   Block:  exit 2, stdout = plain text reason (matches current block-direct-git-ops.py)
+//   Block:  exit 2, stdout = plain text reason
 //
 // PreToolUse hooks (file-lock-acquire):
 //   Allow:  exit 0, stdout = "" (empty)
@@ -1148,7 +1137,7 @@ impl From<CliHookName> for domain::hook::HookName { ... }
 //
 // NOTE: The exact hookSpecificOutput schema may evolve with Claude Code versions.
 // See https://docs.anthropic.com/en/docs/claude-code/hooks for authoritative spec.
-// The Rust CLI should match the patterns established by existing Python hooks.
+// The Rust CLI follows the Claude Code hook protocol (exit 0 = allow, exit 2 = block).
 ```
 
 ### UseCase Return Type Migration
@@ -1188,66 +1177,28 @@ The CLI layer (composition root) maps `TrackReadError`/`TrackWriteError` to user
 | Track | Approach |
 |-------|----------|
 | 1. container-git-readonly | Docker only — no Rust changes |
-| 2. hook-fail-closed | Implement `domain::hook`, `usecase::hook`, `cli::commands::hook`; Python hooks become thin `sotp hook dispatch` launchers |
+| 2. hook-fail-closed | Implement `domain::hook`, `usecase::hook`, `cli::commands::hook`; security hooks dispatched directly via `sotp hook dispatch` shell commands (Python launchers removed in STRAT-03 Phase 1) |
 | 3. filelock-migration | Implement `infrastructure::track::{codec, fs_store, atomic_write}`; replace `TrackRepository` with `TrackReader`+`TrackWriter`; Python `track_state_machine.py` delegates to `sotp track` |
 | 4. per-worker-target-dir | Docker/Makefile only — no Rust changes |
 | 5. atomic-write-standard | Reuse `atomic_write_file` from track 3; apply to remaining Python scripts or migrate them |
 | 6. security-control-tests | Rust integration tests for hooks, locking, atomic writes |
 
-### Python Launcher Pattern (No Fallback, Fail-Closed)
+### Direct Shell Hook Invocation (STRAT-03 Phase 1 Complete)
 
-```python
-#!/usr/bin/env python3
-"""Thin launcher for sotp hook dispatch. No Python fallback — fail-closed by design."""
-import os, subprocess, sys
+Security-critical hooks are now invoked directly via shell commands in `.claude/settings.json`,
+eliminating the Python launcher layer entirely. Example:
 
-# Internal subprocess timeout (seconds). Matches existing file-lock-acquire.py pattern.
-# If sotp hangs beyond this, the launcher exits 2 (block) without waiting for
-# the outer Claude Code hook timeout.
-_SUBPROCESS_TIMEOUT = 10
-
-def main() -> int:
-    cli = os.environ.get("SOTP_CLI_BINARY", "sotp")
-    result = subprocess.run(
-        [cli, "hook", "dispatch", "block-direct-git-ops"],
-        input=sys.stdin.buffer.read(),
-        capture_output=True,
-        timeout=_SUBPROCESS_TIMEOUT,
-    )
-    sys.stdout.buffer.write(result.stdout)
-    sys.stdout.buffer.flush()
-    sys.stderr.buffer.write(result.stderr)
-    sys.stderr.buffer.flush()
-    return 0 if result.returncode == 0 else 2
-
-if __name__ == "__main__":
-    try:
-        code = main()
-    except BaseException:
-        # Catches Exception (FileNotFoundError, TimeoutExpired, etc.),
-        # KeyboardInterrupt, and SystemExit.
-        # No sys.exit() inside the try block, so SystemExit cannot
-        # accidentally swallow an intentional exit.
-        code = 2
-    os._exit(code)  # os._exit bypasses SystemExit entirely — guaranteed exit code
+```bash
+"${SOTP_CLI_BINARY:-sotp}" hook dispatch block-direct-git-ops || exit 2
 ```
 
-Key design decisions (PreToolUse launcher — guard, lock-acquire):
+Key design decisions:
 
-- **No Python fallback**: If `sotp` binary is missing, the launcher blocks (exit 2). No dual authority.
-- **Exit code mapping**: Only Rust exit 0 passes through as allow. Everything else → exit 2 (block).
-- **Subprocess timeout**: 10s internal timeout prevents hung `sotp` from blocking indefinitely. `TimeoutExpired` is caught by `except BaseException` → exit 2.
-- **Explicit flush**: `sys.stdout/stderr.buffer.flush()` before `os._exit()` ensures forwarded output is not lost.
-- **`os._exit()` not `sys.exit()`**: Guarantees the exact exit code without raising `SystemExit`.
-- **`except BaseException`**: Catches `KeyboardInterrupt`, `SystemExit`, and all `Exception` subclasses. Safe because `main()` never calls `sys.exit()`.
+- **No Python intermediary**: `sotp` is called directly from the shell hook command. No subprocess overhead or Python runtime dependency.
+- **Fail-closed**: `|| exit 2` ensures that if `sotp` is missing or fails, the hook blocks the operation.
 - **Bootstrap guarantee**: `cargo make bootstrap` builds `sotp` before hooks can fire.
 - **Claude Code hook protocol**: exit 0 = allow, exit 2 = block, exit 1 = non-blocking error (continues execution — NOT safe for security hooks).
-
-PostToolUse launcher (lock-release) differences:
-
-- **Cannot block**: PostToolUse fires after the tool has already executed. Exit 2 has no effect.
-- **Error → warn + exit 0**: If `sotp` is missing, crashes, or times out, the launcher writes a warning to stderr and exits 0. This matches PostToolUse semantics.
-- **`except BaseException` → exit 0** (not exit 2): All launcher-level errors are non-fatal.
+- **PostToolUse (lock-release)**: Uses `|| { ... exit 0; }` — errors are warnings only, matching PostToolUse semantics.
 
 ### Risks
 

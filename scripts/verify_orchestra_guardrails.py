@@ -13,7 +13,6 @@ from typing import Any
 SETTINGS_PATH = Path(".claude/settings.json")
 SETTINGS_LOCAL_PATH = Path(".claude/settings.local.json")
 PERMISSION_EXTENSIONS_PATH = Path(".claude/permission-extensions.json")
-BLOCK_HOOK_PATH = Path(".claude/hooks/block-direct-git-ops.py")
 AGENTS_DIR = Path(".claude/agents")
 
 REQUIRED_AGENT_FILES = {"orchestrator.md", "rust-implementation-lead.md"}
@@ -399,19 +398,6 @@ FORBIDDEN_STALE_REVIEWER_SNIPPETS = {
     ],
 }
 
-BLOCK_HOOK_MARKERS = {
-    "os._exit(2)": "hard block via os._exit(2) confirmed (thin launcher fail-closed)",
-    "GIT_ADD_MESSAGE": "git add block confirmed",
-    "GIT_COMMIT_MESSAGE": "git commit block confirmed",
-    "GIT_BRANCH_DELETE_MESSAGE": "git branch delete block confirmed",
-    "GIT_PUSH_MESSAGE": "git push block confirmed",
-    "GIT_SWITCH_MESSAGE": "git switch/checkout -b block confirmed",
-    "GIT_MERGE_MESSAGE": "git merge block confirmed",
-    "GIT_REBASE_MESSAGE": "git rebase block confirmed",
-    "GIT_CHERRY_PICK_MESSAGE": "git cherry-pick block confirmed",
-    "GIT_RESET_MESSAGE": "git reset block confirmed",
-}
-
 # Phrases that must appear in the TeammateIdle feedback to prevent drift.
 TEAMMATE_IDLE_MARKERS = {
     "parent directory": "TeammateIdle feedback instructs creating parent directory before writing",
@@ -674,22 +660,6 @@ def verify_env(settings: dict[str, Any]) -> bool:
     return failed
 
 
-def verify_block_hook() -> bool:
-    if not BLOCK_HOOK_PATH.is_file():
-        emit_error(f"Missing hard-block hook: {BLOCK_HOOK_PATH}")
-        return True
-
-    content = BLOCK_HOOK_PATH.read_text(encoding="utf-8")
-    failed = False
-    for marker, label in BLOCK_HOOK_MARKERS.items():
-        if marker in content:
-            emit_ok(f"{BLOCK_HOOK_PATH}: {label}")
-        else:
-            emit_error(f"{BLOCK_HOOK_PATH} does not include marker: {marker}")
-            failed = True
-    return failed
-
-
 def verify_teammate_idle_feedback(settings: dict[str, Any]) -> bool:
     hooks = settings.get("hooks", {})
     idle_bindings = hooks.get("TeammateIdle", [])
@@ -861,7 +831,6 @@ def main() -> int:
     failed = verify_allowlist(allow, extra_allow) or failed
     failed = verify_denylist(deny) or failed
     failed = verify_env(settings) or failed
-    failed = verify_block_hook() or failed
     failed = verify_teammate_idle_feedback(settings) or failed
     failed = verify_agent_definitions() or failed
     failed = verify_no_hardcoded_codex_model_literals() or failed
