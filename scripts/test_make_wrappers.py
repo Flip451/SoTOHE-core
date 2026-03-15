@@ -276,10 +276,10 @@ class MakeWrappersTest(unittest.TestCase):
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
 
         for task_header, expected in (
-            ("[tasks.track-switch-main]", 'cargo run --quiet -p cli -- git switch-and-pull main'),
-            ("[tasks.track-add-paths]", 'cargo run --quiet -p cli -- git add-from-file tmp/track-commit/add-paths.txt --cleanup'),
-            ("[tasks.track-commit-message]", 'cargo run --quiet -p cli -- git commit-from-file tmp/track-commit/commit-message.txt --cleanup'),
-            ("[tasks.track-note]", 'cargo run --quiet -p cli -- git note-from-file tmp/track-commit/note.md --cleanup'),
+            ("[tasks.track-switch-main]", 'bin/sotp git switch-and-pull main'),
+            ("[tasks.track-add-paths]", 'bin/sotp git add-from-file tmp/track-commit/add-paths.txt --cleanup'),
+            ("[tasks.track-commit-message]", 'bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup'),
+            ("[tasks.track-note]", 'bin/sotp git note-from-file tmp/track-commit/note.md --cleanup'),
         ):
             with self.subTest(task=task_header):
                 task_start = makefile.index(task_header)
@@ -295,8 +295,8 @@ class MakeWrappersTest(unittest.TestCase):
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
 
         for task_header, expected in (
-            ("[tasks.track-pr-merge]", 'cargo run --quiet -p cli -- pr wait-and-merge ${@}'),
-            ("[tasks.track-pr-status]", 'cargo run --quiet -p cli -- pr status ${@}'),
+            ("[tasks.track-pr-merge]", 'bin/sotp pr wait-and-merge ${@}'),
+            ("[tasks.track-pr-status]", 'bin/sotp pr status ${@}'),
         ):
             with self.subTest(task=task_header):
                 task_start = makefile.index(task_header)
@@ -319,7 +319,7 @@ class MakeWrappersTest(unittest.TestCase):
 
         self.assertIn('script_runner = "@shell"', task_body)
         self.assertIn('if [ "${1:-}" = "--" ]; then shift; fi;', task_body)
-        self.assertIn('cargo run --quiet -p cli -- review codex-local "$@"', task_body)
+        self.assertIn('bin/sotp review codex-local "$@"', task_body)
         self.assertNotIn(', "${@}"', task_body)
 
     def test_verify_orchestra_local_honors_python_bin_override(self) -> None:
@@ -468,7 +468,7 @@ class MakeWrappersTest(unittest.TestCase):
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
         self.assertIn(
-            "script = ['cargo run --quiet -p cli -- git add-all']",
+            "script = ['bin/sotp git add-all']",
             task_body,
         )
 
@@ -479,7 +479,7 @@ class MakeWrappersTest(unittest.TestCase):
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
         self.assertIn(
-            "script = ['cargo run --quiet -p cli -- git add-from-file tmp/track-commit/add-paths.txt --cleanup']",
+            "script = ['bin/sotp git add-from-file tmp/track-commit/add-paths.txt --cleanup']",
             task_body,
         )
 
@@ -491,7 +491,7 @@ class MakeWrappersTest(unittest.TestCase):
         )
         self.assertIn("cargo make ci", task_body, "track-commit-message must run CI internally")
         self.assertIn(
-            "cargo run --quiet -p cli -- git commit-from-file tmp/track-commit/commit-message.txt --cleanup",
+            "bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup",
             task_body,
         )
         # Safety: CI failure must prevent commit. The script must not use
@@ -516,7 +516,7 @@ class MakeWrappersTest(unittest.TestCase):
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
         self.assertIn(
-            "script = ['cargo run --quiet -p cli -- git note-from-file tmp/track-commit/note.md --cleanup']",
+            "script = ['bin/sotp git note-from-file tmp/track-commit/note.md --cleanup']",
             task_body,
         )
 
