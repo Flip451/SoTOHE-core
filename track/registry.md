@@ -7,15 +7,15 @@
 
 ## Current Focus
 
-- Latest active track: `None yet`
-- Next recommended command: `/track:plan <feature>`
+- Latest active track: `takt-deprecation-impl-2026-03-15`
+- Next recommended command: `/track:activate takt-deprecation-impl-2026-03-15`
 - Last updated: `2026-03-15`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| _No active tracks yet_ | - | `/track:plan <feature>` | - |
+| takt-deprecation-impl-2026-03-15 | planned | `/track:activate takt-deprecation-impl-2026-03-15` | 2026-03-15 |
 
 ## Completed Tracks
 
