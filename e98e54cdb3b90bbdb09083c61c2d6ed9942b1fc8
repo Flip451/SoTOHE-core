@@ -1,0 +1,16 @@
+## Task Summary: Add fast_model escalation to review workflow
+
+**Track:** sotp-bin-placement-2026-03-15
+**Task:** Review workflow improvement (fast_model escalation)
+**Date:** 2026-03-15
+
+### Changes
+
+- .claude/agent-profiles.json: Added providers.codex.fast_model field (gpt-5.3-codex-spark)
+- .claude/commands/track/review.md: Model escalation strategy — fast_model for iterative rounds, default_model for final confirmation
+- scripts/verify_orchestra_guardrails.py: Updated snippet expectations for fast_model
+- scripts/test_verify_scripts.py: Updated test assertions for new snippets
+
+### Why
+
+Review cycles with gpt-5.4 take ~3-5 minutes per round. Using gpt-5.3-codex-spark (~20-30s) for iterative fix-verify rounds and escalating to gpt-5.4 only for final confirmation reduces total review time significantly while maintaining deep design coverage.
