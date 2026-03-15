@@ -1,13 +1,12 @@
+use crate::CliError;
+
 use super::*;
 
-pub(super) fn execute_resolve(args: ResolveArgs) -> ExitCode {
+pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
     let ResolveArgs { items_dir, track_id } = args;
 
     // Validate items_dir structure (must be <root>/track/items).
-    if let Err(err) = resolve_project_root(&items_dir) {
-        eprintln!("{err}");
-        return ExitCode::FAILURE;
-    }
+    resolve_project_root(&items_dir).map_err(CliError::Message)?;
 
     // Auto-detect is only safe when items_dir is the default (track/items
     // relative to CWD), because auto_detect uses SystemGitRepo::discover
@@ -17,33 +16,20 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> ExitCode {
     let effective_track_id = match track_id {
         Some(id) => id,
         None if !is_default_items_dir => {
-            eprintln!("resolve failed: custom --items-dir requires an explicit track-id argument");
-            return ExitCode::FAILURE;
+            return Err(CliError::Message(
+                "resolve failed: custom --items-dir requires an explicit track-id argument"
+                    .to_owned(),
+            ));
         }
-        None => match auto_detect_track_id_from_branch() {
-            Ok(id) => id,
-            Err(err) => {
-                eprintln!("resolve failed: {err}");
-                return ExitCode::FAILURE;
-            }
-        },
+        None => auto_detect_track_id_from_branch()
+            .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?,
     };
 
-    let track_id = match TrackId::new(&effective_track_id) {
-        Ok(id) => id,
-        Err(err) => {
-            eprintln!("invalid track id: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let track_id = TrackId::new(&effective_track_id)
+        .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
-    let (track, meta) = match read_track_metadata(&items_dir, &track_id) {
-        Ok(result) => result,
-        Err(err) => {
-            eprintln!("resolve failed: {err}");
-            return ExitCode::FAILURE;
-        }
-    };
+    let (track, meta) = read_track_metadata(&items_dir, &track_id)
+        .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?;
 
     // Fail-closed: reject branchless v3 tracks that violate planning-only invariants.
     // Both raw status (from JSON) and domain-derived status (from tasks) must be planned.
@@ -51,19 +37,17 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> ExitCode {
         let raw = meta.original_status.as_deref();
         let derived = track.status();
         if raw != Some("planned") {
-            eprintln!(
+            return Err(CliError::Message(format!(
                 "resolve failed: track '{track_id}' is branchless v3 but raw status is '{}', \
                  not planned; metadata may be corrupt",
                 raw.unwrap_or("(missing)")
-            );
-            return ExitCode::FAILURE;
+            )));
         }
         if derived != domain::TrackStatus::Planned {
-            eprintln!(
+            return Err(CliError::Message(format!(
                 "resolve failed: track '{track_id}' is branchless v3 but derived status is \
                  '{derived}', not planned; metadata may be corrupt"
-            );
-            return ExitCode::FAILURE;
+            )));
         }
     }
 
@@ -78,7 +62,7 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> ExitCode {
         println!("Blocker: {blocker}");
     }
 
-    ExitCode::SUCCESS
+    Ok(ExitCode::SUCCESS)
 }
 
 /// Auto-detect track ID from the current git branch.
@@ -86,9 +70,10 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> ExitCode {
 /// Git I/O stays here in the CLI layer; pure branch-name parsing is
 /// delegated to `usecase::track_resolution::resolve_track_id_from_branch`.
 fn auto_detect_track_id_from_branch() -> Result<String, String> {
-    let repo = SystemGitRepo::discover()?;
-    let branch = repo.current_branch()?;
+    let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
+    let branch = repo.current_branch().map_err(|e| e.to_string())?;
     usecase::track_resolution::resolve_track_id_from_branch(branch.as_deref())
+        .map_err(|e| e.to_string())
 }
 
 /// Read-only metadata load via `infrastructure::track::codec`.
@@ -98,6 +83,6 @@ fn auto_detect_track_id_from_branch() -> Result<String, String> {
 pub(super) fn read_track_metadata(
     items_dir: &std::path::Path,
     track_id: &TrackId,
-) -> Result<(domain::TrackMetadata, DocumentMeta), String> {
+) -> Result<(domain::TrackMetadata, DocumentMeta), domain::RepositoryError> {
     infrastructure::track::fs_store::read_track_metadata(items_dir, track_id)
 }

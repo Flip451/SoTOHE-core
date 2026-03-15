@@ -13,7 +13,8 @@ pub mod track_phase;
 
 pub use decision::Decision;
 pub use error::{
-    DomainError, RepositoryError, TrackReadError, TrackWriteError, TransitionError, ValidationError,
+    DomainError, RepositoryError, TrackReadError, TrackWriteError, TransitionError,
+    ValidationError, WorktreeError,
 };
 pub use ids::{CommitHash, TaskId, TrackBranch, TrackId};
 pub use plan::{PlanSection, PlanView};

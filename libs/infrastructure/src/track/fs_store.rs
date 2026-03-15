@@ -260,15 +260,17 @@ pub fn metadata_json_path(root: &Path, id: &TrackId) -> PathBuf {
 /// full `FsTrackStore` with a lock manager would introduce unwanted side effects.
 ///
 /// # Errors
-/// Returns a human-readable error message on I/O or decode failure.
+/// Returns `RepositoryError` on I/O or decode failure.
 pub fn read_track_metadata(
     items_dir: &Path,
     id: &TrackId,
-) -> Result<(TrackMetadata, DocumentMeta), String> {
+) -> Result<(TrackMetadata, DocumentMeta), RepositoryError> {
     let path = items_dir.join(id.as_str()).join("metadata.json");
-    let json = std::fs::read_to_string(&path)
-        .map_err(|err| format!("cannot read {}: {err}", path.display()))?;
-    codec::decode(&json).map_err(|err| format!("cannot parse {}: {err}", path.display()))
+    let json = std::fs::read_to_string(&path).map_err(|err| {
+        RepositoryError::Message(format!("cannot read {}: {err}", path.display()))
+    })?;
+    codec::decode(&json)
+        .map_err(|err| RepositoryError::Message(format!("cannot parse {}: {err}", path.display())))
 }
 
 #[cfg(test)]
