@@ -92,7 +92,11 @@ pub(super) fn execute_transition(
         let current_kind = task.status().kind();
 
         // target_status was validated above, so this branch is unreachable in practice.
-        let transition = match resolve_transition(&target_status, current_kind, parsed_hash) {
+        let transition = match usecase::track_resolution::resolve_transition(
+            &target_status,
+            current_kind,
+            parsed_hash,
+        ) {
             Ok(t) => t,
             Err(msg) => {
                 return Err(domain::ValidationError::InvalidTrackId(msg).into());
@@ -138,18 +142,18 @@ pub(super) fn reject_branchless_implementation_transition(
     track_id: &TrackId,
     target_status: &str,
 ) -> Result<(), String> {
+    // Short-circuit for non-implementation targets to avoid unnecessary I/O.
     if !matches!(target_status, "in_progress" | "done" | "skipped") {
         return Ok(());
     }
 
     let track = activate::load_track_branch_record(project_root, items_dir, track_id)?;
-    if track.schema_version == 3 && track.branch.is_none() {
-        return Err(format!(
-            "track '{track_id}' is not activated yet; run /track:activate {track_id}"
-        ));
-    }
-
-    Ok(())
+    usecase::track_resolution::reject_branchless_implementation_transition(
+        track.schema_version,
+        track.branch.as_deref(),
+        track_id,
+        target_status,
+    )
 }
 
 fn verify_branch_guard<R: TrackReader>(
@@ -197,23 +201,4 @@ fn current_git_branch(cwd: &std::path::Path) -> Result<String, String> {
 
     let branch = String::from_utf8_lossy(&output.stdout).trim().to_owned();
     Ok(branch)
-}
-
-/// Resolves the correct `TaskTransition` based on target status and current task status.
-/// This handles cases like `done -> in_progress` (Reopen) vs `todo -> in_progress` (Start).
-fn resolve_transition(
-    target_status: &str,
-    current_kind: TaskStatusKind,
-    commit_hash: Option<CommitHash>,
-) -> Result<TaskTransition, String> {
-    match target_status {
-        "in_progress" => match current_kind {
-            TaskStatusKind::Done => Ok(TaskTransition::Reopen),
-            _ => Ok(TaskTransition::Start),
-        },
-        "done" => Ok(TaskTransition::Complete { commit_hash }),
-        "todo" => Ok(TaskTransition::ResetToTodo),
-        "skipped" => Ok(TaskTransition::Skip),
-        other => Err(format!("unsupported target status: {other}")),
-    }
 }

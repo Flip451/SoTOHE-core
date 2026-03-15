@@ -641,19 +641,8 @@ pub(super) fn ensure_clean_worktree(
     repo: &impl GitRepository,
     allowed_dirty_paths: &std::collections::BTreeSet<String>,
 ) -> Result<(), String> {
-    let dirty_paths = dirty_worktree_paths(repo)?;
-    if dirty_paths.is_empty() {
-        return Ok(());
-    }
-    if dirty_paths.iter().all(|path| allowed_dirty_paths.contains(path)) {
-        return Ok(());
-    }
-    if !dirty_paths.is_empty() {
-        return Err(
-            "activation requires a clean worktree before metadata materialization".to_owned()
-        );
-    }
-    Ok(())
+    let dirty_paths = git_dirty_worktree_paths(repo)?;
+    usecase::worktree_guard::validate_clean_worktree(&dirty_paths, allowed_dirty_paths)
 }
 
 fn activation_create_requires_main_branch(
@@ -684,23 +673,14 @@ pub(super) fn uses_legacy_branch_mode(mode: BranchMode, schema_version: u32) -> 
     schema_version != 3 && !matches!(mode, BranchMode::Auto)
 }
 
-fn dirty_worktree_paths(repo: &impl GitRepository) -> Result<Vec<String>, String> {
+/// Fetches dirty worktree paths via git, delegating parsing to the usecase layer.
+fn git_dirty_worktree_paths(repo: &impl GitRepository) -> Result<Vec<String>, String> {
     let output = repo.output(&["status", "--porcelain"])?;
     if !output.status.success() {
         return Err("git status --porcelain failed".to_owned());
     }
-    let mut paths = Vec::new();
-    for line in String::from_utf8_lossy(&output.stdout).lines() {
-        if line.len() < 4 {
-            continue;
-        }
-        let path = &line[3..];
-        let normalized = path.split_once(" -> ").map(|(_, after)| after).unwrap_or(path).trim();
-        if !normalized.is_empty() {
-            paths.push(normalized.to_owned());
-        }
-    }
-    Ok(paths)
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    Ok(usecase::worktree_guard::parse_dirty_worktree_paths(&stdout))
 }
 
 fn activation_artifacts_dirty(
@@ -710,7 +690,7 @@ fn activation_artifacts_dirty(
     track_id: &TrackId,
 ) -> Result<bool, String> {
     let artifact_paths = activation_artifact_paths(project_root, items_dir, track_id);
-    let dirty_paths = dirty_worktree_paths(repo)?;
+    let dirty_paths = git_dirty_worktree_paths(repo)?;
     Ok(dirty_paths.iter().any(|path| artifact_paths.contains(path)))
 }
 

@@ -6,15 +6,12 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use clap::{Args, Subcommand};
-use domain::{
-    CommitHash, TaskId, TaskStatusKind, TaskTransition, TrackBranch, TrackId, TrackReader,
-    TrackWriter,
-};
+use domain::{CommitHash, TaskId, TrackBranch, TrackId, TrackReader, TrackWriter};
 use infrastructure::git_cli::{
     GitRepository, SystemGitRepo, TrackBranchRecord, load_explicit_track_branch_from_items_dir,
 };
 use infrastructure::lock::FsFileLockManager;
-use infrastructure::track::codec::{self, DocumentMeta};
+use infrastructure::track::codec::DocumentMeta;
 use infrastructure::track::fs_store::FsTrackStore;
 use infrastructure::track::render;
 use usecase::track_activation::{ActivateTrackOutcome, ActivateTrackUseCase};

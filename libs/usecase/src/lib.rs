@@ -6,6 +6,8 @@ pub mod pr_workflow;
 pub mod review_workflow;
 pub mod track_activation;
 pub mod track_phase;
+pub mod track_resolution;
+pub mod worktree_guard;
 
 use std::sync::Arc;
 

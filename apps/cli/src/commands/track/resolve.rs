@@ -83,26 +83,21 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> ExitCode {
 
 /// Auto-detect track ID from the current git branch.
 ///
-/// Assumes `items_dir` belongs to the same repo as `CWD` (the default
-/// `track/items` is relative to CWD, so they always match in practice).
+/// Git I/O stays here in the CLI layer; pure branch-name parsing is
+/// delegated to `usecase::track_resolution::resolve_track_id_from_branch`.
 fn auto_detect_track_id_from_branch() -> Result<String, String> {
     let repo = SystemGitRepo::discover()?;
     let branch = repo.current_branch()?;
-    match branch.as_deref() {
-        Some(b) if b.starts_with("track/") => Ok(b["track/".len()..].to_owned()),
-        Some("HEAD") => Err("detached HEAD; provide an explicit track-id".to_owned()),
-        Some(b) => Err(format!("not on a track branch (on '{b}'); provide an explicit track-id")),
-        None => Err("cannot determine current git branch; provide an explicit track-id".to_owned()),
-    }
+    usecase::track_resolution::resolve_track_id_from_branch(branch.as_deref())
 }
 
-/// Read-only metadata load via codec (no lock manager needed).
+/// Read-only metadata load via `infrastructure::track::codec`.
+///
+/// Uses the codec directly to avoid constructing a `FsFileLockManager`
+/// (which eagerly creates the `.locks` directory as a side effect).
 pub(super) fn read_track_metadata(
     items_dir: &std::path::Path,
     track_id: &TrackId,
 ) -> Result<(domain::TrackMetadata, DocumentMeta), String> {
-    let path = items_dir.join(track_id.as_str()).join("metadata.json");
-    let json = std::fs::read_to_string(&path)
-        .map_err(|err| format!("cannot read {}: {err}", path.display()))?;
-    codec::decode(&json).map_err(|err| format!("cannot parse {}: {err}", path.display()))
+    infrastructure::track::fs_store::read_track_metadata(items_dir, track_id)
 }

@@ -81,14 +81,15 @@
       "status": "done"
     },
     {
+      "commit_hash": "7233977",
       "description": "`apps/cli/src/commands/track.rs` を責務ごとに分割し、CLI 層に流出したロジックを適切なレイヤーへ戻す。対象: (1) `track.rs` を `track/mod.rs`（dispatch + shared helpers）、`track/transition.rs`、`track/activate.rs`、`track/resolve.rs`、`track/views.rs` に分割する。(2) `auto_detect_track_id_from_branch` を usecase 層の resolution logic に移す。(3) `read_track_metadata` を infrastructure 層の `FsTrackStore` に read-only メソッドとして追加し、CLI の codec 直接呼び出しを除去する。(4) `render.rs` の `TrackSnapshot` 関連の sort/filter ロジックのうち domain 判定に該当するものを domain 層に寄せる。分割後も `cargo make ci` が通ることを確認する",
       "id": "T006",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "CLI 層に残ったビジネスロジックを適切なレイヤーへ移動する。(1) `auto_detect_track_id_from_branch` を usecase 層に `TrackResolution` として移動（track ID 解決は usecase の責務）。(2) `read_track_metadata` を infrastructure 層の `FsTrackStore` に `find_with_meta` read-only メソッドとして追加し、CLI の `codec::decode` 直接呼び出しを除去。(3) `resolve_transition` を usecase 層に移動（状態遷移の解決は usecase の責務）。(4) `reject_branchless_implementation_transition` を usecase 層に移動（guard ロジックは usecase の責務）。(5) `ensure_clean_worktree` / `dirty_worktree_paths` を usecase 層に移動（worktree 検証ロジック）。移動後も `cargo make ci` が通ることを確認する",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "回帰テストを追加・更新する。schema、branch の確定、activation の再開、review/commit/PR の selector、`/track:merge` の PR 番号ルール、`/track:status`、`track/registry.md`、resolver の優先順位、docs/router の guardrail を確認する。branch-null の planning-only track では `/track:status` と `track/registry.md` の両方が `/track:activate <track-id>` を返し、materialized された `planned` track では従来どおり implementation command を返すこと、同じ fixture を Python validator と Rust render / validate path の両方へ通して rendered guidance まで一致すること、planning-only track が activation 前に selector 付き review/commit/PR を使えること、allowlist 外の diff が activation 前の導線で reject されること、PR wrapper / script が hidden な `track/<id>` 前提を要求しないこと、`/track:merge` が current-branch auto-detect に戻らず PR 番号だけを受け付けること、stale / divergent branch を activation preflight が metadata 永続化前に止めること、activation 後に source branch へ戻っても materialized state が current-focus / latest-track resolver から観測できること、mixed-state repo で `/track:catchup`・`/track:revert`・`scripts/external_guides.py`・`scripts/verify_latest_track_files.py` が materialized active track を planning-only track より優先すること、materialized active track と branch-null planning-only track が同時にある non-track branch で、auto-detect が active track を優先しつつ explicit `track-id` selector が planning-only track へ正しくルーティングされ、active track に乗っ取られないことを確認すること、`/track:activate` が dirty worktree を reject することを確認すること、planning-only diff に対して `/track:ci` が activation 前でも正常に動作することを確認すること、`track-transition` による `todo -> in_progress` などの implementation-phase 状態遷移が activation 前に fail-closed であることを確認すること、archived branchless track が resolver priority 変更後も Current Focus / latest-track selection に再浮上しないことを確認すること、`/track:full-cycle` が activation guard を bypass しないことを確認し、最後に `cargo make ci` で既存の branch-per-track workflow を壊していないことを確かめる",
@@ -97,5 +98,5 @@
     }
   ],
   "title": "track:plan plan-only / activate 導線",
-  "updated_at": "2026-03-15T01:23:53Z"
+  "updated_at": "2026-03-15T02:00:25Z"
 }
