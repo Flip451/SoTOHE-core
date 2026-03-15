@@ -1,0 +1,101 @@
+{
+  "branch": "track/cli-error-handling-2026-03-15",
+  "created_at": "2026-03-15",
+  "id": "cli-error-handling-2026-03-15",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "GitRepository, GhClient, read_track_metadata の String エラーを thiserror ベースの型付きエラーに置換する。"
+        ],
+        "id": "S001",
+        "task_ids": [
+          "T001",
+          "T002"
+        ],
+        "title": "infrastructure 層の型付きエラー導入"
+      },
+      {
+        "description": [
+          "WorktreeReader の String エラーを型付きに変更し、usecase 層の track_resolution, git_workflow, pr_workflow, review_workflow, worktree_guard を型付きエラーに移行する。"
+        ],
+        "id": "S002",
+        "task_ids": [
+          "T003",
+          "T004"
+        ],
+        "title": "domain port + usecase 層の型付きエラー導入"
+      },
+      {
+        "description": [
+          "CliError enum を定義し、各コマンドの eprintln! + ExitCode::FAILURE パターンを ? 演算子に置換する。"
+        ],
+        "id": "S003",
+        "task_ids": [
+          "T005",
+          "T006",
+          "T007"
+        ],
+        "title": "CLI 層の CliError + ? 演算子統合"
+      },
+      {
+        "description": [],
+        "id": "S004",
+        "task_ids": [
+          "T008"
+        ],
+        "title": "CI 検証"
+      }
+    ],
+    "summary": [
+      "全層で蔓延する Result<_, String> を型付きエラーに置換し、CLI 層の eprintln! + ExitCode::FAILURE ボイラープレート (94箇所) を CliError + ? 演算子に統合する。",
+      "下層 (infrastructure/domain port/usecase) から型付きエラーを導入し、CLI 層で CliError として集約する。"
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "libs/infrastructure/src/git_cli.rs に GitError、gh_cli.rs に GhError を thiserror で定義。trait メソッドの戻り値を Result<_, String> から型付きエラーに変更。全アダプタ・呼び出し元を更新。",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "libs/infrastructure/src/track/fs_store.rs の read_track_metadata を型付きエラーに変更。RepositoryError::Message catch-all を可能な限り構造化バリアントに置換。",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "libs/domain/src/repository.rs の WorktreeReader::porcelain_status を Result<String, String> から型付きエラーに変更。domain 層にエラー型を追加し、infrastructure アダプタを更新。",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "track_resolution.rs, git_workflow.rs, pr_workflow.rs, review_workflow.rs, worktree_guard.rs の public 関数を型付きエラーに移行。map_err(|e| e.to_string()) による型情報消失を解消。",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "apps/cli/src/ に CliError enum を thiserror で定義。domain, usecase, infrastructure の各エラー型からの From impl を提供。ExitCode への変換メソッドを実装。",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "commands/track/activate.rs (~28箇所), commands/track/transition.rs (9箇所), commands/track/resolve.rs (6箇所), commands/track/views.rs (2箇所) を CliError + ? に変換。注意: commands/lock.rs は JSON stderr 出力を維持するため CliError 統合対象外。commands/hook.rs は exit code プロトコル (0/1/2) を維持するため CliError 統合対象外。",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "description": "commands/git.rs (20箇所), commands/pr.rs (9箇所), commands/file.rs (3箇所), commands/review.rs (Result<_, String> パス), main.rs (4箇所) を CliError + ? に変換。commands/review.rs は独自の ReviewRunResult ワークフローを持つため、CliError 統合は内部ヘルパーの String エラーを型付きに変更する範囲に留める。",
+      "id": "T007",
+      "status": "done"
+    },
+    {
+      "description": "cargo make ci が通ることを確認。テスト数が変わらないことを検証。",
+      "id": "T008",
+      "status": "done"
+    }
+  ],
+  "title": "ERR-09: 全層エラーハンドリング改善 — String エラー撲滅と CliError 導入",
+  "updated_at": "2026-03-15T08:35:15Z"
+}

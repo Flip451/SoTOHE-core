@@ -3,17 +3,35 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
 use serde::Deserialize;
+use thiserror::Error;
+
+/// Structured error type for git CLI operations.
+#[derive(Debug, Error)]
+pub enum GitError {
+    #[error("failed to determine current directory: {0}")]
+    CurrentDir(#[source] std::io::Error),
+    #[error("failed to run git {command}: {source}")]
+    Spawn {
+        command: String,
+        #[source]
+        source: std::io::Error,
+    },
+    #[error("git {command} failed (exit {code}): {stderr}")]
+    CommandFailed { command: String, code: i32, stderr: String },
+    #[error("git rev-parse --show-toplevel returned an empty path")]
+    EmptyRepoRoot,
+}
 
 pub trait GitRepository {
     fn root(&self) -> &Path;
-    fn status(&self, args: &[&str]) -> Result<i32, String>;
-    fn output(&self, args: &[&str]) -> Result<Output, String>;
+    fn status(&self, args: &[&str]) -> Result<i32, GitError>;
+    fn output(&self, args: &[&str]) -> Result<Output, GitError>;
 
     fn resolve_path(&self, path: &Path) -> PathBuf {
         resolve_repo_path(self.root(), path)
     }
 
-    fn current_branch(&self) -> Result<Option<String>, String> {
+    fn current_branch(&self) -> Result<Option<String>, GitError> {
         let output = self.output(&["rev-parse", "--abbrev-ref", "HEAD"])?;
         if !output.status.success() {
             return Ok(None);
@@ -25,18 +43,16 @@ pub trait GitRepository {
     ///
     /// # Errors
     ///
-    /// Returns an error description if `git push` fails.
-    fn push_branch(&self, branch: &str) -> Result<(), String> {
+    /// Returns [`GitError::CommandFailed`] if `git push` fails.
+    fn push_branch(&self, branch: &str) -> Result<(), GitError> {
+        let command = format!("push -u origin {branch}");
         let output = self.output(&["push", "-u", "origin", branch])?;
         if output.status.success() {
             return Ok(());
         }
         let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
-        Err(if stderr.is_empty() {
-            format!("git push -u origin {branch} failed")
-        } else {
-            format!("git push -u origin {branch} failed: {stderr}")
-        })
+        let code = output.status.code().unwrap_or(-1);
+        Err(GitError::CommandFailed { command, code, stderr })
     }
 
     /// Stage all worktree changes using `git add -A`, excluding the given pathspecs.
@@ -46,13 +62,13 @@ pub trait GitRepository {
     ///
     /// # Errors
     ///
-    /// Returns an error description if `git add` fails for a reason other than
+    /// Returns [`GitError::CommandFailed`] if `git add` fails for a reason other than
     /// the gitignore warning, or if the index cannot be verified after staging.
     fn stage_all_excluding(
         &self,
         exclude_files: &[&str],
         exclude_dirs: &[&str],
-    ) -> Result<(), String> {
+    ) -> Result<(), GitError> {
         let mut owned_args =
             vec!["add".to_owned(), "-A".to_owned(), "--".to_owned(), ".".to_owned()];
         owned_args.extend(exclude_files.iter().map(|p| format!(":(exclude){p}")));
@@ -82,11 +98,9 @@ pub trait GitRepository {
             return Ok(());
         }
 
-        Err(format!(
-            "git add failed (exit {}): {}",
-            output.status.code().unwrap_or(-1),
-            stderr.trim()
-        ))
+        let code = output.status.code().unwrap_or(-1);
+        let stderr = stderr.trim().to_owned();
+        Err(GitError::CommandFailed { command: "add -A".to_owned(), code, stderr })
     }
 }
 
@@ -96,26 +110,35 @@ pub struct SystemGitRepo {
 }
 
 impl SystemGitRepo {
-    pub fn discover() -> Result<Self, String> {
-        let cwd = std::env::current_dir()
-            .map_err(|err| format!("failed to determine current directory: {err}"))?;
+    /// Discover the git repository root from the current working directory.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`GitError`] if the current directory cannot be determined,
+    /// git cannot be spawned, the command fails, or the root path is empty.
+    pub fn discover() -> Result<Self, GitError> {
+        let cwd = std::env::current_dir().map_err(GitError::CurrentDir)?;
         let output = Command::new("git")
             .args(["rev-parse", "--show-toplevel"])
             .current_dir(&cwd)
             .output()
-            .map_err(|err| format!("failed to run git rev-parse --show-toplevel: {err}"))?;
+            .map_err(|source| GitError::Spawn {
+                command: "rev-parse --show-toplevel".to_owned(),
+                source,
+            })?;
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
-            return Err(if stderr.is_empty() {
-                "failed to resolve repository root".to_owned()
-            } else {
-                format!("failed to resolve repository root: {stderr}")
+            let code = output.status.code().unwrap_or(-1);
+            return Err(GitError::CommandFailed {
+                command: "rev-parse --show-toplevel".to_owned(),
+                code,
+                stderr,
             });
         }
 
         let root = String::from_utf8_lossy(&output.stdout).trim().to_owned();
         if root.is_empty() {
-            return Err("git rev-parse --show-toplevel returned an empty path".to_owned());
+            return Err(GitError::EmptyRepoRoot);
         }
 
         Ok(Self { root: PathBuf::from(root) })
@@ -127,29 +150,42 @@ impl GitRepository for SystemGitRepo {
         &self.root
     }
 
-    fn status(&self, args: &[&str]) -> Result<i32, String> {
+    fn status(&self, args: &[&str]) -> Result<i32, GitError> {
         let status = Command::new("git")
             .args(args)
             .current_dir(&self.root)
             .status()
-            .map_err(|err| format!("failed to run git {}: {err}", args.join(" ")))?;
+            .map_err(|source| GitError::Spawn { command: args.join(" "), source })?;
         Ok(status.code().unwrap_or(1))
     }
 
-    fn output(&self, args: &[&str]) -> Result<Output, String> {
+    fn output(&self, args: &[&str]) -> Result<Output, GitError> {
         Command::new("git")
             .args(args)
             .current_dir(&self.root)
             .output()
-            .map_err(|err| format!("failed to run git {}: {err}", args.join(" ")))
+            .map_err(|source| GitError::Spawn { command: args.join(" "), source })
     }
 }
 
 impl domain::WorktreeReader for SystemGitRepo {
-    fn porcelain_status(&self) -> Result<String, String> {
-        let output = self.output(&["status", "--porcelain"])?;
+    fn porcelain_status(&self) -> Result<String, domain::WorktreeError> {
+        let output = self
+            .output(&["status", "--porcelain"])
+            .map_err(|e| domain::WorktreeError::StatusFailed(e.to_string()))?;
         if !output.status.success() {
-            return Err("git status --porcelain failed".to_owned());
+            let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+            return Err(domain::WorktreeError::StatusFailed(if stderr.is_empty() {
+                format!(
+                    "git status --porcelain failed (exit {})",
+                    output.status.code().unwrap_or(-1)
+                )
+            } else {
+                format!(
+                    "git status --porcelain failed (exit {}): {stderr}",
+                    output.status.code().unwrap_or(-1)
+                )
+            }));
         }
         Ok(String::from_utf8_lossy(&output.stdout).into_owned())
     }

@@ -88,3 +88,10 @@ pub enum TrackWriteError {
     #[error(transparent)]
     Repository(#[from] RepositoryError),
 }
+
+/// Error type for `WorktreeReader` port operations.
+#[derive(Debug, Error)]
+pub enum WorktreeError {
+    #[error("worktree status failed: {0}")]
+    StatusFailed(String),
+}
