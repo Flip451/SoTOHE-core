@@ -2009,7 +2009,7 @@ class VerifyScriptsTest(unittest.TestCase):
     ) -> None:
         replacements = {
             Path(".claude/commands/track/review.md"): (
-                "Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.<provider>` first, then fall back to `providers.<provider>.default_model`.",
+                "profiles.<active_profile>.provider_model_overrides.<provider>",
                 "Read the provider's `default_model` to get `{model}`.",
             ),
             Path(".claude/skills/codex-system/SKILL.md"): (
@@ -2050,7 +2050,7 @@ class VerifyScriptsTest(unittest.TestCase):
     ) -> None:
         replacements = {
             Path(".claude/commands/track/review.md"): (
-                " then fall back to `providers.<provider>.default_model`.",
+                "providers.<provider>.default_model",
                 "",
             ),
             Path(".claude/skills/codex-system/SKILL.md"): (
