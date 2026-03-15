@@ -2009,7 +2009,7 @@ class VerifyScriptsTest(unittest.TestCase):
     ) -> None:
         replacements = {
             Path(".claude/commands/track/review.md"): (
-                "profiles.<active_profile>.provider_model_overrides.<provider>",
+                "provider_model_overrides",
                 "Read the provider's `default_model` to get `{model}`.",
             ),
             Path(".claude/skills/codex-system/SKILL.md"): (
@@ -2050,7 +2050,7 @@ class VerifyScriptsTest(unittest.TestCase):
     ) -> None:
         replacements = {
             Path(".claude/commands/track/review.md"): (
-                "providers.<provider>.default_model",
+                "providers.<reviewer_provider>.default_model",
                 "",
             ),
             Path(".claude/skills/codex-system/SKILL.md"): (
@@ -2309,8 +2309,8 @@ class VerifyScriptsTest(unittest.TestCase):
                 'cargo make track-local-review --model {model} --prompt \\"{task}\\"',
             ),
             Path(".claude/commands/track/review.md"): (
-                "cargo make track-local-review -- --model {model} --briefing-file tmp/reviewer-runtime/briefing-",
-                "cargo make track-local-review --model {model} --briefing-file tmp/reviewer-runtime/briefing-",
+                "cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-",
+                "cargo make track-local-review --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-",
             ),
             Path(".claude/skills/codex-system/SKILL.md"): (
                 'cargo make track-local-review -- --model {model} --prompt "',
