@@ -1,0 +1,17 @@
+## Task Summary: Plan sotp binary placement at bin/sotp
+
+**Track:** sotp-bin-placement-2026-03-15
+**Task:** Planning artifacts for sotp binary placement
+**Date:** 2026-03-15
+
+### Changes
+
+- track/items/sotp-bin-placement-2026-03-15/metadata.json: Track definition with 6 tasks
+- track/items/sotp-bin-placement-2026-03-15/spec.md: Goal, scope, constraints, acceptance criteria
+- track/items/sotp-bin-placement-2026-03-15/plan.md: Generated from metadata.json
+- track/items/sotp-bin-placement-2026-03-15/verification.md: Verification checklist
+- track/registry.md: Active track registered
+
+### Why
+
+Replace cargo run --quiet -p cli overhead in Makefile.toml host-side wrappers with a pre-built bin/sotp binary, built via cargo make bootstrap. Hook fallback chain: SOTP_CLI_BINARY → $CLAUDE_PROJECT_DIR/bin/sotp → cargo run.
