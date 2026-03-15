@@ -38,7 +38,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${SOTP_CLI_BINARY:-sotp}\" hook dispatch block-direct-git-ops || exit 2",
+            "command": "if [ -n \"${SOTP_CLI_BINARY:-}\" ]; then \"$SOTP_CLI_BINARY\" hook dispatch block-direct-git-ops || exit 2; elif [ -x \"$CLAUDE_PROJECT_DIR/bin/sotp\" ]; then \"$CLAUDE_PROJECT_DIR/bin/sotp\" hook dispatch block-direct-git-ops || exit 2; elif command -v sotp >/dev/null 2>&1; then sotp hook dispatch block-direct-git-ops || exit 2; else cargo run --quiet -p cli -- hook dispatch block-direct-git-ops || exit 2; fi",
             "timeout": 10
           }
         ]
@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ \"${SOTP_LOCK_ENABLED:-}\" != \"1\" ]; then exit 0; fi; \"${SOTP_CLI_BINARY:-sotp}\" hook dispatch file-lock-acquire --agent \"${SOTP_AGENT_ID:-pid-$PPID}\" --pid \"$PPID\" || exit 2",
+            "command": "if [ \"${SOTP_LOCK_ENABLED:-}\" != \"1\" ]; then exit 0; fi; if [ -n \"${SOTP_CLI_BINARY:-}\" ]; then \"$SOTP_CLI_BINARY\" hook dispatch file-lock-acquire --agent \"${SOTP_AGENT_ID:-pid-$PPID}\" --pid \"$PPID\" || exit 2; elif [ -x \"$CLAUDE_PROJECT_DIR/bin/sotp\" ]; then \"$CLAUDE_PROJECT_DIR/bin/sotp\" hook dispatch file-lock-acquire --agent \"${SOTP_AGENT_ID:-pid-$PPID}\" --pid \"$PPID\" || exit 2; elif command -v sotp >/dev/null 2>&1; then sotp hook dispatch file-lock-acquire --agent \"${SOTP_AGENT_ID:-pid-$PPID}\" --pid \"$PPID\" || exit 2; else cargo run --quiet -p cli -- hook dispatch file-lock-acquire --agent \"${SOTP_AGENT_ID:-pid-$PPID}\" --pid \"$PPID\" || exit 2; fi",
             "timeout": 15
           }
         ]
@@ -110,7 +110,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ \"${SOTP_LOCK_ENABLED:-}\" != \"1\" ]; then exit 0; fi; \"${SOTP_CLI_BINARY:-sotp}\" hook dispatch file-lock-release --agent \"${SOTP_AGENT_ID:-pid-$PPID}\" || { echo \"warning: file-lock-release launcher failed\" >&2; exit 0; }",
+            "command": "if [ \"${SOTP_LOCK_ENABLED:-}\" != \"1\" ]; then exit 0; fi; if [ -n \"${SOTP_CLI_BINARY:-}\" ]; then \"$SOTP_CLI_BINARY\" hook dispatch file-lock-release --agent \"${SOTP_AGENT_ID:-pid-$PPID}\" || { echo \"warning: file-lock-release launcher failed\" >&2; exit 0; }; elif [ -x \"$CLAUDE_PROJECT_DIR/bin/sotp\" ]; then \"$CLAUDE_PROJECT_DIR/bin/sotp\" hook dispatch file-lock-release --agent \"${SOTP_AGENT_ID:-pid-$PPID}\" || { echo \"warning: file-lock-release launcher failed\" >&2; exit 0; }; elif command -v sotp >/dev/null 2>&1; then sotp hook dispatch file-lock-release --agent \"${SOTP_AGENT_ID:-pid-$PPID}\" || { echo \"warning: file-lock-release launcher failed\" >&2; exit 0; }; else cargo run --quiet -p cli -- hook dispatch file-lock-release --agent \"${SOTP_AGENT_ID:-pid-$PPID}\" || { echo \"warning: file-lock-release launcher failed\" >&2; exit 0; }; fi",
             "timeout": 10
           }
         ]
