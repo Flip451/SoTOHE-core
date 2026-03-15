@@ -489,11 +489,25 @@ class MakeWrappersTest(unittest.TestCase):
         task_body = (
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
-        self.assertIn('dependencies = ["ci"]', task_body)
+        self.assertIn("cargo make ci", task_body, "track-commit-message must run CI internally")
         self.assertIn(
-            "script = ['cargo run --quiet -p cli -- git commit-from-file tmp/track-commit/commit-message.txt --cleanup']",
+            "cargo run --quiet -p cli -- git commit-from-file tmp/track-commit/commit-message.txt --cleanup",
             task_body,
         )
+        # Safety: CI failure must prevent commit. The script must not use
+        # `cargo make ci || true` or place commit before CI.
+        ci_pos = task_body.index("cargo make ci")
+        commit_pos = task_body.index("commit-from-file")
+        self.assertLess(
+            ci_pos,
+            commit_pos,
+            "CI must run before commit-from-file in track-commit-message script",
+        )
+        # Ensure CI is not silently swallowed (no `|| true` or `; true` after ci call)
+        ci_line_end = task_body.index("\n", ci_pos)
+        ci_line = task_body[ci_pos:ci_line_end]
+        self.assertNotIn("|| true", ci_line, "CI failure must not be silenced")
+        self.assertNotIn("; true", ci_line, "CI failure must not be silenced")
 
         task_header = "[tasks.track-note]"
         task_start = makefile.index(task_header)

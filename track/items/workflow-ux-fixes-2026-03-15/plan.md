@@ -6,7 +6,7 @@ track-commit-message の CI 出力抑制、plan/ ブランチ PR 対応、PR bod
 
 ## CI 出力抑制
 
-- [ ] Makefile.toml の track-commit-message タスクから dependencies = [ci] を外し、task script 内で CI を実行して出力を tmp/ci-output.log にリダイレクトする。stdout には最終結果のサマリー行のみ出力し、失敗時は tmp/ci-output.log の末尾20行を表示する
+- [x] Makefile.toml の track-commit-message タスクから dependencies = [ci] を外し、task script 内で CI を実行して出力を tmp/ci-output.log にリダイレクトする。stdout には最終結果のサマリー行のみ出力し、失敗時は tmp/ci-output.log の末尾20行を表示する
 
 ## plan/ ブランチ PR 対応
 
@@ -15,7 +15,7 @@ track-commit-message の CI 出力抑制、plan/ ブランチ PR 対応、PR bod
 
 ## add-all エラー処理
 
-- [ ] sotp git add-all の Rust 実装で git add 実行前に gitignore 対象パスを除外する。git check-ignore でフィルタリングしてから git add に渡すことで、gitignore 警告自体を発生させない。exit code の意味を変更しない
+- [x] sotp git add-all の Rust 実装で git add 実行前に gitignore 対象パスを除外する。git check-ignore でフィルタリングしてから git add に渡すことで、gitignore 警告自体を発生させない。exit code の意味を変更しない
 
 ## CI 検証
 

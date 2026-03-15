@@ -15,7 +15,7 @@
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| workflow-ux-fixes-2026-03-15 | planned | `/track:implement` | 2026-03-15 |
+| workflow-ux-fixes-2026-03-15 | in_progress | `/track:implement` | 2026-03-15 |
 | python-hook-launcher-removal-2026-03-15 | planned | `/track:activate python-hook-launcher-removal-2026-03-15` | 2026-03-15 |
 
 ## Completed Tracks

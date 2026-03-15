@@ -1,73 +1,77 @@
 {
-  "schema_version": 3,
-  "id": "workflow-ux-fixes-2026-03-15",
-  "title": "Track ワークフロー UX 改善",
-  "status": "planned",
   "branch": "track/workflow-ux-fixes-2026-03-15",
   "created_at": "2026-03-15",
-  "updated_at": "2026-03-15",
+  "id": "workflow-ux-fixes-2026-03-15",
   "plan": {
+    "sections": [
+      {
+        "description": [],
+        "id": "S001",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "CI 出力抑制"
+      },
+      {
+        "description": [],
+        "id": "S002",
+        "task_ids": [
+          "T002",
+          "T003"
+        ],
+        "title": "plan/ ブランチ PR 対応"
+      },
+      {
+        "description": [],
+        "id": "S003",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "add-all エラー処理"
+      },
+      {
+        "description": [],
+        "id": "S004",
+        "task_ids": [
+          "T005"
+        ],
+        "title": "CI 検証"
+      }
+    ],
     "summary": [
       "track-commit-message の CI 出力抑制、plan/ ブランチ PR 対応、PR body-file 化、add-all エラー処理など、日常運用で発生する UX 不具合を一括修正する。",
       "セキュリティ・状態管理には影響しない、ツーリング改善に閉じたスコープ。"
-    ],
-    "sections": [
-      {
-        "id": "S001",
-        "title": "CI 出力抑制",
-        "description": [],
-        "task_ids": ["T001"]
-      },
-      {
-        "id": "S002",
-        "title": "plan/ ブランチ PR 対応",
-        "description": [],
-        "task_ids": ["T002", "T003"]
-      },
-      {
-        "id": "S003",
-        "title": "add-all エラー処理",
-        "description": [],
-        "task_ids": ["T004"]
-      },
-      {
-        "id": "S004",
-        "title": "CI 検証",
-        "description": [],
-        "task_ids": ["T005"]
-      }
     ]
   },
+  "schema_version": 3,
+  "status": "in_progress",
   "tasks": [
     {
+      "description": "Makefile.toml の track-commit-message タスクから dependencies = [ci] を外し、task script 内で CI を実行して出力を tmp/ci-output.log にリダイレクトする。stdout には最終結果のサマリー行のみ出力し、失敗時は tmp/ci-output.log の末尾20行を表示する",
       "id": "T001",
-      "title": "track-commit-message の CI 出力抑制",
-      "status": "todo",
-      "description": "Makefile.toml の track-commit-message タスクから dependencies = [ci] を外し、task script 内で CI を実行して出力を tmp/ci-output.log にリダイレクトする。stdout には最終結果のサマリー行のみ出力し、失敗時は tmp/ci-output.log の末尾20行を表示する"
+      "status": "done"
     },
     {
+      "description": "usecase 層に PR push / ensure-pr のポート trait を定義し、infrastructure 層に gh CLI adapter を実装する。apps/cli の pr.rs は薄い CLI adapter のみ担当する。ブランチ解決: track/<id> ブランチでは自動解決、plan/<id> ブランチでは明示的な --track-id 引数を要求する（explicit-selector ルール維持）。plan/ ブランチの PR タイトルは Plan: <track-id> にする。PR body は一時ファイル経由で gh pr create --body-file を使いフック誤検知を回避する。Makefile.toml の track-pr-push / track-pr-ensure を Rust CLI 呼び出しに変更する。scripts/pr_review.py の cmd_push() / cmd_ensure_pr() は sotp pr を subprocess で呼ぶだけに縮退させる。track/workflow.md に plan/ ブランチの PR ワークフロー（push + ensure-pr のみ、track-pr-review は対象外）を追記する",
       "id": "T002",
-      "title": "sotp pr push / sotp pr ensure-pr サブコマンド新設",
-      "status": "todo",
-      "description": "usecase 層に PR push / ensure-pr のポート trait を定義し、infrastructure 層に gh CLI adapter を実装する。apps/cli の pr.rs は薄い CLI adapter のみ担当する。ブランチ解決: track/<id> ブランチでは自動解決、plan/<id> ブランチでは明示的な --track-id 引数を要求する（explicit-selector ルール維持）。plan/ ブランチの PR タイトルは Plan: <track-id> にする。PR body は一時ファイル経由で gh pr create --body-file を使いフック誤検知を回避する。Makefile.toml の track-pr-push / track-pr-ensure を Rust CLI 呼び出しに変更する。scripts/pr_review.py の cmd_push() / cmd_ensure_pr() は sotp pr を subprocess で呼ぶだけに縮退させる。track/workflow.md に plan/ ブランチの PR ワークフロー（push + ensure-pr のみ、track-pr-review は対象外）を追記する"
+      "status": "todo"
     },
     {
+      "description": "scripts/pr_review.py の cmd_push() / cmd_ensure_pr() を sotp pr push / sotp pr ensure-pr の subprocess 呼び出しに縮退させる。body-file ロジックは Rust 側に閉じ、Python 側には新規ロジックを追加しない。cmd_trigger_review / cmd_poll_review / cmd_run は track/<id> ブランチ専用のまま現状維持する（plan/ ブランチでの track-pr-review は対象外と明示）。STRAT-03 Phase 4 で全体 Rust 化予定",
       "id": "T003",
-      "title": "Python PR wrapper の Rust CLI 委譲化",
-      "status": "todo",
-      "description": "scripts/pr_review.py の cmd_push() / cmd_ensure_pr() を sotp pr push / sotp pr ensure-pr の subprocess 呼び出しに縮退させる。body-file ロジックは Rust 側に閉じ、Python 側には新規ロジックを追加しない。cmd_trigger_review / cmd_poll_review / cmd_run は track/<id> ブランチ専用のまま現状維持する（plan/ ブランチでの track-pr-review は対象外と明示）。STRAT-03 Phase 4 で全体 Rust 化予定"
+      "status": "todo"
     },
     {
+      "description": "sotp git add-all の Rust 実装で git add 実行前に gitignore 対象パスを除外する。git check-ignore でフィルタリングしてから git add に渡すことで、gitignore 警告自体を発生させない。exit code の意味を変更しない",
       "id": "T004",
-      "title": "add-all の gitignore エラー処理",
-      "status": "todo",
-      "description": "sotp git add-all の Rust 実装で git add 実行前に gitignore 対象パスを除外する。git check-ignore でフィルタリングしてから git add に渡すことで、gitignore 警告自体を発生させない。exit code の意味を変更しない"
+      "status": "done"
     },
     {
+      "description": "cargo make ci が通ることを確認する",
       "id": "T005",
-      "title": "CI 検証",
-      "status": "todo",
-      "description": "cargo make ci が通ることを確認する"
+      "status": "todo"
     }
-  ]
+  ],
+  "title": "Track ワークフロー UX 改善",
+  "updated_at": "2026-03-15T05:29:16Z"
 }
