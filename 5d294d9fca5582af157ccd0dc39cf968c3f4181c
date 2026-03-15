@@ -1,0 +1,21 @@
+## Task Summary: Remove takt from repository
+
+**Track:** takt-deprecation-impl-2026-03-15
+**Task:** T001-T005 — takt 廃止実装（ドキュメント清書、hook/profile 互換エイリアス除去、ランタイム削除、transient path 清掃、最終清掃）
+**Date:** 2026-03-15
+
+### Changes
+
+- 14 docs: takt migration-only mentions removed, Claude Code + Rust CLI descriptions
+- TAKT_TRACK_TRACEABILITY.md → TRACK_TRACEABILITY.md renamed
+- .takt/ directory: completely removed (config, pieces, personas, runtime, tasks, runs)
+- scripts/takt_profile.py, scripts/takt_failure_report.py: deleted
+- Makefile.toml: 12 takt/legacy wrappers removed, TAKT_PYTHON removed
+- .claude/hooks: TAKT_SESSION guards removed from 6 hooks, takt_host_* aliases removed
+- .claude/settings.json: legacy pending permissions removed
+- git_workflow.rs, git_ops.py: .takt/pending-* transient paths removed
+- test files: takt-specific tests deleted, assertions updated
+
+### Why
+
+takt-removal-2026-03-13 で固定した計画に基づき、takt runtime / wrapper / テスト / ドキュメントをリポジトリから完全に除去した。/track:* + Rust CLI + Claude Code のみで全 workflow が閉じる状態を達成。
