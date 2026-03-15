@@ -48,7 +48,7 @@ sotp CLI バイナリのビルド成果物を `bin/sotp` に配置し、Makefile
 
 ## 完了条件
 
-- [ ] `bin/sotp` にバイナリが配置されること
-- [ ] Makefile.toml のホスト側 wrapper タスク（非 `-local`）に `cargo run --quiet -p cli` が残っていないこと（コンテナ内 `-local` タスクは対象外）
-- [ ] `.claude/settings.json` の hook が `bin/sotp` 存在時に優先し、不在時に `cargo run` にフォールバックすること
-- [ ] `cargo make bootstrap && cargo make ci` が通ること
+- [x] `bin/sotp` にバイナリが配置されること
+- [x] Makefile.toml のホスト側 wrapper タスク（非 `-local`）に `cargo run --quiet -p cli` が残っていないこと（コンテナ内 `-local` タスクは対象外）
+- [x] `.claude/settings.json` の hook が `bin/sotp` 存在時に優先し、不在時に `cargo run` にフォールバックすること
+- [x] `cargo make bootstrap && cargo make ci` が通ること
