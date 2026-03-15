@@ -1,0 +1,19 @@
+## Task Summary: Split track.rs into track/ directory module
+
+**Track:** track-plan-activation-2026-03-14
+**Task:** T006 — track.rs を責務ごとに分割
+**Date:** 2026-03-15
+
+### Changes
+
+- track.rs (2432 lines) deleted
+- track/mod.rs (193 lines): types, dispatch, shared helpers
+- track/views.rs (39 lines): view validation and rendering
+- track/resolve.rs (108 lines): phase resolution CLI
+- track/transition.rs (219 lines): task state transitions
+- track/activate.rs (1876 lines): activation, branch ops, tests
+
+### Why
+
+Monolithic track.rs was too large to navigate and maintain. Splitting by responsibility
+makes each module independently reviewable and prepares for T008 logic layer movement.
