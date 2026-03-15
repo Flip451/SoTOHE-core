@@ -1,0 +1,16 @@
+## Task Summary: Add regression tests for planning-only/activation workflow
+
+**Track:** track-plan-activation-2026-03-14
+**Task:** T005 — 回帰テストを追加・更新する
+**Date:** 2026-03-15
+
+### Changes
+
+- libs/domain/src/track_phase.rs: Added 16 tests for resolve_phase, resolve_phase_from_record, and next_command covering all status/branch/schema combinations
+- libs/usecase/src/track_resolution.rs: Added 5 tests for reject_branchless_guard error messages, done/skipped with branch, and plan/ branch resolution
+- track/items/track-plan-activation-2026-03-14/verification.md: Updated with verification results and verified_at date
+- track/registry.md: Auto-updated to reflect track completion (all tasks done)
+
+### Why
+
+Track の全タスク（T001-T009, T005）が完了し、planning-only / activation workflow の回帰テストカバレッジを確保した。特に `track_phase.rs` はゼロテストだった状態から 16 テストに拡充し、phase resolution の全分岐をカバーした。
