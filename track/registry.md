@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| workflow-ux-fixes-2026-03-15 | Done | 2026-03-15 |
 | takt-deprecation-impl-2026-03-15 | Done | 2026-03-15 |
 | track-plan-activation-2026-03-14 | Done | 2026-03-15 |
 | reviewer-process-termination-2026-03-14 | Done | 2026-03-14 |

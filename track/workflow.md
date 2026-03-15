@@ -194,13 +194,23 @@ graph TD
 
 - `cargo make track-branch-switch '<id>'` で対象トラックのブランチに切り替える
 
-### マージワークフロー
+### マージワークフロー（track/ ブランチ）
 
 1. トラックブランチで作業を完了する
-2. ブランチを remote に push する
-3. `main` に対する PR を作成する
+2. `cargo make track-pr-push` でブランチを push する
+3. `cargo make track-pr-ensure` で PR を作成する
 4. CI が通過することを確認する
 5. PR をマージする
+
+### マージワークフロー（plan/ ブランチ）
+
+`plan/<id>` ブランチは計画レビュー用の一時ブランチであり、push / PR 作成には明示的なトラック ID が必要。`/track:pr-review` は `plan/` ブランチでは使用不可（`track/<id>` ブランチ専用）。
+
+1. 計画成果物をコミットする
+2. `cargo make track-pr-push '<track-id>'` でブランチを push する
+3. `cargo make track-pr-ensure '<track-id>'` で PR を作成する
+4. PR をレビュー・マージする
+5. `/track:activate <track-id>` で実装ブランチを作成する
 6. `/track:archive <id>` でトラックをアーカイブする
 
 ### PR ベースレビュー（Codex Cloud）

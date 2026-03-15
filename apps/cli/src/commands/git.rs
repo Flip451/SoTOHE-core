@@ -102,14 +102,8 @@ fn add_all() -> ExitCode {
         }
     };
 
-    let mut owned_args = vec!["add".to_owned(), "-A".to_owned(), "--".to_owned(), ".".to_owned()];
-    owned_args.extend(TRANSIENT_AUTOMATION_FILES.iter().map(|path| format!(":(exclude){path}")));
-    owned_args.extend(TRANSIENT_AUTOMATION_DIRS.iter().map(|path| format!(":(exclude){path}")));
-    let args: Vec<&str> = owned_args.iter().map(String::as_str).collect();
-
-    match repo.status(&args) {
-        Ok(0) => ExitCode::SUCCESS,
-        Ok(_) => ExitCode::FAILURE,
+    match repo.stage_all_excluding(TRANSIENT_AUTOMATION_FILES, TRANSIENT_AUTOMATION_DIRS) {
+        Ok(()) => ExitCode::SUCCESS,
         Err(err) => {
             eprintln!("[ERROR] {err}");
             ExitCode::FAILURE
@@ -549,6 +543,66 @@ mod tests {
                 .lines()
                 .collect::<Vec<_>>(),
             vec!["new.txt", "tracked.txt"]
+        );
+    }
+
+    #[test]
+    fn add_all_succeeds_when_gitignored_transient_dir_exists() {
+        let _lock = cwd_lock().lock().unwrap();
+        let dir = init_repo();
+        fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
+        run_git(dir.path(), &["add", "tracked.txt"]);
+        run_git(dir.path(), &["commit", "-m", "initial"]);
+
+        // Create .gitignore that ignores tmp/
+        fs::write(dir.path().join(".gitignore"), "tmp/\n").unwrap();
+        // Create gitignored files inside tmp/
+        fs::create_dir_all(dir.path().join("tmp/track-commit")).unwrap();
+        fs::write(dir.path().join("tmp/track-commit/commit-message.txt"), "message\n").unwrap();
+        // Also create a trackable change
+        fs::write(dir.path().join("tracked.txt"), "changed\n").unwrap();
+
+        let _guard = CurrentDirGuard::change_to(dir.path());
+
+        // add_all must succeed despite gitignored tmp/ overlapping with exclude patterns
+        assert_eq!(add_all(), ExitCode::SUCCESS);
+
+        // Verify that tracked changes were actually staged
+        let staged = run_git_output(dir.path(), &["diff", "--cached", "--name-only"]);
+        let staged_files: Vec<&str> = staged.lines().collect();
+        assert!(
+            staged_files.contains(&".gitignore"),
+            "expected .gitignore to be staged, got: {staged_files:?}"
+        );
+        assert!(
+            staged_files.contains(&"tracked.txt"),
+            "expected tracked.txt to be staged, got: {staged_files:?}"
+        );
+    }
+
+    #[test]
+    fn add_all_succeeds_when_gitignored_transient_file_exists() {
+        let _lock = cwd_lock().lock().unwrap();
+        let dir = init_repo();
+        fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
+        run_git(dir.path(), &["add", "tracked.txt"]);
+        run_git(dir.path(), &["commit", "-m", "initial"]);
+
+        // Gitignore a specific transient file (not the whole dir)
+        fs::write(dir.path().join(".gitignore"), "tmp/track-commit/commit-message.txt\n").unwrap();
+        fs::create_dir_all(dir.path().join("tmp/track-commit")).unwrap();
+        fs::write(dir.path().join("tmp/track-commit/commit-message.txt"), "message\n").unwrap();
+        fs::write(dir.path().join("tracked.txt"), "changed\n").unwrap();
+
+        let _guard = CurrentDirGuard::change_to(dir.path());
+
+        assert_eq!(add_all(), ExitCode::SUCCESS);
+
+        let staged = run_git_output(dir.path(), &["diff", "--cached", "--name-only"]);
+        let staged_files: Vec<&str> = staged.lines().collect();
+        assert!(
+            staged_files.contains(&"tracked.txt"),
+            "expected tracked.txt to be staged, got: {staged_files:?}"
         );
     }
 

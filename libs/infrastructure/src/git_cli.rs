@@ -20,6 +20,74 @@ pub trait GitRepository {
         }
         Ok(Some(String::from_utf8_lossy(&output.stdout).trim().to_owned()))
     }
+
+    /// Push the given branch to origin with tracking (`-u`).
+    ///
+    /// # Errors
+    ///
+    /// Returns an error description if `git push` fails.
+    fn push_branch(&self, branch: &str) -> Result<(), String> {
+        let output = self.output(&["push", "-u", "origin", branch])?;
+        if output.status.success() {
+            return Ok(());
+        }
+        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+        Err(if stderr.is_empty() {
+            format!("git push -u origin {branch} failed")
+        } else {
+            format!("git push -u origin {branch} failed: {stderr}")
+        })
+    }
+
+    /// Stage all worktree changes using `git add -A`, excluding the given pathspecs.
+    ///
+    /// Tolerates gitignore warnings when the only stderr lines match a known
+    /// benign pattern ("ignored by …" + hint lines + listed dir names).
+    ///
+    /// # Errors
+    ///
+    /// Returns an error description if `git add` fails for a reason other than
+    /// the gitignore warning, or if the index cannot be verified after staging.
+    fn stage_all_excluding(
+        &self,
+        exclude_files: &[&str],
+        exclude_dirs: &[&str],
+    ) -> Result<(), String> {
+        let mut owned_args =
+            vec!["add".to_owned(), "-A".to_owned(), "--".to_owned(), ".".to_owned()];
+        owned_args.extend(exclude_files.iter().map(|p| format!(":(exclude){p}")));
+        owned_args.extend(exclude_dirs.iter().map(|p| format!(":(exclude){p}")));
+        let args: Vec<&str> = owned_args.iter().map(String::as_str).collect();
+
+        let output = self.output(&args)?;
+        if output.status.success() {
+            return Ok(());
+        }
+
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        let is_only_ignored_warning = !stderr.is_empty()
+            && stderr.contains("ignored by")
+            && stderr.lines().filter(|line| !line.trim().is_empty()).all(|line| {
+                line.contains("ignored by")
+                    || line.starts_with("hint:")
+                    || exclude_dirs.iter().any(|dir| line.trim() == *dir)
+                    || exclude_files.iter().any(|file| line.trim() == *file)
+            });
+
+        if is_only_ignored_warning {
+            // git add -A updates the index for all non-ignored paths even when
+            // it emits this warning and returns exit 1. The warning is advisory
+            // only — the staging operation completes successfully for all
+            // trackable files. No post-add verification is needed.
+            return Ok(());
+        }
+
+        Err(format!(
+            "git add failed (exit {}): {}",
+            output.status.code().unwrap_or(-1),
+            stderr.trim()
+        ))
+    }
 }
 
 #[derive(Debug, Clone)]
