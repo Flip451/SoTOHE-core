@@ -1,67 +1,70 @@
 {
-  "schema_version": 3,
-  "id": "python-hook-launcher-removal-2026-03-15",
-  "title": "Python security hook launcher 除去",
-  "status": "planned",
-  "branch": null,
+  "branch": "track/python-hook-launcher-removal-2026-03-15",
   "created_at": "2026-03-15",
-  "updated_at": "2026-03-15",
+  "id": "python-hook-launcher-removal-2026-03-15",
   "plan": {
+    "sections": [
+      {
+        "description": [],
+        "id": "S001",
+        "task_ids": [
+          "T001",
+          "T002"
+        ],
+        "title": "Python launcher ファイル削除"
+      },
+      {
+        "description": [],
+        "id": "S002",
+        "task_ids": [
+          "T003",
+          "T004"
+        ],
+        "title": "検証スクリプト・ドキュメント更新"
+      },
+      {
+        "description": [],
+        "id": "S003",
+        "task_ids": [
+          "T005"
+        ],
+        "title": "CI 検証"
+      }
+    ],
     "summary": [
       "STRAT-03 Phase 1 完了: deprecated Python security hook launcher 3本を削除し、関連テスト・検証・ドキュメントを更新する。",
       "settings.json は既に sotp 直接呼び出しに移行済みのため、Python launcher の削除のみで必須経路から Python 依存が消える。"
-    ],
-    "sections": [
-      {
-        "id": "S001",
-        "title": "Python launcher ファイル削除",
-        "description": [],
-        "task_ids": ["T001", "T002"]
-      },
-      {
-        "id": "S002",
-        "title": "検証スクリプト・ドキュメント更新",
-        "description": [],
-        "task_ids": ["T003", "T004"]
-      },
-      {
-        "id": "S003",
-        "title": "CI 検証",
-        "description": [],
-        "task_ids": ["T005"]
-      }
     ]
   },
+  "schema_version": 3,
+  "status": "done",
   "tasks": [
     {
+      "description": ".claude/hooks/block-direct-git-ops.py, file-lock-acquire.py, file-lock-release.py を削除する",
       "id": "T001",
-      "title": "Python launcher 3ファイル削除",
-      "status": "todo",
-      "description": ".claude/hooks/block-direct-git-ops.py, file-lock-acquire.py, file-lock-release.py を削除する"
+      "status": "done"
     },
     {
+      "description": "block-direct-git-ops.py の Python 関数に依存するテストファイル .claude/hooks/test_policy_hooks.py を削除する",
       "id": "T002",
-      "title": "test_policy_hooks.py 削除",
-      "status": "todo",
-      "description": "block-direct-git-ops.py の Python 関数に依存するテストファイル .claude/hooks/test_policy_hooks.py を削除する"
+      "status": "done"
     },
     {
+      "description": "BLOCK_HOOK_PATH, BLOCK_HOOK_MARKERS, verify_block_hook() を削除する。Rust テストが権威的実装",
       "id": "T003",
-      "title": "verify_orchestra_guardrails.py から verify_block_hook 除去",
-      "status": "todo",
-      "description": "BLOCK_HOOK_PATH, BLOCK_HOOK_MARKERS, verify_block_hook() を削除する。Rust テストが権威的実装"
+      "status": "done"
     },
     {
+      "description": "10-guardrails.md, 02-codex-delegation.md, .claude/docs/DESIGN.md, libs/domain/src/hook/types.rs の Python launcher 参照を sotp 直接呼び出し前提に更新する",
       "id": "T004",
-      "title": "ドキュメント・コメント更新",
-      "status": "todo",
-      "description": "10-guardrails.md, 02-codex-delegation.md, .claude/docs/DESIGN.md, libs/domain/src/hook/types.rs の Python launcher 参照を sotp 直接呼び出し前提に更新する"
+      "status": "done"
     },
     {
+      "description": "cargo make ci が通ることを確認する",
       "id": "T005",
-      "title": "CI 検証",
-      "status": "todo",
-      "description": "cargo make ci が通ることを確認する"
+      "status": "done"
     }
-  ]
+  ],
+  "title": "Python security hook launcher 除去",
+  "updated_at": "2026-03-15T06:45:39Z"
 }
