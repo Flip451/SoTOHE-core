@@ -14,9 +14,9 @@ scripts-selftest の引数リストを更新する。
 
 ## CI パス分離
 
-ci-local の依存チェーンから Python タスクを分離し、
-新タスク ci-python-local を追加する。
-.venv 不在時の graceful skip を実装する。
+ci-local/ci-container は Python タスクを維持し、
+ホスト用に ci-no-python-local + ci-python-local を追加する。
+cargo make ci の compose wrapper に .venv 存在チェック付き条件分岐を導入する。
 
 - [ ] Makefile.toml: ci-local/ci-container は Python タスクを維持（Docker 内は Python 常在）。ホスト用に ci-no-python-local を追加し、.venv 不在時にはそちらを使う仕組みを導入
 - [ ] Makefile.toml: ci-python-local/ci-python タスク追加（ホスト optional gate）+ .claude/settings.json permissions.allow に ci-python 追加。bootstrap の venv 構築後に ci-python-local を呼び出す（依存ではなくスクリプト内実行）

@@ -9,8 +9,10 @@
 ### In Scope
 
 - 孤立 Python verify スクリプトの削除（`verify_plan_progress.py`, `verify_track_metadata.py`, `verify_track_registry.py`）
-- 孤立テストファイルの削除（`test_verify_scripts.py`, `test_verify_latest_track_files.py`）
-  - 注: `test_track_resolution.py` は `track_resolution.py`（共有ライブラリ）の回帰テストを含むため保持。削除済みスクリプトへの参照のみ修正。
+- テストファイル整理:
+  - `test_verify_latest_track_files.py` を削除（対象スクリプト削除済み）
+  - `test_verify_scripts.py` から削除済みスクリプトのテストケースのみ除去（生存する verifier テストは維持）
+  - `test_track_resolution.py` は `track_resolution.py`（共有ライブラリ）の回帰テストを含むため保持。削除済みスクリプトへの参照のみ修正。
 - CI パスの整理:
   - `ci-local`/`ci-container` は Python タスクを維持（Docker コンテナ内は Python 常在）
   - ホスト用に `ci-no-python-local` を追加（`.venv` 不在時のフォールバック）

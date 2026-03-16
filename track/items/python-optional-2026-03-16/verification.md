@@ -5,7 +5,8 @@
 - [ ] `.venv` 未構築で `cargo make ci` が成功する
 - [ ] `cargo make ci-python` が Python 品質ゲートを実行する
 - [ ] 孤立 verify スクリプト 3 件が削除されている
-- [ ] 孤立テストファイル 2 件が削除されている（`test_track_resolution.py` は保持・修正済み）
+- [ ] `test_verify_latest_track_files.py` が削除されている
+- [ ] `test_verify_scripts.py` から削除済みスクリプトのテストケースが除去されている（生存テスト維持）
 - [ ] `test_track_resolution.py` の削除済みスクリプト参照が修正されている
 - [ ] advisory hook が Python 不在時に graceful skip する
 - [ ] Docker コンテナ内で `scripts-selftest` / `hooks-selftest` が引き続き動作する
