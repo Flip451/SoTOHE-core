@@ -10,7 +10,7 @@ Python タスクを optional utility に降格する。
 scripts-selftest の引数リストを更新する。
 
 - [ ] 孤立 verify スクリプト削除: verify_plan_progress.py, verify_track_metadata.py, verify_track_registry.py
-- [ ] 孤立テストファイル削除: test_verify_scripts.py, test_verify_latest_track_files.py, test_track_resolution.py + scripts-selftest 更新
+- [ ] 孤立テストファイル削除: test_verify_scripts.py, test_verify_latest_track_files.py + test_track_resolution.py の参照修正 + scripts-selftest 更新
 
 ## CI パス分離
 

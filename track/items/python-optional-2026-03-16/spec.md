@@ -9,7 +9,8 @@
 ### In Scope
 
 - 孤立 Python verify スクリプトの削除（`verify_plan_progress.py`, `verify_track_metadata.py`, `verify_track_registry.py`）
-- 孤立テストファイルの削除（`test_verify_scripts.py`, `test_verify_latest_track_files.py`, `test_track_resolution.py`）
+- 孤立テストファイルの削除（`test_verify_scripts.py`, `test_verify_latest_track_files.py`）
+  - 注: `test_track_resolution.py` は `track_resolution.py`（共有ライブラリ）の回帰テストを含むため保持。削除済みスクリプトへの参照のみ修正。
 - `ci-local` から Python 必須タスクを分離:
   - `python-lint-local` を `ci-local` の必須依存から外す（`.venv` 存在時のみ実行）
   - `scripts-selftest-local` を `ci-local` の必須依存から外す
@@ -37,6 +38,10 @@
 - [ ] `cargo make ci` が `.venv` 未構築環境で成功する
 - [ ] `cargo make ci-python` が Python lint + selftest + hooks-selftest を実行する
 - [ ] 孤立 Python verify スクリプト 3 ファイルが削除されている
-- [ ] 孤立テストファイル 3 ファイルが削除されている
+- [ ] 孤立テストファイル 2 ファイルが削除されている（`test_track_resolution.py` は保持・修正）
 - [ ] advisory hook が Python 不在時にクラッシュせず graceful に skip する
-- [ ] `track/workflow.md`, `DEVELOPER_AI_WORKFLOW.md` が更新されている
+- [ ] 以下のドキュメントが更新されている:
+  - `track/workflow.md`
+  - `DEVELOPER_AI_WORKFLOW.md`
+  - `.claude/rules/07-dev-environment.md`
+  - `CLAUDE.md`
