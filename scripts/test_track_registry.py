@@ -9,7 +9,6 @@ from pathlib import Path
 
 from track_registry import collect_track_metadata, render_registry, write_registry
 from track_state_machine import sync_rendered_views
-from verify_track_registry import verify_registry
 
 
 def _make_track(
@@ -400,47 +399,6 @@ class TestWriteRegistry(unittest.TestCase):
             self.assertIn("feat-001", content)
 
 
-class TestVerifyRegistry(unittest.TestCase):
-    def test_verify_registry_in_sync(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            (root / "track" / "items").mkdir(parents=True)
-            _make_track(
-                root,
-                "feat-001",
-                status="in_progress",
-                tasks=[_task("T001", "in_progress")],
-            )
-            # Write registry from rendered output
-            write_registry(root)
-            results = verify_registry(root)
-            self.assertTrue(any("[OK]" in r for r in results))
-            self.assertFalse(any("[ERROR]" in r for r in results))
-
-    def test_verify_registry_out_of_sync(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            (root / "track" / "items").mkdir(parents=True)
-            _make_track(
-                root,
-                "feat-001",
-                status="in_progress",
-                tasks=[_task("T001", "in_progress")],
-            )
-            # Write stale registry
-            registry_path = root / "track" / "registry.md"
-            registry_path.write_text("# Stale content\n", encoding="utf-8")
-            results = verify_registry(root)
-            self.assertTrue(any("[ERROR]" in r for r in results))
-
-    def test_verify_registry_missing_file(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            (root / "track" / "items").mkdir(parents=True)
-            results = verify_registry(root)
-            self.assertTrue(any("[ERROR]" in r for r in results))
-
-
 class TestSyncRenderedViewsRegistry(unittest.TestCase):
     def test_sync_rendered_views_updates_registry(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -613,18 +571,6 @@ class TestCollectEdgeCases(unittest.TestCase):
             (track_dir / "metadata.json").write_text("{invalid json")
             result = collect_track_metadata(root)
             self.assertEqual(result, [])
-
-
-class TestVerifyRegistryMain(unittest.TestCase):
-    def test_main_returns_zero_when_in_sync(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            (root / "track" / "items").mkdir(parents=True)
-            write_registry(root)
-            # main() uses project_root() by default, but we test verify_registry directly
-            results = verify_registry(root)
-            has_error = any("[ERROR]" in r for r in results)
-            self.assertFalse(has_error)
 
 
 class TestCollectFromArchiveDirectory(unittest.TestCase):

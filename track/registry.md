@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `python-optional-2026-03-16`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-16`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| python-optional-2026-03-16 | planned | `/track:implement` | 2026-03-16 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| python-optional-2026-03-16 | Done | 2026-03-16 |
 | verify-scripts-rust-2026-03-16 | Done | 2026-03-16 |
 | pr-review-rust-2026-03-16 | Done | 2026-03-16 |
 | py-workflow-cleanup-2026-03-16 | Done | 2026-03-16 |
