@@ -8,14 +8,14 @@
 ## Current Focus
 
 - Latest active track: `python-optional-2026-03-16`
-- Next recommended command: `/track:activate python-optional-2026-03-16`
-- Last updated: `2026-03-17`
+- Next recommended command: `/track:implement`
+- Last updated: `2026-03-16`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| python-optional-2026-03-16 | planned | `/track:activate python-optional-2026-03-16` | 2026-03-17 |
+| python-optional-2026-03-16 | planned | `/track:implement` | 2026-03-16 |
 
 ## Completed Tracks
 
