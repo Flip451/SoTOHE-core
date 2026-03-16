@@ -10,7 +10,7 @@ Python タスクを optional utility に降格する。
 scripts-selftest の引数リストを更新する。
 
 - [ ] 孤立 verify スクリプト削除: verify_plan_progress.py, verify_track_metadata.py, verify_track_registry.py
-- [ ] 孤立テストファイル削除: test_verify_scripts.py, test_verify_latest_track_files.py + test_track_resolution.py/test_track_registry.py/test_track_schema.py の参照修正 + test_track_resolution.py を scripts-selftest-local に追加 + scripts-selftest 更新
+- [ ] テストファイル整理: test_verify_latest_track_files.py 削除 + test_verify_scripts.py から削除済みスクリプトのテストケースのみ除去（生存テスト維持）+ test_track_resolution.py/test_track_registry.py/test_track_schema.py の参照修正 + test_track_resolution.py を scripts-selftest-local に追加
 
 ## CI パス分離
 
@@ -18,8 +18,8 @@ ci-local の依存チェーンから Python タスクを分離し、
 新タスク ci-python-local を追加する。
 .venv 不在時の graceful skip を実装する。
 
-- [ ] Makefile.toml: ci-local/ci-container から python-lint-local, scripts-selftest-local, hooks-selftest-local を分離
-- [ ] Makefile.toml: ci-python-local/ci-python/ci-python-container タスク追加 + .github/workflows/ci.yml に ci-python-container ステップ追加 + .claude/settings.json permissions.allow に ci-python 追加 + bootstrap タスクに ci-python-local 依存追加
+- [ ] Makefile.toml: ci-local/ci-container は Python タスクを維持（Docker 内は Python 常在）。ホスト用に ci-no-python-local を追加し、.venv 不在時にはそちらを使う仕組みを導入
+- [ ] Makefile.toml: ci-python-local/ci-python タスク追加（ホスト optional gate）+ .claude/settings.json permissions.allow に ci-python 追加。bootstrap の venv 構築後に ci-python-local を呼び出す（依存ではなくスクリプト内実行）
 - [ ] cargo make ci の compose wrapper 更新: .venv 存在チェック付き conditional Python gate
 
 ## Hook graceful degradation + ドキュメント
