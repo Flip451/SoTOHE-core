@@ -11,7 +11,7 @@
 - 孤立 Python verify スクリプトの削除（`verify_plan_progress.py`, `verify_track_metadata.py`, `verify_track_registry.py`）
 - テストファイル整理:
   - `test_verify_latest_track_files.py` を削除（対象スクリプト削除済み）
-  - `test_verify_scripts.py` から削除済みスクリプトのテストケースのみ除去（生存する verifier テストは維持）
+  - `test_verify_scripts.py` から削除済みスクリプト（Phase 5 + Phase 6 の全削除対象）のテストケースを除去（生存する verifier テストは維持）。対象: `verify_latest_track_files.py`, `verify_tech_stack_ready.py`, `verify_architecture_docs.py`, `verify_orchestra_guardrails.py`, `verify_plan_progress.py`, `verify_track_metadata.py`, `verify_track_registry.py` への参照
   - `test_track_resolution.py` は `track_resolution.py`（共有ライブラリ）の回帰テストを含むため保持。削除済みスクリプトへの参照のみ修正。
 - CI パスの整理:
   - `ci-local`/`ci-container` は Python タスクを維持（Docker コンテナ内は Python 常在）
