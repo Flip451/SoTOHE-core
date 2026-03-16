@@ -1,0 +1,17 @@
+## Task Summary: Plan PR review orchestration Rust migration
+
+**Track:** pr-review-rust-2026-03-16
+**Task:** STRAT-03 Phase 4 planning artifacts
+**Date:** 2026-03-16
+
+### Changes
+
+- metadata.json: 8 tasks (T001-T008), schema v3, usecase layer for review types
+- spec.md: feature goal, scope, constraints (plan/ fail-closed, sanitize patterns), acceptance criteria
+- plan.md: auto-generated from metadata.json (4 sections: infra/usecase/cli/cleanup)
+- verification.md: 13 verification steps including edge case coverage
+- registry.md: track added to Active Tracks
+
+### Why
+
+Migrate scripts/pr_review.py to sotp pr subcommands to achieve STRAT-03 M2 milestone (Python-free commit/branch/pr-review workflow). Reviewed by Codex (gpt-5.4): 4 P1 findings in round 1, all fixed in round 2, zero findings confirmed.
