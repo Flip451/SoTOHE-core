@@ -1,0 +1,25 @@
+## Task Summary: STRAT-03 Phase 2 — Track state machine Rust migration
+
+**Track:** statemachine-rust-2026-03-15
+**Task:** Migrate track_state_machine.py / track_schema.py / track_markdown.py core to Rust CLI
+**Date:** 2026-03-16
+
+### Changes
+
+- libs/domain/src/track.rs: add_task(), next_task_id() methods + 14 tests
+- libs/domain/src/plan.rs: insert_task_into_section() (pub(crate)), insert_task_id()
+- libs/domain/src/ids.rs: TaskId u64 range enforcement
+- libs/domain/src/error.rs: SectionNotFound, NoSectionsAvailable variants
+- libs/usecase/src/lib.rs: AddTaskUseCase, SetOverrideUseCase + 4 tests
+- apps/cli/src/commands/track/state_ops.rs: 5 new subcommands (add-task, set-override, clear-override, next-task, task-counts) + 13 tests
+- apps/cli/src/commands/track/mod.rs: TrackCommand enum extensions
+- apps/cli/src/commands/track/transition.rs: verify_branch_guard pub(super)
+- Makefile.toml: 4 wrapper tasks (track-add-task, track-next-task, track-task-counts, track-set-override)
+- scripts/track_state_machine.py: Python fallback removed, sotp required
+- scripts/test_*.py: Updated for sotp requirement, added wrapper tests
+- track/workflow.md: Updated to reference sotp CLI
+- .claude/commands/track/plan.md: Updated render_plan reference
+
+### Why
+
+STRAT-03 Phase 2 migrates the remaining Python state machine operations to Rust CLI subcommands, removing Python fallback paths and making sotp the required binary for production track operations. This is a prerequisite for the /track:auto autonomous execution mode.
