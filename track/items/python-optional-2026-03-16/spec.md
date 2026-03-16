@@ -40,6 +40,8 @@
 - [ ] 孤立 Python verify スクリプト 3 ファイルが削除されている
 - [ ] 孤立テストファイル 2 ファイルが削除されている（`test_track_resolution.py` は保持・修正）
 - [ ] advisory hook が Python 不在時にクラッシュせず graceful に skip する
+- [ ] Docker コンテナ内で `scripts-selftest` / `hooks-selftest` が引き続き動作する
+- [ ] `test_track_resolution.py` の削除済みスクリプト参照が修正されている
 - [ ] 以下のドキュメントが更新されている:
   - `track/workflow.md`
   - `DEVELOPER_AI_WORKFLOW.md`
