@@ -84,24 +84,6 @@ VERIFY_ORCHESTRA_STUB = textwrap.dedent(
     """
 )
 
-GIT_OPS_STUB = textwrap.dedent(
-    """\
-    import json
-    import sys
-
-    print(
-        json.dumps(
-            {
-                "script": "git_ops.py",
-                "argv": sys.argv[1:],
-                "python": sys.executable,
-            }
-        )
-    )
-    """
-)
-
-
 PASSING_TEST = textwrap.dedent(
     """\
     import unittest
@@ -134,14 +116,11 @@ class MakeWrappersTest(unittest.TestCase):
         self.write_text(
             root / "scripts" / "verify_orchestra_guardrails.py", VERIFY_ORCHESTRA_STUB
         )
-        self.write_text(root / "scripts" / "git_ops.py", GIT_OPS_STUB)
-
         for test_name in (
             "test_architecture_rules.py",
             "test_verify_scripts.py",
             "test_convention_docs.py",
             "test_external_guides.py",
-            "test_git_ops.py",
             "test_make_wrappers.py",
         ):
             self.write_text(root / "scripts" / test_name, PASSING_TEST)
