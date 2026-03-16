@@ -9,13 +9,13 @@
 
 - Latest active track: `python-optional-2026-03-16`
 - Next recommended command: `/track:activate python-optional-2026-03-16`
-- Last updated: `2026-03-16`
+- Last updated: `2026-03-17`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| python-optional-2026-03-16 | planned | `/track:activate python-optional-2026-03-16` | 2026-03-16 |
+| python-optional-2026-03-16 | planned | `/track:activate python-optional-2026-03-16` | 2026-03-17 |
 
 ## Completed Tracks
 
