@@ -33,7 +33,7 @@
 
 - domain 層の型定義は既存の `TrackMetadata`, `TrackTask`, `TaskTransition` 等と整合させる
 - `auto-mode-config.json` のフェーズ→capability マッピングは `agent-profiles.json` の capability 名を参照する（provider 解決は agent-profiles に委譲）
-- `auto-state.json` は `track/items/<id>/` に配置し、git 追跡可能にする
+- `auto-state.json` は `track/items/<id>/` に配置する（エフェメラルなセッション状態のため git 追跡しない。`.gitignore` に追加する）
 - 6フェーズの巻き戻しルールは reviewer の findings severity に基づく
 - エスカレーション時は状態を永続化してプロセスを停止し、`--resume` で再開できる設計とする
 - 型定義は enum/struct のフィールドとメソッドシグネチャのみとし、メソッド body は設計ドキュメント内に擬似コードとして記載する。`todo!()` や `unimplemented!()` は本番コードに含めない

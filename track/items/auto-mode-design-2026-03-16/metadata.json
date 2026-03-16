@@ -1,89 +1,100 @@
 {
-  "schema_version": 3,
-  "id": "auto-mode-design-2026-03-16",
   "branch": "track/auto-mode-design-2026-03-16",
-  "title": "MEMO-15: /track:auto — Auto Mode Design Spike",
-  "status": "planned",
   "created_at": "2026-03-16T00:00:00+00:00",
-  "updated_at": "2026-03-16T00:00:00+00:00",
-  "tasks": [
-    {
-      "id": "T001",
-      "description": "Auto Mode 6-phase state machine 設計 — AutoPhase enum + 遷移ルール + 巻き戻しルールを domain 層に型定義として設計",
-      "status": "todo"
-    },
-    {
-      "id": "T002",
-      "description": "auto-state.json スキーマ設計 — phase/round/escalation/context/artifacts の JSON Schema + 対応 Rust 型定義",
-      "status": "todo"
-    },
-    {
-      "id": "T003",
-      "description": "auto-mode-config.json スキーマ設計 — フェーズ→capability マッピング + max_rounds/escalation_policy パラメータ定義",
-      "status": "todo"
-    },
-    {
-      "id": "T004",
-      "description": "専門エージェントブリーフィング設計 — 6フェーズ各エージェントのプロンプトテンプレート + コンテキスト注入ルール",
-      "status": "todo"
-    },
-    {
-      "id": "T005",
-      "description": "エスカレーション UI 設計 — /track:auto CLI インターフェース + --resume フロー + 人間の判断注入 API",
-      "status": "todo"
-    },
-    {
-      "id": "T006",
-      "description": "/track:full-cycle との統合設計 — 既存コードとの共存パス + migration strategy",
-      "status": "todo"
-    },
-    {
-      "id": "T007",
-      "description": "DESIGN.md 統合更新 — 上記すべてを統合した設計ドキュメント（Canonical Blocks 含む）",
-      "status": "todo"
-    }
-  ],
+  "id": "auto-mode-design-2026-03-16",
   "plan": {
-    "summary": [
-      "MEMO-15 /track:auto の設計スパイク。実装は含まず、設計ドキュメント + domain 層型定義（enum/struct シグネチャのみ）が成果物。",
-      "6フェーズステートマシン（plan → plan-review → type-design → type-review → implement → code-review）を domain 層に AutoPhase enum として定義し、",
-      "auto-state.json（track/items/<id>/）と auto-mode-config.json（.claude/）のスキーマを設計する。"
-    ],
     "sections": [
       {
-        "id": "S1",
-        "title": "Domain 層 — AutoPhase ステートマシン設計",
         "description": [
           "6フェーズの AutoPhase enum、遷移ルール（前進・巻き戻し）、エスカレーション条件を domain 層に定義。",
           "型定義（enum/struct シグネチャのみ）として Rust コードに落とし込む。"
         ],
-        "task_ids": ["T001"]
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Domain 層 — AutoPhase ステートマシン設計"
       },
       {
-        "id": "S2",
-        "title": "状態永続化スキーマ設計",
         "description": [
           "auto-state.json のスキーマ（エスカレーション状態の永続化）と auto-mode-config.json（フェーズ→capability マッピング + 運用パラメータ）を設計。",
           "Rust 型定義も合わせて設計。"
         ],
-        "task_ids": ["T002", "T003"]
+        "id": "S2",
+        "task_ids": [
+          "T002",
+          "T003"
+        ],
+        "title": "状態永続化スキーマ設計"
       },
       {
-        "id": "S3",
-        "title": "エージェント・UI 設計",
         "description": [
           "各フェーズの専門エージェントブリーフィング（プロンプト設計）とエスカレーション UI（CLI + --resume フロー）を設計。"
         ],
-        "task_ids": ["T004", "T005"]
+        "id": "S3",
+        "task_ids": [
+          "T004",
+          "T005"
+        ],
+        "title": "エージェント・UI 設計"
       },
       {
-        "id": "S4",
-        "title": "統合 & ドキュメント",
         "description": [
           "/track:full-cycle との共存設計と、DESIGN.md への統合更新。"
         ],
-        "task_ids": ["T006", "T007"]
+        "id": "S4",
+        "task_ids": [
+          "T006",
+          "T007"
+        ],
+        "title": "統合 & ドキュメント"
       }
+    ],
+    "summary": [
+      "MEMO-15 /track:auto の設計スパイク。実装は含まず、設計ドキュメント + domain 層型定義（enum/struct シグネチャのみ）が成果物。",
+      "6フェーズステートマシン（plan → plan-review → type-design → type-review → implement → code-review）を domain 層に AutoPhase enum として定義し、",
+      "auto-state.json（track/items/<id>/）と auto-mode-config.json（.claude/）のスキーマを設計する。"
     ]
-  }
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "Auto Mode 6-phase state machine 設計 — AutoPhase enum + 遷移ルール + 巻き戻しルールを domain 層に型定義として設計",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "auto-state.json スキーマ設計 — phase/round/escalation/context/artifacts の JSON Schema + 対応 Rust 型定義",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "auto-mode-config.json スキーマ設計 — フェーズ→capability マッピング + max_rounds/escalation_policy パラメータ定義",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "専門エージェントブリーフィング設計 — 6フェーズ各エージェントのプロンプトテンプレート + コンテキスト注入ルール",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "エスカレーション UI 設計 — /track:auto CLI インターフェース + --resume フロー + 人間の判断注入 API",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "/track:full-cycle との統合設計 — 既存コードとの共存パス + migration strategy",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "description": "DESIGN.md 統合更新 — 上記すべてを統合した設計ドキュメント（Canonical Blocks 含む）",
+      "id": "T007",
+      "status": "done"
+    }
+  ],
+  "title": "MEMO-15: /track:auto — Auto Mode Design Spike",
+  "updated_at": "2026-03-16T01:16:35Z"
 }
