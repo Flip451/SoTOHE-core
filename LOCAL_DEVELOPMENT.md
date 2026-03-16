@@ -6,15 +6,15 @@ Read `START_HERE_HUMAN.md` first if you are new to this repository.
 
 ## Host Requirements
 
-- Python 3.11+ is required on the host machine.
-- host-side Python package management should use `uv`.
+- Python 3.11+ is optional on the host machine. Advisory hooks gracefully skip when `python3` is absent.
+- host-side Python package management should use `uv` (when Python is installed).
 - `.tool-versions` は `python 3.12.8` を pin しており、asdf 利用時は `python3` 解決に使われる。
 - Docker compose 実行は `HOST_UID` / `HOST_GID` を使ってホスト user に寄せる。Linux で uid/gid が `1000:1000` 以外なら `export HOST_UID=$(id -u) HOST_GID=$(id -g)` を shell profile に入れる。
-- `guides-*` / `conventions-*` / `architecture-rules-*` などの Python helper は `cargo make` wrapper で内部的に `python3` を実行する。
-- ホスト側の検証スクリプト（`scripts/check_layers.py`, `scripts/verify_architecture_docs.py`, `scripts/verify_track_metadata.py`, `scripts/verify_latest_track_files.py`）と `cargo make --allow-private verify-orchestra-local` は `PYTHON_BIN=/path/to/python3.12 ...` で上書きできる。
+- `guides-*` / `conventions-*` / `architecture-rules-*` などの Python helper はホスト上で `python3` を直接実行する。これらのタスクは `python3` がインストールされている環境でのみ動作する。
+- ホスト側の検証は `cargo make verify-*` タスク（`sotp verify` サブコマンド、Rust CLI）で実行される。Python 検証スクリプトは Phase 5/6 で Rust へ移行済み。
 - Python test は Docker 経由で実行する（`cargo make guides-selftest`, `cargo make scripts-selftest`, `cargo make hooks-selftest`）。
 - `*-local` タスクは内部専用（private）で、直接実行しない。
-- Claude hooks in `.claude/hooks/` run via `python3`.
+- Claude hooks in `.claude/hooks/` run via `python3` (skipped gracefully when `python3` is unavailable).
 
 1. Build tool image:
 

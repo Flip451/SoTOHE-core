@@ -36,29 +36,29 @@
     ]
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "done",
   "tasks": [
     {
       "description": "孤立 verify スクリプト削除: verify_plan_progress.py, verify_track_metadata.py, verify_track_registry.py",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "テストファイル整理: test_verify_latest_track_files.py 削除 + test_verify_scripts.py から全削除済みスクリプト(Phase5+6)のテストケース除去(生存テスト維持) + test_track_resolution.py/test_track_registry.py/test_track_schema.py の参照修正 + test_track_resolution.py を scripts-selftest-local に追加",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "advisory hook の Python 不在時 graceful skip: .claude/settings.json の hook command を python3 存在チェック付きランチャーに変更 (command -v python3 || exit 0) + .claude/hooks/ 内の個別 hook にもガード追加",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "ドキュメント更新: track/workflow.md, DEVELOPER_AI_WORKFLOW.md, .claude/rules/07-dev-environment.md, .claude/rules/09-maintainer-checklist.md, CLAUDE.md, LOCAL_DEVELOPMENT.md + 削除済み Python verifier への参照修正",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "STRAT-03 Phase 6: 残留 Python の optional utility 化",
-  "updated_at": "2026-03-16T15:46:31Z"
+  "updated_at": "2026-03-16T23:50:23Z"
 }
