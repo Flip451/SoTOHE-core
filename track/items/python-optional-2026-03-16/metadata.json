@@ -59,7 +59,7 @@
     },
     {
       "commit_hash": null,
-      "description": "孤立テストファイル削除: test_verify_scripts.py, test_verify_latest_track_files.py + test_track_resolution.py の参照修正 + scripts-selftest 更新",
+      "description": "孤立テストファイル削除: test_verify_scripts.py, test_verify_latest_track_files.py + test_track_resolution.py/test_track_registry.py/test_track_schema.py の削除済みスクリプト参照修正 + scripts-selftest 更新",
       "id": "T002",
       "status": "todo"
     },
@@ -71,7 +71,7 @@
     },
     {
       "commit_hash": null,
-      "description": "Makefile.toml: ci-python-local/ci-python タスク追加（Python lint + selftest + hooks-selftest の optional gate）",
+      "description": "Makefile.toml: ci-python-local/ci-python/ci-python-container タスク追加 + .github/workflows/ci.yml に ci-python-container ステップ追加（Python lint + selftest + hooks-selftest の optional gate）",
       "id": "T004",
       "status": "todo"
     },

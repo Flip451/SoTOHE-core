@@ -24,7 +24,7 @@
 3. 孤立 verify スクリプト 3 件（`verify_plan_progress.py`, `verify_track_metadata.py`, `verify_track_registry.py`）が `scripts/` に存在しないことを確認
 4. 孤立テストファイル 2 件（`test_verify_scripts.py`, `test_verify_latest_track_files.py`）が `scripts/` に存在しないことを確認
 5. `test_track_resolution.py` が存在し、`pytest scripts/test_track_resolution.py` が pass することを確認
-6. advisory hook が `.venv` 退避状態で Claude Code セッション内でクラッシュしないことを確認
+6. advisory hook が `python3` 不在をシミュレート（`PATH` から python3 を除外した環境）で `.claude/settings.json` の hook command がクラッシュせずスキップすることを確認（`.venv` 退避だけでは不十分 — python3 インタプリタ自体の不在をテスト）
 7. Docker コンテナ内で `cargo make scripts-selftest` と `cargo make hooks-selftest` が pass することを確認
 8. 6 ドキュメント（`track/workflow.md`, `DEVELOPER_AI_WORKFLOW.md`, `.claude/rules/07-dev-environment.md`, `.claude/rules/09-maintainer-checklist.md`, `CLAUDE.md`, `LOCAL_DEVELOPMENT.md`）に新しい CI パス構造が反映され、削除済み Python verifier への参照がないことを確認
 
