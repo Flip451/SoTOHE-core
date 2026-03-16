@@ -59,7 +59,7 @@
     },
     {
       "commit_hash": null,
-      "description": "孤立テストファイル削除: test_verify_scripts.py, test_verify_latest_track_files.py, test_track_resolution.py + scripts-selftest 更新",
+      "description": "孤立テストファイル削除: test_verify_scripts.py, test_verify_latest_track_files.py + test_track_resolution.py の参照修正 + scripts-selftest 更新",
       "id": "T002",
       "status": "todo"
     },
