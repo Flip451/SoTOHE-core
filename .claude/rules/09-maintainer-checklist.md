@@ -4,7 +4,7 @@ When changing workflow or architecture, update all affected layers together.
 
 Host prerequisite:
 
-- `python3` is required for `.claude/hooks/*.py` and `scripts/external_guides.py`
+- `python3` is optional on host (advisory hooks gracefully skip when absent); required inside Docker for CI
 
 Always consider:
 
@@ -18,7 +18,7 @@ Always consider:
   - `TRACK_TRACEABILITY.md`
 - enforcement:
   - `Makefile.toml`
-  - `scripts/verify_*.py`
+  - `sotp verify` subcommands (Rust CLI, replaces deleted `scripts/verify_*.py`)
   - `scripts/track_schema.py` / `track_state_machine.py` / `track_markdown.py`
   - `.claude/settings.json`
   - `.claude/hooks/`
