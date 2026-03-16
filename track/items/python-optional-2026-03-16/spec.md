@@ -41,7 +41,9 @@
 - [ ] 孤立テストファイル 2 ファイルが削除されている（`test_track_resolution.py` は保持・修正）
 - [ ] advisory hook が Python 不在時にクラッシュせず graceful に skip する
 - [ ] Docker コンテナ内で `scripts-selftest` / `hooks-selftest` が引き続き動作する
-- [ ] `test_track_resolution.py` の削除済みスクリプト参照が修正されている
+- [ ] `test_track_resolution.py` の削除済みスクリプト参照が修正され、`scripts-selftest-local` に追加されている
+- [ ] `.claude/settings.json` permissions.allow に `ci-python` 関連タスクが追加されている
+- [ ] `cargo make bootstrap` が `ci-python-local` を含む
 - [ ] 以下のドキュメントが更新されている:
   - `track/workflow.md`
   - `DEVELOPER_AI_WORKFLOW.md`
