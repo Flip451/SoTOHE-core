@@ -4,6 +4,7 @@ pub mod gh_cli;
 pub mod git_cli;
 pub mod lock;
 pub mod track;
+pub mod verify;
 
 use std::collections::HashMap;
 use std::sync::Mutex;

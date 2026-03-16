@@ -11,6 +11,7 @@ mod plan;
 mod repository;
 mod track;
 pub mod track_phase;
+pub mod verify;
 
 pub use decision::Decision;
 pub use error::{

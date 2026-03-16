@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| verify-scripts-rust-2026-03-16 | Done | 2026-03-16 |
 | pr-review-rust-2026-03-16 | Done | 2026-03-16 |
 | py-workflow-cleanup-2026-03-16 | Done | 2026-03-16 |
 | auto-mode-design-2026-03-16 | Done | 2026-03-16 |

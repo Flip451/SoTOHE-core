@@ -8,3 +8,4 @@ pub mod lock;
 pub mod pr;
 pub mod review;
 pub mod track;
+pub mod verify;
