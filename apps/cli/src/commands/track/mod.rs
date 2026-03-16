@@ -18,6 +18,7 @@ use usecase::track_activation::{ActivateTrackOutcome, ActivateTrackUseCase};
 
 mod activate;
 mod resolve;
+mod state_ops;
 mod transition;
 mod views;
 
@@ -85,6 +86,98 @@ pub enum TrackCommand {
     Views {
         #[command(subcommand)]
         action: ViewAction,
+    },
+
+    /// Add a new task to a track (atomic read-modify-write).
+    AddTask {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: PathBuf,
+
+        /// Locks directory for exclusive access.
+        #[arg(long, default_value = ".locks")]
+        locks_dir: PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        track_id: String,
+
+        /// Task description.
+        description: String,
+
+        /// Target section ID. If omitted, appends to the first section.
+        #[arg(long)]
+        section: Option<String>,
+
+        /// Insert after this task ID within the section. If omitted or not found, appends to end.
+        #[arg(long)]
+        after: Option<String>,
+
+        /// Skip branch validation (escape hatch for CI/testing).
+        #[arg(long, default_value_t = false)]
+        skip_branch_check: bool,
+    },
+
+    /// Set a status override on a track (blocked/cancelled).
+    SetOverride {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: PathBuf,
+
+        /// Locks directory for exclusive access.
+        #[arg(long, default_value = ".locks")]
+        locks_dir: PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        track_id: String,
+
+        /// Override status: blocked or cancelled.
+        status: String,
+
+        /// Reason for the override.
+        #[arg(long, default_value = "")]
+        reason: String,
+
+        /// Skip branch validation.
+        #[arg(long, default_value_t = false)]
+        skip_branch_check: bool,
+    },
+
+    /// Clear a status override on a track.
+    ClearOverride {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: PathBuf,
+
+        /// Locks directory for exclusive access.
+        #[arg(long, default_value = ".locks")]
+        locks_dir: PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        track_id: String,
+
+        /// Skip branch validation.
+        #[arg(long, default_value_t = false)]
+        skip_branch_check: bool,
+    },
+
+    /// Show the next open task for a track (JSON output).
+    NextTask {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        track_id: String,
+    },
+
+    /// Show task status counts for a track (JSON output).
+    TaskCounts {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        track_id: String,
     },
 }
 
@@ -188,6 +281,47 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         TrackCommand::Activate(args) => activate::execute_activate(args, BranchMode::Auto),
         TrackCommand::Resolve(args) => resolve::execute_resolve(args),
         TrackCommand::Views { action } => views::execute_views(action),
+        TrackCommand::AddTask {
+            items_dir,
+            locks_dir,
+            track_id,
+            description,
+            section,
+            after,
+            skip_branch_check,
+        } => state_ops::execute_add_task(
+            items_dir,
+            locks_dir,
+            track_id,
+            description,
+            section,
+            after,
+            skip_branch_check,
+        ),
+        TrackCommand::SetOverride {
+            items_dir,
+            locks_dir,
+            track_id,
+            status,
+            reason,
+            skip_branch_check,
+        } => state_ops::execute_set_override(
+            items_dir,
+            locks_dir,
+            track_id,
+            status,
+            reason,
+            skip_branch_check,
+        ),
+        TrackCommand::ClearOverride { items_dir, locks_dir, track_id, skip_branch_check } => {
+            state_ops::execute_clear_override(items_dir, locks_dir, track_id, skip_branch_check)
+        }
+        TrackCommand::NextTask { items_dir, track_id } => {
+            state_ops::execute_next_task(items_dir, track_id)
+        }
+        TrackCommand::TaskCounts { items_dir, track_id } => {
+            state_ops::execute_task_counts(items_dir, track_id)
+        }
     };
     match result {
         Ok(code) => code,

@@ -52,6 +52,10 @@ pub enum ValidationError {
     TrackAlreadyMaterialized { track_id: String, branch: String },
     #[error("unsupported target status: {0}")]
     UnsupportedTargetStatus(String),
+    #[error("section '{0}' not found")]
+    SectionNotFound(String),
+    #[error("no sections available to add task to")]
+    NoSectionsAvailable,
 }
 
 /// Errors from invalid task state transitions.

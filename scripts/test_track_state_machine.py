@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import tempfile
 import unittest
 from datetime import UTC, datetime
@@ -144,7 +145,7 @@ class TestTransitionTask(unittest.TestCase):
                 sections=[_section("s1", ["T001"])],
             )
 
-            transition_task(track_dir, "T001", "in_progress")
+            transition_task(track_dir, "T001", "in_progress", now=datetime.now(UTC))
 
             data = _read_metadata(track_dir)
             self.assertEqual(data["tasks"][0]["status"], "in_progress")
@@ -161,7 +162,7 @@ class TestTransitionTask(unittest.TestCase):
                 status="in_progress",
             )
 
-            transition_task(track_dir, "T001", "done", commit_hash="abc1234")
+            transition_task(track_dir, "T001", "done", commit_hash="abc1234", now=datetime.now(UTC))
 
             data = _read_metadata(track_dir)
             self.assertEqual(data["tasks"][0]["status"], "done")
@@ -179,7 +180,7 @@ class TestTransitionTask(unittest.TestCase):
                 status="done",
             )
 
-            transition_task(track_dir, "T001", "in_progress")
+            transition_task(track_dir, "T001", "in_progress", now=datetime.now(UTC))
 
             data = _read_metadata(track_dir)
             self.assertEqual(data["tasks"][0]["status"], "in_progress")
@@ -197,7 +198,7 @@ class TestTransitionTask(unittest.TestCase):
                 status="in_progress",
             )
 
-            transition_task(track_dir, "T001", "todo")
+            transition_task(track_dir, "T001", "todo", now=datetime.now(UTC))
 
             data = _read_metadata(track_dir)
             self.assertEqual(data["tasks"][0]["status"], "todo")
@@ -213,7 +214,7 @@ class TestTransitionTask(unittest.TestCase):
                 sections=[_section("s1", ["T001", "T002"])],
             )
 
-            transition_task(track_dir, "T001", "skipped")
+            transition_task(track_dir, "T001", "skipped", now=datetime.now(UTC))
 
             data = _read_metadata(track_dir)
             self.assertEqual(data["tasks"][0]["status"], "skipped")
@@ -230,7 +231,7 @@ class TestTransitionTask(unittest.TestCase):
                 status="in_progress",
             )
 
-            transition_task(track_dir, "T001", "skipped")
+            transition_task(track_dir, "T001", "skipped", now=datetime.now(UTC))
 
             data = _read_metadata(track_dir)
             self.assertEqual(data["tasks"][0]["status"], "skipped")
@@ -254,7 +255,7 @@ class TestTransitionTask(unittest.TestCase):
                 status="done",
             )
 
-            transition_task(track_dir, "T001", "todo")
+            transition_task(track_dir, "T001", "todo", now=datetime.now(UTC))
 
             data = _read_metadata(track_dir)
             self.assertEqual(data["tasks"][0]["status"], "todo")
@@ -279,7 +280,7 @@ class TestTransitionTask(unittest.TestCase):
             )
 
             with self.assertRaises(TransitionError):
-                transition_task(track_dir, "T001", "done")
+                transition_task(track_dir, "T001", "done", now=datetime.now(UTC))
 
     def test_done_and_skipped_mix_derives_done_status(self) -> None:
         """Skip the last remaining task and verify the track derives 'done'."""
@@ -296,7 +297,7 @@ class TestTransitionTask(unittest.TestCase):
                 status="in_progress",
             )
 
-            transition_task(track_dir, "T002", "skipped")
+            transition_task(track_dir, "T002", "skipped", now=datetime.now(UTC))
 
             data = _read_metadata(track_dir)
             self.assertEqual(data["tasks"][1]["status"], "skipped")
@@ -313,7 +314,7 @@ class TestTransitionTask(unittest.TestCase):
             )
 
             with self.assertRaises(TransitionError):
-                transition_task(track_dir, "T001", "done")
+                transition_task(track_dir, "T001", "done", now=datetime.now(UTC))
 
     def test_unknown_task_id_raises(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -326,7 +327,7 @@ class TestTransitionTask(unittest.TestCase):
             )
 
             with self.assertRaises(TransitionError):
-                transition_task(track_dir, "T999", "in_progress")
+                transition_task(track_dir, "T999", "in_progress", now=datetime.now(UTC))
 
     def test_updates_updated_at(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -462,7 +463,7 @@ class TestTransitionTaskValidation(unittest.TestCase):
             )
 
             with self.assertRaises(TransitionError):
-                transition_task(track_dir, "T001", "done", commit_hash="not-a-hash!")
+                transition_task(track_dir, "T001", "done", commit_hash="not-a-hash!", now=datetime.now(UTC))
 
     def test_branchless_planning_only_track_rejects_in_progress_transition(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -530,7 +531,7 @@ class TestOverrideSurvivesTransition(unittest.TestCase):
                 status_override={"status": "blocked", "reason": "dep"},
             )
 
-            transition_task(track_dir, "T001", "done", commit_hash="abc1234")
+            transition_task(track_dir, "T001", "done", commit_hash="abc1234", now=datetime.now(UTC))
 
             data = _read_metadata(track_dir)
             self.assertIsNone(data["status_override"])
@@ -557,7 +558,7 @@ class TestStateMachineDefensiveParsing(unittest.TestCase):
 
             # Should raise TransitionError, not TypeError
             with self.assertRaises(TransitionError):
-                transition_task(track_dir, "T001", "in_progress")
+                transition_task(track_dir, "T001", "in_progress", now=datetime.now(UTC))
 
     def test_add_task_tasks_none_succeeds(self) -> None:
         """tasks=None should not crash add_task — list is auto-created."""
@@ -597,7 +598,7 @@ class TestStateMachineDefensiveParsing(unittest.TestCase):
             )
 
             with self.assertRaises(TransitionError):
-                transition_task(track_dir, "T001", "in_progress")
+                transition_task(track_dir, "T001", "in_progress", now=datetime.now(UTC))
 
     def test_set_override_tasks_none_raises(self) -> None:
         """tasks=None should not crash set_track_override."""
@@ -656,7 +657,7 @@ class TestStateMachineDefensiveParsing(unittest.TestCase):
             )
 
             with self.assertRaises(TransitionError):
-                transition_task(track_dir, "T001", "in_progress")
+                transition_task(track_dir, "T001", "in_progress", now=datetime.now(UTC))
 
     def test_add_task_section_task_ids_none(self) -> None:
         """Section with task_ids=None should not crash."""
@@ -749,7 +750,11 @@ class TestStateMachineDefensiveParsing(unittest.TestCase):
                 add_task(track_dir, "New task")
 
 
+_SOTP_AVAILABLE = bool(shutil.which("sotp") or Path(__file__).resolve().parent.parent.joinpath("bin/sotp").is_file())
+
+
 class TestSyncRenderedViews(unittest.TestCase):
+    @unittest.skipUnless(_SOTP_AVAILABLE, "sotp binary not available")
     def test_renders_plan_md(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -799,7 +804,8 @@ class TestSyncRenderedViews(unittest.TestCase):
                 [root / "track/items/demo/plan.md", root / "track/registry.md"],
             )
 
-    def test_falls_back_when_sotp_sync_views_is_unavailable(self) -> None:
+    def test_raises_when_sotp_sync_views_is_unavailable(self) -> None:
+        """sync_rendered_views now requires sotp and raises when unavailable."""
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             track_dir = root / "track" / "items" / "demo"
@@ -813,21 +819,11 @@ class TestSyncRenderedViews(unittest.TestCase):
             with (
                 patch(
                     "track_state_machine._find_sotp_for_track_views_sync",
-                    return_value="/tmp/sotp",
-                ),
-                patch("atomic_write._find_sotp", return_value=None),
-                patch(
-                    "track_state_machine.subprocess.run",
-                    return_value=unittest.mock.Mock(
-                        returncode=1,
-                        stderr="unrecognized subcommand 'views'",
-                    ),
+                    return_value=None,
                 ),
             ):
-                changed = sync_rendered_views(root, track_id="demo")
-
-            self.assertTrue(any("plan.md" in str(path) for path in changed))
-            self.assertTrue((track_dir / "plan.md").exists())
+                with self.assertRaises(TransitionError):
+                    sync_rendered_views(root, track_id="demo")
 
     def test_raises_when_sotp_sync_views_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -976,6 +972,7 @@ class TestTaskCounts(unittest.TestCase):
 class TestCLI(unittest.TestCase):
     """Tests for the CLI entry point (main function)."""
 
+    @unittest.skipUnless(shutil.which("sotp") or Path(__file__).resolve().parent.parent.joinpath("bin/sotp").is_file(), "sotp binary not available")
     def test_transition_subcommand_success(self) -> None:
         from track_state_machine import main
 
@@ -1019,6 +1016,7 @@ class TestCLI(unittest.TestCase):
         rc = main(["transition", "/nonexistent/path", "T001", "in_progress"])
         self.assertEqual(rc, 1)
 
+    @unittest.skipUnless(shutil.which("sotp") or Path(__file__).resolve().parent.parent.joinpath("bin/sotp").is_file(), "sotp binary not available")
     def test_transition_with_commit_hash(self) -> None:
         from track_state_machine import main
 
@@ -1047,6 +1045,7 @@ class TestCLI(unittest.TestCase):
             data = json.loads((track_dir / "metadata.json").read_text(encoding="utf-8"))
             self.assertEqual(data["tasks"][0]["commit_hash"], "abc1234")
 
+    @unittest.skipUnless(shutil.which("sotp") or Path(__file__).resolve().parent.parent.joinpath("bin/sotp").is_file(), "sotp binary not available")
     def test_sync_views_subcommand(self) -> None:
         from track_state_machine import main
 

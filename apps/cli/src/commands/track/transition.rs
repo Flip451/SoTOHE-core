@@ -91,7 +91,7 @@ pub(super) fn execute_transition(
 // state autonomously through the TrackReader port. The CLI now calls it
 // directly in execute_transition with schema_version from DocumentMeta.
 
-fn verify_branch_guard<R: TrackReader>(
+pub(super) fn verify_branch_guard<R: TrackReader>(
     reader: &R,
     track_id: &TrackId,
     repo_dir: &std::path::Path,

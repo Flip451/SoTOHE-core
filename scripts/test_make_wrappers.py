@@ -272,6 +272,24 @@ class MakeWrappersTest(unittest.TestCase):
             task_body,
         )
 
+    def test_track_state_ops_wrappers_delegate_to_rust_cli(self) -> None:
+        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
+
+        for task_header, expected_fragments in (
+            ("[tasks.track-add-task]", ["bin/sotp track add-task", "--items-dir track/items"]),
+            ("[tasks.track-next-task]", ["bin/sotp track next-task", "--items-dir track/items"]),
+            ("[tasks.track-task-counts]", ["bin/sotp track task-counts", "--items-dir track/items"]),
+            ("[tasks.track-set-override]", ["bin/sotp track set-override", "bin/sotp track clear-override"]),
+        ):
+            with self.subTest(task=task_header):
+                task_start = makefile.index(task_header)
+                next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+                task_body = (
+                    makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
+                )
+                for fragment in expected_fragments:
+                    self.assertIn(fragment, task_body, f"{task_header} missing '{fragment}'")
+
     def test_track_git_wrappers_delegate_to_rust_cli(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
 

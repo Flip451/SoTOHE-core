@@ -56,6 +56,23 @@ impl PlanSection {
     pub fn task_ids(&self) -> &[TaskId] {
         &self.task_ids
     }
+
+    /// Inserts a task ID into this section's task list.
+    ///
+    /// If `after` is `Some` and exists in the list, inserts after it.
+    /// Otherwise appends to the end.
+    ///
+    /// This is `pub(crate)` to ensure it is only called through
+    /// `TrackMetadata::add_task()` which validates invariants.
+    pub(crate) fn insert_task_id(&mut self, task_id: TaskId, after: Option<&TaskId>) {
+        if let Some(after_id) = after {
+            if let Some(pos) = self.task_ids.iter().position(|id| id == after_id) {
+                self.task_ids.insert(pos + 1, task_id);
+                return;
+            }
+        }
+        self.task_ids.push(task_id);
+    }
 }
 
 /// A read-only view of the plan: summary text and ordered sections.
@@ -82,5 +99,31 @@ impl PlanView {
     #[must_use]
     pub fn sections(&self) -> &[PlanSection] {
         &self.sections
+    }
+
+    /// Inserts a task ID into the specified section (or the first section if `section_id` is `None`).
+    ///
+    /// This is `pub(crate)` to ensure it is only called through
+    /// `TrackMetadata::add_task()` which validates invariants.
+    ///
+    /// # Errors
+    /// - `ValidationError::SectionNotFound` if the specified section does not exist.
+    /// - `ValidationError::NoSectionsAvailable` if no sections exist and `section_id` is `None`.
+    pub(crate) fn insert_task_into_section(
+        &mut self,
+        task_id: TaskId,
+        section_id: Option<&str>,
+        after_task_id: Option<&TaskId>,
+    ) -> Result<(), ValidationError> {
+        let target = match section_id {
+            Some(sid) => self
+                .sections
+                .iter_mut()
+                .find(|s| s.id() == sid)
+                .ok_or(ValidationError::SectionNotFound(sid.to_string()))?,
+            None => self.sections.first_mut().ok_or(ValidationError::NoSectionsAvailable)?,
+        };
+        target.insert_task_id(task_id, after_task_id);
+        Ok(())
     }
 }
