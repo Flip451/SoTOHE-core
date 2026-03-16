@@ -1,31 +1,22 @@
 <!-- Generated from metadata.json — DO NOT EDIT DIRECTLY -->
 # STRAT-03 Phase 6: 残留 Python の optional utility 化
 
-STRAT-03 Phase 6: .venv 未構築でも CI 必須経路が動作するよう、
-Python タスクを optional utility に降格する。
+STRAT-03 Phase 6: ホスト上で .venv 未構築でも advisory hook がクラッシュしない状態を達成する。
+CI (Docker コンテナ内) は Python 常在のため変更不要。孤立 Python ファイルを削除し、hook のランチャーにガードを追加する。
 
-## 孤立ファイル削除
+## 孤立ファイル削除・テスト整理
 
 孤立した Python verify スクリプトとテストファイルを削除し、
-scripts-selftest の引数リストを更新する。
+test_verify_scripts.py から削除済みスクリプトへの参照を除去する。
 
 - [ ] 孤立 verify スクリプト削除: verify_plan_progress.py, verify_track_metadata.py, verify_track_registry.py
-- [ ] テストファイル整理: test_verify_latest_track_files.py 削除 + test_verify_scripts.py から削除済みスクリプトのテストケースのみ除去（生存テスト維持）+ test_track_resolution.py/test_track_registry.py/test_track_schema.py の参照修正 + test_track_resolution.py を scripts-selftest-local に追加
-
-## CI パス分離
-
-ci-local/ci-container は Python タスクを維持し、
-ホスト用に ci-no-python-local + ci-python-local を追加する。
-cargo make ci の compose wrapper に .venv 存在チェック付き条件分岐を導入する。
-
-- [ ] Makefile.toml: ci-local/ci-container は Python タスクを維持（Docker 内は Python 常在）。ホスト用に ci-no-python-local を追加し、.venv 不在時にはそちらを使う仕組みを導入
-- [ ] Makefile.toml: ci-python-local/ci-python タスク追加（ホスト optional gate）+ .claude/settings.json permissions.allow に ci-python 追加。bootstrap の venv 構築後に ci-python-local を呼び出す（依存ではなくスクリプト内実行）
-- [ ] cargo make ci の compose wrapper 更新: .venv 存在チェック付き conditional Python gate
+- [ ] テストファイル整理: test_verify_latest_track_files.py 削除 + test_verify_scripts.py から全削除済みスクリプト(Phase5+6)のテストケース除去(生存テスト維持) + test_track_resolution.py/test_track_registry.py/test_track_schema.py の参照修正 + test_track_resolution.py を scripts-selftest-local に追加
 
 ## Hook graceful degradation + ドキュメント
 
 advisory hook が Python 不在時にクラッシュしない仕組みを追加し、
 ドキュメントを更新する。
+注: cargo make ci は Docker コンテナ内で実行され Python は常に利用可能。CI パス自体の変更は不要。
 
 - [ ] advisory hook の Python 不在時 graceful skip: .claude/settings.json の hook command を python3 存在チェック付きランチャーに変更 (command -v python3 || exit 0) + .claude/hooks/ 内の個別 hook にもガード追加
 - [ ] ドキュメント更新: track/workflow.md, DEVELOPER_AI_WORKFLOW.md, .claude/rules/07-dev-environment.md, .claude/rules/09-maintainer-checklist.md, CLAUDE.md, LOCAL_DEVELOPMENT.md + 削除済み Python verifier への参照修正
