@@ -11,12 +11,12 @@
 - 孤立 Python verify スクリプトの削除（`verify_plan_progress.py`, `verify_track_metadata.py`, `verify_track_registry.py`）
 - 孤立テストファイルの削除（`test_verify_scripts.py`, `test_verify_latest_track_files.py`）
   - 注: `test_track_resolution.py` は `track_resolution.py`（共有ライブラリ）の回帰テストを含むため保持。削除済みスクリプトへの参照のみ修正。
-- `ci-local` から Python 必須タスクを分離:
-  - `python-lint-local` を `ci-local` の必須依存から外す（`.venv` 存在時のみ実行）
-  - `scripts-selftest-local` を `ci-local` の必須依存から外す
-  - `hooks-selftest-local` を `ci-local` の必須依存から外す
-- 新タスク `ci-python-local` の追加（Python lint + selftest + hooks-selftest をまとめた optional gate）
-- `cargo make ci` compose wrapper の更新
+- CI パスの整理:
+  - `ci-local`/`ci-container` は Python タスクを維持（Docker コンテナ内は Python 常在）
+  - ホスト用に `ci-no-python-local` を追加（`.venv` 不在時のフォールバック）
+  - `cargo make ci` compose wrapper に `.venv` 存在チェック付き条件分岐を追加
+- 新タスク `ci-python-local`/`ci-python` の追加（ホスト向け optional Python gate）
+- `test_verify_scripts.py` は削除ではなく、削除済みスクリプトのテストケースのみ除去（生存テスト維持）
 - ドキュメント更新（`track/workflow.md`, `DEVELOPER_AI_WORKFLOW.md` 等）
 
 ### Out of Scope
@@ -38,12 +38,13 @@
 - [ ] `cargo make ci` が `.venv` 未構築環境で成功する
 - [ ] `cargo make ci-python` が Python lint + selftest + hooks-selftest を実行する
 - [ ] 孤立 Python verify スクリプト 3 ファイルが削除されている
-- [ ] 孤立テストファイル 2 ファイルが削除されている（`test_track_resolution.py` は保持・修正）
+- [ ] `test_verify_latest_track_files.py` が削除されている
+- [ ] `test_verify_scripts.py` から削除済みスクリプトのテストケースが除去されている（生存テスト維持）
 - [ ] advisory hook が Python 不在時にクラッシュせず graceful に skip する
 - [ ] Docker コンテナ内で `scripts-selftest` / `hooks-selftest` が引き続き動作する
 - [ ] `test_track_resolution.py` の削除済みスクリプト参照が修正され、`scripts-selftest-local` に追加されている
 - [ ] `.claude/settings.json` permissions.allow に `ci-python` 関連タスクが追加されている
-- [ ] `cargo make bootstrap` が `ci-python-local` を含む
+- [ ] `cargo make bootstrap` が venv 構築後に `ci-python-local` を実行する（依存ではなくスクリプト内呼び出し）
 - [ ] 以下のドキュメントが更新されている:
   - `track/workflow.md`
   - `DEVELOPER_AI_WORKFLOW.md`
