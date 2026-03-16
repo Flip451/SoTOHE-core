@@ -487,14 +487,47 @@ mod tests {
 
     #[test]
     fn parse_review_final_message_rejects_inconsistent_verdict_payloads() {
-        let zero_with_findings = parse_review_final_message(Some(
+        // Real finding (severity set) with zero_findings verdict — still rejected.
+        let zero_with_real_findings = parse_review_final_message(Some(
             "{\"verdict\":\"zero_findings\",\"findings\":[{\"message\":\"P1: finding\",\"severity\":\"P1\",\"file\":null,\"line\":null}]}",
         ));
         let findings_without_entries =
             parse_review_final_message(Some("{\"verdict\":\"findings_remain\",\"findings\":[]}"));
 
-        assert!(matches!(zero_with_findings, ReviewFinalMessageState::Invalid { .. }));
+        assert!(matches!(zero_with_real_findings, ReviewFinalMessageState::Invalid { .. }));
         assert!(matches!(findings_without_entries, ReviewFinalMessageState::Invalid { .. }));
+    }
+
+    #[test]
+    fn parse_review_final_message_rejects_zero_findings_with_null_locator_findings() {
+        // zero_findings + non-empty findings is always rejected (fail-closed),
+        // regardless of locator values or message content.
+        let payload = parse_review_final_message(Some(
+            "{\"verdict\":\"zero_findings\",\"findings\":[{\"message\":\"Schema-level checks passed; running validators...\",\"severity\":null,\"file\":null,\"line\":null}]}",
+        ));
+
+        assert!(matches!(payload, ReviewFinalMessageState::Invalid { .. }));
+    }
+
+    #[test]
+    fn parse_review_final_message_accepts_findings_remain_with_null_locators() {
+        // findings_remain with findings is valid, even if locators are null.
+        let payload = parse_review_final_message(Some(
+            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"thinking...\",\"severity\":null,\"file\":null,\"line\":null}]}",
+        ));
+
+        assert_eq!(
+            payload,
+            ReviewFinalMessageState::Parsed(ReviewFinalPayload {
+                verdict: ReviewPayloadVerdict::FindingsRemain,
+                findings: vec![ReviewFinding {
+                    message: "thinking...".to_owned(),
+                    severity: None,
+                    file: None,
+                    line: None,
+                }],
+            })
+        );
     }
 
     #[test]
