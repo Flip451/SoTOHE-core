@@ -1,5 +1,6 @@
 //! Domain layer for the SoTOHE-core track state machine.
 
+pub mod auto_phase;
 mod decision;
 mod error;
 pub mod guard;
