@@ -1,0 +1,26 @@
+## Task Summary: STRAT-03 Phase 6 — Make Python optional on host
+
+**Track:** python-optional-2026-03-16
+**Task:** Remove orphan Python verify scripts and add hook graceful-skip guards
+**Date:** 2026-03-17
+
+### Changes
+
+- scripts/verify_plan_progress.py: Deleted (orphan, replaced by sotp verify)
+- scripts/verify_track_metadata.py: Deleted (orphan, replaced by sotp verify)
+- scripts/verify_track_registry.py: Deleted (orphan, replaced by sotp verify)
+- scripts/test_verify_latest_track_files.py: Deleted (tested deleted script)
+- scripts/test_verify_scripts.py: Pruned dead test cases for all Phase 5+6 deleted scripts (3315→350 lines)
+- scripts/test_track_registry.py: Removed verify_track_registry dependency and related test classes
+- scripts/test_track_resolution.py: Removed verify_latest_track_files import reference
+- scripts/test_track_schema.py: Removed deleted scripts from migrated_scripts list
+- Makefile.toml: Added test_track_resolution.py to scripts-selftest-local
+- .claude/settings.json: Added `command -v python3` guard to all 10 Python hook commands
+- track/workflow.md: Updated stale check_layers.py and track_schema.py references
+- DEVELOPER_AI_WORKFLOW.md: Updated check_layers.py reference
+- .claude/rules/09-maintainer-checklist.md: Python now optional, verify_*.py replaced by sotp verify
+- LOCAL_DEVELOPMENT.md: Updated host requirements to reflect Python optional status
+
+### Why
+
+Phase 5 migrated all verify scripts to Rust. Phase 6 completes the cleanup by removing orphan Python verifiers, pruning dead tests, and adding launcher-level guards so advisory hooks gracefully skip when python3 is absent on the host.
