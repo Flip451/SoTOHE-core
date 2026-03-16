@@ -126,7 +126,6 @@ args = [
   "scripts/test_track_state_machine.py",
   "scripts/test_track_branch_guard.py",
   "scripts/test_track_registry.py",
-  "scripts/test_pr_review.py",
 ]
 
 [tasks.scripts-selftest]
@@ -727,7 +726,7 @@ bin/sotp pr ensure-pr $TRACK_ARG
 [tasks.track-pr-review]
 description = "[wrapper] Run full PR review cycle: push, ensure PR, trigger @codex review, poll, parse"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/pr_review.py run']
+script = ['bin/sotp pr review-cycle']
 
 [tasks.track-pr-merge]
 description = "[wrapper] Wait for PR checks to pass, then merge"

@@ -1,88 +1,94 @@
 {
-  "schema_version": 3,
-  "id": "pr-review-rust-2026-03-16",
   "branch": "track/pr-review-rust-2026-03-16",
-  "title": "STRAT-03 Phase 4: PR review orchestration の Rust 化",
-  "status": "planned",
   "created_at": "2026-03-16T12:00:00+09:00",
-  "updated_at": "2026-03-16T12:00:00+09:00",
-  "tasks": [
-    {
-      "id": "T001",
-      "description": "GhClient trait に PR review 系メソッド追加 (post_issue_comment, list_reviews, list_issue_comments, list_review_comments) + SystemGhClient 実装",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T002",
-      "description": "sanitize_text usecase ユーティリティ実装 (秘匿情報・絶対パス・内部IP・localhost・RFC1918 除去、libs/usecase に配置)",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T003",
-      "description": "PR review usecase 型 (ReviewFinding, ReviewResult) + severity 分類 + review body パース + paginated JSON パース (libs/usecase/src/pr_review.rs)",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T004",
-      "description": "sotp pr trigger-review サブコマンド実装 (@codex review コメント投稿、reviewer provider 検証)",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T005",
-      "description": "sotp pr poll-review サブコマンド実装 (GitHub API ポーリング、タイムアウト、bot activity 検出、stale review 排除、paginated API 対応)",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T006",
-      "description": "sotp pr review-cycle フルサイクルコマンド (push → ensure-pr → trigger → poll → parse → report、track/ ブランチ必須の fail-closed ガード)",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T007",
-      "description": "Makefile.toml の track-pr-review を Rust に切替 + scripts/pr_review.py, scripts/test_pr_review.py 削除",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T008",
-      "description": "scripts-selftest リストから test_pr_review.py 除去 + ドキュメント参照修正",
-      "status": "todo",
-      "commit_hash": null
-    }
-  ],
+  "id": "pr-review-rust-2026-03-16",
   "plan": {
-    "summary": ["scripts/pr_review.py の全責務を sotp pr サブコマンド群に移行し、/track:pr-review が Python 非依存で成立するようにする。M2 マイルストーン達成に直結。"],
     "sections": [
       {
+        "description": [],
         "id": "S1",
-        "title": "Infrastructure 層: GhClient 拡張",
-        "description": [],
-        "task_ids": ["T001"]
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Infrastructure 層: GhClient 拡張"
       },
       {
+        "description": [],
         "id": "S2",
-        "title": "Usecase 層: sanitize + review 型 + パースロジック",
-        "description": [],
-        "task_ids": ["T002", "T003"]
+        "task_ids": [
+          "T002",
+          "T003"
+        ],
+        "title": "Usecase 層: sanitize + review 型 + パースロジック"
       },
       {
+        "description": [],
         "id": "S3",
-        "title": "CLI 層: 新サブコマンド群",
-        "description": [],
-        "task_ids": ["T004", "T005", "T006"]
+        "task_ids": [
+          "T004",
+          "T005",
+          "T006"
+        ],
+        "title": "CLI 層: 新サブコマンド群"
       },
       {
-        "id": "S4",
-        "title": "切替・クリーンアップ",
         "description": [],
-        "task_ids": ["T007", "T008"]
+        "id": "S4",
+        "task_ids": [
+          "T007",
+          "T008"
+        ],
+        "title": "切替・クリーンアップ"
       }
+    ],
+    "summary": [
+      "scripts/pr_review.py の全責務を sotp pr サブコマンド群に移行し、/track:pr-review が Python 非依存で成立するようにする。M2 マイルストーン達成に直結。"
     ]
-  }
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "GhClient trait に PR review 系メソッド追加 (post_issue_comment, list_reviews, list_issue_comments, list_review_comments) + SystemGhClient 実装",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "sanitize_text usecase ユーティリティ実装 (秘匿情報・絶対パス・内部IP・localhost・RFC1918 除去、libs/usecase に配置)",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "PR review usecase 型 (ReviewFinding, ReviewResult) + severity 分類 + review body パース + paginated JSON パース (libs/usecase/src/pr_review.rs)",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "sotp pr trigger-review サブコマンド実装 (@codex review コメント投稿、reviewer provider 検証)",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "sotp pr poll-review サブコマンド実装 (GitHub API ポーリング、タイムアウト、bot activity 検出、stale review 排除、paginated API 対応)",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "sotp pr review-cycle フルサイクルコマンド (push → ensure-pr → trigger → poll → parse → report、track/ ブランチ必須の fail-closed ガード)",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "description": "Makefile.toml の track-pr-review を Rust に切替 + scripts/pr_review.py, scripts/test_pr_review.py 削除",
+      "id": "T007",
+      "status": "done"
+    },
+    {
+      "description": "scripts-selftest リストから test_pr_review.py 除去 + ドキュメント参照修正",
+      "id": "T008",
+      "status": "done"
+    }
+  ],
+  "title": "STRAT-03 Phase 4: PR review orchestration の Rust 化",
+  "updated_at": "2026-03-16T05:05:15Z"
 }

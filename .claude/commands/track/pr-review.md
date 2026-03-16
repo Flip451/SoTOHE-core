@@ -45,7 +45,7 @@ Run the full cycle which handles trigger, poll, and parse:
 cargo make track-pr-review
 ```
 
-This executes `scripts/pr_review.py run` which:
+This executes `sotp pr review-cycle` which:
 1. Pushes the track branch
 2. Creates/reuses the PR
 3. Posts `@codex review` comment on the PR
