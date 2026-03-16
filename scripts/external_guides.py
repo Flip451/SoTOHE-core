@@ -17,12 +17,20 @@ from urllib.parse import urlparse
 
 try:
     from scripts.track_resolution import latest_legacy_track_dir
-    from scripts.verify_latest_track_files import (
-        latest_track_dir as latest_verified_track_dir,
+    from scripts.track_schema import (
+        all_track_directories,
+        v3_branch_field_missing,
+        v3_branchless_track_invalid,
+        v3_non_null_branch_invalid,
     )
 except ImportError:  # pragma: no cover - script execution path
     from track_resolution import latest_legacy_track_dir
-    from verify_latest_track_files import latest_track_dir as latest_verified_track_dir
+    from track_schema import (
+        all_track_directories,
+        v3_branch_field_missing,
+        v3_branchless_track_invalid,
+        v3_non_null_branch_invalid,
+    )
 
 MAX_DOWNLOAD_BYTES = 2 * 1024 * 1024
 USER_AGENT = "SoTOHE/1.0 (+https://github.com/anthropics)"
@@ -181,10 +189,62 @@ def latest_track_dir(root: Path | None = None) -> Path | None:
     latest_dir, _warnings = latest_legacy_track_dir(repo_root)
     if latest_dir is not None:
         return latest_dir
-    latest_dir, errors = latest_verified_track_dir(repo_root)
-    if errors:
-        return None
-    return latest_dir
+    # Inline fallback: pick latest non-archived, valid track by updated_at.
+    dirs = all_track_directories(repo_root)
+    archive_root = (repo_root / "track" / "archive").resolve()
+    best: Path | None = None
+    best_priority = -1
+    best_ts = datetime.min.replace(tzinfo=UTC)
+    best_name = ""
+    for d in dirs:
+        try:
+            d.resolve().relative_to(archive_root)
+            continue
+        except ValueError:
+            pass
+        # Skip tracks with invalid metadata.
+        meta_path = d / "metadata.json"
+        if not meta_path.is_file():
+            continue
+        try:
+            data = json.loads(meta_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        if not isinstance(data, dict):
+            continue
+        # v3 branch field validation: skip invalid v3 tracks.
+        if v3_branch_field_missing(data):
+            continue
+        if v3_branchless_track_invalid(data):
+            continue
+        if v3_non_null_branch_invalid(data):
+            continue
+        status = data.get("status", "")
+        if not isinstance(status, str):
+            continue
+        if status == "archived":
+            continue
+        branch = data.get("branch")
+        branch_str = branch.strip() if isinstance(branch, str) else ""
+        has_branch = bool(branch_str)
+        schema_version = data.get("schema_version", 2)
+        if not isinstance(schema_version, int):
+            schema_version = 2
+        # selection_priority: active branched tracks > branchless planned > done
+        if has_branch and status != "done":
+            priority = 2
+        elif not has_branch and schema_version != 3 and status not in ("done", "archived"):
+            priority = 2
+        elif not has_branch and status == "planned":
+            priority = 1
+        else:
+            priority = 0
+        ts = _track_updated_at(d)
+        rank = (priority, ts, d.name)
+        if rank > (best_priority, best_ts, best_name):
+            best_priority, best_ts, best_name = rank
+            best = d
+    return best
 
 
 def latest_track_context(root: Path | None = None) -> str:

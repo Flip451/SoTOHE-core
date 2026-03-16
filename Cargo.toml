@@ -15,8 +15,10 @@ rust-version = "1.85"
 publish = false
 
 [workspace.dependencies]
+regex = "1"
 rstest = "0.26.1"
 thiserror = "2"
+toml = "1"
 
 [workspace.lints.rust]
 warnings = "deny"

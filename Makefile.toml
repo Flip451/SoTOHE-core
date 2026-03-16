@@ -116,8 +116,6 @@ args = [
   "cache_dir=.cache/pytest",
   "scripts/test_architecture_rules.py",
   "scripts/test_atomic_write.py",
-  "scripts/test_check_layers.py",
-  "scripts/test_verify_scripts.py",
   "scripts/test_convention_docs.py",
   "scripts/test_external_guides.py",
   "scripts/test_make_wrappers.py",
@@ -453,13 +451,13 @@ args = ["llvm-cov", "--html", "--all-features"]
 private = true
 description = "[internal] Check architectural layer dependencies"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/check_layers.py']
+script = ['cargo run --quiet -p cli -- verify layers']
 
 [tasks.verify-arch-docs-local]
 private = true
 description = "[internal] Verify workspace architecture docs are in sync"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/verify_architecture_docs.py']
+script = ['cargo run --quiet -p cli -- verify arch-docs']
 
 [tasks.verify-plan-progress-local]
 private = true
@@ -477,13 +475,13 @@ script = ['cargo run --quiet -p cli -- track views validate --project-root .']
 private = true
 description = "[internal] Verify tech stack decisions are fully resolved"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/verify_tech_stack_ready.py']
+script = ['cargo run --quiet -p cli -- verify tech-stack']
 
 [tasks.verify-orchestra-local]
 private = true
 description = "[internal] Verify orchestra hooks, delegation, and agent definitions"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/verify_orchestra_guardrails.py']
+script = ['cargo run --quiet -p cli -- verify orchestra']
 
 [tasks.verify-track-registry-local]
 private = true
@@ -495,7 +493,7 @@ script = ['cargo run --quiet -p cli -- track views validate --project-root .']
 private = true
 description = "[internal] Verify latest track has spec.md, plan.md, and verification.md"
 script_runner = "@shell"
-script = ['"${PYTHON_BIN:-python3}" scripts/verify_latest_track_files.py']
+script = ['cargo run --quiet -p cli -- verify latest-track']
 
 [tasks.hooks-selftest]
 description = "[wrapper] Run Claude hook Python self-tests (docker compose)"
