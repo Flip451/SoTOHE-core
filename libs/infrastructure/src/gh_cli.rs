@@ -57,6 +57,85 @@ pub trait GhClient {
         title: &str,
         body_file: &Path,
     ) -> Result<String, GhError>;
+
+    /// Post a comment on a PR (issue comments endpoint).
+    ///
+    /// Returns the raw JSON response from the GitHub API.
+    /// Default implementation returns an error to maintain backward compatibility.
+    ///
+    /// # Errors
+    /// Returns `GhError::CommandFailed` if the gh command exits with a non-zero status.
+    fn post_issue_comment(
+        &self,
+        _repo_nwo: &str,
+        _pr: &str,
+        _body: &str,
+    ) -> Result<String, GhError> {
+        Err(GhError::CommandFailed {
+            command: "post_issue_comment".to_owned(),
+            stderr: "not implemented".to_owned(),
+        })
+    }
+
+    /// List all reviews on a PR.
+    ///
+    /// Returns the raw JSON response from the GitHub API.
+    /// Default implementation returns an error to maintain backward compatibility.
+    ///
+    /// # Errors
+    /// Returns `GhError::CommandFailed` if the gh command exits with a non-zero status.
+    fn list_reviews(&self, _repo_nwo: &str, _pr: &str) -> Result<String, GhError> {
+        Err(GhError::CommandFailed {
+            command: "list_reviews".to_owned(),
+            stderr: "not implemented".to_owned(),
+        })
+    }
+
+    /// List all issue comments on a PR.
+    ///
+    /// Returns the raw JSON response from the GitHub API.
+    /// Default implementation returns an error to maintain backward compatibility.
+    ///
+    /// # Errors
+    /// Returns `GhError::CommandFailed` if the gh command exits with a non-zero status.
+    fn list_issue_comments(&self, _repo_nwo: &str, _pr: &str) -> Result<String, GhError> {
+        Err(GhError::CommandFailed {
+            command: "list_issue_comments".to_owned(),
+            stderr: "not implemented".to_owned(),
+        })
+    }
+
+    /// List all inline comments for a specific review on a PR.
+    ///
+    /// Returns the raw JSON response from the GitHub API.
+    /// Default implementation returns an error to maintain backward compatibility.
+    ///
+    /// # Errors
+    /// Returns `GhError::CommandFailed` if the gh command exits with a non-zero status.
+    fn list_review_comments(
+        &self,
+        _repo_nwo: &str,
+        _pr: &str,
+        _review_id: &str,
+    ) -> Result<String, GhError> {
+        Err(GhError::CommandFailed {
+            command: "list_review_comments".to_owned(),
+            stderr: "not implemented".to_owned(),
+        })
+    }
+
+    /// Return the owner/repo string for the current repository.
+    ///
+    /// Default implementation returns an error to maintain backward compatibility.
+    ///
+    /// # Errors
+    /// Returns `GhError::CommandFailed` if the gh command exits with a non-zero status.
+    fn repo_nwo(&self) -> Result<String, GhError> {
+        Err(GhError::CommandFailed {
+            command: "repo_nwo".to_owned(),
+            stderr: "not implemented".to_owned(),
+        })
+    }
 }
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -87,6 +166,31 @@ impl GhClient for SystemGhClient {
         body_file: &Path,
     ) -> Result<String, GhError> {
         create_pr_with(head, base, title, body_file, &run_gh)
+    }
+
+    fn post_issue_comment(&self, repo_nwo: &str, pr: &str, body: &str) -> Result<String, GhError> {
+        post_issue_comment_with(repo_nwo, pr, body, &run_gh)
+    }
+
+    fn list_reviews(&self, repo_nwo: &str, pr: &str) -> Result<String, GhError> {
+        list_reviews_with(repo_nwo, pr, &run_gh)
+    }
+
+    fn list_issue_comments(&self, repo_nwo: &str, pr: &str) -> Result<String, GhError> {
+        list_issue_comments_with(repo_nwo, pr, &run_gh)
+    }
+
+    fn list_review_comments(
+        &self,
+        repo_nwo: &str,
+        pr: &str,
+        review_id: &str,
+    ) -> Result<String, GhError> {
+        list_review_comments_with(repo_nwo, pr, review_id, &run_gh)
+    }
+
+    fn repo_nwo(&self) -> Result<String, GhError> {
+        repo_nwo_with(&run_gh)
     }
 }
 
@@ -211,6 +315,89 @@ where
     if number.is_empty() || number == "null" { Err(GhError::PrNumberUnknown) } else { Ok(number) }
 }
 
+fn post_issue_comment_with<F>(
+    repo_nwo: &str,
+    pr: &str,
+    body: &str,
+    run_gh: &F,
+) -> Result<String, GhError>
+where
+    F: Fn(&[&str]) -> Result<Output, GhError>,
+{
+    let endpoint = format!("repos/{repo_nwo}/issues/{pr}/comments");
+    let body_field = format!("body={body}");
+    let output = run_gh(&["api", &endpoint, "-f", &body_field])?;
+    if output.status.success() {
+        return Ok(String::from_utf8_lossy(&output.stdout).into_owned());
+    }
+    let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+    Err(GhError::CommandFailed { command: format!("api {endpoint}"), stderr })
+}
+
+fn list_reviews_with<F>(repo_nwo: &str, pr: &str, run_gh: &F) -> Result<String, GhError>
+where
+    F: Fn(&[&str]) -> Result<Output, GhError>,
+{
+    let endpoint = format!("repos/{repo_nwo}/pulls/{pr}/reviews");
+    let output = run_gh(&["api", &endpoint, "--paginate"])?;
+    if output.status.success() {
+        return Ok(String::from_utf8_lossy(&output.stdout).into_owned());
+    }
+    let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+    Err(GhError::CommandFailed { command: format!("api {endpoint}"), stderr })
+}
+
+fn list_issue_comments_with<F>(repo_nwo: &str, pr: &str, run_gh: &F) -> Result<String, GhError>
+where
+    F: Fn(&[&str]) -> Result<Output, GhError>,
+{
+    let endpoint = format!("repos/{repo_nwo}/issues/{pr}/comments");
+    let output = run_gh(&["api", &endpoint, "--paginate"])?;
+    if output.status.success() {
+        return Ok(String::from_utf8_lossy(&output.stdout).into_owned());
+    }
+    let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+    Err(GhError::CommandFailed { command: format!("api {endpoint}"), stderr })
+}
+
+fn list_review_comments_with<F>(
+    repo_nwo: &str,
+    pr: &str,
+    review_id: &str,
+    run_gh: &F,
+) -> Result<String, GhError>
+where
+    F: Fn(&[&str]) -> Result<Output, GhError>,
+{
+    let endpoint = format!("repos/{repo_nwo}/pulls/{pr}/reviews/{review_id}/comments");
+    let output = run_gh(&["api", &endpoint, "--paginate"])?;
+    if output.status.success() {
+        return Ok(String::from_utf8_lossy(&output.stdout).into_owned());
+    }
+    let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+    Err(GhError::CommandFailed { command: format!("api {endpoint}"), stderr })
+}
+
+fn repo_nwo_with<F>(run_gh: &F) -> Result<String, GhError>
+where
+    F: Fn(&[&str]) -> Result<Output, GhError>,
+{
+    let output = run_gh(&["repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner"])?;
+    if output.status.success() {
+        let nwo = String::from_utf8_lossy(&output.stdout).trim().to_owned();
+        // Fail-closed: reject empty or "null" output to prevent malformed API endpoints.
+        if nwo.is_empty() || nwo == "null" {
+            return Err(GhError::CommandFailed {
+                command: "repo view".to_owned(),
+                stderr: "repository nameWithOwner is empty or null".to_owned(),
+            });
+        }
+        return Ok(nwo);
+    }
+    let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+    Err(GhError::CommandFailed { command: "repo view".to_owned(), stderr })
+}
+
 fn decode_pr_checks(stdout: &[u8], pr: &str) -> Result<Vec<PrCheckRecord>, GhError> {
     serde_json::from_slice(stdout)
         .map_err(|source| GhError::JsonDecode { pr: pr.to_owned(), source })
@@ -227,8 +414,9 @@ mod tests {
     use rstest::rstest;
 
     use super::{
-        GhError, PrCheckRecord, create_pr_with, decode_pr_checks, find_open_pr_with, merge_pr_with,
-        pr_checks_with,
+        GhError, PrCheckRecord, create_pr_with, decode_pr_checks, find_open_pr_with,
+        list_issue_comments_with, list_review_comments_with, list_reviews_with, merge_pr_with,
+        post_issue_comment_with, pr_checks_with, repo_nwo_with,
     };
 
     fn output(code: i32, stdout: &str, stderr: &str) -> Output {
@@ -434,5 +622,138 @@ mod tests {
         .unwrap_err()
         .to_string();
         assert!(err.contains("could not determine PR number"), "got: {err}");
+    }
+
+    // --- post_issue_comment_with tests ---
+
+    #[test]
+    fn post_issue_comment_with_verifies_argv() {
+        let result = post_issue_comment_with("owner/repo", "42", "hello world", &|args| {
+            assert_eq!(
+                args,
+                ["api", "repos/owner/repo/issues/42/comments", "-f", "body=hello world"]
+            );
+            Ok(output(0, r#"{"id":1,"created_at":"2026-01-01T00:00:00Z"}"#, ""))
+        });
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn post_issue_comment_with_returns_stdout_on_success() {
+        let json = r#"{"id":7,"created_at":"2026-03-01T12:00:00Z"}"#;
+        let result =
+            post_issue_comment_with("owner/repo", "1", "body", &fake_gh(0, json, "")).unwrap();
+        assert_eq!(result, json);
+    }
+
+    #[test]
+    fn post_issue_comment_with_surfaces_stderr_on_failure() {
+        let err = post_issue_comment_with("owner/repo", "1", "body", &fake_gh(1, "", "auth error"))
+            .unwrap_err()
+            .to_string();
+        assert!(err.contains("auth error"), "got: {err}");
+    }
+
+    // --- list_reviews_with tests ---
+
+    #[test]
+    fn list_reviews_with_verifies_argv() {
+        let result = list_reviews_with("owner/repo", "7", &|args| {
+            assert_eq!(args, ["api", "repos/owner/repo/pulls/7/reviews", "--paginate"]);
+            Ok(output(0, r#"[{"id":1,"state":"APPROVED"}]"#, ""))
+        });
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn list_reviews_with_returns_stdout_on_success() {
+        let json = r#"[{"id":1,"state":"APPROVED"}]"#;
+        let result = list_reviews_with("owner/repo", "7", &fake_gh(0, json, "")).unwrap();
+        assert_eq!(result, json);
+    }
+
+    #[test]
+    fn list_reviews_with_surfaces_stderr_on_failure() {
+        let err = list_reviews_with("owner/repo", "7", &fake_gh(1, "", "not found"))
+            .unwrap_err()
+            .to_string();
+        assert!(err.contains("not found"), "got: {err}");
+    }
+
+    // --- list_issue_comments_with tests ---
+
+    #[test]
+    fn list_issue_comments_with_verifies_argv() {
+        let result = list_issue_comments_with("owner/repo", "3", &|args| {
+            assert_eq!(args, ["api", "repos/owner/repo/issues/3/comments", "--paginate"]);
+            Ok(output(0, r#"[{"id":10,"body":"looks good"}]"#, ""))
+        });
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn list_issue_comments_with_returns_stdout_on_success() {
+        let json = r#"[{"id":10,"body":"looks good"}]"#;
+        let result = list_issue_comments_with("owner/repo", "3", &fake_gh(0, json, "")).unwrap();
+        assert_eq!(result, json);
+    }
+
+    #[test]
+    fn list_issue_comments_with_surfaces_stderr_on_failure() {
+        let err = list_issue_comments_with("owner/repo", "3", &fake_gh(1, "", "forbidden"))
+            .unwrap_err()
+            .to_string();
+        assert!(err.contains("forbidden"), "got: {err}");
+    }
+
+    // --- list_review_comments_with tests ---
+
+    #[test]
+    fn list_review_comments_with_verifies_argv() {
+        let result = list_review_comments_with("owner/repo", "5", "99", &|args| {
+            assert_eq!(args, ["api", "repos/owner/repo/pulls/5/reviews/99/comments", "--paginate"]);
+            Ok(output(0, r#"[{"id":20,"body":"nit"}]"#, ""))
+        });
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn list_review_comments_with_returns_stdout_on_success() {
+        let json = r#"[{"id":20,"body":"nit"}]"#;
+        let result =
+            list_review_comments_with("owner/repo", "5", "99", &fake_gh(0, json, "")).unwrap();
+        assert_eq!(result, json);
+    }
+
+    #[test]
+    fn list_review_comments_with_surfaces_stderr_on_failure() {
+        let err =
+            list_review_comments_with("owner/repo", "5", "99", &fake_gh(1, "", "server error"))
+                .unwrap_err()
+                .to_string();
+        assert!(err.contains("server error"), "got: {err}");
+    }
+
+    // --- repo_nwo_with tests ---
+
+    #[test]
+    fn repo_nwo_with_verifies_argv() {
+        let result = repo_nwo_with(&|args| {
+            assert_eq!(args, ["repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner"]);
+            Ok(output(0, "owner/repo\n", ""))
+        });
+        assert_eq!(result.unwrap(), "owner/repo");
+    }
+
+    #[test]
+    fn repo_nwo_with_returns_trimmed_nwo_on_success() {
+        let result = repo_nwo_with(&fake_gh(0, "myorg/myrepo\n", "")).unwrap();
+        assert_eq!(result, "myorg/myrepo");
+    }
+
+    #[test]
+    fn repo_nwo_with_surfaces_stderr_on_failure() {
+        let err = repo_nwo_with(&fake_gh(1, "", "not a git repo")).unwrap_err().to_string();
+        assert!(err.contains("not a git repo"), "got: {err}");
     }
 }
