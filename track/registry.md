@@ -9,7 +9,7 @@
 
 - Latest active track: `None yet`
 - Next recommended command: `/track:plan <feature>`
-- Last updated: `2026-03-15`
+- Last updated: `2026-03-16`
 
 ## Active Tracks
 
@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| auto-mode-design-2026-03-16 | Done | 2026-03-16 |
 | statemachine-rust-2026-03-15 | Done | 2026-03-15 |
 | sotp-bin-placement-2026-03-15 | Done | 2026-03-15 |
 | plan-review-flow-2026-03-15 | Done | 2026-03-15 |
