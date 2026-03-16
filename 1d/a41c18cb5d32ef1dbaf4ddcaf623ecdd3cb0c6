@@ -1,0 +1,18 @@
+## Task Summary: Add planning artifacts and remove strip_thinking_noise for STRAT-03 Phase 5
+
+**Track:** verify-scripts-rust-2026-03-16
+**Task:** Planning artifacts for verify script Rust migration (16 tasks) + wrapper cleanup
+**Date:** 2026-03-16
+
+### Changes
+
+- metadata.json: 16 tasks across 4 sections (S1-S4) for migrating 5 Python verify scripts to sotp verify subcommands
+- spec.md: Feature goal, scope (in/out), constraints, acceptance criteria
+- plan.md: Auto-generated read-only view from metadata.json
+- verification.md: Manual verification steps for all 5 verify commands + CI
+- registry.md: New active track row added
+- review_workflow.rs: Removed strip_thinking_noise function and is_noise_message heuristic (fail-closed approach), consolidated tests from 626 to 622
+
+### Why
+
+STRAT-03 Phase 5 plans the migration of remaining Python verify scripts (verify_tech_stack_ready.py, verify_latest_track_files.py, verify_architecture_docs.py, verify_orchestra_guardrails.py, check_layers.py) to Rust sotp verify subcommands. The strip_thinking_noise removal ensures zero_findings + non-empty findings is always rejected (fail-closed), eliminating false-negative risk from heuristic-based noise filtering.
