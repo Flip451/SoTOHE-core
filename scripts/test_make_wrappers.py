@@ -217,7 +217,7 @@ class MakeWrappersTest(unittest.TestCase):
                 return json.loads(stripped)
         self.fail(f"no JSON payload found in output:\n{output}")
 
-    def test_verify_orchestra_local_uses_python_script(self) -> None:
+    def test_verify_orchestra_local_uses_rust_cli(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
         task_header = "[tasks.verify-orchestra-local]"
         task_start = makefile.index(task_header)
@@ -228,10 +228,10 @@ class MakeWrappersTest(unittest.TestCase):
 
         self.assertIn('script_runner = "@shell"', task_body)
         self.assertIn(
-            "script = ['\"${PYTHON_BIN:-python3}\" scripts/verify_orchestra_guardrails.py']",
+            "script = ['cargo run --quiet -p cli -- verify orchestra']",
             task_body,
         )
-        self.assertNotIn("verify_orchestra_guardrails.sh", task_body)
+        self.assertNotIn("verify_orchestra_guardrails.py", task_body)
 
     def test_track_transition_wrapper_preserves_track_dir_contract(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
@@ -318,38 +318,6 @@ class MakeWrappersTest(unittest.TestCase):
         self.assertIn('if [ "${1:-}" = "--" ]; then shift; fi;', task_body)
         self.assertIn('bin/sotp review codex-local "$@"', task_body)
         self.assertNotIn(', "${@}"', task_body)
-
-    def test_verify_orchestra_local_honors_python_bin_override(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            root = Path(tmp_dir)
-            self.make_fixture(root)
-
-            custom_python = root / "bin" / "custom-python"
-            self.write_text(
-                custom_python,
-                textwrap.dedent(
-                    f"""\
-                    #!/usr/bin/env bash
-                    export VERIFY_ORCHESTRA_WRAPPER_MARKER=custom-python
-                    exec "{sys.executable}" "$@"
-                    """
-                ),
-            )
-            os.chmod(custom_python, 0o755)
-
-            result = self.run_make(
-                root,
-                "verify-orchestra-local",
-                allow_private=True,
-                env_updates={"PYTHON_BIN": str(custom_python)},
-            )
-
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            payload = self.parse_json_line(result.stdout)
-            self.assertEqual(payload["script"], "verify_orchestra_guardrails.py")
-            self.assertEqual(payload["argv"], [])
-            self.assertEqual(payload["python"], str(sys.executable))
-            self.assertEqual(payload["wrapper_marker"], "custom-python")
 
     def test_guides_wrappers_smoke(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
