@@ -1,0 +1,17 @@
+## Task Summary: Add planning artifacts for STRAT-03 Phase 3 cleanup
+
+**Track:** py-workflow-cleanup-2026-03-16
+**Task:** Planning artifacts creation (spec, metadata, verification, plan)
+**Date:** 2026-03-16
+
+### Changes
+
+- metadata.json: Track definition with 6 tasks for dead Python script cleanup
+- spec.md: Scope, constraints, and acceptance criteria for git_ops/branch_switch/pr_merge deletion
+- verification.md: Manual verification checklist template
+- plan.md: Auto-generated view from metadata.json
+- registry.md: Updated Current Focus to new track
+
+### Why
+
+STRAT-03 Phase 3 removes Python git workflow scripts (git_ops.py, branch_switch.py, pr_merge.py) that have been fully replaced by Rust sotp CLI. This commit establishes the track plan before implementation.
