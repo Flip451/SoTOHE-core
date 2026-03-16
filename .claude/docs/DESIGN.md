@@ -1270,3 +1270,118 @@ _None at this time._
 | 2026-03-11 | Codex review R9 fixes: serde parse failure per event type, risk table per-event exit code, --pid CLI-arg-only (no env var) |
 | 2026-03-11 | Codex review R10 fixes: risk table tool_name per-event, HookContext.project_dir Optional (guard works without CLAUDE_PROJECT_DIR) |
 | 2026-03-12 | Feature branch strategy: per-track branches, branch-aware resolution, guard policy extension (Codex planner) |
+| 2026-03-16 | Auto mode design spike (MEMO-15): 6-phase state machine, auto-state.json persistence, escalation UI |
+
+## Auto Mode (MEMO-15 Design Spike)
+
+`/track:auto` provides autonomous track execution with a 6-phase cycle per commit unit
+and human escalation for design decisions.
+
+### Phase State Machine
+
+```mermaid
+flowchart TD
+    Plan[Plan] --> PlanReview[PlanReview]
+    PlanReview -->|zero_findings| TypeDesign[TypeDesign]
+    PlanReview -->|P2+: design issue| Plan
+    PlanReview -->|P1: fix in place| Plan
+    TypeDesign --> TypeReview[TypeReview]
+    TypeReview -->|zero_findings| Implement[Implement]
+    TypeReview -->|P3: design issue| Plan
+    TypeReview -->|P2: type change| TypeDesign
+    TypeReview -->|P1: fix in place| TypeDesign
+    Implement --> CodeReview[CodeReview]
+    CodeReview -->|zero_findings| Committed[Committed]
+    CodeReview -->|P3: design issue| Plan
+    CodeReview -->|P2: type change| TypeDesign
+    CodeReview -->|P1: impl fix| Implement
+    Plan -.->|unresolvable| Escalated[Escalated]
+    PlanReview -.->|unresolvable| Escalated
+    TypeDesign -.->|unresolvable| Escalated
+    TypeReview -.->|unresolvable| Escalated
+    Implement -.->|unresolvable| Escalated
+    CodeReview -.->|unresolvable| Escalated
+    Escalated -->|"--resume (returns to phase that escalated)"| Plan
+    Escalated -.->|or| TypeDesign
+    Escalated -.->|or| Implement
+    Escalated -.->|or| PlanReview
+    Escalated -.->|or| TypeReview
+    Escalated -.->|or| CodeReview
+```
+
+### Canonical Blocks
+
+```rust
+// auto_phase.rs — domain layer
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum AutoPhase {
+    Plan,
+    PlanReview,
+    TypeDesign,
+    TypeReview,
+    Implement,
+    CodeReview,
+    Escalated,
+    Committed,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RollbackTarget {
+    Plan,
+    TypeDesign,
+    Implement,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AutoPhaseTransition {
+    Advance,
+    Rollback(RollbackTarget),
+    Escalate { reason: String },
+    Resume { decision: String },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum FindingSeverity {
+    P1, // Minor fix — rollback target is phase-specific (see rollback_target())
+    P2, // Type-level issue — rollback target is phase-specific
+    P3, // Design-level issue — always rolls back to Plan
+}
+
+// Phase-specific rollback rules:
+// PlanReview:  P1/P2/P3 → Plan
+// TypeReview:  P3 → Plan, P2/P1 → TypeDesign
+// CodeReview:  P3 → Plan, P2 → TypeDesign, P1 → Implement
+// See rollback_target(current_phase, severity) in auto_phase.rs
+
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+pub enum AutoPhaseError {
+    #[error("invalid auto-phase transition: {from} cannot {action}")]
+    InvalidTransition { from: String, action: String },
+    #[error("cannot resume: phase is '{phase}', not escalated")]
+    NotEscalated { phase: String },
+    #[error("rollback from '{from}' to '{to}' is not allowed")]
+    InvalidRollback { from: String, to: String },
+}
+```
+
+### Configuration
+
+- **Phase config**: `.claude/auto-mode-config.json` — maps phases to capabilities from `agent-profiles.json`
+- **Session state**: `track/items/<id>/auto-state.json` — ephemeral, not git-tracked; cross-session persistence for escalation/resume; deleted on completion/abort
+- **Schema docs**: `.claude/docs/schemas/auto-state-schema.md`, `.claude/docs/schemas/auto-mode-config-schema.md`
+
+### Design Docs
+
+- Agent briefings: `.claude/docs/designs/auto-mode-agent-briefings.md`
+- Escalation UI: `.claude/docs/designs/auto-mode-escalation-ui.md`
+- Integration with /track:full-cycle: `.claude/docs/designs/auto-mode-integration.md`
+
+### Key Design Decisions
+
+| Decision | Rationale |
+|----------|-----------|
+| auto-state.json is ephemeral session state, metadata.json remains SSoT | Prevents dual-SSoT conflict; auto-state references task IDs but never modifies task status directly |
+| 6 phases with severity-based rollback | P1→Implement, P2→TypeDesign, P3→Plan; minimizes rework while ensuring design issues are caught early |
+| Separate config file (.claude/auto-mode-config.json) | Decouples auto-mode parameters from agent-profiles.json; phase→capability mapping with delegated provider resolution |
+| Escalation exits process cleanly (exit 1) | Conversation not blocked; state persisted for async human decision; --resume with decision text |
+| Domain layer AutoPhase enum (no method bodies in spike) | Type signatures only; implementation deferred to follow-up track |
