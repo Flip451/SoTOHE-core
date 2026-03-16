@@ -3057,7 +3057,7 @@ class VerifyScriptsTest(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("schema_version", plan_doc)
         self.assertIn("match the created track directory name", plan_doc)
-        self.assertIn("render_plan()", plan_doc)
+        self.assertIn("track-sync-views", plan_doc)
         self.assertIn("read-only view", plan_doc)
 
         implement_doc = (

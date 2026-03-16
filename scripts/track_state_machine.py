@@ -14,8 +14,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from track_branch_guard import verify_track_branch
-from track_markdown import render_plan
-from track_registry import collect_track_metadata, render_registry
 from track_schema import (
     COMMIT_HASH_RE,
     VALID_OVERRIDE_STATUSES,
@@ -29,6 +27,26 @@ _SENTINEL = object()
 """Sentinel for 'current_branch not provided' in _save_metadata()."""
 _SOTP_TRACK_SYNC_BINARY: str | None = None
 _SOTP_TRACK_SYNC_SEARCHED = False
+
+
+def _find_sotp_binary() -> str | None:
+    """Find sotp binary: SOTP_CLI_BINARY env, bin/sotp, target builds, then PATH."""
+    from os import environ
+
+    if environ.get("SOTP_CLI_BINARY"):
+        return environ["SOTP_CLI_BINARY"]
+
+    project_root = Path(__file__).resolve().parent.parent
+    for candidate_path in (
+        "bin/sotp",
+        "target/release/sotp",
+        "target/debug/sotp",
+    ):
+        candidate = project_root / candidate_path
+        if candidate.is_file():
+            return str(candidate)
+
+    return shutil.which("sotp")
 
 
 class TransitionError(Exception):
@@ -208,7 +226,7 @@ def _try_sotp_transition(
     (not installed or missing the ``track`` subcommand).
     Raises TransitionError if sotp ran a recognized transition but failed.
     """
-    sotp = shutil.which("sotp")
+    sotp = _find_sotp_binary()
     if sotp is None:
         return False
 
@@ -270,6 +288,11 @@ def _find_sotp_for_track_views_sync() -> str | None:
         candidates.append(environ["SOTP_CLI_BINARY"])
 
     project_root = Path(__file__).resolve().parent.parent
+    # Check bin/sotp first (standard install location)
+    bin_sotp = project_root / "bin" / "sotp"
+    if bin_sotp.is_file():
+        candidates.append(str(bin_sotp))
+
     for build_path in ("target/debug/sotp", "target/release/sotp"):
         candidate = project_root / build_path
         if candidate.is_file():
@@ -333,23 +356,25 @@ def transition_task(
 ) -> None:
     """Transition a task to a new status. Raises TransitionError on invalid transition.
 
-    When ``now`` is None (production path), delegates to ``sotp track transition``
-    for atomic read-modify-write with file locking.  Falls back to the Python
-    implementation if ``sotp`` is not available or ``now`` is explicitly set
-    (test determinism).
+    Production path delegates to ``sotp track transition`` (required).
+    The ``now`` parameter is only used by tests for deterministic timestamps;
+    when set, the Python fallback is used instead.
     """
-    # Delegate to Rust CLI for atomic locking when available.
-    # Skip delegation when `now` is provided (tests need deterministic timestamps).
-    if now is None:
-        if _try_sotp_transition(
-            track_dir, task_id, new_status, commit_hash=commit_hash
-        ):
-            return
-        # sotp not found — use Python implementation (no fallback on CLI errors).
+    # Test path: use Python implementation for deterministic timestamps.
+    if now is not None:
+        _transition_task_python(
+            track_dir, task_id, new_status, commit_hash=commit_hash, now=now
+        )
+        return
 
-    _transition_task_python(
-        track_dir, task_id, new_status, commit_hash=commit_hash, now=now
-    )
+    # Production path: sotp is required.
+    if not _try_sotp_transition(
+        track_dir, task_id, new_status, commit_hash=commit_hash
+    ):
+        raise TransitionError(
+            "sotp binary not found or does not support 'track transition'. "
+            "Run 'cargo make build-sotp' to build it."
+        )
 
 
 def _transition_task_python(
@@ -481,57 +506,18 @@ def sync_rendered_views(
     *,
     track_id: str | None = None,
 ) -> list[Path]:
-    """Render plan.md and registry.md from metadata.json for specified or all tracks."""
+    """Render plan.md and registry.md from metadata.json for specified or all tracks.
+
+    Delegates to sotp CLI (required). Raises TransitionError if sotp is unavailable.
+    """
     delegated = _try_sotp_sync_views(root, track_id=track_id)
     if delegated is not None:
         return delegated
 
-    changed: list[Path] = []
-    track_root = root / "track" / "items"
-
-    if track_id:
-        dirs = [track_root / track_id]
-    else:
-        dirs = (
-            sorted(p for p in track_root.iterdir() if p.is_dir())
-            if track_root.exists()
-            else []
-        )
-
-    for track_dir in dirs:
-        metadata_file = track_dir / "metadata.json"
-        if not metadata_file.exists():
-            continue
-
-        data = _load_metadata(track_dir)
-        if data.get("schema_version") not in (2, 3):
-            continue
-
-        meta = parse_metadata_v2(data)
-        plan_content = render_plan(meta)
-        plan_file = track_dir / "plan.md"
-        old_plan = plan_file.read_text(encoding="utf-8") if plan_file.exists() else None
-        if old_plan != plan_content:
-            from atomic_write import atomic_write_file as _atomic_write
-
-            _atomic_write(plan_file, plan_content)
-            changed.append(plan_file)
-
-    # Render registry.md (always uses all tracks, regardless of track_id filter)
-    tracks = collect_track_metadata(root)
-    registry_content = render_registry(tracks)
-    registry_path = root / "track" / "registry.md"
-    registry_path.parent.mkdir(parents=True, exist_ok=True)
-    old_content = (
-        registry_path.read_text(encoding="utf-8") if registry_path.exists() else None
+    raise TransitionError(
+        "sotp binary not found or does not support 'track views sync'. "
+        "Run 'cargo make build-sotp' to build it."
     )
-    if old_content != registry_content:
-        from atomic_write import atomic_write_file as _atomic_write_reg
-
-        _atomic_write_reg(registry_path, registry_content)
-        changed.append(registry_path)
-
-    return changed
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -580,19 +566,27 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[OK] {args.task_id}: transitioned to {args.status}")
         # Auto-sync rendered views
         root = track_dir.parent.parent.parent  # track/items/<id> -> project root
-        changed = sync_rendered_views(root, track_id=track_dir.name)
-        for p in changed:
-            print(f"[OK] Rendered: {p.relative_to(root)}")
+        try:
+            changed = sync_rendered_views(root, track_id=track_dir.name)
+            for p in changed:
+                print(f"[OK] Rendered: {p.relative_to(root)}")
+        except TransitionError as e:
+            print(f"[ERROR] transition persisted but sync-views failed: {e}", file=sys.stderr)
+            return 1
         return 0
 
     if args.command == "sync-views":
         root = Path(".")
-        changed = sync_rendered_views(root, track_id=args.track_id)
-        if not changed:
-            print("[OK] All views already up to date")
-        else:
-            for p in changed:
-                print(f"[OK] Rendered: {p.relative_to(root)}")
+        try:
+            changed = sync_rendered_views(root, track_id=args.track_id)
+            if not changed:
+                print("[OK] All views already up to date")
+            else:
+                for p in changed:
+                    print(f"[OK] Rendered: {p.relative_to(root)}")
+        except TransitionError as e:
+            print(f"[ERROR] {e}", file=sys.stderr)
+            return 1
         return 0
 
     parser.print_help()

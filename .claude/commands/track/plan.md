@@ -33,7 +33,7 @@ After approval — create track artifacts:
 - After writing metadata.json, create and switch to the track branch:
   - Run `cargo make track-branch-create '<track-id>'` to create branch `track/<track-id>` and switch to it.
   - If branch creation fails (e.g. branch already exists), switch to it with `cargo make track-branch-switch '<track-id>'` instead.
-- Generate `plan.md` from `metadata.json` via `scripts/track_markdown.py` `render_plan()`. Do NOT write `plan.md` directly — it is a read-only view rendered from metadata.json.
+- Generate `plan.md` from `metadata.json` via `cargo make track-sync-views` (delegates to `sotp track views sync`). Do NOT write `plan.md` directly — it is a read-only view rendered from metadata.json.
 - Include a `## Related Conventions (Required Reading)` section in `plan.md` listing repo-relative paths to relevant `project-docs/conventions/*.md` files. If none apply, write `None`. Do not use `- [ ]` checkbox format (conflicts with task parser).
 - If `plan.md` needs an architecture or dependency diagram, use Mermaid `flowchart TD`.
 - Do not use ASCII box drawings in `plan.md`.

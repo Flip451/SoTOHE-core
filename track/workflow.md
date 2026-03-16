@@ -124,29 +124,33 @@ Specialist capability の実体は `.claude/agent-profiles.json` で決まる。
 ## plan.md と metadata.json SSoT
 
 `metadata.json`（`schema_version: 3`）がタスク状態の唯一の真実の源泉（SSoT）。
-`plan.md` は `scripts/track_markdown.py` の `render_plan()` で `metadata.json` から生成される **読み取り専用ビュー** であり、直接編集してはならない。
+`plan.md` は `cargo make track-sync-views`（`sotp track views sync`）で `metadata.json` から生成される **読み取り専用ビュー** であり、直接編集してはならない。
 
 ### 二段階ライフサイクル
 
 `plan.md` と `metadata.json` には初回作成と以降の更新で扱いが異なる：
 
-1. **初回作成**（`/track:plan` の承認後）: `metadata.json` を作成し、`plan.md` は `render_plan()` で生成する。初回から SSoT モデルに従う
-2. **以降の更新**: タスク状態の変更は `transition_task()` / `add_task()` / `set_track_override()` 経由で `metadata.json` を更新し、`plan.md` は `render_plan()` で再生成する。直接編集は禁止
+1. **初回作成**（`/track:plan` の承認後）: `metadata.json` を作成し、`plan.md` は `cargo make track-sync-views` で生成する。初回から SSoT モデルに従う
+2. **以降の更新**: タスク状態の変更は `sotp track` サブコマンド経由で `metadata.json` を更新し、`plan.md` は自動再生成される。直接編集は禁止
 
 ### 状態遷移 API
 
-状態遷移は `scripts/track_state_machine.py` の API を経由する：
-- `transition_task()`: タスクの状態遷移（todo → in_progress → done / skipped）
-- `add_task()`: 新タスクの追加
-- `set_track_override()`: トラック全体のブロック/キャンセル
+状態遷移は `sotp track` サブコマンド（Rust CLI）を経由する：
+- `sotp track transition`: タスクの状態遷移（todo → in_progress → done / skipped）
+- `sotp track add-task`: 新タスクの追加
+- `sotp track set-override` / `clear-override`: トラック全体のブロック/キャンセル
+- `sotp track next-task`: 次の作業対象タスクの取得（JSON）
+- `sotp track task-counts`: タスク集計の取得（JSON）
+
+対応する `cargo make` wrapper: `track-transition`, `track-add-task`, `track-set-override`, `track-next-task`, `track-task-counts`
 
 CI（`verify-plan-progress`）は `plan.md` と `metadata.json` からのレンダリング結果が一致することを検証する。
 
 ### 関連ファイル
 
-- `scripts/track_schema.py`: データモデル・バリデーション
-- `scripts/track_state_machine.py`: 状態遷移 API
-- `scripts/track_markdown.py`: plan.md レンダラー
+- `sotp track` サブコマンド群（Rust CLI）: 状態遷移・ビュー生成の主要実装
+- `scripts/track_schema.py`: データモデル・バリデーション（Python、verify script から参照。将来 Phase 5 で Rust 化予定）
+- `scripts/track_state_machine.py`: レガシー状態遷移 API（Python、テスト用フォールバックのみ残存。production は sotp 必須）
 
 詳細な更新タイミングと commit 前チェックは `TRACK_TRACEABILITY.md` を参照する。
 

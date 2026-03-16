@@ -1,0 +1,128 @@
+{
+  "branch": "track/statemachine-rust-2026-03-15",
+  "created_at": "2026-03-15T12:00:00+00:00",
+  "id": "statemachine-rust-2026-03-15",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "TrackMetadata にタスク追加のドメインロジックを実装する。",
+          "next_task_id() で連番 TaskId 生成、add_task() で tasks + section.task_ids を更新し、validate_plan_invariants() で整合性を保証。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Domain 層 — タスク追加メソッド"
+      },
+      {
+        "description": [
+          "TrackWriter::update() 経由の atomic RMW でタスク追加とオーバーライド操作を実装。",
+          "既存の TransitionTaskUseCase と同じパターンに従う。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002",
+          "T003"
+        ],
+        "title": "Usecase 層 — 新ユースケース"
+      },
+      {
+        "description": [
+          "sotp track に add-task, set-override, clear-override, next-task, task-counts サブコマンドを追加。",
+          "next-task と task-counts は JSON 出力でスクリプトから解析可能にする。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T004",
+          "T005",
+          "T006",
+          "T007"
+        ],
+        "title": "CLI 層 — 新サブコマンド"
+      },
+      {
+        "description": [
+          "Makefile.toml に wrapper タスクを追加し、bin/sotp をリビルド。"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T008"
+        ],
+        "title": "Makefile 統合 + bin/sotp 更新"
+      },
+      {
+        "description": [
+          "track_state_machine.py の Python フォールバックを削除し sotp を必須化。",
+          "ドキュメント参照を更新し、deprecated マーキングを追加。"
+        ],
+        "id": "S5",
+        "task_ids": [
+          "T009",
+          "T010"
+        ],
+        "title": "Python 削減"
+      }
+    ],
+    "summary": [
+      "STRAT-03 Phase 2: track_state_machine.py / track_schema.py / track_markdown.py の中核責務を sotp track サブコマンドに移行する。",
+      "transition と sync-views は既に Rust 実装済み。残りの add-task, set-override, next-task, task-counts を CLI サブコマンドとして追加し、Python フォールバックを除去する。"
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "Domain 層: TrackMetadata::add_task() + next_task_id() メソッド追加",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "Usecase 層: AddTaskUseCase（atomic RMW でタスク追加）",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "Usecase 層: SetOverrideUseCase（atomic RMW でオーバーライド設定/解除）",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "CLI 層: sotp track add-task サブコマンド（--section/--after オプション + ブランチガード）",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "CLI 層: sotp track set-override / clear-override サブコマンド（ブランチガード付き）",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "CLI 層: sotp track next-task サブコマンド（plan section 順 + in_progress 優先 + JSON スキーマ準拠）",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "description": "CLI 層: sotp track task-counts サブコマンド（total/todo/in_progress/done/skipped の JSON スキーマ準拠）",
+      "id": "T007",
+      "status": "done"
+    },
+    {
+      "description": "Makefile 統合: wrapper タスク追加 + bin/sotp リビルド",
+      "id": "T008",
+      "status": "done"
+    },
+    {
+      "description": "Python 削減: track_state_machine.py の Python フォールバック削除 + sotp 必須化",
+      "id": "T009",
+      "status": "done"
+    },
+    {
+      "description": "ドキュメント更新: deprecated マーキング + /track:plan コマンド参照更新",
+      "id": "T010",
+      "status": "done"
+    }
+  ],
+  "title": "STRAT-03 Phase 2: Track state machine の Rust 化",
+  "updated_at": "2026-03-15T14:55:21Z"
+}
