@@ -1,0 +1,20 @@
+## Task Summary: Delete dead Python git workflow scripts and fix stale docs
+
+**Track:** py-workflow-cleanup-2026-03-16
+**Task:** T001-T006 — STRAT-03 Phase 3 full implementation
+**Date:** 2026-03-16
+
+### Changes
+
+- scripts/git_ops.py: Deleted (replaced by sotp git subcommands)
+- scripts/branch_switch.py: Deleted (replaced by sotp git switch-and-pull)
+- scripts/pr_merge.py: Deleted (replaced by sotp pr subcommands)
+- scripts/test_git_ops.py: Deleted (Rust tests cover this)
+- scripts/test_make_wrappers.py: Removed GIT_OPS_STUB and git_ops.py fixture references
+- Makefile.toml: Removed test_git_ops.py from scripts-selftest list
+- .claude/commands/track/merge.md: Updated reference to bin/sotp pr wait-and-merge
+- track/workflow.md: Updated reference to sotp git note-from-file
+
+### Why
+
+STRAT-03 Phase 3 removes Python git workflow scripts that were fully replaced by Rust CLI (sotp git/pr) in prior tracks. This eliminates 1324 lines of dead Python code and fixes stale documentation references.
