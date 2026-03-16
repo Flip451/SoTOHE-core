@@ -1,83 +1,83 @@
 {
-  "schema_version": 3,
-  "id": "py-workflow-cleanup-2026-03-16",
   "branch": "track/py-workflow-cleanup-2026-03-16",
-  "title": "STRAT-03 Phase 3: Git workflow Python scripts cleanup",
-  "status": "planned",
   "created_at": "2026-03-16T02:00:00+00:00",
-  "updated_at": "2026-03-16T02:00:00+00:00",
-  "tasks": [
-    {
-      "id": "T001",
-      "description": "Delete dead Python scripts: git_ops.py, branch_switch.py, pr_merge.py",
-      "status": "todo"
-    },
-    {
-      "id": "T002",
-      "description": "Delete test_git_ops.py and remove from Makefile.toml scripts-selftest list",
-      "status": "todo"
-    },
-    {
-      "id": "T003",
-      "description": "Update test_make_wrappers.py: remove git_ops.py fixture/stub references",
-      "status": "todo"
-    },
-    {
-      "id": "T004",
-      "description": "Fix stale docs: .claude/commands/track/merge.md and track/workflow.md Python references",
-      "status": "todo"
-    },
-    {
-      "id": "T005",
-      "description": "Update tmp/TODO.md: mark STRAT-03 Phase 3 as complete",
-      "status": "todo"
-    },
-    {
-      "id": "T006",
-      "description": "Verify cargo make ci passes",
-      "status": "todo"
-    }
-  ],
+  "id": "py-workflow-cleanup-2026-03-16",
   "plan": {
-    "summary": [
-      "STRAT-03 Phase 3 のクリーンアップトラック。",
-      "git_ops.py / branch_switch.py / pr_merge.py の Rust 移行は既に完了済み（sotp git/pr サブコマンド）。",
-      "残留するデッドコード Python スクリプトの削除とドキュメントの stale 参照修正を行う。"
-    ],
     "sections": [
       {
-        "id": "S1",
-        "title": "Python スクリプト削除",
         "description": [
           "呼び出し元がなくなった Python スクリプトとそのテストを削除し、Makefile.toml の selftest リストを更新する。"
         ],
+        "id": "S1",
         "task_ids": [
           "T001",
           "T002",
           "T003"
-        ]
+        ],
+        "title": "Python スクリプト削除"
       },
       {
-        "id": "S2",
-        "title": "ドキュメント修正",
         "description": [
           "Python スクリプト参照が残っているドキュメントを Rust CLI (bin/sotp) 参照に更新する。"
         ],
+        "id": "S2",
         "task_ids": [
           "T004"
-        ]
+        ],
+        "title": "ドキュメント修正"
       },
       {
-        "id": "S3",
-        "title": "完了処理",
         "description": [
           "TODO.md の進捗更新と CI 通過確認。"
         ],
+        "id": "S3",
         "task_ids": [
           "T005",
           "T006"
-        ]
+        ],
+        "title": "完了処理"
       }
+    ],
+    "summary": [
+      "STRAT-03 Phase 3 のクリーンアップトラック。",
+      "git_ops.py / branch_switch.py / pr_merge.py の Rust 移行は既に完了済み（sotp git/pr サブコマンド）。",
+      "残留するデッドコード Python スクリプトの削除とドキュメントの stale 参照修正を行う。"
     ]
-  }
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "Delete dead Python scripts: git_ops.py, branch_switch.py, pr_merge.py",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "Delete test_git_ops.py and remove from Makefile.toml scripts-selftest list",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "Update test_make_wrappers.py: remove git_ops.py fixture/stub references",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "Fix stale docs: .claude/commands/track/merge.md and track/workflow.md Python references",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "Update tmp/TODO.md: mark STRAT-03 Phase 3 as complete",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "Verify cargo make ci passes",
+      "id": "T006",
+      "status": "done"
+    }
+  ],
+  "title": "STRAT-03 Phase 3: Git workflow Python scripts cleanup",
+  "updated_at": "2026-03-16T04:01:19Z"
 }

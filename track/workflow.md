@@ -264,7 +264,7 @@ cargo make track-note
 cargo make note "note text here"
 ```
 
-`cargo make track-note` は file-based wrapper（`git_ops.py note-from-file`）経由で note を適用する。
+`cargo make track-note` は file-based wrapper（`sotp git note-from-file`）経由で note を適用する。
 `cargo make note` は低レベル経路で `git notes add -f -m "$CARGO_MAKE_TASK_ARGS" HEAD` を直接実行する。
 自動化フローでは `tmp/track-commit/` を使う file-based wrapper を優先すること。
 
