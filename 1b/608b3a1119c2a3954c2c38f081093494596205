@@ -1,0 +1,20 @@
+## Task Summary: Verify script Rust migration (STRAT-03 Phase 5)
+
+**Track:** verify-scripts-rust-2026-03-16
+**Task:** Migrate 5 Python verify scripts to sotp verify subcommands
+**Date:** 2026-03-16
+
+### Changes
+
+- libs/domain/src/verify.rs: VerifyOutcome, Finding, Severity domain types
+- libs/infrastructure/src/verify/: 7 verification modules (tech_stack, latest_track, architecture_rules, doc_patterns, convention_docs, orchestra, layers)
+- apps/cli/src/commands/verify.rs: sotp verify subcommand group with --project-root flag
+- Makefile.toml: verify-*-local tasks switched from Python to Rust CLI
+- scripts/: 5 Python verify scripts deleted, external_guides.py updated
+- scripts/test_make_wrappers.py, test_track_schema.py: updated for migration
+
+### Why
+
+STRAT-03 Phase 5 reduces CI Python dependency by migrating verify scripts to Rust.
+All 5 verify checks (tech-stack, latest-track, arch-docs, layers, orchestra) now run
+via `sotp verify` with full fail-closed parity validated through 9 rounds of Codex review.
