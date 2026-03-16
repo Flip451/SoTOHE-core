@@ -7,15 +7,15 @@
 
 ## Current Focus
 
-- Latest active track: `None yet`
-- Next recommended command: `/track:plan <feature>`
-- Last updated: `2026-03-16`
+- Latest active track: `python-optional-2026-03-16`
+- Next recommended command: `/track:activate python-optional-2026-03-16`
+- Last updated: `2026-03-17`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| _No active tracks yet_ | - | `/track:plan <feature>` | - |
+| python-optional-2026-03-16 | planned | `/track:activate python-optional-2026-03-16` | 2026-03-17 |
 
 ## Completed Tracks
 
