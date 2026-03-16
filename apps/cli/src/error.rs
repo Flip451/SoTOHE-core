@@ -47,6 +47,9 @@ pub enum CliError {
     #[error("{0}")]
     ReviewWorkflow(#[from] usecase::review_workflow::ReviewWorkflowError),
 
+    #[error("{0}")]
+    PrReview(#[from] usecase::pr_review::PrReviewError),
+
     /// Generic message for errors that don't fit a specific variant.
     #[error("{0}")]
     Message(String),

@@ -168,6 +168,7 @@ checksum = "3a822ea5bc7590f9d40f1ba12c0dc3c2760f3482c6984db1573ad11031420831"
 name = "cli"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "clap",
  "domain",
  "infrastructure",
@@ -763,9 +764,11 @@ name = "usecase"
 version = "0.1.0"
 dependencies = [
  "domain",
+ "regex",
  "rstest",
  "serde",
  "serde_json",
+ "tempfile",
  "thiserror",
 ]
 
