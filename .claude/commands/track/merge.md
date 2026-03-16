@@ -23,7 +23,7 @@ Run the merge wrapper:
 cargo make track-pr-merge <pr_number> --method <method>
 ```
 
-This executes `scripts/pr_merge.py wait-and-merge` which:
+This executes `bin/sotp pr wait-and-merge` which:
 1. Polls `gh pr checks` every 15 seconds (10 minute timeout)
 2. On all checks passed: merges via `gh pr merge --<method>`
 3. On any check failed: stops and reports failures
