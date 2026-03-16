@@ -7,15 +7,15 @@
 
 ## Current Focus
 
-- Latest active track: `None yet`
-- Next recommended command: `/track:plan <feature>`
-- Last updated: `2026-03-15`
+- Latest active track: `auto-mode-design-2026-03-16`
+- Next recommended command: `/track:implement`
+- Last updated: `2026-03-16`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| _No active tracks yet_ | - | `/track:plan <feature>` | - |
+| auto-mode-design-2026-03-16 | planned | `/track:implement` | 2026-03-16 |
 
 ## Completed Tracks
 
