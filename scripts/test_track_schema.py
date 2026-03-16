@@ -699,11 +699,10 @@ class TrackItemsDirConsistencyTest(unittest.TestCase):
         from pathlib import Path
 
         migrated_scripts = [
-            "verify_plan_progress.py",
-            "verify_track_metadata.py",
             "track_registry.py",
-            # verify_latest_track_files.py and verify_tech_stack_ready.py
-            # migrated to Rust (sotp verify latest-track / tech-stack).
+            # verify_plan_progress.py, verify_track_metadata.py,
+            # verify_latest_track_files.py, and verify_tech_stack_ready.py
+            # migrated to Rust (sotp verify).
         ]
         scripts_dir = Path(__file__).parent
 

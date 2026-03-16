@@ -124,6 +124,7 @@ args = [
   "scripts/test_track_state_machine.py",
   "scripts/test_track_branch_guard.py",
   "scripts/test_track_registry.py",
+  "scripts/test_track_resolution.py",
 ]
 
 [tasks.scripts-selftest]

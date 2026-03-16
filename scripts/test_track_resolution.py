@@ -44,7 +44,7 @@ class TrackResolutionTest(unittest.TestCase):
             [
                 sys.executable,
                 "-c",
-                "import sys; sys.path = ['.', *sys.path]; import scripts.track_resolution, scripts.track_registry, scripts.verify_latest_track_files, scripts.external_guides",
+                "import sys; sys.path = ['.', *sys.path]; import scripts.track_resolution, scripts.track_registry, scripts.external_guides",
             ],
             cwd=repo_root,
             capture_output=True,
