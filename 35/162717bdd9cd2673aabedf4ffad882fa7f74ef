@@ -1,0 +1,18 @@
+## Task Summary: PR review orchestration Rust migration
+
+**Track:** pr-review-rust-2026-03-16
+**Task:** STRAT-03 Phase 4: PR review orchestration の Rust 化 (T001-T008 all done)
+**Date:** 2026-03-16
+
+### Changes
+
+- libs/infrastructure/src/gh_cli.rs: GhClient trait に PR review 系メソッド追加 (post_issue_comment, list_reviews, list_issue_comments, list_review_comments, repo_nwo_with)
+- libs/usecase/src/pr_review.rs: ReviewFinding/ReviewResult 型、severity 分類、review body パース、paginated JSON パース、sanitize_text
+- apps/cli/src/commands/pr.rs: trigger-review, poll-review, review-cycle サブコマンド実装
+- apps/cli/src/error.rs: PrReview エラーバリアント追加
+- Makefile.toml: track-pr-review を Rust バイナリに切替
+- scripts/pr_review.py, scripts/test_pr_review.py: 削除
+
+### Why
+
+STRAT-03 Phase 4 として scripts/pr_review.py の全責務を sotp pr サブコマンド群に移行し、/track:pr-review が Python 非依存で成立するようにした。M2 マイルストーン（Python 最小化）に直結する変更。
