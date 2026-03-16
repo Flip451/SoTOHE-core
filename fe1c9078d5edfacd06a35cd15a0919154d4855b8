@@ -1,0 +1,26 @@
+## Task Summary: MEMO-15 auto mode design spike — all design artifacts
+
+**Track:** auto-mode-design-2026-03-16
+**Task:** T001–T007 (6-phase state machine, schemas, agent briefings, escalation UI, integration, DESIGN.md)
+**Date:** 2026-03-16
+
+### Changes
+
+- libs/domain/src/auto_phase.rs: AutoPhase enum, phase-aware rollback_target(), FindingSeverity, transition types, 12 tests
+- .claude/docs/schemas/auto-state-schema.md: JSON Schema + Rust types for ephemeral session state (ActivePhase, EscalationInfo with resume_phase)
+- .claude/docs/schemas/auto-mode-config-schema.md: JSON Schema + Rust types for phase config (Capability enum, timeout_seconds)
+- .claude/docs/designs/auto-mode-agent-briefings.md: Prompt templates for all 6 phases with severity/rollback rules
+- .claude/docs/designs/auto-mode-escalation-ui.md: CLI interface design, --resume flow, provider-agnostic error handling
+- .claude/docs/designs/auto-mode-integration.md: /track:full-cycle coexistence, migration strategy
+- .claude/docs/DESIGN.md: Canonical blocks (AutoPhase, transitions, errors), Mermaid state diagram
+- .claude/rules/10-guardrails.md: New file creation pattern (Read+Write), hook constraint docs
+- .gitignore: **/auto-state.json excluded
+- track/items/auto-mode-design-2026-03-16/: metadata.json (all tasks done), spec.md, plan.md, verification.md updated
+
+### Why
+
+MEMO-15 design spike to define the autonomous execution mode (/track:auto) architecture.
+The 6-phase state machine with phase-aware rollback, typed escalation state (ActivePhase for
+resume targets), and provider-agnostic capability resolution form the foundation for future
+implementation. 21 issues found and fixed during Codex reviewer cycle (P0: next_phase logic,
+P1: schema invariants, type safety, serde annotations, provider-agnostic design).
