@@ -18,9 +18,9 @@
       },
       {
         "description": [
-          "ci-local の依存チェーンから Python タスクを分離し、",
-          "新タスク ci-python-local を追加する。",
-          ".venv 不在時の graceful skip を実装する。"
+          "ci-local/ci-container は Python タスクを維持し、",
+          "ホスト用に ci-no-python-local + ci-python-local を追加する。",
+          "cargo make ci の compose wrapper に .venv 存在チェック付き条件分岐を導入する。"
         ],
         "id": "S2",
         "task_ids": [
