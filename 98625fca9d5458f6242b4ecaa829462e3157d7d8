@@ -1,0 +1,20 @@
+## Task Summary: Add MEMO-15 auto mode design spike planning artifacts
+
+**Track:** auto-mode-design-2026-03-16
+**Task:** Planning artifacts for /track:auto 6-phase autonomous execution design
+**Date:** 2026-03-16
+
+### Changes
+
+- metadata.json: SSoT with 7 tasks across 4 sections for auto mode design spike
+- spec.md: Feature goal, scope (design spike only, no implementation), constraints, acceptance criteria
+- plan.md: Generated read-only view from metadata.json
+- verification.md: Initialized with scope checklist and manual verification steps
+- registry.md: Updated active track to auto-mode-design-2026-03-16
+
+### Why
+
+MEMO-15 defines /track:auto as the successor to takt's autonomous queue. This design spike
+establishes the 6-phase state machine (plan → plan-review → type-design → type-review →
+implement → code-review), auto-state.json persistence schema, and escalation UI before
+implementation begins.
