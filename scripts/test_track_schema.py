@@ -679,9 +679,8 @@ class TrackItemsDirConsistencyTest(unittest.TestCase):
         from track_schema import TRACK_ITEMS_DIR
 
         # Scripts that directly reference track/items (not yet migrated to all_track_directories)
-        scripts_with_track_items = [
-            "track_state_machine.py",
-        ]
+        # track_state_machine.py removed: production path now delegates to sotp CLI
+        scripts_with_track_items: list[str] = []
         scripts_dir = Path(__file__).parent
         pattern = re.compile(r'"track"\s*/\s*"items"|["\']track/items["\']')
 

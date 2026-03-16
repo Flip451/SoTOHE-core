@@ -793,6 +793,26 @@ description = "[wrapper] Transition a task status and sync rendered views"
 script_runner = "@shell"
 script = ['TRACK_DIR="${1:-}"; TASK_ID="${2:-}"; TARGET_STATUS="${3:-}"; shift 3 || true; if [ -z "$TRACK_DIR" ] || [ -z "$TASK_ID" ] || [ -z "$TARGET_STATUS" ]; then echo "error: usage: cargo make track-transition <track_dir> <task_id> <status> [--commit-hash <hash>]" >&2; exit 1; fi; TRACK_ITEMS_DIR="$(dirname "$TRACK_DIR")"; TRACK_ID="$(basename "$TRACK_DIR")"; bin/sotp track transition --items-dir "$TRACK_ITEMS_DIR" --locks-dir .locks "$TRACK_ID" "$TASK_ID" "$TARGET_STATUS" "$@"']
 
+[tasks.track-add-task]
+description = "[wrapper] Add a new task to a track"
+script_runner = "@shell"
+script = ['TRACK_ID="${1:-}"; DESC="${2:-}"; shift 2 || true; if [ -z "$TRACK_ID" ] || [ -z "$DESC" ]; then echo "error: usage: cargo make track-add-task <track-id> <description> [--section <id>] [--after <task-id>]" >&2; exit 1; fi; bin/sotp track add-task --items-dir track/items --locks-dir .locks "$TRACK_ID" "$DESC" "$@"']
+
+[tasks.track-next-task]
+description = "[wrapper] Show the next open task for a track (JSON)"
+script_runner = "@shell"
+script = ['TRACK_ID="${1:-}"; if [ -z "$TRACK_ID" ]; then echo "error: usage: cargo make track-next-task <track-id>" >&2; exit 1; fi; bin/sotp track next-task --items-dir track/items "$TRACK_ID"']
+
+[tasks.track-task-counts]
+description = "[wrapper] Show task status counts for a track (JSON)"
+script_runner = "@shell"
+script = ['TRACK_ID="${1:-}"; if [ -z "$TRACK_ID" ]; then echo "error: usage: cargo make track-task-counts <track-id>" >&2; exit 1; fi; bin/sotp track task-counts --items-dir track/items "$TRACK_ID"']
+
+[tasks.track-set-override]
+description = "[wrapper] Set or clear a status override on a track"
+script_runner = "@shell"
+script = ['TRACK_ID="${1:-}"; STATUS="${2:-}"; shift 2 || true; if [ -z "$TRACK_ID" ] || [ -z "$STATUS" ]; then echo "error: usage: cargo make track-set-override <track-id> <blocked|cancelled|clear> [--reason <text>]" >&2; exit 1; fi; if [ "$STATUS" = "clear" ]; then bin/sotp track clear-override --items-dir track/items --locks-dir .locks "$TRACK_ID" "$@"; else bin/sotp track set-override --items-dir track/items --locks-dir .locks "$TRACK_ID" "$STATUS" "$@"; fi']
+
 [tasks.track-sync-views]
 description = "[wrapper] Render plan.md and registry.md from metadata.json"
 script_runner = "@shell"

@@ -12,8 +12,8 @@ pub mod worktree_guard;
 use std::sync::Arc;
 
 use domain::{
-    CommitHash, TaskId, TaskTransition, TrackId, TrackMetadata, TrackReadError, TrackReader,
-    TrackWriteError, TrackWriter, TransitionError, ValidationError,
+    CommitHash, StatusOverride, TaskId, TaskTransition, TrackId, TrackMetadata, TrackReadError,
+    TrackReader, TrackWriteError, TrackWriter, TransitionError, ValidationError,
 };
 
 /// Persists a track aggregate.
@@ -123,6 +123,69 @@ impl<W: TrackWriter> TransitionTaskUseCase<W> {
     }
 }
 
+/// Adds a new task to a track and persists the result atomically.
+pub struct AddTaskUseCase<W: TrackWriter> {
+    writer: Arc<W>,
+}
+
+impl<W: TrackWriter> AddTaskUseCase<W> {
+    #[must_use]
+    pub fn new(writer: Arc<W>) -> Self {
+        Self { writer }
+    }
+
+    /// Adds a task to the track and persists atomically.
+    ///
+    /// # Errors
+    /// Returns `TrackWriteError` if the track is not found, description is empty,
+    /// or the target section does not exist.
+    pub fn execute(
+        &self,
+        track_id: &TrackId,
+        description: &str,
+        section_id: Option<&str>,
+        after_task_id: Option<&TaskId>,
+    ) -> Result<(TrackMetadata, TaskId), TrackWriteError> {
+        let captured_id = std::cell::Cell::new(None);
+        let track = self.writer.update(track_id, |track| {
+            let tid = track.add_task(description, section_id, after_task_id)?;
+            captured_id.set(Some(tid));
+            Ok(())
+        })?;
+        let tid = captured_id
+            .into_inner()
+            .ok_or_else(|| TrackWriteError::Domain(ValidationError::EmptyTaskDescription.into()))?;
+        Ok((track, tid))
+    }
+}
+
+/// Sets or clears a status override on a track and persists the result atomically.
+pub struct SetOverrideUseCase<W: TrackWriter> {
+    writer: Arc<W>,
+}
+
+impl<W: TrackWriter> SetOverrideUseCase<W> {
+    #[must_use]
+    pub fn new(writer: Arc<W>) -> Self {
+        Self { writer }
+    }
+
+    /// Sets a status override on the track and persists atomically.
+    ///
+    /// # Errors
+    /// Returns `TrackWriteError` if the track is not found or override is incompatible.
+    pub fn execute(
+        &self,
+        track_id: &TrackId,
+        status_override: Option<StatusOverride>,
+    ) -> Result<TrackMetadata, TrackWriteError> {
+        self.writer.update(track_id, |track| {
+            track.set_status_override(status_override)?;
+            Ok(())
+        })
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
@@ -135,7 +198,12 @@ mod tests {
         TrackWriter,
     };
 
-    use super::{LoadTrackUseCase, SaveTrackUseCase, TransitionTaskUseCase};
+    use domain::StatusOverride;
+
+    use super::{
+        AddTaskUseCase, LoadTrackUseCase, SaveTrackUseCase, SetOverrideUseCase,
+        TransitionTaskUseCase,
+    };
 
     #[derive(Default)]
     struct StubTrackStore {
@@ -287,6 +355,134 @@ mod tests {
             transition.execute_by_status(track.id(), &task_id, "in_progress", None).unwrap();
 
         assert_eq!(updated.status(), TrackStatus::InProgress);
+    }
+
+    // --- AddTaskUseCase tests ---
+
+    #[test]
+    fn add_task_usecase_appends_task_and_persists() {
+        let store = Arc::new(StubTrackStore::default());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let add_task = AddTaskUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+
+        save.execute(&track).unwrap();
+        let (updated, new_id) =
+            add_task.execute(track.id(), "New task from usecase", None, None).unwrap();
+
+        assert_eq!(new_id.as_str(), "T002");
+        assert_eq!(updated.tasks().len(), 2);
+        assert_eq!(updated.tasks()[1].description(), "New task from usecase");
+        // Verify persistence
+        let loaded = store.find(track.id()).unwrap().unwrap();
+        assert_eq!(loaded.tasks().len(), 2);
+    }
+
+    #[test]
+    fn add_task_usecase_returns_error_for_missing_track() {
+        let store = Arc::new(StubTrackStore::default());
+        let add_task = AddTaskUseCase::new(store);
+        let track_id = TrackId::new("nonexistent-track").unwrap();
+
+        let result = add_task.execute(&track_id, "Some task", None, None);
+        assert!(matches!(
+            result,
+            Err(TrackWriteError::Repository(RepositoryError::TrackNotFound(_)))
+        ));
+    }
+
+    #[test]
+    fn add_task_usecase_returns_error_for_empty_description() {
+        let store = Arc::new(StubTrackStore::default());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let add_task = AddTaskUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+
+        save.execute(&track).unwrap();
+        let result = add_task.execute(track.id(), "", None, None);
+        assert!(result.is_err());
+    }
+
+    // --- SetOverrideUseCase tests ---
+
+    #[test]
+    fn set_override_usecase_blocks_track() {
+        let store = Arc::new(StubTrackStore::default());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let set_override = SetOverrideUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+
+        save.execute(&track).unwrap();
+        let updated = set_override
+            .execute(track.id(), Some(StatusOverride::blocked("blocker reason")))
+            .unwrap();
+
+        assert_eq!(updated.status(), TrackStatus::Blocked);
+        let loaded = store.find(track.id()).unwrap().unwrap();
+        assert_eq!(loaded.status(), TrackStatus::Blocked);
+    }
+
+    #[test]
+    fn set_override_usecase_clears_override() {
+        let store = Arc::new(StubTrackStore::default());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let set_override = SetOverrideUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+
+        save.execute(&track).unwrap();
+        set_override.execute(track.id(), Some(StatusOverride::blocked("reason"))).unwrap();
+        let updated = set_override.execute(track.id(), None).unwrap();
+
+        assert_eq!(updated.status(), TrackStatus::Planned);
+    }
+
+    #[test]
+    fn set_override_usecase_returns_error_for_missing_track() {
+        let store = Arc::new(StubTrackStore::default());
+        let set_override = SetOverrideUseCase::new(store);
+        let track_id = TrackId::new("nonexistent-track").unwrap();
+
+        let result = set_override.execute(&track_id, Some(StatusOverride::blocked("reason")));
+        assert!(matches!(
+            result,
+            Err(TrackWriteError::Repository(RepositoryError::TrackNotFound(_)))
+        ));
+    }
+
+    #[test]
+    fn add_task_usecase_returns_error_for_unknown_section() {
+        let store = Arc::new(StubTrackStore::default());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let add_task = AddTaskUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+
+        save.execute(&track).unwrap();
+        let result = add_task.execute(track.id(), "Some task", Some("NONEXISTENT"), None);
+        assert!(result.is_err());
+        let msg = result.unwrap_err().to_string();
+        assert!(msg.contains("not found"), "expected 'not found' in: {msg}");
+    }
+
+    #[test]
+    fn set_override_usecase_rejects_override_on_resolved_track() {
+        let store = Arc::new(StubTrackStore::default());
+        let save = SaveTrackUseCase::new(Arc::clone(&store));
+        let transition = TransitionTaskUseCase::new(Arc::clone(&store));
+        let set_override = SetOverrideUseCase::new(Arc::clone(&store));
+        let track = sample_track();
+        let task_id = TaskId::new("T1").unwrap();
+
+        save.execute(&track).unwrap();
+        // Move task to done to make all tasks resolved
+        transition.execute(track.id(), &task_id, TaskTransition::Start).unwrap();
+        transition
+            .execute(track.id(), &task_id, TaskTransition::Complete { commit_hash: None })
+            .unwrap();
+
+        let result = set_override.execute(track.id(), Some(StatusOverride::blocked("reason")));
+        assert!(result.is_err());
+        let msg = result.unwrap_err().to_string();
+        assert!(msg.contains("incompatible"), "expected 'incompatible' in: {msg}");
     }
 
     #[test]

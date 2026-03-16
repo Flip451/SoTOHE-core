@@ -150,10 +150,13 @@ fn is_valid_track_id(value: &str) -> bool {
 }
 
 fn is_valid_task_id(value: &str) -> bool {
-    let mut chars = value.chars();
-    matches!(chars.next(), Some('T'))
-        && matches!(chars.next(), Some(ch) if ch.is_ascii_digit())
-        && chars.all(|ch| ch.is_ascii_digit())
+    let Some(digits) = value.strip_prefix('T') else {
+        return false;
+    };
+    // Must have at least one digit, all digits, and fit in u64
+    !digits.is_empty()
+        && digits.chars().all(|ch| ch.is_ascii_digit())
+        && digits.parse::<u64>().is_ok()
 }
 
 fn is_valid_commit_hash(value: &str) -> bool {
