@@ -66,6 +66,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::file::FileCommand,
     },
+    /// Verification checks for CI validation.
+    Verify {
+        #[command(subcommand)]
+        cmd: commands::verify::VerifyCommand,
+    },
     /// Run the example track state machine demo.
     Demo,
 }
@@ -82,6 +87,7 @@ fn main() -> ExitCode {
         Some(CliCommand::Pr { cmd }) => commands::pr::execute(cmd),
         Some(CliCommand::Review { cmd }) => commands::review::execute(cmd),
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
+        Some(CliCommand::Verify { cmd }) => commands::verify::execute(cmd),
         Some(CliCommand::Demo) | None => match run_demo() {
             Ok(code) => code,
             Err(err) => {
