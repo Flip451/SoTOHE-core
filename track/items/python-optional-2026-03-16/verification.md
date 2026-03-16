@@ -9,11 +9,13 @@
 - [ ] `test_track_resolution.py` の削除済みスクリプト参照が修正されている
 - [ ] advisory hook が Python 不在時に graceful skip する
 - [ ] Docker コンテナ内で `scripts-selftest` / `hooks-selftest` が引き続き動作する
-- [ ] 以下の 4 ドキュメントが更新されている:
+- [ ] 以下の 6 ドキュメントが更新されている:
   - `track/workflow.md`
   - `DEVELOPER_AI_WORKFLOW.md`
   - `.claude/rules/07-dev-environment.md`
+  - `.claude/rules/09-maintainer-checklist.md`
   - `CLAUDE.md`
+  - `LOCAL_DEVELOPMENT.md`
 
 ## Manual Verification Steps
 
@@ -24,7 +26,7 @@
 5. `test_track_resolution.py` が存在し、`pytest scripts/test_track_resolution.py` が pass することを確認
 6. advisory hook が `.venv` 退避状態で Claude Code セッション内でクラッシュしないことを確認
 7. Docker コンテナ内で `cargo make scripts-selftest` と `cargo make hooks-selftest` が pass することを確認
-8. 4 ドキュメント（`track/workflow.md`, `DEVELOPER_AI_WORKFLOW.md`, `.claude/rules/07-dev-environment.md`, `CLAUDE.md`）に新しい CI パス構造が反映されていることを確認
+8. 6 ドキュメント（`track/workflow.md`, `DEVELOPER_AI_WORKFLOW.md`, `.claude/rules/07-dev-environment.md`, `.claude/rules/09-maintainer-checklist.md`, `CLAUDE.md`, `LOCAL_DEVELOPMENT.md`）に新しい CI パス構造が反映され、削除済み Python verifier への参照がないことを確認
 
 ## Result
 

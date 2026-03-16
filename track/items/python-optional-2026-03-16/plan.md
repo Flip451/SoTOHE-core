@@ -27,5 +27,5 @@ ci-local の依存チェーンから Python タスクを分離し、
 advisory hook が Python 不在時にクラッシュしない仕組みを追加し、
 ドキュメントを更新する。
 
-- [ ] advisory hook の Python 不在時 graceful skip: .claude/hooks/ の全 .py hook に python3 存在チェック追加
-- [ ] ドキュメント更新: track/workflow.md, DEVELOPER_AI_WORKFLOW.md, .claude/rules/07-dev-environment.md, CLAUDE.md
+- [ ] advisory hook の Python 不在時 graceful skip: .claude/settings.json の hook command を python3 存在チェック付きランチャーに変更 (command -v python3 || exit 0) + .claude/hooks/ 内の個別 hook にもガード追加
+- [ ] ドキュメント更新: track/workflow.md, DEVELOPER_AI_WORKFLOW.md, .claude/rules/07-dev-environment.md, .claude/rules/09-maintainer-checklist.md, CLAUDE.md, LOCAL_DEVELOPMENT.md + 削除済み Python verifier への参照修正

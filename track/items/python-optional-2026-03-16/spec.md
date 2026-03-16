@@ -46,4 +46,6 @@
   - `track/workflow.md`
   - `DEVELOPER_AI_WORKFLOW.md`
   - `.claude/rules/07-dev-environment.md`
+  - `.claude/rules/09-maintainer-checklist.md`
   - `CLAUDE.md`
+  - `LOCAL_DEVELOPMENT.md`

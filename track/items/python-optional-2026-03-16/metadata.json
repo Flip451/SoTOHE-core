@@ -83,13 +83,13 @@
     },
     {
       "commit_hash": null,
-      "description": "advisory hook の Python 不在時 graceful skip: .claude/hooks/ の全 .py hook に python3 存在チェック追加",
+      "description": "advisory hook の Python 不在時 graceful skip: .claude/settings.json の hook command を python3 存在チェック付きランチャーに変更 (command -v python3 || exit 0) + .claude/hooks/ 内の個別 hook にもガード追加",
       "id": "T006",
       "status": "todo"
     },
     {
       "commit_hash": null,
-      "description": "ドキュメント更新: track/workflow.md, DEVELOPER_AI_WORKFLOW.md, .claude/rules/07-dev-environment.md, CLAUDE.md",
+      "description": "ドキュメント更新: track/workflow.md, DEVELOPER_AI_WORKFLOW.md, .claude/rules/07-dev-environment.md, .claude/rules/09-maintainer-checklist.md, CLAUDE.md, LOCAL_DEVELOPMENT.md + 削除済み Python verifier への参照修正",
       "id": "T007",
       "status": "todo"
     }
