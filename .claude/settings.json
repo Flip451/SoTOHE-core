@@ -275,7 +275,8 @@
       "Read(~/.aws/**)",
       "Bash(rm -rf /)",
       "Bash(rm -rf ~)",
-      "Bash(cargo make --allow-private:*)"
+      "Bash(cargo make --allow-private:*)",
+      "Bash(while :*)"
     ]
   },
   "env": {
