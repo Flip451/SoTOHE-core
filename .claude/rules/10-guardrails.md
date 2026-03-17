@@ -17,7 +17,8 @@ Core guardrails:
 The `FORBIDDEN_ALLOW` list in `scripts/verify_orchestra_guardrails.py` prevents the following
 shell commands from being added to `permissions.allow` in `.claude/settings.json`:
 
-- `Bash(ls:*)`, `Bash(cat:*)`, `Bash(find:*)`, `Bash(grep:*)`, `Bash(head:*)`, `Bash(tail:*)` etc. — use dedicated tools (`Glob`, `Read`, `Grep`) instead
+- `Bash(ls:*)`, `Bash(cat:*)`, `Bash(find:*)`, `Bash(grep:*)` etc. — use dedicated tools (`Glob`, `Read`, `Grep`) instead
+- `Bash(head:*)`, `Bash(tail:*)`, `Bash(wc:*)` — moved to `allow` (read-only, no write risk)
 - `Bash(cd:*)` — use each tool's `path` parameter instead
 - `Bash(echo:*)`, `Bash(pwd:*)` — output text directly, use `Glob` for path confirmation
 - `Bash(git add:*)`, `Bash(git commit:*)` etc. — use `cargo make` wrappers instead

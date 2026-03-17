@@ -55,6 +55,8 @@
 この一覧は `cargo make conventions-add ...` により自動更新される。既知の主要カテゴリは推奨読順で並び、それ以外はファイル名順で並ぶ。
 
 <!-- convention-docs:start -->
+- `prefer-type-safe-abstractions.md`: Prefer Type-Safe Abstractions Convention
 - `security.md`: Security Convention
 - `shell-parsing.md`: Shell Parsing Convention
+- `typed-deserialization.md`: Typed Deserialization Convention
 <!-- convention-docs:end -->

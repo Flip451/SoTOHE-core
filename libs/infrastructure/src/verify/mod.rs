@@ -7,6 +7,7 @@ pub mod architecture_rules;
 pub mod canonical_modules;
 pub mod convention_docs;
 pub mod doc_patterns;
+pub mod frontmatter;
 pub mod latest_track;
 pub mod layers;
 pub mod orchestra;
