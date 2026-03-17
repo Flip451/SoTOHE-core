@@ -136,6 +136,19 @@
           }
         ]
       }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "A Bash command requires user permission: $ARGUMENTS\n\nAnalyze the command and decide:\n\n1. Can this be done with a dedicated Claude Code tool instead?\n   - File reading (cat, head, tail, less, more) → Use the Read tool\n   - File searching (grep, rg, ag) → Use the Grep tool\n   - File finding (find, ls, tree) → Use the Glob tool\n   - File writing (cat >, echo >) → Use the Write or Edit tool\n   - Multiple commands chained with && containing any of the above → Split into separate tool calls\n\n2. If a dedicated tool CAN replace this command, respond with JSON:\n   {\"hookSpecificOutput\":{\"hookEventName\":\"PermissionRequest\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Use dedicated tool instead\",\"additionalContext\":\"This Bash command can be replaced by [TOOL_NAME]. Use [SPECIFIC_ALTERNATIVE] instead of Bash.\"}}\n\n3. If the command genuinely needs Bash (cargo, git, docker, system commands with no dedicated tool equivalent), respond with JSON:\n   {\"hookSpecificOutput\":{\"hookEventName\":\"PermissionRequest\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"No dedicated tool alternative\"}}",
+            "timeout": 15,
+            "statusMessage": "Evaluating if dedicated tool can replace Bash command..."
+          }
+        ]
+      }
     ]
   },
   "permissions": {
