@@ -1,0 +1,18 @@
+## Task Summary: Phase 3 mid-priority arg-forwarding migration
+
+**Track:** shell-wrapper-rust-2026-03-17
+**Task:** T007-T010: track-branch/pr/plan-branch/resolve/misc ops migration
+**Date:** 2026-03-17
+
+### Changes
+
+- Makefile.toml: 18 tasks migrated from script_runner="@shell" to command+args or sotp make shell wrappers
+- scripts/test_make_wrappers.py: 4 tests updated + 2 new tests for migrated task validation
+- metadata.json: T007-T010 transitioned to done
+- verification.md: Phase 3 results recorded
+
+### Why
+
+Remove shell string interpolation from track-branch, PR lifecycle, and miscellaneous
+operations to improve safety and LSP traceability. track-local-review retains shell
+"$@" wrapper to preserve multi-word argument quoting for --prompt and --briefing-file args.
