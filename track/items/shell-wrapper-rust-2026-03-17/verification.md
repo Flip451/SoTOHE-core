@@ -18,8 +18,16 @@
 
 ## Result / Open Issues
 
-- 未検証
+### Phase 1 (T001 + T002): sotp make サブコマンド基盤 — Done
+
+- `cargo make ci-rust` グリーン (fmt, clippy, nextest 743 tests pass, deny ok, check-layers ok)
+- `bin/sotp make --help` が全26サブコマンドを表示
+- `bin/sotp make track-sync-views` が正常ディスパッチ
+- `bin/sotp make track-task-counts shell-wrapper-rust-2026-03-17` が JSON を返す
+- `raw_args_to_single` / `raw_args_to_words` のユニットテスト 10 件パス
+- clippy `indexing_slicing` を `.get()` パターンに修正済み
+- 残タスク: T003–T014 (Phase 2–5)
 
 ## verified_at
 
-- 未検証
+- Phase 1: 2026-03-17

@@ -15,7 +15,7 @@
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| shell-wrapper-rust-2026-03-17 | planned | `/track:implement` | 2026-03-17 |
+| shell-wrapper-rust-2026-03-17 | in_progress | `/track:implement` | 2026-03-17 |
 
 ## Completed Tracks
 
