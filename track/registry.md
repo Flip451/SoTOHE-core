@@ -9,7 +9,7 @@
 
 - Latest active track: `None yet`
 - Next recommended command: `/track:plan <feature>`
-- Last updated: `2026-03-16`
+- Last updated: `2026-03-17`
 
 ## Active Tracks
 
@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| reviewer-full-auto-2026-03-17 | Done | 2026-03-17 |
 | python-optional-2026-03-16 | Done | 2026-03-16 |
 | verify-scripts-rust-2026-03-16 | Done | 2026-03-16 |
 | pr-review-rust-2026-03-16 | Done | 2026-03-16 |
