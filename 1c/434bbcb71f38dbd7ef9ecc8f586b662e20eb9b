@@ -1,0 +1,17 @@
+## Task Summary: Complete shell wrapper migration (Phase 4 skip + Phase 5 finalization)
+
+**Track:** shell-wrapper-rust-2026-03-17
+**Task:** Phase 4 skip (T011-T012: -exec daemon, low ROI) + Phase 5 (T013: script_runner audit, T014: dispatch docs)
+**Date:** 2026-03-17
+
+### Changes
+
+- .claude/rules/07-dev-environment.md: Added `sotp make` Dispatch section (English) documenting cargo make → bin/sotp delegation and multi-word arg limitation
+- track/items/shell-wrapper-rust-2026-03-17/metadata.json: T011-T012 marked skipped, T013-T014 marked done, track status set to done
+- track/items/shell-wrapper-rust-2026-03-17/plan.md: Re-rendered from metadata.json (read-only view)
+- track/items/shell-wrapper-rust-2026-03-17/verification.md: Phase 4-5 results documented including skip rationale and residual audit
+- track/registry.md: Track moved to Completed Tracks
+
+### Why
+
+Finalizes STRAT-09 by documenting the sotp make dispatch pattern for future developers, auditing all remaining script_runner="@shell" tasks (27 confirmed as intentional or out-of-scope), and recording the Phase 4 skip decision (-exec daemon migration deferred due to low ROI vs run --rm).
