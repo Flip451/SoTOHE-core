@@ -55,8 +55,27 @@
 - `cargo make ci` グリーン
 - `bin/sotp make track-resolve` スモークテスト確認
 
+### Phase 4 (T011–T012): -exec daemon ラッパー統一 — Skipped
+
+- **スキップ理由**: `-exec` 系タスクは `tools-daemon` 常駐前提だが、現在のワークフローでは `run --rm` (cargo make ci 等) で十分。daemon 常駐の投資対効果が低い:
+  - `run --rm` オーバーヘッドは ~2-3秒/回で体感的に十分速い
+  - daemon stale 状態やキャッシュ不整合のデバッグコストが増える
+  - 並列ワーカーは Codex CLI に委譲しており、Claude Code 側の `-exec` 多重実行の場面が少ない
+- **将来方針**: Agent Teams の並列度が上がって `run --rm` がボトルネックになったら改めて検討
+- `dispatch_exec()` は Phase 1 で実装済み。Makefile.toml 側の移行のみ未実施
+
+### Phase 5 (T013–T014): ドキュメント・CI 更新 — Done
+
+- T013: `script_runner = "@shell"` 残存監査
+  - 残存 27 件を分類: -exec 8件 (Phase 4 skipped), bootstrap 1件, -local 8件, shell "$@" wrapper 3件, host/internal 7件
+  - 全て spec の out of scope または intentional shell wrapper として妥当
+- T014: `.claude/rules/07-dev-environment.md` に `sotp make` dispatch セクション追加 (英語)
+  - cargo make → bin/sotp make の委譲関係と multi-word arg 制約を記載
+
 ## verified_at
 
 - Phase 1: 2026-03-17
 - Phase 2: 2026-03-17
 - Phase 3: 2026-03-17
+- Phase 4: 2026-03-17 (skipped)
+- Phase 5: 2026-03-17
