@@ -1,0 +1,19 @@
+## Task Summary: Plan STRAT-09 shell wrapper Rust migration
+
+**Track:** shell-wrapper-rust-2026-03-17
+**Task:** Planning artifacts for STRAT-09 shell wrapper / cargo make dependency reduction
+**Date:** 2026-03-17
+
+### Changes
+
+- metadata.json: Created SSoT with 14 tasks across 5 phases (schema_version 3)
+- plan.md: Generated from metadata.json via sync-views
+- spec.md: Feature specification with goal, scope, constraints, acceptance criteria
+- verification.md: Manual verification checklist covering quoting safety
+- track/registry.md: Added active track row, updated current focus
+
+### Why
+
+STRAT-09 targets 46 `script_runner="@shell"` tasks in Makefile.toml that use shell string
+assembly for argument parsing, creating quoting vulnerabilities and tracking difficulties.
+This plan migrates safety/state-management wrappers to Rust CLI subcommands via `sotp make`.
