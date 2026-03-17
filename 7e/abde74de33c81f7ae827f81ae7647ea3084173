@@ -1,0 +1,17 @@
+## Task Summary: Phase 1 sotp CLI hardening planning artifacts
+
+**Track:** phase1-sotp-hardening-2026-03-17
+**Task:** Initialize track with spec, plan, and verification artifacts (8 tasks: T001-T008)
+**Date:** 2026-03-17
+
+### Changes
+
+- metadata.json: SSoT with 8 tasks across 5 sections (data safety, validation, hooks, immutability, spec verification)
+- spec.md: Feature goal, scope, constraints, and 8 testable acceptance criteria
+- verification.md: 27 manual verification steps with pass/fail/edge-case coverage per task
+- plan.md: Auto-generated from metadata.json
+- registry.md: Updated active track row and current focus
+
+### Why
+
+Phase 1 of the unified roadmap targets sotp CLI hardening: fixing data-loss bugs (SSoT-09/10), strengthening input validation (WF-30/33), adding test-file deletion protection (SURVEY-03), enforcing task description immutability (SURVEY-10), and adding spec.md structure verification (TSUMIKI-02, SURVEY-16). Planning artifacts reviewed through 9 rounds with Codex reviewer (12 findings fixed).
