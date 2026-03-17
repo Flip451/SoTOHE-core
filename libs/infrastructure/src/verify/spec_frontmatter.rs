@@ -1,5 +1,6 @@
 //! Verify that spec.md has valid YAML frontmatter with required fields.
 
+use super::frontmatter::parse_yaml_frontmatter;
 use domain::verify::{Finding, VerifyOutcome};
 use std::path::Path;
 
@@ -23,41 +24,18 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
         }
     };
 
-    // Check for YAML frontmatter delimiters (exactly "---" at the very start of the file)
-    let has_opening =
-        content == "---" || content.starts_with("---\n") || content.starts_with("---\r\n");
-    if !has_opening {
+    let Some(fm) = parse_yaml_frontmatter(&content) else {
         return VerifyOutcome::from_findings(vec![Finding::error(format!(
-            "{}: missing YAML frontmatter (expected '---' at start)",
-            spec_path.display()
-        ))]);
-    }
-
-    // Find closing delimiter (must be exactly "---" on its own line)
-    let after_first = &content[3..];
-    let close_pos = after_first
-        .lines()
-        .enumerate()
-        .skip(1) // skip the remainder of the opening delimiter line
-        .find(|(_, line)| *line == "---")
-        .map(|(i, _)| {
-            // Calculate byte offset of this line
-            after_first.match_indices('\n').nth(i - 1).map_or(0, |(pos, _)| pos)
-        });
-    let Some(close_pos) = close_pos else {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
-            "{}: missing closing YAML frontmatter delimiter '---'",
+            "{}: missing or invalid YAML frontmatter (expected '---' delimiters)",
             spec_path.display()
         ))]);
     };
-
-    let frontmatter_body = &after_first[..close_pos];
 
     // Check for required fields (simple line-based check)
     let mut findings = Vec::new();
     for field in REQUIRED_FIELDS {
         let pattern = format!("{field}:");
-        if !frontmatter_body.lines().any(|line| line.starts_with(&pattern)) {
+        if !fm.frontmatter.lines().any(|line| line.starts_with(&pattern)) {
             findings.push(Finding::error(format!(
                 "{}: YAML frontmatter missing required field '{field}'",
                 spec_path.display()

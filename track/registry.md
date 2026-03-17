@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| review-quality-quick-wins-2026-03-17 | Done | 2026-03-17 |
 | phase1-sotp-hardening-2026-03-17 | Done | 2026-03-17 |
 | shell-wrapper-rust-2026-03-17 | Done | 2026-03-17 |
 | reviewer-full-auto-2026-03-17 | Done | 2026-03-17 |
