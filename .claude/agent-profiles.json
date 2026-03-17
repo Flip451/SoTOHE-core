@@ -24,6 +24,11 @@
       "label": "Codex CLI",
       "default_model": "gpt-5.4",
       "fast_model": "gpt-5.3-codex-spark",
+      "model_profiles": {
+        "gpt-5.4": { "full_auto": true },
+        "gpt-5.3-codex": { "full_auto": true },
+        "gpt-5.3-codex-spark": { "full_auto": false }
+      },
       "supported_capabilities": [
         "planner",
         "researcher",

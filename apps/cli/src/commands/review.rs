@@ -8,8 +8,9 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use clap::{ArgGroup, Args, Subcommand};
 use usecase::review_workflow::{
-    REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewVerdict, classify_review_verdict,
-    normalize_final_message, parse_review_final_message, render_review_payload,
+    ModelProfile, REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewVerdict,
+    classify_review_verdict, normalize_final_message, parse_review_final_message,
+    render_review_payload, resolve_full_auto,
 };
 
 #[cfg(unix)]
@@ -175,6 +176,7 @@ fn render_missing_message_failure(prefix: &str, result: &ReviewRunResult) -> Str
 
 fn run_codex_local(args: &CodexLocalArgs) -> Result<ReviewRunResult, String> {
     let prompt = build_prompt(args)?;
+    let full_auto = resolve_full_auto_from_profiles(&args.model);
     #[cfg(test)]
     let explicit_output_last_message = args.output_last_message.as_deref();
     #[cfg(not(test))]
@@ -190,6 +192,7 @@ fn run_codex_local(args: &CodexLocalArgs) -> Result<ReviewRunResult, String> {
         &prompt,
         &output_last_message.path,
         &output_schema.path,
+        full_auto,
     );
     run_codex_invocation(
         &invocation,
@@ -301,21 +304,61 @@ fn build_codex_invocation(
     prompt: &str,
     output_last_message: &Path,
     output_schema: &Path,
+    full_auto: bool,
 ) -> CodexInvocation {
-    let args = vec![
+    let mut args = vec![
         OsString::from("exec"),
         OsString::from("--model"),
         OsString::from(model),
         OsString::from("--sandbox"),
         OsString::from("read-only"),
+    ];
+    if full_auto {
+        args.push(OsString::from("--full-auto"));
+    }
+    args.extend([
         OsString::from("--output-schema"),
         output_schema.as_os_str().to_os_string(),
         OsString::from("--output-last-message"),
         output_last_message.as_os_str().to_os_string(),
         OsString::from(prompt),
-    ];
+    ]);
 
     CodexInvocation { bin: codex_bin(), args }
+}
+
+const AGENT_PROFILES_PATH: &str = ".claude/agent-profiles.json";
+
+/// Reads `agent-profiles.json` and resolves `full_auto` for the given model.
+///
+/// Falls back to `true` (fail-closed) when the file is missing, unreadable,
+/// or does not contain `model_profiles` for the codex provider.
+fn resolve_full_auto_from_profiles(model: &str) -> bool {
+    #[derive(serde::Deserialize)]
+    struct AgentProfiles {
+        #[serde(default)]
+        providers: std::collections::HashMap<String, ProviderConfig>,
+    }
+
+    #[derive(serde::Deserialize)]
+    struct ProviderConfig {
+        #[serde(default)]
+        model_profiles: Option<std::collections::HashMap<String, ModelProfile>>,
+    }
+
+    let content = match std::fs::read_to_string(AGENT_PROFILES_PATH) {
+        Ok(c) => c,
+        Err(_) => return true,
+    };
+    let profiles: AgentProfiles = match serde_json::from_str(&content) {
+        Ok(p) => p,
+        Err(_) => return true,
+    };
+    let codex = match profiles.providers.get("codex") {
+        Some(p) => p,
+        None => return true,
+    };
+    resolve_full_auto(model, codex.model_profiles.as_ref())
 }
 
 fn codex_bin() -> OsString {
@@ -629,12 +672,13 @@ exit "${SOTP_FAKE_CODEX_EXIT_CODE:-0}"
     }
 
     #[test]
-    fn build_codex_invocation_uses_read_only_output_schema_without_full_auto() {
+    fn build_codex_invocation_omits_full_auto_when_false() {
         let invocation = build_codex_invocation(
-            "gpt-5.4",
+            "gpt-5.3-codex-spark",
             "Review this change.",
             Path::new("tmp/reviewer-runtime/out.txt"),
             Path::new("tmp/reviewer-runtime/schema.json"),
+            false,
         );
         let rendered =
             invocation.args.iter().map(|arg| arg.to_string_lossy().to_string()).collect::<Vec<_>>();
@@ -646,8 +690,26 @@ exit "${SOTP_FAKE_CODEX_EXIT_CODE:-0}"
                 .windows(2)
                 .any(|pair| pair == ["--output-schema", "tmp/reviewer-runtime/schema.json"])
         );
-        assert!(rendered.windows(2).any(|pair| pair == ["--model", "gpt-5.4"]));
+        assert!(rendered.windows(2).any(|pair| pair == ["--model", "gpt-5.3-codex-spark"]));
         assert!(!rendered.iter().any(|arg| arg == "--full-auto"));
+    }
+
+    #[test]
+    fn build_codex_invocation_includes_full_auto_when_true() {
+        let invocation = build_codex_invocation(
+            "gpt-5.4",
+            "Review this change.",
+            Path::new("tmp/reviewer-runtime/out.txt"),
+            Path::new("tmp/reviewer-runtime/schema.json"),
+            true,
+        );
+        let rendered =
+            invocation.args.iter().map(|arg| arg.to_string_lossy().to_string()).collect::<Vec<_>>();
+
+        assert_eq!(rendered.first().map(String::as_str), Some("exec"));
+        assert!(rendered.windows(2).any(|pair| pair == ["--sandbox", "read-only"]));
+        assert!(rendered.iter().any(|arg| arg == "--full-auto"));
+        assert!(rendered.windows(2).any(|pair| pair == ["--model", "gpt-5.4"]));
     }
 
     #[test]
@@ -1043,6 +1105,128 @@ sleep "${SOTP_FAKE_CODEX_SLEEP_SECONDS:-30}"
         assert!(
             child_gone,
             "expected timed-out reviewer descendant {child_pid} to be gone or zombie"
+        );
+    }
+
+    fn write_agent_profiles(root: &Path, model_profiles_json: &str) {
+        let claude_dir = root.join(".claude");
+        fs::create_dir_all(&claude_dir).unwrap();
+        fs::write(
+            claude_dir.join("agent-profiles.json"),
+            format!(
+                r#"{{
+  "version": 1,
+  "providers": {{
+    "codex": {{
+      "default_model": "gpt-5.4",
+      "model_profiles": {model_profiles_json}
+    }}
+  }},
+  "profiles": {{
+    "default": {{ "reviewer": "codex" }}
+  }}
+}}"#
+            ),
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn run_codex_local_passes_full_auto_for_full_model() {
+        let _lock = env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let _cwd = CurrentDirGuard::change_to(dir.path());
+        let script = write_fake_codex_script(dir.path());
+        let output = dir.path().join("last.txt");
+        let args_file = dir.path().join("codex-args.txt");
+        write_agent_profiles(
+            dir.path(),
+            r#"{"gpt-5.4": {"full_auto": true}, "gpt-5.3-codex-spark": {"full_auto": false}}"#,
+        );
+        let _bin = EnvVarGuard::set(CODEX_BIN_ENV, script.as_os_str());
+        let _args_env = EnvVarGuard::set("SOTP_FAKE_CODEX_ARGS_FILE", args_file.as_os_str());
+        let _message = EnvVarGuard::set(
+            "SOTP_FAKE_CODEX_MESSAGE",
+            std::ffi::OsStr::new("{\"verdict\":\"zero_findings\",\"findings\":[]}"),
+        );
+
+        let result = run_codex_local(&fake_args(
+            Some("Review this implementation.".to_owned()),
+            None,
+            output,
+            1,
+        ))
+        .unwrap();
+
+        assert_eq!(result.verdict, ReviewVerdict::ZeroFindings);
+        let args_content = fs::read_to_string(&args_file).unwrap();
+        assert!(
+            args_content.contains("--full-auto"),
+            "expected --full-auto in args for full model, got: {args_content}"
+        );
+    }
+
+    #[test]
+    fn run_codex_local_omits_full_auto_for_spark_model() {
+        let _lock = env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let _cwd = CurrentDirGuard::change_to(dir.path());
+        let script = write_fake_codex_script(dir.path());
+        let output = dir.path().join("last.txt");
+        let args_file = dir.path().join("codex-args.txt");
+        write_agent_profiles(
+            dir.path(),
+            r#"{"gpt-5.4": {"full_auto": true}, "gpt-5.3-codex-spark": {"full_auto": false}}"#,
+        );
+        let _bin = EnvVarGuard::set(CODEX_BIN_ENV, script.as_os_str());
+        let _args_env = EnvVarGuard::set("SOTP_FAKE_CODEX_ARGS_FILE", args_file.as_os_str());
+        let _message = EnvVarGuard::set(
+            "SOTP_FAKE_CODEX_MESSAGE",
+            std::ffi::OsStr::new("{\"verdict\":\"zero_findings\",\"findings\":[]}"),
+        );
+
+        let mut args = fake_args(Some("Review this implementation.".to_owned()), None, output, 1);
+        args.model = "gpt-5.3-codex-spark".to_owned();
+
+        let result = run_codex_local(&args).unwrap();
+
+        assert_eq!(result.verdict, ReviewVerdict::ZeroFindings);
+        let args_content = fs::read_to_string(&args_file).unwrap();
+        assert!(
+            !args_content.contains("--full-auto"),
+            "expected no --full-auto in args for spark model, got: {args_content}"
+        );
+    }
+
+    #[test]
+    fn run_codex_local_defaults_to_full_auto_when_profiles_missing() {
+        let _lock = env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let _cwd = CurrentDirGuard::change_to(dir.path());
+        // No agent-profiles.json written — file read should fail, fall back to full_auto=true
+        let script = write_fake_codex_script(dir.path());
+        let output = dir.path().join("last.txt");
+        let args_file = dir.path().join("codex-args.txt");
+        let _bin = EnvVarGuard::set(CODEX_BIN_ENV, script.as_os_str());
+        let _args_env = EnvVarGuard::set("SOTP_FAKE_CODEX_ARGS_FILE", args_file.as_os_str());
+        let _message = EnvVarGuard::set(
+            "SOTP_FAKE_CODEX_MESSAGE",
+            std::ffi::OsStr::new("{\"verdict\":\"zero_findings\",\"findings\":[]}"),
+        );
+
+        let result = run_codex_local(&fake_args(
+            Some("Review this implementation.".to_owned()),
+            None,
+            output,
+            1,
+        ))
+        .unwrap();
+
+        assert_eq!(result.verdict, ReviewVerdict::ZeroFindings);
+        let args_content = fs::read_to_string(&args_file).unwrap();
+        assert!(
+            args_content.contains("--full-auto"),
+            "expected --full-auto (fail-closed) when profiles missing, got: {args_content}"
         );
     }
 }
