@@ -1,5 +1,6 @@
 //! Verify that spec.md requirement lines have [source: ...] attribution.
 
+use super::frontmatter::parse_yaml_frontmatter;
 use domain::verify::{Finding, VerifyOutcome};
 use std::path::Path;
 
@@ -50,22 +51,10 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
     // (fence_char, min_count) — closing fence must use same char, at least as many
     let mut fence: Option<(char, usize)> = None;
 
-    // Skip YAML frontmatter (opening `---` must be the very first line).
-    // The closing delimiter must be an unindented `---` (column 0) to avoid
-    // matching `---` inside YAML block scalars.  If no closing delimiter is
-    // found the file has no valid frontmatter — scan all lines.
+    // Skip YAML frontmatter using shared parser.
+    // If no valid frontmatter is found, scan all lines.
     let lines_vec: Vec<(usize, &str)> = content.lines().enumerate().collect();
-    let body_start = if lines_vec.first().is_some_and(|(_, l)| *l == "---") {
-        // Search for closing `---` at column 0 (unindented)
-        lines_vec
-            .get(1..)
-            .and_then(|rest| {
-                rest.iter().find(|(_, l)| *l == "---").map(|(i, _)| i + 1) // skip past closing ---
-            })
-            .unwrap_or(0) // no closing --- found → don't skip anything
-    } else {
-        0
-    };
+    let body_start = parse_yaml_frontmatter(&content).map(|fm| fm.body_start).unwrap_or(0);
 
     for &(line_num, line) in lines_vec.get(body_start..).unwrap_or_default() {
         let trimmed = line.trim();

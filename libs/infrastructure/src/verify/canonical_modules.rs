@@ -9,10 +9,30 @@ use std::path::Path;
 
 use domain::verify::{Finding, VerifyOutcome};
 use regex::Regex;
+use serde::Deserialize;
 
 const ARCH_RULES_FILE: &str = "docs/architecture-rules.json";
 
-/// A parsed canonical module rule.
+/// Raw deserialization target for `architecture-rules.json`.
+/// Invalid data (missing fields, wrong types) causes a serde error
+/// rather than silent data loss.
+#[derive(Debug, Deserialize)]
+struct ArchitectureRules {
+    #[serde(default)]
+    canonical_modules: Vec<RawCanonicalRule>,
+}
+
+/// A single canonical module rule as stored in JSON.
+#[derive(Debug, Deserialize)]
+struct RawCanonicalRule {
+    concern: String,
+    forbidden_patterns: Vec<String>,
+    allowed_in: Vec<String>,
+    #[serde(default)]
+    convention: String,
+}
+
+/// A parsed canonical module rule with compiled regexes.
 #[derive(Debug)]
 struct CanonicalRule {
     concern: String,
@@ -39,7 +59,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
         }
     };
 
-    let json: serde_json::Value = match serde_json::from_str(&content) {
+    let arch_rules: ArchitectureRules = match serde_json::from_str(&content) {
         Ok(v) => v,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![Finding::error(format!(
@@ -48,7 +68,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
         }
     };
 
-    let rules = match parse_canonical_rules(&json) {
+    let rules = match compile_canonical_rules(&arch_rules.canonical_modules) {
         Ok(r) => r,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![Finding::error(e)]);
@@ -65,47 +85,22 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
 }
 
-fn parse_canonical_rules(json: &serde_json::Value) -> Result<Vec<CanonicalRule>, String> {
-    let modules = match json.get("canonical_modules") {
-        Some(serde_json::Value::Array(arr)) => arr,
-        Some(_) => return Err("canonical_modules must be an array".into()),
-        None => return Ok(Vec::new()),
-    };
-
+/// Compiles raw deserialized rules into `CanonicalRule` with compiled regexes.
+fn compile_canonical_rules(raw_rules: &[RawCanonicalRule]) -> Result<Vec<CanonicalRule>, String> {
     let mut rules = Vec::new();
-    for entry in modules {
-        let concern = entry
-            .get("concern")
-            .and_then(|v| v.as_str())
-            .ok_or("canonical_modules entry missing 'concern'")?
-            .to_string();
-
-        let patterns_raw = entry
-            .get("forbidden_patterns")
-            .and_then(|v| v.as_array())
-            .ok_or("canonical_modules entry missing 'forbidden_patterns'")?;
-
+    for entry in raw_rules {
         let mut forbidden_patterns = Vec::new();
-        for p in patterns_raw {
-            let s = p.as_str().ok_or("forbidden_patterns must contain strings")?;
+        for s in &entry.forbidden_patterns {
             let re = Regex::new(s).map_err(|e| format!("invalid regex '{s}': {e}"))?;
             forbidden_patterns.push(re);
         }
 
-        let allowed_raw = entry
-            .get("allowed_in")
-            .and_then(|v| v.as_array())
-            .ok_or("canonical_modules entry missing 'allowed_in'")?;
-
-        let mut allowed_in = Vec::new();
-        for v in allowed_raw {
-            let s = v.as_str().ok_or("allowed_in must contain strings")?;
-            allowed_in.push(s.to_string());
-        }
-
-        let convention = entry.get("convention").and_then(|v| v.as_str()).unwrap_or("").to_string();
-
-        rules.push(CanonicalRule { concern, forbidden_patterns, allowed_in, convention });
+        rules.push(CanonicalRule {
+            concern: entry.concern.clone(),
+            forbidden_patterns,
+            allowed_in: entry.allowed_in.clone(),
+            convention: entry.convention.clone(),
+        });
     }
 
     Ok(rules)
@@ -288,14 +283,14 @@ mod tests {
 
     #[test]
     fn test_empty_canonical_modules_passes() {
-        let json: serde_json::Value = serde_json::from_str(r#"{"version": 2}"#).unwrap();
-        let rules = parse_canonical_rules(&json).unwrap();
+        let arch: ArchitectureRules = serde_json::from_str(r#"{"version": 2}"#).unwrap();
+        let rules = compile_canonical_rules(&arch.canonical_modules).unwrap();
         assert!(rules.is_empty());
     }
 
     #[test]
     fn test_parse_canonical_rule() {
-        let json: serde_json::Value = serde_json::from_str(
+        let arch: ArchitectureRules = serde_json::from_str(
             r#"{
             "canonical_modules": [{
                 "concern": "shell-parsing",
@@ -307,7 +302,7 @@ mod tests {
         }"#,
         )
         .unwrap();
-        let rules = parse_canonical_rules(&json).unwrap();
+        let rules = compile_canonical_rules(&arch.canonical_modules).unwrap();
         assert_eq!(rules.len(), 1);
         assert_eq!(rules[0].concern, "shell-parsing");
         assert_eq!(rules[0].forbidden_patterns.len(), 1);
@@ -445,7 +440,7 @@ mod tests {
 
     #[test]
     fn test_allowed_in_rejects_non_string_entries() {
-        let json: serde_json::Value = serde_json::from_str(
+        let result = serde_json::from_str::<ArchitectureRules>(
             r#"{
             "canonical_modules": [{
                 "concern": "test-concern",
@@ -454,9 +449,7 @@ mod tests {
                 "convention": ""
             }]
         }"#,
-        )
-        .unwrap();
-        let result = parse_canonical_rules(&json);
-        assert!(result.is_err(), "non-string entry in allowed_in must cause error");
+        );
+        assert!(result.is_err(), "non-string entry in allowed_in must cause serde error");
     }
 }

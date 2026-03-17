@@ -241,7 +241,16 @@
       "Bash(cargo make track-pr-status:*)",
       "Bash(cargo make track-local-review:*)",
       "Bash(cargo make track-switch-main)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(head :*)",
+      "Bash(tail :*)",
+      "Bash(wc :*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git status:*)",
+      "Bash(git branch --show-current)"
     ],
     "deny": [
       "Read(./track/archive/**)",
@@ -276,7 +285,8 @@
       "Bash(rm -rf /)",
       "Bash(rm -rf ~)",
       "Bash(cargo make --allow-private:*)",
-      "Bash(while :*)"
+      "Bash(while :*)",
+      "Bash(cat :*)"
     ]
   },
   "env": {
