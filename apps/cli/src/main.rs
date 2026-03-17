@@ -71,6 +71,8 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::verify::VerifyCommand,
     },
+    /// Replaces Makefile.toml shell wrappers with safe Rust dispatch.
+    Make(commands::make::MakeArgs),
     /// Run the example track state machine demo.
     Demo,
 }
@@ -88,6 +90,7 @@ fn main() -> ExitCode {
         Some(CliCommand::Review { cmd }) => commands::review::execute(cmd),
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
         Some(CliCommand::Verify { cmd }) => commands::verify::execute(cmd),
+        Some(CliCommand::Make(args)) => commands::make::execute(args),
         Some(CliCommand::Demo) | None => match run_demo() {
             Ok(code) => code,
             Err(err) => {

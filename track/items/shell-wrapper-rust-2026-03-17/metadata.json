@@ -1,0 +1,137 @@
+{
+  "branch": "track/shell-wrapper-rust-2026-03-17",
+  "created_at": "2026-03-17T02:00:00Z",
+  "id": "shell-wrapper-rust-2026-03-17",
+  "plan": {
+    "sections": [
+      {
+        "description": [],
+        "id": "S1",
+        "task_ids": [
+          "T001",
+          "T002"
+        ],
+        "title": "Phase 1: sotp make サブコマンド基盤"
+      },
+      {
+        "description": [],
+        "id": "S2",
+        "task_ids": [
+          "T003",
+          "T004",
+          "T005",
+          "T006"
+        ],
+        "title": "Phase 2: 高優先度マイグレーション (quoting/安全性)"
+      },
+      {
+        "description": [],
+        "id": "S3",
+        "task_ids": [
+          "T007",
+          "T008",
+          "T009",
+          "T010"
+        ],
+        "title": "Phase 3: 中優先度マイグレーション (arg フォワーディング)"
+      },
+      {
+        "description": [],
+        "id": "S4",
+        "task_ids": [
+          "T011",
+          "T012"
+        ],
+        "title": "Phase 4: -exec daemon ラッパー統一"
+      },
+      {
+        "description": [],
+        "id": "S5",
+        "task_ids": [
+          "T013",
+          "T014"
+        ],
+        "title": "Phase 5: ドキュメント・CI 更新"
+      }
+    ],
+    "summary": [
+      "Makefile.toml の script_runner=\"@shell\" ラッパーを sotp CLI サブコマンドに集約し、quoting 脆弱性・追跡困難性・条件分岐の脆さを根本解決する"
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "sotp make サブコマンド基盤: clap 定義と MakeCommand enum の追加",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "sotp make ディスパッチ機構: 既存 sotp サブコマンドへの内部転送",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "高優先度: commit タスクの Rust 化 (sotp make commit — CI + git commit をアトミックに)",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "高優先度: note タスクの Rust 化 (sotp make note — git notes add を安全に)",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "高優先度: track-commit-message の Rust 化 (sotp make track-commit-message — CI + commit-from-file)",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "高優先度: track-transition/add-task/set-override の Makefile 直接呼び出し化 (shell 引数パース除去)",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "description": "中優先度: track-branch-create/switch/activate の command 直接呼び出し化",
+      "id": "T007",
+      "status": "done"
+    },
+    {
+      "description": "中優先度: track-pr-* 系の command 直接呼び出し化",
+      "id": "T008",
+      "status": "done"
+    },
+    {
+      "description": "中優先度: track-plan-branch を sotp track branch plan サブコマンドとして新設",
+      "id": "T009",
+      "status": "done"
+    },
+    {
+      "description": "中優先度: 残りの薄い shell ラッパー (track-local-review, track-resolve 等) の command 直接呼び出し化",
+      "id": "T010",
+      "status": "done"
+    },
+    {
+      "description": "-exec daemon ラッパー: sotp make exec サブコマンドで WORKER_ID 処理を Rust 統一 [skipped: run --rm で十分、daemon 常駐の投資対効果が低い]",
+      "id": "T011",
+      "status": "skipped"
+    },
+    {
+      "description": "-exec タスク群の Makefile.toml command 形式への変換 [skipped: T011 と同理由]",
+      "id": "T012",
+      "status": "skipped"
+    },
+    {
+      "description": "Makefile.toml の最終整理と script_runner=@shell 残存の監査",
+      "id": "T013",
+      "status": "done"
+    },
+    {
+      "description": "ドキュメント更新: track/workflow.md, .claude/rules/07-dev-environment.md, DESIGN.md",
+      "id": "T014",
+      "status": "done"
+    }
+  ],
+  "title": "STRAT-09: shell wrapper / cargo make 依存の縮退",
+  "updated_at": "2026-03-17T04:12:11Z"
+}

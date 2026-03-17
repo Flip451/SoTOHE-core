@@ -56,6 +56,23 @@ cargo make test-doc               # ドキュメントテスト
 cargo make python-lint            # ruff lint（Python scripts / hooks）
 ```
 
+### `sotp make` Dispatch
+
+Most `cargo make` tasks internally delegate to `bin/sotp make <task>`, which
+replaces shell string interpolation with safe Rust argument handling.
+
+```
+# Via cargo make (recommended) — backward-compatible interface
+cargo make track-transition track/items/xxx T001 done
+
+# Direct bin/sotp (safely passes multi-word arguments)
+bin/sotp make track-add-task my-track "description with spaces"
+```
+
+A few tasks (`track-local-review`, `track-add-task`, `track-set-override`) use
+a shell `"$@"` wrapper because cargo-make's `${@}` expansion loses quoting for
+multi-word positional arguments.
+
 ### `-local` タスクについて
 
 `Makefile.toml` には `fmt-local`, `clippy-local`, `ci-local` などの `-local` サフィックス付きタスクがある。
