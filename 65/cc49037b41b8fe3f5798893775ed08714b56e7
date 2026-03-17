@@ -1,0 +1,21 @@
+## Task Summary: Auto-resolve --full-auto from agent-profiles.json model_profiles
+
+**Track:** reviewer-full-auto-2026-03-17
+**Task:** Full model reviewer の --full-auto 自動付与
+**Date:** 2026-03-17
+
+### Changes
+
+- `.claude/agent-profiles.json`: Added `model_profiles` to codex provider (gpt-5.4, gpt-5.3-codex, gpt-5.3-codex-spark)
+- `libs/usecase/src/review_workflow.rs`: Added `ModelProfile` type, `default_full_auto()`, `resolve_full_auto()` + 7 unit tests
+- `apps/cli/src/commands/review.rs`: Added `resolve_full_auto_from_profiles()`, updated `build_codex_invocation` with `full_auto` param + 5 tests
+- `.claude/docs/DESIGN.md`: Added reviewer model_profiles design decision
+- `track/items/reviewer-full-auto-2026-03-17/`: Updated metadata (all tasks done), plan, verification (fully verified)
+- `track/registry.md`: Track moved to Completed Tracks
+
+### Why
+
+Full model Codex reviewers (gpt-5.4, gpt-5.3-codex) require `--full-auto` to produce JSON verdicts,
+but the track-local-review wrapper didn't pass it. A manual workaround script was required.
+This change centralizes per-model behavioral config in agent-profiles.json and auto-resolves
+the flag, eliminating the workaround. Fail-closed on all error paths ensures safety.
