@@ -5,6 +5,7 @@ pub mod git;
 pub mod guard;
 pub mod hook;
 pub mod lock;
+pub mod make;
 pub mod pr;
 pub mod review;
 pub mod track;

@@ -27,7 +27,7 @@
 - Docker compose ラッパー（shell ロジックなし、現状で安全）
 - Python スクリプトラッパー (`guides-*`, `conventions-*`, `architecture-rules-*`)
 - `bootstrap` スクリプト（一回限りの初期化、投資対効果低い）
-- `-local` タスク（shell 不使用、`command` + `args` 形式）
+- `-local` タスク（コンテナ内部で呼ばれる実装詳細。一部は `script_runner = "@shell"` を使用するが、単一コマンド実行のみで quoting リスクが低いため優先度外）
 
 ## Constraints
 
