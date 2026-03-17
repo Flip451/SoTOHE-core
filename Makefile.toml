@@ -231,9 +231,23 @@ echo "=== Bootstrap complete ==="
 ''']
 
 [tasks.build-sotp]
-description = "[host] Build sotp CLI binary and install to bin/sotp"
+description = "[host] Build sotp CLI binary and install to bin/sotp (with runtime verification)"
 script_runner = "@shell"
-script = ['TARGET_DIR="${CARGO_TARGET_DIR:-target}"; cargo build -p cli --release && mkdir -p bin && cp "$TARGET_DIR/release/sotp" bin/sotp && echo "[OK] bin/sotp built"']
+script = ['''
+TARGET_DIR="${CARGO_TARGET_DIR:-target}"
+cargo build -p cli --release && mkdir -p bin && rm -f bin/sotp && cp "$TARGET_DIR/release/sotp" bin/sotp || exit 1
+# Post-build verification: ensure the binary is actually executable on this system.
+# This catches glibc mismatch errors (e.g., building on a newer glibc host and running on WSL2).
+if bin/sotp --help >/dev/null 2>&1; then
+  echo "[OK] bin/sotp built and verified"
+else
+  echo "[ERROR] bin/sotp was built but cannot execute on this system." >&2
+  echo "        This usually means a glibc version mismatch." >&2
+  echo "        Try building inside the tools container instead." >&2
+  rm -f bin/sotp
+  exit 1
+fi
+''']
 
 [tasks.build-tools]
 description = "[wrapper] Build tools image"
@@ -490,6 +504,12 @@ description = "[internal] Verify track registry.md is in sync with metadata.json
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- track views validate --project-root .']
 
+[tasks.verify-canonical-modules-local]
+private = true
+description = "[internal] Verify no reimplementation of canonical module concerns"
+script_runner = "@shell"
+script = ['cargo run --quiet -p cli -- verify canonical-modules']
+
 [tasks.verify-latest-track-local]
 private = true
 description = "[internal] Verify latest track has spec.md, plan.md, and verification.md"
@@ -504,21 +524,21 @@ args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "
 
 [tasks.ci-rust-local]
 private = true
-description = "[internal] Run Rust-only CI checks (fmt + clippy + test + deny + check-layers)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "check-layers-local"]
+description = "[internal] Run Rust-only CI checks (fmt + clippy + test + deny + check-layers + canonical-modules)"
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "check-layers-local", "verify-canonical-modules-local"]
 
 [tasks.ci-local]
 private = true
 description = "[internal] Run local CI checks"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-latest-track-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "check-layers-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "check-layers-local", "verify-canonical-modules-local"]
 
 [tasks.ci-container]
 description = "[gate] Run CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-latest-track-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -643,6 +663,12 @@ description = "[gate] Verify track registry.md sync (docker compose)"
 dependencies = ["prepare-local-cache-dirs"]
 command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-track-registry-local"]
+
+[tasks.verify-canonical-modules]
+description = "[gate] Verify no reimplementation of canonical module concerns (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-canonical-modules-local"]
 
 [tasks.verify-latest-track]
 description = "[gate] Verify latest track files (host, no docker; uses bash/find only)"

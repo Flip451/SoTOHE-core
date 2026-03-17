@@ -11,6 +11,8 @@ pub enum HookName {
     FileLockAcquire,
     /// Lock hook: releases file lock after tool use.
     FileLockRelease,
+    /// Guard hook: blocks `rm` commands targeting test files.
+    BlockTestFileDeletion,
 }
 
 /// Context for hook execution. Built by the CLI layer from:

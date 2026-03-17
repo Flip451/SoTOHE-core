@@ -56,6 +56,10 @@ pub enum ValidationError {
     SectionNotFound(String),
     #[error("no sections available to add task to")]
     NoSectionsAvailable,
+    #[error(
+        "task '{task_id}' description was mutated; task descriptions are immutable once created"
+    )]
+    TaskDescriptionMutated { task_id: String },
 }
 
 /// Errors from invalid task state transitions.

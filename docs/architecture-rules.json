@@ -1,5 +1,23 @@
 {
-  "version": 1,
+  "version": 2,
+  "canonical_modules": [
+    {
+      "concern": "shell-parsing",
+      "owner": "libs/domain/src/guard/parser.rs",
+      "forbidden_patterns": [
+        "fn\\s+normalize_separators",
+        "fn\\s+shell_tokenize",
+        "fn\\s+is_redirect_operator",
+        "fn\\s+split_shell_tokens",
+        "matches!\\(token,\\s*\">\"",
+        "\\.split_whitespace\\(\\).*is_rm",
+        "prev_was_fd_digit"
+      ],
+      "allowed_in": ["libs/domain/src/guard/"],
+      "convention": "project-docs/conventions/shell-parsing.md",
+      "rationale": "All shell command parsing must use conch-parser via domain::guard::parser"
+    }
+  ],
   "extra_dirs": [
     {
       "path": "project-docs/conventions",

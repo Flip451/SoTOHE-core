@@ -13,7 +13,7 @@ use super::verdict::{GuardVerdict, ParseError};
 /// Command launchers that prefix the real command.
 const COMMAND_LAUNCHERS: &[&str] = &[
     "nohup", "nice", "timeout", "stdbuf", "setsid", "chronic", "ionice", "chrt", "taskset",
-    "command", "time", "exec",
+    "command", "time", "exec", "sudo", "doas",
 ];
 
 /// Launchers that consume a mandatory positional argument before the command.
@@ -50,8 +50,30 @@ const LAUNCHER_OPTIONS_WITH_ARG: &[&str] = &[
 /// excluded. These are treated as no-arg flags, and the CPU mask/list is consumed
 /// via `LAUNCHER_POSITIONAL_ARGS` (1 positional). This handles both `taskset MASK cmd`
 /// and `taskset -c LIST cmd` uniformly.
-const LAUNCHER_SPECIFIC_OPTIONS_WITH_ARG: &[(&str, &str)] =
-    &[("exec", "-a"), ("chrt", "-p"), ("chrt", "--pid"), ("ionice", "-c"), ("ionice", "--class")];
+const LAUNCHER_SPECIFIC_OPTIONS_WITH_ARG: &[(&str, &str)] = &[
+    ("exec", "-a"),
+    ("chrt", "-p"),
+    ("chrt", "--pid"),
+    ("ionice", "-c"),
+    ("ionice", "--class"),
+    ("sudo", "-u"),
+    ("sudo", "--user"),
+    ("sudo", "-g"),
+    ("sudo", "--group"),
+    ("sudo", "-C"),
+    ("sudo", "--close-from"),
+    ("sudo", "-p"),
+    ("sudo", "--prompt"),
+    ("sudo", "-D"),
+    ("sudo", "--chdir"),
+    ("sudo", "-r"),
+    ("sudo", "--role"),
+    ("sudo", "-t"),
+    ("sudo", "--type"),
+    ("sudo", "-h"),
+    ("sudo", "--host"),
+    ("doas", "-u"),
+];
 
 /// Git top-level options that consume the next token.
 const GIT_OPTIONS_WITH_ARG: &[&str] = &[
@@ -102,6 +124,9 @@ const ENV_COMMAND_MESSAGE: &str = "[Git Policy] `env` command is blocked. \
 
 const NESTED_GIT_REFERENCE_MESSAGE: &str = "[Git Policy] Non-git command contains a git reference in its arguments. \
      Git operations must use literal `git` commands, not wrappers or nested invocations.";
+
+const BIN_SOTP_OVERWRITE_MESSAGE: &str = "[Build Policy] Direct copy to `bin/sotp` is blocked. \
+     Use `cargo make build-sotp` which includes runtime verification to prevent glibc mismatch.";
 
 /// Checks a shell command against the guard policy.
 ///
@@ -160,6 +185,11 @@ fn check_simple_command(cmd: &SimpleCommand) -> GuardVerdict {
     // Direct git command — check specific subcommands
     if effective_cmd == "git" {
         return check_git_command(argv, effective_start);
+    }
+
+    // Block `cp` (or `mv`) targeting `bin/sotp` — must use `cargo make build-sotp`.
+    if is_bin_sotp_overwrite(argv, effective_start) {
+        return GuardVerdict::block(BIN_SOTP_OVERWRITE_MESSAGE);
     }
 
     // Non-git command: block if any argv token or redirect text (including
@@ -389,6 +419,123 @@ fn skip_command_launchers(argv: &[String], start: usize) -> usize {
     }
 
     i
+}
+
+/// Checks if a command is `cp`, `mv`, or `install` targeting `bin/sotp` as
+/// the **destination**.
+///
+/// Checks both the last non-flag argument (default destination) and explicit
+/// target-directory options (`-t`/`--target-directory=`) that can also specify
+/// the destination.
+/// Commands that only *read from* `bin/sotp` (e.g., `cp bin/sotp /tmp/backup`)
+/// are intentionally allowed.
+fn is_bin_sotp_overwrite(argv: &[String], effective_start: usize) -> bool {
+    if effective_start >= argv.len() {
+        return false;
+    }
+    let cmd = basename(&argv[effective_start]).to_lowercase();
+    if cmd != "cp" && cmd != "mv" && cmd != "install" {
+        return false;
+    }
+    let args = &argv[effective_start + 1..];
+    // Check explicit target-directory options (-t dir, --target-directory=dir, --target-directory dir)
+    let mut has_target_dir_option = false;
+    let mut i = 0;
+    while i < args.len() {
+        if args[i] == "-t" || args[i] == "--target-directory" {
+            has_target_dir_option = true;
+            if let Some(dir) = args.get(i + 1) {
+                if is_bin_sotp_path(dir) {
+                    return true;
+                }
+            }
+            i += 2;
+            continue;
+        }
+        if let Some(dir) = args[i].strip_prefix("--target-directory=") {
+            has_target_dir_option = true;
+            if is_bin_sotp_path(dir) {
+                return true;
+            }
+        }
+        // Handle clustered short options containing `t`.
+        // GNU cp/mv/install allow clustering: `-at dir`, `-atbin/sotp`, `-ft dir`, etc.
+        // We scan any arg starting with `-` (but not `--`) for the letter `t`.
+        if args[i].starts_with('-') && !args[i].starts_with("--") {
+            let flags = &args[i][1..]; // strip leading '-'
+            if let Some(t_pos) = flags.find('t') {
+                let after_t = &flags[t_pos + 1..];
+                if !after_t.is_empty() {
+                    // Attached form: -atbin/sotp or -tbin/sotp
+                    has_target_dir_option = true;
+                    if is_bin_sotp_path(after_t) {
+                        return true;
+                    }
+                } else {
+                    // Detached form: -at dir (next arg is the directory)
+                    has_target_dir_option = true;
+                    if let Some(dir) = args.get(i + 1) {
+                        if is_bin_sotp_path(dir) {
+                            return true;
+                        }
+                    }
+                    i += 2;
+                    continue;
+                }
+            }
+        }
+        i += 1;
+    }
+    // When -t/--target-directory is used, the destination is specified by that
+    // option, not the last positional argument. Skip last-arg check to avoid
+    // false positives (e.g., `cp -t /tmp bin/sotp` reads FROM bin/sotp).
+    if has_target_dir_option {
+        return false;
+    }
+    // The destination is the last non-flag argument.
+    let last_arg = args.iter().rev().find(|arg| !arg.starts_with('-'));
+    match last_arg {
+        Some(arg) => is_bin_sotp_path(arg),
+        None => false,
+    }
+}
+
+/// Returns `true` if a path refers to the repo-relative `bin/sotp`.
+///
+/// Normalizes the path first to handle equivalent spellings like
+/// `./bin/./sotp`, `bin//sotp`, `./bin/sotp`, `bin/tmp/../sotp`, etc.
+/// Absolute paths (e.g., `/tmp/bin/sotp`) are NOT matched to avoid
+/// false positives on unrelated destinations outside the repository.
+fn is_bin_sotp_path(path: &str) -> bool {
+    // Absolute paths cannot be repo-relative bin/sotp
+    if path.starts_with('/') {
+        return false;
+    }
+    let normalized = normalize_path(path);
+    normalized == "bin/sotp"
+}
+
+/// Normalizes a Unix path by collapsing `/./`, `//`, `..`, and stripping leading `./`.
+fn normalize_path(path: &str) -> String {
+    let mut parts: Vec<&str> = Vec::new();
+    for seg in path.split('/') {
+        if seg.is_empty() || seg == "." {
+            continue;
+        }
+        if seg == ".." {
+            // Pop only if there is a real (non-`..`) parent to resolve against.
+            // Leading `..` segments are preserved so that `../bin/sotp` stays
+            // outside the repo and is NOT normalized to `bin/sotp`.
+            if parts.last().is_some_and(|&p| p != "..") {
+                parts.pop();
+            } else {
+                parts.push(seg);
+            }
+        } else {
+            parts.push(seg);
+        }
+    }
+    parts.join("/")
 }
 
 /// Checks if any token in a slice contains "git" (case-insensitive).
@@ -708,6 +855,51 @@ mod tests {
     #[case::multibyte_utf8_command_no_panic("€aab")]
     #[case::multibyte_utf8_with_exe_suffix_no_panic("日本語.exe add")]
     fn test_allowed_commands(#[case] cmd: &str) {
+        let v = check(cmd);
+        assert!(!v.is_blocked(), "expected allowed: {cmd}");
+    }
+
+    // -- Blocked: cp/mv to bin/sotp --
+
+    #[rstest]
+    #[case::cp_bin_sotp("cp target/release/sotp bin/sotp")]
+    #[case::cp_full_path("cp /tmp/sotp ./bin/sotp")]
+    #[case::mv_bin_sotp("mv target/release/sotp bin/sotp")]
+    #[case::install_bin_sotp("install target/release/sotp bin/sotp")]
+    #[case::cp_with_flags("cp -f target/release/sotp bin/sotp")]
+    #[case::cp_target_dir_option("cp -t bin/sotp target/release/sotp")]
+    #[case::cp_target_directory_long("cp --target-directory=bin/sotp target/release/sotp")]
+    #[case::install_target_dir("install -t bin/sotp target/release/sotp")]
+    #[case::sudo_cp_bin_sotp("sudo cp target/release/sotp bin/sotp")]
+    #[case::cp_target_directory_space("cp --target-directory bin/sotp target/release/sotp")]
+    #[case::sudo_u_root_cp_bin_sotp("sudo -u root cp target/release/sotp bin/sotp")]
+    #[case::cp_attached_t_option("cp -tbin/sotp target/release/sotp")]
+    #[case::cp_clustered_at("cp -at bin/sotp target/release/sotp")]
+    #[case::cp_clustered_ft("cp -ft bin/sotp target/release/sotp")]
+    #[case::cp_clustered_at_attached("cp -atbin/sotp target/release/sotp")]
+    #[case::cp_dot_slash_dot_path("cp target/release/sotp ./bin/./sotp")]
+    #[case::cp_double_slash_path("cp target/release/sotp bin//sotp")]
+    #[case::cp_dotdot_path("cp target/release/sotp bin/tmp/../sotp")]
+    #[case::cp_dotdot_deep("cp target/release/sotp foo/../bin/sotp")]
+    #[case::sudo_p_prompt_cp_bin_sotp("sudo -p Password: cp target/release/sotp bin/sotp")]
+    fn test_blocked_bin_sotp_overwrite(#[case] cmd: &str) {
+        let v = check(cmd);
+        assert!(v.is_blocked(), "expected blocked: {cmd}");
+        assert!(v.reason.contains("bin/sotp"), "reason should mention bin/sotp: {:?}", v.reason);
+    }
+
+    #[rstest]
+    #[case::cp_other_file("cp target/release/sotp /tmp/sotp")]
+    #[case::cp_unrelated("cp file.txt other.txt")]
+    #[case::cargo_make_build_sotp("cargo make build-sotp")]
+    #[case::cp_from_bin_sotp("cp bin/sotp /tmp/sotp-backup")]
+    #[case::cp_from_full_path_bin_sotp("cp ./bin/sotp /tmp/backup")]
+    #[case::cp_target_dir_read_from_sotp("cp -t /tmp bin/sotp")]
+    #[case::sudo_u_root_cp_elsewhere("sudo -u root cp target/release/sotp /tmp/sotp")]
+    #[case::cp_absolute_bin_sotp("/usr/bin/cp target/release/sotp /tmp/bin/sotp")]
+    #[case::cp_dotdot_leading_bin_sotp("cp target/release/sotp ../bin/sotp")]
+    #[case::sudo_p_prompt_cp_elsewhere("sudo -p Password: cp target/release/sotp /tmp/sotp")]
+    fn test_allowed_bin_sotp_unrelated(#[case] cmd: &str) {
         let v = check(cmd);
         assert!(!v.is_blocked(), "expected allowed: {cmd}");
     }
