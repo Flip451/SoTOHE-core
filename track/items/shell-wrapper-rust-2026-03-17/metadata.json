@@ -94,22 +94,22 @@
     {
       "description": "中優先度: track-branch-create/switch/activate の command 直接呼び出し化",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "中優先度: track-pr-* 系の command 直接呼び出し化",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "中優先度: track-plan-branch を sotp track branch plan サブコマンドとして新設",
       "id": "T009",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "中優先度: 残りの薄い shell ラッパー (track-local-review, track-resolve 等) の command 直接呼び出し化",
       "id": "T010",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "-exec daemon ラッパー: sotp make exec サブコマンドで WORKER_ID 処理を Rust 統一",
@@ -133,5 +133,5 @@
     }
   ],
   "title": "STRAT-09: shell wrapper / cargo make 依存の縮退",
-  "updated_at": "2026-03-17T03:21:49Z"
+  "updated_at": "2026-03-17T03:49:18Z"
 }

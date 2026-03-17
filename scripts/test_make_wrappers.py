@@ -283,6 +283,28 @@ class MakeWrappersTest(unittest.TestCase):
                 self.assertIn(f'bin/sotp make {task_name}', task_body, f"{task_header} missing sotp make call")
                 self.assertIn('"$@"', task_body, f"{task_header} missing shell $@ forwarding")
 
+    def test_track_branch_ops_delegate_to_sotp_make(self) -> None:
+        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
+
+        for task_header, task_name in (
+            ("[tasks.track-branch-create]", "track-branch-create"),
+            ("[tasks.track-branch-switch]", "track-branch-switch"),
+            ("[tasks.track-activate]", "track-activate"),
+            ("[tasks.track-plan-branch]", "track-plan-branch"),
+            ("[tasks.track-resolve]", "track-resolve"),
+        ):
+            with self.subTest(task=task_header):
+                task_start = makefile.index(task_header)
+                next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+                task_body = (
+                    makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
+                )
+                self.assertIn('command = "bin/sotp"', task_body, f"{task_header} missing command")
+                self.assertIn(f'"{task_name}"', task_body, f"{task_header} missing task name")
+                self.assertIn('"make"', task_body, f"{task_header} missing 'make' in args")
+                self.assertIn('"${@}"', task_body, f"{task_header} missing arg forwarding")
+                self.assertNotIn('script_runner', task_body, f"{task_header} should not use script_runner")
+
     def test_track_sync_views_delegates_to_sotp_make(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
         task_header = "[tasks.track-sync-views]"
@@ -297,26 +319,12 @@ class MakeWrappersTest(unittest.TestCase):
         self.assertIn('"${@}"', task_body)
         self.assertNotIn('script_runner', task_body)
 
-    def test_track_git_wrappers_delegate_to_rust_cli(self) -> None:
+    def test_track_git_wrappers_delegate_to_sotp_make(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
 
-        # Shell-based wrappers (not yet migrated to sotp make)
-        for task_header, expected in (
-            ("[tasks.track-switch-main]", 'bin/sotp git switch-and-pull main'),
-            ("[tasks.track-add-paths]", 'bin/sotp git add-from-file tmp/track-commit/add-paths.txt --cleanup'),
-        ):
-            with self.subTest(task=task_header):
-                task_start = makefile.index(task_header)
-                next_task = makefile.find("\n[tasks.", task_start + len(task_header))
-                task_body = (
-                    makefile[task_start:]
-                    if next_task == -1
-                    else makefile[task_start:next_task]
-                )
-                self.assertIn(expected, task_body)
-
-        # Migrated to sotp make (command + args format)
         for task_header, task_name in (
+            ("[tasks.track-switch-main]", "track-switch-main"),
+            ("[tasks.track-add-paths]", "track-add-paths"),
             ("[tasks.track-commit-message]", "track-commit-message"),
             ("[tasks.track-note]", "track-note"),
         ):
@@ -328,15 +336,21 @@ class MakeWrappersTest(unittest.TestCase):
                     if next_task == -1
                     else makefile[task_start:next_task]
                 )
-                self.assertIn('command = "bin/sotp"', task_body)
-                self.assertIn(f'"{task_name}"', task_body)
+                self.assertIn('command = "bin/sotp"', task_body, f"{task_header} missing command")
+                self.assertIn(f'"{task_name}"', task_body, f"{task_header} missing task name")
+                self.assertIn('"make"', task_body, f"{task_header} missing 'make' in args")
+                self.assertNotIn('script_runner', task_body, f"{task_header} should not use script_runner")
 
-    def test_track_pr_wrappers_delegate_to_rust_cli(self) -> None:
+    def test_track_pr_wrappers_delegate_to_sotp_make(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
 
-        for task_header, expected in (
-            ("[tasks.track-pr-merge]", 'bin/sotp pr wait-and-merge ${@}'),
-            ("[tasks.track-pr-status]", 'bin/sotp pr status ${@}'),
+        for task_header, task_name in (
+            ("[tasks.track-pr-push]", "track-pr-push"),
+            ("[tasks.track-pr-ensure]", "track-pr-ensure"),
+            ("[tasks.track-pr]", "track-pr"),
+            ("[tasks.track-pr-review]", "track-pr-review"),
+            ("[tasks.track-pr-merge]", "track-pr-merge"),
+            ("[tasks.track-pr-status]", "track-pr-status"),
         ):
             with self.subTest(task=task_header):
                 task_start = makefile.index(task_header)
@@ -346,9 +360,12 @@ class MakeWrappersTest(unittest.TestCase):
                     if next_task == -1
                     else makefile[task_start:next_task]
                 )
-                self.assertIn(expected, task_body)
+                self.assertIn('command = "bin/sotp"', task_body, f"{task_header} missing command")
+                self.assertIn(f'"{task_name}"', task_body, f"{task_header} missing task name")
+                self.assertIn('"make"', task_body, f"{task_header} missing 'make' in args")
+                self.assertNotIn('script_runner', task_body, f"{task_header} should not use script_runner")
 
-    def test_track_local_review_wrapper_delegates_to_rust_cli(self) -> None:
+    def test_track_local_review_wrapper_delegates_to_sotp_make(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
         task_header = "[tasks.track-local-review]"
         task_start = makefile.index(task_header)
@@ -358,9 +375,8 @@ class MakeWrappersTest(unittest.TestCase):
         )
 
         self.assertIn('script_runner = "@shell"', task_body)
-        self.assertIn('if [ "${1:-}" = "--" ]; then shift; fi;', task_body)
-        self.assertIn('bin/sotp review codex-local "$@"', task_body)
-        self.assertNotIn(', "${@}"', task_body)
+        self.assertIn('bin/sotp make track-local-review', task_body)
+        self.assertIn('"$@"', task_body)
 
     def test_guides_wrappers_smoke(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -469,27 +485,29 @@ class MakeWrappersTest(unittest.TestCase):
     def test_git_ops_wrapper_tasks_are_exact_and_file_backed(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
 
+        # add-all: migrated to sotp make
         task_header = "[tasks.add-all]"
         task_start = makefile.index(task_header)
         next_task = makefile.find("\n[tasks.", task_start + len(task_header))
         task_body = (
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
-        self.assertIn(
-            "script = ['bin/sotp git add-all']",
-            task_body,
-        )
+        self.assertIn('command = "bin/sotp"', task_body)
+        self.assertIn('"make"', task_body)
+        self.assertIn('"add-all"', task_body)
+        self.assertNotIn('script_runner', task_body)
 
+        # track-add-paths: migrated to sotp make
         task_header = "[tasks.track-add-paths]"
         task_start = makefile.index(task_header)
         next_task = makefile.find("\n[tasks.", task_start + len(task_header))
         task_body = (
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
-        self.assertIn(
-            "script = ['bin/sotp git add-from-file tmp/track-commit/add-paths.txt --cleanup']",
-            task_body,
-        )
+        self.assertIn('command = "bin/sotp"', task_body)
+        self.assertIn('"make"', task_body)
+        self.assertIn('"track-add-paths"', task_body)
+        self.assertNotIn('script_runner', task_body)
 
         # track-commit-message: migrated to sotp make (CI + commit logic handled in Rust)
         task_header = "[tasks.track-commit-message]"
