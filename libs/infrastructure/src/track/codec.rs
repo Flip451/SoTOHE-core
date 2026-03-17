@@ -34,6 +34,10 @@ pub struct TrackDocumentV2 {
     pub plan: PlanDocument,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status_override: Option<TrackStatusOverrideDocument>,
+    /// Unknown fields captured during deserialization and preserved on re-serialization.
+    #[serde(flatten)]
+    #[serde(default)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -78,6 +82,8 @@ pub struct DocumentMeta {
     /// Original JSON status string, preserved for values the domain model
     /// cannot compute (e.g., "archived" which is a workflow-level state).
     pub original_status: Option<String>,
+    /// Unknown fields captured from the original JSON and preserved on re-serialization.
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 fn deserialize_string_vec_relaxed<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
@@ -112,6 +118,7 @@ pub fn decode(json: &str) -> Result<(TrackMetadata, DocumentMeta), CodecError> {
         created_at: doc.created_at.clone(),
         updated_at: doc.updated_at.clone(),
         original_status: Some(doc.status.clone()),
+        extra: doc.extra.clone(),
     };
     let track = track_metadata_from_document(doc)?;
     Ok((track, meta))
@@ -178,6 +185,7 @@ fn document_from_track_metadata(track: &TrackMetadata, meta: &DocumentMeta) -> T
         tasks: track.tasks().iter().map(task_to_document).collect(),
         plan: plan_to_document(track.plan()),
         status_override: track.status_override().map(override_to_document),
+        extra: meta.extra.clone(),
     }
 }
 
@@ -475,6 +483,51 @@ mod tests {
 
         // "archived" must be preserved, not rewritten to "done".
         assert_eq!(doc["status"].as_str().unwrap(), "archived");
+    }
+
+    #[test]
+    fn test_decode_encode_preserves_unknown_fields() {
+        let json = r#"{
+  "schema_version": 2,
+  "id": "test-track",
+  "title": "Test Track",
+  "status": "planned",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z",
+  "custom_field": "preserved_value",
+  "tasks": [
+    {"id": "T1", "description": "First task", "status": "todo"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {"id": "S1", "title": "Section 1", "description": [], "task_ids": ["T1"]}
+    ]
+  }
+}"#;
+        let (track, meta) = decode(json).unwrap();
+        let re_encoded = encode(&track, &meta).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&re_encoded).unwrap();
+        assert_eq!(doc["custom_field"].as_str().unwrap(), "preserved_value");
+    }
+
+    #[test]
+    fn test_decode_encode_without_extra_fields_round_trips_correctly() {
+        let (track, meta) = decode(sample_json()).unwrap();
+        let re_encoded = encode(&track, &meta).unwrap();
+        let (track2, _) = decode(&re_encoded).unwrap();
+        assert_eq!(track, track2);
+    }
+
+    #[test]
+    fn test_known_fields_are_not_in_extra_map() {
+        let json = sample_json();
+        let doc: TrackDocumentV2 = serde_json::from_str(json).unwrap();
+        // Known fields like "id", "title", "tasks" should NOT appear in the extra map
+        assert!(!doc.extra.contains_key("id"));
+        assert!(!doc.extra.contains_key("title"));
+        assert!(!doc.extra.contains_key("tasks"));
+        assert!(!doc.extra.contains_key("schema_version"));
     }
 
     #[test]

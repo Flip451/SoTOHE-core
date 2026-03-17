@@ -223,14 +223,65 @@ pub fn classify_severity(text: &str) -> &'static str {
 #[must_use]
 pub fn parse_body_findings(body: &str) -> Vec<PrReviewFinding> {
     let mut findings = Vec::new();
+    // Tracks (fence_char, min_length) so ```````` is not closed by ```
+    let mut fence_marker: Option<(char, usize)> = None;
     for line in body.lines() {
         let stripped = line.trim();
+        // CommonMark: fenced code blocks allow 0-3 leading spaces only.
+        // Lines with 4+ leading spaces are indented code, not fences.
+        // CommonMark: tabs expand to 4-space tab stops. A tab at column 0
+        // expands to 4 spaces, disqualifying the line as a fence (max 3).
+        let leading_indent: usize = line
+            .chars()
+            .take_while(|c| c.is_whitespace())
+            .map(|c| if c == '\t' { 4 } else { 1 })
+            .sum();
+        let could_be_fence = leading_indent <= 3;
+        // Track fenced code blocks — remember fence char AND length.
+        // Opening fences may have an info string; closing fences must be
+        // fence chars + optional whitespace only (per CommonMark spec).
+        if could_be_fence
+            && let Some(fence_len) = stripped
+                .strip_prefix("```")
+                .map(|rest| 3 + rest.chars().take_while(|&c| c == '`').count())
+        {
+            let after_fence = &stripped[fence_len..];
+            let is_close_candidate = after_fence.trim().is_empty();
+            fence_marker = match fence_marker {
+                Some(('`', open_len)) if fence_len >= open_len && is_close_candidate => None,
+                None => Some(('`', fence_len)),
+                other => other,
+            };
+            continue;
+        }
+        if could_be_fence
+            && let Some(fence_len) = stripped
+                .strip_prefix("~~~")
+                .map(|rest| 3 + rest.chars().take_while(|&c| c == '~').count())
+        {
+            let after_fence = &stripped[fence_len..];
+            let is_close_candidate = after_fence.trim().is_empty();
+            fence_marker = match fence_marker {
+                Some(('~', open_len)) if fence_len >= open_len && is_close_candidate => None,
+                None => Some(('~', fence_len)),
+                other => other,
+            };
+            continue;
+        }
+        let in_code_block = fence_marker.is_some();
+        if in_code_block {
+            continue;
+        }
         let content = if let Some(rest) = stripped.strip_prefix("- ") {
             rest.trim()
         } else if let Some(rest) = stripped.strip_prefix("* ") {
             rest.trim()
         } else if let Some(rest) = stripped.strip_prefix('\u{2022}') {
             // '•' U+2022 BULLET
+            rest.trim()
+        } else if let Some(rest) = stripped.strip_prefix("+ ") {
+            rest.trim()
+        } else if let Some(rest) = strip_numbered_prefix(stripped) {
             rest.trim()
         } else {
             continue;
@@ -349,6 +400,18 @@ pub fn resolve_reviewer_provider(profiles_path: &Path) -> Result<String, PrRevie
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
+
+/// Strips a leading numbered list prefix (e.g., `1. `, `12. `) from a line.
+/// Returns `None` if the line does not match the pattern `<digits>. <rest>`.
+fn strip_numbered_prefix(s: &str) -> Option<&str> {
+    let dot_pos = s.find(". ")?;
+    let prefix = s.get(..dot_pos)?;
+    if !prefix.is_empty() && prefix.chars().all(|c| c.is_ascii_digit()) {
+        s.get(dot_pos + 2..)
+    } else {
+        None
+    }
+}
 
 // ---------------------------------------------------------------------------
 // Tests (written first — TDD)
@@ -587,6 +650,136 @@ mod tests {
 
     // -----------------------------------------------------------------------
     // resolve_reviewer_provider — 2 tests
+    // -----------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------
+    // parse_body_findings — T004: extended format support (written first — Red phase)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_parse_body_findings_parses_numbered_list() {
+        let body = "1. This function has a critical bug in error handling";
+        let findings = parse_body_findings(body);
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].severity, "P0"); // "critical"
+    }
+
+    #[test]
+    fn test_parse_body_findings_parses_plus_prefix() {
+        let body = "+ This function has a critical bug in error handling";
+        let findings = parse_body_findings(body);
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].severity, "P0");
+    }
+
+    #[test]
+    fn test_parse_body_findings_ignores_plain_paragraph() {
+        let body = "This is a plain paragraph without any list prefix. It should not be a finding.";
+        let findings = parse_body_findings(body);
+        assert!(findings.is_empty());
+    }
+
+    #[test]
+    fn test_parse_body_findings_skips_plus_prefix_inside_code_block() {
+        let body =
+            "Review:\n```diff\n+ cargo test\n+ some other line that looks like a finding\n```\n";
+        let findings = parse_body_findings(body);
+        assert!(
+            findings.is_empty(),
+            "lines inside fenced code blocks must not be parsed as findings"
+        );
+    }
+
+    #[test]
+    fn test_parse_body_findings_skips_tilde_fence_code_block() {
+        let body = "Review:\n~~~diff\n+ critical bug in error handling\n~~~\n";
+        let findings = parse_body_findings(body);
+        assert!(
+            findings.is_empty(),
+            "lines inside ~~~ fenced code blocks must not be parsed as findings"
+        );
+    }
+
+    #[test]
+    fn test_parse_body_findings_tilde_inside_backtick_fence_does_not_close() {
+        // A ~~~ inside a ```-opened block must NOT close the block
+        let body = "```\n~~~\n+ this is still inside the code block\n```\n";
+        let findings = parse_body_findings(body);
+        assert!(findings.is_empty(), "~~~ inside ``` block must not close the fence");
+    }
+
+    #[test]
+    fn test_parse_body_findings_backtick_inside_tilde_fence_does_not_close() {
+        let body = "~~~\n```\n+ this is still inside the code block\n~~~\n";
+        let findings = parse_body_findings(body);
+        assert!(findings.is_empty(), "``` inside ~~~ block must not close the fence");
+    }
+
+    #[test]
+    fn test_parse_body_findings_longer_fence_not_closed_by_shorter() {
+        // A ```````` (4-backtick) block must not be closed by ``` (3-backtick)
+        let body = "````\n```\n+ still inside outer fence\n```\n````\n";
+        let findings = parse_body_findings(body);
+        assert!(findings.is_empty(), "``` inside ```` block must not close the fence");
+    }
+
+    #[test]
+    fn test_parse_body_findings_longer_tilde_fence_not_closed_by_shorter() {
+        let body = "~~~~\n~~~\n+ still inside outer fence\n~~~\n~~~~\n";
+        let findings = parse_body_findings(body);
+        assert!(findings.is_empty(), "~~~ inside ~~~~ block must not close the fence");
+    }
+
+    #[test]
+    fn test_parse_body_findings_equal_length_fence_closes() {
+        // A ``` block is correctly closed by another ```
+        let body = "```\n+ inside code block\n```\n- real finding outside code block\n";
+        let findings = parse_body_findings(body);
+        assert_eq!(findings.len(), 1, "finding after closed fence should be parsed");
+    }
+
+    #[test]
+    fn test_parse_body_findings_closing_fence_with_info_string_does_not_close() {
+        // A line like ```diff inside a ``` block must NOT close the block (info string present)
+        let body = "```\n```diff\n+ still inside code block\n```\n";
+        let findings = parse_body_findings(body);
+        assert!(
+            findings.is_empty(),
+            "```diff inside ``` block must not close the fence (closing fence cannot have info text)"
+        );
+    }
+
+    #[test]
+    fn test_parse_body_findings_deeply_indented_fence_is_not_fence() {
+        // 4+ leading spaces means indented code block, not a fence (CommonMark)
+        let body = "- finding before\n    ```\n+ indented but not a code block\n    ```\n- finding after\n";
+        let findings = parse_body_findings(body);
+        // Both "- finding before" and "- finding after" should be parsed;
+        // the indented ``` lines are NOT fences.
+        // 3 findings: "- finding before", "+ indented but not a code block", "- finding after"
+        assert_eq!(findings.len(), 3, "4-space indented ``` must not be treated as fence");
+    }
+
+    #[test]
+    fn test_parse_body_findings_tab_indented_fence_is_not_fence() {
+        // A tab before ``` means ≥4 columns indent — not a CommonMark fence
+        let body =
+            "- finding before\n\t```diff\n+ inside tab-indented block\n\t```\n- finding after\n";
+        let findings = parse_body_findings(body);
+        // Tab-indented ``` is NOT a fence, so all 3 lines are findings
+        assert_eq!(findings.len(), 3, "tab-indented ``` must not be treated as fence");
+    }
+
+    #[test]
+    fn test_parse_body_findings_quoted_rm_blocked() {
+        // Test that quoted rm commands are still detected (uses hook.rs but validates integration)
+        let body = "- critical bug: rm command bypasses guard with quotes\n";
+        let findings = parse_body_findings(body);
+        assert_eq!(findings.len(), 1);
+    }
+
+    // -----------------------------------------------------------------------
+    // resolve_reviewer_provider — tests
     // -----------------------------------------------------------------------
 
     #[test]

@@ -1,0 +1,111 @@
+{
+  "branch": "track/phase1-sotp-hardening-2026-03-17",
+  "created_at": "2026-03-17T12:00:00Z",
+  "id": "phase1-sotp-hardening-2026-03-17",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Fix TrackDocumentV2 silent field loss and collect_track_branch_claims abort-on-single-failure."
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001",
+          "T002"
+        ],
+        "title": "Data Safety Fixes"
+      },
+      {
+        "description": [
+          "Add TrackId validation to branch resolution and extend PR body findings parser format coverage."
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T003",
+          "T004"
+        ],
+        "title": "Input Validation Hardening"
+      },
+      {
+        "description": [
+          "Add block-test-file-deletion PreToolUse hook in Rust (domain + usecase + cli layers)."
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T005"
+        ],
+        "title": "Test File Deletion Guard Hook"
+      },
+      {
+        "description": [
+          "Validate that existing task descriptions are not mutated on save."
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T006"
+        ],
+        "title": "Task Description Immutability"
+      },
+      {
+        "description": [
+          "Add sotp verify spec-attribution and spec-frontmatter subcommands for spec.md quality gates."
+        ],
+        "id": "S5",
+        "task_ids": [
+          "T007",
+          "T008"
+        ],
+        "title": "Spec Verification Subcommands"
+      }
+    ],
+    "summary": [
+      "Phase 1 hardening of sotp CLI: fix data-loss bugs (T001-T002), strengthen input validation (T003-T004), add test-file deletion guard hook (T005), enforce task description immutability (T006), and add spec.md structure verification (T007-T008)."
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "SSoT-09: Add #[serde(flatten)] to TrackDocumentV2 to preserve unknown fields during round-trip",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "SSoT-10: Change collect_track_branch_claims to skip-and-warn on broken metadata instead of aborting all",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "WF-33: Add TrackId::new() validation in resolve_track_id_from_branch after prefix strip",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "WF-30: Extend parse_body_findings to recognize numbered lists and + prefix",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "SURVEY-03: Add block-test-file-deletion PreToolUse hook to prevent test file removal",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "SURVEY-10: Add task description immutability validation on save (detect description mutation of existing tasks)",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "description": "TSUMIKI-02: Add sotp verify spec-attribution subcommand to check [source: ...] tags in spec.md",
+      "id": "T007",
+      "status": "done"
+    },
+    {
+      "description": "SURVEY-16: Add sotp verify spec-frontmatter subcommand to check YAML frontmatter in spec.md",
+      "id": "T008",
+      "status": "done"
+    }
+  ],
+  "title": "Phase 1: sotp CLI hardening (data safety, validation, hooks, spec verification)",
+  "updated_at": "2026-03-17T12:30:00Z"
+}

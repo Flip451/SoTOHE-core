@@ -174,6 +174,7 @@ impl<L: FileLockManager> TrackWriter for FsTrackStore<L> {
                 created_at: Self::now_iso8601(),
                 updated_at: Self::now_iso8601(),
                 original_status: None,
+                extra: serde_json::Map::new(),
             },
         };
 

@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| phase1-sotp-hardening-2026-03-17 | Done | 2026-03-17 |
 | shell-wrapper-rust-2026-03-17 | Done | 2026-03-17 |
 | reviewer-full-auto-2026-03-17 | Done | 2026-03-17 |
 | python-optional-2026-03-16 | Done | 2026-03-16 |
