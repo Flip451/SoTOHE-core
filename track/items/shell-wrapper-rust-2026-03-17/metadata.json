@@ -74,22 +74,22 @@
     {
       "description": "高優先度: commit タスクの Rust 化 (sotp make commit — CI + git commit をアトミックに)",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "高優先度: note タスクの Rust 化 (sotp make note — git notes add を安全に)",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "高優先度: track-commit-message の Rust 化 (sotp make track-commit-message — CI + commit-from-file)",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "高優先度: track-transition/add-task/set-override の Makefile 直接呼び出し化 (shell 引数パース除去)",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "中優先度: track-branch-create/switch/activate の command 直接呼び出し化",
@@ -133,5 +133,5 @@
     }
   ],
   "title": "STRAT-09: shell wrapper / cargo make 依存の縮退",
-  "updated_at": "2026-03-17T02:08:47Z"
+  "updated_at": "2026-03-17T03:21:49Z"
 }

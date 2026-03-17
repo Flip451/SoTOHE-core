@@ -233,7 +233,7 @@ class MakeWrappersTest(unittest.TestCase):
         )
         self.assertNotIn("verify_orchestra_guardrails.py", task_body)
 
-    def test_track_transition_wrapper_preserves_track_dir_contract(self) -> None:
+    def test_track_transition_wrapper_delegates_to_sotp_make(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
         task_header = "[tasks.track-transition]"
         task_start = makefile.index(task_header)
@@ -242,23 +242,19 @@ class MakeWrappersTest(unittest.TestCase):
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
 
-        self.assertIn('TRACK_DIR="${1:-}"', task_body)
-        self.assertIn('TRACK_ITEMS_DIR="$(dirname "$TRACK_DIR")"', task_body)
-        self.assertIn('TRACK_ID="$(basename "$TRACK_DIR")"', task_body)
-        self.assertIn('--items-dir "$TRACK_ITEMS_DIR"', task_body)
-        self.assertIn(
-            'usage: cargo make track-transition <track_dir> <task_id> <status> [--commit-hash <hash>]',
-            task_body,
-        )
+        self.assertIn('command = "bin/sotp"', task_body)
+        self.assertIn('"make"', task_body)
+        self.assertIn('"track-transition"', task_body)
+        self.assertIn('"${@}"', task_body)
+        self.assertNotIn('script_runner', task_body)
 
-    def test_track_state_ops_wrappers_delegate_to_rust_cli(self) -> None:
+    def test_track_state_ops_wrappers_delegate_to_sotp_make(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
 
-        for task_header, expected_fragments in (
-            ("[tasks.track-add-task]", ["bin/sotp track add-task", "--items-dir track/items"]),
-            ("[tasks.track-next-task]", ["bin/sotp track next-task", "--items-dir track/items"]),
-            ("[tasks.track-task-counts]", ["bin/sotp track task-counts", "--items-dir track/items"]),
-            ("[tasks.track-set-override]", ["bin/sotp track set-override", "bin/sotp track clear-override"]),
+        # command + args format (single-word positional args only)
+        for task_header, task_name in (
+            ("[tasks.track-next-task]", "track-next-task"),
+            ("[tasks.track-task-counts]", "track-task-counts"),
         ):
             with self.subTest(task=task_header):
                 task_start = makefile.index(task_header)
@@ -266,17 +262,48 @@ class MakeWrappersTest(unittest.TestCase):
                 task_body = (
                     makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
                 )
-                for fragment in expected_fragments:
-                    self.assertIn(fragment, task_body, f"{task_header} missing '{fragment}'")
+                self.assertIn('command = "bin/sotp"', task_body, f"{task_header} missing command")
+                self.assertIn(f'"{task_name}"', task_body, f"{task_header} missing task name in args")
+                self.assertIn('"make"', task_body, f"{task_header} missing 'make' in args")
+                self.assertIn('"${@}"', task_body, f"{task_header} missing arg forwarding")
+                self.assertNotIn('script_runner', task_body, f"{task_header} should not use script_runner")
+
+        # Shell-based wrappers (multi-word positional args need "$@" quoting)
+        for task_header, task_name in (
+            ("[tasks.track-add-task]", "track-add-task"),
+            ("[tasks.track-set-override]", "track-set-override"),
+        ):
+            with self.subTest(task=task_header):
+                task_start = makefile.index(task_header)
+                next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+                task_body = (
+                    makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
+                )
+                self.assertIn('script_runner = "@shell"', task_body, f"{task_header} missing script_runner")
+                self.assertIn(f'bin/sotp make {task_name}', task_body, f"{task_header} missing sotp make call")
+                self.assertIn('"$@"', task_body, f"{task_header} missing shell $@ forwarding")
+
+    def test_track_sync_views_delegates_to_sotp_make(self) -> None:
+        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
+        task_header = "[tasks.track-sync-views]"
+        task_start = makefile.index(task_header)
+        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+        task_body = (
+            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
+        )
+        self.assertIn('command = "bin/sotp"', task_body)
+        self.assertIn('"make"', task_body)
+        self.assertIn('"track-sync-views"', task_body)
+        self.assertIn('"${@}"', task_body)
+        self.assertNotIn('script_runner', task_body)
 
     def test_track_git_wrappers_delegate_to_rust_cli(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
 
+        # Shell-based wrappers (not yet migrated to sotp make)
         for task_header, expected in (
             ("[tasks.track-switch-main]", 'bin/sotp git switch-and-pull main'),
             ("[tasks.track-add-paths]", 'bin/sotp git add-from-file tmp/track-commit/add-paths.txt --cleanup'),
-            ("[tasks.track-commit-message]", 'bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup'),
-            ("[tasks.track-note]", 'bin/sotp git note-from-file tmp/track-commit/note.md --cleanup'),
         ):
             with self.subTest(task=task_header):
                 task_start = makefile.index(task_header)
@@ -287,6 +314,22 @@ class MakeWrappersTest(unittest.TestCase):
                     else makefile[task_start:next_task]
                 )
                 self.assertIn(expected, task_body)
+
+        # Migrated to sotp make (command + args format)
+        for task_header, task_name in (
+            ("[tasks.track-commit-message]", "track-commit-message"),
+            ("[tasks.track-note]", "track-note"),
+        ):
+            with self.subTest(task=task_header):
+                task_start = makefile.index(task_header)
+                next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+                task_body = (
+                    makefile[task_start:]
+                    if next_task == -1
+                    else makefile[task_start:next_task]
+                )
+                self.assertIn('command = "bin/sotp"', task_body)
+                self.assertIn(f'"{task_name}"', task_body)
 
     def test_track_pr_wrappers_delegate_to_rust_cli(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
@@ -448,42 +491,29 @@ class MakeWrappersTest(unittest.TestCase):
             task_body,
         )
 
+        # track-commit-message: migrated to sotp make (CI + commit logic handled in Rust)
         task_header = "[tasks.track-commit-message]"
         task_start = makefile.index(task_header)
         next_task = makefile.find("\n[tasks.", task_start + len(task_header))
         task_body = (
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
-        self.assertIn("cargo make ci", task_body, "track-commit-message must run CI internally")
-        self.assertIn(
-            "bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup",
-            task_body,
-        )
-        # Safety: CI failure must prevent commit. The script must not use
-        # `cargo make ci || true` or place commit before CI.
-        ci_pos = task_body.index("cargo make ci")
-        commit_pos = task_body.index("commit-from-file")
-        self.assertLess(
-            ci_pos,
-            commit_pos,
-            "CI must run before commit-from-file in track-commit-message script",
-        )
-        # Ensure CI is not silently swallowed (no `|| true` or `; true` after ci call)
-        ci_line_end = task_body.index("\n", ci_pos)
-        ci_line = task_body[ci_pos:ci_line_end]
-        self.assertNotIn("|| true", ci_line, "CI failure must not be silenced")
-        self.assertNotIn("; true", ci_line, "CI failure must not be silenced")
+        self.assertIn('command = "bin/sotp"', task_body)
+        self.assertIn('"make"', task_body)
+        self.assertIn('"track-commit-message"', task_body)
+        self.assertNotIn('script_runner', task_body)
 
+        # track-note: migrated to sotp make
         task_header = "[tasks.track-note]"
         task_start = makefile.index(task_header)
         next_task = makefile.find("\n[tasks.", task_start + len(task_header))
         task_body = (
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
-        self.assertIn(
-            "script = ['bin/sotp git note-from-file tmp/track-commit/note.md --cleanup']",
-            task_body,
-        )
+        self.assertIn('command = "bin/sotp"', task_body)
+        self.assertIn('"make"', task_body)
+        self.assertIn('"track-note"', task_body)
+        self.assertNotIn('script_runner', task_body)
 
     def test_ci_container_tasks_exist_and_are_public(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
