@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `shell-wrapper-rust-2026-03-17`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-17`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| shell-wrapper-rust-2026-03-17 | in_progress | `/track:implement` | 2026-03-17 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| shell-wrapper-rust-2026-03-17 | Done | 2026-03-17 |
 | reviewer-full-auto-2026-03-17 | Done | 2026-03-17 |
 | python-optional-2026-03-16 | Done | 2026-03-16 |
 | verify-scripts-rust-2026-03-16 | Done | 2026-03-16 |

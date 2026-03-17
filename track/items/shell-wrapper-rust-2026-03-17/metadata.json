@@ -59,7 +59,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "description": "sotp make サブコマンド基盤: clap 定義と MakeCommand enum の追加",
@@ -112,26 +112,26 @@
       "status": "done"
     },
     {
-      "description": "-exec daemon ラッパー: sotp make exec サブコマンドで WORKER_ID 処理を Rust 統一",
+      "description": "-exec daemon ラッパー: sotp make exec サブコマンドで WORKER_ID 処理を Rust 統一 [skipped: run --rm で十分、daemon 常駐の投資対効果が低い]",
       "id": "T011",
-      "status": "todo"
+      "status": "skipped"
     },
     {
-      "description": "-exec タスク群の Makefile.toml command 形式への変換",
+      "description": "-exec タスク群の Makefile.toml command 形式への変換 [skipped: T011 と同理由]",
       "id": "T012",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "Makefile.toml の最終整理と script_runner=@shell 残存の監査",
       "id": "T013",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "ドキュメント更新: track/workflow.md, .claude/rules/07-dev-environment.md, DESIGN.md",
       "id": "T014",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "STRAT-09: shell wrapper / cargo make 依存の縮退",
-  "updated_at": "2026-03-17T03:49:18Z"
+  "updated_at": "2026-03-17T04:12:11Z"
 }
