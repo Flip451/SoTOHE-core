@@ -64,6 +64,7 @@ Note: See `.claude/agent-profiles.json` for which provider handles each capabili
 | Shell guard in domain layer (no trait) | Pure computation, no I/O, no implementation variability | tree-sitter-bash (C dep), domain trait (over-engineering) | 2026-03-11 |
 | conch-parser for shell AST (vendored, patched) | Full POSIX AST, minimal deps (void only), structural env var/command separation | Hand-written parser (edge case proliferation), tree-sitter-bash (C dep), brush-parser (heavy deps) | 2026-03-11 |
 | Guard policy: ban edge-case-producing patterns | Unconditionally block patterns that create bypass vectors but are unnecessary in the template workflow: (1) `env` command → immediate block, (2) `$VAR`/`$(cmd)`/`` `cmd` `` in **any position** (argv + redirect texts including heredoc bodies) → immediate block, (3) `.exe` suffix → stripped in basename, (4) if effective command ≠ `git` and any argv/redirect token contains "git" (case-insensitive) → block. Rules (2) and (4) together eliminate ALL per-tool nesting analysis with argv/redirect-level checks. | Per-pattern recursive parsing and validation (complex, error-prone, ~200 lines of per-tool option parsing) | 2026-03-11 |
+| Reviewer model_profiles in agent-profiles.json | Centralized per-model behavioral config (`full_auto`, etc.) in `providers.codex.model_profiles`. CLI reads the file and resolves flags automatically. Fail-closed: unknown model or missing file defaults to `full_auto: true`. | Hardcoded model-name heuristic in Rust code; explicit CLI `--full-auto` flag | 2026-03-17 |
 
 ## Crate Selection
 

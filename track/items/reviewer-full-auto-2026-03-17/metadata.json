@@ -1,0 +1,110 @@
+{
+  "branch": "track/reviewer-full-auto-2026-03-17",
+  "created_at": "2026-03-17T00:00:00+09:00",
+  "id": "reviewer-full-auto-2026-03-17",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "agent-profiles.json の codex provider に model_profiles を追加。",
+          "各モデルの full_auto フラグを設定ファイルで一元管理する。",
+          "未知モデルのフォールバックは full_auto: true（fail-closed）。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Phase 1: agent-profiles.json スキーマ拡張"
+      },
+      {
+        "description": [
+          "domain/usecase 層に agent-profiles.json のモデルプロファイル読み取り型を追加。",
+          "ModelProfile 型と resolve_full_auto(model, profiles) 関数を定義。",
+          "フォールバック（未知モデル → full_auto: true）のテストを含む。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002",
+          "T003"
+        ],
+        "title": "Phase 2: Usecase 層 — モデルプロファイル解決ロジック"
+      },
+      {
+        "description": [
+          "build_codex_invocation に full_auto: bool パラメータを追加。",
+          "run_codex_local で agent-profiles.json を読み、model_profiles から full_auto を解決。",
+          "fake-codex 統合テストで --full-auto の有無を検証。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T004",
+          "T005"
+        ],
+        "title": "Phase 3: CLI 層 — invocation 構築の統合"
+      },
+      {
+        "description": [
+          "ワークアラウンドスクリプト削除、ドキュメント・メモリ更新、CI グリーン確認。"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T006",
+          "T007",
+          "T008"
+        ],
+        "title": "Phase 4: クリーンアップ"
+      }
+    ],
+    "summary": [
+      "agent-profiles.json に model_profiles を追加し、per-model の振る舞い（--full-auto 等）を設定ファイルで一元管理する。",
+      "review.rs は agent-profiles.json を読んで model に応じたフラグを解決する。",
+      "未知モデルは fail-closed（full_auto: true）。spark は full_auto: false。"
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "agent-profiles.json の codex provider に model_profiles セクションを追加（gpt-5.4: full_auto=true, gpt-5.3-codex: full_auto=true, gpt-5.3-codex-spark: full_auto=false）",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "usecase 層に ModelProfile 型と resolve_full_auto() 関数を追加",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "resolve_full_auto のユニットテスト（既知モデル、未知モデルフォールバック、model_profiles 欠如）",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "build_codex_invocation に full_auto: bool パラメータを追加しテスト更新",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "run_codex_local で agent-profiles.json を読み model_profiles から full_auto を解決 + fake-codex 統合テスト（full model: --full-auto あり、spark: --full-auto なし、ファイル読み込み失敗: fail-closed）",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "ワークアラウンドスクリプト (test-full-auto.sh 等) の削除",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "description": "ドキュメント更新 (DESIGN.md reviewer セクション、メモリノート、spec.md)",
+      "id": "T007",
+      "status": "done"
+    },
+    {
+      "description": "CI グリーン確認",
+      "id": "T008",
+      "status": "done"
+    }
+  ],
+  "title": "Full model reviewer の --full-auto 自動付与",
+  "updated_at": "2026-03-17T00:55:13Z"
+}

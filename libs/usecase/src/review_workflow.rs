@@ -160,6 +160,39 @@ pub fn classify_review_verdict(
     }
 }
 
+fn default_full_auto() -> bool {
+    true
+}
+
+/// Per-model behavioral profile loaded from `agent-profiles.json`.
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+pub struct ModelProfile {
+    /// Whether `--full-auto` should be passed to `codex exec`.
+    /// Defaults to `true` (fail-closed) when omitted from JSON.
+    #[serde(default = "default_full_auto")]
+    pub full_auto: bool,
+}
+
+/// Resolves whether `--full-auto` should be enabled for the given model.
+///
+/// Looks up `model` in the provided `model_profiles` map.
+/// Falls back to `true` (fail-closed) when the model is not found
+/// or when `model_profiles` is `None`.
+///
+/// # Errors
+///
+/// This function does not return errors — unknown models default to `true`.
+#[must_use]
+pub fn resolve_full_auto(
+    model: &str,
+    model_profiles: Option<&std::collections::HashMap<String, ModelProfile>>,
+) -> bool {
+    match model_profiles {
+        Some(profiles) => profiles.get(model).is_none_or(|profile| profile.full_auto),
+        None => true,
+    }
+}
+
 pub fn render_review_payload(payload: &ReviewFinalPayload) -> Result<String, ReviewWorkflowError> {
     Ok(serde_json::to_string(payload)?)
 }
@@ -350,11 +383,12 @@ impl<'de> Visitor<'de> for ReviewFindingShapeVisitor {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::{
-        REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewFinalPayload, ReviewFinding,
-        ReviewPayloadVerdict, ReviewVerdict, classify_review_verdict, normalize_final_message,
-        parse_review_final_message,
+        ModelProfile, REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewFinalPayload,
+        ReviewFinding, ReviewPayloadVerdict, ReviewVerdict, classify_review_verdict,
+        normalize_final_message, parse_review_final_message, resolve_full_auto,
     };
     use serde_json::Value;
+    use std::collections::HashMap;
 
     #[test]
     fn review_output_schema_json_contains_expected_verdict_literals() {
@@ -617,5 +651,59 @@ mod tests {
             classify_review_verdict(false, false, &ReviewFinalMessageState::Missing),
             ReviewVerdict::ProcessFailed
         );
+    }
+
+    #[test]
+    fn resolve_full_auto_returns_true_for_full_model() {
+        let mut profiles = HashMap::new();
+        profiles.insert("gpt-5.4".to_owned(), ModelProfile { full_auto: true });
+        profiles.insert("gpt-5.3-codex-spark".to_owned(), ModelProfile { full_auto: false });
+
+        assert!(resolve_full_auto("gpt-5.4", Some(&profiles)));
+    }
+
+    #[test]
+    fn resolve_full_auto_returns_false_for_spark_model() {
+        let mut profiles = HashMap::new();
+        profiles.insert("gpt-5.4".to_owned(), ModelProfile { full_auto: true });
+        profiles.insert("gpt-5.3-codex-spark".to_owned(), ModelProfile { full_auto: false });
+
+        assert!(!resolve_full_auto("gpt-5.3-codex-spark", Some(&profiles)));
+    }
+
+    #[test]
+    fn resolve_full_auto_returns_true_for_explicit_gpt53_codex_entry() {
+        let mut profiles = HashMap::new();
+        profiles.insert("gpt-5.3-codex".to_owned(), ModelProfile { full_auto: true });
+
+        assert!(resolve_full_auto("gpt-5.3-codex", Some(&profiles)));
+    }
+
+    #[test]
+    fn resolve_full_auto_returns_true_for_unknown_model_fail_closed() {
+        let mut profiles = HashMap::new();
+        profiles.insert("gpt-5.3-codex-spark".to_owned(), ModelProfile { full_auto: false });
+
+        assert!(resolve_full_auto("unknown-model-xyz", Some(&profiles)));
+    }
+
+    #[test]
+    fn resolve_full_auto_returns_true_when_model_profiles_is_none() {
+        assert!(resolve_full_auto("gpt-5.4", None));
+        assert!(resolve_full_auto("gpt-5.3-codex-spark", None));
+    }
+
+    #[test]
+    fn resolve_full_auto_returns_true_when_model_profiles_is_empty() {
+        let profiles = HashMap::new();
+
+        assert!(resolve_full_auto("gpt-5.4", Some(&profiles)));
+    }
+
+    #[test]
+    fn model_profile_defaults_full_auto_to_true_when_omitted() {
+        let profile: ModelProfile = serde_json::from_str("{}").unwrap();
+
+        assert!(profile.full_auto, "omitted full_auto should default to true (fail-closed)");
     }
 }
