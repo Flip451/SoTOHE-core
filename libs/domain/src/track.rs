@@ -451,6 +451,34 @@ impl TrackMetadata {
         Ok(task_id)
     }
 
+    /// Validates that existing task descriptions have not been modified.
+    ///
+    /// Compares task descriptions between `self` (the new state) and `previous`
+    /// (the last saved state). Tasks that exist in both (matched by ID) must
+    /// have identical descriptions. New tasks (IDs not in `previous`) are allowed.
+    ///
+    /// # Errors
+    /// Returns `ValidationError::TaskDescriptionMutated` if any existing task's
+    /// description has been changed.
+    pub fn validate_descriptions_unchanged(
+        &self,
+        previous: &TrackMetadata,
+    ) -> Result<(), ValidationError> {
+        let prev_map: HashMap<&TaskId, &str> =
+            previous.tasks.iter().map(|t| (t.id(), t.description())).collect();
+
+        for task in &self.tasks {
+            if let Some(prev_desc) = prev_map.get(task.id()) {
+                if task.description() != *prev_desc {
+                    return Err(ValidationError::TaskDescriptionMutated {
+                        task_id: task.id().to_string(),
+                    });
+                }
+            }
+        }
+        Ok(())
+    }
+
     fn ordered_task_ids(&self) -> Vec<&TaskId> {
         let mut ordered = Vec::new();
         let mut seen = HashSet::new();
@@ -669,6 +697,70 @@ mod tests {
             result,
             Err(DomainError::Validation(ValidationError::NoSectionsAvailable))
         ));
+    }
+
+    #[test]
+    fn test_validate_descriptions_unchanged_rejects_mutation() {
+        let original = make_track(&["T001", "T002"], &["T001", "T002"]);
+
+        let t1 = TrackTask::new(TaskId::new("T001").unwrap(), "CHANGED description").unwrap();
+        let t2 = TrackTask::new(TaskId::new("T002").unwrap(), "Task T002").unwrap();
+        let section = PlanSection::new(
+            "S1",
+            "Section 1",
+            vec![],
+            vec![TaskId::new("T001").unwrap(), TaskId::new("T002").unwrap()],
+        )
+        .unwrap();
+        let plan = PlanView::new(vec![], vec![section]);
+        let modified = TrackMetadata::new(
+            TrackId::new("test-track").unwrap(),
+            "Test Track",
+            vec![t1, t2],
+            plan,
+            None,
+        )
+        .unwrap();
+
+        let result = modified.validate_descriptions_unchanged(&original);
+        assert!(
+            matches!(result, Err(ValidationError::TaskDescriptionMutated { ref task_id }) if task_id == "T001"),
+            "expected TaskDescriptionMutated for T001, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_validate_descriptions_unchanged_accepts_unchanged() {
+        let track = make_track(&["T001", "T002"], &["T001", "T002"]);
+        let result = track.validate_descriptions_unchanged(&track);
+        assert!(result.is_ok(), "expected Ok for unchanged descriptions, got: {result:?}");
+    }
+
+    #[test]
+    fn test_validate_descriptions_unchanged_accepts_new_task() {
+        let original = make_track(&["T001"], &["T001"]);
+
+        let t1 = TrackTask::new(TaskId::new("T001").unwrap(), "Task T001").unwrap();
+        let t2 = TrackTask::new(TaskId::new("T002").unwrap(), "Brand new task").unwrap();
+        let section = PlanSection::new(
+            "S1",
+            "Section 1",
+            vec![],
+            vec![TaskId::new("T001").unwrap(), TaskId::new("T002").unwrap()],
+        )
+        .unwrap();
+        let plan = PlanView::new(vec![], vec![section]);
+        let updated = TrackMetadata::new(
+            TrackId::new("test-track").unwrap(),
+            "Test Track",
+            vec![t1, t2],
+            plan,
+            None,
+        )
+        .unwrap();
+
+        let result = updated.validate_descriptions_unchanged(&original);
+        assert!(result.is_ok(), "expected Ok when adding a new task, got: {result:?}");
     }
 
     #[test]

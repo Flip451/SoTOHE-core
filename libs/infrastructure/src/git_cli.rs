@@ -288,7 +288,13 @@ pub fn collect_track_branch_claims(root: &Path) -> Result<Vec<TrackBranchRecord>
             if !metadata_path.is_file() {
                 continue;
             }
-            let metadata = read_metadata(&metadata_path)?;
+            let metadata = match read_metadata(&metadata_path) {
+                Ok(m) => m,
+                Err(e) => {
+                    eprintln!("warning: skipping {}: {e}", metadata_path.display());
+                    continue;
+                }
+            };
             claims.push(TrackBranchRecord {
                 display_path: entry.strip_prefix(root).unwrap_or(&entry).display().to_string(),
                 track_name: entry
@@ -407,7 +413,7 @@ fn invalid_v3_non_null_branch(raw: &serde_json::Value) -> bool {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+#[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use std::fs;
     use std::path::PathBuf;
@@ -637,15 +643,21 @@ mod tests {
     }
 
     #[test]
-    fn collect_track_branch_claims_fails_closed_on_invalid_metadata() {
+    fn collect_track_branch_claims_skips_invalid_metadata_and_returns_valid() {
         let dir = tempfile::tempdir().unwrap();
-        let active = dir.path().join("track/items/active");
-        fs::create_dir_all(&active).unwrap();
-        fs::write(active.join("metadata.json"), "{not-json").unwrap();
+        let valid = dir.path().join("track/items/valid");
+        let invalid = dir.path().join("track/items/invalid");
+        fs::create_dir_all(&valid).unwrap();
+        fs::create_dir_all(&invalid).unwrap();
+        fs::write(
+            valid.join("metadata.json"),
+            "{\"branch\":\"track/valid\",\"status\":\"in_progress\"}",
+        )
+        .unwrap();
+        fs::write(invalid.join("metadata.json"), "{not-json").unwrap();
 
-        let err = collect_track_branch_claims(dir.path()).unwrap_err();
-
-        assert!(err.contains("Cannot read or parse metadata.json"));
-        assert!(err.contains("track/items/active/metadata.json"));
+        let claims = collect_track_branch_claims(dir.path()).unwrap();
+        assert_eq!(claims.len(), 1);
+        assert_eq!(claims[0].track_name, "valid");
     }
 }

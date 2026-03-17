@@ -105,6 +105,10 @@ DO NOT report findings about unchanged pre-existing code.
 Launch one reviewer per non-empty group, **in parallel** using Agent Teams
 (the Agent tool with `run_in_background: true`).
 
+**Agent tool usage constraint**: When spawning agents, instruct them to use the `Read` tool
+(not `Bash(grep ...)`, `Bash(cat ...)`, etc.) for reading output files and extracting results.
+Commands in the `FORBIDDEN_ALLOW` list trigger permission prompts and block automation.
+
 **When the provider has a CLI tool** (e.g., Codex CLI — the default profile):
 
 Use `{fast_model}` for iterative rounds and `{model}` for the final confirmation round (see Model escalation strategy).

@@ -4,7 +4,10 @@
 //! rather than CLI: track ID detection from branch names, task transition
 //! resolution, and activation guard checks.
 
-use domain::{CommitHash, TaskStatusKind, TaskTransition, TrackId, TrackReadError, TrackReader};
+use domain::{
+    CommitHash, TaskStatusKind, TaskTransition, TrackId, TrackReadError, TrackReader,
+    ValidationError,
+};
 use thiserror::Error;
 
 /// Errors returned by track resolution functions.
@@ -16,6 +19,8 @@ pub enum TrackResolutionError {
     NotTrackBranch(String),
     #[error("cannot determine current git branch; provide an explicit track-id")]
     NoBranch,
+    #[error("invalid track id from branch '{0}': {1}")]
+    InvalidTrackId(String, #[source] ValidationError),
     #[error("unsupported target status: {0}")]
     UnsupportedTargetStatus(String),
     #[error("track '{0}' is not activated yet; run /track:activate {0}")]
@@ -33,9 +38,15 @@ pub enum TrackResolutionError {
 /// is detached HEAD, or is `None`.
 pub fn resolve_track_id_from_branch(branch: Option<&str>) -> Result<String, TrackResolutionError> {
     match branch {
-        Some(b) if b.starts_with("track/") => Ok(b["track/".len()..].to_owned()),
-        Some("HEAD") => Err(TrackResolutionError::DetachedHead),
-        Some(b) => Err(TrackResolutionError::NotTrackBranch(b.to_owned())),
+        Some(b) => match b.strip_prefix("track/") {
+            Some(slug) => {
+                TrackId::new(slug)
+                    .map_err(|e| TrackResolutionError::InvalidTrackId(slug.to_owned(), e))?;
+                Ok(slug.to_owned())
+            }
+            None if b == "HEAD" => Err(TrackResolutionError::DetachedHead),
+            None => Err(TrackResolutionError::NotTrackBranch(b.to_owned())),
+        },
         None => Err(TrackResolutionError::NoBranch),
     }
 }
@@ -329,6 +340,20 @@ mod tests {
 
         let id = TrackId::new("test").unwrap();
         assert!(reject_branchless_guard(&reader, &id, "skipped", 3).is_ok());
+    }
+
+    // --- T003: TrackId validation tests (written first — Red phase) ---
+
+    #[test]
+    fn test_resolve_track_id_from_branch_with_invalid_slug_returns_invalid_track_id() {
+        let result = resolve_track_id_from_branch(Some("track/Not Valid"));
+        assert!(matches!(result.unwrap_err(), TrackResolutionError::InvalidTrackId(..)));
+    }
+
+    #[test]
+    fn test_resolve_track_id_from_branch_with_empty_suffix_returns_invalid_track_id() {
+        let result = resolve_track_id_from_branch(Some("track/"));
+        assert!(matches!(result.unwrap_err(), TrackResolutionError::InvalidTrackId(..)));
     }
 
     #[test]

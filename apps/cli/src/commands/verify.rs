@@ -9,6 +9,13 @@ use std::process::ExitCode;
 use clap::{Args, Subcommand};
 use domain::verify::VerifyOutcome;
 
+/// Arguments for spec-level verify subcommands.
+#[derive(Args)]
+pub struct SpecVerifyArgs {
+    /// Path to the spec.md file to verify.
+    spec_path: PathBuf,
+}
+
 /// Verify subcommands for CI validation.
 #[derive(Subcommand)]
 pub enum VerifyCommand {
@@ -22,6 +29,12 @@ pub enum VerifyCommand {
     Layers(VerifyArgs),
     /// Check .claude/settings.json structural guardrails.
     Orchestra(VerifyArgs),
+    /// Check spec.md requirement lines for [source: ...] attribution.
+    SpecAttribution(SpecVerifyArgs),
+    /// Check spec.md YAML frontmatter for required fields.
+    SpecFrontmatter(SpecVerifyArgs),
+    /// Check canonical module ownership (no reimplementation outside canonical modules).
+    CanonicalModules(VerifyArgs),
 }
 
 /// Common arguments for all verify subcommands.
@@ -51,6 +64,18 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
         VerifyCommand::Orchestra(args) => (
             "verify orchestra guardrails",
             infrastructure::verify::orchestra::verify(&args.project_root),
+        ),
+        VerifyCommand::SpecAttribution(args) => (
+            "verify spec attribution",
+            infrastructure::verify::spec_attribution::verify(&args.spec_path),
+        ),
+        VerifyCommand::SpecFrontmatter(args) => (
+            "verify spec frontmatter",
+            infrastructure::verify::spec_frontmatter::verify(&args.spec_path),
+        ),
+        VerifyCommand::CanonicalModules(args) => (
+            "verify canonical modules",
+            infrastructure::verify::canonical_modules::verify(&args.project_root),
         ),
     };
 
@@ -175,5 +200,64 @@ mod tests {
             VerifyOutcome::from_findings(vec![domain::verify::Finding::warning("note this")]);
         let exit = print_outcome("test", &outcome);
         assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    // --- spec-attribution CLI wiring ---
+
+    #[test]
+    fn test_spec_attribution_subcommand_returns_success_for_valid_spec() {
+        let tmp = TempDir::new().unwrap();
+        let spec = tmp.path().join("spec.md");
+        std::fs::write(&spec, "# Spec\n\nNo requirement lines here.\n").unwrap();
+        let exit = execute(VerifyCommand::SpecAttribution(SpecVerifyArgs { spec_path: spec }));
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn test_spec_attribution_subcommand_returns_failure_for_missing_source() {
+        let tmp = TempDir::new().unwrap();
+        let spec = tmp.path().join("spec.md");
+        std::fs::write(&spec, "### S-AUTH-01 Login required\n").unwrap();
+        let exit = execute(VerifyCommand::SpecAttribution(SpecVerifyArgs { spec_path: spec }));
+        assert_eq!(exit, ExitCode::FAILURE);
+    }
+
+    // --- spec-frontmatter CLI wiring ---
+
+    #[test]
+    fn test_spec_frontmatter_subcommand_returns_success_for_valid_spec() {
+        let tmp = TempDir::new().unwrap();
+        let spec = tmp.path().join("spec.md");
+        std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Spec\n").unwrap();
+        let exit = execute(VerifyCommand::SpecFrontmatter(SpecVerifyArgs { spec_path: spec }));
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn test_spec_frontmatter_subcommand_returns_failure_for_missing_frontmatter() {
+        let tmp = TempDir::new().unwrap();
+        let spec = tmp.path().join("spec.md");
+        std::fs::write(&spec, "# Spec without frontmatter\n").unwrap();
+        let exit = execute(VerifyCommand::SpecFrontmatter(SpecVerifyArgs { spec_path: spec }));
+        assert_eq!(exit, ExitCode::FAILURE);
+    }
+
+    // --- canonical-modules CLI wiring ---
+
+    #[test]
+    fn test_canonical_modules_subcommand_returns_success_for_clean_project() {
+        let tmp = TempDir::new().unwrap();
+        // No architecture-rules.json → canonical_modules section absent → pass
+        write_file(tmp.path(), "docs/architecture-rules.json", r#"{"version": 2}"#);
+        let exit = execute(VerifyCommand::CanonicalModules(make_args(tmp.path())));
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn test_canonical_modules_subcommand_returns_failure_for_missing_rules_file() {
+        let tmp = TempDir::new().unwrap();
+        // No docs/architecture-rules.json at all → error
+        let exit = execute(VerifyCommand::CanonicalModules(make_args(tmp.path())));
+        assert_eq!(exit, ExitCode::FAILURE);
     }
 }
