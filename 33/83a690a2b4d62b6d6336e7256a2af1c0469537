@@ -1,0 +1,22 @@
+## Task Summary: Review quality quick wins — shared parser, typed deserialization, permission relaxation
+
+**Track:** review-quality-quick-wins-2026-03-17
+**Task:** T001 (frontmatter parser), T002 (serde types), WF-35 (read-only commands)
+**Date:** 2026-03-17
+
+### Changes
+
+- frontmatter.rs: New shared YAML frontmatter parser (CRLF-safe)
+- spec_attribution.rs: Refactored to use shared parser
+- spec_frontmatter.rs: Refactored to use shared parser
+- canonical_modules.rs: Replaced hand-rolled Value walking with typed Deserialize structs
+- orchestra.rs: Removed head/tail/wc from FORBIDDEN_ALLOW, added git branch --show-current to expected
+- settings.json: Added head/tail/wc/git read-only to allow, cat/while to deny
+- 10-guardrails.md: Updated FORBIDDEN_ALLOW documentation
+- conventions/: Added typed-deserialization.md and prefer-type-safe-abstractions.md
+
+### Why
+
+Eliminate recurring review-cycle bugs: duplicated frontmatter parsing (same bug 3 times)
+and silent data loss via hand-rolled serde_json::Value walking. Also resolve permission
+prompts blocking agent automation for read-only commands.
