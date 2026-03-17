@@ -1,0 +1,26 @@
+## Task Summary: Phase 1 sotp hardening — security guards, verify modules, shell parsing
+
+**Track:** phase1-sotp-hardening-2026-03-17
+**Task:** T001-T008: Data safety, input validation, test file guards, spec verification
+**Date:** 2026-03-17
+
+### Changes
+
+- libs/domain/src/guard/policy.rs: bin/sotp overwrite guard with clustered short option handling
+- libs/domain/src/track.rs: validate_descriptions_unchanged for task description immutability
+- libs/domain/src/error.rs: TaskDescriptionMutated error variant
+- libs/usecase/src/hook.rs: TestFileDeletionGuardHandler with conch-parser, recursive shell re-entry detection
+- libs/usecase/src/pr_review.rs: numbered list and + prefix parsing, fenced code block tracking
+- libs/usecase/src/track_resolution.rs: TrackId validation after branch prefix strip
+- libs/infrastructure/src/verify/mod.rs: spec_attribution, spec_frontmatter, canonical_modules modules
+- libs/infrastructure/src/git_cli.rs: collect_track_branch_claims skip-and-warn
+- libs/infrastructure/src/track/codec.rs: TrackDocumentV2 serde(flatten) for unknown field preservation
+- apps/cli/src/commands/verify.rs: sotp verify spec-attribution and spec-frontmatter subcommands
+- docs/architecture-rules.json: canonical_modules rules for shell-parsing concern
+
+### Why
+
+Harden the sotp CLI against data loss (silent field drops, abort-on-single-failure),
+input validation gaps (unvalidated TrackId, limited PR body parsing), and accidental
+test file deletion. Add automated spec.md verification (attribution and frontmatter)
+and reinvention detection via canonical module rules.
