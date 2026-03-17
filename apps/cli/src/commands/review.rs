@@ -306,16 +306,16 @@ fn build_codex_invocation(
     output_schema: &Path,
     full_auto: bool,
 ) -> CodexInvocation {
-    let mut args = vec![
-        OsString::from("exec"),
-        OsString::from("--model"),
-        OsString::from(model),
-        OsString::from("--sandbox"),
-        OsString::from("read-only"),
-    ];
+    let mut args = vec![OsString::from("exec"), OsString::from("--model"), OsString::from(model)];
     if full_auto {
+        // --full-auto is required for full models (gpt-5.4 etc.) to produce
+        // JSON verdicts reliably (see GitHub Issue #4181).
+        // However, --full-auto implicitly sets --sandbox workspace-write.
+        // We re-apply --sandbox read-only AFTER --full-auto so the last-wins
+        // CLI semantics enforce read-only sandbox for reviewers.
         args.push(OsString::from("--full-auto"));
     }
+    args.extend([OsString::from("--sandbox"), OsString::from("read-only")]);
     args.extend([
         OsString::from("--output-schema"),
         output_schema.as_os_str().to_os_string(),
@@ -695,7 +695,7 @@ exit "${SOTP_FAKE_CODEX_EXIT_CODE:-0}"
     }
 
     #[test]
-    fn build_codex_invocation_includes_full_auto_when_true() {
+    fn build_codex_invocation_includes_full_auto_then_read_only_when_true() {
         let invocation = build_codex_invocation(
             "gpt-5.4",
             "Review this change.",
@@ -707,8 +707,15 @@ exit "${SOTP_FAKE_CODEX_EXIT_CODE:-0}"
             invocation.args.iter().map(|arg| arg.to_string_lossy().to_string()).collect::<Vec<_>>();
 
         assert_eq!(rendered.first().map(String::as_str), Some("exec"));
-        assert!(rendered.windows(2).any(|pair| pair == ["--sandbox", "read-only"]));
         assert!(rendered.iter().any(|arg| arg == "--full-auto"));
+        // --sandbox read-only must appear AFTER --full-auto to override workspace-write
+        let full_auto_pos = rendered.iter().position(|a| a == "--full-auto").unwrap();
+        let sandbox_pos =
+            rendered.windows(2).position(|p| p == ["--sandbox", "read-only"]).unwrap();
+        assert!(
+            sandbox_pos > full_auto_pos,
+            "--sandbox read-only must come after --full-auto to override its implicit workspace-write"
+        );
         assert!(rendered.windows(2).any(|pair| pair == ["--model", "gpt-5.4"]));
     }
 

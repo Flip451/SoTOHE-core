@@ -54,6 +54,8 @@ pub enum CliHookName {
     FileLockAcquire,
     /// Lock: release file lock (PostToolUse).
     FileLockRelease,
+    /// Guard: block `rm` commands targeting test files (PreToolUse).
+    BlockTestFileDeletion,
 }
 
 impl CliHookName {
@@ -64,6 +66,7 @@ impl CliHookName {
             Self::BlockDirectGitOps => HookName::BlockDirectGitOps,
             Self::FileLockAcquire => HookName::FileLockAcquire,
             Self::FileLockRelease => HookName::FileLockRelease,
+            Self::BlockTestFileDeletion => HookName::BlockTestFileDeletion,
         }
     }
 
@@ -159,6 +162,10 @@ fn execute_dispatch(
             let handler = usecase::hook::GuardHookHandler;
             handler_handle(&handler, &ctx, &input)
         }
+        CliHookName::BlockTestFileDeletion => {
+            let handler = usecase::hook::TestFileDeletionGuardHandler;
+            handler_handle(&handler, &ctx, &input)
+        }
         CliHookName::FileLockAcquire | CliHookName::FileLockRelease => {
             // Lock hooks require locks_dir to construct FsFileLockManager.
             let Some(ref dir) = ctx.locks_dir else {
@@ -179,8 +186,8 @@ fn execute_dispatch(
                     let handler = usecase::hook::LockReleaseHookHandler::new(lock_manager);
                     handler_handle(&handler, &ctx, &input)
                 }
-                CliHookName::BlockDirectGitOps => {
-                    // unreachable — handled by outer match arm
+                CliHookName::BlockDirectGitOps | CliHookName::BlockTestFileDeletion => {
+                    // unreachable — handled by outer match arms
                     return handle_error(is_post, "internal dispatch error");
                 }
             }
@@ -213,7 +220,7 @@ fn resolve_locks_dir(explicit: Option<PathBuf>) -> Option<PathBuf> {
 /// Emits the hook verdict to stdout and returns the appropriate exit code.
 fn emit_verdict(hook: CliHookName, verdict: &domain::hook::HookVerdict) -> ExitCode {
     match hook {
-        CliHookName::BlockDirectGitOps => {
+        CliHookName::BlockDirectGitOps | CliHookName::BlockTestFileDeletion => {
             // Guard: plain text reason + exit 2, or empty + exit 0
             if verdict.is_blocked() {
                 if let Some(reason) = &verdict.reason {

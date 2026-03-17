@@ -56,4 +56,5 @@
 
 <!-- convention-docs:start -->
 - `security.md`: Security Convention
+- `shell-parsing.md`: Shell Parsing Convention
 <!-- convention-docs:end -->

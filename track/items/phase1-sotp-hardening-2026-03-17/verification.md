@@ -2,14 +2,14 @@
 
 ## Scope Verified
 
-- [ ] T001: TrackDocumentV2 unknown field preservation
-- [ ] T002: collect_track_branch_claims skip-and-warn
-- [ ] T003: resolve_track_id_from_branch TrackId validation
-- [ ] T004: parse_body_findings extended format support
-- [ ] T005: block-test-file-deletion hook
-- [ ] T006: Task description immutability validation
-- [ ] T007: sotp verify spec-attribution
-- [ ] T008: sotp verify spec-frontmatter
+- [x] T001: TrackDocumentV2 unknown field preservation
+- [x] T002: collect_track_branch_claims skip-and-warn
+- [x] T003: resolve_track_id_from_branch TrackId validation
+- [x] T004: parse_body_findings extended format support
+- [x] T005: block-test-file-deletion hook
+- [x] T006: Task description immutability validation
+- [x] T007: sotp verify spec-attribution
+- [x] T008: sotp verify spec-frontmatter
 
 ## Manual Verification Steps
 
@@ -69,7 +69,7 @@
 
 ## Result
 
-- pending
+- All 8 tasks implemented and verified. 776 tests pass. CI green.
 
 ## Open Issues
 
@@ -77,4 +77,4 @@
 
 ## Verified At
 
-- pending
+- 2026-03-17

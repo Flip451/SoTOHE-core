@@ -73,6 +73,26 @@ A few tasks (`track-local-review`, `track-add-task`, `track-set-override`) use
 a shell `"$@"` wrapper because cargo-make's `${@}` expansion loses quoting for
 multi-word positional arguments.
 
+### `bin/sotp` バイナリ管理
+
+`bin/sotp` はホスト toolchain でビルドされる実行バイナリ（`.gitignore` 済み）。
+**必ず `cargo make build-sotp` 経由でビルドすること。**
+
+```bash
+# OK: 検証付きビルド（glibc 不一致を自動検出）
+cargo make build-sotp
+
+# NG: 手動ビルド＆コピー（glibc 不一致を検出できない）
+cargo build --release -p cli && cp target/release/sotp bin/sotp
+```
+
+`build-sotp` はビルド後に `bin/sotp --help` を実行して動作を検証する。
+glibc 不一致などで実行不能な場合はバイナリを自動削除してエラー終了する。
+
+**`bin/sotp` が壊れた場合の復旧手順:**
+1. `rm bin/sotp`
+2. `cargo make build-sotp`
+
 ### `-local` タスクについて
 
 `Makefile.toml` には `fmt-local`, `clippy-local`, `ci-local` などの `-local` サフィックス付きタスクがある。
