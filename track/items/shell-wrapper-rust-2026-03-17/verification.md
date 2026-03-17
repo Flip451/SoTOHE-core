@@ -43,7 +43,20 @@
   - `dispatch_exec()` 残余引数転送
   - `dispatch_track_pr_push/ensure()` 残余引数転送
 
+### Phase 3 (T007–T010): 中優先度 arg フォワーディング移行 — Done
+
+- 18 タスクを `script_runner = "@shell"` → `command + args` に移行:
+  - `track-branch-create`, `track-branch-switch`, `track-activate` (T007)
+  - `track-pr-push`, `track-pr-ensure`, `track-pr`, `track-pr-review`, `track-pr-merge`, `track-pr-status` (T008)
+  - `track-plan-branch` (T009)
+  - `track-resolve`, `track-switch-main`, `track-add-paths`, `add-all` (T010)
+- `track-local-review` は shell `"$@"` wrapper 維持 (multi-word arg quoting 保護)
+- Python テスト: 4 テスト更新 + 2 テスト新規追加
+- `cargo make ci` グリーン
+- `bin/sotp make track-resolve` スモークテスト確認
+
 ## verified_at
 
 - Phase 1: 2026-03-17
 - Phase 2: 2026-03-17
+- Phase 3: 2026-03-17

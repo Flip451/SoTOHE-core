@@ -675,82 +675,78 @@ args = ["add", "${@}"]
 
 [tasks.add-all]
 description = "[wrapper] Stage all worktree changes except transient automation scratch files"
-script_runner = "@shell"
-script = ['bin/sotp git add-all']
+command = "bin/sotp"
+args = ["make", "add-all"]
 
 [tasks.track-branch-create]
 description = "[wrapper] Materialize branch metadata, create a track branch from main, and switch to it (usage: cargo make track-branch-create '<track-id>')"
-script_runner = "@shell"
-script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; bin/sotp track branch create --items-dir track/items "$TRACK_ID"']
+command = "bin/sotp"
+args = ["make", "track-branch-create", "${@}"]
 
 [tasks.track-branch-switch]
 description = "[wrapper] Materialize branch metadata if needed, then switch to an existing track branch (usage: cargo make track-branch-switch '<track-id>')"
-script_runner = "@shell"
-script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; bin/sotp track branch switch --items-dir track/items "$TRACK_ID"']
+command = "bin/sotp"
+args = ["make", "track-branch-switch", "${@}"]
 
 [tasks.track-activate]
 description = "[wrapper] Materialize a planning-only track and switch to its track branch (usage: cargo make track-activate '<track-id>')"
-script_runner = "@shell"
-script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; bin/sotp track activate --items-dir track/items "$TRACK_ID"']
+command = "bin/sotp"
+args = ["make", "track-activate", "${@}"]
 
 [tasks.track-plan-branch]
 description = "[wrapper] Create a plan/<track-id> branch from main for planning-only review (usage: cargo make track-plan-branch '<track-id>')"
-script_runner = "@shell"
-script = ['TRACK_ID="$CARGO_MAKE_TASK_ARGS"; if [ -z "$TRACK_ID" ]; then echo "error: track-id argument required" >&2; exit 1; fi; git switch -c "plan/$TRACK_ID" main']
+command = "bin/sotp"
+args = ["make", "track-plan-branch", "${@}"]
 
 [tasks.track-resolve]
 description = "[wrapper] Resolve current track phase, next command, and blocker"
-script_runner = "@shell"
-script = ['bin/sotp track resolve $CARGO_MAKE_TASK_ARGS']
+command = "bin/sotp"
+args = ["make", "track-resolve", "${@}"]
 
 [tasks.track-pr-push]
 description = "[wrapper] Push current track/plan branch to origin (plan/ branches require track-id arg)"
-script_runner = "@shell"
-script = ['bin/sotp pr push ${CARGO_MAKE_TASK_ARGS:+--track-id $CARGO_MAKE_TASK_ARGS}']
+command = "bin/sotp"
+args = ["make", "track-pr-push", "${@}"]
 
 [tasks.track-pr-ensure]
 description = "[wrapper] Create or reuse a PR for the current track/plan branch (plan/ branches require track-id arg)"
-script_runner = "@shell"
-script = ['bin/sotp pr ensure-pr ${CARGO_MAKE_TASK_ARGS:+--track-id $CARGO_MAKE_TASK_ARGS}']
+command = "bin/sotp"
+args = ["make", "track-pr-ensure", "${@}"]
 
 [tasks.track-pr]
 description = "[wrapper] Push current branch and create/reuse a PR (push + ensure-pr in one step)"
-script_runner = "@shell"
-script = ['''
-TRACK_ARG="${CARGO_MAKE_TASK_ARGS:+--track-id $CARGO_MAKE_TASK_ARGS}"
-bin/sotp pr push $TRACK_ARG && \
-bin/sotp pr ensure-pr $TRACK_ARG
-''']
+command = "bin/sotp"
+args = ["make", "track-pr", "${@}"]
 
 [tasks.track-pr-review]
 description = "[wrapper] Run full PR review cycle: push, ensure PR, trigger @codex review, poll, parse"
-script_runner = "@shell"
-script = ['bin/sotp pr review-cycle']
+command = "bin/sotp"
+args = ["make", "track-pr-review"]
 
 [tasks.track-pr-merge]
 description = "[wrapper] Wait for PR checks to pass, then merge"
-script_runner = "@shell"
-script = ['bin/sotp pr wait-and-merge ${@}']
+command = "bin/sotp"
+args = ["make", "track-pr-merge", "${@}"]
 
 [tasks.track-pr-status]
 description = "[wrapper] Show PR check status"
-script_runner = "@shell"
-script = ['bin/sotp pr status ${@}']
+command = "bin/sotp"
+args = ["make", "track-pr-status", "${@}"]
 
 [tasks.track-local-review]
 description = "[wrapper] Run the local Codex reviewer through the repo-owned Rust wrapper"
 script_runner = "@shell"
-script = ['if [ "${1:-}" = "--" ]; then shift; fi; bin/sotp review codex-local "$@"']
+script = ['bin/sotp make track-local-review "$@"']
 
 [tasks.track-switch-main]
 description = "[wrapper] Switch to main branch and pull latest"
-script_runner = "@shell"
-script = ['bin/sotp git switch-and-pull main']
+command = "bin/sotp"
+args = ["make", "track-switch-main"]
 
 [tasks.track-add-paths]
 description = "[wrapper] Stage paths listed in tmp/track-commit/add-paths.txt and delete the scratch file"
-script_runner = "@shell"
-script = ['bin/sotp git add-from-file tmp/track-commit/add-paths.txt --cleanup']
+command = "bin/sotp"
+args = ["make", "track-add-paths"]
 
 [tasks.commit]
 description = "[gate] Run CI then commit (via sotp make)"
