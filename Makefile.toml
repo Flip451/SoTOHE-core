@@ -753,67 +753,54 @@ script_runner = "@shell"
 script = ['bin/sotp git add-from-file tmp/track-commit/add-paths.txt --cleanup']
 
 [tasks.commit]
-description = "[gate] Run CI then commit"
-dependencies = ["ci"]
-script_runner = "@shell"
-script = ['git commit -m "$CARGO_MAKE_TASK_ARGS"']
+description = "[gate] Run CI then commit (via sotp make)"
+command = "bin/sotp"
+args = ["make", "commit", "${@}"]
 
 [tasks.track-commit-message]
 description = "[wrapper] Run CI (output to tmp/ci-output.log) then commit using tmp/track-commit/commit-message.txt"
-script_runner = "@shell"
-script = ['''
-mkdir -p tmp
-echo "[track-commit-message] Running CI..."
-if cargo make ci > tmp/ci-output.log 2>&1; then
-  echo "[track-commit-message] CI PASSED"
-else
-  CI_EXIT=$?
-  echo "[track-commit-message] CI FAILED (exit $CI_EXIT). Last 20 lines:"
-  tail -20 tmp/ci-output.log
-  exit $CI_EXIT
-fi
-bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup
-''']
+command = "bin/sotp"
+args = ["make", "track-commit-message"]
 
 [tasks.note]
 description = "[git] Attach a git note to HEAD (usage: cargo make note '<note text>')"
-script_runner = "@shell"
-script = ['git notes add -f -m "$CARGO_MAKE_TASK_ARGS" HEAD']
+command = "bin/sotp"
+args = ["make", "note", "${@}"]
 
 [tasks.track-note]
 description = "[wrapper] Attach a git note from tmp/track-commit/note.md and delete the scratch file"
-script_runner = "@shell"
-script = ['bin/sotp git note-from-file tmp/track-commit/note.md --cleanup']
+command = "bin/sotp"
+args = ["make", "track-note"]
 
 [tasks.track-transition]
 description = "[wrapper] Transition a task status and sync rendered views"
-script_runner = "@shell"
-script = ['TRACK_DIR="${1:-}"; TASK_ID="${2:-}"; TARGET_STATUS="${3:-}"; shift 3 || true; if [ -z "$TRACK_DIR" ] || [ -z "$TASK_ID" ] || [ -z "$TARGET_STATUS" ]; then echo "error: usage: cargo make track-transition <track_dir> <task_id> <status> [--commit-hash <hash>]" >&2; exit 1; fi; TRACK_ITEMS_DIR="$(dirname "$TRACK_DIR")"; TRACK_ID="$(basename "$TRACK_DIR")"; bin/sotp track transition --items-dir "$TRACK_ITEMS_DIR" --locks-dir .locks "$TRACK_ID" "$TASK_ID" "$TARGET_STATUS" "$@"']
+command = "bin/sotp"
+args = ["make", "track-transition", "${@}"]
 
 [tasks.track-add-task]
 description = "[wrapper] Add a new task to a track"
 script_runner = "@shell"
-script = ['TRACK_ID="${1:-}"; DESC="${2:-}"; shift 2 || true; if [ -z "$TRACK_ID" ] || [ -z "$DESC" ]; then echo "error: usage: cargo make track-add-task <track-id> <description> [--section <id>] [--after <task-id>]" >&2; exit 1; fi; bin/sotp track add-task --items-dir track/items --locks-dir .locks "$TRACK_ID" "$DESC" "$@"']
+script = ['bin/sotp make track-add-task "$@"']
 
 [tasks.track-next-task]
 description = "[wrapper] Show the next open task for a track (JSON)"
-script_runner = "@shell"
-script = ['TRACK_ID="${1:-}"; if [ -z "$TRACK_ID" ]; then echo "error: usage: cargo make track-next-task <track-id>" >&2; exit 1; fi; bin/sotp track next-task --items-dir track/items "$TRACK_ID"']
+command = "bin/sotp"
+args = ["make", "track-next-task", "${@}"]
 
 [tasks.track-task-counts]
 description = "[wrapper] Show task status counts for a track (JSON)"
-script_runner = "@shell"
-script = ['TRACK_ID="${1:-}"; if [ -z "$TRACK_ID" ]; then echo "error: usage: cargo make track-task-counts <track-id>" >&2; exit 1; fi; bin/sotp track task-counts --items-dir track/items "$TRACK_ID"']
+command = "bin/sotp"
+args = ["make", "track-task-counts", "${@}"]
 
 [tasks.track-set-override]
 description = "[wrapper] Set or clear a status override on a track"
 script_runner = "@shell"
-script = ['TRACK_ID="${1:-}"; STATUS="${2:-}"; shift 2 || true; if [ -z "$TRACK_ID" ] || [ -z "$STATUS" ]; then echo "error: usage: cargo make track-set-override <track-id> <blocked|cancelled|clear> [--reason <text>]" >&2; exit 1; fi; if [ "$STATUS" = "clear" ]; then bin/sotp track clear-override --items-dir track/items --locks-dir .locks "$TRACK_ID" "$@"; else bin/sotp track set-override --items-dir track/items --locks-dir .locks "$TRACK_ID" "$STATUS" "$@"; fi']
+script = ['bin/sotp make track-set-override "$@"']
 
 [tasks.track-sync-views]
 description = "[wrapper] Render plan.md and registry.md from metadata.json"
-script_runner = "@shell"
-script = ['bin/sotp track views sync --project-root . $CARGO_MAKE_TASK_ARGS']
+command = "bin/sotp"
+args = ["make", "track-sync-views", "${@}"]
 
 [tasks.clean]
 description = "[wrapper] Remove compose resources"

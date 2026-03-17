@@ -28,6 +28,22 @@
 - clippy `indexing_slicing` を `.get()` パターンに修正済み
 - 残タスク: T003–T014 (Phase 2–5)
 
+### Phase 2 (T003–T006): 高優先度タスク移行 — Done
+
+- 10 タスクを `script_runner = "@shell"` → `command = "bin/sotp"` + `args = ["make", "<task>", "${@}"]` に移行:
+  - `commit`, `track-commit-message`, `note`, `track-note`
+  - `track-transition`, `track-add-task`, `track-next-task`, `track-task-counts`
+  - `track-set-override`, `track-sync-views`
+- `scripts/test_make_wrappers.py` の 4 テストを新フォーマットに対応するよう更新
+- `cargo make ci` グリーン (336 passed scripts, 245 passed hooks, 全 verify パス)
+- レビュー済み P1 修正 (Phase 1 中):
+  - `raw_args_to_words()` quoting 保持
+  - `dispatch_track_commit_message()` stderr キャプチャ
+  - CI exit code 伝播 (`dispatch_commit`, `dispatch_track_commit_message`)
+  - `dispatch_exec()` 残余引数転送
+  - `dispatch_track_pr_push/ensure()` 残余引数転送
+
 ## verified_at
 
 - Phase 1: 2026-03-17
+- Phase 2: 2026-03-17
