@@ -1,0 +1,19 @@
+## Task Summary: Phase 2 high-priority Makefile.toml migration
+
+**Track:** shell-wrapper-rust-2026-03-17
+**Task:** T003-T006: commit/note quoting fix, track-transition/add-task/set-override shell removal
+**Date:** 2026-03-17
+
+### Changes
+
+- Makefile.toml: 10 tasks migrated from script_runner="@shell" to command+args or sotp make shell wrappers
+- scripts/test_make_wrappers.py: 4 tests updated + 1 new test for new wrapper format validation
+- metadata.json: T003-T006 transitioned to done
+- verification.md: Phase 2 results recorded
+
+### Why
+
+Eliminate shell string interpolation in commit/note tasks to fix quoting vulnerabilities (SEC-11),
+and remove complex positional arg parsing ($1/$2/shift) from track-transition and state ops
+for better error diagnostics and LSP traceability. track-add-task and track-set-override retain
+shell "$@" wrapper to preserve multi-word argument quoting lost by cargo-make ${@} expansion.
