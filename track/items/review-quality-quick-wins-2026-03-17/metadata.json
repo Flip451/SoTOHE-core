@@ -1,0 +1,48 @@
+{
+  "branch": "track/review-quality-quick-wins-2026-03-17",
+  "created_at": "2026-03-17T13:00:00Z",
+  "id": "review-quality-quick-wins-2026-03-17",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Extract common YAML frontmatter parsing logic from spec_attribution.rs and spec_frontmatter.rs into a shared frontmatter.rs module."
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Shared Frontmatter Parser"
+      },
+      {
+        "description": [
+          "Replace hand-rolled serde_json::Value parsing in canonical_modules.rs with typed #[derive(Deserialize)] structs, and add convention doc for typed deserialization over manual JSON walking."
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "Typed Deserialization Convention"
+      }
+    ],
+    "summary": [
+      "Extract duplicated frontmatter parsing into a shared module and replace hand-rolled JSON parsing with typed serde deserialization"
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "Extract shared frontmatter parser from spec_attribution and spec_frontmatter into verify/frontmatter.rs",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "Replace hand-rolled serde_json::Value parsing in canonical_modules.rs with typed deserialization (#[derive(Deserialize)]), add typed-deserialization and prefer-type-safe-abstractions convention docs, and update conventions/README.md index",
+      "id": "T002",
+      "status": "done"
+    }
+  ],
+  "title": "Review quality quick wins: shared frontmatter parser + fail-closed convention",
+  "updated_at": "2026-03-17T14:38:24Z"
+}

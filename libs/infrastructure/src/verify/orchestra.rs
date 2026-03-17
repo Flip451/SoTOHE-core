@@ -116,6 +116,9 @@ const EXPECTED_OTHER_ALLOW: &[(&str, &str)] = &[
     ("Bash(tree:*)", "tree permission"),
     ("Bash(which:*)", "which permission"),
     ("Bash(true)", "true permission"),
+    ("Bash(head :*)", "head read-only permission"),
+    ("Bash(tail :*)", "tail read-only permission"),
+    ("Bash(wc :*)", "wc read-only permission"),
 ];
 
 const EXPECTED_GIT_ALLOW: &[(&str, &str)] = &[
@@ -124,6 +127,7 @@ const EXPECTED_GIT_ALLOW: &[(&str, &str)] = &[
     ("Bash(git log:*)", "git log permission"),
     ("Bash(git show:*)", "git show permission"),
     ("Bash(git branch --list:*)", "git branch --list permission"),
+    ("Bash(git branch --show-current)", "git branch --show-current permission"),
     ("Bash(git rev-parse:*)", "git rev-parse permission"),
     ("Bash(git ls-files:*)", "git ls-files permission"),
     ("Bash(git notes show:*)", "git notes show permission"),
@@ -230,9 +234,7 @@ const FORBIDDEN_ALLOW: &[&str] = &[
     "Bash(ls:*)",
     "Bash(find:*)",
     "Bash(grep:*)",
-    "Bash(head:*)",
-    "Bash(tail:*)",
-    "Bash(wc:*)",
+    // head, tail, wc are read-only — moved to allow (WF-35)
     "Bash(sort:*)",
     "Bash(uniq:*)",
     "Bash(diff:*)",
