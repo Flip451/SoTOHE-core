@@ -1,0 +1,18 @@
+## Task Summary: Phase 1 sotp make subcommand foundation
+
+**Track:** shell-wrapper-rust-2026-03-17
+**Task:** T001 (sotp make clap definition) + T002 (dispatch mechanism)
+**Date:** 2026-03-17
+
+### Changes
+
+- apps/cli/src/commands/make.rs: New 591-line module with MakeArgs, MakeTask enum (26 variants), raw_args_to_single/raw_args_to_words helpers, execute/run dispatch, and per-task dispatch functions
+- apps/cli/src/commands/mod.rs: Added `pub mod make`
+- apps/cli/src/main.rs: Added Make variant to CliCommand enum with match arm
+- track/items/shell-wrapper-rust-2026-03-17/metadata.json: T001/T002 marked done
+- track/items/shell-wrapper-rust-2026-03-17/spec.md: Fixed -local task scope description
+- track/items/shell-wrapper-rust-2026-03-17/verification.md: Phase 1 results recorded
+
+### Why
+
+Replaces Makefile.toml shell wrappers with safe Rust dispatch to eliminate quoting vulnerabilities from shell string interpolation of $CARGO_MAKE_TASK_ARGS. Phase 1 establishes the `sotp make` subcommand foundation and dispatch mechanism that all subsequent phases build upon.
