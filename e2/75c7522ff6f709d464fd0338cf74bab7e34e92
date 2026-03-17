@@ -1,0 +1,19 @@
+## Task Summary: Planning artifacts for reviewer --full-auto auto-config
+
+**Track:** reviewer-full-auto-2026-03-17
+**Task:** Planning phase — metadata.json, spec.md, plan.md, verification.md
+**Date:** 2026-03-17
+
+### Changes
+
+- metadata.json: Track SSoT with 8 tasks across 4 phases (schema extension, usecase logic, CLI integration, cleanup)
+- spec.md: Feature specification with model_profiles design, fail-closed strategy, 9 acceptance criteria
+- plan.md: Auto-generated view from metadata.json
+- verification.md: Checklist covering all fail-closed paths (unknown model, missing model_profiles, file-read failure)
+- registry.md: Updated to reflect new active track
+
+### Why
+
+Full model Codex reviewers (gpt-5.4) require --full-auto to produce JSON verdicts.
+This track adds model_profiles to agent-profiles.json for centralized per-model behavior config,
+replacing the manual test-full-auto.sh workaround.
