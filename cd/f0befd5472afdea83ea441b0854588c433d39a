@@ -1,0 +1,19 @@
+## Task Summary: Plan review-quality-quick-wins track
+
+**Track:** review-quality-quick-wins-2026-03-17
+**Task:** Planning artifacts for shared frontmatter parser and typed deserialization
+**Date:** 2026-03-17
+
+### Changes
+
+- metadata.json: Track definition with T001 (frontmatter) and T002 (typed deserialization)
+- spec.md: Goal, scope, constraints, acceptance criteria
+- plan.md: Auto-rendered from metadata.json
+- verification.md: Manual verification steps for both tasks
+- registry.md: Active track entry
+- .claude/settings.json: Added Bash(while:*) to deny list
+
+### Why
+
+Eliminate recurring review-cycle bug patterns: duplicated frontmatter parsing (same
+bug 3 times) and hand-rolled serde_json::Value walking (silent data loss via filter_map).
