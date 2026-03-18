@@ -1,0 +1,18 @@
+## Task Summary: Review infrastructure hardening
+
+**Track:** review-infra-hardening-2026-03-18
+**Task:** T001-T004: stderr capture, review state, record-round, commit guard
+**Date:** 2026-03-18
+
+### Changes
+
+- libs/domain/src/review.rs: New ReviewState, ReviewStatus, ReviewGroupState domain types with record_round/check_commit_ready/invalidate methods
+- libs/domain/src/track.rs: Added review field to TrackMetadata aggregate
+- libs/infrastructure/src/track/codec.rs: Review section serde types + backward-compatible encode/decode
+- libs/infrastructure/src/git_cli.rs: index_tree_hash() via git write-tree
+- apps/cli/src/commands/review.rs: Codex stderr capture via tee thread, session log fallback, RecordRound + CheckApproved subcommands
+- apps/cli/src/commands/make.rs: Review approval guard in track-commit-message
+
+### Why
+
+Solve three operational problems: Codex verdict extraction failures with no diagnostics, no enforcement of sequential model escalation, and no gate preventing commits without completed review. Review state is now tracked in metadata.json as SSoT with code hash validation.
