@@ -751,32 +751,43 @@ where
             }
         }
 
-        // Stage 1: Check reactions for bot +1 (post-trigger).
-        if check_reaction_zero_findings(client, &repo_nwo, pr, trigger_dt)? {
-            eprintln!("[OK] Zero-findings detected via +1 reaction.");
-            return Ok(PollReviewResult::ZeroFindings);
-        }
+        // Stage 1–2: Zero-findings detection via reactions/comments.
+        // These are PR-level signals (not commit-scoped), so we only trust them
+        // when we know the reviewed HEAD — the trigger_dt filter excludes stale
+        // signals, and the reviews loop above already returned for any completed
+        // review on the current commit. When head_commit is None (standalone
+        // poll_review), skip zero-findings detection to avoid accepting signals
+        // from a different commit.
+        if head_commit.is_some() {
+            // Stage 1: Check reactions for bot +1 (post-trigger).
+            if check_reaction_zero_findings(client, &repo_nwo, pr, trigger_dt)? {
+                eprintln!("[OK] Zero-findings detected via +1 reaction.");
+                return Ok(PollReviewResult::ZeroFindings);
+            }
 
-        // Stage 2: Comment-text fallback — only when a stale bot +1 reaction exists
-        // (GitHub deduplicates: same user + same reaction type keeps old created_at).
-        let has_stale_reaction = {
-            let reactions_json = client.list_reactions(&repo_nwo, pr)?;
-            let reactions = pr_review::parse_paginated_json(&reactions_json)
-                .map_err(|e| CliError::Message(format!("failed to parse reactions JSON: {e}")))?;
-            reactions.iter().any(|r| {
-                let content = r.get("content").and_then(|c| c.as_str()).unwrap_or("");
-                let author = r
-                    .get("user")
-                    .and_then(|u| u.get("login"))
-                    .and_then(|l| l.as_str())
-                    .unwrap_or("");
-                content == "+1" && is_codex_bot(author)
-            })
-        };
+            // Stage 2: Comment-text fallback — only when a stale bot +1 reaction exists
+            // (GitHub deduplicates: same user + same reaction type keeps old created_at).
+            let has_stale_reaction = {
+                let reactions_json = client.list_reactions(&repo_nwo, pr)?;
+                let reactions = pr_review::parse_paginated_json(&reactions_json).map_err(|e| {
+                    CliError::Message(format!("failed to parse reactions JSON: {e}"))
+                })?;
+                reactions.iter().any(|r| {
+                    let content = r.get("content").and_then(|c| c.as_str()).unwrap_or("");
+                    let author = r
+                        .get("user")
+                        .and_then(|u| u.get("login"))
+                        .and_then(|l| l.as_str())
+                        .unwrap_or("");
+                    content == "+1" && is_codex_bot(author)
+                })
+            };
 
-        if has_stale_reaction && check_comment_zero_findings(client, &repo_nwo, pr, trigger_dt)? {
-            eprintln!("[OK] Zero-findings detected via comment text fallback.");
-            return Ok(PollReviewResult::ZeroFindings);
+            if has_stale_reaction && check_comment_zero_findings(client, &repo_nwo, pr, trigger_dt)?
+            {
+                eprintln!("[OK] Zero-findings detected via comment text fallback.");
+                return Ok(PollReviewResult::ZeroFindings);
+            }
         }
 
         // Check comments for any bot activity (heartbeat detection).
@@ -1355,7 +1366,7 @@ mod tests {
             60,
             &client,
             &|_| {},
-            None,
+            Some("commit1"),
         );
         assert!(result.is_ok());
         assert!(
@@ -1378,7 +1389,7 @@ mod tests {
             0,
             &client,
             &|_| {},
-            None,
+            Some("commit1"),
         );
         assert!(result.is_ok());
         assert!(
@@ -1402,7 +1413,7 @@ mod tests {
             60,
             &client,
             &|_| {},
-            None,
+            Some("commit1"),
         );
         assert!(result.is_ok());
         assert!(
@@ -1426,7 +1437,7 @@ mod tests {
             60,
             &client,
             &|_| {},
-            None,
+            Some("commit1"),
         );
         assert!(result.is_ok());
         assert!(
@@ -1454,7 +1465,7 @@ mod tests {
             60,
             &client,
             &|_| {},
-            None,
+            Some("commit1"),
         );
         assert!(result.is_ok());
         assert!(
@@ -1464,27 +1475,16 @@ mod tests {
     }
 
     #[test]
-    fn poll_review_outputs_zero_findings_json_on_reaction_detection() {
-        // poll_review (standalone) should output {"verdict":"zero_findings","findings":[]} and return SUCCESS
+    fn poll_review_standalone_skips_zero_findings_without_head_commit() {
+        // Standalone poll_review passes head_commit=None, so zero-findings
+        // detection (reactions/comments) is skipped — they are PR-level signals
+        // that cannot be scoped to a specific commit.
         let client = PollTestClient::with_reactions(
             r#"[{"content":"+1","user":{"login":"openai-codex[bot]"},"created_at":"2026-03-18T10:05:00Z"}]"#,
         );
-        let result = super::poll_review("1", "2026-03-18T10:00:00Z", 15, 60, &client, &|_| {});
+        let result = super::poll_review("1", "2026-03-18T10:00:00Z", 15, 0, &client, &|_| {});
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ExitCode::SUCCESS);
-    }
-
-    #[test]
-    fn poll_review_outputs_zero_findings_json_on_comment_text_fallback() {
-        // poll_review with stale reaction + matching comment text → SUCCESS
-        let client = PollTestClient {
-            reviews: "[]".to_owned(),
-            comments: r#"[{"user":{"login":"openai-codex[bot]"},"body":"Didn't find any major issues.","created_at":"2026-03-18T10:05:00Z"}]"#.to_owned(),
-            reactions: r#"[{"content":"+1","user":{"login":"openai-codex[bot]"},"created_at":"2026-03-18T09:00:00Z"}]"#.to_owned(),
-        };
-        let result = super::poll_review("1", "2026-03-18T10:00:00Z", 15, 60, &client, &|_| {});
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ExitCode::SUCCESS);
+        assert_eq!(result.unwrap(), ExitCode::FAILURE);
     }
 
     // --- poll_review tests ---

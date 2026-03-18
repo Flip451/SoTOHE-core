@@ -851,12 +851,21 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         if has_non_metadata {
             // Roll back review state to pre-mutation snapshot (restores
             // status, code_hash, AND groups — not just invalidate).
+            // Propagate rollback failures so the caller knows the state
+            // may be corrupted rather than cleanly restored.
             if let Some(snapshot) = &review_snapshot {
                 let snap = snapshot.clone();
-                let _ = store.update(&track_id, |track| {
-                    *track.review_mut() = snap;
-                    Ok(())
-                });
+                store
+                    .update(&track_id, |track| {
+                        *track.review_mut() = snap;
+                        Ok(())
+                    })
+                    .map_err(|e| {
+                        format!(
+                            "[BLOCKED] Non-metadata staging detected AND rollback failed: {e}. \
+                             metadata.json may contain a partial review state."
+                        )
+                    })?;
                 stage_metadata(&git, &metadata_rel)?;
             }
             return Err("[BLOCKED] Non-metadata files were staged between hash computation \
@@ -894,14 +903,22 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         .index_tree_hash_normalizing(&metadata_rel)
         .map_err(|e| format!("verification hash error: {e}"))?;
     if verify_hash != post_update_hash {
-        // Roll back review state to pre-mutation snapshot (restores
-        // status, code_hash, AND groups — not just invalidate).
+        // Roll back review state to pre-mutation snapshot.
+        // Propagate rollback failures so the caller knows the state
+        // may be corrupted rather than cleanly restored.
         if let Some(snapshot) = &review_snapshot {
             let snap = snapshot.clone();
-            let _ = store.update(&track_id, |track| {
-                *track.review_mut() = snap;
-                Ok(())
-            });
+            store
+                .update(&track_id, |track| {
+                    *track.review_mut() = snap;
+                    Ok(())
+                })
+                .map_err(|e| {
+                    format!(
+                        "[BLOCKED] TOCTOU detected AND rollback failed: {e}. \
+                         metadata.json may contain a partial review state."
+                    )
+                })?;
             stage_metadata(&git, &metadata_rel)?;
         }
         return Err("[BLOCKED] Index changed between hash computation and verification — \
