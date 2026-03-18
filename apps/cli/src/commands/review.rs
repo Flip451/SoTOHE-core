@@ -783,12 +783,13 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
     use domain::TrackWriter;
     let mut stale_error: Option<String> = None;
     // Capture pre-mutation review snapshot for rollback on TOCTOU failure.
-    let mut review_snapshot: Option<domain::ReviewState> = None;
+    // Snapshot the Option<ReviewState> BEFORE get_or_insert_with so that
+    // tracks without a review section are restored to None, not empty ReviewState.
+    let mut review_snapshot: Option<Option<domain::ReviewState>> = None;
     store
         .update(&track_id, |track| {
+            review_snapshot = Some(track.review().cloned());
             let review = track.review_mut().get_or_insert_with(ReviewState::new);
-            // Snapshot before mutation so rollback can fully restore state.
-            review_snapshot = Some(review.clone());
 
             let round_num = review
                 .groups()
@@ -853,7 +854,7 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
             if let Some(snapshot) = &review_snapshot {
                 let snap = snapshot.clone();
                 let _ = store.update(&track_id, |track| {
-                    *track.review_mut() = Some(snap);
+                    *track.review_mut() = snap;
                     Ok(())
                 });
                 stage_metadata(&git, &metadata_rel)?;
@@ -898,7 +899,7 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         if let Some(snapshot) = &review_snapshot {
             let snap = snapshot.clone();
             let _ = store.update(&track_id, |track| {
-                *track.review_mut() = Some(snap);
+                *track.review_mut() = snap;
                 Ok(())
             });
             stage_metadata(&git, &metadata_rel)?;

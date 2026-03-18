@@ -815,38 +815,34 @@ where
     // Timeout recovery: the review may have been submitted but missed by
     // the timestamp filter (GitHub API eventual consistency, or the review
     // was triggered by a prior @codex review and completed between polls).
-    // Do one final commit-based lookup before giving up.
-    // Propagate errors (fail-closed) instead of swallowing them with .ok().
-    let recovery_nwo = client.repo_nwo()?;
-    let recovery_reviews_json = client.list_reviews(&recovery_nwo, pr)?;
-    let recovery_reviews = pr_review::parse_paginated_json(&recovery_reviews_json)
-        .map_err(|e| CliError::Message(format!("recovery: failed to parse reviews JSON: {e}")))?;
-    // Drop the trigger_dt filter for recovery — the review may have been
-    // triggered by a prior @codex review or a push event, so its submitted_at
-    // can predate this trigger. Filter on bot identity, terminal state, and
-    // optionally commit_id to avoid surfacing reviews for older commits.
-    let recovery_refs: Vec<&serde_json::Value> = recovery_reviews
-        .iter()
-        .filter(|r| {
-            let author =
-                r.get("user").and_then(|u| u.get("login")).and_then(|l| l.as_str()).unwrap_or("");
-            let state = r.get("state").and_then(|s| s.as_str()).unwrap_or("");
-            if !is_codex_bot(author)
-                || !matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
-            {
-                return false;
-            }
-            // When head_commit is known, only accept reviews for that commit.
-            if let Some(expected) = head_commit {
+    // Only attempt recovery when head_commit is known — without it we cannot
+    // scope the lookup and risk returning a stale review from an older commit.
+    if let Some(expected_commit) = head_commit {
+        let recovery_nwo = client.repo_nwo()?;
+        let recovery_reviews_json = client.list_reviews(&recovery_nwo, pr)?;
+        let recovery_reviews =
+            pr_review::parse_paginated_json(&recovery_reviews_json).map_err(|e| {
+                CliError::Message(format!("recovery: failed to parse reviews JSON: {e}"))
+            })?;
+        let recovery_refs: Vec<&serde_json::Value> = recovery_reviews
+            .iter()
+            .filter(|r| {
+                let author = r
+                    .get("user")
+                    .and_then(|u| u.get("login"))
+                    .and_then(|l| l.as_str())
+                    .unwrap_or("");
+                let state = r.get("state").and_then(|s| s.as_str()).unwrap_or("");
                 let review_commit = r.get("commit_id").and_then(|s| s.as_str()).unwrap_or("");
-                return review_commit == expected;
-            }
-            true
-        })
-        .collect();
-    if let Some(recovered) = find_latest_bot_review_in(&recovery_refs) {
-        eprintln!("[OK] Recovered Codex review after timeout (commit-based fallback).");
-        return Ok(PollReviewResult::ReviewFound(recovered));
+                is_codex_bot(author)
+                    && matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
+                    && review_commit == expected_commit
+            })
+            .collect();
+        if let Some(recovered) = find_latest_bot_review_in(&recovery_refs) {
+            eprintln!("[OK] Recovered Codex review after timeout (commit-based fallback).");
+            return Ok(PollReviewResult::ReviewFound(recovered));
+        }
     }
 
     if !any_bot_activity {
@@ -1496,10 +1492,9 @@ mod tests {
     }
 
     #[test]
-    fn poll_review_recovers_pre_trigger_review_after_timeout() {
-        // Pre-trigger review is not found during the polling loop (timestamp
-        // filter), but the timeout recovery picks it up since it drops the
-        // timestamp requirement to handle reviews that arrived between polls.
+    fn poll_review_standalone_does_not_recover_without_head_commit() {
+        // Standalone poll_review passes head_commit=None, so timeout recovery
+        // is skipped to avoid returning stale reviews from older commits.
         let client = PollTestClient::with_reviews(
             r#"[{
                 "id": 1,
@@ -1510,9 +1505,8 @@ mod tests {
             }]"#,
         );
         let result = super::poll_review("1", "2026-03-16T09:00:00Z", 15, 0, &client, &|_| {});
-        // Timeout recovery finds the pre-trigger review and returns SUCCESS
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ExitCode::SUCCESS);
+        assert_eq!(result.unwrap(), ExitCode::FAILURE);
     }
 
     #[test]
