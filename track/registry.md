@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `review-workflow-fixes-2026-03-18`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-18`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| review-workflow-fixes-2026-03-18 | in_progress | `/track:implement` | 2026-03-18 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| review-workflow-fixes-2026-03-18 | Done | 2026-03-18 |
 | spec-template-foundation-2026-03-18 | Done | 2026-03-18 |
 | bash-write-guard-2026-03-18 | Done | 2026-03-18 |
 | review-infra-hardening-2026-03-18 | Done | 2026-03-18 |

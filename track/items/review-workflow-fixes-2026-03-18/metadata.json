@@ -60,7 +60,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "description": "Add chatgpt-codex-connector[bot] to CODEX_BOT_LOGINS + tests",
@@ -70,24 +70,24 @@
     {
       "description": "Add zero-findings detection to poll_review (reaction + comment text fallback) + update review_cycle to handle zero-findings without requiring a review object + tests",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Add index_tree_hash_normalizing to GitRepository trait (libs/infrastructure/src/git_cli.rs): normalize review.code_hash to \"PENDING\" and updated_at to epoch in temp index, then git write-tree. Switch TrackReviewDocument.groups to BTreeMap. Add ReviewState::record_round_with_pending and set_code_hash domain methods (libs/domain/src/review.rs) + tests",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Use normalized hash in record-round and check-approved: record-round computes pre-update normalized hash, calls record_round_with_pending (freshness check + review state + PENDING), re-stages, computes post-update normalized hash H1, calls set_code_hash(H1), re-stages. check-approved normalizes and compares + tests",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Integration tests: full review->commit with re-stage, pre-update freshness check, first-round (no prior code_hash), updated_at stability, reaction+comment fallback detection, multi-group BTreeMap ordering, tamper detection",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "WF-42+WF-43: review workflow critical fixes (bot login + completion detection + code_hash cycle)",
-  "updated_at": "2026-03-18T11:39:09Z"
+  "updated_at": "2026-03-18T11:59:34Z"
 }

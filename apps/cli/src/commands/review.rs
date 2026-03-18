@@ -745,9 +745,20 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         }
     };
 
-    // Get current git tree hash
     let git = SystemGitRepo::discover().map_err(|e| format!("git error: {e}"))?;
-    let code_hash = git.index_tree_hash().map_err(|e| format!("git tree hash error: {e}"))?;
+
+    // Compute repo-relative metadata path for normalized hash.
+    let metadata_abs = args.items_dir.join(&args.track_id).join("metadata.json");
+    let metadata_rel = metadata_abs
+        .strip_prefix(git.root())
+        .unwrap_or(&metadata_abs)
+        .to_string_lossy()
+        .into_owned();
+
+    // Step 1: Compute pre-update normalized hash.
+    let pre_update_hash = git
+        .index_tree_hash_normalizing(&metadata_rel)
+        .map_err(|e| format!("normalized hash error: {e}"))?;
 
     // Open track store with locking
     let track_id =
@@ -762,7 +773,7 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
 
     let timestamp = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
 
-    // Atomic read-modify-write under lock.
+    // Step 2: Write review state + code_hash="PENDING" via record_round_with_pending.
     // On StaleCodeHash, persist the invalidation (return Ok from closure so update writes),
     // then report the error to the caller.
     use domain::TrackWriter;
@@ -781,11 +792,16 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
                 .unwrap_or(1);
 
             let result = ReviewRoundResult::new(round_num, verdict_str, &timestamp);
-            match review.record_round(round_type, &args.group, result, &expected_groups, &code_hash)
-            {
+            match review.record_round_with_pending(
+                round_type,
+                &args.group,
+                result,
+                &expected_groups,
+                &pre_update_hash,
+            ) {
                 Ok(()) => Ok(()),
                 Err(domain::ReviewError::StaleCodeHash { expected, actual }) => {
-                    // record_round already set status to Invalidated in memory.
+                    // record_round_with_pending already set status to Invalidated.
                     // Return Ok so update() persists the invalidation to disk.
                     stale_error = Some(format!(
                         "code hash mismatch: review recorded against {expected}, \
@@ -804,10 +820,48 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         return Err(format!("[BLOCKED] {err_msg}"));
     }
 
+    // Step 3: Re-stage metadata.json (now contains code_hash="PENDING").
+    stage_metadata(&git, &metadata_rel)?;
+
+    // Step 4: Compute post-update normalized hash H1.
+    // Since code_hash is "PENDING" and normalization replaces it with "PENDING",
+    // this is effectively a no-op for the code_hash field. updated_at is normalized to epoch.
+    let post_update_hash = git
+        .index_tree_hash_normalizing(&metadata_rel)
+        .map_err(|e| format!("post-update normalized hash error: {e}"))?;
+
+    // Step 5: Write back the computed hash via set_code_hash.
+    store
+        .update(&track_id, |track| {
+            if let Some(review) = track.review_mut().as_mut() {
+                review.set_code_hash(post_update_hash.clone());
+            }
+            Ok(())
+        })
+        .map_err(|e| format!("failed to write code_hash: {e}"))?;
+
+    // Step 6: Re-stage metadata.json (now contains code_hash=H1).
+    stage_metadata(&git, &metadata_rel)?;
+
     eprintln!(
         "[OK] Recorded {round_type} round for group '{}' (verdict: {verdict_str})",
         args.group
     );
+    Ok(())
+}
+
+/// Stage a single file into the git index.
+fn stage_metadata(
+    git: &impl infrastructure::git_cli::GitRepository,
+    metadata_rel: &str,
+) -> Result<(), String> {
+    let output = git
+        .output(&["add", "--", metadata_rel])
+        .map_err(|e| format!("failed to stage metadata.json: {e}"))?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+        return Err(format!("failed to stage metadata.json: {stderr}"));
+    }
     Ok(())
 }
 
@@ -833,7 +887,19 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
     use infrastructure::track::fs_store::FsTrackStore;
 
     let git = SystemGitRepo::discover().map_err(|e| format!("git error: {e}"))?;
-    let code_hash = git.index_tree_hash().map_err(|e| format!("git tree hash error: {e}"))?;
+
+    // Compute repo-relative metadata path for normalized hash.
+    let metadata_abs = args.items_dir.join(&args.track_id).join("metadata.json");
+    let metadata_rel = metadata_abs
+        .strip_prefix(git.root())
+        .unwrap_or(&metadata_abs)
+        .to_string_lossy()
+        .into_owned();
+
+    // Use normalized hash: review.code_hash → "PENDING", updated_at → epoch.
+    let code_hash = git
+        .index_tree_hash_normalizing(&metadata_rel)
+        .map_err(|e| format!("normalized hash error: {e}"))?;
 
     let track_id =
         domain::TrackId::new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
