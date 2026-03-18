@@ -29,7 +29,7 @@ version: "1.0"
 - **修正**:
   1. `GhClient` trait に `list_reactions` メソッドを追加
   2. reaction の `created_at` をトリガー時刻と比較し、トリガー後のリアクションのみ有効とする（過去の zero-findings の `+1` が残っていても誤検出しない）
-  3. `poll_review` (standalone) の zero-findings 時ペイロードを定義: `{"verdict":"zero_findings","source":"reaction"}` を stdout に出力し exit 0 で終了する
+  3. `poll_review` (standalone) の zero-findings 時ペイロードを既存契約に準拠: `{"verdict":"zero_findings","findings":[]}` を stdout に出力し exit 0 で終了する（reaction 由来であることは stderr に出力）
   4. `poll_review_for_cycle` の返り値を拡張し、zero-findings（reaction 検出、review なし）と findings-present（review JSON あり）を区別できるようにする
   5. `review_cycle` で zero-findings を受け取った場合は `parse_review` をスキップし、直接成功を報告する
 
@@ -37,31 +37,46 @@ version: "1.0"
 
 - **問題**: `record-round` が `git write-tree` で index hash を計算し `metadata.json` に書き込むが、再 staging 後に `check-approved` が計算する hash は `metadata.json` の変更を含むため永久にミスマッチ
 - **影響**: `/track:review` → `/track:commit` フローが完全にブロックされる
-- **根本原因**: `git write-tree` が staged index 全体（`metadata.json` 含む）をハッシュする
-- **修正**: hash 計算時に `metadata.json` を除外する。一時 index ファイルを使用し、実際の staging 状態を変更しない読み取り専用アプローチ:
-  1. `git write-tree` で現在の index から tree オブジェクトを取得
-  2. 一時 index ファイルに `GIT_INDEX_FILE=$tmp git read-tree $tree` で復元
-  3. 一時 index 上で `GIT_INDEX_FILE=$tmp git rm --cached <metadata.json path>` で除外
-  4. `GIT_INDEX_FILE=$tmp git write-tree` で除外後の tree hash を取得
-  5. 一時 index ファイルを削除
+- **根本原因**: `git write-tree` が staged index 全体（`metadata.json` 含む）をハッシュする。`record-round` が metadata.json に書き込んだ後に再 stage すると hash が変わる
+- **修正方式**: staging 順序制御（方式 C）。metadata.json を hash に含めたまま、staging タイミングを制御して循環を回避する:
+  1. `add-all` で全ファイルを stage（metadata.json は review 書き込み前の状態）
+  2. `record-round` が staged index から `git write-tree` → hash H1 を計算
+  3. `record-round` が metadata.json に review state + code_hash: H1 を disk 書き込み（**再 stage しない**）
+  4. `check-approved` が staged index から `git write-tree` → H1（staged metadata.json は変わっていない）
+  5. `check-approved` が **disk 上の** metadata.json から code_hash を読み取り → H1 == H1 → OK
+  6. commit wrapper が metadata.json を stage してから commit
+- **利点**:
+  - metadata.json は SSoT のまま（コミットされる版に code_hash が含まれる）
+  - metadata.json は hash 計算に含まれる（tamper 防御維持）
+  - 一時 index やファイル分離が不要
+- **調査**: git-appraise (Google) のレビュー状態外部保存パターンとビルド時 hash 埋め込みパターンを参考に、staging 順序制御が最もシンプルと判断
+- **対象ファイル**:
+  - `apps/cli/src/commands/review.rs`（`run_record_round`, `run_check_approved`）
+  - `libs/infrastructure/src/git_cli.rs`（`index_tree_hash` — 変更なし、既存のまま使用）
+  - `libs/usecase/src/git_workflow.rs`（staging 順序の調整が必要な場合）
+  - commit wrapper（`check-approved` 後に metadata.json を stage する処理追加）
 
 ## 制約
 
 - `metadata.json` の schema_version 3 は変更しない
-- `ReviewState` ドメイン型のインターフェースは維持する（hash 除外は infrastructure 層で完結）
-- 既存の `index_tree_hash()` は互換性のため残す（新メソッド `index_tree_hash_excluding()` を追加）
+- `ReviewState` ドメイン型のインターフェースは維持する
+- 既存の `index_tree_hash()` をそのまま使用する（新メソッド追加不要）
+- `record-round` は disk 書き込み後に metadata.json を再 stage しない
+- `check-approved` は code_hash を staged index ではなく disk 上の metadata.json から読み取る
+- commit wrapper は `check-approved` 通過後に metadata.json を stage してから commit する
 - `GhClient` trait の既存メソッドは変更しない（`list_reactions` を追加のみ）
 
 ## 受け入れ基準
 
 1. `is_codex_bot("chatgpt-codex-connector[bot]")` が `true` を返す
 2. `poll_review` が bot の 👍 リアクションを zero-findings 完了として検出する（トリガー時刻以降のリアクションのみ）
-3. `poll_review` (standalone) が zero-findings 時に `{"verdict":"zero_findings","source":"reaction"}` を stdout に出力する
+3. `poll_review` (standalone) が zero-findings 時に `{"verdict":"zero_findings","findings":[]}` を stdout に出力する
 4. `review_cycle` が zero-findings（reaction のみ、review なし）で正常に成功を返す
-5. `record-round` → 再 stage → `check-approved` で hash が一致する
-6. ソースコードを変更した場合は hash が正しく不一致になる（セキュリティ保証）
-7. `cargo make ci` が通る
-8. 既存の `index_tree_hash()` テストが壊れない
+5. `record-round` → `check-approved` で hash が一致する（metadata.json は再 stage しない）
+6. metadata.json を再 stage した場合でも、`check-approved` は disk から code_hash を読むため正しく動作する
+7. ソースコードを変更した場合は hash が正しく不一致になる（セキュリティ保証）
+8. `cargo make ci` が通る
+9. 既存の `index_tree_hash()` テストが壊れない
 
 ## 出典
 
