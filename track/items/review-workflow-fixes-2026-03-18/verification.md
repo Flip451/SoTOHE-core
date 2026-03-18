@@ -8,22 +8,23 @@
 - [ ] WF-42/2: `poll_review` still detects COMMENTED review for findings-present case
 - [ ] WF-42/2: `review_cycle` handles zero-findings without requiring review JSON
 - [ ] WF-42/2: standalone `poll_review` outputs `{"verdict":"zero_findings","findings":[]}` for reaction-only completion
-- [ ] WF-43: `record-round` computes hash from staged index, writes to disk without re-staging
-- [ ] WF-43: `check-approved` reads code_hash from disk, computes hash from staged index, matches
-- [ ] WF-43: source code change correctly invalidates the hash
-- [ ] WF-43: commit wrapper stages metadata.json after check-approved passes
+- [ ] WF-43: `index_tree_hash_normalizing` produces stable hash across re-stage of metadata.json
+- [ ] WF-43: `record-round` -> re-stage -> `check-approved` succeeds with normalized hash
+- [ ] WF-43: source code change correctly invalidates the normalized hash
+- [ ] WF-43: metadata.json review.status tamper is detected by normalized hash
+- [ ] WF-43: sentinel value is `"PENDING"` (not null)
 - [ ] `cargo make ci` passes
 
 ## Manual Verification Steps
 
 1. Run `cargo make test` and confirm all new tests pass
 2. For WF-42/2: verify reaction detection with mock GhClient returning bot +1 reaction
-3. For WF-43: manually verify the staging order control:
-   - Stage all files including metadata.json (pre-review state)
-   - Run `sotp review record-round` with a mock verdict (writes to disk only)
-   - Do NOT re-stage metadata.json
-   - Run `sotp review check-approved` and confirm it succeeds
-   - Stage metadata.json and commit
+3. For WF-43: manually verify the normalization approach:
+   - Stage all files including metadata.json
+   - Run `sotp review record-round` with a mock verdict (writes code_hash to metadata.json)
+   - Re-stage metadata.json (now with code_hash)
+   - Run `sotp review check-approved` and confirm it succeeds (normalized hash matches)
+   - Tamper with review.status in metadata.json, re-stage, confirm check-approved fails
 
 ## Result
 

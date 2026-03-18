@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json — DO NOT EDIT DIRECTLY -->
 # WF-42+WF-43: review workflow critical fixes (bot login + completion detection + code_hash cycle)
 
-Fix three critical review workflow issues: WF-42/1 (CODEX_BOT_LOGINS missing chatgpt-codex-connector[bot]), WF-42/2 (poll_review completion detection ignores thumbs-up reaction for zero-findings), and WF-43 (code_hash self-referential cycle in metadata.json). WF-42/1 is a constant addition. WF-42/2 requires adding reaction API polling + review_cycle zero-findings path. WF-43 uses staging order control: compute hash from staged index before writing code_hash to disk, never re-stage metadata.json between record-round and check-approved.
+Fix three critical review workflow issues: WF-42/1 (CODEX_BOT_LOGINS missing chatgpt-codex-connector[bot]), WF-42/2 (poll_review completion detection ignores thumbs-up reaction for zero-findings), and WF-43 (code_hash self-referential cycle in metadata.json). WF-42/1 is a constant addition. WF-42/2 requires adding reaction API polling + review_cycle zero-findings path. WF-43 uses code_hash normalization (method D): replace review.code_hash with a null sentinel before computing tree hash, so the hash covers all metadata.json fields except code_hash itself, breaking the self-reference cycle while preserving tamper detection.
 
 ## Phase 1: WF-42 bot login fix
 
@@ -15,20 +15,20 @@ Extend poll_review and poll_review_for_cycle to check issues/{pr}/reactions API 
 
 - [ ] Add thumbs-up reaction detection to poll_review + update review_cycle to handle zero-findings (reaction-only) without requiring a review object + tests
 
-## Phase 3: WF-43 staging order control in record-round
+## Phase 3: WF-43 normalized hash infrastructure
 
-Enforce staging order in run_record_round (apps/cli/src/commands/review.rs): (1) compute hash from staged index via existing index_tree_hash(), (2) write review state + code_hash to metadata.json on disk via FsTrackStore::update(), (3) do NOT re-stage metadata.json. The key invariant: staged metadata.json remains in its pre-review state so the hash is stable. No new GitRepository methods needed — use existing index_tree_hash() as-is.
+Add index_tree_hash_normalizing method to GitRepository trait in libs/domain and implement in libs/infrastructure/src/git_cli.rs. The method: (1) reads metadata.json blob from staged index, (2) parses JSON and replaces review.code_hash with "PENDING" sentinel, (3) serializes deterministically via serde_json, (4) creates normalized blob with git hash-object -w, (5) copies current index to a temp GIT_INDEX_FILE, (6) swaps metadata.json blob in temp index via git update-index --cacheinfo, (7) runs git write-tree on temp index to get normalized tree hash, (8) cleans up temp index. This approach keeps metadata.json fully in the hash (tamper protection for all fields except code_hash) while breaking the self-reference cycle.
 
-- [ ] Enforce staging order in record-round: compute hash from staged index before disk write, do not re-stage metadata.json + tests
+- [ ] Add index_tree_hash_normalizing method to GitRepository trait: normalize review.code_hash to null sentinel in a temp index, then git write-tree + tests
 
-## Phase 4: WF-43 check-approved + commit wrapper update
+## Phase 4: WF-43 integration into review commands
 
-Update run_check_approved to read code_hash from the on-disk metadata.json (not from staged index) while computing the hash from staged index. Since staged metadata.json is still in pre-review state, the hash matches. Update the commit wrapper (track-commit-message / sotp make track-commit-message) to stage metadata.json AFTER check-approved passes but BEFORE git commit, so the committed version includes code_hash.
+Update run_record_round and run_check_approved in apps/cli/src/commands/review.rs to call index_tree_hash_normalizing with the track's metadata.json path. record-round: compute normalized hash -> write code_hash to metadata.json -> re-stage. check-approved: compute normalized hash -> compare with stored code_hash from staged metadata.json. Both use identical normalization so hashes are comparable. Re-staging metadata.json between record-round and check-approved is safe because the normalized hash is stable.
 
-- [ ] Update check-approved to read code_hash from disk metadata.json while computing hash from staged index + update commit wrapper to stage metadata.json after check-approved + tests
+- [ ] Use normalized hash in record-round and check-approved: both normalize review.code_hash to null before computing tree hash + tests
 
 ## Phase 5: End-to-end verification
 
-Integration tests: (1) add-all -> record-round (disk write only) -> check-approved (staged index hash matches disk code_hash) -> stage metadata.json -> commit succeeds, (2) source code change after record-round causes check-approved to fail (security invariant), (3) poll_review detects bot thumbs-up reaction as zero-findings completion with trigger timestamp filter.
+Integration tests: (1) record-round -> re-stage metadata.json -> check-approved succeeds (normalized hash stable across re-stage), (2) source code change after record-round causes check-approved to fail (security invariant), (3) metadata.json review.status tamper causes check-approved to fail (tamper detection), (4) poll_review detects bot thumbs-up reaction as zero-findings completion with trigger timestamp filter.
 
-- [ ] Integration test: full review -> commit flow with staging order control + pr-review polling with reaction detection
+- [ ] Integration test: full review -> commit flow with normalized hash (re-stage OK) + pr-review polling with reaction detection + tamper detection for non-code_hash metadata fields
