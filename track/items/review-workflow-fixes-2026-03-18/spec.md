@@ -15,13 +15,16 @@
 
 ### WF-42 課題2: 完了判定ロジックの不一致（HIGH）
 
-- **問題**: `poll_review` が reviews API と comments API のみをチェックし、`issues/{pr}/reactions` API の bot 👍 リアクションを検出しない
-- **影響**: findings なし時の完了シグナル（👍 リアクション）を見逃し、レビュー完了を検出できない
+- **問題**: `poll_review` が reviews API と comments API のみをチェックし、`issues/{pr}/reactions` API の bot 👍 リアクションを検出しない。さらに `review_cycle()` は `poll_review_for_cycle` が review JSON を返す前提で `parse_review()` を呼ぶため、zero-findings（review オブジェクトなし、reaction のみ）のケースで review-cycle パスが破綻する
+- **影響**: findings なし時の完了シグナル（👍 リアクション）を見逃し、レビュー完了を検出できない。ポーラーだけ修正しても `review_cycle` 側が review JSON を要求するため、zero-findings PR で primary review-cycle が正常完了しない
 - **確認済み動作**（PR #2, #36）:
-  - findings なし → bot が PR に 👍 リアクション + "Didn't find any major issues" テキストコメント
+  - findings なし → bot が PR に 👍 リアクション + "Didn't find any major issues" テキストコメント（review オブジェクトは投稿されない）
   - findings あり → bot が `COMMENTED` state の PR review を投稿 + review body にインライン findings
-- **対象ファイル**: `apps/cli/src/commands/pr.rs`（`poll_review`, `poll_review_for_cycle`）
-- **修正**: `GhClient` trait に `list_reactions` メソッドを追加し、bot の `+1` リアクションを完了シグナルとして検出
+- **対象ファイル**: `apps/cli/src/commands/pr.rs`（`poll_review`, `poll_review_for_cycle`, `review_cycle`）
+- **修正**:
+  1. `GhClient` trait に `list_reactions` メソッドを追加
+  2. `poll_review_for_cycle` の返り値を拡張し、zero-findings（reaction 検出、review なし）と findings-present（review JSON あり）を区別できるようにする
+  3. `review_cycle` で zero-findings を受け取った場合は `parse_review` をスキップし、直接成功を報告する
 
 ### WF-43: code_hash 自己参照循環（CRITICAL）
 
@@ -41,10 +44,11 @@
 
 1. `is_codex_bot("chatgpt-codex-connector[bot]")` が `true` を返す
 2. `poll_review` が bot の 👍 リアクションを zero-findings 完了として検出する
-3. `record-round` → 再 stage → `check-approved` で hash が一致する
-4. ソースコードを変更した場合は hash が正しく不一致になる（セキュリティ保証）
-5. `cargo make ci` が通る
-6. 既存の `index_tree_hash()` テストが壊れない
+3. `review_cycle` が zero-findings（reaction のみ、review なし）で正常に成功を返す
+4. `record-round` → 再 stage → `check-approved` で hash が一致する
+5. ソースコードを変更した場合は hash が正しく不一致になる（セキュリティ保証）
+6. `cargo make ci` が通る
+7. 既存の `index_tree_hash()` テストが壊れない
 
 ## 出典
 
