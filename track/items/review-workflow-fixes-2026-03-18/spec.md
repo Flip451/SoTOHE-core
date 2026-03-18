@@ -1,3 +1,8 @@
+---
+status: draft
+version: "1.0"
+---
+
 # Spec: WF-42+WF-43 Review Workflow Critical Fixes
 
 ## 目標
@@ -31,7 +36,12 @@
 - **問題**: `record-round` が `git write-tree` で index hash を計算し `metadata.json` に書き込むが、再 staging 後に `check-approved` が計算する hash は `metadata.json` の変更を含むため永久にミスマッチ
 - **影響**: `/track:review` → `/track:commit` フローが完全にブロックされる
 - **根本原因**: `git write-tree` が staged index 全体（`metadata.json` 含む）をハッシュする
-- **修正**: hash 計算時に `metadata.json` を除外する。`git ls-files --stage` + `git mktree` で `metadata.json` を除外した tree を構築する方式（staging 状態を変更しない読み取り専用アプローチ）
+- **修正**: hash 計算時に `metadata.json` を除外する。一時 index ファイルを使用し、実際の staging 状態を変更しない読み取り専用アプローチ:
+  1. `git write-tree` で現在の index から tree オブジェクトを取得
+  2. 一時 index ファイルに `GIT_INDEX_FILE=$tmp git read-tree $tree` で復元
+  3. 一時 index 上で `GIT_INDEX_FILE=$tmp git rm --cached <metadata.json path>` で除外
+  4. `GIT_INDEX_FILE=$tmp git write-tree` で除外後の tree hash を取得
+  5. 一時 index ファイルを削除
 
 ## 制約
 

@@ -17,7 +17,7 @@ Extend poll_review and poll_review_for_cycle to check issues/{pr}/reactions API 
 
 ## Phase 3: WF-43 hash exclusion infrastructure
 
-Add index_tree_hash_excluding(&self, exclude_paths: &[&str]) method to the GitRepository trait in libs/domain and implement it in libs/infrastructure/src/git_cli.rs. Use git ls-files --stage + git mktree to compute a tree hash excluding specified paths without modifying the staging area.
+Add index_tree_hash_excluding(&self, exclude_paths: &[&str]) method to the GitRepository trait in libs/domain and implement it in libs/infrastructure/src/git_cli.rs. Use a temporary GIT_INDEX_FILE to compute a tree hash excluding specified paths without modifying the real staging area: (1) git write-tree to get current tree, (2) git read-tree into temp index, (3) git rm --cached on temp index to exclude paths, (4) git write-tree on temp index, (5) delete temp index.
 
 - [ ] Add index_tree_hash_excluding method to GitRepository trait + infrastructure impl + tests
 
