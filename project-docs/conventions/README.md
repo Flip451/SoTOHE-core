@@ -59,5 +59,6 @@
 - `prefer-type-safe-abstractions.md`: Prefer Type-Safe Abstractions Convention
 - `security.md`: Security Convention
 - `shell-parsing.md`: Shell Parsing Convention
+- `source-attribution.md`: Source Attribution Convention
 - `typed-deserialization.md`: Typed Deserialization Convention
 <!-- convention-docs:end -->
