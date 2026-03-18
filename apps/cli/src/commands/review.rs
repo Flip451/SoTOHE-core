@@ -769,13 +769,15 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
     let timestamp = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
 
     // Step 1: Snapshot the index before any mutation.
-    // - normalized hash: used by record_round_with_pending for freshness check
-    // - raw tree hash: used at step 4 to verify no non-metadata files were staged
+    // Compute raw tree hash first, then normalized hash. Both read the same
+    // git index — computing raw first minimizes the window for a concurrent
+    // `git add` to land between the two reads (the normalized hash internally
+    // copies the index, so a concurrent add after it starts won't affect it).
+    let raw_tree_baseline =
+        git.index_tree_hash().map_err(|e| format!("raw tree hash baseline error: {e}"))?;
     let pre_update_hash = git
         .index_tree_hash_normalizing(&metadata_rel)
         .map_err(|e| format!("normalized hash error: {e}"))?;
-    let raw_tree_baseline =
-        git.index_tree_hash().map_err(|e| format!("raw tree hash baseline error: {e}"))?;
 
     // Step 2: Write review state + code_hash="PENDING" via record_round_with_pending.
     // On StaleCodeHash, persist the invalidation (return Ok from closure so update writes),
@@ -835,7 +837,10 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
 
     // Step 4a: Verify no non-metadata files were staged between step 1 and now.
     // Compare the raw tree hash baseline with the current raw tree hash.
-    // The only difference should be metadata.json (which we wrote and re-staged).
+    // The only difference should be metadata.json (which we wrote under the
+    // FsTrackStore file lock and re-staged). External metadata.json edits are
+    // prevented by the file lock — any concurrent writer that bypasses the lock
+    // is a precondition violation, not a runtime race we can detect here.
     let raw_tree_after =
         git.index_tree_hash().map_err(|e| format!("raw tree hash after step 3: {e}"))?;
     if raw_tree_baseline != raw_tree_after {

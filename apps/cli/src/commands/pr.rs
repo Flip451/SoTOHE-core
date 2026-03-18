@@ -124,6 +124,12 @@ pub fn execute(cmd: PrCommand) -> ExitCode {
             }
         },
         PrCommand::PollReview(args) => {
+            let head = SystemGitRepo::discover().ok().and_then(|r| {
+                r.output(&["rev-parse", "HEAD"])
+                    .ok()
+                    .filter(|o| o.status.success())
+                    .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
+            });
             match poll_review(
                 &args.pr,
                 &args.trigger_timestamp,
@@ -131,6 +137,7 @@ pub fn execute(cmd: PrCommand) -> ExitCode {
                 args.timeout,
                 &SystemGhClient,
                 &thread::sleep,
+                head.as_deref(),
             ) {
                 Ok(code) => code,
                 Err(err) => {
@@ -480,12 +487,21 @@ fn poll_review<C, Sleep>(
     timeout: u64,
     client: &C,
     sleep: &Sleep,
+    head_commit: Option<&str>,
 ) -> Result<ExitCode, CliError>
 where
     C: GhClient,
     Sleep: Fn(Duration),
 {
-    match poll_review_for_cycle(pr, trigger_timestamp, interval, timeout, client, sleep, None)? {
+    match poll_review_for_cycle(
+        pr,
+        trigger_timestamp,
+        interval,
+        timeout,
+        client,
+        sleep,
+        head_commit,
+    )? {
         PollReviewResult::ReviewFound(review) => {
             let review_str = serde_json::to_string(&review).unwrap_or_default();
             println!("{review_str}");
@@ -1482,7 +1498,15 @@ mod tests {
         let client = PollTestClient::with_reactions(
             r#"[{"content":"+1","user":{"login":"openai-codex[bot]"},"created_at":"2026-03-18T10:05:00Z"}]"#,
         );
-        let result = super::poll_review("1", "2026-03-18T10:00:00Z", 15, 0, &client, &|_| {});
+        let result = super::poll_review(
+            "1",
+            "2026-03-18T10:00:00Z",
+            15,
+            0,
+            &client,
+            &|_| {},
+            Some("commit1"),
+        );
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), ExitCode::FAILURE);
     }
@@ -1501,7 +1525,15 @@ mod tests {
             }]"#,
         );
         // Use timeout=60 so at least one poll iteration runs; sleep is a no-op.
-        let result = super::poll_review("1", "2026-03-16T09:00:00Z", 15, 60, &client, &|_| {});
+        let result = super::poll_review(
+            "1",
+            "2026-03-16T09:00:00Z",
+            15,
+            60,
+            &client,
+            &|_| {},
+            Some("commit1"),
+        );
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), ExitCode::SUCCESS);
     }
@@ -1519,7 +1551,15 @@ mod tests {
                 "body": "old review"
             }]"#,
         );
-        let result = super::poll_review("1", "2026-03-16T09:00:00Z", 15, 0, &client, &|_| {});
+        let result = super::poll_review(
+            "1",
+            "2026-03-16T09:00:00Z",
+            15,
+            0,
+            &client,
+            &|_| {},
+            Some("commit1"),
+        );
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), ExitCode::FAILURE);
     }
@@ -1528,7 +1568,15 @@ mod tests {
     fn poll_review_timeout_with_no_reviews_returns_failure() {
         // No reviews at all — timeout recovery also finds nothing.
         let client = PollTestClient::with_reviews("[]");
-        let result = super::poll_review("1", "2026-03-16T09:00:00Z", 15, 0, &client, &|_| {});
+        let result = super::poll_review(
+            "1",
+            "2026-03-16T09:00:00Z",
+            15,
+            0,
+            &client,
+            &|_| {},
+            Some("commit1"),
+        );
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), ExitCode::FAILURE);
     }
@@ -1545,7 +1593,15 @@ mod tests {
             }]"#,
         );
         // The function should succeed (found a post-trigger APPROVED review)
-        let result = super::poll_review("1", "2026-03-16T09:00:00Z", 15, 60, &client, &|_| {});
+        let result = super::poll_review(
+            "1",
+            "2026-03-16T09:00:00Z",
+            15,
+            60,
+            &client,
+            &|_| {},
+            Some("commit1"),
+        );
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), ExitCode::SUCCESS);
     }
