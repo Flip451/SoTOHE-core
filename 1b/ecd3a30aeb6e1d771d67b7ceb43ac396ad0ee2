@@ -1,0 +1,16 @@
+## Task Summary: Plan bash-write-guard (CON-07)
+
+**Track:** bash-write-guard-2026-03-18
+**Task:** Planning phase — layered defense design
+**Date:** 2026-03-18
+
+### Changes
+
+- metadata.json: 3 tasks (deny layer, guard extension, residual risk docs)
+- spec.md: Layered defense design (permissions.deny + extend block-direct-git-ops + document risks)
+- verification.md: 32 verification steps covering deny, redirects, write commands, shell re-entry
+- registry.md: New active track registered
+
+### Why
+
+CON-07: Bash file writes bypass file-lock hooks. Pragmatic approach: reuse existing guard infrastructure rather than building a parallel shell analyzer.
