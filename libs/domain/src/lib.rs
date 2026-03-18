@@ -9,6 +9,7 @@ mod ids;
 pub mod lock;
 mod plan;
 mod repository;
+pub mod review;
 mod track;
 pub mod track_phase;
 pub mod verify;
@@ -21,6 +22,9 @@ pub use error::{
 pub use ids::{CommitHash, TaskId, TrackBranch, TrackId};
 pub use plan::{PlanSection, PlanView};
 pub use repository::{TrackReader, TrackWriter, WorktreeReader};
+pub use review::{
+    ReviewError, ReviewGroupState, ReviewRoundResult, ReviewState, ReviewStatus, RoundType,
+};
 pub use track::{
     StatusOverride, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata, TrackStatus,
     TrackTask,

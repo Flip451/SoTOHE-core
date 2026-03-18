@@ -1,0 +1,78 @@
+{
+  "branch": "track/review-infra-hardening-2026-03-18",
+  "created_at": "2026-03-18T01:00:00Z",
+  "id": "review-infra-hardening-2026-03-18",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Capture Codex stderr to persistent log files and extract verdict from stderr as fallback when --output-last-message file is empty."
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Codex Session Traceability"
+      },
+      {
+        "description": [
+          "Extend metadata.json schema with review section tracking round results, model escalation state, and code hash for stale verdict detection."
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "Review State in metadata.json"
+      },
+      {
+        "description": [
+          "Add sotp review record-round command. Validates code_hash freshness and sequential escalation (fast before final), then writes aggregated results to metadata.json. sotp review codex-local stays stateless — parallel-safe."
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "Review State Recording + Sequential Escalation"
+      },
+      {
+        "description": [
+          "Gate track-commit-message on review.status == approved in metadata.json. Auto-reset review state when code changes are detected via git tree hash."
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "Commit Guard"
+      }
+    ],
+    "summary": [
+      "Harden review infrastructure: capture Codex session logs for traceability, integrate review state into metadata.json as SSoT, enforce sequential model escalation, and gate commits on review approval"
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "Capture Codex stderr to session log file and add verdict extraction fallback when codex-last-message is empty",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "Add review section to metadata.json schema v3 via serde(default) (ReviewStatus enum: not_started/invalidated/fast_passed/approved, code_hash, groups with fast/final round results)",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "Add sotp review record-round command that validates sequential escalation (code_hash + review.status) and writes aggregated round results to metadata.json. sotp review codex-local remains stateless (verdict on stdout only).",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "Add review.status == approved guard to track-commit-message with automatic reset on code changes (git tree hash)",
+      "id": "T004",
+      "status": "done"
+    }
+  ],
+  "title": "Review infrastructure hardening: stderr capture, review state in metadata.json, commit guard",
+  "updated_at": "2026-03-18T00:35:44Z"
+}

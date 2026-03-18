@@ -9,7 +9,7 @@
 
 - Latest active track: `None yet`
 - Next recommended command: `/track:plan <feature>`
-- Last updated: `2026-03-17`
+- Last updated: `2026-03-18`
 
 ## Active Tracks
 
@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| review-infra-hardening-2026-03-18 | Done | 2026-03-18 |
 | review-quality-quick-wins-2026-03-17 | Done | 2026-03-17 |
 | phase1-sotp-hardening-2026-03-17 | Done | 2026-03-17 |
 | shell-wrapper-rust-2026-03-17 | Done | 2026-03-17 |
