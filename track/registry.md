@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `review-infra-hardening-2026-03-18`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-18`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| review-infra-hardening-2026-03-18 | planned | `/track:implement` | 2026-03-18 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| review-infra-hardening-2026-03-18 | Done | 2026-03-18 |
 | review-quality-quick-wins-2026-03-17 | Done | 2026-03-17 |
 | phase1-sotp-hardening-2026-03-17 | Done | 2026-03-17 |
 | shell-wrapper-rust-2026-03-17 | Done | 2026-03-17 |

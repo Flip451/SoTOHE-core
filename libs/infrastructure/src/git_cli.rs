@@ -55,6 +55,26 @@ pub trait GitRepository {
         Err(GitError::CommandFailed { command, code, stderr })
     }
 
+    /// Returns the tree hash of the current index (staged state).
+    ///
+    /// Uses `git write-tree` to compute the tree object hash from the index,
+    /// which reflects staged changes (not just the last commit). This is the
+    /// correct hash for review state tracking since it captures what will
+    /// actually be committed.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`GitError::CommandFailed`] if `git write-tree` fails.
+    fn index_tree_hash(&self) -> Result<String, GitError> {
+        let output = self.output(&["write-tree"])?;
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+            let code = output.status.code().unwrap_or(-1);
+            return Err(GitError::CommandFailed { command: "write-tree".to_owned(), code, stderr });
+        }
+        Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
+    }
+
     /// Stage all worktree changes using `git add -A`, excluding the given pathspecs.
     ///
     /// Tolerates gitignore warnings when the only stderr lines match a known
