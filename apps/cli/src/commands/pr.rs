@@ -802,27 +802,16 @@ where
     let recovery_reviews_json = client.list_reviews(&recovery_nwo, pr)?;
     let recovery_reviews = pr_review::parse_paginated_json(&recovery_reviews_json)
         .map_err(|e| CliError::Message(format!("recovery: failed to parse reviews JSON: {e}")))?;
+    // Drop the trigger_dt filter for recovery — the review may have been
+    // triggered by a prior @codex review or a push event, so its submitted_at
+    // can predate this trigger. Filter only on bot identity and terminal state.
     let recovery_refs: Vec<&serde_json::Value> = recovery_reviews
         .iter()
         .filter(|r| {
             let author =
                 r.get("user").and_then(|u| u.get("login")).and_then(|l| l.as_str()).unwrap_or("");
             let state = r.get("state").and_then(|s| s.as_str()).unwrap_or("");
-            if !is_codex_bot(author)
-                || !matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
-            {
-                return false;
-            }
-            // Still require submitted_at >= trigger to avoid surfacing
-            // stale reviews from earlier trigger rounds.
-            let submitted_raw = r.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
-            if submitted_raw.is_empty() {
-                return false;
-            }
-            let submitted_str = submitted_raw.replace('Z', "+00:00");
-            chrono::DateTime::parse_from_rfc3339(&submitted_str)
-                .map(|dt| dt >= trigger_dt)
-                .unwrap_or(false)
+            is_codex_bot(author) && matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
         })
         .collect();
     if let Some(recovered) = find_latest_bot_review_in(&recovery_refs) {
@@ -1442,7 +1431,10 @@ mod tests {
     }
 
     #[test]
-    fn poll_review_ignores_pre_trigger_review() {
+    fn poll_review_recovers_pre_trigger_review_after_timeout() {
+        // Pre-trigger review is not found during the polling loop (timestamp
+        // filter), but the timeout recovery picks it up since it drops the
+        // timestamp requirement to handle reviews that arrived between polls.
         let client = PollTestClient::with_reviews(
             r#"[{
                 "id": 1,
@@ -1453,24 +1445,15 @@ mod tests {
             }]"#,
         );
         let result = super::poll_review("1", "2026-03-16T09:00:00Z", 15, 0, &client, &|_| {});
-        // Should timeout (FAILURE) because the only review is pre-trigger
+        // Timeout recovery finds the pre-trigger review and returns SUCCESS
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ExitCode::FAILURE);
+        assert_eq!(result.unwrap(), ExitCode::SUCCESS);
     }
 
     #[test]
-    fn poll_review_stale_review_does_not_suppress_comment_check() {
-        // Old (pre-trigger) review should NOT set any_bot_activity, so the
-        // comment check path should still run and timeout as "no bot activity".
-        let client = PollTestClient::with_reviews(
-            r#"[{
-                "id": 1,
-                "user": {"login": "openai-codex[bot]"},
-                "submitted_at": "2026-03-16T08:00:00Z",
-                "state": "APPROVED",
-                "body": "old review"
-            }]"#,
-        );
+    fn poll_review_timeout_with_no_reviews_returns_failure() {
+        // No reviews at all — timeout recovery also finds nothing.
+        let client = PollTestClient::with_reviews("[]");
         let result = super::poll_review("1", "2026-03-16T09:00:00Z", 15, 0, &client, &|_| {});
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), ExitCode::FAILURE);

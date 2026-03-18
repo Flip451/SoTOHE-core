@@ -835,7 +835,7 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
     if raw_tree_baseline != raw_tree_after {
         // Trees differ — verify that only metadata.json changed.
         let diff_output = git
-            .output(&["diff-tree", &raw_tree_baseline, &raw_tree_after])
+            .output(&["diff-tree", "-r", &raw_tree_baseline, &raw_tree_after])
             .map_err(|e| format!("diff-tree error: {e}"))?;
         let diff_text = String::from_utf8_lossy(&diff_output.stdout);
         let has_non_metadata = diff_text.lines().any(|line| {
