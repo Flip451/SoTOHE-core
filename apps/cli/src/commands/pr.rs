@@ -537,27 +537,9 @@ fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
 
     let nwo = client.repo_nwo()?;
 
-    // Step 3a: Check for existing completed bot review on the HEAD commit.
-    // This handles the case where a previous @codex review trigger completed
-    // after the polling timed out — the review exists but would be missed by
-    // a new trigger's timestamp filter.
-    let head_hash = repo
-        .output(&["rev-parse", "HEAD"])
-        .ok()
-        .filter(|o| o.status.success())
-        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
-        .unwrap_or_default();
-
-    if let Some(existing) =
-        find_existing_bot_review_for_commit(&pr_number, &head_hash, &nwo, &client)?
-    {
-        eprintln!("[OK] Found existing Codex review for HEAD commit — skipping new trigger");
-        let parsed = parse_review(&pr_number, &existing, &nwo, &client)?;
-        print_review_summary(&pr_number, &parsed);
-        return if parsed.passed { Ok(ExitCode::SUCCESS) } else { Ok(ExitCode::FAILURE) };
-    }
-
-    // Step 3b: Trigger new review
+    // Step 3: Trigger new review.
+    // Always post a fresh trigger — timeout recovery (at the end of polling)
+    // handles the case where a prior review exists but was missed.
     let response = client.post_issue_comment(&nwo, &pr_number, "@codex review")?;
     let trigger_timestamp = serde_json::from_str::<serde_json::Value>(&response)
         .ok()
@@ -594,40 +576,6 @@ fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
             if parsed.passed { Ok(ExitCode::SUCCESS) } else { Ok(ExitCode::FAILURE) }
         }
     }
-}
-
-/// Check if there is already a completed bot review for the given commit.
-///
-/// Returns the **latest** (by `submitted_at` / `id`) sanitized review JSON
-/// if found, or None.  When multiple reviews exist for the same commit
-/// (e.g., after re-triggering without a new push), the newest one is
-/// authoritative — an older APPROVED may be superseded by a newer
-/// CHANGES_REQUESTED.
-fn find_existing_bot_review_for_commit<C: GhClient>(
-    pr: &str,
-    commit_hash: &str,
-    repo_nwo: &str,
-    client: &C,
-) -> Result<Option<serde_json::Value>, CliError> {
-    if commit_hash.is_empty() {
-        return Ok(None);
-    }
-    let reviews_json = client.list_reviews(repo_nwo, pr)?;
-    let reviews = pr_review::parse_paginated_json(&reviews_json)
-        .map_err(|e| CliError::Message(format!("failed to parse reviews JSON: {e}")))?;
-    let filtered: Vec<&serde_json::Value> = reviews
-        .iter()
-        .filter(|r| {
-            let author =
-                r.get("user").and_then(|u| u.get("login")).and_then(|l| l.as_str()).unwrap_or("");
-            let rc = r.get("commit_id").and_then(|s| s.as_str()).unwrap_or("");
-            let state = r.get("state").and_then(|s| s.as_str()).unwrap_or("");
-            is_codex_bot(author)
-                && rc == commit_hash
-                && matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
-        })
-        .collect();
-    Ok(find_latest_bot_review_in(&filtered))
 }
 
 /// Pick the latest completed bot review from a slice, by `submitted_at` then `id`.

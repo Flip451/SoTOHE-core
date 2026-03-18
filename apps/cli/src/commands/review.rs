@@ -854,8 +854,18 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         .index_tree_hash_normalizing(&metadata_rel)
         .map_err(|e| format!("verification hash error: {e}"))?;
     if verify_hash != post_update_hash {
+        // Roll back: invalidate the review state so the stale code_hash
+        // cannot be used by check-approved.
+        let _ = store.update(&track_id, |track| {
+            if let Some(review) = track.review_mut().as_mut() {
+                review.invalidate();
+            }
+            Ok(())
+        });
+        stage_metadata(&git, &metadata_rel)?;
         return Err("[BLOCKED] Index changed between hash computation and verification — \
              another process may have staged files during record-round. \
+             Review state rolled back to invalidated. \
              Re-run after confirming no concurrent staging."
             .to_owned());
     }
