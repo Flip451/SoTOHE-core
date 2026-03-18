@@ -60,6 +60,8 @@ pub enum ValidationError {
         "task '{task_id}' description was mutated; task descriptions are immutable once created"
     )]
     TaskDescriptionMutated { task_id: String },
+    #[error("task '{task_id}' was removed; existing tasks cannot be deleted via save")]
+    TaskRemoved { task_id: String },
 }
 
 /// Errors from invalid task state transitions.

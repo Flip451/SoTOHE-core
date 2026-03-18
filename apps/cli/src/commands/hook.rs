@@ -33,6 +33,68 @@ struct HookEnvelope {
 struct HookToolInput {
     command: Option<String>,
     file_path: Option<PathBuf>,
+    /// Content written by the Write tool (used by block-test-file-deletion guard).
+    /// Deserialized with a custom helper that silently returns None if the JSON
+    /// value is not a string (e.g. structured content blocks array).
+    #[serde(default, deserialize_with = "deserialize_string_or_none")]
+    content: Option<String>,
+}
+
+/// Deserializes `content` from hook JSON, handling both plain strings and
+/// structured content blocks (`[{"type":"text","text":"..."},...]`).
+/// Returns `None` only if the field is absent or contains no extractable text.
+fn deserialize_string_or_none<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    use serde::Deserialize;
+    let value: Option<serde_json::Value> = Option::<serde_json::Value>::deserialize(deserializer)?;
+    Ok(value.and_then(|v| flatten_content_text(&v)))
+}
+
+/// Extracts text from a hook content value, recursing into nested structures.
+///
+/// Mirrors the behavior of Python `_shared.py`'s `flatten_text()`:
+/// - Plain string: returned as-is.
+/// - Array: recurse into each element, concatenate extracted text.
+/// - Object with `"text"` string field: extract it.
+/// - Object with `"content"` or `"message"` sub-values: recurse into them.
+/// - Other types: returns `None`.
+fn flatten_content_text(value: &serde_json::Value) -> Option<String> {
+    let mut parts = Vec::new();
+    collect_text_parts(value, &mut parts);
+    if parts.is_empty() { None } else { Some(parts.join("\n")) }
+}
+
+fn collect_text_parts(value: &serde_json::Value, parts: &mut Vec<String>) {
+    match value {
+        serde_json::Value::String(s) => {
+            if !s.is_empty() {
+                parts.push(s.clone());
+            }
+        }
+        serde_json::Value::Array(arr) => {
+            for item in arr {
+                collect_text_parts(item, parts);
+            }
+        }
+        serde_json::Value::Object(obj) => {
+            // Prefer "text" field from {"type":"text","text":"..."} blocks
+            if let Some(text) = obj.get("text").and_then(|v| v.as_str()) {
+                if !text.is_empty() {
+                    parts.push(text.to_owned());
+                    return;
+                }
+            }
+            // Recurse into "content", "message" sub-values
+            for key in &["content", "message"] {
+                if let Some(sub) = obj.get(*key) {
+                    collect_text_parts(sub, parts);
+                }
+            }
+        }
+        _ => {}
+    }
 }
 
 impl From<HookEnvelope> for domain::hook::HookInput {
@@ -41,6 +103,7 @@ impl From<HookEnvelope> for domain::hook::HookInput {
             tool_name: env.tool_name,
             command: env.tool_input.command,
             file_path: env.tool_input.file_path,
+            content: env.tool_input.content,
         }
     }
 }
