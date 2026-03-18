@@ -768,12 +768,20 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
 
     let timestamp = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
 
-    // Acquire git index lock to make the entire hash-write-restage cycle atomic.
-    // While this lock is held, concurrent `git add` / `git reset` will block,
-    // eliminating all TOCTOU races between hash computation and staging.
+    // Acquire an advisory lock to serialize concurrent record-round invocations.
+    //
+    // Design note: we intentionally use an application-level lock (not git's
+    // `.git/index.lock`) because git's index lock would block `git add` calls
+    // within this process. The advisory lock only serializes `sotp record-round`
+    // against itself. External `git add` from other tools is not blocked; in
+    // the normal workflow, the Claude Code `block-direct-git-ops` hook prevents
+    // uncontrolled staging. This is a deliberate trade-off: full index-level
+    // atomicity is not achievable without forking git internals, and the
+    // advisory lock + hook combination provides sufficient protection for the
+    // intended single-operator workflow.
     let index_lock = acquire_git_index_lock(&git)?;
 
-    // Step 1: Compute pre-update normalized hash (index is locked — stable).
+    // Step 1: Compute pre-update normalized hash (advisory lock held).
     let pre_update_hash = git
         .index_tree_hash_normalizing(&metadata_rel)
         .map_err(|e| format!("normalized hash error: {e}"))?;
@@ -913,7 +921,13 @@ fn acquire_git_index_lock(
                 #[cfg(unix)]
                 {
                     // Safety: kill(pid, 0) only checks process existence, no signal is sent.
-                    let alive = unsafe { libc::kill(pid as libc::pid_t, 0) } == 0;
+                    let ret = unsafe { libc::kill(pid as libc::pid_t, 0) };
+                    // ret == 0 → process exists and we can signal it.
+                    // ret == -1 && errno == EPERM → process exists but owned by another user.
+                    // ret == -1 && errno == ESRCH → process does not exist (stale).
+                    let alive = ret == 0
+                        || (ret == -1
+                            && std::io::Error::last_os_error().raw_os_error() == Some(libc::EPERM));
                     if !alive {
                         eprintln!(
                             "Removing stale record-round lock (PID {pid} is no longer running)"
