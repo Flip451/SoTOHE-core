@@ -290,22 +290,26 @@ impl ReviewState {
         pre_update_hash: &str,
     ) -> Result<(), ReviewError> {
         // 1. Code hash freshness check — skip if None (first round).
-        if let Some(stored_hash) = self.code_hash.take() {
+        let taken_hash = self.code_hash.take();
+        if let Some(ref stored_hash) = taken_hash {
             if stored_hash != pre_update_hash {
                 self.status = ReviewStatus::Invalidated;
                 return Err(ReviewError::StaleCodeHash {
-                    expected: stored_hash,
+                    expected: stored_hash.clone(),
                     actual: pre_update_hash.to_owned(),
                 });
             }
-            // hash matched — code_hash already cleared by take(); will be set to PENDING below
+            // hash matched — code_hash cleared by take(); will be set to PENDING below
         }
 
-        // 2. Sequential escalation check (final requires fast_passed or approved)
+        // 2. Sequential escalation check (final requires fast_passed or approved).
+        // Restore code_hash on failure so the next retry still has a valid
+        // freshness baseline rather than skipping the check as if first-round.
         if round_type == RoundType::Final
             && self.status != ReviewStatus::FastPassed
             && self.status != ReviewStatus::Approved
         {
+            self.code_hash = taken_hash;
             return Err(ReviewError::FinalRequiresFastPassed(self.status));
         }
 
