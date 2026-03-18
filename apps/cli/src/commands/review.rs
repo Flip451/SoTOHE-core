@@ -768,31 +768,22 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
 
     let timestamp = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
 
-    // Step 1: Snapshot the index before any mutation.
-    // Compute raw tree hash first, then normalized hash. Both read the same
-    // git index — computing raw first minimizes the window for a concurrent
-    // `git add` to land between the two reads (the normalized hash internally
-    // copies the index, so a concurrent add after it starts won't affect it).
-    let raw_tree_baseline =
-        git.index_tree_hash().map_err(|e| format!("raw tree hash baseline error: {e}"))?;
+    // Acquire git index lock to make the entire hash-write-restage cycle atomic.
+    // While this lock is held, concurrent `git add` / `git reset` will block,
+    // eliminating all TOCTOU races between hash computation and staging.
+    let index_lock = acquire_git_index_lock(&git)?;
+
+    // Step 1: Compute pre-update normalized hash (index is locked — stable).
     let pre_update_hash = git
         .index_tree_hash_normalizing(&metadata_rel)
         .map_err(|e| format!("normalized hash error: {e}"))?;
 
     // Step 2: Write review state + code_hash="PENDING" via record_round_with_pending.
-    // On StaleCodeHash, persist the invalidation (return Ok from closure so update writes),
-    // then report the error to the caller.
     use domain::TrackWriter;
     let mut stale_error: Option<String> = None;
-    // Capture pre-mutation review snapshot for rollback on TOCTOU failure.
-    // Snapshot the Option<ReviewState> BEFORE get_or_insert_with so that
-    // tracks without a review section are restored to None, not empty ReviewState.
-    let mut review_snapshot: Option<Option<domain::ReviewState>> = None;
     store
         .update(&track_id, |track| {
-            review_snapshot = Some(track.review().cloned());
             let review = track.review_mut().get_or_insert_with(ReviewState::new);
-
             let round_num = review
                 .groups()
                 .get(&args.group)
@@ -813,8 +804,6 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
             ) {
                 Ok(()) => Ok(()),
                 Err(domain::ReviewError::StaleCodeHash { expected, actual }) => {
-                    // record_round_with_pending already set status to Invalidated.
-                    // Return Ok so update() persists the invalidation to disk.
                     stale_error = Some(format!(
                         "code hash mismatch: review recorded against {expected}, \
                          but current code is {actual} — review.status set to invalidated"
@@ -829,60 +818,14 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         .map_err(|e| format!("failed to update metadata.json: {e}"))?;
 
     if let Some(err_msg) = stale_error {
+        drop(index_lock);
         return Err(format!("[BLOCKED] {err_msg}"));
     }
 
-    // Step 3: Re-stage metadata.json (now contains code_hash="PENDING").
+    // Step 3: Re-stage metadata.json (index is still locked).
     stage_metadata(&git, &metadata_rel)?;
 
-    // Step 4a: Verify no non-metadata files were staged between step 1 and now.
-    // Compare the raw tree hash baseline with the current raw tree hash.
-    // The only difference should be metadata.json (which we wrote under the
-    // FsTrackStore file lock and re-staged). External metadata.json edits are
-    // prevented by the file lock — any concurrent writer that bypasses the lock
-    // is a precondition violation, not a runtime race we can detect here.
-    let raw_tree_after =
-        git.index_tree_hash().map_err(|e| format!("raw tree hash after step 3: {e}"))?;
-    if raw_tree_baseline != raw_tree_after {
-        // Trees differ — verify that only metadata.json changed.
-        let diff_output = git
-            .output(&["diff-tree", "-r", &raw_tree_baseline, &raw_tree_after])
-            .map_err(|e| format!("diff-tree error: {e}"))?;
-        let diff_text = String::from_utf8_lossy(&diff_output.stdout);
-        let has_non_metadata = diff_text.lines().any(|line| {
-            // git diff-tree output: :<old_mode> <new_mode> <old_hash> <new_hash> <status>\t<path>
-            line.split('\t').nth(1).is_some_and(|path| path.trim() != metadata_rel)
-        });
-        if has_non_metadata {
-            // Roll back review state to pre-mutation snapshot (restores
-            // status, code_hash, AND groups — not just invalidate).
-            // Propagate rollback failures so the caller knows the state
-            // may be corrupted rather than cleanly restored.
-            if let Some(snapshot) = &review_snapshot {
-                let snap = snapshot.clone();
-                store
-                    .update(&track_id, |track| {
-                        *track.review_mut() = snap;
-                        Ok(())
-                    })
-                    .map_err(|e| {
-                        format!(
-                            "[BLOCKED] Non-metadata staging detected AND rollback failed: {e}. \
-                             metadata.json may contain a partial review state."
-                        )
-                    })?;
-                stage_metadata(&git, &metadata_rel)?;
-            }
-            return Err("[BLOCKED] Non-metadata files were staged between hash computation \
-                 and metadata write — the review would bless unreviewed changes. \
-                 Review state rolled back. Re-run after confirming no concurrent staging."
-                .to_owned());
-        }
-    }
-
-    // Step 4b: Compute post-update normalized hash H1.
-    // Since code_hash is "PENDING" and normalization replaces it with "PENDING",
-    // this is effectively a no-op for the code_hash field. updated_at is normalized to epoch.
+    // Step 4: Compute post-update normalized hash H1 (index is still locked — stable).
     let post_update_hash = git
         .index_tree_hash_normalizing(&metadata_rel)
         .map_err(|e| format!("post-update normalized hash error: {e}"))?;
@@ -897,47 +840,63 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         })
         .map_err(|e| format!("failed to write code_hash: {e}"))?;
 
-    // Step 6: Re-stage metadata.json (now contains code_hash=H1).
+    // Step 6: Re-stage metadata.json (index is still locked).
     stage_metadata(&git, &metadata_rel)?;
 
-    // Step 7: Post-update freshness re-verification (TOCTOU guard).
-    // If any non-metadata file was staged between steps 3–6, the normalized
-    // hash will differ from H1, and we fail closed rather than blessing
-    // unreviewed changes.
-    let verify_hash = git
-        .index_tree_hash_normalizing(&metadata_rel)
-        .map_err(|e| format!("verification hash error: {e}"))?;
-    if verify_hash != post_update_hash {
-        // Roll back review state to pre-mutation snapshot.
-        // Propagate rollback failures so the caller knows the state
-        // may be corrupted rather than cleanly restored.
-        if let Some(snapshot) = &review_snapshot {
-            let snap = snapshot.clone();
-            store
-                .update(&track_id, |track| {
-                    *track.review_mut() = snap;
-                    Ok(())
-                })
-                .map_err(|e| {
-                    format!(
-                        "[BLOCKED] TOCTOU detected AND rollback failed: {e}. \
-                         metadata.json may contain a partial review state."
-                    )
-                })?;
-            stage_metadata(&git, &metadata_rel)?;
-        }
-        return Err("[BLOCKED] Index changed between hash computation and verification — \
-             another process may have staged files during record-round. \
-             Review state rolled back to invalidated. \
-             Re-run after confirming no concurrent staging."
-            .to_owned());
-    }
+    // Release the git index lock — concurrent git operations can resume.
+    drop(index_lock);
 
     eprintln!(
         "[OK] Recorded {round_type} round for group '{}' (verdict: {verdict_str})",
         args.group
     );
     Ok(())
+}
+
+/// Acquire the git index lock (`.git/index.lock`) to prevent concurrent
+/// index modifications during the record-round protocol.
+///
+/// Returns a guard that removes the lock file on drop.
+fn acquire_git_index_lock(
+    git: &impl infrastructure::git_cli::GitRepository,
+) -> Result<GitIndexLockGuard, String> {
+    // Resolve the index lock path the same way git does.
+    let index_path_output = git
+        .output(&["rev-parse", "--git-path", "index"])
+        .map_err(|e| format!("failed to resolve git index path: {e}"))?;
+    if !index_path_output.status.success() {
+        return Err("failed to resolve git index path".to_owned());
+    }
+    let index_path_str = String::from_utf8_lossy(&index_path_output.stdout).trim().to_owned();
+    let index_path = if std::path::Path::new(&index_path_str).is_absolute() {
+        std::path::PathBuf::from(&index_path_str)
+    } else {
+        git.root().join(&index_path_str)
+    };
+    let lock_path = index_path.with_extension("lock");
+
+    // O_CREAT | O_EXCL — fails if the lock already exists (another git operation).
+    let _file =
+        std::fs::OpenOptions::new().write(true).create_new(true).open(&lock_path).map_err(|e| {
+            format!(
+                "failed to acquire git index lock at {}: {e}. \
+                 Another git operation may be in progress.",
+                lock_path.display()
+            )
+        })?;
+
+    Ok(GitIndexLockGuard { path: lock_path })
+}
+
+/// RAII guard that removes the git index lock file on drop.
+struct GitIndexLockGuard {
+    path: std::path::PathBuf,
+}
+
+impl Drop for GitIndexLockGuard {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_file(&self.path);
+    }
 }
 
 /// Stage a single file into the git index.
