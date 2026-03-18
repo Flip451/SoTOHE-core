@@ -598,9 +598,11 @@ fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
 
 /// Check if there is already a completed bot review for the given commit.
 ///
-/// Returns the sanitized review JSON if found, or None.
-/// This prevents re-triggering when a previous review completed after
-/// the polling timed out.
+/// Returns the **latest** (by `submitted_at` / `id`) sanitized review JSON
+/// if found, or None.  When multiple reviews exist for the same commit
+/// (e.g., after re-triggering without a new push), the newest one is
+/// authoritative — an older APPROVED may be superseded by a newer
+/// CHANGES_REQUESTED.
 fn find_existing_bot_review_for_commit<C: GhClient>(
     pr: &str,
     commit_hash: &str,
@@ -613,29 +615,42 @@ fn find_existing_bot_review_for_commit<C: GhClient>(
     let reviews_json = client.list_reviews(repo_nwo, pr)?;
     let reviews = pr_review::parse_paginated_json(&reviews_json)
         .map_err(|e| CliError::Message(format!("failed to parse reviews JSON: {e}")))?;
-    for review in &reviews {
-        let author =
-            review.get("user").and_then(|u| u.get("login")).and_then(|l| l.as_str()).unwrap_or("");
-        if !is_codex_bot(author) {
-            continue;
-        }
-        let review_commit = review.get("commit_id").and_then(|s| s.as_str()).unwrap_or("");
-        if review_commit != commit_hash {
-            continue;
-        }
-        let state = review.get("state").and_then(|s| s.as_str()).unwrap_or("");
-        if matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED") {
-            let mut sanitized = review.clone();
-            if let Some(obj) = sanitized.as_object_mut() {
-                if let Some(serde_json::Value::String(body)) = obj.get("body") {
-                    let clean = sanitize_text(body);
-                    obj.insert("body".to_owned(), serde_json::Value::String(clean));
-                }
-            }
-            return Ok(Some(sanitized));
+    let filtered: Vec<&serde_json::Value> = reviews
+        .iter()
+        .filter(|r| {
+            let author =
+                r.get("user").and_then(|u| u.get("login")).and_then(|l| l.as_str()).unwrap_or("");
+            let rc = r.get("commit_id").and_then(|s| s.as_str()).unwrap_or("");
+            let state = r.get("state").and_then(|s| s.as_str()).unwrap_or("");
+            is_codex_bot(author)
+                && rc == commit_hash
+                && matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
+        })
+        .collect();
+    Ok(find_latest_bot_review_in(&filtered))
+}
+
+/// Pick the latest completed bot review from a slice, by `submitted_at` then `id`.
+///
+/// Returns a sanitized clone or None if the slice is empty.
+fn find_latest_bot_review_in(reviews: &[&serde_json::Value]) -> Option<serde_json::Value> {
+    let best = reviews.iter().max_by(|a, b| {
+        let ts_a = a.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
+        let ts_b = b.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
+        ts_a.cmp(ts_b).then_with(|| {
+            let id_a = a.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
+            let id_b = b.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
+            id_a.cmp(&id_b)
+        })
+    })?;
+    let mut sanitized = (*best).clone();
+    if let Some(obj) = sanitized.as_object_mut() {
+        if let Some(serde_json::Value::String(body)) = obj.get("body") {
+            let clean = sanitize_text(body);
+            obj.insert("body".to_owned(), serde_json::Value::String(clean));
         }
     }
-    Ok(None)
+    Some(sanitized)
 }
 
 /// Ensure PR exists for review cycle, returning the PR number.
@@ -828,6 +843,46 @@ where
         let remaining = deadline.saturating_duration_since(Instant::now()).as_secs();
         eprintln!("  Waiting... ({remaining}s remaining)");
         sleep(Duration::from_secs(interval));
+    }
+
+    // Timeout recovery: the review may have been submitted but missed by
+    // the timestamp filter (GitHub API eventual consistency, or the review
+    // was triggered by a prior @codex review and completed between polls).
+    // Do one final commit-based lookup before giving up.
+    let head_output = client.repo_nwo().ok().and_then(|nwo| {
+        let reviews_json = client.list_reviews(&nwo, pr).ok()?;
+        let reviews = pr_review::parse_paginated_json(&reviews_json).ok()?;
+        let refs: Vec<&serde_json::Value> = reviews
+            .iter()
+            .filter(|r| {
+                let author = r
+                    .get("user")
+                    .and_then(|u| u.get("login"))
+                    .and_then(|l| l.as_str())
+                    .unwrap_or("");
+                let state = r.get("state").and_then(|s| s.as_str()).unwrap_or("");
+                if !is_codex_bot(author)
+                    || !matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
+                {
+                    return false;
+                }
+                // Still require submitted_at >= trigger to avoid surfacing
+                // stale reviews from earlier trigger rounds.
+                let submitted_raw = r.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
+                if submitted_raw.is_empty() {
+                    return false;
+                }
+                let submitted_str = submitted_raw.replace('Z', "+00:00");
+                chrono::DateTime::parse_from_rfc3339(&submitted_str)
+                    .map(|dt| dt >= trigger_dt)
+                    .unwrap_or(false)
+            })
+            .collect();
+        find_latest_bot_review_in(&refs)
+    });
+    if let Some(recovered) = head_output {
+        eprintln!("[OK] Recovered Codex review after timeout (commit-based fallback).");
+        return Ok(PollReviewResult::ReviewFound(recovered));
     }
 
     if !any_bot_activity {

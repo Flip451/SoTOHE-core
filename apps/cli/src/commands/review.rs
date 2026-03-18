@@ -755,11 +755,6 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         .to_string_lossy()
         .into_owned();
 
-    // Step 1: Compute pre-update normalized hash.
-    let pre_update_hash = git
-        .index_tree_hash_normalizing(&metadata_rel)
-        .map_err(|e| format!("normalized hash error: {e}"))?;
-
     // Open track store with locking
     let track_id =
         domain::TrackId::new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
@@ -772,6 +767,14 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         FsTrackStore::new(&args.items_dir, lock_manager, std::time::Duration::from_secs(10));
 
     let timestamp = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
+
+    // Step 1: Compute pre-update normalized hash immediately before the
+    // locked update to minimize the TOCTOU window between hash computation
+    // and the metadata lock acquisition. Any concurrent staging between
+    // this point and step 6 is caught by the post-update verification (step 7).
+    let pre_update_hash = git
+        .index_tree_hash_normalizing(&metadata_rel)
+        .map_err(|e| format!("normalized hash error: {e}"))?;
 
     // Step 2: Write review state + code_hash="PENDING" via record_round_with_pending.
     // On StaleCodeHash, persist the invalidation (return Ok from closure so update writes),
