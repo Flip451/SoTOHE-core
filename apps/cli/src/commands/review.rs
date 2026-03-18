@@ -856,17 +856,32 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
 /// Acquire an advisory lock to serialize concurrent `sotp record-round` invocations.
 ///
 /// This does NOT use `.git/index.lock` (which would block `git add` inside
-/// this process). Instead it creates `.git/sotp-record-round.lock` — an
+/// this process). Instead it creates `<git-dir>/sotp-record-round.lock` — an
 /// application-level lock that prevents two `record-round` commands from
-/// racing against each other. External `git add` from other tools is not
-/// blocked, but the Claude Code hook `block-direct-git-ops` prevents
-/// uncontrolled staging during normal workflow.
+/// racing against each other. External `git add` from other tools is NOT
+/// blocked by this lock; it is an advisory guard only. In the normal workflow,
+/// the Claude Code hook `block-direct-git-ops` prevents uncontrolled staging,
+/// so this lock's scope is limited to serializing `record-round` invocations.
 ///
 /// Returns a guard that removes the lock file on drop.
 fn acquire_git_index_lock(
     git: &impl infrastructure::git_cli::GitRepository,
 ) -> Result<GitIndexLockGuard, String> {
-    let lock_path = git.root().join(".git/sotp-record-round.lock");
+    // Use `git rev-parse --git-dir` to support linked worktrees where
+    // `.git` is a file pointing to the real git directory.
+    let git_dir_output = git
+        .output(&["rev-parse", "--git-dir"])
+        .map_err(|e| format!("failed to resolve git dir: {e}"))?;
+    if !git_dir_output.status.success() {
+        return Err("failed to resolve git dir".to_owned());
+    }
+    let git_dir_str = String::from_utf8_lossy(&git_dir_output.stdout).trim().to_owned();
+    let git_dir = if std::path::Path::new(&git_dir_str).is_absolute() {
+        std::path::PathBuf::from(&git_dir_str)
+    } else {
+        git.root().join(&git_dir_str)
+    };
+    let lock_path = git_dir.join("sotp-record-round.lock");
 
     // O_CREAT | O_EXCL — fails if the lock already exists (another record-round).
     let _file =
