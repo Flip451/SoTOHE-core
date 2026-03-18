@@ -1,0 +1,26 @@
+## Task Summary: Phase 1 remaining — spec.md template foundation
+
+**Track:** spec-template-foundation-2026-03-18
+**Task:** T001-T004: test deletion guard, task immutability, source attribution, frontmatter signals
+**Date:** 2026-03-18
+
+### Changes
+
+- apps/cli/src/commands/hook.rs: content field deserialization with flatten_content_text() for structured content blocks
+- libs/domain/src/error.rs: TaskRemoved variant added to ValidationError
+- libs/domain/src/track.rs: validate_descriptions_unchanged() extended with task removal detection
+- libs/domain/src/hook/types.rs: HookInput content field added
+- libs/infrastructure/src/track/fs_store.rs: save() wired to validate_descriptions_unchanged()
+- libs/infrastructure/src/verify/spec_frontmatter.rs: serde_yaml signals validation with inline mapping enforcement
+- libs/infrastructure/Cargo.toml: serde_yaml dependency added
+- libs/usecase/src/hook.rs: TestFileDeletionGuardHandler for Write tool (fail-closed)
+- .claude/settings.json: block-test-file-deletion hook entry
+- .claude/skills/track-plan/SKILL.md: source attribution template (5 tag types)
+- project-docs/conventions/source-attribution.md: new convention
+- track artifacts: all tasks done, verification complete
+
+### Why
+
+Completes Phase 1 remaining quick wins (SURVEY-03, SURVEY-10, TSUMIKI-02, SURVEY-16) to
+establish the spec.md metadata foundation needed for Phase 2 specification quality
+institutionalization. Adds serde_yaml for proper YAML validation as Phase 2 preparation.
