@@ -8,14 +8,14 @@
 ## Current Focus
 
 - Latest active track: `review-workflow-fixes-2026-03-18`
-- Next recommended command: `/track:activate review-workflow-fixes-2026-03-18`
+- Next recommended command: `/track:implement`
 - Last updated: `2026-03-18`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| review-workflow-fixes-2026-03-18 | planned | `/track:activate review-workflow-fixes-2026-03-18` | 2026-03-18 |
+| review-workflow-fixes-2026-03-18 | planned | `/track:implement` | 2026-03-18 |
 
 ## Completed Tracks
 
