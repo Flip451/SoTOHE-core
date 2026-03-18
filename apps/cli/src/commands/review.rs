@@ -781,8 +781,11 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
     // Step 2: Write review state + code_hash="PENDING" via record_round_with_pending.
     use domain::TrackWriter;
     let mut stale_error: Option<String> = None;
+    // Capture pre-mutation snapshot for rollback if steps 3–6 fail.
+    let mut review_snapshot: Option<Option<domain::ReviewState>> = None;
     store
         .update(&track_id, |track| {
+            review_snapshot = Some(track.review().cloned());
             let review = track.review_mut().get_or_insert_with(ReviewState::new);
             let round_num = review
                 .groups()
@@ -822,29 +825,48 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         return Err(format!("[BLOCKED] {err_msg}"));
     }
 
-    // Step 3: Re-stage metadata.json (index is still locked).
-    stage_metadata(&git, &metadata_rel)?;
+    // Steps 3–6: re-stage → compute hash → write-back → re-stage.
+    // If any step fails, roll back review state to pre-mutation snapshot
+    // so we don't leave metadata.json with code_hash="PENDING".
+    let hash_write_result = (|| -> Result<(), String> {
+        // Step 3: Re-stage metadata.json (advisory lock still held).
+        stage_metadata(&git, &metadata_rel)?;
 
-    // Step 4: Compute post-update normalized hash H1 (index is still locked — stable).
-    let post_update_hash = git
-        .index_tree_hash_normalizing(&metadata_rel)
-        .map_err(|e| format!("post-update normalized hash error: {e}"))?;
+        // Step 4: Compute post-update normalized hash H1.
+        let h1 = git
+            .index_tree_hash_normalizing(&metadata_rel)
+            .map_err(|e| format!("post-update normalized hash error: {e}"))?;
 
-    // Step 5: Write back the computed hash via set_code_hash.
-    store
-        .update(&track_id, |track| {
-            if let Some(review) = track.review_mut().as_mut() {
-                review.set_code_hash(post_update_hash.clone());
-            }
-            Ok(())
-        })
-        .map_err(|e| format!("failed to write code_hash: {e}"))?;
+        // Step 5: Write back the computed hash via set_code_hash.
+        store
+            .update(&track_id, |track| {
+                if let Some(review) = track.review_mut().as_mut() {
+                    review.set_code_hash(h1.clone());
+                }
+                Ok(())
+            })
+            .map_err(|e| format!("failed to write code_hash: {e}"))?;
 
-    // Step 6: Re-stage metadata.json (index is still locked).
-    stage_metadata(&git, &metadata_rel)?;
+        // Step 6: Re-stage metadata.json.
+        stage_metadata(&git, &metadata_rel)?;
+        Ok(())
+    })();
 
-    // Release the git index lock — concurrent git operations can resume.
+    // Release the advisory lock — concurrent record-round can proceed.
     drop(index_lock);
+
+    if let Err(e) = hash_write_result {
+        // Roll back: restore pre-mutation review state so metadata.json
+        // does not retain code_hash="PENDING" from the failed attempt.
+        if let Some(snap) = review_snapshot {
+            let _ = store.update(&track_id, |track| {
+                *track.review_mut() = snap;
+                Ok(())
+            });
+            let _ = stage_metadata(&git, &metadata_rel);
+        }
+        return Err(format!("[BLOCKED] hash write-back failed: {e}. Review state rolled back."));
+    }
 
     eprintln!(
         "[OK] Recorded {round_type} round for group '{}' (verdict: {verdict_str})",
@@ -883,8 +905,32 @@ fn acquire_git_index_lock(
     };
     let lock_path = git_dir.join("sotp-record-round.lock");
 
+    // Check for stale lock left by a crashed process.
+    if lock_path.exists() {
+        if let Ok(contents) = std::fs::read_to_string(&lock_path) {
+            if let Ok(pid) = contents.trim().parse::<u32>() {
+                // On Unix, sending signal 0 checks if the process exists.
+                #[cfg(unix)]
+                {
+                    // Safety: kill(pid, 0) only checks process existence, no signal is sent.
+                    let alive = unsafe { libc::kill(pid as libc::pid_t, 0) } == 0;
+                    if !alive {
+                        eprintln!(
+                            "Removing stale record-round lock (PID {pid} is no longer running)"
+                        );
+                        let _ = std::fs::remove_file(&lock_path);
+                    }
+                }
+                #[cfg(not(unix))]
+                {
+                    let _ = pid; // suppress unused warning
+                }
+            }
+        }
+    }
+
     // O_CREAT | O_EXCL — fails if the lock already exists (another record-round).
-    let _file =
+    let mut file =
         std::fs::OpenOptions::new().write(true).create_new(true).open(&lock_path).map_err(|e| {
             format!(
                 "failed to acquire record-round lock at {}: {e}. \
@@ -892,6 +938,9 @@ fn acquire_git_index_lock(
                 lock_path.display()
             )
         })?;
+    // Write our PID so stale lock detection can identify dead holders.
+    use std::io::Write;
+    let _ = write!(file, "{}", std::process::id());
 
     Ok(GitIndexLockGuard { path: lock_path })
 }
