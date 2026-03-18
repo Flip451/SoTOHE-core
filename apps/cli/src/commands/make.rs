@@ -472,7 +472,42 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
         return Ok(ExitCode::from(u8::try_from(ci_exit).unwrap_or(1)));
     }
     eprintln!("[track-commit-message] CI PASSED");
+
+    // Review guard: check review.status == approved with current code hash.
+    // Resolve track ID from current branch (track/<id>).
+    if let Some(track_id) = resolve_track_id_from_branch() {
+        eprintln!("[track-commit-message] Checking review approval for track '{track_id}'...");
+        let guard_result = run_sotp(&[
+            "review",
+            "check-approved",
+            "--items-dir",
+            "track/items",
+            "--track-id",
+            &track_id,
+        ])?;
+        if guard_result != ExitCode::SUCCESS {
+            eprintln!("[track-commit-message] BLOCKED: review guard rejected commit");
+            return Ok(guard_result);
+        }
+        eprintln!("[track-commit-message] Review approved");
+    }
+
     run_sotp(&["git", "commit-from-file", "tmp/track-commit/commit-message.txt", "--cleanup"])
+}
+
+/// Resolves the track ID from the current git branch.
+///
+/// Returns `Some(id)` if the branch matches `track/<id>`, otherwise `None`.
+fn resolve_track_id_from_branch() -> Option<String> {
+    let output = std::process::Command::new("git")
+        .args(["rev-parse", "--abbrev-ref", "HEAD"])
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let branch = String::from_utf8_lossy(&output.stdout).trim().to_owned();
+    branch.strip_prefix("track/").map(|id| id.to_owned())
 }
 
 // --- Phase 4: Exec dispatcher ---

@@ -1,8 +1,11 @@
 //! Serde types for metadata.json (TrackDocumentV2) matching Python track_schema.py.
 
+use std::collections::HashMap;
+
 use domain::{
-    CommitHash, DomainError, PlanSection, PlanView, StatusOverride, TaskId, TaskStatus,
-    TrackBranch, TrackId, TrackMetadata, TrackTask,
+    CommitHash, DomainError, PlanSection, PlanView, ReviewGroupState, ReviewRoundResult,
+    ReviewState, ReviewStatus, StatusOverride, TaskId, TaskStatus, TrackBranch, TrackId,
+    TrackMetadata, TrackTask,
 };
 use serde::{Deserialize, Deserializer};
 
@@ -34,6 +37,8 @@ pub struct TrackDocumentV2 {
     pub plan: PlanDocument,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status_override: Option<TrackStatusOverrideDocument>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub review: Option<TrackReviewDocument>,
     /// Unknown fields captured during deserialization and preserved on re-serialization.
     #[serde(flatten)]
     #[serde(default)]
@@ -71,6 +76,30 @@ pub struct PlanSectionDocument {
 pub struct TrackStatusOverrideDocument {
     pub status: String,
     pub reason: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct TrackReviewDocument {
+    pub status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub code_hash: Option<String>,
+    #[serde(default)]
+    pub groups: HashMap<String, ReviewGroupDocument>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ReviewGroupDocument {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fast: Option<ReviewRoundDocument>,
+    #[serde(rename = "final", skip_serializing_if = "Option::is_none")]
+    pub final_round: Option<ReviewRoundDocument>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ReviewRoundDocument {
+    pub round: u32,
+    pub verdict: String,
+    pub timestamp: String,
 }
 
 /// Metadata not part of the domain aggregate (infrastructure concern).
@@ -162,7 +191,14 @@ fn track_metadata_from_document(doc: TrackDocumentV2) -> Result<TrackMetadata, C
     let status_override =
         doc.status_override.map(|o| parse_status_override(&o.status, o.reason)).transpose()?;
 
-    let track = TrackMetadata::with_branch(id, branch, doc.title, tasks, plan, status_override)?;
+    let mut track =
+        TrackMetadata::with_branch(id, branch, doc.title, tasks, plan, status_override)?;
+
+    // Decode review section (backward compatible: None when absent)
+    if let Some(review_doc) = doc.review {
+        track.set_review(Some(review_from_document(review_doc)?));
+    }
+
     Ok(track)
 }
 
@@ -185,6 +221,7 @@ fn document_from_track_metadata(track: &TrackMetadata, meta: &DocumentMeta) -> T
         tasks: track.tasks().iter().map(task_to_document).collect(),
         plan: plan_to_document(track.plan()),
         status_override: track.status_override().map(override_to_document),
+        review: track.review().map(review_to_document),
         extra: meta.extra.clone(),
     }
 }
@@ -268,6 +305,72 @@ fn plan_to_document(plan: &PlanView) -> PlanDocument {
                 task_ids: s.task_ids().iter().map(|id| id.to_string()).collect(),
             })
             .collect(),
+    }
+}
+
+fn review_from_document(doc: TrackReviewDocument) -> Result<ReviewState, CodecError> {
+    let status = parse_review_status(&doc.status)?;
+    let groups = doc
+        .groups
+        .into_iter()
+        .map(|(name, group_doc)| {
+            let fast = group_doc.fast.map(round_result_from_document);
+            let final_round = group_doc.final_round.map(round_result_from_document);
+            let group_state = match (fast, final_round) {
+                (Some(f), Some(fin)) => ReviewGroupState::with_both(f, fin),
+                (Some(f), None) => ReviewGroupState::with_fast(f),
+                (None, Some(fin)) => ReviewGroupState::with_final_only(fin),
+                (None, None) => ReviewGroupState::default(),
+            };
+            (name, group_state)
+        })
+        .collect();
+
+    Ok(ReviewState::with_fields(status, doc.code_hash, groups))
+}
+
+fn round_result_from_document(doc: ReviewRoundDocument) -> ReviewRoundResult {
+    ReviewRoundResult::new(doc.round, doc.verdict, doc.timestamp)
+}
+
+fn review_to_document(review: &ReviewState) -> TrackReviewDocument {
+    TrackReviewDocument {
+        status: review.status().to_string(),
+        code_hash: review.code_hash().map(|s| s.to_owned()),
+        groups: review
+            .groups()
+            .iter()
+            .map(|(name, group)| {
+                (
+                    name.clone(),
+                    ReviewGroupDocument {
+                        fast: group.fast().map(round_result_to_document),
+                        final_round: group.final_round().map(round_result_to_document),
+                    },
+                )
+            })
+            .collect(),
+    }
+}
+
+fn round_result_to_document(result: &ReviewRoundResult) -> ReviewRoundDocument {
+    ReviewRoundDocument {
+        round: result.round(),
+        verdict: result.verdict().to_owned(),
+        timestamp: result.timestamp().to_owned(),
+    }
+}
+
+fn parse_review_status(status: &str) -> Result<ReviewStatus, CodecError> {
+    match status {
+        "not_started" => Ok(ReviewStatus::NotStarted),
+        "invalidated" => Ok(ReviewStatus::Invalidated),
+        "fast_passed" => Ok(ReviewStatus::FastPassed),
+        "approved" => Ok(ReviewStatus::Approved),
+        other => Err(CodecError::InvalidField {
+            field: "review.status".into(),
+            reason: format!("unknown review status: {other}"),
+        }),
     }
 }
 
@@ -556,5 +659,147 @@ mod tests {
 
         assert!(doc.get("branch").is_some());
         assert!(doc["branch"].is_null());
+    }
+
+    #[test]
+    fn test_decode_with_review_section_round_trips() {
+        let json = r#"{
+  "schema_version": 3,
+  "id": "review-track",
+  "branch": "track/review-track",
+  "title": "Review Track",
+  "status": "in_progress",
+  "created_at": "2026-03-18T00:00:00Z",
+  "updated_at": "2026-03-18T00:00:00Z",
+  "tasks": [
+    {"id": "T1", "description": "Task", "status": "in_progress"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}
+    ]
+  },
+  "review": {
+    "status": "fast_passed",
+    "code_hash": "abc123def",
+    "groups": {
+      "infra-domain": {
+        "fast": {"round": 1, "verdict": "zero_findings", "timestamp": "2026-03-18T01:00:00Z"}
+      }
+    }
+  }
+}"#;
+        let (track, meta) = decode(json).unwrap();
+        let review = track.review().unwrap();
+        assert_eq!(review.status(), domain::ReviewStatus::FastPassed);
+        assert_eq!(review.code_hash(), Some("abc123def"));
+        assert!(review.groups().get("infra-domain").is_some());
+        assert!(review.groups().get("infra-domain").unwrap().fast().is_some());
+
+        // Round-trip
+        let re_encoded = encode(&track, &meta).unwrap();
+        let (track2, _) = decode(&re_encoded).unwrap();
+        assert_eq!(track, track2);
+    }
+
+    #[test]
+    fn test_decode_without_review_section_backward_compatible() {
+        // Existing schema_version 3 without review section should still parse
+        let json = r#"{
+  "schema_version": 3,
+  "id": "compat-track",
+  "branch": "track/compat-track",
+  "title": "Compat Track",
+  "status": "planned",
+  "created_at": "2026-03-11T00:00:00Z",
+  "updated_at": "2026-03-11T00:00:00Z",
+  "tasks": [
+    {"id": "T1", "description": "Task", "status": "todo"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}
+    ]
+  }
+}"#;
+        let (track, _) = decode(json).unwrap();
+        assert!(track.review().is_none());
+    }
+
+    #[test]
+    fn test_decode_review_with_fast_and_final_rounds() {
+        let json = r#"{
+  "schema_version": 3,
+  "id": "full-review-track",
+  "branch": "track/full-review-track",
+  "title": "Full Review Track",
+  "status": "in_progress",
+  "created_at": "2026-03-18T00:00:00Z",
+  "updated_at": "2026-03-18T00:00:00Z",
+  "tasks": [
+    {"id": "T1", "description": "Task", "status": "in_progress"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}
+    ]
+  },
+  "review": {
+    "status": "approved",
+    "code_hash": "def456",
+    "groups": {
+      "g1": {
+        "fast": {"round": 1, "verdict": "zero_findings", "timestamp": "2026-03-18T01:00:00Z"},
+        "final": {"round": 2, "verdict": "zero_findings", "timestamp": "2026-03-18T02:00:00Z"}
+      }
+    }
+  }
+}"#;
+        let (track, _) = decode(json).unwrap();
+        let review = track.review().unwrap();
+        assert_eq!(review.status(), domain::ReviewStatus::Approved);
+        let g1 = review.groups().get("g1").unwrap();
+        assert_eq!(g1.fast().unwrap().round(), 1);
+        assert_eq!(g1.final_round().unwrap().round(), 2);
+    }
+
+    #[test]
+    fn test_decode_review_invalid_status_returns_error() {
+        let json = r#"{
+  "schema_version": 3,
+  "id": "bad-review-track",
+  "branch": "track/bad-review-track",
+  "title": "Bad Review Track",
+  "status": "planned",
+  "created_at": "2026-03-18T00:00:00Z",
+  "updated_at": "2026-03-18T00:00:00Z",
+  "tasks": [
+    {"id": "T1", "description": "Task", "status": "todo"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}
+    ]
+  },
+  "review": {
+    "status": "unknown_status",
+    "groups": {}
+  }
+}"#;
+        let result = decode(json);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_encode_review_none_omits_review_field() {
+        let (track, meta) = decode(sample_json()).unwrap();
+        assert!(track.review().is_none());
+        let encoded = encode(&track, &meta).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+        assert!(doc.get("review").is_none());
     }
 }
