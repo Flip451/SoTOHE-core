@@ -246,6 +246,8 @@ const FORBIDDEN_ALLOW: &[&str] = &[
     "Bash(cp:*)",
     "Bash(mv:*)",
     "Bash(chmod:*)",
+    "Bash(chown:*)",
+    "Bash(install:*)",
     "Bash(cargo:*)",
     "Bash(docker:*)",
     "Bash(docker-compose:*)",
@@ -302,6 +304,12 @@ const EXPECTED_DENY: &[(&str, &str)] = &[
     ("Bash(rm -rf /)", "rm root deny rule"),
     ("Bash(rm -rf ~)", "rm home deny rule"),
     ("Bash(cargo make --allow-private:*)", "host allow-private deny rule"),
+    ("Bash(touch :*)", "file-write touch deny rule"),
+    ("Bash(cp :*)", "file-write cp deny rule"),
+    ("Bash(mv :*)", "file-write mv deny rule"),
+    ("Bash(install :*)", "file-write install deny rule"),
+    ("Bash(chmod :*)", "file-write chmod deny rule"),
+    ("Bash(chown :*)", "file-write chown deny rule"),
 ];
 
 // ---------------------------------------------------------------------------
