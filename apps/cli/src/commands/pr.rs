@@ -350,7 +350,8 @@ fn wait_and_merge(pr: &str, interval: u64, timeout: u64, method: &str) -> ExitCo
 /// GitHub App bots use the `<app-slug>[bot]` login convention.
 /// We match against exact known login names to prevent unrelated GitHub Apps
 /// (e.g., `evil-codex-helper[bot]`) from being treated as the trusted reviewer.
-const CODEX_BOT_LOGINS: &[&str] = &["openai-codex[bot]", "codex[bot]"];
+const CODEX_BOT_LOGINS: &[&str] =
+    &["openai-codex[bot]", "codex[bot]", "chatgpt-codex-connector[bot]"];
 
 fn is_codex_bot(login: &str) -> bool {
     let lower = login.to_lowercase();
@@ -1115,6 +1116,8 @@ mod tests {
         assert!(super::is_codex_bot("openai-codex[bot]"));
         assert!(super::is_codex_bot("OpenAI-Codex[bot]"));
         assert!(super::is_codex_bot("codex[bot]"));
+        assert!(super::is_codex_bot("chatgpt-codex-connector[bot]"));
+        assert!(super::is_codex_bot("ChatGPT-Codex-Connector[bot]"));
     }
 
     #[test]

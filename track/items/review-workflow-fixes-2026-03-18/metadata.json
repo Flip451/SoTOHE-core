@@ -60,12 +60,12 @@
     ]
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
   "tasks": [
     {
       "description": "Add chatgpt-codex-connector[bot] to CODEX_BOT_LOGINS + tests",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Add zero-findings detection to poll_review (reaction + comment text fallback) + update review_cycle to handle zero-findings without requiring a review object + tests",
@@ -89,5 +89,5 @@
     }
   ],
   "title": "WF-42+WF-43: review workflow critical fixes (bot login + completion detection + code_hash cycle)",
-  "updated_at": "2026-03-18T11:32:34Z"
+  "updated_at": "2026-03-18T11:39:09Z"
 }

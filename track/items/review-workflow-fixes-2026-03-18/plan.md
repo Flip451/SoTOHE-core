@@ -7,7 +7,7 @@ Fix three critical review workflow issues: WF-42/1 (CODEX_BOT_LOGINS missing cha
 
 Add chatgpt-codex-connector[bot] to the CODEX_BOT_LOGINS constant in apps/cli/src/commands/pr.rs. Add test cases for the new login including case-insensitive matching.
 
-- [ ] Add chatgpt-codex-connector[bot] to CODEX_BOT_LOGINS + tests
+- [x] Add chatgpt-codex-connector[bot] to CODEX_BOT_LOGINS + tests
 
 ## Phase 2: WF-42 completion detection via reaction + comment fallback
 

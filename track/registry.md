@@ -15,7 +15,7 @@
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| review-workflow-fixes-2026-03-18 | planned | `/track:implement` | 2026-03-18 |
+| review-workflow-fixes-2026-03-18 | in_progress | `/track:implement` | 2026-03-18 |
 
 ## Completed Tracks
 
