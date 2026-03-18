@@ -165,7 +165,9 @@ impl<L: FileLockManager> TrackWriter for FsTrackStore<L> {
 
         // Read existing meta under lock to preserve created_at, or create new meta.
         let mut meta = match self.read_track(track.id()).map_err(TrackWriteError::from)? {
-            Some((_existing, mut meta)) => {
+            Some((existing, mut meta)) => {
+                track.validate_descriptions_unchanged(&existing).map_err(DomainError::from)?;
+                track.validate_no_tasks_removed(&existing).map_err(DomainError::from)?;
                 meta.updated_at = Self::now_iso8601();
                 meta
             }
@@ -400,6 +402,123 @@ mod tests {
         assert!(matches!(
             result,
             Err(TrackWriteError::Repository(RepositoryError::TrackNotFound(_)))
+        ));
+    }
+
+    #[test]
+    fn test_save_new_track_succeeds_without_validation() {
+        // A brand-new track (no previous on disk) should succeed regardless of descriptions.
+        let dir = tempfile::tempdir().unwrap();
+        let store = test_store(dir.path());
+        let track = sample_track("new-track");
+
+        let result = store.save(&track);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_save_with_unchanged_descriptions_succeeds() {
+        // Re-saving with identical task descriptions should succeed.
+        let dir = tempfile::tempdir().unwrap();
+        let store = test_store(dir.path());
+        let track = sample_track("test-track");
+
+        store.save(&track).unwrap();
+
+        // Save again with the exact same data — should succeed.
+        let result = store.save(&track);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_save_with_mutated_description_returns_error() {
+        // Saving with a changed task description on an existing track should fail.
+        let dir = tempfile::tempdir().unwrap();
+        let store = test_store(dir.path());
+        let track = sample_track("test-track");
+
+        store.save(&track).unwrap();
+
+        // Build a track with the same ID but a different task description.
+        let task_id = TaskId::new("T1").unwrap();
+        let mutated_task = TrackTask::new(task_id.clone(), "MUTATED description").unwrap();
+        let section = PlanSection::new("S1", "Build", Vec::new(), vec![task_id]).unwrap();
+        let plan = PlanView::new(Vec::new(), vec![section]);
+        let mutated_track = TrackMetadata::new(
+            TrackId::new("test-track").unwrap(),
+            "Test Track",
+            vec![mutated_task],
+            plan,
+            None,
+        )
+        .unwrap();
+
+        let result = store.save(&mutated_track);
+        assert!(matches!(
+            result,
+            Err(TrackWriteError::Domain(DomainError::Validation(
+                domain::ValidationError::TaskDescriptionMutated { .. }
+            )))
+        ));
+    }
+
+    #[test]
+    fn test_save_adding_new_task_to_existing_track_succeeds() {
+        // Adding a brand-new task ID (not present in the previous version) should succeed.
+        let dir = tempfile::tempdir().unwrap();
+        let store = test_store(dir.path());
+        let track = sample_track("test-track");
+
+        store.save(&track).unwrap();
+
+        // Build a new version that keeps T1 unchanged and adds T2.
+        let task_id_t1 = TaskId::new("T1").unwrap();
+        let task_id_t2 = TaskId::new("T2").unwrap();
+        let task_t1 = TrackTask::new(task_id_t1.clone(), "Implement feature").unwrap();
+        let task_t2 = TrackTask::new(task_id_t2.clone(), "New task").unwrap();
+        let section =
+            PlanSection::new("S1", "Build", Vec::new(), vec![task_id_t1, task_id_t2]).unwrap();
+        let plan = PlanView::new(Vec::new(), vec![section]);
+        let extended_track = TrackMetadata::new(
+            TrackId::new("test-track").unwrap(),
+            "Test Track",
+            vec![task_t1, task_t2],
+            plan,
+            None,
+        )
+        .unwrap();
+
+        let result = store.save(&extended_track);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_save_with_removed_task_returns_error() {
+        // Removing a task that existed in the previous version must fail.
+        let dir = tempfile::tempdir().unwrap();
+        let store = test_store(dir.path());
+        let track = sample_track("test-track"); // has T1
+
+        store.save(&track).unwrap();
+
+        // Build a new version with no tasks (T1 removed).
+        let section = PlanSection::new("S1", "Build", Vec::new(), Vec::new()).unwrap();
+        let plan = PlanView::new(Vec::new(), vec![section]);
+        let empty_track = TrackMetadata::new(
+            TrackId::new("test-track").unwrap(),
+            "Test Track",
+            Vec::new(),
+            plan,
+            None,
+        )
+        .unwrap();
+
+        let result = store.save(&empty_track);
+        assert!(matches!(
+            result,
+            Err(TrackWriteError::Domain(DomainError::Validation(
+                domain::ValidationError::TaskRemoved { .. }
+            )))
         ));
     }
 
