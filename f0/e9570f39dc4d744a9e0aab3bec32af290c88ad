@@ -1,0 +1,17 @@
+## Task Summary: Bash file-write guard (CON-07)
+
+**Track:** bash-write-guard-2026-03-18
+**Task:** T001-T003: deny rules, AST redirect guard, residual risk docs
+**Date:** 2026-03-18
+
+### Changes
+
+- .claude/settings.json: 6 permissions.deny entries for file-write commands
+- libs/domain/src/guard/parser.rs: has_output_redirect field, is_output_redirect helper, compound propagation
+- libs/domain/src/guard/policy.rs: output redirect/tee/sed-i checks, 20 new tests
+- libs/infrastructure/src/verify/orchestra.rs: FORBIDDEN_ALLOW + EXPECTED_DENY for chown/install
+- project-docs/conventions/bash-write-guard.md: layered defense architecture and accepted residual risks
+
+### Why
+
+CON-07: Bash tool file writes bypass file-lock hooks. Layered defense: permissions.deny for command names, AST-level output redirect detection via existing guard extension, and documented residual risks for vectors impractical to guard against.
