@@ -44,11 +44,15 @@ version: "1.0"
   - `review.code_hash` → `"PENDING"`（自己参照フィールド）
   - `updated_at` → `"1970-01-01T00:00:00Z"`（`FsTrackStore::update()` が毎回更新するため、複数 write 間で変動する）
   - これにより上記2フィールド以外の全フィールド（review.status, review.groups, tasks 等）が hash に含まれ、tamper 検出可能
-- **record-round のフロー**:
-  1. **Pre-update freshness check**: 現在の staged metadata.json から正規化 hash を計算し、stored `code_hash`（前回 round の値）と比較。不一致ならコードが変更されている → `StaleCodeHash` エラー。初回（`code_hash` 未設定）はスキップ
-  2. **Review state 書き込み**: `store.update()` で review verdict/status/groups + code_hash: `"PENDING"` を**単一の write** で書き込み → re-stage。`code_hash` のデフォルト値が `None` の場合も、正規化前に明示的に `"PENDING"` を**挿入**する（`None`/未設定のままにしない）
-  3. **Post-update hash 計算**: staged metadata.json（code_hash: `"PENDING"` 入り）を正規化 → 一時 index で `git write-tree` → hash H1
-  4. **code_hash 書き戻し**: `store.update()` で code_hash のみ H1 に更新 → re-stage。この write で `updated_at` が変わるが、正規化対象なので hash に影響しない
+- **ドメインメソッド変更**: 現在の `ReviewState::record_round` は freshness check と code_hash 書き込みを一体で行うが、方式 D では「freshness check → review state 書き込み → 外部で正規化 hash 計算 → code_hash 書き戻し」の4段階が必要。以下のようにメソッドを分離する:
+  - `record_round_with_pending(round_type, group, result, expected_groups, pre_update_hash)`: freshness check（stored hash vs `pre_update_hash`、初回は `code_hash == None` なのでスキップ）→ review verdict/status/groups 書き込み → `code_hash` を `"PENDING"` に設定。`code_hash` が `None` の場合も `Some("PENDING")` を挿入
+  - `set_code_hash(hash)`: 外部で計算した正規化 hash を `code_hash` に書き戻すだけのメソッド
+  - 既存の `record_round` は互換性のため残す
+- **record-round のフロー（CLI 層）**:
+  1. **Pre-update 正規化 hash 計算**: 現在の staged metadata.json から正規化 hash を計算
+  2. **Review state 書き込み**: `store.update()` 内で `record_round_with_pending(round_type, group, result, expected_groups, pre_update_hash)` を呼び出し。freshness check + review state + code_hash: `"PENDING"` を単一 write で書き込み → re-stage
+  3. **Post-update 正規化 hash 計算**: staged metadata.json（code_hash: `"PENDING"` 入り）を正規化 → 一時 index で `git write-tree` → hash H1。正規化は `code_hash` を `"PENDING"` に、`updated_at` を epoch に置き換えるため、step 2 で書いた `"PENDING"` がそのまま使われ、正規化は実質ノーオプ（code_hash 部分）
+  4. **code_hash 書き戻し**: `store.update()` 内で `set_code_hash(H1)` を呼び出し → re-stage。`updated_at` が変わるが正規化対象なので hash に影響しない
 - **check-approved のフロー**:
   1. staged metadata.json を読み（code_hash: H1 入り）
   2. 正規化（`review.code_hash` → `"PENDING"`, `updated_at` → `"1970-01-01T00:00:00Z"`）を適用
@@ -60,14 +64,14 @@ version: "1.0"
   - hash は commit される tree の意味的内容を正確に表す
   - re-stage 可能（staging 順序依存なし）
   - pre-update freshness check で「前回レビュー後のコード変更」を検出可能
-- **実装**: `GitRepository` trait に `index_tree_hash_normalizing()` メソッドを追加。内部で一時 `GIT_INDEX_FILE` を使い、metadata.json の blob を正規化版に差し替えて `git write-tree` を実行
+- **実装**: `GitRepository` trait（`libs/infrastructure/src/git_cli.rs:25`）に `index_tree_hash_normalizing()` メソッドを追加。内部で一時 `GIT_INDEX_FILE` を使い、metadata.json の blob を正規化版に差し替えて `git write-tree` を実行
 - **決定論的シリアライズ**: `TrackReviewDocument.groups` を `HashMap` から `BTreeMap` に変更し、JSON キー順序を決定論的にする
 - **調査**: git-appraise (Google) のレビュー状態外部保存パターン、ビルド時 hash 埋め込みパターン、Solidity metadata hash のセンチネル方式を参考
 - **対象ファイル**:
-  - `libs/domain/src/git.rs` or `libs/domain/src/review.rs`（`GitRepository` trait に `index_tree_hash_normalizing` 追加）
-  - `libs/infrastructure/src/git_cli.rs`（正規化 + 一時 index による実装）
+  - `libs/infrastructure/src/git_cli.rs`（`GitRepository` trait に `index_tree_hash_normalizing` 追加 + 実装）
+  - `libs/domain/src/review.rs`（`ReviewState::record_round_with_pending` + `set_code_hash` メソッド追加）
   - `libs/infrastructure/src/track/codec.rs`（`TrackReviewDocument.groups` を `BTreeMap` に変更）
-  - `apps/cli/src/commands/review.rs`（`run_record_round`, `run_check_approved` で正規化 hash を使用）
+  - `apps/cli/src/commands/review.rs`（`run_record_round`, `run_check_approved` で正規化 hash + 新ドメインメソッドを使用）
 
 ## 制約
 
