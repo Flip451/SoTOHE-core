@@ -1,6 +1,7 @@
 //! CLI subcommands for local reviewer workflow wrappers.
 
 use std::ffi::OsString;
+use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, ExitCode, Stdio};
 use std::thread;
@@ -26,6 +27,10 @@ const CODEX_BIN_ENV: &str = "SOTP_CODEX_BIN";
 pub enum ReviewCommand {
     /// Run the local Codex-backed reviewer through a repo-owned wrapper.
     CodexLocal(CodexLocalArgs),
+    /// Record a review round result into metadata.json.
+    RecordRound(RecordRoundArgs),
+    /// Check if review is approved for commit.
+    CheckApproved(CheckApprovedArgs),
 }
 
 #[derive(Debug, Args)]
@@ -57,6 +62,52 @@ pub struct CodexLocalArgs {
     output_last_message: Option<PathBuf>,
 }
 
+#[derive(Debug, Args)]
+pub struct RecordRoundArgs {
+    /// Round type: fast or final.
+    #[arg(long)]
+    round_type: String,
+
+    /// Review group name (e.g., "infra-domain").
+    #[arg(long)]
+    group: String,
+
+    /// Verdict JSON string (e.g., '{"verdict":"zero_findings","findings":[]}').
+    #[arg(long)]
+    verdict: String,
+
+    /// Comma-separated list of expected group names.
+    #[arg(long)]
+    expected_groups: String,
+
+    /// Path to the track items directory.
+    #[arg(long, default_value = "track/items")]
+    items_dir: PathBuf,
+
+    /// Track ID.
+    #[arg(long)]
+    track_id: String,
+
+    /// Directory for lock registry files.
+    #[arg(long, default_value = ".locks")]
+    locks_dir: String,
+}
+
+#[derive(Debug, Args)]
+pub struct CheckApprovedArgs {
+    /// Path to the track items directory.
+    #[arg(long, default_value = "track/items")]
+    items_dir: PathBuf,
+
+    /// Track ID.
+    #[arg(long)]
+    track_id: String,
+
+    /// Directory for lock registry files.
+    #[arg(long, default_value = ".locks")]
+    locks_dir: String,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct ReviewRunResult {
     verdict: ReviewVerdict,
@@ -82,6 +133,8 @@ struct RenderedCommandResult {
 pub fn execute(cmd: ReviewCommand) -> ExitCode {
     match cmd {
         ReviewCommand::CodexLocal(args) => execute_codex_local(&args),
+        ReviewCommand::RecordRound(args) => execute_record_round(&args),
+        ReviewCommand::CheckApproved(args) => execute_check_approved(&args),
     }
 }
 
@@ -184,6 +237,8 @@ fn run_codex_local(args: &CodexLocalArgs) -> Result<ReviewRunResult, String> {
 
     let output_last_message = prepare_output_last_message_path(explicit_output_last_message)?;
     let output_schema = prepare_output_schema_path()?;
+    let session_log = prepare_session_log_path()?;
+    // Session log is NOT auto-managed — it persists for post-run traceability/debugging.
     let _cleanup = AutoManagedArtifacts::new([&output_last_message, &output_schema]);
     reset_output_last_message(&output_last_message.path)?;
     write_output_schema(&output_schema.path)?;
@@ -198,6 +253,7 @@ fn run_codex_local(args: &CodexLocalArgs) -> Result<ReviewRunResult, String> {
         &invocation,
         Duration::from_secs(args.timeout_seconds),
         output_last_message,
+        &session_log.path,
     )
 }
 
@@ -370,32 +426,68 @@ fn codex_bin() -> OsString {
     OsString::from("codex")
 }
 
-fn spawn_codex(invocation: &CodexInvocation) -> Result<Child, String> {
+fn spawn_codex(
+    invocation: &CodexInvocation,
+    session_log_path: &Path,
+) -> Result<(Child, Option<thread::JoinHandle<()>>), String> {
     let mut command = Command::new(&invocation.bin);
-    command
-        .args(&invocation.args)
-        .stdin(Stdio::null())
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit());
+    command.args(&invocation.args).stdin(Stdio::null()).stdout(Stdio::inherit());
+
+    // Capture stderr to a session log file while also forwarding to inherited stderr.
+    // Open the log file before spawning so we fail early on I/O errors.
+    let log_file = std::fs::File::create(session_log_path).map_err(|err| {
+        format!("failed to create session log {}: {err}", session_log_path.display())
+    })?;
+
+    command.stderr(Stdio::piped());
     configure_child_process_group(&mut command);
-    command
+
+    let mut child = command
         .spawn()
-        .map_err(|err| format!("failed to spawn {}: {err}", invocation.bin.to_string_lossy()))
+        .map_err(|err| format!("failed to spawn {}: {err}", invocation.bin.to_string_lossy()))?;
+
+    // Spawn a tee thread that copies stderr to both the log file and the real stderr.
+    let stderr_pipe = child.stderr.take();
+    let tee_handle = stderr_pipe.map(|pipe| {
+        thread::spawn(move || {
+            tee_stderr_to_file(pipe, log_file);
+        })
+    });
+
+    Ok((child, tee_handle))
+}
+
+/// Copies lines from a pipe to both a log file and inherited stderr.
+fn tee_stderr_to_file(pipe: std::process::ChildStderr, mut log_file: std::fs::File) {
+    let reader = BufReader::new(pipe);
+    for line in reader.lines() {
+        match line {
+            Ok(line) => {
+                let _ = writeln!(log_file, "{line}");
+                eprintln!("{line}");
+            }
+            Err(_) => break,
+        }
+    }
+    let _ = log_file.flush();
 }
 
 fn run_codex_invocation(
     invocation: &CodexInvocation,
     timeout: Duration,
     output_last_message: OutputLastMessagePath,
+    session_log_path: &Path,
 ) -> Result<ReviewRunResult, String> {
-    let child = spawn_codex(invocation)?;
-    run_codex_child(child, timeout, output_last_message)
+    let (child, tee_handle) = spawn_codex(invocation, session_log_path)?;
+    run_codex_child(child, tee_handle, timeout, output_last_message, session_log_path)
 }
 
 fn run_codex_child(
     mut child: Child,
+    tee_handle: Option<thread::JoinHandle<()>>,
     timeout: Duration,
     output_last_message: OutputLastMessagePath,
+    session_log_path: &Path,
 ) -> Result<ReviewRunResult, String> {
     let start = Instant::now();
     let mut timed_out = false;
@@ -419,8 +511,30 @@ fn run_codex_child(
         }
     }
 
+    // Wait for the tee thread to finish flushing the log file.
+    if let Some(handle) = tee_handle {
+        let _ = handle.join();
+    }
+
     let raw_final_message = read_final_message(&output_last_message.path)?;
     let final_message_state = parse_review_final_message(raw_final_message.as_deref());
+
+    // Fallback: if codex-last-message is empty, try extracting verdict from session log.
+    let final_message_state = if matches!(final_message_state, ReviewFinalMessageState::Missing) {
+        match extract_verdict_from_session_log(session_log_path) {
+            Some(fallback_state) => {
+                eprintln!(
+                    "[INFO] Verdict extracted from session log fallback: {}",
+                    session_log_path.display()
+                );
+                fallback_state
+            }
+            None => final_message_state,
+        }
+    } else {
+        final_message_state
+    };
+
     let final_message = match &final_message_state {
         ReviewFinalMessageState::Parsed(payload) => {
             Some(render_review_payload(payload).map_err(|e| e.to_string())?)
@@ -442,6 +556,78 @@ fn run_codex_child(
         output_last_message_auto_managed: output_last_message.auto_managed,
         verdict_detail,
     })
+}
+
+/// Attempts to extract a verdict JSON from the session log file.
+///
+/// Handles both single-line and pretty-printed multi-line JSON.
+/// Scans backward for JSON objects containing `"verdict"` and `"findings"` keys.
+/// Returns `None` if no valid verdict is found.
+fn extract_verdict_from_session_log(path: &Path) -> Option<ReviewFinalMessageState> {
+    let content = std::fs::read_to_string(path).ok()?;
+
+    // Strategy 1: Check single lines (compact JSON)
+    for line in content.lines().rev() {
+        let trimmed = line.trim();
+        if trimmed.starts_with('{') && trimmed.contains("\"verdict\"") {
+            let state = parse_review_final_message(Some(trimmed));
+            if matches!(state, ReviewFinalMessageState::Parsed(_)) {
+                return Some(state);
+            }
+        }
+    }
+
+    // Strategy 2: Extract multi-line JSON blocks (pretty-printed)
+    // Scan backward for '{' ... '}' blocks that contain "verdict"
+    let bytes = content.as_bytes();
+    let mut end = bytes.len();
+    while let Some(close) = content.get(..end).and_then(|s| s.rfind('}')) {
+        // Find the matching opening brace by counting brace depth
+        let mut depth = 0i32;
+        let mut start = None;
+        for (i, &b) in bytes.get(..=close).iter().flat_map(|s| s.iter().enumerate().rev()) {
+            match b {
+                b'}' => depth += 1,
+                b'{' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        start = Some(i);
+                        break;
+                    }
+                }
+                _ => {}
+            }
+        }
+        if let Some(start) = start {
+            if let Some(block) = content.get(start..=close) {
+                if block.contains("\"verdict\"") {
+                    let state = parse_review_final_message(Some(block));
+                    if matches!(state, ReviewFinalMessageState::Parsed(_)) {
+                        return Some(state);
+                    }
+                }
+            }
+        }
+        end = close;
+    }
+
+    None
+}
+
+fn prepare_session_log_path() -> Result<OutputLastMessagePath, String> {
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|err| format!("failed to compute timestamp: {err}"))?
+        .as_millis();
+    let path = PathBuf::from(REVIEW_RUNTIME_DIR)
+        .join(format!("codex-session-{}-{timestamp}.log", std::process::id()));
+    let parent = path.parent().ok_or_else(|| {
+        format!("session log path must have a parent directory: {}", path.display())
+    })?;
+    std::fs::create_dir_all(parent)
+        .map_err(|err| format!("failed to create {}: {err}", parent.display()))?;
+
+    Ok(OutputLastMessagePath { path, auto_managed: true })
 }
 
 fn read_final_message(path: &Path) -> Result<Option<String>, String> {
@@ -509,6 +695,200 @@ fn terminate_reviewer_child(child: &mut Child) -> Result<(), String> {
 #[cfg(all(not(unix), not(windows)))]
 fn terminate_reviewer_child(child: &mut Child) -> Result<(), String> {
     child.kill().map_err(|err| format!("failed to terminate reviewer child: {err}"))
+}
+
+// ---------------------------------------------------------------------------
+// record-round: Write review round results to metadata.json
+// ---------------------------------------------------------------------------
+
+fn execute_record_round(args: &RecordRoundArgs) -> ExitCode {
+    match run_record_round(args) {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(msg) => {
+            eprintln!("{msg}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
+    use domain::{ReviewRoundResult, ReviewState, RoundType};
+    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+    use infrastructure::track::fs_store::FsTrackStore;
+
+    let round_type = match args.round_type.as_str() {
+        "fast" => RoundType::Fast,
+        "final" => RoundType::Final,
+        other => return Err(format!("unknown round type: {other} (expected 'fast' or 'final')")),
+    };
+
+    let expected_groups: Vec<String> =
+        args.expected_groups.split(',').map(|s| s.trim().to_owned()).collect();
+    if expected_groups.is_empty() || expected_groups.iter().any(|g| g.is_empty()) {
+        return Err("--expected-groups must be a non-empty comma-separated list".to_owned());
+    }
+
+    // Parse and semantically validate the verdict JSON.
+    // parse_review_final_message applies both structural and semantic checks
+    // (e.g., zero_findings must have empty findings, findings_remain must have entries).
+    let final_message_state = parse_review_final_message(Some(&args.verdict));
+    let verdict_str = match &final_message_state {
+        ReviewFinalMessageState::Parsed(payload) => match payload.verdict {
+            usecase::review_workflow::ReviewPayloadVerdict::ZeroFindings => "zero_findings",
+            usecase::review_workflow::ReviewPayloadVerdict::FindingsRemain => "findings_remain",
+        },
+        ReviewFinalMessageState::Missing => {
+            return Err("--verdict is required".to_owned());
+        }
+        ReviewFinalMessageState::Invalid { reason } => {
+            return Err(format!("invalid --verdict: {reason}"));
+        }
+    };
+
+    // Get current git tree hash
+    let git = SystemGitRepo::discover().map_err(|e| format!("git error: {e}"))?;
+    let code_hash = git.index_tree_hash().map_err(|e| format!("git tree hash error: {e}"))?;
+
+    // Open track store with locking
+    let track_id =
+        domain::TrackId::new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
+
+    let lock_manager = std::sync::Arc::new(
+        infrastructure::lock::FsFileLockManager::new(&args.locks_dir)
+            .map_err(|e| format!("failed to init lock manager: {e}"))?,
+    );
+    let store =
+        FsTrackStore::new(&args.items_dir, lock_manager, std::time::Duration::from_secs(10));
+
+    let timestamp = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
+
+    // Atomic read-modify-write under lock.
+    // On StaleCodeHash, persist the invalidation (return Ok from closure so update writes),
+    // then report the error to the caller.
+    use domain::TrackWriter;
+    let mut stale_error: Option<String> = None;
+    store
+        .update(&track_id, |track| {
+            let review = track.review_mut().get_or_insert_with(ReviewState::new);
+            let round_num = review
+                .groups()
+                .get(&args.group)
+                .and_then(|g| match round_type {
+                    RoundType::Fast => g.fast().map(|r| r.round()),
+                    RoundType::Final => g.final_round().map(|r| r.round()),
+                })
+                .map(|n| n.saturating_add(1))
+                .unwrap_or(1);
+
+            let result = ReviewRoundResult::new(round_num, verdict_str, &timestamp);
+            match review.record_round(round_type, &args.group, result, &expected_groups, &code_hash)
+            {
+                Ok(()) => Ok(()),
+                Err(domain::ReviewError::StaleCodeHash { expected, actual }) => {
+                    // record_round already set status to Invalidated in memory.
+                    // Return Ok so update() persists the invalidation to disk.
+                    stale_error = Some(format!(
+                        "code hash mismatch: review recorded against {expected}, \
+                         but current code is {actual} — review.status set to invalidated"
+                    ));
+                    Ok(())
+                }
+                Err(e) => Err(domain::DomainError::Validation(
+                    domain::ValidationError::InvalidTaskId(e.to_string()),
+                )),
+            }
+        })
+        .map_err(|e| format!("failed to update metadata.json: {e}"))?;
+
+    if let Some(err_msg) = stale_error {
+        return Err(format!("[BLOCKED] {err_msg}"));
+    }
+
+    eprintln!(
+        "[OK] Recorded {round_type} round for group '{}' (verdict: {verdict_str})",
+        args.group
+    );
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// check-approved: Verify review.status == approved with current code hash
+// ---------------------------------------------------------------------------
+
+fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
+    match run_check_approved(args) {
+        Ok(()) => {
+            eprintln!("[OK] Review is approved and code hash is current");
+            ExitCode::SUCCESS
+        }
+        Err(msg) => {
+            eprintln!("{msg}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
+    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+    use infrastructure::track::fs_store::FsTrackStore;
+
+    let git = SystemGitRepo::discover().map_err(|e| format!("git error: {e}"))?;
+    let code_hash = git.index_tree_hash().map_err(|e| format!("git tree hash error: {e}"))?;
+
+    let track_id =
+        domain::TrackId::new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
+
+    let lock_manager = std::sync::Arc::new(
+        infrastructure::lock::FsFileLockManager::new(&args.locks_dir)
+            .map_err(|e| format!("failed to init lock manager: {e}"))?,
+    );
+    let store =
+        FsTrackStore::new(&args.items_dir, lock_manager, std::time::Duration::from_secs(10));
+
+    // Phase 1: Read-only check. On success, return without writing metadata.json.
+    use domain::TrackReader;
+    let track = store
+        .find(&track_id)
+        .map_err(|e| format!("failed to read track: {e}"))?
+        .ok_or_else(|| format!("track '{}' not found", args.track_id))?;
+
+    let review = track.review().ok_or("[BLOCKED] no review section in metadata.json")?;
+
+    let mut review_check = review.clone();
+    match review_check.check_commit_ready(&code_hash) {
+        Ok(()) => return Ok(()),
+        Err(domain::ReviewError::StaleCodeHash { .. }) => {
+            // Phase 2: Persist invalidation under lock with re-check to prevent TOCTOU.
+            use domain::TrackWriter;
+            let mut invalidation_msg: Option<String> = None;
+            store
+                .update(&track_id, |track| {
+                    if let Some(r) = track.review_mut().as_mut() {
+                        match r.check_commit_ready(&code_hash) {
+                            Ok(()) => {} // Refreshed by another process — no invalidation
+                            Err(domain::ReviewError::StaleCodeHash { expected, actual }) => {
+                                invalidation_msg = Some(format!(
+                                    "[BLOCKED] code hash mismatch: recorded against {expected}, \
+                                     current is {actual} — review.status set to invalidated"
+                                ));
+                            }
+                            Err(e) => {
+                                invalidation_msg =
+                                    Some(format!("[BLOCKED] Review guard failed: {e}"));
+                            }
+                        }
+                    }
+                    Ok(())
+                })
+                .map_err(|e| format!("failed to persist invalidation: {e}"))?;
+
+            if let Some(msg) = invalidation_msg {
+                return Err(msg);
+            }
+        }
+        Err(e) => return Err(format!("[BLOCKED] Review guard failed: {e}")),
+    }
+    Ok(())
 }
 
 #[cfg(test)]
@@ -979,10 +1359,21 @@ exit "${SOTP_FAKE_CODEX_EXIT_CODE:-0}"
         let err = run_codex_local(&args).unwrap_err();
         assert!(err.contains("failed to spawn"));
 
+        // Auto-managed artifacts (output-last-message, output-schema) should be cleaned up.
+        // Session log persists intentionally for post-run debugging.
         let runtime_dir = dir.path().join("tmp/reviewer-runtime");
-        let entries =
-            if runtime_dir.is_dir() { fs::read_dir(runtime_dir).unwrap().count() } else { 0 };
-        assert_eq!(entries, 0);
+        if runtime_dir.is_dir() {
+            let remaining: Vec<_> = fs::read_dir(&runtime_dir)
+                .unwrap()
+                .filter_map(|e| e.ok())
+                .map(|e| e.file_name().to_string_lossy().to_string())
+                .collect();
+            // Only session log files should remain
+            assert!(
+                remaining.iter().all(|name| name.starts_with("codex-session-")),
+                "unexpected non-session-log artifacts remain: {remaining:?}"
+            );
+        }
     }
 
     #[test]
