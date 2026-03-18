@@ -86,11 +86,20 @@ fn collect_text_parts(value: &serde_json::Value, parts: &mut Vec<String>) {
                     return;
                 }
             }
-            // Recurse into all nested values (dicts and arrays) to match
-            // Python _shared.py's recursive traversal behavior.
-            for (_key, sub) in obj {
-                if sub.is_object() || sub.is_array() {
-                    collect_text_parts(sub, parts);
+            // Recurse into all nested values to match Python _shared.py behavior.
+            // String values under "message"/"content" keys are extracted directly;
+            // objects and arrays are recursed into.
+            for (key, sub) in obj {
+                match sub {
+                    serde_json::Value::String(s) if !s.is_empty() => {
+                        if key == "message" || key == "content" {
+                            parts.push(s.clone());
+                        }
+                    }
+                    serde_json::Value::Object(_) | serde_json::Value::Array(_) => {
+                        collect_text_parts(sub, parts);
+                    }
+                    _ => {}
                 }
             }
         }
