@@ -299,7 +299,13 @@
       "Bash(rm -rf ~)",
       "Bash(cargo make --allow-private:*)",
       "Bash(while :*)",
-      "Bash(cat :*)"
+      "Bash(cat :*)",
+      "Bash(touch :*)",
+      "Bash(cp :*)",
+      "Bash(mv :*)",
+      "Bash(install :*)",
+      "Bash(chmod :*)",
+      "Bash(chown :*)"
     ]
   },
   "env": {

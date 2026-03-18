@@ -128,6 +128,21 @@ const NESTED_GIT_REFERENCE_MESSAGE: &str = "[Git Policy] Non-git command contain
 const BIN_SOTP_OVERWRITE_MESSAGE: &str = "[Build Policy] Direct copy to `bin/sotp` is blocked. \
      Use `cargo make build-sotp` which includes runtime verification to prevent glibc mismatch.";
 
+const OUTPUT_REDIRECT_MESSAGE: &str = "[File-Write Policy] Output redirect (>, >>, >|, <>) is blocked. \
+     Use the Write/Edit tool for file modifications, or `cargo make` wrappers for controlled writes.";
+
+const FILE_WRITE_COMMAND_MESSAGE: &str = "[File-Write Policy] File-write command is blocked. \
+     Use the Write/Edit tool for file modifications, or `cargo make` wrappers for controlled writes.";
+
+/// Commands that write to files (blocked in direct Bash).
+const FILE_WRITE_COMMANDS: &[&str] = &["tee"];
+
+/// Known shells for recursive `-c` payload inspection.
+/// Used by the existing recursive parse in `split_shell` which already handles
+/// `bash -c` / `sh -c`. Listed here for future generalization to other shells.
+#[allow(dead_code)]
+const KNOWN_SHELLS: &[&str] = &["bash", "sh", "dash", "zsh", "ash"];
+
 /// Checks a shell command against the guard policy.
 ///
 /// Returns a `GuardVerdict` indicating whether the command is allowed or blocked.
@@ -156,6 +171,12 @@ pub fn check(input: &str) -> GuardVerdict {
 
 /// Checks a single simple command against the policy.
 fn check_simple_command(cmd: &SimpleCommand) -> GuardVerdict {
+    // Check output redirects first — even redirect-only commands (empty argv)
+    // like `> /tmp/file` must be blocked.
+    if cmd.has_output_redirect {
+        return GuardVerdict::block(OUTPUT_REDIRECT_MESSAGE);
+    }
+
     let argv = &cmd.argv;
     if argv.is_empty() {
         return GuardVerdict::allow();
@@ -181,6 +202,22 @@ fn check_simple_command(cmd: &SimpleCommand) -> GuardVerdict {
     if command_contains_expansion(cmd) {
         return GuardVerdict::block(GIT_VARIABLE_BYPASS_MESSAGE);
     }
+
+    // --- File-write guards (CON-07) ---
+    // Note: output redirect check is at the top of check_simple_command
+    // (before the empty-argv short-circuit) to catch redirect-only commands.
+
+    // Block known file-write commands (tee).
+    if FILE_WRITE_COMMANDS.contains(&effective_cmd.as_str()) {
+        return GuardVerdict::block(FILE_WRITE_COMMAND_MESSAGE);
+    }
+
+    // Block `sed` with `-i` flag (in-place edit).
+    if effective_cmd == "sed" && has_sed_inplace_flag(argv, effective_start) {
+        return GuardVerdict::block(FILE_WRITE_COMMAND_MESSAGE);
+    }
+
+    // --- End file-write guards ---
 
     // Direct git command — check specific subcommands
     if effective_cmd == "git" {
@@ -419,6 +456,42 @@ fn skip_command_launchers(argv: &[String], start: usize) -> usize {
     }
 
     i
+}
+
+/// Checks if `sed` is invoked with the `-i` (in-place edit) flag.
+///
+/// Scans ALL tokens (not just until the first non-flag) because `-i` can
+/// appear after `-e expr` or `-f script` which consume the next token.
+fn has_sed_inplace_flag(argv: &[String], effective_start: usize) -> bool {
+    let tokens = argv.get(effective_start + 1..).unwrap_or_default();
+    let mut skip_next = false;
+    for token in tokens {
+        if skip_next {
+            skip_next = false;
+            continue;
+        }
+        // Stop at `--` end-of-options marker — anything after is a positional filename
+        if token == "--" {
+            break;
+        }
+        // `-e` and `-f` consume the next token (expression / script file).
+        // Skip it to avoid treating the operand as a flag.
+        if token == "-e" || token == "-f" {
+            skip_next = true;
+            continue;
+        }
+        if token == "-i"
+            || token.starts_with("-i=")
+            || token == "--in-place"
+            || token.starts_with("--in-place=")
+        {
+            return true;
+        }
+        // Note: combined short flags like -ni/-Ei are NOT checked here to
+        // avoid false positives (e.g., `sed -finit.sed` where `-f` consumes
+        // the rest of the token as a filename). This is an accepted trade-off.
+    }
+    false
 }
 
 /// Checks if a command is `cp`, `mv`, or `install` targeting `bin/sotp` as
@@ -841,8 +914,8 @@ mod tests {
     #[case::git_branch_create("git branch feature-x")]
     #[case::cargo_make_test("cargo make test")]
     #[case::empty_command("")]
-    #[case::redirect_to_normal_file("echo hi > /tmp/file.txt")]
-    #[case::redirect_to_file_without_git("echo hello > /tmp/output.txt")]
+    // redirect_to_normal_file and redirect_to_file_without_git moved to blocked
+    // tests — output redirects are now blocked by CON-07 file-write guard.
     #[case::git_checkout_file_restore("git checkout -- file.txt")]
     #[case::git_branch_double_dash_dev("git branch -- -dev")]
     #[case::taskset_git_status("taskset -c 0 git status")]
@@ -900,6 +973,41 @@ mod tests {
     #[case::cp_dotdot_leading_bin_sotp("cp target/release/sotp ../bin/sotp")]
     #[case::sudo_p_prompt_cp_elsewhere("sudo -p Password: cp target/release/sotp /tmp/sotp")]
     fn test_allowed_bin_sotp_unrelated(#[case] cmd: &str) {
+        let v = check(cmd);
+        assert!(!v.is_blocked(), "expected allowed: {cmd}");
+    }
+
+    // -- Blocked: file-write operations (CON-07) --
+
+    #[rstest]
+    #[case::redirect_stdout("echo hi > /tmp/file.txt")]
+    #[case::redirect_append("echo hi >> /tmp/file.txt")]
+    #[case::redirect_stderr("cmd 2> err.log")]
+    #[case::redirect_clobber("cmd >| force.txt")]
+    #[case::tee_standalone("tee output.txt")]
+    #[case::tee_pipeline("ls | tee output.txt")]
+    #[case::sed_inplace("sed -i 's/a/b/' file.txt")]
+    #[case::sed_inplace_suffix("sed --in-place=.bak 's/a/b/' file.txt")]
+    #[case::sed_e_then_inplace("sed -e 's/a/b/' -i file.txt")]
+    #[case::sed_f_then_inplace("sed -f script.sed -i file.txt")]
+    #[case::compound_redirect("{ echo hi; } > file.txt")]
+    #[case::subshell_redirect("(echo hi) >> file.txt")]
+    #[case::redirect_only("> /tmp/file.txt")]
+    #[case::readwrite_redirect("cmd <> file.txt")]
+    fn test_blocked_file_write_operations(#[case] cmd: &str) {
+        let v = check(cmd);
+        assert!(v.is_blocked(), "expected blocked: {cmd}");
+    }
+
+    #[rstest]
+    #[case::input_redirect("sort < input.txt")]
+    #[case::fd_dup_stderr_to_stdout("ls 2>&1")]
+    #[case::fd_dup_stdout_to_stderr("echo err 1>&2")]
+    #[case::sed_without_inplace("sed 's/a/b/' file.txt")]
+    #[case::sed_f_script("sed -finit.sed file.txt")]
+    #[case::sed_e_with_i_as_expr("sed -e -i input.txt")]
+    #[case::sed_f_with_inplace_as_script("sed -f --in-place input.txt")]
+    fn test_allowed_non_write_redirects(#[case] cmd: &str) {
         let v = check(cmd);
         assert!(!v.is_blocked(), "expected allowed: {cmd}");
     }

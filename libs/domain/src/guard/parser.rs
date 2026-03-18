@@ -18,7 +18,7 @@ use super::verdict::ParseError;
 /// Maximum nesting depth for command substitution extraction.
 const MAX_NESTING_DEPTH: usize = 16;
 
-/// A parsed simple command (argv list + redirect texts).
+/// A parsed simple command (argv list + redirect texts + output redirect flag).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SimpleCommand {
     /// The argument vector of the command.
@@ -26,6 +26,9 @@ pub struct SimpleCommand {
     /// Flattened text from redirect targets (including heredoc bodies).
     /// Used by policy to detect git references hidden in heredocs.
     pub redirect_texts: Vec<String>,
+    /// Whether this command has any output redirect (Write/Append/Clobber).
+    /// Does NOT include DupWrite (`>&fd`) or Read (`<`).
+    pub has_output_redirect: bool,
 }
 
 /// Splits a shell command string into individual simple commands.
@@ -277,8 +280,12 @@ fn collect_from_conch_simple(
 
     // Collect flattened text from redirect targets (including heredoc bodies)
     let mut redirect_texts = Vec::new();
+    let mut has_output_redirect = false;
     for item in &simple.redirects_or_env_vars {
         if let ast::RedirectOrEnvVar::Redirect(redirect) = item {
+            if is_output_redirect(redirect) {
+                has_output_redirect = true;
+            }
             if let Some(word) = extract_redirect_word(redirect) {
                 redirect_texts.push(flatten_top_level_word(word));
             }
@@ -286,14 +293,20 @@ fn collect_from_conch_simple(
     }
     for item in &simple.redirects_or_cmd_words {
         if let ast::RedirectOrCmdWord::Redirect(redirect) = item {
+            if is_output_redirect(redirect) {
+                has_output_redirect = true;
+            }
             if let Some(word) = extract_redirect_word(redirect) {
                 redirect_texts.push(flatten_top_level_word(word));
             }
         }
     }
 
-    if !argv.is_empty() {
-        out.push(SimpleCommand { argv, redirect_texts });
+    // Emit a SimpleCommand if there are arguments OR if there are output redirects.
+    // Redirect-only commands like `> /tmp/file` must reach policy evaluation
+    // so the CON-07 file-write guard can block them.
+    if !argv.is_empty() || has_output_redirect {
+        out.push(SimpleCommand { argv, redirect_texts, has_output_redirect });
     }
 
     // Recursively extract commands from command substitutions in all words,
@@ -354,15 +367,23 @@ fn collect_from_compound(
     // Flatten redirect texts from compound.io (including heredoc bodies)
     // and propagate them to all commands collected from inside the compound.
     // This ensures `{ bash; } <<'SH'\ngit add .\nSH` is detected.
+    // Also propagate has_output_redirect for CON-07 file-write guard.
     let mut compound_redirect_texts = Vec::new();
+    let mut compound_has_output_redirect = false;
     for redirect in &compound.io {
+        if is_output_redirect(redirect) {
+            compound_has_output_redirect = true;
+        }
         if let Some(word) = extract_redirect_word(redirect) {
             compound_redirect_texts.push(flatten_top_level_word(word));
         }
     }
-    if !compound_redirect_texts.is_empty() {
+    if !compound_redirect_texts.is_empty() || compound_has_output_redirect {
         for cmd in &mut out[before_len..] {
             cmd.redirect_texts.extend(compound_redirect_texts.iter().cloned());
+            if compound_has_output_redirect {
+                cmd.has_output_redirect = true;
+            }
         }
     }
 
@@ -670,6 +691,25 @@ fn walk_pipeable_for_flatten(
 // ---------------------------------------------------------------------------
 // Command substitution extraction from AST words
 // ---------------------------------------------------------------------------
+
+/// Returns `true` if the redirect is an output redirect (Write/Append/Clobber).
+///
+/// Does NOT match DupWrite (`>&fd`) — that's FD duplication, not a file write.
+/// Does NOT match Read (`<`), ReadWrite (`<>`), DupRead (`<&`), or Heredoc (`<<`).
+/// Returns `true` if the redirect opens a writable file descriptor.
+///
+/// Matches Write (`>`), Append (`>>`), Clobber (`>|`), and ReadWrite (`<>`).
+/// Does NOT match DupWrite (`>&fd`) — that's FD duplication, not a file open.
+/// Does NOT match Read (`<`) or DupRead (`<&`).
+fn is_output_redirect(redirect: &ast::Redirect<ast::TopLevelWord<String>>) -> bool {
+    matches!(
+        redirect,
+        ast::Redirect::Write(..)
+            | ast::Redirect::Append(..)
+            | ast::Redirect::Clobber(..)
+            | ast::Redirect::ReadWrite(..)
+    )
+}
 
 /// Extracts the target word from a `Redirect` variant.
 fn extract_redirect_word(
