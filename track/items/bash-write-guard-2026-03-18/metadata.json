@@ -1,0 +1,63 @@
+{
+  "branch": "track/bash-write-guard-2026-03-18",
+  "created_at": "2026-03-18T00:50:00Z",
+  "id": "bash-write-guard-2026-03-18",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Add permissions.deny entries for file-write commands and matching FORBIDDEN_ALLOW entries. Simple, fast first defense."
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Permissions Deny Layer"
+      },
+      {
+        "description": [
+          "Extend block-direct-git-ops guard's existing conch-parser CommandVisitor to also flag output redirect AST nodes (Write/Append/Clobber kinds) and tee/sed-i command names. Reuses all existing infrastructure: AST parsing, recursive bash -c inspection, fail-closed on parse error, selftest framework."
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "Extend Existing Guard (output redirects + write commands)"
+      },
+      {
+        "description": [
+          "Document accepted risks that are impractical to guard against (FD duplication like 2>&1, exotic shell re-entry, named pipes, process substitution) in a convention doc."
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "Residual Risk Documentation"
+      }
+    ],
+    "summary": [
+      "Close CON-07 pragmatically: permissions.deny for command-name patterns, extend existing block-direct-git-ops guard to detect output redirects via conch-parser AST, and document accepted residual risks"
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "Add permissions.deny entries for file-write commands (touch, cp, mv, install, chmod, chown) and corresponding FORBIDDEN_ALLOW entries in orchestra.rs",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "Extend existing block-direct-git-ops guard policy to also detect output redirect AST nodes and tee/sed-i command names, reusing the existing conch-parser CommandVisitor infrastructure",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "Document accepted residual risks (FD duplication, exotic shell re-entry, named pipes, process substitution, /proc writes) in project-docs/conventions/bash-write-guard.md",
+      "id": "T003",
+      "status": "done"
+    }
+  ],
+  "title": "Bash file-write guard via existing guard extension (CON-07)",
+  "updated_at": "2026-03-18T03:11:15Z"
+}

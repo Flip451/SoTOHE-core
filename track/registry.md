@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| bash-write-guard-2026-03-18 | Done | 2026-03-18 |
 | review-infra-hardening-2026-03-18 | Done | 2026-03-18 |
 | review-quality-quick-wins-2026-03-17 | Done | 2026-03-17 |
 | phase1-sotp-hardening-2026-03-17 | Done | 2026-03-17 |
