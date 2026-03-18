@@ -294,7 +294,15 @@ impl GitRepository for SystemGitRepo {
         // Resolve the index path via Git to support linked worktrees where
         // .git is a pointer file and the real index lives elsewhere.
         let index_path = match std::env::var("GIT_INDEX_FILE") {
-            Ok(p) => p,
+            Ok(p) => {
+                // Anchor relative paths to the repo root so the copy
+                // works regardless of the process's current directory.
+                if std::path::Path::new(&p).is_absolute() {
+                    p
+                } else {
+                    self.root.join(&p).to_string_lossy().into_owned()
+                }
+            }
             Err(_) => {
                 let rev_output = self.output(&["rev-parse", "--git-path", "index"])?;
                 if !rev_output.status.success() {

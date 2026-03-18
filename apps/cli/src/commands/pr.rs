@@ -797,38 +797,35 @@ where
     // the timestamp filter (GitHub API eventual consistency, or the review
     // was triggered by a prior @codex review and completed between polls).
     // Do one final commit-based lookup before giving up.
-    let head_output = client.repo_nwo().ok().and_then(|nwo| {
-        let reviews_json = client.list_reviews(&nwo, pr).ok()?;
-        let reviews = pr_review::parse_paginated_json(&reviews_json).ok()?;
-        let refs: Vec<&serde_json::Value> = reviews
-            .iter()
-            .filter(|r| {
-                let author = r
-                    .get("user")
-                    .and_then(|u| u.get("login"))
-                    .and_then(|l| l.as_str())
-                    .unwrap_or("");
-                let state = r.get("state").and_then(|s| s.as_str()).unwrap_or("");
-                if !is_codex_bot(author)
-                    || !matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
-                {
-                    return false;
-                }
-                // Still require submitted_at >= trigger to avoid surfacing
-                // stale reviews from earlier trigger rounds.
-                let submitted_raw = r.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
-                if submitted_raw.is_empty() {
-                    return false;
-                }
-                let submitted_str = submitted_raw.replace('Z', "+00:00");
-                chrono::DateTime::parse_from_rfc3339(&submitted_str)
-                    .map(|dt| dt >= trigger_dt)
-                    .unwrap_or(false)
-            })
-            .collect();
-        find_latest_bot_review_in(&refs)
-    });
-    if let Some(recovered) = head_output {
+    // Propagate errors (fail-closed) instead of swallowing them with .ok().
+    let recovery_nwo = client.repo_nwo()?;
+    let recovery_reviews_json = client.list_reviews(&recovery_nwo, pr)?;
+    let recovery_reviews = pr_review::parse_paginated_json(&recovery_reviews_json)
+        .map_err(|e| CliError::Message(format!("recovery: failed to parse reviews JSON: {e}")))?;
+    let recovery_refs: Vec<&serde_json::Value> = recovery_reviews
+        .iter()
+        .filter(|r| {
+            let author =
+                r.get("user").and_then(|u| u.get("login")).and_then(|l| l.as_str()).unwrap_or("");
+            let state = r.get("state").and_then(|s| s.as_str()).unwrap_or("");
+            if !is_codex_bot(author)
+                || !matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
+            {
+                return false;
+            }
+            // Still require submitted_at >= trigger to avoid surfacing
+            // stale reviews from earlier trigger rounds.
+            let submitted_raw = r.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
+            if submitted_raw.is_empty() {
+                return false;
+            }
+            let submitted_str = submitted_raw.replace('Z', "+00:00");
+            chrono::DateTime::parse_from_rfc3339(&submitted_str)
+                .map(|dt| dt >= trigger_dt)
+                .unwrap_or(false)
+        })
+        .collect();
+    if let Some(recovered) = find_latest_bot_review_in(&recovery_refs) {
         eprintln!("[OK] Recovered Codex review after timeout (commit-based fallback).");
         return Ok(PollReviewResult::ReviewFound(recovered));
     }
