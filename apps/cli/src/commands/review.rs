@@ -782,9 +782,14 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
     // then report the error to the caller.
     use domain::TrackWriter;
     let mut stale_error: Option<String> = None;
+    // Capture pre-mutation review snapshot for rollback on TOCTOU failure.
+    let mut review_snapshot: Option<domain::ReviewState> = None;
     store
         .update(&track_id, |track| {
             let review = track.review_mut().get_or_insert_with(ReviewState::new);
+            // Snapshot before mutation so rollback can fully restore state.
+            review_snapshot = Some(review.clone());
+
             let round_num = review
                 .groups()
                 .get(&args.group)
@@ -843,14 +848,16 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
             line.split('\t').nth(1).is_some_and(|path| path.trim() != metadata_rel)
         });
         if has_non_metadata {
-            // Roll back review state before aborting.
-            let _ = store.update(&track_id, |track| {
-                if let Some(review) = track.review_mut().as_mut() {
-                    review.invalidate();
-                }
-                Ok(())
-            });
-            stage_metadata(&git, &metadata_rel)?;
+            // Roll back review state to pre-mutation snapshot (restores
+            // status, code_hash, AND groups — not just invalidate).
+            if let Some(snapshot) = &review_snapshot {
+                let snap = snapshot.clone();
+                let _ = store.update(&track_id, |track| {
+                    *track.review_mut() = Some(snap);
+                    Ok(())
+                });
+                stage_metadata(&git, &metadata_rel)?;
+            }
             return Err("[BLOCKED] Non-metadata files were staged between hash computation \
                  and metadata write — the review would bless unreviewed changes. \
                  Review state rolled back. Re-run after confirming no concurrent staging."
@@ -886,15 +893,16 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         .index_tree_hash_normalizing(&metadata_rel)
         .map_err(|e| format!("verification hash error: {e}"))?;
     if verify_hash != post_update_hash {
-        // Roll back: invalidate the review state so the stale code_hash
-        // cannot be used by check-approved.
-        let _ = store.update(&track_id, |track| {
-            if let Some(review) = track.review_mut().as_mut() {
-                review.invalidate();
-            }
-            Ok(())
-        });
-        stage_metadata(&git, &metadata_rel)?;
+        // Roll back review state to pre-mutation snapshot (restores
+        // status, code_hash, AND groups — not just invalidate).
+        if let Some(snapshot) = &review_snapshot {
+            let snap = snapshot.clone();
+            let _ = store.update(&track_id, |track| {
+                *track.review_mut() = Some(snap);
+                Ok(())
+            });
+            stage_metadata(&git, &metadata_rel)?;
+        }
         return Err("[BLOCKED] Index changed between hash computation and verification — \
              another process may have staged files during record-round. \
              Review state rolled back to invalidated. \

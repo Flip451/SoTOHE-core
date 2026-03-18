@@ -485,7 +485,7 @@ where
     C: GhClient,
     Sleep: Fn(Duration),
 {
-    match poll_review_for_cycle(pr, trigger_timestamp, interval, timeout, client, sleep)? {
+    match poll_review_for_cycle(pr, trigger_timestamp, interval, timeout, client, sleep, None)? {
         PollReviewResult::ReviewFound(review) => {
             let review_str = serde_json::to_string(&review).unwrap_or_default();
             println!("{review_str}");
@@ -553,9 +553,24 @@ fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
         ));
     }
 
+    // Resolve HEAD commit for timeout recovery commit-id filtering.
+    let head_hash = repo
+        .output(&["rev-parse", "HEAD"])
+        .ok()
+        .filter(|o| o.status.success())
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned());
+    let head_ref = head_hash.as_deref();
+
     // Step 4: Poll for review
-    let poll_result =
-        poll_review_for_cycle(&pr_number, &trigger_timestamp, 15, 600, &client, &thread::sleep)?;
+    let poll_result = poll_review_for_cycle(
+        &pr_number,
+        &trigger_timestamp,
+        15,
+        600,
+        &client,
+        &thread::sleep,
+        head_ref,
+    )?;
 
     match poll_result {
         PollReviewResult::ZeroFindings => {
@@ -660,6 +675,9 @@ fn ensure_pr_for_cycle<C: GhClient>(
 }
 
 /// Poll for review in cycle context, returning a `PollReviewResult`.
+///
+/// `head_commit` is used by the timeout recovery to filter reviews by commit.
+/// Pass `None` to accept any bot review during recovery (less safe).
 pub fn poll_review_for_cycle<C, Sleep>(
     pr: &str,
     trigger_timestamp: &str,
@@ -667,6 +685,7 @@ pub fn poll_review_for_cycle<C, Sleep>(
     timeout: u64,
     client: &C,
     sleep: &Sleep,
+    head_commit: Option<&str>,
 ) -> Result<PollReviewResult, CliError>
 where
     C: GhClient,
@@ -804,14 +823,25 @@ where
         .map_err(|e| CliError::Message(format!("recovery: failed to parse reviews JSON: {e}")))?;
     // Drop the trigger_dt filter for recovery — the review may have been
     // triggered by a prior @codex review or a push event, so its submitted_at
-    // can predate this trigger. Filter only on bot identity and terminal state.
+    // can predate this trigger. Filter on bot identity, terminal state, and
+    // optionally commit_id to avoid surfacing reviews for older commits.
     let recovery_refs: Vec<&serde_json::Value> = recovery_reviews
         .iter()
         .filter(|r| {
             let author =
                 r.get("user").and_then(|u| u.get("login")).and_then(|l| l.as_str()).unwrap_or("");
             let state = r.get("state").and_then(|s| s.as_str()).unwrap_or("");
-            is_codex_bot(author) && matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
+            if !is_codex_bot(author)
+                || !matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
+            {
+                return false;
+            }
+            // When head_commit is known, only accept reviews for that commit.
+            if let Some(expected) = head_commit {
+                let review_commit = r.get("commit_id").and_then(|s| s.as_str()).unwrap_or("");
+                return review_commit == expected;
+            }
+            true
         })
         .collect();
     if let Some(recovered) = find_latest_bot_review_in(&recovery_refs) {
@@ -1307,8 +1337,15 @@ mod tests {
         let client = PollTestClient::with_reactions(
             r#"[{"content":"+1","user":{"login":"openai-codex[bot]"},"created_at":"2026-03-18T10:05:00Z"}]"#,
         );
-        let result =
-            super::poll_review_for_cycle("1", "2026-03-18T10:00:00Z", 15, 60, &client, &|_| {});
+        let result = super::poll_review_for_cycle(
+            "1",
+            "2026-03-18T10:00:00Z",
+            15,
+            60,
+            &client,
+            &|_| {},
+            None,
+        );
         assert!(result.is_ok());
         assert!(
             matches!(result.unwrap(), super::PollReviewResult::ZeroFindings),
@@ -1323,8 +1360,15 @@ mod tests {
         let client = PollTestClient::with_reactions(
             r#"[{"content":"+1","user":{"login":"openai-codex[bot]"},"created_at":"2026-03-18T09:00:00Z"}]"#,
         );
-        let result =
-            super::poll_review_for_cycle("1", "2026-03-18T10:00:00Z", 15, 0, &client, &|_| {});
+        let result = super::poll_review_for_cycle(
+            "1",
+            "2026-03-18T10:00:00Z",
+            15,
+            0,
+            &client,
+            &|_| {},
+            None,
+        );
         assert!(result.is_ok());
         assert!(
             matches!(result.unwrap(), super::PollReviewResult::Timeout),
@@ -1340,8 +1384,15 @@ mod tests {
             comments: r#"[{"user":{"login":"openai-codex[bot]"},"body":"Didn't find any major issues with the code.","created_at":"2026-03-18T10:05:00Z"}]"#.to_owned(),
             reactions: r#"[{"content":"+1","user":{"login":"openai-codex[bot]"},"created_at":"2026-03-18T09:00:00Z"}]"#.to_owned(),
         };
-        let result =
-            super::poll_review_for_cycle("1", "2026-03-18T10:00:00Z", 15, 60, &client, &|_| {});
+        let result = super::poll_review_for_cycle(
+            "1",
+            "2026-03-18T10:00:00Z",
+            15,
+            60,
+            &client,
+            &|_| {},
+            None,
+        );
         assert!(result.is_ok());
         assert!(
             matches!(result.unwrap(), super::PollReviewResult::ZeroFindings),
@@ -1357,8 +1408,15 @@ mod tests {
             comments: "[]".to_owned(),
             reactions: r#"[{"content":"+1","user":{"login":"openai-codex[bot]"},"created_at":"2026-03-18T10:05:00Z"}]"#.to_owned(),
         };
-        let result =
-            super::poll_review_for_cycle("1", "2026-03-18T10:00:00Z", 15, 60, &client, &|_| {});
+        let result = super::poll_review_for_cycle(
+            "1",
+            "2026-03-18T10:00:00Z",
+            15,
+            60,
+            &client,
+            &|_| {},
+            None,
+        );
         assert!(result.is_ok());
         assert!(
             matches!(result.unwrap(), super::PollReviewResult::ZeroFindings),
@@ -1378,8 +1436,15 @@ mod tests {
                 "body": "Please fix these issues."
             }]"#,
         );
-        let result =
-            super::poll_review_for_cycle("1", "2026-03-18T10:00:00Z", 15, 60, &client, &|_| {});
+        let result = super::poll_review_for_cycle(
+            "1",
+            "2026-03-18T10:00:00Z",
+            15,
+            60,
+            &client,
+            &|_| {},
+            None,
+        );
         assert!(result.is_ok());
         assert!(
             matches!(result.unwrap(), super::PollReviewResult::ReviewFound(_)),
