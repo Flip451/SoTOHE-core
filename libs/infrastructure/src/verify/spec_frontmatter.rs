@@ -38,7 +38,7 @@ fn is_valid_inline_mapping(value: &str) -> bool {
     }
     match serde_yaml::from_str::<serde_yaml::Value>(value) {
         Ok(serde_yaml::Value::Mapping(map)) => map.iter().all(|(k, v)| {
-            k.is_string() && matches!(v, serde_yaml::Value::Number(n) if n.is_u64() || n.is_i64())
+            k.is_string() && matches!(v, serde_yaml::Value::Number(n) if n.as_u64().is_some())
         }),
         _ => false,
     }
