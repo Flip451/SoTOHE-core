@@ -28,8 +28,10 @@ version: "1.0"
 - **対象ファイル**: `apps/cli/src/commands/pr.rs`（`poll_review`, `poll_review_for_cycle`, `review_cycle`）
 - **修正**:
   1. `GhClient` trait に `list_reactions` メソッドを追加
-  2. `poll_review_for_cycle` の返り値を拡張し、zero-findings（reaction 検出、review なし）と findings-present（review JSON あり）を区別できるようにする
-  3. `review_cycle` で zero-findings を受け取った場合は `parse_review` をスキップし、直接成功を報告する
+  2. reaction の `created_at` をトリガー時刻と比較し、トリガー後のリアクションのみ有効とする（過去の zero-findings の `+1` が残っていても誤検出しない）
+  3. `poll_review` (standalone) の zero-findings 時ペイロードを定義: `{"verdict":"zero_findings","source":"reaction"}` を stdout に出力し exit 0 で終了する
+  4. `poll_review_for_cycle` の返り値を拡張し、zero-findings（reaction 検出、review なし）と findings-present（review JSON あり）を区別できるようにする
+  5. `review_cycle` で zero-findings を受け取った場合は `parse_review` をスキップし、直接成功を報告する
 
 ### WF-43: code_hash 自己参照循環（CRITICAL）
 
@@ -53,12 +55,13 @@ version: "1.0"
 ## 受け入れ基準
 
 1. `is_codex_bot("chatgpt-codex-connector[bot]")` が `true` を返す
-2. `poll_review` が bot の 👍 リアクションを zero-findings 完了として検出する
-3. `review_cycle` が zero-findings（reaction のみ、review なし）で正常に成功を返す
-4. `record-round` → 再 stage → `check-approved` で hash が一致する
-5. ソースコードを変更した場合は hash が正しく不一致になる（セキュリティ保証）
-6. `cargo make ci` が通る
-7. 既存の `index_tree_hash()` テストが壊れない
+2. `poll_review` が bot の 👍 リアクションを zero-findings 完了として検出する（トリガー時刻以降のリアクションのみ）
+3. `poll_review` (standalone) が zero-findings 時に `{"verdict":"zero_findings","source":"reaction"}` を stdout に出力する
+4. `review_cycle` が zero-findings（reaction のみ、review なし）で正常に成功を返す
+5. `record-round` → 再 stage → `check-approved` で hash が一致する
+6. ソースコードを変更した場合は hash が正しく不一致になる（セキュリティ保証）
+7. `cargo make ci` が通る
+8. 既存の `index_tree_hash()` テストが壊れない
 
 ## 出典
 

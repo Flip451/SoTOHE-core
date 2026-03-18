@@ -11,7 +11,7 @@ Add chatgpt-codex-connector[bot] to the CODEX_BOT_LOGINS constant in apps/cli/sr
 
 ## Phase 2: WF-42 completion detection via reaction API
 
-Extend poll_review and poll_review_for_cycle to check issues/{pr}/reactions API for a bot thumbs-up (+1) reaction as the zero-findings completion signal. When the poller detects a reaction-only completion (no submitted review object), return a sentinel value (e.g. None for review JSON) so that review_cycle can distinguish zero-findings from timeout. Update review_cycle to skip parse_review when poll returns zero-findings and directly report success. Confirmed behavior from PR #2 and #36: findings-none -> bot posts thumbs-up reaction + 'Didn't find any major issues' comment (no review object); findings-present -> bot posts a COMMENTED review with inline findings. Add list_reactions method to GhClient trait.
+Extend poll_review and poll_review_for_cycle to check issues/{pr}/reactions API for a bot thumbs-up (+1) reaction as the zero-findings completion signal. Filter reactions by created_at >= trigger_timestamp to avoid matching stale reactions from previous review cycles. For standalone poll_review: output {"verdict":"zero_findings","source":"reaction"} JSON to stdout on reaction-only success. For poll_review_for_cycle: return a typed enum (ReviewFound/ZeroFindings/Timeout) so review_cycle can distinguish zero-findings from timeout and skip parse_review accordingly. Add list_reactions method to GhClient trait.
 
 - [ ] Add thumbs-up reaction detection to poll_review + update review_cycle to handle zero-findings (reaction-only) without requiring a review object + tests
 
