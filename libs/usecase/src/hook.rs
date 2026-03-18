@@ -312,20 +312,16 @@ fn extract_shell_reentry_arg(cmd: &SimpleCommand) -> Option<String> {
                 // Standalone -c: next arg is the command
                 return rest.get(j + 1).cloned();
             }
-            // Combined short flags containing 'c' (e.g., -lc, -ce)
-            // If 'c' is the last char, next arg is the command payload.
-            // If 'c' is not last, the rest after 'c' is the payload (e.g., -cecho).
+            // Combined short flags containing 'c' (e.g., -lc, -ce, -ec)
+            // Per POSIX/Bash: `-c` consumes the next operand as a command string.
+            // Characters after 'c' in combined flags are other flags, NOT the
+            // command payload (e.g., `-ce` = `-c -e`, next arg is the command).
+            // This applies regardless of where 'c' appears in the flags.
             if arg.starts_with('-') && !arg.starts_with("--") && arg.len() > 2 {
                 let flags = &arg[1..]; // strip leading '-'
-                if let Some(c_pos) = flags.find('c') {
-                    let after_c = &flags[c_pos + 1..];
-                    if after_c.is_empty() {
-                        // -lc: next arg is the command
-                        return rest.get(j + 1).cloned();
-                    } else {
-                        // -cecho or -lc'rm ...' (attached) — after_c is the command
-                        return Some(after_c.to_string());
-                    }
+                if flags.contains('c') {
+                    // Any combined flag with 'c': next arg is the command
+                    return rest.get(j + 1).cloned();
                 }
             }
         }
@@ -456,6 +452,11 @@ fn is_test_file(path: &str) -> bool {
 
     // Check test_*.rs pattern
     if filename.starts_with("test_") && filename.ends_with(".rs") {
+        return true;
+    }
+
+    // Check tests.rs module file (e.g., src/tests.rs, libs/domain/src/tests.rs)
+    if filename == "tests.rs" {
         return true;
     }
 
@@ -1376,9 +1377,9 @@ mod tests {
     }
 
     #[test]
-    fn test_test_file_guard_allows_sh_ce_non_rm() {
-        // -ce: -c takes 'e' as command string (POSIX), next arg becomes $0
-        // The actual command is 'e', not 'rm tests/foo.rs'
+    fn test_test_file_guard_blocks_sh_ce_rm_test_file() {
+        // -ce: -c + -e flags, next arg 'rm tests/foo.rs' is the command
+        // Per POSIX/Bash, `-ce` is equivalent to `-c -e`.
         let handler = TestFileDeletionGuardHandler;
         let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
         let input = HookInput {
@@ -1388,7 +1389,7 @@ mod tests {
             content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
-        assert!(!verdict.is_blocked(), "sh -ce: command is 'e', not rm — should be allowed");
+        assert!(verdict.is_blocked(), "sh -ce 'rm tests/foo.rs' must be blocked");
     }
 
     #[test]
@@ -1521,6 +1522,34 @@ mod tests {
         assert!(raw_mentions_rm(r#""rm" tests/foo.rs"#));
         assert!(raw_mentions_rm("/bin/rm tests/foo.rs"));
         assert!(raw_mentions_rm("rm tests/foo.rs"));
+    }
+
+    #[test]
+    fn test_test_file_guard_blocks_rm_tests_rs_module() {
+        let handler = TestFileDeletionGuardHandler;
+        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let input = HookInput {
+            tool_name: "Bash".into(),
+            command: Some("rm src/tests.rs".into()),
+            file_path: None,
+            content: None,
+        };
+        let verdict = handler.handle(&ctx, &input).unwrap();
+        assert!(verdict.is_blocked(), "rm src/tests.rs must be blocked");
+    }
+
+    #[test]
+    fn test_test_file_guard_write_empty_to_tests_rs_is_blocked() {
+        let handler = TestFileDeletionGuardHandler;
+        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let input = HookInput {
+            tool_name: "Write".into(),
+            command: None,
+            file_path: Some(PathBuf::from("src/tests.rs")),
+            content: Some("".into()),
+        };
+        let verdict = handler.handle(&ctx, &input).unwrap();
+        assert!(verdict.is_blocked(), "Write empty to src/tests.rs must be blocked");
     }
 
     #[test]
