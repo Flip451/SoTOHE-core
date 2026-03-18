@@ -465,15 +465,17 @@ impl TrackMetadata {
         Ok(task_id)
     }
 
-    /// Validates that existing task descriptions have not been modified.
+    /// Validates that existing tasks have not been modified or removed.
     ///
-    /// Compares task descriptions between `self` (the new state) and `previous`
-    /// (the last saved state). Tasks that exist in both (matched by ID) must
-    /// have identical descriptions. New tasks (IDs not in `previous`) are allowed.
+    /// Compares tasks between `self` (the new state) and `previous`
+    /// (the last saved state):
+    /// - Tasks that exist in both (matched by ID) must have identical descriptions.
+    /// - Tasks in `previous` must still exist in `self` (no removal).
+    /// - New tasks (IDs not in `previous`) are allowed.
     ///
     /// # Errors
-    /// Returns `ValidationError::TaskDescriptionMutated` if any existing task's
-    /// description has been changed.
+    /// - `ValidationError::TaskDescriptionMutated` if a description changed.
+    /// - `ValidationError::TaskRemoved` if a previously existing task is absent.
     pub fn validate_descriptions_unchanged(
         &self,
         previous: &TrackMetadata,
@@ -481,6 +483,16 @@ impl TrackMetadata {
         let prev_map: HashMap<&TaskId, &str> =
             previous.tasks.iter().map(|t| (t.id(), t.description())).collect();
 
+        let new_ids: HashSet<&TaskId> = self.tasks.iter().map(|t| t.id()).collect();
+
+        // Check for removed tasks.
+        for prev_task in &previous.tasks {
+            if !new_ids.contains(prev_task.id()) {
+                return Err(ValidationError::TaskRemoved { task_id: prev_task.id().to_string() });
+            }
+        }
+
+        // Check for mutated descriptions.
         for task in &self.tasks {
             if let Some(prev_desc) = prev_map.get(task.id()) {
                 if task.description() != *prev_desc {
@@ -779,6 +791,20 @@ mod tests {
 
         let result = updated.validate_descriptions_unchanged(&original);
         assert!(result.is_ok(), "expected Ok when adding a new task, got: {result:?}");
+    }
+
+    #[test]
+    fn test_validate_descriptions_unchanged_rejects_task_removal() {
+        let original = make_track(&["T001", "T002"], &["T001", "T002"]);
+
+        // New state has only T001 — T002 was removed.
+        let updated = make_track(&["T001"], &["T001"]);
+
+        let result = updated.validate_descriptions_unchanged(&original);
+        assert!(
+            matches!(result, Err(ValidationError::TaskRemoved { ref task_id }) if task_id == "T002"),
+            "expected TaskRemoved for T002, got: {result:?}"
+        );
     }
 
     #[test]

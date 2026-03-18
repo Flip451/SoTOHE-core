@@ -65,6 +65,10 @@ pub struct HookInput {
     pub tool_name: String,
     /// The shell command (for guard hook: `block-direct-git-ops`).
     pub command: Option<String>,
-    /// The file path (for lock hooks: `file-lock-acquire`, `file-lock-release`).
+    /// The file path (for lock hooks: `file-lock-acquire`, `file-lock-release`;
+    /// also used by the Write tool for test-file deletion guard).
     pub file_path: Option<PathBuf>,
+    /// The file content (for Write tool: used by test-file deletion guard to detect
+    /// empty-content writes, which are equivalent to file truncation/deletion).
+    pub content: Option<String>,
 }

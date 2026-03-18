@@ -169,9 +169,42 @@ pub struct TestFileDeletionGuardHandler;
 
 impl HookHandler for TestFileDeletionGuardHandler {
     fn handle(&self, _ctx: &HookContext, input: &HookInput) -> Result<HookVerdict, HookError> {
-        // Only inspect Bash tool
-        if input.tool_name != "Bash" {
-            return Ok(HookVerdict::allow());
+        match input.tool_name.as_str() {
+            "Write" => {
+                // Write with empty content to a test file is equivalent to truncation/deletion.
+                // Write with non-empty content is a legitimate edit — allow it.
+                // Write to a non-test file is always allowed regardless of content.
+                let file_path = match input.file_path.as_ref().and_then(|p| p.to_str()) {
+                    Some(p) => p,
+                    None => {
+                        // Fail-closed: missing or non-UTF-8 file_path on a Write
+                        // could bypass the guard, so block it.
+                        return Ok(HookVerdict::block(
+                            "blocked: Write tool missing file_path (fail-closed)",
+                        ));
+                    }
+                };
+                // Fail-closed: None content or empty content both treated as
+                // deletion attempts. A missing content field in a Write payload
+                // should not silently bypass the guard.
+                let has_content = input.content.as_deref().is_some_and(|s| !s.is_empty());
+                if is_test_file(file_path) && !has_content {
+                    return Ok(HookVerdict::block(format!(
+                        "blocked: cannot overwrite test file '{file_path}' with empty or missing content"
+                    )));
+                }
+                return Ok(HookVerdict::allow());
+            }
+            "Edit" => {
+                // Edit operations are targeted replacements, not deletions — always allow.
+                return Ok(HookVerdict::allow());
+            }
+            "Bash" => {
+                // Fall through to the rm-detection logic below.
+            }
+            _ => {
+                return Ok(HookVerdict::allow());
+            }
         }
 
         let command =
@@ -459,6 +492,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("git status".into()),
             file_path: None,
+            content: None,
         };
 
         let verdict = handler.handle(&ctx, &input).unwrap();
@@ -473,6 +507,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("git add .".into()),
             file_path: None,
+            content: None,
         };
 
         let verdict = handler.handle(&ctx, &input).unwrap();
@@ -483,7 +518,8 @@ mod tests {
     fn test_guard_handler_returns_error_on_missing_command() {
         let handler = GuardHookHandler;
         let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
-        let input = HookInput { tool_name: "Bash".into(), command: None, file_path: None };
+        let input =
+            HookInput { tool_name: "Bash".into(), command: None, file_path: None, content: None };
 
         let result = handler.handle(&ctx, &input);
         assert!(matches!(result, Err(HookError::Input(msg)) if msg.contains("missing command")));
@@ -498,7 +534,8 @@ mod tests {
             agent: Some(domain::lock::AgentId::new("pid-1234")),
             pid: Some(1234),
         };
-        let input = HookInput { tool_name: "Write".into(), command: None, file_path: None };
+        let input =
+            HookInput { tool_name: "Write".into(), command: None, file_path: None, content: None };
 
         let result = handler.handle(&ctx, &input);
         assert!(matches!(result, Err(HookError::Input(msg)) if msg.contains("missing file_path")));
@@ -517,6 +554,7 @@ mod tests {
             tool_name: "Write".into(),
             command: None,
             file_path: Some(PathBuf::from("/tmp/file.txt")),
+            content: None,
         };
 
         let result = handler.handle(&ctx, &input);
@@ -536,6 +574,7 @@ mod tests {
             tool_name: "Write".into(),
             command: None,
             file_path: Some(PathBuf::from("/tmp/file.txt")),
+            content: None,
         };
 
         let result = handler.handle(&ctx, &input);
@@ -551,7 +590,8 @@ mod tests {
             agent: Some(domain::lock::AgentId::new("pid-1234")),
             pid: None,
         };
-        let input = HookInput { tool_name: "Write".into(), command: None, file_path: None };
+        let input =
+            HookInput { tool_name: "Write".into(), command: None, file_path: None, content: None };
 
         let result = handler.handle(&ctx, &input);
         assert!(matches!(result, Err(HookError::Input(msg)) if msg.contains("missing file_path")));
@@ -574,6 +614,7 @@ mod tests {
             // Use a path that will fail canonicalization — that's fine,
             // we're testing pid is not required, not lock success.
             file_path: Some(PathBuf::from("/tmp/file.txt")),
+            content: None,
         };
 
         // Will fail with LockError (path canonicalization) but NOT with HookError::Input.
@@ -589,6 +630,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked());
@@ -602,6 +644,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm src/user_test.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked());
@@ -615,6 +658,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm src/test_user.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked());
@@ -628,6 +672,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm src/lib.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(!verdict.is_blocked());
@@ -641,6 +686,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm src/test_user.rs; echo done".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "rm with trailing `;` must still block test files");
@@ -654,6 +700,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm tests/foo.rs&& echo ok".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "rm with trailing `&&` must still block test files");
@@ -667,6 +714,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm src/main.rs && rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "chained rm after && must still detect test files");
@@ -680,6 +728,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm \"src/test_user.rs\"".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "quoted test file path must still be detected");
@@ -693,6 +742,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("echo ok;rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "glued ;rm must still detect test files");
@@ -706,6 +756,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm src/\"test_user.rs\"".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "partially quoted test file path must still be detected");
@@ -719,6 +770,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm tests/foo.rs& echo ok".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "rm with background & must still block test files");
@@ -732,6 +784,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("echo rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(!verdict.is_blocked(), "echo rm should not be treated as an rm command");
@@ -742,7 +795,8 @@ mod tests {
         let handler = TestFileDeletionGuardHandler;
         let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
         // Bash tool with missing command should error (fail-closed at CLI = exit 2)
-        let input = HookInput { tool_name: "Bash".into(), command: None, file_path: None };
+        let input =
+            HookInput { tool_name: "Bash".into(), command: None, file_path: None, content: None };
         let result = handler.handle(&ctx, &input);
         assert!(matches!(result, Err(HookError::Input(_))));
     }
@@ -755,6 +809,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("FOO=1 rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "env var prefix before rm must be detected");
@@ -768,6 +823,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("echo ok\nrm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "newline-separated rm must be detected");
@@ -781,6 +837,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("/bin/rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "/bin/rm must be detected as rm command");
@@ -794,6 +851,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("/usr/bin/rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "/usr/bin/rm must be detected as rm command");
@@ -807,6 +865,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("env rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "env rm must be detected as rm command");
@@ -820,6 +879,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("env ls tests/".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(!verdict.is_blocked(), "env ls should not be blocked");
@@ -833,6 +893,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("time rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "time rm must be detected as rm command");
@@ -846,6 +907,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("exec rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "exec rm must be detected as rm command");
@@ -859,6 +921,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("command -p rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "command -p rm must be detected as rm command");
@@ -872,6 +935,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("command rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "command rm must be detected as rm command");
@@ -885,6 +949,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("timeout 5 rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "timeout 5 rm must be detected as rm command");
@@ -898,6 +963,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("nice -n 10 rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "nice -n 10 rm must be detected as rm command");
@@ -911,6 +977,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("stdbuf -oL rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "stdbuf -oL rm must be detected as rm command");
@@ -924,6 +991,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("sudo rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "sudo rm must be detected as rm command");
@@ -937,6 +1005,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("doas rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "doas rm must be detected as rm command");
@@ -950,6 +1019,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("/usr/bin/sudo rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "/usr/bin/sudo rm must be detected as rm command");
@@ -963,6 +1033,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("/usr/bin/time rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "/usr/bin/time rm must be detected as rm command");
@@ -976,6 +1047,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm src/test_user.rs>/dev/null".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(
@@ -992,6 +1064,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm tests/foo.rs > /dev/null 2>&1".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "rm with spaced redirect must still be blocked");
@@ -1005,6 +1078,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("\"rm\" tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "quoted \"rm\" must still be detected");
@@ -1018,6 +1092,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("\"/bin/rm\" tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "quoted \"/bin/rm\" must still be detected");
@@ -1031,6 +1106,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some(">/tmp/out rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "leading redirect before rm must still be blocked");
@@ -1044,6 +1120,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("2>/dev/null rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "fd redirect before rm must still be blocked");
@@ -1057,6 +1134,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("2>&1 rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(
@@ -1073,6 +1151,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("<>/tmp/out rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "read-write redirect (<>) before rm must still be blocked");
@@ -1086,6 +1165,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some(">|/tmp/out rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "clobber redirect (>|) before rm must still be blocked");
@@ -1100,6 +1180,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("cat <<<word; rm tests/foo.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "here-string (<<<) before chained rm must still be blocked");
@@ -1113,6 +1194,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm \"src/test_user copy.rs\"".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(
@@ -1129,6 +1211,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm -- -tests/foo_test.rs".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(
@@ -1145,6 +1228,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("rm -rf -- tests/".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "rm -rf -- tests/ must be blocked");
@@ -1158,6 +1242,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("bash -c 'rm tests/foo.rs'".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "bash -c 'rm tests/foo.rs' must be blocked");
@@ -1171,6 +1256,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("sh -c 'rm -rf tests/'".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "sh -c 'rm -rf tests/' must be blocked");
@@ -1184,6 +1270,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("sudo bash -c 'rm tests/foo_test.rs'".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "sudo bash -c 'rm tests/foo_test.rs' must be blocked");
@@ -1197,6 +1284,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("bash -c 'echo hello'".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(!verdict.is_blocked(), "bash -c 'echo hello' must be allowed");
@@ -1210,6 +1298,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("env -i bash -c 'rm tests/foo.rs'".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "env -i bash -c 'rm tests/foo.rs' must be blocked");
@@ -1223,6 +1312,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("timeout 5 bash -c 'rm tests/foo.rs'".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "timeout 5 bash -c 'rm tests/foo.rs' must be blocked");
@@ -1236,6 +1326,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some(r#"bash -c 'sh -c "rm tests/foo.rs"'"#.into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "nested bash -c 'sh -c \"rm ...\"' must be blocked");
@@ -1249,6 +1340,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("sudo -u root bash -c 'rm tests/foo_test.rs'".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "sudo -u root bash -c 'rm ...' must be blocked");
@@ -1262,6 +1354,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("bash -lc 'rm tests/foo.rs'".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "bash -lc 'rm tests/foo.rs' must be blocked");
@@ -1276,6 +1369,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("sh -ec 'rm tests/foo.rs'".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "sh -ec 'rm tests/foo.rs' must be blocked");
@@ -1291,6 +1385,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some("sh -ce 'rm tests/foo.rs'".into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(!verdict.is_blocked(), "sh -ce: command is 'e', not rm — should be allowed");
@@ -1306,6 +1401,7 @@ mod tests {
             tool_name: "Bash".into(),
             command: Some(r#"bash -c 'sh -c "bash -c \"sh -c \\\"rm tests/foo.rs\\\"\"" '"#.into()),
             file_path: None,
+            content: None,
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(
@@ -1314,8 +1410,114 @@ mod tests {
         );
     }
 
+    // === Write tool: test file deletion guard ===
+
     #[test]
-    fn test_raw_mentions_rm_catches_quoted_rm() {
+    fn test_test_file_guard_write_with_empty_content_to_test_file_is_blocked() {
+        let handler = TestFileDeletionGuardHandler;
+        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let input = HookInput {
+            tool_name: "Write".into(),
+            command: None,
+            file_path: Some(PathBuf::from("tests/foo_test.rs")),
+            content: Some("".into()),
+        };
+        let verdict = handler.handle(&ctx, &input).unwrap();
+        assert!(verdict.is_blocked(), "Write with empty content to test file must be blocked");
+    }
+
+    #[test]
+    fn test_test_file_guard_write_with_content_to_test_file_is_allowed() {
+        let handler = TestFileDeletionGuardHandler;
+        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let input = HookInput {
+            tool_name: "Write".into(),
+            command: None,
+            file_path: Some(PathBuf::from("tests/foo_test.rs")),
+            content: Some("#[test]\nfn test_something() {}".into()),
+        };
+        let verdict = handler.handle(&ctx, &input).unwrap();
+        assert!(!verdict.is_blocked(), "Write with content to test file must be allowed");
+    }
+
+    #[test]
+    fn test_test_file_guard_write_with_empty_content_to_non_test_file_is_allowed() {
+        let handler = TestFileDeletionGuardHandler;
+        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let input = HookInput {
+            tool_name: "Write".into(),
+            command: None,
+            file_path: Some(PathBuf::from("src/lib.rs")),
+            content: Some("".into()),
+        };
+        let verdict = handler.handle(&ctx, &input).unwrap();
+        assert!(!verdict.is_blocked(), "Write with empty content to non-test file must be allowed");
+    }
+
+    #[test]
+    fn test_test_file_guard_edit_tool_is_always_allowed() {
+        let handler = TestFileDeletionGuardHandler;
+        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let input = HookInput {
+            tool_name: "Edit".into(),
+            command: None,
+            file_path: Some(PathBuf::from("tests/foo_test.rs")),
+            content: None,
+        };
+        let verdict = handler.handle(&ctx, &input).unwrap();
+        assert!(
+            !verdict.is_blocked(),
+            "Edit tool must always be allowed (edits are not deletions)"
+        );
+    }
+
+    #[test]
+    fn test_test_file_guard_write_with_missing_file_path_is_blocked() {
+        let handler = TestFileDeletionGuardHandler;
+        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let input = HookInput {
+            tool_name: "Write".into(),
+            command: None,
+            file_path: None,
+            content: Some("content".into()),
+        };
+        let verdict = handler.handle(&ctx, &input).unwrap();
+        assert!(verdict.is_blocked(), "Write with missing file_path must be blocked (fail-closed)");
+    }
+
+    #[test]
+    fn test_test_file_guard_write_with_none_content_to_test_file_is_blocked() {
+        let handler = TestFileDeletionGuardHandler;
+        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let input = HookInput {
+            tool_name: "Write".into(),
+            command: None,
+            file_path: Some(PathBuf::from("tests/foo_test.rs")),
+            content: None,
+        };
+        let verdict = handler.handle(&ctx, &input).unwrap();
+        assert!(
+            verdict.is_blocked(),
+            "Write with None content to test file must be blocked (fail-closed)"
+        );
+    }
+
+    #[test]
+    fn test_test_file_guard_write_with_none_content_to_non_test_file_is_allowed() {
+        let handler = TestFileDeletionGuardHandler;
+        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let input = HookInput {
+            tool_name: "Write".into(),
+            command: None,
+            file_path: Some(PathBuf::from("src/lib.rs")),
+            content: None,
+        };
+        let verdict = handler.handle(&ctx, &input).unwrap();
+        assert!(!verdict.is_blocked(), "Write with None content to non-test file must be allowed");
+    }
+
+    #[test]
+    fn raw_mentions_rm_catches_quoted_rm() {
         assert!(raw_mentions_rm(r#""rm" tests/foo.rs"#));
         assert!(raw_mentions_rm("/bin/rm tests/foo.rs"));
         assert!(raw_mentions_rm("rm tests/foo.rs"));
