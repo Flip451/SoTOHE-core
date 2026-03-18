@@ -30,18 +30,25 @@ const REQUIRED_FIELDS: &[&str] = &["status", "version"];
 /// { blue: [1, 2 }
 /// { blue 1 }
 /// ```
+/// Serde-compatible mirror of `domain::SignalCounts` for YAML deserialization.
+///
+/// The domain type is serde-free (no serde dependency in domain layer).
+/// This struct deserializes the frontmatter value and converts to the domain type.
+#[derive(serde::Deserialize)]
+#[allow(dead_code)] // Fields are validated by deserialization, not read directly.
+struct SignalCountsDto {
+    blue: u32,
+    yellow: u32,
+    red: u32,
+}
+
 fn is_valid_inline_mapping(value: &str) -> bool {
     // Require inline flow mapping syntax (must start with `{`).
     // Block mappings like `blue: 0` are valid YAML but not the required format.
     if !value.starts_with('{') {
         return false;
     }
-    match serde_yaml::from_str::<serde_yaml::Value>(value) {
-        Ok(serde_yaml::Value::Mapping(map)) => map.iter().all(|(k, v)| {
-            k.is_string() && matches!(v, serde_yaml::Value::Number(n) if n.as_u64().is_some())
-        }),
-        _ => false,
-    }
+    serde_yaml::from_str::<SignalCountsDto>(value).is_ok()
 }
 
 /// Optional frontmatter fields that are validated when present.

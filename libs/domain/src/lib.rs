@@ -10,6 +10,7 @@ pub mod lock;
 mod plan;
 mod repository;
 pub mod review;
+mod signal;
 mod track;
 pub mod track_phase;
 pub mod verify;
@@ -25,6 +26,7 @@ pub use repository::{TrackReader, TrackWriter, WorktreeReader};
 pub use review::{
     ReviewError, ReviewGroupState, ReviewRoundResult, ReviewState, ReviewStatus, RoundType,
 };
+pub use signal::SignalCounts;
 pub use track::{
     StatusOverride, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata, TrackStatus,
     TrackTask,
