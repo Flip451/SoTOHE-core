@@ -1,0 +1,20 @@
+## Task Summary: Plan spec.md template foundation (Phase 1 remaining)
+
+**Track:** spec-template-foundation-2026-03-18
+**Task:** Phase 1 残り: spec.md テンプレート基盤整備 (SURVEY-03/10, TSUMIKI-02, SURVEY-16)
+**Date:** 2026-03-18
+
+### Changes
+
+- metadata.json: New track with 4 tasks (T001-T004), schema_version 3
+- spec.md: Goal, scope, constraints, acceptance criteria for Phase 1 remaining items
+- plan.md: Auto-generated from metadata.json (4 independent sections)
+- verification.md: Scope verification checklist and manual verification steps
+- registry.md: Added active track entry with planned status
+
+### Why
+
+Completes the planning phase for the remaining Phase 1 quick wins that establish the spec.md
+metadata foundation needed before Phase 2 (specification quality institutionalization). The 4
+tasks cover test file deletion guard, task description immutability, source attribution tags,
+and spec frontmatter signals placeholder.
