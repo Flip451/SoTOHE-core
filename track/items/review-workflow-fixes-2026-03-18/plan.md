@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json — DO NOT EDIT DIRECTLY -->
 # WF-42+WF-43: review workflow critical fixes (bot login + completion detection + code_hash cycle)
 
-Fix three critical review workflow issues: WF-42/1 (CODEX_BOT_LOGINS missing chatgpt-codex-connector[bot]), WF-42/2 (poll_review completion detection ignores thumbs-up reaction for zero-findings), and WF-43 (code_hash self-referential cycle in metadata.json). WF-42/1 is a constant addition. WF-42/2 requires adding reaction API polling + review_cycle zero-findings path. WF-43 uses code_hash normalization (method D): replace review.code_hash with a null sentinel before computing tree hash, so the hash covers all metadata.json fields except code_hash itself, breaking the self-reference cycle while preserving tamper detection.
+Fix three critical review workflow issues: WF-42/1 (CODEX_BOT_LOGINS missing chatgpt-codex-connector[bot]), WF-42/2 (poll_review completion detection ignores thumbs-up reaction for zero-findings), and WF-43 (code_hash self-referential cycle in metadata.json). WF-42/1 is a constant addition. WF-42/2 requires adding reaction API polling + review_cycle zero-findings path. WF-43 uses code_hash normalization (method D): replace review.code_hash with "PENDING" sentinel before computing tree hash, ensuring post-update review state is included and serialization is deterministic (BTreeMap for groups ordering).
 
 ## Phase 1: WF-42 bot login fix
 
@@ -17,18 +17,18 @@ Extend poll_review and poll_review_for_cycle to check issues/{pr}/reactions API 
 
 ## Phase 3: WF-43 normalized hash infrastructure
 
-Add index_tree_hash_normalizing method to GitRepository trait in libs/domain and implement in libs/infrastructure/src/git_cli.rs. The method: (1) reads metadata.json blob from staged index, (2) parses JSON and replaces review.code_hash with "PENDING" sentinel, (3) serializes deterministically via serde_json, (4) creates normalized blob with git hash-object -w, (5) copies current index to a temp GIT_INDEX_FILE, (6) swaps metadata.json blob in temp index via git update-index --cacheinfo, (7) runs git write-tree on temp index to get normalized tree hash, (8) cleans up temp index. This approach keeps metadata.json fully in the hash (tamper protection for all fields except code_hash) while breaking the self-reference cycle.
+Add index_tree_hash_normalizing method to GitRepository trait in libs/domain and implement in libs/infrastructure/src/git_cli.rs. The method: (1) reads metadata.json blob from staged index, (2) parses JSON and replaces review.code_hash with "PENDING" sentinel string (never null — null would become None and skip the stale-hash guard), (3) serializes deterministically via serde_json, (4) creates normalized blob with git hash-object -w, (5) copies current index to a temp GIT_INDEX_FILE, (6) swaps metadata.json blob via git update-index --cacheinfo, (7) runs git write-tree on temp index, (8) cleans up. IMPORTANT: switch TrackReviewDocument.groups from HashMap to BTreeMap (or sort keys before serialization) to guarantee deterministic JSON output across separate CLI invocations.
 
-- [ ] Add index_tree_hash_normalizing method to GitRepository trait: normalize review.code_hash to null sentinel in a temp index, then git write-tree + tests
+- [ ] Add index_tree_hash_normalizing method to GitRepository trait: replace review.code_hash with "PENDING" sentinel in a temp index, then git write-tree. Ensure deterministic serialization by switching TrackReviewDocument.groups from HashMap to BTreeMap + tests
 
 ## Phase 4: WF-43 integration into review commands
 
-Update run_record_round and run_check_approved in apps/cli/src/commands/review.rs to call index_tree_hash_normalizing with the track's metadata.json path. record-round: compute normalized hash -> write code_hash to metadata.json -> re-stage. check-approved: compute normalized hash -> compare with stored code_hash from staged metadata.json. Both use identical normalization so hashes are comparable. Re-staging metadata.json between record-round and check-approved is safe because the normalized hash is stable.
+Update run_record_round and run_check_approved in apps/cli/src/commands/review.rs. CRITICAL ordering for record-round: (1) write review verdict/status/groups to metadata.json via store.update(), (2) re-stage metadata.json, (3) normalize code_hash to "PENDING" and compute tree hash H1 from post-update metadata, (4) write code_hash: H1 back to metadata.json, (5) re-stage. check-approved: (1) normalize code_hash to "PENDING" on staged metadata.json (which has code_hash: H1), (2) compute tree hash -> H1, (3) compare with stored code_hash H1 -> match. Both see identical post-update metadata (except code_hash itself) so hashes agree.
 
-- [ ] Use normalized hash in record-round and check-approved: both normalize review.code_hash to null before computing tree hash + tests
+- [ ] Use normalized hash in record-round and check-approved: record-round writes review state first, then normalizes code_hash to "PENDING" and computes hash, then writes code_hash back. check-approved normalizes and compares. Both see post-update metadata + tests
 
 ## Phase 5: End-to-end verification
 
-Integration tests: (1) record-round -> re-stage metadata.json -> check-approved succeeds (normalized hash stable across re-stage), (2) source code change after record-round causes check-approved to fail (security invariant), (3) metadata.json review.status tamper causes check-approved to fail (tamper detection), (4) poll_review detects bot thumbs-up reaction as zero-findings completion with trigger timestamp filter.
+Integration tests: (1) record-round -> re-stage -> check-approved succeeds (normalized hash stable), (2) source code change causes check-approved to fail, (3) metadata.json review.status tamper causes check-approved to fail, (4) poll_review detects bot thumbs-up reaction with trigger timestamp filter, (5) multiple review groups produce consistent hash across separate CLI invocations (BTreeMap ordering).
 
 - [ ] Integration test: full review -> commit flow with normalized hash (re-stage OK) + pr-review polling with reaction detection + tamper detection for non-code_hash metadata fields

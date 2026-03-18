@@ -38,9 +38,18 @@ version: "1.0"
 - **問題**: `record-round` が `git write-tree` で index hash を計算し `metadata.json` に書き込むが、再 staging 後に `check-approved` が計算する hash は `metadata.json` の変更を含むため永久にミスマッチ
 - **影響**: `/track:review` → `/track:commit` フローが完全にブロックされる
 - **根本原因**: `git write-tree` が staged index 全体（`metadata.json` 含む）をハッシュする。`code_hash` を metadata.json に書き込むとファイル内容が変わり、hash が変わる自己参照循環
-- **修正方式**: code_hash 正規化（方式 D）。hash 計算時に `review.code_hash` フィールドを固定センチネル値（`null`）に置き換えた正規化版で tree hash を計算する。これにより code_hash 以外の全フィールドが hash に含まれ、自己参照循環を回避する:
-  1. `record-round`: staged metadata.json を読み、`review.code_hash` を固定文字列 `"PENDING"` に置き換えた正規化版を作成 → 一時 index で正規化版の blob を差し替えて `git write-tree` → hash H1 を取得 → metadata.json に review state + code_hash: H1 を書き込み → metadata.json を re-stage
-  2. `check-approved`: staged metadata.json を読み（code_hash: H1 入り）、同じ正規化（`review.code_hash` → `"PENDING"`）を適用 → 一時 index で `git write-tree` → H1 → staged metadata.json の code_hash H1 と比較 → 一致 → OK
+- **修正方式**: code_hash 正規化（方式 D）。hash 計算時に `review.code_hash` フィールドを固定センチネル文字列 `"PENDING"` に置き換えた正規化版で tree hash を計算する。これにより code_hash 以外の全フィールド（review.status, review.groups 含む）が hash に含まれ、自己参照循環を回避する:
+  1. `record-round`:
+     - (a) review verdict/status/groups を `metadata.json` に書き込み（`store.update()` 経由）→ re-stage
+     - (b) staged metadata.json を読み、`review.code_hash` を `"PENDING"` に置き換えた正規化版を作成
+     - (c) 一時 index で正規化版の blob を差し替えて `git write-tree` → hash H1 を取得
+     - (d) `metadata.json` に code_hash: H1 を書き込み → re-stage
+     - **重要**: hash は post-update の review state を反映する（pre-update ではない）
+  2. `check-approved`:
+     - (a) staged metadata.json を読み（code_hash: H1 + post-update review state 入り）
+     - (b) 同じ正規化（`review.code_hash` → `"PENDING"`）を適用
+     - (c) 一時 index で `git write-tree` → H1（review state は record-round と同一）
+     - (d) staged metadata.json の code_hash H1 と比較 → 一致 → OK
 - **利点**:
   - metadata.json は SSoT のまま（code_hash を含む）
   - metadata.json は hash に **完全に** 含まれる（code_hash 以外の全フィールドで tamper 検出可能）
@@ -48,10 +57,12 @@ version: "1.0"
   - re-stage 可能（staging 順序依存なし）
   - metadata-only の改変も検出可能（review.status, tasks 等の改ざんを hash で検出）
 - **実装**: `GitRepository` trait に `index_tree_hash_normalizing()` メソッドを追加。内部で一時 `GIT_INDEX_FILE` を使い、metadata.json の blob を正規化版に差し替えて `git write-tree` を実行
+- **決定論的シリアライズ**: `TrackReviewDocument.groups` を `HashMap` から `BTreeMap` に変更し、JSON キー順序を決定論的にする。これにより複数の review group がある場合でも、別プロセスの record-round と check-approved で同一のシリアライズ結果が保証される
 - **調査**: git-appraise (Google) のレビュー状態外部保存パターン、ビルド時 hash 埋め込みパターン、Solidity metadata hash のセンチネル方式を参考
 - **対象ファイル**:
   - `libs/domain/src/git.rs` or `libs/domain/src/review.rs`（`GitRepository` trait に `index_tree_hash_normalizing` 追加）
   - `libs/infrastructure/src/git_cli.rs`（正規化 + 一時 index による実装）
+  - `libs/infrastructure/src/track/codec.rs`（`TrackReviewDocument.groups` を `BTreeMap` に変更）
   - `apps/cli/src/commands/review.rs`（`run_record_round`, `run_check_approved` で正規化 hash を使用）
 
 ## 制約
@@ -60,7 +71,7 @@ version: "1.0"
 - `ReviewState` ドメイン型のインターフェースは維持する
 - 既存の `index_tree_hash()` は互換性のため残す（新メソッド `index_tree_hash_normalizing()` を追加）
 - 正規化のセンチネル値は固定文字列 `"PENDING"`（JSON の `"code_hash": "PENDING"`）とする。`null` は「未設定」と区別がつかないため明示的な文字列を使用
-- 正規化は metadata.json の JSON シリアライズに依存するため、`serde_json` の決定論的出力を前提とする
+- 正規化は metadata.json の JSON シリアライズに依存するため、`serde_json` の決定論的出力を前提とする。`TrackReviewDocument.groups` は `BTreeMap` を使用してキー順序を保証する
 - `GhClient` trait の既存メソッドは変更しない（`list_reactions` を追加のみ）
 
 ## 受け入れ基準
@@ -74,6 +85,7 @@ version: "1.0"
 7. metadata.json の review.status や tasks を改ざんした場合も正規化 hash が不一致になる（tamper 検出）
 8. `cargo make ci` が通る
 9. 既存の `index_tree_hash()` テストが壊れない
+10. 複数 review group がある場合でも、別プロセスの record-round と check-approved で正規化 hash が一致する（BTreeMap 順序保証）
 
 ## 出典
 
