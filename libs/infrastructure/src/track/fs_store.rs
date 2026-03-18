@@ -167,6 +167,7 @@ impl<L: FileLockManager> TrackWriter for FsTrackStore<L> {
         let mut meta = match self.read_track(track.id()).map_err(TrackWriteError::from)? {
             Some((existing, mut meta)) => {
                 track.validate_descriptions_unchanged(&existing).map_err(DomainError::from)?;
+                track.validate_no_tasks_removed(&existing).map_err(DomainError::from)?;
                 meta.updated_at = Self::now_iso8601();
                 meta
             }
