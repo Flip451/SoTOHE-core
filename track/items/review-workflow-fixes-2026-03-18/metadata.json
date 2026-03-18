@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
   "id": "review-workflow-fixes-2026-03-18",
-  "branch": "track/review-workflow-fixes-2026-03-18",
+  "branch": null,
   "title": "WF-42+WF-43: review workflow critical fixes (bot login + completion detection + code_hash cycle)",
   "status": "planned",
   "created_at": "2026-03-18T12:00:00Z",
