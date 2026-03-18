@@ -73,10 +73,9 @@ version: "1.0"
 3. `poll_review` (standalone) が zero-findings 時に `{"verdict":"zero_findings","findings":[]}` を stdout に出力する
 4. `review_cycle` が zero-findings（reaction のみ、review なし）で正常に成功を返す
 5. `record-round` → `check-approved` で hash が一致する（metadata.json は再 stage しない）
-6. metadata.json を再 stage した場合でも、`check-approved` は disk から code_hash を読むため正しく動作する
-7. ソースコードを変更した場合は hash が正しく不一致になる（セキュリティ保証）
-8. `cargo make ci` が通る
-9. 既存の `index_tree_hash()` テストが壊れない
+6. ソースコードを変更した場合は hash が正しく不一致になる（セキュリティ保証）
+7. `cargo make ci` が通る
+8. 既存の `index_tree_hash()` テストが壊れない
 
 ## 出典
 
