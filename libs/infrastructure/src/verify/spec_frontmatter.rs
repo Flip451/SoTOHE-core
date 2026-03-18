@@ -4,36 +4,10 @@ use super::frontmatter::parse_yaml_frontmatter;
 use domain::verify::{Finding, VerifyOutcome};
 use std::path::Path;
 
-/// Required frontmatter fields.
-const REQUIRED_FIELDS: &[&str] = &["status", "version"];
-
-/// Checks that `value` is a valid inline YAML mapping with string keys and
-/// integer values, as required for the `signals` field.
-///
-/// Uses `serde_yaml` to parse the value.  The result must be a YAML mapping
-/// where every key is a string and every value is an integer.  This rejects:
-/// - plain scalars (`not_a_mapping`)
-/// - sequences (`[1, 2, 3]`)
-/// - malformed YAML (`{ blue: [1, 2 }`)
-/// - entries without a value separator (`{ blue 1 }` — no colon means the
-///   value is null, not an integer)
-///
-/// # Examples
-///
-/// ```text
-/// // accepted
-/// { blue: 0, yellow: 0, red: 0 }
-/// { blue: 12, yellow: 1, red: 0 }
-///
-/// // rejected
-/// not_a_mapping
-/// { blue: [1, 2 }
-/// { blue 1 }
-/// ```
 /// Serde-compatible mirror of `domain::SignalCounts` for YAML deserialization.
 ///
 /// The domain type is serde-free (no serde dependency in domain layer).
-/// This struct deserializes the frontmatter value and converts to the domain type.
+/// This struct validates the frontmatter `signals` field via deserialization.
 #[derive(serde::Deserialize)]
 #[allow(dead_code)] // Fields are validated by deserialization, not read directly.
 struct SignalCountsDto {
@@ -42,33 +16,32 @@ struct SignalCountsDto {
     red: u32,
 }
 
-fn is_valid_inline_mapping(value: &str) -> bool {
-    // Require inline flow mapping syntax (must start with `{`).
-    // Block mappings like `blue: 0` are valid YAML but not the required format.
-    if !value.starts_with('{') {
-        return false;
-    }
-    serde_yaml::from_str::<SignalCountsDto>(value).is_ok()
-}
-
-/// Optional frontmatter fields that are validated when present.
+/// Frontmatter structure for YAML deserialization.
 ///
-/// Each optional field listed here is accepted when absent.  When present the
-/// field is subject to structural validation (e.g. `signals` must be an inline
-/// YAML mapping value starting with `{`).
-const OPTIONAL_FIELDS: &[&str] = &["signals"];
+/// Required fields (`status`, `version`) are non-optional.
+/// Optional fields (`signals`) use `Option` and are validated when present.
+/// Unknown fields are silently ignored via `#[serde(flatten)]`.
+#[derive(serde::Deserialize)]
+#[allow(dead_code)] // Fields are validated by deserialization, not read directly.
+struct SpecFrontmatterDto {
+    status: String,
+    version: serde_yaml::Value, // Accept both string "1.0" and number 1.0
+    #[serde(default)]
+    signals: Option<SignalCountsDto>,
+    #[serde(flatten)]
+    _extra: serde_yaml::Mapping, // Ignore unknown fields
+}
 
 /// Verifies spec.md has YAML frontmatter with `status` and `version`.
 ///
-/// The optional `signals` field, when present, must be an inline YAML mapping
-/// (value starts with `{`).  A plain scalar value for `signals` is reported as
-/// an error.
+/// The optional `signals` field, when present, must be a valid mapping with
+/// `blue`, `yellow`, `red` as non-negative integer fields. Both inline
+/// (`{ blue: 0, yellow: 0, red: 0 }`) and block-style YAML are accepted.
 ///
 /// # Errors
 ///
 /// Returns findings when the file cannot be read, when YAML frontmatter
-/// delimiters are missing, required fields are absent, or an optional field is
-/// present but malformed.
+/// delimiters are missing, or when the frontmatter content is invalid.
 pub fn verify(spec_path: &Path) -> VerifyOutcome {
     let content = match std::fs::read_to_string(spec_path) {
         Ok(c) => c,
@@ -87,40 +60,55 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
         ))]);
     };
 
-    let mut findings = Vec::new();
-
-    // Check for required fields (line-based: field must appear at column 0).
-    for field in REQUIRED_FIELDS {
-        let pattern = format!("{field}:");
-        if !fm.frontmatter.lines().any(|line| line.starts_with(&pattern)) {
-            findings.push(Finding::error(format!(
-                "{}: YAML frontmatter missing required field '{field}'",
-                spec_path.display()
-            )));
+    // Parse the entire frontmatter as a typed DTO.
+    // This validates required fields (status, version) and optional fields (signals)
+    // in one pass via serde deserialization.
+    match serde_yaml::from_str::<SpecFrontmatterDto>(&fm.frontmatter) {
+        Ok(dto) => {
+            // Post-validation: if signals key is present but null/empty, reject.
+            if dto.signals.is_none() && fm.frontmatter.lines().any(|l| l.starts_with("signals:")) {
+                return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                    "{}: 'signals' field is present but empty/null; \
+                     provide a mapping like `signals: {{ blue: 0, yellow: 0, red: 0 }}`",
+                    spec_path.display()
+                ))]);
+            }
+            VerifyOutcome::pass()
         }
-    }
+        Err(e) => {
+            // Provide user-friendly error messages for common cases.
+            let err_str = e.to_string();
+            let mut findings = Vec::new();
 
-    // Validate optional fields when present.
-    //
-    // `signals` must be an inline mapping: the characters after `signals:` and
-    // any surrounding whitespace must start with `{`.  Block mappings (next
-    // line indented) and plain scalars are rejected so that Phase 2 tooling can
-    // rely on a consistent format.
-    for field in OPTIONAL_FIELDS {
-        let pattern = format!("{field}:");
-        if let Some(line) = fm.frontmatter.lines().find(|l| l.starts_with(&pattern)) {
-            let value = line[pattern.len()..].trim();
-            if !is_valid_inline_mapping(value) {
+            if err_str.contains("missing field `status`")
+                || err_str.contains("missing field `version`")
+            {
+                // Check which required fields are missing for granular reporting.
+                // Fall back to line-based check for individual field errors.
+                let has_status = fm.frontmatter.lines().any(|l| l.starts_with("status:"));
+                let has_version = fm.frontmatter.lines().any(|l| l.starts_with("version:"));
+                if !has_status {
+                    findings.push(Finding::error(format!(
+                        "{}: YAML frontmatter missing required field 'status'",
+                        spec_path.display()
+                    )));
+                }
+                if !has_version {
+                    findings.push(Finding::error(format!(
+                        "{}: YAML frontmatter missing required field 'version'",
+                        spec_path.display()
+                    )));
+                }
+            } else {
                 findings.push(Finding::error(format!(
-                    "{}: optional field '{field}' must be a valid inline YAML mapping \
-                     (e.g. `{field}: {{ blue: 0, yellow: 0, red: 0 }}`), got: {value:?}",
+                    "{}: invalid YAML frontmatter: {e}",
                     spec_path.display()
                 )));
             }
+
+            VerifyOutcome::from_findings(findings)
         }
     }
-
-    if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
 }
 
 #[cfg(test)]
@@ -267,7 +255,6 @@ mod tests {
 
     #[test]
     fn test_spec_frontmatter_passes_without_signals() {
-        // Existing spec files without signals must continue to pass.
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
         std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Content\n").unwrap();
@@ -276,8 +263,7 @@ mod tests {
     }
 
     #[test]
-    fn test_spec_frontmatter_passes_with_valid_signals_mapping() {
-        // signals with an inline mapping value must pass.
+    fn test_spec_frontmatter_passes_with_valid_signals_inline() {
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
         std::fs::write(
@@ -286,12 +272,24 @@ mod tests {
         )
         .unwrap();
         let outcome = verify(&spec);
-        assert!(!outcome.has_errors(), "spec with valid signals mapping must pass");
+        assert!(!outcome.has_errors(), "spec with valid inline signals must pass");
+    }
+
+    #[test]
+    fn test_spec_frontmatter_passes_with_valid_signals_block_style() {
+        let dir = tempfile::tempdir().unwrap();
+        let spec = dir.path().join("spec.md");
+        std::fs::write(
+            &spec,
+            "---\nstatus: draft\nversion: \"1.0\"\nsignals:\n  blue: 12\n  yellow: 1\n  red: 0\n---\n# Content\n",
+        )
+        .unwrap();
+        let outcome = verify(&spec);
+        assert!(!outcome.has_errors(), "spec with valid block-style signals must pass");
     }
 
     #[test]
     fn test_spec_frontmatter_passes_with_nonzero_signals() {
-        // signals with non-zero counts (the realistic Phase 2 scenario) must pass.
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
         std::fs::write(
@@ -300,12 +298,11 @@ mod tests {
         )
         .unwrap();
         let outcome = verify(&spec);
-        assert!(!outcome.has_errors(), "spec with non-zero signals mapping must pass");
+        assert!(!outcome.has_errors(), "spec with non-zero signals must pass");
     }
 
     #[test]
     fn test_spec_frontmatter_fails_with_only_signals_missing_required_fields() {
-        // Only signals present — required fields are missing so it must fail.
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
         std::fs::write(&spec, "---\nsignals: { blue: 0, yellow: 0, red: 0 }\n---\n# Content\n")
@@ -320,7 +317,6 @@ mod tests {
 
     #[test]
     fn test_spec_frontmatter_fails_with_malformed_signals_scalar_value() {
-        // signals present but value is a plain scalar, not a mapping.
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
         std::fs::write(
@@ -334,7 +330,6 @@ mod tests {
 
     #[test]
     fn test_spec_frontmatter_fails_with_signals_empty_value() {
-        // signals: (empty value after colon) — empty string is not a mapping.
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
         std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\nsignals:\n---\n# Content\n")
@@ -345,7 +340,6 @@ mod tests {
 
     #[test]
     fn test_spec_frontmatter_fails_with_signals_mismatched_braces() {
-        // Balanced-brace heuristic would accept this, but proper YAML parsing must reject it.
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
         std::fs::write(
@@ -361,19 +355,28 @@ mod tests {
     }
 
     #[test]
-    fn test_spec_frontmatter_fails_with_signals_missing_colon_in_mapping() {
-        // `{ blue 1 }` is not valid YAML mapping syntax.
+    fn test_spec_frontmatter_fails_with_negative_signal_count() {
         let dir = tempfile::tempdir().unwrap();
         let spec = dir.path().join("spec.md");
         std::fs::write(
             &spec,
-            "---\nstatus: draft\nversion: \"1.0\"\nsignals: { blue 1 }\n---\n# Content\n",
+            "---\nstatus: draft\nversion: \"1.0\"\nsignals: { blue: -1, yellow: 0, red: 0 }\n---\n# Content\n",
         )
         .unwrap();
         let outcome = verify(&spec);
-        assert!(
-            outcome.has_errors(),
-            "invalid YAML mapping syntax (missing colon) must be rejected"
-        );
+        assert!(outcome.has_errors(), "negative signal count must be rejected");
+    }
+
+    #[test]
+    fn test_spec_frontmatter_fails_with_signals_missing_field() {
+        let dir = tempfile::tempdir().unwrap();
+        let spec = dir.path().join("spec.md");
+        std::fs::write(
+            &spec,
+            "---\nstatus: draft\nversion: \"1.0\"\nsignals: { blue: 0, yellow: 0 }\n---\n# Content\n",
+        )
+        .unwrap();
+        let outcome = verify(&spec);
+        assert!(outcome.has_errors(), "signals missing 'red' field must be rejected");
     }
 }
