@@ -768,12 +768,17 @@ where
         }
 
         // Stage 1–2: Zero-findings detection via reactions/comments.
-        // These are PR-level signals (not commit-scoped), so we only trust them
-        // when we know the reviewed HEAD — the trigger_dt filter excludes stale
-        // signals, and the reviews loop above already returned for any completed
-        // review on the current commit. When head_commit is None (standalone
-        // poll_review), skip zero-findings detection to avoid accepting signals
-        // from a different commit.
+        // These are PR-level signals (not commit-scoped) — the GitHub Reactions
+        // and Issue Comments APIs do not include a commit_id field, so we cannot
+        // verify that the signal corresponds to `head_commit`. We mitigate this by:
+        //   1. Requiring head_commit to be Some (standalone poll_review skips this).
+        //   2. Using trigger_dt to exclude signals from earlier trigger rounds.
+        //   3. The reviews loop above already returned for any completed review on
+        //      the current commit, so reaching this point means no review exists.
+        // Residual risk: if a new commit is pushed between the @codex review trigger
+        // and the bot's zero-findings signal, the signal may correspond to the old
+        // commit. This is accepted as a known limitation — the trigger_dt filter
+        // makes this window very narrow (requires push + new trigger within seconds).
         if head_commit.is_some() {
             // Stage 1: Check reactions for bot +1 (post-trigger).
             if check_reaction_zero_findings(client, &repo_nwo, pr, trigger_dt)? {

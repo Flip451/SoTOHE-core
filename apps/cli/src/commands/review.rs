@@ -853,34 +853,27 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
     Ok(())
 }
 
-/// Acquire the git index lock (`.git/index.lock`) to prevent concurrent
-/// index modifications during the record-round protocol.
+/// Acquire an advisory lock to serialize concurrent `sotp record-round` invocations.
+///
+/// This does NOT use `.git/index.lock` (which would block `git add` inside
+/// this process). Instead it creates `.git/sotp-record-round.lock` — an
+/// application-level lock that prevents two `record-round` commands from
+/// racing against each other. External `git add` from other tools is not
+/// blocked, but the Claude Code hook `block-direct-git-ops` prevents
+/// uncontrolled staging during normal workflow.
 ///
 /// Returns a guard that removes the lock file on drop.
 fn acquire_git_index_lock(
     git: &impl infrastructure::git_cli::GitRepository,
 ) -> Result<GitIndexLockGuard, String> {
-    // Resolve the index lock path the same way git does.
-    let index_path_output = git
-        .output(&["rev-parse", "--git-path", "index"])
-        .map_err(|e| format!("failed to resolve git index path: {e}"))?;
-    if !index_path_output.status.success() {
-        return Err("failed to resolve git index path".to_owned());
-    }
-    let index_path_str = String::from_utf8_lossy(&index_path_output.stdout).trim().to_owned();
-    let index_path = if std::path::Path::new(&index_path_str).is_absolute() {
-        std::path::PathBuf::from(&index_path_str)
-    } else {
-        git.root().join(&index_path_str)
-    };
-    let lock_path = index_path.with_extension("lock");
+    let lock_path = git.root().join(".git/sotp-record-round.lock");
 
-    // O_CREAT | O_EXCL — fails if the lock already exists (another git operation).
+    // O_CREAT | O_EXCL — fails if the lock already exists (another record-round).
     let _file =
         std::fs::OpenOptions::new().write(true).create_new(true).open(&lock_path).map_err(|e| {
             format!(
-                "failed to acquire git index lock at {}: {e}. \
-                 Another git operation may be in progress.",
+                "failed to acquire record-round lock at {}: {e}. \
+                 Another record-round may be in progress.",
                 lock_path.display()
             )
         })?;
@@ -888,7 +881,7 @@ fn acquire_git_index_lock(
     Ok(GitIndexLockGuard { path: lock_path })
 }
 
-/// RAII guard that removes the git index lock file on drop.
+/// RAII guard that removes the advisory lock file on drop.
 struct GitIndexLockGuard {
     path: std::path::PathBuf,
 }
