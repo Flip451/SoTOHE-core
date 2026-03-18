@@ -1,0 +1,19 @@
+## Task Summary: WF-42+WF-43 planning artifacts
+
+**Track:** review-workflow-fixes-2026-03-18
+**Task:** Planning artifacts for review workflow critical fixes
+**Date:** 2026-03-18
+
+### Changes
+
+- metadata.json: Track definition with 4 tasks (T001-T004)
+- plan.md: Auto-generated from metadata.json
+- spec.md: Feature goal, scope, constraints, acceptance criteria
+- verification.md: Verification checklist for both WF-42 and WF-43
+- registry.md: Updated active tracks with new track entry
+
+### Why
+
+WF-43 (CRITICAL): code_hash self-referential cycle blocks /track:review → /track:commit.
+WF-42 (HIGH): missing bot login causes /track:pr-review timeout.
+Both bugs prevent normal review workflow operation.
