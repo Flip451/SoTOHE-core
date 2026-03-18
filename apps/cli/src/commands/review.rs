@@ -768,13 +768,14 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
 
     let timestamp = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
 
-    // Step 1: Compute pre-update normalized hash immediately before the
-    // locked update to minimize the TOCTOU window between hash computation
-    // and the metadata lock acquisition. Any concurrent staging between
-    // this point and step 6 is caught by the post-update verification (step 7).
+    // Step 1: Snapshot the index before any mutation.
+    // - normalized hash: used by record_round_with_pending for freshness check
+    // - raw tree hash: used at step 4 to verify no non-metadata files were staged
     let pre_update_hash = git
         .index_tree_hash_normalizing(&metadata_rel)
         .map_err(|e| format!("normalized hash error: {e}"))?;
+    let raw_tree_baseline =
+        git.index_tree_hash().map_err(|e| format!("raw tree hash baseline error: {e}"))?;
 
     // Step 2: Write review state + code_hash="PENDING" via record_round_with_pending.
     // On StaleCodeHash, persist the invalidation (return Ok from closure so update writes),
@@ -826,7 +827,38 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
     // Step 3: Re-stage metadata.json (now contains code_hash="PENDING").
     stage_metadata(&git, &metadata_rel)?;
 
-    // Step 4: Compute post-update normalized hash H1.
+    // Step 4a: Verify no non-metadata files were staged between step 1 and now.
+    // Compare the raw tree hash baseline with the current raw tree hash.
+    // The only difference should be metadata.json (which we wrote and re-staged).
+    let raw_tree_after =
+        git.index_tree_hash().map_err(|e| format!("raw tree hash after step 3: {e}"))?;
+    if raw_tree_baseline != raw_tree_after {
+        // Trees differ — verify that only metadata.json changed.
+        let diff_output = git
+            .output(&["diff-tree", &raw_tree_baseline, &raw_tree_after])
+            .map_err(|e| format!("diff-tree error: {e}"))?;
+        let diff_text = String::from_utf8_lossy(&diff_output.stdout);
+        let has_non_metadata = diff_text.lines().any(|line| {
+            // git diff-tree output: :<old_mode> <new_mode> <old_hash> <new_hash> <status>\t<path>
+            line.split('\t').nth(1).is_some_and(|path| path.trim() != metadata_rel)
+        });
+        if has_non_metadata {
+            // Roll back review state before aborting.
+            let _ = store.update(&track_id, |track| {
+                if let Some(review) = track.review_mut().as_mut() {
+                    review.invalidate();
+                }
+                Ok(())
+            });
+            stage_metadata(&git, &metadata_rel)?;
+            return Err("[BLOCKED] Non-metadata files were staged between hash computation \
+                 and metadata write — the review would bless unreviewed changes. \
+                 Review state rolled back. Re-run after confirming no concurrent staging."
+                .to_owned());
+        }
+    }
+
+    // Step 4b: Compute post-update normalized hash H1.
     // Since code_hash is "PENDING" and normalization replaces it with "PENDING",
     // this is effectively a no-op for the code_hash field. updated_at is normalized to epoch.
     let post_update_hash = git
