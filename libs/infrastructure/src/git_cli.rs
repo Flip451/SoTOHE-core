@@ -291,8 +291,29 @@ impl GitRepository for SystemGitRepo {
         let blob_hash = String::from_utf8_lossy(&hash_object_output.stdout).trim().to_owned();
 
         // Step 6: Copy current index to a temp file (stdlib only, no tempfile crate needed).
-        let index_path = std::env::var("GIT_INDEX_FILE")
-            .unwrap_or_else(|_| self.root.join(".git/index").to_string_lossy().into_owned());
+        // Resolve the index path via Git to support linked worktrees where
+        // .git is a pointer file and the real index lives elsewhere.
+        let index_path = match std::env::var("GIT_INDEX_FILE") {
+            Ok(p) => p,
+            Err(_) => {
+                let rev_output = self.output(&["rev-parse", "--git-path", "index"])?;
+                if !rev_output.status.success() {
+                    let stderr = String::from_utf8_lossy(&rev_output.stderr).trim().to_owned();
+                    let code = rev_output.status.code().unwrap_or(-1);
+                    return Err(GitError::CommandFailed {
+                        command: "rev-parse --git-path index".to_owned(),
+                        code,
+                        stderr,
+                    });
+                }
+                let resolved = String::from_utf8_lossy(&rev_output.stdout).trim().to_owned();
+                if std::path::Path::new(&resolved).is_absolute() {
+                    resolved
+                } else {
+                    self.root.join(&resolved).to_string_lossy().into_owned()
+                }
+            }
+        };
         // Use a deterministic-but-unique name under the system temp dir.
         let temp_index_path = std::env::temp_dir().join(format!(
             "sotp-norm-index-{}-{}.tmp",

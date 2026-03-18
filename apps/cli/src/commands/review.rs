@@ -843,6 +843,20 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
     // Step 6: Re-stage metadata.json (now contains code_hash=H1).
     stage_metadata(&git, &metadata_rel)?;
 
+    // Step 7: Post-update freshness re-verification (TOCTOU guard).
+    // If any non-metadata file was staged between steps 3–6, the normalized
+    // hash will differ from H1, and we fail closed rather than blessing
+    // unreviewed changes.
+    let verify_hash = git
+        .index_tree_hash_normalizing(&metadata_rel)
+        .map_err(|e| format!("verification hash error: {e}"))?;
+    if verify_hash != post_update_hash {
+        return Err("[BLOCKED] Index changed between hash computation and verification — \
+             another process may have staged files during record-round. \
+             Re-run after confirming no concurrent staging."
+            .to_owned());
+    }
+
     eprintln!(
         "[OK] Recorded {round_type} round for group '{}' (verdict: {verdict_str})",
         args.group
