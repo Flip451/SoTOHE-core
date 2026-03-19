@@ -1,3 +1,4 @@
+#![forbid(unsafe_code)]
 //! Infrastructure layer for the SoTOHE-core track state machine.
 
 pub mod gh_cli;

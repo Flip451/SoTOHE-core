@@ -432,18 +432,43 @@ fn extract_rm_args_from_argv(cmd: &SimpleCommand) -> Vec<String> {
 }
 
 /// Checks if a path refers to a test file.
+///
+/// Normalizes path components (resolving `.` and `..`) before checking patterns,
+/// so that relative traversals like `../tests/foo.rs` or `tests/../src/main.rs`
+/// are handled correctly.
 fn is_test_file(path: &str) -> bool {
+    use std::path::Component;
+
+    // Normalize path: resolve `.` and `..` without touching the filesystem.
+    let mut normalized = Vec::new();
+    for component in std::path::Path::new(path).components() {
+        match component {
+            Component::CurDir => {} // skip `.`
+            Component::ParentDir => {
+                // Pop the last Normal segment if any; ignore otherwise.
+                if matches!(normalized.last(), Some(Component::Normal(_))) {
+                    normalized.pop();
+                }
+            }
+            other => normalized.push(other),
+        }
+    }
+
+    // Rebuild a clean `/`-separated path string from the normalized components.
+    let clean: String =
+        normalized.iter().map(|c| c.as_os_str().to_string_lossy()).collect::<Vec<_>>().join("/");
+
     // Check if path contains a `tests` directory segment (not a substring like `mytests/`)
-    if path == "tests"
-        || path.starts_with("tests/")
-        || path.contains("/tests/")
-        || path.ends_with("/tests")
+    if clean == "tests"
+        || clean.starts_with("tests/")
+        || clean.contains("/tests/")
+        || clean.ends_with("/tests")
     {
         return true;
     }
 
     // Extract filename from path
-    let filename = path.rsplit('/').next().unwrap_or(path);
+    let filename = clean.rsplit('/').next().unwrap_or(&clean);
 
     // Check *_test.rs pattern
     if filename.ends_with("_test.rs") {
@@ -1550,6 +1575,33 @@ mod tests {
         };
         let verdict = handler.handle(&ctx, &input).unwrap();
         assert!(verdict.is_blocked(), "Write empty to src/tests.rs must be blocked");
+    }
+
+    // --- is_test_file path normalization tests (GAP-05) ---
+
+    #[test]
+    fn test_is_test_file_dot_slash_prefix() {
+        assert!(is_test_file("./tests/foo.rs"));
+    }
+
+    #[test]
+    fn test_is_test_file_parent_traversal() {
+        assert!(is_test_file("../tests/foo.rs"));
+    }
+
+    #[test]
+    fn test_is_test_file_multi_level_traversal() {
+        assert!(is_test_file("foo/../../tests/bar.rs"));
+    }
+
+    #[test]
+    fn test_is_test_file_traversal_away_from_tests_is_not_test() {
+        assert!(!is_test_file("tests/../src/main.rs"));
+    }
+
+    #[test]
+    fn test_is_test_file_dot_slash_test_underscore_rs() {
+        assert!(is_test_file("./src/test_user.rs"));
     }
 
     #[test]
