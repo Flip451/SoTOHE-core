@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `domain-type-hardening-2026-03-19`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-19`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| domain-type-hardening-2026-03-19 | in_progress | `/track:implement` | 2026-03-19 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| domain-type-hardening-2026-03-19 | Done | 2026-03-19 |
 | remove-file-lock-system-2026-03-19 | Done | 2026-03-19 |
 | review-escalation-threshold-2026-03-19 | Done | 2026-03-19 |
 | phase1-safety-hardening-2026-03-19 | Done | 2026-03-19 |

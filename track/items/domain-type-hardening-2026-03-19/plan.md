@@ -12,7 +12,7 @@ Replace ReviewRoundResult::verdict: String with Verdict
 Replace all string comparisons (r.verdict == "zero_findings" and "findings_remain" in validate_verdict_concerns) with enum matching
 Add Display impl mapping to snake_case strings for serialization compatibility
 
-- [~] Introduce Verdict enum replacing ReviewRoundResult::verdict String field
+- [x] Introduce Verdict enum replacing ReviewRoundResult::verdict String field 272c0c4
 
 ## CodeHash enum (P2)
 
@@ -21,7 +21,7 @@ Replace ReviewState::code_hash: Option<String> with Option<CodeHash>
 Remove "PENDING" magic string from record_round_with_pending and related logic
 CodeHash::Computed validates non-empty string
 
-- [~] Introduce CodeHash enum replacing ReviewState::code_hash Option<String> with PENDING sentinel
+- [x] Introduce CodeHash enum replacing ReviewState::code_hash Option<String> with PENDING sentinel 272c0c4
 
 ## Timestamp newtype (P3)
 
@@ -29,7 +29,7 @@ Define Timestamp newtype wrapping chrono::DateTime<Utc> in ids.rs (stores parsed
 Validate via str::parse::<DateTime<Utc>>() (relaxed RFC 3339: accepts space separator, rejects invalid dates/times)
 Replace 5 timestamp String fields: ReviewRoundResult.timestamp, ReviewCycleSummary.timestamp, ReviewConcernStreak.last_seen_at, ReviewEscalationBlock.blocked_at, ReviewEscalationResolution.resolved_at
 
-- [~] Introduce Timestamp newtype replacing bare String timestamps in review types
+- [x] Introduce Timestamp newtype replacing bare String timestamps in review types 272c0c4
 
 ## NonEmptyString newtype (P4)
 
@@ -37,7 +37,7 @@ Define NonEmptyString(String) newtype with trimmed non-empty validation
 Replace TrackMetadata::title and TrackTask::description with NonEmptyString
 Remove inline non-empty checks from TrackMetadata::with_branch and TrackTask::with_status constructors (actual validation sites)
 
-- [~] Introduce NonEmptyString newtype for TrackMetadata::title and TrackTask::description
+- [x] Introduce NonEmptyString newtype for TrackMetadata::title and TrackTask::description 272c0c4
 
 ## Layer propagation
 
@@ -46,6 +46,6 @@ Maintain backward compatibility with existing metadata.json files
 Update usecase layer type references
 Update cli layer command handlers
 
-- [ ] Update infrastructure codec layer for new domain types (serde backward compatibility)
-- [ ] Update usecase layer for new domain types
-- [ ] Update cli layer for new domain types
+- [x] Update infrastructure codec layer for new domain types (serde backward compatibility) 272c0c4
+- [x] Update usecase layer for new domain types 272c0c4
+- [x] Update cli layer for new domain types 272c0c4
