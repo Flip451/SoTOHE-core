@@ -124,6 +124,20 @@ pub trait GhClient {
         })
     }
 
+    /// List all reactions on a PR (issue reactions endpoint).
+    ///
+    /// Returns the raw JSON response from the GitHub API.
+    /// Default implementation returns an error to maintain backward compatibility.
+    ///
+    /// # Errors
+    /// Returns `GhError::CommandFailed` if the gh command exits with a non-zero status.
+    fn list_reactions(&self, _repo_nwo: &str, _pr: &str) -> Result<String, GhError> {
+        Err(GhError::CommandFailed {
+            command: "list_reactions".to_owned(),
+            stderr: "not implemented".to_owned(),
+        })
+    }
+
     /// Return the owner/repo string for the current repository.
     ///
     /// Default implementation returns an error to maintain backward compatibility.
@@ -187,6 +201,10 @@ impl GhClient for SystemGhClient {
         review_id: &str,
     ) -> Result<String, GhError> {
         list_review_comments_with(repo_nwo, pr, review_id, &run_gh)
+    }
+
+    fn list_reactions(&self, repo_nwo: &str, pr: &str) -> Result<String, GhError> {
+        list_reactions_with(repo_nwo, pr, &run_gh)
     }
 
     fn repo_nwo(&self) -> Result<String, GhError> {
@@ -334,6 +352,19 @@ where
     Err(GhError::CommandFailed { command: format!("api {endpoint}"), stderr })
 }
 
+fn list_reactions_with<F>(repo_nwo: &str, pr: &str, run_gh: &F) -> Result<String, GhError>
+where
+    F: Fn(&[&str]) -> Result<Output, GhError>,
+{
+    let endpoint = format!("repos/{repo_nwo}/issues/{pr}/reactions");
+    let output = run_gh(&["api", &endpoint, "--paginate"])?;
+    if output.status.success() {
+        return Ok(String::from_utf8_lossy(&output.stdout).into_owned());
+    }
+    let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+    Err(GhError::CommandFailed { command: format!("api {endpoint}"), stderr })
+}
+
 fn list_reviews_with<F>(repo_nwo: &str, pr: &str, run_gh: &F) -> Result<String, GhError>
 where
     F: Fn(&[&str]) -> Result<Output, GhError>,
@@ -415,8 +446,8 @@ mod tests {
 
     use super::{
         GhError, PrCheckRecord, create_pr_with, decode_pr_checks, find_open_pr_with,
-        list_issue_comments_with, list_review_comments_with, list_reviews_with, merge_pr_with,
-        post_issue_comment_with, pr_checks_with, repo_nwo_with,
+        list_issue_comments_with, list_reactions_with, list_review_comments_with,
+        list_reviews_with, merge_pr_with, post_issue_comment_with, pr_checks_with, repo_nwo_with,
     };
 
     fn output(code: i32, stdout: &str, stderr: &str) -> Output {
@@ -704,6 +735,36 @@ mod tests {
             .unwrap_err()
             .to_string();
         assert!(err.contains("forbidden"), "got: {err}");
+    }
+
+    // --- list_reactions_with tests ---
+
+    #[test]
+    fn list_reactions_with_verifies_argv() {
+        let result = list_reactions_with("owner/repo", "7", &|args| {
+            assert_eq!(args, ["api", "repos/owner/repo/issues/7/reactions", "--paginate"]);
+            Ok(output(
+                0,
+                r#"[{"content":"+1","user":{"login":"openai-codex[bot]"},"created_at":"2026-03-18T10:00:00Z"}]"#,
+                "",
+            ))
+        });
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn list_reactions_with_returns_stdout_on_success() {
+        let json = r#"[{"content":"+1","user":{"login":"openai-codex[bot]"},"created_at":"2026-03-18T10:00:00Z"}]"#;
+        let result = list_reactions_with("owner/repo", "7", &fake_gh(0, json, "")).unwrap();
+        assert_eq!(result, json);
+    }
+
+    #[test]
+    fn list_reactions_with_surfaces_stderr_on_failure() {
+        let err = list_reactions_with("owner/repo", "7", &fake_gh(1, "", "not found"))
+            .unwrap_err()
+            .to_string();
+        assert!(err.contains("not found"), "got: {err}");
     }
 
     // --- list_review_comments_with tests ---
