@@ -13,7 +13,7 @@ mod error;
 
 pub use error::CliError;
 
-/// SoTOHE-core CLI: track state machine and file lock management.
+/// SoTOHE-core CLI: track state machine and workflow management.
 #[derive(Parser)]
 #[command(name = "sotp", version, about)]
 struct Cli {
@@ -23,14 +23,6 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum CliCommand {
-    /// File lock management for agent concurrent access.
-    Lock {
-        #[command(subcommand)]
-        cmd: commands::lock::LockCommand,
-        /// Directory for lock registry files.
-        #[arg(long, default_value = ".locks")]
-        locks_dir: String,
-    },
     /// Shell command guard for git operation blocking.
     Guard {
         #[command(subcommand)]
@@ -81,7 +73,6 @@ fn main() -> ExitCode {
     let cli = Cli::parse();
 
     match cli.command {
-        Some(CliCommand::Lock { cmd, locks_dir }) => commands::lock::execute(cmd, &locks_dir),
         Some(CliCommand::Guard { cmd }) => commands::guard::execute(cmd),
         Some(CliCommand::Hook { cmd }) => commands::hook::execute(cmd),
         Some(CliCommand::Track { cmd }) => commands::track::execute(cmd),

@@ -63,7 +63,7 @@
     ]
   },
   "review": {
-    "code_hash": "550ea54b58763b45af8fff66dabde2e6f3eeb5bb",
+    "code_hash": "06705b6d9f41cfe6ead761fa63f398ecd58c1b6d",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -91,6 +91,54 @@
       "threshold": 3
     },
     "groups": {
+      "all": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-19T11:53:24Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T11:53:29Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "cli": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-19T11:52:17Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T11:52:25Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "infra-domain": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-19T11:52:11Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T11:52:23Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "other": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-19T11:52:18Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T11:52:25Z",
+          "verdict": "zero_findings"
+        }
+      },
       "planning": {
         "fast": {
           "round": 1,
@@ -102,54 +150,66 @@
           "timestamp": "2026-03-19T10:01:48Z",
           "verdict": "zero_findings"
         }
+      },
+      "usecase": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-19T11:52:16Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T11:52:24Z",
+          "verdict": "zero_findings"
+        }
       }
     },
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "done",
   "tasks": [
     {
       "description": "Remove CLI lock.rs entirely + remove LockCommand variant from main.rs + remove pub mod lock from commands/mod.rs — consumer removal only, domain::lock and infrastructure::lock still exist so workspace compiles",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Remove usecase lock handlers (LockAcquire/ReleaseHookHandler, resolve_lock_mode, DEFAULT_LOCK_TIMEOUT, StubLockManager, all lock tests) from hook.rs + remove CLI hook.rs FileLockAcquire/Release branches, CliHookName lock variants, AgentId import, locks_dir/agent/pid clap args, resolve_locks_dir helper, and lock-related HookContext construction + remove file-lock hook entries from .claude/settings.json (PreToolUse file-lock-acquire + PostToolUse file-lock-release) to prevent fail-closed hooks calling deleted handlers — atomic commit",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Simplify FsTrackStore: remove FileLockManager generic, lock_manager, lock_timeout, lock imports, lock calls in save/update/with_locked_document, simplify constructor to new(root), delete NoOpLockManager + delete concurrency.rs + update ALL CLI track/ callers (state_ops.rs, activate.rs, transition.rs, mod.rs, resolve.rs, review.rs) removing locks_dir args + update make.rs to remove --locks-dir from track transition/add-task/set-override/clear-override dispatch + update scripts/track_state_machine.py to remove --locks-dir — atomic commit",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Delete infrastructure::lock module entirely (lock/mod.rs, fs_lock_manager.rs) + remove pub mod lock from infrastructure lib.rs + remove fd-lock from Cargo.toml — no consumers remain after T001-T003 so workspace compiles",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Delete domain::lock module entirely (lock/mod.rs, types.rs, error.rs, port.rs, guard.rs) + remove pub mod lock from domain lib.rs + remove HookError::Lock variant from hook/error.rs + remove HookName::FileLockAcquire/FileLockRelease from hook/types.rs + remove HookContext locks_dir/agent/pid fields + update HookInput doc comments — no consumers remain after T001-T004 so workspace compiles",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
-      "description": "Remove file-lock expectations from verify/orchestra.rs + remove .locks/ entry from .gitignore",
+      "description": "Remove file-lock expectations from verify/orchestra.rs + update .gitignore .locks/ comment (kept ignored for backward compat with existing clones)",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Update DESIGN.md and tech-stack.md to remove lock-related references (fd-lock, FsFileLockManager, infrastructure::lock module tree, lock design rationale)",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Run cargo make ci and verify full pass — all lock references eliminated",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "ファイルロックシステム一式削除",
-  "updated_at": "2026-03-19T10:01:48Z"
+  "updated_at": "2026-03-19T11:53:29Z"
 }

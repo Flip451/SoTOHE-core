@@ -29,12 +29,12 @@ Thumbs.db
 .idea/
 .vscode/
 
+# --- Stale lock directory from removed file-lock system (safe to delete locally) ---
+.locks/
+
 # --- Legacy local cache ---
 __pycache__/
 *.pyc
-
-# --- Lock registry (runtime state, not version-controlled) ---
-.locks/
 
 # --- Auto mode ephemeral session state (not version-controlled) ---
 **/auto-state.json
