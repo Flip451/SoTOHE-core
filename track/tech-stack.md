@@ -65,7 +65,7 @@ apps/cli             # CLI エントリーポイント + composition root（usec
 ## ユーティリティ
 
 - **UUID**: `uuid` (`features = ["v4", "serde"]`)
-- **時刻**: `chrono` (`features = ["serde"]`)
+- **時刻**: `chrono` (`features = ["serde"]`) — domain 層でも `DateTime<Utc>` を newtype wrap して使用可（I/O なしの純粋ユーティリティ）
 - **シリアライゼーション**: `serde` + `serde_json`
 - **設定管理**: `config` 0.15
 - **シェルパース**: `conch-parser` 0.1.1（vendored, patched — domain 層: POSIX シェル AST パース、ガードポリシー用）

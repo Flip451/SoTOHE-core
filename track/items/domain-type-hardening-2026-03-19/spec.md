@@ -18,7 +18,7 @@
 - domain 層に serde 依存を追加しないこと（codec は infrastructure 層に留める） [source: architecture-rules.json]
 - 既存テスト（1000+ 件）を壊さないこと [source: convention — 05-testing.md]
 - TDD で進めること（Red → Green → Refactor） [source: feedback — feedback_tdd_enforcement.md]
-- `chrono` は domain 層に入れない。Timestamp の検証は regex なしの手書きパースで行う [source: tech-stack.md — chrono は infrastructure 層のみ]
+- `chrono::DateTime<Utc>` を domain 層で使用可（I/O なしの純粋ユーティリティクレート）。Timestamp newtype は `DateTime<Utc>` を wrap する [source: tech-stack.md — chrono はユーティリティ、Gemini 調査結果]
 
 ## Acceptance Criteria
 

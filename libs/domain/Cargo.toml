@@ -9,7 +9,9 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
+chrono = { workspace = true }
 conch-parser = "0.1.1"
+strum = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]

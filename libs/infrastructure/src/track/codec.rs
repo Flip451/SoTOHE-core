@@ -3,11 +3,11 @@
 use std::collections::BTreeMap;
 
 use domain::{
-    CommitHash, DomainError, EscalationPhase, PlanSection, PlanView, ReviewConcern,
+    CodeHash, CommitHash, DomainError, EscalationPhase, PlanSection, PlanView, ReviewConcern,
     ReviewConcernStreak, ReviewCycleSummary, ReviewEscalationBlock, ReviewEscalationDecision,
     ReviewEscalationResolution, ReviewEscalationState, ReviewGroupState, ReviewRoundResult,
-    ReviewState, ReviewStatus, RoundType, StatusOverride, TaskId, TaskStatus, TrackBranch, TrackId,
-    TrackMetadata, TrackTask,
+    ReviewState, ReviewStatus, RoundType, StatusOverride, TaskId, TaskStatus, Timestamp,
+    TrackBranch, TrackId, TrackMetadata, TrackTask, ValidationError, Verdict,
 };
 use serde::{Deserialize, Deserializer};
 
@@ -386,19 +386,40 @@ fn review_from_document(doc: TrackReviewDocument) -> Result<ReviewState, CodecEr
 
     let escalation = doc.escalation.map(escalation_from_document).transpose()?.unwrap_or_default();
 
-    Ok(ReviewState::with_fields(status, doc.code_hash, groups, escalation))
+    let code_hash = doc
+        .code_hash
+        .map(|s| {
+            if s == "PENDING" {
+                Ok(CodeHash::Pending)
+            } else {
+                CodeHash::computed(s).map_err(|_| CodecError::InvalidField {
+                    field: "review.code_hash".to_owned(),
+                    reason: "code hash must not be empty or whitespace-only".to_owned(),
+                })
+            }
+        })
+        .transpose()?;
+    Ok(ReviewState::with_fields(status, code_hash, groups, escalation))
+}
+
+fn parse_timestamp(s: String, field: &str) -> Result<Timestamp, CodecError> {
+    Timestamp::new(s.clone()).map_err(|_: ValidationError| CodecError::InvalidField {
+        field: field.to_owned(),
+        reason: format!("invalid ISO 8601 timestamp: {s:?}"),
+    })
 }
 
 fn round_result_from_document(doc: ReviewRoundDocument) -> Result<ReviewRoundResult, CodecError> {
+    let timestamp = parse_timestamp(doc.timestamp, "review.groups.*.*.timestamp")?;
+    let verdict = Verdict::parse(&doc.verdict).map_err(|_| CodecError::InvalidField {
+        field: "review.groups.*.*.verdict".to_owned(),
+        reason: format!("unknown verdict: {:?}", doc.verdict),
+    })?;
+
     // For zero_findings, skip concern parsing entirely (backward compat with legacy/corrupt data).
     // Concerns on a zero_findings round are always stripped regardless of content.
-    if doc.verdict == "zero_findings" {
-        return Ok(ReviewRoundResult::new_with_concerns(
-            doc.round,
-            doc.verdict,
-            doc.timestamp,
-            Vec::new(),
-        ));
+    if verdict.is_zero_findings() {
+        return Ok(ReviewRoundResult::new_with_concerns(doc.round, verdict, timestamp, Vec::new()));
     }
 
     // For other verdicts, parse and validate concerns.
@@ -412,8 +433,7 @@ fn round_result_from_document(doc: ReviewRoundDocument) -> Result<ReviewRoundRes
         .collect::<Result<Vec<_>, _>>()?;
 
     // Only findings_remain with no concerns gets "other" fallback (legacy data).
-    // Other unknown verdicts with no concerns are passed through as-is.
-    let sanitized = if doc.verdict == "findings_remain" && concerns.is_empty() {
+    let sanitized = if verdict == Verdict::FindingsRemain && concerns.is_empty() {
         let fallback = ReviewConcern::new("other")
             .map_err(|_| CodecError::Validation("failed to construct fallback concern".into()))?;
         vec![fallback]
@@ -421,7 +441,7 @@ fn round_result_from_document(doc: ReviewRoundDocument) -> Result<ReviewRoundRes
         concerns
     };
 
-    Ok(ReviewRoundResult::new_with_concerns(doc.round, doc.verdict, doc.timestamp, sanitized))
+    Ok(ReviewRoundResult::new_with_concerns(doc.round, verdict, timestamp, sanitized))
 }
 
 fn review_to_document(review: &ReviewState) -> TrackReviewDocument {
@@ -442,19 +462,17 @@ fn review_to_document(review: &ReviewState) -> TrackReviewDocument {
 
     let escalation = escalation_to_document(review.escalation());
 
-    TrackReviewDocument {
-        status: review.status().to_string(),
-        code_hash: review.code_hash().map(|s| s.to_owned()),
-        groups,
-        escalation,
-    }
+    // Serialize code_hash: Pending → "PENDING", Computed(s) → s, None → None.
+    let code_hash = review.code_hash_for_serialization().map(|s| s.to_owned());
+
+    TrackReviewDocument { status: review.status().to_string(), code_hash, groups, escalation }
 }
 
 fn round_result_to_document(result: &ReviewRoundResult) -> ReviewRoundDocument {
     let concerns: Vec<String> = result.concerns().iter().map(|c| c.as_str().to_owned()).collect();
     ReviewRoundDocument {
         round: result.round(),
-        verdict: result.verdict().to_owned(),
+        verdict: result.verdict().to_string(),
         timestamp: result.timestamp().to_owned(),
         concerns,
     }
@@ -483,7 +501,8 @@ fn escalation_from_document(
                     })
                 })
                 .collect::<Result<Vec<_>, _>>()?;
-            Ok(ReviewCycleSummary::new(round_type, c.round, c.timestamp, concerns, c.groups))
+            let ts = parse_timestamp(c.timestamp, "review.escalation.recent_cycles.*.timestamp")?;
+            Ok(ReviewCycleSummary::new(round_type, c.round, ts, concerns, c.groups))
         })
         .collect::<Result<Vec<_>, CodecError>>()?;
 
@@ -496,11 +515,15 @@ fn escalation_from_document(
                 reason: e.to_string(),
             })?;
             let last_round_type = parse_round_type(&streak_doc.last_round_type)?;
+            let last_seen_at = parse_timestamp(
+                streak_doc.last_seen_at,
+                "review.escalation.concern_streaks.*.last_seen_at",
+            )?;
             let streak = ReviewConcernStreak::new(
                 streak_doc.consecutive_rounds,
                 last_round_type,
                 streak_doc.last_round,
-                streak_doc.last_seen_at,
+                last_seen_at,
             );
             Ok((concern, streak))
         })
@@ -537,7 +560,8 @@ fn escalation_phase_from_document(
                     "escalation block must have at least one concern".into(),
                 ));
             }
-            Ok(EscalationPhase::Blocked(ReviewEscalationBlock::new(concerns, blocked_at)))
+            let blocked_at_ts = parse_timestamp(blocked_at, "review.escalation.phase.blocked_at")?;
+            Ok(EscalationPhase::Blocked(ReviewEscalationBlock::new(concerns, blocked_at_ts)))
         }
     }
 }
@@ -577,13 +601,15 @@ fn resolution_from_document(
         return Err(CodecError::Validation("resolution blocked_concerns must not be empty".into()));
     }
     let decision = parse_escalation_decision(&doc.decision)?;
+    let resolved_at =
+        parse_timestamp(doc.resolved_at, "review.escalation.last_resolution.resolved_at")?;
     Ok(ReviewEscalationResolution::new(
         blocked_concerns,
         doc.workspace_search_ref,
         doc.reinvention_check_ref,
         decision,
         doc.summary,
-        doc.resolved_at,
+        resolved_at,
     ))
 }
 

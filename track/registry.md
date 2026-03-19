@@ -15,7 +15,7 @@
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| domain-type-hardening-2026-03-19 | planned | `/track:implement` | 2026-03-19 |
+| domain-type-hardening-2026-03-19 | in_progress | `/track:implement` | 2026-03-19 |
 
 ## Completed Tracks
 

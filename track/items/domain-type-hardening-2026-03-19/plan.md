@@ -12,7 +12,7 @@ Replace ReviewRoundResult::verdict: String with Verdict
 Replace all string comparisons (r.verdict == "zero_findings" and "findings_remain" in validate_verdict_concerns) with enum matching
 Add Display impl mapping to snake_case strings for serialization compatibility
 
-- [ ] Introduce Verdict enum replacing ReviewRoundResult::verdict String field
+- [~] Introduce Verdict enum replacing ReviewRoundResult::verdict String field
 
 ## CodeHash enum (P2)
 
@@ -21,15 +21,15 @@ Replace ReviewState::code_hash: Option<String> with Option<CodeHash>
 Remove "PENDING" magic string from record_round_with_pending and related logic
 CodeHash::Computed validates non-empty string
 
-- [ ] Introduce CodeHash enum replacing ReviewState::code_hash Option<String> with PENDING sentinel
+- [~] Introduce CodeHash enum replacing ReviewState::code_hash Option<String> with PENDING sentinel
 
 ## Timestamp newtype (P3)
 
-Define Timestamp(String) newtype in a new ids.rs or timestamps.rs module
-Validate non-empty and basic ISO8601-like format (YYYY-MM-DDTHH:MM:SSZ)
+Define Timestamp newtype wrapping chrono::DateTime<Utc> in ids.rs (stores parsed DateTime + original RFC 3339 string)
+Validate via str::parse::<DateTime<Utc>>() (relaxed RFC 3339: accepts space separator, rejects invalid dates/times)
 Replace 5 timestamp String fields: ReviewRoundResult.timestamp, ReviewCycleSummary.timestamp, ReviewConcernStreak.last_seen_at, ReviewEscalationBlock.blocked_at, ReviewEscalationResolution.resolved_at
 
-- [ ] Introduce Timestamp newtype replacing bare String timestamps in review types
+- [~] Introduce Timestamp newtype replacing bare String timestamps in review types
 
 ## NonEmptyString newtype (P4)
 
@@ -37,7 +37,7 @@ Define NonEmptyString(String) newtype with trimmed non-empty validation
 Replace TrackMetadata::title and TrackTask::description with NonEmptyString
 Remove inline non-empty checks from TrackMetadata::with_branch and TrackTask::with_status constructors (actual validation sites)
 
-- [ ] Introduce NonEmptyString newtype for TrackMetadata::title and TrackTask::description
+- [~] Introduce NonEmptyString newtype for TrackMetadata::title and TrackTask::description
 
 ## Layer propagation
 

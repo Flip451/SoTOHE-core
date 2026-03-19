@@ -32,8 +32,8 @@
       },
       {
         "description": [
-          "Define Timestamp(String) newtype in a new ids.rs or timestamps.rs module",
-          "Validate non-empty and basic ISO8601-like format (YYYY-MM-DDTHH:MM:SSZ)",
+          "Define Timestamp newtype wrapping chrono::DateTime<Utc> in ids.rs (stores parsed DateTime + original RFC 3339 string)",
+          "Validate via str::parse::<DateTime<Utc>>() (relaxed RFC 3339: accepts space separator, rejects invalid dates/times)",
           "Replace 5 timestamp String fields: ReviewRoundResult.timestamp, ReviewCycleSummary.timestamp, ReviewConcernStreak.last_seen_at, ReviewEscalationBlock.blocked_at, ReviewEscalationResolution.resolved_at"
         ],
         "id": "S3",
@@ -77,7 +77,7 @@
     ]
   },
   "review": {
-    "code_hash": "7fbbff2da96d2e00a085d1daca5825e0f73d7a88",
+    "code_hash": "2958dd91f92bbf2630190a3a038b149c0fc0758a",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -100,20 +100,42 @@
           "round": 1,
           "round_type": "final",
           "timestamp": "2026-03-19T12:55:15Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "infra-domain",
+            "other"
+          ],
+          "round": 2,
+          "round_type": "fast",
+          "timestamp": "2026-03-19T15:10:41Z"
         }
       ],
       "threshold": 3
     },
     "groups": {
-      "other": {
+      "infra-domain": {
         "fast": {
-          "round": 1,
-          "timestamp": "2026-03-19T12:55:08Z",
+          "round": 2,
+          "timestamp": "2026-03-19T15:10:41Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-19T12:55:15Z",
+          "timestamp": "2026-03-19T15:10:49Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "other": {
+        "fast": {
+          "round": 3,
+          "timestamp": "2026-03-19T15:10:49Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T15:10:49Z",
           "verdict": "zero_findings"
         }
       }
@@ -121,27 +143,27 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
   "tasks": [
     {
       "description": "Introduce Verdict enum replacing ReviewRoundResult::verdict String field",
       "id": "T001",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Introduce CodeHash enum replacing ReviewState::code_hash Option<String> with PENDING sentinel",
       "id": "T002",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Introduce Timestamp newtype replacing bare String timestamps in review types",
       "id": "T003",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Introduce NonEmptyString newtype for TrackMetadata::title and TrackTask::description",
       "id": "T004",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Update infrastructure codec layer for new domain types (serde backward compatibility)",
@@ -160,5 +182,5 @@
     }
   ],
   "title": "Domain Type Hardening: Replace stringly-typed fields with validated domain types",
-  "updated_at": "2026-03-19T12:55:15Z"
+  "updated_at": "2026-03-19T15:10:49Z"
 }

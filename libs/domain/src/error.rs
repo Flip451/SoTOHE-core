@@ -14,12 +14,16 @@ pub enum DomainError {
 /// Validation errors for domain invariants.
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
 pub enum ValidationError {
+    #[error("string must not be empty")]
+    EmptyString,
     #[error("track id '{0}' must be a lowercase slug")]
     InvalidTrackId(String),
     #[error("task id '{0}' must match the pattern T<digits>")]
     InvalidTaskId(String),
     #[error("commit hash '{0}' must be 7 to 40 lowercase hex characters")]
     InvalidCommitHash(String),
+    #[error("invalid timestamp: {0}")]
+    InvalidTimestamp(String),
     #[error("track branch '{0}' must match the pattern track/<slug>")]
     InvalidTrackBranch(String),
     #[error("track title must not be empty")]
