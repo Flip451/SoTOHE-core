@@ -1,3 +1,4 @@
+#![forbid(unsafe_code)]
 //! Use case layer for the SoTOHE-core track state machine.
 
 pub mod git_workflow;

@@ -8,11 +8,11 @@ Phase 1 remaining 2 items: GAP-05 (is_test_file path normalization) and GAP-06 (
 Normalize path components in is_test_file using std::path::Path::components() before string pattern matching
 Add tests for relative path traversal patterns (../, ./, multi-level ..)
 
-- [ ] Add path component normalization to is_test_file (GAP-05)
+- [x] Add path component normalization to is_test_file (GAP-05) 83140b1
 
 ## Forbid unsafe code in library crates
 
 Add #![forbid(unsafe_code)] to libs/domain/src/lib.rs, libs/infrastructure/src/lib.rs, libs/usecase/src/lib.rs
 Verify build passes (no existing unsafe code in these crates)
 
-- [ ] Add #![forbid(unsafe_code)] to 3 lib crate roots (GAP-06)
+- [x] Add #![forbid(unsafe_code)] to 3 lib crate roots (GAP-06) 83140b1
