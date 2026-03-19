@@ -1,0 +1,132 @@
+{
+  "branch": "track/review-escalation-threshold-2026-03-19",
+  "created_at": "2026-03-19T02:52:18Z",
+  "id": "review-escalation-threshold-2026-03-19",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "ReviewConcern newtype、ReviewEscalationState、streak ロジック、ReviewState 拡張、resolve_escalation"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001",
+          "T002",
+          "T003",
+          "T004"
+        ],
+        "title": "Phase 1: Domain 層の型定義と状態遷移"
+      },
+      {
+        "description": [
+          "ReviewFinding に category 追加、finding → ReviewConcern 変換、reviewer output schema 拡張"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T005",
+          "T009"
+        ],
+        "title": "Phase 2: Usecase 層のカテゴリ正規化"
+      },
+      {
+        "description": [
+          "metadata.json スキーマ拡張、record-round に concerns 引数追加、resolve-escalation サブコマンド新設"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T006",
+          "T007",
+          "T008"
+        ],
+        "title": "Phase 3: Infra/CLI 層の統合"
+      },
+      {
+        "description": [
+          "10-guardrails.md をプロンプト指示から機構参照に更新"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T010"
+        ],
+        "title": "Phase 4: ドキュメント更新"
+      }
+    ],
+    "summary": [
+      "レビューサイクルで同質の findings が 3 連続した場合に record-round をハードブロックし、Workspace Search + Reinvention Check を強制するサーキットブレーカー機構を ReviewState に組み込む"
+    ]
+  },
+  "review": {
+    "code_hash": "e9c75496f05090001007339b4cd18aed7727cfdf",
+    "groups": {
+      "other": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-19T04:21:26Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T04:21:39Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "planned",
+  "tasks": [
+    {
+      "description": "Domain: ReviewConcern newtype + バリデーション（空文字拒否、slug 正規化）",
+      "id": "T001",
+      "status": "todo"
+    },
+    {
+      "description": "Domain: ReviewEscalationState 型定義 + streak 更新ロジック + threshold 判定",
+      "id": "T002",
+      "status": "todo"
+    },
+    {
+      "description": "Domain: ReviewState に escalation フィールド追加、record_round / record_round_with_pending / check_commit_ready にブロックチェック、新 ReviewError バリアント",
+      "id": "T003",
+      "status": "todo"
+    },
+    {
+      "description": "Domain: resolve_escalation メソッド — ReviewEscalationResolution 全フィールド（blocked_concerns, workspace_search_ref, reinvention_check_ref, decision, summary, resolved_at）の検証 + EscalationPhase::Clear 遷移 + ReviewStatus::Invalidated + code_hash クリア",
+      "id": "T004",
+      "status": "todo"
+    },
+    {
+      "description": "Usecase: ReviewFinding に category フィールド追加 + finding → ReviewConcern 正規化ロジック（category → file パス → 'other' の 3 段フォールバック）",
+      "id": "T005",
+      "status": "todo"
+    },
+    {
+      "description": "Infra/Codec: metadata.json スキーマ拡張 — escalation セクションの serialize/deserialize + ReviewRoundDocument に concerns 追加（#[serde(default)] で既存データとの後方互換を維持）+ 既存 review エントリに escalation フィールド不在時はデフォルト Clear を適用",
+      "id": "T006",
+      "status": "todo"
+    },
+    {
+      "description": "CLI: record-round に --concerns 引数追加 + エスカレーションブロック時のメッセージ出力",
+      "id": "T007",
+      "status": "todo"
+    },
+    {
+      "description": "CLI: sotp review resolve-escalation サブコマンド新設（証拠ファイルパス検証 + 解除実行）",
+      "id": "T008",
+      "status": "todo"
+    },
+    {
+      "description": "Usecase: Reviewer output schema に category フィールド追加（Optional、後方互換）+ ReviewFinding カスタム Visitor/deny_unknown_fields の category 対応更新",
+      "id": "T009",
+      "status": "todo"
+    },
+    {
+      "description": "Docs: 10-guardrails.md をプロンプト指示から機構参照に更新 + convention doc 追加",
+      "id": "T010",
+      "status": "todo"
+    }
+  ],
+  "title": "Review Escalation Threshold の機構化 (WF-36)",
+  "updated_at": "2026-03-19T04:21:39Z"
+}
