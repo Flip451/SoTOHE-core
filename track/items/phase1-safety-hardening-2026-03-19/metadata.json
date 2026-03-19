@@ -32,7 +32,7 @@
     ]
   },
   "review": {
-    "code_hash": "6b4cb961e12506b65bc146beb6358299688fb398",
+    "code_hash": "315c9b21dc10aeb4260c791d0d03c457c695ca58",
     "groups": {
       "other": {
         "fast": {
@@ -45,24 +45,38 @@
           "timestamp": "2026-03-19T01:52:49Z",
           "verdict": "zero_findings"
         }
+      },
+      "usecase": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-19T02:12:03Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T02:12:08Z",
+          "verdict": "zero_findings"
+        }
       }
     },
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "done",
   "tasks": [
     {
+      "commit_hash": "83140b1",
       "description": "Add path component normalization to is_test_file (GAP-05)",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "83140b1",
       "description": "Add #![forbid(unsafe_code)] to 3 lib crate roots (GAP-06)",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "Phase 1 Safety Hardening: is_test_file path normalization + forbid(unsafe_code)",
-  "updated_at": "2026-03-19T01:52:49Z"
+  "updated_at": "2026-03-19T02:12:08Z"
 }

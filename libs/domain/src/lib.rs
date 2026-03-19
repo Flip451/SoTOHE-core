@@ -1,3 +1,4 @@
+#![forbid(unsafe_code)]
 //! Domain layer for the SoTOHE-core track state machine.
 
 pub mod auto_phase;
