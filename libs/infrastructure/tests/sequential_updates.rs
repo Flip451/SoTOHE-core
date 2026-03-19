@@ -14,7 +14,7 @@ use infrastructure::track::fs_store::FsTrackStore;
 fn make_track(num_tasks: usize) -> TrackMetadata {
     let tasks: Vec<TrackTask> = (1..=num_tasks)
         .map(|i| {
-            let id = TaskId::new(format!("T{i}")).unwrap();
+            let id = TaskId::try_new(format!("T{i}")).unwrap();
             TrackTask::new(id, format!("Task {i}")).unwrap()
         })
         .collect();
@@ -24,7 +24,7 @@ fn make_track(num_tasks: usize) -> TrackMetadata {
     let plan = PlanView::new(Vec::new(), vec![section]);
 
     TrackMetadata::new(
-        TrackId::new("concurrency-test").unwrap(),
+        TrackId::try_new("concurrency-test").unwrap(),
         "Concurrency Test Track",
         tasks,
         plan,
@@ -47,7 +47,7 @@ fn sequential_updates_are_applied_correctly() {
 
     // Sequentially transition each task to in_progress.
     for i in 1..=num_tasks {
-        let task_id = TaskId::new(format!("T{i}")).unwrap();
+        let task_id = TaskId::try_new(format!("T{i}")).unwrap();
         store
             .update(&track_id, |t| {
                 t.transition_task(&task_id, TaskTransition::Start)?;
@@ -84,7 +84,7 @@ fn sequential_updates_then_complete_all_results_in_done() {
 
     // Phase 1: Start all tasks sequentially.
     for i in 1..=num_tasks {
-        let task_id = TaskId::new(format!("T{i}")).unwrap();
+        let task_id = TaskId::try_new(format!("T{i}")).unwrap();
         store
             .update(&track_id, |t| {
                 t.transition_task(&task_id, TaskTransition::Start)?;
@@ -95,7 +95,7 @@ fn sequential_updates_then_complete_all_results_in_done() {
 
     // Phase 2: Complete all tasks sequentially.
     for i in 1..=num_tasks {
-        let task_id = TaskId::new(format!("T{i}")).unwrap();
+        let task_id = TaskId::try_new(format!("T{i}")).unwrap();
         store
             .update(&track_id, |t| {
                 t.transition_task(&task_id, TaskTransition::Complete { commit_hash: None })?;

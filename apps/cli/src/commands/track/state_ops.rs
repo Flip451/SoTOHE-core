@@ -12,12 +12,12 @@ pub(super) fn execute_add_task(
     after: Option<String>,
     skip_branch_check: bool,
 ) -> Result<ExitCode, CliError> {
-    let track_id = TrackId::new(&track_id)
+    let track_id = TrackId::try_new(&track_id)
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     // If --after is provided but not a valid TaskId, silently ignore it (append to end).
     // This matches Python behavior where invalid after_task_id falls back to append.
-    let after_task_id = after.and_then(|a| TaskId::new(a).ok());
+    let after_task_id = after.and_then(|a| TaskId::try_new(a).ok());
 
     let repo_dir = items_dir.clone();
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
@@ -48,7 +48,7 @@ pub(super) fn execute_set_override(
     reason: String,
     skip_branch_check: bool,
 ) -> Result<ExitCode, CliError> {
-    let track_id = TrackId::new(&track_id)
+    let track_id = TrackId::try_new(&track_id)
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     let override_value = match status.as_str() {
@@ -87,7 +87,7 @@ pub(super) fn execute_clear_override(
     track_id: String,
     skip_branch_check: bool,
 ) -> Result<ExitCode, CliError> {
-    let track_id = TrackId::new(&track_id)
+    let track_id = TrackId::try_new(&track_id)
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     let repo_dir = items_dir.clone();
@@ -115,7 +115,7 @@ pub(super) fn execute_next_task(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    let track_id = TrackId::new(&track_id)
+    let track_id = TrackId::try_new(&track_id)
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     let track = read_track_metadata_simple(&items_dir, &track_id)?;
@@ -123,7 +123,7 @@ pub(super) fn execute_next_task(
     match track.next_open_task() {
         Some(task) => {
             let obj = serde_json::json!({
-                "task_id": task.id().as_str(),
+                "task_id": task.id().as_ref(),
                 "description": task.description(),
                 "status": task.status().kind().to_string(),
             });
@@ -145,7 +145,7 @@ pub(super) fn execute_task_counts(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    let track_id = TrackId::new(&track_id)
+    let track_id = TrackId::try_new(&track_id)
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     let track = read_track_metadata_simple(&items_dir, &track_id)?;
@@ -185,7 +185,7 @@ fn read_track_metadata_simple(
 
 /// Sync rendered views, printing results. Non-fatal on failure.
 fn sync_views(project_root: &std::path::Path, track_id: &TrackId) {
-    match render::sync_rendered_views(project_root, Some(track_id.as_str())) {
+    match render::sync_rendered_views(project_root, Some(track_id.as_ref())) {
         Ok(changed) => {
             for path in changed {
                 match path.strip_prefix(project_root) {
@@ -260,12 +260,12 @@ mod tests {
             r#"[{"id":"T001","description":"First task","status":"todo","commit_hash":null}]"#;
         let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track", tasks);
 
-        let track_id = TrackId::new("test-track").unwrap();
+        let track_id = TrackId::try_new("test-track").unwrap();
         let track = read_track_metadata_simple(&items_dir, &track_id).unwrap();
         let task = track.next_open_task().unwrap();
 
         let obj = serde_json::json!({
-            "task_id": task.id().as_str(),
+            "task_id": task.id().as_ref(),
             "description": task.description(),
             "status": task.status().kind().to_string(),
         });
@@ -296,10 +296,10 @@ mod tests {
         fs::write(track_dir.join("metadata.json"), metadata).unwrap();
         let items_dir = tmp.path().join("track").join("items");
 
-        let track_id = TrackId::new("test-track").unwrap();
+        let track_id = TrackId::try_new("test-track").unwrap();
         let track = read_track_metadata_simple(&items_dir, &track_id).unwrap();
         let task = track.next_open_task().unwrap();
-        assert_eq!(task.id().as_str(), "T002");
+        assert_eq!(task.id().as_ref(), "T002");
         assert_eq!(task.status().kind().to_string(), "in_progress");
     }
 
@@ -335,7 +335,7 @@ mod tests {
         fs::write(track_dir.join("metadata.json"), metadata).unwrap();
         let items_dir = tmp.path().join("track").join("items");
 
-        let track_id = TrackId::new("test-track").unwrap();
+        let track_id = TrackId::try_new("test-track").unwrap();
         let track = read_track_metadata_simple(&items_dir, &track_id).unwrap();
 
         let (mut total, mut todo, mut in_progress, mut done, mut skipped) =

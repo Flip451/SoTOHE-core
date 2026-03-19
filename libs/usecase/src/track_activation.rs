@@ -121,13 +121,13 @@ mod tests {
     }
 
     fn sample_track() -> TrackMetadata {
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
         let task = TrackTask::new(task_id.clone(), "Implement activation").unwrap();
         let section = PlanSection::new("S1", "Build", Vec::new(), vec![task_id]).unwrap();
         let plan = PlanView::new(Vec::new(), vec![section]);
 
         TrackMetadata::new(
-            TrackId::new("activation-track").unwrap(),
+            TrackId::try_new("activation-track").unwrap(),
             "Activation Track",
             vec![task],
             plan,
@@ -141,7 +141,7 @@ mod tests {
         let store = Arc::new(StubTrackStore::default());
         let usecase = ActivateTrackUseCase::new(Arc::clone(&store));
         let track = sample_track();
-        let branch = TrackBranch::new("track/activation-track").unwrap();
+        let branch = TrackBranch::try_new("track/activation-track").unwrap();
 
         store.save(&track).unwrap();
         let outcome = usecase.execute(track.id(), &branch, 3).unwrap();
@@ -154,7 +154,7 @@ mod tests {
     fn activation_rejects_already_materialized_track() {
         let store = Arc::new(StubTrackStore::default());
         let usecase = ActivateTrackUseCase::new(Arc::clone(&store));
-        let branch = TrackBranch::new("track/activation-track").unwrap();
+        let branch = TrackBranch::try_new("track/activation-track").unwrap();
         let mut track = sample_track();
         track.set_branch(Some(branch.clone()));
 
@@ -175,8 +175,8 @@ mod tests {
         let store = Arc::new(StubTrackStore::default());
         let usecase = ActivateTrackUseCase::new(Arc::clone(&store));
         let mut track = sample_track();
-        let task_id = TaskId::new("T1").unwrap();
-        let branch = TrackBranch::new("track/activation-track").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
+        let branch = TrackBranch::try_new("track/activation-track").unwrap();
 
         track.transition_task(&task_id, domain::TaskTransition::Start).unwrap();
         store.save(&track).unwrap();
@@ -196,7 +196,7 @@ mod tests {
         let store = Arc::new(StubTrackStore::default());
         let usecase = ActivateTrackUseCase::new(Arc::clone(&store));
         let track = sample_track();
-        let branch = TrackBranch::new("track/activation-track").unwrap();
+        let branch = TrackBranch::try_new("track/activation-track").unwrap();
 
         store.save(&track).unwrap();
         let err = usecase.execute(track.id(), &branch, 2).unwrap_err();

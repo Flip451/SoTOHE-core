@@ -433,18 +433,18 @@ pub fn finding_to_concern(
 ) -> Result<domain::ReviewConcern, domain::ReviewError> {
     if let Some(ref cat) = finding.category {
         if !cat.trim().is_empty() {
-            return domain::ReviewConcern::new(cat.as_str());
+            return domain::ReviewConcern::try_new(cat.as_str());
         }
     }
     if let Some(ref file) = finding.file {
         if !file.trim().is_empty() {
             let slug = file_path_to_concern(file);
             if !slug.trim().is_empty() {
-                return domain::ReviewConcern::new(slug);
+                return domain::ReviewConcern::try_new(slug);
             }
         }
     }
-    domain::ReviewConcern::new("other")
+    domain::ReviewConcern::try_new("other")
 }
 
 /// Extracts and normalizes concerns from findings, deduplicating and sorting.
@@ -808,7 +808,7 @@ mod tests {
             line: None,
         };
         let c = finding_to_concern(&f).unwrap();
-        assert_eq!(c.as_str(), "shell-parsing");
+        assert_eq!(c.as_ref(), "shell-parsing");
     }
 
     #[test]
@@ -821,7 +821,7 @@ mod tests {
             line: None,
         };
         let c = finding_to_concern(&f).unwrap();
-        assert_eq!(c.as_str(), "domain.review");
+        assert_eq!(c.as_ref(), "domain.review");
     }
 
     #[test]
@@ -834,7 +834,7 @@ mod tests {
             line: None,
         };
         let c = finding_to_concern(&f).unwrap();
-        assert_eq!(c.as_str(), "other");
+        assert_eq!(c.as_ref(), "other");
     }
 
     #[test]
@@ -847,7 +847,7 @@ mod tests {
             line: None,
         };
         let c = finding_to_concern(&f).unwrap();
-        assert_eq!(c.as_str(), "other");
+        assert_eq!(c.as_ref(), "other");
     }
 
     #[test]
@@ -860,7 +860,7 @@ mod tests {
             line: None,
         };
         let c = finding_to_concern(&f).unwrap();
-        assert_eq!(c.as_str(), "domain.review");
+        assert_eq!(c.as_ref(), "domain.review");
     }
 
     #[test]
@@ -890,8 +890,8 @@ mod tests {
         ];
         let concerns = findings_to_concerns(&findings).unwrap();
         assert_eq!(concerns.len(), 2);
-        assert_eq!(concerns[0].as_str(), "aaa");
-        assert_eq!(concerns[1].as_str(), "bbb");
+        assert_eq!(concerns[0].as_ref(), "aaa");
+        assert_eq!(concerns[1].as_ref(), "bbb");
     }
 
     #[test]

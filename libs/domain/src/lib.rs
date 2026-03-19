@@ -11,6 +11,7 @@ mod plan;
 mod repository;
 pub mod review;
 mod signal;
+mod timestamp;
 mod track;
 pub mod track_phase;
 pub mod verify;
@@ -20,7 +21,7 @@ pub use error::{
     DomainError, RepositoryError, TrackReadError, TrackWriteError, TransitionError,
     ValidationError, WorktreeError,
 };
-pub use ids::{CommitHash, NonEmptyString, TaskId, Timestamp, TrackBranch, TrackId};
+pub use ids::{CommitHash, NonEmptyString, TaskId, TrackBranch, TrackId};
 pub use plan::{PlanSection, PlanView};
 pub use repository::{TrackReader, TrackWriter, WorktreeReader};
 pub use review::{
@@ -30,6 +31,7 @@ pub use review::{
     RoundType, Verdict,
 };
 pub use signal::SignalCounts;
+pub use timestamp::Timestamp;
 pub use track::{
     StatusOverride, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata, TrackStatus,
     TrackTask,
@@ -43,7 +45,7 @@ mod tests {
     use super::*;
 
     fn task(id: &str, description: &str) -> TrackTask {
-        TrackTask::new(TaskId::new(id).unwrap(), description).unwrap()
+        TrackTask::new(TaskId::try_new(id).unwrap(), description).unwrap()
     }
 
     fn section(id: &str, title: &str, task_ids: &[&str]) -> PlanSection {
@@ -51,7 +53,7 @@ mod tests {
             id,
             title,
             Vec::new(),
-            task_ids.iter().map(|task_id| TaskId::new(*task_id).unwrap()).collect(),
+            task_ids.iter().map(|task_id| TaskId::try_new(*task_id).unwrap()).collect(),
         )
         .unwrap()
     }
@@ -62,7 +64,7 @@ mod tests {
 
     #[test]
     fn track_id_rejects_non_slug_values() {
-        let result = TrackId::new("Not A Slug");
+        let result = TrackId::try_new("Not A Slug");
 
         assert!(matches!(
             result,
@@ -72,7 +74,7 @@ mod tests {
 
     #[test]
     fn commit_hash_requires_lowercase_hex_between_seven_and_forty_chars() {
-        let result = CommitHash::new("abc123");
+        let result = CommitHash::try_new("abc123");
 
         assert!(matches!(
             result,
@@ -97,7 +99,7 @@ mod tests {
     #[test]
     fn track_status_is_derived_from_task_states() {
         let mut track = TrackMetadata::new(
-            TrackId::new("track-state-machine").unwrap(),
+            TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
             vec![task("T1", "Write domain model"), task("T2", "Write tests")],
             plan(&["T1", "T2"]),
@@ -107,19 +109,19 @@ mod tests {
 
         assert_eq!(track.status(), TrackStatus::Planned);
 
-        track.transition_task(&TaskId::new("T1").unwrap(), TaskTransition::Start).unwrap();
+        track.transition_task(&TaskId::try_new("T1").unwrap(), TaskTransition::Start).unwrap();
         assert_eq!(track.status(), TrackStatus::InProgress);
 
         track
             .transition_task(
-                &TaskId::new("T1").unwrap(),
+                &TaskId::try_new("T1").unwrap(),
                 TaskTransition::Complete { commit_hash: None },
             )
             .unwrap();
-        track.transition_task(&TaskId::new("T2").unwrap(), TaskTransition::Start).unwrap();
+        track.transition_task(&TaskId::try_new("T2").unwrap(), TaskTransition::Start).unwrap();
         track
             .transition_task(
-                &TaskId::new("T2").unwrap(),
+                &TaskId::try_new("T2").unwrap(),
                 TaskTransition::Complete { commit_hash: None },
             )
             .unwrap();
@@ -130,7 +132,7 @@ mod tests {
     #[test]
     fn resolving_every_task_auto_clears_override() {
         let mut track = TrackMetadata::new(
-            TrackId::new("track-state-machine").unwrap(),
+            TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
             vec![task("T1", "Write domain model")],
             plan(&["T1"]),
@@ -140,10 +142,10 @@ mod tests {
 
         assert_eq!(track.status(), TrackStatus::Blocked);
 
-        track.transition_task(&TaskId::new("T1").unwrap(), TaskTransition::Start).unwrap();
+        track.transition_task(&TaskId::try_new("T1").unwrap(), TaskTransition::Start).unwrap();
         track
             .transition_task(
-                &TaskId::new("T1").unwrap(),
+                &TaskId::try_new("T1").unwrap(),
                 TaskTransition::Complete { commit_hash: None },
             )
             .unwrap();
@@ -159,7 +161,7 @@ mod tests {
     #[case::single_digit_accepted("T1", true)]
     #[case::multi_digit_accepted("T123", true)]
     fn task_id_rejects_non_digit_after_prefix(#[case] input: &str, #[case] should_pass: bool) {
-        let result = TaskId::new(input);
+        let result = TaskId::try_new(input);
         if should_pass {
             assert!(result.is_ok(), "expected {input:?} to be valid");
         } else {
@@ -173,7 +175,7 @@ mod tests {
     #[test]
     fn plan_must_reference_each_task_exactly_once() {
         let track = TrackMetadata::new(
-            TrackId::new("track-state-machine").unwrap(),
+            TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
             vec![task("T1", "Write domain model"), task("T2", "Write tests")],
             plan(&["T1"]),
@@ -222,8 +224,8 @@ mod tests {
 
     #[test]
     fn track_branch_accepts_valid_format() {
-        let branch = TrackBranch::new("track/my-feature").unwrap();
-        assert_eq!(branch.as_str(), "track/my-feature");
+        let branch = TrackBranch::try_new("track/my-feature").unwrap();
+        assert_eq!(branch.as_ref(), "track/my-feature");
         assert_eq!(branch.to_string(), "track/my-feature");
     }
 
@@ -233,7 +235,7 @@ mod tests {
     #[case::empty_slug("track/")]
     fn track_branch_rejects_invalid_input(#[case] input: &str) {
         assert!(
-            matches!(TrackBranch::new(input), Err(ValidationError::InvalidTrackBranch(_))),
+            matches!(TrackBranch::try_new(input), Err(ValidationError::InvalidTrackBranch(_))),
             "expected {input:?} to be rejected"
         );
     }
@@ -241,21 +243,21 @@ mod tests {
     #[test]
     fn track_metadata_with_branch_stores_branch() {
         let track = TrackMetadata::with_branch(
-            TrackId::new("my-track").unwrap(),
-            Some(TrackBranch::new("track/my-track").unwrap()),
+            TrackId::try_new("my-track").unwrap(),
+            Some(TrackBranch::try_new("track/my-track").unwrap()),
             "My Track",
             vec![task("T1", "Task one")],
             plan(&["T1"]),
             None,
         )
         .unwrap();
-        assert_eq!(track.branch().unwrap().as_str(), "track/my-track");
+        assert_eq!(track.branch().unwrap().as_ref(), "track/my-track");
     }
 
     #[test]
     fn track_metadata_without_branch_returns_none() {
         let track = TrackMetadata::new(
-            TrackId::new("my-track").unwrap(),
+            TrackId::try_new("my-track").unwrap(),
             "My Track",
             vec![task("T1", "Task one")],
             plan(&["T1"]),

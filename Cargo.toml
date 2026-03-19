@@ -18,6 +18,7 @@ publish = false
 regex = "1"
 rstest = "0.26.1"
 chrono = { version = "0.4", default-features = false, features = ["std"] }
+nutype = "0.6"
 strum = { version = "0.27", features = ["derive"] }
 thiserror = "2"
 toml = "1"

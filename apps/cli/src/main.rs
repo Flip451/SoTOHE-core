@@ -104,7 +104,7 @@ fn run_demo() -> Result<ExitCode, CliError> {
     save.execute(&track)
         .map_err(|e| CliError::Message(format!("failed to save example track: {e}")))?;
 
-    let task_id = TaskId::new("T1")
+    let task_id = TaskId::try_new("T1")
         .map_err(|e| CliError::Message(format!("failed to build example task id: {e}")))?;
 
     let updated = transition
@@ -116,14 +116,14 @@ fn run_demo() -> Result<ExitCode, CliError> {
 }
 
 fn example_track() -> Result<TrackMetadata, DomainError> {
-    let task_id = TaskId::new("T1")?;
+    let task_id = TaskId::try_new("T1")?;
     let task = TrackTask::new(task_id.clone(), "Implement the track aggregate")?;
     let section = PlanSection::new("S1", "Domain model", Vec::new(), vec![task_id])?;
     let plan =
         PlanView::new(vec!["Track status is derived from task state.".to_owned()], vec![section]);
 
     TrackMetadata::new(
-        TrackId::new("track-state-machine")?,
+        TrackId::try_new("track-state-machine")?,
         "Track state machine",
         vec![task],
         plan,
@@ -148,7 +148,7 @@ mod tests {
         let save = SaveTrackUseCase::new(Arc::clone(&store));
         let transition = TransitionTaskUseCase::new(Arc::clone(&store));
         let track = example_track().unwrap();
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
 
         save.execute(&track).unwrap();
         let updated = transition.execute(track.id(), &task_id, TaskTransition::Start).unwrap();

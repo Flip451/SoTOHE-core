@@ -797,7 +797,7 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
         Vec::new()
     } else {
         let parsed: Result<std::collections::BTreeSet<domain::ReviewConcern>, _> =
-            args.concerns.split(',').map(|s| domain::ReviewConcern::new(s.trim())).collect();
+            args.concerns.split(',').map(|s| domain::ReviewConcern::try_new(s.trim())).collect();
         parsed
             .map_err(|e| RecordRoundError::Other(format!("invalid concern: {e}")))?
             .into_iter()
@@ -837,7 +837,7 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
         .into_owned();
 
     // Open track store.
-    let track_id = domain::TrackId::new(&args.track_id)
+    let track_id = domain::TrackId::try_new(&args.track_id)
         .map_err(|e| RecordRoundError::Other(format!("invalid track id: {e}")))?;
 
     let store = FsTrackStore::new(&args.items_dir);
@@ -1041,7 +1041,7 @@ fn run_resolve_escalation(args: &ResolveEscalationArgs) -> Result<(), String> {
             .blocked_concerns
             .split(',')
             .map(|s| {
-                domain::ReviewConcern::new(s.trim())
+                domain::ReviewConcern::try_new(s.trim())
                     .map_err(|e| format!("invalid blocked concern: {e}"))
             })
             .collect();
@@ -1049,7 +1049,7 @@ fn run_resolve_escalation(args: &ResolveEscalationArgs) -> Result<(), String> {
     };
 
     let track_id =
-        domain::TrackId::new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
+        domain::TrackId::try_new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
 
     let store = FsTrackStore::new(&args.items_dir);
 
@@ -1505,7 +1505,7 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
         .map_err(|e| format!("normalized hash error: {e}"))?;
 
     let track_id =
-        domain::TrackId::new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
+        domain::TrackId::try_new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
 
     let store = FsTrackStore::new(&args.items_dir);
 

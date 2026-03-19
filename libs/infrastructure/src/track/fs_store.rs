@@ -28,7 +28,7 @@ impl FsTrackStore {
 
     /// Returns the path to `metadata.json` for a given track ID.
     fn metadata_path(&self, id: &TrackId) -> PathBuf {
-        self.root.join(id.as_str()).join("metadata.json")
+        self.root.join(id.as_ref()).join("metadata.json")
     }
 
     /// Reads and decodes `metadata.json` for a given track ID.
@@ -241,7 +241,7 @@ impl FsTrackStore {
 /// Exposed for CLI composition (e.g., listing available tracks).
 #[must_use]
 pub fn metadata_json_path(root: &Path, id: &TrackId) -> PathBuf {
-    root.join(id.as_str()).join("metadata.json")
+    root.join(id.as_ref()).join("metadata.json")
 }
 
 /// Read-only metadata load directly from disk.
@@ -256,7 +256,7 @@ pub fn read_track_metadata(
     items_dir: &Path,
     id: &TrackId,
 ) -> Result<(TrackMetadata, DocumentMeta), RepositoryError> {
-    let path = items_dir.join(id.as_str()).join("metadata.json");
+    let path = items_dir.join(id.as_ref()).join("metadata.json");
     let json = std::fs::read_to_string(&path).map_err(|err| {
         RepositoryError::Message(format!("cannot read {}: {err}", path.display()))
     })?;
@@ -272,12 +272,13 @@ mod tests {
     use domain::{PlanSection, PlanView, TaskId, TrackId, TrackMetadata, TrackStatus, TrackTask};
 
     fn sample_track(id: &str) -> TrackMetadata {
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
         let task = TrackTask::new(task_id.clone(), "Implement feature").unwrap();
         let section = PlanSection::new("S1", "Build", Vec::new(), vec![task_id]).unwrap();
         let plan = PlanView::new(Vec::new(), vec![section]);
 
-        TrackMetadata::new(TrackId::new(id).unwrap(), "Test Track", vec![task], plan, None).unwrap()
+        TrackMetadata::new(TrackId::try_new(id).unwrap(), "Test Track", vec![task], plan, None)
+            .unwrap()
     }
 
     #[test]
@@ -295,7 +296,7 @@ mod tests {
     fn test_find_returns_none_for_missing_track() {
         let dir = tempfile::tempdir().unwrap();
         let store = FsTrackStore::new(dir.path());
-        let id = TrackId::new("nonexistent").unwrap();
+        let id = TrackId::try_new("nonexistent").unwrap();
 
         let result = store.find(&id).unwrap();
         assert!(result.is_none());
@@ -309,7 +310,7 @@ mod tests {
 
         store.save(&track).unwrap();
 
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
         let updated = store
             .update(track.id(), |t| {
                 t.transition_task(&task_id, domain::TaskTransition::Start)?;
@@ -328,7 +329,7 @@ mod tests {
     fn test_update_returns_error_for_missing_track() {
         let dir = tempfile::tempdir().unwrap();
         let store = FsTrackStore::new(dir.path());
-        let id = TrackId::new("nonexistent").unwrap();
+        let id = TrackId::try_new("nonexistent").unwrap();
 
         let result = store.update(&id, |_| Ok(()));
         assert!(matches!(
@@ -372,12 +373,12 @@ mod tests {
         store.save(&track).unwrap();
 
         // Build a track with the same ID but a different task description.
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
         let mutated_task = TrackTask::new(task_id.clone(), "MUTATED description").unwrap();
         let section = PlanSection::new("S1", "Build", Vec::new(), vec![task_id]).unwrap();
         let plan = PlanView::new(Vec::new(), vec![section]);
         let mutated_track = TrackMetadata::new(
-            TrackId::new("test-track").unwrap(),
+            TrackId::try_new("test-track").unwrap(),
             "Test Track",
             vec![mutated_task],
             plan,
@@ -404,15 +405,15 @@ mod tests {
         store.save(&track).unwrap();
 
         // Build a new version that keeps T1 unchanged and adds T2.
-        let task_id_t1 = TaskId::new("T1").unwrap();
-        let task_id_t2 = TaskId::new("T2").unwrap();
+        let task_id_t1 = TaskId::try_new("T1").unwrap();
+        let task_id_t2 = TaskId::try_new("T2").unwrap();
         let task_t1 = TrackTask::new(task_id_t1.clone(), "Implement feature").unwrap();
         let task_t2 = TrackTask::new(task_id_t2.clone(), "New task").unwrap();
         let section =
             PlanSection::new("S1", "Build", Vec::new(), vec![task_id_t1, task_id_t2]).unwrap();
         let plan = PlanView::new(Vec::new(), vec![section]);
         let extended_track = TrackMetadata::new(
-            TrackId::new("test-track").unwrap(),
+            TrackId::try_new("test-track").unwrap(),
             "Test Track",
             vec![task_t1, task_t2],
             plan,
@@ -437,7 +438,7 @@ mod tests {
         let section = PlanSection::new("S1", "Build", Vec::new(), Vec::new()).unwrap();
         let plan = PlanView::new(Vec::new(), vec![section]);
         let empty_track = TrackMetadata::new(
-            TrackId::new("test-track").unwrap(),
+            TrackId::try_new("test-track").unwrap(),
             "Test Track",
             Vec::new(),
             plan,
@@ -482,7 +483,7 @@ mod tests {
     fn test_with_locked_document_returns_error_for_missing_track() {
         let dir = tempfile::tempdir().unwrap();
         let store = FsTrackStore::new(dir.path());
-        let id = TrackId::new("nonexistent").unwrap();
+        let id = TrackId::try_new("nonexistent").unwrap();
 
         let result = store.with_locked_document(&id, |_, _| Ok(()));
         assert!(matches!(
@@ -498,7 +499,7 @@ mod tests {
         let track = sample_track("test-track");
         store.save(&track).unwrap();
 
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
         let updated = store
             .with_locked_document(track.id(), |t, _meta| {
                 t.transition_task(&task_id, domain::TaskTransition::Start)?;

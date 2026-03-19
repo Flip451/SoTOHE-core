@@ -7,7 +7,7 @@
 
 ## Current Focus
 
-- Latest active track: `domain-type-hardening-2026-03-19`
+- Latest active track: `nutype-migration-2026-03-20`
 - Next recommended command: `/track:implement`
 - Last updated: `2026-03-19`
 
@@ -15,12 +15,13 @@
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| domain-type-hardening-2026-03-19 | in_progress | `/track:implement` | 2026-03-19 |
+| nutype-migration-2026-03-20 | in_progress | `/track:implement` | 2026-03-19 |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| domain-type-hardening-2026-03-19 | Done | 2026-03-19 |
 | remove-file-lock-system-2026-03-19 | Done | 2026-03-19 |
 | review-escalation-threshold-2026-03-19 | Done | 2026-03-19 |
 | phase1-safety-hardening-2026-03-19 | Done | 2026-03-19 |

@@ -40,7 +40,7 @@ pub fn resolve_track_id_from_branch(branch: Option<&str>) -> Result<String, Trac
     match branch {
         Some(b) => match b.strip_prefix("track/") {
             Some(slug) => {
-                TrackId::new(slug)
+                TrackId::try_new(slug)
                     .map_err(|e| TrackResolutionError::InvalidTrackId(slug.to_owned(), e))?;
                 Ok(slug.to_owned())
             }
@@ -123,7 +123,7 @@ pub fn reject_branchless_guard(
         .ok_or_else(|| TrackResolutionError::TrackNotFound(track_id.to_string()))?;
     reject_branchless_implementation_transition(
         schema_version,
-        track.branch().map(|b| b.as_str()),
+        track.branch().map(|b| b.as_ref()),
         track_id,
         target_status,
     )
@@ -176,7 +176,7 @@ mod tests {
 
     #[test]
     fn test_resolve_transition_to_done_returns_complete() {
-        let hash = CommitHash::new("abc1234").unwrap();
+        let hash = CommitHash::try_new("abc1234").unwrap();
         let result = resolve_transition("done", TaskStatusKind::InProgress, Some(hash));
         assert!(matches!(result.unwrap(), TaskTransition::Complete { .. }));
     }
@@ -219,7 +219,7 @@ mod tests {
         #[case] target_status: &str,
         #[case] expect_ok: bool,
     ) {
-        let id = TrackId::new("test").unwrap();
+        let id = TrackId::try_new("test").unwrap();
         let result =
             reject_branchless_implementation_transition(schema_version, branch, &id, target_status);
         if expect_ok {
@@ -255,13 +255,13 @@ mod tests {
     }
 
     fn sample_track(id: &str, branch: Option<&str>) -> TrackMetadata {
-        let task_id = domain::TaskId::new("T1").unwrap();
+        let task_id = domain::TaskId::try_new("T1").unwrap();
         let task = TrackTask::new(task_id.clone(), "Implement feature").unwrap();
         let section = PlanSection::new("S1", "Build", Vec::new(), vec![task_id]).unwrap();
         let plan = PlanView::new(Vec::new(), vec![section]);
         TrackMetadata::with_branch(
-            TrackId::new(id).unwrap(),
-            branch.map(|b| TrackBranch::new(b).unwrap()),
+            TrackId::try_new(id).unwrap(),
+            branch.map(|b| TrackBranch::try_new(b).unwrap()),
             "Test Track",
             vec![task],
             plan,
@@ -273,7 +273,7 @@ mod tests {
     #[test]
     fn test_reject_branchless_guard_allows_todo_target() {
         let reader = StubReader::default();
-        let id = TrackId::new("test").unwrap();
+        let id = TrackId::try_new("test").unwrap();
         let result = reject_branchless_guard(&reader, &id, "todo", 3);
         assert!(result.is_ok());
     }
@@ -284,7 +284,7 @@ mod tests {
         let track = sample_track("test", None);
         reader.tracks.lock().unwrap().insert(track.id().clone(), track);
 
-        let id = TrackId::new("test").unwrap();
+        let id = TrackId::try_new("test").unwrap();
         let result = reject_branchless_guard(&reader, &id, "in_progress", 3);
         assert!(matches!(result.unwrap_err(), TrackResolutionError::NotActivated(_)));
     }
@@ -295,7 +295,7 @@ mod tests {
         let track = sample_track("test", Some("track/test"));
         reader.tracks.lock().unwrap().insert(track.id().clone(), track);
 
-        let id = TrackId::new("test").unwrap();
+        let id = TrackId::try_new("test").unwrap();
         let result = reject_branchless_guard(&reader, &id, "in_progress", 3);
         assert!(result.is_ok());
     }
@@ -303,7 +303,7 @@ mod tests {
     #[test]
     fn test_reject_branchless_guard_returns_error_for_missing_track() {
         let reader = StubReader::default();
-        let id = TrackId::new("missing").unwrap();
+        let id = TrackId::try_new("missing").unwrap();
         let result = reject_branchless_guard(&reader, &id, "in_progress", 3);
         assert!(matches!(result.unwrap_err(), TrackResolutionError::TrackNotFound(_)));
     }
@@ -314,7 +314,7 @@ mod tests {
         let track = sample_track("test", None);
         reader.tracks.lock().unwrap().insert(track.id().clone(), track);
 
-        let id = TrackId::new("test").unwrap();
+        let id = TrackId::try_new("test").unwrap();
         let err = reject_branchless_guard(&reader, &id, "done", 3).unwrap_err();
         assert!(
             err.to_string().contains("/track:activate test"),
@@ -328,7 +328,7 @@ mod tests {
         let track = sample_track("test", Some("track/test"));
         reader.tracks.lock().unwrap().insert(track.id().clone(), track);
 
-        let id = TrackId::new("test").unwrap();
+        let id = TrackId::try_new("test").unwrap();
         assert!(reject_branchless_guard(&reader, &id, "done", 3).is_ok());
     }
 
@@ -338,7 +338,7 @@ mod tests {
         let track = sample_track("test", Some("track/test"));
         reader.tracks.lock().unwrap().insert(track.id().clone(), track);
 
-        let id = TrackId::new("test").unwrap();
+        let id = TrackId::try_new("test").unwrap();
         assert!(reject_branchless_guard(&reader, &id, "skipped", 3).is_ok());
     }
 
@@ -374,7 +374,7 @@ mod tests {
     #[test]
     fn test_reject_branchless_guard_propagates_read_error() {
         let reader = FailingReader;
-        let id = TrackId::new("test").unwrap();
+        let id = TrackId::try_new("test").unwrap();
         let result = reject_branchless_guard(&reader, &id, "in_progress", 3);
         assert!(matches!(result.unwrap_err(), TrackResolutionError::ReadError(_)));
     }

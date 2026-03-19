@@ -161,42 +161,49 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
+      "commit_hash": "272c0c4",
       "description": "Introduce Verdict enum replacing ReviewRoundResult::verdict String field",
       "id": "T001",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "272c0c4",
       "description": "Introduce CodeHash enum replacing ReviewState::code_hash Option<String> with PENDING sentinel",
       "id": "T002",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "272c0c4",
       "description": "Introduce Timestamp newtype replacing bare String timestamps in review types",
       "id": "T003",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "272c0c4",
       "description": "Introduce NonEmptyString newtype for TrackMetadata::title and TrackTask::description",
       "id": "T004",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "272c0c4",
       "description": "Update infrastructure codec layer for new domain types (serde backward compatibility)",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "272c0c4",
       "description": "Update usecase layer for new domain types",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "272c0c4",
       "description": "Update cli layer for new domain types",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "Domain Type Hardening: Replace stringly-typed fields with validated domain types",

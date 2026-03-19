@@ -248,13 +248,13 @@ mod tests {
     }
 
     fn sample_track() -> TrackMetadata {
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
         let task = TrackTask::new(task_id.clone(), "Implement the domain aggregate").unwrap();
         let section = PlanSection::new("S1", "Domain", Vec::new(), vec![task_id]).unwrap();
         let plan = PlanView::new(Vec::new(), vec![section]);
 
         TrackMetadata::new(
-            TrackId::new("track-state-machine").unwrap(),
+            TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
             vec![task],
             plan,
@@ -282,7 +282,7 @@ mod tests {
         let save = SaveTrackUseCase::new(Arc::clone(&store));
         let transition = TransitionTaskUseCase::new(Arc::clone(&store));
         let track = sample_track();
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
 
         save.execute(&track).unwrap();
         let updated = transition.execute(track.id(), &task_id, TaskTransition::Start).unwrap();
@@ -295,8 +295,8 @@ mod tests {
     fn transition_usecase_returns_error_for_missing_track() {
         let store = Arc::new(StubTrackStore::default());
         let transition = TransitionTaskUseCase::new(store);
-        let track_id = TrackId::new("nonexistent-track").unwrap();
-        let task_id = TaskId::new("T1").unwrap();
+        let track_id = TrackId::try_new("nonexistent-track").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
 
         let result = transition.execute(&track_id, &task_id, TaskTransition::Start);
 
@@ -312,7 +312,7 @@ mod tests {
         let save = SaveTrackUseCase::new(Arc::clone(&store));
         let transition = TransitionTaskUseCase::new(Arc::clone(&store));
         let track = sample_track();
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
 
         save.execute(&track).unwrap();
         let updated =
@@ -327,7 +327,7 @@ mod tests {
         let save = SaveTrackUseCase::new(Arc::clone(&store));
         let transition = TransitionTaskUseCase::new(Arc::clone(&store));
         let track = sample_track();
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
 
         save.execute(&track).unwrap();
         let err = transition.execute_by_status(track.id(), &task_id, "invalid", None).unwrap_err();
@@ -348,7 +348,7 @@ mod tests {
         let save = SaveTrackUseCase::new(Arc::clone(&store));
         let transition = TransitionTaskUseCase::new(Arc::clone(&store));
         let track = sample_track();
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
 
         save.execute(&track).unwrap();
         transition.execute_by_status(track.id(), &task_id, "in_progress", None).unwrap();
@@ -372,7 +372,7 @@ mod tests {
         let (updated, new_id) =
             add_task.execute(track.id(), "New task from usecase", None, None).unwrap();
 
-        assert_eq!(new_id.as_str(), "T002");
+        assert_eq!(new_id.as_ref(), "T002");
         assert_eq!(updated.tasks().len(), 2);
         assert_eq!(updated.tasks()[1].description(), "New task from usecase");
         // Verify persistence
@@ -384,7 +384,7 @@ mod tests {
     fn add_task_usecase_returns_error_for_missing_track() {
         let store = Arc::new(StubTrackStore::default());
         let add_task = AddTaskUseCase::new(store);
-        let track_id = TrackId::new("nonexistent-track").unwrap();
+        let track_id = TrackId::try_new("nonexistent-track").unwrap();
 
         let result = add_task.execute(&track_id, "Some task", None, None);
         assert!(matches!(
@@ -442,7 +442,7 @@ mod tests {
     fn set_override_usecase_returns_error_for_missing_track() {
         let store = Arc::new(StubTrackStore::default());
         let set_override = SetOverrideUseCase::new(store);
-        let track_id = TrackId::new("nonexistent-track").unwrap();
+        let track_id = TrackId::try_new("nonexistent-track").unwrap();
 
         let result = set_override.execute(&track_id, Some(StatusOverride::blocked("reason")));
         assert!(matches!(
@@ -472,7 +472,7 @@ mod tests {
         let transition = TransitionTaskUseCase::new(Arc::clone(&store));
         let set_override = SetOverrideUseCase::new(Arc::clone(&store));
         let track = sample_track();
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
 
         save.execute(&track).unwrap();
         // Move task to done to make all tasks resolved
@@ -491,7 +491,7 @@ mod tests {
     fn load_usecase_returns_none_for_missing_track() {
         let store = Arc::new(StubTrackStore::default());
         let load = LoadTrackUseCase::new(store);
-        let track_id = TrackId::new("nonexistent-track").unwrap();
+        let track_id = TrackId::try_new("nonexistent-track").unwrap();
 
         let result = load.execute(&track_id).unwrap();
 
