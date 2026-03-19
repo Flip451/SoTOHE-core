@@ -3,7 +3,7 @@
 //! Tracks review progress through a state machine:
 //! `NotStarted` → `FastPassed` → `Approved`, with `Invalidated` on code changes.
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::fmt;
 
 use thiserror::Error;
@@ -19,6 +19,362 @@ pub enum ReviewError {
 
     #[error("review status is {0}, not approved")]
     NotApproved(ReviewStatus),
+
+    #[error("invalid concern: {0}")]
+    InvalidConcern(String),
+
+    #[error("review escalation is active for concerns: {concerns:?}")]
+    EscalationActive { concerns: Vec<String> },
+
+    #[error("review escalation is not active")]
+    EscalationNotActive,
+
+    #[error("resolution evidence is required: {0}")]
+    ResolutionEvidenceMissing(&'static str),
+
+    #[error("resolution concerns do not match blocked concerns")]
+    ResolutionConcernMismatch { expected: Vec<String>, actual: Vec<String> },
+}
+
+/// A normalized, non-empty concern identifier used for review escalation tracking.
+///
+/// Concerns are lowercase-trimmed strings that enable consistent dedup and sort.
+///
+/// # Errors
+///
+/// Returns `ReviewError::InvalidConcern` if the value is empty after trimming.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct ReviewConcern(String);
+
+impl ReviewConcern {
+    /// Creates a new `ReviewConcern`, normalizing to lowercase and trimming whitespace.
+    ///
+    /// # Errors
+    ///
+    /// Returns `ReviewError::InvalidConcern` if the value is empty or whitespace-only.
+    pub fn new(value: impl Into<String>) -> Result<Self, ReviewError> {
+        let normalized = value.into().trim().to_lowercase();
+        if normalized.is_empty() {
+            return Err(ReviewError::InvalidConcern(
+                "concern must not be empty or whitespace-only".to_owned(),
+            ));
+        }
+        Ok(Self(normalized))
+    }
+
+    /// Returns the inner string value.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+/// Summary of a closed review cycle for escalation tracking.
+///
+/// A cycle closes when all `expected_groups` have recorded the same `round`
+/// for the given `round_type`. Stored in `ReviewEscalationState::recent_cycles`
+/// (FIFO trim at 10 entries).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewCycleSummary {
+    round_type: RoundType,
+    round: u32,
+    timestamp: String,
+    concerns: Vec<ReviewConcern>,
+    groups: Vec<String>,
+}
+
+impl ReviewCycleSummary {
+    /// Creates a new `ReviewCycleSummary`.
+    #[must_use]
+    pub fn new(
+        round_type: RoundType,
+        round: u32,
+        timestamp: impl Into<String>,
+        concerns: Vec<ReviewConcern>,
+        groups: Vec<String>,
+    ) -> Self {
+        Self { round_type, round, timestamp: timestamp.into(), concerns, groups }
+    }
+
+    /// Returns the round type for this cycle.
+    #[must_use]
+    pub fn round_type(&self) -> RoundType {
+        self.round_type
+    }
+
+    /// Returns the round number for this cycle.
+    #[must_use]
+    pub fn round(&self) -> u32 {
+        self.round
+    }
+
+    /// Returns the timestamp string for this cycle.
+    #[must_use]
+    pub fn timestamp(&self) -> &str {
+        &self.timestamp
+    }
+
+    /// Returns the concerns raised in this cycle.
+    #[must_use]
+    pub fn concerns(&self) -> &[ReviewConcern] {
+        &self.concerns
+    }
+
+    /// Returns the groups that participated in this cycle.
+    #[must_use]
+    pub fn groups(&self) -> &[String] {
+        &self.groups
+    }
+}
+
+/// Tracks consecutive rounds a concern has appeared.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewConcernStreak {
+    consecutive_rounds: u8,
+    last_round_type: RoundType,
+    last_round: u32,
+    last_seen_at: String,
+}
+
+impl ReviewConcernStreak {
+    /// Creates a new `ReviewConcernStreak`.
+    #[must_use]
+    pub fn new(
+        consecutive_rounds: u8,
+        last_round_type: RoundType,
+        last_round: u32,
+        last_seen_at: impl Into<String>,
+    ) -> Self {
+        Self { consecutive_rounds, last_round_type, last_round, last_seen_at: last_seen_at.into() }
+    }
+
+    /// Returns the number of consecutive rounds this concern has appeared.
+    #[must_use]
+    pub fn consecutive_rounds(&self) -> u8 {
+        self.consecutive_rounds
+    }
+
+    /// Returns the round type for the last occurrence.
+    #[must_use]
+    pub fn last_round_type(&self) -> RoundType {
+        self.last_round_type
+    }
+
+    /// Returns the round number for the last occurrence.
+    #[must_use]
+    pub fn last_round(&self) -> u32 {
+        self.last_round
+    }
+
+    /// Returns the timestamp string of the last occurrence.
+    #[must_use]
+    pub fn last_seen_at(&self) -> &str {
+        &self.last_seen_at
+    }
+}
+
+/// Details of an escalation block.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewEscalationBlock {
+    concerns: Vec<ReviewConcern>,
+    blocked_at: String,
+}
+
+impl ReviewEscalationBlock {
+    /// Creates a new `ReviewEscalationBlock`.
+    #[must_use]
+    pub fn new(concerns: Vec<ReviewConcern>, blocked_at: impl Into<String>) -> Self {
+        Self { concerns, blocked_at: blocked_at.into() }
+    }
+
+    /// Returns the concerns that triggered the escalation block.
+    #[must_use]
+    pub fn concerns(&self) -> &[ReviewConcern] {
+        &self.concerns
+    }
+
+    /// Returns the timestamp string of when the block was set.
+    #[must_use]
+    pub fn blocked_at(&self) -> &str {
+        &self.blocked_at
+    }
+}
+
+/// Decision made during escalation resolution.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReviewEscalationDecision {
+    /// Adopt a solution already present in the workspace.
+    AdoptWorkspaceSolution,
+    /// Adopt an external crate to solve the concern.
+    AdoptExternalCrate,
+    /// Continue with the current self-implementation approach.
+    ContinueSelfImplementation,
+}
+
+/// Evidence and decision for resolving an escalation block.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewEscalationResolution {
+    blocked_concerns: Vec<ReviewConcern>,
+    workspace_search_ref: String,
+    reinvention_check_ref: String,
+    decision: ReviewEscalationDecision,
+    summary: String,
+    resolved_at: String,
+}
+
+impl ReviewEscalationResolution {
+    /// Creates a new `ReviewEscalationResolution`.
+    #[must_use]
+    pub fn new(
+        blocked_concerns: Vec<ReviewConcern>,
+        workspace_search_ref: impl Into<String>,
+        reinvention_check_ref: impl Into<String>,
+        decision: ReviewEscalationDecision,
+        summary: impl Into<String>,
+        resolved_at: impl Into<String>,
+    ) -> Self {
+        Self {
+            blocked_concerns,
+            workspace_search_ref: workspace_search_ref.into(),
+            reinvention_check_ref: reinvention_check_ref.into(),
+            decision,
+            summary: summary.into(),
+            resolved_at: resolved_at.into(),
+        }
+    }
+
+    /// Returns the concerns that were blocked at the time of resolution.
+    #[must_use]
+    pub fn blocked_concerns(&self) -> &[ReviewConcern] {
+        &self.blocked_concerns
+    }
+
+    /// Returns the reference path to the workspace search artifact.
+    #[must_use]
+    pub fn workspace_search_ref(&self) -> &str {
+        &self.workspace_search_ref
+    }
+
+    /// Returns the reference path to the reinvention-check artifact.
+    #[must_use]
+    pub fn reinvention_check_ref(&self) -> &str {
+        &self.reinvention_check_ref
+    }
+
+    /// Returns the decision made during resolution.
+    #[must_use]
+    pub fn decision(&self) -> ReviewEscalationDecision {
+        self.decision
+    }
+
+    /// Returns the human-readable summary of the resolution.
+    #[must_use]
+    pub fn summary(&self) -> &str {
+        &self.summary
+    }
+
+    /// Returns the timestamp string of when the resolution was recorded.
+    #[must_use]
+    pub fn resolved_at(&self) -> &str {
+        &self.resolved_at
+    }
+}
+
+/// ADT representing the escalation phase.
+///
+/// `Clear` has no associated data. `Blocked` carries the block details directly,
+/// making illegal states (e.g., "blocked but with no block data") unrepresentable.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum EscalationPhase {
+    /// No active escalation block.
+    Clear,
+    /// Escalation is active; subsequent review operations are rejected.
+    Blocked(ReviewEscalationBlock),
+}
+
+/// Aggregate escalation state composed into `ReviewState`.
+///
+/// Tracks streaks per concern across closed review cycles and transitions
+/// to `EscalationPhase::Blocked` when a concern reaches `threshold` consecutive cycles.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewEscalationState {
+    threshold: u8,
+    phase: EscalationPhase,
+    recent_cycles: Vec<ReviewCycleSummary>,
+    concern_streaks: BTreeMap<ReviewConcern, ReviewConcernStreak>,
+    last_resolution: Option<ReviewEscalationResolution>,
+}
+
+impl ReviewEscalationState {
+    /// Creates a new `ReviewEscalationState` with default values.
+    ///
+    /// Threshold is 3, phase is `Clear`, no cycles or streaks recorded.
+    #[must_use]
+    pub fn new() -> Self {
+        Self {
+            threshold: 3,
+            phase: EscalationPhase::Clear,
+            recent_cycles: Vec::new(),
+            concern_streaks: BTreeMap::new(),
+            last_resolution: None,
+        }
+    }
+
+    /// Creates a `ReviewEscalationState` with all fields set explicitly.
+    ///
+    /// Used by codec deserialization.
+    #[must_use]
+    pub fn with_fields(
+        threshold: u8,
+        phase: EscalationPhase,
+        recent_cycles: Vec<ReviewCycleSummary>,
+        concern_streaks: BTreeMap<ReviewConcern, ReviewConcernStreak>,
+        last_resolution: Option<ReviewEscalationResolution>,
+    ) -> Self {
+        Self { threshold, phase, recent_cycles, concern_streaks, last_resolution }
+    }
+
+    /// Returns the escalation threshold (number of consecutive cycles before blocking).
+    #[must_use]
+    pub fn threshold(&self) -> u8 {
+        self.threshold
+    }
+
+    /// Returns the current escalation phase.
+    #[must_use]
+    pub fn phase(&self) -> &EscalationPhase {
+        &self.phase
+    }
+
+    /// Returns the recent closed review cycle summaries (up to 10).
+    #[must_use]
+    pub fn recent_cycles(&self) -> &[ReviewCycleSummary] {
+        &self.recent_cycles
+    }
+
+    /// Returns the per-concern streak tracking map.
+    #[must_use]
+    pub fn concern_streaks(&self) -> &BTreeMap<ReviewConcern, ReviewConcernStreak> {
+        &self.concern_streaks
+    }
+
+    /// Returns the last escalation resolution record, if any.
+    #[must_use]
+    pub fn last_resolution(&self) -> Option<&ReviewEscalationResolution> {
+        self.last_resolution.as_ref()
+    }
+
+    /// Returns `true` if the escalation phase is `Blocked`.
+    #[must_use]
+    pub fn is_blocked(&self) -> bool {
+        matches!(self.phase, EscalationPhase::Blocked(_))
+    }
+}
+
+impl Default for ReviewEscalationState {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Review status enum with explicit states (no null).
@@ -64,27 +420,49 @@ pub struct ReviewRoundResult {
     round: u32,
     verdict: String,
     timestamp: String,
+    concerns: Vec<ReviewConcern>,
 }
 
 impl ReviewRoundResult {
+    /// Creates a new `ReviewRoundResult` with empty concerns (backward-compatible constructor).
     #[must_use]
     pub fn new(round: u32, verdict: impl Into<String>, timestamp: impl Into<String>) -> Self {
-        Self { round, verdict: verdict.into(), timestamp: timestamp.into() }
+        Self { round, verdict: verdict.into(), timestamp: timestamp.into(), concerns: Vec::new() }
     }
 
+    /// Creates a new `ReviewRoundResult` with associated concerns for escalation tracking.
+    #[must_use]
+    pub fn new_with_concerns(
+        round: u32,
+        verdict: impl Into<String>,
+        timestamp: impl Into<String>,
+        concerns: Vec<ReviewConcern>,
+    ) -> Self {
+        Self { round, verdict: verdict.into(), timestamp: timestamp.into(), concerns }
+    }
+
+    /// Returns the round number.
     #[must_use]
     pub fn round(&self) -> u32 {
         self.round
     }
 
+    /// Returns the verdict string (e.g., `"zero_findings"` or `"findings_remain"`).
     #[must_use]
     pub fn verdict(&self) -> &str {
         &self.verdict
     }
 
+    /// Returns the timestamp string for this result.
     #[must_use]
     pub fn timestamp(&self) -> &str {
         &self.timestamp
+    }
+
+    /// Returns the concerns associated with this round result.
+    #[must_use]
+    pub fn concerns(&self) -> &[ReviewConcern] {
+        &self.concerns
     }
 }
 
@@ -131,6 +509,7 @@ pub struct ReviewState {
     status: ReviewStatus,
     code_hash: Option<String>,
     groups: HashMap<String, ReviewGroupState>,
+    escalation: ReviewEscalationState,
 }
 
 impl Default for ReviewState {
@@ -143,7 +522,12 @@ impl ReviewState {
     /// Creates a new review state in `NotStarted` status.
     #[must_use]
     pub fn new() -> Self {
-        Self { status: ReviewStatus::NotStarted, code_hash: None, groups: HashMap::new() }
+        Self {
+            status: ReviewStatus::NotStarted,
+            code_hash: None,
+            groups: HashMap::new(),
+            escalation: ReviewEscalationState::new(),
+        }
     }
 
     /// Creates a review state with pre-set fields (used by codec deserialization).
@@ -152,32 +536,51 @@ impl ReviewState {
         status: ReviewStatus,
         code_hash: Option<String>,
         groups: HashMap<String, ReviewGroupState>,
+        escalation: ReviewEscalationState,
     ) -> Self {
-        Self { status, code_hash, groups }
+        Self { status, code_hash, groups, escalation }
     }
 
+    /// Returns the current review status.
     #[must_use]
     pub fn status(&self) -> ReviewStatus {
         self.status
     }
 
+    /// Returns the stored code hash, if any.
     #[must_use]
     pub fn code_hash(&self) -> Option<&str> {
         self.code_hash.as_deref()
     }
 
+    /// Returns the map of review group states.
     #[must_use]
     pub fn groups(&self) -> &HashMap<String, ReviewGroupState> {
         &self.groups
     }
 
+    /// Returns the escalation state.
+    #[must_use]
+    pub fn escalation(&self) -> &ReviewEscalationState {
+        &self.escalation
+    }
+
+    /// Returns a mutable reference to the escalation state.
+    pub fn escalation_mut(&mut self) -> &mut ReviewEscalationState {
+        &mut self.escalation
+    }
+
     /// Records a review round result for a group.
     ///
-    /// Validates code hash freshness and sequential escalation (fast before final).
-    /// Promotes status when all expected groups report `zero_findings`.
+    /// Validates escalation block, code hash freshness, and sequential escalation
+    /// (fast before final). Promotes status when all expected groups report `zero_findings`.
     ///
     /// # Errors
     ///
+    /// - `ReviewError::EscalationActive` if escalation is blocked. Short-circuits before all
+    ///   other checks.
+    /// - `ReviewError::InvalidConcern` if verdict/concerns are inconsistent:
+    ///   `zero_findings` with non-empty concerns, or `findings_remain` with empty concerns.
     /// - `ReviewError::StaleCodeHash` if stored code_hash doesn't match `current_code_hash`.
     ///   Sets status to `Invalidated` as a side effect.
     /// - `ReviewError::FinalRequiresFastPassed` if round_type is `Final` but status is not
@@ -190,6 +593,26 @@ impl ReviewState {
         expected_groups: &[String],
         current_code_hash: &str,
     ) -> Result<(), ReviewError> {
+        // 0. Escalation block check (short-circuit before all other checks).
+        if let EscalationPhase::Blocked(ref block) = self.escalation.phase {
+            return Err(ReviewError::EscalationActive {
+                concerns: block.concerns.iter().map(|c| c.as_str().to_owned()).collect(),
+            });
+        }
+
+        // Deduplicate expected_groups to prevent one result satisfying multiple slots.
+        let expected_groups: Vec<String> = {
+            let mut set = std::collections::BTreeSet::new();
+            for g in expected_groups {
+                set.insert(g.clone());
+            }
+            set.into_iter().collect()
+        };
+        let expected_groups = expected_groups.as_slice();
+
+        // 0b. Verdict/concerns consistency check.
+        Self::validate_verdict_concerns(&result)?;
+
         // 1. Code hash freshness check (applies to all round types).
         // Clear code_hash on mismatch so a subsequent call with the new hash succeeds.
         if let Some(stored_hash) = self.code_hash.take() {
@@ -215,6 +638,9 @@ impl ReviewState {
 
         // 3. Set/confirm code_hash
         self.code_hash = Some(current_code_hash.to_owned());
+
+        // Save timestamp before result is moved into group state.
+        let timestamp = result.timestamp().to_owned();
 
         // 4. Record round result for the group.
         // When recording a fast round, clear any stale final_round for this group
@@ -264,6 +690,9 @@ impl ReviewState {
             }
         }
 
+        // 6. Update escalation state after recording.
+        self.update_escalation_after_record(round_type, expected_groups, &timestamp);
+
         Ok(())
     }
 
@@ -277,6 +706,8 @@ impl ReviewState {
     ///
     /// # Errors
     ///
+    /// - `ReviewError::EscalationActive` if escalation is blocked. Short-circuits before all
+    ///   other checks.
     /// - `ReviewError::StaleCodeHash` if stored code_hash doesn't match `pre_update_hash`.
     ///   Skipped when stored code_hash is None (first round).
     /// - `ReviewError::FinalRequiresFastPassed` if round_type is Final but status is not
@@ -289,6 +720,26 @@ impl ReviewState {
         expected_groups: &[String],
         pre_update_hash: &str,
     ) -> Result<(), ReviewError> {
+        // 0. Escalation block check (short-circuit before all other checks).
+        if let EscalationPhase::Blocked(ref block) = self.escalation.phase {
+            return Err(ReviewError::EscalationActive {
+                concerns: block.concerns.iter().map(|c| c.as_str().to_owned()).collect(),
+            });
+        }
+
+        // Deduplicate expected_groups to prevent one result satisfying multiple slots.
+        let expected_groups: Vec<String> = {
+            let mut set = std::collections::BTreeSet::new();
+            for g in expected_groups {
+                set.insert(g.clone());
+            }
+            set.into_iter().collect()
+        };
+        let expected_groups = expected_groups.as_slice();
+
+        // 0b. Verdict/concerns consistency check.
+        Self::validate_verdict_concerns(&result)?;
+
         // 1. Code hash freshness check — skip if None (first round).
         let taken_hash = self.code_hash.take();
         if let Some(ref stored_hash) = taken_hash {
@@ -315,6 +766,9 @@ impl ReviewState {
 
         // 3. Set code_hash to the PENDING sentinel
         self.code_hash = Some("PENDING".to_owned());
+
+        // Save timestamp before result is moved into group state.
+        let timestamp = result.timestamp().to_owned();
 
         // 4. Record round result for the group.
         let group_state = self.groups.entry(group.to_owned()).or_default();
@@ -359,7 +813,138 @@ impl ReviewState {
             }
         }
 
+        // 6. Update escalation state after recording.
+        self.update_escalation_after_record(round_type, expected_groups, &timestamp);
+
         Ok(())
+    }
+
+    /// Validates that verdict and concerns are consistent.
+    ///
+    /// # Errors
+    ///
+    /// - `ReviewError::InvalidConcern` if `zero_findings` verdict has non-empty concerns.
+    /// - `ReviewError::InvalidConcern` if `findings_remain` verdict has empty concerns.
+    fn validate_verdict_concerns(result: &ReviewRoundResult) -> Result<(), ReviewError> {
+        if result.verdict() == "zero_findings" && !result.concerns().is_empty() {
+            return Err(ReviewError::InvalidConcern(
+                "zero_findings verdict must have empty concerns".to_owned(),
+            ));
+        }
+        if result.verdict() == "findings_remain" && result.concerns().is_empty() {
+            return Err(ReviewError::InvalidConcern(
+                "findings_remain verdict must have non-empty concerns".to_owned(),
+            ));
+        }
+        Ok(())
+    }
+
+    /// Called after recording a round result. Checks if a closed cycle is complete
+    /// and updates escalation state accordingly.
+    fn update_escalation_after_record(
+        &mut self,
+        round_type: RoundType,
+        expected_groups: &[String],
+        timestamp: &str,
+    ) {
+        // 1. Check if cycle is closed: all expected groups have recorded this round_type
+        //    with the same round number.
+        let round_numbers: Vec<Option<u32>> = expected_groups
+            .iter()
+            .map(|g| {
+                self.groups.get(g).and_then(|gs| {
+                    let rr = match round_type {
+                        RoundType::Fast => gs.fast(),
+                        RoundType::Final => gs.final_round(),
+                    };
+                    rr.map(|r| r.round())
+                })
+            })
+            .collect();
+
+        // All groups must have a result, and all must have the same round number.
+        let first = match round_numbers.first() {
+            Some(Some(n)) => *n,
+            _ => return,
+        };
+        if !round_numbers.iter().all(|n| *n == Some(first)) {
+            return;
+        }
+
+        // 1b. Duplicate cycle detection: if this (round_type, round) was already counted,
+        //     skip to prevent double-counting when a group re-records the same round.
+        let already_counted = self
+            .escalation
+            .recent_cycles
+            .iter()
+            .any(|c| c.round_type() == round_type && c.round() == first);
+        if already_counted {
+            return;
+        }
+
+        // 2. Collect concerns from all groups for this cycle (union via BTreeSet for dedup).
+        let mut cycle_concerns_set = std::collections::BTreeSet::new();
+        let mut group_names = Vec::new();
+        for g in expected_groups {
+            group_names.push(g.clone());
+            if let Some(gs) = self.groups.get(g) {
+                let rr = match round_type {
+                    RoundType::Fast => gs.fast(),
+                    RoundType::Final => gs.final_round(),
+                };
+                if let Some(r) = rr {
+                    for c in r.concerns() {
+                        cycle_concerns_set.insert(c.clone());
+                    }
+                }
+            }
+        }
+        let cycle_concerns_vec: Vec<ReviewConcern> = cycle_concerns_set.iter().cloned().collect();
+
+        // 3. Update concern_streaks.
+        // Increment streaks for concerns present in this cycle.
+        for concern in &cycle_concerns_vec {
+            let streak =
+                self.escalation.concern_streaks.entry(concern.clone()).or_insert_with(|| {
+                    ReviewConcernStreak::new(0, round_type, first, timestamp.to_owned())
+                });
+            *streak = ReviewConcernStreak::new(
+                streak.consecutive_rounds().saturating_add(1),
+                round_type,
+                first,
+                timestamp.to_owned(),
+            );
+        }
+        // Reset streaks for concerns NOT present in this cycle.
+        self.escalation.concern_streaks.retain(|k, _| cycle_concerns_set.contains(k));
+
+        // 4. Add to recent_cycles (FIFO, max 10).
+        let summary = ReviewCycleSummary::new(
+            round_type,
+            first,
+            timestamp.to_owned(),
+            cycle_concerns_vec,
+            group_names,
+        );
+        self.escalation.recent_cycles.push(summary);
+        if self.escalation.recent_cycles.len() > 10 {
+            self.escalation.recent_cycles.remove(0);
+        }
+
+        // 5. Check threshold → transition to Blocked if any concern streak >= threshold.
+        let threshold = self.escalation.threshold;
+        let blocked_concerns: Vec<ReviewConcern> = self
+            .escalation
+            .concern_streaks
+            .iter()
+            .filter(|(_, s)| s.consecutive_rounds() >= threshold)
+            .map(|(k, _)| k.clone())
+            .collect();
+
+        if !blocked_concerns.is_empty() {
+            self.escalation.phase =
+                EscalationPhase::Blocked(ReviewEscalationBlock::new(blocked_concerns, timestamp));
+        }
     }
 
     /// Sets the code_hash to the given value.
@@ -374,10 +959,19 @@ impl ReviewState {
     ///
     /// # Errors
     ///
+    /// - `ReviewError::EscalationActive` if escalation is blocked. Short-circuits before all
+    ///   other checks.
     /// - `ReviewError::NotApproved` if status is not `Approved`.
     /// - `ReviewError::StaleCodeHash` if code_hash doesn't match. Sets status to
     ///   `Invalidated` as a side effect.
     pub fn check_commit_ready(&mut self, current_code_hash: &str) -> Result<(), ReviewError> {
+        // 0. Escalation block check (short-circuit before all other checks).
+        if let EscalationPhase::Blocked(ref block) = self.escalation.phase {
+            return Err(ReviewError::EscalationActive {
+                concerns: block.concerns.iter().map(|c| c.as_str().to_owned()).collect(),
+            });
+        }
+
         if self.status != ReviewStatus::Approved {
             return Err(ReviewError::NotApproved(self.status));
         }
@@ -401,6 +995,65 @@ impl ReviewState {
         self.status = ReviewStatus::Invalidated;
         self.code_hash = None;
     }
+
+    /// Resolves an active escalation block.
+    ///
+    /// Requires evidence references and a decision. On success:
+    /// - clears streak state
+    /// - stores the resolution record
+    /// - sets `ReviewStatus::Invalidated` and clears `code_hash` (fresh start)
+    ///
+    /// # Errors
+    ///
+    /// - `ReviewError::EscalationNotActive` if no escalation block is active.
+    /// - `ReviewError::ResolutionEvidenceMissing` if `workspace_search_ref` or
+    ///   `reinvention_check_ref` is empty.
+    /// - `ReviewError::ResolutionConcernMismatch` if the resolution's `blocked_concerns`
+    ///   do not match the active block's concerns.
+    pub fn resolve_escalation(
+        &mut self,
+        resolution: ReviewEscalationResolution,
+    ) -> Result<(), ReviewError> {
+        // Verify escalation is active
+        let block = match &self.escalation.phase {
+            EscalationPhase::Blocked(b) => b.clone(),
+            EscalationPhase::Clear => return Err(ReviewError::EscalationNotActive),
+        };
+
+        // Validate evidence references and required fields
+        if resolution.workspace_search_ref.trim().is_empty() {
+            return Err(ReviewError::ResolutionEvidenceMissing("workspace_search_ref"));
+        }
+        if resolution.reinvention_check_ref.trim().is_empty() {
+            return Err(ReviewError::ResolutionEvidenceMissing("reinvention_check_ref"));
+        }
+        if resolution.summary.trim().is_empty() {
+            return Err(ReviewError::ResolutionEvidenceMissing("summary"));
+        }
+        if resolution.resolved_at.trim().is_empty() {
+            return Err(ReviewError::ResolutionEvidenceMissing("resolved_at"));
+        }
+
+        // Validate concerns match (order-insensitive: sort both before comparing).
+        let mut expected: Vec<String> =
+            block.concerns.iter().map(|c| c.as_str().to_owned()).collect();
+        let mut actual: Vec<String> =
+            resolution.blocked_concerns.iter().map(|c| c.as_str().to_owned()).collect();
+        expected.sort();
+        actual.sort();
+        if expected != actual {
+            return Err(ReviewError::ResolutionConcernMismatch { expected, actual });
+        }
+
+        // Apply resolution: clear streaks, store resolution, invalidate review
+        self.escalation.concern_streaks.clear();
+        self.escalation.phase = EscalationPhase::Clear;
+        self.escalation.last_resolution = Some(resolution);
+        self.status = ReviewStatus::Invalidated;
+        self.code_hash = None;
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -408,16 +1061,18 @@ impl ReviewState {
 mod tests {
     use super::*;
 
-    fn round(verdict: &str) -> ReviewRoundResult {
-        ReviewRoundResult::new(1, verdict, "2026-03-18T00:00:00Z")
-    }
-
     fn zero() -> ReviewRoundResult {
-        round("zero_findings")
+        ReviewRoundResult::new(1, "zero_findings", "2026-03-18T00:00:00Z")
     }
 
     fn findings() -> ReviewRoundResult {
-        round("findings_remain")
+        let concern = ReviewConcern::new("test-concern").unwrap();
+        ReviewRoundResult::new_with_concerns(
+            1,
+            "findings_remain",
+            "2026-03-18T00:00:00Z",
+            vec![concern],
+        )
     }
 
     // --- ReviewStatus tests ---
@@ -869,6 +1524,192 @@ mod tests {
         assert_eq!(state.status(), ReviewStatus::FastPassed);
     }
 
+    // --- ReviewConcern tests ---
+
+    #[test]
+    fn test_review_concern_new_with_valid_slug_succeeds() {
+        let c = ReviewConcern::new("domain.review").unwrap();
+        assert_eq!(c.as_str(), "domain.review");
+    }
+
+    #[test]
+    fn test_review_concern_new_with_empty_string_fails() {
+        let result = ReviewConcern::new("");
+        assert!(matches!(result, Err(ReviewError::InvalidConcern(_))));
+    }
+
+    #[test]
+    fn test_review_concern_new_with_whitespace_only_fails() {
+        let result = ReviewConcern::new("   ");
+        assert!(matches!(result, Err(ReviewError::InvalidConcern(_))));
+    }
+
+    #[test]
+    fn test_review_concern_normalizes_to_lowercase() {
+        let c = ReviewConcern::new("Domain.Review").unwrap();
+        assert_eq!(c.as_str(), "domain.review");
+    }
+
+    #[test]
+    fn test_review_concern_trims_whitespace() {
+        let c = ReviewConcern::new("  shell-parsing  ").unwrap();
+        assert_eq!(c.as_str(), "shell-parsing");
+    }
+
+    #[test]
+    fn test_review_concern_ord_is_lexicographic() {
+        let a = ReviewConcern::new("aaa").unwrap();
+        let b = ReviewConcern::new("bbb").unwrap();
+        assert!(a < b);
+    }
+
+    // --- ReviewEscalationState tests ---
+
+    #[test]
+    fn test_escalation_state_new_is_clear() {
+        let state = ReviewEscalationState::new();
+        assert_eq!(state.threshold(), 3);
+        assert_eq!(state.phase(), &EscalationPhase::Clear);
+        assert!(state.recent_cycles().is_empty());
+        assert!(state.concern_streaks().is_empty());
+        assert!(state.last_resolution().is_none());
+    }
+
+    #[test]
+    fn test_escalation_state_is_blocked_returns_false_when_clear() {
+        let state = ReviewEscalationState::new();
+        assert!(!state.is_blocked());
+    }
+
+    #[test]
+    fn test_escalation_state_is_blocked_returns_true_when_blocked() {
+        let concern = ReviewConcern::new("domain.review").unwrap();
+        let block = ReviewEscalationBlock::new(vec![concern], "2026-03-19T00:00:00Z");
+        let state = ReviewEscalationState::with_fields(
+            3,
+            EscalationPhase::Blocked(block),
+            Vec::new(),
+            BTreeMap::new(),
+            None,
+        );
+        assert!(state.is_blocked());
+    }
+
+    // --- EscalationActive gate tests ---
+
+    fn blocked_review_state() -> ReviewState {
+        let concern = ReviewConcern::new("domain.review").unwrap();
+        let block = ReviewEscalationBlock::new(vec![concern], "2026-03-19T00:00:00Z");
+        let escalation = ReviewEscalationState::with_fields(
+            3,
+            EscalationPhase::Blocked(block),
+            Vec::new(),
+            BTreeMap::new(),
+            None,
+        );
+        ReviewState::with_fields(ReviewStatus::NotStarted, None, HashMap::new(), escalation)
+    }
+
+    #[test]
+    fn test_record_round_rejects_when_escalation_blocked() {
+        let mut state = blocked_review_state();
+        let expected = vec!["group-a".to_owned()];
+        let result = state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123");
+        assert!(
+            matches!(result, Err(ReviewError::EscalationActive { ref concerns }) if !concerns.is_empty()),
+            "expected EscalationActive, got {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_record_round_with_pending_rejects_when_escalation_blocked() {
+        let mut state = blocked_review_state();
+        let expected = vec!["group-a".to_owned()];
+        let result = state.record_round_with_pending(
+            RoundType::Fast,
+            "group-a",
+            zero(),
+            &expected,
+            "abc123",
+        );
+        assert!(
+            matches!(result, Err(ReviewError::EscalationActive { ref concerns }) if !concerns.is_empty()),
+            "expected EscalationActive, got {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_check_commit_ready_rejects_when_escalation_blocked() {
+        let concern = ReviewConcern::new("domain.review").unwrap();
+        let block = ReviewEscalationBlock::new(vec![concern], "2026-03-19T00:00:00Z");
+        let escalation = ReviewEscalationState::with_fields(
+            3,
+            EscalationPhase::Blocked(block),
+            Vec::new(),
+            BTreeMap::new(),
+            None,
+        );
+        // Use Approved status so the only block is escalation
+        let mut state = ReviewState::with_fields(
+            ReviewStatus::Approved,
+            Some("abc123".to_owned()),
+            HashMap::new(),
+            escalation,
+        );
+        let result = state.check_commit_ready("abc123");
+        assert!(
+            matches!(result, Err(ReviewError::EscalationActive { ref concerns }) if !concerns.is_empty()),
+            "expected EscalationActive, got {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_escalation_check_happens_before_hash_check() {
+        // Set up a state with BOTH stale hash AND blocked escalation.
+        // The method must return EscalationActive (not StaleCodeHash).
+        let concern = ReviewConcern::new("domain.review").unwrap();
+        let block = ReviewEscalationBlock::new(vec![concern], "2026-03-19T00:00:00Z");
+        let escalation = ReviewEscalationState::with_fields(
+            3,
+            EscalationPhase::Blocked(block),
+            Vec::new(),
+            BTreeMap::new(),
+            None,
+        );
+        let mut state = ReviewState::with_fields(
+            ReviewStatus::NotStarted,
+            Some("old-hash".to_owned()),
+            HashMap::new(),
+            escalation,
+        );
+        let expected = vec!["group-a".to_owned()];
+        let result = state.record_round(RoundType::Fast, "group-a", zero(), &expected, "new-hash");
+        assert!(
+            matches!(result, Err(ReviewError::EscalationActive { .. })),
+            "expected EscalationActive before StaleCodeHash, got {result:?}"
+        );
+    }
+
+    // --- ReviewRoundResult concerns tests ---
+
+    #[test]
+    fn test_review_round_result_new_has_empty_concerns() {
+        let result = ReviewRoundResult::new(1, "zero_findings", "2026-03-19T00:00:00Z");
+        assert!(result.concerns().is_empty());
+    }
+
+    #[test]
+    fn test_review_round_result_new_with_concerns() {
+        let concern = ReviewConcern::new("domain.review").unwrap();
+        let result = ReviewRoundResult::new_with_concerns(
+            1,
+            "findings_remain",
+            "2026-03-19T00:00:00Z",
+            vec![concern.clone()],
+        );
+        assert_eq!(result.concerns(), &[concern]);
+    }
+
     // --- with_fields ---
 
     #[test]
@@ -883,10 +1724,389 @@ mod tests {
             ReviewStatus::FastPassed,
             Some("hash123".to_owned()),
             groups.clone(),
+            ReviewEscalationState::default(),
         );
 
         assert_eq!(state.status(), ReviewStatus::FastPassed);
         assert_eq!(state.code_hash(), Some("hash123"));
         assert_eq!(state.groups(), &groups);
+    }
+
+    // --- resolve_escalation tests ---
+
+    fn blocked_state() -> ReviewState {
+        let block = ReviewEscalationBlock::new(
+            vec![ReviewConcern::new("shell-parsing").unwrap()],
+            "2026-03-19T00:00:00Z".to_owned(),
+        );
+        let escalation = ReviewEscalationState::with_fields(
+            3,
+            EscalationPhase::Blocked(block),
+            Vec::new(),
+            BTreeMap::new(),
+            None,
+        );
+        ReviewState::with_fields(ReviewStatus::NotStarted, None, HashMap::new(), escalation)
+    }
+
+    fn valid_resolution() -> ReviewEscalationResolution {
+        ReviewEscalationResolution::new(
+            vec![ReviewConcern::new("shell-parsing").unwrap()],
+            "search.md".to_owned(),
+            "reinvention.md".to_owned(),
+            ReviewEscalationDecision::ContinueSelfImplementation,
+            "Justified: no suitable crate".to_owned(),
+            "2026-03-19T01:00:00Z".to_owned(),
+        )
+    }
+
+    #[test]
+    fn test_resolve_escalation_succeeds_with_valid_evidence() {
+        let mut state = blocked_state();
+        assert!(state.resolve_escalation(valid_resolution()).is_ok());
+        assert_eq!(state.status(), ReviewStatus::Invalidated);
+        assert!(state.code_hash().is_none());
+        assert!(!state.escalation().is_blocked());
+        assert!(state.escalation().last_resolution().is_some());
+    }
+
+    #[test]
+    fn test_resolve_escalation_rejects_when_not_blocked() {
+        let mut state = ReviewState::new();
+        let result = state.resolve_escalation(valid_resolution());
+        assert!(matches!(result, Err(ReviewError::EscalationNotActive)));
+    }
+
+    #[test]
+    fn test_resolve_escalation_rejects_empty_workspace_search_ref() {
+        let mut state = blocked_state();
+        let mut res = valid_resolution();
+        res.workspace_search_ref = "".to_owned();
+        let result = state.resolve_escalation(res);
+        assert!(matches!(
+            result,
+            Err(ReviewError::ResolutionEvidenceMissing("workspace_search_ref"))
+        ));
+    }
+
+    #[test]
+    fn test_resolve_escalation_rejects_empty_reinvention_check_ref() {
+        let mut state = blocked_state();
+        let mut res = valid_resolution();
+        res.reinvention_check_ref = "  ".to_owned();
+        let result = state.resolve_escalation(res);
+        assert!(matches!(
+            result,
+            Err(ReviewError::ResolutionEvidenceMissing("reinvention_check_ref"))
+        ));
+    }
+
+    #[test]
+    fn test_resolve_escalation_rejects_empty_summary() {
+        let mut state = blocked_state();
+        let mut res = valid_resolution();
+        res.summary = "".to_owned();
+        let result = state.resolve_escalation(res);
+        assert!(matches!(result, Err(ReviewError::ResolutionEvidenceMissing("summary"))));
+    }
+
+    #[test]
+    fn test_resolve_escalation_rejects_empty_resolved_at() {
+        let mut state = blocked_state();
+        let mut res = valid_resolution();
+        res.resolved_at = "".to_owned();
+        let result = state.resolve_escalation(res);
+        assert!(matches!(result, Err(ReviewError::ResolutionEvidenceMissing("resolved_at"))));
+    }
+
+    #[test]
+    fn test_resolve_escalation_rejects_mismatched_concerns() {
+        let mut state = blocked_state();
+        let mut res = valid_resolution();
+        res.blocked_concerns = vec![ReviewConcern::new("different-concern").unwrap()];
+        let result = state.resolve_escalation(res);
+        assert!(matches!(result, Err(ReviewError::ResolutionConcernMismatch { .. })));
+    }
+
+    // --- Finding 1: expected_groups deduplication ---
+
+    #[test]
+    fn test_record_round_deduplicates_expected_groups() {
+        // Passing duplicate expected_groups must not cause false cycle detection
+        // (one result satisfying multiple slots).
+        let mut state = ReviewState::new();
+        // "group-a" appears twice in expected_groups — must be deduplicated to one entry.
+        let expected_with_dups =
+            vec!["group-a".to_owned(), "group-a".to_owned(), "group-b".to_owned()];
+
+        // Record only group-a — with duplicates this might incorrectly satisfy
+        // both "group-a" slots and cause a false promotion.
+        state
+            .record_round(RoundType::Fast, "group-a", zero(), &expected_with_dups, "abc123")
+            .unwrap();
+
+        // After dedup, expected_groups is ["group-a", "group-b"].
+        // Only group-a has recorded, so promotion must NOT happen.
+        assert_eq!(
+            state.status(),
+            ReviewStatus::NotStarted,
+            "duplicate expected_groups must not cause false promotion when only one unique group recorded"
+        );
+
+        // Now record group-b as well — both unique groups have zero_findings, so promote.
+        state
+            .record_round(RoundType::Fast, "group-b", zero(), &expected_with_dups, "abc123")
+            .unwrap();
+        assert_eq!(state.status(), ReviewStatus::FastPassed);
+    }
+
+    // --- Finding 1: verdict/concerns consistency ---
+
+    #[test]
+    fn test_record_round_rejects_zero_findings_with_concerns() {
+        let mut state = ReviewState::new();
+        let expected = vec!["group-a".to_owned()];
+        let concern = ReviewConcern::new("some-concern").unwrap();
+        let result_with_concern = ReviewRoundResult::new_with_concerns(
+            1,
+            "zero_findings",
+            "2026-03-19T00:00:00Z",
+            vec![concern],
+        );
+        let result = state.record_round(
+            RoundType::Fast,
+            "group-a",
+            result_with_concern,
+            &expected,
+            "abc123",
+        );
+        assert!(
+            matches!(result, Err(ReviewError::InvalidConcern(_))),
+            "expected InvalidConcern for zero_findings with non-empty concerns, got {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_record_round_rejects_findings_remain_without_concerns() {
+        let mut state = ReviewState::new();
+        let expected = vec!["group-a".to_owned()];
+        let result_no_concerns =
+            ReviewRoundResult::new(1, "findings_remain", "2026-03-19T00:00:00Z");
+        let result =
+            state.record_round(RoundType::Fast, "group-a", result_no_concerns, &expected, "abc123");
+        assert!(
+            matches!(result, Err(ReviewError::InvalidConcern(_))),
+            "expected InvalidConcern for findings_remain with empty concerns, got {result:?}"
+        );
+    }
+
+    // --- Finding 2: resolve_escalation order-insensitive concern comparison ---
+
+    #[test]
+    fn test_resolve_escalation_accepts_reordered_concerns() {
+        // Block with concerns [a, b]
+        let block = ReviewEscalationBlock::new(
+            vec![ReviewConcern::new("aaa").unwrap(), ReviewConcern::new("bbb").unwrap()],
+            "2026-03-19T00:00:00Z",
+        );
+        let escalation = ReviewEscalationState::with_fields(
+            3,
+            EscalationPhase::Blocked(block),
+            Vec::new(),
+            BTreeMap::new(),
+            None,
+        );
+        let mut state =
+            ReviewState::with_fields(ReviewStatus::NotStarted, None, HashMap::new(), escalation);
+
+        // Resolution with concerns in reverse order [b, a]
+        let resolution = ReviewEscalationResolution::new(
+            vec![ReviewConcern::new("bbb").unwrap(), ReviewConcern::new("aaa").unwrap()],
+            "search.md",
+            "reinvention.md",
+            ReviewEscalationDecision::ContinueSelfImplementation,
+            "justified",
+            "2026-03-19T01:00:00Z",
+        );
+        let result = state.resolve_escalation(resolution);
+        assert!(result.is_ok(), "expected Ok for reordered concerns, got {result:?}");
+    }
+
+    // --- Finding 3: escalation state updates after record_round ---
+
+    fn round_with_concern(round: u32, concern: &str, ts: &str) -> ReviewRoundResult {
+        let c = ReviewConcern::new(concern).unwrap();
+        ReviewRoundResult::new_with_concerns(round, "findings_remain", ts, vec![c])
+    }
+
+    fn zero_round(round: u32, ts: &str) -> ReviewRoundResult {
+        ReviewRoundResult::new(round, "zero_findings", ts)
+    }
+
+    #[test]
+    fn test_escalation_triggers_after_3_consecutive_same_concern_cycles() {
+        let mut state = ReviewState::new();
+        let expected = vec!["group-a".to_owned()];
+
+        // Round 1: fast findings with "bad-pattern"
+        let r1 = round_with_concern(1, "bad-pattern", "2026-03-19T01:00:00Z");
+        state.record_round(RoundType::Fast, "group-a", r1, &expected, "hash1").unwrap();
+
+        // Round 2: fast findings with "bad-pattern" again — streak = 2
+        let r2 = round_with_concern(2, "bad-pattern", "2026-03-19T02:00:00Z");
+        state.record_round(RoundType::Fast, "group-a", r2, &expected, "hash1").unwrap();
+
+        // Not yet blocked
+        assert!(!state.escalation().is_blocked(), "should not be blocked after 2 rounds");
+
+        // Round 3: fast findings with "bad-pattern" — streak = 3 → Blocked
+        let r3 = round_with_concern(3, "bad-pattern", "2026-03-19T03:00:00Z");
+        state.record_round(RoundType::Fast, "group-a", r3, &expected, "hash1").unwrap();
+
+        assert!(state.escalation().is_blocked(), "should be blocked after 3 consecutive rounds");
+        if let EscalationPhase::Blocked(ref block) = *state.escalation().phase() {
+            assert_eq!(block.concerns().len(), 1);
+            assert_eq!(block.concerns()[0].as_str(), "bad-pattern");
+        } else {
+            panic!("expected Blocked phase");
+        }
+    }
+
+    #[test]
+    fn test_escalation_does_not_trigger_with_interrupted_streak() {
+        // A → B → A → A: streak for A is 2 (reset when B appeared in round 2)
+        let mut state = ReviewState::new();
+        let expected = vec!["group-a".to_owned()];
+
+        // Round 1: concern A
+        let r1 = round_with_concern(1, "concern-a", "2026-03-19T01:00:00Z");
+        state.record_round(RoundType::Fast, "group-a", r1, &expected, "hash1").unwrap();
+
+        // Round 2: concern B (different) — resets A's streak
+        let r2 = round_with_concern(2, "concern-b", "2026-03-19T02:00:00Z");
+        state.record_round(RoundType::Fast, "group-a", r2, &expected, "hash1").unwrap();
+
+        // Round 3: concern A again — streak for A is 1 (reset happened in round 2)
+        let r3 = round_with_concern(3, "concern-a", "2026-03-19T03:00:00Z");
+        state.record_round(RoundType::Fast, "group-a", r3, &expected, "hash1").unwrap();
+
+        // Round 4: concern A — streak for A is 2 (not yet 3)
+        let r4 = round_with_concern(4, "concern-a", "2026-03-19T04:00:00Z");
+        state.record_round(RoundType::Fast, "group-a", r4, &expected, "hash1").unwrap();
+
+        assert!(
+            !state.escalation().is_blocked(),
+            "should not be blocked: A streak is only 2 (was reset by B in round 2)"
+        );
+    }
+
+    #[test]
+    fn test_escalation_cycle_requires_all_groups() {
+        let mut state = ReviewState::new();
+        // Two expected groups — cycle only closes when both record
+        let expected = vec!["group-a".to_owned(), "group-b".to_owned()];
+
+        // Only group-a records 3 rounds (group-b never records)
+        for i in 1u32..=3 {
+            let ts = format!("2026-03-19T0{i}:00:00Z");
+            let r = round_with_concern(i, "bad-pattern", &ts);
+            state.record_round(RoundType::Fast, "group-a", r, &expected, "hash1").unwrap();
+        }
+
+        // Cycle never closes because group-b hasn't recorded → no escalation
+        assert!(
+            !state.escalation().is_blocked(),
+            "partial group recording should not close a cycle or trigger escalation"
+        );
+    }
+
+    #[test]
+    fn test_recent_cycles_fifo_trims_at_10() {
+        let mut state = ReviewState::new();
+        let expected = vec!["group-a".to_owned()];
+
+        // Record 12 fast rounds with zero_findings (each closes a cycle)
+        for i in 1u32..=12 {
+            let ts = format!("2026-03-19T{:02}:00:00Z", i);
+            let r = zero_round(i, &ts);
+            state.record_round(RoundType::Fast, "group-a", r, &expected, "hash1").unwrap();
+        }
+
+        assert_eq!(
+            state.escalation().recent_cycles().len(),
+            10,
+            "recent_cycles should be trimmed to 10 (FIFO)"
+        );
+        // The oldest (round 1, 2) should have been evicted; round 12 should be present
+        let last = state.escalation().recent_cycles().last().unwrap();
+        assert_eq!(last.round(), 12);
+    }
+
+    // --- Finding 1: duplicate cycle detection ---
+
+    #[test]
+    fn test_escalation_rerecording_same_round_does_not_double_count() {
+        // Two expected groups. Group A records round 1, then group B records round 1
+        // → cycle closes. If group A then re-records round 1 (e.g., overwriting),
+        // the cycle must NOT be counted again.
+        let mut state = ReviewState::new();
+        let expected = vec!["group-a".to_owned(), "group-b".to_owned()];
+
+        // Both groups record findings_remain round 1 — cycle closes once
+        let c = ReviewConcern::new("bad-pattern").unwrap();
+        let r1a = ReviewRoundResult::new_with_concerns(
+            1,
+            "findings_remain",
+            "2026-03-19T01:00:00Z",
+            vec![c.clone()],
+        );
+        let r1b = ReviewRoundResult::new_with_concerns(
+            1,
+            "findings_remain",
+            "2026-03-19T02:00:00Z",
+            vec![c.clone()],
+        );
+        state.record_round(RoundType::Fast, "group-a", r1a, &expected, "hash1").unwrap();
+        state.record_round(RoundType::Fast, "group-b", r1b, &expected, "hash1").unwrap();
+
+        // After both groups record round 1, exactly 1 cycle should be counted
+        assert_eq!(
+            state.escalation().recent_cycles().len(),
+            1,
+            "one cycle after both groups record"
+        );
+        let streak_after_first = state
+            .escalation()
+            .concern_streaks()
+            .get(&c)
+            .map(|s| s.consecutive_rounds())
+            .unwrap_or(0);
+        assert_eq!(streak_after_first, 1, "streak should be 1 after first cycle");
+
+        // Group A re-records the same round 1 (overwrite scenario)
+        let r1a_again = ReviewRoundResult::new_with_concerns(
+            1,
+            "findings_remain",
+            "2026-03-19T03:00:00Z",
+            vec![c.clone()],
+        );
+        state.record_round(RoundType::Fast, "group-a", r1a_again, &expected, "hash1").unwrap();
+
+        // The cycle for (Fast, round=1) was already counted — must NOT be double-counted
+        assert_eq!(
+            state.escalation().recent_cycles().len(),
+            1,
+            "re-recording same round must not add a second cycle"
+        );
+        let streak_after_rerecord = state
+            .escalation()
+            .concern_streaks()
+            .get(&c)
+            .map(|s| s.consecutive_rounds())
+            .unwrap_or(0);
+        assert_eq!(
+            streak_after_rerecord, 1,
+            "streak must not increment on re-recording same round"
+        );
     }
 }

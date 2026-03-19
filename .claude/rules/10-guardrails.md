@@ -48,51 +48,63 @@ To avoid unnecessary retries:
 - **New file creation**: The `Write` tool rejects writes to unread files, so first `Read` the target path (an error is returned if the file does not exist). Then `Write` can create it. `touch` is in `FORBIDDEN_ALLOW` and must not be added to `allow`.
 - Fallback: when Codex review is blocked by the hook, write the prompt to a file and retry with `--briefing-file`.
 
-## Review Escalation Threshold
+## Review Escalation Threshold (Enforced by `sotp review record-round`)
 
-When the **same category of bug fix occurs 3 consecutive rounds**, stop patching and execute
-the following steps instead:
+When the **same concern category appears in 3 consecutive closed review cycles**,
+`sotp review record-round` automatically blocks further fix-review cycles with
+`EscalationActive` error (exit code 3).
 
-### Step 1: Workspace Search
+This is **enforced by the domain layer** (`ReviewState::record_round` /
+`record_round_with_pending` / `check_commit_ready`), not by prompt instructions.
 
-Use `Grep` to check whether existing code in the workspace already solves the same problem.
+The threshold defaults to 3. `agent-profiles.json` → `providers.codex.escalation_threshold` is
+registered for future configurability but is not yet read by the runtime (hardcoded in domain layer).
 
-### Step 2: Reinvention Check (Automated Researcher Survey)
+### When Escalation Triggers
 
-Invoke the `researcher` capability (default: Gemini CLI) to investigate:
+The blocked message instructs the developer to execute three steps:
 
-1. **Generalize the problem**: Abstract the problem domain that triggered 3 consecutive fixes (e.g., "shell tokenization edge cases" → "POSIX shell parsing")
-2. **Survey existing crates**: Search crates.io for Rust crates that solve the generalized problem
-3. **Evaluate fitness**: Assess whether discovered crates meet the following criteria:
-   - Maintenance status (last release within 6 months, or stable)
-   - License compatibility (`cargo make deny` allowlist)
-   - API fit (covers the project's use cases)
-   - Dependency tree bloat risk
+1. **Workspace Search**: Use `Grep` to check whether existing code solves the problem.
+2. **Reinvention Check**: Invoke the `researcher` capability to survey crates.io.
+   Save results to `.claude/docs/research/reinvention-check-{concern}.md`.
+3. **Decision**: Run `sotp review resolve-escalation` with evidence:
+   ```
+   sotp review resolve-escalation \
+     --track-id <id> \
+     --blocked-concerns <comma-separated-concern-slugs> \
+     --workspace-search-ref <path-to-search-artifact> \
+     --reinvention-check-ref <path-to-research-artifact> \
+     --decision <adopt_workspace|adopt_crate|continue_self> \
+     --summary "Justification for the decision"
+   ```
+   Both artifact paths must exist on disk. `--blocked-concerns` must match the
+   concerns currently blocking escalation (the domain layer validates the match).
 
-Example survey prompt:
+Resolution clears the escalation block, invalidates the review state, and requires
+a fresh review cycle. The resolution record is persisted in `metadata.json`.
 
-```
-Research Rust crates that solve: {generalized problem description}.
-Requirements: {specific needs from the 3 consecutive failures}.
-Evaluate: maintenance status, license (MIT/Apache-2.0), API fit, dependency footprint.
-Compare top 3 candidates. Recommend: adopt existing crate, or justify continued self-implementation.
-```
+### Concern Categories
 
-Save survey results to `.claude/docs/research/reinvention-check-{concern}.md`.
+The `--concerns` flag on `sotp review record-round` accepts comma-separated concern slugs.
+The calling workflow (e.g., `/track:review`) is responsible for extracting concerns from
+reviewer findings using `findings_to_concerns()` (usecase layer), which applies a 3-stage
+fallback:
+1. Reviewer-provided `category` field (if present in findings JSON)
+2. File path normalization (e.g., `libs/domain/src/review.rs` → `domain.review`)
+3. Fallback: `"other"`
 
-### Step 3: Decision and Escalation
+Note: The automatic extraction is available as a library function but is not yet wired
+into the `record-round` CLI command directly. The calling orchestrator must pass `--concerns`.
 
-Present options to the user based on the survey results:
+### Design Reference
 
-| Decision | Condition | Action |
-|----------|-----------|--------|
-| **Adopt crate** | A suitable crate exists | Present `cargo add` + migration plan |
-| **Migrate within workspace** | Solvable via existing canonical module | Present migration diff |
-| **Continue self-implementation** | No suitable crate, or special requirements | Document justification and continue |
+Full design with Canonical Blocks: `.claude/docs/DESIGN.md` → "Review Escalation Threshold (WF-36)"
 
-Do not adopt crates or perform large-scale migrations without user approval.
+### Known Limitation (CLI-02)
 
-Example: shell tokenization bypasses found 3 times → researcher discovers "conch-parser is already in vendor/" → propose migration to `domain::guard::parser`
+The `resolve-escalation` logic currently lives in `apps/cli/src/commands/review.rs`.
+Per `tmp/refactoring-plan-2026-03-19.md` CLI-02, this should be extracted to
+`libs/usecase/src/review_workflow.rs` as a UseCase in a follow-up track.
 
 ## Duplicate Implementation Prevention
 

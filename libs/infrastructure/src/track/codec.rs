@@ -3,8 +3,10 @@
 use std::collections::BTreeMap;
 
 use domain::{
-    CommitHash, DomainError, PlanSection, PlanView, ReviewGroupState, ReviewRoundResult,
-    ReviewState, ReviewStatus, StatusOverride, TaskId, TaskStatus, TrackBranch, TrackId,
+    CommitHash, DomainError, EscalationPhase, PlanSection, PlanView, ReviewConcern,
+    ReviewConcernStreak, ReviewCycleSummary, ReviewEscalationBlock, ReviewEscalationDecision,
+    ReviewEscalationResolution, ReviewEscalationState, ReviewGroupState, ReviewRoundResult,
+    ReviewState, ReviewStatus, RoundType, StatusOverride, TaskId, TaskStatus, TrackBranch, TrackId,
     TrackMetadata, TrackTask,
 };
 use serde::{Deserialize, Deserializer};
@@ -20,6 +22,9 @@ pub enum CodecError {
 
     #[error("invalid field '{field}': {reason}")]
     InvalidField { field: String, reason: String },
+
+    #[error("validation error: {0}")]
+    Validation(String),
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -85,6 +90,8 @@ pub struct TrackReviewDocument {
     pub code_hash: Option<String>,
     #[serde(default)]
     pub groups: BTreeMap<String, ReviewGroupDocument>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub escalation: Option<TrackReviewEscalationDocument>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -100,6 +107,57 @@ pub struct ReviewRoundDocument {
     pub round: u32,
     pub verdict: String,
     pub timestamp: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub concerns: Vec<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct TrackReviewEscalationDocument {
+    pub threshold: u8,
+    pub phase: EscalationPhaseDocument,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub recent_cycles: Vec<ReviewCycleDocument>,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub concern_streaks: BTreeMap<String, ConcernStreakDocument>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_resolution: Option<ResolutionDocument>,
+}
+
+/// Tagged union for `EscalationPhase` ADT.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum EscalationPhaseDocument {
+    Clear,
+    Blocked { concerns: Vec<String>, blocked_at: String },
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ReviewCycleDocument {
+    pub round_type: String,
+    pub round: u32,
+    pub timestamp: String,
+    #[serde(default)]
+    pub concerns: Vec<String>,
+    #[serde(default)]
+    pub groups: Vec<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ConcernStreakDocument {
+    pub consecutive_rounds: u8,
+    pub last_round_type: String,
+    pub last_round: u32,
+    pub last_seen_at: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ResolutionDocument {
+    pub blocked_concerns: Vec<String>,
+    pub workspace_search_ref: String,
+    pub reinvention_check_ref: String,
+    pub decision: String,
+    pub summary: String,
+    pub resolved_at: String,
 }
 
 /// Metadata not part of the domain aggregate (infrastructure concern).
@@ -314,23 +372,56 @@ fn review_from_document(doc: TrackReviewDocument) -> Result<ReviewState, CodecEr
         .groups
         .into_iter()
         .map(|(name, group_doc)| {
-            let fast = group_doc.fast.map(round_result_from_document);
-            let final_round = group_doc.final_round.map(round_result_from_document);
+            let fast = group_doc.fast.map(round_result_from_document).transpose()?;
+            let final_round = group_doc.final_round.map(round_result_from_document).transpose()?;
             let group_state = match (fast, final_round) {
                 (Some(f), Some(fin)) => ReviewGroupState::with_both(f, fin),
                 (Some(f), None) => ReviewGroupState::with_fast(f),
                 (None, Some(fin)) => ReviewGroupState::with_final_only(fin),
                 (None, None) => ReviewGroupState::default(),
             };
-            (name, group_state)
+            Ok((name, group_state))
         })
-        .collect();
+        .collect::<Result<_, CodecError>>()?;
 
-    Ok(ReviewState::with_fields(status, doc.code_hash, groups))
+    let escalation = doc.escalation.map(escalation_from_document).transpose()?.unwrap_or_default();
+
+    Ok(ReviewState::with_fields(status, doc.code_hash, groups, escalation))
 }
 
-fn round_result_from_document(doc: ReviewRoundDocument) -> ReviewRoundResult {
-    ReviewRoundResult::new(doc.round, doc.verdict, doc.timestamp)
+fn round_result_from_document(doc: ReviewRoundDocument) -> Result<ReviewRoundResult, CodecError> {
+    // For zero_findings, skip concern parsing entirely (backward compat with legacy/corrupt data).
+    // Concerns on a zero_findings round are always stripped regardless of content.
+    if doc.verdict == "zero_findings" {
+        return Ok(ReviewRoundResult::new_with_concerns(
+            doc.round,
+            doc.verdict,
+            doc.timestamp,
+            Vec::new(),
+        ));
+    }
+
+    // For other verdicts, parse and validate concerns.
+    let concerns = doc
+        .concerns
+        .into_iter()
+        .map(|s| {
+            ReviewConcern::new(&s)
+                .map_err(|_| CodecError::Validation(format!("invalid concern slug: {s:?}")))
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+
+    // Only findings_remain with no concerns gets "other" fallback (legacy data).
+    // Other unknown verdicts with no concerns are passed through as-is.
+    let sanitized = if doc.verdict == "findings_remain" && concerns.is_empty() {
+        let fallback = ReviewConcern::new("other")
+            .map_err(|_| CodecError::Validation("failed to construct fallback concern".into()))?;
+        vec![fallback]
+    } else {
+        concerns
+    };
+
+    Ok(ReviewRoundResult::new_with_concerns(doc.round, doc.verdict, doc.timestamp, sanitized))
 }
 
 fn review_to_document(review: &ReviewState) -> TrackReviewDocument {
@@ -348,18 +439,249 @@ fn review_to_document(review: &ReviewState) -> TrackReviewDocument {
             )
         })
         .collect();
+
+    let escalation = escalation_to_document(review.escalation());
+
     TrackReviewDocument {
         status: review.status().to_string(),
         code_hash: review.code_hash().map(|s| s.to_owned()),
         groups,
+        escalation,
     }
 }
 
 fn round_result_to_document(result: &ReviewRoundResult) -> ReviewRoundDocument {
+    let concerns: Vec<String> = result.concerns().iter().map(|c| c.as_str().to_owned()).collect();
     ReviewRoundDocument {
         round: result.round(),
         verdict: result.verdict().to_owned(),
         timestamp: result.timestamp().to_owned(),
+        concerns,
+    }
+}
+
+fn escalation_from_document(
+    doc: TrackReviewEscalationDocument,
+) -> Result<ReviewEscalationState, CodecError> {
+    if doc.threshold == 0 {
+        return Err(CodecError::Validation("escalation threshold must be >= 1".into()));
+    }
+    let phase = escalation_phase_from_document(doc.phase)?;
+
+    let recent_cycles = doc
+        .recent_cycles
+        .into_iter()
+        .map(|c| {
+            let round_type = parse_round_type(&c.round_type)?;
+            let concerns = c
+                .concerns
+                .into_iter()
+                .map(|s| {
+                    ReviewConcern::new(s).map_err(|e| CodecError::InvalidField {
+                        field: "review.escalation.recent_cycles.*.concerns".into(),
+                        reason: e.to_string(),
+                    })
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            Ok(ReviewCycleSummary::new(round_type, c.round, c.timestamp, concerns, c.groups))
+        })
+        .collect::<Result<Vec<_>, CodecError>>()?;
+
+    let concern_streaks = doc
+        .concern_streaks
+        .into_iter()
+        .map(|(key, streak_doc)| {
+            let concern = ReviewConcern::new(key).map_err(|e| CodecError::InvalidField {
+                field: "review.escalation.concern_streaks".into(),
+                reason: e.to_string(),
+            })?;
+            let last_round_type = parse_round_type(&streak_doc.last_round_type)?;
+            let streak = ReviewConcernStreak::new(
+                streak_doc.consecutive_rounds,
+                last_round_type,
+                streak_doc.last_round,
+                streak_doc.last_seen_at,
+            );
+            Ok((concern, streak))
+        })
+        .collect::<Result<std::collections::BTreeMap<_, _>, CodecError>>()?;
+
+    let last_resolution = doc.last_resolution.map(resolution_from_document).transpose()?;
+
+    Ok(ReviewEscalationState::with_fields(
+        doc.threshold,
+        phase,
+        recent_cycles,
+        concern_streaks,
+        last_resolution,
+    ))
+}
+
+fn escalation_phase_from_document(
+    doc: EscalationPhaseDocument,
+) -> Result<EscalationPhase, CodecError> {
+    match doc {
+        EscalationPhaseDocument::Clear => Ok(EscalationPhase::Clear),
+        EscalationPhaseDocument::Blocked { concerns, blocked_at } => {
+            let concerns = concerns
+                .into_iter()
+                .map(|s| {
+                    ReviewConcern::new(s).map_err(|e| CodecError::InvalidField {
+                        field: "review.escalation.phase.concerns".into(),
+                        reason: e.to_string(),
+                    })
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            if concerns.is_empty() {
+                return Err(CodecError::Validation(
+                    "escalation block must have at least one concern".into(),
+                ));
+            }
+            Ok(EscalationPhase::Blocked(ReviewEscalationBlock::new(concerns, blocked_at)))
+        }
+    }
+}
+
+fn resolution_from_document(
+    doc: ResolutionDocument,
+) -> Result<ReviewEscalationResolution, CodecError> {
+    // Validate required string fields are non-empty.
+    if doc.workspace_search_ref.trim().is_empty() {
+        return Err(CodecError::Validation(
+            "resolution workspace_search_ref must not be empty".into(),
+        ));
+    }
+    if doc.reinvention_check_ref.trim().is_empty() {
+        return Err(CodecError::Validation(
+            "resolution reinvention_check_ref must not be empty".into(),
+        ));
+    }
+    if doc.summary.trim().is_empty() {
+        return Err(CodecError::Validation("resolution summary must not be empty".into()));
+    }
+    if doc.resolved_at.trim().is_empty() {
+        return Err(CodecError::Validation("resolution resolved_at must not be empty".into()));
+    }
+
+    let blocked_concerns = doc
+        .blocked_concerns
+        .into_iter()
+        .map(|s| {
+            ReviewConcern::new(s).map_err(|e| CodecError::InvalidField {
+                field: "review.escalation.last_resolution.blocked_concerns".into(),
+                reason: e.to_string(),
+            })
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    if blocked_concerns.is_empty() {
+        return Err(CodecError::Validation("resolution blocked_concerns must not be empty".into()));
+    }
+    let decision = parse_escalation_decision(&doc.decision)?;
+    Ok(ReviewEscalationResolution::new(
+        blocked_concerns,
+        doc.workspace_search_ref,
+        doc.reinvention_check_ref,
+        decision,
+        doc.summary,
+        doc.resolved_at,
+    ))
+}
+
+fn escalation_to_document(
+    escalation: &ReviewEscalationState,
+) -> Option<TrackReviewEscalationDocument> {
+    // Skip serializing escalation when it is the default (Clear, threshold=3, no data).
+    let is_default = escalation.threshold() == 3
+        && matches!(escalation.phase(), EscalationPhase::Clear)
+        && escalation.recent_cycles().is_empty()
+        && escalation.concern_streaks().is_empty()
+        && escalation.last_resolution().is_none();
+    if is_default {
+        return None;
+    }
+
+    let phase = match escalation.phase() {
+        EscalationPhase::Clear => EscalationPhaseDocument::Clear,
+        EscalationPhase::Blocked(block) => EscalationPhaseDocument::Blocked {
+            concerns: block.concerns().iter().map(|c| c.as_str().to_owned()).collect(),
+            blocked_at: block.blocked_at().to_owned(),
+        },
+    };
+
+    let recent_cycles = escalation
+        .recent_cycles()
+        .iter()
+        .map(|c| ReviewCycleDocument {
+            round_type: c.round_type().to_string(),
+            round: c.round(),
+            timestamp: c.timestamp().to_owned(),
+            concerns: c.concerns().iter().map(|rc| rc.as_str().to_owned()).collect(),
+            groups: c.groups().to_vec(),
+        })
+        .collect();
+
+    let concern_streaks = escalation
+        .concern_streaks()
+        .iter()
+        .map(|(concern, streak)| {
+            (
+                concern.as_str().to_owned(),
+                ConcernStreakDocument {
+                    consecutive_rounds: streak.consecutive_rounds(),
+                    last_round_type: streak.last_round_type().to_string(),
+                    last_round: streak.last_round(),
+                    last_seen_at: streak.last_seen_at().to_owned(),
+                },
+            )
+        })
+        .collect();
+
+    let last_resolution = escalation.last_resolution().map(|r| ResolutionDocument {
+        blocked_concerns: r.blocked_concerns().iter().map(|c| c.as_str().to_owned()).collect(),
+        workspace_search_ref: r.workspace_search_ref().to_owned(),
+        reinvention_check_ref: r.reinvention_check_ref().to_owned(),
+        decision: escalation_decision_to_str(r.decision()).to_owned(),
+        summary: r.summary().to_owned(),
+        resolved_at: r.resolved_at().to_owned(),
+    });
+
+    Some(TrackReviewEscalationDocument {
+        threshold: escalation.threshold(),
+        phase,
+        recent_cycles,
+        concern_streaks,
+        last_resolution,
+    })
+}
+
+fn parse_round_type(s: &str) -> Result<RoundType, CodecError> {
+    match s {
+        "fast" => Ok(RoundType::Fast),
+        "final" => Ok(RoundType::Final),
+        other => Err(CodecError::InvalidField {
+            field: "round_type".into(),
+            reason: format!("unknown round type: {other}"),
+        }),
+    }
+}
+
+fn parse_escalation_decision(s: &str) -> Result<ReviewEscalationDecision, CodecError> {
+    match s {
+        "adopt_workspace_solution" => Ok(ReviewEscalationDecision::AdoptWorkspaceSolution),
+        "adopt_external_crate" => Ok(ReviewEscalationDecision::AdoptExternalCrate),
+        "continue_self_implementation" => Ok(ReviewEscalationDecision::ContinueSelfImplementation),
+        other => Err(CodecError::InvalidField {
+            field: "review.escalation.last_resolution.decision".into(),
+            reason: format!("unknown escalation decision: {other}"),
+        }),
+    }
+}
+
+fn escalation_decision_to_str(decision: ReviewEscalationDecision) -> &'static str {
+    match decision {
+        ReviewEscalationDecision::AdoptWorkspaceSolution => "adopt_workspace_solution",
+        ReviewEscalationDecision::AdoptExternalCrate => "adopt_external_crate",
+        ReviewEscalationDecision::ContinueSelfImplementation => "continue_self_implementation",
     }
 }
 
@@ -839,5 +1161,348 @@ mod tests {
         let encoded = encode(&track, &meta).unwrap();
         let doc: serde_json::Value = serde_json::from_str(&encoded).unwrap();
         assert!(doc.get("review").is_none());
+    }
+
+    // --- Escalation state tests ---
+
+    fn review_json_with_escalation(escalation_json: &str) -> String {
+        format!(
+            r#"{{
+  "schema_version": 3,
+  "id": "escalation-track",
+  "branch": "track/escalation-track",
+  "title": "Escalation Track",
+  "status": "in_progress",
+  "created_at": "2026-03-19T00:00:00Z",
+  "updated_at": "2026-03-19T00:00:00Z",
+  "tasks": [{{"id": "T1", "description": "Task", "status": "in_progress"}}],
+  "plan": {{"summary": [], "sections": [{{"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}}]}},
+  "review": {{
+    "status": "not_started",
+    "groups": {{}},
+    {escalation_json}
+  }}
+}}"#
+        )
+    }
+
+    #[test]
+    fn test_escalation_state_round_trip() {
+        // Create a metadata with escalation blocked state via JSON
+        let json = review_json_with_escalation(
+            r#""escalation": {
+      "threshold": 3,
+      "phase": {"type": "blocked", "concerns": ["shell-parsing"], "blocked_at": "2026-03-19T00:00:00Z"},
+      "recent_cycles": [
+        {"round_type": "fast", "round": 3, "timestamp": "2026-03-19T00:00:00Z", "concerns": ["shell-parsing"], "groups": ["g1"]}
+      ],
+      "concern_streaks": {
+        "shell-parsing": {"consecutive_rounds": 3, "last_round_type": "fast", "last_round": 3, "last_seen_at": "2026-03-19T00:00:00Z"}
+      },
+      "last_resolution": null
+    }"#,
+        );
+        let (track, meta) = decode(&json).unwrap();
+        let review = track.review().unwrap();
+        let escalation = review.escalation();
+
+        assert!(escalation.is_blocked());
+        assert_eq!(escalation.threshold(), 3);
+        assert_eq!(escalation.recent_cycles().len(), 1);
+        assert_eq!(escalation.concern_streaks().len(), 1);
+        assert!(escalation.last_resolution().is_none());
+
+        // Round-trip: encode → decode → verify
+        let re_encoded = encode(&track, &meta).unwrap();
+        let (track2, _) = decode(&re_encoded).unwrap();
+        assert_eq!(track.review().unwrap().escalation(), track2.review().unwrap().escalation());
+    }
+
+    #[test]
+    fn test_escalation_absent_deserializes_to_default() {
+        // Parse existing metadata.json format without escalation field
+        let json = review_json_with_escalation(r#""code_hash": null"#);
+        let (track, _) = decode(&json).unwrap();
+        let review = track.review().unwrap();
+        let escalation = review.escalation();
+
+        assert!(!escalation.is_blocked());
+        assert_eq!(escalation.threshold(), 3);
+        assert!(escalation.recent_cycles().is_empty());
+        assert!(escalation.concern_streaks().is_empty());
+        assert!(escalation.last_resolution().is_none());
+    }
+
+    #[test]
+    fn test_round_document_with_concerns_round_trips() {
+        // Round result with concerns encodes/decodes correctly
+        let json = r#"{
+  "schema_version": 3,
+  "id": "concerns-track",
+  "branch": "track/concerns-track",
+  "title": "Concerns Track",
+  "status": "in_progress",
+  "created_at": "2026-03-19T00:00:00Z",
+  "updated_at": "2026-03-19T00:00:00Z",
+  "tasks": [{"id": "T1", "description": "Task", "status": "in_progress"}],
+  "plan": {"summary": [], "sections": [{"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}]},
+  "review": {
+    "status": "not_started",
+    "groups": {
+      "g1": {
+        "fast": {"round": 1, "verdict": "findings_remain", "timestamp": "2026-03-19T00:00:00Z", "concerns": ["shell-parsing", "domain.review"]}
+      }
+    }
+  }
+}"#;
+        let (track, meta) = decode(json).unwrap();
+        let review = track.review().unwrap();
+        let fast = review.groups().get("g1").unwrap().fast().unwrap();
+        assert_eq!(fast.concerns().len(), 2);
+        assert_eq!(fast.concerns()[0].as_str(), "shell-parsing");
+        assert_eq!(fast.concerns()[1].as_str(), "domain.review");
+
+        // Round-trip
+        let re_encoded = encode(&track, &meta).unwrap();
+        let (track2, _) = decode(&re_encoded).unwrap();
+        let fast2 = track2.review().unwrap().groups().get("g1").unwrap().fast().unwrap().clone();
+        assert_eq!(fast2.concerns().len(), 2);
+        assert_eq!(fast2.concerns()[0].as_str(), "shell-parsing");
+    }
+
+    #[test]
+    fn test_round_document_without_concerns_backward_compatible() {
+        // Existing round doc without concerns field still parses (empty vec)
+        let json = r#"{
+  "schema_version": 3,
+  "id": "compat-concerns-track",
+  "branch": "track/compat-concerns-track",
+  "title": "Compat Concerns Track",
+  "status": "in_progress",
+  "created_at": "2026-03-19T00:00:00Z",
+  "updated_at": "2026-03-19T00:00:00Z",
+  "tasks": [{"id": "T1", "description": "Task", "status": "in_progress"}],
+  "plan": {"summary": [], "sections": [{"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}]},
+  "review": {
+    "status": "fast_passed",
+    "code_hash": "abc123def",
+    "groups": {
+      "g1": {
+        "fast": {"round": 1, "verdict": "zero_findings", "timestamp": "2026-03-19T00:00:00Z"}
+      }
+    }
+  }
+}"#;
+        let (track, _) = decode(json).unwrap();
+        let review = track.review().unwrap();
+        let fast = review.groups().get("g1").unwrap().fast().unwrap();
+        // No concerns field in JSON → empty vec
+        assert!(fast.concerns().is_empty());
+    }
+
+    #[test]
+    fn test_escalation_blocked_state_encodes_and_decodes() {
+        // Test that a blocked escalation with resolution round-trips correctly
+        let json = review_json_with_escalation(
+            r#""escalation": {
+      "threshold": 3,
+      "phase": {"type": "blocked", "concerns": ["domain.review"], "blocked_at": "2026-03-19T00:00:00Z"},
+      "last_resolution": {
+        "blocked_concerns": ["domain.review"],
+        "workspace_search_ref": "search.md",
+        "reinvention_check_ref": "reinvention.md",
+        "decision": "continue_self_implementation",
+        "summary": "No suitable crate found",
+        "resolved_at": "2026-03-19T01:00:00Z"
+      }
+    }"#,
+        );
+        let (track, meta) = decode(&json).unwrap();
+        let escalation = track.review().unwrap().escalation();
+        assert!(escalation.is_blocked());
+        let resolution = escalation.last_resolution().unwrap();
+        assert_eq!(
+            resolution.decision(),
+            domain::ReviewEscalationDecision::ContinueSelfImplementation
+        );
+        assert_eq!(resolution.summary(), "No suitable crate found");
+
+        // Round-trip
+        let re_encoded = encode(&track, &meta).unwrap();
+        let (track2, _) = decode(&re_encoded).unwrap();
+        assert_eq!(track.review().unwrap().escalation(), track2.review().unwrap().escalation());
+    }
+
+    #[test]
+    fn test_default_escalation_omitted_from_serialized_json() {
+        // A track with review but default (Clear) escalation should not serialize escalation field
+        let json = r#"{
+  "schema_version": 3,
+  "id": "no-escalation-track",
+  "branch": "track/no-escalation-track",
+  "title": "No Escalation Track",
+  "status": "in_progress",
+  "created_at": "2026-03-19T00:00:00Z",
+  "updated_at": "2026-03-19T00:00:00Z",
+  "tasks": [{"id": "T1", "description": "Task", "status": "in_progress"}],
+  "plan": {"summary": [], "sections": [{"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}]},
+  "review": {
+    "status": "not_started",
+    "groups": {}
+  }
+}"#;
+        let (track, meta) = decode(json).unwrap();
+        let encoded = encode(&track, &meta).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+        // Default escalation must not appear in output
+        assert!(
+            doc["review"].get("escalation").is_none(),
+            "escalation should be omitted when default"
+        );
+    }
+
+    #[test]
+    fn test_escalation_decision_all_variants_round_trip() {
+        for decision_str in
+            &["adopt_workspace_solution", "adopt_external_crate", "continue_self_implementation"]
+        {
+            let json = review_json_with_escalation(&format!(
+                r#""escalation": {{
+      "threshold": 3,
+      "phase": {{"type": "blocked", "concerns": ["test-concern"], "blocked_at": "2026-03-19T00:00:00Z"}},
+      "last_resolution": {{
+        "blocked_concerns": ["test-concern"],
+        "workspace_search_ref": "s.md",
+        "reinvention_check_ref": "r.md",
+        "decision": "{decision_str}",
+        "summary": "ok",
+        "resolved_at": "2026-03-19T00:00:00Z"
+      }}
+    }}"#
+            ));
+            let (track, meta) = decode(&json).unwrap();
+            let re_encoded = encode(&track, &meta).unwrap();
+            assert!(
+                re_encoded.contains(decision_str),
+                "decision '{decision_str}' should survive round-trip"
+            );
+        }
+    }
+
+    // --- Finding 2: round_result_from_document verdict/concerns consistency ---
+
+    #[test]
+    fn test_round_result_from_document_strips_concerns_on_zero_findings() {
+        // Persisted data has zero_findings verdict but non-empty concerns (legacy/corrupt data).
+        // The codec must strip concerns rather than reject the document.
+        let json = r#"{
+  "schema_version": 3,
+  "id": "legacy-track",
+  "branch": "track/legacy-track",
+  "title": "Legacy Track",
+  "status": "in_progress",
+  "created_at": "2026-03-19T00:00:00Z",
+  "updated_at": "2026-03-19T00:00:00Z",
+  "tasks": [{"id": "T1", "description": "Task", "status": "in_progress"}],
+  "plan": {"summary": [], "sections": [{"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}]},
+  "review": {
+    "status": "fast_passed",
+    "code_hash": "abc",
+    "groups": {
+      "g1": {
+        "fast": {"round": 1, "verdict": "zero_findings", "timestamp": "2026-03-19T00:00:00Z", "concerns": ["stale-concern"]}
+      }
+    }
+  }
+}"#;
+        let (track, _) = decode(json).unwrap();
+        let fast = track.review().unwrap().groups().get("g1").unwrap().fast().unwrap();
+        // zero_findings must have empty concerns even if persisted data had non-empty
+        assert!(
+            fast.concerns().is_empty(),
+            "zero_findings verdict must have concerns stripped at load time"
+        );
+    }
+
+    #[test]
+    fn test_round_result_from_document_adds_other_for_findings_remain_without_concerns() {
+        // Persisted data has findings_remain verdict but no concerns (legacy data).
+        // The codec must add a fallback "other" concern rather than failing.
+        let json = r#"{
+  "schema_version": 3,
+  "id": "legacy-findings-track",
+  "branch": "track/legacy-findings-track",
+  "title": "Legacy Findings Track",
+  "status": "in_progress",
+  "created_at": "2026-03-19T00:00:00Z",
+  "updated_at": "2026-03-19T00:00:00Z",
+  "tasks": [{"id": "T1", "description": "Task", "status": "in_progress"}],
+  "plan": {"summary": [], "sections": [{"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}]},
+  "review": {
+    "status": "not_started",
+    "groups": {
+      "g1": {
+        "fast": {"round": 1, "verdict": "findings_remain", "timestamp": "2026-03-19T00:00:00Z"}
+      }
+    }
+  }
+}"#;
+        let (track, _) = decode(json).unwrap();
+        let fast = track.review().unwrap().groups().get("g1").unwrap().fast().unwrap();
+        // findings_remain without concerns must get a fallback "other" concern
+        assert_eq!(fast.concerns().len(), 1, "findings_remain must have at least one concern");
+        assert_eq!(fast.concerns()[0].as_str(), "other");
+    }
+
+    // --- Finding 3: resolution_from_document empty field validation ---
+
+    fn resolution_json(
+        workspace_search_ref: &str,
+        reinvention_check_ref: &str,
+        summary: &str,
+        resolved_at: &str,
+    ) -> String {
+        review_json_with_escalation(&format!(
+            r#""escalation": {{
+      "threshold": 3,
+      "phase": {{"type": "blocked", "concerns": ["test-concern"], "blocked_at": "2026-03-19T00:00:00Z"}},
+      "last_resolution": {{
+        "blocked_concerns": ["test-concern"],
+        "workspace_search_ref": "{workspace_search_ref}",
+        "reinvention_check_ref": "{reinvention_check_ref}",
+        "decision": "continue_self_implementation",
+        "summary": "{summary}",
+        "resolved_at": "{resolved_at}"
+      }}
+    }}"#
+        ))
+    }
+
+    #[test]
+    fn test_resolution_from_document_rejects_empty_workspace_search_ref() {
+        let json = resolution_json("", "r.md", "summary text", "2026-03-19T00:00:00Z");
+        let result = decode(&json);
+        assert!(result.is_err(), "empty workspace_search_ref must be rejected");
+    }
+
+    #[test]
+    fn test_resolution_from_document_rejects_empty_reinvention_check_ref() {
+        let json = resolution_json("s.md", "", "summary text", "2026-03-19T00:00:00Z");
+        let result = decode(&json);
+        assert!(result.is_err(), "empty reinvention_check_ref must be rejected");
+    }
+
+    #[test]
+    fn test_resolution_from_document_rejects_empty_summary() {
+        let json = resolution_json("s.md", "r.md", "", "2026-03-19T00:00:00Z");
+        let result = decode(&json);
+        assert!(result.is_err(), "empty summary must be rejected");
+    }
+
+    #[test]
+    fn test_resolution_from_document_rejects_empty_resolved_at() {
+        let json = resolution_json("s.md", "r.md", "summary text", "");
+        let result = decode(&json);
+        assert!(result.is_err(), "empty resolved_at must be rejected");
     }
 }

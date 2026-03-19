@@ -1386,3 +1386,332 @@ pub enum AutoPhaseError {
 | Separate config file (.claude/auto-mode-config.json) | Decouples auto-mode parameters from agent-profiles.json; phase→capability mapping with delegated provider resolution |
 | Escalation exits process cleanly (exit 1) | Conversation not blocked; state persisted for async human decision; --resume with decision text |
 | Domain layer AutoPhase enum (no method bodies in spike) | Type signatures only; implementation deferred to follow-up track |
+
+## Review Escalation Threshold (WF-36)
+
+The review workflow needs a circuit breaker for repeated bug classes. The trigger is:
+the same normalized concern appears in 3 consecutive closed review cycles. A "closed
+review cycle" means one `round_type` + `round` after all `expected_groups` have
+recorded that same round number. This avoids double-counting parallel reviewer groups
+inside a single fix-review wave.
+
+### Recommended Decisions
+
+| Design question | Recommendation | Why |
+|-----------------|----------------|-----|
+| Category determination | Option C: Hybrid | Reviewer-provided `category` is the best semantic signal, but the system cannot depend on every reviewer emitting it correctly on day 1. File-path fallback keeps the feature backward compatible and deterministic. Final fallback is `other`. |
+| State location | Option B: `ReviewEscalationState` composed into `ReviewState` | Escalation is review state, not a separate workflow aggregate. Keeping it under `review` preserves metadata.json as SSoT while isolating circuit-breaker concerns from the existing approval status enum. |
+| Schema extension | Extend `review.groups.*.{fast,final}` with `concerns`, add `review.escalation` object, preserve last 10 closed cycles (FIFO trim on insert) | The latest per-group result must carry concerns so the domain can close a cycle without persisting full findings. 10 cycles is enough to audit streaks (3x threshold + margin) while bounding metadata.json growth. |
+| State-machine interaction | Escalation is orthogonal to `ReviewStatus` and acts as a hard gate | The triggering round should still be recorded, then subsequent `record-round` and `check_commit_ready` calls must fail with `EscalationActive`. Resolving the block invalidates review and clears `code_hash` so the next review starts fresh. |
+| Findings persistence | Option B: category list per closed cycle, not full findings history | Counts-only is too opaque for debugging and migration. Full findings history is heavy and duplicates reviewer artifacts. Concern history keeps metadata small while preserving the recurrence signal. |
+
+### Category Normalization
+
+1. If a reviewer finding includes `category`, normalize that slug and use it.
+2. Otherwise, derive a concern from `file` using a stable repo-local rule such as:
+   `libs/domain/src/review.rs -> domain.review`, `apps/cli/src/commands/review.rs -> cli.review`.
+3. If neither is available, fall back to `other`.
+
+The domain layer should only see validated `ReviewConcern` values. All schema parsing
+and fallback logic stays in CLI/usecase/infra.
+
+### State-Machine Notes
+
+- Triggering escalation does not rewrite `ReviewStatus`; it transitions `escalation.phase` to `EscalationPhase::Blocked(ReviewEscalationBlock)`.
+- `record_round`, `record_round_with_pending`, and `check_commit_ready` must reject while blocked.
+- `resolve-escalation` is explicit. It requires references to a workspace search artifact and a reinvention-check artifact.
+- Successful resolution clears streak state, stores the resolution record, sets `ReviewStatus::Invalidated`, and clears `code_hash`.
+
+### Canonical Blocks
+
+```rust
+// libs/usecase/src/review_workflow.rs
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ReviewFinding {
+    pub message: String,
+    #[serde(default)]
+    pub category: Option<String>,
+    #[serde(default)]
+    pub severity: Option<String>,
+    #[serde(default)]
+    pub file: Option<String>,
+    #[serde(default)]
+    pub line: Option<u64>,
+}
+```
+
+```rust
+// libs/domain/src/review.rs
+use std::collections::{BTreeMap, HashMap};
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct ReviewConcern(String);
+
+impl ReviewConcern {
+    pub fn new(value: impl Into<String>) -> Result<Self, ReviewError>;
+    pub fn as_str(&self) -> &str;
+}
+
+// --- Algebraic data types: use enum variants with data to make illegal states
+// unrepresentable. EscalationPhase::Blocked carries the block data directly,
+// so there is no way to have status=Blocked with blocked=None or vice versa.
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewCycleSummary {
+    round_type: RoundType,
+    round: u32,
+    timestamp: String,
+    concerns: Vec<ReviewConcern>,
+    groups: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewConcernStreak {
+    consecutive_rounds: u8,
+    last_round_type: RoundType,
+    last_round: u32,
+    last_seen_at: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewEscalationBlock {
+    concerns: Vec<ReviewConcern>,
+    blocked_at: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReviewEscalationDecision {
+    AdoptWorkspaceSolution,
+    AdoptExternalCrate,
+    ContinueSelfImplementation,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewEscalationResolution {
+    blocked_concerns: Vec<ReviewConcern>,
+    workspace_search_ref: String,
+    reinvention_check_ref: String,
+    decision: ReviewEscalationDecision,
+    summary: String,
+    resolved_at: String,
+}
+
+/// Algebraic data type: escalation phase carries its associated data in each variant.
+/// `Clear` has no block data. `Blocked` carries the block details.
+/// This eliminates impossible states like "status=Blocked but blocked=None".
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum EscalationPhase {
+    Clear,
+    Blocked(ReviewEscalationBlock),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewEscalationState {
+    threshold: u8,
+    phase: EscalationPhase,
+    recent_cycles: Vec<ReviewCycleSummary>,
+    concern_streaks: BTreeMap<ReviewConcern, ReviewConcernStreak>,
+    last_resolution: Option<ReviewEscalationResolution>,
+}
+
+// ReviewRoundResult gains a `concerns` field but preserves backward compatibility
+// by keeping the existing 3-arg `new()` and adding `new_with_concerns()`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewRoundResult {
+    round: u32,
+    verdict: String,
+    timestamp: String,
+    concerns: Vec<ReviewConcern>,
+}
+
+impl ReviewRoundResult {
+    /// Existing 3-arg constructor — backward compatible, empty concerns.
+    pub fn new(
+        round: u32,
+        verdict: impl Into<String>,
+        timestamp: impl Into<String>,
+    ) -> Self;
+    /// New constructor with concerns for escalation tracking.
+    pub fn new_with_concerns(
+        round: u32,
+        verdict: impl Into<String>,
+        timestamp: impl Into<String>,
+        concerns: Vec<ReviewConcern>,
+    ) -> Self;
+    pub fn round(&self) -> u32;
+    pub fn verdict(&self) -> &str;
+    pub fn timestamp(&self) -> &str;
+    pub fn concerns(&self) -> &[ReviewConcern];
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewState {
+    status: ReviewStatus,
+    code_hash: Option<String>,
+    groups: HashMap<String, ReviewGroupState>,
+    escalation: ReviewEscalationState,
+}
+
+// Note: thiserror is already a dependency of libs/domain (see domain/Cargo.toml).
+// The #[derive(Error)] below does NOT violate the "std-only" constraint.
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum ReviewError {
+    #[error("final round requires review status fast_passed, but current status is {0}")]
+    FinalRequiresFastPassed(ReviewStatus),
+
+    #[error("code hash mismatch: review recorded against {expected}, but current code is {actual}")]
+    StaleCodeHash { expected: String, actual: String },
+
+    #[error("review status is {0}, not approved")]
+    NotApproved(ReviewStatus),
+
+    #[error("review escalation is active for concerns: {concerns:?}")]
+    EscalationActive { concerns: Vec<String> },
+
+    #[error("review escalation is not active")]
+    EscalationNotActive,
+
+    #[error("invalid review concern: {0}")]
+    InvalidConcern(String),
+
+    #[error("resolution evidence is required: {0}")]
+    ResolutionEvidenceMissing(&'static str),
+
+    #[error("resolution concerns do not match blocked concerns")]
+    ResolutionConcernMismatch { expected: Vec<String>, actual: Vec<String> },
+}
+
+impl ReviewState {
+    pub fn escalation(&self) -> &ReviewEscalationState;
+
+    pub fn record_round(
+        &mut self,
+        round_type: RoundType,
+        group: &str,
+        result: ReviewRoundResult,
+        expected_groups: &[String],
+        current_code_hash: &str,
+    ) -> Result<(), ReviewError>;
+
+    pub fn record_round_with_pending(
+        &mut self,
+        round_type: RoundType,
+        group: &str,
+        result: ReviewRoundResult,
+        expected_groups: &[String],
+        pre_update_hash: &str,
+    ) -> Result<(), ReviewError>;
+
+    /// Checks if the review state is ready for commit.
+    /// Returns `Err(EscalationActive)` if escalation is blocked.
+    pub fn check_commit_ready(&mut self, current_code_hash: &str) -> Result<(), ReviewError>;
+
+    pub fn resolve_escalation(
+        &mut self,
+        resolution: ReviewEscalationResolution,
+    ) -> Result<(), ReviewError>;
+
+    /// Extended constructor for codec deserialization — includes escalation state.
+    pub fn with_fields(
+        status: ReviewStatus,
+        code_hash: Option<String>,
+        groups: HashMap<String, ReviewGroupState>,
+        escalation: ReviewEscalationState,
+    ) -> Self;
+}
+```
+
+```mermaid
+flowchart TD
+    NS[NotStarted / Invalidated] -->|fast zero across all expected groups| FP[FastPassed]
+    NS -->|fast findings remain| NS
+    FP -->|final zero across all expected groups| AP[Approved]
+    FP -->|final findings remain| FP
+    AP -->|stale code hash| IV[Invalidated]
+
+    NS -. closed cycle reaches threshold .-> BL[Escalation Blocked]
+    FP -. closed cycle reaches threshold .-> BL
+    AP -. closed cycle reaches threshold .-> BL
+    IV -. closed cycle reaches threshold .-> BL
+
+    BL -->|record_round / record_round_with_pending| RJ1[Reject: EscalationActive]
+    BL -->|check_commit_ready| RJ2[Reject: EscalationActive]
+    BL -->|resolve_escalation| IV
+```
+
+The `phase` field uses an internally tagged union (`#[serde(tag = "type")]`) to preserve the ADT invariant in JSON:
+- `"phase": {"type": "clear"}` — no block data
+- `"phase": {"type": "blocked", "concerns": [...], "blocked_at": "..."}` — block data inline
+
+Codec deserializes this into `EscalationPhase::Clear` or `EscalationPhase::Blocked(...)`.
+The illegal state `type=clear + block data present` cannot be represented.
+
+```json
+{
+  "review": {
+    "status": "not_started",
+    "code_hash": "315c9b21...",
+    "groups": {
+      "infra-domain": {
+        "fast": {
+          "round": 3,
+          "timestamp": "2026-03-19T01:52:41Z",
+          "verdict": "findings_remain",
+          "concerns": ["typed_deserialization"]
+        },
+        "final": null
+      },
+      "other": {
+        "fast": {
+          "round": 3,
+          "timestamp": "2026-03-19T01:53:10Z",
+          "verdict": "zero_findings",
+          "concerns": []
+        },
+        "final": null
+      }
+    },
+    "escalation": {
+      "threshold": 3,
+      "phase": {
+        "type": "blocked",
+        "concerns": ["typed_deserialization"],
+        "blocked_at": "2026-03-19T01:53:10Z"
+      },
+      "recent_cycles": [
+        {
+          "round_type": "fast",
+          "round": 1,
+          "timestamp": "2026-03-19T01:20:00Z",
+          "groups": ["infra-domain", "other"],
+          "concerns": ["typed_deserialization"]
+        },
+        {
+          "round_type": "fast",
+          "round": 2,
+          "timestamp": "2026-03-19T01:36:00Z",
+          "groups": ["infra-domain", "other"],
+          "concerns": ["typed_deserialization"]
+        },
+        {
+          "round_type": "fast",
+          "round": 3,
+          "timestamp": "2026-03-19T01:53:10Z",
+          "groups": ["infra-domain", "other"],
+          "concerns": ["typed_deserialization"]
+        }
+      ],
+      "concern_streaks": {
+        "typed_deserialization": {
+          "consecutive_rounds": 3,
+          "last_round_type": "fast",
+          "last_round": 3,
+          "last_seen_at": "2026-03-19T01:53:10Z"
+        }
+      },
+      "last_resolution": null
+    }
+  }
+}
+```
