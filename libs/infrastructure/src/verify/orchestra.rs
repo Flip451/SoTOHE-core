@@ -394,12 +394,6 @@ const REVIEW_WRAPPER_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
             "codex exec review --uncommitted --json --model {model} --full-auto",
         ],
     ),
-    (
-        ".claude/docs/research/planner-pr-review-cycle-2026-03-12.md",
-        "reviewer research doc wrapper path",
-        &["cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md"],
-        &["codex exec review --uncommitted --json --model {model} --full-auto"],
-    ),
 ];
 
 // ---------------------------------------------------------------------------
