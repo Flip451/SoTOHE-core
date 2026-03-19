@@ -755,7 +755,7 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         .to_string_lossy()
         .into_owned();
 
-    // Open track store with locking
+    // Open track store with locking.
     let track_id =
         domain::TrackId::new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
 
@@ -771,7 +771,7 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
     // Step 1: Copy the current git index to a private temp file.
     // All staging operations go through the private index; the real index is
     // only updated at the very end via an atomic fs::rename.  This eliminates
-    // the TOCTOU window that the old advisory-lock approach left open.
+    // the TOCTOU window between the two `store.update` calls in the old design.
     let private_index = PrivateIndex::from_current(&git)?;
 
     // Step 2: Compute pre-update normalized hash from the private index.
@@ -779,11 +779,19 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         .normalized_tree_hash(&git, &metadata_rel)
         .map_err(|e| format!("normalized hash error: {e}"))?;
 
-    // Step 3: Write review state + code_hash="PENDING" via record_round_with_pending.
-    use domain::TrackWriter;
+    // Steps 3–7 are now a single atomic operation under one file lock.
+    //
+    // with_locked_document holds the exclusive metadata.json lock for the
+    // entire closure, so no other `sotp record-round` process can interleave
+    // between writing the PENDING state and computing the final code_hash.
+    //
+    // Captured variables used inside the closure:
+    //   - git, private_index, metadata_rel (git index staging)
+    //   - round_type, args.group, verdict_str, timestamp, expected_groups, pre_update_hash
     let mut stale_error: Option<String> = None;
     store
-        .update(&track_id, |track| {
+        .with_locked_document(&track_id, |track, meta| {
+            // Step 3: Record round with code_hash="PENDING".
             let review = track.review_mut().get_or_insert_with(ReviewState::new);
             let round_num = review
                 .groups()
@@ -803,62 +811,75 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
                 &expected_groups,
                 &pre_update_hash,
             ) {
-                Ok(()) => Ok(()),
+                Ok(()) => {}
                 Err(domain::ReviewError::StaleCodeHash { expected, actual }) => {
+                    // Persist the invalidated state, then signal the caller.
+                    // Returning Ok here causes with_locked_document to write
+                    // the (now-invalidated) track to disk.
                     stale_error = Some(format!(
                         "code hash mismatch: review recorded against {expected}, \
                          but current code is {actual} — review.status set to invalidated"
                     ));
-                    Ok(())
+                    meta.updated_at = timestamp.clone();
+                    return Ok(());
                 }
-                Err(e) => Err(domain::DomainError::Validation(
-                    domain::ValidationError::InvalidTaskId(e.to_string()),
-                )),
+                Err(e) => {
+                    return Err(domain::DomainError::Validation(
+                        domain::ValidationError::InvalidTaskId(e.to_string()),
+                    ));
+                }
             }
+
+            // Step 4: Set updated_at (not auto-set by with_locked_document).
+            meta.updated_at = timestamp.clone();
+
+            // Step 5: Serialize PENDING state and stage into private index.
+            let pending_json = infrastructure::track::codec::encode(track, meta).map_err(|e| {
+                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
+                    "codec encode error: {e}"
+                )))
+            })?;
+            // Append trailing newline for POSIX compatibility, matching write_track.
+            let pending_content = format!("{pending_json}\n");
+            private_index.stage_bytes(&git, &metadata_rel, pending_content.as_bytes()).map_err(
+                |e| domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(e)),
+            )?;
+
+            // Step 6: Compute normalized hash H1 from the private index (PENDING state staged).
+            let h1 = private_index.normalized_tree_hash(&git, &metadata_rel).map_err(|e| {
+                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
+                    "post-pending normalized hash error: {e}"
+                )))
+            })?;
+
+            // Step 7: Replace PENDING with the real code_hash.
+            if let Some(r) = track.review_mut().as_mut() {
+                r.set_code_hash(h1);
+            }
+
+            // Step 8: Serialize final state and stage into private index.
+            // with_locked_document will write this same state to disk.
+            let final_json = infrastructure::track::codec::encode(track, meta).map_err(|e| {
+                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
+                    "codec encode error (final): {e}"
+                )))
+            })?;
+            let final_content = format!("{final_json}\n");
+            private_index.stage_bytes(&git, &metadata_rel, final_content.as_bytes()).map_err(
+                |e| domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(e)),
+            )?;
+
+            Ok(())
         })
         .map_err(|e| format!("failed to update metadata.json: {e}"))?;
 
     if let Some(err_msg) = stale_error {
-        // private_index is dropped here without swap — real index untouched.
+        // private_index is dropped without swap — real index is untouched.
         return Err(format!("[BLOCKED] {err_msg}"));
     }
 
-    // Step 4: Stage the updated metadata.json (with code_hash="PENDING") into the private index.
-    let metadata_abs_path = git.root().join(&metadata_rel);
-    private_index.stage_file(&git, &metadata_abs_path, &metadata_rel)?;
-
-    // Step 5: Compute post-update normalized hash H1 from the private index.
-    let h1 = private_index
-        .normalized_tree_hash(&git, &metadata_rel)
-        .map_err(|e| format!("post-update normalized hash error: {e}"))?;
-
-    // Step 6: Write back the computed hash via set_code_hash.
-    //
-    // Note: this is a second `store.update` call. FsTrackStore acquires a
-    // per-call file lock, so another `sotp` process using the same lock
-    // manager is serialized. The window between step 3 and step 6 is safe
-    // because (a) all staging happens on the private index (not the real
-    // one), and (b) even if another process writes metadata.json between
-    // steps, `store.update` re-reads the latest state before applying
-    // `set_code_hash`, and the private index swap in step 8 reflects the
-    // final disk state.
-    store
-        .update(&track_id, |track| {
-            if let Some(review) = track.review_mut().as_mut() {
-                review.set_code_hash(h1.clone());
-            }
-            Ok(())
-        })
-        .map_err(|e| format!("failed to write code_hash: {e}"))?;
-
-    // Step 7: Stage the final metadata.json (with real code_hash) into the private index.
-    // Re-stage from disk (which store.update just wrote) so the index blob
-    // matches the actual file content, even if another record-round for a
-    // different group modified metadata.json between steps 5 and 6.
-    private_index.stage_file(&git, &metadata_abs_path, &metadata_rel)?;
-
-    // Step 8: Atomically rename private index over the real index.
-    // If any earlier step failed, private_index would have been dropped without swap,
+    // Step 9: Atomically rename private index over the real index.
+    // If any earlier step failed, private_index would be dropped without swap,
     // leaving the real index entirely untouched.
     private_index.swap_into_real()?;
 
@@ -1084,27 +1105,41 @@ impl PrivateIndex {
         Ok(String::from_utf8_lossy(&write_tree_output.stdout).trim().to_owned())
     }
 
-    /// Stage a file into the private index.
+    /// Stage raw bytes as a blob for the given repo-relative path in the private index.
     ///
-    /// First writes the file content to the git object store with
-    /// `git hash-object -w` (no index needed), then updates the private
-    /// index entry with `git update-index --cacheinfo`.
-    fn stage_file(
+    /// Feeds `content` to `git hash-object -w --stdin` to write a blob to the
+    /// object store, then updates the private index entry with
+    /// `git update-index --cacheinfo`.
+    fn stage_bytes(
         &self,
         git: &impl infrastructure::git_cli::GitRepository,
-        abs_path: &Path,
         rel_path: &str,
+        content: &[u8],
     ) -> Result<(), String> {
-        // Step 1: Write blob to object store.
-        let hash_output = std::process::Command::new("git")
-            .args(["hash-object", "-w", "--"])
-            .arg(abs_path)
+        use std::io::Write as _;
+
+        // Step 1: Write blob to object store via stdin.
+        let mut child = std::process::Command::new("git")
+            .args(["hash-object", "-w", "--stdin"])
             .current_dir(git.root())
-            .output()
-            .map_err(|e| format!("failed to hash-object {}: {e}", abs_path.display()))?;
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::piped())
+            .spawn()
+            .map_err(|e| format!("failed to spawn git hash-object for {rel_path}: {e}"))?;
+
+        if let Some(ref mut stdin) = child.stdin {
+            stdin
+                .write_all(content)
+                .map_err(|e| format!("failed to write content to hash-object stdin: {e}"))?;
+        }
+
+        let hash_output = child
+            .wait_with_output()
+            .map_err(|e| format!("failed to wait for git hash-object: {e}"))?;
         if !hash_output.status.success() {
             let stderr = String::from_utf8_lossy(&hash_output.stderr).trim().to_owned();
-            return Err(format!("git hash-object failed for {}: {stderr}", abs_path.display()));
+            return Err(format!("git hash-object failed for {rel_path}: {stderr}"));
         }
         let blob_hash = String::from_utf8_lossy(&hash_output.stdout).trim().to_owned();
 

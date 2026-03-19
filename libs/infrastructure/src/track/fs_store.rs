@@ -249,6 +249,80 @@ impl<L: FileLockManager> TrackWriter for FsTrackStore<L> {
     }
 }
 
+impl<L: FileLockManager> FsTrackStore<L> {
+    /// Execute a closure with exclusive access to both the domain model and
+    /// infrastructure metadata. Unlike `update`, this gives the caller full
+    /// control over `DocumentMeta` (including `updated_at`) and does NOT
+    /// auto-set any timestamps — the closure is responsible for setting them.
+    ///
+    /// The closure receives `(&mut TrackMetadata, &mut DocumentMeta)` and may
+    /// perform multiple mutations atomically under a single file lock. After
+    /// the closure returns `Ok`, the state is written to disk and the lock is
+    /// released. On `Err`, nothing is written.
+    ///
+    /// # Errors
+    /// Returns `TrackWriteError` if the track is not found, the lock cannot be
+    /// acquired, the closure returns an error, or the write fails.
+    pub fn with_locked_document<F>(
+        &self,
+        id: &TrackId,
+        f: F,
+    ) -> Result<TrackMetadata, TrackWriteError>
+    where
+        F: FnOnce(&mut TrackMetadata, &mut DocumentMeta) -> Result<(), DomainError>,
+    {
+        let path = self.metadata_path(id);
+
+        // Early return if metadata.json does not exist.
+        if !path.exists() {
+            return Err(TrackWriteError::Repository(RepositoryError::TrackNotFound(
+                id.to_string(),
+            )));
+        }
+
+        let lock_path = domain::lock::FilePath::new(&path).map_err(|e| {
+            TrackWriteError::Repository(RepositoryError::Message(format!(
+                "failed to create lock path for {}: {e}",
+                path.display()
+            )))
+        })?;
+
+        let seq = AGENT_SEQ.fetch_add(1, Ordering::Relaxed);
+        let pid = std::process::id();
+        let agent_name = format!("{STORE_AGENT_PREFIX}-{pid}-{seq}");
+        let agent = AgentId::new(&agent_name);
+
+        // Acquire exclusive lock.
+        let guard = self
+            .lock_manager
+            .acquire(&lock_path, LockMode::Exclusive, &agent, pid, Some(self.lock_timeout))
+            .map_err(|e| {
+                TrackWriteError::Repository(RepositoryError::Message(format!(
+                    "failed to acquire lock on {}: {e}",
+                    path.display()
+                )))
+            })?;
+
+        // Read current state under lock.
+        let (mut track, mut meta) =
+            self.read_track(id).map_err(TrackWriteError::from)?.ok_or_else(|| {
+                TrackWriteError::Repository(RepositoryError::TrackNotFound(id.to_string()))
+            })?;
+
+        // Invoke the closure — the caller controls all mutations including timestamps.
+        f(&mut track, &mut meta).map_err(TrackWriteError::from)?;
+
+        // Write the final state; `original_status` is cleared so encode()
+        // recomputes the status from the domain model.
+        meta.original_status = None;
+        self.write_track(&track, &meta).map_err(TrackWriteError::from)?;
+
+        drop(guard);
+
+        Ok(track)
+    }
+}
+
 /// Resolves the metadata.json path from root and track ID.
 /// Exposed for CLI composition (e.g., listing available tracks).
 #[must_use]
@@ -542,5 +616,89 @@ mod tests {
         let json2 = std::fs::read_to_string(&path).unwrap();
         let doc2: serde_json::Value = serde_json::from_str(&json2).unwrap();
         assert_eq!(doc2["created_at"].as_str().unwrap(), created_at);
+    }
+
+    // --- with_locked_document tests ---
+
+    #[test]
+    fn test_with_locked_document_returns_error_for_missing_track() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = test_store(dir.path());
+        let id = TrackId::new("nonexistent").unwrap();
+
+        let result = store.with_locked_document(&id, |_, _| Ok(()));
+        assert!(matches!(
+            result,
+            Err(TrackWriteError::Repository(RepositoryError::TrackNotFound(_)))
+        ));
+    }
+
+    #[test]
+    fn test_with_locked_document_mutates_and_persists() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = test_store(dir.path());
+        let track = sample_track("test-track");
+        store.save(&track).unwrap();
+
+        let task_id = TaskId::new("T1").unwrap();
+        let updated = store
+            .with_locked_document(track.id(), |t, _meta| {
+                t.transition_task(&task_id, domain::TaskTransition::Start)?;
+                Ok(())
+            })
+            .unwrap();
+
+        assert_eq!(updated.status(), TrackStatus::InProgress);
+
+        // Verify persistence.
+        let reloaded = store.find(track.id()).unwrap().unwrap();
+        assert_eq!(reloaded.status(), TrackStatus::InProgress);
+    }
+
+    #[test]
+    fn test_with_locked_document_does_not_auto_set_updated_at() {
+        // The closure sets updated_at explicitly; with_locked_document must not
+        // override it.
+        let dir = tempfile::tempdir().unwrap();
+        let store = test_store(dir.path());
+        let track = sample_track("test-track");
+        store.save(&track).unwrap();
+
+        let sentinel = "1999-01-01T00:00:00Z".to_owned();
+        store
+            .with_locked_document(track.id(), |_t, meta| {
+                meta.updated_at = sentinel.clone();
+                Ok(())
+            })
+            .unwrap();
+
+        let path = dir.path().join("test-track").join("metadata.json");
+        let json = std::fs::read_to_string(&path).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(doc["updated_at"].as_str().unwrap(), sentinel);
+    }
+
+    #[test]
+    fn test_with_locked_document_does_not_write_on_closure_error() {
+        // If the closure returns Err, nothing should be written to disk.
+        let dir = tempfile::tempdir().unwrap();
+        let store = test_store(dir.path());
+        let track = sample_track("test-track");
+        store.save(&track).unwrap();
+
+        // Record the updated_at before the failed call.
+        let path = dir.path().join("test-track").join("metadata.json");
+        let json_before = std::fs::read_to_string(&path).unwrap();
+
+        let result = store.with_locked_document(track.id(), |_, _| {
+            Err(DomainError::Validation(domain::ValidationError::InvalidTaskId(
+                "intentional error".to_owned(),
+            )))
+        });
+        assert!(result.is_err());
+
+        // File must be unchanged.
+        let json_after = std::fs::read_to_string(&path).unwrap();
+        assert_eq!(json_before, json_after);
     }
 }
