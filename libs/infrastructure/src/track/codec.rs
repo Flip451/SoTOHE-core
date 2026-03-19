@@ -1117,6 +1117,53 @@ mod tests {
     }
 
     #[test]
+    fn test_decode_review_final_only_group_round_trips_without_fake_fast() {
+        // Ensures that a group with only a final round does NOT synthesize a fake fast entry.
+        let json = r#"{
+  "schema_version": 3,
+  "id": "final-only-track",
+  "branch": "track/final-only-track",
+  "title": "Final Only Track",
+  "status": "in_progress",
+  "created_at": "2026-03-18T00:00:00Z",
+  "updated_at": "2026-03-18T00:00:00Z",
+  "tasks": [
+    {"id": "T1", "description": "Task", "status": "in_progress"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}
+    ]
+  },
+  "review": {
+    "status": "fast_passed",
+    "code_hash": "abc123def",
+    "groups": {
+      "g1": {
+        "final": {"round": 1, "verdict": "zero_findings", "timestamp": "2026-03-18T02:00:00Z"}
+      }
+    }
+  }
+}"#;
+        let (track, meta) = decode(json).unwrap();
+        let review = track.review().unwrap();
+        let g1 = review.groups().get("g1").unwrap();
+        // fast must be None — no synthetic fast round
+        assert!(g1.fast().is_none(), "final-only group must not have a synthetic fast round");
+        assert!(g1.final_round().is_some());
+
+        // Round-trip: re-encode and decode, verify fast is still absent
+        let re_encoded = encode(&track, &meta).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&re_encoded).unwrap();
+        let g1_json = &doc["review"]["groups"]["g1"];
+        assert!(
+            g1_json.get("fast").is_none() || g1_json["fast"].is_null(),
+            "re-encoded JSON must not contain a fast entry for final-only group"
+        );
+    }
+
+    #[test]
     fn test_decode_review_invalid_status_returns_error() {
         let json = r#"{
   "schema_version": 3,
