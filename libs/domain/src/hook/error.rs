@@ -7,10 +7,6 @@ pub enum HookError {
     #[error("invalid hook input: {0}")]
     Input(String),
 
-    /// Error from the file lock subsystem.
-    #[error(transparent)]
-    Lock(#[from] crate::lock::LockError),
-
     /// Error from the guard command parser.
     #[error(transparent)]
     Guard(#[from] crate::guard::ParseError),

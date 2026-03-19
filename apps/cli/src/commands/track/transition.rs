@@ -4,7 +4,6 @@ use super::*;
 
 pub(super) fn execute_transition(
     items_dir: PathBuf,
-    locks_dir: PathBuf,
     track_id: String,
     task_id: String,
     target_status: String,
@@ -33,11 +32,7 @@ pub(super) fn execute_transition(
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
     // Build FsTrackStore.
-    let lock_manager = FsFileLockManager::new(&locks_dir)
-        .map(Arc::new)
-        .map_err(|err| CliError::Message(format!("failed to initialize lock manager: {err}")))?;
-
-    let store = Arc::new(FsTrackStore::new(items_dir.clone(), lock_manager, DEFAULT_LOCK_TIMEOUT));
+    let store = Arc::new(FsTrackStore::new(items_dir.clone()));
 
     // Activation guard: read schema_version from DocumentMeta, then delegate to usecase.
     let schema_version = match store.find_with_meta(&track_id)? {

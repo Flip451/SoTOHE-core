@@ -6,7 +6,6 @@ use super::*;
 
 pub(super) fn execute_add_task(
     items_dir: PathBuf,
-    locks_dir: PathBuf,
     track_id: String,
     description: String,
     section: Option<String>,
@@ -23,11 +22,7 @@ pub(super) fn execute_add_task(
     let repo_dir = items_dir.clone();
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
-    let lock_manager = FsFileLockManager::new(&locks_dir)
-        .map(Arc::new)
-        .map_err(|err| CliError::Message(format!("failed to initialize lock manager: {err}")))?;
-
-    let store = Arc::new(FsTrackStore::new(items_dir, lock_manager, DEFAULT_LOCK_TIMEOUT));
+    let store = Arc::new(FsTrackStore::new(items_dir));
 
     // Branch guard
     if !skip_branch_check {
@@ -48,7 +43,6 @@ pub(super) fn execute_add_task(
 
 pub(super) fn execute_set_override(
     items_dir: PathBuf,
-    locks_dir: PathBuf,
     track_id: String,
     status: String,
     reason: String,
@@ -70,11 +64,7 @@ pub(super) fn execute_set_override(
     let repo_dir = items_dir.clone();
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
-    let lock_manager = FsFileLockManager::new(&locks_dir)
-        .map(Arc::new)
-        .map_err(|err| CliError::Message(format!("failed to initialize lock manager: {err}")))?;
-
-    let store = Arc::new(FsTrackStore::new(items_dir, lock_manager, DEFAULT_LOCK_TIMEOUT));
+    let store = Arc::new(FsTrackStore::new(items_dir));
 
     if !skip_branch_check {
         transition::verify_branch_guard(&*store, &track_id, &repo_dir)
@@ -94,7 +84,6 @@ pub(super) fn execute_set_override(
 
 pub(super) fn execute_clear_override(
     items_dir: PathBuf,
-    locks_dir: PathBuf,
     track_id: String,
     skip_branch_check: bool,
 ) -> Result<ExitCode, CliError> {
@@ -104,11 +93,7 @@ pub(super) fn execute_clear_override(
     let repo_dir = items_dir.clone();
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
-    let lock_manager = FsFileLockManager::new(&locks_dir)
-        .map(Arc::new)
-        .map_err(|err| CliError::Message(format!("failed to initialize lock manager: {err}")))?;
-
-    let store = Arc::new(FsTrackStore::new(items_dir, lock_manager, DEFAULT_LOCK_TIMEOUT));
+    let store = Arc::new(FsTrackStore::new(items_dir));
 
     if !skip_branch_check {
         transition::verify_branch_guard(&*store, &track_id, &repo_dir)
@@ -410,7 +395,6 @@ mod tests {
 
         let result = execute_add_task(
             items_dir,
-            PathBuf::from(".locks"),
             "INVALID".to_string(),
             "task desc".to_string(),
             None,
@@ -428,7 +412,6 @@ mod tests {
 
         let result = execute_set_override(
             items_dir,
-            PathBuf::from(".locks"),
             "test-track".to_string(),
             "invalid_status".to_string(),
             "reason".to_string(),
@@ -443,11 +426,9 @@ mod tests {
         let tasks =
             r#"[{"id":"T001","description":"First task","status":"todo","commit_hash":null}]"#;
         let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track", tasks);
-        let locks_dir = tmp.path().join(".locks");
 
         let result = execute_add_task(
             items_dir.clone(),
-            locks_dir,
             "test-track".to_string(),
             "New task".to_string(),
             None,
@@ -467,11 +448,9 @@ mod tests {
         let tmp = tempfile::tempdir().unwrap();
         let tasks = r#"[{"id":"T001","description":"Task","status":"todo","commit_hash":null}]"#;
         let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track", tasks);
-        let locks_dir = tmp.path().join(".locks");
 
         let result = execute_set_override(
             items_dir.clone(),
-            locks_dir.clone(),
             "test-track".to_string(),
             "blocked".to_string(),
             "blocker reason".to_string(),
@@ -489,12 +468,10 @@ mod tests {
         let tmp = tempfile::tempdir().unwrap();
         let tasks = r#"[{"id":"T001","description":"Task","status":"todo","commit_hash":null}]"#;
         let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track", tasks);
-        let locks_dir = tmp.path().join(".locks");
 
         // First set an override
         execute_set_override(
             items_dir.clone(),
-            locks_dir.clone(),
             "test-track".to_string(),
             "blocked".to_string(),
             "reason".to_string(),
@@ -503,7 +480,7 @@ mod tests {
         .unwrap();
 
         // Then clear it
-        let result = execute_clear_override(items_dir, locks_dir, "test-track".to_string(), true);
+        let result = execute_clear_override(items_dir, "test-track".to_string(), true);
         assert!(result.is_ok());
     }
 }

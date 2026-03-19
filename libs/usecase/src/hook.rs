@@ -1,28 +1,7 @@
 //! Hook dispatch use cases (OCP: each hook implements `HookHandler` independently).
 
-use std::time::Duration;
-
-use domain::Decision;
 use domain::guard::{SimpleCommand, split_shell};
 use domain::hook::{HookContext, HookError, HookInput, HookName, HookVerdict};
-use domain::lock::{FileLockManager, LockMode};
-
-/// Default timeout for lock acquisition (matches existing lock command default).
-const DEFAULT_LOCK_TIMEOUT: Duration = Duration::from_millis(5000);
-
-/// Resolves `LockMode` from the tool name.
-/// `Read` → `Shared`, `Edit`/`Write` → `Exclusive`.
-///
-/// # Errors
-/// Returns `HookError::Input` for unknown tool names to prevent silent
-/// exclusive lock acquisition on unsupported tools.
-fn resolve_lock_mode(tool_name: &str) -> Result<LockMode, HookError> {
-    match tool_name {
-        "Read" => Ok(LockMode::Shared),
-        "Edit" | "Write" => Ok(LockMode::Exclusive),
-        other => Err(HookError::Input(format!("unsupported tool for lock: {other}"))),
-    }
-}
 
 /// Port for individual hook logic.
 /// Receives framework-free HookInput (converted from HookEnvelope at CLI boundary).
@@ -33,14 +12,11 @@ fn resolve_lock_mode(tool_name: &str) -> Result<LockMode, HookError> {
 /// and return `HookError::Input` if they are missing.
 ///
 /// How the CLI maps `HookError::Input` depends on the hook event type:
-/// - PreToolUse (guard, lock-acquire): `HookError::Input` → exit 2 (block, fail-closed)
-/// - PostToolUse (lock-release): `HookError::Input` → stderr warning + exit 0 (cannot block)
+/// - PreToolUse (guard): `HookError::Input` → exit 2 (block, fail-closed)
 ///
 /// | Hook | Required fields | Missing → |
 /// |------|----------------|-----------|
 /// | `BlockDirectGitOps` | `tool_name` (always present), `command` | `HookError::Input("missing command")` |
-/// | `FileLockAcquire` | `tool_name`, `file_path` | `HookError::Input("missing file_path")` |
-/// | `FileLockRelease` | `tool_name`, `file_path` | `HookError::Input("missing file_path")` |
 ///
 /// Note: `tool_name` is guaranteed present (required in `HookEnvelope` serde).
 /// `command` and `file_path` are `Option` in `HookInput` because different hooks
@@ -68,94 +44,6 @@ impl HookHandler for GuardHookHandler {
         } else {
             Ok(HookVerdict::allow())
         }
-    }
-}
-
-/// Lock-acquire hook handler: delegates to `FileLockManager::acquire`.
-pub struct LockAcquireHookHandler<L: FileLockManager> {
-    lock_manager: std::sync::Arc<L>,
-}
-
-impl<L: FileLockManager> LockAcquireHookHandler<L> {
-    /// Creates a new handler with the given lock manager.
-    #[must_use]
-    pub fn new(lock_manager: std::sync::Arc<L>) -> Self {
-        Self { lock_manager }
-    }
-}
-
-impl<L: FileLockManager> HookHandler for LockAcquireHookHandler<L> {
-    fn handle(&self, ctx: &HookContext, input: &HookInput) -> Result<HookVerdict, HookError> {
-        let file_path = input
-            .file_path
-            .as_deref()
-            .ok_or_else(|| HookError::Input("missing file_path".into()))?;
-
-        let agent = ctx.agent.as_ref().ok_or_else(|| HookError::Input("missing agent".into()))?;
-
-        let pid = ctx.pid.ok_or_else(|| HookError::Input("missing pid".into()))?;
-
-        let lock_path = domain::lock::FilePath::new(file_path)?;
-
-        // Resolve lock mode from tool_name: Read → Shared, Edit/Write → Exclusive.
-        let mode = resolve_lock_mode(&input.tool_name)?;
-
-        match self.lock_manager.acquire(&lock_path, mode, agent, pid, Some(DEFAULT_LOCK_TIMEOUT)) {
-            Ok(guard) => {
-                // Prevent drop from releasing the lock — PostToolUse will release explicitly.
-                std::mem::forget(guard);
-                Ok(HookVerdict::allow())
-            }
-            Err(domain::lock::LockError::ExclusivelyHeld { holder, pid: held_pid }) => {
-                Ok(HookVerdict {
-                    decision: Decision::Block,
-                    reason: Some(format!(
-                        "file is exclusively locked by agent {holder} (pid {held_pid})"
-                    )),
-                    additional_context: None,
-                })
-            }
-            Err(domain::lock::LockError::SharedLockConflict { count }) => Ok(HookVerdict {
-                decision: Decision::Block,
-                reason: Some(format!(
-                    "file has {count} shared lock(s); cannot acquire exclusive lock"
-                )),
-                additional_context: None,
-            }),
-            Err(e) => Err(HookError::Lock(e)),
-        }
-    }
-}
-
-/// Lock-release hook handler: delegates to `FileLockManager::release`.
-pub struct LockReleaseHookHandler<L: FileLockManager> {
-    lock_manager: std::sync::Arc<L>,
-}
-
-impl<L: FileLockManager> LockReleaseHookHandler<L> {
-    /// Creates a new handler with the given lock manager.
-    #[must_use]
-    pub fn new(lock_manager: std::sync::Arc<L>) -> Self {
-        Self { lock_manager }
-    }
-}
-
-impl<L: FileLockManager> HookHandler for LockReleaseHookHandler<L> {
-    fn handle(&self, ctx: &HookContext, input: &HookInput) -> Result<HookVerdict, HookError> {
-        let file_path = input
-            .file_path
-            .as_deref()
-            .ok_or_else(|| HookError::Input("missing file_path".into()))?;
-
-        let agent = ctx.agent.as_ref().ok_or_else(|| HookError::Input("missing agent".into()))?;
-
-        // pid is NOT required for release — FileLockManager::release uses path + agent only.
-
-        let lock_path = domain::lock::FilePath::new(file_path)?;
-
-        self.lock_manager.release(&lock_path, agent)?;
-
-        Ok(HookVerdict::allow())
     }
 }
 
@@ -513,7 +401,7 @@ mod tests {
     #[test]
     fn test_guard_handler_allows_safe_command() {
         let handler = GuardHookHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("git status".into()),
@@ -528,7 +416,7 @@ mod tests {
     #[test]
     fn test_guard_handler_blocks_git_add() {
         let handler = GuardHookHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("git add .".into()),
@@ -543,7 +431,7 @@ mod tests {
     #[test]
     fn test_guard_handler_returns_error_on_missing_command() {
         let handler = GuardHookHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input =
             HookInput { tool_name: "Bash".into(), command: None, file_path: None, content: None };
 
@@ -552,106 +440,9 @@ mod tests {
     }
 
     #[test]
-    fn test_lock_acquire_returns_error_on_missing_file_path() {
-        let handler = LockAcquireHookHandler::new(std::sync::Arc::new(StubLockManager));
-        let ctx = HookContext {
-            project_dir: None,
-            locks_dir: Some(PathBuf::from("/tmp/locks")),
-            agent: Some(domain::lock::AgentId::new("pid-1234")),
-            pid: Some(1234),
-        };
-        let input =
-            HookInput { tool_name: "Write".into(), command: None, file_path: None, content: None };
-
-        let result = handler.handle(&ctx, &input);
-        assert!(matches!(result, Err(HookError::Input(msg)) if msg.contains("missing file_path")));
-    }
-
-    #[test]
-    fn test_lock_acquire_returns_error_on_missing_agent() {
-        let handler = LockAcquireHookHandler::new(std::sync::Arc::new(StubLockManager));
-        let ctx = HookContext {
-            project_dir: None,
-            locks_dir: Some(PathBuf::from("/tmp/locks")),
-            agent: None,
-            pid: Some(1234),
-        };
-        let input = HookInput {
-            tool_name: "Write".into(),
-            command: None,
-            file_path: Some(PathBuf::from("/tmp/file.txt")),
-            content: None,
-        };
-
-        let result = handler.handle(&ctx, &input);
-        assert!(matches!(result, Err(HookError::Input(msg)) if msg.contains("missing agent")));
-    }
-
-    #[test]
-    fn test_lock_acquire_returns_error_on_missing_pid() {
-        let handler = LockAcquireHookHandler::new(std::sync::Arc::new(StubLockManager));
-        let ctx = HookContext {
-            project_dir: None,
-            locks_dir: Some(PathBuf::from("/tmp/locks")),
-            agent: Some(domain::lock::AgentId::new("pid-1234")),
-            pid: None,
-        };
-        let input = HookInput {
-            tool_name: "Write".into(),
-            command: None,
-            file_path: Some(PathBuf::from("/tmp/file.txt")),
-            content: None,
-        };
-
-        let result = handler.handle(&ctx, &input);
-        assert!(matches!(result, Err(HookError::Input(msg)) if msg.contains("missing pid")));
-    }
-
-    #[test]
-    fn test_lock_release_returns_error_on_missing_file_path() {
-        let handler = LockReleaseHookHandler::new(std::sync::Arc::new(StubLockManager));
-        let ctx = HookContext {
-            project_dir: None,
-            locks_dir: Some(PathBuf::from("/tmp/locks")),
-            agent: Some(domain::lock::AgentId::new("pid-1234")),
-            pid: None,
-        };
-        let input =
-            HookInput { tool_name: "Write".into(), command: None, file_path: None, content: None };
-
-        let result = handler.handle(&ctx, &input);
-        assert!(matches!(result, Err(HookError::Input(msg)) if msg.contains("missing file_path")));
-    }
-
-    #[test]
-    fn test_lock_release_does_not_require_pid() {
-        // lock-release only needs locks_dir + agent, NOT pid.
-        // This test verifies pid=None does not cause an error.
-        let handler = LockReleaseHookHandler::new(std::sync::Arc::new(StubLockManager));
-        let ctx = HookContext {
-            project_dir: None,
-            locks_dir: Some(PathBuf::from("/tmp/locks")),
-            agent: Some(domain::lock::AgentId::new("pid-1234")),
-            pid: None,
-        };
-        let input = HookInput {
-            tool_name: "Write".into(),
-            command: None,
-            // Use a path that will fail canonicalization — that's fine,
-            // we're testing pid is not required, not lock success.
-            file_path: Some(PathBuf::from("/tmp/file.txt")),
-            content: None,
-        };
-
-        // Will fail with LockError (path canonicalization) but NOT with HookError::Input.
-        let result = handler.handle(&ctx, &input);
-        assert!(!matches!(result, Err(HookError::Input(_))), "lock-release should not require pid");
-    }
-
-    #[test]
     fn test_test_file_guard_blocks_rm_tests_dir() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm tests/foo.rs".into()),
@@ -665,7 +456,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_rm_underscore_test_rs() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm src/user_test.rs".into()),
@@ -679,7 +470,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_rm_test_underscore_rs() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm src/test_user.rs".into()),
@@ -693,7 +484,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_allows_non_test_file() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm src/lib.rs".into()),
@@ -707,7 +498,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_rm_with_shell_separator() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm src/test_user.rs; echo done".into()),
@@ -721,7 +512,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_rm_with_double_ampersand_suffix() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm tests/foo.rs&& echo ok".into()),
@@ -735,7 +526,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_chained_rm_after_separator() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm src/main.rs && rm tests/foo.rs".into()),
@@ -749,7 +540,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_quoted_operand() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm \"src/test_user.rs\"".into()),
@@ -763,7 +554,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_glued_separator_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("echo ok;rm tests/foo.rs".into()),
@@ -777,7 +568,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_partial_quoting() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm src/\"test_user.rs\"".into()),
@@ -791,7 +582,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_rm_with_background_operator() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm tests/foo.rs& echo ok".into()),
@@ -805,7 +596,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_allows_echo_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("echo rm tests/foo.rs".into()),
@@ -819,7 +610,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_fail_closed_on_malformed_input() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         // Bash tool with missing command should error (fail-closed at CLI = exit 2)
         let input =
             HookInput { tool_name: "Bash".into(), command: None, file_path: None, content: None };
@@ -830,7 +621,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_env_var_prefix_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("FOO=1 rm tests/foo.rs".into()),
@@ -844,7 +635,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_newline_separated_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("echo ok\nrm tests/foo.rs".into()),
@@ -858,7 +649,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_absolute_path_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("/bin/rm tests/foo.rs".into()),
@@ -872,7 +663,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_usr_bin_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("/usr/bin/rm tests/foo.rs".into()),
@@ -886,7 +677,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_env_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("env rm tests/foo.rs".into()),
@@ -900,7 +691,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_allows_env_non_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("env ls tests/".into()),
@@ -914,7 +705,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_time_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("time rm tests/foo.rs".into()),
@@ -928,7 +719,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_exec_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("exec rm tests/foo.rs".into()),
@@ -942,7 +733,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_command_p_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("command -p rm tests/foo.rs".into()),
@@ -956,7 +747,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_command_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("command rm tests/foo.rs".into()),
@@ -970,7 +761,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_timeout_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("timeout 5 rm tests/foo.rs".into()),
@@ -984,7 +775,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_nice_n_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("nice -n 10 rm tests/foo.rs".into()),
@@ -998,7 +789,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_stdbuf_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("stdbuf -oL rm tests/foo.rs".into()),
@@ -1012,7 +803,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_sudo_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("sudo rm tests/foo.rs".into()),
@@ -1026,7 +817,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_doas_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("doas rm tests/foo.rs".into()),
@@ -1040,7 +831,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_absolute_path_sudo_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("/usr/bin/sudo rm tests/foo.rs".into()),
@@ -1054,7 +845,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_absolute_path_time_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("/usr/bin/time rm tests/foo.rs".into()),
@@ -1068,7 +859,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_rm_with_redirect() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm src/test_user.rs>/dev/null".into()),
@@ -1085,7 +876,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_rm_with_spaced_redirect() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm tests/foo.rs > /dev/null 2>&1".into()),
@@ -1099,7 +890,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_quoted_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("\"rm\" tests/foo.rs".into()),
@@ -1113,7 +904,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_quoted_bin_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("\"/bin/rm\" tests/foo.rs".into()),
@@ -1127,7 +918,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_leading_redirect_before_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some(">/tmp/out rm tests/foo.rs".into()),
@@ -1141,7 +932,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_fd_redirect_before_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("2>/dev/null rm tests/foo.rs".into()),
@@ -1155,7 +946,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_fd_dup_redirect_before_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("2>&1 rm tests/foo.rs".into()),
@@ -1172,7 +963,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_read_write_redirect_before_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("<>/tmp/out rm tests/foo.rs".into()),
@@ -1186,7 +977,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_clobber_redirect_before_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some(">|/tmp/out rm tests/foo.rs".into()),
@@ -1200,7 +991,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_herestring_before_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         // Here-string before a chained rm
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1215,7 +1006,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_quoted_path_with_space() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm \"src/test_user copy.rs\"".into()),
@@ -1232,7 +1023,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_rm_double_dash_test_file() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm -- -tests/foo_test.rs".into()),
@@ -1249,7 +1040,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_rm_rf_double_dash_test_dir() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm -rf -- tests/".into()),
@@ -1263,7 +1054,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_bash_c_rm_test_file() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("bash -c 'rm tests/foo.rs'".into()),
@@ -1277,7 +1068,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_sh_c_rm_test_file() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("sh -c 'rm -rf tests/'".into()),
@@ -1291,7 +1082,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_sudo_bash_c_rm_test_file() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("sudo bash -c 'rm tests/foo_test.rs'".into()),
@@ -1305,7 +1096,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_allows_bash_c_without_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("bash -c 'echo hello'".into()),
@@ -1319,7 +1110,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_env_i_bash_c_rm_test_file() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("env -i bash -c 'rm tests/foo.rs'".into()),
@@ -1333,7 +1124,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_timeout_bash_c_rm_test_file() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("timeout 5 bash -c 'rm tests/foo.rs'".into()),
@@ -1347,7 +1138,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_nested_bash_c_sh_c_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some(r#"bash -c 'sh -c "rm tests/foo.rs"'"#.into()),
@@ -1361,7 +1152,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_sudo_u_root_bash_c_rm() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("sudo -u root bash -c 'rm tests/foo_test.rs'".into()),
@@ -1375,7 +1166,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_bash_lc_rm_test_file() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("bash -lc 'rm tests/foo.rs'".into()),
@@ -1390,7 +1181,7 @@ mod tests {
     fn test_test_file_guard_blocks_sh_ec_rm_test_file() {
         // -ec: -e flag (exit on error), -c takes next arg as command
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("sh -ec 'rm tests/foo.rs'".into()),
@@ -1406,7 +1197,7 @@ mod tests {
         // -ce: -c + -e flags, next arg 'rm tests/foo.rs' is the command
         // Per POSIX/Bash, `-ce` is equivalent to `-c -e`.
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("sh -ce 'rm tests/foo.rs'".into()),
@@ -1422,7 +1213,7 @@ mod tests {
         // 4 levels of nesting — depth limit is 3, so the innermost shell re-entry
         // must be blocked via fail-closed (raw_mentions_rm) at depth 3
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some(r#"bash -c 'sh -c "bash -c \"sh -c \\\"rm tests/foo.rs\\\"\"" '"#.into()),
@@ -1441,7 +1232,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_write_with_empty_content_to_test_file_is_blocked() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Write".into(),
             command: None,
@@ -1455,7 +1246,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_write_with_content_to_test_file_is_allowed() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Write".into(),
             command: None,
@@ -1469,7 +1260,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_write_with_empty_content_to_non_test_file_is_allowed() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Write".into(),
             command: None,
@@ -1483,7 +1274,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_edit_tool_is_always_allowed() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Edit".into(),
             command: None,
@@ -1500,7 +1291,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_write_with_missing_file_path_is_blocked() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Write".into(),
             command: None,
@@ -1514,7 +1305,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_write_with_none_content_to_test_file_is_blocked() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Write".into(),
             command: None,
@@ -1531,7 +1322,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_write_with_none_content_to_non_test_file_is_allowed() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Write".into(),
             command: None,
@@ -1552,7 +1343,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_rm_tests_rs_module() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
             command: Some("rm src/tests.rs".into()),
@@ -1566,7 +1357,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_write_empty_to_tests_rs_is_blocked() {
         let handler = TestFileDeletionGuardHandler;
-        let ctx = HookContext { project_dir: None, locks_dir: None, agent: None, pid: None };
+        let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Write".into(),
             command: None,
@@ -1609,70 +1400,5 @@ mod tests {
         assert!(!raw_mentions_rm("format something"));
         assert!(!raw_mentions_rm("firmware update"));
         assert!(!raw_mentions_rm("echo normal"));
-    }
-
-    use rstest::rstest;
-
-    #[rstest]
-    #[case::read_is_shared("Read", Ok(LockMode::Shared))]
-    #[case::edit_is_exclusive("Edit", Ok(LockMode::Exclusive))]
-    #[case::write_is_exclusive("Write", Ok(LockMode::Exclusive))]
-    #[case::unknown_tool_returns_error("Bash", Err(()))]
-    fn test_resolve_lock_mode(#[case] tool_name: &str, #[case] expected_ok: Result<LockMode, ()>) {
-        let result = resolve_lock_mode(tool_name);
-        match expected_ok {
-            Ok(expected_mode) => assert_eq!(result.unwrap(), expected_mode),
-            Err(()) => {
-                assert!(
-                    matches!(result, Err(HookError::Input(ref msg)) if msg.contains("unsupported tool")),
-                    "expected unsupported tool error, got: {result:?}"
-                );
-            }
-        }
-    }
-
-    /// Stub lock manager for unit tests (validates field presence, not lock logic).
-    struct StubLockManager;
-
-    impl FileLockManager for StubLockManager {
-        fn acquire(
-            &self,
-            _path: &domain::lock::FilePath,
-            _mode: domain::lock::LockMode,
-            _agent: &domain::lock::AgentId,
-            _pid: u32,
-            _timeout: Option<std::time::Duration>,
-        ) -> Result<domain::lock::FileGuard, domain::lock::LockError> {
-            // Not reachable in these tests — we test field validation, not lock logic.
-            Err(domain::lock::LockError::Timeout { elapsed_ms: 0 })
-        }
-
-        fn release(
-            &self,
-            _path: &domain::lock::FilePath,
-            _agent: &domain::lock::AgentId,
-        ) -> Result<(), domain::lock::LockError> {
-            Ok(())
-        }
-
-        fn query(
-            &self,
-            _path: Option<&domain::lock::FilePath>,
-        ) -> Result<Vec<domain::lock::LockEntry>, domain::lock::LockError> {
-            Ok(Vec::new())
-        }
-
-        fn cleanup(&self) -> Result<usize, domain::lock::LockError> {
-            Ok(0)
-        }
-
-        fn extend(
-            &self,
-            _path: &domain::lock::FilePath,
-            _agent: &domain::lock::AgentId,
-            _additional: std::time::Duration,
-        ) -> Result<(), domain::lock::LockError> {
-            Ok(())
-        }
     }
 }

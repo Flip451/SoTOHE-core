@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| remove-file-lock-system-2026-03-19 | Done | 2026-03-19 |
 | review-escalation-threshold-2026-03-19 | Done | 2026-03-19 |
 | phase1-safety-hardening-2026-03-19 | Done | 2026-03-19 |
 | review-workflow-fixes-2026-03-18 | Done | 2026-03-18 |

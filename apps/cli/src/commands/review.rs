@@ -94,10 +94,6 @@ pub struct RecordRoundArgs {
     /// Track ID.
     #[arg(long)]
     track_id: String,
-
-    /// Directory for lock registry files.
-    #[arg(long, default_value = ".locks")]
-    locks_dir: String,
 }
 
 #[derive(Debug, Args)]
@@ -130,10 +126,6 @@ pub struct ResolveEscalationArgs {
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
     items_dir: PathBuf,
-
-    /// Directory for lock registry files.
-    #[arg(long, default_value = ".locks")]
-    locks_dir: String,
 }
 
 #[derive(Debug, Args)]
@@ -145,10 +137,6 @@ pub struct CheckApprovedArgs {
     /// Track ID.
     #[arg(long)]
     track_id: String,
-
-    /// Directory for lock registry files.
-    #[arg(long, default_value = ".locks")]
-    locks_dir: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -844,16 +832,11 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
         .to_string_lossy()
         .into_owned();
 
-    // Open track store with locking.
+    // Open track store.
     let track_id = domain::TrackId::new(&args.track_id)
         .map_err(|e| RecordRoundError::Other(format!("invalid track id: {e}")))?;
 
-    let lock_manager = std::sync::Arc::new(
-        infrastructure::lock::FsFileLockManager::new(&args.locks_dir)
-            .map_err(|e| RecordRoundError::Other(format!("failed to init lock manager: {e}")))?,
-    );
-    let store =
-        FsTrackStore::new(&args.items_dir, lock_manager, std::time::Duration::from_secs(10));
+    let store = FsTrackStore::new(&args.items_dir);
 
     let timestamp = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
 
@@ -868,11 +851,9 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
         .normalized_tree_hash(&git, &metadata_rel)
         .map_err(|e| RecordRoundError::Other(format!("normalized hash error: {e}")))?;
 
-    // Steps 3–7 are now a single atomic operation under one file lock.
-    //
-    // with_locked_document holds the exclusive metadata.json lock for the
-    // entire closure, so no other `sotp record-round` process can interleave
-    // between writing the PENDING state and computing the final code_hash.
+    // Steps 3–7 are a single atomic read-modify-write via with_locked_document.
+    // Correctness relies on single-process sequential execution (no concurrent
+    // sotp record-round). Parallel access will use worktree isolation (SPEC-04).
     //
     // Captured variables used inside the closure:
     //   - git, private_index, metadata_rel (git index staging)
@@ -1063,12 +1044,7 @@ fn run_resolve_escalation(args: &ResolveEscalationArgs) -> Result<(), String> {
     let track_id =
         domain::TrackId::new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
 
-    let lock_manager = std::sync::Arc::new(
-        infrastructure::lock::FsFileLockManager::new(&args.locks_dir)
-            .map_err(|e| format!("failed to init lock manager: {e}"))?,
-    );
-    let store =
-        FsTrackStore::new(&args.items_dir, lock_manager, std::time::Duration::from_secs(10));
+    let store = FsTrackStore::new(&args.items_dir);
 
     let timestamp = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
 
@@ -1522,12 +1498,7 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
     let track_id =
         domain::TrackId::new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
 
-    let lock_manager = std::sync::Arc::new(
-        infrastructure::lock::FsFileLockManager::new(&args.locks_dir)
-            .map_err(|e| format!("failed to init lock manager: {e}"))?,
-    );
-    let store =
-        FsTrackStore::new(&args.items_dir, lock_manager, std::time::Duration::from_secs(10));
+    let store = FsTrackStore::new(&args.items_dir);
 
     // Phase 1: Read-only check. On success, return without writing metadata.json.
     use domain::TrackReader;

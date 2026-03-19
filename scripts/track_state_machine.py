@@ -238,12 +238,10 @@ def _try_sotp_transition(
 
     items_dir = track_dir.parent  # track/items/<id> -> track/items/
     track_id = track_dir.name
-    locks_dir = str(track_dir.parent.parent.parent / ".locks")
 
     cmd = [
         sotp, "track", "transition",
         "--items-dir", str(items_dir),
-        "--locks-dir", locks_dir,
         track_id, task_id, new_status,
     ]
     if commit_hash is not None:
