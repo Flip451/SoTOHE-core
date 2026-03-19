@@ -25,7 +25,10 @@ pub use ids::{CommitHash, TaskId, TrackBranch, TrackId};
 pub use plan::{PlanSection, PlanView};
 pub use repository::{TrackReader, TrackWriter, WorktreeReader};
 pub use review::{
-    ReviewError, ReviewGroupState, ReviewRoundResult, ReviewState, ReviewStatus, RoundType,
+    EscalationPhase, ReviewConcern, ReviewConcernStreak, ReviewCycleSummary, ReviewError,
+    ReviewEscalationBlock, ReviewEscalationDecision, ReviewEscalationResolution,
+    ReviewEscalationState, ReviewGroupState, ReviewRoundResult, ReviewState, ReviewStatus,
+    RoundType,
 };
 pub use signal::SignalCounts;
 pub use track::{

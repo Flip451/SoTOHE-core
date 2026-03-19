@@ -23,11 +23,13 @@
     "codex": {
       "label": "Codex CLI",
       "default_model": "gpt-5.4",
-      "fast_model": "gpt-5.3-codex-spark",
+      "fast_model": "gpt-5.4-mini",
+      "nano_model": "gpt-5.4-nano",
+      "escalation_threshold": 3,
       "model_profiles": {
         "gpt-5.4": { "full_auto": true },
-        "gpt-5.3-codex": { "full_auto": true },
-        "gpt-5.3-codex-spark": { "full_auto": false }
+        "gpt-5.4-mini": { "full_auto": true },
+        "gpt-5.4-nano": { "full_auto": true, "api_only": true }
       },
       "supported_capabilities": [
         "planner",
@@ -65,7 +67,6 @@
       "researcher": "gemini",
       "implementer": "claude",
       "reviewer": "codex",
-
       "debugger": "codex",
       "multimodal_reader": "gemini",
       "workflow_host_provider": "claude",
@@ -89,7 +90,6 @@
       "researcher": "codex",
       "implementer": "codex",
       "reviewer": "codex",
-
       "debugger": "codex",
       "multimodal_reader": "gemini",
       "workflow_host_provider": "codex",

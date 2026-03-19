@@ -34,9 +34,13 @@ pub const REVIEW_OUTPUT_SCHEMA_JSON: &str = r##"{
         "message": { "type": "string" },
         "severity": { "type": ["string", "null"] },
         "file": { "type": ["string", "null"] },
-        "line": { "type": ["integer", "null"], "minimum": 1 }
+        "line": { "type": ["integer", "null"], "minimum": 1 },
+        "category": {
+          "type": ["string", "null"],
+          "description": "Optional concern category for escalation tracking"
+        }
       },
-      "required": ["message", "severity", "file", "line"],
+      "required": ["message", "severity", "file", "line", "category"],
       "additionalProperties": false
     }
   }
@@ -96,6 +100,8 @@ pub struct ReviewFinding {
     pub file: Option<String>,
     #[serde(default)]
     pub line: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub category: Option<String>,
 }
 
 #[must_use]
@@ -322,6 +328,7 @@ impl<'de> Visitor<'de> for ReviewFindingShapeVisitor {
         let mut seen_severity = false;
         let mut seen_file = false;
         let mut seen_line = false;
+        let mut seen_category = false;
 
         while let Some(key) = map.next_key::<String>()? {
             match key.as_str() {
@@ -353,10 +360,17 @@ impl<'de> Visitor<'de> for ReviewFindingShapeVisitor {
                     let _: Option<u64> = map.next_value()?;
                     seen_line = true;
                 }
+                "category" => {
+                    if seen_category {
+                        return Err(de::Error::duplicate_field("category"));
+                    }
+                    let _: Option<String> = map.next_value()?;
+                    seen_category = true;
+                }
                 other => {
                     return Err(de::Error::unknown_field(
                         other,
-                        &["message", "severity", "file", "line"],
+                        &["message", "severity", "file", "line", "category"],
                     ));
                 }
             }
@@ -379,13 +393,83 @@ impl<'de> Visitor<'de> for ReviewFindingShapeVisitor {
     }
 }
 
+/// Converts a file path to a concern slug.
+///
+/// # Examples
+///
+/// ```
+/// // "libs/domain/src/guard/parser.rs" → "domain.guard.parser"
+/// // "apps/cli/src/commands/review.rs" → "cli.commands.review"
+/// ```
+pub(crate) fn file_path_to_concern(path: &str) -> String {
+    // Handle absolute paths: find "libs/" or "apps/" anywhere in the path
+    let path = if let Some(idx) = path.find("libs/") {
+        &path[idx..]
+    } else if let Some(idx) = path.find("apps/") {
+        &path[idx..]
+    } else {
+        path
+    };
+    // Strip known workspace prefixes
+    let path = path.trim_start_matches("libs/").trim_start_matches("apps/");
+    // Strip .rs extension
+    let path = path.trim_end_matches(".rs");
+    // Replace "/src/" segments with "."
+    let path = path.replace("/src/", ".");
+    // Replace remaining "/" with "."
+    path.replace('/', ".")
+}
+
+/// Normalizes a `ReviewFinding` into a `ReviewConcern`.
+///
+/// Fallback order: category → file path → "other".
+///
+/// # Errors
+///
+/// Returns `domain::ReviewError::InvalidConcern` if the derived concern slug is empty
+/// (which should not occur in practice given the "other" fallback).
+pub fn finding_to_concern(
+    finding: &ReviewFinding,
+) -> Result<domain::ReviewConcern, domain::ReviewError> {
+    if let Some(ref cat) = finding.category {
+        if !cat.trim().is_empty() {
+            return domain::ReviewConcern::new(cat.as_str());
+        }
+    }
+    if let Some(ref file) = finding.file {
+        if !file.trim().is_empty() {
+            let slug = file_path_to_concern(file);
+            if !slug.trim().is_empty() {
+                return domain::ReviewConcern::new(slug);
+            }
+        }
+    }
+    domain::ReviewConcern::new("other")
+}
+
+/// Extracts and normalizes concerns from findings, deduplicating and sorting.
+///
+/// # Errors
+///
+/// Returns `domain::ReviewError::InvalidConcern` if a derived concern slug is empty.
+pub fn findings_to_concerns(
+    findings: &[ReviewFinding],
+) -> Result<Vec<domain::ReviewConcern>, domain::ReviewError> {
+    let mut set = std::collections::BTreeSet::new();
+    for f in findings {
+        set.insert(finding_to_concern(f)?);
+    }
+    Ok(set.into_iter().collect())
+}
+
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use super::{
         ModelProfile, REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewFinalPayload,
         ReviewFinding, ReviewPayloadVerdict, ReviewVerdict, classify_review_verdict,
-        normalize_final_message, parse_review_final_message, resolve_full_auto,
+        file_path_to_concern, finding_to_concern, findings_to_concerns, normalize_final_message,
+        parse_review_final_message, resolve_full_auto,
     };
     use serde_json::Value;
     use std::collections::HashMap;
@@ -421,7 +505,8 @@ mod tests {
                 Value::String("message".to_owned()),
                 Value::String("severity".to_owned()),
                 Value::String("file".to_owned()),
-                Value::String("line".to_owned())
+                Value::String("line".to_owned()),
+                Value::String("category".to_owned()),
             ]
         );
     }
@@ -478,6 +563,7 @@ mod tests {
                     severity: Some("P1".to_owned()),
                     file: None,
                     line: None,
+                    category: None,
                 }],
             })
         );
@@ -559,6 +645,7 @@ mod tests {
                     severity: None,
                     file: None,
                     line: None,
+                    category: None,
                 }],
             })
         );
@@ -604,6 +691,7 @@ mod tests {
                     severity: Some("P1".to_owned()),
                     file: None,
                     line: None,
+                    category: None,
                 }],
             }),
         );
@@ -623,6 +711,7 @@ mod tests {
                     severity: Some("P1".to_owned()),
                     file: None,
                     line: None,
+                    category: None,
                 }],
             }),
         );
@@ -705,5 +794,143 @@ mod tests {
         let profile: ModelProfile = serde_json::from_str("{}").unwrap();
 
         assert!(profile.full_auto, "omitted full_auto should default to true (fail-closed)");
+    }
+
+    // --- finding_to_concern tests ---
+
+    #[test]
+    fn test_finding_to_concern_uses_category_when_present() {
+        let f = ReviewFinding {
+            message: "bug".to_owned(),
+            category: Some("shell-parsing".to_owned()),
+            severity: None,
+            file: Some("foo.rs".to_owned()),
+            line: None,
+        };
+        let c = finding_to_concern(&f).unwrap();
+        assert_eq!(c.as_str(), "shell-parsing");
+    }
+
+    #[test]
+    fn test_finding_to_concern_falls_back_to_file_path() {
+        let f = ReviewFinding {
+            message: "bug".to_owned(),
+            category: None,
+            severity: None,
+            file: Some("libs/domain/src/review.rs".to_owned()),
+            line: None,
+        };
+        let c = finding_to_concern(&f).unwrap();
+        assert_eq!(c.as_str(), "domain.review");
+    }
+
+    #[test]
+    fn test_finding_to_concern_falls_back_to_other() {
+        let f = ReviewFinding {
+            message: "bug".to_owned(),
+            category: None,
+            severity: None,
+            file: None,
+            line: None,
+        };
+        let c = finding_to_concern(&f).unwrap();
+        assert_eq!(c.as_str(), "other");
+    }
+
+    #[test]
+    fn test_finding_to_concern_malformed_path_falls_back_to_other() {
+        let f = ReviewFinding {
+            message: "bug".to_owned(),
+            category: None,
+            severity: None,
+            file: Some(".rs".to_owned()),
+            line: None,
+        };
+        let c = finding_to_concern(&f).unwrap();
+        assert_eq!(c.as_str(), "other");
+    }
+
+    #[test]
+    fn test_finding_to_concern_ignores_empty_category() {
+        let f = ReviewFinding {
+            message: "bug".to_owned(),
+            category: Some("".to_owned()),
+            severity: None,
+            file: Some("libs/domain/src/review.rs".to_owned()),
+            line: None,
+        };
+        let c = finding_to_concern(&f).unwrap();
+        assert_eq!(c.as_str(), "domain.review");
+    }
+
+    #[test]
+    fn test_findings_to_concerns_deduplicates_and_sorts() {
+        let findings = vec![
+            ReviewFinding {
+                message: "a".to_owned(),
+                category: Some("bbb".to_owned()),
+                severity: None,
+                file: None,
+                line: None,
+            },
+            ReviewFinding {
+                message: "b".to_owned(),
+                category: Some("aaa".to_owned()),
+                severity: None,
+                file: None,
+                line: None,
+            },
+            ReviewFinding {
+                message: "c".to_owned(),
+                category: Some("bbb".to_owned()),
+                severity: None,
+                file: None,
+                line: None,
+            },
+        ];
+        let concerns = findings_to_concerns(&findings).unwrap();
+        assert_eq!(concerns.len(), 2);
+        assert_eq!(concerns[0].as_str(), "aaa");
+        assert_eq!(concerns[1].as_str(), "bbb");
+    }
+
+    #[test]
+    fn test_file_path_to_concern_domain() {
+        assert_eq!(file_path_to_concern("libs/domain/src/guard/parser.rs"), "domain.guard.parser");
+    }
+
+    #[test]
+    fn test_file_path_to_concern_cli() {
+        assert_eq!(file_path_to_concern("apps/cli/src/commands/review.rs"), "cli.commands.review");
+    }
+
+    #[test]
+    fn test_file_path_to_concern_absolute_path() {
+        assert_eq!(
+            file_path_to_concern("/home/user/project/libs/domain/src/review.rs"),
+            "domain.review"
+        );
+    }
+
+    #[test]
+    fn test_file_path_to_concern_absolute_path_apps() {
+        assert_eq!(
+            file_path_to_concern("/workspace/apps/cli/src/commands/review.rs"),
+            "cli.commands.review"
+        );
+    }
+
+    #[test]
+    fn test_parse_finding_with_category() {
+        let json = r#"{"verdict":"findings_remain","findings":[{"message":"bug","severity":"P1","file":"foo.rs","line":1,"category":"shell-parsing"}]}"#;
+        let result = parse_review_final_message(Some(json));
+        assert!(matches!(result, ReviewFinalMessageState::Parsed(_)));
+    }
+
+    #[test]
+    fn test_parse_finding_without_category() {
+        let json = r#"{"verdict":"findings_remain","findings":[{"message":"bug","severity":"P1","file":"foo.rs","line":1}]}"#;
+        let result = parse_review_final_message(Some(json));
+        assert!(matches!(result, ReviewFinalMessageState::Parsed(_)));
     }
 }
