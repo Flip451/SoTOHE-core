@@ -833,6 +833,15 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         .map_err(|e| format!("post-update normalized hash error: {e}"))?;
 
     // Step 6: Write back the computed hash via set_code_hash.
+    //
+    // Note: this is a second `store.update` call. FsTrackStore acquires a
+    // per-call file lock, so another `sotp` process using the same lock
+    // manager is serialized. The window between step 3 and step 6 is safe
+    // because (a) all staging happens on the private index (not the real
+    // one), and (b) even if another process writes metadata.json between
+    // steps, `store.update` re-reads the latest state before applying
+    // `set_code_hash`, and the private index swap in step 8 reflects the
+    // final disk state.
     store
         .update(&track_id, |track| {
             if let Some(review) = track.review_mut().as_mut() {
@@ -1111,21 +1120,40 @@ impl PrivateIndex {
         Ok(())
     }
 
-    /// Atomically rename the private index over the real index.
+    /// Atomically replace the real index using git's own lockfile protocol.
     ///
-    /// On POSIX, `fs::rename` is atomic when both paths are on the same
-    /// filesystem (guaranteed by [`from_current`] placing the temp file in
-    /// the same directory as the real index).
+    /// 1. Create `<index>.lock` with `O_CREAT|O_EXCL` — blocks concurrent
+    ///    git operations (they also use this lock before touching the index).
+    /// 2. Copy our private index content into the lock file.
+    /// 3. Rename `<index>.lock` → `<index>` — atomic on POSIX, and this is
+    ///    exactly how git itself commits index changes.
     ///
-    /// [`from_current`]: PrivateIndex::from_current
+    /// The lock is held only for the copy+rename duration (microseconds),
+    /// so it does not interfere with our earlier `git hash-object` /
+    /// `git update-index` calls which operate on the private index.
     fn swap_into_real(mut self) -> Result<(), String> {
-        std::fs::rename(&self.temp_path, &self.real_index_path).map_err(|e| {
+        let lock_path = self.real_index_path.with_extension("lock");
+        // Acquire git's index lock — fails if another git operation holds it.
+        std::fs::OpenOptions::new().write(true).create_new(true).open(&lock_path).map_err(|e| {
             format!(
-                "failed to atomically rename private index {} -> {}: {e}",
-                self.temp_path.display(),
-                self.real_index_path.display()
+                "failed to acquire index lock at {}: {e}. \
+                     A concurrent git operation may be in progress.",
+                lock_path.display()
             )
         })?;
+        // Copy private index content into the lock file.
+        if let Err(e) = std::fs::copy(&self.temp_path, &lock_path) {
+            let _ = std::fs::remove_file(&lock_path);
+            return Err(format!("failed to write index lock: {e}"));
+        }
+        // Atomic rename: lock file becomes the real index.
+        // This is git's own commit protocol for index updates.
+        if let Err(e) = std::fs::rename(&lock_path, &self.real_index_path) {
+            let _ = std::fs::remove_file(&lock_path);
+            return Err(format!("failed to rename index lock to index: {e}"));
+        }
+        // Clean up the temp private index.
+        let _ = std::fs::remove_file(&self.temp_path);
         self.swapped = true;
         Ok(())
     }
