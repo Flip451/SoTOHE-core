@@ -1,0 +1,68 @@
+{
+  "branch": "track/phase1-safety-hardening-2026-03-19",
+  "created_at": "2026-03-19T01:41:10Z",
+  "id": "phase1-safety-hardening-2026-03-19",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Normalize path components in is_test_file using std::path::Path::components() before string pattern matching",
+          "Add tests for relative path traversal patterns (../, ./, multi-level ..)"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Path normalization for test file detection"
+      },
+      {
+        "description": [
+          "Add #![forbid(unsafe_code)] to libs/domain/src/lib.rs, libs/infrastructure/src/lib.rs, libs/usecase/src/lib.rs",
+          "Verify build passes (no existing unsafe code in these crates)"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "Forbid unsafe code in library crates"
+      }
+    ],
+    "summary": [
+      "Phase 1 remaining 2 items: GAP-05 (is_test_file path normalization) and GAP-06 (forbid unsafe_code). Both S-difficulty safety improvements."
+    ]
+  },
+  "review": {
+    "code_hash": "6b4cb961e12506b65bc146beb6358299688fb398",
+    "groups": {
+      "other": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-19T01:52:41Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T01:52:49Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "planned",
+  "tasks": [
+    {
+      "description": "Add path component normalization to is_test_file (GAP-05)",
+      "id": "T001",
+      "status": "todo"
+    },
+    {
+      "description": "Add #![forbid(unsafe_code)] to 3 lib crate roots (GAP-06)",
+      "id": "T002",
+      "status": "todo"
+    }
+  ],
+  "title": "Phase 1 Safety Hardening: is_test_file path normalization + forbid(unsafe_code)",
+  "updated_at": "2026-03-19T01:52:49Z"
+}
