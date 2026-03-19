@@ -31,6 +31,8 @@ pub enum ReviewCommand {
     RecordRound(RecordRoundArgs),
     /// Check if review is approved for commit.
     CheckApproved(CheckApprovedArgs),
+    /// Resolve an active review escalation block.
+    ResolveEscalation(ResolveEscalationArgs),
 }
 
 #[derive(Debug, Args)]
@@ -80,6 +82,11 @@ pub struct RecordRoundArgs {
     #[arg(long)]
     expected_groups: String,
 
+    /// Comma-separated list of concern slugs for escalation tracking.
+    /// Extracted from reviewer findings. Empty for zero_findings rounds.
+    #[arg(long, default_value = "")]
+    concerns: String,
+
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
     items_dir: PathBuf,
@@ -87,6 +94,42 @@ pub struct RecordRoundArgs {
     /// Track ID.
     #[arg(long)]
     track_id: String,
+
+    /// Directory for lock registry files.
+    #[arg(long, default_value = ".locks")]
+    locks_dir: String,
+}
+
+#[derive(Debug, Args)]
+pub struct ResolveEscalationArgs {
+    /// Track ID.
+    #[arg(long)]
+    track_id: String,
+
+    /// Comma-separated list of blocked concerns to resolve.
+    /// Must match the concerns currently blocking escalation.
+    #[arg(long)]
+    blocked_concerns: String,
+
+    /// Path to workspace search artifact.
+    #[arg(long)]
+    workspace_search_ref: String,
+
+    /// Path to reinvention check artifact.
+    #[arg(long)]
+    reinvention_check_ref: String,
+
+    /// Decision: adopt_workspace, adopt_crate, or continue_self.
+    #[arg(long)]
+    decision: String,
+
+    /// Summary of the decision rationale.
+    #[arg(long)]
+    summary: String,
+
+    /// Path to the track items directory.
+    #[arg(long, default_value = "track/items")]
+    items_dir: PathBuf,
 
     /// Directory for lock registry files.
     #[arg(long, default_value = ".locks")]
@@ -135,6 +178,7 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
         ReviewCommand::CodexLocal(args) => execute_codex_local(&args),
         ReviewCommand::RecordRound(args) => execute_record_round(&args),
         ReviewCommand::CheckApproved(args) => execute_check_approved(&args),
+        ReviewCommand::ResolveEscalation(args) => execute_resolve_escalation(&args),
     }
 }
 
@@ -701,17 +745,42 @@ fn terminate_reviewer_child(child: &mut Child) -> Result<(), String> {
 // record-round: Write review round results to metadata.json
 // ---------------------------------------------------------------------------
 
+/// Exit code used when a review escalation block prevents recording a round.
+const EXIT_CODE_ESCALATION_BLOCKED: u8 = 3;
+
 fn execute_record_round(args: &RecordRoundArgs) -> ExitCode {
     match run_record_round(args) {
         Ok(()) => ExitCode::SUCCESS,
-        Err(msg) => {
+        Err(RecordRoundError::EscalationBlocked(concerns)) => {
+            eprintln!(
+                "[BLOCKED] Review escalation active for concerns: {concerns:?}\n\
+                 Required actions:\n\
+                 \x20 1. Workspace Search: use Grep to check if existing code solves this problem\n\
+                 \x20 2. Reinvention Check: invoke researcher capability to survey crates.io\n\
+                 \x20 3. Decision: run `sotp review resolve-escalation` with evidence"
+            );
+            ExitCode::from(EXIT_CODE_ESCALATION_BLOCKED)
+        }
+        Err(RecordRoundError::Other(msg)) => {
             eprintln!("{msg}");
             ExitCode::FAILURE
         }
     }
 }
 
-fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
+#[derive(Debug)]
+enum RecordRoundError {
+    EscalationBlocked(Vec<String>),
+    Other(String),
+}
+
+impl From<String> for RecordRoundError {
+    fn from(s: String) -> Self {
+        Self::Other(s)
+    }
+}
+
+fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
     use domain::{ReviewRoundResult, ReviewState, RoundType};
     use infrastructure::git_cli::{GitRepository, SystemGitRepo};
     use infrastructure::track::fs_store::FsTrackStore;
@@ -719,14 +788,33 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
     let round_type = match args.round_type.as_str() {
         "fast" => RoundType::Fast,
         "final" => RoundType::Final,
-        other => return Err(format!("unknown round type: {other} (expected 'fast' or 'final')")),
+        other => {
+            return Err(RecordRoundError::Other(format!(
+                "unknown round type: {other} (expected 'fast' or 'final')"
+            )));
+        }
     };
 
     let expected_groups: Vec<String> =
         args.expected_groups.split(',').map(|s| s.trim().to_owned()).collect();
     if expected_groups.is_empty() || expected_groups.iter().any(|g| g.is_empty()) {
-        return Err("--expected-groups must be a non-empty comma-separated list".to_owned());
+        return Err(RecordRoundError::Other(
+            "--expected-groups must be a non-empty comma-separated list".to_owned(),
+        ));
     }
+
+    // Parse concerns from the comma-separated --concerns argument.
+    // Dedup and sort via BTreeSet so the stored list is canonical regardless of input order.
+    let concerns: Vec<domain::ReviewConcern> = if args.concerns.trim().is_empty() {
+        Vec::new()
+    } else {
+        let parsed: Result<std::collections::BTreeSet<domain::ReviewConcern>, _> =
+            args.concerns.split(',').map(|s| domain::ReviewConcern::new(s.trim())).collect();
+        parsed
+            .map_err(|e| RecordRoundError::Other(format!("invalid concern: {e}")))?
+            .into_iter()
+            .collect()
+    };
 
     // Parse and semantically validate the verdict JSON.
     // parse_review_final_message applies both structural and semantic checks
@@ -738,14 +826,15 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
             usecase::review_workflow::ReviewPayloadVerdict::FindingsRemain => "findings_remain",
         },
         ReviewFinalMessageState::Missing => {
-            return Err("--verdict is required".to_owned());
+            return Err(RecordRoundError::Other("--verdict is required".to_owned()));
         }
         ReviewFinalMessageState::Invalid { reason } => {
-            return Err(format!("invalid --verdict: {reason}"));
+            return Err(RecordRoundError::Other(format!("invalid --verdict: {reason}")));
         }
     };
 
-    let git = SystemGitRepo::discover().map_err(|e| format!("git error: {e}"))?;
+    let git = SystemGitRepo::discover()
+        .map_err(|e| RecordRoundError::Other(format!("git error: {e}")))?;
 
     // Compute repo-relative metadata path for normalized hash.
     let metadata_abs = args.items_dir.join(&args.track_id).join("metadata.json");
@@ -756,6 +845,221 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         .into_owned();
 
     // Open track store with locking.
+    let track_id = domain::TrackId::new(&args.track_id)
+        .map_err(|e| RecordRoundError::Other(format!("invalid track id: {e}")))?;
+
+    let lock_manager = std::sync::Arc::new(
+        infrastructure::lock::FsFileLockManager::new(&args.locks_dir)
+            .map_err(|e| RecordRoundError::Other(format!("failed to init lock manager: {e}")))?,
+    );
+    let store =
+        FsTrackStore::new(&args.items_dir, lock_manager, std::time::Duration::from_secs(10));
+
+    let timestamp = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
+
+    // Step 1: Copy the current git index to a private temp file.
+    // All staging operations go through the private index; the real index is
+    // only updated at the very end via an atomic fs::rename.  This eliminates
+    // the TOCTOU window between the two `store.update` calls in the old design.
+    let private_index = PrivateIndex::from_current(&git).map_err(RecordRoundError::Other)?;
+
+    // Step 2: Compute pre-update normalized hash from the private index.
+    let pre_update_hash = private_index
+        .normalized_tree_hash(&git, &metadata_rel)
+        .map_err(|e| RecordRoundError::Other(format!("normalized hash error: {e}")))?;
+
+    // Steps 3–7 are now a single atomic operation under one file lock.
+    //
+    // with_locked_document holds the exclusive metadata.json lock for the
+    // entire closure, so no other `sotp record-round` process can interleave
+    // between writing the PENDING state and computing the final code_hash.
+    //
+    // Captured variables used inside the closure:
+    //   - git, private_index, metadata_rel (git index staging)
+    //   - round_type, args.group, verdict_str, timestamp, expected_groups, pre_update_hash
+    let mut stale_error: Option<String> = None;
+    let mut escalation_error: Option<Vec<String>> = None;
+    let with_locked_result = store.with_locked_document(&track_id, |track, meta| {
+        // Step 3: Record round with code_hash="PENDING".
+        let review = track.review_mut().get_or_insert_with(ReviewState::new);
+        let round_num = review
+            .groups()
+            .get(&args.group)
+            .and_then(|g| match round_type {
+                RoundType::Fast => g.fast().map(|r| r.round()),
+                RoundType::Final => g.final_round().map(|r| r.round()),
+            })
+            .map(|n| n.saturating_add(1))
+            .unwrap_or(1);
+
+        let result = if concerns.is_empty() {
+            ReviewRoundResult::new(round_num, verdict_str, &timestamp)
+        } else {
+            ReviewRoundResult::new_with_concerns(
+                round_num,
+                verdict_str,
+                &timestamp,
+                concerns.clone(),
+            )
+        };
+        match review.record_round_with_pending(
+            round_type,
+            &args.group,
+            result,
+            &expected_groups,
+            &pre_update_hash,
+        ) {
+            Ok(()) => {}
+            Err(domain::ReviewError::EscalationActive { concerns: blocked }) => {
+                // Escalation is active — signal via sentinel and abort the closure
+                // with an Err so that with_locked_document does NOT write metadata.json.
+                escalation_error = Some(blocked);
+                return Err(domain::DomainError::Validation(
+                    domain::ValidationError::InvalidTaskId(
+                        "escalation-blocked-sentinel".to_owned(),
+                    ),
+                ));
+            }
+            Err(domain::ReviewError::StaleCodeHash { expected, actual }) => {
+                // Persist the invalidated state, then signal the caller.
+                // Returning Ok here causes with_locked_document to write
+                // the (now-invalidated) track to disk.
+                stale_error = Some(format!(
+                    "code hash mismatch: review recorded against {expected}, \
+                         but current code is {actual} — review.status set to invalidated"
+                ));
+                meta.updated_at = timestamp.clone();
+                return Ok(());
+            }
+            Err(e) => {
+                return Err(domain::DomainError::Validation(
+                    domain::ValidationError::InvalidTaskId(e.to_string()),
+                ));
+            }
+        }
+
+        // Step 4: Set updated_at (not auto-set by with_locked_document).
+        meta.updated_at = timestamp.clone();
+
+        // Step 5: Serialize PENDING state and stage into private index.
+        let pending_json = infrastructure::track::codec::encode(track, meta).map_err(|e| {
+            domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
+                "codec encode error: {e}"
+            )))
+        })?;
+        // Append trailing newline for POSIX compatibility, matching write_track.
+        let pending_content = format!("{pending_json}\n");
+        private_index.stage_bytes(&git, &metadata_rel, pending_content.as_bytes()).map_err(
+            |e| domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(e)),
+        )?;
+
+        // Step 6: Compute normalized hash H1 from the private index (PENDING state staged).
+        let h1 = private_index.normalized_tree_hash(&git, &metadata_rel).map_err(|e| {
+            domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
+                "post-pending normalized hash error: {e}"
+            )))
+        })?;
+
+        // Step 7: Replace PENDING with the real code_hash.
+        if let Some(r) = track.review_mut().as_mut() {
+            r.set_code_hash(h1);
+        }
+
+        // Step 8: Serialize final state and stage into private index.
+        // with_locked_document will write this same state to disk.
+        let final_json = infrastructure::track::codec::encode(track, meta).map_err(|e| {
+            domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
+                "codec encode error (final): {e}"
+            )))
+        })?;
+        let final_content = format!("{final_json}\n");
+        private_index.stage_bytes(&git, &metadata_rel, final_content.as_bytes()).map_err(|e| {
+            domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(e))
+        })?;
+
+        Ok(())
+    });
+
+    // Escalation block — the closure returned Err (sentinel), so with_locked_document
+    // did NOT write metadata.json. Check escalation_error before propagating other errors.
+    if let Some(blocked_concerns) = escalation_error {
+        return Err(RecordRoundError::EscalationBlocked(blocked_concerns));
+    }
+
+    // Propagate any real (non-escalation) error from with_locked_document.
+    // Extract inner message from InvalidTaskId sentinel wrapping (CLI-02 will fix properly).
+    with_locked_result.map_err(|e| {
+        let msg = e.to_string();
+        let cleaned = if let Some(inner) = msg.strip_prefix("task id '") {
+            inner.strip_suffix("' must match the pattern T<digits>").unwrap_or(inner).to_owned()
+        } else {
+            msg
+        };
+        RecordRoundError::Other(format!("record-round failed: {cleaned}"))
+    })?;
+
+    if let Some(err_msg) = stale_error {
+        // private_index is dropped without swap — real index is untouched.
+        return Err(RecordRoundError::Other(format!("[BLOCKED] {err_msg}")));
+    }
+
+    // Step 9: Atomically rename private index over the real index.
+    // If any earlier step failed, private_index would be dropped without swap,
+    // leaving the real index entirely untouched.
+    private_index.swap_into_real().map_err(RecordRoundError::Other)?;
+
+    eprintln!(
+        "[OK] Recorded {round_type} round for group '{}' (verdict: {verdict_str})",
+        args.group
+    );
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// resolve-escalation: Resolve an active review escalation block
+// ---------------------------------------------------------------------------
+
+fn execute_resolve_escalation(args: &ResolveEscalationArgs) -> ExitCode {
+    match run_resolve_escalation(args) {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(msg) => {
+            eprintln!("{msg}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn run_resolve_escalation(args: &ResolveEscalationArgs) -> Result<(), String> {
+    use domain::{ReviewEscalationDecision, ReviewEscalationResolution};
+    use infrastructure::track::fs_store::FsTrackStore;
+
+    let decision = match args.decision.as_str() {
+        "adopt_workspace" => ReviewEscalationDecision::AdoptWorkspaceSolution,
+        "adopt_crate" => ReviewEscalationDecision::AdoptExternalCrate,
+        "continue_self" => ReviewEscalationDecision::ContinueSelfImplementation,
+        other => {
+            return Err(format!(
+                "unknown decision: {other}. Use: adopt_workspace, adopt_crate, or continue_self"
+            ));
+        }
+    };
+
+    // Parse caller-supplied blocked concerns. Deduplicate and sort via BTreeSet so
+    // that order-insensitive comparisons in the domain layer are stable.
+    // The domain layer validates the match against the active escalation block via
+    // ReviewEscalationResolution::new.
+    let blocked_concerns: Vec<domain::ReviewConcern> = {
+        let parsed: Result<std::collections::BTreeSet<_>, _> = args
+            .blocked_concerns
+            .split(',')
+            .map(|s| {
+                domain::ReviewConcern::new(s.trim())
+                    .map_err(|e| format!("invalid blocked concern: {e}"))
+            })
+            .collect();
+        parsed?.into_iter().collect()
+    };
+
     let track_id =
         domain::TrackId::new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
 
@@ -768,125 +1072,76 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
 
     let timestamp = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
 
-    // Step 1: Copy the current git index to a private temp file.
-    // All staging operations go through the private index; the real index is
-    // only updated at the very end via an atomic fs::rename.  This eliminates
-    // the TOCTOU window between the two `store.update` calls in the old design.
-    let private_index = PrivateIndex::from_current(&git)?;
-
-    // Step 2: Compute pre-update normalized hash from the private index.
-    let pre_update_hash = private_index
-        .normalized_tree_hash(&git, &metadata_rel)
-        .map_err(|e| format!("normalized hash error: {e}"))?;
-
-    // Steps 3–7 are now a single atomic operation under one file lock.
-    //
-    // with_locked_document holds the exclusive metadata.json lock for the
-    // entire closure, so no other `sotp record-round` process can interleave
-    // between writing the PENDING state and computing the final code_hash.
-    //
-    // Captured variables used inside the closure:
-    //   - git, private_index, metadata_rel (git index staging)
-    //   - round_type, args.group, verdict_str, timestamp, expected_groups, pre_update_hash
-    let mut stale_error: Option<String> = None;
     store
         .with_locked_document(&track_id, |track, meta| {
-            // Step 3: Record round with code_hash="PENDING".
-            let review = track.review_mut().get_or_insert_with(ReviewState::new);
-            let round_num = review
-                .groups()
-                .get(&args.group)
-                .and_then(|g| match round_type {
-                    RoundType::Fast => g.fast().map(|r| r.round()),
-                    RoundType::Final => g.final_round().map(|r| r.round()),
-                })
-                .map(|n| n.saturating_add(1))
-                .unwrap_or(1);
+            let review = track.review_mut().as_mut().ok_or_else(|| {
+                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(
+                    "no review section in metadata.json".to_owned(),
+                ))
+            })?;
 
-            let result = ReviewRoundResult::new(round_num, verdict_str, &timestamp);
-            match review.record_round_with_pending(
-                round_type,
-                &args.group,
-                result,
-                &expected_groups,
-                &pre_update_hash,
-            ) {
-                Ok(()) => {}
-                Err(domain::ReviewError::StaleCodeHash { expected, actual }) => {
-                    // Persist the invalidated state, then signal the caller.
-                    // Returning Ok here causes with_locked_document to write
-                    // the (now-invalidated) track to disk.
-                    stale_error = Some(format!(
-                        "code hash mismatch: review recorded against {expected}, \
-                         but current code is {actual} — review.status set to invalidated"
-                    ));
-                    meta.updated_at = timestamp.clone();
-                    return Ok(());
-                }
-                Err(e) => {
-                    return Err(domain::DomainError::Validation(
-                        domain::ValidationError::InvalidTaskId(e.to_string()),
-                    ));
-                }
+            // Check escalation is active before verifying evidence artifacts.
+            // This ensures callers get "EscalationNotActive" rather than
+            // "artifact not found" when no escalation is in progress.
+            if !review.escalation().is_blocked() {
+                return Err(domain::DomainError::Validation(
+                    domain::ValidationError::InvalidTaskId(
+                        "no active escalation block; cannot resolve".to_owned(),
+                    ),
+                ));
             }
 
-            // Step 4: Set updated_at (not auto-set by with_locked_document).
+            // Verify evidence artifacts exist before committing to the resolution.
+            if !std::path::Path::new(&args.workspace_search_ref).exists() {
+                return Err(domain::DomainError::Validation(
+                    domain::ValidationError::InvalidTaskId(format!(
+                        "workspace search artifact not found: {}",
+                        args.workspace_search_ref
+                    )),
+                ));
+            }
+            if !std::path::Path::new(&args.reinvention_check_ref).exists() {
+                return Err(domain::DomainError::Validation(
+                    domain::ValidationError::InvalidTaskId(format!(
+                        "reinvention check artifact not found: {}",
+                        args.reinvention_check_ref
+                    )),
+                ));
+            }
+
+            let resolution = ReviewEscalationResolution::new(
+                blocked_concerns.clone(),
+                args.workspace_search_ref.clone(),
+                args.reinvention_check_ref.clone(),
+                decision,
+                args.summary.clone(),
+                timestamp.clone(),
+            );
+
+            review.resolve_escalation(resolution).map_err(|e| {
+                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(
+                    e.to_string(),
+                ))
+            })?;
+
             meta.updated_at = timestamp.clone();
-
-            // Step 5: Serialize PENDING state and stage into private index.
-            let pending_json = infrastructure::track::codec::encode(track, meta).map_err(|e| {
-                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
-                    "codec encode error: {e}"
-                )))
-            })?;
-            // Append trailing newline for POSIX compatibility, matching write_track.
-            let pending_content = format!("{pending_json}\n");
-            private_index.stage_bytes(&git, &metadata_rel, pending_content.as_bytes()).map_err(
-                |e| domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(e)),
-            )?;
-
-            // Step 6: Compute normalized hash H1 from the private index (PENDING state staged).
-            let h1 = private_index.normalized_tree_hash(&git, &metadata_rel).map_err(|e| {
-                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
-                    "post-pending normalized hash error: {e}"
-                )))
-            })?;
-
-            // Step 7: Replace PENDING with the real code_hash.
-            if let Some(r) = track.review_mut().as_mut() {
-                r.set_code_hash(h1);
-            }
-
-            // Step 8: Serialize final state and stage into private index.
-            // with_locked_document will write this same state to disk.
-            let final_json = infrastructure::track::codec::encode(track, meta).map_err(|e| {
-                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
-                    "codec encode error (final): {e}"
-                )))
-            })?;
-            let final_content = format!("{final_json}\n");
-            private_index.stage_bytes(&git, &metadata_rel, final_content.as_bytes()).map_err(
-                |e| domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(e)),
-            )?;
-
             Ok(())
         })
-        .map_err(|e| format!("failed to update metadata.json: {e}"))?;
+        .map_err(|e| {
+            // Extract the inner message from InvalidTaskId sentinel wrapping.
+            // The closure uses InvalidTaskId as a generic error carrier because
+            // with_locked_document constrains the return type to DomainError.
+            // This will be cleaned up in CLI-02 (usecase layer extraction).
+            let msg = e.to_string();
+            if let Some(inner) = msg.strip_prefix("task id '") {
+                if let Some(inner) = inner.strip_suffix("' must match the pattern T<digits>") {
+                    return format!("resolve-escalation failed: {inner}");
+                }
+            }
+            format!("resolve-escalation failed: {msg}")
+        })?;
 
-    if let Some(err_msg) = stale_error {
-        // private_index is dropped without swap — real index is untouched.
-        return Err(format!("[BLOCKED] {err_msg}"));
-    }
-
-    // Step 9: Atomically rename private index over the real index.
-    // If any earlier step failed, private_index would be dropped without swap,
-    // leaving the real index entirely untouched.
-    private_index.swap_into_real()?;
-
-    eprintln!(
-        "[OK] Recorded {round_type} round for group '{}' (verdict: {verdict_str})",
-        args.group
-    );
+    println!("[OK] Escalation resolved: {}", args.decision);
     Ok(())
 }
 

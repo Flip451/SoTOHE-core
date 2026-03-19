@@ -25,6 +25,7 @@
       "default_model": "gpt-5.4",
       "fast_model": "gpt-5.4-mini",
       "nano_model": "gpt-5.4-nano",
+      "escalation_threshold": 3,
       "model_profiles": {
         "gpt-5.4": { "full_auto": true },
         "gpt-5.4-mini": { "full_auto": true },

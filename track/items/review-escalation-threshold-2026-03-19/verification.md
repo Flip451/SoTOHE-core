@@ -2,11 +2,11 @@
 
 ## Scope Verified
 
-- [ ] Domain 層の型定義と状態遷移ロジック
-- [ ] Usecase 層のカテゴリ正規化
-- [ ] Infra/Codec 層の metadata.json スキーマ拡張
-- [ ] CLI 層の record-round 拡張と resolve-escalation サブコマンド
-- [ ] ドキュメント更新
+- [x] Domain 層の型定義と状態遷移ロジック
+- [x] Usecase 層のカテゴリ正規化
+- [x] Infra/Codec 層の metadata.json スキーマ拡張
+- [x] CLI 層の record-round 拡張と resolve-escalation サブコマンド
+- [x] ドキュメント更新
 
 ## Manual Verification Steps
 
@@ -14,11 +14,12 @@
    - 単一グループ: 同一 concern で 3 連続 closed cycle → 3 回目は正常記録 + `EscalationPhase::Blocked` に遷移
    - 複数グループ: 2 つの expected_groups が同一ラウンドに参加する場合、全グループが同一ラウンドを完了して初めて 1 closed cycle としてカウントされることを確認（グループごとのカウントではなく、ラウンド完了単位）
 2. **ハードブロックテスト**: エスカレーション `blocked` 中に `record_round` / `record_round_with_pending` / `check_commit_ready` を呼び出し、すべてが `Err(ReviewError::EscalationActive)` で拒否されることを確認
-3. **解除テスト（正常系）**: `resolve-escalation` に `ReviewEscalationResolution` 全フィールド（blocked_concerns, workspace_search_ref, reinvention_check_ref, decision, summary, resolved_at）を渡して解除。解除後に `ReviewStatus::Invalidated` + `code_hash = None` + `EscalationPhase::Clear` + `last_resolution` に record が保存されていることを確認
-   - **解除テスト（エラー系）**:
+3. **解除テスト（正常系）**: `sotp review resolve-escalation` に `--blocked-concerns`, `--workspace-search-ref`, `--reinvention-check-ref`, `--decision`, `--summary` を渡して解除（`resolved_at` は CLI が自動生成）。解除後に `ReviewStatus::Invalidated` + `code_hash = None` + `EscalationPhase::Clear` + `last_resolution` に record が保存されていることを確認
+   - **解除テスト（エラー系 — domain 層ユニットテストで検証）**:
      - `blocked_concerns` が現在の blocked concerns と一致しない場合に `ResolutionConcernMismatch` が返ることを確認
      - `workspace_search_ref` / `reinvention_check_ref` / `summary` / `resolved_at` が空文字の場合に `ResolutionEvidenceMissing` が返ることを確認
      - エスカレーション未発動中に `resolve_escalation` を呼んだ場合に `EscalationNotActive` が返ることを確認
+   - **CLI 固有の検証**: `sotp review resolve-escalation` で存在しないアーティファクトパスを渡した場合にエラーメッセージが表示されることを確認（CLI がファイル存在チェック、`resolved_at` は CLI が自動生成）
 4. **ReviewConcern バリデーションテスト**:
    - 空文字で `ReviewConcern::new("")` を呼んだ場合に `Err(ReviewError::InvalidConcern)` が返ることを確認
    - 有効な slug（例: `"domain.review"`）で `ReviewConcern::new()` が成功することを確認
@@ -41,8 +42,11 @@
 
 ## Result / Open Issues
 
-_To be filled after implementation_
+- 1076 テスト全パス、clippy クリーン、CI 全パス
+- review.rs が ~2300 行に肥大化（CLI-02 で対処予定）
+- Follow-up items (WF-44〜53) は `tmp/TODO.md` セクション K に記録済み
+- T010 の convention doc 追加は scope 判断により省略（既存 `typed-deserialization.md` が関連 convention として十分）
 
 ## verified_at
 
-_To be filled after verification_
+2026-03-19

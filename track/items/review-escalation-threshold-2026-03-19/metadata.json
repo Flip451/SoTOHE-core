@@ -56,17 +56,85 @@
     ]
   },
   "review": {
-    "code_hash": "e9c75496f05090001007339b4cd18aed7727cfdf",
+    "code_hash": "43040e74db5c10f75b0045376f5002fdb3167d10",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "cli",
+            "infra-domain",
+            "other",
+            "usecase"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-19T08:29:00Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "cli",
+            "infra-domain",
+            "other",
+            "usecase"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-19T08:29:07Z"
+        }
+      ],
+      "threshold": 3
+    },
     "groups": {
-      "other": {
+      "cli": {
         "fast": {
           "round": 1,
-          "timestamp": "2026-03-19T04:21:26Z",
+          "timestamp": "2026-03-19T08:29:00Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-19T04:21:39Z",
+          "timestamp": "2026-03-19T08:29:07Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "infra-domain": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-19T08:28:54Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T08:29:07Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "other": {
+        "fast": {
+          "round": 2,
+          "timestamp": "2026-03-19T08:29:01Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T08:29:07Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "usecase": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-19T08:29:00Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T08:29:07Z",
           "verdict": "zero_findings"
         }
       }
@@ -74,59 +142,59 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "done",
   "tasks": [
     {
       "description": "Domain: ReviewConcern newtype + バリデーション（空文字拒否、slug 正規化）",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Domain: ReviewEscalationState 型定義 + streak 更新ロジック + threshold 判定",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Domain: ReviewState に escalation フィールド追加、record_round / record_round_with_pending / check_commit_ready にブロックチェック、新 ReviewError バリアント",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Domain: resolve_escalation メソッド — ReviewEscalationResolution 全フィールド（blocked_concerns, workspace_search_ref, reinvention_check_ref, decision, summary, resolved_at）の検証 + EscalationPhase::Clear 遷移 + ReviewStatus::Invalidated + code_hash クリア",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Usecase: ReviewFinding に category フィールド追加 + finding → ReviewConcern 正規化ロジック（category → file パス → 'other' の 3 段フォールバック）",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Infra/Codec: metadata.json スキーマ拡張 — escalation セクションの serialize/deserialize + ReviewRoundDocument に concerns 追加（#[serde(default)] で既存データとの後方互換を維持）+ 既存 review エントリに escalation フィールド不在時はデフォルト Clear を適用",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "CLI: record-round に --concerns 引数追加 + エスカレーションブロック時のメッセージ出力",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "CLI: sotp review resolve-escalation サブコマンド新設（証拠ファイルパス検証 + 解除実行）",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Usecase: Reviewer output schema に category フィールド追加（Optional、後方互換）+ ReviewFinding カスタム Visitor/deny_unknown_fields の category 対応更新",
       "id": "T009",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Docs: 10-guardrails.md をプロンプト指示から機構参照に更新 + convention doc 追加",
       "id": "T010",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "Review Escalation Threshold の機構化 (WF-36)",
-  "updated_at": "2026-03-19T04:21:39Z"
+  "updated_at": "2026-03-19T08:29:07Z"
 }
