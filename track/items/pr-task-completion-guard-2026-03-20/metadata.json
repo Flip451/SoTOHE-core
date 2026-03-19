@@ -51,7 +51,7 @@
     ]
   },
   "review": {
-    "code_hash": "b021982642b7f95604597f17ba022e18f3fe2912",
+    "code_hash": "fe6fc3df50374b18bf4f989622e679366b0620e5",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -88,6 +88,18 @@
       "threshold": 3
     },
     "groups": {
+      "infra-domain": {
+        "fast": {
+          "round": 2,
+          "timestamp": "2026-03-19T23:23:51Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T23:26:59Z",
+          "verdict": "zero_findings"
+        }
+      },
       "other": {
         "fast": {
           "round": 2,
@@ -104,24 +116,24 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "done",
   "tasks": [
     {
       "description": "Domain: add all_tasks_resolved() method to TrackMetadata",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "CLI: add task completion guard to sotp pr push before git push",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Tests: guard blocks on unresolved tasks, passes on all done/skipped",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "Block PR push when track has unresolved tasks",
-  "updated_at": "2026-03-19T22:25:05Z"
+  "updated_at": "2026-03-19T23:26:59Z"
 }

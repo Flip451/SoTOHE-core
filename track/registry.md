@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `pr-task-completion-guard-2026-03-20`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-19`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| pr-task-completion-guard-2026-03-20 | planned | `/track:implement` | 2026-03-19 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| pr-task-completion-guard-2026-03-20 | Done | 2026-03-19 |
 | nutype-migration-2026-03-20 | Done | 2026-03-19 |
 | domain-type-hardening-2026-03-19 | Done | 2026-03-19 |
 | remove-file-lock-system-2026-03-19 | Done | 2026-03-19 |
