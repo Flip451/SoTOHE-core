@@ -1,0 +1,127 @@
+{
+  "branch": "track/pr-task-completion-guard-2026-03-20",
+  "created_at": "2026-03-20T06:00:00Z",
+  "id": "pr-task-completion-guard-2026-03-20",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Add pub fn all_tasks_resolved(&self) -> bool to TrackMetadata",
+          "Returns true if every task has status done or skipped",
+          "Pure domain logic, no I/O"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Domain layer: task completion check"
+      },
+      {
+        "description": [
+          "In apps/cli/src/commands/pr.rs push(), after resolve_branch_context() and before repo.push_branch()",
+          "Read metadata.json via FsTrackStore or direct decode",
+          "Call track.all_tasks_resolved()",
+          "If false: print [BLOCKED] with list of unresolved task IDs and statuses, return ExitCode::FAILURE",
+          "If true: proceed with push",
+          "Skip guard entirely when branch starts with plan/ (planning-only branches have no code tasks)"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "CLI guard in pr push"
+      },
+      {
+        "description": [
+          "Domain unit test: all_tasks_resolved returns false with mixed states, true with all done/skipped",
+          "CLI integration test: push() returns FAILURE when tasks are unresolved",
+          "CLI integration test: push() skips guard on plan/ branches (AC3)"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "Tests"
+      }
+    ],
+    "summary": [
+      "Add a guard to sotp pr push that blocks when the track has unresolved tasks (not done/skipped).",
+      "Prevents the workflow mistake of pushing before task state transitions, which forces main-branch direct commits post-merge.",
+      "Enforces by mechanism (domain guard), not by memory or prompt instructions."
+    ]
+  },
+  "review": {
+    "code_hash": "b021982642b7f95604597f17ba022e18f3fe2912",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-19T22:23:32Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-19T22:23:45Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 2,
+          "round_type": "fast",
+          "timestamp": "2026-03-19T22:25:05Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "other": {
+        "fast": {
+          "round": 2,
+          "timestamp": "2026-03-19T22:25:05Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T22:25:05Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "planned",
+  "tasks": [
+    {
+      "description": "Domain: add all_tasks_resolved() method to TrackMetadata",
+      "id": "T001",
+      "status": "todo"
+    },
+    {
+      "description": "CLI: add task completion guard to sotp pr push before git push",
+      "id": "T002",
+      "status": "todo"
+    },
+    {
+      "description": "Tests: guard blocks on unresolved tasks, passes on all done/skipped",
+      "id": "T003",
+      "status": "todo"
+    }
+  ],
+  "title": "Block PR push when track has unresolved tasks",
+  "updated_at": "2026-03-19T22:25:05Z"
+}
