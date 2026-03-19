@@ -1,6 +1,6 @@
 //! Serde types for metadata.json (TrackDocumentV2) matching Python track_schema.py.
 
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use domain::{
     CommitHash, DomainError, PlanSection, PlanView, ReviewGroupState, ReviewRoundResult,
@@ -84,7 +84,7 @@ pub struct TrackReviewDocument {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub code_hash: Option<String>,
     #[serde(default)]
-    pub groups: HashMap<String, ReviewGroupDocument>,
+    pub groups: BTreeMap<String, ReviewGroupDocument>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -334,22 +334,24 @@ fn round_result_from_document(doc: ReviewRoundDocument) -> ReviewRoundResult {
 }
 
 fn review_to_document(review: &ReviewState) -> TrackReviewDocument {
+    // Collect into BTreeMap for deterministic key ordering in serialized JSON.
+    let groups: BTreeMap<String, ReviewGroupDocument> = review
+        .groups()
+        .iter()
+        .map(|(name, group)| {
+            (
+                name.clone(),
+                ReviewGroupDocument {
+                    fast: group.fast().map(round_result_to_document),
+                    final_round: group.final_round().map(round_result_to_document),
+                },
+            )
+        })
+        .collect();
     TrackReviewDocument {
         status: review.status().to_string(),
         code_hash: review.code_hash().map(|s| s.to_owned()),
-        groups: review
-            .groups()
-            .iter()
-            .map(|(name, group)| {
-                (
-                    name.clone(),
-                    ReviewGroupDocument {
-                        fast: group.fast().map(round_result_to_document),
-                        final_round: group.final_round().map(round_result_to_document),
-                    },
-                )
-            })
-            .collect(),
+        groups,
     }
 }
 
@@ -792,6 +794,42 @@ mod tests {
 }"#;
         let result = decode(json);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_review_groups_serialized_in_deterministic_key_order() {
+        // Encode a review with multiple groups inserted in non-alphabetical order.
+        // The serialized JSON must list them in alphabetical (BTreeMap) order every time.
+        let json_template = r#"{
+  "schema_version": 3,
+  "id": "order-track",
+  "branch": "track/order-track",
+  "title": "Order Track",
+  "status": "in_progress",
+  "created_at": "2026-03-18T00:00:00Z",
+  "updated_at": "2026-03-18T00:00:00Z",
+  "tasks": [{"id": "T1", "description": "Task", "status": "in_progress"}],
+  "plan": {"summary": [], "sections": [{"id": "S1", "title": "Section", "description": [], "task_ids": ["T1"]}]},
+  "review": {
+    "status": "fast_passed",
+    "code_hash": "abc",
+    "groups": {
+      "zzz-group": {"fast": {"round": 1, "verdict": "zero_findings", "timestamp": "2026-03-18T01:00:00Z"}},
+      "aaa-group": {"fast": {"round": 1, "verdict": "zero_findings", "timestamp": "2026-03-18T01:00:00Z"}}
+    }
+  }
+}"#;
+        let (track, meta) = decode(json_template).unwrap();
+        let encoded1 = encode(&track, &meta).unwrap();
+        let encoded2 = encode(&track, &meta).unwrap();
+
+        // Encoding must be deterministic
+        assert_eq!(encoded1, encoded2);
+
+        // Groups must appear in alphabetical order in the JSON
+        let aaa_pos = encoded1.find("\"aaa-group\"").unwrap();
+        let zzz_pos = encoded1.find("\"zzz-group\"").unwrap();
+        assert!(aaa_pos < zzz_pos, "groups should be in alphabetical order");
     }
 
     #[test]

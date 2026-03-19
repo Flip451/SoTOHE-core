@@ -267,6 +267,109 @@ impl ReviewState {
         Ok(())
     }
 
+    /// Records a review round with code_hash set to "PENDING" sentinel.
+    ///
+    /// Used in the normalized hash protocol (method D):
+    /// 1. Caller computes pre-update normalized hash
+    /// 2. This method: freshness check → record round → set code_hash to "PENDING"
+    /// 3. Caller re-stages, computes post-update normalized hash H1
+    /// 4. Caller calls set_code_hash(H1) to write back the real hash
+    ///
+    /// # Errors
+    ///
+    /// - `ReviewError::StaleCodeHash` if stored code_hash doesn't match `pre_update_hash`.
+    ///   Skipped when stored code_hash is None (first round).
+    /// - `ReviewError::FinalRequiresFastPassed` if round_type is Final but status is not
+    ///   FastPassed/Approved.
+    pub fn record_round_with_pending(
+        &mut self,
+        round_type: RoundType,
+        group: &str,
+        result: ReviewRoundResult,
+        expected_groups: &[String],
+        pre_update_hash: &str,
+    ) -> Result<(), ReviewError> {
+        // 1. Code hash freshness check — skip if None (first round).
+        let taken_hash = self.code_hash.take();
+        if let Some(ref stored_hash) = taken_hash {
+            if stored_hash != pre_update_hash {
+                self.status = ReviewStatus::Invalidated;
+                return Err(ReviewError::StaleCodeHash {
+                    expected: stored_hash.clone(),
+                    actual: pre_update_hash.to_owned(),
+                });
+            }
+            // hash matched — code_hash cleared by take(); will be set to PENDING below
+        }
+
+        // 2. Sequential escalation check (final requires fast_passed or approved).
+        // Restore code_hash on failure so the next retry still has a valid
+        // freshness baseline rather than skipping the check as if first-round.
+        if round_type == RoundType::Final
+            && self.status != ReviewStatus::FastPassed
+            && self.status != ReviewStatus::Approved
+        {
+            self.code_hash = taken_hash;
+            return Err(ReviewError::FinalRequiresFastPassed(self.status));
+        }
+
+        // 3. Set code_hash to the PENDING sentinel
+        self.code_hash = Some("PENDING".to_owned());
+
+        // 4. Record round result for the group.
+        let group_state = self.groups.entry(group.to_owned()).or_default();
+        match round_type {
+            RoundType::Fast => {
+                group_state.fast = Some(result);
+                group_state.final_round = None;
+            }
+            RoundType::Final => group_state.final_round = Some(result),
+        }
+
+        // 5. Check promotion/demotion based on aggregated verdicts
+        let all_expected_zero = expected_groups.iter().all(|eg| {
+            self.groups.get(eg).is_some_and(|gs| {
+                let round_result = match round_type {
+                    RoundType::Fast => gs.fast.as_ref(),
+                    RoundType::Final => gs.final_round.as_ref(),
+                };
+                round_result.is_some_and(|r| r.verdict == "zero_findings")
+            })
+        });
+
+        if all_expected_zero {
+            match round_type {
+                RoundType::Fast => self.status = ReviewStatus::FastPassed,
+                RoundType::Final => self.status = ReviewStatus::Approved,
+            }
+        } else {
+            match round_type {
+                RoundType::Fast => {
+                    if self.status == ReviewStatus::FastPassed
+                        || self.status == ReviewStatus::Approved
+                    {
+                        self.status = ReviewStatus::NotStarted;
+                    }
+                }
+                RoundType::Final => {
+                    if self.status == ReviewStatus::Approved {
+                        self.status = ReviewStatus::FastPassed;
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Sets the code_hash to the given value.
+    ///
+    /// Used in the normalized hash protocol to write back the computed hash
+    /// after record_round_with_pending + re-stage + hash computation.
+    pub fn set_code_hash(&mut self, hash: String) {
+        self.code_hash = Some(hash);
+    }
+
     /// Checks if the review state is ready for commit.
     ///
     /// # Errors
@@ -627,6 +730,143 @@ mod tests {
         state.record_round(RoundType::Fast, "group-a", zero(), &expected, "hash2").unwrap();
         assert_eq!(state.status(), ReviewStatus::FastPassed);
         assert_eq!(state.code_hash(), Some("hash2"));
+    }
+
+    // --- record_round_with_pending ---
+
+    #[test]
+    fn test_record_round_with_pending_sets_code_hash_to_pending() {
+        let mut state = ReviewState::new();
+        let expected = vec!["group-a".to_owned()];
+        state
+            .record_round_with_pending(RoundType::Fast, "group-a", zero(), &expected, "pre-hash")
+            .unwrap();
+        assert_eq!(state.code_hash(), Some("PENDING"));
+    }
+
+    #[test]
+    fn test_record_round_with_pending_first_round_skips_freshness_check() {
+        let mut state = ReviewState::new();
+        // code_hash is None initially — freshness check must be skipped
+        let expected = vec!["group-a".to_owned()];
+        let result = state.record_round_with_pending(
+            RoundType::Fast,
+            "group-a",
+            zero(),
+            &expected,
+            "any-hash",
+        );
+        assert!(result.is_ok());
+        assert_eq!(state.code_hash(), Some("PENDING"));
+    }
+
+    #[test]
+    fn test_record_round_with_pending_subsequent_round_checks_freshness() {
+        let mut state = ReviewState::new();
+        let expected = vec!["group-a".to_owned()];
+        // Set up a code_hash via record_round first
+        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "hash1").unwrap();
+        assert_eq!(state.code_hash(), Some("hash1"));
+
+        // Passing correct pre_update_hash should succeed
+        let result =
+            state.record_round_with_pending(RoundType::Fast, "group-a", zero(), &expected, "hash1");
+        assert!(result.is_ok());
+        assert_eq!(state.code_hash(), Some("PENDING"));
+    }
+
+    #[test]
+    fn test_record_round_with_pending_stale_hash_rejects_and_invalidates() {
+        let mut state = ReviewState::new();
+        let expected = vec!["group-a".to_owned()];
+        // Set up a code_hash
+        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "hash1").unwrap();
+
+        // Wrong pre_update_hash → should fail
+        let result = state.record_round_with_pending(
+            RoundType::Fast,
+            "group-a",
+            zero(),
+            &expected,
+            "wrong-hash",
+        );
+        assert!(matches!(
+            result,
+            Err(ReviewError::StaleCodeHash { ref expected, ref actual })
+                if expected == "hash1" && actual == "wrong-hash"
+        ));
+        assert_eq!(state.status(), ReviewStatus::Invalidated);
+    }
+
+    #[test]
+    fn test_record_round_with_pending_final_without_fast_passed_fails() {
+        let mut state = ReviewState::new();
+        let expected = vec!["group-a".to_owned()];
+        let result = state.record_round_with_pending(
+            RoundType::Final,
+            "group-a",
+            zero(),
+            &expected,
+            "any-hash",
+        );
+        assert!(matches!(
+            result,
+            Err(ReviewError::FinalRequiresFastPassed(ReviewStatus::NotStarted))
+        ));
+    }
+
+    #[test]
+    fn test_record_round_with_pending_records_group_result() {
+        let mut state = ReviewState::new();
+        let expected = vec!["group-a".to_owned()];
+        state
+            .record_round_with_pending(RoundType::Fast, "group-a", zero(), &expected, "pre-hash")
+            .unwrap();
+        assert!(state.groups().get("group-a").is_some());
+        assert!(state.groups().get("group-a").unwrap().fast().is_some());
+    }
+
+    // --- set_code_hash ---
+
+    #[test]
+    fn test_set_code_hash_sets_value() {
+        let mut state = ReviewState::new();
+        state.set_code_hash("computed-hash".to_owned());
+        assert_eq!(state.code_hash(), Some("computed-hash"));
+    }
+
+    #[test]
+    fn test_set_code_hash_overwrites_existing_value() {
+        let mut state = ReviewState::new();
+        state.set_code_hash("old-hash".to_owned());
+        state.set_code_hash("new-hash".to_owned());
+        assert_eq!(state.code_hash(), Some("new-hash"));
+    }
+
+    #[test]
+    fn test_two_phase_hash_protocol_full_flow() {
+        // Simulate the full two-phase protocol:
+        // 1. record_round_with_pending with pre_update_hash
+        // 2. set_code_hash with the computed post-update hash
+        let mut state = ReviewState::new();
+        let expected = vec!["group-a".to_owned()];
+
+        // Phase 1: record with PENDING
+        state
+            .record_round_with_pending(
+                RoundType::Fast,
+                "group-a",
+                zero(),
+                &expected,
+                "pre-update-hash",
+            )
+            .unwrap();
+        assert_eq!(state.code_hash(), Some("PENDING"));
+
+        // Phase 2: write back real hash
+        state.set_code_hash("post-update-hash".to_owned());
+        assert_eq!(state.code_hash(), Some("post-update-hash"));
+        assert_eq!(state.status(), ReviewStatus::FastPassed);
     }
 
     // --- with_fields ---

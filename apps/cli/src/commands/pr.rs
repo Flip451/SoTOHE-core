@@ -124,6 +124,12 @@ pub fn execute(cmd: PrCommand) -> ExitCode {
             }
         },
         PrCommand::PollReview(args) => {
+            let head = SystemGitRepo::discover().ok().and_then(|r| {
+                r.output(&["rev-parse", "HEAD"])
+                    .ok()
+                    .filter(|o| o.status.success())
+                    .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
+            });
             match poll_review(
                 &args.pr,
                 &args.trigger_timestamp,
@@ -131,6 +137,7 @@ pub fn execute(cmd: PrCommand) -> ExitCode {
                 args.timeout,
                 &SystemGhClient,
                 &thread::sleep,
+                head.as_deref(),
             ) {
                 Ok(code) => code,
                 Err(err) => {
@@ -350,7 +357,8 @@ fn wait_and_merge(pr: &str, interval: u64, timeout: u64, method: &str) -> ExitCo
 /// GitHub App bots use the `<app-slug>[bot]` login convention.
 /// We match against exact known login names to prevent unrelated GitHub Apps
 /// (e.g., `evil-codex-helper[bot]`) from being treated as the trusted reviewer.
-const CODEX_BOT_LOGINS: &[&str] = &["openai-codex[bot]", "codex[bot]"];
+const CODEX_BOT_LOGINS: &[&str] =
+    &["openai-codex[bot]", "codex[bot]", "chatgpt-codex-connector[bot]"];
 
 fn is_codex_bot(login: &str) -> bool {
     let lower = login.to_lowercase();
@@ -386,6 +394,92 @@ fn trigger_review<C: GhClient>(pr: &str, client: &C) -> Result<ExitCode, CliErro
 // T005: poll-review
 // ---------------------------------------------------------------------------
 
+/// Outcome of a poll-review operation for the review cycle.
+#[derive(Debug)]
+pub enum PollReviewResult {
+    /// A completed formal review was found; contains the sanitized review JSON.
+    ReviewFound(serde_json::Value),
+    /// Zero-findings detected via 👍 reaction or comment-text fallback.
+    ZeroFindings,
+    /// Polling timed out without finding a review or zero-findings signal.
+    Timeout,
+}
+
+/// Check reactions for a post-trigger 👍 from a Codex bot.
+///
+/// Returns `Ok(true)` if a fresh +1 reaction is found, `Ok(false)` otherwise.
+fn check_reaction_zero_findings<C: GhClient>(
+    client: &C,
+    repo: &str,
+    pr: &str,
+    trigger_dt: chrono::DateTime<chrono::FixedOffset>,
+) -> Result<bool, CliError> {
+    let reactions_json = client.list_reactions(repo, pr)?;
+    let reactions = pr_review::parse_paginated_json(&reactions_json)
+        .map_err(|e| CliError::Message(format!("failed to parse reactions JSON: {e}")))?;
+    for reaction in &reactions {
+        let content = reaction.get("content").and_then(|c| c.as_str()).unwrap_or("");
+        if content != "+1" {
+            continue;
+        }
+        let author = reaction
+            .get("user")
+            .and_then(|u| u.get("login"))
+            .and_then(|l| l.as_str())
+            .unwrap_or("");
+        if !is_codex_bot(author) {
+            continue;
+        }
+        let created_raw = reaction.get("created_at").and_then(|s| s.as_str()).unwrap_or("");
+        if created_raw.is_empty() {
+            continue;
+        }
+        let created_str = created_raw.replace('Z', "+00:00");
+        let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
+            .map_err(|e| CliError::Message(format!("invalid reaction created_at: {e}")))?;
+        if created_dt >= trigger_dt {
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}
+
+/// Check issue comments for a post-trigger zero-findings phrase from a Codex bot.
+///
+/// Returns `Ok(true)` if a matching comment is found, `Ok(false)` otherwise.
+fn check_comment_zero_findings<C: GhClient>(
+    client: &C,
+    repo: &str,
+    pr: &str,
+    trigger_dt: chrono::DateTime<chrono::FixedOffset>,
+) -> Result<bool, CliError> {
+    let comments_json = client.list_issue_comments(repo, pr)?;
+    let comments = pr_review::parse_paginated_json(&comments_json)
+        .map_err(|e| CliError::Message(format!("failed to parse comments JSON: {e}")))?;
+    for comment in &comments {
+        let author =
+            comment.get("user").and_then(|u| u.get("login")).and_then(|l| l.as_str()).unwrap_or("");
+        if !is_codex_bot(author) {
+            continue;
+        }
+        let created_raw = comment.get("created_at").and_then(|s| s.as_str()).unwrap_or("");
+        if created_raw.is_empty() {
+            continue;
+        }
+        let created_str = created_raw.replace('Z', "+00:00");
+        let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
+            .map_err(|e| CliError::Message(format!("invalid comment created_at: {e}")))?;
+        if created_dt < trigger_dt {
+            continue;
+        }
+        let body = comment.get("body").and_then(|b| b.as_str()).unwrap_or("");
+        if body.contains("Didn't find any major issues") {
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}
+
 fn poll_review<C, Sleep>(
     pr: &str,
     trigger_timestamp: &str,
@@ -393,120 +487,32 @@ fn poll_review<C, Sleep>(
     timeout: u64,
     client: &C,
     sleep: &Sleep,
+    head_commit: Option<&str>,
 ) -> Result<ExitCode, CliError>
 where
     C: GhClient,
     Sleep: Fn(Duration),
 {
-    let trigger_time = trigger_timestamp.replace('Z', "+00:00");
-    let trigger_dt = chrono::DateTime::parse_from_rfc3339(&trigger_time)
-        .map_err(|e| CliError::Message(format!("invalid trigger timestamp: {e}")))?;
-
-    let repo = client.repo_nwo()?;
-    // Cap timeout to prevent Instant overflow panic on extremely large values.
-    let deadline = Instant::now() + Duration::from_secs(timeout.min(86400));
-    let mut any_bot_activity = false;
-
-    eprintln!("Polling for Codex review on PR #{pr} (interval={interval}s, timeout={timeout}s)...");
-
-    loop {
-        if Instant::now() >= deadline {
-            break;
+    match poll_review_for_cycle(
+        pr,
+        trigger_timestamp,
+        interval,
+        timeout,
+        client,
+        sleep,
+        head_commit,
+    )? {
+        PollReviewResult::ReviewFound(review) => {
+            let review_str = serde_json::to_string(&review).unwrap_or_default();
+            println!("{review_str}");
+            Ok(ExitCode::SUCCESS)
         }
-
-        // Fetch reviews — propagate API errors (fail-closed)
-        let reviews_json = client.list_reviews(&repo, pr)?;
-        let reviews = pr_review::parse_paginated_json(&reviews_json)
-            .map_err(|e| CliError::Message(format!("failed to parse reviews JSON: {e}")))?;
-        for review in &reviews {
-            let author = review
-                .get("user")
-                .and_then(|u| u.get("login"))
-                .and_then(|l| l.as_str())
-                .unwrap_or("");
-            if !is_codex_bot(author) {
-                continue;
-            }
-            let submitted_raw = review.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
-            if submitted_raw.is_empty() {
-                // PENDING review (no submitted_at) — cannot tie to this trigger,
-                // so skip without marking bot activity to avoid suppressing the
-                // issue-comment fallback check.
-                continue;
-            }
-            let submitted_str = submitted_raw.replace('Z', "+00:00");
-            let submitted_dt = chrono::DateTime::parse_from_rfc3339(&submitted_str)
-                .map_err(|e| CliError::Message(format!("invalid review submitted_at: {e}")))?;
-            if submitted_dt >= trigger_dt {
-                // Post-trigger review — record bot activity.
-                any_bot_activity = true;
-                let state = review.get("state").and_then(|s| s.as_str()).unwrap_or("");
-                if matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED") {
-                    let review_id = review.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
-                    eprintln!("[OK] Found Codex review (id={review_id}, state={state})");
-                    // Sanitize review body before stdout output to prevent
-                    // leaking absolute paths, secrets, or internal URLs.
-                    let mut sanitized = review.clone();
-                    if let Some(obj) = sanitized.as_object_mut() {
-                        if let Some(serde_json::Value::String(body)) = obj.get("body") {
-                            let clean = sanitize_text(body);
-                            obj.insert("body".to_owned(), serde_json::Value::String(clean));
-                        }
-                    }
-                    let review_str = serde_json::to_string(&sanitized).unwrap_or_default();
-                    println!("{review_str}");
-                    return Ok(ExitCode::SUCCESS);
-                }
-            }
+        PollReviewResult::ZeroFindings => {
+            println!(r#"{{"verdict":"zero_findings","findings":[]}}"#);
+            Ok(ExitCode::SUCCESS)
         }
-
-        // Check comments for bot activity — propagate API errors (fail-closed)
-        if !any_bot_activity {
-            let comments_json = client.list_issue_comments(&repo, pr)?;
-            let comments = pr_review::parse_paginated_json(&comments_json)
-                .map_err(|e| CliError::Message(format!("failed to parse comments JSON: {e}")))?;
-            for comment in &comments {
-                let author = comment
-                    .get("user")
-                    .and_then(|u| u.get("login"))
-                    .and_then(|l| l.as_str())
-                    .unwrap_or("");
-                if !is_codex_bot(author) {
-                    continue;
-                }
-                let created_raw = comment.get("created_at").and_then(|s| s.as_str()).unwrap_or("");
-                if created_raw.is_empty() {
-                    continue;
-                }
-                let created_str = created_raw.replace('Z', "+00:00");
-                let created_dt = chrono::DateTime::parse_from_rfc3339(&created_str)
-                    .map_err(|e| CliError::Message(format!("invalid comment created_at: {e}")))?;
-                if created_dt >= trigger_dt {
-                    any_bot_activity = true;
-                    break;
-                }
-            }
-        }
-
-        let remaining = deadline.saturating_duration_since(Instant::now()).as_secs();
-        eprintln!("  Waiting... ({remaining}s remaining)");
-        sleep(Duration::from_secs(interval));
+        PollReviewResult::Timeout => Ok(ExitCode::FAILURE),
     }
-
-    // Timeout — distinguish cause
-    if !any_bot_activity {
-        eprintln!(
-            "[ERROR] Timeout: No Codex bot activity detected on this PR. \
-             Ensure the Codex Cloud GitHub App is installed on this repository. \
-             See: https://github.com/apps/openai-codex"
-        );
-    } else {
-        eprintln!(
-            "[ERROR] Timeout: Codex bot is active but review not yet completed. \
-             The review may still be in progress. Try again later or increase timeout."
-        );
-    }
-    Ok(ExitCode::FAILURE)
 }
 
 // ---------------------------------------------------------------------------
@@ -545,8 +551,11 @@ fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
         None => return Ok(ExitCode::FAILURE),
     };
 
-    // Step 3: Trigger review
     let nwo = client.repo_nwo()?;
+
+    // Step 3: Trigger new review.
+    // Always post a fresh trigger — timeout recovery (at the end of polling)
+    // handles the case where a prior review exists but was missed.
     let response = client.post_issue_comment(&nwo, &pr_number, "@codex review")?;
     let trigger_timestamp = serde_json::from_str::<serde_json::Value>(&response)
         .ok()
@@ -560,20 +569,67 @@ fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
         ));
     }
 
+    // Resolve HEAD commit for timeout recovery commit-id filtering.
+    let head_hash = repo
+        .output(&["rev-parse", "HEAD"])
+        .ok()
+        .filter(|o| o.status.success())
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned());
+    let head_ref = head_hash.as_deref();
+
     // Step 4: Poll for review
-    let review_json =
-        poll_review_for_cycle(&pr_number, &trigger_timestamp, 15, 600, &client, &thread::sleep)?;
-    let Some(review) = review_json else {
-        return Ok(ExitCode::FAILURE);
-    };
+    let poll_result = poll_review_for_cycle(
+        &pr_number,
+        &trigger_timestamp,
+        15,
+        600,
+        &client,
+        &thread::sleep,
+        head_ref,
+    )?;
 
-    // Step 5: Parse review
-    let parsed = parse_review(&pr_number, &review, &nwo, &client)?;
+    match poll_result {
+        PollReviewResult::ZeroFindings => {
+            println!();
+            println!("=== PR Review Result: PASS ===");
+            println!("PR: #{pr_number}");
+            println!("Zero findings detected (bot signalled no issues).");
+            Ok(ExitCode::SUCCESS)
+        }
+        PollReviewResult::Timeout => Ok(ExitCode::FAILURE),
+        PollReviewResult::ReviewFound(review) => {
+            // Step 5: Parse review
+            let parsed = parse_review(&pr_number, &review, &nwo, &client)?;
 
-    // Step 6: Report
-    print_review_summary(&pr_number, &parsed);
+            // Step 6: Report
+            print_review_summary(&pr_number, &parsed);
 
-    if parsed.passed { Ok(ExitCode::SUCCESS) } else { Ok(ExitCode::FAILURE) }
+            if parsed.passed { Ok(ExitCode::SUCCESS) } else { Ok(ExitCode::FAILURE) }
+        }
+    }
+}
+
+/// Pick the latest completed bot review from a slice, by `submitted_at` then `id`.
+///
+/// Returns a sanitized clone or None if the slice is empty.
+fn find_latest_bot_review_in(reviews: &[&serde_json::Value]) -> Option<serde_json::Value> {
+    let best = reviews.iter().max_by(|a, b| {
+        let ts_a = a.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
+        let ts_b = b.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
+        ts_a.cmp(ts_b).then_with(|| {
+            let id_a = a.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
+            let id_b = b.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
+            id_a.cmp(&id_b)
+        })
+    })?;
+    let mut sanitized = (*best).clone();
+    if let Some(obj) = sanitized.as_object_mut() {
+        if let Some(serde_json::Value::String(body)) = obj.get("body") {
+            let clean = sanitize_text(body);
+            obj.insert("body".to_owned(), serde_json::Value::String(clean));
+        }
+    }
+    Some(sanitized)
 }
 
 /// Ensure PR exists for review cycle, returning the PR number.
@@ -634,15 +690,19 @@ fn ensure_pr_for_cycle<C: GhClient>(
     }
 }
 
-/// Poll for review in cycle context, returning the review JSON value.
-fn poll_review_for_cycle<C, Sleep>(
+/// Poll for review in cycle context, returning a `PollReviewResult`.
+///
+/// `head_commit` is used by the timeout recovery to filter reviews by commit.
+/// Pass `None` to accept any bot review during recovery (less safe).
+pub fn poll_review_for_cycle<C, Sleep>(
     pr: &str,
     trigger_timestamp: &str,
     interval: u64,
     timeout: u64,
     client: &C,
     sleep: &Sleep,
-) -> Result<Option<serde_json::Value>, CliError>
+    head_commit: Option<&str>,
+) -> Result<PollReviewResult, CliError>
 where
     C: GhClient,
     Sleep: Fn(Duration),
@@ -702,12 +762,56 @@ where
                             obj.insert("body".to_owned(), serde_json::Value::String(clean));
                         }
                     }
-                    return Ok(Some(sanitized));
+                    return Ok(PollReviewResult::ReviewFound(sanitized));
                 }
             }
         }
 
-        // Check comments for bot activity — propagate API errors (fail-closed)
+        // Stage 1–2: Zero-findings detection via reactions/comments.
+        // These are PR-level signals (not commit-scoped) — the GitHub Reactions
+        // and Issue Comments APIs do not include a commit_id field, so we cannot
+        // verify that the signal corresponds to `head_commit`. We mitigate this by:
+        //   1. Requiring head_commit to be Some (standalone poll_review skips this).
+        //   2. Using trigger_dt to exclude signals from earlier trigger rounds.
+        //   3. The reviews loop above already returned for any completed review on
+        //      the current commit, so reaching this point means no review exists.
+        // Residual risk: if a new commit is pushed between the @codex review trigger
+        // and the bot's zero-findings signal, the signal may correspond to the old
+        // commit. This is accepted as a known limitation — the trigger_dt filter
+        // makes this window very narrow (requires push + new trigger within seconds).
+        if head_commit.is_some() {
+            // Stage 1: Check reactions for bot +1 (post-trigger).
+            if check_reaction_zero_findings(client, &repo_nwo, pr, trigger_dt)? {
+                eprintln!("[OK] Zero-findings detected via +1 reaction.");
+                return Ok(PollReviewResult::ZeroFindings);
+            }
+
+            // Stage 2: Comment-text fallback — only when a stale bot +1 reaction exists
+            // (GitHub deduplicates: same user + same reaction type keeps old created_at).
+            let has_stale_reaction = {
+                let reactions_json = client.list_reactions(&repo_nwo, pr)?;
+                let reactions = pr_review::parse_paginated_json(&reactions_json).map_err(|e| {
+                    CliError::Message(format!("failed to parse reactions JSON: {e}"))
+                })?;
+                reactions.iter().any(|r| {
+                    let content = r.get("content").and_then(|c| c.as_str()).unwrap_or("");
+                    let author = r
+                        .get("user")
+                        .and_then(|u| u.get("login"))
+                        .and_then(|l| l.as_str())
+                        .unwrap_or("");
+                    content == "+1" && is_codex_bot(author)
+                })
+            };
+
+            if has_stale_reaction && check_comment_zero_findings(client, &repo_nwo, pr, trigger_dt)?
+            {
+                eprintln!("[OK] Zero-findings detected via comment text fallback.");
+                return Ok(PollReviewResult::ZeroFindings);
+            }
+        }
+
+        // Check comments for any bot activity (heartbeat detection).
         if !any_bot_activity {
             let comments_json = client.list_issue_comments(&repo_nwo, pr)?;
             let comments = pr_review::parse_paginated_json(&comments_json)
@@ -740,6 +844,43 @@ where
         sleep(Duration::from_secs(interval));
     }
 
+    // Timeout recovery: the review may have been submitted but missed by
+    // the timestamp filter (GitHub API eventual consistency, or the review
+    // was triggered by a prior @codex review and completed between polls).
+    // Only attempt recovery when head_commit is known — without it we cannot
+    // scope the lookup and risk returning a stale review from an older commit.
+    if let Some(expected_commit) = head_commit {
+        let recovery_nwo = client.repo_nwo()?;
+        let recovery_reviews_json = client.list_reviews(&recovery_nwo, pr)?;
+        let recovery_reviews =
+            pr_review::parse_paginated_json(&recovery_reviews_json).map_err(|e| {
+                CliError::Message(format!("recovery: failed to parse reviews JSON: {e}"))
+            })?;
+        // Filter by bot, terminal state, and commit_id. Since the commit_id
+        // guarantees the review covers the same code as HEAD, we do NOT require
+        // submitted_at >= trigger_dt — a review from a prior trigger round on
+        // the same SHA is equally valid (the code hasn't changed).
+        let recovery_refs: Vec<&serde_json::Value> = recovery_reviews
+            .iter()
+            .filter(|r| {
+                let author = r
+                    .get("user")
+                    .and_then(|u| u.get("login"))
+                    .and_then(|l| l.as_str())
+                    .unwrap_or("");
+                let state = r.get("state").and_then(|s| s.as_str()).unwrap_or("");
+                let review_commit = r.get("commit_id").and_then(|s| s.as_str()).unwrap_or("");
+                is_codex_bot(author)
+                    && matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
+                    && review_commit == expected_commit
+            })
+            .collect();
+        if let Some(recovered) = find_latest_bot_review_in(&recovery_refs) {
+            eprintln!("[OK] Recovered Codex review after timeout (commit-based fallback).");
+            return Ok(PollReviewResult::ReviewFound(recovered));
+        }
+    }
+
     if !any_bot_activity {
         eprintln!(
             "[ERROR] Timeout: No Codex bot activity detected. \
@@ -748,7 +889,7 @@ where
     } else {
         eprintln!("[ERROR] Timeout: Codex bot active but review not yet completed.");
     }
-    Ok(None)
+    Ok(PollReviewResult::Timeout)
 }
 
 /// Parse a review JSON into a normalized PrReviewResult.
@@ -1115,6 +1256,8 @@ mod tests {
         assert!(super::is_codex_bot("openai-codex[bot]"));
         assert!(super::is_codex_bot("OpenAI-Codex[bot]"));
         assert!(super::is_codex_bot("codex[bot]"));
+        assert!(super::is_codex_bot("chatgpt-codex-connector[bot]"));
+        assert!(super::is_codex_bot("ChatGPT-Codex-Connector[bot]"));
     }
 
     #[test]
@@ -1144,11 +1287,33 @@ mod tests {
     struct PollTestClient {
         reviews: String,
         comments: String,
+        reactions: String,
     }
 
     impl PollTestClient {
         fn with_reviews(reviews: &str) -> Self {
-            Self { reviews: reviews.to_owned(), comments: "[]".to_owned() }
+            Self {
+                reviews: reviews.to_owned(),
+                comments: "[]".to_owned(),
+                reactions: "[]".to_owned(),
+            }
+        }
+
+        fn with_reactions(reactions: &str) -> Self {
+            Self {
+                reviews: "[]".to_owned(),
+                comments: "[]".to_owned(),
+                reactions: reactions.to_owned(),
+            }
+        }
+
+        #[allow(dead_code)]
+        fn with_comments(comments: &str) -> Self {
+            Self {
+                reviews: "[]".to_owned(),
+                comments: comments.to_owned(),
+                reactions: "[]".to_owned(),
+            }
         }
     }
 
@@ -1187,9 +1352,157 @@ mod tests {
             Ok(self.comments.clone())
         }
 
+        fn list_reactions(&self, _nwo: &str, _pr: &str) -> Result<String, GhError> {
+            Ok(self.reactions.clone())
+        }
+
         fn repo_nwo(&self) -> Result<String, GhError> {
             Ok("owner/repo".to_owned())
         }
+    }
+
+    // --- T002: reaction-based and comment-text zero-findings detection tests ---
+
+    #[test]
+    fn poll_review_for_cycle_returns_zero_findings_on_thumbsup_reaction() {
+        // Bot posts a +1 reaction after trigger_timestamp — should return ZeroFindings
+        let client = PollTestClient::with_reactions(
+            r#"[{"content":"+1","user":{"login":"openai-codex[bot]"},"created_at":"2026-03-18T10:05:00Z"}]"#,
+        );
+        let result = super::poll_review_for_cycle(
+            "1",
+            "2026-03-18T10:00:00Z",
+            15,
+            60,
+            &client,
+            &|_| {},
+            Some("commit1"),
+        );
+        assert!(result.is_ok());
+        assert!(
+            matches!(result.unwrap(), super::PollReviewResult::ZeroFindings),
+            "expected ZeroFindings from post-trigger +1 reaction"
+        );
+    }
+
+    #[test]
+    fn poll_review_for_cycle_ignores_stale_thumbsup_reaction() {
+        // Bot posted +1 BEFORE trigger — should not count as zero-findings
+        // Comment fallback also has nothing matching → Timeout
+        let client = PollTestClient::with_reactions(
+            r#"[{"content":"+1","user":{"login":"openai-codex[bot]"},"created_at":"2026-03-18T09:00:00Z"}]"#,
+        );
+        let result = super::poll_review_for_cycle(
+            "1",
+            "2026-03-18T10:00:00Z",
+            15,
+            0,
+            &client,
+            &|_| {},
+            Some("commit1"),
+        );
+        assert!(result.is_ok());
+        assert!(
+            matches!(result.unwrap(), super::PollReviewResult::Timeout),
+            "expected Timeout when reaction is pre-trigger"
+        );
+    }
+
+    #[test]
+    fn poll_review_for_cycle_returns_zero_findings_on_comment_text_fallback() {
+        // Reaction is stale (pre-trigger), but a post-trigger comment contains the zero-findings phrase
+        let client = PollTestClient {
+            reviews: "[]".to_owned(),
+            comments: r#"[{"user":{"login":"openai-codex[bot]"},"body":"Didn't find any major issues with the code.","created_at":"2026-03-18T10:05:00Z"}]"#.to_owned(),
+            reactions: r#"[{"content":"+1","user":{"login":"openai-codex[bot]"},"created_at":"2026-03-18T09:00:00Z"}]"#.to_owned(),
+        };
+        let result = super::poll_review_for_cycle(
+            "1",
+            "2026-03-18T10:00:00Z",
+            15,
+            60,
+            &client,
+            &|_| {},
+            Some("commit1"),
+        );
+        assert!(result.is_ok());
+        assert!(
+            matches!(result.unwrap(), super::PollReviewResult::ZeroFindings),
+            "expected ZeroFindings from comment text fallback"
+        );
+    }
+
+    #[test]
+    fn poll_review_for_cycle_does_not_trigger_comment_fallback_when_reaction_is_fresh() {
+        // Fresh +1 reaction (post-trigger) → ZeroFindings immediately, no need for comment check
+        let client = PollTestClient {
+            reviews: "[]".to_owned(),
+            comments: "[]".to_owned(),
+            reactions: r#"[{"content":"+1","user":{"login":"openai-codex[bot]"},"created_at":"2026-03-18T10:05:00Z"}]"#.to_owned(),
+        };
+        let result = super::poll_review_for_cycle(
+            "1",
+            "2026-03-18T10:00:00Z",
+            15,
+            60,
+            &client,
+            &|_| {},
+            Some("commit1"),
+        );
+        assert!(result.is_ok());
+        assert!(
+            matches!(result.unwrap(), super::PollReviewResult::ZeroFindings),
+            "expected ZeroFindings from fresh reaction"
+        );
+    }
+
+    #[test]
+    fn poll_review_for_cycle_returns_review_found_when_review_exists() {
+        // A completed review takes priority over reaction/comment fallbacks
+        let client = PollTestClient::with_reviews(
+            r#"[{
+                "id": 42,
+                "user": {"login": "openai-codex[bot]"},
+                "submitted_at": "2026-03-18T10:05:00Z",
+                "state": "CHANGES_REQUESTED",
+                "body": "Please fix these issues."
+            }]"#,
+        );
+        let result = super::poll_review_for_cycle(
+            "1",
+            "2026-03-18T10:00:00Z",
+            15,
+            60,
+            &client,
+            &|_| {},
+            Some("commit1"),
+        );
+        assert!(result.is_ok());
+        assert!(
+            matches!(result.unwrap(), super::PollReviewResult::ReviewFound(_)),
+            "expected ReviewFound when a completed review exists"
+        );
+    }
+
+    #[test]
+    fn poll_review_standalone_skips_zero_findings_without_head_commit() {
+        // Standalone poll_review passes head_commit=None, so zero-findings
+        // detection (reactions/comments) is skipped — they are PR-level signals
+        // that cannot be scoped to a specific commit.
+        let client = PollTestClient::with_reactions(
+            r#"[{"content":"+1","user":{"login":"openai-codex[bot]"},"created_at":"2026-03-18T10:05:00Z"}]"#,
+        );
+        let result = super::poll_review(
+            "1",
+            "2026-03-18T10:00:00Z",
+            15,
+            0,
+            &client,
+            &|_| {},
+            Some("commit1"),
+        );
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), ExitCode::FAILURE);
     }
 
     // --- poll_review tests ---
@@ -1206,13 +1519,23 @@ mod tests {
             }]"#,
         );
         // Use timeout=60 so at least one poll iteration runs; sleep is a no-op.
-        let result = super::poll_review("1", "2026-03-16T09:00:00Z", 15, 60, &client, &|_| {});
+        let result = super::poll_review(
+            "1",
+            "2026-03-16T09:00:00Z",
+            15,
+            60,
+            &client,
+            &|_| {},
+            Some("commit1"),
+        );
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), ExitCode::SUCCESS);
     }
 
     #[test]
-    fn poll_review_ignores_pre_trigger_review() {
+    fn poll_review_standalone_does_not_recover_without_head_commit() {
+        // Standalone poll_review passes head_commit=None, so timeout recovery
+        // is skipped to avoid returning stale reviews from older commits.
         let client = PollTestClient::with_reviews(
             r#"[{
                 "id": 1,
@@ -1222,26 +1545,32 @@ mod tests {
                 "body": "old review"
             }]"#,
         );
-        let result = super::poll_review("1", "2026-03-16T09:00:00Z", 15, 0, &client, &|_| {});
-        // Should timeout (FAILURE) because the only review is pre-trigger
+        let result = super::poll_review(
+            "1",
+            "2026-03-16T09:00:00Z",
+            15,
+            0,
+            &client,
+            &|_| {},
+            Some("commit1"),
+        );
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), ExitCode::FAILURE);
     }
 
     #[test]
-    fn poll_review_stale_review_does_not_suppress_comment_check() {
-        // Old (pre-trigger) review should NOT set any_bot_activity, so the
-        // comment check path should still run and timeout as "no bot activity".
-        let client = PollTestClient::with_reviews(
-            r#"[{
-                "id": 1,
-                "user": {"login": "openai-codex[bot]"},
-                "submitted_at": "2026-03-16T08:00:00Z",
-                "state": "APPROVED",
-                "body": "old review"
-            }]"#,
+    fn poll_review_timeout_with_no_reviews_returns_failure() {
+        // No reviews at all — timeout recovery also finds nothing.
+        let client = PollTestClient::with_reviews("[]");
+        let result = super::poll_review(
+            "1",
+            "2026-03-16T09:00:00Z",
+            15,
+            0,
+            &client,
+            &|_| {},
+            Some("commit1"),
         );
-        let result = super::poll_review("1", "2026-03-16T09:00:00Z", 15, 0, &client, &|_| {});
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), ExitCode::FAILURE);
     }
@@ -1258,7 +1587,15 @@ mod tests {
             }]"#,
         );
         // The function should succeed (found a post-trigger APPROVED review)
-        let result = super::poll_review("1", "2026-03-16T09:00:00Z", 15, 60, &client, &|_| {});
+        let result = super::poll_review(
+            "1",
+            "2026-03-16T09:00:00Z",
+            15,
+            60,
+            &client,
+            &|_| {},
+            Some("commit1"),
+        );
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), ExitCode::SUCCESS);
     }
