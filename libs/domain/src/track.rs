@@ -160,8 +160,8 @@ impl TrackTask {
         description: impl Into<String>,
         status: TaskStatus,
     ) -> Result<Self, ValidationError> {
-        let description =
-            NonEmptyString::new(description).map_err(|_| ValidationError::EmptyTaskDescription)?;
+        let description = NonEmptyString::try_new(description)
+            .map_err(|_| ValidationError::EmptyTaskDescription)?;
         Ok(Self { id, description, status })
     }
 
@@ -172,7 +172,7 @@ impl TrackTask {
 
     #[must_use]
     pub fn description(&self) -> &str {
-        self.description.as_str()
+        self.description.as_ref()
     }
 
     #[must_use]
@@ -249,7 +249,7 @@ impl TrackMetadata {
         plan: PlanView,
         status_override: Option<StatusOverride>,
     ) -> Result<Self, DomainError> {
-        let title = NonEmptyString::new(title).map_err(|_| ValidationError::EmptyTrackTitle)?;
+        let title = NonEmptyString::try_new(title).map_err(|_| ValidationError::EmptyTrackTitle)?;
 
         validate_plan_invariants(&tasks, &plan)?;
 
@@ -275,7 +275,7 @@ impl TrackMetadata {
 
     #[must_use]
     pub fn title(&self) -> &str {
-        self.title.as_str()
+        self.title.as_ref()
     }
 
     #[must_use]
@@ -423,7 +423,9 @@ impl TrackMetadata {
         let max_num: u64 = self
             .tasks
             .iter()
-            .filter_map(|t| t.id().as_str().strip_prefix('T').and_then(|d| d.parse::<u64>().ok()))
+            .filter_map(|t| {
+                t.id().as_ref().strip_prefix('T').and_then(|d: &str| d.parse::<u64>().ok())
+            })
             .max()
             .unwrap_or(0);
         let next = max_num.checked_add(1).ok_or_else(|| {
@@ -431,7 +433,7 @@ impl TrackMetadata {
                 "task ID overflow: max T-number exceeded u64".to_string(),
             )
         })?;
-        TaskId::new(format!("T{next:03}"))
+        TaskId::try_new(format!("T{next:03}"))
     }
 
     /// Adds a new task to this track.
@@ -568,17 +570,17 @@ mod tests {
     fn make_track(task_ids: &[&str], section_task_ids: &[&str]) -> TrackMetadata {
         let tasks: Vec<TrackTask> = task_ids
             .iter()
-            .map(|id| TrackTask::new(TaskId::new(*id).unwrap(), format!("Task {id}")).unwrap())
+            .map(|id| TrackTask::new(TaskId::try_new(*id).unwrap(), format!("Task {id}")).unwrap())
             .collect();
         let section = PlanSection::new(
             "S1",
             "Section 1",
             vec![],
-            section_task_ids.iter().map(|id| TaskId::new(*id).unwrap()).collect(),
+            section_task_ids.iter().map(|id| TaskId::try_new(*id).unwrap()).collect(),
         )
         .unwrap();
         let plan = PlanView::new(vec![], vec![section]);
-        TrackMetadata::new(TrackId::new("test-track").unwrap(), "Test Track", tasks, plan, None)
+        TrackMetadata::new(TrackId::try_new("test-track").unwrap(), "Test Track", tasks, plan, None)
             .unwrap()
     }
 
@@ -586,34 +588,34 @@ mod tests {
     fn test_next_task_id_with_no_tasks_returns_t001() {
         let plan = PlanView::new(vec![], vec![]);
         let track = TrackMetadata {
-            id: TrackId::new("test-track").unwrap(),
+            id: TrackId::try_new("test-track").unwrap(),
             branch: None,
-            title: NonEmptyString::new("Test").unwrap(),
+            title: NonEmptyString::try_new("Test").unwrap(),
             tasks: vec![],
             plan,
             status_override: None,
             review: None,
         };
-        assert_eq!(track.next_task_id().unwrap().as_str(), "T001");
+        assert_eq!(track.next_task_id().unwrap().as_ref(), "T001");
     }
 
     #[test]
     fn test_next_task_id_with_existing_tasks_returns_next() {
         let track = make_track(&["T001", "T002", "T003"], &["T001", "T002", "T003"]);
-        assert_eq!(track.next_task_id().unwrap().as_str(), "T004");
+        assert_eq!(track.next_task_id().unwrap().as_ref(), "T004");
     }
 
     #[test]
     fn test_next_task_id_with_gaps_uses_max() {
         let track = make_track(&["T001", "T010"], &["T001", "T010"]);
-        assert_eq!(track.next_task_id().unwrap().as_str(), "T011");
+        assert_eq!(track.next_task_id().unwrap().as_ref(), "T011");
     }
 
     #[test]
     fn test_add_task_appends_to_first_section_by_default() {
         let mut track = make_track(&["T001"], &["T001"]);
         let new_id = track.add_task("New task", None, None).unwrap();
-        assert_eq!(new_id.as_str(), "T002");
+        assert_eq!(new_id.as_ref(), "T002");
         assert_eq!(track.tasks().len(), 2);
         assert_eq!(track.tasks()[1].description(), "New task");
         assert_eq!(track.plan().sections()[0].task_ids().len(), 2);
@@ -623,35 +625,36 @@ mod tests {
     #[test]
     fn test_add_task_inserts_after_specified_task() {
         let mut track = make_track(&["T001", "T002"], &["T001", "T002"]);
-        let after = TaskId::new("T001").unwrap();
+        let after = TaskId::try_new("T001").unwrap();
         let new_id = track.add_task("Inserted task", None, Some(&after)).unwrap();
-        assert_eq!(new_id.as_str(), "T003");
+        assert_eq!(new_id.as_ref(), "T003");
         let section_ids: Vec<&str> =
-            track.plan().sections()[0].task_ids().iter().map(|id| id.as_str()).collect();
+            track.plan().sections()[0].task_ids().iter().map(|id| id.as_ref()).collect();
         assert_eq!(section_ids, vec!["T001", "T003", "T002"]);
     }
 
     #[test]
     fn test_add_task_with_unknown_after_appends_to_end() {
         let mut track = make_track(&["T001"], &["T001"]);
-        let unknown = TaskId::new("T999").unwrap();
+        let unknown = TaskId::try_new("T999").unwrap();
         let new_id = track.add_task("Appended task", None, Some(&unknown)).unwrap();
         let section_ids: Vec<&str> =
-            track.plan().sections()[0].task_ids().iter().map(|id| id.as_str()).collect();
-        assert_eq!(section_ids, vec!["T001", new_id.as_str()]);
+            track.plan().sections()[0].task_ids().iter().map(|id| id.as_ref()).collect();
+        assert_eq!(section_ids, vec!["T001", new_id.as_ref()]);
     }
 
     #[test]
     fn test_add_task_to_named_section() {
-        let tasks = vec![TrackTask::new(TaskId::new("T001").unwrap(), "Task 1").unwrap()];
-        let s1 = PlanSection::new("S1", "Section 1", vec![], vec![TaskId::new("T001").unwrap()])
-            .unwrap();
+        let tasks = vec![TrackTask::new(TaskId::try_new("T001").unwrap(), "Task 1").unwrap()];
+        let s1 =
+            PlanSection::new("S1", "Section 1", vec![], vec![TaskId::try_new("T001").unwrap()])
+                .unwrap();
         let s2 = PlanSection::new("S2", "Section 2", vec![], vec![]).unwrap();
         let plan = PlanView::new(vec![], vec![s1, s2]);
         let mut track = TrackMetadata {
-            id: TrackId::new("test-track").unwrap(),
+            id: TrackId::try_new("test-track").unwrap(),
             branch: None,
-            title: NonEmptyString::new("Test").unwrap(),
+            title: NonEmptyString::try_new("Test").unwrap(),
             tasks,
             plan,
             status_override: None,
@@ -689,10 +692,10 @@ mod tests {
     fn test_next_task_id_parametrized(#[case] existing: &[&str], #[case] expected: &str) {
         let tasks: Vec<TrackTask> = existing
             .iter()
-            .map(|id| TrackTask::new(TaskId::new(*id).unwrap(), format!("Task {id}")).unwrap())
+            .map(|id| TrackTask::new(TaskId::try_new(*id).unwrap(), format!("Task {id}")).unwrap())
             .collect();
         let section_ids: Vec<TaskId> =
-            existing.iter().map(|id| TaskId::new(*id).unwrap()).collect();
+            existing.iter().map(|id| TaskId::try_new(*id).unwrap()).collect();
         let sections = if existing.is_empty() {
             vec![]
         } else {
@@ -700,24 +703,24 @@ mod tests {
         };
         let plan = PlanView::new(vec![], sections);
         let track = TrackMetadata {
-            id: TrackId::new("test-track").unwrap(),
+            id: TrackId::try_new("test-track").unwrap(),
             branch: None,
-            title: NonEmptyString::new("Test").unwrap(),
+            title: NonEmptyString::try_new("Test").unwrap(),
             tasks,
             plan,
             status_override: None,
             review: None,
         };
-        assert_eq!(track.next_task_id().unwrap().as_str(), expected);
+        assert_eq!(track.next_task_id().unwrap().as_ref(), expected);
     }
 
     #[test]
     fn test_add_task_with_no_sections_returns_error() {
         let plan = PlanView::new(vec![], vec![]);
         let mut track = TrackMetadata {
-            id: TrackId::new("test-track").unwrap(),
+            id: TrackId::try_new("test-track").unwrap(),
             branch: None,
-            title: NonEmptyString::new("Test").unwrap(),
+            title: NonEmptyString::try_new("Test").unwrap(),
             tasks: vec![],
             plan,
             status_override: None,
@@ -734,18 +737,18 @@ mod tests {
     fn test_validate_descriptions_unchanged_rejects_mutation() {
         let original = make_track(&["T001", "T002"], &["T001", "T002"]);
 
-        let t1 = TrackTask::new(TaskId::new("T001").unwrap(), "CHANGED description").unwrap();
-        let t2 = TrackTask::new(TaskId::new("T002").unwrap(), "Task T002").unwrap();
+        let t1 = TrackTask::new(TaskId::try_new("T001").unwrap(), "CHANGED description").unwrap();
+        let t2 = TrackTask::new(TaskId::try_new("T002").unwrap(), "Task T002").unwrap();
         let section = PlanSection::new(
             "S1",
             "Section 1",
             vec![],
-            vec![TaskId::new("T001").unwrap(), TaskId::new("T002").unwrap()],
+            vec![TaskId::try_new("T001").unwrap(), TaskId::try_new("T002").unwrap()],
         )
         .unwrap();
         let plan = PlanView::new(vec![], vec![section]);
         let modified = TrackMetadata::new(
-            TrackId::new("test-track").unwrap(),
+            TrackId::try_new("test-track").unwrap(),
             "Test Track",
             vec![t1, t2],
             plan,
@@ -771,18 +774,18 @@ mod tests {
     fn test_validate_descriptions_unchanged_accepts_new_task() {
         let original = make_track(&["T001"], &["T001"]);
 
-        let t1 = TrackTask::new(TaskId::new("T001").unwrap(), "Task T001").unwrap();
-        let t2 = TrackTask::new(TaskId::new("T002").unwrap(), "Brand new task").unwrap();
+        let t1 = TrackTask::new(TaskId::try_new("T001").unwrap(), "Task T001").unwrap();
+        let t2 = TrackTask::new(TaskId::try_new("T002").unwrap(), "Brand new task").unwrap();
         let section = PlanSection::new(
             "S1",
             "Section 1",
             vec![],
-            vec![TaskId::new("T001").unwrap(), TaskId::new("T002").unwrap()],
+            vec![TaskId::try_new("T001").unwrap(), TaskId::try_new("T002").unwrap()],
         )
         .unwrap();
         let plan = PlanView::new(vec![], vec![section]);
         let updated = TrackMetadata::new(
-            TrackId::new("test-track").unwrap(),
+            TrackId::try_new("test-track").unwrap(),
             "Test Track",
             vec![t1, t2],
             plan,
@@ -812,15 +815,15 @@ mod tests {
     fn test_next_task_id_overflow_returns_error() {
         // Create a task with the max u64 value
         let max_id = format!("T{}", u64::MAX);
-        let task = TrackTask::new(TaskId::new(&max_id).unwrap(), "Max task").unwrap();
+        let task = TrackTask::new(TaskId::try_new(&max_id).unwrap(), "Max task").unwrap();
         let section =
-            PlanSection::new("S1", "Section 1", vec![], vec![TaskId::new(&max_id).unwrap()])
+            PlanSection::new("S1", "Section 1", vec![], vec![TaskId::try_new(&max_id).unwrap()])
                 .unwrap();
         let plan = PlanView::new(vec![], vec![section]);
         let track = TrackMetadata {
-            id: TrackId::new("test-track").unwrap(),
+            id: TrackId::try_new("test-track").unwrap(),
             branch: None,
-            title: NonEmptyString::new("Test").unwrap(),
+            title: NonEmptyString::try_new("Test").unwrap(),
             tasks: vec![task],
             plan,
             status_override: None,

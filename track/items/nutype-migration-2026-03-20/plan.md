@@ -13,7 +13,7 @@ Add nutype = "0.6" to workspace Cargo.toml
 Add nutype = { workspace = true } to libs/domain/Cargo.toml
 No serde feature needed (domain layer has no serde)
 
-- [ ] Add nutype 0.6 to workspace dependencies and domain Cargo.toml
+- [~] Add nutype 0.6 to workspace dependencies and domain Cargo.toml
 
 ## ID newtypes migration
 
@@ -22,14 +22,14 @@ Retain is_valid_track_id, is_valid_task_id, is_valid_commit_hash validation func
 Use validate(with = |s: &str| if is_valid_track_id(s) { Ok(()) } else { Err(ValidationError::InvalidTrackId(s.to_owned())) }, error = ValidationError)
 Derive: Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Display, AsRef, FromStr
 
-- [ ] Migrate TrackId, TaskId, CommitHash, TrackBranch to nutype (custom validation fns retained)
+- [~] Migrate TrackId, TaskId, CommitHash, TrackBranch to nutype (custom validation fns retained)
 
 ## NonEmptyString migration
 
 Use sanitize(trim) + validate for non-empty check
 Error type: ValidationError::EmptyString
 
-- [ ] Migrate NonEmptyString to nutype with sanitize(trim)
+- [~] Migrate NonEmptyString to nutype with sanitize(trim)
 
 ## ReviewConcern migration
 
@@ -37,7 +37,7 @@ Use sanitize(trim, lowercase) + validate for non-empty check
 Error type: ReviewError::InvalidConcern
 Note: ReviewConcern uses ReviewError not ValidationError — nutype supports this via error = ReviewError
 
-- [ ] Migrate ReviewConcern to nutype with sanitize(trim, lowercase) and ReviewError
+- [~] Migrate ReviewConcern to nutype with sanitize(trim, lowercase) and ReviewError
 
 ## Call site migration and cleanup
 
@@ -46,5 +46,5 @@ nutype generates try_new() instead of new() for validated types
 Remove manual Display impls, as_str() methods, fmt::Display blocks (nutype derives these)
 Update tests: new() -> try_new(), as_str() -> as_ref() or .into_inner()
 
-- [ ] Update all call sites from new() to try_new() across domain/infrastructure/usecase/cli layers
-- [ ] Remove hand-rolled boilerplate (Display, as_str, fmt impls) and update tests
+- [~] Update all call sites from new() to try_new() across domain/infrastructure/usecase/cli layers
+- [~] Remove hand-rolled boilerplate (Display, as_str, fmt impls) and update tests

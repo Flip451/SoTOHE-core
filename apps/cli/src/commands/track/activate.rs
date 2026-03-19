@@ -18,12 +18,12 @@ pub(super) fn execute_branch(action: BranchAction) -> Result<ExitCode, CliError>
 pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<ExitCode, CliError> {
     let ActivateArgs { items_dir, track_id } = args;
 
-    let track_id = TrackId::new(&track_id)
+    let track_id = TrackId::try_new(&track_id)
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     let branch_name = format!("track/{track_id}");
 
-    let branch = TrackBranch::new(&branch_name)
+    let branch = TrackBranch::try_new(&branch_name)
         .map_err(|err| CliError::Message(format!("invalid track branch: {err}")))?;
 
     let project_root = resolve_project_root(&items_dir).map_err(CliError::Message)?;
@@ -119,7 +119,7 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
     };
 
     let created_activation_commit = if should_persist_side_effects {
-        let rendered_paths = render::sync_rendered_views(&project_root, Some(track_id.as_str()))
+        let rendered_paths = render::sync_rendered_views(&project_root, Some(track_id.as_ref()))
             .map_err(|err| {
                 CliError::Message(format!("activation persisted but sync-views failed: {err}"))
             })?;
@@ -263,7 +263,7 @@ pub(super) fn load_track_branch_record(
     items_dir: &std::path::Path,
     track_id: &TrackId,
 ) -> Result<TrackBranchRecord, String> {
-    let track_dir = items_dir.join(track_id.as_str());
+    let track_dir = items_dir.join(track_id.as_ref());
     load_explicit_track_branch_from_items_dir(project_root, items_dir, &track_dir)
 }
 
@@ -275,10 +275,10 @@ fn persist_activation_commit(
     rendered_paths: &[PathBuf],
 ) -> Result<bool, String> {
     let metadata_path = items_dir
-        .join(track_id.as_str())
+        .join(track_id.as_ref())
         .join("metadata.json")
         .strip_prefix(project_root)
-        .unwrap_or(&items_dir.join(track_id.as_str()).join("metadata.json"))
+        .unwrap_or(&items_dir.join(track_id.as_ref()).join("metadata.json"))
         .display()
         .to_string();
     let mut staged = std::collections::BTreeSet::from([metadata_path]);
@@ -322,7 +322,7 @@ fn activation_resume_marker_path(
     project_root: &std::path::Path,
     track_id: &TrackId,
 ) -> std::path::PathBuf {
-    project_root.join("tmp/track-activate").join(format!("{}.pending", track_id.as_str()))
+    project_root.join("tmp/track-activate").join(format!("{}.pending", track_id.as_ref()))
 }
 
 fn activation_resume_marker_exists(project_root: &std::path::Path, track_id: &TrackId) -> bool {
@@ -530,17 +530,17 @@ fn activation_artifact_paths(
     track_id: &TrackId,
 ) -> std::collections::BTreeSet<String> {
     let metadata_path = items_dir
-        .join(track_id.as_str())
+        .join(track_id.as_ref())
         .join("metadata.json")
         .strip_prefix(project_root)
-        .unwrap_or(&items_dir.join(track_id.as_str()).join("metadata.json"))
+        .unwrap_or(&items_dir.join(track_id.as_ref()).join("metadata.json"))
         .display()
         .to_string();
     let plan_path = items_dir
-        .join(track_id.as_str())
+        .join(track_id.as_ref())
         .join("plan.md")
         .strip_prefix(project_root)
-        .unwrap_or(&items_dir.join(track_id.as_str()).join("plan.md"))
+        .unwrap_or(&items_dir.join(track_id.as_ref()).join("plan.md"))
         .display()
         .to_string();
     std::collections::BTreeSet::from([metadata_path, plan_path, "track/registry.md".to_owned()])
@@ -915,11 +915,11 @@ mod tests {
 
         let items_dir = dir.path().join("track/items");
         let store = infrastructure::track::fs_store::FsTrackStore::new(items_dir);
-        let (_, meta) = store.find_with_meta(&TrackId::new("demo").unwrap()).unwrap().unwrap();
+        let (_, meta) = store.find_with_meta(&TrackId::try_new("demo").unwrap()).unwrap().unwrap();
 
         let err = usecase::track_resolution::reject_branchless_guard(
             &store,
-            &TrackId::new("demo").unwrap(),
+            &TrackId::try_new("demo").unwrap(),
             "in_progress",
             meta.schema_version,
         )
@@ -935,11 +935,11 @@ mod tests {
 
         let items_dir = dir.path().join("track/items");
         let store = infrastructure::track::fs_store::FsTrackStore::new(items_dir);
-        let (_, meta) = store.find_with_meta(&TrackId::new("demo").unwrap()).unwrap().unwrap();
+        let (_, meta) = store.find_with_meta(&TrackId::try_new("demo").unwrap()).unwrap().unwrap();
 
         let result = usecase::track_resolution::reject_branchless_guard(
             &store,
-            &TrackId::new("demo").unwrap(),
+            &TrackId::try_new("demo").unwrap(),
             "in_progress",
             meta.schema_version,
         );
@@ -957,7 +957,7 @@ mod tests {
 
         let result = usecase::track_resolution::reject_branchless_guard(
             &store,
-            &TrackId::new("demo").unwrap(),
+            &TrackId::try_new("demo").unwrap(),
             "in_progress",
             2,
         );
@@ -1017,7 +1017,7 @@ mod tests {
     #[test]
     fn activation_resume_allowed_only_for_planned_materialization_commit_on_non_track_branch() {
         let dir = tempfile::tempdir().unwrap();
-        let track_id = TrackId::new("demo").unwrap();
+        let track_id = TrackId::try_new("demo").unwrap();
         write_activation_resume_marker(dir.path(), &track_id).unwrap();
         let repo = StubRepo { current_branch: Some("main".to_owned()), outputs: HashMap::new() };
 
@@ -1062,7 +1062,7 @@ mod tests {
     #[test]
     fn activation_resume_allowed_when_head_has_advanced_past_activation_commit() {
         let dir = tempfile::tempdir().unwrap();
-        let track_id = TrackId::new("demo").unwrap();
+        let track_id = TrackId::try_new("demo").unwrap();
         write_activation_resume_marker(dir.path(), &track_id).unwrap();
         let repo = StubRepo { current_branch: Some("main".to_owned()), outputs: HashMap::new() };
 
@@ -1083,7 +1083,7 @@ mod tests {
     #[test]
     fn activation_resume_allowed_rejects_clean_existing_branch_without_resume_marker() {
         let dir = tempfile::tempdir().unwrap();
-        let track_id = TrackId::new("demo").unwrap();
+        let track_id = TrackId::try_new("demo").unwrap();
         let repo = StubRepo {
             current_branch: Some("main".to_owned()),
             outputs: HashMap::from([
@@ -1144,7 +1144,7 @@ mod tests {
                 &repo,
                 dir.path(),
                 &dir.path().join("track/items"),
-                &TrackId::new("demo").unwrap(),
+                &TrackId::try_new("demo").unwrap(),
                 "track/demo",
                 "planned",
                 Some("main"),
@@ -1156,7 +1156,7 @@ mod tests {
     #[test]
     fn activation_resume_marker_round_trips() {
         let dir = tempfile::tempdir().unwrap();
-        let track_id = TrackId::new("demo").unwrap();
+        let track_id = TrackId::try_new("demo").unwrap();
 
         assert!(!activation_resume_marker_path(dir.path(), &track_id).exists());
         write_activation_resume_marker(dir.path(), &track_id).unwrap();
@@ -1248,7 +1248,7 @@ mod tests {
 
     #[test]
     fn allowed_activation_dirty_paths_only_open_for_auto_resume() {
-        let track_id = TrackId::new("demo").unwrap();
+        let track_id = TrackId::try_new("demo").unwrap();
         assert_eq!(
             allowed_activation_dirty_paths(
                 Path::new("."),
@@ -1290,7 +1290,7 @@ mod tests {
 
     #[test]
     fn allowed_activation_dirty_paths_respects_items_dir() {
-        let track_id = TrackId::new("demo").unwrap();
+        let track_id = TrackId::try_new("demo").unwrap();
         assert_eq!(
             allowed_activation_dirty_paths(
                 Path::new("."),
@@ -1360,7 +1360,7 @@ mod tests {
         .unwrap();
 
         let record =
-            load_track_branch_record(dir.path(), &items_dir, &TrackId::new("demo").unwrap())
+            load_track_branch_record(dir.path(), &items_dir, &TrackId::try_new("demo").unwrap())
                 .unwrap();
 
         assert_eq!(record.display_path, "custom/track/items/demo");
@@ -1611,7 +1611,7 @@ mod tests {
 
         let base = activation_branch_create_base(
             &repo,
-            &TrackId::new("demo").unwrap(),
+            &TrackId::try_new("demo").unwrap(),
             "track/demo",
             BranchMode::Auto,
             false,
@@ -1678,7 +1678,7 @@ mod tests {
 
         let base = activation_branch_create_base(
             &repo,
-            &TrackId::new("demo").unwrap(),
+            &TrackId::try_new("demo").unwrap(),
             "track/demo",
             BranchMode::Auto,
             true,
@@ -1737,7 +1737,7 @@ mod tests {
 
         let base = activation_branch_create_base(
             &repo,
-            &TrackId::new("demo").unwrap(),
+            &TrackId::try_new("demo").unwrap(),
             "track/demo",
             BranchMode::Auto,
             true,
@@ -1768,7 +1768,7 @@ mod tests {
             &repo,
             Path::new("."),
             Path::new("track/items"),
-            &TrackId::new("demo").unwrap(),
+            &TrackId::try_new("demo").unwrap(),
             &[],
         )
         .unwrap();
@@ -1797,7 +1797,7 @@ mod tests {
             &repo,
             Path::new("."),
             Path::new("track/items"),
-            &TrackId::new("demo").unwrap(),
+            &TrackId::try_new("demo").unwrap(),
             &[],
         )
         .unwrap();

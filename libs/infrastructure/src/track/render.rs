@@ -152,7 +152,7 @@ pub fn render_plan(track: &TrackMetadata) -> String {
     let task_map = track
         .tasks()
         .iter()
-        .map(|task| (task.id().as_str(), task))
+        .map(|task| (task.id().as_ref(), task))
         .collect::<std::collections::HashMap<_, _>>();
 
     for section in track.plan().sections() {
@@ -167,7 +167,7 @@ pub fn render_plan(track: &TrackMetadata) -> String {
         }
 
         for task_id in section.task_ids() {
-            if let Some(task) = task_map.get(task_id.as_str()) {
+            if let Some(task) = task_map.get(task_id.as_ref()) {
                 let marker = match task.status() {
                     TaskStatus::Todo => " ",
                     TaskStatus::InProgress => "~",
@@ -203,7 +203,7 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
     let mut active: Vec<_> = tracks
         .iter()
         .filter(|track| {
-            matches!(track.status().as_str(), "planned" | "in_progress" | "blocked" | "cancelled")
+            matches!(track.status().as_ref(), "planned" | "in_progress" | "blocked" | "cancelled")
         })
         .collect();
     active.sort_by_key(|track| {
@@ -361,7 +361,7 @@ fn validate_track_document(
         }
     }
 
-    if !VALID_TRACK_STATUSES.contains(&doc.status.as_str()) {
+    if !VALID_TRACK_STATUSES.contains(&doc.status.as_ref()) {
         return Err(RenderError::InvalidTrackMetadata {
             path: metadata_path.to_path_buf(),
             reason: format!("Invalid track status '{}'", doc.status),
@@ -483,7 +483,7 @@ pub fn sync_rendered_views(
         let rendered = render_plan(&track);
         let plan_path = track_dir.join("plan.md");
         let old = std::fs::read_to_string(&plan_path).ok();
-        if old.as_deref().is_none_or(|existing| !rendered_matches(existing, rendered.as_str())) {
+        if old.as_deref().is_none_or(|existing| !rendered_matches(existing, rendered.as_ref())) {
             atomic_write_file(&plan_path, rendered.as_bytes())?;
             changed.push(plan_path);
         }
@@ -493,7 +493,7 @@ pub fn sync_rendered_views(
         std::fs::create_dir_all(parent)?;
     }
     let old = std::fs::read_to_string(&registry_path).ok();
-    if old.as_deref().is_none_or(|existing| !rendered_matches(existing, rendered_registry.as_str()))
+    if old.as_deref().is_none_or(|existing| !rendered_matches(existing, rendered_registry.as_ref()))
     {
         atomic_write_file(&registry_path, rendered_registry.as_bytes())?;
         changed.push(registry_path);

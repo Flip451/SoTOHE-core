@@ -25,7 +25,7 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
             .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?,
     };
 
-    let track_id = TrackId::new(&effective_track_id)
+    let track_id = TrackId::try_new(&effective_track_id)
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     let (track, meta) = read_track_metadata(&items_dir, &track_id)

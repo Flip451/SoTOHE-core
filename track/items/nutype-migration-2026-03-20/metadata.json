@@ -76,7 +76,7 @@
     ]
   },
   "review": {
-    "code_hash": "49326951d3efb6f952463f0fd6daaa012194a55b",
+    "code_hash": "438034f17ec264e6564f647d442bc4d2e8fb44f4",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -113,15 +113,39 @@
       "threshold": 3
     },
     "groups": {
-      "other": {
+      "infra-domain": {
         "fast": {
-          "round": 2,
-          "timestamp": "2026-03-19T17:33:17Z",
+          "round": 1,
+          "timestamp": "2026-03-19T21:45:52Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-19T17:33:28Z",
+          "timestamp": "2026-03-19T21:46:20Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "other": {
+        "fast": {
+          "round": 3,
+          "timestamp": "2026-03-19T21:45:59Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T21:46:20Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "usecase": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-19T21:45:59Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T21:46:20Z",
           "verdict": "zero_findings"
         }
       }
@@ -129,39 +153,39 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
   "tasks": [
     {
       "description": "Add nutype 0.6 to workspace dependencies and domain Cargo.toml",
       "id": "T001",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Migrate TrackId, TaskId, CommitHash, TrackBranch to nutype (custom validation fns retained)",
       "id": "T002",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Migrate NonEmptyString to nutype with sanitize(trim)",
       "id": "T003",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Migrate ReviewConcern to nutype with sanitize(trim, lowercase) and ReviewError",
       "id": "T004",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Update all call sites from new() to try_new() across domain/infrastructure/usecase/cli layers",
       "id": "T005",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Remove hand-rolled boilerplate (Display, as_str, fmt impls) and update tests",
       "id": "T006",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "title": "Migrate hand-rolled newtypes to nutype crate (6 types, ~120 lines reduced)",
-  "updated_at": "2026-03-19T17:33:28Z"
+  "updated_at": "2026-03-19T21:46:20Z"
 }

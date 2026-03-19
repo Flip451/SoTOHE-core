@@ -228,16 +228,19 @@ pub fn encode(track: &TrackMetadata, meta: &DocumentMeta) -> Result<String, Code
 }
 
 fn track_metadata_from_document(doc: TrackDocumentV2) -> Result<TrackMetadata, CodecError> {
-    let id = TrackId::new(&doc.id).map_err(DomainError::from)?;
+    let id = TrackId::try_new(&doc.id).map_err(DomainError::from)?;
 
-    let branch =
-        doc.branch.map(TrackBranch::new).transpose().map_err(|e| CodecError::Domain(e.into()))?;
+    let branch = doc
+        .branch
+        .map(TrackBranch::try_new)
+        .transpose()
+        .map_err(|e| CodecError::Domain(e.into()))?;
 
     let tasks: Vec<TrackTask> = doc
         .tasks
         .into_iter()
         .map(|t| {
-            let task_id = TaskId::new(&t.id).map_err(DomainError::from)?;
+            let task_id = TaskId::try_new(&t.id).map_err(DomainError::from)?;
             let status = parse_task_status(&t.status, t.commit_hash.as_deref())?;
             TrackTask::with_status(task_id, t.description, status)
                 .map_err(|e| CodecError::Domain(e.into()))
@@ -290,7 +293,7 @@ fn parse_task_status(status: &str, commit_hash: Option<&str>) -> Result<TaskStat
         "in_progress" => Ok(TaskStatus::InProgress),
         "done" => {
             let hash = commit_hash
-                .map(CommitHash::new)
+                .map(CommitHash::try_new)
                 .transpose()
                 .map_err(|e| CodecError::Domain(e.into()))?;
             Ok(TaskStatus::Done { commit_hash: hash })
@@ -322,7 +325,7 @@ fn plan_from_document(doc: PlanDocument) -> Result<PlanView, CodecError> {
             let task_ids = s
                 .task_ids
                 .into_iter()
-                .map(|id| TaskId::new(id).map_err(|e| CodecError::Domain(e.into())))
+                .map(|id| TaskId::try_new(id).map_err(|e| CodecError::Domain(e.into())))
                 .collect::<Result<Vec<_>, _>>()?;
             PlanSection::new(s.id, s.title, s.description, task_ids)
                 .map_err(|e| CodecError::Domain(e.into()))
@@ -427,14 +430,14 @@ fn round_result_from_document(doc: ReviewRoundDocument) -> Result<ReviewRoundRes
         .concerns
         .into_iter()
         .map(|s| {
-            ReviewConcern::new(&s)
+            ReviewConcern::try_new(&s)
                 .map_err(|_| CodecError::Validation(format!("invalid concern slug: {s:?}")))
         })
         .collect::<Result<Vec<_>, _>>()?;
 
     // Only findings_remain with no concerns gets "other" fallback (legacy data).
     let sanitized = if verdict == Verdict::FindingsRemain && concerns.is_empty() {
-        let fallback = ReviewConcern::new("other")
+        let fallback = ReviewConcern::try_new("other")
             .map_err(|_| CodecError::Validation("failed to construct fallback concern".into()))?;
         vec![fallback]
     } else {
@@ -469,7 +472,7 @@ fn review_to_document(review: &ReviewState) -> TrackReviewDocument {
 }
 
 fn round_result_to_document(result: &ReviewRoundResult) -> ReviewRoundDocument {
-    let concerns: Vec<String> = result.concerns().iter().map(|c| c.as_str().to_owned()).collect();
+    let concerns: Vec<String> = result.concerns().iter().map(|c| c.as_ref().to_owned()).collect();
     ReviewRoundDocument {
         round: result.round(),
         verdict: result.verdict().to_string(),
@@ -495,7 +498,7 @@ fn escalation_from_document(
                 .concerns
                 .into_iter()
                 .map(|s| {
-                    ReviewConcern::new(s).map_err(|e| CodecError::InvalidField {
+                    ReviewConcern::try_new(s).map_err(|e| CodecError::InvalidField {
                         field: "review.escalation.recent_cycles.*.concerns".into(),
                         reason: e.to_string(),
                     })
@@ -510,7 +513,7 @@ fn escalation_from_document(
         .concern_streaks
         .into_iter()
         .map(|(key, streak_doc)| {
-            let concern = ReviewConcern::new(key).map_err(|e| CodecError::InvalidField {
+            let concern = ReviewConcern::try_new(key).map_err(|e| CodecError::InvalidField {
                 field: "review.escalation.concern_streaks".into(),
                 reason: e.to_string(),
             })?;
@@ -549,7 +552,7 @@ fn escalation_phase_from_document(
             let concerns = concerns
                 .into_iter()
                 .map(|s| {
-                    ReviewConcern::new(s).map_err(|e| CodecError::InvalidField {
+                    ReviewConcern::try_new(s).map_err(|e| CodecError::InvalidField {
                         field: "review.escalation.phase.concerns".into(),
                         reason: e.to_string(),
                     })
@@ -591,7 +594,7 @@ fn resolution_from_document(
         .blocked_concerns
         .into_iter()
         .map(|s| {
-            ReviewConcern::new(s).map_err(|e| CodecError::InvalidField {
+            ReviewConcern::try_new(s).map_err(|e| CodecError::InvalidField {
                 field: "review.escalation.last_resolution.blocked_concerns".into(),
                 reason: e.to_string(),
             })
@@ -629,7 +632,7 @@ fn escalation_to_document(
     let phase = match escalation.phase() {
         EscalationPhase::Clear => EscalationPhaseDocument::Clear,
         EscalationPhase::Blocked(block) => EscalationPhaseDocument::Blocked {
-            concerns: block.concerns().iter().map(|c| c.as_str().to_owned()).collect(),
+            concerns: block.concerns().iter().map(|c| c.as_ref().to_owned()).collect(),
             blocked_at: block.blocked_at().to_owned(),
         },
     };
@@ -641,7 +644,7 @@ fn escalation_to_document(
             round_type: c.round_type().to_string(),
             round: c.round(),
             timestamp: c.timestamp().to_owned(),
-            concerns: c.concerns().iter().map(|rc| rc.as_str().to_owned()).collect(),
+            concerns: c.concerns().iter().map(|rc| rc.as_ref().to_owned()).collect(),
             groups: c.groups().to_vec(),
         })
         .collect();
@@ -651,7 +654,7 @@ fn escalation_to_document(
         .iter()
         .map(|(concern, streak)| {
             (
-                concern.as_str().to_owned(),
+                concern.as_ref().to_owned(),
                 ConcernStreakDocument {
                     consecutive_rounds: streak.consecutive_rounds(),
                     last_round_type: streak.last_round_type().to_string(),
@@ -663,7 +666,7 @@ fn escalation_to_document(
         .collect();
 
     let last_resolution = escalation.last_resolution().map(|r| ResolutionDocument {
-        blocked_concerns: r.blocked_concerns().iter().map(|c| c.as_str().to_owned()).collect(),
+        blocked_concerns: r.blocked_concerns().iter().map(|c| c.as_ref().to_owned()).collect(),
         workspace_search_ref: r.workspace_search_ref().to_owned(),
         reinvention_check_ref: r.reinvention_check_ref().to_owned(),
         decision: escalation_decision_to_str(r.decision()).to_owned(),
@@ -776,7 +779,7 @@ mod tests {
     #[test]
     fn test_decode_valid_json_returns_track_metadata() {
         let (track, meta) = decode(sample_json()).unwrap();
-        assert_eq!(track.id().as_str(), "test-track");
+        assert_eq!(track.id().as_ref(), "test-track");
         assert_eq!(track.title(), "Test Track");
         assert_eq!(track.tasks().len(), 2);
         assert_eq!(meta.schema_version, 2);
@@ -1332,15 +1335,15 @@ mod tests {
         let review = track.review().unwrap();
         let fast = review.groups().get("g1").unwrap().fast().unwrap();
         assert_eq!(fast.concerns().len(), 2);
-        assert_eq!(fast.concerns()[0].as_str(), "shell-parsing");
-        assert_eq!(fast.concerns()[1].as_str(), "domain.review");
+        assert_eq!(fast.concerns()[0].as_ref(), "shell-parsing");
+        assert_eq!(fast.concerns()[1].as_ref(), "domain.review");
 
         // Round-trip
         let re_encoded = encode(&track, &meta).unwrap();
         let (track2, _) = decode(&re_encoded).unwrap();
         let fast2 = track2.review().unwrap().groups().get("g1").unwrap().fast().unwrap().clone();
         assert_eq!(fast2.concerns().len(), 2);
-        assert_eq!(fast2.concerns()[0].as_str(), "shell-parsing");
+        assert_eq!(fast2.concerns()[0].as_ref(), "shell-parsing");
     }
 
     #[test]
@@ -1524,7 +1527,7 @@ mod tests {
         let fast = track.review().unwrap().groups().get("g1").unwrap().fast().unwrap();
         // findings_remain without concerns must get a fallback "other" concern
         assert_eq!(fast.concerns().len(), 1, "findings_remain must have at least one concern");
-        assert_eq!(fast.concerns()[0].as_str(), "other");
+        assert_eq!(fast.concerns()[0].as_ref(), "other");
     }
 
     // --- Finding 3: resolution_from_document empty field validation ---

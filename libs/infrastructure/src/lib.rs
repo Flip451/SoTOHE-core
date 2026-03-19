@@ -75,13 +75,13 @@ mod tests {
     use super::InMemoryTrackStore;
 
     fn sample_track() -> TrackMetadata {
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
         let task = TrackTask::new(task_id.clone(), "Persist the track aggregate").unwrap();
         let section = PlanSection::new("S1", "Persistence", Vec::new(), vec![task_id]).unwrap();
         let plan = PlanView::new(Vec::new(), vec![section]);
 
         TrackMetadata::new(
-            TrackId::new("track-state-machine").unwrap(),
+            TrackId::try_new("track-state-machine").unwrap(),
             "Track state machine",
             vec![task],
             plan,
@@ -105,7 +105,7 @@ mod tests {
     fn update_atomically_mutates_and_persists() {
         let store = InMemoryTrackStore::new();
         let track = sample_track();
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
 
         store.save(&track).unwrap();
 

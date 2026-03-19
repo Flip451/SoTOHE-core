@@ -37,6 +37,14 @@ pub enum ReviewError {
     ResolutionConcernMismatch { expected: Vec<String>, actual: Vec<String> },
 }
 
+fn validate_review_concern(value: &str) -> Result<(), ReviewError> {
+    if value.is_empty() {
+        Err(ReviewError::InvalidConcern("concern must not be empty or whitespace-only".to_owned()))
+    } else {
+        Ok(())
+    }
+}
+
 /// A normalized, non-empty concern identifier used for review escalation tracking.
 ///
 /// Concerns are lowercase-trimmed strings that enable consistent dedup and sort.
@@ -44,31 +52,12 @@ pub enum ReviewError {
 /// # Errors
 ///
 /// Returns `ReviewError::InvalidConcern` if the value is empty after trimming.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[nutype::nutype(
+    sanitize(with = |s: String| s.trim().to_lowercase()),
+    validate(with = validate_review_concern, error = ReviewError),
+    derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, AsRef)
+)]
 pub struct ReviewConcern(String);
-
-impl ReviewConcern {
-    /// Creates a new `ReviewConcern`, normalizing to lowercase and trimming whitespace.
-    ///
-    /// # Errors
-    ///
-    /// Returns `ReviewError::InvalidConcern` if the value is empty or whitespace-only.
-    pub fn new(value: impl Into<String>) -> Result<Self, ReviewError> {
-        let normalized = value.into().trim().to_lowercase();
-        if normalized.is_empty() {
-            return Err(ReviewError::InvalidConcern(
-                "concern must not be empty or whitespace-only".to_owned(),
-            ));
-        }
-        Ok(Self(normalized))
-    }
-
-    /// Returns the inner string value.
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
 
 /// Summary of a closed review cycle for escalation tracking.
 ///
@@ -680,7 +669,7 @@ impl ReviewState {
         // 0. Escalation block check (short-circuit before all other checks).
         if let EscalationPhase::Blocked(ref block) = self.escalation.phase {
             return Err(ReviewError::EscalationActive {
-                concerns: block.concerns.iter().map(|c| c.as_str().to_owned()).collect(),
+                concerns: block.concerns.iter().map(|c| c.as_ref().to_owned()).collect(),
             });
         }
 
@@ -821,7 +810,7 @@ impl ReviewState {
         // 0. Escalation block check (short-circuit before all other checks).
         if let EscalationPhase::Blocked(ref block) = self.escalation.phase {
             return Err(ReviewError::EscalationActive {
-                concerns: block.concerns.iter().map(|c| c.as_str().to_owned()).collect(),
+                concerns: block.concerns.iter().map(|c| c.as_ref().to_owned()).collect(),
             });
         }
 
@@ -1090,7 +1079,7 @@ impl ReviewState {
         // 0. Escalation block check (short-circuit before all other checks).
         if let EscalationPhase::Blocked(ref block) = self.escalation.phase {
             return Err(ReviewError::EscalationActive {
-                concerns: block.concerns.iter().map(|c| c.as_str().to_owned()).collect(),
+                concerns: block.concerns.iter().map(|c| c.as_ref().to_owned()).collect(),
             });
         }
 
@@ -1168,9 +1157,9 @@ impl ReviewState {
 
         // Validate concerns match (order-insensitive: sort both before comparing).
         let mut expected: Vec<String> =
-            block.concerns.iter().map(|c| c.as_str().to_owned()).collect();
+            block.concerns.iter().map(|c| c.as_ref().to_owned()).collect();
         let mut actual: Vec<String> =
-            resolution.blocked_concerns.iter().map(|c| c.as_str().to_owned()).collect();
+            resolution.blocked_concerns.iter().map(|c| c.as_ref().to_owned()).collect();
         expected.sort();
         actual.sort();
         if expected != actual {
@@ -1202,7 +1191,7 @@ mod tests {
     }
 
     fn findings() -> ReviewRoundResult {
-        let concern = ReviewConcern::new("test-concern").unwrap();
+        let concern = ReviewConcern::try_new("test-concern").unwrap();
         ReviewRoundResult::new_with_concerns(
             1,
             Verdict::FindingsRemain,
@@ -1670,38 +1659,38 @@ mod tests {
 
     #[test]
     fn test_review_concern_new_with_valid_slug_succeeds() {
-        let c = ReviewConcern::new("domain.review").unwrap();
-        assert_eq!(c.as_str(), "domain.review");
+        let c = ReviewConcern::try_new("domain.review").unwrap();
+        assert_eq!(c.as_ref(), "domain.review");
     }
 
     #[test]
     fn test_review_concern_new_with_empty_string_fails() {
-        let result = ReviewConcern::new("");
+        let result = ReviewConcern::try_new("");
         assert!(matches!(result, Err(ReviewError::InvalidConcern(_))));
     }
 
     #[test]
     fn test_review_concern_new_with_whitespace_only_fails() {
-        let result = ReviewConcern::new("   ");
+        let result = ReviewConcern::try_new("   ");
         assert!(matches!(result, Err(ReviewError::InvalidConcern(_))));
     }
 
     #[test]
     fn test_review_concern_normalizes_to_lowercase() {
-        let c = ReviewConcern::new("Domain.Review").unwrap();
-        assert_eq!(c.as_str(), "domain.review");
+        let c = ReviewConcern::try_new("Domain.Review").unwrap();
+        assert_eq!(c.as_ref(), "domain.review");
     }
 
     #[test]
     fn test_review_concern_trims_whitespace() {
-        let c = ReviewConcern::new("  shell-parsing  ").unwrap();
-        assert_eq!(c.as_str(), "shell-parsing");
+        let c = ReviewConcern::try_new("  shell-parsing  ").unwrap();
+        assert_eq!(c.as_ref(), "shell-parsing");
     }
 
     #[test]
     fn test_review_concern_ord_is_lexicographic() {
-        let a = ReviewConcern::new("aaa").unwrap();
-        let b = ReviewConcern::new("bbb").unwrap();
+        let a = ReviewConcern::try_new("aaa").unwrap();
+        let b = ReviewConcern::try_new("bbb").unwrap();
         assert!(a < b);
     }
 
@@ -1725,7 +1714,7 @@ mod tests {
 
     #[test]
     fn test_escalation_state_is_blocked_returns_true_when_blocked() {
-        let concern = ReviewConcern::new("domain.review").unwrap();
+        let concern = ReviewConcern::try_new("domain.review").unwrap();
         let block = ReviewEscalationBlock::new(vec![concern], ts("2026-03-19T00:00:00Z"));
         let state = ReviewEscalationState::with_fields(
             3,
@@ -1740,7 +1729,7 @@ mod tests {
     // --- EscalationActive gate tests ---
 
     fn blocked_review_state() -> ReviewState {
-        let concern = ReviewConcern::new("domain.review").unwrap();
+        let concern = ReviewConcern::try_new("domain.review").unwrap();
         let block = ReviewEscalationBlock::new(vec![concern], ts("2026-03-19T00:00:00Z"));
         let escalation = ReviewEscalationState::with_fields(
             3,
@@ -1782,7 +1771,7 @@ mod tests {
 
     #[test]
     fn test_check_commit_ready_rejects_when_escalation_blocked() {
-        let concern = ReviewConcern::new("domain.review").unwrap();
+        let concern = ReviewConcern::try_new("domain.review").unwrap();
         let block = ReviewEscalationBlock::new(vec![concern], ts("2026-03-19T00:00:00Z"));
         let escalation = ReviewEscalationState::with_fields(
             3,
@@ -1809,7 +1798,7 @@ mod tests {
     fn test_escalation_check_happens_before_hash_check() {
         // Set up a state with BOTH stale hash AND blocked escalation.
         // The method must return EscalationActive (not StaleCodeHash).
-        let concern = ReviewConcern::new("domain.review").unwrap();
+        let concern = ReviewConcern::try_new("domain.review").unwrap();
         let block = ReviewEscalationBlock::new(vec![concern], ts("2026-03-19T00:00:00Z"));
         let escalation = ReviewEscalationState::with_fields(
             3,
@@ -1842,7 +1831,7 @@ mod tests {
 
     #[test]
     fn test_review_round_result_new_with_concerns() {
-        let concern = ReviewConcern::new("domain.review").unwrap();
+        let concern = ReviewConcern::try_new("domain.review").unwrap();
         let result = ReviewRoundResult::new_with_concerns(
             1,
             Verdict::FindingsRemain,
@@ -1882,7 +1871,7 @@ mod tests {
 
     fn blocked_state() -> ReviewState {
         let block = ReviewEscalationBlock::new(
-            vec![ReviewConcern::new("shell-parsing").unwrap()],
+            vec![ReviewConcern::try_new("shell-parsing").unwrap()],
             ts("2026-03-19T00:00:00Z"),
         );
         let escalation = ReviewEscalationState::with_fields(
@@ -1897,7 +1886,7 @@ mod tests {
 
     fn valid_resolution() -> ReviewEscalationResolution {
         ReviewEscalationResolution::new(
-            vec![ReviewConcern::new("shell-parsing").unwrap()],
+            vec![ReviewConcern::try_new("shell-parsing").unwrap()],
             "search.md".to_owned(),
             "reinvention.md".to_owned(),
             ReviewEscalationDecision::ContinueSelfImplementation,
@@ -1960,7 +1949,7 @@ mod tests {
     fn test_resolve_escalation_rejects_mismatched_concerns() {
         let mut state = blocked_state();
         let mut res = valid_resolution();
-        res.blocked_concerns = vec![ReviewConcern::new("different-concern").unwrap()];
+        res.blocked_concerns = vec![ReviewConcern::try_new("different-concern").unwrap()];
         let result = state.resolve_escalation(res);
         assert!(matches!(result, Err(ReviewError::ResolutionConcernMismatch { .. })));
     }
@@ -2003,7 +1992,7 @@ mod tests {
     fn test_record_round_rejects_zero_findings_with_concerns() {
         let mut state = ReviewState::new();
         let expected = vec!["group-a".to_owned()];
-        let concern = ReviewConcern::new("some-concern").unwrap();
+        let concern = ReviewConcern::try_new("some-concern").unwrap();
         let result_with_concern = ReviewRoundResult::new_with_concerns(
             1,
             Verdict::ZeroFindings,
@@ -2043,7 +2032,7 @@ mod tests {
     fn test_resolve_escalation_accepts_reordered_concerns() {
         // Block with concerns [a, b]
         let block = ReviewEscalationBlock::new(
-            vec![ReviewConcern::new("aaa").unwrap(), ReviewConcern::new("bbb").unwrap()],
+            vec![ReviewConcern::try_new("aaa").unwrap(), ReviewConcern::try_new("bbb").unwrap()],
             ts("2026-03-19T00:00:00Z"),
         );
         let escalation = ReviewEscalationState::with_fields(
@@ -2058,7 +2047,7 @@ mod tests {
 
         // Resolution with concerns in reverse order [b, a]
         let resolution = ReviewEscalationResolution::new(
-            vec![ReviewConcern::new("bbb").unwrap(), ReviewConcern::new("aaa").unwrap()],
+            vec![ReviewConcern::try_new("bbb").unwrap(), ReviewConcern::try_new("aaa").unwrap()],
             "search.md",
             "reinvention.md",
             ReviewEscalationDecision::ContinueSelfImplementation,
@@ -2072,7 +2061,7 @@ mod tests {
     // --- Finding 3: escalation state updates after record_round ---
 
     fn round_with_concern(round: u32, concern: &str, ts_str: &str) -> ReviewRoundResult {
-        let c = ReviewConcern::new(concern).unwrap();
+        let c = ReviewConcern::try_new(concern).unwrap();
         ReviewRoundResult::new_with_concerns(round, Verdict::FindingsRemain, ts(ts_str), vec![c])
     }
 
@@ -2103,7 +2092,7 @@ mod tests {
         assert!(state.escalation().is_blocked(), "should be blocked after 3 consecutive rounds");
         if let EscalationPhase::Blocked(ref block) = *state.escalation().phase() {
             assert_eq!(block.concerns().len(), 1);
-            assert_eq!(block.concerns()[0].as_str(), "bad-pattern");
+            assert_eq!(block.concerns()[0].as_ref(), "bad-pattern");
         } else {
             panic!("expected Blocked phase");
         }
@@ -2190,7 +2179,7 @@ mod tests {
         let expected = vec!["group-a".to_owned(), "group-b".to_owned()];
 
         // Both groups record findings_remain round 1 — cycle closes once
-        let c = ReviewConcern::new("bad-pattern").unwrap();
+        let c = ReviewConcern::try_new("bad-pattern").unwrap();
         let r1a = ReviewRoundResult::new_with_concerns(
             1,
             Verdict::FindingsRemain,

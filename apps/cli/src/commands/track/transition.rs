@@ -11,16 +11,16 @@ pub(super) fn execute_transition(
     skip_branch_check: bool,
 ) -> Result<ExitCode, CliError> {
     // Validate inputs.
-    let track_id = TrackId::new(&track_id)
+    let track_id = TrackId::try_new(&track_id)
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
-    let task_id = TaskId::new(&task_id)
+    let task_id = TaskId::try_new(&task_id)
         .map_err(|err| CliError::Message(format!("invalid task id: {err}")))?;
 
     // Validate commit_hash early if provided.
     let parsed_hash = match commit_hash {
         Some(h) => {
-            let hash = CommitHash::new(h)
+            let hash = CommitHash::try_new(h)
                 .map_err(|err| CliError::Message(format!("invalid commit hash: {err}")))?;
             Some(hash)
         }
@@ -65,7 +65,7 @@ pub(super) fn execute_transition(
         target_status,
         track.status()
     );
-    match render::sync_rendered_views(&project_root, Some(track_id.as_str())) {
+    match render::sync_rendered_views(&project_root, Some(track_id.as_ref())) {
         Ok(changed) => {
             for path in changed {
                 match path.strip_prefix(&project_root) {
@@ -108,7 +108,7 @@ pub(super) fn verify_branch_guard<R: TrackReader>(
         return Err(format!("detached HEAD — expected branch '{expected_branch}', cannot verify"));
     }
 
-    if actual != expected_branch.as_str() {
+    if actual != expected_branch.as_ref() {
         return Err(format!(
             "current branch '{actual}' does not match expected '{expected_branch}'"
         ));

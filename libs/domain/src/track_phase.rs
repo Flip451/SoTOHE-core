@@ -211,13 +211,13 @@ mod tests {
     };
 
     fn planned_track(id: &str, branch: Option<&str>) -> TrackMetadata {
-        let task_id = TaskId::new("T1").unwrap();
+        let task_id = TaskId::try_new("T1").unwrap();
         let task = TrackTask::new(task_id.clone(), "Implement feature").unwrap();
         let section = PlanSection::new("S1", "Build", Vec::new(), vec![task_id]).unwrap();
         let plan = PlanView::new(Vec::new(), vec![section]);
         TrackMetadata::with_branch(
-            TrackId::new(id).unwrap(),
-            branch.map(|b| TrackBranch::new(b).unwrap()),
+            TrackId::try_new(id).unwrap(),
+            branch.map(|b| TrackBranch::try_new(b).unwrap()),
             "Test Track",
             vec![task],
             plan,
@@ -257,7 +257,7 @@ mod tests {
     #[test]
     fn resolve_phase_in_progress_returns_in_progress() {
         let mut track = planned_track("demo", Some("track/demo"));
-        track.transition_task(&TaskId::new("T1").unwrap(), TaskTransition::Start).unwrap();
+        track.transition_task(&TaskId::try_new("T1").unwrap(), TaskTransition::Start).unwrap();
         let info = resolve_phase(&track, 3);
         assert_eq!(info.phase, TrackPhase::InProgress);
         assert_eq!(info.next_command, "/track:implement");
@@ -266,10 +266,10 @@ mod tests {
     #[test]
     fn resolve_phase_done_returns_ready_to_ship() {
         let mut track = planned_track("demo", Some("track/demo"));
-        track.transition_task(&TaskId::new("T1").unwrap(), TaskTransition::Start).unwrap();
+        track.transition_task(&TaskId::try_new("T1").unwrap(), TaskTransition::Start).unwrap();
         track
             .transition_task(
-                &TaskId::new("T1").unwrap(),
+                &TaskId::try_new("T1").unwrap(),
                 TaskTransition::Complete { commit_hash: None },
             )
             .unwrap();
@@ -281,15 +281,20 @@ mod tests {
     #[test]
     fn resolve_phase_blocked_returns_blocked_with_reason() {
         let track = TrackMetadata::with_branch(
-            TrackId::new("demo").unwrap(),
-            Some(TrackBranch::new("track/demo").unwrap()),
+            TrackId::try_new("demo").unwrap(),
+            Some(TrackBranch::try_new("track/demo").unwrap()),
             "Test",
-            vec![TrackTask::new(TaskId::new("T1").unwrap(), "task").unwrap()],
+            vec![TrackTask::new(TaskId::try_new("T1").unwrap(), "task").unwrap()],
             PlanView::new(
                 Vec::new(),
                 vec![
-                    PlanSection::new("S1", "Build", Vec::new(), vec![TaskId::new("T1").unwrap()])
-                        .unwrap(),
+                    PlanSection::new(
+                        "S1",
+                        "Build",
+                        Vec::new(),
+                        vec![TaskId::try_new("T1").unwrap()],
+                    )
+                    .unwrap(),
                 ],
             ),
             Some(StatusOverride::blocked("waiting on review")),
@@ -303,15 +308,20 @@ mod tests {
     #[test]
     fn resolve_phase_cancelled_returns_cancelled() {
         let track = TrackMetadata::with_branch(
-            TrackId::new("demo").unwrap(),
-            Some(TrackBranch::new("track/demo").unwrap()),
+            TrackId::try_new("demo").unwrap(),
+            Some(TrackBranch::try_new("track/demo").unwrap()),
             "Test",
-            vec![TrackTask::new(TaskId::new("T1").unwrap(), "task").unwrap()],
+            vec![TrackTask::new(TaskId::try_new("T1").unwrap(), "task").unwrap()],
             PlanView::new(
                 Vec::new(),
                 vec![
-                    PlanSection::new("S1", "Build", Vec::new(), vec![TaskId::new("T1").unwrap()])
-                        .unwrap(),
+                    PlanSection::new(
+                        "S1",
+                        "Build",
+                        Vec::new(),
+                        vec![TaskId::try_new("T1").unwrap()],
+                    )
+                    .unwrap(),
                 ],
             ),
             Some(StatusOverride::cancelled("scope changed")),

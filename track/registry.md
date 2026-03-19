@@ -15,7 +15,7 @@
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| nutype-migration-2026-03-20 | planned | `/track:implement` | 2026-03-19 |
+| nutype-migration-2026-03-20 | in_progress | `/track:implement` | 2026-03-19 |
 
 ## Completed Tracks
 
