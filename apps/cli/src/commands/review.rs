@@ -768,32 +768,22 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
 
     let timestamp = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
 
-    // Acquire an advisory lock to serialize concurrent record-round invocations.
-    //
-    // Design note: we intentionally use an application-level lock (not git's
-    // `.git/index.lock`) because git's index lock would block `git add` calls
-    // within this process. The advisory lock only serializes `sotp record-round`
-    // against itself. External `git add` from other tools is not blocked; in
-    // the normal workflow, the Claude Code `block-direct-git-ops` hook prevents
-    // uncontrolled staging. This is a deliberate trade-off: full index-level
-    // atomicity is not achievable without forking git internals, and the
-    // advisory lock + hook combination provides sufficient protection for the
-    // intended single-operator workflow.
-    let index_lock = acquire_git_index_lock(&git)?;
+    // Step 1: Copy the current git index to a private temp file.
+    // All staging operations go through the private index; the real index is
+    // only updated at the very end via an atomic fs::rename.  This eliminates
+    // the TOCTOU window that the old advisory-lock approach left open.
+    let private_index = PrivateIndex::from_current(&git)?;
 
-    // Step 1: Compute pre-update normalized hash (advisory lock held).
-    let pre_update_hash = git
-        .index_tree_hash_normalizing(&metadata_rel)
+    // Step 2: Compute pre-update normalized hash from the private index.
+    let pre_update_hash = private_index
+        .normalized_tree_hash(&git, &metadata_rel)
         .map_err(|e| format!("normalized hash error: {e}"))?;
 
-    // Step 2: Write review state + code_hash="PENDING" via record_round_with_pending.
+    // Step 3: Write review state + code_hash="PENDING" via record_round_with_pending.
     use domain::TrackWriter;
     let mut stale_error: Option<String> = None;
-    // Capture pre-mutation snapshot for rollback if steps 3–6 fail.
-    let mut review_snapshot: Option<Option<domain::ReviewState>> = None;
     store
         .update(&track_id, |track| {
-            review_snapshot = Some(track.review().cloned());
             let review = track.review_mut().get_or_insert_with(ReviewState::new);
             let round_num = review
                 .groups()
@@ -829,52 +819,36 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         .map_err(|e| format!("failed to update metadata.json: {e}"))?;
 
     if let Some(err_msg) = stale_error {
-        drop(index_lock);
+        // private_index is dropped here without swap — real index untouched.
         return Err(format!("[BLOCKED] {err_msg}"));
     }
 
-    // Steps 3–6: re-stage → compute hash → write-back → re-stage.
-    // If any step fails, roll back review state to pre-mutation snapshot
-    // so we don't leave metadata.json with code_hash="PENDING".
-    let hash_write_result = (|| -> Result<(), String> {
-        // Step 3: Re-stage metadata.json (advisory lock still held).
-        stage_metadata(&git, &metadata_rel)?;
+    // Step 4: Stage the updated metadata.json (with code_hash="PENDING") into the private index.
+    let metadata_abs_path = git.root().join(&metadata_rel);
+    private_index.stage_file(&git, &metadata_abs_path, &metadata_rel)?;
 
-        // Step 4: Compute post-update normalized hash H1.
-        let h1 = git
-            .index_tree_hash_normalizing(&metadata_rel)
-            .map_err(|e| format!("post-update normalized hash error: {e}"))?;
+    // Step 5: Compute post-update normalized hash H1 from the private index.
+    let h1 = private_index
+        .normalized_tree_hash(&git, &metadata_rel)
+        .map_err(|e| format!("post-update normalized hash error: {e}"))?;
 
-        // Step 5: Write back the computed hash via set_code_hash.
-        store
-            .update(&track_id, |track| {
-                if let Some(review) = track.review_mut().as_mut() {
-                    review.set_code_hash(h1.clone());
-                }
-                Ok(())
-            })
-            .map_err(|e| format!("failed to write code_hash: {e}"))?;
+    // Step 6: Write back the computed hash via set_code_hash.
+    store
+        .update(&track_id, |track| {
+            if let Some(review) = track.review_mut().as_mut() {
+                review.set_code_hash(h1.clone());
+            }
+            Ok(())
+        })
+        .map_err(|e| format!("failed to write code_hash: {e}"))?;
 
-        // Step 6: Re-stage metadata.json.
-        stage_metadata(&git, &metadata_rel)?;
-        Ok(())
-    })();
+    // Step 7: Stage the final metadata.json (with real code_hash) into the private index.
+    private_index.stage_file(&git, &metadata_abs_path, &metadata_rel)?;
 
-    // Release the advisory lock — concurrent record-round can proceed.
-    drop(index_lock);
-
-    if let Err(e) = hash_write_result {
-        // Roll back: restore pre-mutation review state so metadata.json
-        // does not retain code_hash="PENDING" from the failed attempt.
-        if let Some(snap) = review_snapshot {
-            let _ = store.update(&track_id, |track| {
-                *track.review_mut() = snap;
-                Ok(())
-            });
-            let _ = stage_metadata(&git, &metadata_rel);
-        }
-        return Err(format!("[BLOCKED] hash write-back failed: {e}. Review state rolled back."));
-    }
+    // Step 8: Atomically rename private index over the real index.
+    // If any earlier step failed, private_index would have been dropped without swap,
+    // leaving the real index entirely untouched.
+    private_index.swap_into_real()?;
 
     eprintln!(
         "[OK] Recorded {round_type} round for group '{}' (verdict: {verdict_str})",
@@ -883,106 +857,309 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
     Ok(())
 }
 
-/// Acquire an advisory lock to serialize concurrent `sotp record-round` invocations.
-///
-/// This does NOT use `.git/index.lock` (which would block `git add` inside
-/// this process). Instead it creates `<git-dir>/sotp-record-round.lock` — an
-/// application-level lock that prevents two `record-round` commands from
-/// racing against each other. External `git add` from other tools is NOT
-/// blocked by this lock; it is an advisory guard only. In the normal workflow,
-/// the Claude Code hook `block-direct-git-ops` prevents uncontrolled staging,
-/// so this lock's scope is limited to serializing `record-round` invocations.
-///
-/// Returns a guard that removes the lock file on drop.
-fn acquire_git_index_lock(
-    git: &impl infrastructure::git_cli::GitRepository,
-) -> Result<GitIndexLockGuard, String> {
-    // Use `git rev-parse --git-dir` to support linked worktrees where
-    // `.git` is a file pointing to the real git directory.
-    let git_dir_output = git
-        .output(&["rev-parse", "--git-dir"])
-        .map_err(|e| format!("failed to resolve git dir: {e}"))?;
-    if !git_dir_output.status.success() {
-        return Err("failed to resolve git dir".to_owned());
-    }
-    let git_dir_str = String::from_utf8_lossy(&git_dir_output.stdout).trim().to_owned();
-    let git_dir = if std::path::Path::new(&git_dir_str).is_absolute() {
-        std::path::PathBuf::from(&git_dir_str)
-    } else {
-        git.root().join(&git_dir_str)
-    };
-    let lock_path = git_dir.join("sotp-record-round.lock");
+// ---------------------------------------------------------------------------
+// PrivateIndex: POSIX-atomic index update via private copy + rename
+// ---------------------------------------------------------------------------
 
-    // Check for stale lock left by a crashed process.
-    if lock_path.exists() {
-        if let Ok(contents) = std::fs::read_to_string(&lock_path) {
-            if let Ok(pid) = contents.trim().parse::<u32>() {
-                // On Unix, sending signal 0 checks if the process exists.
-                #[cfg(unix)]
-                {
-                    // Safety: kill(pid, 0) only checks process existence, no signal is sent.
-                    let ret = unsafe { libc::kill(pid as libc::pid_t, 0) };
-                    // ret == 0 → process exists and we can signal it.
-                    // ret == -1 && errno == EPERM → process exists but owned by another user.
-                    // ret == -1 && errno == ESRCH → process does not exist (stale).
-                    let alive = ret == 0
-                        || (ret == -1
-                            && std::io::Error::last_os_error().raw_os_error() == Some(libc::EPERM));
-                    if !alive {
-                        eprintln!(
-                            "Removing stale record-round lock (PID {pid} is no longer running)"
-                        );
-                        let _ = std::fs::remove_file(&lock_path);
-                    }
-                }
-                #[cfg(not(unix))]
-                {
-                    let _ = pid; // suppress unused warning
-                }
+/// A private copy of the git index used to stage files without touching the
+/// real `.git/index` until all operations succeed.
+///
+/// All git commands that read or modify the index operate on `temp_path`
+/// via `GIT_INDEX_FILE`.  When every step has succeeded, [`swap_into_real`]
+/// atomically renames `temp_path` over `real_index_path`.  If the
+/// `PrivateIndex` is dropped before [`swap_into_real`] is called, the temp
+/// file is removed and the real index is left completely untouched.
+///
+/// [`swap_into_real`]: PrivateIndex::swap_into_real
+struct PrivateIndex {
+    temp_path: PathBuf,
+    real_index_path: PathBuf,
+    swapped: bool,
+}
+
+impl PrivateIndex {
+    /// Copy the current git index to a temp file in the same directory as the
+    /// real index (required for `fs::rename` to be atomic on POSIX).
+    ///
+    /// Uses `git rev-parse --git-path index` to find the real index path so
+    /// that linked worktrees are handled correctly.
+    fn from_current(git: &impl infrastructure::git_cli::GitRepository) -> Result<Self, String> {
+        // Resolve the real index path (worktree-safe).
+        let real_index_path = resolve_real_index_path(git)?;
+
+        // Place the temp file in the same directory so rename is atomic.
+        let temp_dir = real_index_path.parent().ok_or_else(|| {
+            format!("git index path has no parent directory: {}", real_index_path.display())
+        })?;
+        let temp_path = temp_dir.join(format!(
+            "sotp-private-index-{}-{}.tmp",
+            std::process::id(),
+            // Pointer address of a stack local used as a secondary disambiguator.
+            // This is stable within a single call site and avoids collisions
+            // when multiple PrivateIndex values are alive concurrently.
+            {
+                let marker: u8 = 0;
+                std::ptr::from_ref(&marker) as usize
             }
-        }
-    }
+        ));
 
-    // O_CREAT | O_EXCL — fails if the lock already exists (another record-round).
-    let mut file =
-        std::fs::OpenOptions::new().write(true).create_new(true).open(&lock_path).map_err(|e| {
+        std::fs::copy(&real_index_path, &temp_path).map_err(|e| {
             format!(
-                "failed to acquire record-round lock at {}: {e}. \
-                 Another record-round may be in progress.",
-                lock_path.display()
+                "failed to copy git index {} -> {}: {e}",
+                real_index_path.display(),
+                temp_path.display()
             )
         })?;
-    // Write our PID so stale lock detection can identify dead holders.
-    use std::io::Write;
-    let _ = write!(file, "{}", std::process::id());
 
-    Ok(GitIndexLockGuard { path: lock_path })
-}
+        Ok(Self { temp_path, real_index_path, swapped: false })
+    }
 
-/// RAII guard that removes the advisory lock file on drop.
-struct GitIndexLockGuard {
-    path: std::path::PathBuf,
-}
+    /// Compute the normalized tree hash from the private index.
+    ///
+    /// The normalization is identical to `index_tree_hash_normalizing` in
+    /// `git_cli.rs`: `review.code_hash` is set to `"PENDING"` and
+    /// `updated_at` is set to the Unix epoch.  A second temp copy of the
+    /// private index is used for the write-tree operation so the private
+    /// index itself is not modified.
+    fn normalized_tree_hash(
+        &self,
+        git: &impl infrastructure::git_cli::GitRepository,
+        metadata_path: &str,
+    ) -> Result<String, infrastructure::git_cli::GitError> {
+        use infrastructure::git_cli::GitError;
+        use std::io::Write as _;
 
-impl Drop for GitIndexLockGuard {
-    fn drop(&mut self) {
-        let _ = std::fs::remove_file(&self.path);
+        // Step 1: Read the metadata.json blob from the private index.
+        let show_output = std::process::Command::new("git")
+            .args(["show", &format!(":{metadata_path}")])
+            .current_dir(git.root())
+            .env("GIT_INDEX_FILE", &self.temp_path)
+            .output()
+            .map_err(|source| GitError::Spawn {
+                command: format!("show :{metadata_path}"),
+                source,
+            })?;
+        if !show_output.status.success() {
+            let stderr = String::from_utf8_lossy(&show_output.stderr).trim().to_owned();
+            let code = show_output.status.code().unwrap_or(-1);
+            return Err(GitError::CommandFailed {
+                command: format!("show :{metadata_path}"),
+                code,
+                stderr,
+            });
+        }
+        let blob_content = String::from_utf8_lossy(&show_output.stdout);
+
+        // Step 2: Parse as JSON.
+        let mut json: serde_json::Value =
+            serde_json::from_str(&blob_content).map_err(|e| GitError::CommandFailed {
+                command: format!("parse {metadata_path}"),
+                code: -1,
+                stderr: e.to_string(),
+            })?;
+
+        // Step 3: Normalize volatile fields.
+        if let serde_json::Value::Object(obj) = &mut json {
+            obj.insert(
+                "updated_at".to_owned(),
+                serde_json::Value::String("1970-01-01T00:00:00Z".to_owned()),
+            );
+            let review = obj
+                .entry("review")
+                .or_insert_with(|| serde_json::Value::Object(serde_json::Map::new()));
+            if let serde_json::Value::Object(review_obj) = review {
+                review_obj.insert(
+                    "code_hash".to_owned(),
+                    serde_json::Value::String("PENDING".to_owned()),
+                );
+            }
+        }
+
+        // Step 4: Serialize deterministically.
+        let normalized =
+            serde_json::to_string_pretty(&json).map_err(|e| GitError::CommandFailed {
+                command: format!("serialize {metadata_path}"),
+                code: -1,
+                stderr: e.to_string(),
+            })?;
+
+        // Step 5: Write normalized blob to object store.
+        let mut hash_object_child = std::process::Command::new("git")
+            .args(["hash-object", "-w", "--stdin"])
+            .current_dir(git.root())
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::piped())
+            .spawn()
+            .map_err(|source| GitError::Spawn {
+                command: "hash-object -w --stdin".to_owned(),
+                source,
+            })?;
+        if let Some(ref mut stdin) = hash_object_child.stdin {
+            stdin.write_all(normalized.as_bytes()).map_err(|source| GitError::Spawn {
+                command: "hash-object write stdin".to_owned(),
+                source,
+            })?;
+        }
+        let hash_object_output = hash_object_child.wait_with_output().map_err(|source| {
+            GitError::Spawn { command: "hash-object -w --stdin (wait)".to_owned(), source }
+        })?;
+        if !hash_object_output.status.success() {
+            let stderr = String::from_utf8_lossy(&hash_object_output.stderr).trim().to_owned();
+            let code = hash_object_output.status.code().unwrap_or(-1);
+            return Err(GitError::CommandFailed {
+                command: "hash-object -w --stdin".to_owned(),
+                code,
+                stderr,
+            });
+        }
+        let blob_hash = String::from_utf8_lossy(&hash_object_output.stdout).trim().to_owned();
+
+        // Step 6: Copy private index to a second temp file for write-tree
+        // (write-tree modifies internal index state, so we must not use
+        // self.temp_path directly).
+        let norm_temp = self.temp_path.with_extension("norm.tmp");
+        std::fs::copy(&self.temp_path, &norm_temp).map_err(|source| GitError::Spawn {
+            command: "copy private index for write-tree".to_owned(),
+            source,
+        })?;
+
+        // Step 7: Update the norm copy with the normalized blob.
+        let update_output = std::process::Command::new("git")
+            .args(["update-index", "--cacheinfo", &format!("100644,{blob_hash},{metadata_path}")])
+            .current_dir(git.root())
+            .env("GIT_INDEX_FILE", &norm_temp)
+            .output()
+            .map_err(|source| GitError::Spawn {
+                command: "update-index --cacheinfo (norm)".to_owned(),
+                source,
+            })?;
+        if !update_output.status.success() {
+            let _ = std::fs::remove_file(&norm_temp);
+            let stderr = String::from_utf8_lossy(&update_output.stderr).trim().to_owned();
+            let code = update_output.status.code().unwrap_or(-1);
+            return Err(GitError::CommandFailed {
+                command: "update-index --cacheinfo (norm)".to_owned(),
+                code,
+                stderr,
+            });
+        }
+
+        // Step 8: Write tree from the norm copy.
+        let write_tree_output = std::process::Command::new("git")
+            .args(["write-tree"])
+            .current_dir(git.root())
+            .env("GIT_INDEX_FILE", &norm_temp)
+            .output()
+            .map_err(|source| GitError::Spawn {
+                command: "write-tree (private-norm)".to_owned(),
+                source,
+            })?;
+
+        // Step 9: Clean up the norm copy unconditionally.
+        let _ = std::fs::remove_file(&norm_temp);
+
+        if !write_tree_output.status.success() {
+            let stderr = String::from_utf8_lossy(&write_tree_output.stderr).trim().to_owned();
+            let code = write_tree_output.status.code().unwrap_or(-1);
+            return Err(GitError::CommandFailed {
+                command: "write-tree (private-norm)".to_owned(),
+                code,
+                stderr,
+            });
+        }
+
+        Ok(String::from_utf8_lossy(&write_tree_output.stdout).trim().to_owned())
+    }
+
+    /// Stage a file into the private index.
+    ///
+    /// First writes the file content to the git object store with
+    /// `git hash-object -w` (no index needed), then updates the private
+    /// index entry with `git update-index --cacheinfo`.
+    fn stage_file(
+        &self,
+        git: &impl infrastructure::git_cli::GitRepository,
+        abs_path: &Path,
+        rel_path: &str,
+    ) -> Result<(), String> {
+        // Step 1: Write blob to object store.
+        let hash_output = std::process::Command::new("git")
+            .args(["hash-object", "-w", "--"])
+            .arg(abs_path)
+            .current_dir(git.root())
+            .output()
+            .map_err(|e| format!("failed to hash-object {}: {e}", abs_path.display()))?;
+        if !hash_output.status.success() {
+            let stderr = String::from_utf8_lossy(&hash_output.stderr).trim().to_owned();
+            return Err(format!("git hash-object failed for {}: {stderr}", abs_path.display()));
+        }
+        let blob_hash = String::from_utf8_lossy(&hash_output.stdout).trim().to_owned();
+
+        // Step 2: Update the private index entry.
+        let update_output = std::process::Command::new("git")
+            .args(["update-index", "--cacheinfo", &format!("100644,{blob_hash},{rel_path}")])
+            .current_dir(git.root())
+            .env("GIT_INDEX_FILE", &self.temp_path)
+            .output()
+            .map_err(|e| format!("failed to update-index for {rel_path}: {e}"))?;
+        if !update_output.status.success() {
+            let stderr = String::from_utf8_lossy(&update_output.stderr).trim().to_owned();
+            return Err(format!("git update-index failed for {rel_path}: {stderr}"));
+        }
+
+        Ok(())
+    }
+
+    /// Atomically rename the private index over the real index.
+    ///
+    /// On POSIX, `fs::rename` is atomic when both paths are on the same
+    /// filesystem (guaranteed by [`from_current`] placing the temp file in
+    /// the same directory as the real index).
+    ///
+    /// [`from_current`]: PrivateIndex::from_current
+    fn swap_into_real(mut self) -> Result<(), String> {
+        std::fs::rename(&self.temp_path, &self.real_index_path).map_err(|e| {
+            format!(
+                "failed to atomically rename private index {} -> {}: {e}",
+                self.temp_path.display(),
+                self.real_index_path.display()
+            )
+        })?;
+        self.swapped = true;
+        Ok(())
     }
 }
 
-/// Stage a single file into the git index.
-fn stage_metadata(
+impl Drop for PrivateIndex {
+    fn drop(&mut self) {
+        if !self.swapped {
+            let _ = std::fs::remove_file(&self.temp_path);
+        }
+    }
+}
+
+/// Resolve the absolute path of the real git index, worktree-safe.
+///
+/// Uses `git rev-parse --git-path index` which correctly resolves the index
+/// path even in linked worktrees where `.git` is a pointer file.
+fn resolve_real_index_path(
     git: &impl infrastructure::git_cli::GitRepository,
-    metadata_rel: &str,
-) -> Result<(), String> {
+) -> Result<PathBuf, String> {
     let output = git
-        .output(&["add", "--", metadata_rel])
-        .map_err(|e| format!("failed to stage metadata.json: {e}"))?;
+        .output(&["rev-parse", "--git-path", "index"])
+        .map_err(|e| format!("failed to resolve git index path: {e}"))?;
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
-        return Err(format!("failed to stage metadata.json: {stderr}"));
+        return Err(format!("git rev-parse --git-path index failed: {stderr}"));
     }
-    Ok(())
+    let resolved = String::from_utf8_lossy(&output.stdout).trim().to_owned();
+    let path = if std::path::Path::new(&resolved).is_absolute() {
+        PathBuf::from(resolved)
+    } else {
+        git.root().join(resolved)
+    };
+    Ok(path)
 }
 
 // ---------------------------------------------------------------------------
