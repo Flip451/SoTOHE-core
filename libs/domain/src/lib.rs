@@ -7,7 +7,6 @@ mod error;
 pub mod guard;
 pub mod hook;
 mod ids;
-pub mod lock;
 mod plan;
 mod repository;
 pub mod review;

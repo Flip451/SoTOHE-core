@@ -5,26 +5,18 @@ use super::*;
 pub(super) fn execute_branch(action: BranchAction) -> Result<ExitCode, CliError> {
     match action {
         BranchAction::Create(args) => execute_activate(
-            ActivateArgs {
-                items_dir: args.items_dir,
-                locks_dir: args.locks_dir,
-                track_id: args.track_id,
-            },
+            ActivateArgs { items_dir: args.items_dir, track_id: args.track_id },
             BranchMode::Create,
         ),
         BranchAction::Switch(args) => execute_activate(
-            ActivateArgs {
-                items_dir: args.items_dir,
-                locks_dir: args.locks_dir,
-                track_id: args.track_id,
-            },
+            ActivateArgs { items_dir: args.items_dir, track_id: args.track_id },
             BranchMode::Switch,
         ),
     }
 }
 
 pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<ExitCode, CliError> {
-    let ActivateArgs { items_dir, locks_dir, track_id } = args;
+    let ActivateArgs { items_dir, track_id } = args;
 
     let track_id = TrackId::new(&track_id)
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
@@ -39,10 +31,7 @@ pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<E
     let repo = SystemGitRepo::discover()
         .map_err(|err| CliError::Message(format!("failed to discover git repository: {err}")))?;
 
-    let lock_manager = FsFileLockManager::new(&locks_dir)
-        .map(Arc::new)
-        .map_err(|err| CliError::Message(format!("failed to initialize lock manager: {err}")))?;
-    let store = Arc::new(FsTrackStore::new(items_dir.clone(), lock_manager, DEFAULT_LOCK_TIMEOUT));
+    let store = Arc::new(FsTrackStore::new(items_dir.clone()));
     let activation = ActivateTrackUseCase::new(Arc::clone(&store));
 
     let track_record = load_track_branch_record(&project_root, &items_dir, &track_id)
@@ -734,7 +723,7 @@ mod tests {
     use std::fs;
     use std::os::unix::process::ExitStatusExt;
     use std::process::Output;
-    use std::sync::{Arc, Mutex};
+    use std::sync::Mutex;
 
     use domain::TrackId;
     use infrastructure::git_cli::{GitError, GitRepository};
@@ -925,14 +914,7 @@ mod tests {
         write_track_metadata(dir.path(), 3, None);
 
         let items_dir = dir.path().join("track/items");
-        let lock_manager = Arc::new(
-            infrastructure::lock::FsFileLockManager::new(dir.path().join(".locks")).unwrap(),
-        );
-        let store = infrastructure::track::fs_store::FsTrackStore::new(
-            items_dir,
-            lock_manager,
-            std::time::Duration::from_secs(5),
-        );
+        let store = infrastructure::track::fs_store::FsTrackStore::new(items_dir);
         let (_, meta) = store.find_with_meta(&TrackId::new("demo").unwrap()).unwrap().unwrap();
 
         let err = usecase::track_resolution::reject_branchless_guard(
@@ -952,14 +934,7 @@ mod tests {
         write_track_metadata(dir.path(), 3, Some("track/demo"));
 
         let items_dir = dir.path().join("track/items");
-        let lock_manager = Arc::new(
-            infrastructure::lock::FsFileLockManager::new(dir.path().join(".locks")).unwrap(),
-        );
-        let store = infrastructure::track::fs_store::FsTrackStore::new(
-            items_dir,
-            lock_manager,
-            std::time::Duration::from_secs(5),
-        );
+        let store = infrastructure::track::fs_store::FsTrackStore::new(items_dir);
         let (_, meta) = store.find_with_meta(&TrackId::new("demo").unwrap()).unwrap().unwrap();
 
         let result = usecase::track_resolution::reject_branchless_guard(
@@ -978,14 +953,7 @@ mod tests {
         write_track_metadata(dir.path(), 2, None);
 
         let items_dir = dir.path().join("track/items");
-        let lock_manager = Arc::new(
-            infrastructure::lock::FsFileLockManager::new(dir.path().join(".locks")).unwrap(),
-        );
-        let store = infrastructure::track::fs_store::FsTrackStore::new(
-            items_dir,
-            lock_manager,
-            std::time::Duration::from_secs(5),
-        );
+        let store = infrastructure::track::fs_store::FsTrackStore::new(items_dir);
 
         let result = usecase::track_resolution::reject_branchless_guard(
             &store,

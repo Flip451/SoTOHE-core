@@ -59,44 +59,16 @@ const EXPECTED_HOOK_PATHS: &[(&str, &str)] = &[
 // Constants: expected hook commands (label -> required fragments)
 // ---------------------------------------------------------------------------
 
-const EXPECTED_HOOK_COMMANDS: &[(&str, &[&str])] = &[
-    (
-        "direct git ops block hook",
-        &[
-            "SOTP_CLI_BINARY:-",
-            "$CLAUDE_PROJECT_DIR/bin/sotp",
-            "cargo run --quiet -p cli --",
-            "hook dispatch block-direct-git-ops",
-            "|| exit 2",
-        ],
-    ),
-    (
-        "file-lock-acquire hook",
-        &[
-            "SOTP_LOCK_ENABLED:-",
-            "SOTP_CLI_BINARY:-",
-            "$CLAUDE_PROJECT_DIR/bin/sotp",
-            "cargo run --quiet -p cli --",
-            "hook dispatch file-lock-acquire",
-            "SOTP_AGENT_ID:-pid-$PPID",
-            "--pid \"$PPID\"",
-            "|| exit 2",
-        ],
-    ),
-    (
-        "file-lock-release hook",
-        &[
-            "SOTP_LOCK_ENABLED:-",
-            "SOTP_CLI_BINARY:-",
-            "$CLAUDE_PROJECT_DIR/bin/sotp",
-            "cargo run --quiet -p cli --",
-            "hook dispatch file-lock-release",
-            "SOTP_AGENT_ID:-pid-$PPID",
-            "warning: file-lock-release launcher failed",
-            "exit 0",
-        ],
-    ),
-];
+const EXPECTED_HOOK_COMMANDS: &[(&str, &[&str])] = &[(
+    "direct git ops block hook",
+    &[
+        "SOTP_CLI_BINARY:-",
+        "$CLAUDE_PROJECT_DIR/bin/sotp",
+        "cargo run --quiet -p cli --",
+        "hook dispatch block-direct-git-ops",
+        "|| exit 2",
+    ],
+)];
 
 // ---------------------------------------------------------------------------
 // Constants: expected allow (entry -> label)

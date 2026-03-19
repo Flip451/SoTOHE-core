@@ -16,7 +16,7 @@
 - [ ] resolve.rs doc comment lock references removed
 - [ ] DESIGN.md lock references updated (fd-lock, FsFileLockManager, module tree)
 - [ ] tech-stack.md lock references updated (fd-lock entry removed)
-- [ ] .gitignore .locks/ entry removed
+- [ ] .gitignore .locks/ comment updated (kept ignored for backward compat)
 - [ ] No remaining references to lock types in libs/ apps/
 
 ## Manual Verification Steps
@@ -30,7 +30,7 @@
 7. `test -d libs/infrastructure/src/lock && echo FAIL || echo OK` returns OK
 8. `test -f libs/infrastructure/tests/concurrency.rs && echo FAIL || echo OK` returns OK
 9. `grep "pub struct FsTrackStore" libs/infrastructure/src/track/fs_store.rs` shows no generic parameter
-10. `grep "\.locks" .gitignore` returns 0 matches
+10. `grep "\.locks" .gitignore` returns the backward-compat ignore entry with updated comment
 11. `grep "pub locks_dir\|pub agent.*AgentId\|pub pid" libs/domain/src/hook/types.rs` returns 0 matches (HookContext lock fields removed)
 12. `grep "FileLockAcquire\|FileLockRelease" libs/domain/src/hook/types.rs` returns 0 matches (HookName lock variants removed)
 13. `grep -i "fd.lock\|FsFileLockManager\|file.lock\|lock.manager\|infrastructure::lock" .claude/docs/DESIGN.md` returns 0 matches

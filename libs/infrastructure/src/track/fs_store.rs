@@ -1,11 +1,7 @@
-//! File-system backed TrackReader + TrackWriter using FileLockManager for exclusive access.
+//! File-system backed TrackReader + TrackWriter using atomic writes for crash-safe persistence.
 
 use std::path::{Path, PathBuf};
-use std::sync::Arc;
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::Duration;
 
-use domain::lock::{AgentId, FileLockManager, LockMode};
 use domain::{
     DomainError, RepositoryError, TrackId, TrackMetadata, TrackReadError, TrackReader,
     TrackWriteError, TrackWriter,
@@ -14,31 +10,20 @@ use domain::{
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
 
-/// Agent ID prefix used by `FsTrackStore` for lock acquisition.
-const STORE_AGENT_PREFIX: &str = "sotp-track-store";
-
-/// Global monotonic counter for generating unique per-call agent IDs.
-static AGENT_SEQ: AtomicU64 = AtomicU64::new(0);
-
 /// File-system backed TrackReader + TrackWriter.
-/// Uses `FileLockManager` for exclusive access during mutations.
 /// Uses `atomic_write_file` for crash-safe persistence.
-pub struct FsTrackStore<L: FileLockManager> {
+pub struct FsTrackStore {
     root: PathBuf,
-    lock_manager: Arc<L>,
-    lock_timeout: Duration,
 }
 
-impl<L: FileLockManager> FsTrackStore<L> {
+impl FsTrackStore {
     /// Creates a new `FsTrackStore`.
     ///
     /// # Arguments
     /// * `root` - Root directory containing track item directories (e.g., `track/items/`).
-    /// * `lock_manager` - Shared lock manager for exclusive access.
-    /// * `lock_timeout` - Timeout for lock acquisition.
     #[must_use]
-    pub fn new(root: impl Into<PathBuf>, lock_manager: Arc<L>, lock_timeout: Duration) -> Self {
-        Self { root: root.into(), lock_manager, lock_timeout }
+    pub fn new(root: impl Into<PathBuf>) -> Self {
+        Self { root: root.into() }
     }
 
     /// Returns the path to `metadata.json` for a given track ID.
@@ -104,7 +89,7 @@ impl<L: FileLockManager> FsTrackStore<L> {
     }
 }
 
-impl<L: FileLockManager> FsTrackStore<L> {
+impl FsTrackStore {
     /// Read-only metadata load returning both domain model and document metadata.
     ///
     /// Unlike `TrackReader::find`, this also returns `DocumentMeta` (schema version,
@@ -120,17 +105,17 @@ impl<L: FileLockManager> FsTrackStore<L> {
     }
 }
 
-impl<L: FileLockManager> TrackReader for FsTrackStore<L> {
+impl TrackReader for FsTrackStore {
     fn find(&self, id: &TrackId) -> Result<Option<TrackMetadata>, TrackReadError> {
         self.read_track(id).map(|opt| opt.map(|(track, _meta)| track)).map_err(TrackReadError::from)
     }
 }
 
-impl<L: FileLockManager> TrackWriter for FsTrackStore<L> {
+impl TrackWriter for FsTrackStore {
     fn save(&self, track: &TrackMetadata) -> Result<(), TrackWriteError> {
         let path = self.metadata_path(track.id());
 
-        // Ensure the track directory exists so FilePath::new can canonicalize the parent.
+        // Ensure the track directory exists.
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
                 TrackWriteError::Repository(RepositoryError::Message(format!(
@@ -140,30 +125,7 @@ impl<L: FileLockManager> TrackWriter for FsTrackStore<L> {
             })?;
         }
 
-        // Acquire exclusive lock to prevent concurrent save/update races.
-        let lock_path = domain::lock::FilePath::new(&path).map_err(|e| {
-            TrackWriteError::Repository(RepositoryError::Message(format!(
-                "failed to create lock path for {}: {e}",
-                path.display()
-            )))
-        })?;
-
-        let seq = AGENT_SEQ.fetch_add(1, Ordering::Relaxed);
-        let pid = std::process::id();
-        let agent_name = format!("{STORE_AGENT_PREFIX}-{pid}-{seq}");
-        let agent = AgentId::new(&agent_name);
-
-        let guard = self
-            .lock_manager
-            .acquire(&lock_path, LockMode::Exclusive, &agent, pid, Some(self.lock_timeout))
-            .map_err(|e| {
-                TrackWriteError::Repository(RepositoryError::Message(format!(
-                    "failed to acquire lock on {}: {e}",
-                    path.display()
-                )))
-            })?;
-
-        // Read existing meta under lock to preserve created_at, or create new meta.
+        // Read existing meta to preserve created_at, or create new meta.
         let mut meta = match self.read_track(track.id()).map_err(TrackWriteError::from)? {
             Some((existing, mut meta)) => {
                 track.validate_descriptions_unchanged(&existing).map_err(DomainError::from)?;
@@ -186,7 +148,6 @@ impl<L: FileLockManager> TrackWriter for FsTrackStore<L> {
 
         self.write_track(track, &meta).map_err(TrackWriteError::from)?;
 
-        drop(guard);
         Ok(())
     }
 
@@ -203,30 +164,7 @@ impl<L: FileLockManager> TrackWriter for FsTrackStore<L> {
             )));
         }
 
-        let lock_path = domain::lock::FilePath::new(&path).map_err(|e| {
-            TrackWriteError::Repository(RepositoryError::Message(format!(
-                "failed to create lock path for {}: {e}",
-                path.display()
-            )))
-        })?;
-
-        let seq = AGENT_SEQ.fetch_add(1, Ordering::Relaxed);
-        let pid = std::process::id();
-        let agent_name = format!("{STORE_AGENT_PREFIX}-{pid}-{seq}");
-        let agent = AgentId::new(&agent_name);
-
-        // Acquire exclusive lock.
-        let guard = self
-            .lock_manager
-            .acquire(&lock_path, LockMode::Exclusive, &agent, pid, Some(self.lock_timeout))
-            .map_err(|e| {
-                TrackWriteError::Repository(RepositoryError::Message(format!(
-                    "failed to acquire lock on {}: {e}",
-                    path.display()
-                )))
-            })?;
-
-        // Read current state under lock.
+        // Read current state.
         let (mut track, mut meta) =
             self.read_track(id).map_err(TrackWriteError::from)?.ok_or_else(|| {
                 TrackWriteError::Repository(RepositoryError::TrackNotFound(id.to_string()))
@@ -242,27 +180,28 @@ impl<L: FileLockManager> TrackWriter for FsTrackStore<L> {
         meta.original_status = None;
         self.write_track(&track, &meta).map_err(TrackWriteError::from)?;
 
-        // Explicitly release lock (RAII drop also works, but explicit is clearer).
-        drop(guard);
-
         Ok(track)
     }
 }
 
-impl<L: FileLockManager> FsTrackStore<L> {
-    /// Execute a closure with exclusive access to both the domain model and
+impl FsTrackStore {
+    /// Execute a closure with full control over both the domain model and
     /// infrastructure metadata. Unlike `update`, this gives the caller full
     /// control over `DocumentMeta` (including `updated_at`) and does NOT
     /// auto-set any timestamps — the closure is responsible for setting them.
     ///
     /// The closure receives `(&mut TrackMetadata, &mut DocumentMeta)` and may
-    /// perform multiple mutations atomically under a single file lock. After
-    /// the closure returns `Ok`, the state is written to disk and the lock is
-    /// released. On `Err`, nothing is written.
+    /// perform multiple mutations in a single read-modify-write cycle. After
+    /// the closure returns `Ok`, the state is written to disk atomically.
+    /// On `Err`, nothing is written.
+    ///
+    /// Note: this method relies on single-process sequential execution for
+    /// correctness. Concurrent callers are not supported — parallel access
+    /// will be handled by worktree isolation (Phase 4 SPEC-04).
     ///
     /// # Errors
-    /// Returns `TrackWriteError` if the track is not found, the lock cannot be
-    /// acquired, the closure returns an error, or the write fails.
+    /// Returns `TrackWriteError` if the track is not found, the closure returns
+    /// an error, or the write fails.
     pub fn with_locked_document<F>(
         &self,
         id: &TrackId,
@@ -280,30 +219,7 @@ impl<L: FileLockManager> FsTrackStore<L> {
             )));
         }
 
-        let lock_path = domain::lock::FilePath::new(&path).map_err(|e| {
-            TrackWriteError::Repository(RepositoryError::Message(format!(
-                "failed to create lock path for {}: {e}",
-                path.display()
-            )))
-        })?;
-
-        let seq = AGENT_SEQ.fetch_add(1, Ordering::Relaxed);
-        let pid = std::process::id();
-        let agent_name = format!("{STORE_AGENT_PREFIX}-{pid}-{seq}");
-        let agent = AgentId::new(&agent_name);
-
-        // Acquire exclusive lock.
-        let guard = self
-            .lock_manager
-            .acquire(&lock_path, LockMode::Exclusive, &agent, pid, Some(self.lock_timeout))
-            .map_err(|e| {
-                TrackWriteError::Repository(RepositoryError::Message(format!(
-                    "failed to acquire lock on {}: {e}",
-                    path.display()
-                )))
-            })?;
-
-        // Read current state under lock.
+        // Read current state.
         let (mut track, mut meta) =
             self.read_track(id).map_err(TrackWriteError::from)?.ok_or_else(|| {
                 TrackWriteError::Repository(RepositoryError::TrackNotFound(id.to_string()))
@@ -317,8 +233,6 @@ impl<L: FileLockManager> FsTrackStore<L> {
         meta.original_status = None;
         self.write_track(&track, &meta).map_err(TrackWriteError::from)?;
 
-        drop(guard);
-
         Ok(track)
     }
 }
@@ -330,11 +244,11 @@ pub fn metadata_json_path(root: &Path, id: &TrackId) -> PathBuf {
     root.join(id.as_str()).join("metadata.json")
 }
 
-/// Read-only metadata load without requiring a lock manager.
+/// Read-only metadata load directly from disk.
 ///
-/// Reads and decodes `metadata.json` for a given track ID directly from disk.
-/// Use this for read-only paths (e.g., `track resolve`) where constructing a
-/// full `FsTrackStore` with a lock manager would introduce unwanted side effects.
+/// Reads and decodes `metadata.json` for a given track ID.
+/// Use this for read-only paths (e.g., `track resolve`) that only need
+/// to inspect metadata without constructing a full `FsTrackStore`.
 ///
 /// # Errors
 /// Returns `RepositoryError` on I/O or decode failure.
@@ -356,7 +270,6 @@ mod tests {
     use super::*;
 
     use domain::{PlanSection, PlanView, TaskId, TrackId, TrackMetadata, TrackStatus, TrackTask};
-    use infrastructure_test_helpers::*;
 
     fn sample_track(id: &str) -> TrackMetadata {
         let task_id = TaskId::new("T1").unwrap();
@@ -367,65 +280,10 @@ mod tests {
         TrackMetadata::new(TrackId::new(id).unwrap(), "Test Track", vec![task], plan, None).unwrap()
     }
 
-    /// Test helpers shared across infrastructure tests.
-    mod infrastructure_test_helpers {
-        use std::path::Path;
-        use std::sync::Arc;
-        use std::time::Duration;
-
-        use domain::lock::{
-            AgentId, FileGuard, FileLockManager, FilePath, LockEntry, LockError, LockMode,
-        };
-
-        use super::FsTrackStore;
-
-        /// No-op lock manager for unit tests that don't need real locking.
-        pub struct NoOpLockManager;
-
-        impl FileLockManager for NoOpLockManager {
-            fn acquire(
-                &self,
-                path: &FilePath,
-                mode: LockMode,
-                agent: &AgentId,
-                _pid: u32,
-                _timeout: Option<Duration>,
-            ) -> Result<FileGuard, LockError> {
-                Ok(FileGuard::new(path.clone(), mode, agent.clone(), Box::new(|_, _| {})))
-            }
-
-            fn release(&self, _path: &FilePath, _agent: &AgentId) -> Result<(), LockError> {
-                Ok(())
-            }
-
-            fn query(&self, _path: Option<&FilePath>) -> Result<Vec<LockEntry>, LockError> {
-                Ok(Vec::new())
-            }
-
-            fn cleanup(&self) -> Result<usize, LockError> {
-                Ok(0)
-            }
-
-            fn extend(
-                &self,
-                _path: &FilePath,
-                _agent: &AgentId,
-                _additional: Duration,
-            ) -> Result<(), LockError> {
-                Ok(())
-            }
-        }
-
-        /// Creates a `FsTrackStore` backed by a temporary directory with a no-op lock manager.
-        pub fn test_store(root: &Path) -> FsTrackStore<NoOpLockManager> {
-            FsTrackStore::new(root, Arc::new(NoOpLockManager), Duration::from_secs(5))
-        }
-    }
-
     #[test]
     fn test_save_and_find_round_trip() {
         let dir = tempfile::tempdir().unwrap();
-        let store = test_store(dir.path());
+        let store = FsTrackStore::new(dir.path());
         let track = sample_track("test-track");
 
         store.save(&track).unwrap();
@@ -436,7 +294,7 @@ mod tests {
     #[test]
     fn test_find_returns_none_for_missing_track() {
         let dir = tempfile::tempdir().unwrap();
-        let store = test_store(dir.path());
+        let store = FsTrackStore::new(dir.path());
         let id = TrackId::new("nonexistent").unwrap();
 
         let result = store.find(&id).unwrap();
@@ -446,7 +304,7 @@ mod tests {
     #[test]
     fn test_update_mutates_and_persists() {
         let dir = tempfile::tempdir().unwrap();
-        let store = test_store(dir.path());
+        let store = FsTrackStore::new(dir.path());
         let track = sample_track("test-track");
 
         store.save(&track).unwrap();
@@ -469,7 +327,7 @@ mod tests {
     #[test]
     fn test_update_returns_error_for_missing_track() {
         let dir = tempfile::tempdir().unwrap();
-        let store = test_store(dir.path());
+        let store = FsTrackStore::new(dir.path());
         let id = TrackId::new("nonexistent").unwrap();
 
         let result = store.update(&id, |_| Ok(()));
@@ -483,7 +341,7 @@ mod tests {
     fn test_save_new_track_succeeds_without_validation() {
         // A brand-new track (no previous on disk) should succeed regardless of descriptions.
         let dir = tempfile::tempdir().unwrap();
-        let store = test_store(dir.path());
+        let store = FsTrackStore::new(dir.path());
         let track = sample_track("new-track");
 
         let result = store.save(&track);
@@ -494,7 +352,7 @@ mod tests {
     fn test_save_with_unchanged_descriptions_succeeds() {
         // Re-saving with identical task descriptions should succeed.
         let dir = tempfile::tempdir().unwrap();
-        let store = test_store(dir.path());
+        let store = FsTrackStore::new(dir.path());
         let track = sample_track("test-track");
 
         store.save(&track).unwrap();
@@ -508,7 +366,7 @@ mod tests {
     fn test_save_with_mutated_description_returns_error() {
         // Saving with a changed task description on an existing track should fail.
         let dir = tempfile::tempdir().unwrap();
-        let store = test_store(dir.path());
+        let store = FsTrackStore::new(dir.path());
         let track = sample_track("test-track");
 
         store.save(&track).unwrap();
@@ -540,7 +398,7 @@ mod tests {
     fn test_save_adding_new_task_to_existing_track_succeeds() {
         // Adding a brand-new task ID (not present in the previous version) should succeed.
         let dir = tempfile::tempdir().unwrap();
-        let store = test_store(dir.path());
+        let store = FsTrackStore::new(dir.path());
         let track = sample_track("test-track");
 
         store.save(&track).unwrap();
@@ -570,7 +428,7 @@ mod tests {
     fn test_save_with_removed_task_returns_error() {
         // Removing a task that existed in the previous version must fail.
         let dir = tempfile::tempdir().unwrap();
-        let store = test_store(dir.path());
+        let store = FsTrackStore::new(dir.path());
         let track = sample_track("test-track"); // has T1
 
         store.save(&track).unwrap();
@@ -599,7 +457,7 @@ mod tests {
     #[test]
     fn test_save_preserves_created_at() {
         let dir = tempfile::tempdir().unwrap();
-        let store = test_store(dir.path());
+        let store = FsTrackStore::new(dir.path());
         let track = sample_track("test-track");
 
         store.save(&track).unwrap();
@@ -623,7 +481,7 @@ mod tests {
     #[test]
     fn test_with_locked_document_returns_error_for_missing_track() {
         let dir = tempfile::tempdir().unwrap();
-        let store = test_store(dir.path());
+        let store = FsTrackStore::new(dir.path());
         let id = TrackId::new("nonexistent").unwrap();
 
         let result = store.with_locked_document(&id, |_, _| Ok(()));
@@ -636,7 +494,7 @@ mod tests {
     #[test]
     fn test_with_locked_document_mutates_and_persists() {
         let dir = tempfile::tempdir().unwrap();
-        let store = test_store(dir.path());
+        let store = FsTrackStore::new(dir.path());
         let track = sample_track("test-track");
         store.save(&track).unwrap();
 
@@ -660,7 +518,7 @@ mod tests {
         // The closure sets updated_at explicitly; with_locked_document must not
         // override it.
         let dir = tempfile::tempdir().unwrap();
-        let store = test_store(dir.path());
+        let store = FsTrackStore::new(dir.path());
         let track = sample_track("test-track");
         store.save(&track).unwrap();
 
@@ -682,7 +540,7 @@ mod tests {
     fn test_with_locked_document_does_not_write_on_closure_error() {
         // If the closure returns Err, nothing should be written to disk.
         let dir = tempfile::tempdir().unwrap();
-        let store = test_store(dir.path());
+        let store = FsTrackStore::new(dir.path());
         let track = sample_track("test-track");
         store.save(&track).unwrap();
 

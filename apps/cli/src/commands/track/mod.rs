@@ -3,14 +3,12 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 use std::sync::Arc;
-use std::time::Duration;
 
 use clap::{Args, Subcommand};
 use domain::{CommitHash, TaskId, TrackBranch, TrackId, TrackReader};
 use infrastructure::git_cli::{
     GitRepository, SystemGitRepo, TrackBranchRecord, load_explicit_track_branch_from_items_dir,
 };
-use infrastructure::lock::FsFileLockManager;
 use infrastructure::track::codec::DocumentMeta;
 use infrastructure::track::fs_store::FsTrackStore;
 use infrastructure::track::render;
@@ -21,9 +19,6 @@ mod resolve;
 mod state_ops;
 mod transition;
 mod views;
-
-/// Default timeout for lock acquisition during track operations.
-const DEFAULT_LOCK_TIMEOUT: Duration = Duration::from_millis(5000);
 
 pub(super) fn resolve_project_root(items_dir: &std::path::Path) -> Result<PathBuf, String> {
     let items_name = items_dir.file_name().and_then(|name| name.to_str());
@@ -47,10 +42,6 @@ pub enum TrackCommand {
         /// Path to the track items root directory (e.g., `track/items`).
         #[arg(long)]
         items_dir: PathBuf,
-
-        /// Locks directory for exclusive access.
-        #[arg(long, default_value = ".locks")]
-        locks_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
         track_id: String,
@@ -94,10 +85,6 @@ pub enum TrackCommand {
         #[arg(long, default_value = "track/items")]
         items_dir: PathBuf,
 
-        /// Locks directory for exclusive access.
-        #[arg(long, default_value = ".locks")]
-        locks_dir: PathBuf,
-
         /// Track ID (directory name under items_dir).
         track_id: String,
 
@@ -123,10 +110,6 @@ pub enum TrackCommand {
         #[arg(long, default_value = "track/items")]
         items_dir: PathBuf,
 
-        /// Locks directory for exclusive access.
-        #[arg(long, default_value = ".locks")]
-        locks_dir: PathBuf,
-
         /// Track ID (directory name under items_dir).
         track_id: String,
 
@@ -147,10 +130,6 @@ pub enum TrackCommand {
         /// Path to the track items root directory (e.g., `track/items`).
         #[arg(long, default_value = "track/items")]
         items_dir: PathBuf,
-
-        /// Locks directory for exclusive access.
-        #[arg(long, default_value = ".locks")]
-        locks_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
         track_id: String,
@@ -196,10 +175,6 @@ pub struct BranchArgs {
     #[arg(long, default_value = "track/items")]
     items_dir: PathBuf,
 
-    /// Locks directory for exclusive access.
-    #[arg(long, default_value = ".locks")]
-    locks_dir: PathBuf,
-
     /// Track ID used to form the branch name `track/<track-id>`.
     track_id: String,
 }
@@ -219,10 +194,6 @@ pub struct ActivateArgs {
     /// Path to the track items root directory (e.g., `track/items`).
     #[arg(long, default_value = "track/items")]
     items_dir: PathBuf,
-
-    /// Locks directory for exclusive access.
-    #[arg(long, default_value = ".locks")]
-    locks_dir: PathBuf,
 
     /// Track ID used to form the branch name `track/<track-id>`.
     track_id: String,
@@ -262,7 +233,6 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
     let result: Result<ExitCode, CliError> = match cmd {
         TrackCommand::Transition {
             items_dir,
-            locks_dir,
             track_id,
             task_id,
             target_status,
@@ -270,7 +240,6 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             skip_branch_check,
         } => transition::execute_transition(
             items_dir,
-            locks_dir,
             track_id,
             task_id,
             target_status,
@@ -283,7 +252,6 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         TrackCommand::Views { action } => views::execute_views(action),
         TrackCommand::AddTask {
             items_dir,
-            locks_dir,
             track_id,
             description,
             section,
@@ -291,30 +259,17 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             skip_branch_check,
         } => state_ops::execute_add_task(
             items_dir,
-            locks_dir,
             track_id,
             description,
             section,
             after,
             skip_branch_check,
         ),
-        TrackCommand::SetOverride {
-            items_dir,
-            locks_dir,
-            track_id,
-            status,
-            reason,
-            skip_branch_check,
-        } => state_ops::execute_set_override(
-            items_dir,
-            locks_dir,
-            track_id,
-            status,
-            reason,
-            skip_branch_check,
-        ),
-        TrackCommand::ClearOverride { items_dir, locks_dir, track_id, skip_branch_check } => {
-            state_ops::execute_clear_override(items_dir, locks_dir, track_id, skip_branch_check)
+        TrackCommand::SetOverride { items_dir, track_id, status, reason, skip_branch_check } => {
+            state_ops::execute_set_override(items_dir, track_id, status, reason, skip_branch_check)
+        }
+        TrackCommand::ClearOverride { items_dir, track_id, skip_branch_check } => {
+            state_ops::execute_clear_override(items_dir, track_id, skip_branch_check)
         }
         TrackCommand::NextTask { items_dir, track_id } => {
             state_ops::execute_next_task(items_dir, track_id)

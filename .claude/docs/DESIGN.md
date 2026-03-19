@@ -28,12 +28,10 @@ flowchart TD
 | Crate/Module | Role | Key Types |
 |--------------|------|-----------|
 | `domain` | Domain logic, Ports | `TrackId`, `TaskId`, `CommitHash`, `TrackMetadata`, `TrackTask`, `TaskStatus`, `TaskTransition`, `TrackStatus`, `StatusOverride`, `PlanView`, `PlanSection`, `TrackRepository` |
-| `domain::lock` | File lock domain types, Ports | `FilePath`, `AgentId`, `LockMode`, `LockEntry`, `FileGuard`, `LockError`, `FileLockManager` |
 | `domain::guard` | Shell command guard (pure computation) | `Decision`, `GuardVerdict`, `ParseError`, `SimpleCommand`, `split_shell()`, `check()` |
 | `usecase` | Application services | `SaveTrackUseCase`, `LoadTrackUseCase`, `TransitionTaskUseCase` |
-| `infrastructure` | Infrastructure adapters | `InMemoryTrackRepository` |
-| `infrastructure::lock` | File lock infrastructure | `FsFileLockManager` |
-| `cli` | Composition Root | `main()`, lock subcommands |
+| `infrastructure` | Infrastructure adapters | `InMemoryTrackRepository`, `FsTrackStore` |
+| `cli` | Composition Root | `main()` |
 
 ## Agent Roles
 
@@ -54,13 +52,7 @@ Note: See `.claude/agent-profiles.json` for which provider handles each capabili
 | TaskTransition as explicit enum commands | Type-safe transition API; exhaustive match coverage | String-based transitions like Python | 2026-03-11 |
 | StatusOverride auto-clears on all-resolved | Prevents stale override on completed tracks | Manual override management | 2026-03-11 |
 | Plan-task referential integrity at construction | Catches invalid plans early; mirrors Python validation | Runtime validation on access | 2026-03-11 |
-| File-based lock registry + flock | Inspectable, no daemon, flock auto-release on crash | Per-file sidecar, advisory locks, socket daemon | 2026-03-11 |
-| FileGuard with boxed release callback | Domain layer stays I/O-free; RAII release on drop | Trait-based release, manual release only | 2026-03-11 |
-| fd-lock for cross-process file locking | RwLock API maps to &/&mut semantics; RAII built-in | fs2 (no RAII), fslock (weak shared/exclusive) | 2026-03-11 |
-| PID + TTL stale lock recovery | Auto-reap on crash; no manual intervention needed | Heartbeat daemon, manual cleanup only | 2026-03-11 |
-| Lexicographic path ordering for deadlock prevention | Simple total ordering; no lock upgrading allowed | Wait-for graph, lock-free design | 2026-03-11 |
-| Fail-closed hook error handling | Lock acquire hook blocks tool on any error (CLI not found, timeout, unexpected exception); never proceeds unlocked | Fail-open (silently skip locking on error) | 2026-03-11 |
-| AlreadyHeld immediate rejection | Same-agent reacquire returns AlreadyHeld immediately even with timeout; logic errors should not be retried | Retry until timeout (masks the real error) | 2026-03-11 |
+| Fail-closed hook error handling | Guard hook blocks tool on any error (CLI not found, unexpected exception); never proceeds without verification | Fail-open (silently skip guard on error) | 2026-03-11 |
 | Shell guard in domain layer (no trait) | Pure computation, no I/O, no implementation variability | tree-sitter-bash (C dep), domain trait (over-engineering) | 2026-03-11 |
 | conch-parser for shell AST (vendored, patched) | Full POSIX AST, minimal deps (void only), structural env var/command separation | Hand-written parser (edge case proliferation), tree-sitter-bash (C dep), brush-parser (heavy deps) | 2026-03-11 |
 | Guard policy: ban edge-case-producing patterns | Unconditionally block patterns that create bypass vectors but are unnecessary in the template workflow: (1) `env` command → immediate block, (2) `$VAR`/`$(cmd)`/`` `cmd` `` in **any position** (argv + redirect texts including heredoc bodies) → immediate block, (3) `.exe` suffix → stripped in basename, (4) if effective command ≠ `git` and any argv/redirect token contains "git" (case-insensitive) → block. Rules (2) and (4) together eliminate ALL per-tool nesting analysis with argv/redirect-level checks. | Per-pattern recursive parsing and validation (complex, error-prone, ~200 lines of per-tool option parsing) | 2026-03-11 |
@@ -71,7 +63,6 @@ Note: See `.claude/agent-profiles.json` for which provider handles each capabili
 | Crate | Version | Role | Notes |
 |-------|---------|------|-------|
 | thiserror | 2.x | Error derive macros | Domain layer only external dep |
-| fd-lock | latest | Cross-process file locking (RwLock API) | Infrastructure layer; maps &/&mut to shared/exclusive |
 
 ## Canonical Blocks
 
@@ -331,265 +322,6 @@ match (&self.status, transition) {
 }
 ```
 
-### File Lock Manager (ownership-file-lock-2026-03-11)
-
-```text
-libs/domain/src/lock/
-├── mod.rs              # re-exports
-├── types.rs            # FilePath, AgentId, LockMode, LockEntry
-├── guard.rs            # FileGuard (RAII)
-├── error.rs            # LockError
-└── port.rs             # FileLockManager trait
-
-libs/infrastructure/src/lock/
-├── mod.rs              # re-exports
-└── fs_lock_manager.rs  # FsFileLockManager (file-based registry impl)
-
-apps/cli/src/commands/
-├── mod.rs
-└── lock.rs             # lock acquire/release/status/cleanup/extend
-```
-
-```rust
-// domain/src/lock/types.rs
-use std::fmt;
-use std::path::{Path, PathBuf};
-use std::time::SystemTime;
-
-/// A canonicalized file path used as lock key.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct FilePath(PathBuf);
-
-impl FilePath {
-    /// Creates a new `FilePath` by canonicalizing the given path.
-    ///
-    /// # Errors
-    /// Returns `LockError::InvalidPath` if canonicalization fails.
-    pub fn new(path: impl AsRef<Path>) -> Result<Self, super::error::LockError>;
-    pub fn as_path(&self) -> &Path;
-}
-
-/// Identifies the agent holding or requesting a lock.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AgentId(String);
-
-impl AgentId {
-    pub fn new(id: impl Into<String>) -> Self;
-    pub fn as_str(&self) -> &str;
-}
-
-/// Maps to Rust's borrow semantics:
-/// - `Shared` ≈ `&T` — multiple readers allowed
-/// - `Exclusive` ≈ `&mut T` — single writer, no concurrent readers
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LockMode {
-    Shared,
-    Exclusive,
-}
-
-/// A single lock entry in the registry.
-#[derive(Debug, Clone)]
-pub struct LockEntry {
-    pub path: FilePath,
-    pub mode: LockMode,
-    pub agent: AgentId,
-    pub pid: u32,
-    pub acquired_at: SystemTime,
-    pub expires_at: SystemTime,
-}
-```
-
-```rust
-// domain/src/lock/error.rs
-use std::path::PathBuf;
-
-#[derive(Debug, thiserror::Error)]
-pub enum LockError {
-    #[error("path cannot be canonicalized: {path}")]
-    InvalidPath {
-        path: PathBuf,
-        #[source]
-        source: std::io::Error,
-    },
-
-    #[error("file is exclusively locked by agent {holder} (pid {pid})")]
-    ExclusivelyHeld {
-        holder: super::types::AgentId,
-        pid: u32,
-    },
-
-    #[error("file has {count} shared lock(s); cannot acquire exclusive lock")]
-    SharedLockConflict { count: usize },
-
-    #[error("lock not found for path {path} held by agent {agent}")]
-    NotFound {
-        path: super::types::FilePath,
-        agent: super::types::AgentId,
-    },
-
-    #[error("lock acquisition timed out after {elapsed_ms}ms")]
-    Timeout { elapsed_ms: u64 },
-
-    #[error("lock registry I/O error")]
-    RegistryIo(#[source] std::io::Error),
-}
-```
-
-```rust
-// domain/src/lock/guard.rs
-
-/// RAII guard that releases the lock on drop.
-///
-/// Holds a boxed release callback so the domain layer
-/// does not depend on the infrastructure implementation.
-pub struct FileGuard {
-    path: FilePath,
-    mode: LockMode,
-    agent: AgentId,
-    release_fn: Option<Box<dyn FnOnce(&FilePath, &AgentId) + Send>>,
-}
-
-impl FileGuard {
-    pub fn new(
-        path: FilePath,
-        mode: LockMode,
-        agent: AgentId,
-        release_fn: Box<dyn FnOnce(&FilePath, &AgentId) + Send>,
-    ) -> Self;
-    pub fn path(&self) -> &FilePath;
-    pub fn mode(&self) -> LockMode;
-    pub fn agent(&self) -> &AgentId;
-}
-
-impl Drop for FileGuard {
-    fn drop(&mut self) {
-        if let Some(f) = self.release_fn.take() {
-            f(&self.path, &self.agent);
-        }
-    }
-}
-```
-
-```rust
-// domain/src/lock/port.rs
-use std::time::Duration;
-
-/// Port for file lock management.
-///
-/// Implementations must be `Send + Sync` for use across threads
-/// within the CLI process.
-pub trait FileLockManager: Send + Sync {
-    /// Acquires a lock on the given path.
-    ///
-    /// # Errors
-    /// - `LockError::ExclusivelyHeld` if another agent holds an exclusive lock.
-    /// - `LockError::SharedLockConflict` if shared locks exist and exclusive is requested.
-    /// - `LockError::Timeout` if `timeout` elapses before the lock is available.
-    /// - `LockError::RegistryIo` on I/O failure.
-    fn acquire(
-        &self,
-        path: &FilePath,
-        mode: LockMode,
-        agent: &AgentId,
-        pid: u32,
-        timeout: Option<Duration>,
-    ) -> Result<FileGuard, LockError>;
-
-    /// Explicitly releases a lock. Used by CLI subcommand path
-    /// where RAII drop is not practical (Python hook → CLI invoke → process exits).
-    ///
-    /// # Errors
-    /// - `LockError::NotFound` if no matching lock exists.
-    /// - `LockError::RegistryIo` on I/O failure.
-    fn release(&self, path: &FilePath, agent: &AgentId) -> Result<(), LockError>;
-
-    /// Queries all current locks. If `path` is `Some`, filters to that file.
-    ///
-    /// # Errors
-    /// - `LockError::RegistryIo` on I/O failure.
-    fn query(&self, path: Option<&FilePath>) -> Result<Vec<LockEntry>, LockError>;
-
-    /// Removes stale entries (dead PIDs, expired timestamps).
-    /// Returns the number of entries reaped.
-    ///
-    /// # Errors
-    /// - `LockError::RegistryIo` on I/O failure.
-    fn cleanup(&self) -> Result<usize, LockError>;
-
-    /// Extends the expiry of an existing lock.
-    ///
-    /// # Errors
-    /// - `LockError::NotFound` if no matching lock exists.
-    /// - `LockError::RegistryIo` on I/O failure.
-    fn extend(
-        &self,
-        path: &FilePath,
-        agent: &AgentId,
-        additional: Duration,
-    ) -> Result<(), LockError>;
-}
-```
-
-```mermaid
-flowchart TD
-    A[Agent calls Edit/Write tool] --> B[PreToolUse Hook fires]
-    B --> C[Shell hook: extract file path from JSON stdin]
-    C --> D[sotp lock acquire\n--mode exclusive --path file.rs\n--agent agent-1 --pid PID]
-    D --> E{CLI: acquire lock}
-    E -->|flock .locks/LOCK| F[Read .locks/registry.json]
-    F --> G{Conflict?}
-    G -->|No conflict| H[Write new LockEntry to registry]
-    H --> I[Release flock]
-    I --> J[Exit 0]
-    J --> K[Hook: exit 0 — allow tool]
-    K --> L[Tool executes Edit/Write]
-    L --> M[PostToolUse Hook fires]
-    M --> N[sotp lock release\n--path file.rs --agent agent-1]
-    N --> O[CLI removes entry from registry]
-    G -->|Conflict: exclusive held| Q[Exit 1 + error message]
-    Q --> R[Hook: exit 2 — block tool]
-    G -->|Stale entry detected| T[Reap stale entry]
-    T --> G
-```
-
-```rust
-// CLI lock subcommands (apps/cli/src/commands/lock.rs)
-#[derive(Debug, clap::Subcommand)]
-pub enum LockCommand {
-    Acquire {
-        #[arg(long)]
-        mode: String,  // "shared" or "exclusive"
-        #[arg(long)]
-        path: PathBuf,
-        #[arg(long)]
-        agent: String,
-        #[arg(long)]
-        pid: u32,
-        #[arg(long, default_value = "5000")]
-        timeout_ms: u64,
-    },
-    Release {
-        #[arg(long)]
-        path: PathBuf,
-        #[arg(long)]
-        agent: String,
-    },
-    Status {
-        #[arg(long)]
-        path: Option<PathBuf>,
-    },
-    Cleanup,
-    Extend {
-        #[arg(long)]
-        path: PathBuf,
-        #[arg(long)]
-        agent: String,
-        #[arg(long, default_value = "300000")]
-        additional_ms: u64,
-    },
-}
-```
-
 ### Shell Command Guard (guard-cli-2026-03-11)
 
 ```text
@@ -686,7 +418,7 @@ flowchart TD
 
 ### Strategy: Rust for Critical Paths, Python for Advisory
 
-Security-critical hooks (`block-direct-git-ops`, `file-lock-acquire/release`) are now dispatched
+Security-critical hooks (`block-direct-git-ops`, `block-test-file-deletion`) are now dispatched
 directly via `sotp hook dispatch` shell commands in `.claude/settings.json`. The deprecated Python
 launcher files have been removed (STRAT-03 Phase 1).
 
@@ -704,7 +436,7 @@ launcher files have been removed (STRAT-03 Phase 1).
 | OCP | `HookHandler` trait for extensible hook dispatch without modifying existing code |
 | LSP | `TrackReader`/`TrackWriter` implementations interchangeable (InMemory, Fs) |
 | ISP | Read-only consumers depend only on `TrackReader`; mutation consumers on `TrackWriter` |
-| DIP | Domain defines ports; `clap`/`fd-lock` confined to CLI/Infrastructure layers |
+| DIP | Domain defines ports; `clap` confined to CLI layer; infrastructure adapters confined to Infrastructure layer |
 
 ### New Module Structure
 
@@ -732,7 +464,7 @@ libs/infrastructure/src/
 ├── track/
 │   ├── mod.rs           # re-exports
 │   ├── codec.rs         # TrackDocumentV2 serde types (metadata.json schema)
-│   ├── fs_store.rs      # FsTrackStore: TrackReader + TrackWriter with FileLockManager
+│   ├── fs_store.rs      # FsTrackStore: TrackReader + TrackWriter (atomic write)
 │   └── atomic_write.rs  # atomic_write_file() utility
 └── ...
 
@@ -757,42 +489,14 @@ pub enum Decision {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HookName {
     BlockDirectGitOps,
-    FileLockAcquire,
-    FileLockRelease,
+    BlockTestFileDeletion,
 }
 
 /// Context for hook execution. Built by the CLI layer from:
 /// - `project_dir`: `$CLAUDE_PROJECT_DIR` env var (set by Claude Code)
-/// - `locks_dir`: `$SOTP_LOCKS_DIR` env var or `--locks-dir` CLI arg
-///   (default: `$CLAUDE_PROJECT_DIR/.locks` — must be project-root-anchored)
-///   If neither is set → exit 2 (fail-closed, prevents split-registry)
-/// - `agent`: `$SOTP_AGENT_ID` env var or `--agent` CLI arg — passed by
-///   the shell hook command in `.claude/settings.json`.
-/// - `pid`: `--pid` CLI arg — passed by the shell hook command (lock-acquire only).
-///
-/// ## PID / Agent Propagation for Lock Hooks
-///
-/// Lock hooks are invoked directly via shell commands in `.claude/settings.json`.
-/// The shell hook command passes `--pid "$PPID"` (Claude Code's PID) and
-/// `--agent "$SOTP_AGENT_ID"` explicitly.
-///
-/// - lock-acquire: `--agent` + `--pid` required
-/// - lock-release: `--agent` required, `--pid` optional
-/// - guard (block-direct-git-ops): pid/agent irrelevant, can be omitted
-/// All fields are `Option` because different hooks need different subsets.
-/// The CLI layer validates per-hook requirements:
-/// - guard (block-direct-git-ops): only `project_dir` needed (for future use);
-///   if `$CLAUDE_PROJECT_DIR` is unset, guard still works (it only inspects the command)
-/// - lock-acquire: `project_dir` (for locks_dir default) + `locks_dir` + `agent` + `pid`
-///   required — missing any → exit 2
-/// - lock-release: `locks_dir` + `agent` required — `pid` NOT needed
-///   (`FileLockManager::release` takes only `path` + `agent`, not `pid`)
 #[derive(Debug, Clone)]
 pub struct HookContext {
     pub project_dir: Option<std::path::PathBuf>,
-    pub locks_dir: Option<std::path::PathBuf>,
-    pub agent: Option<crate::lock::AgentId>,
-    pub pid: Option<u32>,
 }
 
 /// Framework-free hook input extracted from Claude Code hook JSON.
@@ -811,7 +515,7 @@ pub struct HookInput {
 // HookEnvelope lives outside domain to keep serde/serde_json out of the domain layer.
 // Security-critical fields (tool_name) must NOT use #[serde(default)] — parse failure
 // is caught at the CLI boundary. For PreToolUse hooks this results in exit 2 (block,
-// fail-closed). For PostToolUse hooks (lock-release) it results in stderr warning +
+// fail-closed). For PostToolUse hooks, errors result in stderr warning +
 // exit 0 (PostToolUse cannot block).
 
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -859,9 +563,6 @@ pub enum HookError {
     Input(String),
 
     #[error(transparent)]
-    Lock(#[from] crate::lock::LockError),
-
-    #[error(transparent)]
     Guard(#[from] crate::guard::ParseError),
 
     #[error("unsupported hook: {0:?}")]
@@ -881,13 +582,13 @@ pub enum TrackReadError {
 
 /// Error type for TrackWriter port operations.
 /// Captures both domain validation failures (from mutation closures)
-/// and infrastructure errors (I/O, lock, codec).
+/// and infrastructure errors (I/O, codec).
 ///
 /// NOTE: The `Domain` variant wraps `DomainError` which currently contains
 /// a `Repository` variant. This creates an ambiguous path:
 /// `TrackWriteError::Domain(DomainError::Repository(_))`.
 ///
-/// Migration plan (applied in filelock-migration track):
+/// Migration plan:
 /// 1. Remove `DomainError::Repository` variant from `DomainError`.
 /// 2. `DomainError` keeps only `Validation` and `Transition`.
 /// 3. Repository errors flow exclusively through `TrackReadError::Repository`
@@ -924,11 +625,11 @@ pub trait TrackWriter: Send + Sync {
     /// Matches the current `TrackRepository::save` contract for backward compatibility.
     fn save(&self, track: &TrackMetadata) -> Result<(), TrackWriteError>;
 
-    /// Atomically loads, mutates, and persists a track under exclusive lock.
+    /// Atomically loads, mutates, and persists a track.
     ///
     /// # Errors
     /// - `TrackWriteError::Repository(TrackNotFound)` if the track does not exist.
-    /// - `TrackWriteError::Repository(Message)` on I/O or lock failure.
+    /// - `TrackWriteError::Repository(Message)` on I/O failure.
     /// - `TrackWriteError::Domain` propagated from the mutation closure.
     fn update<F>(&self, id: &TrackId, mutate: F) -> Result<TrackMetadata, TrackWriteError>
     where
@@ -948,14 +649,12 @@ pub trait TrackWriter: Send + Sync {
 /// and return `HookError::Input` if they are missing.
 ///
 /// How the CLI maps `HookError::Input` depends on the hook event type:
-/// - PreToolUse (guard, lock-acquire): `HookError::Input` → exit 2 (block, fail-closed)
-/// - PostToolUse (lock-release): `HookError::Input` → stderr warning + exit 0 (cannot block)
+/// - PreToolUse (guard): `HookError::Input` → exit 2 (block, fail-closed)
 ///
 /// | Hook | Required fields | Missing → |
 /// |------|----------------|-----------|
 /// | `BlockDirectGitOps` | `tool_name` (always present), `command` | `HookError::Input("missing command")` |
-/// | `FileLockAcquire` | `tool_name`, `file_path` | `HookError::Input("missing file_path")` |
-/// | `FileLockRelease` | `tool_name`, `file_path` | `HookError::Input("missing file_path")` |
+/// | `BlockTestFileDeletion` | `tool_name` (always present), `file_path` | `HookError::Input("missing file_path")` |
 ///
 /// Note: `tool_name` is guaranteed present (required in `HookEnvelope` serde).
 /// `command` and `file_path` are `Option` in `HookInput` because different hooks
@@ -1020,20 +719,13 @@ pub struct TrackStatusOverrideDocument {
 // infrastructure/src/track/fs_store.rs
 
 /// File-system backed TrackReader + TrackWriter.
-/// Uses FileLockManager for exclusive access during mutations.
 /// Uses atomic_write_file for crash-safe persistence.
-pub struct FsTrackStore<L: domain::lock::FileLockManager> {
+pub struct FsTrackStore {
     root: std::path::PathBuf,
-    lock_manager: std::sync::Arc<L>,
-    lock_timeout: std::time::Duration,
 }
 
-impl<L: domain::lock::FileLockManager> FsTrackStore<L> {
-    pub fn new(
-        root: impl Into<std::path::PathBuf>,
-        lock_manager: std::sync::Arc<L>,
-        lock_timeout: std::time::Duration,
-    ) -> Self;
+impl FsTrackStore {
+    pub fn new(root: impl Into<std::path::PathBuf>) -> Self;
 }
 ```
 
@@ -1056,94 +748,37 @@ pub enum HookCommand {
     /// Reads Claude Code hook JSON from stdin.
     /// Exit 0 = allow, exit 2 = block (Claude Code hook protocol).
     /// PreToolUse hooks: any internal error → exit 2 (fail-closed).
-    /// PostToolUse hooks (lock-release): any error → stderr warning + exit 0 (cannot block).
     Dispatch {
         #[arg(value_enum)]
         hook: CliHookName,
-
-        /// Locks directory (for file-lock hooks).
-        /// Default: `$CLAUDE_PROJECT_DIR/.locks` (project-root-anchored).
-        /// Also read from `$SOTP_LOCKS_DIR`.
-        /// If neither `--locks-dir` nor `$SOTP_LOCKS_DIR` nor `$CLAUDE_PROJECT_DIR`
-        /// is set → exit 2 (fail-closed). No cwd fallback — prevents split-registry.
-        #[arg(long, env = "SOTP_LOCKS_DIR")]
-        locks_dir: Option<std::path::PathBuf>,
-
-        /// Agent ID (for file-lock hooks). Required for lock hooks.
-        /// Passed by the shell hook command in `.claude/settings.json`.
-        /// Also read from `$SOTP_AGENT_ID`.
-        #[arg(long, env = "SOTP_AGENT_ID")]
-        agent: Option<String>,
-
-        /// Process ID of the lock holder (required for lock-acquire only).
-        /// MUST be the long-lived Claude Code PID, passed via `--pid "$PPID"`
-        /// in the shell hook command.
-        /// Not needed for lock-release (release API uses path + agent only).
-        /// Not needed for guard hooks (block-direct-git-ops).
-        #[arg(long)]
-        pid: Option<u32>,
     },
 }
 
 #[derive(Debug, Clone, Copy, clap::ValueEnum)]
 pub enum CliHookName {
     BlockDirectGitOps,
-    FileLockAcquire,
-    FileLockRelease,
+    BlockTestFileDeletion,
 }
 
 impl From<CliHookName> for domain::hook::HookName { ... }
-
-// NOTE: For FileLockAcquire, the handler calls FileLockManager::acquire()
-// and the returned FileGuard must be forgotten (std::mem::forget) to prevent
-// the RAII drop from releasing the lock when the hook process exits.
-// The lock is explicitly released by a separate PostToolUse hook
-// (FileLockRelease). This matches the existing pattern in lock.rs:L108-112.
 ```
 
 ```rust
-// apps/cli/src/commands/hook.rs — stdout JSON mapping for Claude Code hooks
+// apps/cli/src/commands/hook.rs — stdout mapping for Claude Code hooks
 //
-// The Rust CLI outputs structured JSON to stdout.
-// These formats match the Claude Code hook protocol.
-//
-// PreToolUse hooks (block-direct-git-ops):
+// PreToolUse hooks (block-direct-git-ops, block-test-file-deletion):
 //   Allow:  exit 0, stdout = "" (empty)
 //   Block:  exit 2, stdout = plain text reason
 //
-// PreToolUse hooks (file-lock-acquire):
-//   Allow:  exit 0, stdout = "" (empty)
-//   Block:  exit 2, stdout = JSON:
-//     {"hookSpecificOutput": {
-//       "decision": "block",
-//       "reason": "<reason from HookVerdict>"
-//     }}
+// Error (PreToolUse):
+//   exit 2, stdout = plain text. All PreToolUse errors are fail-closed.
 //
-// PostToolUse hooks (file-lock-release):
-//   exit 0, stdout = "" or JSON:
-//     {"hookSpecificOutput": {
-//       "hookEventName": "PostToolUse",
-//       "additionalContext": "<context from HookVerdict>"
-//     }}
-//   (PostToolUse cannot block — it runs after tool execution)
-//
-// Error:
-//   PreToolUse hooks (guard, lock-acquire):
-//     exit 2, stdout = plain text (guard) or block JSON (lock-acquire)
-//     All PreToolUse errors are fail-closed (exit 2).
-//   PostToolUse hooks (lock-release):
-//     exit 0, stderr = warning message. PostToolUse CANNOT block —
-//     the tool has already executed. Errors are logged but do not
-//     prevent operation. This matches PostToolUse semantics.
-//
-// NOTE: The exact hookSpecificOutput schema may evolve with Claude Code versions.
-// See https://docs.anthropic.com/en/docs/claude-code/hooks for authoritative spec.
 // The Rust CLI follows the Claude Code hook protocol (exit 0 = allow, exit 2 = block).
 ```
 
 ### UseCase Return Type Migration
 
-When use cases migrate from `TrackRepository` to `TrackReader`/`TrackWriter` (filelock-migration track):
+When use cases migrate from `TrackRepository` to `TrackReader`/`TrackWriter`:
 
 ```rust
 // BEFORE (current): all use cases return DomainError
@@ -1179,10 +814,10 @@ The CLI layer (composition root) maps `TrackReadError`/`TrackWriteError` to user
 |-------|----------|
 | 1. container-git-readonly | Docker only — no Rust changes |
 | 2. hook-fail-closed | Implement `domain::hook`, `usecase::hook`, `cli::commands::hook`; security hooks dispatched directly via `sotp hook dispatch` shell commands (Python launchers removed in STRAT-03 Phase 1) |
-| 3. filelock-migration | Implement `infrastructure::track::{codec, fs_store, atomic_write}`; replace `TrackRepository` with `TrackReader`+`TrackWriter`; Python `track_state_machine.py` delegates to `sotp track` |
+| 3. track-persistence | Implement `infrastructure::track::{codec, fs_store, atomic_write}`; replace `TrackRepository` with `TrackReader`+`TrackWriter`; Python `track_state_machine.py` delegates to `sotp track` |
 | 4. per-worker-target-dir | Docker/Makefile only — no Rust changes |
 | 5. atomic-write-standard | Reuse `atomic_write_file` from track 3; apply to remaining Python scripts or migrate them |
-| 6. security-control-tests | Rust integration tests for hooks, locking, atomic writes |
+| 6. security-control-tests | Rust integration tests for hooks, atomic writes |
 
 ### Direct Shell Hook Invocation (STRAT-03 Phase 1 Complete)
 
@@ -1199,7 +834,7 @@ Key design decisions:
 - **Fail-closed**: `|| exit 2` ensures that if `sotp` is missing or fails, the hook blocks the operation.
 - **Bootstrap guarantee**: `cargo make bootstrap` builds `sotp` before hooks can fire.
 - **Claude Code hook protocol**: exit 0 = allow, exit 2 = block, exit 1 = non-blocking error (continues execution — NOT safe for security hooks).
-- **PostToolUse (lock-release)**: Uses `|| { ... exit 0; }` — errors are warnings only, matching PostToolUse semantics.
+- **PostToolUse**: errors are warnings only (exit 0), matching PostToolUse semantics.
 
 ### Risks
 
@@ -1207,8 +842,8 @@ Key design decisions:
 |------|--------|------------|
 | `TrackDocumentV2` schema drift vs Python `track_schema.py` | Incompatible metadata.json | Shared compatibility tests until Python writers removed |
 | `TransitionTaskUseCase` still using `find/save` pattern | Data loss under contention | Migrate to `TrackWriter::update` in track 3 |
-| Hook `tool_name` field missing from payload | JSON parse failure at CLI boundary | No `#[serde(default)]` on security fields. PreToolUse: parse error → exit 2 (block). PostToolUse: parse error → warn + exit 0 |
-| Hook-specific required fields (`command`, `file_path`) missing | Malformed payload bypasses control | Each `HookHandler` validates required fields → `HookError::Input` → PreToolUse: exit 2 (block), PostToolUse: warn + exit 0 |
+| Hook `tool_name` field missing from payload | JSON parse failure at CLI boundary | No `#[serde(default)]` on security fields. PreToolUse: parse error → exit 2 (block). |
+| Hook-specific required fields (`command`, `file_path`) missing | Malformed payload bypasses control | Each `HookHandler` validates required fields → `HookError::Input` → PreToolUse: exit 2 (block) |
 | Atomic rename cross-filesystem | Non-atomic write | Temp file in target directory; parent fsync mandatory |
 | `TrackWriter::update<F>` is non-object-safe | Cannot use `dyn TrackWriter` | Acceptable: use cases use generics. Extract non-generic sub-trait if dyn needed later |
 | `TrackStatus::Archived` missing in Rust domain | Python schema incompatibility | Add `Archived` variant to `TrackStatus` enum in domain layer |
@@ -1257,19 +892,9 @@ _None at this time._
 | Date | Changes |
 |------|---------|
 | 2026-03-11 | Initial design: DMMF track state machine domain model (Codex planner) |
-| 2026-03-11 | File lock manager: ownership-based concurrent file access control (Codex planner) |
 | 2026-03-11 | Shell command guard: deterministic shell parsing + git operation blocking in domain layer |
 | 2026-03-11 | Security hardening: Python-to-Rust hybrid migration design (SOLID, Codex planner) |
-| 2026-03-11 | Codex review R1 fixes: typed port errors, HookInput DIP, exit code 2, no Python fallback, non-object-safe note |
-| 2026-03-11 | Codex review R2 fixes: HookContext param supply, BaseException launcher, required field validation, DomainError::Repository separation, UseCase return types, hook output JSON mapping |
-| 2026-03-11 | Codex review R3 fixes: hook JSON aligned with existing patterns, subprocess timeout, stdout flush before os._exit, create→save upsert semantics |
-| 2026-03-11 | Codex review R4 fixes: pid default→getppid(), locks_dir→$CLAUDE_PROJECT_DIR/.locks, hook output per-hook spec alignment |
-| 2026-03-11 | Codex review R5 fixes: explicit pid/agent propagation from launcher, CLAUDE_PROJECT_DIR unset→exit 2, PostToolUse error→warn+exit 0 |
-| 2026-03-11 | Codex review R6 fixes: PostToolUse launcher exit 0 (not exit 2), agent no safe default in sotp, HookContext lock fields Optional |
-| 2026-03-11 | Codex review R7 fixes: lock-release pid not required, per-hook context validation, acceptance criteria PreToolUse/PostToolUse split |
-| 2026-03-11 | Codex review R8 fixes: HookError::Input exit code per event type, launcher pid guidance acquire-only, --pid doc scoped to lock-acquire |
-| 2026-03-11 | Codex review R9 fixes: serde parse failure per event type, risk table per-event exit code, --pid CLI-arg-only (no env var) |
-| 2026-03-11 | Codex review R10 fixes: risk table tool_name per-event, HookContext.project_dir Optional (guard works without CLAUDE_PROJECT_DIR) |
+| 2026-03-11 | Codex review cycles R1-R10: typed port errors, HookInput DIP, exit code 2, required field validation, DomainError::Repository separation, UseCase return types, hook output JSON mapping |
 | 2026-03-12 | Feature branch strategy: per-track branches, branch-aware resolution, guard policy extension (Codex planner) |
 | 2026-03-16 | Auto mode design spike (MEMO-15): 6-phase state machine, auto-state.json persistence, escalation UI |
 

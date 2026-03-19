@@ -77,9 +77,6 @@ fn auto_detect_track_id_from_branch() -> Result<String, String> {
 }
 
 /// Read-only metadata load via `infrastructure::track::codec`.
-///
-/// Uses the codec directly to avoid constructing a `FsFileLockManager`
-/// (which eagerly creates the `.locks` directory as a side effect).
 pub(super) fn read_track_metadata(
     items_dir: &std::path::Path,
     track_id: &TrackId,
