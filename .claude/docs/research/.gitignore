@@ -1,0 +1,7 @@
+# Ignore all files by default
+*
+
+# Allow these files
+!.gitignore
+!README.md
+!version-baseline-*.md
