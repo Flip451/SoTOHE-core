@@ -1,0 +1,164 @@
+{
+  "branch": "track/domain-type-hardening-2026-03-19",
+  "created_at": "2026-03-19T12:00:00Z",
+  "id": "domain-type-hardening-2026-03-19",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Define enum Verdict { ZeroFindings, FindingsRemain } in review.rs",
+          "Replace ReviewRoundResult::verdict: String with Verdict",
+          "Replace all string comparisons (r.verdict == \"zero_findings\" and \"findings_remain\" in validate_verdict_concerns) with enum matching",
+          "Add Display impl mapping to snake_case strings for serialization compatibility"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Verdict enum (P1)"
+      },
+      {
+        "description": [
+          "Define enum CodeHash { Computed(String), Pending } in review.rs",
+          "Replace ReviewState::code_hash: Option<String> with Option<CodeHash>",
+          "Remove \"PENDING\" magic string from record_round_with_pending and related logic",
+          "CodeHash::Computed validates non-empty string"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "CodeHash enum (P2)"
+      },
+      {
+        "description": [
+          "Define Timestamp(String) newtype in a new ids.rs or timestamps.rs module",
+          "Validate non-empty and basic ISO8601-like format (YYYY-MM-DDTHH:MM:SSZ)",
+          "Replace 5 timestamp String fields: ReviewRoundResult.timestamp, ReviewCycleSummary.timestamp, ReviewConcernStreak.last_seen_at, ReviewEscalationBlock.blocked_at, ReviewEscalationResolution.resolved_at"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "Timestamp newtype (P3)"
+      },
+      {
+        "description": [
+          "Define NonEmptyString(String) newtype with trimmed non-empty validation",
+          "Replace TrackMetadata::title and TrackTask::description with NonEmptyString",
+          "Remove inline non-empty checks from TrackMetadata::with_branch and TrackTask::with_status constructors (actual validation sites)"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "NonEmptyString newtype (P4)"
+      },
+      {
+        "description": [
+          "Update infrastructure codec (TrackDocumentV2 serde) to map between JSON strings and new domain types",
+          "Maintain backward compatibility with existing metadata.json files",
+          "Update usecase layer type references",
+          "Update cli layer command handlers"
+        ],
+        "id": "S5",
+        "task_ids": [
+          "T005",
+          "T006",
+          "T007"
+        ],
+        "title": "Layer propagation"
+      }
+    ],
+    "summary": [
+      "Replace stringly-typed domain fields with validated types: Verdict enum, CodeHash enum, Timestamp newtype, NonEmptyString newtype.",
+      "Follows prefer-type-safe-abstractions convention to make illegal states unrepresentable.",
+      "T001-T004 are independent domain-layer changes; T005-T007 propagate changes through infrastructure/usecase/cli layers."
+    ]
+  },
+  "review": {
+    "code_hash": "7fbbff2da96d2e00a085d1daca5825e0f73d7a88",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-19T12:55:08Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-19T12:55:15Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "other": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-19T12:55:08Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T12:55:15Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "planned",
+  "tasks": [
+    {
+      "description": "Introduce Verdict enum replacing ReviewRoundResult::verdict String field",
+      "id": "T001",
+      "status": "todo"
+    },
+    {
+      "description": "Introduce CodeHash enum replacing ReviewState::code_hash Option<String> with PENDING sentinel",
+      "id": "T002",
+      "status": "todo"
+    },
+    {
+      "description": "Introduce Timestamp newtype replacing bare String timestamps in review types",
+      "id": "T003",
+      "status": "todo"
+    },
+    {
+      "description": "Introduce NonEmptyString newtype for TrackMetadata::title and TrackTask::description",
+      "id": "T004",
+      "status": "todo"
+    },
+    {
+      "description": "Update infrastructure codec layer for new domain types (serde backward compatibility)",
+      "id": "T005",
+      "status": "todo"
+    },
+    {
+      "description": "Update usecase layer for new domain types",
+      "id": "T006",
+      "status": "todo"
+    },
+    {
+      "description": "Update cli layer for new domain types",
+      "id": "T007",
+      "status": "todo"
+    }
+  ],
+  "title": "Domain Type Hardening: Replace stringly-typed fields with validated domain types",
+  "updated_at": "2026-03-19T12:55:15Z"
+}
