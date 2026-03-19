@@ -648,6 +648,15 @@ mod tests {
         LOCK.get_or_init(|| Mutex::new(()))
     }
 
+    /// Convenience constructor for a zero-findings ReviewRoundResult in tests.
+    fn rrz(round: u32, ts: &str) -> domain::ReviewRoundResult {
+        domain::ReviewRoundResult::new(
+            round,
+            domain::Verdict::ZeroFindings,
+            domain::Timestamp::new(ts).unwrap(),
+        )
+    }
+
     struct CurrentDirGuard {
         original: PathBuf,
     }
@@ -1058,7 +1067,7 @@ mod tests {
 
         // Step 2: record_round_with_pending
         let mut review = domain::ReviewState::new();
-        let result = domain::ReviewRoundResult::new(1, "zero_findings", "2026-03-18T01:00:00Z");
+        let result = rrz(1, "2026-03-18T01:00:00Z");
         let groups = vec!["default".to_owned()];
         review
             .record_round_with_pending(
@@ -1069,7 +1078,9 @@ mod tests {
                 &pre_hash,
             )
             .unwrap();
-        assert_eq!(review.code_hash(), Some("PENDING"));
+        // code_hash() returns None for Pending; serialization gives "PENDING"
+        assert!(review.code_hash().is_none());
+        assert_eq!(review.code_hash_for_serialization(), Some("PENDING"));
 
         // Write metadata with PENDING hash and re-stage
         write_full_metadata(
@@ -1088,7 +1099,7 @@ mod tests {
         let post_hash = repo.index_tree_hash_normalizing(metadata_path).unwrap();
 
         // Step 4: set_code_hash(H1) and re-stage
-        review.set_code_hash(post_hash.clone());
+        review.set_code_hash(post_hash.clone()).unwrap();
         write_full_metadata(
             dir.path(),
             metadata_path,
@@ -1107,7 +1118,7 @@ mod tests {
         let pre_hash2 = repo.index_tree_hash_normalizing(metadata_path).unwrap();
         assert_eq!(pre_hash2, post_hash, "pre-update hash for 2nd round should match stored hash");
 
-        let result2 = domain::ReviewRoundResult::new(1, "zero_findings", "2026-03-18T02:00:00Z");
+        let result2 = rrz(1, "2026-03-18T02:00:00Z");
         review
             .record_round_with_pending(
                 domain::RoundType::Final,
@@ -1132,7 +1143,7 @@ mod tests {
         run_git(dir.path(), &["add", metadata_path]);
 
         let final_hash = repo.index_tree_hash_normalizing(metadata_path).unwrap();
-        review.set_code_hash(final_hash.clone());
+        review.set_code_hash(final_hash.clone()).unwrap();
 
         write_full_metadata(
             dir.path(),
@@ -1168,7 +1179,7 @@ mod tests {
         let groups = vec!["default".to_owned()];
 
         // Fast round
-        let r1 = domain::ReviewRoundResult::new(1, "zero_findings", "2026-03-18T01:00:00Z");
+        let r1 = rrz(1, "2026-03-18T01:00:00Z");
         review
             .record_round_with_pending(domain::RoundType::Fast, "default", r1, &groups, &pre_hash)
             .unwrap();
@@ -1180,7 +1191,7 @@ mod tests {
         );
         run_git(dir.path(), &["add", metadata_path]);
         let h1 = repo.index_tree_hash_normalizing(metadata_path).unwrap();
-        review.set_code_hash(h1.clone());
+        review.set_code_hash(h1.clone()).unwrap();
 
         // Final round
         write_full_metadata(
@@ -1192,7 +1203,7 @@ mod tests {
             ),
         );
         run_git(dir.path(), &["add", metadata_path]);
-        let r2 = domain::ReviewRoundResult::new(1, "zero_findings", "2026-03-18T02:00:00Z");
+        let r2 = rrz(1, "2026-03-18T02:00:00Z");
         let pre2 = repo.index_tree_hash_normalizing(metadata_path).unwrap();
         review
             .record_round_with_pending(domain::RoundType::Final, "default", r2, &groups, &pre2)
@@ -1205,7 +1216,7 @@ mod tests {
         );
         run_git(dir.path(), &["add", metadata_path]);
         let approved_hash = repo.index_tree_hash_normalizing(metadata_path).unwrap();
-        review.set_code_hash(approved_hash.clone());
+        review.set_code_hash(approved_hash.clone()).unwrap();
 
         // Write approved hash back
         write_full_metadata(
@@ -1247,7 +1258,7 @@ mod tests {
         let mut review = domain::ReviewState::new();
         let groups = vec!["default".to_owned()];
 
-        let r1 = domain::ReviewRoundResult::new(1, "zero_findings", "2026-03-18T01:00:00Z");
+        let r1 = rrz(1, "2026-03-18T01:00:00Z");
         review
             .record_round_with_pending(domain::RoundType::Fast, "default", r1, &groups, &pre_hash)
             .unwrap();
@@ -1259,7 +1270,7 @@ mod tests {
         );
         run_git(dir.path(), &["add", metadata_path]);
         let h1 = repo.index_tree_hash_normalizing(metadata_path).unwrap();
-        review.set_code_hash(h1.clone());
+        review.set_code_hash(h1.clone()).unwrap();
 
         // Now tamper: change review.status from fast_passed to approved (without final round)
         write_full_metadata(
@@ -1291,7 +1302,7 @@ mod tests {
         assert!(review.code_hash().is_none(), "first round: code_hash must be None");
 
         let groups = vec!["default".to_owned()];
-        let r = domain::ReviewRoundResult::new(1, "zero_findings", "2026-03-18T01:00:00Z");
+        let r = rrz(1, "2026-03-18T01:00:00Z");
         let result = review.record_round_with_pending(
             domain::RoundType::Fast,
             "default",
@@ -1300,7 +1311,9 @@ mod tests {
             &pre_hash,
         );
         assert!(result.is_ok(), "first round with no prior code_hash must succeed");
-        assert_eq!(review.code_hash(), Some("PENDING"));
+        // code_hash() returns None for Pending; serialization gives "PENDING"
+        assert!(review.code_hash().is_none());
+        assert_eq!(review.code_hash_for_serialization(), Some("PENDING"));
     }
 
     #[test]
@@ -1315,7 +1328,7 @@ mod tests {
         let pre_hash = repo.index_tree_hash_normalizing(metadata_path).unwrap();
         let mut review = domain::ReviewState::new();
         let groups = vec!["default".to_owned()];
-        let r1 = domain::ReviewRoundResult::new(1, "zero_findings", "2026-03-18T01:00:00Z");
+        let r1 = rrz(1, "2026-03-18T01:00:00Z");
         review
             .record_round_with_pending(domain::RoundType::Fast, "default", r1, &groups, &pre_hash)
             .unwrap();
@@ -1327,7 +1340,7 @@ mod tests {
         );
         run_git(dir.path(), &["add", metadata_path]);
         let h1 = repo.index_tree_hash_normalizing(metadata_path).unwrap();
-        review.set_code_hash(h1.clone());
+        review.set_code_hash(h1.clone()).unwrap();
         write_full_metadata(
             dir.path(),
             metadata_path,
@@ -1347,7 +1360,7 @@ mod tests {
         assert_ne!(pre_hash2, h1, "code change between rounds must change hash");
 
         // record_round_with_pending should detect the stale hash
-        let r2 = domain::ReviewRoundResult::new(2, "zero_findings", "2026-03-18T03:00:00Z");
+        let r2 = rrz(2, "2026-03-18T03:00:00Z");
         let result = review.record_round_with_pending(
             domain::RoundType::Fast,
             "default",

@@ -2,8 +2,8 @@ use std::collections::{HashMap, HashSet};
 use std::fmt;
 
 use crate::{
-    CommitHash, DomainError, PlanView, ReviewState, TaskId, TrackBranch, TrackId, TransitionError,
-    ValidationError,
+    CommitHash, DomainError, NonEmptyString, PlanView, ReviewState, TaskId, TrackBranch, TrackId,
+    TransitionError, ValidationError,
 };
 
 /// Derived status of a track, computed from its task states and optional override.
@@ -142,7 +142,7 @@ impl StatusOverride {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TrackTask {
     id: TaskId,
-    description: String,
+    description: NonEmptyString,
     status: TaskStatus,
 }
 
@@ -160,11 +160,8 @@ impl TrackTask {
         description: impl Into<String>,
         status: TaskStatus,
     ) -> Result<Self, ValidationError> {
-        let description = description.into();
-        if description.trim().is_empty() {
-            return Err(ValidationError::EmptyTaskDescription);
-        }
-
+        let description =
+            NonEmptyString::new(description).map_err(|_| ValidationError::EmptyTaskDescription)?;
         Ok(Self { id, description, status })
     }
 
@@ -175,7 +172,7 @@ impl TrackTask {
 
     #[must_use]
     pub fn description(&self) -> &str {
-        &self.description
+        self.description.as_str()
     }
 
     #[must_use]
@@ -218,7 +215,7 @@ impl TrackTask {
 pub struct TrackMetadata {
     id: TrackId,
     branch: Option<TrackBranch>,
-    title: String,
+    title: NonEmptyString,
     tasks: Vec<TrackTask>,
     plan: PlanView,
     status_override: Option<StatusOverride>,
@@ -252,10 +249,7 @@ impl TrackMetadata {
         plan: PlanView,
         status_override: Option<StatusOverride>,
     ) -> Result<Self, DomainError> {
-        let title = title.into();
-        if title.trim().is_empty() {
-            return Err(ValidationError::EmptyTrackTitle.into());
-        }
+        let title = NonEmptyString::new(title).map_err(|_| ValidationError::EmptyTrackTitle)?;
 
         validate_plan_invariants(&tasks, &plan)?;
 
@@ -281,7 +275,7 @@ impl TrackMetadata {
 
     #[must_use]
     pub fn title(&self) -> &str {
-        &self.title
+        self.title.as_str()
     }
 
     #[must_use]
@@ -594,7 +588,7 @@ mod tests {
         let track = TrackMetadata {
             id: TrackId::new("test-track").unwrap(),
             branch: None,
-            title: "Test".to_string(),
+            title: NonEmptyString::new("Test").unwrap(),
             tasks: vec![],
             plan,
             status_override: None,
@@ -657,7 +651,7 @@ mod tests {
         let mut track = TrackMetadata {
             id: TrackId::new("test-track").unwrap(),
             branch: None,
-            title: "Test".to_string(),
+            title: NonEmptyString::new("Test").unwrap(),
             tasks,
             plan,
             status_override: None,
@@ -708,7 +702,7 @@ mod tests {
         let track = TrackMetadata {
             id: TrackId::new("test-track").unwrap(),
             branch: None,
-            title: "Test".to_string(),
+            title: NonEmptyString::new("Test").unwrap(),
             tasks,
             plan,
             status_override: None,
@@ -723,7 +717,7 @@ mod tests {
         let mut track = TrackMetadata {
             id: TrackId::new("test-track").unwrap(),
             branch: None,
-            title: "Test".to_string(),
+            title: NonEmptyString::new("Test").unwrap(),
             tasks: vec![],
             plan,
             status_override: None,
@@ -826,7 +820,7 @@ mod tests {
         let track = TrackMetadata {
             id: TrackId::new("test-track").unwrap(),
             branch: None,
-            title: "Test".to_string(),
+            title: NonEmptyString::new("Test").unwrap(),
             tasks: vec![task],
             plan,
             status_override: None,

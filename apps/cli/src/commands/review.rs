@@ -808,10 +808,14 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
     // parse_review_final_message applies both structural and semantic checks
     // (e.g., zero_findings must have empty findings, findings_remain must have entries).
     let final_message_state = parse_review_final_message(Some(&args.verdict));
-    let verdict_str = match &final_message_state {
+    let verdict = match &final_message_state {
         ReviewFinalMessageState::Parsed(payload) => match payload.verdict {
-            usecase::review_workflow::ReviewPayloadVerdict::ZeroFindings => "zero_findings",
-            usecase::review_workflow::ReviewPayloadVerdict::FindingsRemain => "findings_remain",
+            usecase::review_workflow::ReviewPayloadVerdict::ZeroFindings => {
+                domain::Verdict::ZeroFindings
+            }
+            usecase::review_workflow::ReviewPayloadVerdict::FindingsRemain => {
+                domain::Verdict::FindingsRemain
+            }
         },
         ReviewFinalMessageState::Missing => {
             return Err(RecordRoundError::Other("--verdict is required".to_owned()));
@@ -838,7 +842,9 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
 
     let store = FsTrackStore::new(&args.items_dir);
 
-    let timestamp = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
+    let timestamp_str = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
+    let timestamp = domain::Timestamp::new(timestamp_str.clone())
+        .map_err(|e| RecordRoundError::Other(format!("invalid timestamp: {e}")))?;
 
     // Step 1: Copy the current git index to a private temp file.
     // All staging operations go through the private index; the real index is
@@ -874,12 +880,12 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
             .unwrap_or(1);
 
         let result = if concerns.is_empty() {
-            ReviewRoundResult::new(round_num, verdict_str, &timestamp)
+            ReviewRoundResult::new(round_num, verdict, timestamp.clone())
         } else {
             ReviewRoundResult::new_with_concerns(
                 round_num,
-                verdict_str,
-                &timestamp,
+                verdict,
+                timestamp.clone(),
                 concerns.clone(),
             )
         };
@@ -909,7 +915,7 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
                     "code hash mismatch: review recorded against {expected}, \
                          but current code is {actual} — review.status set to invalidated"
                 ));
-                meta.updated_at = timestamp.clone();
+                meta.updated_at = timestamp.to_string();
                 return Ok(());
             }
             Err(e) => {
@@ -920,7 +926,7 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
         }
 
         // Step 4: Set updated_at (not auto-set by with_locked_document).
-        meta.updated_at = timestamp.clone();
+        meta.updated_at = timestamp.to_string();
 
         // Step 5: Serialize PENDING state and stage into private index.
         let pending_json = infrastructure::track::codec::encode(track, meta).map_err(|e| {
@@ -943,7 +949,11 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
 
         // Step 7: Replace PENDING with the real code_hash.
         if let Some(r) = track.review_mut().as_mut() {
-            r.set_code_hash(h1);
+            r.set_code_hash(h1).map_err(|e| {
+                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
+                    "set_code_hash error: {e}"
+                )))
+            })?;
         }
 
         // Step 8: Serialize final state and stage into private index.
@@ -989,10 +999,7 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
     // leaving the real index entirely untouched.
     private_index.swap_into_real().map_err(RecordRoundError::Other)?;
 
-    eprintln!(
-        "[OK] Recorded {round_type} round for group '{}' (verdict: {verdict_str})",
-        args.group
-    );
+    eprintln!("[OK] Recorded {round_type} round for group '{}' (verdict: {verdict})", args.group);
     Ok(())
 }
 
@@ -1046,7 +1053,9 @@ fn run_resolve_escalation(args: &ResolveEscalationArgs) -> Result<(), String> {
 
     let store = FsTrackStore::new(&args.items_dir);
 
-    let timestamp = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
+    let timestamp_str = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
+    let timestamp =
+        domain::Timestamp::new(timestamp_str).map_err(|e| format!("invalid timestamp: {e}"))?;
 
     store
         .with_locked_document(&track_id, |track, meta| {
@@ -1100,7 +1109,7 @@ fn run_resolve_escalation(args: &ResolveEscalationArgs) -> Result<(), String> {
                 ))
             })?;
 
-            meta.updated_at = timestamp.clone();
+            meta.updated_at = timestamp.to_string();
             Ok(())
         })
         .map_err(|e| {
