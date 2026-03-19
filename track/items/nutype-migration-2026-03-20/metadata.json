@@ -1,0 +1,167 @@
+{
+  "branch": "track/nutype-migration-2026-03-20",
+  "created_at": "2026-03-20T00:00:00Z",
+  "id": "nutype-migration-2026-03-20",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Add nutype = \"0.6\" to workspace Cargo.toml",
+          "Add nutype = { workspace = true } to libs/domain/Cargo.toml",
+          "No serde feature needed (domain layer has no serde)"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Dependency setup"
+      },
+      {
+        "description": [
+          "Convert TrackId, TaskId, CommitHash, TrackBranch from manual struct + impl to #[nutype(...)] declarations",
+          "Retain is_valid_track_id, is_valid_task_id, is_valid_commit_hash validation functions",
+          "Use validate(with = |s: &str| if is_valid_track_id(s) { Ok(()) } else { Err(ValidationError::InvalidTrackId(s.to_owned())) }, error = ValidationError)",
+          "Derive: Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Display, AsRef, FromStr"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "ID newtypes migration"
+      },
+      {
+        "description": [
+          "Use sanitize(trim) + validate for non-empty check",
+          "Error type: ValidationError::EmptyString"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "NonEmptyString migration"
+      },
+      {
+        "description": [
+          "Use sanitize(trim, lowercase) + validate for non-empty check",
+          "Error type: ReviewError::InvalidConcern",
+          "Note: ReviewConcern uses ReviewError not ValidationError — nutype supports this via error = ReviewError"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "ReviewConcern migration"
+      },
+      {
+        "description": [
+          "Replace all Type::new(val) with Type::try_new(val) across all layers",
+          "nutype generates try_new() instead of new() for validated types",
+          "Remove manual Display impls, as_str() methods, fmt::Display blocks (nutype derives these)",
+          "Update tests: new() -> try_new(), as_str() -> as_ref() or .into_inner()"
+        ],
+        "id": "S5",
+        "task_ids": [
+          "T005",
+          "T006"
+        ],
+        "title": "Call site migration and cleanup"
+      }
+    ],
+    "summary": [
+      "Replace 6 hand-rolled String newtypes with nutype macro declarations.",
+      "Retains existing validation functions (is_valid_track_id etc.) via nutype validate(with=..., error=...).",
+      "Timestamp is excluded (multi-field struct, not supported by nutype).",
+      "Constructor changes from new() to try_new(); all call sites updated.",
+      "Estimated ~120 lines of boilerplate removed."
+    ]
+  },
+  "review": {
+    "code_hash": "49326951d3efb6f952463f0fd6daaa012194a55b",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-19T17:31:46Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-19T17:31:46Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 2,
+          "round_type": "fast",
+          "timestamp": "2026-03-19T17:33:17Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "other": {
+        "fast": {
+          "round": 2,
+          "timestamp": "2026-03-19T17:33:17Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-19T17:33:28Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "planned",
+  "tasks": [
+    {
+      "description": "Add nutype 0.6 to workspace dependencies and domain Cargo.toml",
+      "id": "T001",
+      "status": "todo"
+    },
+    {
+      "description": "Migrate TrackId, TaskId, CommitHash, TrackBranch to nutype (custom validation fns retained)",
+      "id": "T002",
+      "status": "todo"
+    },
+    {
+      "description": "Migrate NonEmptyString to nutype with sanitize(trim)",
+      "id": "T003",
+      "status": "todo"
+    },
+    {
+      "description": "Migrate ReviewConcern to nutype with sanitize(trim, lowercase) and ReviewError",
+      "id": "T004",
+      "status": "todo"
+    },
+    {
+      "description": "Update all call sites from new() to try_new() across domain/infrastructure/usecase/cli layers",
+      "id": "T005",
+      "status": "todo"
+    },
+    {
+      "description": "Remove hand-rolled boilerplate (Display, as_str, fmt impls) and update tests",
+      "id": "T006",
+      "status": "todo"
+    }
+  ],
+  "title": "Migrate hand-rolled newtypes to nutype crate (6 types, ~120 lines reduced)",
+  "updated_at": "2026-03-19T17:33:28Z"
+}
