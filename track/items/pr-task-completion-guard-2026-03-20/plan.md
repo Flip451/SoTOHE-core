@@ -11,7 +11,7 @@ Add pub fn all_tasks_resolved(&self) -> bool to TrackMetadata
 Returns true if every task has status done or skipped
 Pure domain logic, no I/O
 
-- [x] Domain: add all_tasks_resolved() method to TrackMetadata
+- [x] Domain: add all_tasks_resolved() method to TrackMetadata 2fc1cd8
 
 ## CLI guard in pr push
 
@@ -22,7 +22,7 @@ If false: print [BLOCKED] with list of unresolved task IDs and statuses, return 
 If true: proceed with push
 Skip guard entirely when branch starts with plan/ (planning-only branches have no code tasks)
 
-- [x] CLI: add task completion guard to sotp pr push before git push
+- [x] CLI: add task completion guard to sotp pr push before git push 2fc1cd8
 
 ## Tests
 
@@ -30,4 +30,4 @@ Domain unit test: all_tasks_resolved returns false with mixed states, true with 
 CLI integration test: push() returns FAILURE when tasks are unresolved
 CLI integration test: push() skips guard on plan/ branches (AC3)
 
-- [x] Tests: guard blocks on unresolved tasks, passes on all done/skipped
+- [x] Tests: guard blocks on unresolved tasks, passes on all done/skipped 2fc1cd8

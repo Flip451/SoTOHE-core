@@ -60,5 +60,6 @@
 - `security.md`: Security Convention
 - `shell-parsing.md`: Shell Parsing Convention
 - `source-attribution.md`: Source Attribution Convention
+- `task-completion-flow.md`: Task Completion Flow
 - `typed-deserialization.md`: Typed Deserialization Convention
 <!-- convention-docs:end -->
