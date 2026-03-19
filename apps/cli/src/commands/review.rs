@@ -852,6 +852,9 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), String> {
         .map_err(|e| format!("failed to write code_hash: {e}"))?;
 
     // Step 7: Stage the final metadata.json (with real code_hash) into the private index.
+    // Re-stage from disk (which store.update just wrote) so the index blob
+    // matches the actual file content, even if another record-round for a
+    // different group modified metadata.json between steps 5 and 6.
     private_index.stage_file(&git, &metadata_abs_path, &metadata_rel)?;
 
     // Step 8: Atomically rename private index over the real index.

@@ -856,8 +856,10 @@ where
             pr_review::parse_paginated_json(&recovery_reviews_json).map_err(|e| {
                 CliError::Message(format!("recovery: failed to parse reviews JSON: {e}"))
             })?;
-        // Filter by bot, terminal state, commit_id, AND submitted_at >= trigger
-        // to avoid recovering stale reviews from a previous trigger on the same SHA.
+        // Filter by bot, terminal state, and commit_id. Since the commit_id
+        // guarantees the review covers the same code as HEAD, we do NOT require
+        // submitted_at >= trigger_dt — a review from a prior trigger round on
+        // the same SHA is equally valid (the code hasn't changed).
         let recovery_refs: Vec<&serde_json::Value> = recovery_reviews
             .iter()
             .filter(|r| {
@@ -868,22 +870,9 @@ where
                     .unwrap_or("");
                 let state = r.get("state").and_then(|s| s.as_str()).unwrap_or("");
                 let review_commit = r.get("commit_id").and_then(|s| s.as_str()).unwrap_or("");
-                if !is_codex_bot(author)
-                    || !matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
-                    || review_commit != expected_commit
-                {
-                    return false;
-                }
-                // Require submitted_at >= trigger_dt to exclude reviews from
-                // earlier trigger rounds on the same commit.
-                let submitted_raw = r.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
-                if submitted_raw.is_empty() {
-                    return false;
-                }
-                let submitted_str = submitted_raw.replace('Z', "+00:00");
-                chrono::DateTime::parse_from_rfc3339(&submitted_str)
-                    .map(|dt| dt >= trigger_dt)
-                    .unwrap_or(false)
+                is_codex_bot(author)
+                    && matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
+                    && review_commit == expected_commit
             })
             .collect();
         if let Some(recovered) = find_latest_bot_review_in(&recovery_refs) {
