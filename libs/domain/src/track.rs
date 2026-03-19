@@ -390,6 +390,19 @@ impl TrackMetadata {
         None
     }
 
+    /// Returns `true` if the task list is non-empty and every task has status `Done` or `Skipped`.
+    ///
+    /// An empty task list returns `false` — a track with no tasks should not bypass the guard.
+    /// Used by the PR push guard to ensure all tasks are resolved before pushing.
+    #[must_use]
+    pub fn all_tasks_resolved(&self) -> bool {
+        !self.tasks.is_empty()
+            && self
+                .tasks
+                .iter()
+                .all(|t| matches!(t.status(), TaskStatus::Done { .. } | TaskStatus::Skipped))
+    }
+
     fn tasks_are_resolved(&self) -> bool {
         !self.tasks.is_empty() && self.tasks.iter().all(|task| task.status.is_resolved())
     }
@@ -809,6 +822,61 @@ mod tests {
             matches!(result, Err(ValidationError::TaskRemoved { ref task_id }) if task_id == "T002"),
             "expected TaskRemoved for T002, got: {result:?}"
         );
+    }
+
+    // --- all_tasks_resolved tests ---
+
+    #[test]
+    fn test_all_tasks_resolved_returns_false_with_todo_tasks() {
+        let track = make_track(&["T001", "T002"], &["T001", "T002"]);
+        assert!(!track.all_tasks_resolved());
+    }
+
+    #[test]
+    fn test_all_tasks_resolved_returns_false_with_in_progress_tasks() {
+        let mut track = make_track(&["T001"], &["T001"]);
+        let task_id = TaskId::try_new("T001").unwrap();
+        track.transition_task(&task_id, TaskTransition::Start).unwrap();
+        assert!(!track.all_tasks_resolved());
+    }
+
+    #[test]
+    fn test_all_tasks_resolved_returns_true_with_all_done() {
+        let mut track = make_track(&["T001", "T002"], &["T001", "T002"]);
+        for id_str in &["T001", "T002"] {
+            let task_id = TaskId::try_new(*id_str).unwrap();
+            track.transition_task(&task_id, TaskTransition::Start).unwrap();
+            track
+                .transition_task(&task_id, TaskTransition::Complete { commit_hash: None })
+                .unwrap();
+        }
+        assert!(track.all_tasks_resolved());
+    }
+
+    #[test]
+    fn test_all_tasks_resolved_returns_true_with_done_and_skipped() {
+        let mut track = make_track(&["T001", "T002"], &["T001", "T002"]);
+        let t1 = TaskId::try_new("T001").unwrap();
+        let t2 = TaskId::try_new("T002").unwrap();
+        track.transition_task(&t1, TaskTransition::Start).unwrap();
+        track.transition_task(&t1, TaskTransition::Complete { commit_hash: None }).unwrap();
+        track.transition_task(&t2, TaskTransition::Skip).unwrap();
+        assert!(track.all_tasks_resolved());
+    }
+
+    #[test]
+    fn test_all_tasks_resolved_returns_false_with_empty_tasks() {
+        let plan = PlanView::new(vec![], vec![]);
+        let track = TrackMetadata {
+            id: TrackId::try_new("test-track").unwrap(),
+            branch: None,
+            title: NonEmptyString::try_new("Test").unwrap(),
+            tasks: vec![],
+            plan,
+            status_override: None,
+            review: None,
+        };
+        assert!(!track.all_tasks_resolved());
     }
 
     #[test]

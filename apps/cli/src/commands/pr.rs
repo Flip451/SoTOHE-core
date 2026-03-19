@@ -166,11 +166,115 @@ fn resolve_branch_context(explicit_track_id: Option<&str>) -> Result<PrBranchCon
 
 fn push(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
     let ctx = resolve_branch_context(explicit_track_id)?;
+
+    // Run task completion guard (skip for plan/ branches).
+    let repo_for_guard = SystemGitRepo::discover()?;
+    let result = check_task_completion_guard(&ctx.branch, repo_for_guard.root());
+    if result != ExitCode::SUCCESS {
+        return Ok(result);
+    }
+
     let repo = SystemGitRepo::discover()?;
     println!("Pushing {} to origin...", ctx.branch);
     repo.push_branch(&ctx.branch)?;
     println!("[OK] Pushed {}", ctx.branch);
     Ok(ExitCode::SUCCESS)
+}
+
+/// Checks that all tasks in the track metadata are resolved (done/skipped).
+///
+/// Returns `ExitCode::SUCCESS` if the guard passes, `ExitCode::FAILURE` otherwise.
+/// Skips the check for `plan/` branches (planning-only, no code tasks).
+fn check_task_completion_guard(branch: &str, repo_root: &std::path::Path) -> ExitCode {
+    // Skip guard for plan/ branches.
+    if branch.starts_with("plan/") {
+        return ExitCode::SUCCESS;
+    }
+
+    let track_id_str = branch.strip_prefix("track/").unwrap_or(branch);
+    let metadata_path = repo_root.join("track/items").join(track_id_str).join("metadata.json");
+
+    if !metadata_path.exists() {
+        eprintln!("[BLOCKED] metadata.json not found at {}", metadata_path.display());
+        eprintln!("Cannot verify task completion without metadata.json.");
+        return ExitCode::FAILURE;
+    }
+
+    // Fail-closed: if metadata.json has uncommitted or untracked changes, block push.
+    // Check both staged/unstaged modifications (git diff HEAD) and untracked status (git status --porcelain).
+    let metadata_relative = format!("track/items/{track_id_str}/metadata.json");
+
+    // Check modified (committed vs worktree)
+    let diff_result = std::process::Command::new("git")
+        .args(["diff", "--name-only", "HEAD", "--", &metadata_relative])
+        .current_dir(repo_root)
+        .output();
+    match diff_result {
+        Ok(output) if output.status.success() => {
+            if !String::from_utf8_lossy(&output.stdout).trim().is_empty() {
+                eprintln!("[BLOCKED] metadata.json has uncommitted changes");
+                eprintln!("Commit your task state transitions before pushing PR.");
+                return ExitCode::FAILURE;
+            }
+        }
+        _ => {
+            // git command failed — fail-closed
+            eprintln!("[BLOCKED] failed to check metadata.json dirty state");
+            return ExitCode::FAILURE;
+        }
+    }
+
+    // Check untracked (new file not yet committed)
+    let status_result = std::process::Command::new("git")
+        .args(["status", "--porcelain", "--", &metadata_relative])
+        .current_dir(repo_root)
+        .output();
+    match status_result {
+        Ok(output) if output.status.success() => {
+            let status_output = String::from_utf8_lossy(&output.stdout);
+            if status_output.contains('?') {
+                eprintln!("[BLOCKED] metadata.json is untracked (not committed)");
+                eprintln!("Commit your track artifacts before pushing PR.");
+                return ExitCode::FAILURE;
+            }
+        }
+        _ => {
+            eprintln!("[BLOCKED] failed to check metadata.json tracked state");
+            return ExitCode::FAILURE;
+        }
+    }
+
+    let json = match std::fs::read_to_string(&metadata_path) {
+        Ok(j) => j,
+        Err(e) => {
+            eprintln!("[BLOCKED] failed to read metadata: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    let (track, _) = match infrastructure::track::codec::decode(&json) {
+        Ok(t) => t,
+        Err(e) => {
+            eprintln!("[BLOCKED] failed to decode metadata: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    if !track.all_tasks_resolved() {
+        let unresolved: Vec<String> = track
+            .tasks()
+            .iter()
+            .filter(|t| {
+                !matches!(t.status(), domain::TaskStatus::Done { .. } | domain::TaskStatus::Skipped)
+            })
+            .map(|t| format!("{} ({})", t.id(), t.status().kind()))
+            .collect();
+        eprintln!("[BLOCKED] Track has unresolved tasks: {}", unresolved.join(", "));
+        eprintln!("Run track-transition to mark tasks as done before pushing PR.");
+        return ExitCode::FAILURE;
+    }
+
+    ExitCode::SUCCESS
 }
 
 fn ensure_pr(explicit_track_id: Option<&str>, base: &str) -> Result<ExitCode, CliError> {
@@ -539,8 +643,12 @@ fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
 
     let client = SystemGhClient;
 
-    // Step 1: Push
+    // Step 1: Push (with task completion guard)
     let ctx = resolve_branch_context(explicit_track_id)?;
+    let guard_result = check_task_completion_guard(&ctx.branch, repo.root());
+    if guard_result != ExitCode::SUCCESS {
+        return Ok(guard_result);
+    }
     println!("Pushing {} to origin...", ctx.branch);
     repo.push_branch(&ctx.branch)?;
     println!("[OK] Pushed {}", ctx.branch);
@@ -1573,6 +1681,147 @@ mod tests {
         );
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), ExitCode::FAILURE);
+    }
+
+    // --- check_task_completion_guard tests ---
+
+    fn init_git_repo(dir: &Path) {
+        std::process::Command::new("git").args(["init"]).current_dir(dir).output().unwrap();
+        std::process::Command::new("git")
+            .args(["config", "user.email", "test@test.com"])
+            .current_dir(dir)
+            .output()
+            .unwrap();
+        std::process::Command::new("git")
+            .args(["config", "user.name", "Test"])
+            .current_dir(dir)
+            .output()
+            .unwrap();
+    }
+
+    fn git_add_commit(dir: &Path) {
+        std::process::Command::new("git").args(["add", "-A"]).current_dir(dir).output().unwrap();
+        std::process::Command::new("git")
+            .args(["commit", "-m", "test", "--allow-empty"])
+            .current_dir(dir)
+            .output()
+            .unwrap();
+    }
+
+    fn write_metadata(dir: &Path, track_id: &str, tasks_json: &str) {
+        let track_dir = dir.join("track/items").join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let json = format!(
+            r#"{{
+  "schema_version": 3,
+  "id": "{track_id}",
+  "branch": "track/{track_id}",
+  "title": "Test",
+  "status": "in_progress",
+  "created_at": "2026-03-20T00:00:00Z",
+  "updated_at": "2026-03-20T00:00:00Z",
+  "tasks": [{tasks_json}],
+  "plan": {{
+    "summary": [],
+    "sections": [{{"id": "S1", "title": "S", "description": [], "task_ids": ["T1"]}}]
+  }}
+}}"#
+        );
+        std::fs::write(track_dir.join("metadata.json"), json).unwrap();
+    }
+
+    #[test]
+    fn check_task_completion_guard_blocks_on_unresolved_tasks() {
+        let dir = tempfile::tempdir().unwrap();
+        init_git_repo(dir.path());
+        write_metadata(
+            dir.path(),
+            "my-track",
+            r#"{"id": "T1", "description": "Task", "status": "todo"}"#,
+        );
+        git_add_commit(dir.path());
+        let result = super::check_task_completion_guard("track/my-track", dir.path());
+        assert_eq!(result, ExitCode::FAILURE);
+    }
+
+    #[test]
+    fn check_task_completion_guard_passes_with_all_done() {
+        let dir = tempfile::tempdir().unwrap();
+        init_git_repo(dir.path());
+        write_metadata(
+            dir.path(),
+            "my-track",
+            r#"{"id": "T1", "description": "Task", "status": "done", "commit_hash": "abc1234"}"#,
+        );
+        git_add_commit(dir.path());
+        let result = super::check_task_completion_guard("track/my-track", dir.path());
+        assert_eq!(result, ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn check_task_completion_guard_blocks_on_missing_metadata() {
+        let dir = tempfile::tempdir().unwrap();
+        init_git_repo(dir.path());
+        git_add_commit(dir.path()); // empty initial commit
+        // No metadata.json written
+        let result = super::check_task_completion_guard("track/my-track", dir.path());
+        assert_eq!(result, ExitCode::FAILURE);
+    }
+
+    #[test]
+    fn check_task_completion_guard_skips_for_plan_branch() {
+        let dir = tempfile::tempdir().unwrap();
+        // No metadata.json — but plan/ branch should skip guard entirely
+        let result = super::check_task_completion_guard("plan/my-track", dir.path());
+        assert_eq!(result, ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn check_task_completion_guard_blocks_on_dirty_metadata() {
+        let dir = tempfile::tempdir().unwrap();
+        init_git_repo(dir.path());
+        write_metadata(
+            dir.path(),
+            "my-track",
+            r#"{"id": "T1", "description": "Task", "status": "todo"}"#,
+        );
+        git_add_commit(dir.path());
+        // Now modify metadata without committing (dirty worktree)
+        write_metadata(
+            dir.path(),
+            "my-track",
+            r#"{"id": "T1", "description": "Task", "status": "done", "commit_hash": "abc1234"}"#,
+        );
+        let result = super::check_task_completion_guard("track/my-track", dir.path());
+        assert_eq!(result, ExitCode::FAILURE, "dirty metadata should block push");
+    }
+
+    #[test]
+    fn check_task_completion_guard_blocks_on_untracked_metadata() {
+        let dir = tempfile::tempdir().unwrap();
+        init_git_repo(dir.path());
+        git_add_commit(dir.path()); // empty initial commit
+        // Write metadata but don't add/commit (untracked)
+        write_metadata(
+            dir.path(),
+            "my-track",
+            r#"{"id": "T1", "description": "Task", "status": "done", "commit_hash": "abc1234"}"#,
+        );
+        let result = super::check_task_completion_guard("track/my-track", dir.path());
+        assert_eq!(result, ExitCode::FAILURE, "untracked metadata should block push");
+    }
+
+    #[test]
+    fn check_task_completion_guard_blocks_on_non_git_directory() {
+        let dir = tempfile::tempdir().unwrap();
+        // No git init — git commands will fail → fail-closed
+        write_metadata(
+            dir.path(),
+            "my-track",
+            r#"{"id": "T1", "description": "Task", "status": "done", "commit_hash": "abc1234"}"#,
+        );
+        let result = super::check_task_completion_guard("track/my-track", dir.path());
+        assert_eq!(result, ExitCode::FAILURE, "non-git directory should fail-closed");
     }
 
     #[test]

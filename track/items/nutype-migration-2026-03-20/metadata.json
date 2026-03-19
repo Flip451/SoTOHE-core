@@ -153,37 +153,43 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
+      "commit_hash": "5ede331",
       "description": "Add nutype 0.6 to workspace dependencies and domain Cargo.toml",
       "id": "T001",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "5ede331",
       "description": "Migrate TrackId, TaskId, CommitHash, TrackBranch to nutype (custom validation fns retained)",
       "id": "T002",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "5ede331",
       "description": "Migrate NonEmptyString to nutype with sanitize(trim)",
       "id": "T003",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "5ede331",
       "description": "Migrate ReviewConcern to nutype with sanitize(trim, lowercase) and ReviewError",
       "id": "T004",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "5ede331",
       "description": "Update all call sites from new() to try_new() across domain/infrastructure/usecase/cli layers",
       "id": "T005",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "5ede331",
       "description": "Remove hand-rolled boilerplate (Display, as_str, fmt impls) and update tests",
       "id": "T006",
-      "status": "in_progress"
+      "status": "done"
     }
   ],
   "title": "Migrate hand-rolled newtypes to nutype crate (6 types, ~120 lines reduced)",
