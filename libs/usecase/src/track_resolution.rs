@@ -5,7 +5,7 @@
 //! resolution, and activation guard checks.
 
 use domain::{
-    CommitHash, TaskStatusKind, TaskTransition, TrackId, TrackReadError, TrackReader,
+    CommitHash, TaskStatus, TaskStatusKind, TaskTransition, TrackId, TrackReadError, TrackReader,
     ValidationError,
 };
 use thiserror::Error;
@@ -60,15 +60,20 @@ pub fn resolve_track_id_from_branch(branch: Option<&str>) -> Result<String, Trac
 /// Returns an error if the target status string is not recognized.
 pub fn resolve_transition(
     target_status: &str,
-    current_kind: TaskStatusKind,
+    current_status: &TaskStatus,
     commit_hash: Option<CommitHash>,
 ) -> Result<TaskTransition, TrackResolutionError> {
     match target_status {
-        "in_progress" => match current_kind {
+        "in_progress" => match current_status.kind() {
             TaskStatusKind::Done => Ok(TaskTransition::Reopen),
             _ => Ok(TaskTransition::Start),
         },
-        "done" => Ok(TaskTransition::Complete { commit_hash }),
+        "done" => match (current_status, commit_hash) {
+            (TaskStatus::DonePending, Some(hash)) => {
+                Ok(TaskTransition::BackfillHash { commit_hash: hash })
+            }
+            (_, hash) => Ok(TaskTransition::Complete { commit_hash: hash }),
+        },
         "todo" => Ok(TaskTransition::ResetToTodo),
         "skipped" => Ok(TaskTransition::Skip),
         other => Err(TrackResolutionError::UnsupportedTargetStatus(other.to_owned())),
@@ -164,42 +169,69 @@ mod tests {
 
     #[test]
     fn test_resolve_transition_todo_to_in_progress_returns_start() {
-        let result = resolve_transition("in_progress", TaskStatusKind::Todo, None);
+        let result = resolve_transition("in_progress", &TaskStatus::Todo, None);
         assert!(matches!(result.unwrap(), TaskTransition::Start));
     }
 
     #[test]
     fn test_resolve_transition_done_to_in_progress_returns_reopen() {
-        let result = resolve_transition("in_progress", TaskStatusKind::Done, None);
+        let result = resolve_transition("in_progress", &TaskStatus::DonePending, None);
         assert!(matches!(result.unwrap(), TaskTransition::Reopen));
     }
 
     #[test]
     fn test_resolve_transition_to_done_returns_complete() {
         let hash = CommitHash::try_new("abc1234").unwrap();
-        let result = resolve_transition("done", TaskStatusKind::InProgress, Some(hash));
+        let result = resolve_transition("done", &TaskStatus::InProgress, Some(hash));
         assert!(matches!(result.unwrap(), TaskTransition::Complete { .. }));
     }
 
     #[test]
     fn test_resolve_transition_to_todo_returns_reset() {
-        let result = resolve_transition("todo", TaskStatusKind::InProgress, None);
+        let result = resolve_transition("todo", &TaskStatus::InProgress, None);
         assert!(matches!(result.unwrap(), TaskTransition::ResetToTodo));
     }
 
     #[test]
     fn test_resolve_transition_to_skipped_returns_skip() {
-        let result = resolve_transition("skipped", TaskStatusKind::Todo, None);
+        let result = resolve_transition("skipped", &TaskStatus::Todo, None);
         assert!(matches!(result.unwrap(), TaskTransition::Skip));
     }
 
     #[test]
     fn test_resolve_transition_with_unsupported_status_returns_raw_token() {
-        let result = resolve_transition("invalid", TaskStatusKind::Todo, None);
+        let result = resolve_transition("invalid", &TaskStatus::Todo, None);
         assert!(matches!(
             result.unwrap_err(),
             TrackResolutionError::UnsupportedTargetStatus(ref s) if s == "invalid"
         ));
+    }
+
+    #[test]
+    fn test_resolve_transition_done_pending_with_hash_returns_backfill() {
+        let hash = CommitHash::try_new("abc1234").unwrap();
+        let result = resolve_transition("done", &TaskStatus::DonePending, Some(hash));
+        assert!(matches!(result.unwrap(), TaskTransition::BackfillHash { .. }));
+    }
+
+    #[test]
+    fn test_resolve_transition_done_pending_without_hash_returns_complete() {
+        let result = resolve_transition("done", &TaskStatus::DonePending, None);
+        assert!(matches!(result.unwrap(), TaskTransition::Complete { commit_hash: None }));
+    }
+
+    #[test]
+    fn test_resolve_transition_done_traced_with_hash_returns_complete() {
+        let existing = CommitHash::try_new("aabbcc1").unwrap();
+        let new_hash = CommitHash::try_new("ddeeff2").unwrap();
+        let result = resolve_transition(
+            "done",
+            &TaskStatus::DoneTraced { commit_hash: existing },
+            Some(new_hash),
+        );
+        // Domain layer will reject this (DoneTraced + Complete is invalid),
+        // but resolve_transition returns Complete — domain enforces the guard.
+        assert!(matches!(result.unwrap(), TaskTransition::Complete { .. }));
     }
 
     use rstest::rstest;

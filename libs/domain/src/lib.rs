@@ -21,7 +21,7 @@ pub use error::{
     DomainError, RepositoryError, TrackReadError, TrackWriteError, TransitionError,
     ValidationError, WorktreeError,
 };
-pub use ids::{CommitHash, NonEmptyString, TaskId, TrackBranch, TrackId};
+pub use ids::{CommitHash, NonEmptyString, ReviewGroupName, TaskId, TrackBranch, TrackId};
 pub use plan::{PlanSection, PlanView};
 pub use repository::{TrackReader, TrackWriter, WorktreeReader};
 pub use review::{
@@ -33,8 +33,8 @@ pub use review::{
 pub use signal::SignalCounts;
 pub use timestamp::Timestamp;
 pub use track::{
-    StatusOverride, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata, TrackStatus,
-    TrackTask,
+    StatusOverride, StatusOverrideKind, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata,
+    TrackStatus, TrackTask,
 };
 
 #[cfg(test)]
@@ -136,7 +136,7 @@ mod tests {
             "Track state machine",
             vec![task("T1", "Write domain model")],
             plan(&["T1"]),
-            Some(StatusOverride::blocked("waiting on review")),
+            Some(StatusOverride::blocked("waiting on review").unwrap()),
         )
         .unwrap();
 

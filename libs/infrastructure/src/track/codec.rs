@@ -1,13 +1,13 @@
 //! Serde types for metadata.json (TrackDocumentV2) matching Python track_schema.py.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 
 use domain::{
     CodeHash, CommitHash, DomainError, EscalationPhase, PlanSection, PlanView, ReviewConcern,
     ReviewConcernStreak, ReviewCycleSummary, ReviewEscalationBlock, ReviewEscalationDecision,
-    ReviewEscalationResolution, ReviewEscalationState, ReviewGroupState, ReviewRoundResult,
-    ReviewState, ReviewStatus, RoundType, StatusOverride, TaskId, TaskStatus, Timestamp,
-    TrackBranch, TrackId, TrackMetadata, TrackTask, ValidationError, Verdict,
+    ReviewEscalationResolution, ReviewEscalationState, ReviewGroupName, ReviewGroupState,
+    ReviewRoundResult, ReviewState, ReviewStatus, RoundType, StatusOverride, TaskId, TaskStatus,
+    Timestamp, TrackBranch, TrackId, TrackMetadata, TrackTask, ValidationError, Verdict,
 };
 use serde::{Deserialize, Deserializer};
 
@@ -291,13 +291,13 @@ fn parse_task_status(status: &str, commit_hash: Option<&str>) -> Result<TaskStat
     match status {
         "todo" => Ok(TaskStatus::Todo),
         "in_progress" => Ok(TaskStatus::InProgress),
-        "done" => {
-            let hash = commit_hash
-                .map(CommitHash::try_new)
-                .transpose()
-                .map_err(|e| CodecError::Domain(e.into()))?;
-            Ok(TaskStatus::Done { commit_hash: hash })
-        }
+        "done" => match commit_hash {
+            Some(h) => {
+                let hash = CommitHash::try_new(h).map_err(|e| CodecError::Domain(e.into()))?;
+                Ok(TaskStatus::DoneTraced { commit_hash: hash })
+            }
+            None => Ok(TaskStatus::DonePending),
+        },
         "skipped" => Ok(TaskStatus::Skipped),
         other => Err(CodecError::InvalidField {
             field: "status".into(),
@@ -308,8 +308,8 @@ fn parse_task_status(status: &str, commit_hash: Option<&str>) -> Result<TaskStat
 
 fn parse_status_override(status: &str, reason: String) -> Result<StatusOverride, CodecError> {
     match status {
-        "blocked" => Ok(StatusOverride::blocked(reason)),
-        "cancelled" => Ok(StatusOverride::cancelled(reason)),
+        "blocked" => StatusOverride::blocked(reason).map_err(|e| CodecError::Domain(e.into())),
+        "cancelled" => StatusOverride::cancelled(reason).map_err(|e| CodecError::Domain(e.into())),
         other => Err(CodecError::InvalidField {
             field: "status_override.status".into(),
             reason: format!("unknown override status: {other}"),
@@ -339,8 +339,9 @@ fn task_to_document(task: &TrackTask) -> TrackTaskDocument {
     let (status, commit_hash) = match task.status() {
         TaskStatus::Todo => ("todo".to_owned(), None),
         TaskStatus::InProgress => ("in_progress".to_owned(), None),
-        TaskStatus::Done { commit_hash } => {
-            ("done".to_owned(), commit_hash.as_ref().map(|h| h.to_string()))
+        TaskStatus::DonePending => ("done".to_owned(), None),
+        TaskStatus::DoneTraced { commit_hash } => {
+            ("done".to_owned(), Some(commit_hash.to_string()))
         }
         TaskStatus::Skipped => ("skipped".to_owned(), None),
     };
@@ -371,10 +372,13 @@ fn plan_to_document(plan: &PlanView) -> PlanDocument {
 
 fn review_from_document(doc: TrackReviewDocument) -> Result<ReviewState, CodecError> {
     let status = parse_review_status(&doc.status)?;
+    let original_group_count = doc.groups.len();
     let groups = doc
         .groups
         .into_iter()
         .map(|(name, group_doc)| {
+            let group_name =
+                ReviewGroupName::try_new(name).map_err(|e| CodecError::Domain(e.into()))?;
             let fast = group_doc.fast.map(round_result_from_document).transpose()?;
             let final_round = group_doc.final_round.map(round_result_from_document).transpose()?;
             let group_state = match (fast, final_round) {
@@ -383,25 +387,27 @@ fn review_from_document(doc: TrackReviewDocument) -> Result<ReviewState, CodecEr
                 (None, Some(fin)) => ReviewGroupState::with_final_only(fin),
                 (None, None) => ReviewGroupState::default(),
             };
-            Ok((name, group_state))
+            Ok((group_name, group_state))
         })
-        .collect::<Result<_, CodecError>>()?;
+        .collect::<Result<HashMap<_, _>, CodecError>>()?;
+    // Detect collisions after normalization (trimming) — two JSON keys that differ
+    // only in whitespace would silently merge, dropping review history.
+    if groups.len() != original_group_count {
+        return Err(CodecError::Validation(
+            "review.groups contains keys that collide after normalization".into(),
+        ));
+    }
 
     let escalation = doc.escalation.map(escalation_from_document).transpose()?.unwrap_or_default();
 
-    let code_hash = doc
-        .code_hash
-        .map(|s| {
-            if s == "PENDING" {
-                Ok(CodeHash::Pending)
-            } else {
-                CodeHash::computed(s).map_err(|_| CodecError::InvalidField {
-                    field: "review.code_hash".to_owned(),
-                    reason: "code hash must not be empty or whitespace-only".to_owned(),
-                })
-            }
-        })
-        .transpose()?;
+    let code_hash = match doc.code_hash {
+        None => CodeHash::NotRecorded,
+        Some(s) if s == "PENDING" => CodeHash::Pending,
+        Some(s) => CodeHash::computed(s).map_err(|_| CodecError::InvalidField {
+            field: "review.code_hash".to_owned(),
+            reason: "code hash must not be empty or whitespace-only".to_owned(),
+        })?,
+    };
     Ok(ReviewState::with_fields(status, code_hash, groups, escalation))
 }
 
@@ -454,7 +460,7 @@ fn review_to_document(review: &ReviewState) -> TrackReviewDocument {
         .iter()
         .map(|(name, group)| {
             (
-                name.clone(),
+                name.as_ref().to_owned(),
                 ReviewGroupDocument {
                     fast: group.fast().map(round_result_to_document),
                     final_round: group.final_round().map(round_result_to_document),
@@ -505,7 +511,12 @@ fn escalation_from_document(
                 })
                 .collect::<Result<Vec<_>, _>>()?;
             let ts = parse_timestamp(c.timestamp, "review.escalation.recent_cycles.*.timestamp")?;
-            Ok(ReviewCycleSummary::new(round_type, c.round, ts, concerns, c.groups))
+            let groups = c
+                .groups
+                .into_iter()
+                .map(|s| ReviewGroupName::try_new(s).map_err(|e| CodecError::Domain(e.into())))
+                .collect::<Result<Vec<_>, _>>()?;
+            Ok(ReviewCycleSummary::new(round_type, c.round, ts, concerns, groups))
         })
         .collect::<Result<Vec<_>, CodecError>>()?;
 
@@ -572,20 +583,6 @@ fn escalation_phase_from_document(
 fn resolution_from_document(
     doc: ResolutionDocument,
 ) -> Result<ReviewEscalationResolution, CodecError> {
-    // Validate required string fields are non-empty.
-    if doc.workspace_search_ref.trim().is_empty() {
-        return Err(CodecError::Validation(
-            "resolution workspace_search_ref must not be empty".into(),
-        ));
-    }
-    if doc.reinvention_check_ref.trim().is_empty() {
-        return Err(CodecError::Validation(
-            "resolution reinvention_check_ref must not be empty".into(),
-        ));
-    }
-    if doc.summary.trim().is_empty() {
-        return Err(CodecError::Validation("resolution summary must not be empty".into()));
-    }
     if doc.resolved_at.trim().is_empty() {
         return Err(CodecError::Validation("resolution resolved_at must not be empty".into()));
     }
@@ -606,14 +603,15 @@ fn resolution_from_document(
     let decision = parse_escalation_decision(&doc.decision)?;
     let resolved_at =
         parse_timestamp(doc.resolved_at, "review.escalation.last_resolution.resolved_at")?;
-    Ok(ReviewEscalationResolution::new(
+    ReviewEscalationResolution::new(
         blocked_concerns,
         doc.workspace_search_ref,
         doc.reinvention_check_ref,
         decision,
         doc.summary,
         resolved_at,
-    ))
+    )
+    .map_err(|e| CodecError::Validation(e.to_string()))
 }
 
 fn escalation_to_document(
@@ -645,7 +643,7 @@ fn escalation_to_document(
             round: c.round(),
             timestamp: c.timestamp().to_owned(),
             concerns: c.concerns().iter().map(|rc| rc.as_ref().to_owned()).collect(),
-            groups: c.groups().to_vec(),
+            groups: c.groups().iter().map(|g| g.as_ref().to_owned()).collect(),
         })
         .collect();
 
@@ -728,11 +726,10 @@ fn parse_review_status(status: &str) -> Result<ReviewStatus, CodecError> {
 }
 
 fn override_to_document(override_: &StatusOverride) -> TrackStatusOverrideDocument {
-    let status = match override_ {
-        StatusOverride::Blocked { .. } => "blocked",
-        StatusOverride::Cancelled { .. } => "cancelled",
-    };
-    TrackStatusOverrideDocument { status: status.to_owned(), reason: override_.reason().to_owned() }
+    TrackStatusOverrideDocument {
+        status: override_.kind().to_string(),
+        reason: override_.reason().to_owned(),
+    }
 }
 
 #[cfg(test)]
@@ -793,6 +790,36 @@ mod tests {
         let (track2, meta2) = decode(&json).unwrap();
         assert_eq!(track, track2);
         assert_eq!(meta.schema_version, meta2.schema_version);
+    }
+
+    #[test]
+    fn test_done_pending_round_trips_without_commit_hash() {
+        let json = r#"{
+  "schema_version": 2,
+  "id": "pending-track",
+  "title": "Pending Test",
+  "status": "in_progress",
+  "created_at": "2026-03-20T00:00:00Z",
+  "updated_at": "2026-03-20T00:00:00Z",
+  "tasks": [
+    {"id": "T1", "description": "Done without hash", "status": "done"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [{"id": "S1", "title": "S", "description": [], "task_ids": ["T1"]}]
+  }
+}"#;
+        let (track, meta) = decode(json).unwrap();
+        assert!(matches!(track.tasks()[0].status(), TaskStatus::DonePending));
+
+        let re_encoded = encode(&track, &meta).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&re_encoded).unwrap();
+        let task = &doc["tasks"][0];
+        assert_eq!(task["status"], "done");
+        assert!(task.get("commit_hash").is_none() || task["commit_hash"].is_null());
+
+        let (track2, _) = decode(&re_encoded).unwrap();
+        assert_eq!(track, track2);
     }
 
     #[test]
@@ -1047,8 +1074,9 @@ mod tests {
         let review = track.review().unwrap();
         assert_eq!(review.status(), domain::ReviewStatus::FastPassed);
         assert_eq!(review.code_hash(), Some("abc123def"));
-        assert!(review.groups().get("infra-domain").is_some());
-        assert!(review.groups().get("infra-domain").unwrap().fast().is_some());
+        let infra_domain_group = domain::ReviewGroupName::try_new("infra-domain").unwrap();
+        assert!(review.groups().get(&infra_domain_group).is_some());
+        assert!(review.groups().get(&infra_domain_group).unwrap().fast().is_some());
 
         // Round-trip
         let re_encoded = encode(&track, &meta).unwrap();
@@ -1114,7 +1142,8 @@ mod tests {
         let (track, _) = decode(json).unwrap();
         let review = track.review().unwrap();
         assert_eq!(review.status(), domain::ReviewStatus::Approved);
-        let g1 = review.groups().get("g1").unwrap();
+        let g1_key = domain::ReviewGroupName::try_new("g1").unwrap();
+        let g1 = review.groups().get(&g1_key).unwrap();
         assert_eq!(g1.fast().unwrap().round(), 1);
         assert_eq!(g1.final_round().unwrap().round(), 2);
     }
@@ -1151,7 +1180,8 @@ mod tests {
 }"#;
         let (track, meta) = decode(json).unwrap();
         let review = track.review().unwrap();
-        let g1 = review.groups().get("g1").unwrap();
+        let g1_key = domain::ReviewGroupName::try_new("g1").unwrap();
+        let g1 = review.groups().get(&g1_key).unwrap();
         // fast must be None — no synthetic fast round
         assert!(g1.fast().is_none(), "final-only group must not have a synthetic fast round");
         assert!(g1.final_round().is_some());
@@ -1333,7 +1363,8 @@ mod tests {
 }"#;
         let (track, meta) = decode(json).unwrap();
         let review = track.review().unwrap();
-        let fast = review.groups().get("g1").unwrap().fast().unwrap();
+        let g1_key = domain::ReviewGroupName::try_new("g1").unwrap();
+        let fast = review.groups().get(&g1_key).unwrap().fast().unwrap();
         assert_eq!(fast.concerns().len(), 2);
         assert_eq!(fast.concerns()[0].as_ref(), "shell-parsing");
         assert_eq!(fast.concerns()[1].as_ref(), "domain.review");
@@ -1341,7 +1372,7 @@ mod tests {
         // Round-trip
         let re_encoded = encode(&track, &meta).unwrap();
         let (track2, _) = decode(&re_encoded).unwrap();
-        let fast2 = track2.review().unwrap().groups().get("g1").unwrap().fast().unwrap().clone();
+        let fast2 = track2.review().unwrap().groups().get(&g1_key).unwrap().fast().unwrap().clone();
         assert_eq!(fast2.concerns().len(), 2);
         assert_eq!(fast2.concerns()[0].as_ref(), "shell-parsing");
     }
@@ -1371,7 +1402,8 @@ mod tests {
 }"#;
         let (track, _) = decode(json).unwrap();
         let review = track.review().unwrap();
-        let fast = review.groups().get("g1").unwrap().fast().unwrap();
+        let g1_key = domain::ReviewGroupName::try_new("g1").unwrap();
+        let fast = review.groups().get(&g1_key).unwrap().fast().unwrap();
         // No concerns field in JSON → empty vec
         assert!(fast.concerns().is_empty());
     }
@@ -1492,7 +1524,8 @@ mod tests {
   }
 }"#;
         let (track, _) = decode(json).unwrap();
-        let fast = track.review().unwrap().groups().get("g1").unwrap().fast().unwrap();
+        let g1_key = domain::ReviewGroupName::try_new("g1").unwrap();
+        let fast = track.review().unwrap().groups().get(&g1_key).unwrap().fast().unwrap();
         // zero_findings must have empty concerns even if persisted data had non-empty
         assert!(
             fast.concerns().is_empty(),
@@ -1524,7 +1557,8 @@ mod tests {
   }
 }"#;
         let (track, _) = decode(json).unwrap();
-        let fast = track.review().unwrap().groups().get("g1").unwrap().fast().unwrap();
+        let g1_key = domain::ReviewGroupName::try_new("g1").unwrap();
+        let fast = track.review().unwrap().groups().get(&g1_key).unwrap().fast().unwrap();
         // findings_remain without concerns must get a fallback "other" concern
         assert_eq!(fast.concerns().len(), 1, "findings_remain must have at least one concern");
         assert_eq!(fast.concerns()[0].as_ref(), "other");

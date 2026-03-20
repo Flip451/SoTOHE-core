@@ -95,13 +95,13 @@ pub enum FindingSeverity {
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
 pub enum AutoPhaseError {
     #[error("invalid auto-phase transition: {from} cannot {action}")]
-    InvalidTransition { from: String, action: String },
+    InvalidTransition { from: AutoPhase, action: String },
 
     #[error("cannot resume: phase is '{phase}', not escalated")]
-    NotEscalated { phase: String },
+    NotEscalated { phase: AutoPhase },
 
     #[error("rollback from '{from}' to '{to}' is not allowed")]
-    InvalidRollback { from: String, to: String },
+    InvalidRollback { from: AutoPhase, to: String },
 }
 
 /// Determines the rollback target based on the current review phase and finding severity.
@@ -133,7 +133,7 @@ pub fn rollback_target(
             FindingSeverity::P1 => Ok(RollbackTarget::Implement),
         },
         _ => Err(AutoPhaseError::InvalidRollback {
-            from: current_phase.to_string(),
+            from: current_phase,
             to: "rollback (not a review phase)".to_string(),
         }),
     }
@@ -261,7 +261,7 @@ mod tests {
     #[test]
     fn test_auto_phase_error_display() {
         let err = AutoPhaseError::InvalidTransition {
-            from: "committed".to_string(),
+            from: AutoPhase::Committed,
             action: "advance".to_string(),
         };
         assert_eq!(err.to_string(), "invalid auto-phase transition: committed cannot advance");

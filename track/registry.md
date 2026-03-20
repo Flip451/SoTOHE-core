@@ -9,7 +9,7 @@
 
 - Latest active track: `None yet`
 - Next recommended command: `/track:plan <feature>`
-- Last updated: `2026-03-19`
+- Last updated: `2026-03-20`
 
 ## Active Tracks
 
@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| done-hash-backfill-2026-03-20 | Done | 2026-03-20 |
 | pr-task-completion-guard-2026-03-20 | Done | 2026-03-19 |
 | nutype-migration-2026-03-20 | Done | 2026-03-19 |
 | domain-type-hardening-2026-03-19 | Done | 2026-03-19 |

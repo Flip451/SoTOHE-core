@@ -1,0 +1,284 @@
+{
+  "branch": "track/done-hash-backfill-2026-03-20",
+  "created_at": "2026-03-20T12:00:00Z",
+  "id": "done-hash-backfill-2026-03-20",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Split Done { commit_hash: Option<CommitHash> } into DonePending and DoneTraced { commit_hash: CommitHash }",
+          "Add TaskTransition::BackfillHash { commit_hash: CommitHash }",
+          "Transition rules: InProgress + Complete(None) -> DonePending, InProgress + Complete(Some) -> DoneTraced",
+          "DonePending + BackfillHash(hash) -> DoneTraced { hash }",
+          "DoneTraced + BackfillHash -> InvalidTaskTransition (no overwrite)",
+          "DonePending/DoneTraced + Reopen -> InProgress",
+          "TaskStatusKind::Done is preserved for external compatibility",
+          "resolve_transition() signature change: accept &TaskStatus instead of TaskStatusKind to discriminate DonePending vs DoneTraced",
+          "usecase execute_by_status(): pass task.status() instead of task.status().kind() to resolve_transition",
+          "CLI transition.rs: pass full TaskStatus from TrackTask to resolve_transition",
+          "Update usecase resolve_transition, codec, render, CLI match arms"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001",
+          "T002",
+          "T003",
+          "T004",
+          "T005",
+          "T006"
+        ],
+        "title": "Phase A: TaskStatus Split and BackfillHash (WF-40)"
+      },
+      {
+        "description": [
+          "T007: Harden resolve_phase() to use TrackStatus enum matching (it already takes TrackMetadata but derives status via string internally)",
+          "resolve_phase_from_record: accept TrackStatus instead of &str, remove silent fallback wildcard arm",
+          "Note: resolve_phase_from_record has no non-test production callers; resolve_phase (used by resolve.rs and render.rs) is the primary target",
+          "Production callers: apps/cli/src/commands/track/resolve.rs and libs/infrastructure/src/track/render.rs",
+          "T008: Replace next_command: String with NextCommand enum",
+          "Variants: Implement, Done, ActivateTrack(TrackId), PlanNewFeature, Status",
+          "Add Display impl for user-facing output (/track:implement, etc.)",
+          "T009: Propagate to infrastructure/CLI — resolve.rs and render.rs (next_command usage, TrackStatus matching)"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T007",
+          "T008",
+          "T009"
+        ],
+        "title": "Phase B: Type-safe Track Phase Resolution"
+      },
+      {
+        "description": [
+          "T010: Add CodeHash::NotRecorded, change ReviewState.code_hash from Option<CodeHash> to CodeHash",
+          "Serialization: NotRecorded preserves current behavior — field omitted from JSON (not emitted as null)",
+          "T011: Replace ReviewGroupState { fast: Option<_>, final_round: Option<_> } with ReviewGroupProgress ADT",
+          "Variants: NoRounds, FastOnly(ReviewRoundResult), FinalOnly(ReviewRoundResult), BothRounds { fast, final_round }",
+          "FinalOnly preserves backward-compat for legacy metadata with final_round-only groups",
+          "with_final_only constructor renamed to from_legacy_final_only for clarity (codec path only)",
+          "T012: Use NonEmptyString for ReviewEscalationResolution.workspace_search_ref/reinvention_check_ref/summary",
+          "Move validation from resolve_escalation() into the constructor",
+          "T013: Propagate to infrastructure/codec + CLI — review_from_document/review_to_document for CodeHash/ReviewGroupProgress, and apps/cli/src/commands/review.rs for ReviewEscalationResolution::new() constructor change"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T010",
+          "T011",
+          "T012",
+          "T013"
+        ],
+        "title": "Phase C: Review System ADTs"
+      },
+      {
+        "description": [
+          "T014: AutoPhaseError fields from/phase/to: String -> AutoPhase enum",
+          "T015: StatusOverride -> struct { kind: StatusOverrideKind, reason: NonEmptyString }",
+          "T016: Review group name String -> ReviewGroupName newtype throughout (Vec<String>, HashMap<String, ...>, record_round group: &str, expected_groups: &[String], record_round_with_pending same params)",
+          "T017: Propagate to infrastructure/codec + CLI — StatusOverride codec, AutoPhaseError callers, ReviewGroupName codec and CLI review.rs (group/expected_groups params)"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T014",
+          "T015",
+          "T016",
+          "T017"
+        ],
+        "title": "Phase D: Minor Domain Cleanups"
+      }
+    ],
+    "summary": [
+      "Domain layer semantics hardening: eliminate stringly-typed fields and Option-encoded distinct states.",
+      "Phase A (WF-40): Split TaskStatus::Done into DonePending/DoneTraced for commit_hash backfill.",
+      "Phase B: Type-safe track phase resolution (TrackStatus enum, NextCommand enum) + infrastructure propagation.",
+      "Phase C: Review system ADTs (ReviewGroupProgress, CodeHash::NotRecorded, NonEmptyString fields) + codec propagation.",
+      "Phase D: Minor cleanups (AutoPhaseError, StatusOverride, ReviewGroupName newtype) + codec/CLI propagation.",
+      "All changes maintain JSON serialization backward-compatibility (field omission preserved, no new required fields)."
+    ]
+  },
+  "review": {
+    "code_hash": "acbba6ee3af2d46dfcfbf2de12e415ca268ffca7",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-20T01:58:23Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-20T01:58:28Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 2,
+          "round_type": "fast",
+          "timestamp": "2026-03-20T02:27:55Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 3,
+          "round_type": "fast",
+          "timestamp": "2026-03-20T02:47:42Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 4,
+          "round_type": "fast",
+          "timestamp": "2026-03-20T02:48:41Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "infra-domain": {
+        "fast": {
+          "round": 2,
+          "timestamp": "2026-03-20T05:17:03Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-20T05:17:21Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "other": {
+        "fast": {
+          "round": 5,
+          "timestamp": "2026-03-20T05:17:14Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-20T05:17:21Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "usecase-cli": {
+        "fast": {
+          "round": 2,
+          "timestamp": "2026-03-20T05:17:14Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-20T05:17:21Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "domain: Split TaskStatus::Done into DonePending/DoneTraced, add BackfillHash transition",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "usecase: Update resolve_transition() to accept &TaskStatus (not TaskStatusKind), update execute_by_status() caller to pass task.status() instead of task.status().kind()",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "infrastructure/codec: Update parse_task_status and task_to_document for DonePending/DoneTraced",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "infrastructure/render: Update plan.md rendering match arms for DonePending/DoneTraced",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "CLI: Update pr.rs task resolution check and state_ops.rs task counts for new variants",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "docs: Update task-completion-flow.md WF-40 constraint and TODO.md",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "description": "domain: resolve_phase and resolve_phase_from_record — status param &str -> TrackStatus enum, remove silent fallback",
+      "id": "T007",
+      "status": "done"
+    },
+    {
+      "description": "domain: TrackPhaseInfo.next_command String -> NextCommand enum",
+      "id": "T008",
+      "status": "done"
+    },
+    {
+      "description": "infrastructure/CLI: Propagate Phase B changes — update resolve.rs and render.rs for NextCommand enum and TrackStatus matching",
+      "id": "T009",
+      "status": "done"
+    },
+    {
+      "description": "domain: Fold Option<CodeHash> into CodeHash::NotRecorded, remove Option wrapper from ReviewState",
+      "id": "T010",
+      "status": "done"
+    },
+    {
+      "description": "domain: ReviewGroupState Option pair -> ReviewGroupProgress ADT (NoRounds/FastOnly/FinalOnly/BothRounds)",
+      "id": "T011",
+      "status": "done"
+    },
+    {
+      "description": "domain: ReviewEscalationResolution String fields -> NonEmptyString for workspace_search_ref/reinvention_check_ref/summary",
+      "id": "T012",
+      "status": "done"
+    },
+    {
+      "description": "infrastructure/codec + CLI: Propagate Phase C changes — review_from_document/review_to_document for CodeHash/ReviewGroupProgress, review.rs for ReviewEscalationResolution constructor",
+      "id": "T013",
+      "status": "done"
+    },
+    {
+      "description": "domain: AutoPhaseError String fields -> AutoPhase enum for from/phase/to",
+      "id": "T014",
+      "status": "done"
+    },
+    {
+      "description": "domain: StatusOverride refactor - extract StatusOverrideKind enum, use NonEmptyString for reason",
+      "id": "T015",
+      "status": "done"
+    },
+    {
+      "description": "domain: Review group name String -> ReviewGroupName newtype throughout (Vec<String>, HashMap<String, ...>, record_round group: &str, record_round expected_groups: &[String], record_round_with_pending same params)",
+      "id": "T016",
+      "status": "done"
+    },
+    {
+      "description": "infrastructure/codec + CLI: Propagate Phase D changes — StatusOverride codec, AutoPhaseError callers, ReviewGroupName codec and CLI review.rs (group/expected_groups params)",
+      "id": "T017",
+      "status": "done"
+    }
+  ],
+  "title": "Domain semantics hardening: type-safe states, eliminate stringly-typed fields",
+  "updated_at": "2026-03-20T05:17:21Z"
+}
