@@ -7,15 +7,15 @@
 
 ## Current Focus
 
-- Latest active track: `None yet`
-- Next recommended command: `/track:plan <feature>`
+- Latest active track: `review-usecase-extraction-2026-03-20`
+- Next recommended command: `/track:implement`
 - Last updated: `2026-03-20`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| _No active tracks yet_ | - | `/track:plan <feature>` | - |
+| review-usecase-extraction-2026-03-20 | planned | `/track:implement` | 2026-03-20 |
 
 ## Completed Tracks
 
