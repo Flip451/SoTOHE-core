@@ -96,7 +96,7 @@
     ]
   },
   "review": {
-    "code_hash": "7819cd1cd863aff8d7dbcac489fffddd035d1ea0",
+    "code_hash": "7409465c583286810146d56e0a2fc024cda244ac",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -119,20 +119,53 @@
           "round": 1,
           "round_type": "final",
           "timestamp": "2026-03-20T01:58:28Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 2,
+          "round_type": "fast",
+          "timestamp": "2026-03-20T02:27:55Z"
         }
       ],
       "threshold": 3
     },
     "groups": {
-      "other": {
+      "infra-domain": {
         "fast": {
           "round": 1,
-          "timestamp": "2026-03-20T01:58:23Z",
+          "timestamp": "2026-03-20T02:26:41Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-20T01:58:28Z",
+          "timestamp": "2026-03-20T02:26:51Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "other": {
+        "fast": {
+          "round": 2,
+          "timestamp": "2026-03-20T02:27:55Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-20T02:28:00Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "usecase-cli": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-20T02:26:46Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-20T02:26:55Z",
           "verdict": "zero_findings"
         }
       }
@@ -140,37 +173,37 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
   "tasks": [
     {
       "description": "domain: Split TaskStatus::Done into DonePending/DoneTraced, add BackfillHash transition",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "usecase: Update resolve_transition() to accept &TaskStatus (not TaskStatusKind), update execute_by_status() caller to pass task.status() instead of task.status().kind()",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "infrastructure/codec: Update parse_task_status and task_to_document for DonePending/DoneTraced",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "infrastructure/render: Update plan.md rendering match arms for DonePending/DoneTraced",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "CLI: Update pr.rs task resolution check and state_ops.rs task counts for new variants",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "docs: Update task-completion-flow.md WF-40 constraint and TODO.md",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "domain: resolve_phase and resolve_phase_from_record — status param &str -> TrackStatus enum, remove silent fallback",
@@ -229,5 +262,5 @@
     }
   ],
   "title": "Domain semantics hardening: type-safe states, eliminate stringly-typed fields",
-  "updated_at": "2026-03-20T01:58:28Z"
+  "updated_at": "2026-03-20T02:28:00Z"
 }

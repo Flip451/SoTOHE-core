@@ -108,10 +108,10 @@ impl<W: TrackWriter> TransitionTaskUseCase<W> {
                 track.tasks().iter().find(|t| *t.id() == *task_id).ok_or_else(|| {
                     TransitionError::TaskNotFound { task_id: task_id.to_string() }
                 })?;
-            let current_kind = task.status().kind();
+            let current_status = task.status();
 
             let transition =
-                track_resolution::resolve_transition(target_status, current_kind, commit_hash)
+                track_resolution::resolve_transition(target_status, current_status, commit_hash)
                     .map_err(|e| match e {
                         track_resolution::TrackResolutionError::UnsupportedTargetStatus(s) => {
                             ValidationError::UnsupportedTargetStatus(s)

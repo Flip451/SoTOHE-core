@@ -291,13 +291,13 @@ fn parse_task_status(status: &str, commit_hash: Option<&str>) -> Result<TaskStat
     match status {
         "todo" => Ok(TaskStatus::Todo),
         "in_progress" => Ok(TaskStatus::InProgress),
-        "done" => {
-            let hash = commit_hash
-                .map(CommitHash::try_new)
-                .transpose()
-                .map_err(|e| CodecError::Domain(e.into()))?;
-            Ok(TaskStatus::Done { commit_hash: hash })
-        }
+        "done" => match commit_hash {
+            Some(h) => {
+                let hash = CommitHash::try_new(h).map_err(|e| CodecError::Domain(e.into()))?;
+                Ok(TaskStatus::DoneTraced { commit_hash: hash })
+            }
+            None => Ok(TaskStatus::DonePending),
+        },
         "skipped" => Ok(TaskStatus::Skipped),
         other => Err(CodecError::InvalidField {
             field: "status".into(),
@@ -339,8 +339,9 @@ fn task_to_document(task: &TrackTask) -> TrackTaskDocument {
     let (status, commit_hash) = match task.status() {
         TaskStatus::Todo => ("todo".to_owned(), None),
         TaskStatus::InProgress => ("in_progress".to_owned(), None),
-        TaskStatus::Done { commit_hash } => {
-            ("done".to_owned(), commit_hash.as_ref().map(|h| h.to_string()))
+        TaskStatus::DonePending => ("done".to_owned(), None),
+        TaskStatus::DoneTraced { commit_hash } => {
+            ("done".to_owned(), Some(commit_hash.to_string()))
         }
         TaskStatus::Skipped => ("skipped".to_owned(), None),
     };
@@ -793,6 +794,36 @@ mod tests {
         let (track2, meta2) = decode(&json).unwrap();
         assert_eq!(track, track2);
         assert_eq!(meta.schema_version, meta2.schema_version);
+    }
+
+    #[test]
+    fn test_done_pending_round_trips_without_commit_hash() {
+        let json = r#"{
+  "schema_version": 2,
+  "id": "pending-track",
+  "title": "Pending Test",
+  "status": "in_progress",
+  "created_at": "2026-03-20T00:00:00Z",
+  "updated_at": "2026-03-20T00:00:00Z",
+  "tasks": [
+    {"id": "T1", "description": "Done without hash", "status": "done"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [{"id": "S1", "title": "S", "description": [], "task_ids": ["T1"]}]
+  }
+}"#;
+        let (track, meta) = decode(json).unwrap();
+        assert!(matches!(track.tasks()[0].status(), TaskStatus::DonePending));
+
+        let re_encoded = encode(&track, &meta).unwrap();
+        let doc: serde_json::Value = serde_json::from_str(&re_encoded).unwrap();
+        let task = &doc["tasks"][0];
+        assert_eq!(task["status"], "done");
+        assert!(task.get("commit_hash").is_none() || task["commit_hash"].is_null());
+
+        let (track2, _) = decode(&re_encoded).unwrap();
+        assert_eq!(track, track2);
     }
 
     #[test]

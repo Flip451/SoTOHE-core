@@ -52,12 +52,16 @@ impl fmt::Display for TaskStatusKind {
     }
 }
 
-/// Status of a task. `Done` carries an optional commit hash.
+/// Status of a task.
+///
+/// `DonePending` means the task is complete but the commit hash is not yet known.
+/// `DoneTraced` means the task is complete with a traced commit hash.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TaskStatus {
     Todo,
     InProgress,
-    Done { commit_hash: Option<CommitHash> },
+    DonePending,
+    DoneTraced { commit_hash: CommitHash },
     Skipped,
 }
 
@@ -68,7 +72,7 @@ impl TaskStatus {
         match self {
             Self::Todo => TaskStatusKind::Todo,
             Self::InProgress => TaskStatusKind::InProgress,
-            Self::Done { .. } => TaskStatusKind::Done,
+            Self::DonePending | Self::DoneTraced { .. } => TaskStatusKind::Done,
             Self::Skipped => TaskStatusKind::Skipped,
         }
     }
@@ -76,7 +80,7 @@ impl TaskStatus {
     /// Returns `true` if the task is in a terminal state (Done or Skipped).
     #[must_use]
     pub fn is_resolved(&self) -> bool {
-        matches!(self, Self::Done { .. } | Self::Skipped)
+        matches!(self, Self::DonePending | Self::DoneTraced { .. } | Self::Skipped)
     }
 }
 
@@ -85,6 +89,7 @@ impl TaskStatus {
 pub enum TaskTransition {
     Start,
     Complete { commit_hash: Option<CommitHash> },
+    BackfillHash { commit_hash: CommitHash },
     ResetToTodo,
     Skip,
     Reopen,
@@ -96,7 +101,7 @@ impl TaskTransition {
     pub fn target_kind(&self) -> TaskStatusKind {
         match self {
             Self::Start => TaskStatusKind::InProgress,
-            Self::Complete { .. } => TaskStatusKind::Done,
+            Self::Complete { .. } | Self::BackfillHash { .. } => TaskStatusKind::Done,
             Self::ResetToTodo => TaskStatusKind::Todo,
             Self::Skip => TaskStatusKind::Skipped,
             Self::Reopen => TaskStatusKind::InProgress,
@@ -189,12 +194,19 @@ impl TrackTask {
         let next_status = match (&self.status, transition) {
             (TaskStatus::Todo, TaskTransition::Start) => TaskStatus::InProgress,
             (TaskStatus::Todo, TaskTransition::Skip) => TaskStatus::Skipped,
-            (TaskStatus::InProgress, TaskTransition::Complete { commit_hash }) => {
-                TaskStatus::Done { commit_hash }
+            (TaskStatus::InProgress, TaskTransition::Complete { commit_hash: None }) => {
+                TaskStatus::DonePending
+            }
+            (TaskStatus::InProgress, TaskTransition::Complete { commit_hash: Some(hash) }) => {
+                TaskStatus::DoneTraced { commit_hash: hash }
             }
             (TaskStatus::InProgress, TaskTransition::ResetToTodo) => TaskStatus::Todo,
             (TaskStatus::InProgress, TaskTransition::Skip) => TaskStatus::Skipped,
-            (TaskStatus::Done { .. }, TaskTransition::Reopen) => TaskStatus::InProgress,
+            (TaskStatus::DonePending, TaskTransition::BackfillHash { commit_hash }) => {
+                TaskStatus::DoneTraced { commit_hash }
+            }
+            (TaskStatus::DonePending, TaskTransition::Reopen)
+            | (TaskStatus::DoneTraced { .. }, TaskTransition::Reopen) => TaskStatus::InProgress,
             (TaskStatus::Skipped, TaskTransition::ResetToTodo) => TaskStatus::Todo,
             (_, transition) => {
                 return Err(TransitionError::InvalidTaskTransition {
@@ -397,10 +409,12 @@ impl TrackMetadata {
     #[must_use]
     pub fn all_tasks_resolved(&self) -> bool {
         !self.tasks.is_empty()
-            && self
-                .tasks
-                .iter()
-                .all(|t| matches!(t.status(), TaskStatus::Done { .. } | TaskStatus::Skipped))
+            && self.tasks.iter().all(|t| {
+                matches!(
+                    t.status(),
+                    TaskStatus::DonePending | TaskStatus::DoneTraced { .. } | TaskStatus::Skipped
+                )
+            })
     }
 
     fn tasks_are_resolved(&self) -> bool {
@@ -877,6 +891,118 @@ mod tests {
             review: None,
         };
         assert!(!track.all_tasks_resolved());
+    }
+
+    // --- DonePending / DoneTraced / BackfillHash tests ---
+
+    #[test]
+    fn test_complete_without_hash_yields_done_pending() {
+        let mut track = make_track(&["T001"], &["T001"]);
+        let t1 = TaskId::try_new("T001").unwrap();
+        track.transition_task(&t1, TaskTransition::Start).unwrap();
+        track.transition_task(&t1, TaskTransition::Complete { commit_hash: None }).unwrap();
+        assert!(matches!(track.tasks()[0].status(), TaskStatus::DonePending));
+    }
+
+    #[test]
+    fn test_complete_with_hash_yields_done_traced() {
+        let mut track = make_track(&["T001"], &["T001"]);
+        let t1 = TaskId::try_new("T001").unwrap();
+        let hash = CommitHash::try_new("abc1234").unwrap();
+        track.transition_task(&t1, TaskTransition::Start).unwrap();
+        track.transition_task(&t1, TaskTransition::Complete { commit_hash: Some(hash) }).unwrap();
+        assert!(matches!(track.tasks()[0].status(), TaskStatus::DoneTraced { .. }));
+    }
+
+    #[test]
+    fn test_backfill_hash_on_done_pending_yields_done_traced() {
+        let mut track = make_track(&["T001"], &["T001"]);
+        let t1 = TaskId::try_new("T001").unwrap();
+        let hash = CommitHash::try_new("abc1234").unwrap();
+        track.transition_task(&t1, TaskTransition::Start).unwrap();
+        track.transition_task(&t1, TaskTransition::Complete { commit_hash: None }).unwrap();
+        track
+            .transition_task(&t1, TaskTransition::BackfillHash { commit_hash: hash.clone() })
+            .unwrap();
+        assert_eq!(track.tasks()[0].status(), &TaskStatus::DoneTraced { commit_hash: hash });
+    }
+
+    #[test]
+    fn test_backfill_hash_on_done_traced_is_rejected() {
+        let mut track = make_track(&["T001"], &["T001"]);
+        let t1 = TaskId::try_new("T001").unwrap();
+        let hash = CommitHash::try_new("abc1234").unwrap();
+        track.transition_task(&t1, TaskTransition::Start).unwrap();
+        track
+            .transition_task(&t1, TaskTransition::Complete { commit_hash: Some(hash.clone()) })
+            .unwrap();
+        let result = track.transition_task(&t1, TaskTransition::BackfillHash { commit_hash: hash });
+        assert!(matches!(
+            result,
+            Err(DomainError::Transition(TransitionError::InvalidTaskTransition { .. }))
+        ));
+    }
+
+    #[test]
+    fn test_done_pending_reopen_yields_in_progress() {
+        let mut track = make_track(&["T001"], &["T001"]);
+        let t1 = TaskId::try_new("T001").unwrap();
+        track.transition_task(&t1, TaskTransition::Start).unwrap();
+        track.transition_task(&t1, TaskTransition::Complete { commit_hash: None }).unwrap();
+        track.transition_task(&t1, TaskTransition::Reopen).unwrap();
+        assert!(matches!(track.tasks()[0].status(), TaskStatus::InProgress));
+    }
+
+    #[test]
+    fn test_done_traced_reopen_yields_in_progress() {
+        let mut track = make_track(&["T001"], &["T001"]);
+        let t1 = TaskId::try_new("T001").unwrap();
+        let hash = CommitHash::try_new("abc1234").unwrap();
+        track.transition_task(&t1, TaskTransition::Start).unwrap();
+        track.transition_task(&t1, TaskTransition::Complete { commit_hash: Some(hash) }).unwrap();
+        track.transition_task(&t1, TaskTransition::Reopen).unwrap();
+        assert!(matches!(track.tasks()[0].status(), TaskStatus::InProgress));
+    }
+
+    #[test]
+    fn test_done_pending_is_resolved() {
+        let task = TrackTask::with_status(
+            TaskId::try_new("T001").unwrap(),
+            "test",
+            TaskStatus::DonePending,
+        )
+        .unwrap();
+        assert!(task.status().is_resolved());
+    }
+
+    #[test]
+    fn test_done_traced_is_resolved() {
+        let hash = CommitHash::try_new("abc1234").unwrap();
+        let task = TrackTask::with_status(
+            TaskId::try_new("T001").unwrap(),
+            "test",
+            TaskStatus::DoneTraced { commit_hash: hash },
+        )
+        .unwrap();
+        assert!(task.status().is_resolved());
+    }
+
+    #[test]
+    fn test_done_pending_kind_is_done() {
+        assert_eq!(TaskStatus::DonePending.kind(), TaskStatusKind::Done);
+    }
+
+    #[test]
+    fn test_done_traced_kind_is_done() {
+        let hash = CommitHash::try_new("abc1234").unwrap();
+        assert_eq!(TaskStatus::DoneTraced { commit_hash: hash }.kind(), TaskStatusKind::Done);
+    }
+
+    #[test]
+    fn test_backfill_hash_target_kind_is_done() {
+        let hash = CommitHash::try_new("abc1234").unwrap();
+        let t = TaskTransition::BackfillHash { commit_hash: hash };
+        assert_eq!(t.target_kind(), TaskStatusKind::Done);
     }
 
     #[test]

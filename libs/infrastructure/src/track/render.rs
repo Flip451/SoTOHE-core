@@ -171,11 +171,11 @@ pub fn render_plan(track: &TrackMetadata) -> String {
                 let marker = match task.status() {
                     TaskStatus::Todo => " ",
                     TaskStatus::InProgress => "~",
-                    TaskStatus::Done { .. } => "x",
+                    TaskStatus::DonePending | TaskStatus::DoneTraced { .. } => "x",
                     TaskStatus::Skipped => "-",
                 };
                 let suffix = match task.status() {
-                    TaskStatus::Done { commit_hash: Some(hash) } => format!(" {hash}"),
+                    TaskStatus::DoneTraced { commit_hash } => format!(" {commit_hash}"),
                     _ => String::new(),
                 };
                 lines.push(format!("- [{marker}] {}{suffix}", task.description()));

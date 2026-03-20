@@ -15,7 +15,7 @@
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| done-hash-backfill-2026-03-20 | planned | `/track:implement` | 2026-03-20 |
+| done-hash-backfill-2026-03-20 | in_progress | `/track:implement` | 2026-03-20 |
 
 ## Completed Tracks
 

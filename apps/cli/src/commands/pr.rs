@@ -265,7 +265,12 @@ fn check_task_completion_guard(branch: &str, repo_root: &std::path::Path) -> Exi
             .tasks()
             .iter()
             .filter(|t| {
-                !matches!(t.status(), domain::TaskStatus::Done { .. } | domain::TaskStatus::Skipped)
+                !matches!(
+                    t.status(),
+                    domain::TaskStatus::DonePending
+                        | domain::TaskStatus::DoneTraced { .. }
+                        | domain::TaskStatus::Skipped
+                )
             })
             .map(|t| format!("{} ({})", t.id(), t.status().kind()))
             .collect();

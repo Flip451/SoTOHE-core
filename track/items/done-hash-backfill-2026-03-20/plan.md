@@ -22,12 +22,12 @@ usecase execute_by_status(): pass task.status() instead of task.status().kind() 
 CLI transition.rs: pass full TaskStatus from TrackTask to resolve_transition
 Update usecase resolve_transition, codec, render, CLI match arms
 
-- [ ] domain: Split TaskStatus::Done into DonePending/DoneTraced, add BackfillHash transition
-- [ ] usecase: Update resolve_transition() to accept &TaskStatus (not TaskStatusKind), update execute_by_status() caller to pass task.status() instead of task.status().kind()
-- [ ] infrastructure/codec: Update parse_task_status and task_to_document for DonePending/DoneTraced
-- [ ] infrastructure/render: Update plan.md rendering match arms for DonePending/DoneTraced
-- [ ] CLI: Update pr.rs task resolution check and state_ops.rs task counts for new variants
-- [ ] docs: Update task-completion-flow.md WF-40 constraint and TODO.md
+- [x] domain: Split TaskStatus::Done into DonePending/DoneTraced, add BackfillHash transition
+- [x] usecase: Update resolve_transition() to accept &TaskStatus (not TaskStatusKind), update execute_by_status() caller to pass task.status() instead of task.status().kind()
+- [x] infrastructure/codec: Update parse_task_status and task_to_document for DonePending/DoneTraced
+- [x] infrastructure/render: Update plan.md rendering match arms for DonePending/DoneTraced
+- [x] CLI: Update pr.rs task resolution check and state_ops.rs task counts for new variants
+- [x] docs: Update task-completion-flow.md WF-40 constraint and TODO.md
 
 ## Phase B: Type-safe Track Phase Resolution
 
