@@ -768,6 +768,7 @@ impl From<String> for RecordRoundError {
     }
 }
 
+#[allow(clippy::too_many_lines)]
 fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
     use domain::{ReviewRoundResult, ReviewState, RoundType};
     use infrastructure::git_cli::{GitRepository, SystemGitRepo};
@@ -1208,6 +1209,7 @@ impl PrivateIndex {
     /// `updated_at` is set to the Unix epoch.  A second temp copy of the
     /// private index is used for the write-tree operation so the private
     /// index itself is not modified.
+    #[allow(clippy::too_many_lines)]
     fn normalized_tree_hash(
         &self,
         git: &impl infrastructure::git_cli::GitRepository,
@@ -1531,6 +1533,13 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
         .ok_or_else(|| format!("track '{}' not found", args.track_id))?;
 
     let review = track.review().ok_or("[BLOCKED] no review section in metadata.json")?;
+
+    // WF-54: Allow commit when review is in its initial state (no rounds recorded).
+    // NotStarted + empty groups = freshly created track (planning artifacts only).
+    // NotStarted + non-empty groups = demoted after findings_remain — must re-review.
+    if review.status() == domain::ReviewStatus::NotStarted && review.groups().is_empty() {
+        return Ok(());
+    }
 
     let mut review_check = review.clone();
     match review_check.check_commit_ready(&code_hash) {

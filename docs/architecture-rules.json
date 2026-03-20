@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "module_limits": {
+    "max_lines": 700,
+    "warn_lines": 400,
+    "exclude": ["vendor/", ".cache/"]
+  },
   "canonical_modules": [
     {
       "concern": "shell-parsing",

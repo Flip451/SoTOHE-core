@@ -35,6 +35,12 @@ pub enum VerifyCommand {
     SpecFrontmatter(SpecVerifyArgs),
     /// Check canonical module ownership (no reimplementation outside canonical modules).
     CanonicalModules(VerifyArgs),
+    /// Check Rust source file sizes against module_limits thresholds.
+    ModuleSize(VerifyArgs),
+    /// Check libs/domain/src/ for pub String fields (should be enums or newtypes).
+    DomainStrings(VerifyArgs),
+    /// Check that plan.md files are up-to-date with metadata.json renderings.
+    ViewFreshness(VerifyArgs),
 }
 
 /// Common arguments for all verify subcommands.
@@ -76,6 +82,17 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
         VerifyCommand::CanonicalModules(args) => (
             "verify canonical modules",
             infrastructure::verify::canonical_modules::verify(&args.project_root),
+        ),
+        VerifyCommand::ModuleSize(args) => {
+            ("verify module size", infrastructure::verify::module_size::verify(&args.project_root))
+        }
+        VerifyCommand::DomainStrings(args) => (
+            "verify domain strings",
+            infrastructure::verify::domain_strings::verify(&args.project_root),
+        ),
+        VerifyCommand::ViewFreshness(args) => (
+            "verify view freshness",
+            infrastructure::verify::view_freshness::verify(&args.project_root),
         ),
     };
 
@@ -259,5 +276,53 @@ mod tests {
         // No docs/architecture-rules.json at all → error
         let exit = execute(VerifyCommand::CanonicalModules(make_args(tmp.path())));
         assert_eq!(exit, ExitCode::FAILURE);
+    }
+
+    // --- module-size CLI wiring ---
+
+    #[test]
+    fn test_module_size_subcommand_returns_success_for_small_files() {
+        let tmp = TempDir::new().unwrap();
+        write_file(
+            tmp.path(),
+            "docs/architecture-rules.json",
+            r#"{"version":2,"module_limits":{"max_lines":700,"warn_lines":400,"exclude":[]}}"#,
+        );
+        write_file(tmp.path(), "src/small.rs", "fn main() {}\n");
+        let exit = execute(VerifyCommand::ModuleSize(make_args(tmp.path())));
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn test_module_size_subcommand_returns_failure_for_missing_rules() {
+        let tmp = TempDir::new().unwrap();
+        let exit = execute(VerifyCommand::ModuleSize(make_args(tmp.path())));
+        assert_eq!(exit, ExitCode::FAILURE);
+    }
+
+    // --- domain-strings CLI wiring ---
+
+    #[test]
+    fn test_domain_strings_subcommand_returns_success_for_clean_domain() {
+        let tmp = TempDir::new().unwrap();
+        write_file(tmp.path(), "libs/domain/src/lib.rs", "pub struct Foo { pub count: u32 }\n");
+        let exit = execute(VerifyCommand::DomainStrings(make_args(tmp.path())));
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn test_domain_strings_subcommand_returns_failure_for_missing_domain() {
+        let tmp = TempDir::new().unwrap();
+        let exit = execute(VerifyCommand::DomainStrings(make_args(tmp.path())));
+        assert_eq!(exit, ExitCode::FAILURE);
+    }
+
+    // --- view-freshness CLI wiring ---
+
+    #[test]
+    fn test_view_freshness_subcommand_returns_success_with_no_tracks() {
+        let tmp = TempDir::new().unwrap();
+        let exit = execute(VerifyCommand::ViewFreshness(make_args(tmp.path())));
+        assert_eq!(exit, ExitCode::SUCCESS);
     }
 }

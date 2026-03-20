@@ -807,6 +807,7 @@ fn ensure_pr_for_cycle<C: GhClient>(
 ///
 /// `head_commit` is used by the timeout recovery to filter reviews by commit.
 /// Pass `None` to accept any bot review during recovery (less safe).
+#[allow(clippy::too_many_lines)]
 pub fn poll_review_for_cycle<C, Sleep>(
     pr: &str,
     trigger_timestamp: &str,

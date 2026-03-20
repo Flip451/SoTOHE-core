@@ -1,3 +1,5 @@
+#![warn(clippy::too_many_lines)]
+
 use std::process::ExitCode;
 use std::sync::Arc;
 
