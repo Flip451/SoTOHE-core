@@ -40,9 +40,9 @@ Variants: Implement, Done, ActivateTrack(TrackId), PlanNewFeature, Status
 Add Display impl for user-facing output (/track:implement, etc.)
 T009: Propagate to infrastructure/CLI — resolve.rs and render.rs (next_command usage, TrackStatus matching)
 
-- [ ] domain: resolve_phase and resolve_phase_from_record — status param &str -> TrackStatus enum, remove silent fallback
-- [ ] domain: TrackPhaseInfo.next_command String -> NextCommand enum
-- [ ] infrastructure/CLI: Propagate Phase B changes — update resolve.rs and render.rs for NextCommand enum and TrackStatus matching
+- [x] domain: resolve_phase and resolve_phase_from_record — status param &str -> TrackStatus enum, remove silent fallback
+- [x] domain: TrackPhaseInfo.next_command String -> NextCommand enum
+- [x] infrastructure/CLI: Propagate Phase B changes — update resolve.rs and render.rs for NextCommand enum and TrackStatus matching
 
 ## Phase C: Review System ADTs
 

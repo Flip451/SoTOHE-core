@@ -41,12 +41,34 @@ impl fmt::Display for TrackPhase {
     }
 }
 
+/// Recommended next command for the track workflow.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NextCommand {
+    Implement,
+    Done,
+    ActivateTrack(String),
+    PlanNewFeature,
+    Status,
+}
+
+impl fmt::Display for NextCommand {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Implement => f.write_str("/track:implement"),
+            Self::Done => f.write_str("/track:done"),
+            Self::ActivateTrack(id) => write!(f, "/track:activate {id}"),
+            Self::PlanNewFeature => f.write_str("/track:plan <feature>"),
+            Self::Status => f.write_str("/track:status"),
+        }
+    }
+}
+
 /// Phase resolution result with routing guidance.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TrackPhaseInfo {
     pub phase: TrackPhase,
     pub reason: String,
-    pub next_command: String,
+    pub next_command: NextCommand,
     pub blocker: Option<String>,
 }
 
@@ -63,7 +85,7 @@ pub fn resolve_phase(track: &TrackMetadata, schema_version: u32) -> TrackPhaseIn
         TrackStatus::Planned if is_branchless_v3 => TrackPhaseInfo {
             phase: TrackPhase::ReadyToActivate,
             reason: "track exists, status is planned, branch is not materialized yet".to_owned(),
-            next_command: format!("/track:activate {}", track.id()),
+            next_command: NextCommand::ActivateTrack(track.id().to_string()),
             blocker: Some(
                 "implementation commands are disabled until activation completes".to_owned(),
             ),
@@ -71,19 +93,19 @@ pub fn resolve_phase(track: &TrackMetadata, schema_version: u32) -> TrackPhaseIn
         TrackStatus::Planned => TrackPhaseInfo {
             phase: TrackPhase::Planning,
             reason: "track is planned with branch materialized".to_owned(),
-            next_command: "/track:implement".to_owned(),
+            next_command: NextCommand::Implement,
             blocker: None,
         },
         TrackStatus::InProgress => TrackPhaseInfo {
             phase: TrackPhase::InProgress,
             reason: "track has unresolved tasks".to_owned(),
-            next_command: "/track:implement".to_owned(),
+            next_command: NextCommand::Implement,
             blocker: None,
         },
         TrackStatus::Done => TrackPhaseInfo {
             phase: TrackPhase::ReadyToShip,
             reason: "all tasks completed".to_owned(),
-            next_command: "/track:done".to_owned(),
+            next_command: NextCommand::Done,
             blocker: None,
         },
         TrackStatus::Blocked => {
@@ -94,7 +116,7 @@ pub fn resolve_phase(track: &TrackMetadata, schema_version: u32) -> TrackPhaseIn
             TrackPhaseInfo {
                 phase: TrackPhase::Blocked,
                 reason: override_reason.clone(),
-                next_command: "/track:status".to_owned(),
+                next_command: NextCommand::Status,
                 blocker: Some(override_reason),
             }
         }
@@ -106,14 +128,14 @@ pub fn resolve_phase(track: &TrackMetadata, schema_version: u32) -> TrackPhaseIn
             TrackPhaseInfo {
                 phase: TrackPhase::Cancelled,
                 reason: override_reason,
-                next_command: "/track:plan <feature>".to_owned(),
+                next_command: NextCommand::PlanNewFeature,
                 blocker: None,
             }
         }
         TrackStatus::Archived => TrackPhaseInfo {
             phase: TrackPhase::Archived,
             reason: "track is archived".to_owned(),
-            next_command: "/track:plan <feature>".to_owned(),
+            next_command: NextCommand::PlanNewFeature,
             blocker: None,
         },
     }
@@ -126,7 +148,7 @@ pub fn resolve_phase(track: &TrackMetadata, schema_version: u32) -> TrackPhaseIn
 #[must_use]
 pub fn resolve_phase_from_record(
     track_id: &str,
-    status: &str,
+    status: TrackStatus,
     has_branch: bool,
     schema_version: u32,
     override_reason: Option<&str>,
@@ -134,68 +156,62 @@ pub fn resolve_phase_from_record(
     let is_branchless_v3 = schema_version == 3 && !has_branch;
 
     match status {
-        "planned" if is_branchless_v3 => TrackPhaseInfo {
+        TrackStatus::Planned if is_branchless_v3 => TrackPhaseInfo {
             phase: TrackPhase::ReadyToActivate,
             reason: "track exists, status is planned, branch is not materialized yet".to_owned(),
-            next_command: format!("/track:activate {track_id}"),
+            next_command: NextCommand::ActivateTrack(track_id.to_owned()),
             blocker: Some(
                 "implementation commands are disabled until activation completes".to_owned(),
             ),
         },
-        "planned" => TrackPhaseInfo {
+        TrackStatus::Planned => TrackPhaseInfo {
             phase: TrackPhase::Planning,
             reason: "track is planned with branch materialized".to_owned(),
-            next_command: "/track:implement".to_owned(),
+            next_command: NextCommand::Implement,
             blocker: None,
         },
-        "in_progress" => TrackPhaseInfo {
+        TrackStatus::InProgress => TrackPhaseInfo {
             phase: TrackPhase::InProgress,
             reason: "track has unresolved tasks".to_owned(),
-            next_command: "/track:implement".to_owned(),
+            next_command: NextCommand::Implement,
             blocker: None,
         },
-        "done" => TrackPhaseInfo {
+        TrackStatus::Done => TrackPhaseInfo {
             phase: TrackPhase::ReadyToShip,
             reason: "all tasks completed".to_owned(),
-            next_command: "/track:done".to_owned(),
+            next_command: NextCommand::Done,
             blocker: None,
         },
-        "blocked" => {
+        TrackStatus::Blocked => {
             let reason = override_reason.unwrap_or("track is blocked").to_owned();
             TrackPhaseInfo {
                 phase: TrackPhase::Blocked,
                 reason: reason.clone(),
-                next_command: "/track:status".to_owned(),
+                next_command: NextCommand::Status,
                 blocker: Some(reason),
             }
         }
-        "cancelled" => {
+        TrackStatus::Cancelled => {
             let reason = override_reason.unwrap_or("track has been cancelled").to_owned();
             TrackPhaseInfo {
                 phase: TrackPhase::Cancelled,
                 reason,
-                next_command: "/track:plan <feature>".to_owned(),
+                next_command: NextCommand::PlanNewFeature,
                 blocker: None,
             }
         }
-        "archived" => TrackPhaseInfo {
+        TrackStatus::Archived => TrackPhaseInfo {
             phase: TrackPhase::Archived,
             reason: "track is archived".to_owned(),
-            next_command: "/track:plan <feature>".to_owned(),
-            blocker: None,
-        },
-        _ => TrackPhaseInfo {
-            phase: TrackPhase::InProgress,
-            reason: format!("unknown status '{status}'"),
-            next_command: "/track:status".to_owned(),
+            next_command: NextCommand::PlanNewFeature,
             blocker: None,
         },
     }
 }
 
-/// Returns the recommended next command string for registry rendering.
+/// Returns the recommended next command for registry rendering.
 #[must_use]
-pub fn next_command(track: &TrackMetadata, schema_version: u32) -> String {
+pub fn next_command(track: &TrackMetadata, schema_version: u32) -> NextCommand {
     resolve_phase(track, schema_version).next_command
 }
 
@@ -233,7 +249,7 @@ mod tests {
         let track = planned_track("demo", None);
         let info = resolve_phase(&track, 3);
         assert_eq!(info.phase, TrackPhase::ReadyToActivate);
-        assert_eq!(info.next_command, "/track:activate demo");
+        assert_eq!(info.next_command, NextCommand::ActivateTrack("demo".to_owned()));
         assert!(info.blocker.is_some());
     }
 
@@ -242,7 +258,7 @@ mod tests {
         let track = planned_track("demo", Some("track/demo"));
         let info = resolve_phase(&track, 3);
         assert_eq!(info.phase, TrackPhase::Planning);
-        assert_eq!(info.next_command, "/track:implement");
+        assert_eq!(info.next_command, NextCommand::Implement);
         assert!(info.blocker.is_none());
     }
 
@@ -260,7 +276,7 @@ mod tests {
         track.transition_task(&TaskId::try_new("T1").unwrap(), TaskTransition::Start).unwrap();
         let info = resolve_phase(&track, 3);
         assert_eq!(info.phase, TrackPhase::InProgress);
-        assert_eq!(info.next_command, "/track:implement");
+        assert_eq!(info.next_command, NextCommand::Implement);
     }
 
     #[test]
@@ -275,7 +291,7 @@ mod tests {
             .unwrap();
         let info = resolve_phase(&track, 3);
         assert_eq!(info.phase, TrackPhase::ReadyToShip);
-        assert_eq!(info.next_command, "/track:done");
+        assert_eq!(info.next_command, NextCommand::Done);
     }
 
     #[test]
@@ -329,53 +345,58 @@ mod tests {
         .unwrap();
         let info = resolve_phase(&track, 3);
         assert_eq!(info.phase, TrackPhase::Cancelled);
-        assert_eq!(info.next_command, "/track:plan <feature>");
+        assert_eq!(info.next_command, NextCommand::PlanNewFeature);
     }
 
     // --- resolve_phase_from_record ---
 
     #[rstest]
     #[case::branchless_v3_planned_returns_ready_to_activate(
-        "planned",
+        TrackStatus::Planned,
         false,
         3,
         None,
         TrackPhase::ReadyToActivate
     )]
     #[case::materialized_v3_planned_returns_planning(
-        "planned",
+        TrackStatus::Planned,
         true,
         3,
         None,
         TrackPhase::Planning
     )]
-    #[case::v2_branchless_returns_planning("planned", false, 2, None, TrackPhase::Planning)]
-    #[case::in_progress_returns_in_progress("in_progress", true, 3, None, TrackPhase::InProgress)]
-    #[case::done_returns_ready_to_ship("done", true, 3, None, TrackPhase::ReadyToShip)]
+    #[case::v2_branchless_returns_planning(
+        TrackStatus::Planned,
+        false,
+        2,
+        None,
+        TrackPhase::Planning
+    )]
+    #[case::in_progress_returns_in_progress(
+        TrackStatus::InProgress,
+        true,
+        3,
+        None,
+        TrackPhase::InProgress
+    )]
+    #[case::done_returns_ready_to_ship(TrackStatus::Done, true, 3, None, TrackPhase::ReadyToShip)]
     #[case::blocked_returns_blocked(
-        "blocked",
+        TrackStatus::Blocked,
         true,
         3,
         Some("waiting on review"),
         TrackPhase::Blocked
     )]
     #[case::cancelled_returns_cancelled(
-        "cancelled",
+        TrackStatus::Cancelled,
         true,
         3,
         Some("scope changed"),
         TrackPhase::Cancelled
     )]
-    #[case::archived_returns_archived("archived", false, 3, None, TrackPhase::Archived)]
-    #[case::unknown_status_falls_back_to_in_progress(
-        "unknown",
-        true,
-        3,
-        None,
-        TrackPhase::InProgress
-    )]
+    #[case::archived_returns_archived(TrackStatus::Archived, false, 3, None, TrackPhase::Archived)]
     fn resolve_phase_from_record_status_branch_matrix(
-        #[case] status: &str,
+        #[case] status: TrackStatus,
         #[case] has_branch: bool,
         #[case] schema_version: u32,
         #[case] override_reason: Option<&str>,
@@ -388,13 +409,19 @@ mod tests {
 
     #[test]
     fn resolve_phase_from_record_branchless_v3_planned_next_command_is_activate() {
-        let info = resolve_phase_from_record("demo", "planned", false, 3, None);
-        assert_eq!(info.next_command, "/track:activate demo");
+        let info = resolve_phase_from_record("demo", TrackStatus::Planned, false, 3, None);
+        assert_eq!(info.next_command, NextCommand::ActivateTrack("demo".to_owned()));
     }
 
     #[test]
     fn resolve_phase_from_record_blocked_blocker_contains_reason() {
-        let info = resolve_phase_from_record("demo", "blocked", true, 3, Some("waiting on review"));
+        let info = resolve_phase_from_record(
+            "demo",
+            TrackStatus::Blocked,
+            true,
+            3,
+            Some("waiting on review"),
+        );
         assert!(info.blocker.unwrap().contains("waiting on review"));
     }
 
@@ -404,13 +431,13 @@ mod tests {
     fn next_command_for_branchless_v3_returns_activate() {
         let track = planned_track("demo", None);
         let cmd = next_command(&track, 3);
-        assert_eq!(cmd, "/track:activate demo");
+        assert_eq!(cmd, NextCommand::ActivateTrack("demo".to_owned()));
     }
 
     #[test]
     fn next_command_for_materialized_planned_returns_implement() {
         let track = planned_track("demo", Some("track/demo"));
         let cmd = next_command(&track, 3);
-        assert_eq!(cmd, "/track:implement");
+        assert_eq!(cmd, NextCommand::Implement);
     }
 }

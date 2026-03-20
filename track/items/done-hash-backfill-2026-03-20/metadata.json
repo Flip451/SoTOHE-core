@@ -96,7 +96,7 @@
     ]
   },
   "review": {
-    "code_hash": "7409465c583286810146d56e0a2fc024cda244ac",
+    "code_hash": "45f7f76545f03a1900de79f9ea6ec613983459b6",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -128,6 +128,24 @@
           "round": 2,
           "round_type": "fast",
           "timestamp": "2026-03-20T02:27:55Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 3,
+          "round_type": "fast",
+          "timestamp": "2026-03-20T02:47:42Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "other"
+          ],
+          "round": 4,
+          "round_type": "fast",
+          "timestamp": "2026-03-20T02:48:41Z"
         }
       ],
       "threshold": 3
@@ -147,13 +165,13 @@
       },
       "other": {
         "fast": {
-          "round": 2,
-          "timestamp": "2026-03-20T02:27:55Z",
+          "round": 4,
+          "timestamp": "2026-03-20T02:48:41Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-20T02:28:00Z",
+          "timestamp": "2026-03-20T02:48:46Z",
           "verdict": "zero_findings"
         }
       },
@@ -208,17 +226,17 @@
     {
       "description": "domain: resolve_phase and resolve_phase_from_record — status param &str -> TrackStatus enum, remove silent fallback",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "domain: TrackPhaseInfo.next_command String -> NextCommand enum",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "infrastructure/CLI: Propagate Phase B changes — update resolve.rs and render.rs for NextCommand enum and TrackStatus matching",
       "id": "T009",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "domain: Fold Option<CodeHash> into CodeHash::NotRecorded, remove Option wrapper from ReviewState",
@@ -262,5 +280,5 @@
     }
   ],
   "title": "Domain semantics hardening: type-safe states, eliminate stringly-typed fields",
-  "updated_at": "2026-03-20T02:28:00Z"
+  "updated_at": "2026-03-20T02:48:46Z"
 }
