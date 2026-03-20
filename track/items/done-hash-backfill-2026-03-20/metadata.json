@@ -96,7 +96,7 @@
     ]
   },
   "review": {
-    "code_hash": "45f7f76545f03a1900de79f9ea6ec613983459b6",
+    "code_hash": "acbba6ee3af2d46dfcfbf2de12e415ca268ffca7",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -153,37 +153,37 @@
     "groups": {
       "infra-domain": {
         "fast": {
-          "round": 1,
-          "timestamp": "2026-03-20T02:26:41Z",
+          "round": 2,
+          "timestamp": "2026-03-20T05:17:03Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-20T02:26:51Z",
+          "timestamp": "2026-03-20T05:17:21Z",
           "verdict": "zero_findings"
         }
       },
       "other": {
         "fast": {
-          "round": 4,
-          "timestamp": "2026-03-20T02:48:41Z",
+          "round": 5,
+          "timestamp": "2026-03-20T05:17:14Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-20T02:48:46Z",
+          "timestamp": "2026-03-20T05:17:21Z",
           "verdict": "zero_findings"
         }
       },
       "usecase-cli": {
         "fast": {
-          "round": 1,
-          "timestamp": "2026-03-20T02:26:46Z",
+          "round": 2,
+          "timestamp": "2026-03-20T05:17:14Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-20T02:26:55Z",
+          "timestamp": "2026-03-20T05:17:21Z",
           "verdict": "zero_findings"
         }
       }
@@ -191,7 +191,7 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "description": "domain: Split TaskStatus::Done into DonePending/DoneTraced, add BackfillHash transition",
@@ -241,44 +241,44 @@
     {
       "description": "domain: Fold Option<CodeHash> into CodeHash::NotRecorded, remove Option wrapper from ReviewState",
       "id": "T010",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "domain: ReviewGroupState Option pair -> ReviewGroupProgress ADT (NoRounds/FastOnly/FinalOnly/BothRounds)",
       "id": "T011",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "domain: ReviewEscalationResolution String fields -> NonEmptyString for workspace_search_ref/reinvention_check_ref/summary",
       "id": "T012",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "infrastructure/codec + CLI: Propagate Phase C changes — review_from_document/review_to_document for CodeHash/ReviewGroupProgress, review.rs for ReviewEscalationResolution constructor",
       "id": "T013",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "domain: AutoPhaseError String fields -> AutoPhase enum for from/phase/to",
       "id": "T014",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "domain: StatusOverride refactor - extract StatusOverrideKind enum, use NonEmptyString for reason",
       "id": "T015",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "domain: Review group name String -> ReviewGroupName newtype throughout (Vec<String>, HashMap<String, ...>, record_round group: &str, record_round expected_groups: &[String], record_round_with_pending same params)",
       "id": "T016",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "infrastructure/codec + CLI: Propagate Phase D changes — StatusOverride codec, AutoPhaseError callers, ReviewGroupName codec and CLI review.rs (group/expected_groups params)",
       "id": "T017",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "Domain semantics hardening: type-safe states, eliminate stringly-typed fields",
-  "updated_at": "2026-03-20T02:48:46Z"
+  "updated_at": "2026-03-20T05:17:21Z"
 }

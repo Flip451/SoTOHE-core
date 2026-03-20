@@ -7,7 +7,7 @@ use std::collections::{BTreeMap, HashMap};
 
 use thiserror::Error;
 
-use crate::Timestamp;
+use crate::{ReviewGroupName, Timestamp};
 
 /// Errors from review state operations.
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
@@ -70,7 +70,7 @@ pub struct ReviewCycleSummary {
     round: u32,
     timestamp: Timestamp,
     concerns: Vec<ReviewConcern>,
-    groups: Vec<String>,
+    groups: Vec<ReviewGroupName>,
 }
 
 impl ReviewCycleSummary {
@@ -81,7 +81,7 @@ impl ReviewCycleSummary {
         round: u32,
         timestamp: Timestamp,
         concerns: Vec<ReviewConcern>,
-        groups: Vec<String>,
+        groups: Vec<ReviewGroupName>,
     ) -> Self {
         Self { round_type, round, timestamp, concerns, groups }
     }
@@ -112,7 +112,7 @@ impl ReviewCycleSummary {
 
     /// Returns the groups that participated in this cycle.
     #[must_use]
-    pub fn groups(&self) -> &[String] {
+    pub fn groups(&self) -> &[ReviewGroupName] {
         &self.groups
     }
 }
@@ -205,16 +205,20 @@ pub enum ReviewEscalationDecision {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReviewEscalationResolution {
     blocked_concerns: Vec<ReviewConcern>,
-    workspace_search_ref: String,
-    reinvention_check_ref: String,
+    workspace_search_ref: crate::NonEmptyString,
+    reinvention_check_ref: crate::NonEmptyString,
     decision: ReviewEscalationDecision,
-    summary: String,
+    summary: crate::NonEmptyString,
     resolved_at: Timestamp,
 }
 
 impl ReviewEscalationResolution {
     /// Creates a new `ReviewEscalationResolution`.
-    #[must_use]
+    ///
+    /// # Errors
+    ///
+    /// Returns `ReviewError::ResolutionEvidenceMissing` if any of
+    /// `workspace_search_ref`, `reinvention_check_ref`, or `summary` is empty.
     pub fn new(
         blocked_concerns: Vec<ReviewConcern>,
         workspace_search_ref: impl Into<String>,
@@ -222,15 +226,21 @@ impl ReviewEscalationResolution {
         decision: ReviewEscalationDecision,
         summary: impl Into<String>,
         resolved_at: Timestamp,
-    ) -> Self {
-        Self {
+    ) -> Result<Self, ReviewError> {
+        let workspace_search_ref = crate::NonEmptyString::try_new(workspace_search_ref)
+            .map_err(|_| ReviewError::ResolutionEvidenceMissing("workspace_search_ref"))?;
+        let reinvention_check_ref = crate::NonEmptyString::try_new(reinvention_check_ref)
+            .map_err(|_| ReviewError::ResolutionEvidenceMissing("reinvention_check_ref"))?;
+        let summary = crate::NonEmptyString::try_new(summary)
+            .map_err(|_| ReviewError::ResolutionEvidenceMissing("summary"))?;
+        Ok(Self {
             blocked_concerns,
-            workspace_search_ref: workspace_search_ref.into(),
-            reinvention_check_ref: reinvention_check_ref.into(),
+            workspace_search_ref,
+            reinvention_check_ref,
             decision,
-            summary: summary.into(),
+            summary,
             resolved_at,
-        }
+        })
     }
 
     /// Returns the concerns that were blocked at the time of resolution.
@@ -242,13 +252,13 @@ impl ReviewEscalationResolution {
     /// Returns the reference path to the workspace search artifact.
     #[must_use]
     pub fn workspace_search_ref(&self) -> &str {
-        &self.workspace_search_ref
+        self.workspace_search_ref.as_ref()
     }
 
     /// Returns the reference path to the reinvention-check artifact.
     #[must_use]
     pub fn reinvention_check_ref(&self) -> &str {
-        &self.reinvention_check_ref
+        self.reinvention_check_ref.as_ref()
     }
 
     /// Returns the decision made during resolution.
@@ -260,7 +270,7 @@ impl ReviewEscalationResolution {
     /// Returns the human-readable summary of the resolution.
     #[must_use]
     pub fn summary(&self) -> &str {
-        &self.summary
+        self.summary.as_ref()
     }
 
     /// Returns the timestamp string of when the resolution was recorded.
@@ -397,11 +407,14 @@ impl Verdict {
 
 /// Code hash state for review freshness tracking.
 ///
-/// Replaces `Option<String>` with `"PENDING"` sentinel.
-/// `Pending` means a round was recorded but the final hash hasn't been written back yet.
-/// `Computed` holds the actual hash (validated non-empty).
+/// Three-state ADT replacing `Option<CodeHash>`:
+/// - `NotRecorded`: no review round has been recorded yet (initial state).
+/// - `Pending`: a round was recorded but the final hash hasn't been written back yet.
+/// - `Computed`: holds the actual hash (validated non-empty).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CodeHash {
+    /// No review round has been recorded yet (replaces former `None`).
+    NotRecorded,
     /// Hash computation is pending (two-phase protocol intermediate state).
     Pending,
     /// A computed, non-empty hash string.
@@ -430,12 +443,12 @@ impl CodeHash {
 
     /// Returns the hash string if this is a `Computed` variant.
     ///
-    /// Returns `None` for the `Pending` variant.
+    /// Returns `None` for `NotRecorded` and `Pending` variants.
     #[must_use]
     pub fn as_str(&self) -> Option<&str> {
         match self {
             Self::Computed(s) => Some(s),
-            Self::Pending => None,
+            Self::NotRecorded | Self::Pending => None,
         }
     }
 
@@ -443,6 +456,12 @@ impl CodeHash {
     #[must_use]
     pub fn is_pending(&self) -> bool {
         matches!(self, Self::Pending)
+    }
+
+    /// Returns `true` if this is the `NotRecorded` variant.
+    #[must_use]
+    pub fn is_not_recorded(&self) -> bool {
+        matches!(self, Self::NotRecorded)
     }
 }
 
@@ -523,40 +542,80 @@ impl ReviewRoundResult {
     }
 }
 
-/// State of a named review group, tracking fast and final round results.
+/// Progress state of a named review group as an ADT.
+///
+/// Replaces the former `{ fast: Option, final_round: Option }` struct,
+/// making illegal states (e.g., having a final round without a fast round
+/// in normal flow) explicit via variants.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub struct ReviewGroupState {
-    fast: Option<ReviewRoundResult>,
-    final_round: Option<ReviewRoundResult>,
+pub enum ReviewGroupState {
+    /// No rounds recorded yet.
+    #[default]
+    NoRounds,
+    /// Only a fast round has been recorded.
+    FastOnly(ReviewRoundResult),
+    /// Only a final round exists (legacy/backward-compat data).
+    FinalOnly(ReviewRoundResult),
+    /// Both fast and final rounds have been recorded.
+    BothRounds { fast: ReviewRoundResult, final_round: ReviewRoundResult },
 }
 
 impl ReviewGroupState {
+    /// Returns the fast round result, if present.
     #[must_use]
     pub fn fast(&self) -> Option<&ReviewRoundResult> {
-        self.fast.as_ref()
+        match self {
+            Self::FastOnly(r) | Self::BothRounds { fast: r, .. } => Some(r),
+            Self::NoRounds | Self::FinalOnly(_) => None,
+        }
     }
 
+    /// Returns the final round result, if present.
     #[must_use]
     pub fn final_round(&self) -> Option<&ReviewRoundResult> {
-        self.final_round.as_ref()
+        match self {
+            Self::FinalOnly(r) | Self::BothRounds { final_round: r, .. } => Some(r),
+            Self::NoRounds | Self::FastOnly(_) => None,
+        }
     }
 
     /// Creates a group state with only a fast round result.
     #[must_use]
     pub fn with_fast(result: ReviewRoundResult) -> Self {
-        Self { fast: Some(result), final_round: None }
+        Self::FastOnly(result)
     }
 
-    /// Creates a group state with only a final round result.
+    /// Creates a group state with only a final round result (legacy data).
     #[must_use]
     pub fn with_final_only(result: ReviewRoundResult) -> Self {
-        Self { fast: None, final_round: Some(result) }
+        Self::FinalOnly(result)
+    }
+
+    /// Alias for `with_final_only` — used by codec for legacy data clarity.
+    #[must_use]
+    pub fn from_legacy_final_only(result: ReviewRoundResult) -> Self {
+        Self::FinalOnly(result)
     }
 
     /// Creates a group state with both fast and final round results.
     #[must_use]
     pub fn with_both(fast: ReviewRoundResult, final_round: ReviewRoundResult) -> Self {
-        Self { fast: Some(fast), final_round: Some(final_round) }
+        Self::BothRounds { fast, final_round }
+    }
+
+    /// Records a fast round result, clearing any stale final round.
+    pub fn record_fast(&mut self, result: ReviewRoundResult) {
+        *self = Self::FastOnly(result);
+    }
+
+    /// Records a final round result, preserving the existing fast round if present.
+    pub fn record_final(&mut self, result: ReviewRoundResult) {
+        *self = match std::mem::take(self) {
+            Self::FastOnly(fast) | Self::BothRounds { fast, .. } => {
+                Self::BothRounds { fast, final_round: result }
+            }
+            Self::NoRounds | Self::FinalOnly(_) => Self::FinalOnly(result),
+        };
     }
 }
 
@@ -564,8 +623,8 @@ impl ReviewGroupState {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReviewState {
     status: ReviewStatus,
-    code_hash: Option<CodeHash>,
-    groups: HashMap<String, ReviewGroupState>,
+    code_hash: CodeHash,
+    groups: HashMap<ReviewGroupName, ReviewGroupState>,
     escalation: ReviewEscalationState,
 }
 
@@ -581,7 +640,7 @@ impl ReviewState {
     pub fn new() -> Self {
         Self {
             status: ReviewStatus::NotStarted,
-            code_hash: None,
+            code_hash: CodeHash::NotRecorded,
             groups: HashMap::new(),
             escalation: ReviewEscalationState::new(),
         }
@@ -591,8 +650,8 @@ impl ReviewState {
     #[must_use]
     pub fn with_fields(
         status: ReviewStatus,
-        code_hash: Option<CodeHash>,
-        groups: HashMap<String, ReviewGroupState>,
+        code_hash: CodeHash,
+        groups: HashMap<ReviewGroupName, ReviewGroupState>,
         escalation: ReviewEscalationState,
     ) -> Self {
         Self { status, code_hash, groups, escalation }
@@ -606,29 +665,35 @@ impl ReviewState {
 
     /// Returns the stored code hash string, if any.
     ///
-    /// Returns `None` when there is no hash or when the hash is in `Pending` state.
+    /// Returns `None` when hash is `NotRecorded` or `Pending`.
     #[must_use]
     pub fn code_hash(&self) -> Option<&str> {
-        self.code_hash.as_ref().and_then(|ch| ch.as_str())
+        self.code_hash.as_str()
+    }
+
+    /// Returns a reference to the raw `CodeHash` ADT.
+    #[must_use]
+    pub fn code_hash_raw(&self) -> &CodeHash {
+        &self.code_hash
     }
 
     /// Returns the code hash as a string suitable for serialization.
     ///
-    /// - `None` → `None`
-    /// - `Some(Pending)` → `Some("PENDING")`
-    /// - `Some(Computed(s))` → `Some(s)`
+    /// - `NotRecorded` → `None`
+    /// - `Pending` → `Some("PENDING")`
+    /// - `Computed(s)` → `Some(s)`
     #[must_use]
     pub fn code_hash_for_serialization(&self) -> Option<&str> {
         match &self.code_hash {
-            None => None,
-            Some(CodeHash::Pending) => Some("PENDING"),
-            Some(CodeHash::Computed(s)) => Some(s),
+            CodeHash::NotRecorded => None,
+            CodeHash::Pending => Some("PENDING"),
+            CodeHash::Computed(s) => Some(s),
         }
     }
 
     /// Returns the map of review group states.
     #[must_use]
-    pub fn groups(&self) -> &HashMap<String, ReviewGroupState> {
+    pub fn groups(&self) -> &HashMap<ReviewGroupName, ReviewGroupState> {
         &self.groups
     }
 
@@ -661,9 +726,9 @@ impl ReviewState {
     pub fn record_round(
         &mut self,
         round_type: RoundType,
-        group: &str,
+        group: &ReviewGroupName,
         result: ReviewRoundResult,
-        expected_groups: &[String],
+        expected_groups: &[ReviewGroupName],
         current_code_hash: &str,
     ) -> Result<(), ReviewError> {
         // 0. Escalation block check (short-circuit before all other checks).
@@ -674,7 +739,7 @@ impl ReviewState {
         }
 
         // Deduplicate expected_groups to prevent one result satisfying multiple slots.
-        let expected_groups: Vec<String> = {
+        let expected_groups: Vec<ReviewGroupName> = {
             let mut set = std::collections::BTreeSet::new();
             for g in expected_groups {
                 set.insert(g.clone());
@@ -687,29 +752,29 @@ impl ReviewState {
         Self::validate_verdict_concerns(&result)?;
 
         // 1. Code hash freshness check (applies to all round types).
-        // Clear code_hash on mismatch so a subsequent call with the new hash succeeds.
-        if let Some(stored) = self.code_hash.take() {
-            match &stored {
-                CodeHash::Pending => {
-                    // Two-phase protocol hasn't completed. Block like the old "PENDING" string.
+        // NotRecorded means first round — skip freshness check.
+        match &self.code_hash {
+            CodeHash::NotRecorded => {}
+            CodeHash::Pending => {
+                // Two-phase protocol hasn't completed. Block like the old "PENDING" string.
+                self.status = ReviewStatus::Invalidated;
+                self.code_hash = CodeHash::NotRecorded;
+                return Err(ReviewError::StaleCodeHash {
+                    expected: "PENDING".to_owned(),
+                    actual: current_code_hash.to_owned(),
+                });
+            }
+            CodeHash::Computed(stored_str) => {
+                if stored_str != current_code_hash {
+                    let expected = stored_str.clone();
                     self.status = ReviewStatus::Invalidated;
+                    self.code_hash = CodeHash::NotRecorded;
                     return Err(ReviewError::StaleCodeHash {
-                        expected: "PENDING".to_owned(),
+                        expected,
                         actual: current_code_hash.to_owned(),
                     });
                 }
-                CodeHash::Computed(stored_str) => {
-                    if stored_str != current_code_hash {
-                        self.status = ReviewStatus::Invalidated;
-                        return Err(ReviewError::StaleCodeHash {
-                            expected: stored_str.clone(),
-                            actual: current_code_hash.to_owned(),
-                        });
-                    }
-                }
             }
-            // Restore hash if it matched
-            self.code_hash = Some(stored);
         }
 
         // 2. Sequential escalation check (final requires fast_passed or approved)
@@ -721,10 +786,8 @@ impl ReviewState {
         }
 
         // 3. Set/confirm code_hash (validated via computed())
-        self.code_hash = Some(
-            CodeHash::computed(current_code_hash)
-                .map_err(|e| ReviewError::InvalidConcern(format!("invalid code hash: {e}")))?,
-        );
+        self.code_hash = CodeHash::computed(current_code_hash)
+            .map_err(|e| ReviewError::InvalidConcern(format!("invalid code hash: {e}")))?;
 
         // Save timestamp before result is moved into group state.
         let timestamp = result.timestamp_value().clone();
@@ -732,50 +795,14 @@ impl ReviewState {
         // 4. Record round result for the group.
         // When recording a fast round, clear any stale final_round for this group
         // since a new fast cycle invalidates previous final approvals.
-        let group_state = self.groups.entry(group.to_owned()).or_default();
+        let group_state = self.groups.entry(group.clone()).or_default();
         match round_type {
-            RoundType::Fast => {
-                group_state.fast = Some(result);
-                group_state.final_round = None;
-            }
-            RoundType::Final => group_state.final_round = Some(result),
+            RoundType::Fast => group_state.record_fast(result),
+            RoundType::Final => group_state.record_final(result),
         }
 
         // 5. Check promotion/demotion based on aggregated verdicts
-        let all_expected_zero = expected_groups.iter().all(|eg| {
-            self.groups.get(eg).is_some_and(|gs| {
-                let round_result = match round_type {
-                    RoundType::Fast => gs.fast.as_ref(),
-                    RoundType::Final => gs.final_round.as_ref(),
-                };
-                round_result.is_some_and(|r| r.verdict.is_zero_findings())
-            })
-        });
-
-        if all_expected_zero {
-            match round_type {
-                RoundType::Fast => self.status = ReviewStatus::FastPassed,
-                RoundType::Final => self.status = ReviewStatus::Approved,
-            }
-        } else {
-            // Demote if current status is higher than what this round type warrants.
-            // A fast round with findings should not leave status at FastPassed or Approved.
-            // A final round with findings should not leave status at Approved.
-            match round_type {
-                RoundType::Fast => {
-                    if self.status == ReviewStatus::FastPassed
-                        || self.status == ReviewStatus::Approved
-                    {
-                        self.status = ReviewStatus::NotStarted;
-                    }
-                }
-                RoundType::Final => {
-                    if self.status == ReviewStatus::Approved {
-                        self.status = ReviewStatus::FastPassed;
-                    }
-                }
-            }
-        }
+        self.update_status_after_record(round_type, expected_groups);
 
         // 6. Update escalation state after recording.
         self.update_escalation_after_record(round_type, expected_groups, &timestamp);
@@ -802,9 +829,9 @@ impl ReviewState {
     pub fn record_round_with_pending(
         &mut self,
         round_type: RoundType,
-        group: &str,
+        group: &ReviewGroupName,
         result: ReviewRoundResult,
-        expected_groups: &[String],
+        expected_groups: &[ReviewGroupName],
         pre_update_hash: &str,
     ) -> Result<(), ReviewError> {
         // 0. Escalation block check (short-circuit before all other checks).
@@ -815,7 +842,7 @@ impl ReviewState {
         }
 
         // Deduplicate expected_groups to prevent one result satisfying multiple slots.
-        let expected_groups: Vec<String> = {
+        let expected_groups: Vec<ReviewGroupName> = {
             let mut set = std::collections::BTreeSet::new();
             for g in expected_groups {
                 set.insert(g.clone());
@@ -827,30 +854,30 @@ impl ReviewState {
         // 0b. Verdict/concerns consistency check.
         Self::validate_verdict_concerns(&result)?;
 
-        // 1. Code hash freshness check — skip if None (first round).
-        let taken_hash = self.code_hash.take();
-        if let Some(ref stored) = taken_hash {
-            match stored {
-                CodeHash::Pending => {
-                    // Previous two-phase protocol hasn't completed.
-                    // Block: the old "PENDING" string always mismatched, so preserve that behavior.
+        // 1. Code hash freshness check — skip if NotRecorded (first round).
+        let saved_hash = self.code_hash.clone();
+        match &self.code_hash {
+            CodeHash::NotRecorded => {}
+            CodeHash::Pending => {
+                // Previous two-phase protocol hasn't completed.
+                self.status = ReviewStatus::Invalidated;
+                self.code_hash = CodeHash::NotRecorded;
+                return Err(ReviewError::StaleCodeHash {
+                    expected: "PENDING".to_owned(),
+                    actual: pre_update_hash.to_owned(),
+                });
+            }
+            CodeHash::Computed(stored_str) => {
+                if stored_str != pre_update_hash {
+                    let expected = stored_str.clone();
                     self.status = ReviewStatus::Invalidated;
+                    self.code_hash = CodeHash::NotRecorded;
                     return Err(ReviewError::StaleCodeHash {
-                        expected: "PENDING".to_owned(),
+                        expected,
                         actual: pre_update_hash.to_owned(),
                     });
                 }
-                CodeHash::Computed(stored_str) => {
-                    if stored_str != pre_update_hash {
-                        self.status = ReviewStatus::Invalidated;
-                        return Err(ReviewError::StaleCodeHash {
-                            expected: stored_str.clone(),
-                            actual: pre_update_hash.to_owned(),
-                        });
-                    }
-                }
             }
-            // hash matched — code_hash cleared by take(); will be set to PENDING below
         }
 
         // 2. Sequential escalation check (final requires fast_passed or approved).
@@ -860,58 +887,25 @@ impl ReviewState {
             && self.status != ReviewStatus::FastPassed
             && self.status != ReviewStatus::Approved
         {
-            self.code_hash = taken_hash;
+            self.code_hash = saved_hash;
             return Err(ReviewError::FinalRequiresFastPassed(self.status));
         }
 
         // 3. Set code_hash to the PENDING sentinel
-        self.code_hash = Some(CodeHash::Pending);
+        self.code_hash = CodeHash::Pending;
 
         // Save timestamp before result is moved into group state.
         let timestamp = result.timestamp_value().clone();
 
         // 4. Record round result for the group.
-        let group_state = self.groups.entry(group.to_owned()).or_default();
+        let group_state = self.groups.entry(group.clone()).or_default();
         match round_type {
-            RoundType::Fast => {
-                group_state.fast = Some(result);
-                group_state.final_round = None;
-            }
-            RoundType::Final => group_state.final_round = Some(result),
+            RoundType::Fast => group_state.record_fast(result),
+            RoundType::Final => group_state.record_final(result),
         }
 
         // 5. Check promotion/demotion based on aggregated verdicts
-        let all_expected_zero = expected_groups.iter().all(|eg| {
-            self.groups.get(eg).is_some_and(|gs| {
-                let round_result = match round_type {
-                    RoundType::Fast => gs.fast.as_ref(),
-                    RoundType::Final => gs.final_round.as_ref(),
-                };
-                round_result.is_some_and(|r| r.verdict.is_zero_findings())
-            })
-        });
-
-        if all_expected_zero {
-            match round_type {
-                RoundType::Fast => self.status = ReviewStatus::FastPassed,
-                RoundType::Final => self.status = ReviewStatus::Approved,
-            }
-        } else {
-            match round_type {
-                RoundType::Fast => {
-                    if self.status == ReviewStatus::FastPassed
-                        || self.status == ReviewStatus::Approved
-                    {
-                        self.status = ReviewStatus::NotStarted;
-                    }
-                }
-                RoundType::Final => {
-                    if self.status == ReviewStatus::Approved {
-                        self.status = ReviewStatus::FastPassed;
-                    }
-                }
-            }
-        }
+        self.update_status_after_record(round_type, expected_groups);
 
         // 6. Update escalation state after recording.
         self.update_escalation_after_record(round_type, expected_groups, &timestamp);
@@ -939,12 +933,51 @@ impl ReviewState {
         Ok(())
     }
 
+    /// Promotes or demotes review status based on aggregated group verdicts.
+    fn update_status_after_record(
+        &mut self,
+        round_type: RoundType,
+        expected_groups: &[ReviewGroupName],
+    ) {
+        let all_expected_zero = expected_groups.iter().all(|eg| {
+            self.groups.get(eg).is_some_and(|gs| {
+                let round_result = match round_type {
+                    RoundType::Fast => gs.fast(),
+                    RoundType::Final => gs.final_round(),
+                };
+                round_result.is_some_and(|r| r.verdict().is_zero_findings())
+            })
+        });
+
+        if all_expected_zero {
+            match round_type {
+                RoundType::Fast => self.status = ReviewStatus::FastPassed,
+                RoundType::Final => self.status = ReviewStatus::Approved,
+            }
+        } else {
+            match round_type {
+                RoundType::Fast => {
+                    if self.status == ReviewStatus::FastPassed
+                        || self.status == ReviewStatus::Approved
+                    {
+                        self.status = ReviewStatus::NotStarted;
+                    }
+                }
+                RoundType::Final => {
+                    if self.status == ReviewStatus::Approved {
+                        self.status = ReviewStatus::FastPassed;
+                    }
+                }
+            }
+        }
+    }
+
     /// Called after recording a round result. Checks if a closed cycle is complete
     /// and updates escalation state accordingly.
     fn update_escalation_after_record(
         &mut self,
         round_type: RoundType,
-        expected_groups: &[String],
+        expected_groups: &[ReviewGroupName],
         timestamp: &Timestamp,
     ) {
         // 1. Check if cycle is closed: all expected groups have recorded this round_type
@@ -1062,7 +1095,7 @@ impl ReviewState {
     /// Returns `ReviewError::InvalidConcern` if the hash is empty, whitespace-only,
     /// or the reserved `"PENDING"` literal.
     pub fn set_code_hash(&mut self, hash: String) -> Result<(), ReviewError> {
-        self.code_hash = Some(CodeHash::computed(hash)?);
+        self.code_hash = CodeHash::computed(hash)?;
         Ok(())
     }
 
@@ -1087,25 +1120,28 @@ impl ReviewState {
             return Err(ReviewError::NotApproved(self.status));
         }
         match &self.code_hash {
-            Some(CodeHash::Pending) => {
+            CodeHash::NotRecorded => {}
+            CodeHash::Pending => {
                 // Pending means the two-phase protocol hasn't completed.
                 // Reject commit — the real hash was never written back.
                 self.status = ReviewStatus::Invalidated;
+                self.code_hash = CodeHash::NotRecorded;
                 return Err(ReviewError::StaleCodeHash {
                     expected: "PENDING".to_owned(),
                     actual: current_code_hash.to_owned(),
                 });
             }
-            Some(CodeHash::Computed(stored_str)) => {
+            CodeHash::Computed(stored_str) => {
                 if stored_str != current_code_hash {
+                    let expected = stored_str.clone();
                     self.status = ReviewStatus::Invalidated;
+                    self.code_hash = CodeHash::NotRecorded;
                     return Err(ReviewError::StaleCodeHash {
-                        expected: stored_str.clone(),
+                        expected,
                         actual: current_code_hash.to_owned(),
                     });
                 }
             }
-            None => {}
         }
         Ok(())
     }
@@ -1116,7 +1152,7 @@ impl ReviewState {
     /// is accepted (fresh start), preventing permanent deadlock.
     pub fn invalidate(&mut self) {
         self.status = ReviewStatus::Invalidated;
-        self.code_hash = None;
+        self.code_hash = CodeHash::NotRecorded;
     }
 
     /// Resolves an active escalation block.
@@ -1143,17 +1179,8 @@ impl ReviewState {
             EscalationPhase::Clear => return Err(ReviewError::EscalationNotActive),
         };
 
-        // Validate evidence references and required fields
-        if resolution.workspace_search_ref.trim().is_empty() {
-            return Err(ReviewError::ResolutionEvidenceMissing("workspace_search_ref"));
-        }
-        if resolution.reinvention_check_ref.trim().is_empty() {
-            return Err(ReviewError::ResolutionEvidenceMissing("reinvention_check_ref"));
-        }
-        if resolution.summary.trim().is_empty() {
-            return Err(ReviewError::ResolutionEvidenceMissing("summary"));
-        }
-        // resolved_at is a Timestamp — validity is guaranteed by its constructor.
+        // Evidence fields (workspace_search_ref, reinvention_check_ref, summary)
+        // are validated at construction time via NonEmptyString.
 
         // Validate concerns match (order-insensitive: sort both before comparing).
         let mut expected: Vec<String> =
@@ -1171,7 +1198,7 @@ impl ReviewState {
         self.escalation.phase = EscalationPhase::Clear;
         self.escalation.last_resolution = Some(resolution);
         self.status = ReviewStatus::Invalidated;
-        self.code_hash = None;
+        self.code_hash = CodeHash::NotRecorded;
 
         Ok(())
     }
@@ -1198,6 +1225,10 @@ mod tests {
             ts("2026-03-18T00:00:00Z"),
             vec![concern],
         )
+    }
+
+    fn gn(s: &str) -> ReviewGroupName {
+        ReviewGroupName::try_new(s).unwrap()
     }
 
     // --- ReviewStatus tests ---
@@ -1230,19 +1261,19 @@ mod tests {
     #[test]
     fn test_record_fast_zero_findings_for_single_group_promotes_to_fast_passed() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
 
         assert_eq!(state.status(), ReviewStatus::FastPassed);
         assert_eq!(state.code_hash(), Some("abc123"));
-        assert!(state.groups().get("group-a").unwrap().fast().is_some());
+        assert!(state.groups().get(&gn("group-a")).unwrap().fast().is_some());
     }
 
     #[test]
     fn test_record_fast_partial_groups_does_not_promote() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned(), "group-b".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a"), gn("group-b")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
 
         // Only one of two expected groups recorded — no promotion
         assert_eq!(state.status(), ReviewStatus::NotStarted);
@@ -1251,9 +1282,9 @@ mod tests {
     #[test]
     fn test_record_fast_all_groups_zero_findings_promotes() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned(), "group-b".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Fast, "group-b", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a"), gn("group-b")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-b"), zero(), &expected, "abc123").unwrap();
 
         assert_eq!(state.status(), ReviewStatus::FastPassed);
     }
@@ -1261,9 +1292,11 @@ mod tests {
     #[test]
     fn test_record_fast_findings_remain_blocks_promotion() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned(), "group-b".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", findings(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Fast, "group-b", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a"), gn("group-b")];
+        state
+            .record_round(RoundType::Fast, &gn("group-a"), findings(), &expected, "abc123")
+            .unwrap();
+        state.record_round(RoundType::Fast, &gn("group-b"), zero(), &expected, "abc123").unwrap();
 
         // group-a has findings_remain — no promotion
         assert_eq!(state.status(), ReviewStatus::NotStarted);
@@ -1272,13 +1305,13 @@ mod tests {
     #[test]
     fn test_record_fast_does_not_overwrite_other_groups() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned(), "group-b".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Fast, "group-b", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a"), gn("group-b")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-b"), zero(), &expected, "abc123").unwrap();
 
         // Both groups should exist
-        assert!(state.groups().get("group-a").unwrap().fast().is_some());
-        assert!(state.groups().get("group-b").unwrap().fast().is_some());
+        assert!(state.groups().get(&gn("group-a")).unwrap().fast().is_some());
+        assert!(state.groups().get(&gn("group-b")).unwrap().fast().is_some());
     }
 
     // --- record_round: final round recording ---
@@ -1286,19 +1319,20 @@ mod tests {
     #[test]
     fn test_record_final_after_fast_passed_succeeds() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
         assert_eq!(state.status(), ReviewStatus::FastPassed);
 
-        state.record_round(RoundType::Final, "group-a", zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Final, &gn("group-a"), zero(), &expected, "abc123").unwrap();
         assert_eq!(state.status(), ReviewStatus::Approved);
     }
 
     #[test]
     fn test_record_final_without_fast_passed_fails() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
-        let result = state.record_round(RoundType::Final, "group-a", zero(), &expected, "abc123");
+        let expected = vec![gn("group-a")];
+        let result =
+            state.record_round(RoundType::Final, &gn("group-a"), zero(), &expected, "abc123");
 
         assert!(matches!(
             result,
@@ -1309,26 +1343,28 @@ mod tests {
     #[test]
     fn test_record_final_partial_groups_does_not_promote() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned(), "group-b".to_owned()];
+        let expected = vec![gn("group-a"), gn("group-b")];
         // Fast pass both
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Fast, "group-b", zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-b"), zero(), &expected, "abc123").unwrap();
         assert_eq!(state.status(), ReviewStatus::FastPassed);
 
         // Final only for group-a
-        state.record_round(RoundType::Final, "group-a", zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Final, &gn("group-a"), zero(), &expected, "abc123").unwrap();
         assert_eq!(state.status(), ReviewStatus::FastPassed); // Not promoted yet
     }
 
     #[test]
     fn test_record_final_findings_remain_blocks_promotion() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned(), "group-b".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Fast, "group-b", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a"), gn("group-b")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-b"), zero(), &expected, "abc123").unwrap();
 
-        state.record_round(RoundType::Final, "group-a", findings(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Final, "group-b", zero(), &expected, "abc123").unwrap();
+        state
+            .record_round(RoundType::Final, &gn("group-a"), findings(), &expected, "abc123")
+            .unwrap();
+        state.record_round(RoundType::Final, &gn("group-b"), zero(), &expected, "abc123").unwrap();
 
         assert_eq!(state.status(), ReviewStatus::FastPassed); // findings in A blocks
     }
@@ -1338,10 +1374,11 @@ mod tests {
     #[test]
     fn test_record_round_stale_code_hash_rejects_and_invalidates() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
 
-        let result = state.record_round(RoundType::Fast, "group-a", zero(), &expected, "def456");
+        let result =
+            state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "def456");
 
         assert!(matches!(
             result,
@@ -1354,8 +1391,8 @@ mod tests {
     #[test]
     fn test_record_round_first_round_sets_code_hash() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
 
         assert_eq!(state.code_hash(), Some("abc123"));
     }
@@ -1363,11 +1400,12 @@ mod tests {
     #[test]
     fn test_record_final_stale_code_hash_rejects() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
         assert_eq!(state.status(), ReviewStatus::FastPassed);
 
-        let result = state.record_round(RoundType::Final, "group-a", zero(), &expected, "new-hash");
+        let result =
+            state.record_round(RoundType::Final, &gn("group-a"), zero(), &expected, "new-hash");
         assert!(matches!(result, Err(ReviewError::StaleCodeHash { .. })));
         assert_eq!(state.status(), ReviewStatus::Invalidated);
     }
@@ -1377,9 +1415,9 @@ mod tests {
     #[test]
     fn test_check_commit_ready_approved_with_matching_hash_succeeds() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Final, "group-a", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Final, &gn("group-a"), zero(), &expected, "abc123").unwrap();
         assert_eq!(state.status(), ReviewStatus::Approved);
 
         assert!(state.check_commit_ready("abc123").is_ok());
@@ -1388,8 +1426,8 @@ mod tests {
     #[test]
     fn test_check_commit_ready_not_approved_fails() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
 
         let result = state.check_commit_ready("abc123");
         assert!(matches!(result, Err(ReviewError::NotApproved(ReviewStatus::FastPassed))));
@@ -1398,9 +1436,9 @@ mod tests {
     #[test]
     fn test_check_commit_ready_stale_hash_rejects_and_invalidates() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Final, "group-a", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Final, &gn("group-a"), zero(), &expected, "abc123").unwrap();
         assert_eq!(state.status(), ReviewStatus::Approved);
 
         let result = state.check_commit_ready("new-hash");
@@ -1413,64 +1451,72 @@ mod tests {
     #[test]
     fn test_fast_findings_after_fast_passed_demotes_to_not_started() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
         assert_eq!(state.status(), ReviewStatus::FastPassed);
 
         // Record a new fast round with findings — should demote
-        state.record_round(RoundType::Fast, "group-a", findings(), &expected, "abc123").unwrap();
+        state
+            .record_round(RoundType::Fast, &gn("group-a"), findings(), &expected, "abc123")
+            .unwrap();
         assert_eq!(state.status(), ReviewStatus::NotStarted);
     }
 
     #[test]
     fn test_fast_findings_after_approved_demotes_to_not_started() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Final, "group-a", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Final, &gn("group-a"), zero(), &expected, "abc123").unwrap();
         assert_eq!(state.status(), ReviewStatus::Approved);
 
         // Fast round with findings on approved track — demotes to not_started
-        state.record_round(RoundType::Fast, "group-a", findings(), &expected, "abc123").unwrap();
+        state
+            .record_round(RoundType::Fast, &gn("group-a"), findings(), &expected, "abc123")
+            .unwrap();
         assert_eq!(state.status(), ReviewStatus::NotStarted);
     }
 
     #[test]
     fn test_final_findings_after_approved_demotes_to_fast_passed() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned(), "group-b".to_owned()];
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Fast, "group-b", zero(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Final, "group-a", zero(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Final, "group-b", zero(), &expected, "abc123").unwrap();
+        let expected = vec![gn("group-a"), gn("group-b")];
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-b"), zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Final, &gn("group-a"), zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Final, &gn("group-b"), zero(), &expected, "abc123").unwrap();
         assert_eq!(state.status(), ReviewStatus::Approved);
 
         // Final round with findings — demotes to fast_passed
-        state.record_round(RoundType::Final, "group-a", findings(), &expected, "abc123").unwrap();
+        state
+            .record_round(RoundType::Final, &gn("group-a"), findings(), &expected, "abc123")
+            .unwrap();
         assert_eq!(state.status(), ReviewStatus::FastPassed);
     }
 
     #[test]
     fn test_fast_rerun_clears_stale_final_round() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned(), "group-b".to_owned()];
+        let expected = vec![gn("group-a"), gn("group-b")];
 
         // Full approval cycle
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Fast, "group-b", zero(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Final, "group-a", zero(), &expected, "abc123").unwrap();
-        state.record_round(RoundType::Final, "group-b", zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-b"), zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Final, &gn("group-a"), zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Final, &gn("group-b"), zero(), &expected, "abc123").unwrap();
         assert_eq!(state.status(), ReviewStatus::Approved);
 
         // Re-run fast for group-a with findings — should clear group-a's final_round
-        state.record_round(RoundType::Fast, "group-a", findings(), &expected, "abc123").unwrap();
+        state
+            .record_round(RoundType::Fast, &gn("group-a"), findings(), &expected, "abc123")
+            .unwrap();
         assert_eq!(state.status(), ReviewStatus::NotStarted);
-        assert!(state.groups().get("group-a").unwrap().final_round().is_none());
+        assert!(state.groups().get(&gn("group-a")).unwrap().final_round().is_none());
         // group-b's final_round should still be intact
-        assert!(state.groups().get("group-b").unwrap().final_round().is_some());
+        assert!(state.groups().get(&gn("group-b")).unwrap().final_round().is_some());
 
         // Now re-pass fast for group-a and try to go to final
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123").unwrap();
         // group-a still has no final_round, so final aggregation should NOT promote
         // even though group-b has an old final zero_findings
         assert_eq!(state.status(), ReviewStatus::FastPassed);
@@ -1478,7 +1524,7 @@ mod tests {
         // After group-a's fast rerun cleared group-a's final, re-record group-a's final.
         // group-b's final is still valid (its fast was not re-run, same code_hash).
         // Both groups now have final zero_findings → promotes to Approved.
-        state.record_round(RoundType::Final, "group-a", zero(), &expected, "abc123").unwrap();
+        state.record_round(RoundType::Final, &gn("group-a"), zero(), &expected, "abc123").unwrap();
         assert_eq!(state.status(), ReviewStatus::Approved);
     }
 
@@ -1494,20 +1540,20 @@ mod tests {
     #[test]
     fn test_record_round_after_stale_hash_invalidation_accepts_new_hash() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
+        let expected = vec![gn("group-a")];
 
         // First round sets code_hash
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "hash1").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "hash1").unwrap();
         assert_eq!(state.status(), ReviewStatus::FastPassed);
 
         // Stale hash → invalidation + code_hash cleared
-        let err = state.record_round(RoundType::Fast, "group-a", zero(), &expected, "hash2");
+        let err = state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "hash2");
         assert!(matches!(err, Err(ReviewError::StaleCodeHash { .. })));
         assert_eq!(state.status(), ReviewStatus::Invalidated);
         assert!(state.code_hash().is_none());
 
         // Re-run with new hash should succeed (fresh start)
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "hash2").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "hash2").unwrap();
         assert_eq!(state.status(), ReviewStatus::FastPassed);
         assert_eq!(state.code_hash(), Some("hash2"));
     }
@@ -1517,9 +1563,15 @@ mod tests {
     #[test]
     fn test_record_round_with_pending_sets_code_hash_to_pending() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
+        let expected = vec![gn("group-a")];
         state
-            .record_round_with_pending(RoundType::Fast, "group-a", zero(), &expected, "pre-hash")
+            .record_round_with_pending(
+                RoundType::Fast,
+                &gn("group-a"),
+                zero(),
+                &expected,
+                "pre-hash",
+            )
             .unwrap();
         // code_hash() returns None for Pending; use code_hash_for_serialization() to get "PENDING"
         assert!(state.code_hash().is_none());
@@ -1530,10 +1582,10 @@ mod tests {
     fn test_record_round_with_pending_first_round_skips_freshness_check() {
         let mut state = ReviewState::new();
         // code_hash is None initially — freshness check must be skipped
-        let expected = vec!["group-a".to_owned()];
+        let expected = vec![gn("group-a")];
         let result = state.record_round_with_pending(
             RoundType::Fast,
-            "group-a",
+            &gn("group-a"),
             zero(),
             &expected,
             "any-hash",
@@ -1546,14 +1598,19 @@ mod tests {
     #[test]
     fn test_record_round_with_pending_subsequent_round_checks_freshness() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
+        let expected = vec![gn("group-a")];
         // Set up a code_hash via record_round first
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "hash1").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "hash1").unwrap();
         assert_eq!(state.code_hash(), Some("hash1"));
 
         // Passing correct pre_update_hash should succeed
-        let result =
-            state.record_round_with_pending(RoundType::Fast, "group-a", zero(), &expected, "hash1");
+        let result = state.record_round_with_pending(
+            RoundType::Fast,
+            &gn("group-a"),
+            zero(),
+            &expected,
+            "hash1",
+        );
         assert!(result.is_ok());
         assert!(state.code_hash().is_none());
         assert_eq!(state.code_hash_for_serialization(), Some("PENDING"));
@@ -1562,14 +1619,14 @@ mod tests {
     #[test]
     fn test_record_round_with_pending_stale_hash_rejects_and_invalidates() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
+        let expected = vec![gn("group-a")];
         // Set up a code_hash
-        state.record_round(RoundType::Fast, "group-a", zero(), &expected, "hash1").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "hash1").unwrap();
 
         // Wrong pre_update_hash → should fail
         let result = state.record_round_with_pending(
             RoundType::Fast,
-            "group-a",
+            &gn("group-a"),
             zero(),
             &expected,
             "wrong-hash",
@@ -1585,10 +1642,10 @@ mod tests {
     #[test]
     fn test_record_round_with_pending_final_without_fast_passed_fails() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
+        let expected = vec![gn("group-a")];
         let result = state.record_round_with_pending(
             RoundType::Final,
-            "group-a",
+            &gn("group-a"),
             zero(),
             &expected,
             "any-hash",
@@ -1602,12 +1659,18 @@ mod tests {
     #[test]
     fn test_record_round_with_pending_records_group_result() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
+        let expected = vec![gn("group-a")];
         state
-            .record_round_with_pending(RoundType::Fast, "group-a", zero(), &expected, "pre-hash")
+            .record_round_with_pending(
+                RoundType::Fast,
+                &gn("group-a"),
+                zero(),
+                &expected,
+                "pre-hash",
+            )
             .unwrap();
-        assert!(state.groups().get("group-a").is_some());
-        assert!(state.groups().get("group-a").unwrap().fast().is_some());
+        assert!(state.groups().get(&gn("group-a")).is_some());
+        assert!(state.groups().get(&gn("group-a")).unwrap().fast().is_some());
     }
 
     // --- set_code_hash ---
@@ -1633,13 +1696,13 @@ mod tests {
         // 1. record_round_with_pending with pre_update_hash
         // 2. set_code_hash with the computed post-update hash
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
+        let expected = vec![gn("group-a")];
 
         // Phase 1: record with PENDING
         state
             .record_round_with_pending(
                 RoundType::Fast,
-                "group-a",
+                &gn("group-a"),
                 zero(),
                 &expected,
                 "pre-update-hash",
@@ -1738,14 +1801,20 @@ mod tests {
             BTreeMap::new(),
             None,
         );
-        ReviewState::with_fields(ReviewStatus::NotStarted, None, HashMap::new(), escalation)
+        ReviewState::with_fields(
+            ReviewStatus::NotStarted,
+            CodeHash::NotRecorded,
+            HashMap::new(),
+            escalation,
+        )
     }
 
     #[test]
     fn test_record_round_rejects_when_escalation_blocked() {
         let mut state = blocked_review_state();
-        let expected = vec!["group-a".to_owned()];
-        let result = state.record_round(RoundType::Fast, "group-a", zero(), &expected, "abc123");
+        let expected = vec![gn("group-a")];
+        let result =
+            state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "abc123");
         assert!(
             matches!(result, Err(ReviewError::EscalationActive { ref concerns }) if !concerns.is_empty()),
             "expected EscalationActive, got {result:?}"
@@ -1755,10 +1824,10 @@ mod tests {
     #[test]
     fn test_record_round_with_pending_rejects_when_escalation_blocked() {
         let mut state = blocked_review_state();
-        let expected = vec!["group-a".to_owned()];
+        let expected = vec![gn("group-a")];
         let result = state.record_round_with_pending(
             RoundType::Fast,
-            "group-a",
+            &gn("group-a"),
             zero(),
             &expected,
             "abc123",
@@ -1783,7 +1852,7 @@ mod tests {
         // Use Approved status so the only block is escalation
         let mut state = ReviewState::with_fields(
             ReviewStatus::Approved,
-            Some(CodeHash::Computed("abc123".to_owned())),
+            CodeHash::Computed("abc123".to_owned()),
             HashMap::new(),
             escalation,
         );
@@ -1809,12 +1878,13 @@ mod tests {
         );
         let mut state = ReviewState::with_fields(
             ReviewStatus::NotStarted,
-            Some(CodeHash::Computed("old-hash".to_owned())),
+            CodeHash::Computed("old-hash".to_owned()),
             HashMap::new(),
             escalation,
         );
-        let expected = vec!["group-a".to_owned()];
-        let result = state.record_round(RoundType::Fast, "group-a", zero(), &expected, "new-hash");
+        let expected = vec![gn("group-a")];
+        let result =
+            state.record_round(RoundType::Fast, &gn("group-a"), zero(), &expected, "new-hash");
         assert!(
             matches!(result, Err(ReviewError::EscalationActive { .. })),
             "expected EscalationActive before StaleCodeHash, got {result:?}"
@@ -1847,7 +1917,7 @@ mod tests {
     fn test_with_fields_preserves_all_fields() {
         let mut groups = HashMap::new();
         groups.insert(
-            "g1".to_owned(),
+            gn("g1"),
             ReviewGroupState::with_fast(ReviewRoundResult::new(
                 1,
                 Verdict::ZeroFindings,
@@ -1857,7 +1927,7 @@ mod tests {
 
         let state = ReviewState::with_fields(
             ReviewStatus::FastPassed,
-            Some(CodeHash::Computed("hash123".to_owned())),
+            CodeHash::Computed("hash123".to_owned()),
             groups.clone(),
             ReviewEscalationState::default(),
         );
@@ -1881,7 +1951,12 @@ mod tests {
             BTreeMap::new(),
             None,
         );
-        ReviewState::with_fields(ReviewStatus::NotStarted, None, HashMap::new(), escalation)
+        ReviewState::with_fields(
+            ReviewStatus::NotStarted,
+            CodeHash::NotRecorded,
+            HashMap::new(),
+            escalation,
+        )
     }
 
     fn valid_resolution() -> ReviewEscalationResolution {
@@ -1893,6 +1968,7 @@ mod tests {
             "Justified: no suitable crate".to_owned(),
             ts("2026-03-19T01:00:00Z"),
         )
+        .unwrap()
     }
 
     #[test]
@@ -1913,11 +1989,15 @@ mod tests {
     }
 
     #[test]
-    fn test_resolve_escalation_rejects_empty_workspace_search_ref() {
-        let mut state = blocked_state();
-        let mut res = valid_resolution();
-        res.workspace_search_ref = "".to_owned();
-        let result = state.resolve_escalation(res);
+    fn test_resolution_constructor_rejects_empty_workspace_search_ref() {
+        let result = ReviewEscalationResolution::new(
+            vec![ReviewConcern::try_new("shell-parsing").unwrap()],
+            "",
+            "reinvention.md",
+            ReviewEscalationDecision::ContinueSelfImplementation,
+            "summary",
+            ts("2026-03-19T01:00:00Z"),
+        );
         assert!(matches!(
             result,
             Err(ReviewError::ResolutionEvidenceMissing("workspace_search_ref"))
@@ -1925,11 +2005,15 @@ mod tests {
     }
 
     #[test]
-    fn test_resolve_escalation_rejects_empty_reinvention_check_ref() {
-        let mut state = blocked_state();
-        let mut res = valid_resolution();
-        res.reinvention_check_ref = "  ".to_owned();
-        let result = state.resolve_escalation(res);
+    fn test_resolution_constructor_rejects_empty_reinvention_check_ref() {
+        let result = ReviewEscalationResolution::new(
+            vec![ReviewConcern::try_new("shell-parsing").unwrap()],
+            "search.md",
+            "  ",
+            ReviewEscalationDecision::ContinueSelfImplementation,
+            "summary",
+            ts("2026-03-19T01:00:00Z"),
+        );
         assert!(matches!(
             result,
             Err(ReviewError::ResolutionEvidenceMissing("reinvention_check_ref"))
@@ -1937,19 +2021,30 @@ mod tests {
     }
 
     #[test]
-    fn test_resolve_escalation_rejects_empty_summary() {
-        let mut state = blocked_state();
-        let mut res = valid_resolution();
-        res.summary = "".to_owned();
-        let result = state.resolve_escalation(res);
+    fn test_resolution_constructor_rejects_empty_summary() {
+        let result = ReviewEscalationResolution::new(
+            vec![ReviewConcern::try_new("shell-parsing").unwrap()],
+            "search.md",
+            "reinvention.md",
+            ReviewEscalationDecision::ContinueSelfImplementation,
+            "",
+            ts("2026-03-19T01:00:00Z"),
+        );
         assert!(matches!(result, Err(ReviewError::ResolutionEvidenceMissing("summary"))));
     }
 
     #[test]
     fn test_resolve_escalation_rejects_mismatched_concerns() {
         let mut state = blocked_state();
-        let mut res = valid_resolution();
-        res.blocked_concerns = vec![ReviewConcern::try_new("different-concern").unwrap()];
+        let res = ReviewEscalationResolution::new(
+            vec![ReviewConcern::try_new("different-concern").unwrap()],
+            "search.md",
+            "reinvention.md",
+            ReviewEscalationDecision::ContinueSelfImplementation,
+            "summary",
+            ts("2026-03-19T01:00:00Z"),
+        )
+        .unwrap();
         let result = state.resolve_escalation(res);
         assert!(matches!(result, Err(ReviewError::ResolutionConcernMismatch { .. })));
     }
@@ -1962,13 +2057,12 @@ mod tests {
         // (one result satisfying multiple slots).
         let mut state = ReviewState::new();
         // "group-a" appears twice in expected_groups — must be deduplicated to one entry.
-        let expected_with_dups =
-            vec!["group-a".to_owned(), "group-a".to_owned(), "group-b".to_owned()];
+        let expected_with_dups = vec![gn("group-a"), gn("group-a"), gn("group-b")];
 
         // Record only group-a — with duplicates this might incorrectly satisfy
         // both "group-a" slots and cause a false promotion.
         state
-            .record_round(RoundType::Fast, "group-a", zero(), &expected_with_dups, "abc123")
+            .record_round(RoundType::Fast, &gn("group-a"), zero(), &expected_with_dups, "abc123")
             .unwrap();
 
         // After dedup, expected_groups is ["group-a", "group-b"].
@@ -1981,7 +2075,7 @@ mod tests {
 
         // Now record group-b as well — both unique groups have zero_findings, so promote.
         state
-            .record_round(RoundType::Fast, "group-b", zero(), &expected_with_dups, "abc123")
+            .record_round(RoundType::Fast, &gn("group-b"), zero(), &expected_with_dups, "abc123")
             .unwrap();
         assert_eq!(state.status(), ReviewStatus::FastPassed);
     }
@@ -1991,7 +2085,7 @@ mod tests {
     #[test]
     fn test_record_round_rejects_zero_findings_with_concerns() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
+        let expected = vec![gn("group-a")];
         let concern = ReviewConcern::try_new("some-concern").unwrap();
         let result_with_concern = ReviewRoundResult::new_with_concerns(
             1,
@@ -2001,7 +2095,7 @@ mod tests {
         );
         let result = state.record_round(
             RoundType::Fast,
-            "group-a",
+            &gn("group-a"),
             result_with_concern,
             &expected,
             "abc123",
@@ -2015,11 +2109,16 @@ mod tests {
     #[test]
     fn test_record_round_rejects_findings_remain_without_concerns() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
+        let expected = vec![gn("group-a")];
         let result_no_concerns =
             ReviewRoundResult::new(1, Verdict::FindingsRemain, ts("2026-03-19T00:00:00Z"));
-        let result =
-            state.record_round(RoundType::Fast, "group-a", result_no_concerns, &expected, "abc123");
+        let result = state.record_round(
+            RoundType::Fast,
+            &gn("group-a"),
+            result_no_concerns,
+            &expected,
+            "abc123",
+        );
         assert!(
             matches!(result, Err(ReviewError::InvalidConcern(_))),
             "expected InvalidConcern for findings_remain with empty concerns, got {result:?}"
@@ -2042,8 +2141,12 @@ mod tests {
             BTreeMap::new(),
             None,
         );
-        let mut state =
-            ReviewState::with_fields(ReviewStatus::NotStarted, None, HashMap::new(), escalation);
+        let mut state = ReviewState::with_fields(
+            ReviewStatus::NotStarted,
+            CodeHash::NotRecorded,
+            HashMap::new(),
+            escalation,
+        );
 
         // Resolution with concerns in reverse order [b, a]
         let resolution = ReviewEscalationResolution::new(
@@ -2053,7 +2156,8 @@ mod tests {
             ReviewEscalationDecision::ContinueSelfImplementation,
             "justified",
             ts("2026-03-19T01:00:00Z"),
-        );
+        )
+        .unwrap();
         let result = state.resolve_escalation(resolution);
         assert!(result.is_ok(), "expected Ok for reordered concerns, got {result:?}");
     }
@@ -2072,22 +2176,22 @@ mod tests {
     #[test]
     fn test_escalation_triggers_after_3_consecutive_same_concern_cycles() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
+        let expected = vec![gn("group-a")];
 
         // Round 1: fast findings with "bad-pattern"
         let r1 = round_with_concern(1, "bad-pattern", "2026-03-19T01:00:00Z");
-        state.record_round(RoundType::Fast, "group-a", r1, &expected, "hash1").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), r1, &expected, "hash1").unwrap();
 
         // Round 2: fast findings with "bad-pattern" again — streak = 2
         let r2 = round_with_concern(2, "bad-pattern", "2026-03-19T02:00:00Z");
-        state.record_round(RoundType::Fast, "group-a", r2, &expected, "hash1").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), r2, &expected, "hash1").unwrap();
 
         // Not yet blocked
         assert!(!state.escalation().is_blocked(), "should not be blocked after 2 rounds");
 
         // Round 3: fast findings with "bad-pattern" — streak = 3 → Blocked
         let r3 = round_with_concern(3, "bad-pattern", "2026-03-19T03:00:00Z");
-        state.record_round(RoundType::Fast, "group-a", r3, &expected, "hash1").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), r3, &expected, "hash1").unwrap();
 
         assert!(state.escalation().is_blocked(), "should be blocked after 3 consecutive rounds");
         if let EscalationPhase::Blocked(ref block) = *state.escalation().phase() {
@@ -2102,23 +2206,23 @@ mod tests {
     fn test_escalation_does_not_trigger_with_interrupted_streak() {
         // A → B → A → A: streak for A is 2 (reset when B appeared in round 2)
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
+        let expected = vec![gn("group-a")];
 
         // Round 1: concern A
         let r1 = round_with_concern(1, "concern-a", "2026-03-19T01:00:00Z");
-        state.record_round(RoundType::Fast, "group-a", r1, &expected, "hash1").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), r1, &expected, "hash1").unwrap();
 
         // Round 2: concern B (different) — resets A's streak
         let r2 = round_with_concern(2, "concern-b", "2026-03-19T02:00:00Z");
-        state.record_round(RoundType::Fast, "group-a", r2, &expected, "hash1").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), r2, &expected, "hash1").unwrap();
 
         // Round 3: concern A again — streak for A is 1 (reset happened in round 2)
         let r3 = round_with_concern(3, "concern-a", "2026-03-19T03:00:00Z");
-        state.record_round(RoundType::Fast, "group-a", r3, &expected, "hash1").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), r3, &expected, "hash1").unwrap();
 
         // Round 4: concern A — streak for A is 2 (not yet 3)
         let r4 = round_with_concern(4, "concern-a", "2026-03-19T04:00:00Z");
-        state.record_round(RoundType::Fast, "group-a", r4, &expected, "hash1").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), r4, &expected, "hash1").unwrap();
 
         assert!(
             !state.escalation().is_blocked(),
@@ -2130,13 +2234,13 @@ mod tests {
     fn test_escalation_cycle_requires_all_groups() {
         let mut state = ReviewState::new();
         // Two expected groups — cycle only closes when both record
-        let expected = vec!["group-a".to_owned(), "group-b".to_owned()];
+        let expected = vec![gn("group-a"), gn("group-b")];
 
         // Only group-a records 3 rounds (group-b never records)
         for i in 1u32..=3 {
             let ts_str = format!("2026-03-19T0{i}:00:00Z");
             let r = round_with_concern(i, "bad-pattern", &ts_str);
-            state.record_round(RoundType::Fast, "group-a", r, &expected, "hash1").unwrap();
+            state.record_round(RoundType::Fast, &gn("group-a"), r, &expected, "hash1").unwrap();
         }
 
         // Cycle never closes because group-b hasn't recorded → no escalation
@@ -2149,13 +2253,13 @@ mod tests {
     #[test]
     fn test_recent_cycles_fifo_trims_at_10() {
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned()];
+        let expected = vec![gn("group-a")];
 
         // Record 12 fast rounds with zero_findings (each closes a cycle)
         for i in 1u32..=12 {
             let ts_str = format!("2026-03-19T{:02}:00:00Z", i);
             let r = zero_round(i, &ts_str);
-            state.record_round(RoundType::Fast, "group-a", r, &expected, "hash1").unwrap();
+            state.record_round(RoundType::Fast, &gn("group-a"), r, &expected, "hash1").unwrap();
         }
 
         assert_eq!(
@@ -2176,7 +2280,7 @@ mod tests {
         // → cycle closes. If group A then re-records round 1 (e.g., overwriting),
         // the cycle must NOT be counted again.
         let mut state = ReviewState::new();
-        let expected = vec!["group-a".to_owned(), "group-b".to_owned()];
+        let expected = vec![gn("group-a"), gn("group-b")];
 
         // Both groups record findings_remain round 1 — cycle closes once
         let c = ReviewConcern::try_new("bad-pattern").unwrap();
@@ -2192,8 +2296,8 @@ mod tests {
             ts("2026-03-19T02:00:00Z"),
             vec![c.clone()],
         );
-        state.record_round(RoundType::Fast, "group-a", r1a, &expected, "hash1").unwrap();
-        state.record_round(RoundType::Fast, "group-b", r1b, &expected, "hash1").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), r1a, &expected, "hash1").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-b"), r1b, &expected, "hash1").unwrap();
 
         // After both groups record round 1, exactly 1 cycle should be counted
         assert_eq!(
@@ -2216,7 +2320,7 @@ mod tests {
             ts("2026-03-19T03:00:00Z"),
             vec![c.clone()],
         );
-        state.record_round(RoundType::Fast, "group-a", r1a_again, &expected, "hash1").unwrap();
+        state.record_round(RoundType::Fast, &gn("group-a"), r1a_again, &expected, "hash1").unwrap();
 
         // The cycle for (Fast, round=1) was already counted — must NOT be double-counted
         assert_eq!(

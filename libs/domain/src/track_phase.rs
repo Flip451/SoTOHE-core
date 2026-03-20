@@ -313,7 +313,7 @@ mod tests {
                     .unwrap(),
                 ],
             ),
-            Some(StatusOverride::blocked("waiting on review")),
+            Some(StatusOverride::blocked("waiting on review").unwrap()),
         )
         .unwrap();
         let info = resolve_phase(&track, 3);
@@ -340,7 +340,7 @@ mod tests {
                     .unwrap(),
                 ],
             ),
-            Some(StatusOverride::cancelled("scope changed")),
+            Some(StatusOverride::cancelled("scope changed").unwrap()),
         )
         .unwrap();
         let info = resolve_phase(&track, 3);

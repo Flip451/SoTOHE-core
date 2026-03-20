@@ -783,13 +783,22 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
         }
     };
 
-    let expected_groups: Vec<String> =
+    let expected_groups_raw: Vec<String> =
         args.expected_groups.split(',').map(|s| s.trim().to_owned()).collect();
-    if expected_groups.is_empty() || expected_groups.iter().any(|g| g.is_empty()) {
+    if expected_groups_raw.is_empty() || expected_groups_raw.iter().any(|g| g.is_empty()) {
         return Err(RecordRoundError::Other(
             "--expected-groups must be a non-empty comma-separated list".to_owned(),
         ));
     }
+    let expected_groups: Vec<domain::ReviewGroupName> = expected_groups_raw
+        .iter()
+        .map(|s| {
+            domain::ReviewGroupName::try_new(s.as_str())
+                .map_err(|e| RecordRoundError::Other(format!("invalid group name: {e}")))
+        })
+        .collect::<Result<_, _>>()?;
+    let group_name = domain::ReviewGroupName::try_new(args.group.as_str())
+        .map_err(|e| RecordRoundError::Other(format!("invalid group name: {e}")))?;
 
     // Parse concerns from the comma-separated --concerns argument.
     // Dedup and sort via BTreeSet so the stored list is canonical regardless of input order.
@@ -871,7 +880,7 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
         let review = track.review_mut().get_or_insert_with(ReviewState::new);
         let round_num = review
             .groups()
-            .get(&args.group)
+            .get(&group_name)
             .and_then(|g| match round_type {
                 RoundType::Fast => g.fast().map(|r| r.round()),
                 RoundType::Final => g.final_round().map(|r| r.round()),
@@ -891,7 +900,7 @@ fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
         };
         match review.record_round_with_pending(
             round_type,
-            &args.group,
+            &group_name,
             result,
             &expected_groups,
             &pre_update_hash,
@@ -1101,7 +1110,12 @@ fn run_resolve_escalation(args: &ResolveEscalationArgs) -> Result<(), String> {
                 decision,
                 args.summary.clone(),
                 timestamp.clone(),
-            );
+            )
+            .map_err(|e| {
+                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(
+                    e.to_string(),
+                ))
+            })?;
 
             review.resolve_escalation(resolution).map_err(|e| {
                 domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(

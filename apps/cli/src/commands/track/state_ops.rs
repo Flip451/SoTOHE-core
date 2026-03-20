@@ -52,8 +52,10 @@ pub(super) fn execute_set_override(
         .map_err(|err| CliError::Message(format!("invalid track id: {err}")))?;
 
     let override_value = match status.as_str() {
-        "blocked" => domain::StatusOverride::blocked(reason),
-        "cancelled" => domain::StatusOverride::cancelled(reason),
+        "blocked" => domain::StatusOverride::blocked(reason)
+            .map_err(|e| CliError::Message(format!("invalid blocked reason: {e}")))?,
+        "cancelled" => domain::StatusOverride::cancelled(reason)
+            .map_err(|e| CliError::Message(format!("invalid cancelled reason: {e}")))?,
         other => {
             return Err(CliError::Message(format!(
                 "invalid override status '{other}': must be 'blocked' or 'cancelled'"

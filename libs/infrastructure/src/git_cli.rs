@@ -1068,11 +1068,12 @@ mod tests {
         // Step 2: record_round_with_pending
         let mut review = domain::ReviewState::new();
         let result = rrz(1, "2026-03-18T01:00:00Z");
-        let groups = vec!["default".to_owned()];
+        let default_group = domain::ReviewGroupName::try_new("default").unwrap();
+        let groups = vec![default_group.clone()];
         review
             .record_round_with_pending(
                 domain::RoundType::Fast,
-                "default",
+                &default_group,
                 result,
                 &groups,
                 &pre_hash,
@@ -1122,7 +1123,7 @@ mod tests {
         review
             .record_round_with_pending(
                 domain::RoundType::Final,
-                "default",
+                &default_group,
                 result2,
                 &groups,
                 &pre_hash2,
@@ -1176,12 +1177,19 @@ mod tests {
         // Complete a full approval cycle
         let pre_hash = repo.index_tree_hash_normalizing(metadata_path).unwrap();
         let mut review = domain::ReviewState::new();
-        let groups = vec!["default".to_owned()];
+        let default_group = domain::ReviewGroupName::try_new("default").unwrap();
+        let groups = vec![default_group.clone()];
 
         // Fast round
         let r1 = rrz(1, "2026-03-18T01:00:00Z");
         review
-            .record_round_with_pending(domain::RoundType::Fast, "default", r1, &groups, &pre_hash)
+            .record_round_with_pending(
+                domain::RoundType::Fast,
+                &default_group,
+                r1,
+                &groups,
+                &pre_hash,
+            )
             .unwrap();
         write_full_metadata(
             dir.path(),
@@ -1206,7 +1214,7 @@ mod tests {
         let r2 = rrz(1, "2026-03-18T02:00:00Z");
         let pre2 = repo.index_tree_hash_normalizing(metadata_path).unwrap();
         review
-            .record_round_with_pending(domain::RoundType::Final, "default", r2, &groups, &pre2)
+            .record_round_with_pending(domain::RoundType::Final, &default_group, r2, &groups, &pre2)
             .unwrap();
         write_full_metadata(
             dir.path(),
@@ -1256,11 +1264,18 @@ mod tests {
         // Get initial hash and do fast approval
         let pre_hash = repo.index_tree_hash_normalizing(metadata_path).unwrap();
         let mut review = domain::ReviewState::new();
-        let groups = vec!["default".to_owned()];
+        let default_group = domain::ReviewGroupName::try_new("default").unwrap();
+        let groups = vec![default_group.clone()];
 
         let r1 = rrz(1, "2026-03-18T01:00:00Z");
         review
-            .record_round_with_pending(domain::RoundType::Fast, "default", r1, &groups, &pre_hash)
+            .record_round_with_pending(
+                domain::RoundType::Fast,
+                &default_group,
+                r1,
+                &groups,
+                &pre_hash,
+            )
             .unwrap();
         write_full_metadata(
             dir.path(),
@@ -1301,11 +1316,12 @@ mod tests {
         let mut review = domain::ReviewState::new();
         assert!(review.code_hash().is_none(), "first round: code_hash must be None");
 
-        let groups = vec!["default".to_owned()];
+        let default_group = domain::ReviewGroupName::try_new("default").unwrap();
+        let groups = vec![default_group.clone()];
         let r = rrz(1, "2026-03-18T01:00:00Z");
         let result = review.record_round_with_pending(
             domain::RoundType::Fast,
-            "default",
+            &default_group,
             r,
             &groups,
             &pre_hash,
@@ -1327,10 +1343,17 @@ mod tests {
         // First round
         let pre_hash = repo.index_tree_hash_normalizing(metadata_path).unwrap();
         let mut review = domain::ReviewState::new();
-        let groups = vec!["default".to_owned()];
+        let default_group = domain::ReviewGroupName::try_new("default").unwrap();
+        let groups = vec![default_group.clone()];
         let r1 = rrz(1, "2026-03-18T01:00:00Z");
         review
-            .record_round_with_pending(domain::RoundType::Fast, "default", r1, &groups, &pre_hash)
+            .record_round_with_pending(
+                domain::RoundType::Fast,
+                &default_group,
+                r1,
+                &groups,
+                &pre_hash,
+            )
             .unwrap();
         write_full_metadata(
             dir.path(),
@@ -1363,7 +1386,7 @@ mod tests {
         let r2 = rrz(2, "2026-03-18T03:00:00Z");
         let result = review.record_round_with_pending(
             domain::RoundType::Fast,
-            "default",
+            &default_group,
             r2,
             &groups,
             &pre_hash2,

@@ -416,7 +416,7 @@ mod tests {
 
         save.execute(&track).unwrap();
         let updated = set_override
-            .execute(track.id(), Some(StatusOverride::blocked("blocker reason")))
+            .execute(track.id(), Some(StatusOverride::blocked("blocker reason").unwrap()))
             .unwrap();
 
         assert_eq!(updated.status(), TrackStatus::Blocked);
@@ -432,7 +432,7 @@ mod tests {
         let track = sample_track();
 
         save.execute(&track).unwrap();
-        set_override.execute(track.id(), Some(StatusOverride::blocked("reason"))).unwrap();
+        set_override.execute(track.id(), Some(StatusOverride::blocked("reason").unwrap())).unwrap();
         let updated = set_override.execute(track.id(), None).unwrap();
 
         assert_eq!(updated.status(), TrackStatus::Planned);
@@ -444,7 +444,8 @@ mod tests {
         let set_override = SetOverrideUseCase::new(store);
         let track_id = TrackId::try_new("nonexistent-track").unwrap();
 
-        let result = set_override.execute(&track_id, Some(StatusOverride::blocked("reason")));
+        let result =
+            set_override.execute(&track_id, Some(StatusOverride::blocked("reason").unwrap()));
         assert!(matches!(
             result,
             Err(TrackWriteError::Repository(RepositoryError::TrackNotFound(_)))
@@ -481,7 +482,8 @@ mod tests {
             .execute(track.id(), &task_id, TaskTransition::Complete { commit_hash: None })
             .unwrap();
 
-        let result = set_override.execute(track.id(), Some(StatusOverride::blocked("reason")));
+        let result =
+            set_override.execute(track.id(), Some(StatusOverride::blocked("reason").unwrap()));
         assert!(result.is_err());
         let msg = result.unwrap_err().to_string();
         assert!(msg.contains("incompatible"), "expected 'incompatible' in: {msg}");

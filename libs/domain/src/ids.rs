@@ -78,6 +78,16 @@ pub struct TrackBranch(String);
 )]
 pub struct NonEmptyString(String);
 
+/// A validated review group name (non-empty, trimmed).
+///
+/// Used for review group identifiers (e.g., "infra-domain", "usecase-cli").
+#[nutype(
+    sanitize(trim),
+    validate(with = validate_non_empty, error = ValidationError),
+    derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Display, AsRef)
+)]
+pub struct ReviewGroupName(String);
+
 fn is_valid_track_id(value: &str) -> bool {
     let mut chars = value.chars();
     match chars.next() {

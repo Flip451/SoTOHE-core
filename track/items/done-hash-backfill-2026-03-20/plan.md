@@ -56,10 +56,10 @@ T012: Use NonEmptyString for ReviewEscalationResolution.workspace_search_ref/rei
 Move validation from resolve_escalation() into the constructor
 T013: Propagate to infrastructure/codec + CLI — review_from_document/review_to_document for CodeHash/ReviewGroupProgress, and apps/cli/src/commands/review.rs for ReviewEscalationResolution::new() constructor change
 
-- [ ] domain: Fold Option<CodeHash> into CodeHash::NotRecorded, remove Option wrapper from ReviewState
-- [ ] domain: ReviewGroupState Option pair -> ReviewGroupProgress ADT (NoRounds/FastOnly/FinalOnly/BothRounds)
-- [ ] domain: ReviewEscalationResolution String fields -> NonEmptyString for workspace_search_ref/reinvention_check_ref/summary
-- [ ] infrastructure/codec + CLI: Propagate Phase C changes — review_from_document/review_to_document for CodeHash/ReviewGroupProgress, review.rs for ReviewEscalationResolution constructor
+- [x] domain: Fold Option<CodeHash> into CodeHash::NotRecorded, remove Option wrapper from ReviewState
+- [x] domain: ReviewGroupState Option pair -> ReviewGroupProgress ADT (NoRounds/FastOnly/FinalOnly/BothRounds)
+- [x] domain: ReviewEscalationResolution String fields -> NonEmptyString for workspace_search_ref/reinvention_check_ref/summary
+- [x] infrastructure/codec + CLI: Propagate Phase C changes — review_from_document/review_to_document for CodeHash/ReviewGroupProgress, review.rs for ReviewEscalationResolution constructor
 
 ## Phase D: Minor Domain Cleanups
 
@@ -68,7 +68,7 @@ T015: StatusOverride -> struct { kind: StatusOverrideKind, reason: NonEmptyStrin
 T016: Review group name String -> ReviewGroupName newtype throughout (Vec<String>, HashMap<String, ...>, record_round group: &str, expected_groups: &[String], record_round_with_pending same params)
 T017: Propagate to infrastructure/codec + CLI — StatusOverride codec, AutoPhaseError callers, ReviewGroupName codec and CLI review.rs (group/expected_groups params)
 
-- [ ] domain: AutoPhaseError String fields -> AutoPhase enum for from/phase/to
-- [ ] domain: StatusOverride refactor - extract StatusOverrideKind enum, use NonEmptyString for reason
-- [ ] domain: Review group name String -> ReviewGroupName newtype throughout (Vec<String>, HashMap<String, ...>, record_round group: &str, record_round expected_groups: &[String], record_round_with_pending same params)
-- [ ] infrastructure/codec + CLI: Propagate Phase D changes — StatusOverride codec, AutoPhaseError callers, ReviewGroupName codec and CLI review.rs (group/expected_groups params)
+- [x] domain: AutoPhaseError String fields -> AutoPhase enum for from/phase/to
+- [x] domain: StatusOverride refactor - extract StatusOverrideKind enum, use NonEmptyString for reason
+- [x] domain: Review group name String -> ReviewGroupName newtype throughout (Vec<String>, HashMap<String, ...>, record_round group: &str, record_round expected_groups: &[String], record_round_with_pending same params)
+- [x] infrastructure/codec + CLI: Propagate Phase D changes — StatusOverride codec, AutoPhaseError callers, ReviewGroupName codec and CLI review.rs (group/expected_groups params)

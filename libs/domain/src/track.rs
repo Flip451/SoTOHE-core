@@ -109,36 +109,68 @@ impl TaskTransition {
     }
 }
 
+/// The kind of status override (discriminant only).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StatusOverrideKind {
+    Blocked,
+    Cancelled,
+}
+
+impl std::fmt::Display for StatusOverrideKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Blocked => f.write_str("blocked"),
+            Self::Cancelled => f.write_str("cancelled"),
+        }
+    }
+}
+
 /// Manual override for track status (Blocked or Cancelled with reason).
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum StatusOverride {
-    Blocked { reason: String },
-    Cancelled { reason: String },
+pub struct StatusOverride {
+    kind: StatusOverrideKind,
+    reason: NonEmptyString,
 }
 
 impl StatusOverride {
-    #[must_use]
-    pub fn blocked(reason: impl Into<String>) -> Self {
-        Self::Blocked { reason: reason.into() }
+    /// Creates a Blocked override.
+    ///
+    /// # Errors
+    /// Returns `ValidationError::EmptyString` if `reason` is empty.
+    pub fn blocked(reason: impl Into<String>) -> Result<Self, ValidationError> {
+        Ok(Self { kind: StatusOverrideKind::Blocked, reason: NonEmptyString::try_new(reason)? })
     }
 
+    /// Creates a Cancelled override.
+    ///
+    /// # Errors
+    /// Returns `ValidationError::EmptyString` if `reason` is empty.
+    pub fn cancelled(reason: impl Into<String>) -> Result<Self, ValidationError> {
+        Ok(Self { kind: StatusOverrideKind::Cancelled, reason: NonEmptyString::try_new(reason)? })
+    }
+
+    /// Creates a StatusOverride from a kind and validated reason (codec path).
     #[must_use]
-    pub fn cancelled(reason: impl Into<String>) -> Self {
-        Self::Cancelled { reason: reason.into() }
+    pub fn from_parts(kind: StatusOverrideKind, reason: NonEmptyString) -> Self {
+        Self { kind, reason }
+    }
+
+    /// Returns the override kind.
+    #[must_use]
+    pub fn kind(&self) -> StatusOverrideKind {
+        self.kind
     }
 
     #[must_use]
     pub fn reason(&self) -> &str {
-        match self {
-            Self::Blocked { reason } | Self::Cancelled { reason } => reason,
-        }
+        self.reason.as_ref()
     }
 
     #[must_use]
     pub fn track_status(&self) -> TrackStatus {
-        match self {
-            Self::Blocked { .. } => TrackStatus::Blocked,
-            Self::Cancelled { .. } => TrackStatus::Cancelled,
+        match self.kind {
+            StatusOverrideKind::Blocked => TrackStatus::Blocked,
+            StatusOverrideKind::Cancelled => TrackStatus::Cancelled,
         }
     }
 }
