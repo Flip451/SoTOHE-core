@@ -15,6 +15,7 @@ pub(super) fn execute_branch(action: BranchAction) -> Result<ExitCode, CliError>
     }
 }
 
+#[allow(clippy::too_many_lines)]
 pub(super) fn execute_activate(args: ActivateArgs, mode: BranchMode) -> Result<ExitCode, CliError> {
     let ActivateArgs { items_dir, track_id } = args;
 

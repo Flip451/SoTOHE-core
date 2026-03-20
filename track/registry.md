@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `ci-guardrails-phase15-2026-03-20`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-20`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| ci-guardrails-phase15-2026-03-20 | planned | `/track:implement` | 2026-03-20 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| ci-guardrails-phase15-2026-03-20 | Done | 2026-03-20 |
 | done-hash-backfill-2026-03-20 | Done | 2026-03-20 |
 | pr-task-completion-guard-2026-03-20 | Done | 2026-03-19 |
 | nutype-migration-2026-03-20 | Done | 2026-03-19 |

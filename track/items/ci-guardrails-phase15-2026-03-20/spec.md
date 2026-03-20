@@ -26,10 +26,11 @@ registry.md は git 管理から外し、完全生成ビューに移行する (S
 
 ## Constraints
 
-- `syn` crate は dev-dependency ではなく infrastructure の通常依存として追加（verify サブコマンドは CI で使用）
 - 既存の `sotp verify` パターンに従う（infrastructure で実装、CLI で dispatch）
 - `architecture-rules.json` に `module_limits` セクションを追加（SSoT）
 - vendor/ ディレクトリは module-size / domain-strings の対象外
+- module-size / domain-strings は既存の超過ファイルが多数あるため **warning-only**（CI を fail させない）。リファクタリング完了後に error に切り替え
+- domain-strings は行マッチングで実装（syn 依存追加は過剰。複数行宣言は rustfmt で単一行に正規化されるため実用上十分）
 
 ## Acceptance Criteria
 

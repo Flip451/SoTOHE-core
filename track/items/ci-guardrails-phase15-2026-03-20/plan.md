@@ -9,7 +9,7 @@ T001: Initialize review state (status: not_started, groups: {}) in metadata.json
 check-approved accepts NotStarted as valid (no code to review yet)
 review state absent = error (make illegal states unrepresentable)
 
-- [ ] WF-54: Initialize review state in metadata.json at track creation + check-approved accepts NotStarted
+- [x] WF-54: Initialize review state in metadata.json at track creation + check-approved accepts NotStarted
 
 ## Phase B: CI Detection Net
 
@@ -17,9 +17,9 @@ T002: sotp verify module-size — scan .rs files, warn at 400 lines, error at 70
 T003: sotp verify domain-strings — syn AST parse libs/domain/src/ for pub String fields (newtype excluded)
 T004: Add #![warn(clippy::too_many_lines)] to apps/cli/src/main.rs
 
-- [ ] sotp verify module-size: RS file line count CI gate (warn 400 / error 700, vendor/ excluded)
-- [ ] sotp verify domain-strings: detect pub String fields in domain layer via syn AST parsing
-- [ ] Add #![warn(clippy::too_many_lines)] to CLI crate for function-level bloat detection
+- [x] sotp verify module-size: RS file line count CI gate (warn 400 / error 700, vendor/ excluded)
+- [x] sotp verify domain-strings: detect pub String fields in domain layer via syn AST parsing
+- [x] Add #![warn(clippy::too_many_lines)] to CLI crate for function-level bloat detection
 
 ## Phase C: View Freshness Gate (WF-55 P1)
 
@@ -29,4 +29,4 @@ T005c: registry.md は cargo make track-sync-views で生成のみ (CI commit �
 T005d: verify-track-registry タスクを registry.md file check から metadata.json ベースに移行
 Integrate view-freshness into cargo make ci
 
-- [ ] WF-55 Phase 1: sotp verify view-freshness for plan.md + registry.md gitignore (STRAT-04)
+- [x] WF-55 Phase 1: sotp verify view-freshness for plan.md + registry.md gitignore (STRAT-04)
