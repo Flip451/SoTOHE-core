@@ -1,0 +1,127 @@
+{
+  "branch": "track/ci-guardrails-phase15-2026-03-20",
+  "created_at": "2026-03-20T12:00:00Z",
+  "id": "ci-guardrails-phase15-2026-03-20",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "T001: Initialize review state (status: not_started, groups: {}) in metadata.json at track creation time",
+          "check-approved accepts NotStarted as valid (no code to review yet)",
+          "review state absent = error (make illegal states unrepresentable)"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Phase A: Review Guard Fix (WF-54)"
+      },
+      {
+        "description": [
+          "T002: sotp verify module-size — scan .rs files, warn at 400 lines, error at 700 lines, exclude vendor/",
+          "T003: sotp verify domain-strings — syn AST parse libs/domain/src/ for pub String fields (newtype excluded)",
+          "T004: Add #![warn(clippy::too_many_lines)] to apps/cli/src/main.rs"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002",
+          "T003",
+          "T004"
+        ],
+        "title": "Phase B: CI Detection Net"
+      },
+      {
+        "description": [
+          "T005a: sotp verify view-freshness — render plan.md from metadata.json, compare with on-disk file",
+          "T005b: registry.md を .gitignore に追加し git rm --cached で untrack (STRAT-04)",
+          "T005c: registry.md は cargo make track-sync-views で生成のみ (CI commit 不要)",
+          "T005d: verify-track-registry タスクを registry.md file check から metadata.json ベースに移行",
+          "Integrate view-freshness into cargo make ci"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T005"
+        ],
+        "title": "Phase C: View Freshness Gate (WF-55 P1)"
+      }
+    ],
+    "summary": [
+      "CI guardrails for Phase 1.5: fix review guard blocking planning artifacts (WF-54), add module-size/domain-strings/view-freshness verify subcommands, and clippy::too_many_lines attribute"
+    ]
+  },
+  "review": {
+    "code_hash": "0099560e02cd06fc5eb0fbc5266dfdd2b0929fbe",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-20T09:29:50Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-20T09:30:03Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "default": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-20T09:29:50Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-20T09:30:03Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "planned",
+  "tasks": [
+    {
+      "description": "WF-54: Initialize review state in metadata.json at track creation + check-approved accepts NotStarted",
+      "id": "T001",
+      "status": "todo"
+    },
+    {
+      "description": "sotp verify module-size: RS file line count CI gate (warn 400 / error 700, vendor/ excluded)",
+      "id": "T002",
+      "status": "todo"
+    },
+    {
+      "description": "sotp verify domain-strings: detect pub String fields in domain layer via syn AST parsing",
+      "id": "T003",
+      "status": "todo"
+    },
+    {
+      "description": "Add #![warn(clippy::too_many_lines)] to CLI crate for function-level bloat detection",
+      "id": "T004",
+      "status": "todo"
+    },
+    {
+      "description": "WF-55 Phase 1: sotp verify view-freshness for plan.md + registry.md gitignore (STRAT-04)",
+      "id": "T005",
+      "status": "todo"
+    }
+  ],
+  "title": "CI Guardrails Phase 1.5: review guard fix + CI detection net + view-freshness",
+  "updated_at": "2026-03-20T09:30:03Z"
+}
