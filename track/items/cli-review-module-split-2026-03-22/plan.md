@@ -11,10 +11,10 @@ codex_local.rs (~480行): subprocess管理 — run_codex_local, spawn_codex, tee
 adapters.rs (~340行): CliRecordRoundStore, CliResolveEscalationStore, CliCheckApprovedStore port trait impls
 tests.rs (~735行): 全テスト（mod tests ブロック）
 
-- [~] review.rs → review/ ディレクトリ化 + 4ファイル分割（mod.rs, codex_local.rs, adapters.rs, tests.rs）
+- [x] review.rs → review/ ディレクトリ化 + 4ファイル分割（mod.rs, codex_local.rs, adapters.rs, tests.rs） ac85273
 
 ## Phase 2: 検証
 
 T002: cargo make ci 全通し + 全対象ファイルが 700行以下（tests.rs 除く）
 
-- [ ] CI 全通し + 行数確認（mod.rs/codex_local.rs/adapters.rs が 700行以下）
+- [x] CI 全通し + 行数確認（mod.rs/codex_local.rs/adapters.rs が 700行以下） ac85273

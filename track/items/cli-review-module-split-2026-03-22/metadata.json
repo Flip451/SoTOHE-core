@@ -34,7 +34,7 @@
     ]
   },
   "review": {
-    "code_hash": "b7c4bee9019f130cb09a55dc44435c23694bd319",
+    "code_hash": "7de685f666dc2544aed9e47cc137369e8b5e7ecf",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -57,6 +57,15 @@
           "round": 1,
           "round_type": "final",
           "timestamp": "2026-03-21T23:31:48Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 2,
+          "round_type": "fast",
+          "timestamp": "2026-03-21T23:36:13Z"
         }
       ],
       "threshold": 3
@@ -64,13 +73,13 @@
     "groups": {
       "default": {
         "fast": {
-          "round": 1,
-          "timestamp": "2026-03-21T23:31:48Z",
+          "round": 2,
+          "timestamp": "2026-03-21T23:36:13Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-21T23:31:48Z",
+          "timestamp": "2026-03-21T23:36:13Z",
           "verdict": "zero_findings"
         }
       }
@@ -78,19 +87,21 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
+      "commit_hash": "ac85273",
       "description": "review.rs → review/ ディレクトリ化 + 4ファイル分割（mod.rs, codex_local.rs, adapters.rs, tests.rs）",
       "id": "T001",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "ac85273",
       "description": "CI 全通し + 行数確認（mod.rs/codex_local.rs/adapters.rs が 700行以下）",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "CLI review.rs module directory split (1825 lines → 4 files)",
-  "updated_at": "2026-03-21T23:31:48Z"
+  "updated_at": "2026-03-21T23:36:13Z"
 }
