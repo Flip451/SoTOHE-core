@@ -6,6 +6,8 @@ use std::process::{Command, Output, Stdio};
 use serde::Deserialize;
 use thiserror::Error;
 
+pub mod private_index;
+
 /// Structured error type for git CLI operations.
 #[derive(Debug, Error)]
 pub enum GitError {

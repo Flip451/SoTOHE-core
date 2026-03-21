@@ -9,7 +9,7 @@
 
 - Latest active track: `None yet`
 - Next recommended command: `/track:plan <feature>`
-- Last updated: `2026-03-20`
+- Last updated: `2026-03-21`
 
 ## Active Tracks
 
@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| review-usecase-extraction-2026-03-20 | Done | 2026-03-21 |
 | ci-guardrails-phase15-2026-03-20 | Done | 2026-03-20 |
 | done-hash-backfill-2026-03-20 | Done | 2026-03-20 |
 | pr-task-completion-guard-2026-03-20 | Done | 2026-03-19 |

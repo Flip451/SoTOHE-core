@@ -9,9 +9,9 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use clap::{ArgGroup, Args, Subcommand};
 use usecase::review_workflow::{
-    ModelProfile, REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewVerdict,
-    classify_review_verdict, normalize_final_message, parse_review_final_message,
-    render_review_payload, resolve_full_auto,
+    REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewVerdict, classify_review_verdict,
+    extract_verdict_from_session_log, normalize_final_message, parse_review_final_message,
+    render_review_payload,
 };
 
 #[cfg(unix)]
@@ -261,7 +261,7 @@ fn render_missing_message_failure(prefix: &str, result: &ReviewRunResult) -> Str
 
 fn run_codex_local(args: &CodexLocalArgs) -> Result<ReviewRunResult, String> {
     let prompt = build_prompt(args)?;
-    let full_auto = resolve_full_auto_from_profiles(&args.model);
+    let full_auto = infrastructure::agent_profiles::resolve_full_auto_from_profiles(&args.model);
     #[cfg(test)]
     let explicit_output_last_message = args.output_last_message.as_deref();
     #[cfg(not(test))]
@@ -415,40 +415,6 @@ fn build_codex_invocation(
     CodexInvocation { bin: codex_bin(), args }
 }
 
-const AGENT_PROFILES_PATH: &str = ".claude/agent-profiles.json";
-
-/// Reads `agent-profiles.json` and resolves `full_auto` for the given model.
-///
-/// Falls back to `true` (fail-closed) when the file is missing, unreadable,
-/// or does not contain `model_profiles` for the codex provider.
-fn resolve_full_auto_from_profiles(model: &str) -> bool {
-    #[derive(serde::Deserialize)]
-    struct AgentProfiles {
-        #[serde(default)]
-        providers: std::collections::HashMap<String, ProviderConfig>,
-    }
-
-    #[derive(serde::Deserialize)]
-    struct ProviderConfig {
-        #[serde(default)]
-        model_profiles: Option<std::collections::HashMap<String, ModelProfile>>,
-    }
-
-    let content = match std::fs::read_to_string(AGENT_PROFILES_PATH) {
-        Ok(c) => c,
-        Err(_) => return true,
-    };
-    let profiles: AgentProfiles = match serde_json::from_str(&content) {
-        Ok(p) => p,
-        Err(_) => return true,
-    };
-    let codex = match profiles.providers.get("codex") {
-        Some(p) => p,
-        None => return true,
-    };
-    resolve_full_auto(model, codex.model_profiles.as_ref())
-}
-
 fn codex_bin() -> OsString {
     #[cfg(test)]
     if let Some(value) = std::env::var_os(CODEX_BIN_ENV).filter(|value| !value.is_empty()) {
@@ -590,62 +556,6 @@ fn run_codex_child(
     })
 }
 
-/// Attempts to extract a verdict JSON from the session log file.
-///
-/// Handles both single-line and pretty-printed multi-line JSON.
-/// Scans backward for JSON objects containing `"verdict"` and `"findings"` keys.
-/// Returns `None` if no valid verdict is found.
-fn extract_verdict_from_session_log(path: &Path) -> Option<ReviewFinalMessageState> {
-    let content = std::fs::read_to_string(path).ok()?;
-
-    // Strategy 1: Check single lines (compact JSON)
-    for line in content.lines().rev() {
-        let trimmed = line.trim();
-        if trimmed.starts_with('{') && trimmed.contains("\"verdict\"") {
-            let state = parse_review_final_message(Some(trimmed));
-            if matches!(state, ReviewFinalMessageState::Parsed(_)) {
-                return Some(state);
-            }
-        }
-    }
-
-    // Strategy 2: Extract multi-line JSON blocks (pretty-printed)
-    // Scan backward for '{' ... '}' blocks that contain "verdict"
-    let bytes = content.as_bytes();
-    let mut end = bytes.len();
-    while let Some(close) = content.get(..end).and_then(|s| s.rfind('}')) {
-        // Find the matching opening brace by counting brace depth
-        let mut depth = 0i32;
-        let mut start = None;
-        for (i, &b) in bytes.get(..=close).iter().flat_map(|s| s.iter().enumerate().rev()) {
-            match b {
-                b'}' => depth += 1,
-                b'{' => {
-                    depth -= 1;
-                    if depth == 0 {
-                        start = Some(i);
-                        break;
-                    }
-                }
-                _ => {}
-            }
-        }
-        if let Some(start) = start {
-            if let Some(block) = content.get(start..=close) {
-                if block.contains("\"verdict\"") {
-                    let state = parse_review_final_message(Some(block));
-                    if matches!(state, ReviewFinalMessageState::Parsed(_)) {
-                        return Some(state);
-                    }
-                }
-            }
-        }
-        end = close;
-    }
-
-    None
-}
-
 fn prepare_session_log_path() -> Result<OutputLastMessagePath, String> {
     let timestamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -739,7 +649,7 @@ const EXIT_CODE_ESCALATION_BLOCKED: u8 = 3;
 fn execute_record_round(args: &RecordRoundArgs) -> ExitCode {
     match run_record_round(args) {
         Ok(()) => ExitCode::SUCCESS,
-        Err(RecordRoundError::EscalationBlocked(concerns)) => {
+        Err(usecase::review_workflow::usecases::RecordRoundError::EscalationBlocked(concerns)) => {
             eprintln!(
                 "[BLOCKED] Review escalation active for concerns: {concerns:?}\n\
                  Required actions:\n\
@@ -749,268 +659,374 @@ fn execute_record_round(args: &RecordRoundArgs) -> ExitCode {
             );
             ExitCode::from(EXIT_CODE_ESCALATION_BLOCKED)
         }
-        Err(RecordRoundError::Other(msg)) => {
+        Err(usecase::review_workflow::usecases::RecordRoundError::Other(msg)) => {
             eprintln!("{msg}");
             ExitCode::FAILURE
         }
     }
 }
 
-#[derive(Debug)]
-enum RecordRoundError {
-    EscalationBlocked(Vec<String>),
-    Other(String),
+// ---------------------------------------------------------------------------
+// CLI adapter structs implementing usecase port traits
+// ---------------------------------------------------------------------------
+
+struct CliRecordRoundStore {
+    items_dir: PathBuf,
+    group: String,
 }
 
-impl From<String> for RecordRoundError {
-    fn from(s: String) -> Self {
-        Self::Other(s)
-    }
-}
+impl usecase::review_workflow::usecases::RecordRoundStore for CliRecordRoundStore {
+    #[allow(clippy::too_many_lines)]
+    fn execute_atomic(
+        &self,
+        track_id: &usecase::review_workflow::usecases::TrackId,
+        round_type: usecase::review_workflow::usecases::RoundType,
+        group_name: usecase::review_workflow::usecases::ReviewGroupName,
+        verdict: usecase::review_workflow::usecases::Verdict,
+        concerns: Vec<usecase::review_workflow::usecases::ReviewConcern>,
+        expected_groups: Vec<usecase::review_workflow::usecases::ReviewGroupName>,
+        timestamp: usecase::review_workflow::usecases::Timestamp,
+    ) -> Result<(), usecase::review_workflow::usecases::RecordRoundStoreError> {
+        use domain::{ReviewRoundResult, ReviewState};
+        use infrastructure::git_cli::private_index::PrivateIndex;
+        use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+        use infrastructure::track::fs_store::FsTrackStore;
 
-#[allow(clippy::too_many_lines)]
-fn run_record_round(args: &RecordRoundArgs) -> Result<(), RecordRoundError> {
-    use domain::{ReviewRoundResult, ReviewState, RoundType};
-    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
-    use infrastructure::track::fs_store::FsTrackStore;
+        let git = SystemGitRepo::discover().map_err(|e| {
+            usecase::review_workflow::usecases::RecordRoundStoreError::Other(format!(
+                "git error: {e}"
+            ))
+        })?;
 
-    let round_type = match args.round_type.as_str() {
-        "fast" => RoundType::Fast,
-        "final" => RoundType::Final,
-        other => {
-            return Err(RecordRoundError::Other(format!(
-                "unknown round type: {other} (expected 'fast' or 'final')"
-            )));
-        }
-    };
+        let metadata_abs = self.items_dir.join(track_id.as_ref()).join("metadata.json");
+        let metadata_rel = metadata_abs
+            .strip_prefix(git.root())
+            .unwrap_or(&metadata_abs)
+            .to_string_lossy()
+            .into_owned();
 
-    let expected_groups_raw: Vec<String> =
-        args.expected_groups.split(',').map(|s| s.trim().to_owned()).collect();
-    if expected_groups_raw.is_empty() || expected_groups_raw.iter().any(|g| g.is_empty()) {
-        return Err(RecordRoundError::Other(
-            "--expected-groups must be a non-empty comma-separated list".to_owned(),
-        ));
-    }
-    let expected_groups: Vec<domain::ReviewGroupName> = expected_groups_raw
-        .iter()
-        .map(|s| {
-            domain::ReviewGroupName::try_new(s.as_str())
-                .map_err(|e| RecordRoundError::Other(format!("invalid group name: {e}")))
-        })
-        .collect::<Result<_, _>>()?;
-    let group_name = domain::ReviewGroupName::try_new(args.group.as_str())
-        .map_err(|e| RecordRoundError::Other(format!("invalid group name: {e}")))?;
+        let store = FsTrackStore::new(&self.items_dir);
 
-    // Parse concerns from the comma-separated --concerns argument.
-    // Dedup and sort via BTreeSet so the stored list is canonical regardless of input order.
-    let concerns: Vec<domain::ReviewConcern> = if args.concerns.trim().is_empty() {
-        Vec::new()
-    } else {
-        let parsed: Result<std::collections::BTreeSet<domain::ReviewConcern>, _> =
-            args.concerns.split(',').map(|s| domain::ReviewConcern::try_new(s.trim())).collect();
-        parsed
-            .map_err(|e| RecordRoundError::Other(format!("invalid concern: {e}")))?
-            .into_iter()
-            .collect()
-    };
+        let private_index = PrivateIndex::from_current(&git)
+            .map_err(usecase::review_workflow::usecases::RecordRoundStoreError::Other)?;
 
-    // Parse and semantically validate the verdict JSON.
-    // parse_review_final_message applies both structural and semantic checks
-    // (e.g., zero_findings must have empty findings, findings_remain must have entries).
-    let final_message_state = parse_review_final_message(Some(&args.verdict));
-    let verdict = match &final_message_state {
-        ReviewFinalMessageState::Parsed(payload) => match payload.verdict {
-            usecase::review_workflow::ReviewPayloadVerdict::ZeroFindings => {
-                domain::Verdict::ZeroFindings
-            }
-            usecase::review_workflow::ReviewPayloadVerdict::FindingsRemain => {
-                domain::Verdict::FindingsRemain
-            }
-        },
-        ReviewFinalMessageState::Missing => {
-            return Err(RecordRoundError::Other("--verdict is required".to_owned()));
-        }
-        ReviewFinalMessageState::Invalid { reason } => {
-            return Err(RecordRoundError::Other(format!("invalid --verdict: {reason}")));
-        }
-    };
+        let pre_update_hash =
+            private_index.normalized_tree_hash(&git, &metadata_rel).map_err(|e| {
+                usecase::review_workflow::usecases::RecordRoundStoreError::Other(format!(
+                    "normalized hash error: {e}"
+                ))
+            })?;
 
-    let git = SystemGitRepo::discover()
-        .map_err(|e| RecordRoundError::Other(format!("git error: {e}")))?;
+        let mut stale_error: Option<String> = None;
+        let mut escalation_error: Option<Vec<String>> = None;
+        let with_locked_result = store.with_locked_document(track_id, |track, meta| {
+            let review = track.review_mut().get_or_insert_with(ReviewState::new);
+            let round_num = review
+                .groups()
+                .get(&group_name)
+                .and_then(|g| match round_type {
+                    domain::RoundType::Fast => g.fast().map(|r| r.round()),
+                    domain::RoundType::Final => g.final_round().map(|r| r.round()),
+                })
+                .map(|n| n.saturating_add(1))
+                .unwrap_or(1);
 
-    // Compute repo-relative metadata path for normalized hash.
-    let metadata_abs = args.items_dir.join(&args.track_id).join("metadata.json");
-    let metadata_rel = metadata_abs
-        .strip_prefix(git.root())
-        .unwrap_or(&metadata_abs)
-        .to_string_lossy()
-        .into_owned();
-
-    // Open track store.
-    let track_id = domain::TrackId::try_new(&args.track_id)
-        .map_err(|e| RecordRoundError::Other(format!("invalid track id: {e}")))?;
-
-    let store = FsTrackStore::new(&args.items_dir);
-
-    let timestamp_str = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
-    let timestamp = domain::Timestamp::new(timestamp_str.clone())
-        .map_err(|e| RecordRoundError::Other(format!("invalid timestamp: {e}")))?;
-
-    // Step 1: Copy the current git index to a private temp file.
-    // All staging operations go through the private index; the real index is
-    // only updated at the very end via an atomic fs::rename.  This eliminates
-    // the TOCTOU window between the two `store.update` calls in the old design.
-    let private_index = PrivateIndex::from_current(&git).map_err(RecordRoundError::Other)?;
-
-    // Step 2: Compute pre-update normalized hash from the private index.
-    let pre_update_hash = private_index
-        .normalized_tree_hash(&git, &metadata_rel)
-        .map_err(|e| RecordRoundError::Other(format!("normalized hash error: {e}")))?;
-
-    // Steps 3–7 are a single atomic read-modify-write via with_locked_document.
-    // Correctness relies on single-process sequential execution (no concurrent
-    // sotp record-round). Parallel access will use worktree isolation (SPEC-04).
-    //
-    // Captured variables used inside the closure:
-    //   - git, private_index, metadata_rel (git index staging)
-    //   - round_type, args.group, verdict_str, timestamp, expected_groups, pre_update_hash
-    let mut stale_error: Option<String> = None;
-    let mut escalation_error: Option<Vec<String>> = None;
-    let with_locked_result = store.with_locked_document(&track_id, |track, meta| {
-        // Step 3: Record round with code_hash="PENDING".
-        let review = track.review_mut().get_or_insert_with(ReviewState::new);
-        let round_num = review
-            .groups()
-            .get(&group_name)
-            .and_then(|g| match round_type {
-                RoundType::Fast => g.fast().map(|r| r.round()),
-                RoundType::Final => g.final_round().map(|r| r.round()),
-            })
-            .map(|n| n.saturating_add(1))
-            .unwrap_or(1);
-
-        let result = if concerns.is_empty() {
-            ReviewRoundResult::new(round_num, verdict, timestamp.clone())
-        } else {
-            ReviewRoundResult::new_with_concerns(
-                round_num,
-                verdict,
-                timestamp.clone(),
-                concerns.clone(),
-            )
-        };
-        match review.record_round_with_pending(
-            round_type,
-            &group_name,
-            result,
-            &expected_groups,
-            &pre_update_hash,
-        ) {
-            Ok(()) => {}
-            Err(domain::ReviewError::EscalationActive { concerns: blocked }) => {
-                // Escalation is active — signal via sentinel and abort the closure
-                // with an Err so that with_locked_document does NOT write metadata.json.
-                escalation_error = Some(blocked);
-                return Err(domain::DomainError::Validation(
-                    domain::ValidationError::InvalidTaskId(
-                        "escalation-blocked-sentinel".to_owned(),
-                    ),
-                ));
-            }
-            Err(domain::ReviewError::StaleCodeHash { expected, actual }) => {
-                // Persist the invalidated state, then signal the caller.
-                // Returning Ok here causes with_locked_document to write
-                // the (now-invalidated) track to disk.
-                stale_error = Some(format!(
-                    "code hash mismatch: review recorded against {expected}, \
+            let result = if concerns.is_empty() {
+                ReviewRoundResult::new(round_num, verdict, timestamp.clone())
+            } else {
+                ReviewRoundResult::new_with_concerns(
+                    round_num,
+                    verdict,
+                    timestamp.clone(),
+                    concerns.clone(),
+                )
+            };
+            match review.record_round_with_pending(
+                round_type,
+                &group_name,
+                result,
+                &expected_groups,
+                &pre_update_hash,
+            ) {
+                Ok(()) => {}
+                Err(domain::ReviewError::EscalationActive { concerns: blocked }) => {
+                    escalation_error = Some(blocked);
+                    return Err(domain::DomainError::Validation(
+                        domain::ValidationError::InvalidTaskId(
+                            "escalation-blocked-sentinel".to_owned(),
+                        ),
+                    ));
+                }
+                Err(domain::ReviewError::StaleCodeHash { expected, actual }) => {
+                    stale_error = Some(format!(
+                        "code hash mismatch: review recorded against {expected}, \
                          but current code is {actual} — review.status set to invalidated"
-                ));
-                meta.updated_at = timestamp.to_string();
-                return Ok(());
+                    ));
+                    meta.updated_at = timestamp.to_string();
+                    return Ok(());
+                }
+                Err(e) => {
+                    return Err(domain::DomainError::Validation(
+                        domain::ValidationError::InvalidTaskId(e.to_string()),
+                    ));
+                }
             }
-            Err(e) => {
-                return Err(domain::DomainError::Validation(
-                    domain::ValidationError::InvalidTaskId(e.to_string()),
-                ));
-            }
-        }
 
-        // Step 4: Set updated_at (not auto-set by with_locked_document).
-        meta.updated_at = timestamp.to_string();
+            meta.updated_at = timestamp.to_string();
 
-        // Step 5: Serialize PENDING state and stage into private index.
-        let pending_json = infrastructure::track::codec::encode(track, meta).map_err(|e| {
-            domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
-                "codec encode error: {e}"
-            )))
-        })?;
-        // Append trailing newline for POSIX compatibility, matching write_track.
-        let pending_content = format!("{pending_json}\n");
-        private_index.stage_bytes(&git, &metadata_rel, pending_content.as_bytes()).map_err(
-            |e| domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(e)),
-        )?;
-
-        // Step 6: Compute normalized hash H1 from the private index (PENDING state staged).
-        let h1 = private_index.normalized_tree_hash(&git, &metadata_rel).map_err(|e| {
-            domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
-                "post-pending normalized hash error: {e}"
-            )))
-        })?;
-
-        // Step 7: Replace PENDING with the real code_hash.
-        if let Some(r) = track.review_mut().as_mut() {
-            r.set_code_hash(h1).map_err(|e| {
+            let pending_json = infrastructure::track::codec::encode(track, meta).map_err(|e| {
                 domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
-                    "set_code_hash error: {e}"
+                    "codec encode error: {e}"
                 )))
             })?;
+            let pending_content = format!("{pending_json}\n");
+            private_index.stage_bytes(&git, &metadata_rel, pending_content.as_bytes()).map_err(
+                |e| domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(e)),
+            )?;
+
+            let h1 = private_index.normalized_tree_hash(&git, &metadata_rel).map_err(|e| {
+                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
+                    "post-pending normalized hash error: {e}"
+                )))
+            })?;
+
+            if let Some(r) = track.review_mut().as_mut() {
+                r.set_code_hash(h1).map_err(|e| {
+                    domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(
+                        format!("set_code_hash error: {e}"),
+                    ))
+                })?;
+            }
+
+            let final_json = infrastructure::track::codec::encode(track, meta).map_err(|e| {
+                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
+                    "codec encode error (final): {e}"
+                )))
+            })?;
+            let final_content = format!("{final_json}\n");
+            private_index.stage_bytes(&git, &metadata_rel, final_content.as_bytes()).map_err(
+                |e| domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(e)),
+            )?;
+
+            Ok(())
+        });
+
+        if let Some(blocked_concerns) = escalation_error {
+            return Err(
+                usecase::review_workflow::usecases::RecordRoundStoreError::EscalationBlocked(
+                    blocked_concerns,
+                ),
+            );
         }
 
-        // Step 8: Serialize final state and stage into private index.
-        // with_locked_document will write this same state to disk.
-        let final_json = infrastructure::track::codec::encode(track, meta).map_err(|e| {
-            domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(format!(
-                "codec encode error (final): {e}"
-            )))
-        })?;
-        let final_content = format!("{final_json}\n");
-        private_index.stage_bytes(&git, &metadata_rel, final_content.as_bytes()).map_err(|e| {
-            domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(e))
+        with_locked_result.map_err(|e| {
+            let msg = e.to_string();
+            let cleaned = if let Some(inner) = msg.strip_prefix("task id '") {
+                inner.strip_suffix("' must match the pattern T<digits>").unwrap_or(inner).to_owned()
+            } else {
+                msg
+            };
+            usecase::review_workflow::usecases::RecordRoundStoreError::Other(format!(
+                "record-round failed: {cleaned}"
+            ))
         })?;
 
+        if let Some(err_msg) = stale_error {
+            return Err(usecase::review_workflow::usecases::RecordRoundStoreError::StaleHash(
+                err_msg,
+            ));
+        }
+
+        private_index
+            .swap_into_real()
+            .map_err(usecase::review_workflow::usecases::RecordRoundStoreError::Other)?;
+
+        eprintln!(
+            "[OK] Recorded {round_type} round for group '{}' (verdict: {verdict})",
+            self.group
+        );
         Ok(())
-    });
-
-    // Escalation block — the closure returned Err (sentinel), so with_locked_document
-    // did NOT write metadata.json. Check escalation_error before propagating other errors.
-    if let Some(blocked_concerns) = escalation_error {
-        return Err(RecordRoundError::EscalationBlocked(blocked_concerns));
     }
+}
 
-    // Propagate any real (non-escalation) error from with_locked_document.
-    // Extract inner message from InvalidTaskId sentinel wrapping (CLI-02 will fix properly).
-    with_locked_result.map_err(|e| {
-        let msg = e.to_string();
-        let cleaned = if let Some(inner) = msg.strip_prefix("task id '") {
-            inner.strip_suffix("' must match the pattern T<digits>").unwrap_or(inner).to_owned()
-        } else {
-            msg
-        };
-        RecordRoundError::Other(format!("record-round failed: {cleaned}"))
-    })?;
+struct CliResolveEscalationStore {
+    items_dir: PathBuf,
+    decision_str: String,
+}
 
-    if let Some(err_msg) = stale_error {
-        // private_index is dropped without swap — real index is untouched.
-        return Err(RecordRoundError::Other(format!("[BLOCKED] {err_msg}")));
+impl usecase::review_workflow::usecases::ResolveEscalationStore for CliResolveEscalationStore {
+    fn resolve(
+        &self,
+        track_id: &usecase::review_workflow::usecases::TrackId,
+        blocked_concerns: Vec<usecase::review_workflow::usecases::ReviewConcern>,
+        workspace_search_ref: String,
+        reinvention_check_ref: String,
+        decision: usecase::review_workflow::usecases::ReviewEscalationDecision,
+        summary: String,
+        timestamp: usecase::review_workflow::usecases::Timestamp,
+    ) -> Result<(), String> {
+        use domain::ReviewEscalationResolution;
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let store = FsTrackStore::new(&self.items_dir);
+
+        store
+            .with_locked_document(track_id, |track, meta| {
+                let review = track.review_mut().as_mut().ok_or_else(|| {
+                    domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(
+                        "no review section in metadata.json".to_owned(),
+                    ))
+                })?;
+
+                if !review.escalation().is_blocked() {
+                    return Err(domain::DomainError::Validation(
+                        domain::ValidationError::InvalidTaskId(
+                            "no active escalation block; cannot resolve".to_owned(),
+                        ),
+                    ));
+                }
+
+                if !std::path::Path::new(&workspace_search_ref).exists() {
+                    return Err(domain::DomainError::Validation(
+                        domain::ValidationError::InvalidTaskId(format!(
+                            "workspace search artifact not found: {workspace_search_ref}"
+                        )),
+                    ));
+                }
+                if !std::path::Path::new(&reinvention_check_ref).exists() {
+                    return Err(domain::DomainError::Validation(
+                        domain::ValidationError::InvalidTaskId(format!(
+                            "reinvention check artifact not found: {reinvention_check_ref}"
+                        )),
+                    ));
+                }
+
+                let resolution = ReviewEscalationResolution::new(
+                    blocked_concerns.clone(),
+                    workspace_search_ref.clone(),
+                    reinvention_check_ref.clone(),
+                    decision,
+                    summary.clone(),
+                    timestamp.clone(),
+                )
+                .map_err(|e| {
+                    domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(
+                        e.to_string(),
+                    ))
+                })?;
+
+                review.resolve_escalation(resolution).map_err(|e| {
+                    domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(
+                        e.to_string(),
+                    ))
+                })?;
+
+                meta.updated_at = timestamp.to_string();
+                Ok(())
+            })
+            .map_err(|e| {
+                let msg = e.to_string();
+                if let Some(inner) = msg.strip_prefix("task id '") {
+                    if let Some(inner) = inner.strip_suffix("' must match the pattern T<digits>") {
+                        return format!("resolve-escalation failed: {inner}");
+                    }
+                }
+                format!("resolve-escalation failed: {msg}")
+            })?;
+
+        println!("[OK] Escalation resolved: {}", self.decision_str);
+        Ok(())
     }
+}
 
-    // Step 9: Atomically rename private index over the real index.
-    // If any earlier step failed, private_index would be dropped without swap,
-    // leaving the real index entirely untouched.
-    private_index.swap_into_real().map_err(RecordRoundError::Other)?;
+struct CliCheckApprovedStore {
+    items_dir: PathBuf,
+}
 
-    eprintln!("[OK] Recorded {round_type} round for group '{}' (verdict: {verdict})", args.group);
-    Ok(())
+impl usecase::review_workflow::usecases::CheckApprovedStore for CliCheckApprovedStore {
+    fn check(&self, track_id: &usecase::review_workflow::usecases::TrackId) -> Result<(), String> {
+        use domain::TrackReader;
+        use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let git = SystemGitRepo::discover().map_err(|e| format!("git error: {e}"))?;
+
+        let metadata_abs = self.items_dir.join(track_id.as_ref()).join("metadata.json");
+        let metadata_rel = metadata_abs
+            .strip_prefix(git.root())
+            .unwrap_or(&metadata_abs)
+            .to_string_lossy()
+            .into_owned();
+
+        let code_hash = git
+            .index_tree_hash_normalizing(&metadata_rel)
+            .map_err(|e| format!("normalized hash error: {e}"))?;
+
+        let store = FsTrackStore::new(&self.items_dir);
+
+        let track = store
+            .find(track_id)
+            .map_err(|e| format!("failed to read track: {e}"))?
+            .ok_or_else(|| format!("track '{}' not found", track_id.as_ref()))?;
+
+        let review = track.review().ok_or("[BLOCKED] no review section in metadata.json")?;
+
+        if review.status() == domain::ReviewStatus::NotStarted && review.groups().is_empty() {
+            return Ok(());
+        }
+
+        let mut review_check = review.clone();
+        match review_check.check_commit_ready(&code_hash) {
+            Ok(()) => return Ok(()),
+            Err(domain::ReviewError::StaleCodeHash { .. }) => {
+                use domain::TrackWriter;
+                let mut invalidation_msg: Option<String> = None;
+                store
+                    .update(track_id, |track| {
+                        if let Some(r) = track.review_mut().as_mut() {
+                            match r.check_commit_ready(&code_hash) {
+                                Ok(()) => {}
+                                Err(domain::ReviewError::StaleCodeHash { expected, actual }) => {
+                                    invalidation_msg = Some(format!(
+                                        "[BLOCKED] code hash mismatch: recorded against {expected}, \
+                                         current is {actual} — review.status set to invalidated"
+                                    ));
+                                }
+                                Err(e) => {
+                                    invalidation_msg =
+                                        Some(format!("[BLOCKED] Review guard failed: {e}"));
+                                }
+                            }
+                        }
+                        Ok(())
+                    })
+                    .map_err(|e| format!("failed to persist invalidation: {e}"))?;
+
+                if let Some(msg) = invalidation_msg {
+                    return Err(msg);
+                }
+            }
+            Err(e) => return Err(format!("[BLOCKED] Review guard failed: {e}")),
+        }
+        Ok(())
+    }
+}
+
+fn run_record_round(
+    args: &RecordRoundArgs,
+) -> Result<(), usecase::review_workflow::usecases::RecordRoundError> {
+    let store =
+        CliRecordRoundStore { items_dir: args.items_dir.clone(), group: args.group.clone() };
+    let input = usecase::review_workflow::usecases::RecordRoundInput {
+        round_type: args.round_type.clone(),
+        group: args.group.clone(),
+        verdict: args.verdict.clone(),
+        expected_groups: args.expected_groups.clone(),
+        concerns: args.concerns.clone(),
+        items_dir: args.items_dir.clone(),
+        track_id: args.track_id.clone(),
+    };
+    usecase::review_workflow::usecases::record_round(input, &store)
 }
 
 // ---------------------------------------------------------------------------
@@ -1028,460 +1044,20 @@ fn execute_resolve_escalation(args: &ResolveEscalationArgs) -> ExitCode {
 }
 
 fn run_resolve_escalation(args: &ResolveEscalationArgs) -> Result<(), String> {
-    use domain::{ReviewEscalationDecision, ReviewEscalationResolution};
-    use infrastructure::track::fs_store::FsTrackStore;
-
-    let decision = match args.decision.as_str() {
-        "adopt_workspace" => ReviewEscalationDecision::AdoptWorkspaceSolution,
-        "adopt_crate" => ReviewEscalationDecision::AdoptExternalCrate,
-        "continue_self" => ReviewEscalationDecision::ContinueSelfImplementation,
-        other => {
-            return Err(format!(
-                "unknown decision: {other}. Use: adopt_workspace, adopt_crate, or continue_self"
-            ));
-        }
+    let store = CliResolveEscalationStore {
+        items_dir: args.items_dir.clone(),
+        decision_str: args.decision.clone(),
     };
-
-    // Parse caller-supplied blocked concerns. Deduplicate and sort via BTreeSet so
-    // that order-insensitive comparisons in the domain layer are stable.
-    // The domain layer validates the match against the active escalation block via
-    // ReviewEscalationResolution::new.
-    let blocked_concerns: Vec<domain::ReviewConcern> = {
-        let parsed: Result<std::collections::BTreeSet<_>, _> = args
-            .blocked_concerns
-            .split(',')
-            .map(|s| {
-                domain::ReviewConcern::try_new(s.trim())
-                    .map_err(|e| format!("invalid blocked concern: {e}"))
-            })
-            .collect();
-        parsed?.into_iter().collect()
+    let input = usecase::review_workflow::usecases::ResolveEscalationInput {
+        track_id: args.track_id.clone(),
+        blocked_concerns: args.blocked_concerns.clone(),
+        workspace_search_ref: args.workspace_search_ref.clone(),
+        reinvention_check_ref: args.reinvention_check_ref.clone(),
+        decision: args.decision.clone(),
+        summary: args.summary.clone(),
+        items_dir: args.items_dir.clone(),
     };
-
-    let track_id =
-        domain::TrackId::try_new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
-
-    let store = FsTrackStore::new(&args.items_dir);
-
-    let timestamp_str = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
-    let timestamp =
-        domain::Timestamp::new(timestamp_str).map_err(|e| format!("invalid timestamp: {e}"))?;
-
-    store
-        .with_locked_document(&track_id, |track, meta| {
-            let review = track.review_mut().as_mut().ok_or_else(|| {
-                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(
-                    "no review section in metadata.json".to_owned(),
-                ))
-            })?;
-
-            // Check escalation is active before verifying evidence artifacts.
-            // This ensures callers get "EscalationNotActive" rather than
-            // "artifact not found" when no escalation is in progress.
-            if !review.escalation().is_blocked() {
-                return Err(domain::DomainError::Validation(
-                    domain::ValidationError::InvalidTaskId(
-                        "no active escalation block; cannot resolve".to_owned(),
-                    ),
-                ));
-            }
-
-            // Verify evidence artifacts exist before committing to the resolution.
-            if !std::path::Path::new(&args.workspace_search_ref).exists() {
-                return Err(domain::DomainError::Validation(
-                    domain::ValidationError::InvalidTaskId(format!(
-                        "workspace search artifact not found: {}",
-                        args.workspace_search_ref
-                    )),
-                ));
-            }
-            if !std::path::Path::new(&args.reinvention_check_ref).exists() {
-                return Err(domain::DomainError::Validation(
-                    domain::ValidationError::InvalidTaskId(format!(
-                        "reinvention check artifact not found: {}",
-                        args.reinvention_check_ref
-                    )),
-                ));
-            }
-
-            let resolution = ReviewEscalationResolution::new(
-                blocked_concerns.clone(),
-                args.workspace_search_ref.clone(),
-                args.reinvention_check_ref.clone(),
-                decision,
-                args.summary.clone(),
-                timestamp.clone(),
-            )
-            .map_err(|e| {
-                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(
-                    e.to_string(),
-                ))
-            })?;
-
-            review.resolve_escalation(resolution).map_err(|e| {
-                domain::DomainError::Validation(domain::ValidationError::InvalidTaskId(
-                    e.to_string(),
-                ))
-            })?;
-
-            meta.updated_at = timestamp.to_string();
-            Ok(())
-        })
-        .map_err(|e| {
-            // Extract the inner message from InvalidTaskId sentinel wrapping.
-            // The closure uses InvalidTaskId as a generic error carrier because
-            // with_locked_document constrains the return type to DomainError.
-            // This will be cleaned up in CLI-02 (usecase layer extraction).
-            let msg = e.to_string();
-            if let Some(inner) = msg.strip_prefix("task id '") {
-                if let Some(inner) = inner.strip_suffix("' must match the pattern T<digits>") {
-                    return format!("resolve-escalation failed: {inner}");
-                }
-            }
-            format!("resolve-escalation failed: {msg}")
-        })?;
-
-    println!("[OK] Escalation resolved: {}", args.decision);
-    Ok(())
-}
-
-// ---------------------------------------------------------------------------
-// PrivateIndex: POSIX-atomic index update via private copy + rename
-// ---------------------------------------------------------------------------
-
-/// A private copy of the git index used to stage files without touching the
-/// real `.git/index` until all operations succeed.
-///
-/// All git commands that read or modify the index operate on `temp_path`
-/// via `GIT_INDEX_FILE`.  When every step has succeeded, [`swap_into_real`]
-/// atomically renames `temp_path` over `real_index_path`.  If the
-/// `PrivateIndex` is dropped before [`swap_into_real`] is called, the temp
-/// file is removed and the real index is left completely untouched.
-///
-/// [`swap_into_real`]: PrivateIndex::swap_into_real
-struct PrivateIndex {
-    temp_path: PathBuf,
-    real_index_path: PathBuf,
-    swapped: bool,
-}
-
-impl PrivateIndex {
-    /// Copy the current git index to a temp file in the same directory as the
-    /// real index (required for `fs::rename` to be atomic on POSIX).
-    ///
-    /// Uses `git rev-parse --git-path index` to find the real index path so
-    /// that linked worktrees are handled correctly.
-    fn from_current(git: &impl infrastructure::git_cli::GitRepository) -> Result<Self, String> {
-        // Resolve the real index path (worktree-safe).
-        let real_index_path = resolve_real_index_path(git)?;
-
-        // Place the temp file in the same directory so rename is atomic.
-        let temp_dir = real_index_path.parent().ok_or_else(|| {
-            format!("git index path has no parent directory: {}", real_index_path.display())
-        })?;
-        let temp_path = temp_dir.join(format!(
-            "sotp-private-index-{}-{}.tmp",
-            std::process::id(),
-            // Pointer address of a stack local used as a secondary disambiguator.
-            // This is stable within a single call site and avoids collisions
-            // when multiple PrivateIndex values are alive concurrently.
-            {
-                let marker: u8 = 0;
-                std::ptr::from_ref(&marker) as usize
-            }
-        ));
-
-        std::fs::copy(&real_index_path, &temp_path).map_err(|e| {
-            format!(
-                "failed to copy git index {} -> {}: {e}",
-                real_index_path.display(),
-                temp_path.display()
-            )
-        })?;
-
-        Ok(Self { temp_path, real_index_path, swapped: false })
-    }
-
-    /// Compute the normalized tree hash from the private index.
-    ///
-    /// The normalization is identical to `index_tree_hash_normalizing` in
-    /// `git_cli.rs`: `review.code_hash` is set to `"PENDING"` and
-    /// `updated_at` is set to the Unix epoch.  A second temp copy of the
-    /// private index is used for the write-tree operation so the private
-    /// index itself is not modified.
-    #[allow(clippy::too_many_lines)]
-    fn normalized_tree_hash(
-        &self,
-        git: &impl infrastructure::git_cli::GitRepository,
-        metadata_path: &str,
-    ) -> Result<String, infrastructure::git_cli::GitError> {
-        use infrastructure::git_cli::GitError;
-        use std::io::Write as _;
-
-        // Step 1: Read the metadata.json blob from the private index.
-        let show_output = std::process::Command::new("git")
-            .args(["show", &format!(":{metadata_path}")])
-            .current_dir(git.root())
-            .env("GIT_INDEX_FILE", &self.temp_path)
-            .output()
-            .map_err(|source| GitError::Spawn {
-                command: format!("show :{metadata_path}"),
-                source,
-            })?;
-        if !show_output.status.success() {
-            let stderr = String::from_utf8_lossy(&show_output.stderr).trim().to_owned();
-            let code = show_output.status.code().unwrap_or(-1);
-            return Err(GitError::CommandFailed {
-                command: format!("show :{metadata_path}"),
-                code,
-                stderr,
-            });
-        }
-        let blob_content = String::from_utf8_lossy(&show_output.stdout);
-
-        // Step 2: Parse as JSON.
-        let mut json: serde_json::Value =
-            serde_json::from_str(&blob_content).map_err(|e| GitError::CommandFailed {
-                command: format!("parse {metadata_path}"),
-                code: -1,
-                stderr: e.to_string(),
-            })?;
-
-        // Step 3: Normalize volatile fields.
-        if let serde_json::Value::Object(obj) = &mut json {
-            obj.insert(
-                "updated_at".to_owned(),
-                serde_json::Value::String("1970-01-01T00:00:00Z".to_owned()),
-            );
-            let review = obj
-                .entry("review")
-                .or_insert_with(|| serde_json::Value::Object(serde_json::Map::new()));
-            if let serde_json::Value::Object(review_obj) = review {
-                review_obj.insert(
-                    "code_hash".to_owned(),
-                    serde_json::Value::String("PENDING".to_owned()),
-                );
-            }
-        }
-
-        // Step 4: Serialize deterministically.
-        let normalized =
-            serde_json::to_string_pretty(&json).map_err(|e| GitError::CommandFailed {
-                command: format!("serialize {metadata_path}"),
-                code: -1,
-                stderr: e.to_string(),
-            })?;
-
-        // Step 5: Write normalized blob to object store.
-        let mut hash_object_child = std::process::Command::new("git")
-            .args(["hash-object", "-w", "--stdin"])
-            .current_dir(git.root())
-            .stdin(std::process::Stdio::piped())
-            .stdout(std::process::Stdio::piped())
-            .stderr(std::process::Stdio::piped())
-            .spawn()
-            .map_err(|source| GitError::Spawn {
-                command: "hash-object -w --stdin".to_owned(),
-                source,
-            })?;
-        if let Some(ref mut stdin) = hash_object_child.stdin {
-            stdin.write_all(normalized.as_bytes()).map_err(|source| GitError::Spawn {
-                command: "hash-object write stdin".to_owned(),
-                source,
-            })?;
-        }
-        let hash_object_output = hash_object_child.wait_with_output().map_err(|source| {
-            GitError::Spawn { command: "hash-object -w --stdin (wait)".to_owned(), source }
-        })?;
-        if !hash_object_output.status.success() {
-            let stderr = String::from_utf8_lossy(&hash_object_output.stderr).trim().to_owned();
-            let code = hash_object_output.status.code().unwrap_or(-1);
-            return Err(GitError::CommandFailed {
-                command: "hash-object -w --stdin".to_owned(),
-                code,
-                stderr,
-            });
-        }
-        let blob_hash = String::from_utf8_lossy(&hash_object_output.stdout).trim().to_owned();
-
-        // Step 6: Copy private index to a second temp file for write-tree
-        // (write-tree modifies internal index state, so we must not use
-        // self.temp_path directly).
-        let norm_temp = self.temp_path.with_extension("norm.tmp");
-        std::fs::copy(&self.temp_path, &norm_temp).map_err(|source| GitError::Spawn {
-            command: "copy private index for write-tree".to_owned(),
-            source,
-        })?;
-
-        // Step 7: Update the norm copy with the normalized blob.
-        let update_output = std::process::Command::new("git")
-            .args(["update-index", "--cacheinfo", &format!("100644,{blob_hash},{metadata_path}")])
-            .current_dir(git.root())
-            .env("GIT_INDEX_FILE", &norm_temp)
-            .output()
-            .map_err(|source| GitError::Spawn {
-                command: "update-index --cacheinfo (norm)".to_owned(),
-                source,
-            })?;
-        if !update_output.status.success() {
-            let _ = std::fs::remove_file(&norm_temp);
-            let stderr = String::from_utf8_lossy(&update_output.stderr).trim().to_owned();
-            let code = update_output.status.code().unwrap_or(-1);
-            return Err(GitError::CommandFailed {
-                command: "update-index --cacheinfo (norm)".to_owned(),
-                code,
-                stderr,
-            });
-        }
-
-        // Step 8: Write tree from the norm copy.
-        let write_tree_output = std::process::Command::new("git")
-            .args(["write-tree"])
-            .current_dir(git.root())
-            .env("GIT_INDEX_FILE", &norm_temp)
-            .output()
-            .map_err(|source| GitError::Spawn {
-                command: "write-tree (private-norm)".to_owned(),
-                source,
-            })?;
-
-        // Step 9: Clean up the norm copy unconditionally.
-        let _ = std::fs::remove_file(&norm_temp);
-
-        if !write_tree_output.status.success() {
-            let stderr = String::from_utf8_lossy(&write_tree_output.stderr).trim().to_owned();
-            let code = write_tree_output.status.code().unwrap_or(-1);
-            return Err(GitError::CommandFailed {
-                command: "write-tree (private-norm)".to_owned(),
-                code,
-                stderr,
-            });
-        }
-
-        Ok(String::from_utf8_lossy(&write_tree_output.stdout).trim().to_owned())
-    }
-
-    /// Stage raw bytes as a blob for the given repo-relative path in the private index.
-    ///
-    /// Feeds `content` to `git hash-object -w --stdin` to write a blob to the
-    /// object store, then updates the private index entry with
-    /// `git update-index --cacheinfo`.
-    fn stage_bytes(
-        &self,
-        git: &impl infrastructure::git_cli::GitRepository,
-        rel_path: &str,
-        content: &[u8],
-    ) -> Result<(), String> {
-        use std::io::Write as _;
-
-        // Step 1: Write blob to object store via stdin.
-        let mut child = std::process::Command::new("git")
-            .args(["hash-object", "-w", "--stdin"])
-            .current_dir(git.root())
-            .stdin(std::process::Stdio::piped())
-            .stdout(std::process::Stdio::piped())
-            .stderr(std::process::Stdio::piped())
-            .spawn()
-            .map_err(|e| format!("failed to spawn git hash-object for {rel_path}: {e}"))?;
-
-        if let Some(ref mut stdin) = child.stdin {
-            stdin
-                .write_all(content)
-                .map_err(|e| format!("failed to write content to hash-object stdin: {e}"))?;
-        }
-
-        let hash_output = child
-            .wait_with_output()
-            .map_err(|e| format!("failed to wait for git hash-object: {e}"))?;
-        if !hash_output.status.success() {
-            let stderr = String::from_utf8_lossy(&hash_output.stderr).trim().to_owned();
-            return Err(format!("git hash-object failed for {rel_path}: {stderr}"));
-        }
-        let blob_hash = String::from_utf8_lossy(&hash_output.stdout).trim().to_owned();
-
-        // Step 2: Update the private index entry.
-        let update_output = std::process::Command::new("git")
-            .args(["update-index", "--cacheinfo", &format!("100644,{blob_hash},{rel_path}")])
-            .current_dir(git.root())
-            .env("GIT_INDEX_FILE", &self.temp_path)
-            .output()
-            .map_err(|e| format!("failed to update-index for {rel_path}: {e}"))?;
-        if !update_output.status.success() {
-            let stderr = String::from_utf8_lossy(&update_output.stderr).trim().to_owned();
-            return Err(format!("git update-index failed for {rel_path}: {stderr}"));
-        }
-
-        Ok(())
-    }
-
-    /// Atomically replace the real index using git's own lockfile protocol.
-    ///
-    /// 1. Create `<index>.lock` with `O_CREAT|O_EXCL` — blocks concurrent
-    ///    git operations (they also use this lock before touching the index).
-    /// 2. Copy our private index content into the lock file.
-    /// 3. Rename `<index>.lock` → `<index>` — atomic on POSIX, and this is
-    ///    exactly how git itself commits index changes.
-    ///
-    /// The lock is held only for the copy+rename duration (microseconds),
-    /// so it does not interfere with our earlier `git hash-object` /
-    /// `git update-index` calls which operate on the private index.
-    fn swap_into_real(mut self) -> Result<(), String> {
-        let lock_path = self.real_index_path.with_extension("lock");
-        // Acquire git's index lock — fails if another git operation holds it.
-        std::fs::OpenOptions::new().write(true).create_new(true).open(&lock_path).map_err(|e| {
-            format!(
-                "failed to acquire index lock at {}: {e}. \
-                     A concurrent git operation may be in progress.",
-                lock_path.display()
-            )
-        })?;
-        // Copy private index content into the lock file.
-        if let Err(e) = std::fs::copy(&self.temp_path, &lock_path) {
-            let _ = std::fs::remove_file(&lock_path);
-            return Err(format!("failed to write index lock: {e}"));
-        }
-        // Atomic rename: lock file becomes the real index.
-        // This is git's own commit protocol for index updates.
-        if let Err(e) = std::fs::rename(&lock_path, &self.real_index_path) {
-            let _ = std::fs::remove_file(&lock_path);
-            return Err(format!("failed to rename index lock to index: {e}"));
-        }
-        // Clean up the temp private index.
-        let _ = std::fs::remove_file(&self.temp_path);
-        self.swapped = true;
-        Ok(())
-    }
-}
-
-impl Drop for PrivateIndex {
-    fn drop(&mut self) {
-        if !self.swapped {
-            let _ = std::fs::remove_file(&self.temp_path);
-        }
-    }
-}
-
-/// Resolve the absolute path of the real git index, worktree-safe.
-///
-/// Uses `git rev-parse --git-path index` which correctly resolves the index
-/// path even in linked worktrees where `.git` is a pointer file.
-fn resolve_real_index_path(
-    git: &impl infrastructure::git_cli::GitRepository,
-) -> Result<PathBuf, String> {
-    let output = git
-        .output(&["rev-parse", "--git-path", "index"])
-        .map_err(|e| format!("failed to resolve git index path: {e}"))?;
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
-        return Err(format!("git rev-parse --git-path index failed: {stderr}"));
-    }
-    let resolved = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-    let path = if std::path::Path::new(&resolved).is_absolute() {
-        PathBuf::from(resolved)
-    } else {
-        git.root().join(resolved)
-    };
-    Ok(path)
+    usecase::review_workflow::usecases::resolve_escalation(input, &store)
 }
 
 // ---------------------------------------------------------------------------
@@ -1502,80 +1078,12 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
 }
 
 fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
-    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
-    use infrastructure::track::fs_store::FsTrackStore;
-
-    let git = SystemGitRepo::discover().map_err(|e| format!("git error: {e}"))?;
-
-    // Compute repo-relative metadata path for normalized hash.
-    let metadata_abs = args.items_dir.join(&args.track_id).join("metadata.json");
-    let metadata_rel = metadata_abs
-        .strip_prefix(git.root())
-        .unwrap_or(&metadata_abs)
-        .to_string_lossy()
-        .into_owned();
-
-    // Use normalized hash: review.code_hash → "PENDING", updated_at → epoch.
-    let code_hash = git
-        .index_tree_hash_normalizing(&metadata_rel)
-        .map_err(|e| format!("normalized hash error: {e}"))?;
-
-    let track_id =
-        domain::TrackId::try_new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
-
-    let store = FsTrackStore::new(&args.items_dir);
-
-    // Phase 1: Read-only check. On success, return without writing metadata.json.
-    use domain::TrackReader;
-    let track = store
-        .find(&track_id)
-        .map_err(|e| format!("failed to read track: {e}"))?
-        .ok_or_else(|| format!("track '{}' not found", args.track_id))?;
-
-    let review = track.review().ok_or("[BLOCKED] no review section in metadata.json")?;
-
-    // WF-54: Allow commit when review is in its initial state (no rounds recorded).
-    // NotStarted + empty groups = freshly created track (planning artifacts only).
-    // NotStarted + non-empty groups = demoted after findings_remain — must re-review.
-    if review.status() == domain::ReviewStatus::NotStarted && review.groups().is_empty() {
-        return Ok(());
-    }
-
-    let mut review_check = review.clone();
-    match review_check.check_commit_ready(&code_hash) {
-        Ok(()) => return Ok(()),
-        Err(domain::ReviewError::StaleCodeHash { .. }) => {
-            // Phase 2: Persist invalidation under lock with re-check to prevent TOCTOU.
-            use domain::TrackWriter;
-            let mut invalidation_msg: Option<String> = None;
-            store
-                .update(&track_id, |track| {
-                    if let Some(r) = track.review_mut().as_mut() {
-                        match r.check_commit_ready(&code_hash) {
-                            Ok(()) => {} // Refreshed by another process — no invalidation
-                            Err(domain::ReviewError::StaleCodeHash { expected, actual }) => {
-                                invalidation_msg = Some(format!(
-                                    "[BLOCKED] code hash mismatch: recorded against {expected}, \
-                                     current is {actual} — review.status set to invalidated"
-                                ));
-                            }
-                            Err(e) => {
-                                invalidation_msg =
-                                    Some(format!("[BLOCKED] Review guard failed: {e}"));
-                            }
-                        }
-                    }
-                    Ok(())
-                })
-                .map_err(|e| format!("failed to persist invalidation: {e}"))?;
-
-            if let Some(msg) = invalidation_msg {
-                return Err(msg);
-            }
-        }
-        Err(e) => return Err(format!("[BLOCKED] Review guard failed: {e}")),
-    }
-    Ok(())
+    let store = CliCheckApprovedStore { items_dir: args.items_dir.clone() };
+    let input = usecase::review_workflow::usecases::CheckApprovedInput {
+        items_dir: args.items_dir.clone(),
+        track_id: args.track_id.clone(),
+    };
+    usecase::review_workflow::usecases::check_approved(input, &store)
 }
 
 #[cfg(test)]

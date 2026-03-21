@@ -1,0 +1,182 @@
+{
+  "branch": "track/review-usecase-extraction-2026-03-20",
+  "created_at": "2026-03-20T12:00:00Z",
+  "id": "review-usecase-extraction-2026-03-20",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "T001: PrivateIndex (~319行) + resolve_real_index_path (~18行) を infrastructure::git_cli::private_index.rs に移動",
+          "git_cli.rs をモジュールディレクトリ化（git_cli/mod.rs + private_index.rs）"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Phase 1: Infrastructure 移動"
+      },
+      {
+        "description": [
+          "T002: domain::review.rs (2375行) → review/{mod,error,concern,escalation,types,state}.rs に分割",
+          "純粋ロジック追加: classify_review_verdict, resolve_full_auto, ModelProfile, file_path_to_concern, extract_verdict_from_content",
+          "デッドコード削除: ReviewGroupState::from_legacy_final_only（呼び出し箇所ゼロ、done-hash-backfill Phase D 残件）"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "Phase 2: Domain モジュール分割 + 純粋ロジック集約"
+      },
+      {
+        "description": [
+          "T003: usecase::review_workflow.rs (936行) → review_workflow/{mod,verdict,concern,usecases}.rs に分割",
+          "UseCase 新設: RecordRoundUseCase, ResolveEscalationUseCase, CheckCommitReadyUseCase (薄い Load→domain→Save)",
+          "agent-profiles.json の I/O（AgentProfiles/ProviderConfig serde 型 + ファイル読み込み）を infrastructure に分離",
+          "extract_verdict_from_session_log を usecase に移動（file read + domain::extract_verdict_from_content の薄いオーケストレーター）"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "Phase 3: UseCase モジュール分割 + 薄い UseCase 構築"
+      },
+      {
+        "description": [
+          "T004: run_record_round (~242行) → RecordRoundUseCase 呼び出し (~30行) に圧縮。CLI の codex-local は usecase::extract_verdict_from_session_log を呼び出す（domain/infra 直接参照なし）",
+          "T005: run_resolve_escalation (~117行) → ResolveEscalationUseCase 呼び出し (~20行) に圧縮",
+          "T006: run_check_approved (~76行) → CheckCommitReadyUseCase 呼び出し (~15行) に圧縮"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T004",
+          "T005",
+          "T006"
+        ],
+        "title": "Phase 4: CLI 圧縮"
+      },
+      {
+        "description": [
+          "T007: domain/usecase テスト新設 + CLI テスト調整 + cargo make ci 全通し"
+        ],
+        "id": "S5",
+        "task_ids": [
+          "T007"
+        ],
+        "title": "Phase 5: テスト整合性 + CI"
+      }
+    ],
+    "summary": [
+      "CLI-02: apps/cli/src/commands/review.rs (2317行) から domain/infrastructure オーケストレーションロジックを抽出し、domain 厚く / usecase 薄く / CLI 薄くの原則で全層のモジュール分割を実施。全ファイル 700行以下を目標。"
+    ]
+  },
+  "review": {
+    "code_hash": "e59b9cec477c8fb91c7e1da21ae474a065004dbd",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-20T12:48:38Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-20T12:48:45Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 2,
+          "round_type": "fast",
+          "timestamp": "2026-03-21T14:49:52Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 3,
+          "round_type": "fast",
+          "timestamp": "2026-03-21T14:52:15Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "default": {
+        "fast": {
+          "round": 3,
+          "timestamp": "2026-03-21T14:52:15Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-21T14:52:19Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "commit_hash": "34796ac",
+      "description": "PrivateIndex + resolve_real_index_path を infrastructure::git_cli::private_index に移動（git_cli モジュールディレクトリ化）",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "commit_hash": "34796ac",
+      "description": "domain::review.rs をモジュールディレクトリ化（review/{mod,error,concern,escalation,types,state}.rs）+ 純粋ロジック追加（classify_review_verdict, resolve_full_auto, ModelProfile, file_path_to_concern, extract_verdict_from_content）+ from_legacy_final_only 削除（デッドコード）",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "commit_hash": "34796ac",
+      "description": "usecase::review_workflow.rs をモジュールディレクトリ化（review_workflow/{mod,verdict,concern,usecases}.rs）+ 薄い UseCase 構築 + agent-profiles.json I/O を infrastructure に分離（AgentProfiles/ProviderConfig serde 型）+ extract_verdict_from_session_log を usecase に移動（file read + domain::extract_verdict_from_content 呼び出しの薄いオーケストレーター）",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "commit_hash": "34796ac",
+      "description": "CLI run_record_round を RecordRoundUseCase 呼び出しに圧縮",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "commit_hash": "34796ac",
+      "description": "CLI run_resolve_escalation を ResolveEscalationUseCase 呼び出しに圧縮",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "commit_hash": "34796ac",
+      "description": "CLI run_check_approved を CheckCommitReadyUseCase 呼び出しに圧縮",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "commit_hash": "34796ac",
+      "description": "テスト移動・調整（domain/usecase テスト新設 + CLI テスト調整）+ CI 全通し",
+      "id": "T007",
+      "status": "done"
+    }
+  ],
+  "title": "CLI-02: review.rs usecase extraction + domain/usecase/infrastructure module split",
+  "updated_at": "2026-03-21T14:52:19Z"
+}
