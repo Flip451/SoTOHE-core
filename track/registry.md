@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `review-usecase-extraction-2026-03-20`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-21`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| review-usecase-extraction-2026-03-20 | in_progress | `/track:implement` | 2026-03-21 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| review-usecase-extraction-2026-03-20 | Done | 2026-03-21 |
 | ci-guardrails-phase15-2026-03-20 | Done | 2026-03-20 |
 | done-hash-backfill-2026-03-20 | Done | 2026-03-20 |
 | pr-task-completion-guard-2026-03-20 | Done | 2026-03-19 |
