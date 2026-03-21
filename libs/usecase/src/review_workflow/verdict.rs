@@ -3,7 +3,6 @@
 use serde::de::{self, MapAccess, Visitor};
 use serde::{Deserialize, Serialize};
 use std::fmt;
-use std::path::Path;
 use thiserror::Error;
 
 pub use domain::review::{ModelProfile, resolve_full_auto};
@@ -169,17 +168,16 @@ pub fn classify_review_verdict(
     }
 }
 
-/// Attempts to extract a valid verdict `ReviewFinalMessageState` from a session log file.
+/// Attempts to extract a valid verdict from session log content.
 ///
-/// Delegates content scanning to `domain::review::extract_verdict_json_from_content`.
-/// Returns `None` if the file cannot be read or no valid verdict JSON is found.
+/// Delegates candidate scanning to domain, validates each candidate.
+/// The caller is responsible for reading the file content.
+///
+/// Returns `None` if no valid verdict JSON is found.
 #[must_use]
-pub fn extract_verdict_from_session_log(path: &Path) -> Option<ReviewFinalMessageState> {
-    let content = std::fs::read_to_string(path).ok()?;
-
+pub fn extract_verdict_from_content(content: &str) -> Option<ReviewFinalMessageState> {
     // Strategy 1: compact single-line JSON (bottom-up scan).
-    // Try each candidate with validation — return first valid match.
-    for candidate in domain::review::extract_verdict_json_candidates_compact(&content) {
+    for candidate in domain::review::extract_verdict_json_candidates_compact(content) {
         let state = parse_review_final_message(Some(&candidate));
         if matches!(state, ReviewFinalMessageState::Parsed(_)) {
             return Some(state);
@@ -187,8 +185,7 @@ pub fn extract_verdict_from_session_log(path: &Path) -> Option<ReviewFinalMessag
     }
 
     // Strategy 2: pretty-printed multi-line JSON (bottom-up scan).
-    // Only reached when Strategy 1 found no valid compact verdict.
-    for candidate in domain::review::extract_verdict_json_candidates_multiline(&content) {
+    for candidate in domain::review::extract_verdict_json_candidates_multiline(content) {
         let state = parse_review_final_message(Some(&candidate));
         if matches!(state, ReviewFinalMessageState::Parsed(_)) {
             return Some(state);

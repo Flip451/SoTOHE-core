@@ -30,7 +30,7 @@ skip = [
 # Enforce layered architecture boundaries for this template workspace.
 # Crate names can be changed, but wrappers must reflect your composition root.
 deny = [
-    { crate = "infrastructure", wrappers = ["cli"], reason = "Infrastructure implementations must be wired only at composition root." },
-    { crate = "usecase", wrappers = ["cli"], reason = "Usecase crate must only be consumed by the cli layer." },
+    { crate = "infrastructure", wrappers = ["cli"], reason = "Infrastructure implements usecase ports and domain ports; wired at composition root." },
+    { crate = "usecase", wrappers = ["infrastructure", "cli"], reason = "Usecase crate must only be consumed by the cli layer." },
     { crate = "domain", wrappers = ["usecase", "infrastructure", "cli"], reason = "Domain dependencies are controlled by layer boundaries." },
 ]
