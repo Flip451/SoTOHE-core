@@ -9,13 +9,13 @@
 
 - Latest active track: `review-usecase-extraction-2026-03-20`
 - Next recommended command: `/track:implement`
-- Last updated: `2026-03-20`
+- Last updated: `2026-03-21`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| review-usecase-extraction-2026-03-20 | planned | `/track:implement` | 2026-03-20 |
+| review-usecase-extraction-2026-03-20 | in_progress | `/track:implement` | 2026-03-21 |
 
 ## Completed Tracks
 

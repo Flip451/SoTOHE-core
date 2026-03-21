@@ -70,7 +70,7 @@
     ]
   },
   "review": {
-    "code_hash": "6014dc61fcdd1a9da2880f720e279e59439173f3",
+    "code_hash": "8f2a5503247d490ab5ad98047c7e9d057712d2f1",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -93,6 +93,15 @@
           "round": 1,
           "round_type": "final",
           "timestamp": "2026-03-20T12:48:45Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 2,
+          "round_type": "fast",
+          "timestamp": "2026-03-21T14:49:52Z"
         }
       ],
       "threshold": 3
@@ -100,13 +109,13 @@
     "groups": {
       "default": {
         "fast": {
-          "round": 1,
-          "timestamp": "2026-03-20T12:48:38Z",
+          "round": 2,
+          "timestamp": "2026-03-21T14:49:52Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-20T12:48:45Z",
+          "timestamp": "2026-03-21T14:50:06Z",
           "verdict": "zero_findings"
         }
       }
@@ -114,44 +123,44 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
   "tasks": [
     {
       "description": "PrivateIndex + resolve_real_index_path を infrastructure::git_cli::private_index に移動（git_cli モジュールディレクトリ化）",
       "id": "T001",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "domain::review.rs をモジュールディレクトリ化（review/{mod,error,concern,escalation,types,state}.rs）+ 純粋ロジック追加（classify_review_verdict, resolve_full_auto, ModelProfile, file_path_to_concern, extract_verdict_from_content）+ from_legacy_final_only 削除（デッドコード）",
       "id": "T002",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "usecase::review_workflow.rs をモジュールディレクトリ化（review_workflow/{mod,verdict,concern,usecases}.rs）+ 薄い UseCase 構築 + agent-profiles.json I/O を infrastructure に分離（AgentProfiles/ProviderConfig serde 型）+ extract_verdict_from_session_log を usecase に移動（file read + domain::extract_verdict_from_content 呼び出しの薄いオーケストレーター）",
       "id": "T003",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "CLI run_record_round を RecordRoundUseCase 呼び出しに圧縮",
       "id": "T004",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "CLI run_resolve_escalation を ResolveEscalationUseCase 呼び出しに圧縮",
       "id": "T005",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "CLI run_check_approved を CheckCommitReadyUseCase 呼び出しに圧縮",
       "id": "T006",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "テスト移動・調整（domain/usecase テスト新設 + CLI テスト調整）+ CI 全通し",
       "id": "T007",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "title": "CLI-02: review.rs usecase extraction + domain/usecase/infrastructure module split",
-  "updated_at": "2026-03-20T12:48:45Z"
+  "updated_at": "2026-03-21T14:50:06Z"
 }
