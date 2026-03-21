@@ -1,0 +1,86 @@
+{
+  "branch": "track/readme-v3-publish-2026-03-22",
+  "created_at": "2026-03-22T12:00:00Z",
+  "id": "readme-v3-publish-2026-03-22",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "README.md の v3 ビジョン反映をコミットし、PR 経由でマージする"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "README.md v3 公開"
+      }
+    ],
+    "summary": [
+      "README.md を v3 ビジョン（テスト生成パイプライン中心、ハーネス内部詳細の削除、信号機説明の追加）に更新してコミット・公開する"
+    ]
+  },
+  "review": {
+    "code_hash": "17f5dd1589dee3b67f786207af721e812d125e49",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-21T16:43:20Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-21T16:43:30Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 2,
+          "round_type": "fast",
+          "timestamp": "2026-03-21T16:46:00Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "default": {
+        "fast": {
+          "round": 2,
+          "timestamp": "2026-03-21T16:46:00Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-21T16:46:10Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "README.md の v3 更新をコミット（変更は実施済み。コミット + PR + マージのみ）",
+      "id": "T001",
+      "status": "done"
+    }
+  ],
+  "title": "README.md v3 ビジョン反映・公開",
+  "updated_at": "2026-03-21T16:46:10Z"
+}
