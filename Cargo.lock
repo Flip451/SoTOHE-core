@@ -393,6 +393,7 @@ dependencies = [
  "tempfile",
  "thiserror",
  "toml",
+ "usecase",
 ]
 
 [[package]]

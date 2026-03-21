@@ -1,51 +1,45 @@
-//! Thin UseCase orchestrators for review workflow operations.
+//! Review workflow UseCase orchestrators.
 //!
-//! Each public function parses raw CLI arguments into domain types, validates
-//! them, and delegates the infrastructure-level operations to an injected port
-//! trait. This keeps the usecase layer free of infrastructure dependencies
-//! while still centralising all business logic.
-//!
-//! ## Port traits
-//!
-//! Port traits are defined here so that CLI adapters can implement them without
-//! creating a circular dependency (`usecase → infrastructure`). The CLI creates
-//! concrete adapter structs that implement these traits using infrastructure
-//! types and passes them to the usecase functions.
+//! - `check_approved` and `resolve_escalation`: thin orchestrators using
+//!   domain's `TrackReader` / `TrackWriter` ports directly.
+//! - `record_round`: delegates to `RecordRoundProtocol` — a genuinely complex
+//!   infrastructure protocol (two-phase git index commit) that cannot be
+//!   decomposed into simple Load→domain→Save.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
-// Re-export domain types that CLI port-adapter implementations need so that
-// `review.rs` can stay free of direct `domain::` imports.
 pub use domain::{
-    ReviewConcern, ReviewEscalationDecision, ReviewGroupName, RoundType, Timestamp, TrackId,
-    Verdict,
+    DomainError, ReviewConcern, ReviewEscalationDecision, ReviewGroupName, ReviewStatus, RoundType,
+    Timestamp, TrackId, TrackReadError, TrackReader, TrackWriteError, TrackWriter, Verdict,
 };
 
 // ---------------------------------------------------------------------------
-// Port traits
+// Application-level port traits (implemented by infrastructure)
 // ---------------------------------------------------------------------------
 
-/// Port for the atomic record-round protocol (record-round git staging).
+/// Port for computing the normalised git tree hash of a track's metadata.
+pub trait GitHasher {
+    /// Computes the normalised tree hash for the given track.
+    ///
+    /// # Errors
+    ///
+    /// Returns a human-readable error string on failure.
+    fn normalized_hash(&self, items_dir: &Path, track_id: &TrackId) -> Result<String, String>;
+}
+
+/// Port for the atomic two-phase record-round protocol.
 ///
-/// Implementors are responsible for:
-/// 1. Computing the pre-update normalised hash.
-/// 2. Locking the track document and calling domain `record_round_with_pending`.
-/// 3. Staging the pending state, computing h1, setting `code_hash`, staging
-///    the final state.
-/// 4. Atomically swapping the private index over the real index.
-///
-/// # Errors
-///
-/// Returns `RecordRoundStoreError` on escalation blocks, stale hash, or other
-/// failures.
-pub trait RecordRoundStore {
+/// This encapsulates the genuinely complex infrastructure protocol
+/// (PrivateIndex + git staging + two-phase hash commit) that cannot be
+/// decomposed into simple Load → domain → Save.
+pub trait RecordRoundProtocol {
     /// Execute the full atomic record-round protocol.
     ///
     /// # Errors
     ///
-    /// Returns `RecordRoundStoreError` on protocol failure.
+    /// Returns `RecordRoundProtocolError` on protocol failure.
     #[allow(clippy::too_many_arguments)]
-    fn execute_atomic(
+    fn execute(
         &self,
         track_id: &TrackId,
         round_type: RoundType,
@@ -54,12 +48,12 @@ pub trait RecordRoundStore {
         concerns: Vec<ReviewConcern>,
         expected_groups: Vec<ReviewGroupName>,
         timestamp: Timestamp,
-    ) -> Result<(), RecordRoundStoreError>;
+    ) -> Result<(), RecordRoundProtocolError>;
 }
 
-/// Errors returned by [`RecordRoundStore::execute_atomic`].
+/// Errors returned by [`RecordRoundProtocol::execute`].
 #[derive(Debug)]
-pub enum RecordRoundStoreError {
+pub enum RecordRoundProtocolError {
     /// An escalation block prevented the round from being recorded.
     EscalationBlocked(Vec<String>),
     /// The code hash was stale; the review state has been invalidated.
@@ -68,72 +62,20 @@ pub enum RecordRoundStoreError {
     Other(String),
 }
 
-/// Port for the resolve-escalation operation.
-///
-/// Implementors lock the track document, verify evidence artefacts exist, call
-/// domain `resolve_escalation`, and persist the result.
-pub trait ResolveEscalationStore {
-    /// Resolve an active escalation block.
-    ///
-    /// # Errors
-    ///
-    /// Returns a human-readable error string on failure.
-    #[allow(clippy::too_many_arguments)]
-    fn resolve(
-        &self,
-        track_id: &TrackId,
-        blocked_concerns: Vec<ReviewConcern>,
-        workspace_search_ref: String,
-        reinvention_check_ref: String,
-        decision: ReviewEscalationDecision,
-        summary: String,
-        timestamp: Timestamp,
-    ) -> Result<(), String>;
-}
-
-/// Port for the check-approved operation.
-///
-/// Implementors read the track, compute the normalised git hash, call domain
-/// `check_commit_ready`, and optionally persist an invalidation.
-pub trait CheckApprovedStore {
-    /// Check whether the review is approved and the code hash is current.
-    ///
-    /// # Errors
-    ///
-    /// Returns a human-readable error string when the review is not approved or
-    /// the code hash has gone stale.
-    fn check(&self, track_id: &TrackId) -> Result<(), String>;
-}
-
-// ---------------------------------------------------------------------------
-// RecordRound
-// ---------------------------------------------------------------------------
-
-/// Raw string input for the record-round operation.
-/// Fields mirror `RecordRoundArgs` without any clap coupling.
 pub struct RecordRoundInput {
-    /// `"fast"` or `"final"`.
     pub round_type: String,
-    /// Review group name (e.g. `"infra-domain"`).
     pub group: String,
-    /// Verdict JSON string.
     pub verdict: String,
-    /// Comma-separated expected group names.
     pub expected_groups: String,
-    /// Comma-separated concern slugs (empty string for zero-findings rounds).
     pub concerns: String,
-    /// Path to the track items directory.
     pub items_dir: PathBuf,
-    /// Track ID.
     pub track_id: String,
+    pub timestamp: Timestamp,
 }
 
-/// Errors returned by [`record_round`].
 #[derive(Debug)]
 pub enum RecordRoundError {
-    /// An escalation block prevented recording.
     EscalationBlocked(Vec<String>),
-    /// Any other failure.
     Other(String),
 }
 
@@ -143,18 +85,14 @@ impl From<String> for RecordRoundError {
     }
 }
 
-/// Record a review round result.
-///
-/// Parses raw string arguments into domain types, validates them, and delegates
-/// the atomic git-staging protocol to `store`.
+/// Parses raw string arguments and delegates to the infrastructure protocol.
 ///
 /// # Errors
 ///
-/// Returns [`RecordRoundError`] when argument parsing fails, an escalation is
-/// active, or the store reports an error.
+/// Returns [`RecordRoundError`] on parse failure or protocol error.
 pub fn record_round(
     input: RecordRoundInput,
-    store: &impl RecordRoundStore,
+    protocol: &impl RecordRoundProtocol,
 ) -> Result<(), RecordRoundError> {
     use crate::review_workflow::{
         ReviewFinalMessageState, ReviewPayloadVerdict, parse_review_final_message,
@@ -170,17 +108,17 @@ pub fn record_round(
         }
     };
 
-    let expected_groups_raw: Vec<String> =
-        input.expected_groups.split(',').map(|s| s.trim().to_owned()).collect();
-    if expected_groups_raw.is_empty() || expected_groups_raw.iter().any(|g| g.is_empty()) {
-        return Err(RecordRoundError::Other(
-            "--expected-groups must be a non-empty comma-separated list".to_owned(),
-        ));
-    }
-    let expected_groups: Vec<ReviewGroupName> = expected_groups_raw
-        .iter()
+    let expected_groups: Vec<ReviewGroupName> = input
+        .expected_groups
+        .split(',')
         .map(|s| {
-            ReviewGroupName::try_new(s.as_str())
+            let s = s.trim();
+            if s.is_empty() {
+                return Err(RecordRoundError::Other(
+                    "--expected-groups must be a non-empty comma-separated list".to_owned(),
+                ));
+            }
+            ReviewGroupName::try_new(s)
                 .map_err(|e| RecordRoundError::Other(format!("invalid group name: {e}")))
         })
         .collect::<Result<_, _>>()?;
@@ -188,7 +126,6 @@ pub fn record_round(
     let group_name = ReviewGroupName::try_new(input.group.as_str())
         .map_err(|e| RecordRoundError::Other(format!("invalid group name: {e}")))?;
 
-    // Parse concerns; deduplicate and sort via BTreeSet for canonical order.
     let concerns: Vec<ReviewConcern> = if input.concerns.trim().is_empty() {
         Vec::new()
     } else {
@@ -200,7 +137,6 @@ pub fn record_round(
             .collect()
     };
 
-    // Parse and semantically validate the verdict JSON.
     let final_message_state = parse_review_final_message(Some(&input.verdict));
     let verdict = match &final_message_state {
         ReviewFinalMessageState::Parsed(payload) => match payload.verdict {
@@ -218,63 +154,60 @@ pub fn record_round(
     let track_id = TrackId::try_new(&input.track_id)
         .map_err(|e| RecordRoundError::Other(format!("invalid track id: {e}")))?;
 
-    let timestamp_str = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
-    let timestamp = Timestamp::new(timestamp_str)
-        .map_err(|e| RecordRoundError::Other(format!("invalid timestamp: {e}")))?;
-
-    store
-        .execute_atomic(
+    protocol
+        .execute(
             &track_id,
             round_type,
             group_name,
             verdict,
             concerns,
             expected_groups,
-            timestamp,
+            input.timestamp,
         )
         .map_err(|e| match e {
-            RecordRoundStoreError::EscalationBlocked(concerns) => {
-                RecordRoundError::EscalationBlocked(concerns)
+            RecordRoundProtocolError::EscalationBlocked(c) => {
+                RecordRoundError::EscalationBlocked(c)
             }
-            RecordRoundStoreError::StaleHash(msg) => RecordRoundError::Other(msg),
-            RecordRoundStoreError::Other(msg) => RecordRoundError::Other(msg),
+            RecordRoundProtocolError::StaleHash(msg) | RecordRoundProtocolError::Other(msg) => {
+                RecordRoundError::Other(msg)
+            }
         })
 }
 
 // ---------------------------------------------------------------------------
-// ResolveEscalation
+// resolve-escalation: usecase orchestration via domain ports
 // ---------------------------------------------------------------------------
 
-/// Raw string input for the resolve-escalation operation.
 pub struct ResolveEscalationInput {
-    /// Track ID.
     pub track_id: String,
-    /// Comma-separated blocked concern slugs.
     pub blocked_concerns: String,
-    /// Path to workspace search artefact (must exist).
     pub workspace_search_ref: String,
-    /// Path to reinvention check artefact (must exist).
     pub reinvention_check_ref: String,
-    /// Decision string: `"adopt_workspace"`, `"adopt_crate"`, or
-    /// `"continue_self"`.
     pub decision: String,
-    /// Summary of the decision rationale.
     pub summary: String,
-    /// Path to the track items directory.
     pub items_dir: PathBuf,
+    pub timestamp: Timestamp,
 }
 
-/// Resolve an active review escalation block.
+/// Orchestrates resolve-escalation using domain's `TrackWriter::update`.
 ///
-/// Parses raw string arguments into domain types and delegates to `store`.
+/// Returns the decision string on success for the caller to display.
+///
+/// # Preconditions
+///
+/// The caller must verify that `workspace_search_ref` and `reinvention_check_ref`
+/// paths exist on disk before calling this function. This usecase does not perform
+/// file I/O; existence validation is the responsibility of the CLI / composition root.
 ///
 /// # Errors
 ///
 /// Returns a human-readable error string on failure.
 pub fn resolve_escalation(
     input: ResolveEscalationInput,
-    store: &impl ResolveEscalationStore,
-) -> Result<(), String> {
+    writer: &impl TrackWriter,
+) -> Result<String, String> {
+    use domain::ReviewEscalationResolution;
+
     let decision = match input.decision.as_str() {
         "adopt_workspace" => ReviewEscalationDecision::AdoptWorkspaceSolution,
         "adopt_crate" => ReviewEscalationDecision::AdoptExternalCrate,
@@ -286,7 +219,6 @@ pub fn resolve_escalation(
         }
     };
 
-    // Parse blocked concerns; deduplicate and sort via BTreeSet.
     let blocked_concerns: Vec<ReviewConcern> = {
         let parsed: Result<std::collections::BTreeSet<_>, _> = input
             .blocked_concerns
@@ -302,46 +234,113 @@ pub fn resolve_escalation(
     let track_id =
         TrackId::try_new(&input.track_id).map_err(|e| format!("invalid track id: {e}"))?;
 
-    let timestamp_str = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
-    let timestamp = Timestamp::new(timestamp_str).map_err(|e| format!("invalid timestamp: {e}"))?;
+    let timestamp = input.timestamp;
 
-    store.resolve(
-        &track_id,
-        blocked_concerns,
-        input.workspace_search_ref,
-        input.reinvention_check_ref,
-        decision,
-        input.summary,
-        timestamp,
-    )
+    writer
+        .update(&track_id, |track| {
+            let review = track.review_mut().as_mut().ok_or_else(|| {
+                DomainError::Validation(domain::ValidationError::InvalidTaskId(
+                    "no review section in metadata.json".to_owned(),
+                ))
+            })?;
+
+            if !review.escalation().is_blocked() {
+                return Err(DomainError::Validation(domain::ValidationError::InvalidTaskId(
+                    "no active escalation block; cannot resolve".to_owned(),
+                )));
+            }
+
+            let resolution = ReviewEscalationResolution::new(
+                blocked_concerns.clone(),
+                input.workspace_search_ref.clone(),
+                input.reinvention_check_ref.clone(),
+                decision,
+                input.summary.clone(),
+                timestamp.clone(),
+            )
+            .map_err(|e| {
+                DomainError::Validation(domain::ValidationError::InvalidTaskId(e.to_string()))
+            })?;
+
+            review.resolve_escalation(resolution).map_err(|e| {
+                DomainError::Validation(domain::ValidationError::InvalidTaskId(e.to_string()))
+            })?;
+
+            Ok(())
+        })
+        .map_err(|e| {
+            let msg = e.to_string();
+            if let Some(inner) = msg.strip_prefix("task id '") {
+                if let Some(inner) = inner.strip_suffix("' must match the pattern T<digits>") {
+                    return format!("resolve-escalation failed: {inner}");
+                }
+            }
+            format!("resolve-escalation failed: {msg}")
+        })?;
+
+    Ok(input.decision)
 }
 
 // ---------------------------------------------------------------------------
-// CheckApproved
+// check-approved: usecase orchestration via domain ports
 // ---------------------------------------------------------------------------
 
-/// Raw string input for the check-approved operation.
 pub struct CheckApprovedInput {
-    /// Path to the track items directory.
     pub items_dir: PathBuf,
-    /// Track ID.
     pub track_id: String,
 }
 
-/// Verify that the review is approved and the code hash is current.
-///
-/// Parses the track ID and delegates to `store`.
+/// Orchestrates check-approved: read track → domain check → invalidate if stale.
 ///
 /// # Errors
 ///
-/// Returns a human-readable error string when the review is not approved,
-/// the code hash is stale, or any I/O error occurs.
+/// Returns a human-readable error string when the review is not approved.
 pub fn check_approved(
     input: CheckApprovedInput,
-    store: &impl CheckApprovedStore,
+    reader: &impl TrackReader,
+    writer: &impl TrackWriter,
+    hasher: &impl GitHasher,
 ) -> Result<(), String> {
     let track_id =
         TrackId::try_new(&input.track_id).map_err(|e| format!("invalid track id: {e}"))?;
 
-    store.check(&track_id)
+    let code_hash = hasher
+        .normalized_hash(&input.items_dir, &track_id)
+        .map_err(|e| format!("normalized hash error: {e}"))?;
+
+    let track = reader
+        .find(&track_id)
+        .map_err(|e| format!("failed to read track: {e}"))?
+        .ok_or_else(|| format!("track '{}' not found", track_id.as_ref()))?;
+
+    let review = track.review().ok_or("[BLOCKED] no review section in metadata.json")?;
+
+    // Planning-only tracks with no review activity are always approved.
+    if review.status() == ReviewStatus::NotStarted && review.groups().is_empty() {
+        return Ok(());
+    }
+
+    let mut review_check = review.clone();
+    match review_check.check_commit_ready(&code_hash) {
+        Ok(()) => Ok(()),
+        Err(domain::ReviewError::StaleCodeHash { expected, actual }) => {
+            // Persist the invalidation — propagate write errors.
+            writer
+                .update(&track_id, |track| {
+                    if let Some(r) = track.review_mut().as_mut() {
+                        // Intentionally ignore the domain error here: we already
+                        // know the hash is stale. The purpose is to persist the
+                        // invalidation side-effect on the review state.
+                        let _ = r.check_commit_ready(&code_hash);
+                    }
+                    Ok(())
+                })
+                .map_err(|e| format!("failed to persist invalidation: {e}"))?;
+            Err(format!(
+                "[BLOCKED] code hash mismatch: recorded against {expected}, \
+                 current is {actual} — review.status set to invalidated"
+            ))
+        }
+        Err(e) => Err(format!("[BLOCKED] Review guard failed: {e}")),
+    }
 }

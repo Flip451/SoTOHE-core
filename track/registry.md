@@ -7,15 +7,15 @@
 
 ## Current Focus
 
-- Latest active track: `None yet`
-- Next recommended command: `/track:plan <feature>`
+- Latest active track: `cli-review-module-split-2026-03-22`
+- Next recommended command: `/track:implement`
 - Last updated: `2026-03-21`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| _No active tracks yet_ | - | `/track:plan <feature>` | - |
+| cli-review-module-split-2026-03-22 | in_progress | `/track:implement` | 2026-03-21 |
 
 ## Completed Tracks
 

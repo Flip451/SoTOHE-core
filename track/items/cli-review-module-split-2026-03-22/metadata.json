@@ -1,0 +1,96 @@
+{
+  "branch": "track/cli-review-module-split-2026-03-22",
+  "created_at": "2026-03-22T00:00:00Z",
+  "id": "cli-review-module-split-2026-03-22",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "T001: review.rs → review/{mod.rs, codex_local.rs, adapters.rs, tests.rs} に分割",
+          "mod.rs (~170行): clap structs, ReviewCommand enum, execute dispatch, thin run_* wrappers, execute_*",
+          "codex_local.rs (~480行): subprocess管理 — run_codex_local, spawn_codex, tee_stderr, run_codex_child, terminate, artifact management",
+          "adapters.rs (~340行): CliRecordRoundStore, CliResolveEscalationStore, CliCheckApprovedStore port trait impls",
+          "tests.rs (~735行): 全テスト（mod tests ブロック）"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Phase 1: モジュールディレクトリ化"
+      },
+      {
+        "description": [
+          "T002: cargo make ci 全通し + 全対象ファイルが 700行以下（tests.rs 除く）"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "Phase 2: 検証"
+      }
+    ],
+    "summary": [
+      "apps/cli/src/commands/review.rs (1825行) を 4ファイルのモジュールディレクトリに分割。ロジック変更なし、純粋な構造リファクタリング。"
+    ]
+  },
+  "review": {
+    "code_hash": "b7c4bee9019f130cb09a55dc44435c23694bd319",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-21T23:31:48Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-21T23:31:48Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "default": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-21T23:31:48Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-21T23:31:48Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "in_progress",
+  "tasks": [
+    {
+      "description": "review.rs → review/ ディレクトリ化 + 4ファイル分割（mod.rs, codex_local.rs, adapters.rs, tests.rs）",
+      "id": "T001",
+      "status": "in_progress"
+    },
+    {
+      "description": "CI 全通し + 行数確認（mod.rs/codex_local.rs/adapters.rs が 700行以下）",
+      "id": "T002",
+      "status": "todo"
+    }
+  ],
+  "title": "CLI review.rs module directory split (1825 lines → 4 files)",
+  "updated_at": "2026-03-21T23:31:48Z"
+}

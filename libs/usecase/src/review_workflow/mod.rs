@@ -8,6 +8,6 @@ pub use concern::{finding_to_concern, findings_to_concerns};
 pub use verdict::{
     ModelProfile, REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewFinalPayload,
     ReviewFinding, ReviewPayloadVerdict, ReviewVerdict, ReviewWorkflowError,
-    classify_review_verdict, extract_verdict_from_session_log, normalize_final_message,
+    classify_review_verdict, extract_verdict_from_content, normalize_final_message,
     parse_review_final_message, render_review_payload, resolve_full_auto,
 };

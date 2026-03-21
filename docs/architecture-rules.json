@@ -60,9 +60,10 @@
       "crate": "infrastructure",
       "path": "libs/infrastructure",
       "may_depend_on": [
-        "domain"
+        "domain",
+        "usecase"
       ],
-      "deny_reason": "Infrastructure implementations must be wired only at composition root."
+      "deny_reason": "Infrastructure implements usecase ports and domain ports; wired at composition root."
     },
     {
       "crate": "cli",
