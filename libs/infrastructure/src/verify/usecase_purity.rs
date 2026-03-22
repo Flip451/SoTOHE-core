@@ -13,18 +13,18 @@ use syn::visit::Visit;
 
 const USECASE_SRC_DIR: &str = "libs/usecase/src";
 
-/// Path prefixes forbidden in the usecase layer.
+/// Path prefixes forbidden in pure layers (domain, usecase).
 /// Any path or use-import starting with these segments is flagged.
 /// This list covers the entire std I/O surface — the set is finite and stable.
 const FORBIDDEN_PATH_PREFIXES: &[(&str, &str)] = &[
-    ("std::fs", "file I/O belongs in infrastructure/CLI, not usecase"),
-    ("std::net", "network I/O belongs in infrastructure, not usecase"),
-    ("std::process", "process management belongs in CLI, not usecase"),
-    ("std::io", "I/O types/traits belong in infrastructure, not usecase"),
-    ("std::env", "environment access belongs in CLI, not usecase"),
+    ("std::fs", "file I/O belongs in infrastructure/CLI"),
+    ("std::net", "network I/O belongs in infrastructure"),
+    ("std::process", "process management belongs in CLI"),
+    ("std::io", "I/O types/traits belong in infrastructure"),
+    ("std::env", "environment access belongs in CLI"),
 ];
 
-/// Paths forbidden in the usecase layer (prefix match on segments).
+/// Paths forbidden in pure layers (prefix match on segments).
 /// Implicit external dependencies that should be injected as arguments.
 const FORBIDDEN_PATHS: &[(&str, &str)] = &[
     ("chrono::Utc::now", "implicit time dependency; pass timestamps as arguments"),
@@ -32,13 +32,32 @@ const FORBIDDEN_PATHS: &[(&str, &str)] = &[
     ("std::time::Instant", "monotonic clock access; pass timestamps as arguments"),
 ];
 
-/// Macro names forbidden in the usecase layer.
+/// Macro names forbidden in pure layers.
 const FORBIDDEN_MACROS: &[(&str, &str)] = &[
-    ("println", "output belongs in CLI, not usecase"),
-    ("eprintln", "output belongs in CLI, not usecase"),
-    ("print", "output belongs in CLI, not usecase"),
-    ("eprint", "output belongs in CLI, not usecase"),
+    ("println", "output belongs in CLI"),
+    ("eprintln", "output belongs in CLI"),
+    ("print", "output belongs in CLI"),
+    ("eprint", "output belongs in CLI"),
 ];
+
+/// Scan a source directory for forbidden patterns that violate hexagonal purity.
+/// Reusable across layers (usecase, domain).
+///
+/// # Errors
+///
+/// Returns findings for each forbidden pattern found.
+pub(crate) fn check_layer_purity(root: &Path, src_dir: &str, layer_label: &str) -> VerifyOutcome {
+    let src = root.join(src_dir);
+    if !src.is_dir() {
+        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            "{layer_label} source directory not found: {src_dir}"
+        ))]);
+    }
+
+    let mut findings = Vec::new();
+    scan_dir(&src, root, &mut findings);
+    VerifyOutcome::from_findings(findings)
+}
 
 /// Scan `libs/usecase/src/` for forbidden patterns that violate hexagonal purity.
 ///
@@ -46,16 +65,7 @@ const FORBIDDEN_MACROS: &[(&str, &str)] = &[
 ///
 /// Returns findings for each forbidden pattern found.
 pub fn verify(root: &Path) -> VerifyOutcome {
-    let usecase_src = root.join(USECASE_SRC_DIR);
-    if !usecase_src.is_dir() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
-            "Usecase source directory not found: {USECASE_SRC_DIR}"
-        ))]);
-    }
-
-    let mut findings = Vec::new();
-    scan_dir(&usecase_src, root, &mut findings);
-    VerifyOutcome::from_findings(findings)
+    check_layer_purity(root, USECASE_SRC_DIR, "Usecase")
 }
 
 fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<Finding>) {

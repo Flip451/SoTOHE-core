@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| domain-purity-ci-2026-03-23 | Done | 2026-03-22 |
 | usecase-purity-error-2026-03-23 | Done | 2026-03-22 |
 | pr-review-hexagonal-2026-03-22 | Done | 2026-03-22 |
 | usecase-purity-ci-2026-03-22 | Done | 2026-03-22 |

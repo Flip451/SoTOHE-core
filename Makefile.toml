@@ -522,6 +522,12 @@ description = "[internal] Verify no pub String fields in domain layer"
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- verify domain-strings']
 
+[tasks.verify-domain-purity-local]
+private = true
+description = "[internal] Verify domain layer hexagonal purity (no forbidden I/O patterns)"
+script_runner = "@shell"
+script = ['cargo run --quiet -p cli -- verify domain-purity']
+
 [tasks.verify-usecase-purity-local]
 private = true
 description = "[internal] Verify usecase layer hexagonal purity (no forbidden patterns)"
@@ -554,7 +560,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local CI checks"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-usecase-purity-local", "verify-view-freshness-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
@@ -562,7 +568,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-usecase-purity-local", "verify-view-freshness-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local"]
 
 # Compose wrappers
 [tasks.fmt]
