@@ -16,11 +16,12 @@ unrepresentable at the type level.
 
 ```mermaid
 flowchart TD
-    CLI[apps/cli<br>Composition Root / main.rs] --> Usecase[libs/usecase<br>Application Services]
+    CLI[apps/cli<br>Composition Root / main.rs] --> Usecase[libs/usecase<br>Application Services + App Ports]
     CLI --> Infra[libs/infrastructure<br>Infrastructure Adapters]
-    CLI --> Domain[libs/domain<br>Domain Model / Ports]
+    CLI --> Domain[libs/domain<br>Domain Model / Domain Ports]
     Usecase --> Domain
     Infra --> Domain
+    Infra --> Usecase
 ```
 
 ## Module Structure

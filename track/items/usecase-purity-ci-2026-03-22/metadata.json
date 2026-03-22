@@ -1,0 +1,95 @@
+{
+  "branch": "track/usecase-purity-ci-2026-03-22",
+  "created_at": "2026-03-22T00:00:00Z",
+  "id": "usecase-purity-ci-2026-03-22",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "T001: libs/infrastructure/src/verify/usecase_purity.rs を新設",
+          "禁止パターン: std::fs::, chrono::Utc::now, println!, eprintln!, std::process::Command",
+          "スキャン対象: libs/usecase/src/ 配下の .rs ファイル（#[cfg(test)] ブロック除外）",
+          "出力: Finding::warning（module-size / domain-strings と同じ VerifyOutcome 形式）"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Phase 1: サブコマンド実装"
+      },
+      {
+        "description": [
+          "T002: Makefile.toml に verify-usecase-purity タスク追加、ci-local に組み込み"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "Phase 2: CI 統合"
+      }
+    ],
+    "summary": [
+      "usecase 層のヘキサゴナル純粋性を CI で検証する sotp verify usecase-purity サブコマンドを新設。sotp verify module-size / domain-strings と同じパターン。"
+    ]
+  },
+  "review": {
+    "code_hash": "f0f7cc51cdfd71d7226b4fe6b0e3bfcb07fd6b7e",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-22T01:30:57Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-22T01:30:57Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "default": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-22T01:30:57Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-22T01:30:57Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "planned",
+  "tasks": [
+    {
+      "description": "sotp verify usecase-purity サブコマンド実装 — libs/usecase/src/ の非テストコードをスキャンし、禁止パターン（std::fs::, chrono::Utc::now, println!, eprintln!, std::process::Command）を検出。warning-only",
+      "id": "T001",
+      "status": "todo"
+    },
+    {
+      "description": "cargo make ci に usecase-purity を組み込み + CI 全通し確認",
+      "id": "T002",
+      "status": "todo"
+    }
+  ],
+  "title": "INF-15: sotp verify usecase-purity — usecase layer hexagonal purity CI lint",
+  "updated_at": "2026-03-22T01:30:57Z"
+}
