@@ -7,15 +7,15 @@
 
 ## Current Focus
 
-- Latest active track: `None yet`
-- Next recommended command: `/track:plan <feature>`
+- Latest active track: `pr-review-hexagonal-2026-03-22`
+- Next recommended command: `/track:implement`
 - Last updated: `2026-03-22`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| _No active tracks yet_ | - | `/track:plan <feature>` | - |
+| pr-review-hexagonal-2026-03-22 | planned | `/track:implement` | 2026-03-22 |
 
 ## Completed Tracks
 
