@@ -39,6 +39,8 @@ pub enum VerifyCommand {
     ModuleSize(VerifyArgs),
     /// Check libs/domain/src/ for pub String fields (should be enums or newtypes).
     DomainStrings(VerifyArgs),
+    /// Check libs/usecase/src/ for hexagonal purity violations (forbidden patterns).
+    UsecasePurity(VerifyArgs),
     /// Check that plan.md files are up-to-date with metadata.json renderings.
     ViewFreshness(VerifyArgs),
 }
@@ -89,6 +91,10 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
         VerifyCommand::DomainStrings(args) => (
             "verify domain strings",
             infrastructure::verify::domain_strings::verify(&args.project_root),
+        ),
+        VerifyCommand::UsecasePurity(args) => (
+            "verify usecase purity",
+            infrastructure::verify::usecase_purity::verify(&args.project_root),
         ),
         VerifyCommand::ViewFreshness(args) => (
             "verify view freshness",
@@ -314,6 +320,27 @@ mod tests {
     fn test_domain_strings_subcommand_returns_failure_for_missing_domain() {
         let tmp = TempDir::new().unwrap();
         let exit = execute(VerifyCommand::DomainStrings(make_args(tmp.path())));
+        assert_eq!(exit, ExitCode::FAILURE);
+    }
+
+    // --- usecase-purity CLI wiring ---
+
+    #[test]
+    fn test_usecase_purity_subcommand_returns_success_for_clean_usecase() {
+        let tmp = TempDir::new().unwrap();
+        write_file(
+            tmp.path(),
+            "libs/usecase/src/lib.rs",
+            "pub fn execute() -> Result<(), String> { Ok(()) }\n",
+        );
+        let exit = execute(VerifyCommand::UsecasePurity(make_args(tmp.path())));
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn test_usecase_purity_subcommand_returns_failure_for_missing_usecase() {
+        let tmp = TempDir::new().unwrap();
+        let exit = execute(VerifyCommand::UsecasePurity(make_args(tmp.path())));
         assert_eq!(exit, ExitCode::FAILURE);
     }
 

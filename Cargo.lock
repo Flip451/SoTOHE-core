@@ -385,11 +385,13 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "domain",
+ "proc-macro2",
  "regex",
  "rstest",
  "serde",
  "serde_json",
  "serde_yaml",
+ "syn",
  "tempfile",
  "thiserror",
  "toml",

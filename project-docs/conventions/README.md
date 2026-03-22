@@ -56,6 +56,7 @@
 
 <!-- convention-docs:start -->
 - `bash-write-guard.md`: Bash File-Write Guard (CON-07)
+- `hexagonal-architecture.md`: Hexagonal Architecture Convention
 - `prefer-type-safe-abstractions.md`: Prefer Type-Safe Abstractions Convention
 - `security.md`: Security Convention
 - `shell-parsing.md`: Shell Parsing Convention

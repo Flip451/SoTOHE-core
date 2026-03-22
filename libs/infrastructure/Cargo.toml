@@ -11,10 +11,12 @@ workspace = true
 [dependencies]
 chrono = { version = "0.4.44", features = ["serde"] }
 domain = { path = "../domain" }
+proc-macro2 = { version = "1", features = ["span-locations"] }
 usecase = { path = "../usecase" }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 serde_yaml = "0.9"
+syn = { version = "2", features = ["full", "visit"] }
 regex.workspace = true
 thiserror.workspace = true
 toml.workspace = true

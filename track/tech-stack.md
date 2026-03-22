@@ -33,9 +33,10 @@ apps/cli             # CLI エントリーポイント + composition root（usec
 
 - `domain` は `usecase/infrastructure/cli` へ依存してはいけない
 - `usecase` は `infrastructure/cli` へ依存してはいけない
-- `infrastructure` は `usecase/cli` へ依存してはいけない
-- `deny.toml` と `scripts/check_layers.py` は `docs/architecture-rules.json` と同期させる
+- `infrastructure` は `domain` と `usecase` に依存可能（usecase port trait を実装するため）。`cli` へは依存してはいけない
+- `deny.toml` と `sotp verify layers` は `docs/architecture-rules.json` と同期させる
 - ルール検証: `cargo make check-layers` と `cargo make deny`
+- 詳細: `project-docs/conventions/hexagonal-architecture.md`
 
 ## Web レイヤー
 
