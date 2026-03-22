@@ -227,6 +227,7 @@ pub(super) fn build_codex_invocation(
         args.push(OsString::from("--full-auto"));
     }
     args.extend([OsString::from("--sandbox"), OsString::from("read-only")]);
+    args.extend([OsString::from("--config"), OsString::from("model_reasoning_effort=\"high\"")]);
     args.extend([
         OsString::from("--output-schema"),
         output_schema.as_os_str().to_os_string(),

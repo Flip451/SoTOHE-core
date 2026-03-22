@@ -14,7 +14,7 @@ mod tests;
 
 use codex_local::execute_codex_local;
 
-const DEFAULT_TIMEOUT_SECONDS: u64 = 600;
+const DEFAULT_TIMEOUT_SECONDS: u64 = 1800;
 
 fn make_timestamp() -> Result<domain::Timestamp, String> {
     let s = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);

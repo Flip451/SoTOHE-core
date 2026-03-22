@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `usecase-purity-ci-2026-03-22`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-22`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| usecase-purity-ci-2026-03-22 | planned | `/track:implement` | 2026-03-22 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| usecase-purity-ci-2026-03-22 | Done | 2026-03-22 |
 | cli-review-module-split-2026-03-22 | Done | 2026-03-21 |
 | readme-v3-publish-2026-03-22 | Done | 2026-03-21 |
 | review-usecase-extraction-2026-03-20 | Done | 2026-03-21 |

@@ -43,13 +43,33 @@ CLI             → domain, usecase, infrastructure（composition root）
 
 usecase 層は**純粋なオーケストレーター**であり、以下を**禁止**する:
 
+### std I/O モジュール（網羅的ブロック）
+
 | 禁止 | 理由 | 正しい対処 |
 |---|---|---|
-| `std::fs::*` (ファイル I/O) | usecase は I/O を持たない | CLI がファイルを読んでデータを渡す |
-| `std::path::Path::new(...).exists()` | ファイル存在チェックは I/O | CLI が事前検証 |
-| `chrono::Utc::now()` | 暗黙的な外部依存 | タイムスタンプを引数で受け取る |
+| `std::fs::*` | ファイル I/O | CLI がファイルを読んでデータを渡す |
+| `std::net::*` | ネットワーク I/O | infrastructure adapter 経由 |
+| `std::process::*` | プロセス管理 | port trait 経由 |
+| `std::io::*` | I/O trait・型 | usecase 独自のエラー型を定義 |
+| `std::env::*` | 環境変数アクセス | CLI が設定を読んで引数で渡す |
+
+### 暗黙的外部依存
+
+| 禁止 | 理由 | 正しい対処 |
+|---|---|---|
+| `chrono::Utc::now()` | 暗黙的な時刻依存 | タイムスタンプを引数で受け取る |
+| `std::time::SystemTime` | システム時計アクセス | 同上 |
+| `std::time::Instant` | 単調時計アクセス | 同上 |
+
+### 出力マクロ
+
+| 禁止 | 理由 | 正しい対処 |
+|---|---|---|
 | `println!` / `eprintln!` | 出力は CLI の責務 | `Result<T, E>` で結果を返す |
-| `std::process::Command` | プロセス管理は CLI の責務 | port trait 経由 |
+| `print!` / `eprint!` | 同上 | 同上 |
+
+> **CI 検証**: `sotp verify usecase-purity`（syn AST ベース）が上記全パターンを検出。
+> use import（alias, glob, self）も追跡。現在 warning-only、INF-17 で error 昇格予定。
 
 ## CLI as Composition Root
 

@@ -16,4 +16,5 @@ pub mod orchestra;
 pub mod spec_attribution;
 pub mod spec_frontmatter;
 pub mod tech_stack;
+pub mod usecase_purity;
 pub mod view_freshness;

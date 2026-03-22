@@ -33,7 +33,7 @@
     ]
   },
   "review": {
-    "code_hash": "f0f7cc51cdfd71d7226b4fe6b0e3bfcb07fd6b7e",
+    "code_hash": "f838be42e6fe58af60b22ed557efef69ab058b48",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -56,6 +56,15 @@
           "round": 1,
           "round_type": "final",
           "timestamp": "2026-03-22T01:30:57Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 2,
+          "round_type": "fast",
+          "timestamp": "2026-03-22T12:44:00Z"
         }
       ],
       "threshold": 3
@@ -63,13 +72,13 @@
     "groups": {
       "default": {
         "fast": {
-          "round": 1,
-          "timestamp": "2026-03-22T01:30:57Z",
+          "round": 2,
+          "timestamp": "2026-03-22T12:44:00Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-22T01:30:57Z",
+          "timestamp": "2026-03-22T12:44:10Z",
           "verdict": "zero_findings"
         }
       }
@@ -77,19 +86,19 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "done",
   "tasks": [
     {
       "description": "sotp verify usecase-purity サブコマンド実装 — libs/usecase/src/ の非テストコードをスキャンし、禁止パターン（std::fs::, chrono::Utc::now, println!, eprintln!, std::process::Command）を検出。warning-only",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "cargo make ci に usecase-purity を組み込み + CI 全通し確認",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "INF-15: sotp verify usecase-purity — usecase layer hexagonal purity CI lint",
-  "updated_at": "2026-03-22T01:30:57Z"
+  "updated_at": "2026-03-22T12:44:10Z"
 }
