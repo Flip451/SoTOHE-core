@@ -230,7 +230,7 @@ struct PurityVisitor {
 impl PurityVisitor {
     fn report(&mut self, span: proc_macro2::Span, pattern: &str, reason: &str) {
         let line = span.start().line;
-        self.findings.push(Finding::warning(format!(
+        self.findings.push(Finding::error(format!(
             "{}:{}: `{}` found — {}",
             self.rel_path, line, pattern, reason
         )));
@@ -487,7 +487,7 @@ mod tests {
             "fn foo() { let _ = std::fs::read(\"x\"); }\n",
         );
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         assert!(!outcome.findings().is_empty());
         assert!(outcome.findings()[0].to_string().contains("std::fs::"));
     }
@@ -497,7 +497,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         setup_usecase_file(tmp.path(), "workflow.rs", "fn now() { let _ = chrono::Utc::now(); }\n");
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         assert!(!outcome.findings().is_empty());
         assert!(outcome.findings()[0].to_string().contains("chrono::Utc::now"));
     }
@@ -507,7 +507,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         setup_usecase_file(tmp.path(), "workflow.rs", "fn foo() { println!(\"hi\"); }\n");
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         assert!(!outcome.findings().is_empty());
         assert!(outcome.findings()[0].to_string().contains("println!"));
     }
@@ -517,7 +517,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         setup_usecase_file(tmp.path(), "workflow.rs", "fn foo() { eprintln!(\"err\"); }\n");
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         assert!(!outcome.findings().is_empty());
         assert!(outcome.findings()[0].to_string().contains("eprintln!"));
     }
@@ -531,7 +531,7 @@ mod tests {
             "fn run() { std::process::Command::new(\"ls\"); }\n",
         );
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         assert!(!outcome.findings().is_empty());
         assert!(outcome.findings()[0].to_string().contains("std::process::"));
     }
@@ -541,7 +541,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         setup_usecase_file(tmp.path(), "workflow.rs", "use std::fs;\nfn f() {}\n");
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         assert!(!outcome.findings().is_empty());
         assert!(outcome.findings()[0].to_string().contains("std::fs::"));
     }
@@ -551,7 +551,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         setup_usecase_file(tmp.path(), "workflow.rs", "use std::fs::read_to_string;\nfn f() {}\n");
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         assert!(!outcome.findings().is_empty());
         assert!(outcome.findings()[0].to_string().contains("std::fs::"));
     }
@@ -565,7 +565,7 @@ mod tests {
             "fn a() { println!(\"x\"); }\nfn b() { eprintln!(\"y\"); }\n",
         );
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         assert_eq!(outcome.findings().len(), 2);
     }
 
@@ -675,7 +675,7 @@ mod tests {
             "fn f() { /* comment */ std::process::Command::new(\"ls\"); }\n",
         );
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         assert!(!outcome.findings().is_empty());
         assert!(outcome.findings()[0].to_string().contains("std::process::"));
     }
@@ -734,7 +734,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         setup_usecase_file(tmp.path(), "sub/deep.rs", "fn bad() { std::fs::read(\"x\"); }\n");
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         assert!(!outcome.findings().is_empty());
     }
 
@@ -743,7 +743,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         setup_usecase_file(tmp.path(), "workflow.rs", "fn f() { dbg!(std::fs::read(\"x\")); }\n");
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         assert!(!outcome.findings().is_empty());
         assert!(outcome.findings().iter().any(|f| f.to_string().contains("std::fs::")));
     }
@@ -757,7 +757,7 @@ mod tests {
             "use std::process;\nfn f() { process::Command::new(\"ls\"); }\n",
         );
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         assert!(!outcome.findings().is_empty());
         assert!(outcome.findings().iter().any(|f| { f.to_string().contains("std::process::") }));
     }
@@ -771,7 +771,7 @@ mod tests {
             "use std::fs as file_io;\nfn f() { file_io::read(\"x\"); }\n",
         );
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         // The `use std::fs as file_io` itself is flagged (std::fs prefix match)
         assert!(!outcome.findings().is_empty());
         assert!(outcome.findings().iter().any(|f| f.to_string().contains("std::fs::")));
@@ -786,7 +786,7 @@ mod tests {
             "use std::process::{self};\nfn f() { process::Command::new(\"ls\"); }\n",
         );
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         assert!(!outcome.findings().is_empty());
         assert!(outcome.findings().iter().any(|f| f.to_string().contains("std::process::")));
     }
@@ -800,7 +800,7 @@ mod tests {
             "use std::process::*;\nfn f() { Command::new(\"ls\"); }\n",
         );
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok());
+        assert!(outcome.has_errors());
         assert!(!outcome.findings().is_empty());
         assert!(outcome.findings().iter().any(|f| f.to_string().contains("std::process::")));
     }

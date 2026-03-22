@@ -1,0 +1,78 @@
+{
+  "branch": "track/usecase-purity-error-2026-03-23",
+  "created_at": "2026-03-23T00:00:00Z",
+  "id": "usecase-purity-error-2026-03-23",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "T001: usecase_purity.rs の Finding::warning → Finding::error に変更。",
+          "CI 全通し確認（violation ゼロのため error 化しても CI はブロックされない）。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Phase 1: warning → error 昇格"
+      }
+    ],
+    "summary": [
+      "usecase-purity lint を warning-only から error に昇格し、CI で usecase 層の hexagonal violation をブロックする。INF-16 で既存 violation ゼロ達成済み。"
+    ]
+  },
+  "review": {
+    "code_hash": "aa1ce17628f6f9d9358c92d9aad8e8d47b89f044",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-22T23:17:21Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-22T23:17:21Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "default": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-22T23:17:21Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-22T23:17:21Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "Finding::warning → Finding::error に変更 + CI 全通し確認",
+      "id": "T001",
+      "status": "done"
+    }
+  ],
+  "title": "INF-17: usecase-purity warning → error 昇格 — CI ブロック化",
+  "updated_at": "2026-03-22T23:17:21Z"
+}
