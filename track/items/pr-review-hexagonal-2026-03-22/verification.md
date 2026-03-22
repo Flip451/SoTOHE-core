@@ -14,8 +14,15 @@
 
 ## Result / Open Issues
 
-- (未実施)
+1. `bin/sotp verify usecase-purity`: **warning ゼロ** で pass（既存 violation 完全解消）
+2. `cargo make ci`: 全通過
+3. `resolve_reviewer_provider` のシグネチャ: `&str` を受け取る（`&Path` から変更済み）
+4. `PrReviewError`: `Io` variant と `ProfilesNotFound` variant を削除済み。`std::io::Error` / `std::path::Path` 依存なし
+5. CLI 側 (`pr.rs`): ファイル読み込みを CLI で行い、不存在時は `CliError::Message` で fail-closed
+6. usecase テスト 5 件通過（`invalid_json` テスト新規追加）
+
+- Open: なし
 
 ## Verified At
 
-- (未実施)
+- 2026-03-22

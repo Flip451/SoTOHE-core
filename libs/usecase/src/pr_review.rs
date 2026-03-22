@@ -8,7 +8,6 @@
 //! - `parse_paginated_json`: handle concatenated JSON arrays from `gh api --paginate`
 //! - `resolve_reviewer_provider`: read `agent-profiles.json` and validate provider
 
-use std::path::Path;
 use std::sync::LazyLock;
 
 use regex::Regex;
@@ -55,11 +54,7 @@ const STRUCTURED_PROVIDERS: &[&str] = &["codex"];
 /// Errors returned by [`resolve_reviewer_provider`].
 #[derive(Debug, Error)]
 pub enum PrReviewError {
-    /// The `agent-profiles.json` file was not found at the given path.
-    #[error("agent-profiles.json not found: {0}")]
-    ProfilesNotFound(String),
-
-    /// The `agent-profiles.json` file could not be parsed as JSON.
+    /// The `agent-profiles.json` content could not be parsed as JSON.
     #[error("failed to parse agent-profiles.json: {0}")]
     ProfilesParse(#[from] serde_json::Error),
 
@@ -72,10 +67,6 @@ pub enum PrReviewError {
     /// A required field is missing in `agent-profiles.json`.
     #[error("missing required field in agent-profiles.json: {0}")]
     MissingField(String),
-
-    /// An I/O error occurred while reading the profiles file.
-    #[error("failed to read agent-profiles.json: {0}")]
-    Io(#[from] std::io::Error),
 }
 
 // ---------------------------------------------------------------------------
@@ -366,12 +357,8 @@ pub fn parse_paginated_json(text: &str) -> Result<Vec<serde_json::Value>, serde_
 /// [`PrReviewError::MissingField`] if the active profile or its `reviewer`
 /// field is absent, and [`PrReviewError::UnsupportedProvider`] if the resolved
 /// provider is not in `STRUCTURED_PROVIDERS`.
-pub fn resolve_reviewer_provider(profiles_path: &Path) -> Result<String, PrReviewError> {
-    if !profiles_path.exists() {
-        return Err(PrReviewError::ProfilesNotFound(profiles_path.display().to_string()));
-    }
-    let content = std::fs::read_to_string(profiles_path)?;
-    let data: serde_json::Value = serde_json::from_str(&content)?;
+pub fn resolve_reviewer_provider(profiles_content: &str) -> Result<String, PrReviewError> {
+    let data: serde_json::Value = serde_json::from_str(profiles_content)?;
 
     // active_profile defaults to "default" when absent — this is safe because
     // agent-profiles.json always has a "default" profile.
@@ -420,8 +407,6 @@ fn strip_numbered_prefix(s: &str) -> Option<&str> {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
-    use std::fs;
-
     use super::{
         classify_severity, parse_body_findings, parse_paginated_json, resolve_reviewer_provider,
         sanitize_text,
@@ -784,38 +769,26 @@ mod tests {
 
     #[test]
     fn test_resolve_reviewer_provider_codex_succeeds() {
-        let dir = tempfile::tempdir().unwrap();
-        let claude_dir = dir.path().join(".claude");
-        fs::create_dir_all(&claude_dir).unwrap();
-        let profiles_path = claude_dir.join("agent-profiles.json");
         let profiles = serde_json::json!({
             "version": 1,
             "active_profile": "default",
             "providers": {},
             "profiles": { "default": { "reviewer": "codex" } }
         });
-        fs::write(&profiles_path, serde_json::to_string(&profiles).unwrap()).unwrap();
-
-        let result = resolve_reviewer_provider(&profiles_path);
+        let result = resolve_reviewer_provider(&serde_json::to_string(&profiles).unwrap());
         assert!(result.is_ok(), "expected Ok, got: {result:?}");
         assert_eq!(result.unwrap(), "codex");
     }
 
     #[test]
     fn test_resolve_reviewer_provider_claude_fails_closed() {
-        let dir = tempfile::tempdir().unwrap();
-        let claude_dir = dir.path().join(".claude");
-        fs::create_dir_all(&claude_dir).unwrap();
-        let profiles_path = claude_dir.join("agent-profiles.json");
         let profiles = serde_json::json!({
             "version": 1,
             "active_profile": "default",
             "providers": {},
             "profiles": { "default": { "reviewer": "claude" } }
         });
-        fs::write(&profiles_path, serde_json::to_string(&profiles).unwrap()).unwrap();
-
-        let result = resolve_reviewer_provider(&profiles_path);
+        let result = resolve_reviewer_provider(&serde_json::to_string(&profiles).unwrap());
         assert!(result.is_err(), "expected Err for unsupported provider");
         let msg = result.unwrap_err().to_string();
         assert!(
@@ -826,17 +799,13 @@ mod tests {
 
     #[test]
     fn test_resolve_reviewer_provider_missing_profile_fails() {
-        let dir = tempfile::tempdir().unwrap();
-        let profiles_path = dir.path().join("agent-profiles.json");
         let profiles = serde_json::json!({
             "version": 1,
             "active_profile": "nonexistent",
             "providers": {},
             "profiles": {}
         });
-        fs::write(&profiles_path, serde_json::to_string(&profiles).unwrap()).unwrap();
-
-        let result = resolve_reviewer_provider(&profiles_path);
+        let result = resolve_reviewer_provider(&serde_json::to_string(&profiles).unwrap());
         assert!(result.is_err(), "expected Err for missing profile");
         let msg = result.unwrap_err().to_string();
         assert!(msg.contains("profiles.nonexistent"), "unexpected error message: {msg}");
@@ -844,19 +813,21 @@ mod tests {
 
     #[test]
     fn test_resolve_reviewer_provider_missing_reviewer_field_fails() {
-        let dir = tempfile::tempdir().unwrap();
-        let profiles_path = dir.path().join("agent-profiles.json");
         let profiles = serde_json::json!({
             "version": 1,
             "active_profile": "default",
             "providers": {},
             "profiles": { "default": { "planner": "codex" } }
         });
-        fs::write(&profiles_path, serde_json::to_string(&profiles).unwrap()).unwrap();
-
-        let result = resolve_reviewer_provider(&profiles_path);
+        let result = resolve_reviewer_provider(&serde_json::to_string(&profiles).unwrap());
         assert!(result.is_err(), "expected Err for missing reviewer field");
         let msg = result.unwrap_err().to_string();
         assert!(msg.contains("profiles.default.reviewer"), "unexpected error message: {msg}");
+    }
+
+    #[test]
+    fn test_resolve_reviewer_provider_invalid_json_fails() {
+        let result = resolve_reviewer_provider("not valid json");
+        assert!(result.is_err(), "expected Err for invalid JSON");
     }
 }

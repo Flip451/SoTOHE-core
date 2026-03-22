@@ -478,7 +478,10 @@ fn trigger_review<C: GhClient>(pr: &str, client: &C) -> Result<ExitCode, CliErro
     // Fail-closed: validate reviewer provider (resolve from repo root)
     let git_repo = SystemGitRepo::discover()?;
     let profiles_path = git_repo.root().join(".claude/agent-profiles.json");
-    pr_review::resolve_reviewer_provider(&profiles_path)?;
+    let profiles_content = std::fs::read_to_string(&profiles_path).map_err(|e| {
+        CliError::Message(format!("failed to read {}: {e}", profiles_path.display()))
+    })?;
+    pr_review::resolve_reviewer_provider(&profiles_content)?;
 
     let repo = client.repo_nwo()?;
     let response = client.post_issue_comment(&repo, pr, "@codex review")?;
@@ -634,7 +637,10 @@ fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
 
     // Fail-closed: validate reviewer provider (resolve from repo root)
     let profiles_path = repo.root().join(".claude/agent-profiles.json");
-    pr_review::resolve_reviewer_provider(&profiles_path)?;
+    let profiles_content = std::fs::read_to_string(&profiles_path).map_err(|e| {
+        CliError::Message(format!("failed to read {}: {e}", profiles_path.display()))
+    })?;
+    pr_review::resolve_reviewer_provider(&profiles_content)?;
     let branch = repo
         .current_branch()?
         .ok_or_else(|| CliError::Message("could not determine current branch".to_owned()))?;

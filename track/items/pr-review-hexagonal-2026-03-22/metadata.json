@@ -33,7 +33,7 @@
     ]
   },
   "review": {
-    "code_hash": "37aced1fa96550186ad7ad896d27fbc4872d4ebd",
+    "code_hash": "bbb3c57948f9ae842d26c00a768557fa8d9457d9",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -56,6 +56,15 @@
           "round": 1,
           "round_type": "final",
           "timestamp": "2026-03-22T14:05:17Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "default"
+          ],
+          "round": 2,
+          "round_type": "fast",
+          "timestamp": "2026-03-22T14:44:12Z"
         }
       ],
       "threshold": 3
@@ -63,13 +72,13 @@
     "groups": {
       "default": {
         "fast": {
-          "round": 1,
-          "timestamp": "2026-03-22T14:05:17Z",
+          "round": 2,
+          "timestamp": "2026-03-22T14:44:12Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-22T14:05:17Z",
+          "timestamp": "2026-03-22T14:44:12Z",
           "verdict": "zero_findings"
         }
       }
@@ -77,19 +86,19 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "done",
   "tasks": [
     {
       "description": "resolve_reviewer_provider(&Path) → resolve_reviewer_provider(&str) に変更。PrReviewError から Io/ProfilesNotFound を削除。テスト書き換え。",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "CLI 側 (pr.rs) でファイル読み込みを行い &str を渡す。ファイル不存在時の fail-closed テスト追加。CI 全通し + usecase-purity warning ゼロ確認。",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "INF-16: pr_review.rs hexagonal リファクタリング — std::fs / std::io を CLI 層に移動",
-  "updated_at": "2026-03-22T14:05:17Z"
+  "updated_at": "2026-03-22T14:44:12Z"
 }
