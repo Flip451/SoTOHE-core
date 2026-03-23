@@ -30,7 +30,9 @@ pub use review::{
     ReviewEscalationState, ReviewGroupState, ReviewRoundResult, ReviewState, ReviewStatus,
     RoundType, Verdict,
 };
-pub use signal::SignalCounts;
+pub use signal::{
+    ConfidenceSignal, SignalBasis, SignalCounts, classify_source_tag, evaluate_source_tag,
+};
 pub use timestamp::Timestamp;
 pub use track::{
     StatusOverride, StatusOverrideKind, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata,

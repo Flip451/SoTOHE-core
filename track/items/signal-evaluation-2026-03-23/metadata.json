@@ -1,0 +1,146 @@
+{
+  "branch": "track/signal-evaluation-2026-03-23",
+  "created_at": "2026-03-23T03:17:54Z",
+  "id": "signal-evaluation-2026-03-23",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "ConfidenceSignal enum, SignalBasis enum, source tag to signal mapping rules. These types are shared with future Stage 2."
+        ],
+        "id": "domain",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Domain Layer — Shared Primitives"
+      },
+      {
+        "description": [
+          "spec.md source tag parser, signal evaluation engine, Domain States section presence check"
+        ],
+        "id": "infrastructure",
+        "task_ids": [
+          "T002",
+          "T005"
+        ],
+        "title": "Infrastructure Layer — Source Tag Parser + Domain States Presence"
+      },
+      {
+        "description": [
+          "sotp track signals command (spec.md frontmatter update), sotp verify spec-signals gate"
+        ],
+        "id": "cli",
+        "task_ids": [
+          "T003",
+          "T004"
+        ],
+        "title": "CLI Layer — Commands + Gates"
+      }
+    ],
+    "summary": [
+      "Stage 1 of two-stage signal evaluation: spec requirement provenance signals (TSUMIKI-01).",
+      "Evaluates [source: ...] tags in spec.md Scope/Constraints/Acceptance Criteria sections.",
+      "Stores aggregate SignalCounts in spec.md frontmatter signals field.",
+      "Stage 2 (Domain States signals + metadata.json domain_state_signals) is a separate follow-up track."
+    ]
+  },
+  "review": {
+    "code_hash": "6aa7386e035daed0b8e59a2d1e703037f35eee3c",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "planning"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-23T04:40:30Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "planning"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-23T04:40:36Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "all": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-23T07:05:46Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-23T07:05:46Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "infra-domain": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-23T05:26:04Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-23T05:26:04Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "planning": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-23T04:40:30Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-23T04:40:36Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "Domain: ConfidenceSignal enum + SignalBasis enum + source tag mapping rules (pure functions, shared primitives for Stage 1 and future Stage 2)",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "Infrastructure: spec.md source tag parser + signal evaluation engine (Scope/Constraints/Acceptance Criteria sections only)",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "CLI: sotp track signals command (evaluate spec.md source tags, update spec.md frontmatter signals field, display summary)",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "CLI + Infrastructure: sotp verify spec-signals gate (spec.md frontmatter signals vs actual source tag evaluation consistency, red == 0 policy)",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "Infrastructure: sotp verify spec-states minimal — validate that spec.md contains a ## Domain States section with at least one data row in its table (signal tag parsing deferred to Track B)",
+      "id": "T005",
+      "status": "done"
+    }
+  ],
+  "title": "Spec Signal Evaluation — Stage 1 (TSUMIKI-01)",
+  "updated_at": "2026-03-23T07:05:46Z"
+}

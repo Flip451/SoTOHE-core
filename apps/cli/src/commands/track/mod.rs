@@ -16,6 +16,7 @@ use usecase::track_activation::{ActivateTrackOutcome, ActivateTrackUseCase};
 
 mod activate;
 mod resolve;
+mod signals;
 mod state_ops;
 mod transition;
 mod views;
@@ -158,6 +159,16 @@ pub enum TrackCommand {
         /// Track ID (directory name under items_dir).
         track_id: String,
     },
+
+    /// Evaluate spec.md source tags and store results in metadata.json spec_signals.
+    Signals {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        track_id: String,
+    },
 }
 
 #[derive(Debug, Subcommand)]
@@ -276,6 +287,9 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         }
         TrackCommand::TaskCounts { items_dir, track_id } => {
             state_ops::execute_task_counts(items_dir, track_id)
+        }
+        TrackCommand::Signals { items_dir, track_id } => {
+            signals::execute_signals(items_dir, track_id)
         }
     };
     match result {

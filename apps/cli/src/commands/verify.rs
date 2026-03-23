@@ -45,6 +45,10 @@ pub enum VerifyCommand {
     UsecasePurity(VerifyArgs),
     /// Check that plan.md files are up-to-date with metadata.json renderings.
     ViewFreshness(VerifyArgs),
+    /// Check spec.md source tag signals match frontmatter and red == 0 gate.
+    SpecSignals(SpecVerifyArgs),
+    /// Check spec.md contains a ## Domain States section with table data rows.
+    SpecStates(SpecVerifyArgs),
 }
 
 /// Common arguments for all verify subcommands.
@@ -106,6 +110,12 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
             "verify view freshness",
             infrastructure::verify::view_freshness::verify(&args.project_root),
         ),
+        VerifyCommand::SpecSignals(args) => {
+            ("verify spec signals", infrastructure::verify::spec_signals::verify(&args.spec_path))
+        }
+        VerifyCommand::SpecStates(args) => {
+            ("verify spec states", infrastructure::verify::spec_states::verify(&args.spec_path))
+        }
     };
 
     print_outcome(label, &outcome)
@@ -374,5 +384,62 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let exit = execute(VerifyCommand::ViewFreshness(make_args(tmp.path())));
         assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    // --- spec-signals CLI wiring ---
+
+    #[test]
+    fn test_spec_signals_subcommand_returns_success_for_valid_spec() {
+        let tmp = TempDir::new().unwrap();
+        let spec = tmp.path().join("spec.md");
+        // Spec with valid frontmatter, a Scope section, and a blue-signal item — no red items.
+        std::fs::write(
+            &spec,
+            "---\nstatus: draft\nversion: \"1.0\"\n---\n## Scope\n- item [source: PRD §1]\n",
+        )
+        .unwrap();
+        let exit = execute(VerifyCommand::SpecSignals(SpecVerifyArgs { spec_path: spec }));
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn test_spec_signals_subcommand_returns_failure_for_missing_file() {
+        let tmp = TempDir::new().unwrap();
+        let spec = tmp.path().join("nonexistent.md");
+        let exit = execute(VerifyCommand::SpecSignals(SpecVerifyArgs { spec_path: spec }));
+        assert_eq!(exit, ExitCode::FAILURE);
+    }
+
+    // --- spec-states CLI wiring ---
+
+    #[test]
+    fn test_spec_states_subcommand_returns_success_for_valid_section() {
+        let tmp = TempDir::new().unwrap();
+        let spec = tmp.path().join("spec.md");
+        // Spec with a ## Domain States section containing a table with data rows.
+        std::fs::write(
+            &spec,
+            "---\nstatus: draft\nversion: \"1.0\"\n---\n## Domain States\n\n\
+             | State | Description |\n\
+             |-------|-------------|\n\
+             | Draft | Initial state |\n",
+        )
+        .unwrap();
+        let exit = execute(VerifyCommand::SpecStates(SpecVerifyArgs { spec_path: spec }));
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn test_spec_states_subcommand_returns_failure_for_missing_section() {
+        let tmp = TempDir::new().unwrap();
+        let spec = tmp.path().join("spec.md");
+        // Spec with frontmatter but no ## Domain States section.
+        std::fs::write(
+            &spec,
+            "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n\nNo states here.\n",
+        )
+        .unwrap();
+        let exit = execute(VerifyCommand::SpecStates(SpecVerifyArgs { spec_path: spec }));
+        assert_eq!(exit, ExitCode::FAILURE);
     }
 }
