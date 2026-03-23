@@ -40,7 +40,9 @@ Track Workflow との連携：
   → track/items/<id>/ ディレクトリを作成
   → metadata.json (SSoT) を作成
   → plan.md を metadata.json から render_plan() で生成
-  → spec.md, verification.md を初期化
+  → spec.json (SSoT) を作成 — 構造化仕様データ
+  → spec.md を spec.json から render_spec() で生成（read-only view）
+  → verification.md を初期化
   → track/registry.md を更新
 ```
 

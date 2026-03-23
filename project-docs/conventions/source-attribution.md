@@ -46,5 +46,7 @@ For acceptance criteria:
 3. When multiple sources apply, list them comma-separated: `[source: PRD §3.2, discussion]`.
 4. When the source is unknown, use `[source: inference — reason]` with an honest reason.
    Do not fabricate document references.
-5. Source tags are informational metadata. They do not affect CI or verification gates.
-   Phase 2 (TSUMIKI-01) will use them as input for signal evaluation.
+5. Source tags are informational metadata used by signal evaluation (TSUMIKI-01) to assess confidence.
+6. In `spec.json` (SSoT), sources are a JSON array: `"sources": ["PRD §3.2", "discussion"]`.
+   In rendered `spec.md`, multi-source items display as `[source: PRD §3.2, discussion]`.
+   Multi-source signal policy: the item's signal is the **highest confidence** among its sources.

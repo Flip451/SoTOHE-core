@@ -1,4 +1,8 @@
 //! Verify that spec.md contains a ## Domain States section with at least one table data row.
+//!
+//! When a sibling `spec.json` exists, delegates to the JSON-based path which
+//! checks `doc.domain_states()` is non-empty. Otherwise falls back to the
+//! markdown table scan (legacy path).
 
 use std::path::Path;
 
@@ -6,8 +10,52 @@ use domain::verify::{Finding, VerifyOutcome};
 
 use super::frontmatter::parse_yaml_frontmatter;
 
+/// Verifies domain states using a pre-decoded `spec.json`.
+///
+/// Checks that `doc.domain_states()` is non-empty (at least one entry).
+///
+/// # Errors
+///
+/// Returns findings when:
+/// - The file cannot be read.
+/// - The JSON cannot be decoded.
+/// - `domain_states` is empty.
+pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
+    let json = match std::fs::read_to_string(spec_json_path) {
+        Ok(s) => s,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "cannot read {}: {e}",
+                spec_json_path.display()
+            ))]);
+        }
+    };
+
+    let doc = match crate::spec::codec::decode(&json) {
+        Ok(d) => d,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "{}: spec.json decode error: {e}",
+                spec_json_path.display()
+            ))]);
+        }
+    };
+
+    if doc.domain_states().is_empty() {
+        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            "{}: domain_states is empty — at least one entry required",
+            spec_json_path.display()
+        ))]);
+    }
+
+    VerifyOutcome::pass()
+}
+
 /// Verifies that `spec.md` contains a `## Domain States` section with a markdown table
 /// that has at least one data row (beyond the header and separator rows).
+///
+/// When a sibling `spec.json` exists next to `spec_path`, delegates to
+/// `verify_from_spec_json`. Otherwise falls back to the markdown table scan.
 ///
 /// # Errors
 ///
@@ -17,6 +65,14 @@ use super::frontmatter::parse_yaml_frontmatter;
 /// - The section exists but contains no markdown table.
 /// - The table has no data rows (header + separator only).
 pub fn verify(spec_path: &Path) -> VerifyOutcome {
+    // Delegate to spec.json path when a sibling spec.json exists.
+    if let Some(spec_json_path) = sibling_spec_json(spec_path) {
+        if spec_json_path.is_file() {
+            return verify_from_spec_json(&spec_json_path);
+        }
+    }
+
+    // Legacy markdown-based flow.
     let content = match std::fs::read_to_string(spec_path) {
         Ok(c) => c,
         Err(e) => {
@@ -148,6 +204,17 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
     }
 
     VerifyOutcome::pass()
+}
+
+/// Derives the sibling `spec.json` path from a `spec.md` path by replacing
+/// the filename component.
+///
+/// Returns `None` when the path has no parent directory.
+fn sibling_spec_json(spec_md_path: &Path) -> Option<std::path::PathBuf> {
+    spec_md_path
+        .parent()
+        .map(|dir| if dir.as_os_str().is_empty() { Path::new(".") } else { dir })
+        .map(|dir| dir.join("spec.json"))
 }
 
 /// Returns `true` when `line` is a markdown table separator row.
@@ -350,6 +417,109 @@ mod tests {
         assert!(
             !outcome.has_errors(),
             "## Domain States after other sections with valid table must pass"
+        );
+    }
+
+    // --- verify_from_spec_json() tests ---
+
+    const SPEC_JSON_WITH_DOMAIN_STATES: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": { "in_scope": [], "out_of_scope": [] },
+  "domain_states": [{ "name": "Draft", "description": "Initial state" }]
+}"#;
+
+    const SPEC_JSON_WITHOUT_DOMAIN_STATES: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": { "in_scope": [], "out_of_scope": [] }
+}"#;
+
+    #[test]
+    fn test_verify_from_spec_json_with_domain_states_passes() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_WITH_DOMAIN_STATES).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(!outcome.has_errors(), "non-empty domain_states should pass: {outcome:?}");
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_empty_domain_states_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_WITHOUT_DOMAIN_STATES).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(outcome.has_errors(), "empty domain_states should fail");
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_missing_file_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("nonexistent.json");
+        let outcome = verify_from_spec_json(&path);
+        assert!(outcome.has_errors(), "missing file should fail");
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_invalid_json_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, "not valid json").unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(outcome.has_errors(), "invalid JSON should fail");
+    }
+
+    // --- verify() delegation tests ---
+
+    #[test]
+    fn test_verify_delegates_to_spec_json_when_sibling_exists() {
+        let dir = tempfile::tempdir().unwrap();
+        // Write spec.json with domain states (passes)
+        std::fs::write(dir.path().join("spec.json"), SPEC_JSON_WITH_DOMAIN_STATES).unwrap();
+        // Write spec.md without ## Domain States (would fail under legacy path)
+        std::fs::write(
+            dir.path().join("spec.md"),
+            "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n\nNo domain states here.\n",
+        )
+        .unwrap();
+        let outcome = verify(&dir.path().join("spec.md"));
+        assert!(
+            !outcome.has_errors(),
+            "spec.json delegation should override markdown findings: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_verify_spec_json_empty_domain_states_propagates_failure() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(dir.path().join("spec.json"), SPEC_JSON_WITHOUT_DOMAIN_STATES).unwrap();
+        std::fs::write(
+            dir.path().join("spec.md"),
+            "---\nstatus: draft\nversion: \"1.0\"\n---\n## Domain States\n\n| State | Desc |\n|---|---|\n| Draft | ok |\n",
+        )
+        .unwrap();
+        let outcome = verify(&dir.path().join("spec.md"));
+        assert!(outcome.has_errors(), "empty domain_states in spec.json should fail");
+    }
+
+    #[test]
+    fn test_verify_falls_back_to_markdown_when_no_spec_json() {
+        let dir = tempfile::tempdir().unwrap();
+        // No spec.json — use legacy markdown path
+        std::fs::write(
+            dir.path().join("spec.md"),
+            "## Domain States\n\n| State | Desc |\n|-------|------|\n| Ready | ok |\n",
+        )
+        .unwrap();
+        let outcome = verify(&dir.path().join("spec.md"));
+        assert!(
+            !outcome.has_errors(),
+            "legacy markdown path with valid table must pass: {outcome:?}"
         );
     }
 }

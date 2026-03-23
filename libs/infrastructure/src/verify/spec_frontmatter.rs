@@ -1,4 +1,9 @@
 //! Verify that spec.md has valid YAML frontmatter with required fields.
+//!
+//! When a sibling `spec.json` exists, the schema check is performed by
+//! attempting to decode it via `crate::spec::codec::decode`. A successful
+//! decode means the schema is valid. Otherwise, the markdown frontmatter
+//! check (legacy path) is used.
 
 use super::frontmatter::parse_yaml_frontmatter;
 use domain::verify::{Finding, VerifyOutcome};
@@ -32,7 +37,50 @@ struct SpecFrontmatterDto {
     _extra: serde_yaml::Mapping, // Ignore unknown fields
 }
 
+/// Verifies that a `spec.json` file has a valid schema by attempting to decode it.
+///
+/// A successful decode proves the JSON is well-formed, passes schema-version
+/// validation, and satisfies all domain constraints. Failure means the schema
+/// is invalid.
+///
+/// # Errors
+///
+/// Returns findings when the file cannot be read or the decode fails.
+pub fn verify_spec_schema(spec_json_path: &Path) -> VerifyOutcome {
+    let json = match std::fs::read_to_string(spec_json_path) {
+        Ok(s) => s,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "cannot read {}: {e}",
+                spec_json_path.display()
+            ))]);
+        }
+    };
+
+    match crate::spec::codec::decode(&json) {
+        Ok(_) => VerifyOutcome::pass(),
+        Err(e) => VerifyOutcome::from_findings(vec![Finding::error(format!(
+            "{}: spec.json schema invalid: {e}",
+            spec_json_path.display()
+        ))]),
+    }
+}
+
+/// Derives the sibling `spec.json` path from a `spec.md` path.
+///
+/// Returns `None` when the path has no parent directory.
+fn sibling_spec_json(spec_md_path: &Path) -> Option<std::path::PathBuf> {
+    spec_md_path
+        .parent()
+        .map(|dir| if dir.as_os_str().is_empty() { Path::new(".") } else { dir })
+        .map(|dir| dir.join("spec.json"))
+}
+
 /// Verifies spec.md has YAML frontmatter with `status` and `version`.
+///
+/// When a sibling `spec.json` exists next to `spec_path`, delegates to
+/// `verify_spec_schema` (decode-based check). Otherwise falls back to the
+/// YAML frontmatter check (legacy path).
 ///
 /// The optional `signals` field, when present, must be a valid mapping with
 /// `blue`, `yellow`, `red` as non-negative integer fields. Both inline
@@ -43,6 +91,14 @@ struct SpecFrontmatterDto {
 /// Returns findings when the file cannot be read, when YAML frontmatter
 /// delimiters are missing, or when the frontmatter content is invalid.
 pub fn verify(spec_path: &Path) -> VerifyOutcome {
+    // Delegate to spec.json schema check when sibling exists.
+    if let Some(spec_json_path) = sibling_spec_json(spec_path) {
+        if spec_json_path.is_file() {
+            return verify_spec_schema(&spec_json_path);
+        }
+    }
+
+    // Legacy markdown frontmatter check.
     let content = match std::fs::read_to_string(spec_path) {
         Ok(c) => c,
         Err(e) => {
@@ -380,5 +436,110 @@ mod tests {
         .unwrap();
         let outcome = verify(&spec);
         assert!(outcome.has_errors(), "signals missing 'red' field must be rejected");
+    }
+
+    // --- verify_spec_schema() tests ---
+
+    const VALID_SPEC_JSON: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": { "in_scope": [], "out_of_scope": [] }
+}"#;
+
+    #[test]
+    fn test_verify_spec_schema_with_valid_json_passes() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, VALID_SPEC_JSON).unwrap();
+        let outcome = verify_spec_schema(&path);
+        assert!(!outcome.has_errors(), "valid spec.json should pass: {outcome:?}");
+    }
+
+    #[test]
+    fn test_verify_spec_schema_with_missing_file_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("nonexistent.json");
+        let outcome = verify_spec_schema(&path);
+        assert!(outcome.has_errors(), "missing file should fail");
+    }
+
+    #[test]
+    fn test_verify_spec_schema_with_invalid_json_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, "{not valid json}").unwrap();
+        let outcome = verify_spec_schema(&path);
+        assert!(outcome.has_errors(), "invalid JSON should fail");
+    }
+
+    #[test]
+    fn test_verify_spec_schema_with_wrong_schema_version_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(
+            &path,
+            r#"{"schema_version":2,"status":"s","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#,
+        )
+        .unwrap();
+        let outcome = verify_spec_schema(&path);
+        assert!(outcome.has_errors(), "unsupported schema version should fail");
+    }
+
+    #[test]
+    fn test_verify_spec_schema_with_empty_title_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(
+            &path,
+            r#"{"schema_version":1,"status":"s","version":"1","title":"","scope":{"in_scope":[],"out_of_scope":[]}}"#,
+        )
+        .unwrap();
+        let outcome = verify_spec_schema(&path);
+        assert!(outcome.has_errors(), "empty title should fail domain validation");
+    }
+
+    // --- verify() delegation tests ---
+
+    #[test]
+    fn test_verify_delegates_to_spec_json_when_sibling_exists() {
+        let dir = tempfile::tempdir().unwrap();
+        // Write a valid spec.json
+        std::fs::write(dir.path().join("spec.json"), VALID_SPEC_JSON).unwrap();
+        // Write a spec.md that lacks required frontmatter (would fail under legacy path)
+        std::fs::write(dir.path().join("spec.md"), "# No frontmatter\n").unwrap();
+        let outcome = verify(&dir.path().join("spec.md"));
+        // spec.json takes priority and is valid
+        assert!(
+            !outcome.has_errors(),
+            "spec.json delegation should override markdown failure: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_verify_spec_json_invalid_propagates_failure_through_verify() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(dir.path().join("spec.json"), "{not json}").unwrap();
+        std::fs::write(
+            dir.path().join("spec.md"),
+            "---\nstatus: draft\nversion: \"1.0\"\n---\n# Content\n",
+        )
+        .unwrap();
+        let outcome = verify(&dir.path().join("spec.md"));
+        assert!(outcome.has_errors(), "invalid spec.json should propagate failure");
+    }
+
+    #[test]
+    fn test_verify_falls_back_to_markdown_when_no_spec_json() {
+        let dir = tempfile::tempdir().unwrap();
+        // No spec.json — legacy path
+        std::fs::write(
+            dir.path().join("spec.md"),
+            "---\nstatus: draft\nversion: \"1.0\"\n---\n# Content\n",
+        )
+        .unwrap();
+        let outcome = verify(&dir.path().join("spec.md"));
+        assert!(!outcome.has_errors(), "legacy markdown path should pass: {outcome:?}");
     }
 }
