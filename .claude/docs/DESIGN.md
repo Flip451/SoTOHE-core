@@ -46,21 +46,21 @@ Note: See `.claude/agent-profiles.json` for which provider handles each capabili
 
 ## Key Design Decisions
 
-| Decision | Rationale | Alternatives Considered | Date |
-|----------|-----------|------------------------|------|
-| TrackStatus derived from tasks, not stored | Eliminates status desync; matches Python reference | Stored status with manual sync | 2026-03-11 |
-| TaskStatus::Done owns Option\<CommitHash\> | Commit hash data bound to done state at type level | Separate commit_hash field on TrackTask | 2026-03-11 |
-| TaskTransition as explicit enum commands | Type-safe transition API; exhaustive match coverage | String-based transitions like Python | 2026-03-11 |
-| StatusOverride auto-clears on all-resolved | Prevents stale override on completed tracks | Manual override management | 2026-03-11 |
-| Plan-task referential integrity at construction | Catches invalid plans early; mirrors Python validation | Runtime validation on access | 2026-03-11 |
-| Fail-closed hook error handling | Guard hook blocks tool on any error (CLI not found, unexpected exception); never proceeds without verification | Fail-open (silently skip guard on error) | 2026-03-11 |
-| ~~Shell guard in domain layer (no trait)~~ *(superseded by INF-20)* | ~~Pure computation, no I/O, no implementation variability~~ | ~~tree-sitter-bash (C dep), domain trait (over-engineering)~~ | 2026-03-11 |
-| INF-20: ShellParser port + ConchShellParser adapter | Removes conch-parser from domain; policy takes `&[SimpleCommand]` (parse/evaluate split); DI via `Arc<dyn ShellParser>`. Supersedes the "no trait" decision above. | Keep conch-parser in domain (dependency direction violation), cfg feature flag (doesn't decouple) | 2026-03-23 |
-| conch-parser for shell AST (vendored, patched) | Full POSIX AST, minimal deps (void only), structural env var/command separation | Hand-written parser (edge case proliferation), tree-sitter-bash (C dep), brush-parser (heavy deps) | 2026-03-11 |
-| Guard policy: ban edge-case-producing patterns | Unconditionally block patterns that create bypass vectors but are unnecessary in the template workflow: (1) `env` command → immediate block, (2) `$VAR`/`$(cmd)`/`` `cmd` `` in **any position** (argv + redirect texts including heredoc bodies) → immediate block, (3) `.exe` suffix → stripped in basename, (4) if effective command ≠ `git` and any argv/redirect token contains "git" (case-insensitive) → block. Rules (2) and (4) together eliminate ALL per-tool nesting analysis with argv/redirect-level checks. | Per-pattern recursive parsing and validation (complex, error-prone, ~200 lines of per-tool option parsing) | 2026-03-11 |
-| Reviewer model_profiles in agent-profiles.json | Centralized per-model behavioral config (`full_auto`, etc.) in `providers.codex.model_profiles`. CLI reads the file and resolves flags automatically. Fail-closed: unknown model or missing file defaults to `full_auto: true`. | Hardcoded model-name heuristic in Rust code; explicit CLI `--full-auto` flag | 2026-03-17 |
-| TSUMIKI-01/SPEC-05: 3-level signals with SignalBasis | 3 public levels (Blue/Yellow/Red) map to actionable decisions (proceed/verify/block). Richer `SignalBasis` enum captures reason behind each signal without inflating the level count. Follows `DonePending`/`DoneTraced` precedent: internal nuance, unified external kind. | 4+ levels (Green for CI-verified, split Red into unverified/contradicted), single enum without basis separation | 2026-03-23 |
-| Two-stage signal architecture | Stage 1 (spec signals): source tag provenance → `spec.md` frontmatter. Stage 2 (domain state signals): design confidence → `metadata.json domain_state_signals`. Sequential gate: Stage 1 must pass before Stage 2. Shared `ConfidenceSignal`/`SignalCounts` primitives; `SignalBasis` is Stage 1 only. `TrackMetadata` holds Stage 2 only. | Single unified store in metadata.json (mixes spec authority with track state), single-stage evaluation (misses requirement vs design confidence distinction) | 2026-03-23 |
+| Decision | ADR | Date |
+|----------|-----|------|
+| TrackStatus derived from tasks, not stored | [ADR](../../knowledge/adr/2026-03-11-0000-track-status-derived.md) | 2026-03-11 |
+| TaskStatus::Done owns Option\<CommitHash\> | [ADR](../../knowledge/adr/2026-03-11-0010-done-owns-commit-hash.md) | 2026-03-11 |
+| TaskTransition as explicit enum commands | [ADR](../../knowledge/adr/2026-03-11-0020-task-transition-enum.md) | 2026-03-11 |
+| StatusOverride auto-clears on all-resolved | [ADR](../../knowledge/adr/2026-03-11-0030-status-override-auto-clear.md) | 2026-03-11 |
+| Plan-task referential integrity at construction | [ADR](../../knowledge/adr/2026-03-11-0040-plan-task-integrity.md) | 2026-03-11 |
+| Fail-closed hook error handling | [ADR](../../knowledge/adr/2026-03-11-0050-fail-closed-hooks.md) | 2026-03-11 |
+| ~~Shell guard in domain layer (no trait)~~ | [ADR (superseded)](../../knowledge/adr/2026-03-11-0060-shell-guard-in-domain.md) | 2026-03-11 |
+| INF-20: ShellParser port + ConchShellParser adapter | [ADR](../../knowledge/adr/2026-03-23-1000-shell-parser-port.md) | 2026-03-23 |
+| conch-parser for shell AST (vendored, patched) | [ADR](../../knowledge/adr/2026-03-11-0070-conch-parser-selection.md) | 2026-03-11 |
+| Guard policy: ban edge-case-producing patterns | [ADR](../../knowledge/adr/2026-03-11-0080-guard-policy-ban-patterns.md) | 2026-03-11 |
+| Reviewer model_profiles in agent-profiles.json | [ADR](../../knowledge/adr/2026-03-17-0000-reviewer-model-profiles.md) | 2026-03-17 |
+| TSUMIKI-01/SPEC-05: 3-level signals with SignalBasis | [ADR](../../knowledge/adr/2026-03-23-1010-three-level-signals.md) | 2026-03-23 |
+| Two-stage signal architecture | [ADR](../../knowledge/adr/2026-03-23-1020-two-stage-signals.md) | 2026-03-23 |
 
 ## Crate Selection
 

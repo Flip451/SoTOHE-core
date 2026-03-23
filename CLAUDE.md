@@ -12,6 +12,7 @@
 - `track/items/<id>/verification.md`
 - `.claude/docs/DESIGN.md`
 - `.claude/docs/WORKFLOW.md`
+- `knowledge/adr/README.md`
 - `.claude/agent-profiles.json`
 - `.claude/rules/`
 - `project-docs/conventions/README.md`
