@@ -9,7 +9,7 @@
 
 - Latest active track: `None yet`
 - Next recommended command: `/track:plan <feature>`
-- Last updated: `2026-03-22`
+- Last updated: `2026-03-23`
 
 ## Active Tracks
 
@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| conch-parser-infra-move-2026-03-23 | Done | 2026-03-23 |
 | domain-purity-ci-2026-03-23 | Done | 2026-03-22 |
 | usecase-purity-error-2026-03-23 | Done | 2026-03-22 |
 | pr-review-hexagonal-2026-03-22 | Done | 2026-03-22 |

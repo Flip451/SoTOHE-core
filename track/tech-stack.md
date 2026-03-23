@@ -69,7 +69,7 @@ apps/cli             # CLI エントリーポイント + composition root（usec
 - **時刻**: `chrono` (`features = ["serde"]`) — domain 層でも `DateTime<Utc>` を newtype wrap して使用可（I/O なしの純粋ユーティリティ）
 - **シリアライゼーション**: `serde` + `serde_json`
 - **設定管理**: `config` 0.15
-- **シェルパース**: `conch-parser` 0.1.1（vendored, patched — domain 層: POSIX シェル AST パース、ガードポリシー用）
+- **シェルパース**: `conch-parser` 0.1.1（vendored, patched — infrastructure 層: POSIX シェル AST パース、`ShellParser` port adapter として `ConchShellParser` を提供）
 - **モック**: `mockall` 0.14（dev-dependency）
 - **パラメータ化テスト**: `rstest` 0.26（dev-dependency — `#[rstest]` + `#[case]` でパラメータ化テスト、`#[fixture]` で共通セットアップ注入）
 
@@ -91,3 +91,4 @@ apps/cli             # CLI エントリーポイント + composition root（usec
 | 2026-02-28 | テンプレート初期化（対話入力型に変更） | 固定値ではなくプロジェクト開始時に合意形成するため |
 | 2026-03-11 | 技術選定完了（同期CLI, clap, reqwest, config, mockall） | SoTOHE-core プロジェクト開始 |
 | 2026-03-11 | conch-parser 0.1.1 追加（vendored, patched） | domain 層シェル AST パース（ガードポリシー用） |
+| 2026-03-23 | conch-parser を domain → infrastructure に移動（INF-20） | ShellParser port trait + ConchShellParser adapter |

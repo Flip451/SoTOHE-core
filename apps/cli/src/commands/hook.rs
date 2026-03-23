@@ -10,8 +10,10 @@
 use std::io::Read as _;
 use std::path::PathBuf;
 use std::process::ExitCode;
+use std::sync::Arc;
 
 use domain::hook::{HookContext, HookName};
+use infrastructure::shell::ConchShellParser;
 
 /// CLI-layer serde type for Claude Code hook JSON envelope.
 /// Security-critical fields (`tool_name`) must NOT use `#[serde(default)]` —
@@ -183,14 +185,18 @@ fn execute_dispatch(hook: CliHookName) -> ExitCode {
     let ctx =
         HookContext { project_dir: std::env::var("CLAUDE_PROJECT_DIR").ok().map(PathBuf::from) };
 
+    // Composition root: build the shell parser adapter and inject into handlers
+    let parser: Arc<dyn domain::guard::ShellParser> = Arc::new(ConchShellParser);
+
     // Dispatch to the appropriate handler
     let result = match hook {
         CliHookName::BlockDirectGitOps => {
-            let handler = usecase::hook::GuardHookHandler;
+            let handler = usecase::hook::GuardHookHandler { parser: Arc::clone(&parser) };
             handler_handle(&handler, &ctx, &input)
         }
         CliHookName::BlockTestFileDeletion => {
-            let handler = usecase::hook::TestFileDeletionGuardHandler;
+            let handler =
+                usecase::hook::TestFileDeletionGuardHandler { parser: Arc::clone(&parser) };
             handler_handle(&handler, &ctx, &input)
         }
     };

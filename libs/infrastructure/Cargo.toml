@@ -10,6 +10,7 @@ workspace = true
 
 [dependencies]
 chrono = { version = "0.4.44", features = ["serde"] }
+conch-parser = "0.1.1"
 domain = { path = "../domain" }
 proc-macro2 = { version = "1", features = ["span-locations"] }
 usecase = { path = "../usecase" }

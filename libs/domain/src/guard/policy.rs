@@ -7,7 +7,7 @@
 //! Determines whether a shell command should be allowed or blocked
 //! based on git operation detection rules.
 
-use super::parser::{self, SimpleCommand};
+use super::types::SimpleCommand;
 use super::verdict::{GuardVerdict, ParseError};
 
 /// Command launchers that prefix the real command.
@@ -143,23 +143,25 @@ const FILE_WRITE_COMMANDS: &[&str] = &["tee"];
 #[allow(dead_code)]
 const KNOWN_SHELLS: &[&str] = &["bash", "sh", "dash", "zsh", "ash"];
 
-/// Checks a shell command against the guard policy.
+/// Converts a parse error into a fail-closed block verdict.
 ///
-/// Returns a `GuardVerdict` indicating whether the command is allowed or blocked.
-/// On parse failure, returns Block (fail-closed).
-pub fn check(input: &str) -> GuardVerdict {
-    // Parse the command into simple commands
-    let commands = match parser::split_shell(input) {
-        Ok(cmds) => cmds,
-        Err(ParseError::NestingDepthExceeded { .. }) => {
-            return GuardVerdict::block("command nesting depth exceeded");
+/// Callers that parse shell commands via [`super::ShellParser`] should
+/// use this helper to map parse failures to block verdicts.
+pub fn block_on_parse_error(err: &ParseError) -> GuardVerdict {
+    match err {
+        ParseError::NestingDepthExceeded { .. } => {
+            GuardVerdict::block("command nesting depth exceeded")
         }
-        Err(ParseError::UnmatchedQuote) => {
-            return GuardVerdict::block("unparseable command (unmatched quote)");
-        }
-    };
+        ParseError::UnmatchedQuote => GuardVerdict::block("unparseable command (unmatched quote)"),
+    }
+}
 
-    for cmd in &commands {
+/// Checks pre-parsed simple commands against the guard policy.
+///
+/// Returns a `GuardVerdict` indicating whether the commands are allowed or blocked.
+/// Parse errors should be handled by the caller using [`block_on_parse_error`].
+pub fn check_commands(commands: &[SimpleCommand]) -> GuardVerdict {
+    for cmd in commands {
         let verdict = check_simple_command(cmd);
         if verdict.is_blocked() {
             return verdict;
@@ -678,6 +680,50 @@ fn has_expansion_marker(token: &str) -> bool {
 mod tests {
     use super::*;
     use rstest::rstest;
+
+    /// Test-only helper: splits a command string into `SimpleCommand`s and
+    /// evaluates them via `check_commands`. Handles semicolons, pipes,
+    /// and simple redirects (`>`, `>>`, `>|`, `<>`, `2>`). Sufficient for
+    /// policy unit tests. Full shell parsing (quoting, subshells, command
+    /// substitutions) is tested at the infrastructure layer (ConchShellParser).
+    fn check(input: &str) -> GuardVerdict {
+        let commands: Vec<SimpleCommand> = input
+            .split(';')
+            .flat_map(|segment| segment.split('|'))
+            .map(|part| {
+                let tokens: Vec<&str> = part.split_whitespace().collect();
+                let mut argv = Vec::new();
+                let mut redirect_texts = Vec::new();
+                let mut has_output_redirect = false;
+                let mut skip_next = false;
+                for (i, &tok) in tokens.iter().enumerate() {
+                    if skip_next {
+                        skip_next = false;
+                        continue;
+                    }
+                    if tok == ">" || tok == ">>" || tok == ">|" || tok == "<>" {
+                        has_output_redirect = true;
+                        if let Some(target) = tokens.get(i + 1) {
+                            redirect_texts.push((*target).to_string());
+                            skip_next = true;
+                        }
+                    } else if tok.contains('>') && !tok.starts_with('-') && !tok.contains(">&") {
+                        // e.g., "2>" — fd redirect (but NOT "2>&1" which is fd dup)
+                        has_output_redirect = true;
+                        if let Some(target) = tokens.get(i + 1) {
+                            redirect_texts.push((*target).to_string());
+                            skip_next = true;
+                        }
+                    } else {
+                        argv.push(tok.to_string());
+                    }
+                }
+                SimpleCommand { argv, redirect_texts, has_output_redirect }
+            })
+            .filter(|cmd| !cmd.argv.is_empty() || cmd.has_output_redirect)
+            .collect();
+        check_commands(&commands)
+    }
 
     // -- Blocked git subcommands --
 

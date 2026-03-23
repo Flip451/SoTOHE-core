@@ -1,6 +1,8 @@
 //! Hook dispatch use cases (OCP: each hook implements `HookHandler` independently).
 
-use domain::guard::{SimpleCommand, split_shell};
+use std::sync::Arc;
+
+use domain::guard::{ShellParser, SimpleCommand, policy};
 use domain::hook::{HookContext, HookError, HookInput, HookName, HookVerdict};
 
 /// Port for individual hook logic.
@@ -29,15 +31,27 @@ pub trait HookHandler: Send + Sync {
     fn handle(&self, ctx: &HookContext, input: &HookInput) -> Result<HookVerdict, HookError>;
 }
 
-/// Guard hook handler: delegates to `domain::guard::policy::check`.
-pub struct GuardHookHandler;
+/// Guard hook handler: parses via [`ShellParser`], then delegates to
+/// [`domain::guard::policy::check_commands`].
+pub struct GuardHookHandler {
+    /// Injected shell parser (e.g., `ConchShellParser` from infrastructure).
+    pub parser: Arc<dyn ShellParser>,
+}
 
 impl HookHandler for GuardHookHandler {
     fn handle(&self, _ctx: &HookContext, input: &HookInput) -> Result<HookVerdict, HookError> {
         let command =
             input.command.as_deref().ok_or_else(|| HookError::Input("missing command".into()))?;
 
-        let guard_verdict = domain::guard::policy::check(command);
+        let commands = match self.parser.split_shell(command) {
+            Ok(cmds) => cmds,
+            Err(err) => {
+                let verdict = policy::block_on_parse_error(&err);
+                return Ok(HookVerdict::block(verdict.reason));
+            }
+        };
+
+        let guard_verdict = policy::check_commands(&commands);
 
         if guard_verdict.is_blocked() {
             Ok(HookVerdict::block(guard_verdict.reason))
@@ -53,7 +67,10 @@ impl HookHandler for GuardHookHandler {
 /// - Path contains `tests/` directory segment
 /// - Filename matches `*_test.rs`
 /// - Filename matches `test_*.rs`
-pub struct TestFileDeletionGuardHandler;
+pub struct TestFileDeletionGuardHandler {
+    /// Injected shell parser (e.g., `ConchShellParser` from infrastructure).
+    pub parser: Arc<dyn ShellParser>,
+}
 
 impl HookHandler for TestFileDeletionGuardHandler {
     fn handle(&self, _ctx: &HookContext, input: &HookInput) -> Result<HookVerdict, HookError> {
@@ -98,9 +115,9 @@ impl HookHandler for TestFileDeletionGuardHandler {
         let command =
             input.command.as_deref().ok_or_else(|| HookError::Input("missing command".into()))?;
 
-        // Parse using conch-parser; fail-closed on parse error (block if command
+        // Parse using injected ShellParser; fail-closed on parse error (block if command
         // mentions "rm" anywhere — unparseable commands are suspicious).
-        let commands = match split_shell(command) {
+        let commands = match self.parser.split_shell(command) {
             Ok(cmds) => cmds,
             Err(_) => {
                 // Fail-closed: if we can't parse and the raw command mentions rm,
@@ -113,7 +130,8 @@ impl HookHandler for TestFileDeletionGuardHandler {
         };
 
         // Check parsed commands for rm targeting test files, including shell re-entry
-        if let Some(verdict) = check_commands_for_test_deletion(&commands, 0) {
+        if let Some(verdict) = check_commands_for_test_deletion(self.parser.as_ref(), &commands, 0)
+        {
             return Ok(verdict);
         }
 
@@ -134,7 +152,11 @@ const MAX_REENTRY_DEPTH: u8 = 3;
 /// Recursively checks a list of parsed commands for rm invocations targeting test files.
 /// Handles direct rm commands and shell re-entry (`bash -c '...'`).
 /// Returns `Some(HookVerdict)` if a blocking verdict is needed, `None` to allow.
-fn check_commands_for_test_deletion(commands: &[SimpleCommand], depth: u8) -> Option<HookVerdict> {
+fn check_commands_for_test_deletion(
+    parser: &dyn ShellParser,
+    commands: &[SimpleCommand],
+    depth: u8,
+) -> Option<HookVerdict> {
     for cmd in commands {
         // Direct rm check
         if argv_has_rm(cmd) {
@@ -161,9 +183,10 @@ fn check_commands_for_test_deletion(commands: &[SimpleCommand], depth: u8) -> Op
             }
             // Always parse the -c payload — do not pre-filter with raw_mentions_rm,
             // because shell escaping/quoting can obfuscate the rm token.
-            match split_shell(&inner) {
+            match parser.split_shell(&inner) {
                 Ok(inner_cmds) => {
-                    if let Some(verdict) = check_commands_for_test_deletion(&inner_cmds, depth + 1)
+                    if let Some(verdict) =
+                        check_commands_for_test_deletion(parser, &inner_cmds, depth + 1)
                     {
                         return Some(verdict);
                     }
@@ -398,9 +421,146 @@ mod tests {
     use super::*;
     use std::path::PathBuf;
 
+    /// Test-only ShellParser with quote-aware tokenization and simple redirect
+    /// handling. Sufficient for usecase-level hook tests. Full POSIX parsing
+    /// (subshells, compound commands, AST walking) is tested at the
+    /// infrastructure layer (ConchShellParser).
+    struct TestShellParser;
+
+    impl ShellParser for TestShellParser {
+        fn split_shell(
+            &self,
+            input: &str,
+        ) -> Result<Vec<SimpleCommand>, domain::guard::ParseError> {
+            // Split on semicolons and newlines first, then tokenize each segment.
+            let mut commands = Vec::new();
+            for segment in split_on_separators(input) {
+                let tokens = domain::guard::tokenize(segment)?;
+                if tokens.is_empty() {
+                    continue;
+                }
+                let mut argv = Vec::new();
+                let mut redirect_texts = Vec::new();
+                let mut has_output_redirect = false;
+                let mut skip_next = false;
+
+                for (i, tok) in tokens.iter().enumerate() {
+                    if skip_next {
+                        skip_next = false;
+                        continue;
+                    }
+                    // Standalone redirect operators
+                    if tok == ">" || tok == ">>" || tok == ">|" || tok == "<>" {
+                        has_output_redirect = true;
+                        if let Some(target) = tokens.get(i + 1) {
+                            redirect_texts.push(target.clone());
+                            skip_next = true;
+                        }
+                    // fd dup like "2>&1" — NOT an output redirect, skip token
+                    } else if tok.contains(">&") {
+                        // fd duplication — not a file write
+                        // fd redirect like "2>" (but NOT "2>&1" — already matched above)
+                    } else if tok.ends_with('>') && !tok.starts_with('-') {
+                        has_output_redirect = true;
+                        if let Some(target) = tokens.get(i + 1) {
+                            redirect_texts.push(target.clone());
+                            skip_next = true;
+                        }
+                    // Glued redirect like ">|/tmp/out"
+                    } else if let Some(target) = tok.strip_prefix(">|") {
+                        has_output_redirect = true;
+                        if !target.is_empty() {
+                            redirect_texts.push(target.to_string());
+                        }
+                    } else if let Some(target) = tok.strip_prefix(">>") {
+                        has_output_redirect = true;
+                        if !target.is_empty() {
+                            redirect_texts.push(target.to_string());
+                        }
+                    } else if let Some(target) = tok.strip_prefix("<>") {
+                        has_output_redirect = true;
+                        if !target.is_empty() {
+                            redirect_texts.push(target.to_string());
+                        }
+                    } else if let Some(target) = tok.strip_prefix('>') {
+                        has_output_redirect = true;
+                        if !target.is_empty() {
+                            redirect_texts.push(target.to_string());
+                        }
+                    // Glued redirect like "file.rs>/dev/null", "2>/dev/null", or "2>>/tmp/out"
+                    } else if tok.contains('>') && !tok.contains(">&") && !tok.starts_with('-') {
+                        has_output_redirect = true;
+                        // Find ">>" first (append), then fallback to ">" (write)
+                        let (before, target) = if let Some(pos) = tok.find(">>") {
+                            (&tok[..pos], &tok[pos + 2..])
+                        } else if let Some(pos) = tok.find('>') {
+                            (&tok[..pos], &tok[pos + 1..])
+                        } else {
+                            ("", "")
+                        };
+                        // before is a pure fd number (e.g., "2") only if all digits;
+                        // otherwise it's a real token (e.g., "file.rs", "python3")
+                        if !before.is_empty() && !before.chars().all(|c| c.is_ascii_digit()) {
+                            argv.push(before.to_string());
+                        }
+                        if !target.is_empty() {
+                            redirect_texts.push(target.to_string());
+                        }
+                    // Here-string "<<<" — not an output redirect, skip
+                    } else if tok.starts_with("<<<") || tok == "<<<" {
+                        if let Some(_target) = tokens.get(i + 1) {
+                            skip_next = true;
+                        }
+                    } else {
+                        argv.push(tok.clone());
+                    }
+                }
+
+                if !argv.is_empty() || has_output_redirect {
+                    commands.push(SimpleCommand { argv, redirect_texts, has_output_redirect });
+                }
+            }
+            Ok(commands)
+        }
+    }
+
+    /// Splits input on unquoted semicolons and newlines.
+    fn split_on_separators(input: &str) -> Vec<&str> {
+        let mut segments = Vec::new();
+        let mut start = 0;
+        let bytes = input.as_bytes();
+        let mut in_single = false;
+        let mut in_double = false;
+        let mut i = 0;
+        while i < bytes.len() {
+            let b = bytes[i];
+            if b == b'\\' && !in_single && i + 1 < bytes.len() {
+                i += 2;
+                continue;
+            }
+            if b == b'\'' && !in_double {
+                in_single = !in_single;
+            } else if b == b'"' && !in_single {
+                in_double = !in_double;
+            } else if !in_single && !in_double && (b == b';' || b == b'\n') {
+                segments.push(&input[start..i]);
+                start = i + 1;
+            }
+            i += 1;
+        }
+        if start <= input.len() {
+            segments.push(&input[start..]);
+        }
+        segments
+    }
+
+    fn test_parser() -> Arc<dyn ShellParser> {
+        Arc::new(TestShellParser)
+    }
+
     #[test]
     fn test_guard_handler_allows_safe_command() {
-        let handler = GuardHookHandler;
+        let handler = GuardHookHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -415,7 +575,7 @@ mod tests {
 
     #[test]
     fn test_guard_handler_blocks_git_add() {
-        let handler = GuardHookHandler;
+        let handler = GuardHookHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -430,7 +590,7 @@ mod tests {
 
     #[test]
     fn test_guard_handler_returns_error_on_missing_command() {
-        let handler = GuardHookHandler;
+        let handler = GuardHookHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input =
             HookInput { tool_name: "Bash".into(), command: None, file_path: None, content: None };
@@ -441,7 +601,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_rm_tests_dir() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -455,7 +615,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_rm_underscore_test_rs() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -469,7 +629,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_rm_test_underscore_rs() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -483,7 +643,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_allows_non_test_file() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -497,7 +657,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_rm_with_shell_separator() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -511,7 +671,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_rm_with_double_ampersand_suffix() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -525,7 +685,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_chained_rm_after_separator() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -539,7 +699,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_quoted_operand() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -553,7 +713,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_glued_separator_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -567,7 +727,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_partial_quoting() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -581,7 +741,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_rm_with_background_operator() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -595,7 +755,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_allows_echo_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -609,7 +769,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_fail_closed_on_malformed_input() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         // Bash tool with missing command should error (fail-closed at CLI = exit 2)
         let input =
@@ -620,7 +780,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_env_var_prefix_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -634,7 +794,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_newline_separated_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -648,7 +808,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_absolute_path_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -662,7 +822,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_usr_bin_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -676,7 +836,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_env_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -690,7 +850,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_allows_env_non_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -704,7 +864,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_time_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -718,7 +878,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_exec_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -732,7 +892,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_command_p_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -746,7 +906,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_command_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -760,7 +920,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_timeout_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -774,7 +934,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_nice_n_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -788,7 +948,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_stdbuf_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -802,7 +962,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_sudo_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -816,7 +976,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_doas_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -830,7 +990,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_absolute_path_sudo_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -844,7 +1004,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_absolute_path_time_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -858,7 +1018,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_rm_with_redirect() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -875,7 +1035,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_rm_with_spaced_redirect() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -889,7 +1049,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_quoted_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -903,7 +1063,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_quoted_bin_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -917,7 +1077,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_leading_redirect_before_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -931,7 +1091,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_fd_redirect_before_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -945,7 +1105,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_fd_dup_redirect_before_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -962,7 +1122,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_read_write_redirect_before_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -976,7 +1136,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_clobber_redirect_before_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -990,7 +1150,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_herestring_before_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         // Here-string before a chained rm
         let input = HookInput {
@@ -1005,7 +1165,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_quoted_path_with_space() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1022,7 +1182,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_rm_double_dash_test_file() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1039,7 +1199,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_rm_rf_double_dash_test_dir() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1053,7 +1213,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_bash_c_rm_test_file() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1067,7 +1227,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_sh_c_rm_test_file() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1081,7 +1241,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_sudo_bash_c_rm_test_file() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1095,7 +1255,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_allows_bash_c_without_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1109,7 +1269,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_env_i_bash_c_rm_test_file() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1123,7 +1283,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_timeout_bash_c_rm_test_file() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1137,7 +1297,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_nested_bash_c_sh_c_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1151,7 +1311,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_sudo_u_root_bash_c_rm() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1165,7 +1325,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_bash_lc_rm_test_file() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1180,7 +1340,7 @@ mod tests {
     #[test]
     fn test_test_file_guard_blocks_sh_ec_rm_test_file() {
         // -ec: -e flag (exit on error), -c takes next arg as command
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1196,7 +1356,7 @@ mod tests {
     fn test_test_file_guard_blocks_sh_ce_rm_test_file() {
         // -ce: -c + -e flags, next arg 'rm tests/foo.rs' is the command
         // Per POSIX/Bash, `-ce` is equivalent to `-c -e`.
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1212,7 +1372,7 @@ mod tests {
     fn test_test_file_guard_blocks_deeply_nested_rm_at_depth_limit() {
         // 4 levels of nesting — depth limit is 3, so the innermost shell re-entry
         // must be blocked via fail-closed (raw_mentions_rm) at depth 3
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1231,7 +1391,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_write_with_empty_content_to_test_file_is_blocked() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Write".into(),
@@ -1245,7 +1405,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_write_with_content_to_test_file_is_allowed() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Write".into(),
@@ -1259,7 +1419,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_write_with_empty_content_to_non_test_file_is_allowed() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Write".into(),
@@ -1273,7 +1433,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_edit_tool_is_always_allowed() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Edit".into(),
@@ -1290,7 +1450,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_write_with_missing_file_path_is_blocked() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Write".into(),
@@ -1304,7 +1464,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_write_with_none_content_to_test_file_is_blocked() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Write".into(),
@@ -1321,7 +1481,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_write_with_none_content_to_non_test_file_is_allowed() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Write".into(),
@@ -1342,7 +1502,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_blocks_rm_tests_rs_module() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Bash".into(),
@@ -1356,7 +1516,7 @@ mod tests {
 
     #[test]
     fn test_test_file_guard_write_empty_to_tests_rs_is_blocked() {
-        let handler = TestFileDeletionGuardHandler;
+        let handler = TestFileDeletionGuardHandler { parser: test_parser() };
         let ctx = HookContext { project_dir: None };
         let input = HookInput {
             tool_name: "Write".into(),
