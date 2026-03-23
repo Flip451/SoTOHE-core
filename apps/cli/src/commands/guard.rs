@@ -3,7 +3,8 @@
 use std::process::ExitCode;
 
 use domain::Decision;
-use domain::guard::policy;
+use domain::guard::{ShellParser, policy};
+use infrastructure::shell::ConchShellParser;
 
 /// Guard subcommands for shell command checking.
 #[derive(Debug, clap::Subcommand)]
@@ -24,7 +25,11 @@ pub fn execute(cmd: GuardCommand) -> ExitCode {
 }
 
 fn execute_check(command: &str) -> ExitCode {
-    let verdict = policy::check(command);
+    let parser = ConchShellParser;
+    let verdict = match parser.split_shell(command) {
+        Ok(commands) => policy::check_commands(&commands),
+        Err(err) => policy::block_on_parse_error(&err),
+    };
 
     let decision_str = match verdict.decision {
         Decision::Allow => "allow",

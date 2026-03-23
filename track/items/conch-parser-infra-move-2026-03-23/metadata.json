@@ -59,7 +59,7 @@
     ]
   },
   "review": {
-    "code_hash": "6c174ede838ea96edf8896135f331da2aa82ec0b",
+    "code_hash": "cf985022f583d6038ba959e0b654fa08bfd8ff46",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -87,6 +87,18 @@
       "threshold": 3
     },
     "groups": {
+      "all": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-23T02:08:15Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-23T02:08:21Z",
+          "verdict": "zero_findings"
+        }
+      },
       "planning": {
         "fast": {
           "round": 1,
@@ -103,44 +115,44 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
   "tasks": [
     {
       "description": "Domain guard モジュールの再構成 (types.rs, port.rs, text.rs 分離)",
       "id": "T1",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "policy.rs を check_commands(&[SimpleCommand]) + block_on_parse_error() に変更",
       "id": "T2",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Infrastructure に ConchShellParser adapter を実装 (shell/ モジュール)",
       "id": "T3",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Usecase hook handlers を DI 化 (Arc<dyn ShellParser> 注入)",
       "id": "T4",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "CLI composition root で parser 注入 (hook + guard check)",
       "id": "T5",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Cargo.toml 更新 & ドキュメント同期 (architecture-rules, shell-parsing, tech-stack, DESIGN)",
       "id": "T6",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "CI green 確認 (cargo make ci)",
       "id": "T7",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "title": "INF-20: conch-parser を domain から infrastructure に移動",
-  "updated_at": "2026-03-23T01:22:15Z"
+  "updated_at": "2026-03-23T02:08:21Z"
 }

@@ -214,7 +214,6 @@ name = "domain"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "conch-parser",
  "nutype",
  "rstest",
  "strum",
@@ -384,6 +383,7 @@ name = "infrastructure"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "conch-parser",
  "domain",
  "proc-macro2",
  "regex",
