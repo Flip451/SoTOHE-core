@@ -1,0 +1,71 @@
+{
+  "schema_version": 3,
+  "id": "review-escalation-enforcement-2026-03-24",
+  "branch": "track/review-escalation-enforcement-2026-03-24",
+  "title": "Review escalation enforcement — planning-only bypass guard + record-round wiring",
+  "status": "planned",
+  "created_at": "2026-03-24T06:00:00Z",
+  "updated_at": "2026-03-24T06:00:00Z",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "check-approved planning-only bypass guard: staged files vs allowlist → --planning-only flag",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "/track:review skill を sotp review record-round に配線 (fast/final 各グループ結果を永続化)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "sotp review status CLI コマンド: per-group Fast/Final 状態表示",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "統合テスト: planning-only bypass が code diff で拒否されることを検証",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "/track:review が record-round を呼ばないため review state が NotStarted のままコミットできるすり抜けを修正。",
+      "check-approved の planning-only fast-path に staged diff スコープガードを追加し、",
+      "code ファイルが含まれる場合は Approved ステータスを要求する。",
+      "",
+      "既存の domain 層 (RoundType::Fast/Final, ReviewGroupState, check_commit_ready) は変更不要。",
+      "CLI と skill の配線が主な作業。"
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "check-approved bypass guard",
+        "description": [
+          "check-approved CLI が staged files を planning-only allowlist と照合し、",
+          "code ファイルがあれば planning_only=false で usecase を呼び出す。",
+          "usecase は planning_only==false のとき NotStarted+empty groups の fast-path を無効化。"
+        ],
+        "task_ids": ["T001", "T004"]
+      },
+      {
+        "id": "S2",
+        "title": "record-round wiring + visibility",
+        "description": [
+          "/track:review skill の Step 2d (verdict aggregation) 後に record-round を呼ぶよう配線。",
+          "sotp review status コマンドで per-group 状態を表示。"
+        ],
+        "task_ids": ["T002", "T003"]
+      }
+    ]
+  },
+  "review": {
+    "status": "not_started",
+    "code_hash": null,
+    "groups": {}
+  }
+}
