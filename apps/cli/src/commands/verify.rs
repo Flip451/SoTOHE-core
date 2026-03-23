@@ -37,6 +37,8 @@ pub enum VerifyCommand {
     CanonicalModules(VerifyArgs),
     /// Check Rust source file sizes against module_limits thresholds.
     ModuleSize(VerifyArgs),
+    /// Check libs/domain/src/ for hexagonal purity violations (forbidden I/O patterns).
+    DomainPurity(VerifyArgs),
     /// Check libs/domain/src/ for pub String fields (should be enums or newtypes).
     DomainStrings(VerifyArgs),
     /// Check libs/usecase/src/ for hexagonal purity violations (forbidden patterns).
@@ -88,6 +90,10 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
         VerifyCommand::ModuleSize(args) => {
             ("verify module size", infrastructure::verify::module_size::verify(&args.project_root))
         }
+        VerifyCommand::DomainPurity(args) => (
+            "verify domain purity",
+            infrastructure::verify::domain_purity::verify(&args.project_root),
+        ),
         VerifyCommand::DomainStrings(args) => (
             "verify domain strings",
             infrastructure::verify::domain_strings::verify(&args.project_root),
@@ -320,6 +326,23 @@ mod tests {
     fn test_domain_strings_subcommand_returns_failure_for_missing_domain() {
         let tmp = TempDir::new().unwrap();
         let exit = execute(VerifyCommand::DomainStrings(make_args(tmp.path())));
+        assert_eq!(exit, ExitCode::FAILURE);
+    }
+
+    // --- domain-purity CLI wiring ---
+
+    #[test]
+    fn test_domain_purity_subcommand_returns_success_for_clean_domain() {
+        let tmp = TempDir::new().unwrap();
+        write_file(tmp.path(), "libs/domain/src/lib.rs", "pub struct Foo;\n");
+        let exit = execute(VerifyCommand::DomainPurity(make_args(tmp.path())));
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn test_domain_purity_subcommand_returns_failure_for_missing_domain() {
+        let tmp = TempDir::new().unwrap();
+        let exit = execute(VerifyCommand::DomainPurity(make_args(tmp.path())));
         assert_eq!(exit, ExitCode::FAILURE);
     }
 
