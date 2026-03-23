@@ -1,0 +1,81 @@
+{
+  "schema_version": 3,
+  "id": "adr-introduction-2026-03-23",
+  "branch": "track/adr-introduction-2026-03-23",
+  "title": "ADR 導入 — knowledge/adr/ 新設 + 既存判断の ADR 化",
+  "status": "planned",
+  "created_at": "2026-03-23T07:28:03Z",
+  "updated_at": "2026-03-23T07:28:03Z",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "knowledge/adr/README.md 作成（テンプレート + 運用ルール + 索引）",
+      "status": "todo"
+    },
+    {
+      "id": "T002",
+      "description": "tmp/adr-drafts/ の 4 ADR を knowledge/adr/ に移動",
+      "status": "todo"
+    },
+    {
+      "id": "T003",
+      "description": "DESIGN.md Key Design Decisions → 個別 ADR 分解（13 件）",
+      "status": "todo"
+    },
+    {
+      "id": "T004",
+      "description": "project-docs/conventions/adr.md 作成 + CLAUDE.md 参照追加",
+      "status": "todo"
+    }
+  ],
+  "review": {
+    "status": "not_started",
+    "groups": {}
+  },
+  "plan": {
+    "summary": [
+      "ADR（Architecture Decision Records）を knowledge/adr/ に導入し、設計判断の「なぜ」と「却下した選択肢」を体系的に記録する仕組みを構築する。",
+      "フル知識ディレクトリ再編（knowledge/ 統合）は別トラックとして先送り。"
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "ADR ディレクトリ基盤",
+        "description": [
+          "T001: knowledge/adr/README.md を作成。",
+          "Nygard 式テンプレート（+ Rejected Alternatives + Reassess When）。",
+          "採番規則: YYYY-MM-DD-HHMM-slug.md。",
+          "索引テーブルを含む。"
+        ],
+        "task_ids": ["T001"]
+      },
+      {
+        "id": "S2",
+        "title": "既存ドラフト移動",
+        "description": [
+          "T002: tmp/adr-drafts/ の 4 ファイルを knowledge/adr/ に移動。",
+          "phase-1.5-good-enough, sotp-extraction-deferred, two-stage-signal-architecture, spec-code-consistency-deferred。"
+        ],
+        "task_ids": ["T002"]
+      },
+      {
+        "id": "S3",
+        "title": "DESIGN.md 既存判断の ADR 化",
+        "description": [
+          "T003: DESIGN.md Key Design Decisions テーブルの 13 件を個別 ADR ファイルに分解。",
+          "DESIGN.md 側は ADR へのリンクに置換。"
+        ],
+        "task_ids": ["T003"]
+      },
+      {
+        "id": "S4",
+        "title": "Convention 文書 + 参照整備",
+        "description": [
+          "T004: project-docs/conventions/adr.md で ADR 運用ルールを convention 化。",
+          "CLAUDE.md の参照リストに knowledge/adr/ を追加。"
+        ],
+        "task_ids": ["T004"]
+      }
+    ]
+  }
+}
