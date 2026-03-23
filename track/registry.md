@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| adr-introduction-2026-03-23 | Done | 2026-03-23 |
 | signal-evaluation-2026-03-23 | Done | 2026-03-23 |
 | conch-parser-infra-move-2026-03-23 | Done | 2026-03-23 |
 | domain-purity-ci-2026-03-23 | Done | 2026-03-22 |
