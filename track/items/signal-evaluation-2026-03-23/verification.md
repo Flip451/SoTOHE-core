@@ -16,18 +16,21 @@ status: pending
    - `[source: <doc>]` (§ なし) → Document / Blue
    - `[source: feedback — ...]` → Feedback / Blue
    - `[source: convention — ...]` → Convention / Blue
-   - `[source: discussion]` → Discussion / Yellow
+   - `[source: discussion]` or `[source: discussion — ...]` → Discussion / Yellow
    - `[source: inference — ...]` → Inference / Yellow
    - source tag なし → MissingSource / Red
-   - カンマ区切り multi-source → 最高信頼度を採用
 3. 信号評価の対象が Scope / Constraints / Acceptance Criteria セクションに限定されていること（Goal やコード例は対象外）
-4. `sotp track signals` が spec.md を評価し frontmatter `signals:` を更新すること
-5. `sotp verify spec-signals` が frontmatter と実評価の不整合を検出すること
-6. `sotp verify spec-signals` が `red > 0` の場合にエラーを返すこと
-7. `sotp verify spec-states` が `## Domain States` セクション未存在時にエラーを返すこと
-7a. `sotp verify spec-states` が `## Domain States` テーブルにデータ行がない場合（空テーブル・ヘッダーのみ）にエラーを返すこと
-8. `cargo make ci` が通ること
-9. `cargo make llvm-cov` で新規コードのテストカバレッジが 80% 以上であること
+4. `sotp track signals` が spec.md を評価し metadata.json `spec_signals` に格納すること
+5. `sotp verify spec-signals` が spec.md body を実評価し `red > 0` でエラーを返すこと
+6. `sotp verify spec-states` が `## Domain States` セクション未存在時にエラーを返すこと
+6a. `sotp verify spec-states` が `## Domain States` テーブルにデータ行がない場合にエラーを返すこと
+7. `cargo make ci` が通ること
+8. `cargo make llvm-cov` で新規コードのテストカバレッジが 80% 以上であること
+
+## Deferred
+
+- Multi-source (comma-separated) tag support → JSON SSoT track
+- Frontmatter `signals:` drift check → JSON SSoT track
 
 ## Result / Open Issues
 

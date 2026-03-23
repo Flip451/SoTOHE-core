@@ -58,9 +58,8 @@ Stage 1 として source attribution tag に基づく要件出所の信頼度評
 
 ### Multi-source Tags
 
-`[source: PRD §3.2, discussion]` のようにカンマ区切りで複数 source を持つタグは、
-各 source を個別に評価し、**最も高い信頼度**（Blue > Yellow > Red）を採用する。
-例: `Document(Blue) + Discussion(Yellow)` → Blue
+カンマ区切りの multi-source tag（例: `[source: PRD §3.2, discussion]`）は本トラックでは未対応 [source: inference — JSON SSoT 化トラックで配列表現として再導入]。
+各要件には単一の source tag を付与すること。複数ソースが必要な場合は最も信頼度の高い source を使用する。
 
 ## Two-Stage Signal Architecture
 

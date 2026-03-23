@@ -45,7 +45,7 @@
     ]
   },
   "review": {
-    "code_hash": "4e58ff43684447d6b011fe0271564bc9e702ae33",
+    "code_hash": "6aa7386e035daed0b8e59a2d1e703037f35eee3c",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -73,6 +73,30 @@
       "threshold": 3
     },
     "groups": {
+      "all": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-23T07:05:46Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-23T07:05:46Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "infra-domain": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-23T05:26:04Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-23T05:26:04Z",
+          "verdict": "zero_findings"
+        }
+      },
       "planning": {
         "fast": {
           "round": 1,
@@ -89,34 +113,34 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "done",
   "tasks": [
     {
       "description": "Domain: ConfidenceSignal enum + SignalBasis enum + source tag mapping rules (pure functions, shared primitives for Stage 1 and future Stage 2)",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Infrastructure: spec.md source tag parser + signal evaluation engine (Scope/Constraints/Acceptance Criteria sections only)",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "CLI: sotp track signals command (evaluate spec.md source tags, update spec.md frontmatter signals field, display summary)",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "CLI + Infrastructure: sotp verify spec-signals gate (spec.md frontmatter signals vs actual source tag evaluation consistency, red == 0 policy)",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Infrastructure: sotp verify spec-states minimal — validate that spec.md contains a ## Domain States section with at least one data row in its table (signal tag parsing deferred to Track B)",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "Spec Signal Evaluation — Stage 1 (TSUMIKI-01)",
-  "updated_at": "2026-03-23T04:40:36Z"
+  "updated_at": "2026-03-23T07:05:46Z"
 }
