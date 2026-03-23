@@ -9,58 +9,265 @@
   ],
   "scope": {
     "in_scope": [
-      { "text": "DomainStateEntry に transitions_to フィールド追加 (省略=未定義, []=終端)", "sources": ["discussion"] },
-      { "text": "Per-state 信号評価: 型存在 × 遷移関数存在 → Blue/Yellow/Red", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-      { "text": "syn AST スキャナー: domain コードから型名 + 遷移関数を自動検出", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-      { "text": "Result/Option 型のアンラップで遷移先判定", "sources": ["discussion"] },
-      { "text": "transitions_to 参照先の domain_states 内存在チェック", "sources": ["discussion"] },
-      { "text": "spec.json に domain_state_signals フィールド追加", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-      { "text": "sotp track domain-state-signals CLI コマンド", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-      { "text": "sotp verify spec-states に red==0 gate + Stage 1 前提条件追加", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-      { "text": "render_spec() の Domain States テーブルに Signal + Transitions 列追加", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-      { "text": "plan.md に Stage 1 + Stage 2 信号サマリー表示", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] }
+      {
+        "text": "DomainStateEntry に transitions_to フィールド追加 (省略=未定義, []=終端)",
+        "sources": [
+          "discussion"
+        ]
+      },
+      {
+        "text": "Per-state 信号評価: 型存在 × 遷移関数存在 → Blue/Yellow/Red",
+        "sources": [
+          "TODO-PLAN-2026-03-22 §Phase2 2-2"
+        ]
+      },
+      {
+        "text": "syn AST スキャナー: domain コードから型名 + 遷移関数を自動検出",
+        "sources": [
+          "TODO-PLAN-2026-03-22 §Phase2 2-2"
+        ]
+      },
+      {
+        "text": "Result/Option 型のアンラップで遷移先判定",
+        "sources": [
+          "discussion"
+        ]
+      },
+      {
+        "text": "transitions_to 参照先の domain_states 内存在チェック",
+        "sources": [
+          "discussion"
+        ]
+      },
+      {
+        "text": "spec.json に domain_state_signals フィールド追加",
+        "sources": [
+          "TODO-PLAN-2026-03-22 §Phase2 2-2"
+        ]
+      },
+      {
+        "text": "sotp track domain-state-signals CLI コマンド",
+        "sources": [
+          "TODO-PLAN-2026-03-22 §Phase2 2-2"
+        ]
+      },
+      {
+        "text": "sotp verify spec-states に red==0 gate + Stage 1 前提条件追加",
+        "sources": [
+          "TODO-PLAN-2026-03-22 §Phase2 2-2"
+        ]
+      },
+      {
+        "text": "render_spec() の Domain States テーブルに Signal + Transitions 列追加",
+        "sources": [
+          "TODO-PLAN-2026-03-22 §Phase2 2-2"
+        ]
+      },
+      {
+        "text": "plan.md に Stage 1 + Stage 2 信号サマリー表示",
+        "sources": [
+          "TODO-PLAN-2026-03-22 §Phase2 2-2"
+        ]
+      }
     ],
     "out_of_scope": [
-      { "text": "未宣言遷移の検出 (code→spec 逆方向チェック)", "sources": ["inference — Phase 3 spec ↔ code 整合性で対応"] },
-      { "text": "モジュールスコープによる同名型の曖昧性解消", "sources": ["inference — Phase 3 BRIDGE-01 で対応"] },
-      { "text": "TrackMetadata への spec_signals 型化", "sources": ["inference — Stage 2 完了後に別途検討"] }
+      {
+        "text": "未宣言遷移の検出 (code→spec 逆方向チェック)",
+        "sources": [
+          "inference — Phase 3 spec ↔ code 整合性で対応"
+        ]
+      },
+      {
+        "text": "モジュールスコープによる同名型の曖昧性解消",
+        "sources": [
+          "inference — Phase 3 BRIDGE-01 で対応"
+        ]
+      },
+      {
+        "text": "TrackMetadata への spec_signals 型化",
+        "sources": [
+          "inference — Stage 2 完了後に別途検討"
+        ]
+      }
     ]
   },
   "constraints": [
-    { "text": "domain 層は I/O を含まない (hexagonal purity)", "sources": ["convention — hexagonal-architecture.md"] },
-    { "text": "syn AST パースは infrastructure 層に配置", "sources": ["convention — hexagonal-architecture.md"] },
-    { "text": "Stage 1 (spec signals red==0) が前提条件", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-    { "text": "終端状態 (transitions_to: []) は型存在のみで Blue 判定可", "sources": ["discussion"] },
-    { "text": "transitions_to 省略は未定義扱い (最大でも Yellow)", "sources": ["discussion"] },
-    { "text": "遷移関数の検出は fn の引数型/self型に state A、戻り値の Result/Option 内部型に state B を含む場合に A→B 遷移として認識", "sources": ["discussion"] },
-    { "text": "spec.json (仕様 SSoT) の schema_version 1 に後方互換フィールドとして追加。metadata.json (トラック SSoT, schema_version 3) とは別体系", "sources": ["discussion"] }
+    {
+      "text": "domain 層は I/O を含まない (hexagonal purity)",
+      "sources": [
+        "convention — hexagonal-architecture.md"
+      ]
+    },
+    {
+      "text": "syn AST パースは infrastructure 層に配置",
+      "sources": [
+        "convention — hexagonal-architecture.md"
+      ]
+    },
+    {
+      "text": "Stage 1 (spec signals red==0) が前提条件",
+      "sources": [
+        "TODO-PLAN-2026-03-22 §Phase2 2-2"
+      ]
+    },
+    {
+      "text": "終端状態 (transitions_to: []) は型存在のみで Blue 判定可",
+      "sources": [
+        "discussion"
+      ]
+    },
+    {
+      "text": "transitions_to 省略は未定義扱い (最大でも Yellow)",
+      "sources": [
+        "discussion"
+      ]
+    },
+    {
+      "text": "遷移関数の検出は fn の引数型/self型に state A、戻り値の Result/Option 内部型に state B を含む場合に A→B 遷移として認識",
+      "sources": [
+        "discussion"
+      ]
+    },
+    {
+      "text": "spec.json (仕様 SSoT) の schema_version 1 に後方互換フィールドとして追加。metadata.json (トラック SSoT, schema_version 3) とは別体系",
+      "sources": [
+        "discussion"
+      ]
+    }
   ],
   "domain_states": [
-    { "name": "DomainStateEntry", "description": "spec.json の各状態エントリ。name + description + transitions_to を保持" },
-    { "name": "DomainStateSignal", "description": "per-state の信号判定結果: state_name + signal (Blue/Yellow/Red) + found_type (bool) + found_transitions (Vec) + missing_transitions (Vec)" },
-    { "name": "DomainStateSignalCounts", "description": "domain_state_signals の集計: blue + yellow + red" },
-    { "name": "CodeScanResult", "description": "syn スキャン結果: 検出された型名 Set + 遷移関数マップ (from_state → to_states)" }
+    {
+      "name": "DomainStateEntry",
+      "description": "spec.json の各状態エントリ。name + description + transitions_to を保持",
+      "transitions_to": []
+    },
+    {
+      "name": "DomainStateSignal",
+      "description": "per-state の信号判定結果: state_name + signal (Blue/Yellow/Red) + found_type (bool) + found_transitions (Vec) + missing_transitions (Vec)",
+      "transitions_to": []
+    },
+    {
+      "name": "CodeScanResult",
+      "description": "syn スキャン結果: 検出された型名 Set + 遷移関数マップ (from_state → to_states)",
+      "transitions_to": []
+    }
   ],
   "acceptance_criteria": [
-    { "text": "DomainStateEntry に transitions_to フィールドが追加されている", "sources": ["discussion"] },
-    { "text": "transitions_to が省略/空配列/値ありの3パターンで正しく区別される", "sources": ["discussion"] },
-    { "text": "transitions_to の参照先が domain_states に存在しない場合にバリデーションエラーが発生する", "sources": ["discussion"] },
-    { "text": "syn AST スキャンで enum variant / struct 名が正しく検出される", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-    { "text": "syn AST スキャンで遷移関数が正しく検出される (self型→Result内部型)", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-    { "text": "Result/Option 内部型のアンラップが正しく動作する", "sources": ["discussion"] },
-    { "text": "Blue 判定: 型存在 AND (終端 OR 全宣言遷移関数存在)", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-    { "text": "Yellow 判定: 型存在だが遷移未発見、または transitions_to 未宣言", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-    { "text": "Red 判定: 型未存在、またはプレースホルダー", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-    { "text": "sotp track domain-state-signals が spec.json の domain_state_signals を更新する", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-    { "text": "sotp verify spec-states が red==0 gate を適用する", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-    { "text": "sotp verify spec-states が Stage 1 前提条件を検証する", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-    { "text": "rendered spec.md の Domain States テーブルに Signal と Transitions 列が表示される", "sources": ["TODO-PLAN-2026-03-22 §Phase2 2-2"] },
-    { "text": "cargo make ci が全テスト通過する", "sources": ["convention — hexagonal-architecture.md"] }
+    {
+      "text": "DomainStateEntry に transitions_to フィールドが追加されている",
+      "sources": [
+        "discussion"
+      ]
+    },
+    {
+      "text": "transitions_to が省略/空配列/値ありの3パターンで正しく区別される",
+      "sources": [
+        "discussion"
+      ]
+    },
+    {
+      "text": "transitions_to の参照先が domain_states に存在しない場合にバリデーションエラーが発生する",
+      "sources": [
+        "discussion"
+      ]
+    },
+    {
+      "text": "syn AST スキャンで enum variant / struct 名が正しく検出される",
+      "sources": [
+        "TODO-PLAN-2026-03-22 §Phase2 2-2"
+      ]
+    },
+    {
+      "text": "syn AST スキャンで遷移関数が正しく検出される (self型→Result内部型)",
+      "sources": [
+        "TODO-PLAN-2026-03-22 §Phase2 2-2"
+      ]
+    },
+    {
+      "text": "Result/Option 内部型のアンラップが正しく動作する",
+      "sources": [
+        "discussion"
+      ]
+    },
+    {
+      "text": "Blue 判定: 型存在 AND (終端 OR 全宣言遷移関数存在)",
+      "sources": [
+        "TODO-PLAN-2026-03-22 §Phase2 2-2"
+      ]
+    },
+    {
+      "text": "Yellow 判定: 型存在だが遷移未発見、または transitions_to 未宣言",
+      "sources": [
+        "TODO-PLAN-2026-03-22 §Phase2 2-2"
+      ]
+    },
+    {
+      "text": "Red 判定: 型未存在、またはプレースホルダー",
+      "sources": [
+        "TODO-PLAN-2026-03-22 §Phase2 2-2"
+      ]
+    },
+    {
+      "text": "sotp track domain-state-signals が spec.json の domain_state_signals を更新する",
+      "sources": [
+        "TODO-PLAN-2026-03-22 §Phase2 2-2"
+      ]
+    },
+    {
+      "text": "sotp verify spec-states が red==0 gate を適用する",
+      "sources": [
+        "TODO-PLAN-2026-03-22 §Phase2 2-2"
+      ]
+    },
+    {
+      "text": "sotp verify spec-states が Stage 1 前提条件を検証する",
+      "sources": [
+        "TODO-PLAN-2026-03-22 §Phase2 2-2"
+      ]
+    },
+    {
+      "text": "rendered spec.md の Domain States テーブルに Signal と Transitions 列が表示される",
+      "sources": [
+        "TODO-PLAN-2026-03-22 §Phase2 2-2"
+      ]
+    },
+    {
+      "text": "cargo make ci が全テスト通過する",
+      "sources": [
+        "convention — hexagonal-architecture.md"
+      ]
+    }
   ],
-  "additional_sections": [],
   "related_conventions": [
     "project-docs/conventions/hexagonal-architecture.md",
     "project-docs/conventions/source-attribution.md"
   ],
-  "signals": null
+  "signals": {
+    "blue": 20,
+    "yellow": 14,
+    "red": 0
+  },
+  "domain_state_signals": [
+    {
+      "state_name": "DomainStateEntry",
+      "signal": "blue",
+      "found_type": true,
+      "found_transitions": [],
+      "missing_transitions": []
+    },
+    {
+      "state_name": "DomainStateSignal",
+      "signal": "blue",
+      "found_type": true,
+      "found_transitions": [],
+      "missing_transitions": []
+    },
+    {
+      "state_name": "CodeScanResult",
+      "signal": "blue",
+      "found_type": true,
+      "found_transitions": [],
+      "missing_transitions": []
+    }
+  ]
 }

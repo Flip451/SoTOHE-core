@@ -72,7 +72,7 @@
     "status": "not_started"
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "description": "Domain 型拡張: DomainStateEntry に transitions_to 追加 + DomainStateSignal per-state 型",
@@ -97,24 +97,24 @@
     {
       "description": "sotp track domain-state-signals CLI: 評価 → spec.json domain_state_signals 書き戻し",
       "id": "T005",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "render_spec() 拡張: Domain States テーブルに Signal + Transitions 列追加",
       "id": "T006",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "sotp verify spec-states 拡張: red==0 gate + Stage 1 前提条件チェック (spec signals red==0)",
       "id": "T007",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "plan.md 信号サマリー: Stage 1 + Stage 2 集計表示を render_plan に追加",
       "id": "T008",
-      "status": "in_progress"
+      "status": "done"
     }
   ],
   "title": "SPEC-05 Domain States 信号機 Stage 2 — per-state signal + 遷移関数検証",
-  "updated_at": "2026-03-23T12:39:37Z"
+  "updated_at": "2026-03-23T13:28:08Z"
 }

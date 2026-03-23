@@ -34,13 +34,13 @@ Result<T, E> / Option<T> のアンラップで遷移先を判定。
 sotp track domain-state-signals コマンドで評価・書き戻し。
 sotp verify spec-states に red==0 gate + Stage 1 前提条件を追加。
 
-- [~] sotp track domain-state-signals CLI: 評価 → spec.json domain_state_signals 書き戻し
-- [~] sotp verify spec-states 拡張: red==0 gate + Stage 1 前提条件チェック (spec signals red==0)
+- [x] sotp track domain-state-signals CLI: 評価 → spec.json domain_state_signals 書き戻し
+- [x] sotp verify spec-states 拡張: red==0 gate + Stage 1 前提条件チェック (spec signals red==0)
 
 ## レンダリング
 
 spec.md Domain States テーブルに Signal + Transitions 列を追加。
 plan.md に Stage 1 + Stage 2 信号サマリーを表示。
 
-- [~] render_spec() 拡張: Domain States テーブルに Signal + Transitions 列追加
-- [~] plan.md 信号サマリー: Stage 1 + Stage 2 集計表示を render_plan に追加
+- [x] render_spec() 拡張: Domain States テーブルに Signal + Transitions 列追加
+- [x] plan.md 信号サマリー: Stage 1 + Stage 2 集計表示を render_plan に追加

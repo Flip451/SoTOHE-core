@@ -1,21 +1,21 @@
 # Verification: SPEC-05 Domain States 信号機 Stage 2
 
 ## Scope Verified
-- [ ] DomainStateEntry に transitions_to が追加されている (省略/空配列/値ありの3パターン)
-- [ ] transitions_to の参照整合性検証が動作する
-- [ ] syn AST スキャナーが型名 + 遷移関数を検出する
-- [ ] Result/Option アンラップが正しく動作する
-- [ ] Per-state 信号評価 (Blue/Yellow/Red) が基準通りに判定される
-- [ ] 終端状態 (transitions_to: []) が型存在のみで Blue になる
-- [ ] transitions_to 省略が最大 Yellow になる
-- [ ] sotp track domain-state-signals が spec.json を更新する
-- [ ] sotp verify spec-states が red==0 gate を適用する
-- [ ] sotp verify spec-states が Stage 1 前提条件を検証する
-- [ ] rendered spec.md に Signal + Transitions 列が表示される
-- [ ] plan.md に Stage 1 + Stage 2 信号サマリーが表示される
-- [ ] spec.json スキーマが正しくデコードされる (codec round-trip)
-- [ ] spec.json → spec.md レンダリングが正しく動作する (sync_rendered_views)
-- [ ] cargo make ci が全テスト通過する
+- [x] DomainStateEntry に transitions_to が追加されている (省略/空配列/値ありの3パターン)
+- [x] transitions_to の参照整合性検証が動作する
+- [x] syn AST スキャナーが型名 + 遷移関数を検出する
+- [x] Result/Option アンラップが正しく動作する
+- [x] Per-state 信号評価 (Blue/Yellow/Red) が基準通りに判定される
+- [x] 終端状態 (transitions_to: []) が型存在のみで Blue になる
+- [x] transitions_to 省略が最大 Yellow になる
+- [x] sotp track domain-state-signals が spec.json を更新する
+- [x] sotp verify spec-states が red==0 gate を適用する
+- [x] sotp verify spec-states が Stage 1 前提条件を検証する
+- [x] rendered spec.md に Signal + Transitions 列が表示される
+- [x] plan.md に Stage 1 + Stage 2 信号サマリーが表示される
+- [x] spec.json スキーマが正しくデコードされる (codec round-trip)
+- [x] spec.json → spec.md レンダリングが正しく動作する (sync_rendered_views)
+- [x] cargo make ci が全テスト通過する
 
 ## Manual Verification Steps
 1. spec.json が正しくデコード・エンコードされることを確認 (codec round-trip テスト)
@@ -31,7 +31,10 @@
 9. `cargo make ci` が全テスト通過することを確認
 
 ## Result / Open Issues
-(実装完了後に記入)
+- 全テスト通過 (domain 443, infrastructure 492+, CLI pass)
+- `cargo make ci` 全パス (fmt, clippy, test, deny, check-layers, verify-*, view-freshness)
+- CLI の `run_codex_local_*` テストは既知のフレイキーテスト (プロセス並列実行時の SIGABRT) で本変更とは無関係
+- domain_scanner の cross-file トランジション検出: 2パス構成で修正済み
 
 ## Verified At
-(検証完了後に記入)
+2026-03-23

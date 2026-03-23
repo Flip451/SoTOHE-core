@@ -226,7 +226,7 @@ Rust TDD を前提としたタスク順序：
    - `review` section を必ず含める: `{"status": "not_started", "groups": {}}` (WF-54)
    - review section が absent の metadata.json は check-approved でエラーになる（fail-closed）
 3. `plan.md` を `metadata.json` から `render_plan()` で生成（直接書き込み禁止）
-4. `spec.json` (仕様 SSoT) を作成（schema_version 1, goal, scope, constraints, domain_states, acceptance_criteria, related_conventions）
+4. `spec.json` (仕様 SSoT) を作成（schema_version 1, status, version, title, goal, scope, constraints, domain_states, acceptance_criteria, additional_sections, related_conventions）
    - Scope, Constraints, Acceptance Criteria の各要件に `sources` 配列でソース帰属を付与する
    - Source タグの種類（5 種）: document, feedback, convention, inference, discussion
    - 参照: `project-docs/conventions/source-attribution.md`

@@ -50,15 +50,22 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
 
     let mut findings: Vec<Finding> = Vec::new();
 
-    // Check 1: Stage 1 prerequisite — spec signals must have red == 0.
-    if let Some(signals) = doc.signals() {
-        if signals.has_red() {
+    // Check 1: Stage 1 prerequisite — spec signals must exist and have red == 0.
+    match doc.signals() {
+        None => {
+            findings.push(Finding::error(format!(
+                "{}: Stage 1 prerequisite not met: spec signals not yet evaluated. Run `sotp track signals` first.",
+                spec_json_path.display()
+            )));
+        }
+        Some(signals) if signals.has_red() => {
             findings.push(Finding::error(format!(
                 "{}: Stage 1 prerequisite not met: spec signals has {} red items. Run `sotp track signals` first.",
                 spec_json_path.display(),
                 signals.red()
             )));
         }
+        Some(_) => {} // Stage 1 passed
     }
 
     // Check 2: Domain state signals gate.
@@ -71,7 +78,20 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
             )));
         }
         Some(state_signals) => {
-            // Evaluated — emit one error finding per Red state.
+            // Verify coverage: every domain_state must have a corresponding signal.
+            let signal_names: std::collections::HashSet<&str> =
+                state_signals.iter().map(|s| s.state_name()).collect();
+            for entry in doc.domain_states() {
+                if !signal_names.contains(entry.name()) {
+                    findings.push(Finding::error(format!(
+                        "{}: Domain state '{}' has no signal entry — stale domain_state_signals. Run `sotp track domain-state-signals` to update.",
+                        spec_json_path.display(),
+                        entry.name()
+                    )));
+                }
+            }
+
+            // Emit one error finding per Red state.
             for sig in state_signals {
                 if sig.signal() == domain::ConfidenceSignal::Red {
                     findings.push(Finding::error(format!(
@@ -464,7 +484,35 @@ mod tests {
   "version": "1.0",
   "title": "Feature",
   "scope": { "in_scope": [], "out_of_scope": [] },
+  "domain_states": [{ "name": "Draft", "description": "Initial state" }],
+  "signals": { "blue": 1, "yellow": 0, "red": 0 }
+}"#;
+
+    /// spec.json with domain_states but NO signals field — Stage 1 signals not evaluated.
+    const SPEC_JSON_NO_SIGNALS_FIELD: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": { "in_scope": [], "out_of_scope": [] },
   "domain_states": [{ "name": "Draft", "description": "Initial state" }]
+}"#;
+
+    /// spec.json with partial domain_state_signals (missing an entry for "Published").
+    const SPEC_JSON_PARTIAL_STATE_SIGNALS: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": { "in_scope": [], "out_of_scope": [] },
+  "domain_states": [
+    { "name": "Draft", "description": "Initial" },
+    { "name": "Published", "description": "Live" }
+  ],
+  "signals": { "blue": 1, "yellow": 0, "red": 0 },
+  "domain_state_signals": [
+    { "state_name": "Draft", "signal": "blue", "found_type": true, "found_transitions": [], "missing_transitions": [] }
+  ]
 }"#;
 
     const SPEC_JSON_WITHOUT_DOMAIN_STATES: &str = r#"{
@@ -571,6 +619,23 @@ mod tests {
     // --- Stage 1 prerequisite check ---
 
     #[test]
+    fn test_verify_from_spec_json_stage1_signals_absent_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_NO_SIGNALS_FIELD).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(
+            outcome.has_errors(),
+            "spec without signals field should fail Stage 1 prerequisite: {outcome:?}"
+        );
+        let messages: Vec<&str> = outcome.findings().iter().map(|f| f.message()).collect();
+        assert!(
+            messages.iter().any(|m| m.contains("Stage 1 prerequisite not met")),
+            "error message should mention Stage 1 prerequisite: {messages:?}"
+        );
+    }
+
+    #[test]
     fn test_verify_from_spec_json_stage1_red_signals_fails() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("spec.json");
@@ -602,6 +667,25 @@ mod tests {
         let has_warning =
             outcome.findings().iter().any(|f| f.message().contains("domain-state-signals"));
         assert!(has_warning, "should have a warning about unevaluated state signals: {outcome:?}");
+    }
+
+    // --- domain_state_signals partial coverage → error ---
+
+    #[test]
+    fn test_verify_from_spec_json_partial_state_signals_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_PARTIAL_STATE_SIGNALS).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(
+            outcome.has_errors(),
+            "partial domain_state_signals (missing Published) should fail: {outcome:?}"
+        );
+        let messages: Vec<&str> = outcome.findings().iter().map(|f| f.message()).collect();
+        assert!(
+            messages.iter().any(|m| m.contains("Published") && m.contains("no signal entry")),
+            "error message should name missing state 'Published': {messages:?}"
+        );
     }
 
     // --- domain_state_signals with Red → error listing Red states ---

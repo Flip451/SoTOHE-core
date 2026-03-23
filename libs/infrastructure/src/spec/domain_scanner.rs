@@ -76,25 +76,50 @@ pub fn scan_domain_code(source_code: &str) -> CodeScanResult {
 ///
 /// Returns `std::io::Error` if the directory cannot be read or a file cannot
 /// be opened.
-pub fn scan_domain_directory(dir: &Path) -> Result<CodeScanResult, std::io::Error> {
+/// Error type for domain directory scanning.
+#[derive(Debug, thiserror::Error)]
+pub enum DomainScanError {
+    #[error("I/O error: {0}")]
+    Io(#[from] std::io::Error),
+    #[error("{count} file(s) failed to parse: {files:?}")]
+    ParseFailures { count: usize, files: Vec<String> },
+}
+
+pub fn scan_domain_directory(dir: &Path) -> Result<CodeScanResult, DomainScanError> {
     // Collect all source files first so we iterate twice without re-walking.
-    let mut sources: Vec<String> = Vec::new();
+    let mut sources: Vec<(String, String)> = Vec::new(); // (file_path, content)
     collect_sources_recursive(dir, &mut sources)?;
+
+    // Track parse failures so they can be reported.
+    let mut parse_failures: Vec<String> = Vec::new();
 
     // Pass 1: aggregate all public type names across the entire directory tree.
     let mut found_types: HashSet<String> = HashSet::new();
-    for source in &sources {
-        let partial = scan_domain_code(source);
-        found_types.extend(partial.found_types().iter().cloned());
+    let mut parsed_files: Vec<syn::File> = Vec::new();
+    for (path, source) in &sources {
+        match syn::parse_str::<syn::File>(source) {
+            Ok(f) => {
+                for item in &f.items {
+                    collect_pub_types(item, &mut found_types);
+                }
+                parsed_files.push(f);
+            }
+            Err(_) => {
+                parse_failures.push(path.clone());
+            }
+        }
+    }
+
+    if !parse_failures.is_empty() {
+        return Err(DomainScanError::ParseFailures {
+            count: parse_failures.len(),
+            files: parse_failures,
+        });
     }
 
     // Pass 2: detect transitions using the complete type set.
     let mut transition_map: HashMap<String, HashSet<String>> = HashMap::new();
-    for source in &sources {
-        let file = match syn::parse_str::<syn::File>(source) {
-            Ok(f) => f,
-            Err(_) => continue, // unparseable files are skipped, consistent with scan_domain_code
-        };
+    for file in &parsed_files {
         for item in &file.items {
             collect_transitions(item, &found_types, &mut transition_map);
         }
@@ -108,7 +133,10 @@ pub fn scan_domain_directory(dir: &Path) -> Result<CodeScanResult, std::io::Erro
 // ---------------------------------------------------------------------------
 
 /// Recursively collects the text of all `.rs` files under `dir`.
-fn collect_sources_recursive(dir: &Path, out: &mut Vec<String>) -> Result<(), std::io::Error> {
+fn collect_sources_recursive(
+    dir: &Path,
+    out: &mut Vec<(String, String)>,
+) -> Result<(), std::io::Error> {
     for entry in std::fs::read_dir(dir)? {
         let entry = entry?;
         let path = entry.path();
@@ -116,7 +144,7 @@ fn collect_sources_recursive(dir: &Path, out: &mut Vec<String>) -> Result<(), st
             collect_sources_recursive(&path, out)?;
         } else if path.extension().and_then(|e| e.to_str()) == Some("rs") {
             let source = std::fs::read_to_string(&path)?;
-            out.push(source);
+            out.push((path.display().to_string(), source));
         }
     }
     Ok(())
@@ -284,7 +312,7 @@ fn is_pub(vis: &Visibility) -> bool {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
     use super::*;
 
@@ -496,5 +524,26 @@ impl Draft {
         let result = scan_domain_directory(dir.path()).unwrap();
         assert!(result.found_types().is_empty());
         assert!(result.transition_map().is_empty());
+    }
+
+    #[test]
+    fn test_scan_directory_parse_failure_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        // Valid file
+        std::fs::write(dir.path().join("good.rs"), "pub struct Draft;").unwrap();
+        // Malformed file (missing semicolon)
+        std::fs::write(dir.path().join("bad.rs"), "pub struct Broken").unwrap();
+
+        let err = scan_domain_directory(dir.path()).unwrap_err();
+        match err {
+            DomainScanError::ParseFailures { count, files } => {
+                assert_eq!(count, 1);
+                assert!(
+                    files[0].contains("bad.rs"),
+                    "error should name the failing file: {files:?}"
+                );
+            }
+            other => panic!("expected ParseFailures, got: {other}"),
+        }
     }
 }
