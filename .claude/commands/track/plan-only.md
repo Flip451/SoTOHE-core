@@ -16,7 +16,8 @@ Execution:
   ```
 - Create the track artifacts under `track/items/<track-id>/` with `schema_version: 3`, `status: planned`, and `branch: null`.
 - `metadata.json.branch` remains `null` — the `plan/<track-id>` branch is a temporary review branch, not the implementation branch.
-- Render `plan.md` from `metadata.json`; do not write `plan.md` directly.
+- Create `spec.json` (spec SSoT) following the same schema as `/track:plan`. Do NOT write `spec.md` directly.
+- Run `cargo make track-sync-views` to generate `plan.md` from `metadata.json` and `spec.md` from `spec.json`.
 - Update `track/registry.md` as the rendered view of the new planning-only track.
 - Do not implement code in this command.
 - Do not create or switch to `track/<track-id>` — that is `/track:activate`'s responsibility.

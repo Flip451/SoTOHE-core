@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| domain-state-signals-2026-03-23 | Done | 2026-03-23 |
 | spec-json-ssot-2026-03-23 | Done | 2026-03-23 |
 | adr-introduction-2026-03-23 | Done | 2026-03-23 |
 | signal-evaluation-2026-03-23 | Done | 2026-03-23 |

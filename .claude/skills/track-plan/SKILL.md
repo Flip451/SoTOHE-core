@@ -5,7 +5,7 @@ description: |
   Phase 1: Codebase understanding via the active researcher capability.
   Phase 2: Parallel research & design (Agent Teams: researcher + planner).
   Phase 3: Plan synthesis, user approval, and track update.
-  Phase 4: Create track artifacts (metadata.json, plan.md, spec.md, verification.md, registry.md).
+  Phase 4: Create track artifacts (metadata.json, plan.md, spec.json, spec.md, verification.md, registry.md).
 metadata:
   short-description: Rust feature kickoff with Agent Teams (Plan phase)
 ---
@@ -226,14 +226,11 @@ Rust TDD を前提としたタスク順序：
    - `review` section を必ず含める: `{"status": "not_started", "groups": {}}` (WF-54)
    - review section が absent の metadata.json は check-approved でエラーになる（fail-closed）
 3. `plan.md` を `metadata.json` から `render_plan()` で生成（直接書き込み禁止）
-4. `spec.md` を初期化（feature goal, scope, constraints, acceptance criteria）
-   - Scope, Constraints, Acceptance Criteria の各項目に `[source: ...]` タグを付与する（ソース帰属）
-   - Source タグの種類（5 種）:
-     - `[source: <document> §<section>]` — 明示的な文書参照（例: `[source: PRD §3.2]`, `[source: track/tech-stack.md]`）
-     - `[source: feedback — <context>]` — ユーザーフィードバック（例: `[source: feedback — Rust-first policy]`）
-     - `[source: convention — <file>]` — プロジェクト規約（例: `[source: convention — .claude/rules/05-testing.md]`）
-     - `[source: inference — <理由>]` — 推定・慣行ベース（例: `[source: inference — セキュリティ慣行から推定]`）
-     - `[source: discussion]` — チーム・ユーザーとの議論ベース
+4. `spec.json` (仕様 SSoT) を作成（schema_version 1, status, version, title, goal, scope, constraints, domain_states, acceptance_criteria, additional_sections, related_conventions）
+   - Scope, Constraints, Acceptance Criteria の各要件に `sources` 配列でソース帰属を付与する
+   - Source タグの種類（5 種）: document, feedback, convention, inference, discussion
    - 参照: `project-docs/conventions/source-attribution.md`
-5. `verification.md` を初期化（scope verified, manual steps, result, verified_at）
-6. `track/registry.md` を更新（active track row, Current Focus, Last updated）
+   - `related_conventions` に関連規約ファイルパスを含める
+5. `cargo make track-sync-views` で `spec.md` を `spec.json` から自動生成（直接書き込み禁止）
+6. `verification.md` を初期化（scope verified, manual steps, result, verified_at）
+7. `track/registry.md` を更新（active track row, Current Focus, Last updated）

@@ -48,7 +48,63 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
         ))]);
     }
 
-    VerifyOutcome::pass()
+    let mut findings: Vec<Finding> = Vec::new();
+
+    // Check 1: Stage 1 prerequisite — spec signals must exist and have red == 0.
+    match doc.signals() {
+        None => {
+            findings.push(Finding::error(format!(
+                "{}: Stage 1 prerequisite not met: spec signals not yet evaluated. Run `sotp track signals` first.",
+                spec_json_path.display()
+            )));
+        }
+        Some(signals) if signals.has_red() => {
+            findings.push(Finding::error(format!(
+                "{}: Stage 1 prerequisite not met: spec signals has {} red items. Run `sotp track signals` first.",
+                spec_json_path.display(),
+                signals.red()
+            )));
+        }
+        Some(_) => {} // Stage 1 passed
+    }
+
+    // Check 2: Domain state signals gate.
+    match doc.domain_state_signals() {
+        None => {
+            // Not yet evaluated — warn but do not fail.
+            findings.push(Finding::warning(format!(
+                "{}: Domain state signals not yet evaluated. Run `sotp track domain-state-signals` first.",
+                spec_json_path.display()
+            )));
+        }
+        Some(state_signals) => {
+            // Verify coverage: every domain_state must have a corresponding signal.
+            let signal_names: std::collections::HashSet<&str> =
+                state_signals.iter().map(|s| s.state_name()).collect();
+            for entry in doc.domain_states() {
+                if !signal_names.contains(entry.name()) {
+                    findings.push(Finding::error(format!(
+                        "{}: Domain state '{}' has no signal entry — stale domain_state_signals. Run `sotp track domain-state-signals` to update.",
+                        spec_json_path.display(),
+                        entry.name()
+                    )));
+                }
+            }
+
+            // Emit one error finding per Red state.
+            for sig in state_signals {
+                if sig.signal() == domain::ConfidenceSignal::Red {
+                    findings.push(Finding::error(format!(
+                        "{}: Domain state '{}' has Red signal (type not found in domain code)",
+                        spec_json_path.display(),
+                        sig.state_name()
+                    )));
+                }
+            }
+        }
+    }
+
+    if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
 }
 
 /// Verifies that `spec.md` contains a `## Domain States` section with a markdown table
@@ -428,7 +484,35 @@ mod tests {
   "version": "1.0",
   "title": "Feature",
   "scope": { "in_scope": [], "out_of_scope": [] },
+  "domain_states": [{ "name": "Draft", "description": "Initial state" }],
+  "signals": { "blue": 1, "yellow": 0, "red": 0 }
+}"#;
+
+    /// spec.json with domain_states but NO signals field — Stage 1 signals not evaluated.
+    const SPEC_JSON_NO_SIGNALS_FIELD: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": { "in_scope": [], "out_of_scope": [] },
   "domain_states": [{ "name": "Draft", "description": "Initial state" }]
+}"#;
+
+    /// spec.json with partial domain_state_signals (missing an entry for "Published").
+    const SPEC_JSON_PARTIAL_STATE_SIGNALS: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": { "in_scope": [], "out_of_scope": [] },
+  "domain_states": [
+    { "name": "Draft", "description": "Initial" },
+    { "name": "Published", "description": "Live" }
+  ],
+  "signals": { "blue": 1, "yellow": 0, "red": 0 },
+  "domain_state_signals": [
+    { "state_name": "Draft", "signal": "blue", "found_type": true, "found_transitions": [], "missing_transitions": [] }
+  ]
 }"#;
 
     const SPEC_JSON_WITHOUT_DOMAIN_STATES: &str = r#"{
@@ -437,6 +521,64 @@ mod tests {
   "version": "1.0",
   "title": "Feature",
   "scope": { "in_scope": [], "out_of_scope": [] }
+}"#;
+
+    /// spec.json with domain_states + signals (red > 0) — Stage 1 prerequisite fails.
+    const SPEC_JSON_WITH_RED_SIGNALS: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": { "in_scope": [], "out_of_scope": [] },
+  "domain_states": [{ "name": "Draft", "description": "Initial state" }],
+  "signals": { "blue": 0, "yellow": 0, "red": 2 }
+}"#;
+
+    /// spec.json with domain_states + clean signals + NO domain_state_signals (not yet evaluated).
+    const SPEC_JSON_SIGNALS_OK_NO_STATE_SIGNALS: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": { "in_scope": [], "out_of_scope": [] },
+  "domain_states": [{ "name": "Draft", "description": "Initial state" }],
+  "signals": { "blue": 3, "yellow": 0, "red": 0 }
+}"#;
+
+    /// spec.json with domain_state_signals containing a Red state.
+    const SPEC_JSON_WITH_RED_STATE_SIGNAL: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": { "in_scope": [], "out_of_scope": [] },
+  "domain_states": [
+    { "name": "Draft", "description": "Initial state" },
+    { "name": "Ghost", "description": "Missing state" }
+  ],
+  "signals": { "blue": 3, "yellow": 0, "red": 0 },
+  "domain_state_signals": [
+    { "state_name": "Draft", "signal": "blue", "found_type": true, "found_transitions": [], "missing_transitions": [] },
+    { "state_name": "Ghost", "signal": "red", "found_type": false, "found_transitions": [], "missing_transitions": [] }
+  ]
+}"#;
+
+    /// spec.json with domain_state_signals all Green (Blue/Yellow).
+    const SPEC_JSON_WITH_ALL_GREEN_STATE_SIGNALS: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": { "in_scope": [], "out_of_scope": [] },
+  "domain_states": [
+    { "name": "Draft", "description": "Initial state" },
+    { "name": "Published", "description": "Published state" }
+  ],
+  "signals": { "blue": 3, "yellow": 0, "red": 0 },
+  "domain_state_signals": [
+    { "state_name": "Draft", "signal": "blue", "found_type": true, "found_transitions": [], "missing_transitions": [] },
+    { "state_name": "Published", "signal": "yellow", "found_type": true, "found_transitions": [], "missing_transitions": [] }
+  ]
 }"#;
 
     #[test]
@@ -472,6 +614,127 @@ mod tests {
         std::fs::write(&path, "not valid json").unwrap();
         let outcome = verify_from_spec_json(&path);
         assert!(outcome.has_errors(), "invalid JSON should fail");
+    }
+
+    // --- Stage 1 prerequisite check ---
+
+    #[test]
+    fn test_verify_from_spec_json_stage1_signals_absent_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_NO_SIGNALS_FIELD).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(
+            outcome.has_errors(),
+            "spec without signals field should fail Stage 1 prerequisite: {outcome:?}"
+        );
+        let messages: Vec<&str> = outcome.findings().iter().map(|f| f.message()).collect();
+        assert!(
+            messages.iter().any(|m| m.contains("Stage 1 prerequisite not met")),
+            "error message should mention Stage 1 prerequisite: {messages:?}"
+        );
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_stage1_red_signals_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_WITH_RED_SIGNALS).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(
+            outcome.has_errors(),
+            "spec with red signals (Stage 1 prerequisite not met) should fail: {outcome:?}"
+        );
+        let messages: Vec<&str> = outcome.findings().iter().map(|f| f.message()).collect();
+        assert!(
+            messages.iter().any(|m| m.contains("Stage 1 prerequisite not met")),
+            "error message should mention Stage 1 prerequisite: {messages:?}"
+        );
+    }
+
+    // --- domain_state_signals not yet evaluated → pass with warning ---
+
+    #[test]
+    fn test_verify_from_spec_json_state_signals_not_evaluated_passes_with_warning() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_SIGNALS_OK_NO_STATE_SIGNALS).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(
+            !outcome.has_errors(),
+            "not-yet-evaluated domain_state_signals should pass (with warning): {outcome:?}"
+        );
+        let has_warning =
+            outcome.findings().iter().any(|f| f.message().contains("domain-state-signals"));
+        assert!(has_warning, "should have a warning about unevaluated state signals: {outcome:?}");
+    }
+
+    // --- domain_state_signals partial coverage → error ---
+
+    #[test]
+    fn test_verify_from_spec_json_partial_state_signals_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_PARTIAL_STATE_SIGNALS).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(
+            outcome.has_errors(),
+            "partial domain_state_signals (missing Published) should fail: {outcome:?}"
+        );
+        let messages: Vec<&str> = outcome.findings().iter().map(|f| f.message()).collect();
+        assert!(
+            messages.iter().any(|m| m.contains("Published") && m.contains("no signal entry")),
+            "error message should name missing state 'Published': {messages:?}"
+        );
+    }
+
+    // --- domain_state_signals with Red → error listing Red states ---
+
+    #[test]
+    fn test_verify_from_spec_json_red_state_signal_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_WITH_RED_STATE_SIGNAL).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(
+            outcome.has_errors(),
+            "domain_state_signals with Red entry should fail: {outcome:?}"
+        );
+        let messages: Vec<&str> = outcome.findings().iter().map(|f| f.message()).collect();
+        assert!(
+            messages.iter().any(|m| m.contains("Ghost")),
+            "error message should name the Red state 'Ghost': {messages:?}"
+        );
+    }
+
+    // --- domain_state_signals all Green → pass ---
+
+    #[test]
+    fn test_verify_from_spec_json_all_green_state_signals_passes() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_WITH_ALL_GREEN_STATE_SIGNALS).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(
+            !outcome.has_errors(),
+            "domain_state_signals with all Green entries should pass: {outcome:?}"
+        );
+    }
+
+    // --- Stage 1 OK + domain state signals all pass → overall pass ---
+
+    #[test]
+    fn test_verify_from_spec_json_stage1_ok_and_state_signals_ok_passes() {
+        // SPEC_JSON_WITH_ALL_GREEN_STATE_SIGNALS has signals(red=0) and all-green state signals
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_WITH_ALL_GREEN_STATE_SIGNALS).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(
+            !outcome.has_errors(),
+            "Stage 1 OK + all-green state signals should give overall pass: {outcome:?}"
+        );
+        assert!(outcome.findings().is_empty(), "should have no findings at all: {outcome:?}");
     }
 
     // --- verify() delegation tests ---
