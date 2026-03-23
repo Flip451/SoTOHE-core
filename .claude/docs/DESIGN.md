@@ -29,9 +29,9 @@ flowchart TD
 | Crate/Module | Role | Key Types |
 |--------------|------|-----------|
 | `domain` | Domain logic, Ports | `TrackId`, `TaskId`, `CommitHash`, `TrackMetadata`, `TrackTask`, `TaskStatus`, `TaskTransition`, `TrackStatus`, `StatusOverride`, `PlanView`, `PlanSection`, `TrackRepository` |
-| `domain::guard` | Shell command guard (pure computation) | `Decision`, `GuardVerdict`, `ParseError`, `SimpleCommand`, `split_shell()`, `check()` |
+| `domain::guard` | Shell command guard (pure computation, ports) | `Decision`, `GuardVerdict`, `ParseError`, `SimpleCommand`, `ShellParser` trait, `tokenize()`, `check_commands()` |
 | `usecase` | Application services | `SaveTrackUseCase`, `LoadTrackUseCase`, `TransitionTaskUseCase` |
-| `infrastructure` | Infrastructure adapters | `InMemoryTrackRepository`, `FsTrackStore` |
+| `infrastructure` | Infrastructure adapters | `InMemoryTrackRepository`, `FsTrackStore`, `ConchShellParser` |
 | `cli` | Composition Root | `main()` |
 
 ## Agent Roles
@@ -54,7 +54,8 @@ Note: See `.claude/agent-profiles.json` for which provider handles each capabili
 | StatusOverride auto-clears on all-resolved | Prevents stale override on completed tracks | Manual override management | 2026-03-11 |
 | Plan-task referential integrity at construction | Catches invalid plans early; mirrors Python validation | Runtime validation on access | 2026-03-11 |
 | Fail-closed hook error handling | Guard hook blocks tool on any error (CLI not found, unexpected exception); never proceeds without verification | Fail-open (silently skip guard on error) | 2026-03-11 |
-| Shell guard in domain layer (no trait) | Pure computation, no I/O, no implementation variability | tree-sitter-bash (C dep), domain trait (over-engineering) | 2026-03-11 |
+| ~~Shell guard in domain layer (no trait)~~ *(superseded by INF-20)* | ~~Pure computation, no I/O, no implementation variability~~ | ~~tree-sitter-bash (C dep), domain trait (over-engineering)~~ | 2026-03-11 |
+| INF-20: ShellParser port + ConchShellParser adapter | Removes conch-parser from domain; policy takes `&[SimpleCommand]` (parse/evaluate split); DI via `Arc<dyn ShellParser>`. Supersedes the "no trait" decision above. | Keep conch-parser in domain (dependency direction violation), cfg feature flag (doesn't decouple) | 2026-03-23 |
 | conch-parser for shell AST (vendored, patched) | Full POSIX AST, minimal deps (void only), structural env var/command separation | Hand-written parser (edge case proliferation), tree-sitter-bash (C dep), brush-parser (heavy deps) | 2026-03-11 |
 | Guard policy: ban edge-case-producing patterns | Unconditionally block patterns that create bypass vectors but are unnecessary in the template workflow: (1) `env` command → immediate block, (2) `$VAR`/`$(cmd)`/`` `cmd` `` in **any position** (argv + redirect texts including heredoc bodies) → immediate block, (3) `.exe` suffix → stripped in basename, (4) if effective command ≠ `git` and any argv/redirect token contains "git" (case-insensitive) → block. Rules (2) and (4) together eliminate ALL per-tool nesting analysis with argv/redirect-level checks. | Per-pattern recursive parsing and validation (complex, error-prone, ~200 lines of per-tool option parsing) | 2026-03-11 |
 | Reviewer model_profiles in agent-profiles.json | Centralized per-model behavioral config (`full_auto`, etc.) in `providers.codex.model_profiles`. CLI reads the file and resolves flags automatically. Fail-closed: unknown model or missing file defaults to `full_auto: true`. | Hardcoded model-name heuristic in Rust code; explicit CLI `--full-auto` flag | 2026-03-17 |
@@ -323,7 +324,12 @@ match (&self.status, transition) {
 }
 ```
 
-### Shell Command Guard (guard-cli-2026-03-11)
+### Shell Command Guard (guard-cli-2026-03-11) — *will be superseded by INF-20*
+
+> **Note**: The module tree and signatures below reflect the pre-INF-20 layout.
+> INF-20 splits `parser.rs` into `types.rs` / `port.rs` / `text.rs`, moves
+> conch-parser code to `infrastructure::shell`, and changes `policy::check(input)`
+> to `policy::check_commands(&[SimpleCommand])`. Update this section during T6.
 
 ```text
 libs/domain/src/guard/
@@ -898,6 +904,7 @@ _None at this time._
 | 2026-03-11 | Codex review cycles R1-R10: typed port errors, HookInput DIP, exit code 2, required field validation, DomainError::Repository separation, UseCase return types, hook output JSON mapping |
 | 2026-03-12 | Feature branch strategy: per-track branches, branch-aware resolution, guard policy extension (Codex planner) |
 | 2026-03-16 | Auto mode design spike (MEMO-15): 6-phase state machine, auto-state.json persistence, escalation UI |
+| 2026-03-23 | INF-20: ShellParser port in domain, ConchShellParser adapter in infrastructure, policy parse/evaluate split |
 
 ## Auto Mode (MEMO-15 Design Spike)
 

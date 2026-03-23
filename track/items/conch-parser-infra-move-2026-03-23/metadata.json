@@ -1,0 +1,146 @@
+{
+  "branch": "track/conch-parser-infra-move-2026-03-23",
+  "created_at": "2026-03-23T00:31:39Z",
+  "id": "conch-parser-infra-move-2026-03-23",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "parser.rs を types.rs, port.rs, text.rs に分離。",
+          "policy.rs の check() を check_commands(&[SimpleCommand]) に変更。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T1",
+          "T2"
+        ],
+        "title": "Domain guard モジュール再構成"
+      },
+      {
+        "description": [
+          "conch-parser AST walking コードを infrastructure/shell/ に移動。",
+          "ConchShellParser struct で ShellParser trait を実装。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T3"
+        ],
+        "title": "Infrastructure adapter 実装"
+      },
+      {
+        "description": [
+          "usecase handlers と CLI に Arc<dyn ShellParser> を注入。",
+          "Cargo.toml, architecture-rules.json, convention docs を更新。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T4",
+          "T5",
+          "T6"
+        ],
+        "title": "DI 配線 & ドキュメント同期"
+      },
+      {
+        "description": [
+          "cargo make ci で全テスト・lint・layer check・doc sync・purity check が通ることを確認。"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T7"
+        ],
+        "title": "検証"
+      }
+    ],
+    "summary": [
+      "conch-parser 依存を domain 層から infrastructure 層に移動する。",
+      "domain に ShellParser trait (port) を定義し、infrastructure に ConchShellParser adapter を実装。",
+      "policy.rs を parse 済みデータ受け取りに変更し、parse と evaluate を分離。",
+      "usecase hook handlers と CLI guard check に DI で parser を注入。"
+    ]
+  },
+  "review": {
+    "code_hash": "6c174ede838ea96edf8896135f331da2aa82ec0b",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "planning"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-23T01:22:10Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "planning"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-23T01:22:15Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "planning": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-23T01:22:10Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-23T01:22:15Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "planned",
+  "tasks": [
+    {
+      "description": "Domain guard モジュールの再構成 (types.rs, port.rs, text.rs 分離)",
+      "id": "T1",
+      "status": "todo"
+    },
+    {
+      "description": "policy.rs を check_commands(&[SimpleCommand]) + block_on_parse_error() に変更",
+      "id": "T2",
+      "status": "todo"
+    },
+    {
+      "description": "Infrastructure に ConchShellParser adapter を実装 (shell/ モジュール)",
+      "id": "T3",
+      "status": "todo"
+    },
+    {
+      "description": "Usecase hook handlers を DI 化 (Arc<dyn ShellParser> 注入)",
+      "id": "T4",
+      "status": "todo"
+    },
+    {
+      "description": "CLI composition root で parser 注入 (hook + guard check)",
+      "id": "T5",
+      "status": "todo"
+    },
+    {
+      "description": "Cargo.toml 更新 & ドキュメント同期 (architecture-rules, shell-parsing, tech-stack, DESIGN)",
+      "id": "T6",
+      "status": "todo"
+    },
+    {
+      "description": "CI green 確認 (cargo make ci)",
+      "id": "T7",
+      "status": "todo"
+    }
+  ],
+  "title": "INF-20: conch-parser を domain から infrastructure に移動",
+  "updated_at": "2026-03-23T01:22:15Z"
+}
