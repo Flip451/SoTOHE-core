@@ -11,6 +11,7 @@ mod plan;
 mod repository;
 pub mod review;
 mod signal;
+pub mod spec;
 mod timestamp;
 mod track;
 pub mod track_phase;
@@ -32,6 +33,10 @@ pub use review::{
 };
 pub use signal::{
     ConfidenceSignal, SignalBasis, SignalCounts, classify_source_tag, evaluate_source_tag,
+};
+pub use spec::{
+    DomainStateEntry, SpecDocument, SpecRequirement, SpecScope, SpecSection, SpecValidationError,
+    evaluate_requirement_signal,
 };
 pub use timestamp::Timestamp;
 pub use track::{

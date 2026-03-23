@@ -1,4 +1,8 @@
 //! Verify that spec.md requirement lines have [source: ...] attribution.
+//!
+//! When a sibling `spec.json` exists, checks that all `SpecRequirement`s in
+//! scope.in_scope, scope.out_of_scope, constraints, and acceptance_criteria
+//! have non-empty sources. Otherwise falls back to the markdown scan (legacy).
 
 use super::frontmatter::parse_yaml_frontmatter;
 use domain::verify::{Finding, VerifyOutcome};
@@ -25,7 +29,76 @@ fn has_valid_source_tag(line: &str) -> bool {
     false
 }
 
+/// Verifies attribution using a pre-decoded `spec.json`.
+///
+/// Checks that every `SpecRequirement` in scope.in_scope, scope.out_of_scope,
+/// constraints, and acceptance_criteria has at least one non-empty source.
+/// Reports a finding for each requirement with empty sources.
+///
+/// # Errors
+///
+/// Returns findings when the file cannot be read, the JSON decode fails, or
+/// any requirement is missing attribution.
+pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
+    let json = match std::fs::read_to_string(spec_json_path) {
+        Ok(s) => s,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "cannot read {}: {e}",
+                spec_json_path.display()
+            ))]);
+        }
+    };
+
+    let doc = match crate::spec::codec::decode(&json) {
+        Ok(d) => d,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "{}: spec.json decode error: {e}",
+                spec_json_path.display()
+            ))]);
+        }
+    };
+
+    let mut findings = Vec::new();
+
+    let all_reqs = doc
+        .scope()
+        .in_scope()
+        .iter()
+        .chain(doc.scope().out_of_scope().iter())
+        .chain(doc.constraints().iter())
+        .chain(doc.acceptance_criteria().iter());
+
+    for req in all_reqs {
+        let has_valid_source =
+            !req.sources().is_empty() && req.sources().iter().any(|s| !s.trim().is_empty());
+        if !has_valid_source {
+            findings.push(Finding::error(format!(
+                "{}: requirement missing attribution: \"{}\"",
+                spec_json_path.display(),
+                req.text()
+            )));
+        }
+    }
+
+    if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
+}
+
+/// Derives the sibling `spec.json` path from a `spec.md` path.
+///
+/// Returns `None` when the path has no parent directory.
+fn sibling_spec_json(spec_md_path: &Path) -> Option<std::path::PathBuf> {
+    spec_md_path
+        .parent()
+        .map(|dir| if dir.as_os_str().is_empty() { Path::new(".") } else { dir })
+        .map(|dir| dir.join("spec.json"))
+}
+
 /// Verifies spec.md requirement attribution.
+///
+/// When a sibling `spec.json` exists next to `spec_path`, delegates to
+/// `verify_from_spec_json`. Otherwise falls back to the markdown scan (legacy).
 ///
 /// Requirement lines are markdown headings starting with `### S-` or `### REQ-`.
 /// Each must contain a `[source: ...]` tag somewhere on the same line.
@@ -37,6 +110,14 @@ fn has_valid_source_tag(line: &str) -> bool {
 /// Returns findings when the file cannot be read, or when requirement lines
 /// are missing `[source: ...]` tags.
 pub fn verify(spec_path: &Path) -> VerifyOutcome {
+    // Delegate to spec.json path when a sibling spec.json exists.
+    if let Some(spec_json_path) = sibling_spec_json(spec_path) {
+        if spec_json_path.is_file() {
+            return verify_from_spec_json(&spec_json_path);
+        }
+    }
+
+    // Legacy markdown-based flow.
     let content = match std::fs::read_to_string(spec_path) {
         Ok(c) => c,
         Err(e) => {
@@ -258,6 +339,149 @@ mod tests {
         assert!(
             !outcome.has_errors(),
             "requirement headings inside ~~~ fenced code blocks must be exempt"
+        );
+    }
+
+    // --- verify_from_spec_json() tests ---
+
+    const SPEC_JSON_ALL_SOURCED: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": {
+    "in_scope": [{ "text": "In scope req", "sources": ["PRD §1"] }],
+    "out_of_scope": [{ "text": "Out of scope req", "sources": ["inference — not needed"] }]
+  },
+  "constraints": [{ "text": "Constraint", "sources": ["convention — hex.md"] }],
+  "acceptance_criteria": [{ "text": "AC item", "sources": ["PRD §4"] }]
+}"#;
+
+    const SPEC_JSON_UNSOURCED_REQUIREMENT: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": {
+    "in_scope": [{ "text": "Missing source req", "sources": [] }],
+    "out_of_scope": []
+  }
+}"#;
+
+    const SPEC_JSON_NO_REQUIREMENTS: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": { "in_scope": [], "out_of_scope": [] }
+}"#;
+
+    #[test]
+    fn test_verify_from_spec_json_with_all_sourced_requirements_passes() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_ALL_SOURCED).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(!outcome.has_errors(), "all sourced requirements should pass: {outcome:?}");
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_empty_sources_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_UNSOURCED_REQUIREMENT).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(outcome.has_errors(), "requirement with empty sources should fail");
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_no_requirements_passes() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_NO_REQUIREMENTS).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(!outcome.has_errors(), "no requirements at all should pass: {outcome:?}");
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_reports_one_finding_per_unsourced_requirement() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        // Two requirements with empty sources
+        std::fs::write(
+            &path,
+            r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": {
+    "in_scope": [
+      { "text": "Req A", "sources": [] },
+      { "text": "Req B", "sources": [] }
+    ],
+    "out_of_scope": []
+  }
+}"#,
+        )
+        .unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(outcome.has_errors(), "two unsourced requirements should fail");
+        assert_eq!(outcome.error_count(), 2, "expected one finding per unsourced requirement");
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_missing_file_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("nonexistent.json");
+        let outcome = verify_from_spec_json(&path);
+        assert!(outcome.has_errors(), "missing file should fail");
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_invalid_json_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, "not json").unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(outcome.has_errors(), "invalid JSON should fail");
+    }
+
+    // --- verify() delegation tests ---
+
+    #[test]
+    fn test_verify_delegates_to_spec_json_when_sibling_exists() {
+        let dir = tempfile::tempdir().unwrap();
+        // spec.json with all sourced requirements (passes)
+        std::fs::write(dir.path().join("spec.json"), SPEC_JSON_ALL_SOURCED).unwrap();
+        // spec.md with unsourced requirement headings (would fail under legacy path)
+        std::fs::write(dir.path().join("spec.md"), "### S-AUTH-01\n### REQ-DATA-01\n").unwrap();
+        let outcome = verify(&dir.path().join("spec.md"));
+        assert!(
+            !outcome.has_errors(),
+            "spec.json delegation should override markdown failures: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_verify_spec_json_failure_propagates_through_verify() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(dir.path().join("spec.json"), SPEC_JSON_UNSOURCED_REQUIREMENT).unwrap();
+        // spec.md with properly sourced headings (would pass under legacy path)
+        std::fs::write(dir.path().join("spec.md"), "### S-AUTH-01 [source: PRD]\n").unwrap();
+        let outcome = verify(&dir.path().join("spec.md"));
+        assert!(outcome.has_errors(), "spec.json attribution failure should propagate");
+    }
+
+    #[test]
+    fn test_verify_falls_back_to_markdown_when_no_spec_json() {
+        let dir = tempfile::tempdir().unwrap();
+        // No spec.json — use legacy markdown scan
+        std::fs::write(dir.path().join("spec.md"), "### S-AUTH-01 [source: PRD]\n").unwrap();
+        let outcome = verify(&dir.path().join("spec.md"));
+        assert!(
+            !outcome.has_errors(),
+            "legacy markdown path with source tag should pass: {outcome:?}"
         );
     }
 }

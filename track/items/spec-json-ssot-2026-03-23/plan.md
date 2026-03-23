@@ -15,35 +15,35 @@ spec.json が SSoT、spec.md は render_spec() による read-only rendered view
 SpecDocument (aggregate), SpecRequirement (text + sources), DomainStateEntry, SpecScope, SpecSection を domain 層に定義。
 Multi-source ポリシー: 各要件の信号 = sources 中の最高信頼度 (Blue > Yellow > Red)。sources 空 = Red。
 
-- [ ] Domain 型定義: SpecDocument, SpecRequirement, DomainStateEntry, SpecScope, SpecSection
+- [x] Domain 型定義: SpecDocument, SpecRequirement, DomainStateEntry, SpecScope, SpecSection
 
 ## Infrastructure: codec + rendering
 
 spec.json codec (SpecDocumentV1 serde) と render_spec() (spec.json → spec.md)。
 sync_rendered_views に spec.md 生成を統合。
 
-- [ ] spec.json codec: SpecDocumentV1 serde (deserialize + validate + serialize)
-- [ ] render_spec(): spec.json → spec.md レンダリング
-- [ ] sync_rendered_views 統合: spec.md を plan.md と並行して生成
+- [x] spec.json codec: SpecDocumentV1 serde (deserialize + validate + serialize)
+- [x] render_spec(): spec.json → spec.md レンダリング
+- [x] sync_rendered_views 統合: spec.md を plan.md と並行して生成
 
 ## 信号評価の構造化
 
 SpecDocument から直接 SignalCounts を算出。Markdown パース不要。
 sotp track signals を spec.json ベースに更新。
 
-- [ ] 構造化信号評価: evaluate_from_spec(doc: &SpecDocument) -> SignalCounts
-- [ ] sotp track signals 更新: spec.json 読み込み → 信号計算 → spec.json 書き戻し
+- [x] 構造化信号評価: evaluate_from_spec(doc: &SpecDocument) -> SignalCounts
+- [x] sotp track signals 更新: spec.json 読み込み → 信号計算 → spec.json 書き戻し
 
 ## Verifier 移行
 
 全 spec verifier を spec.json 対応に移行。旧 track 用 legacy fallback 付き。
 spec-frontmatter → spec-schema にリネーム。
 
-- [ ] Verifier 移行 (1): spec-signals + spec-states を spec.json ベースに (legacy fallback 付き)
-- [ ] Verifier 移行 (2): spec-frontmatter → spec-schema + latest-track + spec-attribution 更新
+- [x] Verifier 移行 (1): spec-signals + spec-states を spec.json ベースに (legacy fallback 付き)
+- [x] Verifier 移行 (2): spec-frontmatter → spec-schema + latest-track + spec-attribution 更新
 
 ## ワークフロー統合
 
 /track:plan スキルが spec.json を生成するよう更新。ドキュメント・CI 確認。
 
-- [ ] /track:plan スキル更新 + ドキュメント + CI 確認
+- [x] /track:plan スキル更新 + ドキュメント + CI 確認

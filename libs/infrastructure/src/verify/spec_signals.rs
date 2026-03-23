@@ -5,6 +5,9 @@
 //! For each item, evaluates the `[source: ...]` tag via domain logic.
 //! Aggregates results into `SignalCounts` and compares against the frontmatter
 //! `signals:` declaration to detect drift.
+//!
+//! When a sibling `spec.json` exists, the JSON-based path is used instead of
+//! the markdown-based path (legacy fallback).
 
 use std::path::Path;
 
@@ -157,10 +160,71 @@ pub fn evaluate(content: &str) -> SignalCounts {
     SignalCounts::new(blue, yellow, red)
 }
 
+/// Verifies signal quality using a pre-decoded `spec.json`.
+///
+/// Evaluates signals via `doc.evaluate_signals()` (domain logic).
+/// Returns an error if `red > 0` (gate policy violation).
+///
+/// # Errors
+///
+/// Returns findings when:
+/// - The file cannot be read.
+/// - The JSON cannot be decoded.
+/// - The evaluated signals contain red items.
+pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
+    let json = match std::fs::read_to_string(spec_json_path) {
+        Ok(s) => s,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "cannot read {}: {e}",
+                spec_json_path.display()
+            ))]);
+        }
+    };
+
+    let doc = match crate::spec::codec::decode(&json) {
+        Ok(d) => d,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "{}: spec.json decode error: {e}",
+                spec_json_path.display()
+            ))]);
+        }
+    };
+
+    let evaluated = doc.evaluate_signals();
+    let mut findings = Vec::new();
+
+    if evaluated.red() > 0 {
+        findings.push(Finding::error(format!(
+            "{}: red > 0 gate policy violation — {} item(s) missing or have unverified sources",
+            spec_json_path.display(),
+            evaluated.red()
+        )));
+    }
+
+    // Warn if cached signals are stale (mismatch with fresh evaluation)
+    if let Some(cached) = doc.signals() {
+        if *cached != evaluated {
+            findings.push(Finding::error(format!(
+                "{}: cached signals (blue={} yellow={} red={}) differ from evaluated (blue={} yellow={} red={}). Run `sotp track signals` to update.",
+                spec_json_path.display(),
+                cached.blue(), cached.yellow(), cached.red(),
+                evaluated.blue(), evaluated.yellow(), evaluated.red()
+            )));
+        }
+    }
+
+    if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
+}
+
 /// Verifies that the spec.md `signals:` frontmatter declaration matches
 /// the actual source tag signals found in the body.
 ///
-/// Steps:
+/// When a sibling `spec.json` exists next to `spec_path`, delegates to
+/// `verify_from_spec_json`. Otherwise falls back to the markdown-based flow.
+///
+/// Steps (markdown fallback):
 /// 1. Read file, parse frontmatter.
 /// 2. Evaluate body with `evaluate()`.
 /// 3. If `evaluated.red() > 0` → error ("red > 0 gate policy violation").
@@ -176,6 +240,14 @@ pub fn evaluate(content: &str) -> SignalCounts {
 /// - The body contains Red-signal items (missing source).
 /// - The declared `signals:` counts differ from the evaluated counts.
 pub fn verify(spec_path: &Path) -> VerifyOutcome {
+    // Delegate to spec.json path when a sibling spec.json exists.
+    if let Some(spec_json_path) = sibling_spec_json(spec_path) {
+        if spec_json_path.is_file() {
+            return verify_from_spec_json(&spec_json_path);
+        }
+    }
+
+    // Legacy markdown-based flow.
     let content = match std::fs::read_to_string(spec_path) {
         Ok(c) => c,
         Err(e) => {
@@ -212,6 +284,17 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
     }
 
     if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
+}
+
+/// Derives the sibling `spec.json` path from a `spec.md` path by replacing
+/// the filename component.
+///
+/// Returns `None` when the path has no parent directory.
+fn sibling_spec_json(spec_md_path: &Path) -> Option<std::path::PathBuf> {
+    spec_md_path
+        .parent()
+        .map(|dir| if dir.as_os_str().is_empty() { Path::new(".") } else { dir })
+        .map(|dir| dir.join("spec.json"))
 }
 
 #[cfg(test)]
@@ -440,5 +523,129 @@ mod tests {
         .unwrap();
         let outcome = verify(&spec);
         assert!(!outcome.has_errors());
+    }
+
+    // --- verify_from_spec_json() tests ---
+
+    const MINIMAL_SPEC_JSON: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature Title",
+  "scope": { "in_scope": [], "out_of_scope": [] }
+}"#;
+
+    const SPEC_JSON_WITH_BLUE_SOURCE: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature Title",
+  "scope": {
+    "in_scope": [{ "text": "In scope item", "sources": ["PRD §1"] }],
+    "out_of_scope": []
+  }
+}"#;
+
+    const SPEC_JSON_WITH_RED_SOURCE: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature Title",
+  "scope": {
+    "in_scope": [{ "text": "Missing source item", "sources": [] }],
+    "out_of_scope": []
+  }
+}"#;
+
+    #[test]
+    fn test_verify_from_spec_json_with_no_requirements_passes() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, MINIMAL_SPEC_JSON).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(!outcome.has_errors(), "no requirements should pass: {outcome:?}");
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_blue_sources_passes() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_WITH_BLUE_SOURCE).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(!outcome.has_errors(), "blue source should pass: {outcome:?}");
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_empty_sources_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, SPEC_JSON_WITH_RED_SOURCE).unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(outcome.has_errors(), "empty sources (red signal) should fail");
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_missing_file_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("nonexistent.json");
+        let outcome = verify_from_spec_json(&path);
+        assert!(outcome.has_errors(), "missing file should fail");
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_invalid_json_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, "not json at all").unwrap();
+        let outcome = verify_from_spec_json(&path);
+        assert!(outcome.has_errors(), "invalid JSON should fail");
+    }
+
+    // --- verify() delegation tests ---
+
+    #[test]
+    fn test_verify_delegates_to_spec_json_when_sibling_exists() {
+        let dir = tempfile::tempdir().unwrap();
+        // Write spec.json with blue sources (should pass)
+        std::fs::write(dir.path().join("spec.json"), SPEC_JSON_WITH_BLUE_SOURCE).unwrap();
+        // Write spec.md with red items (would fail under legacy path)
+        std::fs::write(
+            dir.path().join("spec.md"),
+            "---\nstatus: draft\nversion: \"1.0\"\n---\n## Scope\n- item without source\n",
+        )
+        .unwrap();
+        let outcome = verify(&dir.path().join("spec.md"));
+        // spec.json takes priority; blue source passes
+        assert!(
+            !outcome.has_errors(),
+            "spec.json delegation should override markdown findings: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_verify_falls_back_to_markdown_when_no_spec_json() {
+        let dir = tempfile::tempdir().unwrap();
+        // No spec.json present
+        std::fs::write(
+            dir.path().join("spec.md"),
+            "---\nstatus: draft\nversion: \"1.0\"\n---\n## Scope\n- item [source: PRD §1]\n",
+        )
+        .unwrap();
+        let outcome = verify(&dir.path().join("spec.md"));
+        assert!(!outcome.has_errors(), "legacy markdown path should pass: {outcome:?}");
+    }
+
+    #[test]
+    fn test_verify_spec_json_failure_propagates_through_verify() {
+        let dir = tempfile::tempdir().unwrap();
+        // Write spec.json with red (empty) sources
+        std::fs::write(dir.path().join("spec.json"), SPEC_JSON_WITH_RED_SOURCE).unwrap();
+        std::fs::write(
+            dir.path().join("spec.md"),
+            "---\nstatus: draft\nversion: \"1.0\"\n---\n## Scope\n- item [source: PRD §1]\n",
+        )
+        .unwrap();
+        let outcome = verify(&dir.path().join("spec.md"));
+        assert!(outcome.has_errors(), "spec.json red signal should propagate as failure");
     }
 }

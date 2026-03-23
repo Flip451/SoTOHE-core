@@ -1,4 +1,4 @@
-//! Rendering and sync of track read-only views (`plan.md`, `registry.md`) from metadata.json.
+//! Rendering and sync of track read-only views (`plan.md`, `registry.md`, `spec.md`) from metadata.json / spec.json.
 
 use std::path::{Path, PathBuf};
 
@@ -6,6 +6,7 @@ use domain::{TaskStatus, TrackMetadata};
 
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
+use crate::spec;
 
 const TRACK_ITEMS_DIR: &str = "track/items";
 const TRACK_ARCHIVE_DIR: &str = "track/archive";
@@ -482,17 +483,66 @@ pub fn sync_rendered_views(
         })?;
         let rendered = render_plan(&track);
         let plan_path = track_dir.join("plan.md");
-        let old = std::fs::read_to_string(&plan_path).ok();
+        let old = match std::fs::read_to_string(&plan_path) {
+            Ok(content) => Some(content),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+            Err(e) => return Err(RenderError::Io(e)),
+        };
         if old.as_deref().is_none_or(|existing| !rendered_matches(existing, rendered.as_ref())) {
             atomic_write_file(&plan_path, rendered.as_bytes())?;
             changed.push(plan_path);
+        }
+
+        // Render spec.md from spec.json if present
+        let spec_json_path = track_dir.join("spec.json");
+        if spec_json_path.is_file() {
+            let spec_json_content = std::fs::read_to_string(&spec_json_path)?;
+            match spec::codec::decode(&spec_json_content) {
+                Ok(spec_doc) => {
+                    let rendered_spec = spec::render::render_spec(&spec_doc);
+                    let spec_md_path = track_dir.join("spec.md");
+                    // Read existing spec.md: propagate real I/O errors, treat NotFound as absent.
+                    let old_spec = match std::fs::read_to_string(&spec_md_path) {
+                        Ok(content) => Some(content),
+                        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+                        Err(e) => return Err(RenderError::Io(e)),
+                    };
+                    if old_spec
+                        .as_deref()
+                        .is_none_or(|existing| !rendered_matches(existing, &rendered_spec))
+                    {
+                        atomic_write_file(&spec_md_path, rendered_spec.as_bytes())?;
+                        changed.push(spec_md_path);
+                    }
+                }
+                Err(spec::codec::SpecCodecError::Json(_)) => {
+                    // Warn and continue only on JSON parse errors — file may be mid-edit.
+                    // Schema version and validation errors are hard failures that should surface.
+                    eprintln!(
+                        "warning: skipping spec.md render for {} (malformed JSON)",
+                        track_dir.display()
+                    );
+                }
+                Err(e) => {
+                    // Unsupported schema version or domain validation failure — propagate as I/O error
+                    // so callers (CI, verify-arch-docs) detect spec.json corruption.
+                    return Err(RenderError::Io(std::io::Error::other(format!(
+                        "spec.json error at {}: {e}",
+                        track_dir.display()
+                    ))));
+                }
+            }
         }
     }
 
     if let Some(parent) = registry_path.parent() {
         std::fs::create_dir_all(parent)?;
     }
-    let old = std::fs::read_to_string(&registry_path).ok();
+    let old = match std::fs::read_to_string(&registry_path) {
+        Ok(content) => Some(content),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+        Err(e) => return Err(RenderError::Io(e)),
+    };
     if old.as_deref().is_none_or(|existing| !rendered_matches(existing, rendered_registry.as_ref()))
     {
         atomic_write_file(&registry_path, rendered_registry.as_bytes())?;
@@ -1157,5 +1207,171 @@ mod tests {
         let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
 
         assert!(err.to_string().contains("Missing required field 'tasks'"));
+    }
+
+    #[test]
+    fn sync_rendered_views_generates_spec_md_from_spec_json() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        // Write valid metadata.json
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+
+        // Write a minimal spec.json
+        std::fs::write(
+            track_dir.join("spec.json"),
+            r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature Alpha",
+  "scope": { "in_scope": [], "out_of_scope": [] }
+}"#,
+        )
+        .unwrap();
+
+        let changed = sync_rendered_views(dir.path(), None).unwrap();
+
+        // spec.md must be in the changed list
+        assert!(
+            changed.iter().any(|p| p.ends_with("spec.md")),
+            "spec.md should be reported as changed"
+        );
+
+        // spec.md must exist and contain the generated header comment and title
+        let spec_md = std::fs::read_to_string(track_dir.join("spec.md")).unwrap();
+        assert!(spec_md.contains("<!-- Generated from spec.json"));
+        assert!(spec_md.contains("Feature Alpha"));
+    }
+
+    #[test]
+    fn sync_rendered_views_skips_spec_md_when_spec_json_absent() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+
+        // No spec.json written — legacy mode
+        let changed = sync_rendered_views(dir.path(), None).unwrap();
+
+        assert!(
+            !changed.iter().any(|p| p.ends_with("spec.md")),
+            "spec.md must NOT be in changed list when spec.json is absent"
+        );
+        assert!(!track_dir.join("spec.md").exists());
+    }
+
+    #[test]
+    fn sync_rendered_views_does_not_overwrite_spec_md_when_already_up_to_date() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+
+        let spec_json = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature Beta",
+  "scope": { "in_scope": [], "out_of_scope": [] }
+}"#;
+        std::fs::write(track_dir.join("spec.json"), spec_json).unwrap();
+
+        // First sync — generates spec.md
+        sync_rendered_views(dir.path(), None).unwrap();
+
+        // Second sync — spec.md is already up-to-date, must NOT be in changed list
+        let changed = sync_rendered_views(dir.path(), None).unwrap();
+        assert!(
+            !changed.iter().any(|p| p.ends_with("spec.md")),
+            "spec.md must NOT be in changed list when already up-to-date"
+        );
+    }
+
+    #[test]
+    fn sync_rendered_views_continues_on_malformed_spec_json() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+
+        // Write malformed spec.json (JSON parse error — warn and continue)
+        std::fs::write(track_dir.join("spec.json"), "{not valid json}").unwrap();
+
+        // Must succeed (only warn) — plan.md and registry.md are still generated
+        let result = sync_rendered_views(dir.path(), None);
+        assert!(result.is_ok(), "JSON-parse-error spec.json must not abort sync");
+
+        let changed = result.unwrap();
+        assert!(changed.iter().any(|p| p.ends_with("plan.md")));
+        assert!(!changed.iter().any(|p| p.ends_with("spec.md")));
+    }
+
+    #[test]
+    fn sync_rendered_views_propagates_error_on_spec_json_unsupported_schema_version() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+
+        // Valid JSON but unsupported schema version — must propagate as an error
+        std::fs::write(
+            track_dir.join("spec.json"),
+            r#"{"schema_version":99,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#,
+        )
+        .unwrap();
+
+        let result = sync_rendered_views(dir.path(), None);
+        assert!(result.is_err(), "unsupported spec.json schema version must return an error");
     }
 }

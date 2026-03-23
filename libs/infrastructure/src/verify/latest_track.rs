@@ -63,12 +63,31 @@ pub fn verify(root: &Path) -> VerifyOutcome {
         Ok(None) => VerifyOutcome::pass(),
         Ok(Some(track_dir)) => {
             let mut outcome = VerifyOutcome::pass();
-            let files: [(&str, FileValidator); 3] = [
-                ("spec.md", validate_spec_file),
-                ("plan.md", validate_plan_file),
-                ("verification.md", validate_verification_file),
-            ];
-            for (filename, validator) in &files {
+
+            // spec.md is optional when spec.json is present (spec.md is a
+            // generated read-only view in that case). Validate whichever
+            // artifact exists; require at least one.
+            let spec_json_path = track_dir.join("spec.json");
+            let spec_md_path = track_dir.join("spec.md");
+            if spec_json_path.is_file() {
+                // spec.json exists — validate it; spec.md is optional.
+                for finding in validate_spec_json_file(&spec_json_path, root) {
+                    outcome.add(finding);
+                }
+            } else if spec_md_path.is_file() {
+                for finding in validate_spec_file(&spec_md_path, root) {
+                    outcome.add(finding);
+                }
+            } else {
+                outcome.add(Finding::error(format!(
+                    "[ERROR] Latest track is missing spec.md (and no spec.json found): {}",
+                    display_path(&spec_md_path, root)
+                )));
+            }
+
+            let other_files: [(&str, FileValidator); 2] =
+                [("plan.md", validate_plan_file), ("verification.md", validate_verification_file)];
+            for (filename, validator) in &other_files {
                 let path = track_dir.join(filename);
                 if !path.is_file() {
                     outcome.add(Finding::error(format!(
@@ -634,6 +653,84 @@ fn scaffold_placeholder_lines(text: &str) -> Vec<(usize, String)> {
 // File validators
 // ---------------------------------------------------------------------------
 
+/// Validate a `spec.json` artifact: must be readable and decode without error.
+fn validate_spec_json_file(path: &Path, root: &Path) -> Vec<Finding> {
+    let text = match std::fs::read_to_string(path) {
+        Ok(t) => t,
+        Err(e) => {
+            return vec![Finding::error(format!(
+                "[ERROR] Cannot read spec.json: {} ({e})",
+                display_path(path, root)
+            ))];
+        }
+    };
+    if text.trim().is_empty() {
+        return vec![Finding::error(format!(
+            "[ERROR] Latest track spec.json is empty: {}",
+            display_path(path, root)
+        ))];
+    }
+    let doc = match crate::spec::codec::decode(&text) {
+        Ok(d) => d,
+        Err(e) => {
+            return vec![Finding::error(format!(
+                "[ERROR] Latest track spec.json is invalid: {} ({e})",
+                display_path(path, root)
+            ))];
+        }
+    };
+
+    // Collect ALL text-bearing strings from the document for placeholder scanning.
+    let mut all_texts: Vec<&str> = vec![doc.title(), doc.status(), doc.version()];
+    all_texts.extend(doc.goal().iter().map(|s| s.as_str()));
+    let all_reqs = doc
+        .scope()
+        .in_scope()
+        .iter()
+        .chain(doc.scope().out_of_scope().iter())
+        .chain(doc.constraints().iter())
+        .chain(doc.acceptance_criteria().iter());
+    for req in all_reqs {
+        all_texts.push(req.text());
+        for src in req.sources() {
+            all_texts.push(src.as_str());
+        }
+    }
+    for state in doc.domain_states() {
+        all_texts.push(state.name());
+        all_texts.push(state.description());
+    }
+    for section in doc.additional_sections() {
+        all_texts.push(section.title());
+        for line in section.content() {
+            all_texts.push(line.as_str());
+        }
+    }
+    for conv in doc.related_conventions() {
+        all_texts.push(conv.as_str());
+    }
+
+    let mut findings = Vec::new();
+    let placeholder_patterns = ["TODO:", "TEMPLATE STUB", "TBD"];
+    let display = display_path(path, root);
+    for text in &all_texts {
+        let upper = text.to_uppercase();
+        for pattern in &placeholder_patterns {
+            if upper.contains(pattern) {
+                findings.push(Finding::error(format!(
+                    "[ERROR] Latest track spec.json contains placeholder '{pattern}': {display}"
+                )));
+                // One finding per placeholder pattern per document is enough
+                break;
+            }
+        }
+        if !findings.is_empty() {
+            break;
+        }
+    }
+    findings
+}
+
 fn validate_spec_file(path: &Path, root: &Path) -> Vec<Finding> {
     let text = match std::fs::read_to_string(path) {
         Ok(t) => t,
@@ -1032,5 +1129,110 @@ mod tests {
         let secs_z = parse_updated_at("2026-01-15T00:00:00Z").unwrap();
         let secs_offset = parse_updated_at("2026-01-15T00:00:00+00:00").unwrap();
         assert_eq!(secs_z, secs_offset);
+    }
+
+    // ---- spec.json artifact tests ----
+
+    const VALID_SPEC_JSON: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": { "in_scope": [], "out_of_scope": [] }
+}"#;
+
+    /// Helper: set up a track with spec.json instead of spec.md.
+    fn setup_complete_track_with_spec_json(root: &Path, id: &str) {
+        setup_track_with_branch(root, id, "in_progress");
+        write_file(root, &format!("{TRACK_ITEMS_DIR}/{id}/spec.json"), VALID_SPEC_JSON);
+        write_file(root, &format!("{TRACK_ITEMS_DIR}/{id}/plan.md"), "# Plan\n\n- [ ] Task one\n");
+        write_file(
+            root,
+            &format!("{TRACK_ITEMS_DIR}/{id}/verification.md"),
+            "# Verification\n\nAll checks passed. The implementation has been verified.\n",
+        );
+    }
+
+    #[test]
+    fn test_spec_json_instead_of_spec_md_passes() {
+        let tmp = TempDir::new().unwrap();
+        setup_complete_track_with_spec_json(tmp.path(), "feat-json");
+        let outcome = verify(tmp.path());
+        assert!(
+            outcome.is_ok(),
+            "track with valid spec.json and no spec.md should pass: {:#?}",
+            outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_spec_json_and_spec_md_both_present_uses_spec_json() {
+        let tmp = TempDir::new().unwrap();
+        setup_complete_track_with_spec_json(tmp.path(), "feat-both");
+        // Also write a spec.md with placeholder content that would fail markdown checks
+        write_file(
+            tmp.path(),
+            &format!("{TRACK_ITEMS_DIR}/feat-both/spec.md"),
+            "TODO: placeholder only\n",
+        );
+        let outcome = verify(tmp.path());
+        // spec.json is preferred; valid spec.json should pass regardless of spec.md content
+        assert!(
+            outcome.is_ok(),
+            "spec.json takes priority over spec.md: {:#?}",
+            outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_invalid_spec_json_fails() {
+        let tmp = TempDir::new().unwrap();
+        setup_track_with_branch(tmp.path(), "feat-bad-json", "in_progress");
+        write_file(
+            tmp.path(),
+            &format!("{TRACK_ITEMS_DIR}/feat-bad-json/spec.json"),
+            "not valid json",
+        );
+        write_file(
+            tmp.path(),
+            &format!("{TRACK_ITEMS_DIR}/feat-bad-json/plan.md"),
+            "# Plan\n\n- [ ] Task one\n",
+        );
+        write_file(
+            tmp.path(),
+            &format!("{TRACK_ITEMS_DIR}/feat-bad-json/verification.md"),
+            "# Verification\n\nAll checks passed.\n",
+        );
+        let outcome = verify(tmp.path());
+        assert!(outcome.has_errors(), "invalid spec.json should fail");
+        let msgs: Vec<_> = outcome.findings().iter().map(|f| f.message()).collect();
+        assert!(
+            msgs.iter().any(|m| m.contains("spec.json")),
+            "error should mention spec.json, got: {msgs:?}"
+        );
+    }
+
+    #[test]
+    fn test_missing_spec_md_and_spec_json_fails() {
+        let tmp = TempDir::new().unwrap();
+        setup_track_with_branch(tmp.path(), "feat-no-spec", "in_progress");
+        // Neither spec.md nor spec.json present
+        write_file(
+            tmp.path(),
+            &format!("{TRACK_ITEMS_DIR}/feat-no-spec/plan.md"),
+            "# Plan\n\n- [ ] Task one\n",
+        );
+        write_file(
+            tmp.path(),
+            &format!("{TRACK_ITEMS_DIR}/feat-no-spec/verification.md"),
+            "# Verification\n\nAll checks passed.\n",
+        );
+        let outcome = verify(tmp.path());
+        assert!(outcome.has_errors(), "missing both spec.md and spec.json should fail");
+        let msgs: Vec<_> = outcome.findings().iter().map(|f| f.message()).collect();
+        assert!(
+            msgs.iter().any(|m| m.contains("spec.md")),
+            "error should mention spec.md, got: {msgs:?}"
+        );
     }
 }
