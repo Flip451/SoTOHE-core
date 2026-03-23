@@ -1,0 +1,128 @@
+{
+  "schema_version": 3,
+  "id": "spec-json-ssot-2026-03-23",
+  "branch": "track/spec-json-ssot-2026-03-23",
+  "title": "spec.json SSoT 化 — spec.md を rendered view に降格",
+  "status": "planned",
+  "created_at": "2026-03-23T12:00:00Z",
+  "updated_at": "2026-03-23T12:00:00Z",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Domain 型定義: SpecDocument, SpecRequirement, DomainStateEntry, SpecScope, SpecSection",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "spec.json codec: SpecDocumentV1 serde (deserialize + validate + serialize)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "構造化信号評価: evaluate_from_spec(doc: &SpecDocument) -> SignalCounts",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "render_spec(): spec.json → spec.md レンダリング",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T005",
+      "description": "sync_rendered_views 統合: spec.md を plan.md と並行して生成",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T006",
+      "description": "sotp track signals 更新: spec.json 読み込み → 信号計算 → spec.json 書き戻し",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "Verifier 移行 (1): spec-signals + spec-states を spec.json ベースに (legacy fallback 付き)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T008",
+      "description": "Verifier 移行 (2): spec-frontmatter → spec-schema + latest-track + spec-attribution 更新",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T009",
+      "description": "/track:plan スキル更新 + ドキュメント + CI 確認",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "spec.md を metadata.json → plan.md と同じ SSoT パターンに移行する。",
+      "spec.json が SSoT、spec.md は render_spec() による read-only rendered view に降格。",
+      "",
+      "解決する問題:",
+      "- Markdown パースの edge case (code block 内誤検出、frontmatter drift)",
+      "- Multi-source タグ未対応 (JSON 配列で自然解決)",
+      "- spec.md frontmatter signals のドリフト (rendered view で解消)",
+      "- spec_signals が metadata.json extra (untyped) に格納されている問題"
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Domain 型定義",
+        "description": [
+          "SpecDocument (aggregate), SpecRequirement (text + sources), DomainStateEntry, SpecScope, SpecSection を domain 層に定義。",
+          "Multi-source ポリシー: 各要件の信号 = sources 中の最高信頼度 (Blue > Yellow > Red)。sources 空 = Red。"
+        ],
+        "task_ids": ["T001"]
+      },
+      {
+        "id": "S2",
+        "title": "Infrastructure: codec + rendering",
+        "description": [
+          "spec.json codec (SpecDocumentV1 serde) と render_spec() (spec.json → spec.md)。",
+          "sync_rendered_views に spec.md 生成を統合。"
+        ],
+        "task_ids": ["T002", "T004", "T005"]
+      },
+      {
+        "id": "S3",
+        "title": "信号評価の構造化",
+        "description": [
+          "SpecDocument から直接 SignalCounts を算出。Markdown パース不要。",
+          "sotp track signals を spec.json ベースに更新。"
+        ],
+        "task_ids": ["T003", "T006"]
+      },
+      {
+        "id": "S4",
+        "title": "Verifier 移行",
+        "description": [
+          "全 spec verifier を spec.json 対応に移行。旧 track 用 legacy fallback 付き。",
+          "spec-frontmatter → spec-schema にリネーム。"
+        ],
+        "task_ids": ["T007", "T008"]
+      },
+      {
+        "id": "S5",
+        "title": "ワークフロー統合",
+        "description": [
+          "/track:plan スキルが spec.json を生成するよう更新。ドキュメント・CI 確認。"
+        ],
+        "task_ids": ["T009"]
+      }
+    ]
+  },
+  "review": {
+    "status": "not_started",
+    "code_hash": null,
+    "groups": {}
+  }
+}
