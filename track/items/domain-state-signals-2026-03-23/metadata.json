@@ -1,62 +1,60 @@
 {
-  "schema_version": 3,
-  "id": "domain-state-signals-2026-03-23",
   "branch": "track/domain-state-signals-2026-03-23",
-  "title": "SPEC-05 Domain States 信号機 Stage 2 — per-state signal + 遷移関数検証",
-  "status": "planned",
   "created_at": "2026-03-23T18:00:00Z",
-  "updated_at": "2026-03-23T18:00:00Z",
-  "tasks": [
-    {
-      "id": "T001",
-      "description": "Domain 型拡張: DomainStateEntry に transitions_to 追加 + DomainStateSignal per-state 型",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T002",
-      "description": "spec.json codec 拡張: transitions_to + domain_state_signals フィールド + 参照整合性検証",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T003",
-      "description": "Domain コードスキャナー (syn AST): 型名検出 + 遷移関数検出 (Result/Option アンラップ対応)",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T004",
-      "description": "Per-state 信号評価ロジック: 型存在 × 遷移関数存在 × 終端/未宣言区別 → Blue/Yellow/Red",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T005",
-      "description": "sotp track domain-state-signals CLI: 評価 → spec.json domain_state_signals 書き戻し",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T006",
-      "description": "render_spec() 拡張: Domain States テーブルに Signal + Transitions 列追加",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T007",
-      "description": "sotp verify spec-states 拡張: red==0 gate + Stage 1 前提条件チェック (spec signals red==0)",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T008",
-      "description": "plan.md 信号サマリー: Stage 1 + Stage 2 集計表示を render_plan に追加",
-      "status": "todo",
-      "commit_hash": null
-    }
-  ],
+  "id": "domain-state-signals-2026-03-23",
   "plan": {
+    "sections": [
+      {
+        "description": [
+          "DomainStateEntry に transitions_to (Option<Vec<String>>) を追加。",
+          "spec.json codec に domain_state_signals フィールドを追加。",
+          "transitions_to の参照先が domain_states に存在しない場合は検証エラー。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001",
+          "T002"
+        ],
+        "title": "Domain 型 + Codec 拡張"
+      },
+      {
+        "description": [
+          "syn AST で libs/domain/src/ をスキャン。型名検出 + 遷移関数検出。",
+          "Result<T, E> / Option<T> のアンラップで遷移先を判定。",
+          "終端状態 (transitions_to: []) は型存在のみで Blue。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T003",
+          "T004"
+        ],
+        "title": "Domain コードスキャナー + 信号評価"
+      },
+      {
+        "description": [
+          "sotp track domain-state-signals コマンドで評価・書き戻し。",
+          "sotp verify spec-states に red==0 gate + Stage 1 前提条件を追加。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T005",
+          "T007"
+        ],
+        "title": "CLI + Verifier"
+      },
+      {
+        "description": [
+          "spec.md Domain States テーブルに Signal + Transitions 列を追加。",
+          "plan.md に Stage 1 + Stage 2 信号サマリーを表示。"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T006",
+          "T008"
+        ],
+        "title": "レンダリング"
+      }
+    ],
     "summary": [
       "Domain States の per-state 信号評価 (Stage 2) を実装する。",
       "syn AST スキャンで domain コードから型名 + 遷移関数を自動検出し、主観排除の 🔵🟡🔴 判定を行う。",
@@ -67,51 +65,56 @@
       "- 🔴 Red: 型未存在、またはプレースホルダー",
       "",
       "前提: Stage 1 (spec signals red==0) が通過済みであること。"
-    ],
-    "sections": [
-      {
-        "id": "S1",
-        "title": "Domain 型 + Codec 拡張",
-        "description": [
-          "DomainStateEntry に transitions_to (Option<Vec<String>>) を追加。",
-          "spec.json codec に domain_state_signals フィールドを追加。",
-          "transitions_to の参照先が domain_states に存在しない場合は検証エラー。"
-        ],
-        "task_ids": ["T001", "T002"]
-      },
-      {
-        "id": "S2",
-        "title": "Domain コードスキャナー + 信号評価",
-        "description": [
-          "syn AST で libs/domain/src/ をスキャン。型名検出 + 遷移関数検出。",
-          "Result<T, E> / Option<T> のアンラップで遷移先を判定。",
-          "終端状態 (transitions_to: []) は型存在のみで Blue。"
-        ],
-        "task_ids": ["T003", "T004"]
-      },
-      {
-        "id": "S3",
-        "title": "CLI + Verifier",
-        "description": [
-          "sotp track domain-state-signals コマンドで評価・書き戻し。",
-          "sotp verify spec-states に red==0 gate + Stage 1 前提条件を追加。"
-        ],
-        "task_ids": ["T005", "T007"]
-      },
-      {
-        "id": "S4",
-        "title": "レンダリング",
-        "description": [
-          "spec.md Domain States テーブルに Signal + Transitions 列を追加。",
-          "plan.md に Stage 1 + Stage 2 信号サマリーを表示。"
-        ],
-        "task_ids": ["T006", "T008"]
-      }
     ]
   },
   "review": {
-    "status": "not_started",
-    "code_hash": null,
-    "groups": {}
-  }
+    "groups": {},
+    "status": "not_started"
+  },
+  "schema_version": 3,
+  "status": "in_progress",
+  "tasks": [
+    {
+      "description": "Domain 型拡張: DomainStateEntry に transitions_to 追加 + DomainStateSignal per-state 型",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "spec.json codec 拡張: transitions_to + domain_state_signals フィールド + 参照整合性検証",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "Domain コードスキャナー (syn AST): 型名検出 + 遷移関数検出 (Result/Option アンラップ対応)",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "Per-state 信号評価ロジック: 型存在 × 遷移関数存在 × 終端/未宣言区別 → Blue/Yellow/Red",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "sotp track domain-state-signals CLI: 評価 → spec.json domain_state_signals 書き戻し",
+      "id": "T005",
+      "status": "in_progress"
+    },
+    {
+      "description": "render_spec() 拡張: Domain States テーブルに Signal + Transitions 列追加",
+      "id": "T006",
+      "status": "in_progress"
+    },
+    {
+      "description": "sotp verify spec-states 拡張: red==0 gate + Stage 1 前提条件チェック (spec signals red==0)",
+      "id": "T007",
+      "status": "in_progress"
+    },
+    {
+      "description": "plan.md 信号サマリー: Stage 1 + Stage 2 集計表示を render_plan に追加",
+      "id": "T008",
+      "status": "in_progress"
+    }
+  ],
+  "title": "SPEC-05 Domain States 信号機 Stage 2 — per-state signal + 遷移関数検証",
+  "updated_at": "2026-03-23T12:39:37Z"
 }

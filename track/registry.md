@@ -15,7 +15,7 @@
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| domain-state-signals-2026-03-23 | planned | `/track:implement` | 2026-03-23 |
+| domain-state-signals-2026-03-23 | in_progress | `/track:implement` | 2026-03-23 |
 
 ## Completed Tracks
 

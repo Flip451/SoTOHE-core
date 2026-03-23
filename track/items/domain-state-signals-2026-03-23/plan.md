@@ -17,8 +17,8 @@ DomainStateEntry に transitions_to (Option<Vec<String>>) を追加。
 spec.json codec に domain_state_signals フィールドを追加。
 transitions_to の参照先が domain_states に存在しない場合は検証エラー。
 
-- [ ] Domain 型拡張: DomainStateEntry に transitions_to 追加 + DomainStateSignal per-state 型
-- [ ] spec.json codec 拡張: transitions_to + domain_state_signals フィールド + 参照整合性検証
+- [x] Domain 型拡張: DomainStateEntry に transitions_to 追加 + DomainStateSignal per-state 型
+- [x] spec.json codec 拡張: transitions_to + domain_state_signals フィールド + 参照整合性検証
 
 ## Domain コードスキャナー + 信号評価
 
@@ -26,21 +26,21 @@ syn AST で libs/domain/src/ をスキャン。型名検出 + 遷移関数検出
 Result<T, E> / Option<T> のアンラップで遷移先を判定。
 終端状態 (transitions_to: []) は型存在のみで Blue。
 
-- [ ] Domain コードスキャナー (syn AST): 型名検出 + 遷移関数検出 (Result/Option アンラップ対応)
-- [ ] Per-state 信号評価ロジック: 型存在 × 遷移関数存在 × 終端/未宣言区別 → Blue/Yellow/Red
+- [x] Domain コードスキャナー (syn AST): 型名検出 + 遷移関数検出 (Result/Option アンラップ対応)
+- [x] Per-state 信号評価ロジック: 型存在 × 遷移関数存在 × 終端/未宣言区別 → Blue/Yellow/Red
 
 ## CLI + Verifier
 
 sotp track domain-state-signals コマンドで評価・書き戻し。
 sotp verify spec-states に red==0 gate + Stage 1 前提条件を追加。
 
-- [ ] sotp track domain-state-signals CLI: 評価 → spec.json domain_state_signals 書き戻し
-- [ ] sotp verify spec-states 拡張: red==0 gate + Stage 1 前提条件チェック (spec signals red==0)
+- [~] sotp track domain-state-signals CLI: 評価 → spec.json domain_state_signals 書き戻し
+- [~] sotp verify spec-states 拡張: red==0 gate + Stage 1 前提条件チェック (spec signals red==0)
 
 ## レンダリング
 
 spec.md Domain States テーブルに Signal + Transitions 列を追加。
 plan.md に Stage 1 + Stage 2 信号サマリーを表示。
 
-- [ ] render_spec() 拡張: Domain States テーブルに Signal + Transitions 列追加
-- [ ] plan.md 信号サマリー: Stage 1 + Stage 2 集計表示を render_plan に追加
+- [~] render_spec() 拡張: Domain States テーブルに Signal + Transitions 列追加
+- [~] plan.md 信号サマリー: Stage 1 + Stage 2 集計表示を render_plan に追加

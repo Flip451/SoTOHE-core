@@ -15,6 +15,7 @@ use infrastructure::track::render;
 use usecase::track_activation::{ActivateTrackOutcome, ActivateTrackUseCase};
 
 mod activate;
+mod domain_state_signals;
 mod resolve;
 mod signals;
 mod state_ops;
@@ -169,6 +170,20 @@ pub enum TrackCommand {
         /// Track ID (directory name under items_dir).
         track_id: String,
     },
+
+    /// Evaluate domain state signals by scanning domain code and store results in spec.json.
+    DomainStateSignals {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        track_id: String,
+
+        /// Path to the domain source directory to scan (relative to cwd).
+        #[arg(long, default_value = "libs/domain/src")]
+        domain_dir: PathBuf,
+    },
 }
 
 #[derive(Debug, Subcommand)]
@@ -290,6 +305,9 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         }
         TrackCommand::Signals { items_dir, track_id } => {
             signals::execute_signals(items_dir, track_id)
+        }
+        TrackCommand::DomainStateSignals { items_dir, track_id, domain_dir } => {
+            domain_state_signals::execute_domain_state_signals(items_dir, track_id, domain_dir)
         }
     };
     match result {

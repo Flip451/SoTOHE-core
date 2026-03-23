@@ -3,8 +3,8 @@
 //! Mirrors the pattern of `crate::track::codec` but for the spec document schema.
 
 use domain::{
-    DomainStateEntry, SignalCounts, SpecDocument, SpecRequirement, SpecScope, SpecSection,
-    SpecValidationError,
+    ConfidenceSignal, DomainStateEntry, DomainStateSignal, SignalCounts, SpecDocument,
+    SpecRequirement, SpecScope, SpecSection, SpecValidationError,
 };
 use serde::{Deserialize, Serialize};
 
@@ -23,6 +23,12 @@ pub enum SpecCodecError {
 
     #[error("unsupported schema_version: expected 1, got {0}")]
     UnsupportedSchemaVersion(u32),
+
+    #[error("domain state '{state}' has transition to unknown state '{target}'")]
+    InvalidTransitionTarget { state: String, target: String },
+
+    #[error("unknown signal string '{0}': expected 'blue', 'yellow', or 'red'")]
+    InvalidSignalString(String),
 }
 
 // ---------------------------------------------------------------------------
@@ -51,6 +57,8 @@ struct SpecDocumentDto {
     pub related_conventions: Vec<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub signals: Option<SignalCountsDto>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub domain_state_signals: Option<Vec<DomainStateSignalDto>>,
 }
 
 /// DTO for a single requirement (text + provenance sources).
@@ -67,6 +75,8 @@ struct DomainStateEntryDto {
     pub name: String,
     #[serde(default)]
     pub description: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub transitions_to: Option<Vec<String>>,
 }
 
 /// DTO for the scope section.
@@ -92,6 +102,19 @@ struct SignalCountsDto {
     pub blue: u32,
     pub yellow: u32,
     pub red: u32,
+}
+
+/// DTO for a per-state domain signal evaluation result.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct DomainStateSignalDto {
+    pub state_name: String,
+    /// Signal level string: "blue", "yellow", or "red".
+    pub signal: String,
+    pub found_type: bool,
+    #[serde(default)]
+    pub found_transitions: Vec<String>,
+    #[serde(default)]
+    pub missing_transitions: Vec<String>,
 }
 
 // ---------------------------------------------------------------------------
@@ -130,6 +153,24 @@ pub fn decode(json: &str) -> Result<SpecDocument, SpecCodecError> {
     let domain_states =
         dto.domain_states.into_iter().map(domain_state_from_dto).collect::<Result<Vec<_>, _>>()?;
 
+    // Reference integrity: every transitions_to target must name an existing domain state.
+    {
+        use std::collections::HashSet;
+        let state_names: HashSet<&str> = domain_states.iter().map(|s| s.name()).collect();
+        for state in &domain_states {
+            if let Some(targets) = state.transitions_to() {
+                for target in targets {
+                    if !state_names.contains(target.as_str()) {
+                        return Err(SpecCodecError::InvalidTransitionTarget {
+                            state: state.name().to_owned(),
+                            target: target.clone(),
+                        });
+                    }
+                }
+            }
+        }
+    }
+
     let acceptance_criteria = dto
         .acceptance_criteria
         .into_iter()
@@ -140,6 +181,13 @@ pub fn decode(json: &str) -> Result<SpecDocument, SpecCodecError> {
         dto.additional_sections.into_iter().map(section_from_dto).collect::<Result<Vec<_>, _>>()?;
 
     let signals = dto.signals.map(signal_counts_from_dto);
+
+    let domain_state_signals = dto
+        .domain_state_signals
+        .map(|dtos| {
+            dtos.into_iter().map(domain_state_signal_from_dto).collect::<Result<Vec<_>, _>>()
+        })
+        .transpose()?;
 
     let doc = SpecDocument::new(
         dto.title,
@@ -153,6 +201,7 @@ pub fn decode(json: &str) -> Result<SpecDocument, SpecCodecError> {
         additional_sections,
         dto.related_conventions,
         signals,
+        domain_state_signals,
     )?;
 
     Ok(doc)
@@ -165,7 +214,7 @@ fn requirement_from_dto(dto: SpecRequirementDto) -> Result<SpecRequirement, Spec
 fn domain_state_from_dto(
     dto: DomainStateEntryDto,
 ) -> Result<DomainStateEntry, SpecValidationError> {
-    DomainStateEntry::new(dto.name, dto.description)
+    DomainStateEntry::new(dto.name, dto.description, dto.transitions_to)
 }
 
 fn section_from_dto(dto: SpecSectionDto) -> Result<SpecSection, SpecValidationError> {
@@ -174,6 +223,48 @@ fn section_from_dto(dto: SpecSectionDto) -> Result<SpecSection, SpecValidationEr
 
 fn signal_counts_from_dto(dto: SignalCountsDto) -> SignalCounts {
     SignalCounts::new(dto.blue, dto.yellow, dto.red)
+}
+
+fn confidence_signal_from_str(s: &str) -> Result<ConfidenceSignal, SpecCodecError> {
+    match s {
+        "blue" => Ok(ConfidenceSignal::Blue),
+        "yellow" => Ok(ConfidenceSignal::Yellow),
+        "red" => Ok(ConfidenceSignal::Red),
+        other => Err(SpecCodecError::InvalidSignalString(other.to_owned())),
+    }
+}
+
+fn confidence_signal_to_str(signal: ConfidenceSignal) -> &'static str {
+    match signal {
+        ConfidenceSignal::Blue => "blue",
+        ConfidenceSignal::Yellow => "yellow",
+        ConfidenceSignal::Red => "red",
+        // ConfidenceSignal is #[non_exhaustive]; future variants fall back to "red" (safe side).
+        _ => "red",
+    }
+}
+
+fn domain_state_signal_from_dto(
+    dto: DomainStateSignalDto,
+) -> Result<DomainStateSignal, SpecCodecError> {
+    let signal = confidence_signal_from_str(&dto.signal)?;
+    Ok(DomainStateSignal::new(
+        dto.state_name,
+        signal,
+        dto.found_type,
+        dto.found_transitions,
+        dto.missing_transitions,
+    ))
+}
+
+fn domain_state_signal_to_dto(sig: &DomainStateSignal) -> DomainStateSignalDto {
+    DomainStateSignalDto {
+        state_name: sig.state_name().to_owned(),
+        signal: confidence_signal_to_str(sig.signal()).to_owned(),
+        found_type: sig.found_type(),
+        found_transitions: sig.found_transitions().to_vec(),
+        missing_transitions: sig.missing_transitions().to_vec(),
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -207,6 +298,9 @@ fn spec_document_to_dto(doc: &SpecDocument) -> SpecDocumentDto {
         additional_sections: doc.additional_sections().iter().map(section_to_dto).collect(),
         related_conventions: doc.related_conventions().to_vec(),
         signals: doc.signals().map(signal_counts_to_dto),
+        domain_state_signals: doc
+            .domain_state_signals()
+            .map(|sigs| sigs.iter().map(domain_state_signal_to_dto).collect()),
     }
 }
 
@@ -218,6 +312,7 @@ fn domain_state_to_dto(entry: &DomainStateEntry) -> DomainStateEntryDto {
     DomainStateEntryDto {
         name: entry.name().to_owned(),
         description: entry.description().to_owned(),
+        transitions_to: entry.transitions_to().map(|v| v.to_vec()),
     }
 }
 
@@ -459,6 +554,7 @@ mod tests {
             vec![],
             vec![],
             None,
+            None,
         )
         .unwrap();
 
@@ -484,6 +580,7 @@ mod tests {
             vec![],
             vec![],
             None,
+            None,
         )
         .unwrap();
         let json = encode(&doc).unwrap();
@@ -505,6 +602,7 @@ mod tests {
             vec![],
             vec![],
             Some(SignalCounts::new(5, 2, 1)),
+            None,
         )
         .unwrap();
         let json = encode(&doc).unwrap();
@@ -528,6 +626,7 @@ mod tests {
             vec![],
             vec![],
             None,
+            None,
         )
         .unwrap();
         let json = encode(&doc).unwrap();
@@ -548,6 +647,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            None,
             None,
         )
         .unwrap();
@@ -657,5 +757,221 @@ mod tests {
         let json = encode(&doc).unwrap();
         let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
         assert_eq!(parsed["schema_version"], 1);
+    }
+
+    // --- transitions_to round-trip ---
+
+    #[test]
+    fn test_round_trip_transitions_to_with_targets() {
+        let json = r#"{
+          "schema_version": 1, "status": "active", "version": "1.0", "title": "Transitions Test",
+          "scope": {"in_scope": [], "out_of_scope": []},
+          "domain_states": [
+            {"name": "Draft", "description": "Initial", "transitions_to": ["Published", "Archived"]},
+            {"name": "Published", "description": "Live", "transitions_to": []},
+            {"name": "Archived", "description": "Final", "transitions_to": []}
+          ]
+        }"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        let states = doc2.domain_states();
+        assert_eq!(
+            states[0].transitions_to(),
+            Some(["Published".to_string(), "Archived".to_string()].as_slice())
+        );
+        assert_eq!(states[1].transitions_to(), Some([].as_slice()));
+        assert_eq!(states[2].transitions_to(), Some([].as_slice()));
+    }
+
+    #[test]
+    fn test_decode_transitions_to_empty_array_maps_to_some_empty_vec() {
+        let json = r#"{
+          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "scope": {"in_scope": [], "out_of_scope": []},
+          "domain_states": [{"name": "Final", "description": "Terminal", "transitions_to": []}]
+        }"#;
+        let doc = decode(json).unwrap();
+        assert_eq!(doc.domain_states()[0].transitions_to(), Some([].as_slice()));
+    }
+
+    #[test]
+    fn test_decode_transitions_to_absent_maps_to_none() {
+        let json = r#"{
+          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "scope": {"in_scope": [], "out_of_scope": []},
+          "domain_states": [{"name": "Draft", "description": "desc"}]
+        }"#;
+        let doc = decode(json).unwrap();
+        assert_eq!(doc.domain_states()[0].transitions_to(), None);
+    }
+
+    #[test]
+    fn test_decode_invalid_transition_target_returns_error() {
+        // "Draft" references "NonExistent" which is not in domain_states list
+        let json = r#"{
+          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "scope": {"in_scope": [], "out_of_scope": []},
+          "domain_states": [
+            {"name": "Draft", "description": "desc", "transitions_to": ["NonExistent"]}
+          ]
+        }"#;
+        let err = decode(json).unwrap_err();
+        assert!(matches!(err, SpecCodecError::InvalidTransitionTarget { .. }));
+    }
+
+    #[test]
+    fn test_decode_valid_self_referencing_transition_is_allowed() {
+        // A state may reference another valid state name in transitions_to
+        let json = r#"{
+          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "scope": {"in_scope": [], "out_of_scope": []},
+          "domain_states": [
+            {"name": "Pending", "description": "desc", "transitions_to": ["Active"]},
+            {"name": "Active", "description": "desc", "transitions_to": []}
+          ]
+        }"#;
+        let doc = decode(json).unwrap();
+        assert_eq!(doc.domain_states().len(), 2);
+    }
+
+    // --- domain_state_signals round-trip ---
+
+    #[test]
+    fn test_round_trip_domain_state_signals() {
+        use domain::{ConfidenceSignal, DomainStateSignal};
+        let doc = SpecDocument::new(
+            "Signals Test",
+            "active",
+            "1.0",
+            vec![],
+            SpecScope::new(vec![], vec![]),
+            vec![],
+            vec![
+                DomainStateEntry::new("Draft", "Initial", Some(vec!["Published".into()])).unwrap(),
+                DomainStateEntry::new("Published", "Live", Some(vec![])).unwrap(),
+            ],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            Some(vec![
+                DomainStateSignal::new(
+                    "Draft",
+                    ConfidenceSignal::Yellow,
+                    true,
+                    vec![],
+                    vec!["Published".into()],
+                ),
+                DomainStateSignal::new("Published", ConfidenceSignal::Blue, true, vec![], vec![]),
+            ]),
+        )
+        .unwrap();
+
+        let json = encode(&doc).unwrap();
+        let doc2 = decode(&json).unwrap();
+        let signals =
+            doc2.domain_state_signals().expect("signals must be present after round-trip");
+        assert_eq!(signals.len(), 2);
+        assert_eq!(signals[0].state_name(), "Draft");
+        assert_eq!(signals[0].signal(), ConfidenceSignal::Yellow);
+        assert!(signals[0].found_type());
+        assert!(signals[0].found_transitions().is_empty());
+        assert_eq!(signals[0].missing_transitions(), &["Published"]);
+        assert_eq!(signals[1].state_name(), "Published");
+        assert_eq!(signals[1].signal(), ConfidenceSignal::Blue);
+        assert!(signals[1].found_transitions().is_empty());
+    }
+
+    #[test]
+    fn test_decode_domain_state_signals_absent_gives_none() {
+        let doc = decode(MINIMAL_JSON).unwrap();
+        assert!(doc.domain_state_signals().is_none());
+    }
+
+    #[test]
+    fn test_encode_omits_domain_state_signals_when_none() {
+        let doc = decode(MINIMAL_JSON).unwrap();
+        let json = encode(&doc).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert!(parsed.get("domain_state_signals").is_none());
+    }
+
+    // --- signal string mapping ---
+
+    #[test]
+    fn test_decode_domain_state_signals_blue_mapping() {
+        use domain::ConfidenceSignal;
+        let json = r#"{
+          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "scope": {"in_scope": [], "out_of_scope": []},
+          "domain_state_signals": [
+            {"state_name": "S", "signal": "blue", "found_type": true}
+          ]
+        }"#;
+        let doc = decode(json).unwrap();
+        let sigs = doc.domain_state_signals().unwrap();
+        assert_eq!(sigs[0].signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_decode_domain_state_signals_yellow_mapping() {
+        use domain::ConfidenceSignal;
+        let json = r#"{
+          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "scope": {"in_scope": [], "out_of_scope": []},
+          "domain_state_signals": [
+            {"state_name": "S", "signal": "yellow", "found_type": false}
+          ]
+        }"#;
+        let doc = decode(json).unwrap();
+        let sigs = doc.domain_state_signals().unwrap();
+        assert_eq!(sigs[0].signal(), ConfidenceSignal::Yellow);
+    }
+
+    #[test]
+    fn test_decode_domain_state_signals_red_mapping() {
+        use domain::ConfidenceSignal;
+        let json = r#"{
+          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "scope": {"in_scope": [], "out_of_scope": []},
+          "domain_state_signals": [
+            {"state_name": "S", "signal": "red", "found_type": false}
+          ]
+        }"#;
+        let doc = decode(json).unwrap();
+        let sigs = doc.domain_state_signals().unwrap();
+        assert_eq!(sigs[0].signal(), ConfidenceSignal::Red);
+    }
+
+    #[test]
+    fn test_decode_domain_state_signals_unknown_signal_returns_error() {
+        let json = r#"{
+          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "scope": {"in_scope": [], "out_of_scope": []},
+          "domain_state_signals": [
+            {"state_name": "S", "signal": "unknown", "found_type": false}
+          ]
+        }"#;
+        let err = decode(json).unwrap_err();
+        assert!(matches!(err, SpecCodecError::InvalidSignalString(_)));
+    }
+
+    #[test]
+    fn test_decode_domain_state_signals_default_transitions_empty() {
+        use domain::ConfidenceSignal;
+        // found_transitions and missing_transitions are #[serde(default)] — absence means empty vec
+        let json = r#"{
+          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "scope": {"in_scope": [], "out_of_scope": []},
+          "domain_state_signals": [
+            {"state_name": "X", "signal": "blue", "found_type": true}
+          ]
+        }"#;
+        let doc = decode(json).unwrap();
+        let sigs = doc.domain_state_signals().unwrap();
+        assert!(sigs[0].found_transitions().is_empty());
+        assert!(sigs[0].missing_transitions().is_empty());
+        assert_eq!(sigs[0].signal(), ConfidenceSignal::Blue);
     }
 }
