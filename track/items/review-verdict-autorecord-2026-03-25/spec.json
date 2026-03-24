@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0.0",
+  "title": "RVW-10/11 Review verdict auto-record + diff scope enforcement",
+  "goal": [
+    "レビュー verdict の改竄を構造的に防止し（RVW-10）、変更範囲外ファイルの finding を構造的に除外する（RVW-11）。",
+    "codex-local コマンドが verdict 抽出後にプロセス内で record-round を直接呼び出す --auto-record モードを追加し、オーケストレータを verdict→record パスから除外する。",
+    "diff ファイルリストで findings をフィルタし、正規化された repo-relative パスで exact match 比較を行う。正規化不能なパスは fail-closed で in-scope 扱いする。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "usecase 層に DiffScope, RepoRelativePath, DiffScopeProvider port, scope filtering 関数を追加",
+        "sources": ["knowledge/strategy/TODO.md §RVW-11", "Codex planner analysis 2026-03-25"],
+        "task_refs": ["T001"]
+      },
+      {
+        "text": "record_round_typed() — parsed domain 型を直接受け取る typed usecase エントリポイント追加",
+        "sources": ["Codex planner analysis 2026-03-25"],
+        "task_refs": ["T002"]
+      },
+      {
+        "text": "GitDiffScopeProvider infrastructure adapter (merge-base diff, renames, deletions, untracked files)",
+        "sources": ["Codex planner analysis 2026-03-25"],
+        "task_refs": ["T003"]
+      },
+      {
+        "text": "CodexLocalArgs 拡張: --auto-record, --track-id, --round-type, --group, --expected-groups, --items-dir, --diff-base",
+        "sources": ["knowledge/strategy/TODO.md §RVW-10"],
+        "task_refs": ["T004"]
+      },
+      {
+        "text": "auto-record 実行フロー: verdict 抽出 → scope filter → concerns 抽出 → record_round_typed 内部呼出",
+        "sources": ["knowledge/strategy/TODO.md §RVW-10", "feedback — verdict falsification incident 2026-03-24"],
+        "task_refs": ["T005"]
+      },
+      {
+        "text": "Makefile.toml + orchestrator command (review.md) の --auto-record --diff-base 対応",
+        "sources": ["inference — integration requirement"],
+        "task_refs": ["T006"]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "ReviewFinding / ReviewFinalPayload の domain 層移動（usecase 配置が正しいと確認済み）",
+        "sources": ["Codex planner analysis 2026-03-25"]
+      },
+      {
+        "text": "suffix match によるパス照合（monorepo で mod.rs, lib.rs 等が曖昧になるため不採用）",
+        "sources": ["Codex planner analysis 2026-03-25"]
+      },
+      {
+        "text": "review.json 分離 (RVW-03) — 別トラック",
+        "sources": ["knowledge/adr/2026-03-24-1200-review-state-trust-model.md"]
+      },
+      {
+        "text": "auto mode 統合 — 別フェーズ",
+        "sources": ["knowledge/strategy/TODO-PLAN.md §Phase 5"]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "新規ロジックは Rust で実装（Python 禁止）",
+      "sources": ["feedback — Rust-first policy"]
+    },
+    {
+      "text": "TDD: テストを先に書く (Red → Green → Refactor)",
+      "sources": ["convention — .claude/rules/05-testing.md"]
+    },
+    {
+      "text": "domain 層に serde を追加しない（既存規約維持）",
+      "sources": ["convention — libs/domain/src/review/types.rs L247"]
+    },
+    {
+      "text": "--auto-record 無効時は既存動作を完全保持（後方互換）",
+      "sources": ["inference — breaking change prevention"]
+    },
+    {
+      "text": "auto-record 引数は Codex サブプロセス起動前に検証（fail fast）",
+      "sources": ["Codex planner analysis 2026-03-25"]
+    }
+  ],
+  "domain_states": [
+    {
+      "name": "FindingScopeClass",
+      "description": "InScope | OutOfScope | UnknownPath — finding のスコープ分類結果"
+    },
+    {
+      "name": "DiffScope",
+      "description": "BTreeSet<RepoRelativePath> — diff に含まれるファイルパスの集合"
+    },
+    {
+      "name": "ScopeFilteredPayload",
+      "description": "adjusted_payload + out_of_scope + unknown_path_count — フィルタ適用後の分割結果"
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "sotp review codex-local --auto-record が verdict 抽出後に record-round を内部呼出しし、オーケストレータが verdict を経由しない",
+      "sources": ["knowledge/strategy/TODO.md §RVW-10"],
+      "task_refs": ["T004", "T005"]
+    },
+    {
+      "text": "変更範囲外ファイルの finding が out_of_scope として分離され、adjusted verdict が正しく計算される",
+      "sources": ["knowledge/strategy/TODO.md §RVW-11"],
+      "task_refs": ["T001"]
+    },
+    {
+      "text": "file: null の finding は in-scope として扱われる",
+      "sources": ["Codex planner analysis 2026-03-25"],
+      "task_refs": ["T001"]
+    },
+    {
+      "text": "正規化不能パスの finding は in-scope + unknown_path_count に計上される（fail-closed）",
+      "sources": ["Codex planner analysis 2026-03-25"],
+      "task_refs": ["T001"]
+    },
+    {
+      "text": "--auto-record なしの既存呼出が動作変更なく通る",
+      "sources": ["inference — backward compatibility"],
+      "task_refs": ["T004"]
+    },
+    {
+      "text": "escalation block 時に exit code 3 が返り、auto-record がスキップされる",
+      "sources": ["inference — escalation contract consistency with record-round"],
+      "task_refs": ["T005"]
+    },
+    {
+      "text": "各新規 public API (scope.rs, record_round_typed, GitDiffScopeProvider, auto-record flow) に TDD でハッピーパス + エラーケースのテストがある",
+      "sources": ["convention — .claude/rules/05-testing.md"],
+      "task_refs": ["T001", "T002", "T003", "T004", "T005"]
+    },
+    {
+      "text": "cargo make ci が通る",
+      "sources": ["convention — .claude/rules/07-dev-environment.md"],
+      "task_refs": ["T001", "T002", "T003", "T004", "T005", "T006"]
+    }
+  ],
+  "additional_sections": [],
+  "related_conventions": [
+    "project-docs/conventions/hexagonal-architecture.md",
+    "project-docs/conventions/source-attribution.md",
+    "project-docs/conventions/task-completion-flow.md"
+  ],
+  "signals": null
+}
