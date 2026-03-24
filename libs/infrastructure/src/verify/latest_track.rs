@@ -218,6 +218,13 @@ fn load_track_metadata(track_dir: &Path, root: &Path) -> Result<Option<TrackMeta
     let schema_version =
         obj.get("schema_version").and_then(|v| v.as_u64()).map(|v| v as u32).unwrap_or(2);
 
+    // Skip archived tracks early — before v3/timestamp validation so that
+    // malformed archived metadata does not block the verifier.
+    let status = obj.get("status").and_then(|v| v.as_str()).unwrap_or("").to_owned();
+    if status == "archived" {
+        return Ok(None);
+    }
+
     // v3 branch field validation.
     if v3_branch_field_missing(&data) {
         return Err(vec![Finding::error(format!(
@@ -258,13 +265,6 @@ fn load_track_metadata(track_dir: &Path, root: &Path) -> Result<Option<TrackMeta
             ))]);
         }
     };
-
-    let status = obj.get("status").and_then(|v| v.as_str()).unwrap_or("").to_owned();
-
-    // Skip archived tracks.
-    if status == "archived" {
-        return Ok(None);
-    }
 
     let branch = obj.get("branch").and_then(|v| v.as_str()).map(|s| s.to_owned());
 
@@ -681,7 +681,7 @@ fn validate_spec_json_file(path: &Path, root: &Path) -> Vec<Finding> {
     };
 
     // Collect ALL text-bearing strings from the document for placeholder scanning.
-    let mut all_texts: Vec<&str> = vec![doc.title(), doc.status(), doc.version()];
+    let mut all_texts: Vec<&str> = vec![doc.title(), doc.status().as_str(), doc.version()];
     all_texts.extend(doc.goal().iter().map(|s| s.as_str()));
     let all_reqs = doc
         .scope()

@@ -4,7 +4,7 @@
 
 use domain::{
     ConfidenceSignal, DomainStateEntry, DomainStateSignal, SignalCounts, SpecDocument,
-    SpecRequirement, SpecScope, SpecSection, SpecValidationError, TaskId,
+    SpecRequirement, SpecScope, SpecSection, SpecStatus, SpecValidationError, TaskId, Timestamp,
 };
 use serde::{Deserialize, Serialize};
 
@@ -62,6 +62,10 @@ struct SpecDocumentDto {
     pub signals: Option<SignalCountsDto>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub domain_state_signals: Option<Vec<DomainStateSignalDto>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub approved_at: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content_hash: Option<String>,
 }
 
 /// DTO for a single requirement (text + provenance sources + task references).
@@ -194,9 +198,21 @@ pub fn decode(json: &str) -> Result<SpecDocument, SpecCodecError> {
         })
         .transpose()?;
 
-    let doc = SpecDocument::new(
+    let status = status_from_str(&dto.status)?;
+
+    let approved_at = dto
+        .approved_at
+        .map(|s| {
+            Timestamp::new(s).map_err(|e| SpecCodecError::InvalidField {
+                field: "approved_at".into(),
+                reason: e.to_string(),
+            })
+        })
+        .transpose()?;
+
+    let mut doc = SpecDocument::new(
         dto.title,
-        dto.status,
+        status,
         dto.version,
         dto.goal,
         scope,
@@ -207,9 +223,31 @@ pub fn decode(json: &str) -> Result<SpecDocument, SpecCodecError> {
         dto.related_conventions,
         signals,
         domain_state_signals,
+        approved_at,
+        dto.content_hash,
     )?;
 
+    // Auto-demote: if status is Approved but content hash doesn't match, revert to Draft.
+    if doc.status() == SpecStatus::Approved {
+        let current_hash = compute_content_hash(&doc)?;
+        if !doc.is_approval_valid(&current_hash) {
+            doc.demote();
+        }
+    }
+
     Ok(doc)
+}
+
+/// Parses a status string into `SpecStatus`.
+fn status_from_str(s: &str) -> Result<SpecStatus, SpecCodecError> {
+    match s {
+        "draft" => Ok(SpecStatus::Draft),
+        "approved" => Ok(SpecStatus::Approved),
+        other => Err(SpecCodecError::InvalidField {
+            field: "status".into(),
+            reason: format!("unknown status '{other}': expected 'draft' or 'approved'"),
+        }),
+    }
 }
 
 fn requirement_from_dto(dto: SpecRequirementDto) -> Result<SpecRequirement, SpecCodecError> {
@@ -283,6 +321,79 @@ fn domain_state_signal_to_dto(sig: &DomainStateSignal) -> DomainStateSignalDto {
 }
 
 // ---------------------------------------------------------------------------
+// Content hash computation
+// ---------------------------------------------------------------------------
+
+/// Computes a SHA-256 content hash of the substantive fields of a spec document.
+///
+/// Hashed fields: title, version, goal, scope (in + out), constraints,
+/// domain_states, acceptance_criteria.
+/// Excluded: status, signals, domain_state_signals, additional_sections,
+/// related_conventions, approved_at, content_hash, task_refs (bookkeeping metadata).
+///
+/// # Errors
+///
+/// Returns `SpecCodecError::Json` if the DTO cannot be serialized (should not happen
+/// in practice since all fields are primitive/String types).
+pub fn compute_content_hash(doc: &SpecDocument) -> Result<String, SpecCodecError> {
+    use sha2::{Digest, Sha256};
+
+    let hashable = ContentHashDto {
+        title: doc.title().to_owned(),
+        version: doc.version().to_owned(),
+        goal: doc.goal().to_vec(),
+        scope: HashScopeDto {
+            in_scope: doc.scope().in_scope().iter().map(requirement_to_hash_dto).collect(),
+            out_of_scope: doc.scope().out_of_scope().iter().map(requirement_to_hash_dto).collect(),
+        },
+        constraints: doc.constraints().iter().map(requirement_to_hash_dto).collect(),
+        domain_states: doc.domain_states().iter().map(domain_state_to_dto).collect(),
+        acceptance_criteria: doc
+            .acceptance_criteria()
+            .iter()
+            .map(requirement_to_hash_dto)
+            .collect(),
+    };
+
+    // Deterministic JSON: serde_json serializes struct fields in declaration order.
+    let json = serde_json::to_string(&hashable)?;
+    let hash = Sha256::digest(json.as_bytes());
+    Ok(format!("sha256:{hash:x}"))
+}
+
+/// DTO for the subset of fields included in the content hash.
+/// Uses `HashRequirementDto` (text + sources only, no task_refs) to avoid
+/// bookkeeping changes from invalidating the approval hash.
+#[derive(Serialize)]
+struct ContentHashDto {
+    title: String,
+    version: String,
+    goal: Vec<String>,
+    scope: HashScopeDto,
+    constraints: Vec<HashRequirementDto>,
+    domain_states: Vec<DomainStateEntryDto>,
+    acceptance_criteria: Vec<HashRequirementDto>,
+}
+
+/// Scope DTO for content hash (uses HashRequirementDto).
+#[derive(Serialize)]
+struct HashScopeDto {
+    in_scope: Vec<HashRequirementDto>,
+    out_of_scope: Vec<HashRequirementDto>,
+}
+
+/// Requirement DTO for content hash — text + sources only, excludes task_refs.
+#[derive(Serialize)]
+struct HashRequirementDto {
+    text: String,
+    sources: Vec<String>,
+}
+
+fn requirement_to_hash_dto(req: &SpecRequirement) -> HashRequirementDto {
+    HashRequirementDto { text: req.text().to_owned(), sources: req.sources().to_vec() }
+}
+
+// ---------------------------------------------------------------------------
 // Encode: domain -> JSON
 // ---------------------------------------------------------------------------
 
@@ -299,7 +410,7 @@ pub fn encode(doc: &SpecDocument) -> Result<String, SpecCodecError> {
 fn spec_document_to_dto(doc: &SpecDocument) -> SpecDocumentDto {
     SpecDocumentDto {
         schema_version: 1,
-        status: doc.status().to_owned(),
+        status: doc.status().as_str().to_owned(),
         version: doc.version().to_owned(),
         title: doc.title().to_owned(),
         goal: doc.goal().to_vec(),
@@ -316,6 +427,8 @@ fn spec_document_to_dto(doc: &SpecDocument) -> SpecDocumentDto {
         domain_state_signals: doc
             .domain_state_signals()
             .map(|sigs| sigs.iter().map(domain_state_signal_to_dto).collect()),
+        approved_at: doc.approved_at().map(|ts| ts.as_str().to_owned()),
+        content_hash: doc.content_hash().map(|s| s.to_owned()),
     }
 }
 
@@ -389,7 +502,7 @@ mod tests {
     fn test_decode_minimal_json_succeeds() {
         let doc = decode(MINIMAL_JSON).unwrap();
         assert_eq!(doc.title(), "Feature Title");
-        assert_eq!(doc.status(), "draft");
+        assert_eq!(doc.status(), domain::SpecStatus::Draft);
         assert_eq!(doc.version(), "1.0");
         assert!(doc.goal().is_empty());
         assert!(doc.scope().in_scope().is_empty());
@@ -431,14 +544,14 @@ mod tests {
 
     #[test]
     fn test_decode_with_absent_goal_defaults_to_empty() {
-        let json = r#"{"schema_version":1,"status":"s","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let json = r#"{"schema_version":1,"status":"draft","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let doc = decode(json).unwrap();
         assert!(doc.goal().is_empty());
     }
 
     #[test]
     fn test_decode_with_null_signals_gives_none() {
-        let json = r#"{"schema_version":1,"status":"s","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":null}"#;
+        let json = r#"{"schema_version":1,"status":"draft","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":null}"#;
         // null is not the same as absent — serde(default) + skip_serializing_if handles absent,
         // but explicit null must also be tolerated. Using Option<> on the DTO absorbs null as None.
         let doc = decode(json).unwrap();
@@ -447,14 +560,14 @@ mod tests {
 
     #[test]
     fn test_decode_additional_sections_defaults_to_empty() {
-        let json = r#"{"schema_version":1,"status":"s","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let json = r#"{"schema_version":1,"status":"draft","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let doc = decode(json).unwrap();
         assert!(doc.additional_sections().is_empty());
     }
 
     #[test]
     fn test_decode_related_conventions_defaults_to_empty() {
-        let json = r#"{"schema_version":1,"status":"s","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let json = r#"{"schema_version":1,"status":"draft","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let doc = decode(json).unwrap();
         assert!(doc.related_conventions().is_empty());
     }
@@ -462,7 +575,7 @@ mod tests {
     #[test]
     fn test_decode_requirement_without_sources_defaults_to_empty() {
         let json = r#"{
-          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
           "scope": {
             "in_scope": [{"text": "needs req"}],
             "out_of_scope": []
@@ -476,14 +589,14 @@ mod tests {
 
     #[test]
     fn test_decode_with_unsupported_schema_version_returns_error() {
-        let json = r#"{"schema_version":2,"status":"s","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let json = r#"{"schema_version":2,"status":"draft","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let err = decode(json).unwrap_err();
         assert!(matches!(err, SpecCodecError::UnsupportedSchemaVersion(2)));
     }
 
     #[test]
     fn test_decode_with_schema_version_zero_returns_error() {
-        let json = r#"{"schema_version":0,"status":"s","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let json = r#"{"schema_version":0,"status":"draft","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let err = decode(json).unwrap_err();
         assert!(matches!(err, SpecCodecError::UnsupportedSchemaVersion(0)));
     }
@@ -492,21 +605,21 @@ mod tests {
 
     #[test]
     fn test_decode_with_empty_title_returns_validation_error() {
-        let json = r#"{"schema_version":1,"status":"s","version":"1","title":"","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let json = r#"{"schema_version":1,"status":"draft","version":"1","title":"","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let err = decode(json).unwrap_err();
         assert!(matches!(err, SpecCodecError::Validation(SpecValidationError::EmptyTitle)));
     }
 
     #[test]
-    fn test_decode_with_empty_status_returns_validation_error() {
+    fn test_decode_with_empty_status_returns_invalid_field_error() {
         let json = r#"{"schema_version":1,"status":"","version":"1","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let err = decode(json).unwrap_err();
-        assert!(matches!(err, SpecCodecError::Validation(SpecValidationError::EmptyStatus)));
+        assert!(matches!(err, SpecCodecError::InvalidField { .. }));
     }
 
     #[test]
     fn test_decode_with_empty_version_returns_validation_error() {
-        let json = r#"{"schema_version":1,"status":"s","version":"","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let json = r#"{"schema_version":1,"status":"draft","version":"","title":"T","scope":{"in_scope":[],"out_of_scope":[]}}"#;
         let err = decode(json).unwrap_err();
         assert!(matches!(err, SpecCodecError::Validation(SpecValidationError::EmptyVersion)));
     }
@@ -514,7 +627,7 @@ mod tests {
     #[test]
     fn test_decode_with_empty_requirement_text_returns_validation_error() {
         let json = r#"{
-          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
           "scope": {"in_scope": [{"text": ""}], "out_of_scope": []}
         }"#;
         let err = decode(json).unwrap_err();
@@ -527,7 +640,7 @@ mod tests {
     #[test]
     fn test_decode_with_empty_domain_state_name_returns_validation_error() {
         let json = r#"{
-          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
           "scope": {"in_scope": [], "out_of_scope": []},
           "domain_states": [{"name": "", "description": "desc"}]
         }"#;
@@ -541,7 +654,7 @@ mod tests {
     #[test]
     fn test_decode_with_empty_section_title_returns_validation_error() {
         let json = r#"{
-          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
           "scope": {"in_scope": [], "out_of_scope": []},
           "additional_sections": [{"title": "", "content": []}]
         }"#;
@@ -563,7 +676,7 @@ mod tests {
     fn test_encode_minimal_document_produces_valid_json() {
         let doc = SpecDocument::new(
             "T",
-            "draft",
+            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -572,6 +685,8 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )
@@ -589,7 +704,7 @@ mod tests {
     fn test_encode_omits_signals_when_none() {
         let doc = SpecDocument::new(
             "T",
-            "s",
+            domain::SpecStatus::Draft,
             "1",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -598,6 +713,8 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )
@@ -611,7 +728,7 @@ mod tests {
     fn test_encode_includes_signals_when_present() {
         let doc = SpecDocument::new(
             "T",
-            "s",
+            domain::SpecStatus::Draft,
             "1",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -621,6 +738,8 @@ mod tests {
             vec![],
             vec![],
             Some(SignalCounts::new(5, 2, 1)),
+            None,
+            None,
             None,
         )
         .unwrap();
@@ -635,7 +754,7 @@ mod tests {
     fn test_encode_omits_empty_additional_sections() {
         let doc = SpecDocument::new(
             "T",
-            "s",
+            domain::SpecStatus::Draft,
             "1",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -644,6 +763,8 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )
@@ -657,7 +778,7 @@ mod tests {
     fn test_encode_omits_empty_related_conventions() {
         let doc = SpecDocument::new(
             "T",
-            "s",
+            domain::SpecStatus::Draft,
             "1",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -666,6 +787,8 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )
@@ -704,7 +827,7 @@ mod tests {
     #[test]
     fn test_round_trip_domain_states() {
         let json = r#"{
-          "schema_version": 1, "status": "active", "version": "2.0", "title": "States Test",
+          "schema_version": 1, "status": "draft", "version": "2.0", "title": "States Test",
           "scope": {"in_scope": [], "out_of_scope": []},
           "domain_states": [
             {"name": "Draft", "description": "Initial"},
@@ -744,7 +867,7 @@ mod tests {
     #[test]
     fn test_round_trip_additional_sections() {
         let json = r#"{
-          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
           "scope": {"in_scope": [], "out_of_scope": []},
           "additional_sections": [
             {"title": "Sec A", "content": ["line 1", "line 2"]},
@@ -783,7 +906,7 @@ mod tests {
     #[test]
     fn test_round_trip_transitions_to_with_targets() {
         let json = r#"{
-          "schema_version": 1, "status": "active", "version": "1.0", "title": "Transitions Test",
+          "schema_version": 1, "status": "draft", "version": "1.0", "title": "Transitions Test",
           "scope": {"in_scope": [], "out_of_scope": []},
           "domain_states": [
             {"name": "Draft", "description": "Initial", "transitions_to": ["Published", "Archived"]},
@@ -806,7 +929,7 @@ mod tests {
     #[test]
     fn test_decode_transitions_to_empty_array_maps_to_some_empty_vec() {
         let json = r#"{
-          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
           "scope": {"in_scope": [], "out_of_scope": []},
           "domain_states": [{"name": "Final", "description": "Terminal", "transitions_to": []}]
         }"#;
@@ -817,7 +940,7 @@ mod tests {
     #[test]
     fn test_decode_transitions_to_absent_maps_to_none() {
         let json = r#"{
-          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
           "scope": {"in_scope": [], "out_of_scope": []},
           "domain_states": [{"name": "Draft", "description": "desc"}]
         }"#;
@@ -829,7 +952,7 @@ mod tests {
     fn test_decode_invalid_transition_target_returns_error() {
         // "Draft" references "NonExistent" which is not in domain_states list
         let json = r#"{
-          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
           "scope": {"in_scope": [], "out_of_scope": []},
           "domain_states": [
             {"name": "Draft", "description": "desc", "transitions_to": ["NonExistent"]}
@@ -843,7 +966,7 @@ mod tests {
     fn test_decode_valid_self_referencing_transition_is_allowed() {
         // A state may reference another valid state name in transitions_to
         let json = r#"{
-          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
           "scope": {"in_scope": [], "out_of_scope": []},
           "domain_states": [
             {"name": "Pending", "description": "desc", "transitions_to": ["Active"]},
@@ -861,7 +984,7 @@ mod tests {
         use domain::{ConfidenceSignal, DomainStateSignal};
         let doc = SpecDocument::new(
             "Signals Test",
-            "active",
+            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -884,6 +1007,8 @@ mod tests {
                 ),
                 DomainStateSignal::new("Published", ConfidenceSignal::Blue, true, vec![], vec![]),
             ]),
+            None,
+            None,
         )
         .unwrap();
 
@@ -922,7 +1047,7 @@ mod tests {
     fn test_decode_domain_state_signals_blue_mapping() {
         use domain::ConfidenceSignal;
         let json = r#"{
-          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
           "scope": {"in_scope": [], "out_of_scope": []},
           "domain_state_signals": [
             {"state_name": "S", "signal": "blue", "found_type": true}
@@ -937,7 +1062,7 @@ mod tests {
     fn test_decode_domain_state_signals_yellow_mapping() {
         use domain::ConfidenceSignal;
         let json = r#"{
-          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
           "scope": {"in_scope": [], "out_of_scope": []},
           "domain_state_signals": [
             {"state_name": "S", "signal": "yellow", "found_type": false}
@@ -952,7 +1077,7 @@ mod tests {
     fn test_decode_domain_state_signals_red_mapping() {
         use domain::ConfidenceSignal;
         let json = r#"{
-          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
           "scope": {"in_scope": [], "out_of_scope": []},
           "domain_state_signals": [
             {"state_name": "S", "signal": "red", "found_type": false}
@@ -966,7 +1091,7 @@ mod tests {
     #[test]
     fn test_decode_domain_state_signals_unknown_signal_returns_error() {
         let json = r#"{
-          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
           "scope": {"in_scope": [], "out_of_scope": []},
           "domain_state_signals": [
             {"state_name": "S", "signal": "unknown", "found_type": false}
@@ -981,7 +1106,7 @@ mod tests {
         use domain::ConfidenceSignal;
         // found_transitions and missing_transitions are #[serde(default)] — absence means empty vec
         let json = r#"{
-          "schema_version": 1, "status": "s", "version": "1", "title": "T",
+          "schema_version": 1, "status": "draft", "version": "1", "title": "T",
           "scope": {"in_scope": [], "out_of_scope": []},
           "domain_state_signals": [
             {"state_name": "X", "signal": "blue", "found_type": true}
@@ -1073,5 +1198,70 @@ mod tests {
         let encoded = encode(&doc).unwrap();
         // task_refs should not appear in output when empty (skip_serializing_if)
         assert!(!encoded.contains("task_refs"));
+    }
+
+    // --- content hash + approval round-trip ---
+
+    #[test]
+    fn test_content_hash_is_deterministic() {
+        let doc = decode(MINIMAL_JSON).unwrap();
+        let h1 = compute_content_hash(&doc).unwrap();
+        let h2 = compute_content_hash(&doc).unwrap();
+        assert_eq!(h1, h2);
+        assert!(h1.starts_with("sha256:"));
+    }
+
+    #[test]
+    fn test_content_hash_ignores_task_refs_changes() {
+        let without_refs = r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[{"text":"item","sources":["PRD"]}],"out_of_scope":[]}}"#;
+        let with_refs = r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[{"text":"item","sources":["PRD"],"task_refs":["T001","T002"]}],"out_of_scope":[]}}"#;
+        let h1 = compute_content_hash(&decode(without_refs).unwrap()).unwrap();
+        let h2 = compute_content_hash(&decode(with_refs).unwrap()).unwrap();
+        assert_eq!(h1, h2, "task_refs should not affect content hash");
+    }
+
+    #[test]
+    fn test_content_hash_changes_when_goal_changes() {
+        let json1 = r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","goal":["A"],"scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let json2 = r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","goal":["B"],"scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let h1 = compute_content_hash(&decode(json1).unwrap()).unwrap();
+        let h2 = compute_content_hash(&decode(json2).unwrap()).unwrap();
+        assert_ne!(h1, h2);
+    }
+
+    #[test]
+    fn test_approval_round_trip() {
+        let mut doc = decode(MINIMAL_JSON).unwrap();
+        let hash = compute_content_hash(&doc).unwrap();
+        let ts = domain::Timestamp::new("2026-03-24T10:00:00Z").unwrap();
+        doc.approve(ts, hash.clone()).unwrap();
+
+        let json = encode(&doc).unwrap();
+        let reloaded = decode(&json).unwrap();
+
+        assert_eq!(reloaded.status(), domain::SpecStatus::Approved);
+        assert!(reloaded.approved_at().is_some());
+        assert_eq!(reloaded.content_hash(), Some(hash.as_str()));
+        assert!(reloaded.is_approval_valid(&hash));
+    }
+
+    #[test]
+    fn test_effective_status_draft_after_content_change() {
+        let mut doc = decode(MINIMAL_JSON).unwrap();
+        let hash = compute_content_hash(&doc).unwrap();
+        let ts = domain::Timestamp::new("2026-03-24T10:00:00Z").unwrap();
+        doc.approve(ts, hash).unwrap();
+
+        // Simulate content change: decode a modified spec with stale content_hash.
+        // decode() auto-demotes when hash doesn't match.
+        let modified = r#"{"schema_version":1,"status":"approved","version":"1.0","title":"Feature Title CHANGED","approved_at":"2026-03-24T10:00:00Z","content_hash":"sha256:old","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let reloaded = decode(modified).unwrap();
+
+        assert_eq!(
+            reloaded.status(),
+            domain::SpecStatus::Draft,
+            "decode should auto-demote when content hash mismatches"
+        );
+        assert!(reloaded.approved_at().is_none(), "auto-demote should clear approved_at");
     }
 }

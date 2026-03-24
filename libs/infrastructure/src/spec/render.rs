@@ -69,6 +69,9 @@ pub fn render_spec(doc: &SpecDocument) -> String {
     // YAML frontmatter
     out.push_str("---\n");
     out.push_str(&format!("status: {}\n", doc.status()));
+    if let Some(ts) = doc.approved_at() {
+        out.push_str(&format!("approved_at: \"{}\"\n", ts));
+    }
     out.push_str(&format!("version: \"{}\"\n", doc.version()));
     if let Some(signals) = doc.signals() {
         out.push_str(&format!(
@@ -365,7 +368,7 @@ mod tests {
     fn make_minimal_doc() -> SpecDocument {
         SpecDocument::new(
             "Feature X",
-            "draft",
+            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -376,6 +379,8 @@ mod tests {
             vec![],
             None,
             None,
+            None,
+            None,
         )
         .unwrap()
     }
@@ -383,7 +388,7 @@ mod tests {
     fn make_full_doc() -> SpecDocument {
         SpecDocument::new(
             "Feature Title",
-            "draft",
+            domain::SpecStatus::Draft,
             "1.0",
             vec!["Goal paragraph line 1".into()],
             SpecScope::new(
@@ -398,6 +403,8 @@ mod tests {
             ],
             vec!["project-docs/conventions/source-attribution.md".into()],
             Some(SignalCounts::new(15, 0, 0)),
+            None,
+            None,
             None,
         )
         .unwrap()
@@ -481,7 +488,7 @@ mod tests {
     fn test_render_spec_goal_multiple_lines_each_on_own_line() {
         let doc = SpecDocument::new(
             "F",
-            "draft",
+            domain::SpecStatus::Draft,
             "1.0",
             vec!["Line A".into(), "Line B".into()],
             SpecScope::new(vec![], vec![]),
@@ -490,6 +497,8 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )
@@ -536,7 +545,7 @@ mod tests {
     fn test_render_spec_requirement_with_no_sources_has_no_source_tag() {
         let doc = SpecDocument::new(
             "F",
-            "draft",
+            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![req("bare item", &[])], vec![]),
@@ -545,6 +554,8 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )
@@ -558,7 +569,7 @@ mod tests {
     fn test_render_spec_requirement_with_multiple_sources_joined_by_comma() {
         let doc = SpecDocument::new(
             "F",
-            "draft",
+            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![req("multi", &["PRD §1", "discussion"])], vec![]),
@@ -567,6 +578,8 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )
@@ -619,7 +632,7 @@ mod tests {
     fn test_render_spec_domain_states_multiple_rows() {
         let doc = SpecDocument::new(
             "F",
-            "draft",
+            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -631,6 +644,8 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )
@@ -656,7 +671,7 @@ mod tests {
     fn test_render_spec_acceptance_criteria_no_source_has_no_tag() {
         let doc = SpecDocument::new(
             "F",
-            "draft",
+            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -665,6 +680,8 @@ mod tests {
             vec![req("plain AC", &[])],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )
@@ -707,7 +724,7 @@ mod tests {
     fn test_render_spec_multiple_additional_sections_all_rendered() {
         let doc = SpecDocument::new(
             "F",
-            "draft",
+            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -719,6 +736,8 @@ mod tests {
                 SpecSection::new("Beta", vec!["line beta".into()]).unwrap(),
             ],
             vec![],
+            None,
+            None,
             None,
             None,
         )
@@ -890,7 +909,7 @@ version: \"1.0\"
     ) -> SpecDocument {
         let mut doc = SpecDocument::new(
             "Feature S",
-            "draft",
+            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -899,6 +918,8 @@ version: \"1.0\"
             vec![],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )
@@ -912,7 +933,7 @@ version: \"1.0\"
         // When domain_state_signals is None, keep 2-column table
         let doc = SpecDocument::new(
             "F",
-            "draft",
+            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -921,6 +942,8 @@ version: \"1.0\"
             vec![],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )
@@ -1101,7 +1124,7 @@ version: \"1.0\"
     fn make_doc_no_signals() -> SpecDocument {
         SpecDocument::new(
             "Feature X",
-            "draft",
+            domain::SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -1110,6 +1133,8 @@ version: \"1.0\"
             vec![],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )

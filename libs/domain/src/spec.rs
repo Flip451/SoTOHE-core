@@ -4,8 +4,40 @@
 //! `spec.json` is the SSoT; `spec.md` is a read-only rendered view.
 
 use std::collections::{HashMap, HashSet};
+use std::fmt;
 
-use crate::{ConfidenceSignal, SignalCounts, TaskId, classify_source_tag};
+use crate::{ConfidenceSignal, SignalCounts, TaskId, Timestamp, classify_source_tag};
+
+// ---------------------------------------------------------------------------
+// SpecStatus enum
+// ---------------------------------------------------------------------------
+
+/// Approval status of a specification document.
+///
+/// - `Draft`: specification is being authored or was auto-demoted after content change.
+/// - `Approved`: explicitly approved; valid only while `content_hash` matches.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SpecStatus {
+    Draft,
+    Approved,
+}
+
+impl SpecStatus {
+    /// Returns the canonical string representation.
+    #[must_use]
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Draft => "draft",
+            Self::Approved => "approved",
+        }
+    }
+}
+
+impl fmt::Display for SpecStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
 
 // ---------------------------------------------------------------------------
 // Value objects
@@ -313,7 +345,7 @@ impl SpecSection {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SpecDocument {
     title: String,
-    status: String,
+    status: SpecStatus,
     version: String,
     goal: Vec<String>,
     scope: SpecScope,
@@ -324,6 +356,8 @@ pub struct SpecDocument {
     related_conventions: Vec<String>,
     signals: Option<SignalCounts>,
     domain_state_signals: Option<Vec<DomainStateSignal>>,
+    approved_at: Option<Timestamp>,
+    content_hash: Option<String>,
 }
 
 impl SpecDocument {
@@ -331,11 +365,11 @@ impl SpecDocument {
     ///
     /// # Errors
     ///
-    /// Returns error if `title`, `status`, or `version` is empty.
+    /// Returns error if `title` or `version` is empty.
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         title: impl Into<String>,
-        status: impl Into<String>,
+        status: SpecStatus,
         version: impl Into<String>,
         goal: Vec<String>,
         scope: SpecScope,
@@ -346,19 +380,30 @@ impl SpecDocument {
         related_conventions: Vec<String>,
         signals: Option<SignalCounts>,
         domain_state_signals: Option<Vec<DomainStateSignal>>,
+        approved_at: Option<Timestamp>,
+        content_hash: Option<String>,
     ) -> Result<Self, SpecValidationError> {
         let title = title.into();
-        let status = status.into();
         let version = version.into();
         if title.trim().is_empty() {
             return Err(SpecValidationError::EmptyTitle);
         }
-        if status.trim().is_empty() {
-            return Err(SpecValidationError::EmptyStatus);
-        }
         if version.trim().is_empty() {
             return Err(SpecValidationError::EmptyVersion);
         }
+        // Enforce status/metadata invariant:
+        // - Draft must NOT carry approval metadata
+        // - Approved must have both approved_at and content_hash
+        let (approved_at, content_hash) = match status {
+            SpecStatus::Draft => (None, None),
+            SpecStatus::Approved => {
+                let hash = content_hash.as_deref().unwrap_or("");
+                if approved_at.is_none() || hash.trim().is_empty() {
+                    return Err(SpecValidationError::ApprovalMetadataMissing);
+                }
+                (approved_at, content_hash)
+            }
+        };
         Ok(Self {
             title,
             status,
@@ -372,6 +417,8 @@ impl SpecDocument {
             related_conventions,
             signals,
             domain_state_signals,
+            approved_at,
+            content_hash,
         })
     }
 
@@ -381,8 +428,63 @@ impl SpecDocument {
     }
 
     #[must_use]
-    pub fn status(&self) -> &str {
-        &self.status
+    pub fn status(&self) -> SpecStatus {
+        self.status
+    }
+
+    /// Returns the approval timestamp, if approved.
+    #[must_use]
+    pub fn approved_at(&self) -> Option<&Timestamp> {
+        self.approved_at.as_ref()
+    }
+
+    /// Returns the content hash recorded at approval time.
+    #[must_use]
+    pub fn content_hash(&self) -> Option<&str> {
+        self.content_hash.as_deref()
+    }
+
+    /// Marks this spec as approved with the given timestamp and content hash.
+    ///
+    /// # Errors
+    ///
+    /// Returns `SpecValidationError::ApprovalMetadataMissing` if `content_hash` is empty.
+    pub fn approve(
+        &mut self,
+        timestamp: Timestamp,
+        content_hash: String,
+    ) -> Result<(), SpecValidationError> {
+        if content_hash.trim().is_empty() {
+            return Err(SpecValidationError::ApprovalMetadataMissing);
+        }
+        self.status = SpecStatus::Approved;
+        self.approved_at = Some(timestamp);
+        self.content_hash = Some(content_hash);
+        Ok(())
+    }
+
+    /// Demotes this spec to draft, clearing approval metadata.
+    pub fn demote(&mut self) {
+        self.status = SpecStatus::Draft;
+        self.approved_at = None;
+        self.content_hash = None;
+    }
+
+    /// Checks whether the current approval is still valid given the current content hash.
+    ///
+    /// Returns `true` only if status is `Approved` AND the stored content hash
+    /// matches `current_hash`.
+    #[must_use]
+    pub fn is_approval_valid(&self, current_hash: &str) -> bool {
+        self.status == SpecStatus::Approved && self.content_hash.as_deref() == Some(current_hash)
+    }
+
+    /// Returns the effective status considering content hash integrity.
+    ///
+    /// If status is `Approved` but the content hash does not match, returns `Draft`.
+    #[must_use]
+    pub fn effective_status(&self, current_hash: &str) -> SpecStatus {
+        if self.is_approval_valid(current_hash) { SpecStatus::Approved } else { SpecStatus::Draft }
     }
 
     #[must_use]
@@ -712,10 +814,10 @@ impl CoverageResult {
 pub enum SpecValidationError {
     #[error("spec title must not be empty")]
     EmptyTitle,
-    #[error("spec status must not be empty")]
-    EmptyStatus,
     #[error("spec version must not be empty")]
     EmptyVersion,
+    #[error("approved spec must have both approved_at and content_hash")]
+    ApprovalMetadataMissing,
     #[error("requirement text must not be empty")]
     EmptyRequirementText,
     #[error("domain state name must not be empty")]
@@ -866,7 +968,7 @@ mod tests {
     fn make_doc() -> SpecDocument {
         SpecDocument::new(
             "Feature X",
-            "draft",
+            SpecStatus::Draft,
             "1.0",
             vec!["Goal line".into()],
             SpecScope::new(
@@ -882,6 +984,8 @@ mod tests {
             vec!["project-docs/conventions/hex.md".into()],
             None,
             None,
+            None,
+            None,
         )
         .unwrap()
     }
@@ -890,17 +994,106 @@ mod tests {
     fn test_document_creation_succeeds() {
         let doc = make_doc();
         assert_eq!(doc.title(), "Feature X");
-        assert_eq!(doc.status(), "draft");
+        assert_eq!(doc.status(), SpecStatus::Draft);
         assert_eq!(doc.version(), "1.0");
         assert_eq!(doc.domain_states().len(), 1);
         assert!(doc.signals().is_none());
+        assert!(doc.approved_at().is_none());
+        assert!(doc.content_hash().is_none());
+    }
+
+    // --- SpecStatus ---
+
+    #[test]
+    fn test_spec_status_display() {
+        assert_eq!(SpecStatus::Draft.to_string(), "draft");
+        assert_eq!(SpecStatus::Approved.to_string(), "approved");
+    }
+
+    #[test]
+    fn test_spec_status_as_str() {
+        assert_eq!(SpecStatus::Draft.as_str(), "draft");
+        assert_eq!(SpecStatus::Approved.as_str(), "approved");
+    }
+
+    // --- SpecDocument approve / demote ---
+
+    #[test]
+    fn test_document_approve_sets_status_and_metadata() {
+        let mut doc = make_doc();
+        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
+        doc.approve(ts.clone(), "sha256:abc123".into()).unwrap();
+
+        assert_eq!(doc.status(), SpecStatus::Approved);
+        assert_eq!(doc.approved_at().unwrap(), &ts);
+        assert_eq!(doc.content_hash(), Some("sha256:abc123"));
+    }
+
+    #[test]
+    fn test_document_demote_clears_approval() {
+        let mut doc = make_doc();
+        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
+        doc.approve(ts, "sha256:abc123".into()).unwrap();
+        doc.demote();
+
+        assert_eq!(doc.status(), SpecStatus::Draft);
+        assert!(doc.approved_at().is_none());
+        assert!(doc.content_hash().is_none());
+    }
+
+    #[test]
+    fn test_is_approval_valid_with_matching_hash() {
+        let mut doc = make_doc();
+        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
+        doc.approve(ts, "sha256:abc123".into()).unwrap();
+
+        assert!(doc.is_approval_valid("sha256:abc123"));
+    }
+
+    #[test]
+    fn test_is_approval_valid_with_mismatched_hash() {
+        let mut doc = make_doc();
+        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
+        doc.approve(ts, "sha256:abc123".into()).unwrap();
+
+        assert!(!doc.is_approval_valid("sha256:different"));
+    }
+
+    #[test]
+    fn test_is_approval_valid_when_draft() {
+        let doc = make_doc();
+        assert!(!doc.is_approval_valid("sha256:abc123"));
+    }
+
+    #[test]
+    fn test_effective_status_approved_with_matching_hash() {
+        let mut doc = make_doc();
+        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
+        doc.approve(ts, "sha256:abc123".into()).unwrap();
+
+        assert_eq!(doc.effective_status("sha256:abc123"), SpecStatus::Approved);
+    }
+
+    #[test]
+    fn test_effective_status_draft_with_mismatched_hash() {
+        let mut doc = make_doc();
+        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
+        doc.approve(ts, "sha256:abc123".into()).unwrap();
+
+        assert_eq!(doc.effective_status("sha256:different"), SpecStatus::Draft);
+    }
+
+    #[test]
+    fn test_effective_status_draft_when_never_approved() {
+        let doc = make_doc();
+        assert_eq!(doc.effective_status("sha256:anything"), SpecStatus::Draft);
     }
 
     #[test]
     fn test_document_with_empty_title_returns_error() {
         let result = SpecDocument::new(
             "",
-            "draft",
+            SpecStatus::Draft,
             "1.0",
             vec![],
             SpecScope::new(vec![], vec![]),
@@ -911,8 +1104,130 @@ mod tests {
             vec![],
             None,
             None,
+            None,
+            None,
         );
         assert!(matches!(result, Err(SpecValidationError::EmptyTitle)));
+    }
+
+    #[test]
+    fn test_document_approved_without_metadata_returns_error() {
+        let result = SpecDocument::new(
+            "T",
+            SpecStatus::Approved,
+            "1.0",
+            vec![],
+            SpecScope::new(vec![], vec![]),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            None, // no approved_at
+            None, // no content_hash
+        );
+        assert!(matches!(result, Err(SpecValidationError::ApprovalMetadataMissing)));
+    }
+
+    #[test]
+    fn test_document_approved_with_only_timestamp_returns_error() {
+        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
+        let result = SpecDocument::new(
+            "T",
+            SpecStatus::Approved,
+            "1.0",
+            vec![],
+            SpecScope::new(vec![], vec![]),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            Some(ts),
+            None, // no content_hash
+        );
+        assert!(matches!(result, Err(SpecValidationError::ApprovalMetadataMissing)));
+    }
+
+    #[test]
+    fn test_document_approved_with_only_hash_returns_error() {
+        let result = SpecDocument::new(
+            "T",
+            SpecStatus::Approved,
+            "1.0",
+            vec![],
+            SpecScope::new(vec![], vec![]),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            None, // no approved_at
+            Some("sha256:abc".into()),
+        );
+        assert!(matches!(result, Err(SpecValidationError::ApprovalMetadataMissing)));
+    }
+
+    #[test]
+    fn test_document_approved_with_empty_hash_returns_error() {
+        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
+        let result = SpecDocument::new(
+            "T",
+            SpecStatus::Approved,
+            "1.0",
+            vec![],
+            SpecScope::new(vec![], vec![]),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            Some(ts),
+            Some("".into()),
+        );
+        assert!(matches!(result, Err(SpecValidationError::ApprovalMetadataMissing)));
+    }
+
+    #[test]
+    fn test_approve_rejects_empty_hash() {
+        let mut doc = make_doc();
+        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
+        let result = doc.approve(ts, "".into());
+        assert!(matches!(result, Err(SpecValidationError::ApprovalMetadataMissing)));
+        assert_eq!(doc.status(), SpecStatus::Draft, "should remain Draft on error");
+    }
+
+    #[test]
+    fn test_document_draft_with_metadata_strips_it() {
+        let ts = Timestamp::new("2026-03-24T10:00:00Z").unwrap();
+        let doc = SpecDocument::new(
+            "T",
+            SpecStatus::Draft,
+            "1.0",
+            vec![],
+            SpecScope::new(vec![], vec![]),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            Some(ts),
+            Some("sha256:abc".into()),
+        )
+        .unwrap();
+        // Draft silently strips approval metadata
+        assert!(doc.approved_at().is_none());
+        assert!(doc.content_hash().is_none());
     }
 
     #[test]
@@ -1208,7 +1523,7 @@ mod tests {
     fn test_evaluate_coverage_all_covered() {
         let doc = SpecDocument::new(
             "Feature",
-            "draft",
+            SpecStatus::Draft,
             "1.0",
             vec!["Goal".into()],
             SpecScope::new(
@@ -1236,6 +1551,8 @@ mod tests {
             vec![],
             None,
             None,
+            None,
+            None,
         )
         .unwrap();
 
@@ -1250,7 +1567,7 @@ mod tests {
     fn test_evaluate_coverage_missing_task_refs() {
         let doc = SpecDocument::new(
             "Feature",
-            "draft",
+            SpecStatus::Draft,
             "1.0",
             vec!["Goal".into()],
             SpecScope::new(
@@ -1262,6 +1579,8 @@ mod tests {
             vec![SpecRequirement::new("uncovered AC", vec!["discussion".into()]).unwrap()],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )
@@ -1280,7 +1599,7 @@ mod tests {
     fn test_evaluate_coverage_invalid_task_ref() {
         let doc = SpecDocument::new(
             "Feature",
-            "draft",
+            SpecStatus::Draft,
             "1.0",
             vec!["Goal".into()],
             SpecScope::new(
@@ -1301,6 +1620,8 @@ mod tests {
             vec![],
             None,
             None,
+            None,
+            None,
         )
         .unwrap();
 
@@ -1316,7 +1637,7 @@ mod tests {
     fn test_evaluate_coverage_mixed_valid_and_invalid_refs() {
         let doc = SpecDocument::new(
             "Feature",
-            "draft",
+            SpecStatus::Draft,
             "1.0",
             vec!["Goal".into()],
             SpecScope::new(
@@ -1337,6 +1658,8 @@ mod tests {
             vec![],
             None,
             None,
+            None,
+            None,
         )
         .unwrap();
 
@@ -1353,7 +1676,7 @@ mod tests {
     fn test_evaluate_coverage_constraints_not_enforced() {
         let doc = SpecDocument::new(
             "Feature",
-            "draft",
+            SpecStatus::Draft,
             "1.0",
             vec!["Goal".into()],
             SpecScope::new(vec![], vec![]),
@@ -1363,6 +1686,8 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )
@@ -1379,7 +1704,7 @@ mod tests {
     fn test_evaluate_coverage_deduplicates_invalid_refs() {
         let doc = SpecDocument::new(
             "Feature",
-            "draft",
+            SpecStatus::Draft,
             "1.0",
             vec!["Goal".into()],
             SpecScope::new(
@@ -1406,6 +1731,8 @@ mod tests {
             vec![],
             None,
             None,
+            None,
+            None,
         )
         .unwrap();
 
@@ -1422,7 +1749,7 @@ mod tests {
     fn test_validate_all_task_refs_catches_constraint_invalid_ref() {
         let doc = SpecDocument::new(
             "Feature",
-            "draft",
+            SpecStatus::Draft,
             "1.0",
             vec!["Goal".into()],
             SpecScope::new(vec![], vec![]),
@@ -1440,6 +1767,8 @@ mod tests {
             vec![],
             None,
             None,
+            None,
+            None,
         )
         .unwrap();
 
@@ -1452,7 +1781,7 @@ mod tests {
     fn test_validate_all_task_refs_catches_out_of_scope_invalid_ref() {
         let doc = SpecDocument::new(
             "Feature",
-            "draft",
+            SpecStatus::Draft,
             "1.0",
             vec!["Goal".into()],
             SpecScope::new(
@@ -1473,6 +1802,8 @@ mod tests {
             vec![],
             None,
             None,
+            None,
+            None,
         )
         .unwrap();
 
@@ -1485,7 +1816,7 @@ mod tests {
     fn test_validate_all_task_refs_empty_when_all_valid() {
         let doc = SpecDocument::new(
             "Feature",
-            "draft",
+            SpecStatus::Draft,
             "1.0",
             vec!["Goal".into()],
             SpecScope::new(
@@ -1511,6 +1842,8 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            None,
+            None,
             None,
             None,
         )

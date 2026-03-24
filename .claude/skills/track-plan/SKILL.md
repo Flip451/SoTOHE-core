@@ -214,7 +214,8 @@ Rust TDD を前提としたタスク順序：
 
 ### 次のステップ
 - この計画で進めてよろしいですか？
-- 承認後に standard lane なら `/track:full-cycle <task>` または `/track:implement`、plan-only lane なら `/track:activate <track-id>` を経由して実装を開始
+- 承認後に `cargo make spec-approve <track-dir>` で仕様を明示的に承認できます（`approved_at` + `content_hash` を記録）
+- standard lane なら `/track:full-cycle <task>` または `/track:implement`、plan-only lane なら `/track:activate <track-id>` を経由して実装を開始
 ```
 
 ### Step 4: Create Track Artifacts（承認後）

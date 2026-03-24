@@ -669,6 +669,11 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **CC-SDD-04** (MEDIUM): Steering 自動生成 → Phase 6
 - [ ] **CC-SDD-05** (MEDIUM): 実装検証コマンド → Phase 3
 
+**Review Infrastructure 強化**:
+- [ ] **RVW-10** (HIGH): レビュー verdict 改竄防止 — track-local-review が record-round を直接呼ぶ `--auto-record` モード。オーケストレータを経由せず verdict を domain state に記録
+- [ ] **RVW-11** (MEDIUM): レビュー diff スコープ強制 — 変更範囲外ファイルの finding を構造的に除外。ブリーフィングに git diff 出力を自動埋め込み、または record-round に `--dismiss-out-of-scope` フラグを追加
+- [ ] **RVW-12** (MEDIUM): 既存コード品質問題の修正 — guard/policy.rs バイパス (P0)、spec_frontmatter.rs trim_end (P1)、git_cli.rs branch_claims skip (P1)
+
 **Coding Agent Workflow 2026**:
 - [ ] **WORKFLOW-01** (MEDIUM): FIC 閾値管理
 - [ ] **WORKFLOW-02** (LOW): Best-of-N 並列戦略

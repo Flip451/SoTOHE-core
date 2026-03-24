@@ -61,12 +61,14 @@ Note: See `.claude/agent-profiles.json` for which provider handles each capabili
 | Reviewer model_profiles in agent-profiles.json | [ADR](../../knowledge/adr/2026-03-17-0000-reviewer-model-profiles.md) | 2026-03-17 |
 | TSUMIKI-01/SPEC-05: 3-level signals with SignalBasis | [ADR](../../knowledge/adr/2026-03-23-1010-three-level-signals.md) | 2026-03-23 |
 | Two-stage signal architecture | [ADR](../../knowledge/adr/2026-03-23-1020-two-stage-signals.md) | 2026-03-23 |
+| CC-SDD-02: SpecStatus enum + content hash auto-demotion | — | 2026-03-24 |
 
 ## Crate Selection
 
 | Crate | Version | Role | Notes |
 |-------|---------|------|-------|
 | thiserror | 2.x | Error derive macros | Domain layer only external dep |
+| sha2 | 0.10.x | Content hash for spec approval | Infrastructure layer only |
 
 ## Canonical Blocks
 
@@ -1351,3 +1353,60 @@ The illegal state `type=clear + block data present` cannot be represented.
   }
 }
 ```
+
+## Spec Approval Gate (CC-SDD-02)
+
+### Overview
+
+`SpecDocument.status` was promoted from `String` to `SpecStatus` enum (`Draft` / `Approved`).
+Two new optional fields enable explicit approval tracking with auto-demotion on content change.
+
+### Domain Types
+
+```rust
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SpecStatus {
+    Draft,
+    Approved,
+}
+
+// On SpecDocument:
+pub fn approve(&mut self, timestamp: Timestamp, content_hash: String);
+pub fn demote(&mut self);
+pub fn is_approval_valid(&self, current_hash: &str) -> bool;
+pub fn effective_status(&self, current_hash: &str) -> SpecStatus;
+```
+
+### Content Hash
+
+SHA-256 of canonical JSON serialization of substantive fields:
+`title`, `version`, `goal`, `scope`, `constraints`, `domain_states`, `acceptance_criteria`.
+
+Excluded (changes do not invalidate approval):
+`status`, `signals`, `domain_state_signals`, `additional_sections`, `related_conventions`,
+`approved_at`, `content_hash`.
+
+Computed in infrastructure layer (`spec::codec::compute_content_hash`) using `sha2` crate.
+Domain layer stores hash as opaque `String`.
+
+### Auto-Demotion
+
+When the codec decodes a spec.json with `status: "approved"`, the caller can use
+`effective_status(current_hash)` to detect content changes since approval.
+If the hash does not match, the effective status is `Draft`.
+
+### spec.json Schema (v1, backward compatible)
+
+New optional fields:
+```json
+{
+  "status": "approved",
+  "approved_at": "2026-03-24T10:00:00Z",
+  "content_hash": "sha256:abc123..."
+}
+```
+
+### CLI
+
+`sotp spec approve <track-dir>` — reads spec.json, computes content hash, sets
+status=approved + approved_at + content_hash, writes back.

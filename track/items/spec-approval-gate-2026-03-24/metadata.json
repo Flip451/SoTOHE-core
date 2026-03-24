@@ -71,8 +71,16 @@
     ]
   },
   "review": {
-    "code_hash": "fec07fb0dbf7d69c4c4dd1632037a03d1ab9bcaf",
+    "code_hash": "2fd021e6cfd459b9f942f4122b8b3a4198587a20",
     "escalation": {
+      "concern_streaks": {
+        "security": {
+          "consecutive_rounds": 2,
+          "last_round": 4,
+          "last_round_type": "fast",
+          "last_seen_at": "2026-03-24T11:43:49Z"
+        }
+      },
       "phase": {
         "type": "clear"
       },
@@ -103,6 +111,33 @@
           "round": 2,
           "round_type": "fast",
           "timestamp": "2026-03-24T08:10:47Z"
+        },
+        {
+          "concerns": [
+            "logic",
+            "security"
+          ],
+          "groups": [
+            "cli",
+            "domain",
+            "infra",
+            "other"
+          ],
+          "round": 3,
+          "round_type": "fast",
+          "timestamp": "2026-03-24T11:28:17Z"
+        },
+        {
+          "concerns": [
+            "security"
+          ],
+          "groups": [
+            "cli",
+            "infra"
+          ],
+          "round": 4,
+          "round_type": "fast",
+          "timestamp": "2026-03-24T11:43:49Z"
         }
       ],
       "threshold": 3
@@ -119,44 +154,92 @@
           "timestamp": "2026-03-24T08:10:56Z",
           "verdict": "zero_findings"
         }
+      },
+      "cli": {
+        "fast": {
+          "round": 7,
+          "timestamp": "2026-03-24T13:21:23Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-24T13:21:33Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "domain": {
+        "fast": {
+          "round": 6,
+          "timestamp": "2026-03-24T13:21:23Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-24T13:21:33Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "infra": {
+        "fast": {
+          "round": 7,
+          "timestamp": "2026-03-24T13:21:23Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-24T13:21:33Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "other": {
+        "fast": {
+          "round": 6,
+          "timestamp": "2026-03-24T13:21:24Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-24T13:21:33Z",
+          "verdict": "zero_findings"
+        }
       }
     },
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "done",
   "tasks": [
     {
       "description": "domain: SpecStatus enum + approved_at + content_hash + approve/integrity メソッド + テスト",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "infra: codec (serialize/deserialize + auto-demote + hash 計算) + テスト",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "infra: render (ステータスバッジ + approved_at 表示) + テスト",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "CLI: sotp spec approve コマンド",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Makefile (spec-approve + track-record-round + track-check-approved ラッパー) + permissions.allow 登録 + /track:plan skill 更新",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "ドキュメント更新 (DESIGN.md, TRACK_TRACEABILITY.md) + 統合テスト",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "CC-SDD-02 明示的承認ゲート（spec.json approved_at + 自動降格）",
-  "updated_at": "2026-03-24T08:10:56Z"
+  "updated_at": "2026-03-24T13:21:33Z"
 }
