@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Review escalation enforcement — planning-only bypass guard + record-round wiring",
+  "goal": [
+    "review state が NotStarted のまま code ファイルを含むコミットが通るすり抜けを構造的に防止する。",
+    "check-approved の planning-only fast-path に staged diff スコープガードを追加し、",
+    "/track:review を record-round に配線して review 結果を domain に永続化する。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "check-approved CLI に staged files スコープ判定を追加 (planning-only allowlist vs code files)",
+        "sources": [
+          "discussion — 2026-03-24 review escalation 発見"
+        ]
+      },
+      {
+        "text": "check_approved usecase に planning_only フラグを追加し fast-path を条件付きに制限",
+        "sources": [
+          "discussion — 2026-03-24 review escalation 発見"
+        ]
+      },
+      {
+        "text": "/track:review skill を sotp review record-round に配線 (各グループの fast/final 結果を永続化)",
+        "sources": [
+          "discussion — 2026-03-24 review escalation 発見"
+        ]
+      },
+      {
+        "text": "sotp review status CLI コマンド: per-group の Fast/Final 状態を表示",
+        "sources": [
+          "discussion — 2026-03-24 review escalation 発見"
+        ]
+      },
+      {
+        "text": "統合テスト: code diff + NotStarted review → check-approved 拒否を検証",
+        "sources": [
+          "discussion — 2026-03-24 review escalation 発見"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "record-round 自体の domain ロジック変更 (RoundType::Fast/Final は既存)",
+        "sources": [
+          "inference — domain layer already complete"
+        ]
+      },
+      {
+        "text": "ReviewGroupState の変更 (FastOnly/BothRounds は既存)",
+        "sources": [
+          "inference — domain layer already complete"
+        ]
+      },
+      {
+        "text": "concern_streaks escalation の変更",
+        "sources": [
+          "inference — separate concern"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "domain 層は I/O を含まない (hexagonal purity)",
+      "sources": [
+        "convention — hexagonal-architecture.md"
+      ]
+    },
+    {
+      "text": "既存の planning-only コミット (track/items/, registry.md 等のみ) は引き続き通過させる",
+      "sources": [
+        "discussion — backward compatibility"
+      ]
+    },
+    {
+      "text": "check-approved の既存呼び出し元 (track-commit-message) を壊さない",
+      "sources": [
+        "discussion — backward compatibility"
+      ]
+    },
+    {
+      "text": "staged files 取得は CLI 層の責務 (usecase は planning_only フラグを受け取るだけ)",
+      "sources": [
+        "convention — hexagonal-architecture.md"
+      ]
+    }
+  ],
+  "domain_states": [
+    {
+      "name": "ReviewStatus",
+      "description": "NotStarted, Invalidated, FastPassed, Approved — 既存型、変更なし",
+      "transitions_to": []
+    },
+    {
+      "name": "ReviewGroupState",
+      "description": "NoRounds, FastOnly, FinalOnly, BothRounds — 既存型、変更なし",
+      "transitions_to": []
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "code ファイルを含む staged diff + NotStarted review → check-approved が拒否する",
+      "sources": [
+        "discussion — 2026-03-24 review escalation 発見"
+      ]
+    },
+    {
+      "text": "planning-only ファイルのみの staged diff + NotStarted review → check-approved が通過する",
+      "sources": [
+        "discussion — backward compatibility"
+      ]
+    },
+    {
+      "text": "/track:review skill が各グループの reviewer 結果を record-round で永続化する",
+      "sources": [
+        "discussion — 2026-03-24 review escalation 発見"
+      ]
+    },
+    {
+      "text": "sotp review status が per-group の Fast/Final 状態を表示する",
+      "sources": [
+        "discussion — 2026-03-24 review escalation 発見"
+      ]
+    },
+    {
+      "text": "cargo make ci が全テスト通過する",
+      "sources": [
+        "convention — hexagonal-architecture.md"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "project-docs/conventions/hexagonal-architecture.md"
+  ],
+  "signals": {
+    "blue": 3,
+    "yellow": 14,
+    "red": 0
+  }
+}

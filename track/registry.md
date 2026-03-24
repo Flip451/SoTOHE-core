@@ -9,7 +9,7 @@
 
 - Latest active track: `None yet`
 - Next recommended command: `/track:plan <feature>`
-- Last updated: `2026-03-23`
+- Last updated: `2026-03-24`
 
 ## Active Tracks
 
@@ -21,6 +21,7 @@
 
 | Track | Result | Updated |
 |------|--------|---------|
+| review-escalation-enforcement-2026-03-24 | Done | 2026-03-24 |
 | domain-state-signals-2026-03-23 | Done | 2026-03-23 |
 | spec-json-ssot-2026-03-23 | Done | 2026-03-23 |
 | adr-introduction-2026-03-23 | Done | 2026-03-23 |

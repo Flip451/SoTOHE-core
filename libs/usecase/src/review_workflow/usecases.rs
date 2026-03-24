@@ -288,6 +288,10 @@ pub fn resolve_escalation(
 pub struct CheckApprovedInput {
     pub items_dir: PathBuf,
     pub track_id: String,
+    /// When `true`, the staged diff contains only planning-only files (track docs,
+    /// config, etc.). The NotStarted+empty-groups fast-path is only allowed in this
+    /// case. When `false`, code files are staged and a completed review is required.
+    pub planning_only: bool,
 }
 
 /// Orchestrates check-approved: read track → domain check → invalidate if stale.
@@ -313,11 +317,22 @@ pub fn check_approved(
         .map_err(|e| format!("failed to read track: {e}"))?
         .ok_or_else(|| format!("track '{}' not found", track_id.as_ref()))?;
 
+    // Fail-closed: missing review section always blocks, regardless of planning_only.
+    // This prevents bypassing the review guard by deleting the review object from metadata.
     let review = track.review().ok_or("[BLOCKED] no review section in metadata.json")?;
 
-    // Planning-only tracks with no review activity are always approved.
+    // Planning-only fast-path: when no review activity exists yet, bypass for
+    // planning-only commits. Once a review has been started, it must be completed
+    // to Approved even for planning-only commits.
     if review.status() == ReviewStatus::NotStarted && review.groups().is_empty() {
-        return Ok(());
+        if input.planning_only {
+            return Ok(());
+        }
+        return Err(
+            "[BLOCKED] Review not started: code files are staged but no review has been run. \
+             Run /track:review first."
+                .to_string(),
+        );
     }
 
     let mut review_check = review.clone();
@@ -342,5 +357,203 @@ pub fn check_approved(
             ))
         }
         Err(e) => Err(format!("[BLOCKED] Review guard failed: {e}")),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used)]
+
+    use std::collections::HashMap;
+    use std::path::PathBuf;
+    use std::sync::Mutex;
+
+    use super::*;
+
+    // --- Mock GitHasher ---
+
+    struct FixedHasher(String);
+
+    impl GitHasher for FixedHasher {
+        fn normalized_hash(
+            &self,
+            _items_dir: &Path,
+            _track_id: &TrackId,
+        ) -> Result<String, String> {
+            Ok(self.0.clone())
+        }
+    }
+
+    // --- Minimal in-memory TrackReader + TrackWriter ---
+
+    #[derive(Default)]
+    struct MemStore {
+        tracks: Mutex<HashMap<String, domain::TrackMetadata>>,
+    }
+
+    impl TrackReader for MemStore {
+        fn find(&self, id: &TrackId) -> Result<Option<domain::TrackMetadata>, TrackReadError> {
+            Ok(self.tracks.lock().unwrap().get(id.as_ref()).cloned())
+        }
+    }
+
+    impl TrackWriter for MemStore {
+        fn save(&self, track: &domain::TrackMetadata) -> Result<(), TrackWriteError> {
+            self.tracks.lock().unwrap().insert(track.id().as_ref().to_owned(), track.clone());
+            Ok(())
+        }
+
+        fn update<F>(
+            &self,
+            id: &TrackId,
+            mutate: F,
+        ) -> Result<domain::TrackMetadata, TrackWriteError>
+        where
+            F: FnOnce(&mut domain::TrackMetadata) -> Result<(), DomainError>,
+        {
+            let mut tracks = self.tracks.lock().unwrap();
+            let track = tracks.get_mut(id.as_ref()).ok_or_else(|| {
+                TrackWriteError::from(domain::RepositoryError::TrackNotFound(
+                    id.as_ref().to_owned(),
+                ))
+            })?;
+            mutate(track)?;
+            Ok(track.clone())
+        }
+    }
+
+    // --- Helper: build a minimal track with review state ---
+
+    fn make_track_with_review(
+        track_id: &str,
+        review: domain::ReviewState,
+    ) -> domain::TrackMetadata {
+        let tid = TrackId::try_new(track_id).unwrap();
+        let task_id = domain::TaskId::try_new("T1").unwrap();
+        let task = domain::TrackTask::new(task_id.clone(), "task").unwrap();
+        let section = domain::PlanSection::new("S1", "section", vec![], vec![task_id]).unwrap();
+        let plan = domain::PlanView::new(vec!["summary".to_string()], vec![section]);
+        let mut track =
+            domain::TrackMetadata::new(tid, "test track", vec![task], plan, None).unwrap();
+        track.set_review(Some(review));
+        track
+    }
+
+    #[test]
+    fn check_approved_planning_only_true_with_not_started_passes() {
+        let store = MemStore::default();
+        let track = make_track_with_review("test-track", domain::ReviewState::new());
+        store.save(&track).unwrap();
+
+        let hasher = FixedHasher("abc123".to_string());
+        let input = CheckApprovedInput {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "test-track".to_string(),
+            planning_only: true,
+        };
+
+        let result = check_approved(input, &store, &store, &hasher);
+        assert!(result.is_ok(), "planning_only=true should bypass: {result:?}");
+    }
+
+    #[test]
+    fn check_approved_planning_only_false_with_not_started_is_blocked() {
+        let store = MemStore::default();
+        let track = make_track_with_review("test-track", domain::ReviewState::new());
+        store.save(&track).unwrap();
+
+        let hasher = FixedHasher("abc123".to_string());
+        let input = CheckApprovedInput {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "test-track".to_string(),
+            planning_only: false,
+        };
+
+        let result = check_approved(input, &store, &store, &hasher);
+        assert!(result.is_err(), "planning_only=false should block");
+        let err = result.unwrap_err();
+        assert!(err.contains("[BLOCKED]"), "error should indicate blocked: {err}");
+    }
+
+    #[test]
+    fn check_approved_planning_only_false_with_approved_review_passes() {
+        let code_hash = "abc123";
+        let review = domain::ReviewState::with_fields(
+            ReviewStatus::Approved,
+            domain::CodeHash::computed(code_hash).unwrap(),
+            HashMap::new(),
+            domain::ReviewEscalationState::new(),
+        );
+        let store = MemStore::default();
+        let track = make_track_with_review("test-track", review);
+        store.save(&track).unwrap();
+
+        let hasher = FixedHasher(code_hash.to_string());
+        let input = CheckApprovedInput {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "test-track".to_string(),
+            planning_only: false,
+        };
+
+        let result = check_approved(input, &store, &store, &hasher);
+        assert!(result.is_ok(), "approved review should pass: {result:?}");
+    }
+
+    #[test]
+    fn check_approved_planning_only_with_started_review_still_requires_approval() {
+        // Once review is started, even planning_only commits must have Approved status.
+        let review = domain::ReviewState::with_fields(
+            ReviewStatus::Approved,
+            domain::CodeHash::computed("old-hash").unwrap(),
+            HashMap::new(),
+            domain::ReviewEscalationState::new(),
+        );
+        let store = MemStore::default();
+        let track = make_track_with_review("test-track", review);
+        store.save(&track).unwrap();
+
+        let hasher = FixedHasher("new-hash".to_string());
+        let input = CheckApprovedInput {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "test-track".to_string(),
+            planning_only: true,
+        };
+
+        let result = check_approved(input, &store, &store, &hasher);
+        assert!(result.is_err(), "started review + stale hash should block even planning_only");
+    }
+
+    #[test]
+    fn check_approved_missing_review_section_always_blocks() {
+        // Fail-closed: missing review section blocks even planning_only.
+        // Prevents bypass by deleting the review object from metadata.
+        let store = MemStore::default();
+        let tid = TrackId::try_new("legacy-track").unwrap();
+        let task_id = domain::TaskId::try_new("T1").unwrap();
+        let task = domain::TrackTask::new(task_id.clone(), "task").unwrap();
+        let section = domain::PlanSection::new("S1", "section", vec![], vec![task_id]).unwrap();
+        let plan = domain::PlanView::new(vec!["summary".to_string()], vec![section]);
+        let track = domain::TrackMetadata::new(tid, "legacy", vec![task], plan, None).unwrap();
+        store.save(&track).unwrap();
+
+        let hasher = FixedHasher("abc123".to_string());
+
+        // planning_only=true still blocked
+        let input = CheckApprovedInput {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "legacy-track".to_string(),
+            planning_only: true,
+        };
+        let result = check_approved(input, &store, &store, &hasher);
+        assert!(result.is_err(), "missing review should block even planning_only");
+
+        // planning_only=false also blocked
+        let input = CheckApprovedInput {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "legacy-track".to_string(),
+            planning_only: false,
+        };
+        let result = check_approved(input, &store, &store, &hasher);
+        assert!(result.is_err(), "missing review should block code commits");
     }
 }
