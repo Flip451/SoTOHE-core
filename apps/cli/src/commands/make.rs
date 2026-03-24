@@ -62,6 +62,12 @@ pub enum MakeTask {
     TrackPrStatus,
     /// Run the local Codex reviewer.
     TrackLocalReview,
+    /// Record a review round result into metadata.json.
+    TrackRecordRound,
+    /// Check that the review state is approved and code hash is current.
+    TrackCheckApproved,
+    /// Approve a spec (set status=approved + content hash).
+    SpecApprove,
     /// Switch to main branch and pull latest.
     TrackSwitchMain,
     /// Stage paths from tmp/track-commit/add-paths.txt.
@@ -163,6 +169,9 @@ fn run(args: MakeArgs) -> Result<ExitCode, CliError> {
         MakeTask::TrackAddTask => dispatch_track_add_task(&args.raw_args),
         MakeTask::TrackSetOverride => dispatch_track_set_override(&args.raw_args),
         MakeTask::TrackLocalReview => dispatch_track_local_review(&args.raw_args),
+        MakeTask::TrackRecordRound => dispatch_track_record_round(&args.raw_args),
+        MakeTask::TrackCheckApproved => dispatch_track_check_approved(&args.raw_args),
+        MakeTask::SpecApprove => dispatch_spec_approve(&args.raw_args),
         MakeTask::TrackPlanBranch => dispatch_track_plan_branch(&args.raw_args),
         MakeTask::Commit => dispatch_commit(&args.raw_args),
         MakeTask::Note => dispatch_note(&args.raw_args),
@@ -395,6 +404,36 @@ fn dispatch_track_local_review(raw_args: &[String]) -> Result<ExitCode, CliError
     run_sotp(&args)
 }
 
+/// Build the sotp argv for a forwarding dispatcher: prefix + user args (with leading "--" stripped).
+///
+/// Uses `raw_args_to_words` (same as other dispatchers) which handles both
+/// cargo-make single-string and direct CLI multi-arg invocations.
+fn build_forwarded_args(prefix: &[&str], raw_args: &[String]) -> Vec<String> {
+    let words = raw_args_to_words(raw_args);
+    let filtered: Vec<&str> = words.iter().map(|s| s.as_str()).skip_while(|s| *s == "--").collect();
+    let mut args: Vec<String> = prefix.iter().map(|s| (*s).to_owned()).collect();
+    args.extend(filtered.iter().map(|s| (*s).to_owned()));
+    args
+}
+
+fn dispatch_track_record_round(raw_args: &[String]) -> Result<ExitCode, CliError> {
+    let args = build_forwarded_args(&["review", "record-round"], raw_args);
+    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    run_sotp(&refs)
+}
+
+fn dispatch_track_check_approved(raw_args: &[String]) -> Result<ExitCode, CliError> {
+    let args = build_forwarded_args(&["review", "check-approved"], raw_args);
+    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    run_sotp(&refs)
+}
+
+fn dispatch_spec_approve(raw_args: &[String]) -> Result<ExitCode, CliError> {
+    let args = build_forwarded_args(&["spec", "approve"], raw_args);
+    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    run_sotp(&refs)
+}
+
 // --- Phase 2: New logic dispatchers ---
 
 fn dispatch_commit(raw_args: &[String]) -> Result<ExitCode, CliError> {
@@ -519,7 +558,7 @@ fn dispatch_exec(raw_args: &[String]) -> Result<ExitCode, CliError> {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use super::*;
 
@@ -589,6 +628,38 @@ mod tests {
             raw_args_to_words(&args),
             vec!["track/items/xxx", "T001", "done", "--commit-hash", "abc123"]
         );
+    }
+
+    // --- build_forwarded_args tests ---
+
+    #[test]
+    fn test_build_forwarded_args_prepends_prefix() {
+        let raw = vec!["--track-id my-track --round-type fast".to_owned()];
+        let args = build_forwarded_args(&["review", "record-round"], &raw);
+        assert_eq!(args[0], "review");
+        assert_eq!(args[1], "record-round");
+        assert_eq!(args[2], "--track-id");
+    }
+
+    #[test]
+    fn test_build_forwarded_args_strips_leading_double_dash() {
+        let raw = vec!["-- --track-id my-track".to_owned()];
+        let args = build_forwarded_args(&["review", "check-approved"], &raw);
+        assert_eq!(args, vec!["review", "check-approved", "--track-id", "my-track"]);
+    }
+
+    #[test]
+    fn test_build_forwarded_args_spec_approve() {
+        let raw = vec!["track/items/my-track".to_owned()];
+        let args = build_forwarded_args(&["spec", "approve"], &raw);
+        assert_eq!(args, vec!["spec", "approve", "track/items/my-track"]);
+    }
+
+    #[test]
+    fn test_build_forwarded_args_empty_raw() {
+        let raw: Vec<String> = vec![];
+        let args = build_forwarded_args(&["spec", "approve"], &raw);
+        assert_eq!(args, vec!["spec", "approve"]);
     }
 
     #[test]

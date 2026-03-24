@@ -7,5 +7,6 @@ pub mod hook;
 pub mod make;
 pub mod pr;
 pub mod review;
+pub mod spec;
 pub mod track;
 pub mod verify;

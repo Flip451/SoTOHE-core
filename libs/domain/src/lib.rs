@@ -36,8 +36,8 @@ pub use signal::{
 };
 pub use spec::{
     CodeScanResult, CoverageResult, DomainStateEntry, DomainStateSignal, SpecDocument,
-    SpecRequirement, SpecScope, SpecSection, SpecValidationError, evaluate_domain_state_signals,
-    evaluate_requirement_signal,
+    SpecRequirement, SpecScope, SpecSection, SpecStatus, SpecValidationError,
+    evaluate_domain_state_signals, evaluate_requirement_signal,
 };
 pub use timestamp::Timestamp;
 pub use track::{

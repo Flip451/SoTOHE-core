@@ -116,7 +116,21 @@ Notes are supplemental traceability data — losing them does not break the temp
 
 Note format follows the "Git Notes" section in `track/workflow.md`.
 
-## 7. Reference Commands
+## 7. Spec Approval Status
+
+`spec.json` has an explicit approval gate via `SpecStatus` enum (`draft` / `approved`).
+
+| Trigger | Action |
+|---------|--------|
+| `/track:plan` creates spec.json | status = `draft` |
+| `cargo make spec-approve <track-dir>` | status = `approved`, `approved_at` and `content_hash` set |
+| spec content changes after approval | `effective_status()` returns `draft` (auto-demotion via content hash mismatch) |
+
+Auto-demotion is based on SHA-256 content hash of substantive fields (title, version, goal,
+scope, constraints, domain_states, acceptance_criteria). Changes to signals, additional_sections,
+or related_conventions do not invalidate approval.
+
+## 8. Reference Commands
 
 ```bash
 # Traceability / consistency checks

@@ -188,7 +188,9 @@ using `findings_to_concerns()` 3-stage fallback:
 3. If neither is available, use `"other"`.
 4. Deduplicate concerns before passing to `--concerns`.
 
-For `zero_findings` verdicts, pass `--concerns ""` (empty).
+For `zero_findings` verdicts, **omit the `--concerns` flag entirely** (the CLI default is empty).
+Do NOT pass `--concerns ""` — the empty-string argument breaks Claude Code permission matching
+for `cargo make track-record-round`.
 
 **Error handling**:
 - If `record-round` returns exit code 3 (`EscalationActive`): stop the review loop and
@@ -262,8 +264,9 @@ Execution:
 
 ### Loop guard
 
-- Maximum 5 rounds with the fast reviewer. If findings persist after 5 fast rounds, stop and report remaining issues to the user for manual decision.
-- The final full-model confirmation round does not count toward the loop guard limit.
+- No fixed round limit for the fast reviewer. Continue fix → review cycles as long as progress is being made.
+- If the same finding recurs 3 times with no code change addressing it, stop and report to the user.
+- The final full-model confirmation round does not count toward the loop guard.
 - Between rounds, always run `cargo make ci-rust` to ensure fixes don't break the build.
 
 ## Step 4: Final validation

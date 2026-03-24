@@ -133,7 +133,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "A Bash command requires user permission: $ARGUMENTS\n\nAnalyze the command and decide:\n\n1. Can this be done with a dedicated Claude Code tool instead?\n   - File reading (cat, head, tail, less, more) → Use the Read tool\n   - File searching (grep, rg, ag) → Use the Grep tool\n   - File finding (find, ls, tree) → Use the Glob tool\n   - File writing (cat >, echo >) → Use the Write or Edit tool\n   - Multiple commands chained with && containing any of the above → Split into separate tool calls\n\n2. If a dedicated tool CAN replace this command, respond with JSON:\n   {\"hookSpecificOutput\":{\"hookEventName\":\"PermissionRequest\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Use dedicated tool instead\",\"additionalContext\":\"This Bash command can be replaced by [TOOL_NAME]. Use [SPECIFIC_ALTERNATIVE] instead of Bash.\"}}\n\n3. If the command genuinely needs Bash (cargo, git, docker, system commands with no dedicated tool equivalent), respond with JSON:\n   {\"hookSpecificOutput\":{\"hookEventName\":\"PermissionRequest\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"No dedicated tool alternative\"}}",
+            "prompt": "A Bash command requires user permission: $ARGUMENTS\n\nAnalyze the command and decide:\n\n1. Can this be done with a dedicated Claude Code tool instead?\n   - File reading (cat, head, tail, less, more) → Use the Read tool\n   - File searching (grep, rg, ag) → Use the Grep tool\n   - File finding (find, ls, tree) → Use the Glob tool\n   - File writing (cat >, echo >) → Use the Write or Edit tool\n   - Multiple commands chained with && containing any of the above → Split into separate tool calls\n\n2. Is this a direct `bin/sotp` call that has a `cargo make` wrapper?\n   - `bin/sotp review record-round` → Use `cargo make track-record-round`\n   - `bin/sotp review check-approved` → Use `cargo make track-check-approved`\n   - `bin/sotp spec approve` → Use `cargo make spec-approve`\n   - `bin/sotp make ...` → Use `cargo make ...` (the wrapper calls sotp make internally)\n   - If a `cargo make` wrapper exists, deny and suggest it.\n\n3. If a dedicated tool or cargo make wrapper CAN replace this command, respond with JSON:\n   {\"hookSpecificOutput\":{\"hookEventName\":\"PermissionRequest\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Use cargo make wrapper or dedicated tool instead\",\"additionalContext\":\"This command can be replaced by [ALTERNATIVE]. Use [SPECIFIC_COMMAND] instead.\"}}\n\n4. If the command genuinely needs Bash (no dedicated tool, no cargo make wrapper), respond with JSON:\n   {\"hookSpecificOutput\":{\"hookEventName\":\"PermissionRequest\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"No dedicated tool or wrapper alternative\"}}",
             "timeout": 15,
             "statusMessage": "Evaluating if dedicated tool can replace Bash command..."
           }
@@ -243,6 +243,9 @@
       "Bash(cargo make track-pr-merge:*)",
       "Bash(cargo make track-pr-status:*)",
       "Bash(cargo make track-local-review:*)",
+      "Bash(cargo make track-record-round:*)",
+      "Bash(cargo make track-check-approved:*)",
+      "Bash(cargo make spec-approve:*)",
       "Bash(cargo make track-switch-main)",
       "Bash(true)",
       "Bash(head :*)",
