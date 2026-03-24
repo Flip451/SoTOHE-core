@@ -1,0 +1,162 @@
+{
+  "branch": "track/spec-approval-gate-2026-03-24",
+  "created_at": "2026-03-24T07:00:00Z",
+  "id": "spec-approval-gate-2026-03-24",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "SpecStatus enum (Draft/Approved) を導入し status: String を型昇格。",
+          "approved_at: Option<Timestamp> と content_hash: Option<String> を SpecDocument に追加。",
+          "approve() / is_approval_valid() / effective_status() メソッドを実装。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Domain: SpecStatus enum + 承認/降格ロジック"
+      },
+      {
+        "description": [
+          "codec.rs: SpecStatus + approved_at + content_hash の serialize/deserialize。",
+          "content hash 計算ロジック (sha2)。auto-demote on decode。",
+          "render.rs: ステータスバッジと approved_at の表示。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002",
+          "T003"
+        ],
+        "title": "Infrastructure: codec + render 変更"
+      },
+      {
+        "description": [
+          "sotp spec approve <track-dir> CLI コマンドを追加。",
+          "spec.json を読み込み、content hash 計算、status=approved に更新して書き戻す。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "CLI: sotp spec approve コマンド"
+      },
+      {
+        "description": [
+          "Makefile.toml に cargo make spec-approve / track-record-round / track-check-approved ラッパーを追加。",
+          "permissions.allow に新ラッパーを登録。",
+          "/track:plan skill の spec.json 生成後に承認フローを案内。"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T005"
+        ],
+        "title": "Makefile + /track:plan skill 更新"
+      },
+      {
+        "description": [
+          "DESIGN.md, TRACK_TRACEABILITY.md を更新。",
+          "統合テストで承認→変更→自動降格の end-to-end フローを確認。"
+        ],
+        "id": "S5",
+        "task_ids": [
+          "T006"
+        ],
+        "title": "ドキュメント + 統合テスト"
+      }
+    ],
+    "summary": [
+      "spec.json の status フィールドを String から SpecStatus enum (Draft/Approved) に型昇格する。",
+      "approved_at タイムスタンプと content_hash によるコンテンツ変更検出で、仕様変更時に自動降格する仕組みを実装する。",
+      "sotp spec approve CLI コマンドで明示的な承認ゲートを提供する。"
+    ]
+  },
+  "review": {
+    "code_hash": "fec07fb0dbf7d69c4c4dd1632037a03d1ab9bcaf",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-24T07:39:59Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-24T07:40:06Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 2,
+          "round_type": "fast",
+          "timestamp": "2026-03-24T08:10:47Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "all": {
+        "fast": {
+          "round": 2,
+          "timestamp": "2026-03-24T08:10:47Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-24T08:10:56Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "planned",
+  "tasks": [
+    {
+      "description": "domain: SpecStatus enum + approved_at + content_hash + approve/integrity メソッド + テスト",
+      "id": "T001",
+      "status": "todo"
+    },
+    {
+      "description": "infra: codec (serialize/deserialize + auto-demote + hash 計算) + テスト",
+      "id": "T002",
+      "status": "todo"
+    },
+    {
+      "description": "infra: render (ステータスバッジ + approved_at 表示) + テスト",
+      "id": "T003",
+      "status": "todo"
+    },
+    {
+      "description": "CLI: sotp spec approve コマンド",
+      "id": "T004",
+      "status": "todo"
+    },
+    {
+      "description": "Makefile (spec-approve + track-record-round + track-check-approved ラッパー) + permissions.allow 登録 + /track:plan skill 更新",
+      "id": "T005",
+      "status": "todo"
+    },
+    {
+      "description": "ドキュメント更新 (DESIGN.md, TRACK_TRACEABILITY.md) + 統合テスト",
+      "id": "T006",
+      "status": "todo"
+    }
+  ],
+  "title": "CC-SDD-02 明示的承認ゲート（spec.json approved_at + 自動降格）",
+  "updated_at": "2026-03-24T08:10:56Z"
+}
