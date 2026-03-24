@@ -62,7 +62,7 @@
     ]
   },
   "review": {
-    "code_hash": "f82cb86b33de54c1c1286531ad0419d5288fa915",
+    "code_hash": "4e92ccdf057389c81e48b666ca274bac7ca65721",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -94,6 +94,15 @@
           "round": 2,
           "round_type": "fast",
           "timestamp": "2026-03-24T05:41:22Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 3,
+          "round_type": "fast",
+          "timestamp": "2026-03-24T05:51:10Z"
         }
       ],
       "threshold": 3
@@ -101,13 +110,13 @@
     "groups": {
       "all": {
         "fast": {
-          "round": 2,
-          "timestamp": "2026-03-24T05:41:22Z",
+          "round": 3,
+          "timestamp": "2026-03-24T05:51:10Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-24T05:41:34Z",
+          "timestamp": "2026-03-24T05:51:10Z",
           "verdict": "zero_findings"
         }
       }
@@ -159,5 +168,5 @@
     }
   ],
   "title": "CC-SDD-01 要件-タスク双方向トレーサビリティ",
-  "updated_at": "2026-03-24T05:41:34Z"
+  "updated_at": "2026-03-24T05:51:10Z"
 }
