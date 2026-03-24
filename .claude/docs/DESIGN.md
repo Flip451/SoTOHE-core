@@ -28,7 +28,7 @@ flowchart TD
 
 | Crate/Module | Role | Key Types |
 |--------------|------|-----------|
-| `domain` | Domain logic, Ports | `TrackId`, `TaskId`, `CommitHash`, `TrackMetadata`, `TrackTask`, `TaskStatus`, `TaskTransition`, `TrackStatus`, `StatusOverride`, `PlanView`, `PlanSection`, `TrackRepository`, `ConfidenceSignal`, `SignalBasis`, `SignalCounts` |
+| `domain` | Domain logic, Ports | `TrackId`, `TaskId`, `CommitHash`, `TrackMetadata`, `TrackTask`, `TaskStatus`, `TaskTransition`, `TrackStatus`, `StatusOverride`, `PlanView`, `PlanSection`, `TrackRepository`, `ConfidenceSignal`, `SignalBasis`, `SignalCounts`, `CoverageResult` |
 | `domain::guard` | Shell command guard (pure computation, ports) | `Decision`, `GuardVerdict`, `ParseError`, `SimpleCommand`, `ShellParser` trait, `tokenize()`, `check_commands()` |
 | `usecase` | Application services | `SaveTrackUseCase`, `LoadTrackUseCase`, `TransitionTaskUseCase` |
 | `infrastructure` | Infrastructure adapters | `InMemoryTrackRepository`, `FsTrackStore`, `ConchShellParser` |

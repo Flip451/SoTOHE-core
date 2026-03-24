@@ -271,6 +271,15 @@ Execution:
 After the reviewer reports zero findings:
 1. Run `cargo make ci` (full CI, not just ci-rust) to confirm all checks pass.
 2. If CI fails, fix and re-run (this does not reset the review loop counter).
+3. **Review state guard verification (mandatory)**: Run `bin/sotp review check-approved --track-id {track-id} --items-dir track/items`
+   to confirm the review state is `Approved`. This is the authoritative readiness check —
+   do NOT declare "Ready" based solely on reviewer stdout verdicts.
+   - If `check-approved` returns exit code 0: review is complete. Proceed to "Ready".
+   - If `check-approved` returns non-zero: review is NOT complete. Diagnose the cause
+     (missing `record-round` calls, stale code hash, escalation block) and resolve before
+     declaring readiness.
+   - This step catches cases where `record-round` was accidentally skipped or where
+     the code hash was invalidated between the last review and CI.
 
 ## Behavior
 
@@ -280,5 +289,6 @@ After execution, summarize:
 3. Findings per round (count and severity breakdown, grouped by layer)
 4. Fixes applied (with file references)
 5. Final CI result
-6. Merge/commit readiness (Ready / Not ready with reason)
-7. Recommended next command (`/track:commit <message>`)
+6. Review state guard (`check-approved`) result
+7. Merge/commit readiness (Ready / Not ready with reason)
+8. Recommended next command (`/track:commit <message>`)

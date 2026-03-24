@@ -4,7 +4,7 @@
 
 use domain::{
     ConfidenceSignal, DomainStateEntry, DomainStateSignal, SignalCounts, SpecDocument,
-    SpecRequirement, SpecScope, SpecSection, SpecValidationError,
+    SpecRequirement, SpecScope, SpecSection, SpecValidationError, TaskId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -29,6 +29,9 @@ pub enum SpecCodecError {
 
     #[error("unknown signal string '{0}': expected 'blue', 'yellow', or 'red'")]
     InvalidSignalString(String),
+
+    #[error("invalid field '{field}': {reason}")]
+    InvalidField { field: String, reason: String },
 }
 
 // ---------------------------------------------------------------------------
@@ -61,12 +64,14 @@ struct SpecDocumentDto {
     pub domain_state_signals: Option<Vec<DomainStateSignalDto>>,
 }
 
-/// DTO for a single requirement (text + provenance sources).
+/// DTO for a single requirement (text + provenance sources + task references).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct SpecRequirementDto {
     pub text: String,
     #[serde(default)]
     pub sources: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub task_refs: Vec<String>,
 }
 
 /// DTO for a domain state entry.
@@ -207,8 +212,18 @@ pub fn decode(json: &str) -> Result<SpecDocument, SpecCodecError> {
     Ok(doc)
 }
 
-fn requirement_from_dto(dto: SpecRequirementDto) -> Result<SpecRequirement, SpecValidationError> {
-    SpecRequirement::new(dto.text, dto.sources)
+fn requirement_from_dto(dto: SpecRequirementDto) -> Result<SpecRequirement, SpecCodecError> {
+    let task_refs: Vec<TaskId> = dto
+        .task_refs
+        .into_iter()
+        .map(|s| {
+            TaskId::try_new(s).map_err(|e| SpecCodecError::InvalidField {
+                field: "task_refs".to_owned(),
+                reason: e.to_string(),
+            })
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(SpecRequirement::with_task_refs(dto.text, dto.sources, task_refs)?)
 }
 
 fn domain_state_from_dto(
@@ -305,7 +320,11 @@ fn spec_document_to_dto(doc: &SpecDocument) -> SpecDocumentDto {
 }
 
 fn requirement_to_dto(req: &SpecRequirement) -> SpecRequirementDto {
-    SpecRequirementDto { text: req.text().to_owned(), sources: req.sources().to_vec() }
+    SpecRequirementDto {
+        text: req.text().to_owned(),
+        sources: req.sources().to_vec(),
+        task_refs: req.task_refs().iter().map(|id| id.to_string()).collect(),
+    }
 }
 
 fn domain_state_to_dto(entry: &DomainStateEntry) -> DomainStateEntryDto {
@@ -973,5 +992,86 @@ mod tests {
         assert!(sigs[0].found_transitions().is_empty());
         assert!(sigs[0].missing_transitions().is_empty());
         assert_eq!(sigs[0].signal(), ConfidenceSignal::Blue);
+    }
+
+    // --- task_refs round-trip ---
+
+    #[test]
+    fn test_decode_task_refs_present() {
+        let json = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": {
+    "in_scope": [{ "text": "Req", "sources": ["PRD"], "task_refs": ["T001", "T002"] }],
+    "out_of_scope": []
+  }
+}"#;
+        let doc = decode(json).unwrap();
+        let refs = doc.scope().in_scope()[0].task_refs();
+        assert_eq!(refs.len(), 2);
+        assert_eq!(refs[0].as_ref(), "T001");
+        assert_eq!(refs[1].as_ref(), "T002");
+    }
+
+    #[test]
+    fn test_decode_task_refs_omitted_defaults_to_empty() {
+        let json = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": {
+    "in_scope": [{ "text": "Req", "sources": ["PRD"] }],
+    "out_of_scope": []
+  }
+}"#;
+        let doc = decode(json).unwrap();
+        assert!(doc.scope().in_scope()[0].task_refs().is_empty());
+    }
+
+    #[test]
+    fn test_decode_invalid_task_ref_format_returns_error() {
+        let json = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": {
+    "in_scope": [{ "text": "Req", "sources": ["PRD"], "task_refs": ["not-valid"] }],
+    "out_of_scope": []
+  }
+}"#;
+        let result = decode(json);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_encode_task_refs_round_trip() {
+        let json = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": {
+    "in_scope": [{ "text": "Req", "sources": ["PRD"], "task_refs": ["T001"] }],
+    "out_of_scope": []
+  }
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let re_decoded = decode(&encoded).unwrap();
+        let refs = re_decoded.scope().in_scope()[0].task_refs();
+        assert_eq!(refs.len(), 1);
+        assert_eq!(refs[0].as_ref(), "T001");
+    }
+
+    #[test]
+    fn test_encode_empty_task_refs_omitted_from_json() {
+        let doc = decode(MINIMAL_JSON).unwrap();
+        let encoded = encode(&doc).unwrap();
+        // task_refs should not appear in output when empty (skip_serializing_if)
+        assert!(!encoded.contains("task_refs"));
     }
 }

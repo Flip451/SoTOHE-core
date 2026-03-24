@@ -35,8 +35,9 @@ pub use signal::{
     ConfidenceSignal, SignalBasis, SignalCounts, classify_source_tag, evaluate_source_tag,
 };
 pub use spec::{
-    CodeScanResult, DomainStateEntry, DomainStateSignal, SpecDocument, SpecRequirement, SpecScope,
-    SpecSection, SpecValidationError, evaluate_domain_state_signals, evaluate_requirement_signal,
+    CodeScanResult, CoverageResult, DomainStateEntry, DomainStateSignal, SpecDocument,
+    SpecRequirement, SpecScope, SpecSection, SpecValidationError, evaluate_domain_state_signals,
+    evaluate_requirement_signal,
 };
 pub use timestamp::Timestamp;
 pub use track::{

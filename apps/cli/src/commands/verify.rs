@@ -49,6 +49,17 @@ pub enum VerifyCommand {
     SpecSignals(SpecVerifyArgs),
     /// Check spec.md contains a ## Domain States section with table data rows.
     SpecStates(SpecVerifyArgs),
+    /// Check requirement-to-task coverage for a track (resolved from branch or --track-dir).
+    SpecCoverage(SpecCoverageArgs),
+}
+
+/// Arguments for spec-coverage verify subcommand.
+#[derive(Args)]
+pub struct SpecCoverageArgs {
+    /// Path to the track directory (e.g., track/items/<id>).
+    /// If not provided, the command is a no-op (pass).
+    #[arg(long)]
+    track_dir: Option<PathBuf>,
 }
 
 /// Common arguments for all verify subcommands.
@@ -115,6 +126,16 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
         }
         VerifyCommand::SpecStates(args) => {
             ("verify spec states", infrastructure::verify::spec_states::verify(&args.spec_path))
+        }
+        VerifyCommand::SpecCoverage(args) => {
+            let outcome = match &args.track_dir {
+                Some(dir) if dir.is_dir() => infrastructure::verify::spec_coverage::verify(dir),
+                Some(dir) => VerifyOutcome::from_findings(vec![domain::verify::Finding::error(
+                    format!("Track directory does not exist: {}", dir.display()),
+                )]),
+                None => VerifyOutcome::pass(),
+            };
+            ("verify spec coverage", outcome)
         }
     };
 
@@ -440,6 +461,52 @@ mod tests {
         )
         .unwrap();
         let exit = execute(VerifyCommand::SpecStates(SpecVerifyArgs { spec_path: spec }));
+        assert_eq!(exit, ExitCode::FAILURE);
+    }
+
+    // --- spec-coverage CLI wiring ---
+
+    #[test]
+    fn test_spec_coverage_subcommand_returns_success_with_no_track_dir() {
+        let exit = execute(VerifyCommand::SpecCoverage(SpecCoverageArgs { track_dir: None }));
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn test_spec_coverage_subcommand_returns_success_with_covered_track() {
+        let tmp = TempDir::new().unwrap();
+        let dir = tmp.path().join("track/items/test-track");
+        std::fs::create_dir_all(&dir).unwrap();
+        write_file(
+            tmp.path(),
+            "track/items/test-track/metadata.json",
+            r#"{"schema_version":3,"id":"test-track","title":"T","status":"in_progress","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch":"track/test-track","tasks":[{"id":"T001","description":"task","status":"todo"}],"plan":{"summary":[],"sections":[{"id":"S1","title":"S","description":[],"task_ids":["T001"]}]}}"#,
+        );
+        write_file(
+            tmp.path(),
+            "track/items/test-track/spec.json",
+            r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[{"text":"item","sources":["PRD"],"task_refs":["T001"]}],"out_of_scope":[]}}"#,
+        );
+        let exit = execute(VerifyCommand::SpecCoverage(SpecCoverageArgs { track_dir: Some(dir) }));
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn test_spec_coverage_subcommand_returns_failure_for_uncovered() {
+        let tmp = TempDir::new().unwrap();
+        let dir = tmp.path().join("track/items/test-track");
+        std::fs::create_dir_all(&dir).unwrap();
+        write_file(
+            tmp.path(),
+            "track/items/test-track/metadata.json",
+            r#"{"schema_version":3,"id":"test-track","title":"T","status":"in_progress","created_at":"2026-01-01T00:00:00Z","updated_at":"2026-01-01T00:00:00Z","branch":"track/test-track","tasks":[{"id":"T001","description":"task","status":"todo"}],"plan":{"summary":[],"sections":[{"id":"S1","title":"S","description":[],"task_ids":["T001"]}]}}"#,
+        );
+        write_file(
+            tmp.path(),
+            "track/items/test-track/spec.json",
+            r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[{"text":"uncovered","sources":["PRD"]}],"out_of_scope":[]}}"#,
+        );
+        let exit = execute(VerifyCommand::SpecCoverage(SpecCoverageArgs { track_dir: Some(dir) }));
         assert_eq!(exit, ExitCode::FAILURE);
     }
 }

@@ -40,6 +40,7 @@ For day-to-day workflow and quality gate overview, see `track/workflow.md`.
   - `test-local` — nextest test execution
   - `test-doc-local` — doctest execution
   - `deny-local` — forbidden dependency / license verification
+  - `python-lint-local` — Python scripts / hooks ruff lint
   - `scripts-selftest-local` — verify script regression tests
   - `hooks-selftest-local` — Claude hook regression tests
   - `check-layers-local` — layer dependency rule verification (including transitive)
@@ -49,7 +50,14 @@ For day-to-day workflow and quality gate overview, see `track/workflow.md`.
   - `verify-tech-stack-local` — tech-stack.md blocking `TODO:` verification
   - `verify-track-registry-local` — registry.md and metadata.json sync verification
   - `verify-orchestra-local` — hooks, permissions, agent definition verification
+  - `verify-canonical-modules-local` — canonical module ownership verification
   - `verify-latest-track-local` — latest track spec.md / plan.md / verification.md completeness
+  - `verify-module-size-local` — Rust source file size verification
+  - `verify-domain-strings-local` — domain pub String field detection
+  - `verify-domain-purity-local` — domain hexagonal purity verification
+  - `verify-usecase-purity-local` — usecase hexagonal purity verification
+  - `verify-view-freshness-local` — plan.md / spec.md / registry.md freshness verification
+  - `verify-spec-coverage-local` — spec.json requirement-to-task coverage (in_scope + AC must have task_refs)
 - `/track:commit <message>` = recommended path; applies `tmp/track-commit/note.md` if present
 - `cargo make commit` = `cargo make ci` + `git commit` low-level alternative (no extra gates, no auto note)
 - Exact automation wrappers:

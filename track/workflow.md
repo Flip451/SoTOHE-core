@@ -75,6 +75,7 @@ Specialist capability の実体は `.claude/agent-profiles.json` で決まる。
 - [ ] `cargo make test` passes (all tests)
 - [ ] `cargo make test-doc` passes (doc tests)
 - [ ] `cargo make deny` passes
+- [ ] `cargo make python-lint` passes
 - [ ] `cargo make scripts-selftest` passes
 - [ ] `cargo make hooks-selftest` passes
 - [ ] `cargo make check-layers` passes
@@ -84,7 +85,14 @@ Specialist capability の実体は `.claude/agent-profiles.json` で決まる。
 - [ ] `cargo make verify-track-registry` passes
 - [ ] `cargo make verify-tech-stack` passes
 - [ ] `cargo make verify-orchestra` passes
+- [ ] `cargo make verify-canonical-modules` passes
 - [ ] `cargo make verify-latest-track` passes
+- [ ] `cargo make verify-module-size` passes
+- [ ] `cargo make verify-domain-strings` passes
+- [ ] `cargo make verify-domain-purity` passes
+- [ ] `cargo make verify-usecase-purity` passes
+- [ ] `cargo make verify-view-freshness` passes
+- [ ] `cargo make verify-spec-coverage` passes
 
 `/track:commit <message>` はユーザー向けの正規コミット経路で、必要なら git note 適用まで含めて処理する。
 

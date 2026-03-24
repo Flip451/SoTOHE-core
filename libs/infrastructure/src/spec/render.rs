@@ -194,29 +194,43 @@ pub fn render_spec(doc: &SpecDocument) -> String {
 // Private helpers
 // ---------------------------------------------------------------------------
 
-/// Renders a requirement as a bullet item with optional source annotation.
+/// Renders a requirement as a bullet item with optional source and task_refs annotations.
 ///
 /// Single source:  `- text [source: tag]`
 /// Multiple:       `- text [source: tag1, tag2]`
+/// With tasks:     `- text [source: tag] [tasks: T001, T002]`
 /// No sources:     `- text`
 fn render_requirement(req: &SpecRequirement) -> String {
-    let sources = req.sources();
-    if sources.is_empty() {
-        format!("- {}\n", req.text())
-    } else {
-        format!("- {} [source: {}]\n", req.text(), sources.join(", "))
-    }
+    let mut line = format!("- {}", req.text());
+    append_source_tag(&mut line, req);
+    append_task_refs_tag(&mut line, req);
+    line.push('\n');
+    line
 }
 
 /// Renders an acceptance criterion as a checkbox bullet item.
 ///
-/// Format: `- [ ] text [source: tag]`
+/// Format: `- [ ] text [source: tag] [tasks: T001]`
 fn render_acceptance_criterion(req: &SpecRequirement) -> String {
+    let mut line = format!("- [ ] {}", req.text());
+    append_source_tag(&mut line, req);
+    append_task_refs_tag(&mut line, req);
+    line.push('\n');
+    line
+}
+
+fn append_source_tag(line: &mut String, req: &SpecRequirement) {
     let sources = req.sources();
-    if sources.is_empty() {
-        format!("- [ ] {}\n", req.text())
-    } else {
-        format!("- [ ] {} [source: {}]\n", req.text(), sources.join(", "))
+    if !sources.is_empty() {
+        line.push_str(&format!(" [source: {}]", sources.join(", ")));
+    }
+}
+
+fn append_task_refs_tag(line: &mut String, req: &SpecRequirement) {
+    let task_refs = req.task_refs();
+    if !task_refs.is_empty() {
+        let refs: Vec<&str> = task_refs.iter().map(|id| id.as_ref()).collect();
+        line.push_str(&format!(" [tasks: {}]", refs.join(", ")));
     }
 }
 
@@ -1187,5 +1201,42 @@ version: \"1.0\"
         let doc = make_doc_both_stages();
         let output = render_signal_summary(&doc);
         assert!(output.ends_with('\n'), "output must end with trailing newline");
+    }
+
+    // --- task_refs rendering ---
+
+    #[test]
+    fn test_render_requirement_with_task_refs() {
+        let req = SpecRequirement::with_task_refs(
+            "Enable feature",
+            vec!["PRD §1".into()],
+            vec![
+                domain::TaskId::try_new("T001").unwrap(),
+                domain::TaskId::try_new("T002").unwrap(),
+            ],
+        )
+        .unwrap();
+        let line = render_requirement(&req);
+        assert_eq!(line, "- Enable feature [source: PRD §1] [tasks: T001, T002]\n");
+    }
+
+    #[test]
+    fn test_render_requirement_without_task_refs() {
+        let req = SpecRequirement::new("Enable feature", vec!["PRD §1".into()]).unwrap();
+        let line = render_requirement(&req);
+        assert_eq!(line, "- Enable feature [source: PRD §1]\n");
+        assert!(!line.contains("[tasks:"));
+    }
+
+    #[test]
+    fn test_render_acceptance_criterion_with_task_refs() {
+        let req = SpecRequirement::with_task_refs(
+            "AC item",
+            vec!["discussion".into()],
+            vec![domain::TaskId::try_new("T003").unwrap()],
+        )
+        .unwrap();
+        let line = render_acceptance_criterion(&req);
+        assert_eq!(line, "- [ ] AC item [source: discussion] [tasks: T003]\n");
     }
 }

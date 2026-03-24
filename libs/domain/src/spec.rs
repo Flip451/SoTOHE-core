@@ -5,7 +5,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::{ConfidenceSignal, SignalCounts, classify_source_tag};
+use crate::{ConfidenceSignal, SignalCounts, TaskId, classify_source_tag};
 
 // ---------------------------------------------------------------------------
 // Value objects
@@ -22,20 +22,34 @@ use crate::{ConfidenceSignal, SignalCounts, classify_source_tag};
 pub struct SpecRequirement {
     text: String,
     sources: Vec<String>,
+    task_refs: Vec<TaskId>,
 }
 
 impl SpecRequirement {
-    /// Creates a new requirement.
+    /// Creates a new requirement with empty task_refs.
     ///
     /// # Errors
     ///
     /// Returns error if `text` is empty or whitespace-only.
     pub fn new(text: impl Into<String>, sources: Vec<String>) -> Result<Self, SpecValidationError> {
+        Self::with_task_refs(text, sources, vec![])
+    }
+
+    /// Creates a new requirement with explicit task references.
+    ///
+    /// # Errors
+    ///
+    /// Returns error if `text` is empty or whitespace-only.
+    pub fn with_task_refs(
+        text: impl Into<String>,
+        sources: Vec<String>,
+        task_refs: Vec<TaskId>,
+    ) -> Result<Self, SpecValidationError> {
         let text = text.into();
         if text.trim().is_empty() {
             return Err(SpecValidationError::EmptyRequirementText);
         }
-        Ok(Self { text, sources })
+        Ok(Self { text, sources, task_refs })
     }
 
     /// Returns the requirement text.
@@ -48,6 +62,12 @@ impl SpecRequirement {
     #[must_use]
     pub fn sources(&self) -> &[String] {
         &self.sources
+    }
+
+    /// Returns the task references linking this requirement to plan tasks.
+    #[must_use]
+    pub fn task_refs(&self) -> &[TaskId] {
+        &self.task_refs
     }
 
     /// Evaluates the confidence signal for this requirement.
@@ -472,6 +492,79 @@ impl SpecDocument {
 
         SignalCounts::new(blue, yellow, red)
     }
+
+    /// Evaluates requirement-to-task coverage for CI gate enforcement.
+    ///
+    /// Checks in_scope and acceptance_criteria requirements (enforced sections).
+    /// Constraints are NOT enforced — their coverage is not checked here.
+    ///
+    /// Validates that:
+    /// 1. Every enforced requirement has at least one task_ref.
+    /// 2. Every task_ref references a valid task ID from the provided set.
+    #[must_use]
+    pub fn evaluate_coverage(&self, valid_task_ids: &HashSet<TaskId>) -> CoverageResult {
+        let mut covered: u32 = 0;
+        let mut uncovered: Vec<String> = Vec::new();
+        let mut invalid_refs: Vec<String> = Vec::new();
+        let mut seen_invalid: HashSet<String> = HashSet::new();
+
+        let enforced = self.scope.in_scope.iter().chain(self.acceptance_criteria.iter());
+
+        for req in enforced {
+            let mut has_valid_ref = false;
+
+            for task_ref in &req.task_refs {
+                if valid_task_ids.contains(task_ref) {
+                    has_valid_ref = true;
+                } else {
+                    let ref_str = task_ref.to_string();
+                    if seen_invalid.insert(ref_str.clone()) {
+                        invalid_refs.push(ref_str);
+                    }
+                }
+            }
+
+            if has_valid_ref {
+                covered += 1;
+            } else {
+                uncovered.push(req.text.clone());
+            }
+        }
+
+        CoverageResult::new(covered, uncovered, invalid_refs)
+    }
+
+    /// Validates referential integrity of task_refs across ALL sections.
+    ///
+    /// Returns task_ref IDs that do not exist in the provided task set.
+    /// Unlike `evaluate_coverage()` which only checks enforced sections,
+    /// this checks constraints and out_of_scope as well.
+    #[must_use]
+    pub fn validate_all_task_refs(&self, valid_task_ids: &HashSet<TaskId>) -> Vec<String> {
+        let mut invalid: Vec<String> = Vec::new();
+        let mut seen: HashSet<String> = HashSet::new();
+
+        let all_requirements = self
+            .scope
+            .in_scope
+            .iter()
+            .chain(self.scope.out_of_scope.iter())
+            .chain(self.constraints.iter())
+            .chain(self.acceptance_criteria.iter());
+
+        for req in all_requirements {
+            for task_ref in &req.task_refs {
+                if !valid_task_ids.contains(task_ref) {
+                    let ref_str = task_ref.to_string();
+                    if seen.insert(ref_str.clone()) {
+                        invalid.push(ref_str);
+                    }
+                }
+            }
+        }
+
+        invalid
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -559,6 +652,58 @@ pub fn evaluate_requirement_signal(sources: &[String]) -> ConfidenceSignal {
 }
 
 // ---------------------------------------------------------------------------
+// Coverage evaluation
+// ---------------------------------------------------------------------------
+
+/// Result of evaluating requirement-to-task coverage.
+///
+/// Produced by `SpecDocument::evaluate_coverage()`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CoverageResult {
+    covered: u32,
+    uncovered: Vec<String>,
+    invalid_refs: Vec<String>,
+}
+
+impl CoverageResult {
+    /// Creates a new coverage result.
+    #[must_use]
+    pub fn new(covered: u32, uncovered: Vec<String>, invalid_refs: Vec<String>) -> Self {
+        Self { covered, uncovered, invalid_refs }
+    }
+
+    /// Returns the count of requirements that have at least one task_ref.
+    #[must_use]
+    pub fn covered(&self) -> u32 {
+        self.covered
+    }
+
+    /// Returns the texts of requirements missing task_refs (in_scope + acceptance_criteria only).
+    #[must_use]
+    pub fn uncovered(&self) -> &[String] {
+        &self.uncovered
+    }
+
+    /// Returns task_ref IDs that do not exist in the provided task set.
+    #[must_use]
+    pub fn invalid_refs(&self) -> &[String] {
+        &self.invalid_refs
+    }
+
+    /// Returns `true` if all evaluable requirements are covered and no invalid refs exist.
+    #[must_use]
+    pub fn is_fully_covered(&self) -> bool {
+        self.uncovered.is_empty() && self.invalid_refs.is_empty()
+    }
+
+    /// Returns the total number of evaluable requirements.
+    #[must_use]
+    pub fn total(&self) -> u32 {
+        self.covered + self.uncovered.len() as u32
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Errors
 // ---------------------------------------------------------------------------
 
@@ -606,6 +751,33 @@ mod tests {
     #[test]
     fn test_requirement_with_whitespace_text_returns_error() {
         let result = SpecRequirement::new("   ", vec![]);
+        assert!(matches!(result, Err(SpecValidationError::EmptyRequirementText)));
+    }
+
+    // --- SpecRequirement task_refs ---
+
+    #[test]
+    fn test_requirement_new_has_empty_task_refs_by_default() {
+        let req = SpecRequirement::new("Enable feature X", vec!["PRD §3.2".into()]).unwrap();
+        assert!(req.task_refs().is_empty());
+    }
+
+    #[test]
+    fn test_requirement_with_task_refs_stores_refs() {
+        let req = SpecRequirement::with_task_refs(
+            "Enable feature X",
+            vec!["PRD §3.2".into()],
+            vec![TaskId::try_new("T001").unwrap(), TaskId::try_new("T002").unwrap()],
+        )
+        .unwrap();
+        assert_eq!(req.task_refs().len(), 2);
+        assert_eq!(req.task_refs()[0].as_ref(), "T001");
+        assert_eq!(req.task_refs()[1].as_ref(), "T002");
+    }
+
+    #[test]
+    fn test_requirement_with_task_refs_empty_text_returns_error() {
+        let result = SpecRequirement::with_task_refs("", vec![], vec![]);
         assert!(matches!(result, Err(SpecValidationError::EmptyRequirementText)));
     }
 
@@ -1005,5 +1177,347 @@ mod tests {
         assert_eq!(results[0].signal(), ConfidenceSignal::Red);
         assert_eq!(results[1].signal(), ConfidenceSignal::Blue);
         assert_eq!(results[2].signal(), ConfidenceSignal::Yellow);
+    }
+
+    // --- CoverageResult ---
+
+    #[test]
+    fn test_coverage_result_accessors() {
+        let result = CoverageResult::new(3, vec!["uncov".into()], vec!["T999".into()]);
+        assert_eq!(result.covered(), 3);
+        assert_eq!(result.uncovered(), &["uncov"]);
+        assert_eq!(result.invalid_refs(), &["T999"]);
+        assert!(!result.is_fully_covered());
+        assert_eq!(result.total(), 4);
+    }
+
+    #[test]
+    fn test_coverage_result_fully_covered() {
+        let result = CoverageResult::new(5, vec![], vec![]);
+        assert!(result.is_fully_covered());
+        assert_eq!(result.total(), 5);
+    }
+
+    // --- SpecDocument::evaluate_coverage ---
+
+    fn make_task_id_set(ids: &[&str]) -> HashSet<TaskId> {
+        ids.iter().map(|id| TaskId::try_new(*id).unwrap()).collect()
+    }
+
+    #[test]
+    fn test_evaluate_coverage_all_covered() {
+        let doc = SpecDocument::new(
+            "Feature",
+            "draft",
+            "1.0",
+            vec!["Goal".into()],
+            SpecScope::new(
+                vec![
+                    SpecRequirement::with_task_refs(
+                        "in scope item",
+                        vec!["PRD §1".into()],
+                        vec![TaskId::try_new("T001").unwrap()],
+                    )
+                    .unwrap(),
+                ],
+                vec![],
+            ),
+            vec![],
+            vec![],
+            vec![
+                SpecRequirement::with_task_refs(
+                    "AC item",
+                    vec!["discussion".into()],
+                    vec![TaskId::try_new("T002").unwrap()],
+                )
+                .unwrap(),
+            ],
+            vec![],
+            vec![],
+            None,
+            None,
+        )
+        .unwrap();
+
+        let valid = make_task_id_set(&["T001", "T002"]);
+        let result = doc.evaluate_coverage(&valid);
+        assert!(result.is_fully_covered());
+        assert_eq!(result.covered(), 2);
+        assert_eq!(result.total(), 2);
+    }
+
+    #[test]
+    fn test_evaluate_coverage_missing_task_refs() {
+        let doc = SpecDocument::new(
+            "Feature",
+            "draft",
+            "1.0",
+            vec!["Goal".into()],
+            SpecScope::new(
+                vec![SpecRequirement::new("uncovered in scope", vec!["PRD §1".into()]).unwrap()],
+                vec![],
+            ),
+            vec![],
+            vec![],
+            vec![SpecRequirement::new("uncovered AC", vec!["discussion".into()]).unwrap()],
+            vec![],
+            vec![],
+            None,
+            None,
+        )
+        .unwrap();
+
+        let valid = make_task_id_set(&["T001"]);
+        let result = doc.evaluate_coverage(&valid);
+        assert!(!result.is_fully_covered());
+        assert_eq!(result.covered(), 0);
+        assert_eq!(result.uncovered().len(), 2);
+        assert!(result.uncovered().contains(&"uncovered in scope".to_string()));
+        assert!(result.uncovered().contains(&"uncovered AC".to_string()));
+    }
+
+    #[test]
+    fn test_evaluate_coverage_invalid_task_ref() {
+        let doc = SpecDocument::new(
+            "Feature",
+            "draft",
+            "1.0",
+            vec!["Goal".into()],
+            SpecScope::new(
+                vec![
+                    SpecRequirement::with_task_refs(
+                        "in scope",
+                        vec!["PRD §1".into()],
+                        vec![TaskId::try_new("T999").unwrap()],
+                    )
+                    .unwrap(),
+                ],
+                vec![],
+            ),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+        )
+        .unwrap();
+
+        let valid = make_task_id_set(&["T001"]);
+        let result = doc.evaluate_coverage(&valid);
+        assert!(!result.is_fully_covered());
+        assert_eq!(result.covered(), 0); // only invalid refs → uncovered
+        assert_eq!(result.uncovered(), &["in scope"]);
+        assert_eq!(result.invalid_refs(), &["T999"]);
+    }
+
+    #[test]
+    fn test_evaluate_coverage_mixed_valid_and_invalid_refs() {
+        let doc = SpecDocument::new(
+            "Feature",
+            "draft",
+            "1.0",
+            vec!["Goal".into()],
+            SpecScope::new(
+                vec![
+                    SpecRequirement::with_task_refs(
+                        "in scope",
+                        vec!["PRD §1".into()],
+                        vec![TaskId::try_new("T001").unwrap(), TaskId::try_new("T999").unwrap()],
+                    )
+                    .unwrap(),
+                ],
+                vec![],
+            ),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+        )
+        .unwrap();
+
+        let valid = make_task_id_set(&["T001"]);
+        let result = doc.evaluate_coverage(&valid);
+        // Has at least one valid ref → covered, but also has invalid ref
+        assert!(!result.is_fully_covered());
+        assert_eq!(result.covered(), 1);
+        assert!(result.uncovered().is_empty());
+        assert_eq!(result.invalid_refs(), &["T999"]);
+    }
+
+    #[test]
+    fn test_evaluate_coverage_constraints_not_enforced() {
+        let doc = SpecDocument::new(
+            "Feature",
+            "draft",
+            "1.0",
+            vec!["Goal".into()],
+            SpecScope::new(vec![], vec![]),
+            // Constraint with NO task_refs — should NOT appear in uncovered
+            vec![SpecRequirement::new("constraint", vec!["convention — hex.md".into()]).unwrap()],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+        )
+        .unwrap();
+
+        let valid = make_task_id_set(&[]);
+        let result = doc.evaluate_coverage(&valid);
+        assert!(result.is_fully_covered());
+        assert_eq!(result.covered(), 0);
+        assert_eq!(result.total(), 0);
+    }
+
+    #[test]
+    fn test_evaluate_coverage_deduplicates_invalid_refs() {
+        let doc = SpecDocument::new(
+            "Feature",
+            "draft",
+            "1.0",
+            vec!["Goal".into()],
+            SpecScope::new(
+                vec![
+                    SpecRequirement::with_task_refs(
+                        "item 1",
+                        vec!["PRD §1".into()],
+                        vec![TaskId::try_new("T999").unwrap()],
+                    )
+                    .unwrap(),
+                    SpecRequirement::with_task_refs(
+                        "item 2",
+                        vec!["PRD §2".into()],
+                        vec![TaskId::try_new("T999").unwrap()],
+                    )
+                    .unwrap(),
+                ],
+                vec![],
+            ),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+        )
+        .unwrap();
+
+        let valid = make_task_id_set(&["T001"]);
+        let result = doc.evaluate_coverage(&valid);
+        // T999 appears twice in different requirements but should be deduplicated
+        assert_eq!(result.invalid_refs().len(), 1);
+        assert_eq!(result.invalid_refs()[0], "T999");
+    }
+
+    // --- validate_all_task_refs ---
+
+    #[test]
+    fn test_validate_all_task_refs_catches_constraint_invalid_ref() {
+        let doc = SpecDocument::new(
+            "Feature",
+            "draft",
+            "1.0",
+            vec!["Goal".into()],
+            SpecScope::new(vec![], vec![]),
+            vec![
+                SpecRequirement::with_task_refs(
+                    "constraint",
+                    vec!["convention — hex.md".into()],
+                    vec![TaskId::try_new("T999").unwrap()],
+                )
+                .unwrap(),
+            ],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+        )
+        .unwrap();
+
+        let valid = make_task_id_set(&["T001"]);
+        let invalid = doc.validate_all_task_refs(&valid);
+        assert_eq!(invalid, &["T999"]);
+    }
+
+    #[test]
+    fn test_validate_all_task_refs_catches_out_of_scope_invalid_ref() {
+        let doc = SpecDocument::new(
+            "Feature",
+            "draft",
+            "1.0",
+            vec!["Goal".into()],
+            SpecScope::new(
+                vec![],
+                vec![
+                    SpecRequirement::with_task_refs(
+                        "excluded",
+                        vec!["inference — not needed".into()],
+                        vec![TaskId::try_new("T888").unwrap()],
+                    )
+                    .unwrap(),
+                ],
+            ),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+        )
+        .unwrap();
+
+        let valid = make_task_id_set(&["T001"]);
+        let invalid = doc.validate_all_task_refs(&valid);
+        assert_eq!(invalid, &["T888"]);
+    }
+
+    #[test]
+    fn test_validate_all_task_refs_empty_when_all_valid() {
+        let doc = SpecDocument::new(
+            "Feature",
+            "draft",
+            "1.0",
+            vec!["Goal".into()],
+            SpecScope::new(
+                vec![
+                    SpecRequirement::with_task_refs(
+                        "in scope",
+                        vec!["PRD §1".into()],
+                        vec![TaskId::try_new("T001").unwrap()],
+                    )
+                    .unwrap(),
+                ],
+                vec![],
+            ),
+            vec![
+                SpecRequirement::with_task_refs(
+                    "constraint",
+                    vec!["convention".into()],
+                    vec![TaskId::try_new("T001").unwrap()],
+                )
+                .unwrap(),
+            ],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+        )
+        .unwrap();
+
+        let valid = make_task_id_set(&["T001"]);
+        let invalid = doc.validate_all_task_refs(&valid);
+        assert!(invalid.is_empty());
     }
 }
