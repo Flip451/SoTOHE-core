@@ -71,6 +71,12 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Coverage は信号機ではなく CI ゲートとする](2026-03-24-0900-coverage-not-a-signal.md) | Accepted | 2026-03-24 |
 | [Stage 2 信号機にコンパイル通過を条件に入れない](2026-03-24-0910-stage2-no-compile-check.md) | Accepted | 2026-03-24 |
 
+### ADR 運用
+
+| ADR | Status | Date |
+|-----|--------|------|
+| [ADR 自動導出: SSoT → ADR 候補検出の設計](2026-03-24-0930-adr-auto-derivation-design.md) | Accepted (設計のみ) | 2026-03-24 |
+
 ### ドメインモデル・型設計 (DESIGN.md 由来)
 
 | ADR | Status | Date |

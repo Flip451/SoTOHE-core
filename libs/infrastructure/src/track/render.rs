@@ -322,13 +322,18 @@ pub fn validate_track_snapshots(root: &Path) -> Result<(), RenderError> {
     }
 
     let registry_path = root.join("track/registry.md");
-    let actual_registry = std::fs::read_to_string(&registry_path)?;
-    let expected_registry = render_registry(&snapshots);
-    if !rendered_matches(&actual_registry, &expected_registry) {
-        return Err(RenderError::OutOfSync {
-            path: registry_path,
-            reason: "registry.md does not match metadata.json".to_owned(),
-        });
+    // registry.md may be absent if it has been removed from git tracking
+    // (e.g., to prevent merge conflicts in parallel track work).
+    // In that case, skip the freshness check.
+    if registry_path.is_file() {
+        let actual_registry = std::fs::read_to_string(&registry_path)?;
+        let expected_registry = render_registry(&snapshots);
+        if !rendered_matches(&actual_registry, &expected_registry) {
+            return Err(RenderError::OutOfSync {
+                path: registry_path,
+                reason: "registry.md does not match metadata.json".to_owned(),
+            });
+        }
     }
     Ok(())
 }

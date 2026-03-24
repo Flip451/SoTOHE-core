@@ -15,6 +15,7 @@ pub mod layers;
 pub mod module_size;
 pub mod orchestra;
 pub mod spec_attribution;
+pub mod spec_coverage;
 pub mod spec_frontmatter;
 pub mod spec_signals;
 pub mod spec_states;

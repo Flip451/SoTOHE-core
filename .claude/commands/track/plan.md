@@ -41,10 +41,10 @@ After approval — create track artifacts:
   - `schema_version`: 1
   - `status`, `version`, `title`
   - `goal`: array of goal paragraph lines
-  - `scope`: `{in_scope, out_of_scope}` where each item has `{text, sources}`
-  - `constraints`: array of `{text, sources}`
+  - `scope`: `{in_scope, out_of_scope}` where each item has `{text, sources, task_refs?}` (`task_refs` is optional, defaults to empty; populated with task IDs from `metadata.json` to establish requirement-task traceability)
+  - `constraints`: array of `{text, sources, task_refs?}` (task_refs optional for constraints)
   - `domain_states`: array of `{name, description}`
-  - `acceptance_criteria`: array of `{text, sources}`
+  - `acceptance_criteria`: array of `{text, sources, task_refs?}` (`task_refs` populated with task IDs for CI coverage gate)
   - `additional_sections`: array of `{title, content}` (default empty)
   - `related_conventions`: array of convention file paths
   - `signals`: null (will be computed by `sotp track signals`)

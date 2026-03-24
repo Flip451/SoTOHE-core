@@ -1,0 +1,172 @@
+{
+  "branch": "track/req-task-traceability-2026-03-24",
+  "created_at": "2026-03-24T03:00:00Z",
+  "id": "req-task-traceability-2026-03-24",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "SpecRequirement に task_refs: Vec<TaskId> を追加。",
+          "CoverageResult 型と SpecDocument::evaluate_coverage() で紐付き検証ロジックを提供。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001",
+          "T002"
+        ],
+        "title": "Domain: task_refs + coverage 計算"
+      },
+      {
+        "description": [
+          "spec/codec.rs の DTO に task_refs を追加し永続化対応。",
+          "spec/render.rs で task_refs を spec.md に表示。",
+          "verify/spec_coverage.rs で CI ゲートを実装。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T003",
+          "T004",
+          "T005"
+        ],
+        "title": "Infrastructure: codec + render + CI ゲート"
+      },
+      {
+        "description": [
+          "sotp verify spec-coverage CLI コマンドを追加。",
+          "Makefile.toml の CI gate に組み込み (最新アクティブ track のみ検証)。",
+          "/track:plan skill の spec.json テンプレートに task_refs を追加。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T006",
+          "T007"
+        ],
+        "title": "CLI + CI 統合"
+      },
+      {
+        "description": [
+          "end-to-end テストで coverage 検証が動作することを確認。",
+          "DESIGN.md, TRACK_TRACEABILITY.md を更新。"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T008"
+        ],
+        "title": "統合テスト + ドキュメント"
+      }
+    ],
+    "summary": [
+      "spec.json の要件項目 (scope.in_scope, constraints, acceptance_criteria) と metadata.json のタスクを双方向に紐付ける。",
+      "ADR 決定に基づき coverage は信号機ではなく CI ゲート (sotp verify spec-coverage) として実装する。",
+      "spec.json 側の SpecRequirement に task_refs フィールドを追加し、逆方向は計算で導出する。"
+    ]
+  },
+  "review": {
+    "code_hash": "4e92ccdf057389c81e48b666ca274bac7ca65721",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-24T05:33:53Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-24T05:34:16Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 2,
+          "round_type": "fast",
+          "timestamp": "2026-03-24T05:41:22Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 3,
+          "round_type": "fast",
+          "timestamp": "2026-03-24T05:51:10Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "all": {
+        "fast": {
+          "round": 3,
+          "timestamp": "2026-03-24T05:51:10Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-24T05:51:10Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "domain: SpecRequirement に task_refs: Vec<TaskId> 追加 + テスト",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "domain: CoverageResult 型 + SpecDocument::evaluate_coverage() + テスト",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "infra: spec/codec.rs の DTO に task_refs 追加 + round-trip テスト",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "infra: spec/render.rs に task_refs 表示追加 + テスト",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "infra: verify/spec_coverage.rs CI ゲート実装 + テスト",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "CLI: sotp verify spec-coverage コマンド追加",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "description": "Makefile: verify-spec-coverage を CI gate に追加 + /track:plan skill の spec.json 生成に task_refs を含める",
+      "id": "T007",
+      "status": "done"
+    },
+    {
+      "description": "統合テスト + ドキュメント更新 (DESIGN.md, TRACK_TRACEABILITY.md)",
+      "id": "T008",
+      "status": "done"
+    }
+  ],
+  "title": "CC-SDD-01 要件-タスク双方向トレーサビリティ",
+  "updated_at": "2026-03-24T05:51:10Z"
+}
