@@ -1,0 +1,78 @@
+{
+  "schema_version": 3,
+  "id": "knowledge-strategy-move-2026-03-24",
+  "branch": "track/knowledge-strategy-move-2026-03-24",
+  "title": "knowledge/strategy/ 移動 — 戦略文書を git 管理下に",
+  "status": "planned",
+  "created_at": "2026-03-24T06:07:22Z",
+  "updated_at": "2026-03-24T06:07:22Z",
+  "review": {
+    "status": "not_started",
+    "groups": {}
+  },
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "knowledge/strategy/README.md 作成（ディレクトリ目的 + ファイル一覧）",
+      "status": "todo"
+    },
+    {
+      "id": "T002",
+      "description": "戦略文書 5 ファイルを tmp/ → knowledge/strategy/ に移動 + 日付サフィックス除去 + .gitignore 除外設定",
+      "status": "todo"
+    },
+    {
+      "id": "T003",
+      "description": "全リポジトリの旧 tmp/ パス参照を knowledge/strategy/ パスに修正（移動ファイル内 + ADR + conventions + その他 git tracked ファイル）",
+      "status": "todo"
+    },
+    {
+      "id": "T004",
+      "description": "CLAUDE.md + memory + knowledge/adr/README.md 参照更新",
+      "status": "todo"
+    }
+  ],
+  "plan": {
+    "summary": [
+      "tmp/（gitignore 済み）にある戦略的 SSoT 文書を knowledge/strategy/ に移動し git 管理下に置く。",
+      "日付サフィックスを除去して SSoT 化。旧版は tmp/ に残す（git 履歴で参照可能）。",
+      "ADR 自動導出（sotp adr suggest）のスキャン対象にするための前提条件。"
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "ディレクトリ基盤",
+        "description": [
+          "T001: knowledge/strategy/README.md を作成。",
+          "ディレクトリの目的（戦略的 SSoT の永続化）とファイル一覧を記載。"
+        ],
+        "task_ids": ["T001"]
+      },
+      {
+        "id": "S2",
+        "title": "ファイル移動",
+        "description": [
+          "T002: 5 ファイルを移動。",
+          "tmp/TODO.md → knowledge/strategy/TODO.md",
+          "tmp/TODO-PLAN-2026-03-22.md → knowledge/strategy/TODO-PLAN.md",
+          "tmp/vision-2026-03-22.md → knowledge/strategy/vision.md",
+          "tmp/progress-tracker-2026-03-22.md → knowledge/strategy/progress-tracker.md",
+          "tmp/TODO-PLAN-v4-draft-2026-03-23.md → knowledge/strategy/TODO-PLAN-v4-draft.md",
+          ".gitignore に !knowledge/strategy/ 除外ルールを追加（tmp/ は gitignore だが knowledge/ は git 管理対象）。"
+        ],
+        "task_ids": ["T002"]
+      },
+      {
+        "id": "S3",
+        "title": "参照修正",
+        "description": [
+          "T003: 旧 tmp/ パス参照を全リポジトリから検索・修正。",
+          "対象: 移動ファイル内の相互参照 + knowledge/adr/*.md + project-docs/conventions/*.md + その他 git tracked ファイル。",
+          "Grep で tmp/TODO, tmp/vision, tmp/progress-tracker, tmp/TODO-PLAN を検索し全て更新（track/items/ 配下の計画文書は除外 — 計画文書は旧パスを意図的に文書化している）。",
+          "T004: CLAUDE.md + memory + knowledge/adr/README.md の参照を更新。"
+        ],
+        "task_ids": ["T003", "T004"]
+      }
+    ]
+  }
+}

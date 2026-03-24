@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "knowledge/strategy/ 移動 — 戦略文書を git 管理下に",
+  "goal": [
+    "tmp/（gitignore 済み）にある戦略的 SSoT 文書を knowledge/strategy/ に移動し git 管理下に置く。",
+    "clone した人にも戦略文書が見え、ADR 自動導出のスキャン対象になる状態を実現する。"
+  ],
+  "scope": {
+    "in_scope": [
+      {"text": "knowledge/strategy/ ディレクトリ新設 + README.md", "sources": ["discussion"], "task_refs": ["T001"]},
+      {"text": "TODO.md を knowledge/strategy/ に移動", "sources": ["discussion"], "task_refs": ["T002"]},
+      {"text": "TODO-PLAN を日付サフィックス除去して移動", "sources": ["discussion"], "task_refs": ["T002"]},
+      {"text": "vision を日付サフィックス除去して移動", "sources": ["discussion"], "task_refs": ["T002"]},
+      {"text": "progress-tracker を日付サフィックス除去して移動", "sources": ["discussion"], "task_refs": ["T002"]},
+      {"text": "TODO-PLAN-v4-draft を移動", "sources": ["discussion"], "task_refs": ["T002"]},
+      {"text": ".gitignore に knowledge/ 除外ルール追加（knowledge/ は git 管理対象）", "sources": ["discussion"], "task_refs": ["T002"]},
+      {"text": "全 git tracked ファイルの旧 tmp/ 戦略文書パス参照を修正（knowledge/adr/*.md, project-docs/conventions/*.md 含む。track/items/ は除外）", "sources": ["discussion"], "task_refs": ["T003"]},
+      {"text": "CLAUDE.md 参照追加", "sources": ["discussion"], "task_refs": ["T004"]},
+      {"text": "memory 参照更新", "sources": ["discussion"], "task_refs": ["T004"]},
+      {"text": "knowledge/adr/README.md の旧パス参照更新", "sources": ["discussion"], "task_refs": ["T004"]}
+    ],
+    "out_of_scope": [
+      {"text": "分析レポート（sdd-comparison, adoption-candidates 等）の移動", "sources": ["inference — フル knowledge/ 再編で対応"]},
+      {"text": "sotp adr suggest 実装", "sources": ["inference — CC-SDD-01 完了後に着手"]},
+      {"text": "tmp/ の完全整理", "sources": ["inference — 別トラック"]},
+      {"text": ".claude/docs/ → knowledge/ の移動", "sources": ["inference — フル knowledge/ 再編で対応"]}
+    ]
+  },
+  "constraints": [
+    {"text": "knowledge/ は git 管理対象（.gitignore の除外ルールで明示）", "sources": ["discussion"], "task_refs": ["T002"]},
+    {"text": "旧版ファイルは tmp/ に残す（gitignore のまま）", "sources": ["discussion"], "task_refs": ["T002"]},
+    {"text": "日付サフィックスを除去し SSoT 化（git 履歴で変更日を管理）", "sources": ["discussion"], "task_refs": ["T002"]}
+  ],
+  "domain_states": [
+    {"name": "StrategyDocument", "description": "戦略文書（TODO, TODO-PLAN, vision, progress-tracker）。移動前は tmp/（gitignore）、移動後は knowledge/strategy/（git 管理）"},
+    {"name": "CrossReference", "description": "ファイル間の相互参照リンク。旧パス（tmp/）→ 新パス（knowledge/strategy/）に更新"}
+  ],
+  "acceptance_criteria": [
+    {"text": "knowledge/strategy/README.md が存在する", "sources": ["discussion"], "task_refs": ["T001"]},
+    {"text": "knowledge/strategy/ に 5 ファイルが存在する（TODO.md, TODO-PLAN.md, vision.md, progress-tracker.md, TODO-PLAN-v4-draft.md）", "sources": ["discussion"], "task_refs": ["T002"]},
+    {"text": "ファイル名に日付サフィックスがない", "sources": ["discussion"], "task_refs": ["T002"]},
+    {"text": "git ls-files --error-unmatch で knowledge/strategy/ の全ファイルが tracked と確認できる", "sources": ["discussion"], "task_refs": ["T002"]},
+    {"text": "git tracked ファイル内に旧 tmp/ 戦略文書パスへの参照が残っていない（Grep で検証、track/items/ 配下の計画文書は除外）", "sources": ["discussion"], "task_refs": ["T003"]},
+    {"text": "CLAUDE.md に knowledge/strategy/ への参照がある", "sources": ["discussion"], "task_refs": ["T004"]},
+    {"text": "knowledge/adr/README.md 内の旧 tmp/ パス参照が新パスに更新されている", "sources": ["discussion"], "task_refs": ["T004"]},
+    {"text": "cargo make ci が全テスト通過する", "sources": ["convention — hexagonal-architecture.md"], "task_refs": ["T001", "T002", "T003", "T004"]}
+  ],
+  "additional_sections": [],
+  "related_conventions": [],
+  "signals": null
+}
