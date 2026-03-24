@@ -68,6 +68,8 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 |-----|--------|------|
 | [2 段階信号機アーキテクチャ](2026-03-23-2120-two-stage-signal-architecture.md) | Accepted | 2026-03-23 |
 | [spec ↔ code 整合性チェックは Phase 3 に送る](2026-03-23-2130-spec-code-consistency-deferred.md) | Accepted | 2026-03-23 |
+| [Coverage は信号機ではなく CI ゲートとする](2026-03-24-0900-coverage-not-a-signal.md) | Accepted | 2026-03-24 |
+| [Stage 2 信号機にコンパイル通過を条件に入れない](2026-03-24-0910-stage2-no-compile-check.md) | Accepted | 2026-03-24 |
 
 ### ドメインモデル・型設計 (DESIGN.md 由来)
 

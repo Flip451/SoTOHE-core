@@ -14,13 +14,13 @@ check-approved CLI が staged files を planning-only allowlist と照合し、
 code ファイルがあれば planning_only=false で usecase を呼び出す。
 usecase は planning_only==false のとき NotStarted+empty groups の fast-path を無効化。
 
-- [ ] check-approved planning-only bypass guard: staged files vs allowlist → --planning-only flag
-- [ ] 統合テスト: planning-only bypass が code diff で拒否されることを検証
+- [x] check-approved planning-only bypass guard: staged files vs allowlist → --planning-only flag
+- [x] 統合テスト: planning-only bypass が code diff で拒否されることを検証
 
 ## record-round wiring + visibility
 
 /track:review skill の Step 2d (verdict aggregation) 後に record-round を呼ぶよう配線。
 sotp review status コマンドで per-group 状態を表示。
 
-- [ ] /track:review skill を sotp review record-round に配線 (fast/final 各グループ結果を永続化)
-- [ ] sotp review status CLI コマンド: per-group Fast/Final 状態表示
+- [x] /track:review skill を sotp review record-round に配線 (fast/final 各グループ結果を永続化)
+- [x] sotp review status CLI コマンド: per-group Fast/Final 状態表示

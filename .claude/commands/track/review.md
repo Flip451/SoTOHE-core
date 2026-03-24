@@ -57,7 +57,8 @@ file to exactly one observation group:
 
 | Group | Scope | Files matching |
 |-------|-------|----------------|
-| **infra-domain** | Error type design, trait signatures, architecture direction | `libs/infrastructure/**`, `libs/domain/**` |
+| **domain** | Type design, invariants, business rules, trait signatures (ports) | `libs/domain/**` |
+| **infra** | I/O correctness, parsing, adapters, external dependencies. Include related domain trait signatures in briefing as context. | `libs/infrastructure/**` |
 | **usecase** | Workflow logic, error propagation, functional correctness | `libs/usecase/**` |
 | **cli** | CLI error handling, exit codes, user-facing messages, functional regressions | `apps/cli/**` |
 | **other** | Workflow docs, skill definitions, track artifacts, scripts, config | Everything else (`.claude/**`, `track/**`, `DEVELOPER_AI_WORKFLOW.md`, `scripts/**`, `Cargo.*`, etc.) |
@@ -114,10 +115,11 @@ Commands in the `FORBIDDEN_ALLOW` list trigger permission prompts and block auto
 Use `{fast_model}` for iterative rounds and `{model}` for the final confirmation round (see Model escalation strategy).
 
 ```
-Agent 1: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-infra-domain.md
-Agent 2: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-usecase.md
-Agent 3: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-cli.md
-Agent 4: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-other.md
+Agent 1: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-domain.md
+Agent 2: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-infra.md
+Agent 3: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-usecase.md
+Agent 4: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-cli.md
+Agent 5: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-other.md
 ```
 
 For the **final confirmation round**, replace `{fast_model}` with `{model}` in the commands above.
@@ -158,6 +160,45 @@ severity, file, or line, use `null` for that field instead of omitting it.
 `zero_findings` must use an empty `findings` array, and `findings_remain` must include at least
 one finding. The wrapper prints that final JSON payload as the last stdout line.
 
+### 2e. Record round results
+
+After aggregating verdicts for each group, persist the result into `metadata.json` via
+`sotp review record-round`. This wires the reviewer output into the domain review state
+machine so that `check-approved` can enforce the review guard.
+
+For **each non-empty group**, run (when the `<= 5 files` collapse rule was applied and a
+single reviewer invocation was used, treat all changed files as a single group named `all`
+and pass `--expected-groups all`):
+
+```bash
+bin/sotp review record-round \
+  --track-id {track-id} \
+  --round-type {fast|final} \
+  --group {group-name} \
+  --verdict '{aggregated verdict JSON for this group}' \
+  --expected-groups {comma-separated list of all non-empty group names} \
+  --concerns {comma-separated concern slugs extracted from findings, empty for zero_findings} \
+  --items-dir track/items
+```
+
+**Concern extraction**: For `findings_remain` verdicts, extract concern slugs from findings
+using `findings_to_concerns()` 3-stage fallback:
+1. Use the finding's `category` field if present (e.g., `"security"`, `"logic_error"`).
+2. If no category, derive from the `file` field (e.g., `libs/domain/src/review.rs` → `domain.review`).
+3. If neither is available, use `"other"`.
+4. Deduplicate concerns before passing to `--concerns`.
+
+For `zero_findings` verdicts, pass `--concerns ""` (empty).
+
+**Error handling**:
+- If `record-round` returns exit code 3 (`EscalationActive`): stop the review loop and
+  report the escalation block to the user with the required resolution steps.
+- If `record-round` fails with a stale-hash error (stderr contains "code hash mismatch"):
+  the review state has been invalidated. Stop and re-run the review from Round 1 —
+  proceeding would leave the review state inconsistent with the current code.
+- If `record-round` fails with any other error: report but continue (fail-open for recording;
+  the review cycle itself is not blocked by a recording failure).
+
 ## Step 3: Review → Fix → Review loop
 
 ### Round 1 (initial review)
@@ -173,11 +214,16 @@ Parse the aggregated verdict:
 ### Fix phase
 
 For each finding:
-1. Assess severity (P1 / P2 / P3).
-2. P3 findings from pre-existing unchanged code: note but do not fix.
-3. P1 and P2: implement the fix.
-4. If the finding requires a new test, add it.
-5. Run `cargo make ci` (or `cargo make ci-rust` for fast inner loop) to verify fixes compile and pass.
+
+1. **Verify factual claims before acting.** If the finding asserts a fact about the codebase
+   (e.g., "function X returns Y", "the runtime emits file Z", "this trait requires W"),
+   use `Grep` / `Read` to confirm the claim is true. Reviewer models can hallucinate
+   implementation details. Do NOT revert correct code based on an unverified claim.
+2. Assess severity (P1 / P2 / P3).
+3. P3 findings from pre-existing unchanged code: note but do not fix.
+4. P1 and P2: implement the fix.
+5. If the finding requires a new test, add it.
+6. Run `cargo make ci` (or `cargo make ci-rust` for fast inner loop) to verify fixes compile and pass.
 
 ### Round N (fix verification)
 

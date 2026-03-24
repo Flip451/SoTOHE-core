@@ -727,3 +727,275 @@ fn run_codex_local_defaults_to_full_auto_when_profiles_missing() {
         "expected --full-auto (fail-closed) when profiles missing, got: {args_content}"
     );
 }
+
+// ---------------------------------------------------------------------------
+// is_planning_only_path unit tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn planning_only_path_accepts_track_files() {
+    use super::is_planning_only_path;
+
+    assert!(is_planning_only_path("track/items/my-track/metadata.json"));
+    assert!(is_planning_only_path("track/registry.md"));
+    assert!(is_planning_only_path("track/tech-stack.md"));
+    assert!(is_planning_only_path("track/workflow.md"));
+}
+
+#[test]
+fn planning_only_path_accepts_doc_and_config_files() {
+    use super::is_planning_only_path;
+
+    assert!(is_planning_only_path(".claude/docs/DESIGN.md"));
+    assert!(is_planning_only_path(".claude/commands/track/review.md"));
+    assert!(is_planning_only_path(".claude/rules/04-coding-principles.md"));
+    assert!(is_planning_only_path(".claude/agent-profiles.json"));
+    assert!(is_planning_only_path(".claude/settings.json"));
+    assert!(is_planning_only_path("project-docs/conventions/hexagonal-architecture.md"));
+    assert!(is_planning_only_path("docs/architecture-rules.json"));
+    assert!(is_planning_only_path("knowledge/adr/2026-03-11-0000-foo.md"));
+    assert!(is_planning_only_path("CLAUDE.md"));
+    assert!(is_planning_only_path("DEVELOPER_AI_WORKFLOW.md"));
+    assert!(is_planning_only_path("TRACK_TRACEABILITY.md"));
+    assert!(is_planning_only_path("README.md"));
+    // Root-level .md files are planning-only
+    assert!(is_planning_only_path("AGENTS.md"));
+    assert!(is_planning_only_path("CHANGELOG.md"));
+}
+
+#[test]
+fn planning_only_path_rejects_code_files() {
+    use super::is_planning_only_path;
+
+    assert!(!is_planning_only_path("libs/domain/src/review/state.rs"));
+    assert!(!is_planning_only_path("libs/usecase/src/review_workflow/usecases.rs"));
+    assert!(!is_planning_only_path("libs/infrastructure/src/review_adapters.rs"));
+    assert!(!is_planning_only_path("apps/cli/src/commands/review/mod.rs"));
+    assert!(!is_planning_only_path("Cargo.toml"));
+    assert!(!is_planning_only_path("Cargo.lock"));
+    // Executable code under .claude/ and tmp/ must NOT be planning-only
+    assert!(!is_planning_only_path(".claude/hooks/check-codex-before-write.py"));
+    assert!(!is_planning_only_path(".claude/skills/track-plan/SKILL.md"));
+    assert!(!is_planning_only_path("tmp/reviewer-runtime/briefing.md"));
+    assert!(!is_planning_only_path("tmp/some-script.sh"));
+    assert!(!is_planning_only_path("Makefile.toml"));
+    assert!(!is_planning_only_path("Dockerfile"));
+    assert!(!is_planning_only_path("deny.toml"));
+    assert!(!is_planning_only_path("rustfmt.toml"));
+    assert!(!is_planning_only_path("scripts/check_layers.py"));
+    assert!(!is_planning_only_path("vendor/conch-parser/src/lib.rs"));
+    // Code/unknown extensions in planning-only directories are rejected (fail-closed)
+    assert!(!is_planning_only_path("docs/exploit.rs"));
+    assert!(!is_planning_only_path("track/items/my-track/helper.py"));
+    assert!(!is_planning_only_path("knowledge/script.sh"));
+    assert!(!is_planning_only_path("docs/exploit.js"));
+    assert!(!is_planning_only_path("docs/tool.rb"));
+    assert!(!is_planning_only_path("track/items/my-track/Dockerfile"));
+}
+
+// ---------------------------------------------------------------------------
+// is_planning_only_path: boundary cases and composition tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn planning_only_path_empty_staged_is_planning_only() {
+    // When no files are staged, all(is_planning_only) returns true (vacuous truth).
+    use super::is_planning_only_path;
+
+    let staged: [&str; 0] = [];
+    assert!(staged.iter().all(|f| is_planning_only_path(f)));
+}
+
+#[test]
+fn planning_only_path_mixed_staged_is_not_planning_only() {
+    // When a mix of planning-only and code files are staged, result is false.
+    use super::is_planning_only_path;
+
+    let staged = ["track/items/my-track/metadata.json", "libs/domain/src/review/state.rs"];
+    assert!(!staged.iter().all(|f| is_planning_only_path(f)));
+}
+
+#[test]
+fn planning_only_path_all_planning_staged_is_planning_only() {
+    use super::is_planning_only_path;
+
+    let staged = [
+        "track/items/my-track/metadata.json",
+        "track/registry.md",
+        ".claude/docs/DESIGN.md",
+        "CLAUDE.md",
+    ];
+    assert!(staged.iter().all(|f| is_planning_only_path(f)));
+}
+
+#[test]
+fn planning_only_path_all_code_staged_is_not_planning_only() {
+    use super::is_planning_only_path;
+
+    let staged =
+        ["libs/usecase/src/review_workflow/usecases.rs", "apps/cli/src/commands/review/mod.rs"];
+    assert!(!staged.iter().all(|f| is_planning_only_path(f)));
+}
+
+// ---------------------------------------------------------------------------
+// extract_paths_from_name_status unit tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn extract_paths_handles_normal_status_lines() {
+    use super::extract_paths_from_name_status;
+
+    let output = "A\tlibs/domain/src/new.rs\nM\tapps/cli/src/main.rs\n";
+    let paths = extract_paths_from_name_status(output);
+    assert_eq!(paths, ["libs/domain/src/new.rs", "apps/cli/src/main.rs"]);
+}
+
+#[test]
+fn extract_paths_includes_both_sides_of_rename() {
+    use super::extract_paths_from_name_status;
+
+    let output = "R100\tlibs/domain/src/old.rs\tdocs/old.rs\n";
+    let paths = extract_paths_from_name_status(output);
+    assert_eq!(paths, ["libs/domain/src/old.rs", "docs/old.rs"]);
+}
+
+#[test]
+fn extract_paths_mixed_add_and_rename() {
+    use super::extract_paths_from_name_status;
+
+    let output = "A\ttrack/registry.md\nR095\tsrc/lib.rs\ttrack/lib.rs\nM\tCLAUDE.md\n";
+    let paths = extract_paths_from_name_status(output);
+    assert_eq!(paths, ["track/registry.md", "src/lib.rs", "track/lib.rs", "CLAUDE.md"]);
+}
+
+#[test]
+fn extract_paths_rename_code_into_planning_dir_is_not_planning_only() {
+    use super::{extract_paths_from_name_status, is_planning_only_path};
+
+    // A code file renamed into docs/ — source path is still code
+    let output = "R100\tlibs/domain/src/review.rs\tdocs/review.rs\n";
+    let paths = extract_paths_from_name_status(output);
+    assert!(!paths.iter().all(|p| is_planning_only_path(p)));
+}
+
+#[test]
+fn extract_paths_empty_output() {
+    use super::extract_paths_from_name_status;
+
+    let paths = extract_paths_from_name_status("");
+    assert!(paths.is_empty());
+}
+
+// ---------------------------------------------------------------------------
+// review status: integration tests via execute_status
+// ---------------------------------------------------------------------------
+
+#[test]
+fn status_succeeds_with_valid_track() {
+    use super::{StatusArgs, execute_status};
+
+    let dir = tempfile::tempdir().unwrap();
+    let items_dir = dir.path().join("items");
+    let track_dir = items_dir.join("test-track");
+    fs::create_dir_all(&track_dir).unwrap();
+
+    // Write a minimal metadata.json with review section
+    let metadata = r#"{
+  "schema_version": 3,
+  "id": "test-track",
+  "branch": "track/test-track",
+  "title": "Test track",
+  "status": "planned",
+  "created_at": "2026-03-24T00:00:00Z",
+  "updated_at": "2026-03-24T00:00:00Z",
+  "tasks": [{"id": "T1", "description": "task", "status": "todo", "commit_hash": null}],
+  "plan": {"summary": ["s"], "sections": [{"id": "S1", "title": "sec", "description": [], "task_ids": ["T1"]}]},
+  "review": {"status": "not_started", "code_hash": null, "groups": {}}
+}"#;
+    fs::write(track_dir.join("metadata.json"), metadata).unwrap();
+
+    let args = StatusArgs { items_dir: items_dir.clone(), track_id: "test-track".to_string() };
+    let exit = execute_status(&args);
+    assert_eq!(exit, std::process::ExitCode::SUCCESS);
+}
+
+#[test]
+fn status_fails_for_missing_track() {
+    use super::{StatusArgs, execute_status};
+
+    let dir = tempfile::tempdir().unwrap();
+    let items_dir = dir.path().join("items");
+    fs::create_dir_all(&items_dir).unwrap();
+
+    let args = StatusArgs { items_dir, track_id: "nonexistent".to_string() };
+    let exit = execute_status(&args);
+    assert_ne!(exit, std::process::ExitCode::SUCCESS);
+}
+
+#[test]
+fn status_succeeds_without_review_section() {
+    use super::{StatusArgs, execute_status};
+
+    let dir = tempfile::tempdir().unwrap();
+    let items_dir = dir.path().join("items");
+    let track_dir = items_dir.join("test-track");
+    fs::create_dir_all(&track_dir).unwrap();
+
+    // metadata.json without review section (older track format)
+    let metadata = r#"{
+  "schema_version": 3,
+  "id": "test-track",
+  "branch": "track/test-track",
+  "title": "Test track",
+  "status": "planned",
+  "created_at": "2026-03-24T00:00:00Z",
+  "updated_at": "2026-03-24T00:00:00Z",
+  "tasks": [{"id": "T1", "description": "task", "status": "todo", "commit_hash": null}],
+  "plan": {"summary": ["s"], "sections": [{"id": "S1", "title": "sec", "description": [], "task_ids": ["T1"]}]}
+}"#;
+    fs::write(track_dir.join("metadata.json"), metadata).unwrap();
+
+    let args = StatusArgs { items_dir, track_id: "test-track".to_string() };
+    let exit = execute_status(&args);
+    assert_eq!(exit, std::process::ExitCode::SUCCESS);
+}
+
+#[test]
+fn status_displays_per_group_fast_final_state() {
+    use super::{StatusArgs, execute_status};
+
+    let dir = tempfile::tempdir().unwrap();
+    let items_dir = dir.path().join("items");
+    let track_dir = items_dir.join("test-track");
+    fs::create_dir_all(&track_dir).unwrap();
+
+    let metadata = r#"{
+  "schema_version": 3,
+  "id": "test-track",
+  "branch": "track/test-track",
+  "title": "Test track",
+  "status": "in_progress",
+  "created_at": "2026-03-24T00:00:00Z",
+  "updated_at": "2026-03-24T00:00:00Z",
+  "tasks": [{"id": "T1", "description": "task", "status": "in_progress", "commit_hash": null}],
+  "plan": {"summary": ["s"], "sections": [{"id": "S1", "title": "sec", "description": [], "task_ids": ["T1"]}]},
+  "review": {
+    "status": "fast_passed",
+    "code_hash": "abc123def456",
+    "groups": {
+      "usecase": {
+        "fast": {"round": 2, "verdict": "zero_findings", "timestamp": "2026-03-24T01:00:00Z"}
+      },
+      "cli": {
+        "fast": {"round": 1, "verdict": "findings_remain", "timestamp": "2026-03-24T00:30:00Z", "concerns": ["security"]},
+        "final": {"round": 1, "verdict": "zero_findings", "timestamp": "2026-03-24T01:30:00Z"}
+      }
+    }
+  }
+}"#;
+    fs::write(track_dir.join("metadata.json"), metadata).unwrap();
+
+    let args = StatusArgs { items_dir, track_id: "test-track".to_string() };
+    let exit = execute_status(&args);
+    assert_eq!(exit, std::process::ExitCode::SUCCESS);
+}

@@ -7,20 +7,21 @@
 
 ## Current Focus
 
-- Latest active track: `review-escalation-enforcement-2026-03-24`
-- Next recommended command: `/track:implement`
+- Latest active track: `None yet`
+- Next recommended command: `/track:plan <feature>`
 - Last updated: `2026-03-24`
 
 ## Active Tracks
 
 | Track | Status | Next | Updated |
 |------|--------|------|---------|
-| review-escalation-enforcement-2026-03-24 | planned | `/track:implement` | 2026-03-24 |
+| _No active tracks yet_ | - | `/track:plan <feature>` | - |
 
 ## Completed Tracks
 
 | Track | Result | Updated |
 |------|--------|---------|
+| review-escalation-enforcement-2026-03-24 | Done | 2026-03-24 |
 | domain-state-signals-2026-03-23 | Done | 2026-03-23 |
 | spec-json-ssot-2026-03-23 | Done | 2026-03-23 |
 | adr-introduction-2026-03-23 | Done | 2026-03-23 |

@@ -35,6 +35,8 @@ pub enum ReviewCommand {
     CheckApproved(CheckApprovedArgs),
     /// Resolve an active review escalation block.
     ResolveEscalation(ResolveEscalationArgs),
+    /// Show per-group Fast/Final review state for a track.
+    Status(StatusArgs),
 }
 
 #[derive(Debug, Args)]
@@ -141,6 +143,17 @@ pub struct CheckApprovedArgs {
     track_id: String,
 }
 
+#[derive(Debug, Args)]
+pub struct StatusArgs {
+    /// Path to the track items directory.
+    #[arg(long, default_value = "track/items")]
+    items_dir: PathBuf,
+
+    /// Track ID.
+    #[arg(long)]
+    track_id: String,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct ReviewRunResult {
     pub(super) verdict: ReviewVerdict,
@@ -200,6 +213,7 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
         ReviewCommand::RecordRound(args) => execute_record_round(&args),
         ReviewCommand::CheckApproved(args) => execute_check_approved(&args),
         ReviewCommand::ResolveEscalation(args) => execute_resolve_escalation(&args),
+        ReviewCommand::Status(args) => execute_status(&args),
     }
 }
 
@@ -315,9 +329,192 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
 fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
     let store = infrastructure::track::fs_store::FsTrackStore::new(&args.items_dir);
     let hasher = infrastructure::review_adapters::SystemGitHasher;
+
+    // Detect whether this is a planning-only commit from staged files.
+    // Fail-closed: if detection fails, assume code files are present.
+    let planning_only = detect_planning_only().unwrap_or(false);
+
     let input = usecase::review_workflow::usecases::CheckApprovedInput {
         items_dir: args.items_dir.clone(),
         track_id: args.track_id.clone(),
+        planning_only,
     };
     usecase::review_workflow::usecases::check_approved(input, &store, &store, &hasher)
+}
+
+/// Returns `true` if all staged files match the planning-only allowlist.
+///
+/// Planning-only files are track docs, configuration, and documentation files
+/// that do not require a reviewer-approved review cycle before committing.
+///
+/// Uses `--name-status` instead of `--name-only` to capture both source and
+/// destination paths for renames/copies, preventing a code file renamed into
+/// a planning-only directory from bypassing the review guard.
+fn detect_planning_only() -> Result<bool, String> {
+    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+
+    let git = SystemGitRepo::discover().map_err(|e| format!("git error: {e}"))?;
+    let output = git
+        .output(&["diff", "--cached", "--name-status", "--diff-filter=ACMRDT"])
+        .map_err(|e| format!("git diff error: {e}"))?;
+    if !output.status.success() {
+        return Err("git diff --cached failed".to_string());
+    }
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let paths = extract_paths_from_name_status(&stdout);
+
+    if paths.is_empty() {
+        return Ok(true);
+    }
+
+    Ok(paths.iter().all(|f| is_planning_only_path(f)))
+}
+
+/// Extracts all file paths from `git diff --name-status` output.
+///
+/// For renames/copies (R/C lines), both source and destination paths are included
+/// so that a code file moved into a planning-only directory is still detected.
+fn extract_paths_from_name_status(output: &str) -> Vec<&str> {
+    let mut paths = Vec::new();
+    for line in output.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+        // Format: "STATUS\tpath" or "R100\told_path\tnew_path"
+        let mut parts = line.split('\t');
+        let _status = parts.next(); // skip status column
+        if let Some(first_path) = parts.next() {
+            paths.push(first_path);
+            // Renames/copies have a second path (destination)
+            if let Some(second_path) = parts.next() {
+                paths.push(second_path);
+            }
+        }
+    }
+    paths
+}
+
+/// Checks whether a file path belongs to the planning-only allowlist.
+///
+/// A file is planning-only when it:
+/// 1. Resides in an allowed directory prefix (track docs, config, documentation), AND
+/// 2. Has a known documentation/config extension (`.md`, `.json`, `.txt`)
+///
+/// This two-layer check (directory + extension) prevents any code file placed in
+/// a documentation directory from bypassing the review guard. Unknown extensions
+/// are treated as code (fail-closed).
+fn is_planning_only_path(path: &str) -> bool {
+    const PREFIXES: &[&str] = &[
+        "track/",
+        ".claude/commands/",
+        ".claude/docs/",
+        ".claude/rules/",
+        "project-docs/",
+        "docs/",
+        "knowledge/",
+    ];
+    // Exact config files that are always planning-only.
+    const EXACT_FILES: &[&str] = &[
+        "CLAUDE.md",
+        "DEVELOPER_AI_WORKFLOW.md",
+        "TRACK_TRACEABILITY.md",
+        "README.md",
+        ".claude/agent-profiles.json",
+        ".claude/settings.json",
+        ".claude/settings.local.json",
+    ];
+
+    if EXACT_FILES.contains(&path) {
+        return true;
+    }
+
+    // Root-level .md files (no directory separator) are always planning-only.
+    if !path.contains('/') && path.ends_with(".md") {
+        return true;
+    }
+
+    // Must be in an allowed directory prefix.
+    if !PREFIXES.iter().any(|p| path.starts_with(p)) {
+        return false;
+    }
+
+    // Within allowed directories, only known doc/config extensions are planning-only.
+    // Unknown extensions are treated as code (fail-closed).
+    const DOC_EXTENSIONS: &[&str] = &[".md", ".json", ".txt", ".csv"];
+
+    DOC_EXTENSIONS.iter().any(|ext| path.ends_with(ext))
+}
+
+// ---------------------------------------------------------------------------
+// status: Show per-group Fast/Final review state
+// ---------------------------------------------------------------------------
+
+fn execute_status(args: &StatusArgs) -> ExitCode {
+    match run_status(args) {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(msg) => {
+            eprintln!("{msg}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn run_status(args: &StatusArgs) -> Result<(), String> {
+    use domain::{ReviewGroupName, TrackId, TrackReader};
+
+    let store = infrastructure::track::fs_store::FsTrackStore::new(&args.items_dir);
+    let track_id =
+        TrackId::try_new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
+    let track = store
+        .find(&track_id)
+        .map_err(|e| format!("failed to read track: {e}"))?
+        .ok_or_else(|| format!("track '{}' not found", track_id.as_ref()))?;
+
+    let review = match track.review() {
+        Some(r) => r,
+        None => {
+            println!("Review:        not configured (no review section in metadata.json)");
+            return Ok(());
+        }
+    };
+
+    println!("Review status: {:?}", review.status());
+    match review.code_hash_raw() {
+        domain::CodeHash::NotRecorded => println!("Code hash:     (not recorded)"),
+        domain::CodeHash::Pending => println!("Code hash:     PENDING (two-phase incomplete)"),
+        domain::CodeHash::Computed(h) => println!("Code hash:     {h}"),
+    }
+
+    let groups = review.groups();
+    if groups.is_empty() {
+        println!("Groups:        (none)");
+    } else {
+        println!("Groups:");
+        let mut sorted_groups: Vec<(&ReviewGroupName, _)> = groups.iter().collect();
+        sorted_groups.sort_by_key(|(name, _)| name.as_ref().to_owned());
+
+        for (name, state) in sorted_groups {
+            let fast_status = match state.fast() {
+                Some(r) => format!("round {} — {:?}", r.round(), r.verdict()),
+                None => "(none)".to_string(),
+            };
+            let final_status = match state.final_round() {
+                Some(r) => format!("round {} — {:?}", r.round(), r.verdict()),
+                None => "(none)".to_string(),
+            };
+            println!("  {name}:");
+            println!("    Fast:  {fast_status}");
+            println!("    Final: {final_status}");
+        }
+    }
+
+    let escalation = review.escalation();
+    if escalation.is_blocked() {
+        println!("Escalation:    BLOCKED");
+    } else {
+        println!("Escalation:    clear");
+    }
+
+    Ok(())
 }
