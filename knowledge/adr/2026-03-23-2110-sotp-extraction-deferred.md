@@ -8,7 +8,7 @@ Accepted
 
 テンプレートの非 Rust 部分（CI, hooks, scripts, rules）が SoTOHE 自身に過学習している問題を分析（`tmp/template-overfitting-analysis-2026-03-23.md`）。過学習率は Makefile 50%、hooks 68%、scripts 73%。
 
-根本原因は sotp CLI のソースコードとテンプレートインフラが同一リポジトリに同居していること。解決策として sotp をスタンドアロンツールに切り出し、テンプレートは sotp インストール済み環境で動作する方式を設計（`tmp/TODO-PLAN-v4-draft-2026-03-23.md`）。
+根本原因は sotp CLI のソースコードとテンプレートインフラが同一リポジトリに同居していること。解決策として sotp をスタンドアロンツールに切り出し、テンプレートは sotp インストール済み環境で動作する方式を設計（`knowledge/strategy/TODO-PLAN-v4-draft.md`）。
 
 しかし、テンプレート利用者がゼロの段階で配布インフラに投資するのは YAGNI。
 

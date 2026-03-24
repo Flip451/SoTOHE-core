@@ -13,6 +13,7 @@
 - `.claude/docs/DESIGN.md`
 - `.claude/docs/WORKFLOW.md`
 - `knowledge/adr/README.md`
+- `knowledge/strategy/TODO-PLAN.md`
 - `.claude/agent-profiles.json`
 - `.claude/rules/`
 - `project-docs/conventions/README.md`

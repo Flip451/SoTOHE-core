@@ -77,4 +77,4 @@ cargo make track-transition track/items/<id> T001 done --commit-hash <hash>
 - `.claude/rules/10-guardrails.md` — ガードレール全般
 - `apps/cli/src/commands/pr.rs` — `check_task_completion_guard()` 実装
 - `libs/domain/src/track.rs` — `all_tasks_resolved()` メソッド
-- `tmp/TODO.md` — WF-40（解消済み: DonePending/DoneTraced split）
+- `knowledge/strategy/TODO.md` — WF-40（解消済み: DonePending/DoneTraced split）

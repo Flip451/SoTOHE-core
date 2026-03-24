@@ -1,0 +1,766 @@
+# テンプレート基盤 改善 TODO リスト
+
+> **出典**: `tmp/review-2026-03-10.md`（Gemini による包括的レビュー）
+> **作成日**: 2026-03-11
+> **最終更新**: 2026-03-19
+> **アーカイブ**: 解決済み項目は `tmp/TODO-archived-2026-03-16.md` に移動済み
+> **全体計画**: [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md)（v3: ハーネス vs テンプレート出力の区別）
+> **全体計画 (旧版)**: `tmp/archive-2026-03-20/`
+> **SDD 比較レポート**: `tmp/sdd-comparison-report-2026-03-17.md`（Tsumiki vs CC-SDD vs SoTOHE-core）
+> **ハーネスサーベイ**: `tmp/agent-harness-survey-2026-03-17.md`（Spec Kit, OpenSpec, SpecPulse, ECC, Anthropic 公式, Symphony）
+> **取り込み推奨一覧**: `tmp/adoption-candidates-2026-03-17.md`（全 35 件、ロードマップ付き）
+> **リファクタリング計画**: [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md)（対象タスク + ドメインモデリング + 再発防止メカニズム）
+> **進捗管理**: [`knowledge/strategy/progress-tracker.md`](progress-tracker.md)（v3）
+
+---
+
+## 凡例
+
+- [ ] 未着手
+- 優先度: **CRITICAL** / **HIGH** / **MEDIUM** / **LOW**
+- カテゴリ接頭辞: SEC=セキュリティ, CON=並行処理, SSoT=データ整合性, RTR=ルーティング, ERR=エラー処理, INF=インフラ, WF=ワークフロー
+
+---
+
+## A. セキュリティ・ガードレール (SEC)
+
+### A-2. サンドボックス境界の強化
+
+- [x] ~~**SEC-09** (HIGH): キャッシュパス検証の不備 — 任意ファイル上書き (§A-483)~~ ✅ Python 側で修正済み
+  - **対応**: `validate_cache_path` に `resolve()` + `relative_to()` によるパス境界検証を実装。テスト 2 本（絶対パス拒否 + トラバーサル拒否）追加済み。Rust 移行は未実施
+
+### A-3. パストラバーサル
+
+- [ ] **SEC-10** (MEDIUM): パス検証の `".." in path` 依存 (§A-84)
+  - **課題**: `verify_plan_progress.py`, `lint-on-save.py` で文字列判定に依存
+  - **提案**: `pathlib.Path.resolve()` + `is_relative_to()` に移行
+
+- [ ] **SEC-11** (MEDIUM): guard の `"git"` 部分文字列検出の過剰ブロック
+  - **根拠**: `libs/domain/src/guard/policy.rs` は非 git コマンドでも argv/redirect に `"git"` を含むだけで block する設計。
+  - **提案**: 部分文字列ではなく、argv 境界・AST 上のコマンド名・`git` 実行意図に限定した判定へ縮退する。
+
+### A-3a. Guard 再帰パース強化（bash-write-guard 残留リスク）
+
+- [ ] **SEC-14** (LOW-MEDIUM → HIGH): shell `-c` payload の再帰パース不足 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §3
+  - **追加根拠** (2026-03-24 CC-SDD-01 review): `bin/sotp` 上書きガード (`guard/policy.rs:191`) がトップレベルコマンドのみ検査するため、`sh -c 'cp target/release/sotp bin/sotp'` でバイパス可能。`-c` payload の再帰パースが必要
+
+- [x] ~~**SEC-15** (LOW-MEDIUM): heredoc body の再帰パース不足~~ ✅ bash-write-guard で対応済み
+  - **対応**: `redirect_texts` フィールドが heredoc body（`Redirect::Heredoc`）を収集し、`command_contains_git` が `redirect_texts` を検査。compound command の `compound_redirect_texts` も内部コマンドに伝播される設計
+  - **残留リスク文書**: `project-docs/conventions/bash-write-guard.md`
+
+- [ ] **SEC-16** (LOW): `sed -ni` / `sed -i.bak` 等の combined short flag / attached suffix 検知不足
+  - **課題**: `has_sed_inplace_flag` は standalone `-i`、`-i=suffix`、`--in-place`、`--in-place=suffix` のみ検知。combined flags（`-ni`）や attached suffix（`-i.bak`）は false positive 回避のため見送り
+  - **対応方針**: sed の `-e`/`-f` が引数を消費する仕様を考慮した option-aware parser を実装。combined flags 内で `-e`/`-f` より前に `i` が出現する場合のみ in-place と判定。または `sed` を `permissions.deny` に追加して全面禁止（aggressive だが安全）
+  - **トレードオフ**: 精度向上 vs false positive リスク。現状は false positive 回避を優先
+
+### A-4. サプライチェーン・依存管理
+
+- [ ] **SEC-12** (MEDIUM): External Guides のチェックサム/staleness 検知欠如
+  - **課題**: `external_guides.py` の `fetch_guides()` にハッシュ検証・ETag/Last-Modified 比較なし。改ざんや古いキャッシュを検知できない
+  - **提案**: レジストリに `sha256` フィールドを追加し、ダウンロード後に検証。staleness 検知には Last-Modified ヘッダ比較を導入
+  - **出典**: NotebookLM 2026-03-16 指摘 1.3 + 4.1
+
+- [ ] **SEC-13** (MEDIUM): `conch-parser` ベンダリングの保守方針
+  - **課題**: `vendor/conch-parser/` は Rust 2015 Edition で `#![allow(warnings)]` により全警告を抑制。上流のセキュリティパッチ追従が不可能
+  - **提案**: 上流フォークの定期確認体制を整える、または代替パーサー（`tree-sitter-bash`, `shlex`）への移行を検討
+  - **出典**: NotebookLM 2026-03-16 指摘 4.5
+
+- [ ] **SEC-17** (LOW): `serde_yaml` の deprecated 状態の経過観察
+  - **課題**: `serde_yaml` は 2023 年に作者（dtolnay）により deprecated。ただしコミュニティでは引き続き広く使用されており、実質的に壊れているわけではない（Reddit r/rust 2025 年議論で確認）
+  - **提案**: 定期的に `cargo audit` で脆弱性を監視。問題が出た場合の移行候補: (1) `serde_yml`（コミュニティフォーク、即使用可）、(2) `saphyr` + `saphyr-serde`（YAML 1.2 完全準拠、serde 統合は未リリース — リリース後に再評価）
+  - **出典**: spec-template-foundation-2026-03-18 で導入 (2026-03-18)
+
+---
+
+## B. 並行処理・排他制御 (CON)
+
+- [x] ~~**CON-02** (MEDIUM): ログローテーション競合 (§B-14)~~ ✅ 修正済み
+  - **対応**: `log-cli-tools.py` に `fcntl.flock(LOCK_EX | LOCK_NB)` ロックガードを実装。`.lock` サイドカーファイルで排他制御。Windows では graceful skip
+
+- [ ] **CON-03** (MEDIUM): 自然言語依存の排他制御 — Cargo.lock (§B-295)
+  - **課題**: `Cargo.lock` 変更の直列化をプロンプト指示に依存
+  - **提案**: `flock` による OS レベルロックを `cargo make` タスクに組み込み
+
+- [x] ~~**CON-07** (HIGH): `Bash` 経由のファイル更新が file-lock hook を完全に迂回~~ ✅ `bash-write-guard-2026-03-18` (PR #35)
+  - **対応**: 3層防御 — permissions.deny（touch/cp/mv/install/chmod/chown）+ AST output redirect 検知（既存 guard 拡張）+ 残留リスクドキュメント
+  - **残留リスク**: `-c` payload / heredoc body の再帰パース不足 → SEC-14/SEC-15 で別途対応予定
+
+- [ ] **CON-08** (MEDIUM): `tmp/track-commit/` の singleton scratch file による競合・残骸汚染
+  - **根拠**: `tmp/track-commit/add-paths.txt`, `commit-message.txt`, `note.md`, `track-dir.txt` は固定パス。CI 失敗時は scratch file が残留する。
+  - **提案**: `tmp/track-commit/<track-id>/` または `tmp/track-commit/<run-id>/` に分離し、失敗時も cleanup する専用ラッパーへ変更する。
+
+---
+
+## C. SSoT・データ整合性 (SSoT)
+
+- [ ] **SSoT-02** (MEDIUM): SSoT リカバリ・障害耐性の不在 (§C-173)
+  - **課題**: `metadata.json` 破損時にシステム全体がクラッシュ
+  - **提案**: Read-only フォールバックモード、Git Notes からの自動復元
+
+- [ ] **SSoT-03** (MEDIUM): SSoT と AI テキスト編集の不一致 (§C-259)
+  - **課題**: AI が `plan.md` を直接編集 → 次回レンダリングで消失
+  - **提案**: `plan.md` の OS レベル ReadOnly 化、または双方向バインディング
+
+- [ ] **SSoT-04** (LOW): View 層の破壊的レンダリング (§C-304, §C-372)
+  - **課題**: 人間の編集が `sync_rendered_views()` でサイレントに上書き
+  - **提案**: 楽観的ロック（ハッシュ比較）またはマーカータグによる領域分離
+
+- [ ] **SSoT-05** (LOW): SSoT 分散と同期オーバーヘッド (§C-395)
+  - **課題**: `architecture-rules.json`, `deny.toml`, `check_layers.py` 等の5箇所同時更新
+  - **提案**: JSON SSoT からの自動生成（コード生成）
+
+- [ ] **SSoT-06** (LOW): 状態遷移の監査証跡欠如 (§C-452)
+  - **課題**: metadata.json がスナップショット型、誰がいつ変更したか不明
+  - **提案**: イベントソーシングモデル（Append-only ログ）
+
+- [ ] **SSoT-07** (MEDIUM): SSoT と AI プロンプトの矛盾 — Split-brain (§C-464) → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §5
+
+- [x] ~~**SSoT-09** (MEDIUM): `TrackDocumentV2` の未知フィールドサイレント消失~~ ✅ 修正済み
+  - **対応**: `TrackDocumentV2` に `#[serde(flatten)] pub extra: serde_json::Map<String, Value>` を追加。`DocumentMeta` にも `extra` フィールドを追加し、read-modify-write 全経路で未知フィールドを保全。テスト 3 本追加済み
+  - **出典**: NotebookLM 2026-03-16 指摘 10.1
+
+- [x] ~~**SSoT-10** (MEDIUM): `collect_track_branch_claims` の単一破損ファイルによる全停止~~ ✅ 修正済み
+  - **対応**: `match` + `continue` パターンで破損ファイルを `warning:` 付きでスキップし、正常なトラックの処理を継続。テスト `collect_track_branch_claims_skips_invalid_metadata_and_returns_valid` で検証済み
+
+- [ ] **SSoT-11** (LOW): `spec_frontmatter.rs` の closing delimiter が末尾空白を許容
+  - **根拠** (2026-03-24 CC-SDD-01 review): `verify/spec_frontmatter.rs:42` で `line.trim_end() == "---"` を使用。`---   ` (末尾空白付き) が正常な frontmatter 終端として通過してしまう
+  - **提案**: `line.trim_end()` → `line == "---"` に変更（厳密一致）
+  - **出典**: NotebookLM 2026-03-16 指摘 10.2
+
+---
+
+## D. ルーティング・コンテキスト管理 (RTR)
+
+- [ ] **RTR-01** (MEDIUM): 正規表現スコアリングによるルーターハイジャック (§D-270)
+  - **課題**: 外部ガイド文脈中のキーワードで意図しないエージェントにルーティング
+  - **提案**: Tool Calling ベースのセマンティック意図分類に移行
+
+- [ ] **RTR-02** (MEDIUM): ステートレスルーティングの文脈喪失 (§D-423)
+  - **課題**: 最新プロンプトのみでルーティング判定、「はい」等の短い返答で誤作動
+  - **提案**: 過去 N ターンのスライディングウィンドウまたは LLM Tool Calling
+
+- [ ] **RTR-03** (LOW): マルチモーダル判定の意図ハイジャック (§D-526)
+  - **課題**: `.pdf` 拡張子だけで multimodal_reader にルーティング
+  - **提案**: 拡張子よりユーザー意図（設計/実装/デバッグ）を優先
+
+- [ ] **RTR-04** (LOW): O(N) コンテキスト手動ロードの非効率性 (§D-474)
+  - **課題**: Implementer が規約ファイルを1つずつ手動で読み込み
+  - **提案**: オーケストレーター側でコンテキストインジェクション
+
+---
+
+## E. エラーハンドリング・可観測性 (ERR)
+
+- [ ] **ERR-01** (MEDIUM): ハードコード設定値とフォールバック (§E-27)
+  - **課題**: タイムアウト値が固定、タイムアウト時の部分出力が握りつぶし
+  - **提案**: 環境変数オーバーライド、部分出力をエラーレポートに含める
+
+- [ ] **ERR-02** (MEDIUM): LLM 応答 JSON パースの堅牢性 (§E-95)
+  - **課題**: LLM が Markdown コードブロックで囲むとパース失敗
+  - **提案**: コードブロックマーカー除去の前処理、または Structured Outputs API
+
+- [ ] **ERR-03** (MEDIUM): 孤立子プロセスのタイムアウト管理 (§E-105)
+  - **課題**: `TimeoutExpired` 時に孫プロセスが残留
+  - **提案**: `os.setsid` + プロセスグループ全体 SIGKILL
+
+- [ ] **ERR-04** (MEDIUM): サーキットブレーカーの自己監視欠陥 (§E-183)
+  - **課題**: ループ判定を LLM 推論に依存、非決定論的
+  - **提案**: 同一エラーコード連続 + Git Diff ゼロなどの決定論的ヒューリスティック
+
+- [ ] **ERR-05** (MEDIUM): ログ切り捨てによるデバッグ阻害 (§E-225)
+  - **課題**: 末尾20行のみ切り取り、根本原因が先頭/中間に出力される
+  - **提案**: `cargo test --message-format=json` で構造化エラー抽出
+
+- [ ] **ERR-07** (LOW): ヒューリスティック文字列照合の脆さ (§E-363)
+  - **課題**: コマンド文字列に `"cargo test"` が含まれるかで判定
+  - **提案**: 終了コードや構造化出力ベースのトリガー判定
+
+- [ ] **ERR-08** (MEDIUM): `/track:pr-review` の同期ポーリングが中断耐性を持たない
+  - **根拠**: `scripts/pr_review.py` の `poll-review` はメモリ上の `trigger_time` に依存して最大10分同期ポーリングするが、途中中断後に再開用 state を保存しない。
+  - **提案**: PR 番号・trigger comment id・trigger timestamp を永続化し、resume / reconcile サブコマンドを追加する。
+
+---
+
+## F. プラットフォーム・インフラ (INF)
+
+- [ ] **INF-01** (LOW): ファイルパス解決のプラットフォーム依存 (§F-48)
+  - **課題**: Windows パス判定が正規表現依存、UNC パス未対応
+  - **提案**: `pathlib` / `os.path` のネイティブ判定に移行
+
+- [ ] **INF-02** (MEDIUM): Tarpit / Slowloris 脆弱性 (§F-130)
+  - **課題**: `urlopen(timeout=30)` はソケット無通信タイムアウトのみ
+  - **提案**: チャンク読み取り + 全体経過時間の絶対タイムアウト
+
+- [ ] **INF-03** (MEDIUM): ホスト vs コンテナのパス解決の構造的亀裂 (§F-164)
+  - **課題**: パス変換ロジックが脆く、シンボリックリンクやドライブレターで破綻
+  - **提案**: DevContainer 内にカプセル化して境界を単一化
+
+- [ ] **INF-05** (MEDIUM): インフラ状態管理の LLM 過剰委譲 (§F-235)
+  - **課題**: `tools-daemon` クラッシュ時にAIがインフラ再起動を推論できない
+  - **提案**: `*-exec` タスク内でヘルスチェック + 自動再起動
+
+- [ ] **INF-06** (LOW): Docker Compose UID/GID フォールバック (§F-403)
+  - **課題**: 環境変数未設定時にファイル所有者不一致
+  - **提案**: `cargo make bootstrap` で自動検知 → `.env` 書き込み
+
+- [ ] **INF-07** (LOW): 動的 Python インタプリタ解決のレイテンシ (§F-411)
+  - **課題**: タスク実行ごとにサブシェルでパス解決
+  - **提案**: 初期化時に解決済みパスを `.env` にキャッシュ
+
+- [ ] **INF-08** (MEDIUM): 動的 Python 環境の分離不全 (§F-654)
+  - **課題**: `.venv` 未アクティベート時にフックが機能不全
+  - **提案**: フックコマンドを `uv run` 経由に変更
+
+- [ ] **INF-09** (MEDIUM): `.venv` の Bootstrapping Paradox (§F-791)
+  - **課題**: `.venv` 未構築状態でフックがクラッシュ → 初期化すら開始不可
+  - **提案**: フック層を標準ライブラリのみ or コンパイル済み Rust バイナリに
+  - **進捗**: STRAT-03 Phase 1 で security-critical hook 3本の Python launcher を除去。必須経路からの Python 依存は大幅縮小。advisory hook はまだ Python 依存
+
+- [ ] **INF-10** (MEDIUM): `tools-daemon` のステートフルネスによるフレイキーテスト (§F-800)
+  - **課題**: 常駐コンテナに一時状態が蓄積 → CI との不一致
+  - **提案**: エフェメラル指向 (`run --rm`)、sccache / tmpfs 活用
+
+- [ ] **INF-11** (LOW): 外部依存 URL の GitHub 密結合 (§D-433)
+  - **課題**: `derive_raw_url` が GitHub URL 構造にハードコード依存
+  - **提案**: `raw_url` の明示的登録、またはプロバイダアダプタ層
+
+- [ ] **INF-12** (MEDIUM): Claude Code hook の cold build timeout
+  - **課題**: `.claude/settings.json` の PreToolUse hook が timeout 10-15s で fail-closed する設計だが、`sotp` バイナリが未ビルド（fresh clone 等）の場合、`cargo run -p cli` フォールバックが cold build を伴い timeout を超える
+  - **提案**: hook timeout の引き上げ、または bootstrap 前の hook スキップ機構（`SOTP_HOOK_SKIP=1` 等）を導入
+
+- [ ] **INF-13** (LOW): `atomic_write_file` のファイルパーミッション未転写
+  - **課題**: `atomic_write.rs` の `fs::File::create(tmp_path)` は umask 依存でパーミッションを設定。元ファイルのパーミッションを転写しないため、保存のたびに固有の権限が初期化される
+  - **提案**: `fs::metadata(target)` でパーミッションを取得し、rename 前に `set_permissions` で転写
+  - **出典**: NotebookLM 2026-03-16 指摘 7.2
+
+- [ ] **INF-14** (MEDIUM): ホスト Rust ツールチェーン依存によるコンテナ完結性の破綻
+  - **課題**: `build-sotp` タスクがホスト `cargo build` を直接要求し、「Docker だけで開発開始」のポータビリティが崩れている
+  - **提案**: コンテナ内ビルド + bind mount でバイナリを共有するか、マルチステージビルドで `bin/sotp` を生成
+  - **関連**: INF-12（cold build timeout）
+  - **出典**: NotebookLM 2026-03-16 指摘 2.2
+
+- [x] **INF-15** (MEDIUM): ~~`sotp verify usecase-purity` — usecase 層のヘキサゴナル純粋性 CI 検証~~
+  - **完了**: syn AST ベースで実装。std I/O を網羅的にブロック（`std::fs`, `std::net`, `std::process`, `std::io`, `std::env` + `std::time::SystemTime`/`Instant` + `println!`/`eprintln!`/`print!`/`eprint!` + `chrono::Utc::now`）。use import / alias / glob / self import も検出。warning-only。
+  - **関連**: `project-docs/conventions/hexagonal-architecture.md` の "Usecase Layer Purity Rules"
+  - **完了日**: 2026-03-22
+
+- [x] **INF-16** (SMALL): ~~`pr_review.rs` hexagonal リファクタリング — `std::fs` / `std::io` を CLI 層に移動~~
+  - **完了**: `resolve_reviewer_provider(&Path)` → `resolve_reviewer_provider(&str)` に変更。`PrReviewError` から `Io`/`ProfilesNotFound` 削除。CLI でファイル読み込み。usecase-purity warning ゼロ達成。
+  - **完了日**: 2026-03-22 (PR #51)
+
+- [x] **INF-17** (SMALL): ~~`usecase-purity` warning → error 昇格 — CI ブロック化~~
+  - **完了**: `Finding::warning` → `Finding::error`。CI で usecase 層の hexagonal violation をブロック。
+  - **完了日**: 2026-03-23 (PR #52)
+
+- [ ] **INF-18** (SMALL): verify ルール定義の外部設定化 — ドメインロジックの infrastructure 流出防止
+  - **課題**: `usecase_purity.rs` の禁止パターン定義（`FORBIDDEN_PATH_PREFIXES` 等）はドメイン知識だが infrastructure にハードコードされている。他の verify モジュール（`domain_strings.rs` 等）も同様。`module_size.rs` のみ `architecture-rules.json` から読み込み済み
+  - **提案**: `docs/layer-purity-rules.json` を新設し、禁止パターンを外部設定化。infrastructure は設定を読んで適用するだけの「エンジン」に限定。`architecture-rules.json` への詰め込みは責務混在になるため別ファイルとする
+  - **関連**: INF-15, `module_size.rs` の `architecture-rules.json` 読み込みパターン
+  - **追加日**: 2026-03-22
+
+- [x] ~~**INF-19** (SMALL): `sotp verify domain-purity` — domain 層 I/O purity CI~~
+  - **完了**: `usecase-purity` と共通の `check_layer_purity` エンジンで実装。即 error モード。
+  - **完了日**: 2026-03-23 (PR #53)
+
+- [x] ~~**INF-20** (MEDIUM): `conch-parser` を domain から infrastructure に移動~~
+  - **完了**: ShellParser port trait を domain に定義し、conch-parser 実装を infrastructure に移動。domain の I/O purity CI ゲートで今後の混入を防止。
+  - **完了日**: 2026-03-23 (PR #54)
+
+---
+
+## G. ワークフロー・TDD (WF)
+
+### G-1. TDD ステートマシン
+
+- [ ] **WF-01** (MEDIUM): TDD テスト名の非決定性 (§G-492)
+  - **課題**: LLM が完全修飾テスト名を誤推測 → 0件実行で成功扱い
+  - **提案**: 構造化出力パースで実行件数を決定論的に検証
+
+- [ ] **WF-02** (MEDIUM): コンパイルエラーとテスト失敗の混同 (§G-537)
+  - **課題**: Red フェーズでコンパイルエラーも「テスト失敗」と誤認
+  - **提案**: `--message-format=json` でコンパイルエラー 0件 + テスト FAIL を確認
+
+- [ ] **WF-03** (LOW): 厳格すぎる状態遷移モデル (§G-552)
+  - **課題**: `todo → done` 直接遷移が禁止、軽微タスクでも2回のAPI呼び出し必須
+  - **提案**: Fast-path 遷移の許可、または一括更新 API
+
+### G-2. トラック管理
+
+- [ ] **WF-04** (MEDIUM): 最新トラック推論のコンテキスト競合 (§G-562)
+  - **課題**: `updated_at` 最新のトラックをグローバルに選択 → 並行作業で誤参照
+  - **提案**: ブランチ名とトラック ID の紐付け、または明示的セッション変数
+
+- [x] ~~**WF-04b** (MEDIUM): metadata.json タイムスタンプの逆転・不整合~~ ✅ 修正済み
+  - **対応**: `fs_store.rs` の `save()` で新規作成時に `created_at: Self::now_iso8601()` を自動生成。既存更新時は `created_at` を保持し `updated_at` のみ更新。手書きは排除済み
+
+- [ ] **WF-05** (LOW): Git Notes のローカル制約 (§G-572)
+  - **課題**: Notes はデフォルトでリモートと同期されない
+  - **提案**: `cargo make bootstrap` で refspec 自動設定
+
+- [ ] **WF-06** (LOW): `.gitignore` 責務の漏出 (§G-581)
+  - **課題**: 一時ファイル除外を `:(exclude)` スクリプトに依存
+  - **提案**: `.gitignore` に一時パスパターンを明示的定義
+
+- [ ] **WF-08** (MEDIUM): 人間の検証（Verification）の形骸化 (§G-624)
+  - **課題**: AI が `verification.md` に適当な文字列を書いて CI 通過可能
+  - **提案**: AI からの書き込みをハードブロック、または人間の対話的承認ゲート
+
+- [ ] **WF-08a** (MEDIUM): Track 完了状態と Verification 完了の型不整合
+  - **課題**: `metadata.json` が `done` なら `registry.md` の Completed Tracks に載るため、`verification.md` が未実質完了でも完了扱いが表示されうる
+  - **提案**: `done` 遷移に verification 完了を必須化する、または `VerifiedDone` 相当の状態/フラグを SSoT に導入
+
+- [ ] **WF-26** (LOW): `find_open_pr_with` の First-Match Bias（一意性検証欠如）
+  - **課題**: `gh_cli.rs` の `find_open_pr_with` が `.[0].number` で先頭要素を無条件取得。同一 head branch に複数 PR がある場合に意図しない PR を操作するリスク
+  - **提案**: 配列長を検証し、複数 PR 存在時はエラーまたは警告を返す
+  - **出典**: NotebookLM 2026-03-16 指摘 4.2
+
+- [ ] **WF-27** (MEDIUM): `parse_dirty_worktree_paths` のクォート/エスケープ未処理
+  - **課題**: `worktree_guard.rs` のパーサーが Git のクォート付きファイル名（スペース・日本語等の非 ASCII）を未処理。`"path with spaces.rs"` がクォート込みで記録され、許可リストと不一致
+  - **提案**: Git の C-style unquote を実装し、クォートを除去してからパス比較する
+  - **出典**: NotebookLM 2026-03-16 指摘 6.1
+
+- [ ] **WF-28** (LOW): `git notes add -f` ハードコードによるデータロスリスク
+  - **課題**: `apps/cli/src/commands/git.rs:255` で `-f` が無条件使用。既存の手動 Notes や別プロセスの Notes をサイレント上書き
+  - **提案**: `--force` をオプション化、または append モード（`git notes append`）を検討
+  - **出典**: NotebookLM 2026-03-16 指摘 6.2
+
+- [ ] **WF-29** (LOW): commit → note の partial failure ロールバック欠如
+  - **課題**: `commit_from_file` と `note_from_file` が独立サブコマンド。コミット成功後の note 失敗でトレーサビリティ欠損状態になるが、自動ロールバックなし
+  - **提案**: note 失敗時の警告強化、または `track-commit-message` 内で commit+note をアトミック化
+  - **出典**: NotebookLM 2026-03-16 指摘 6.5
+
+- [x] ~~**WF-40** (MEDIUM): `done → done` 遷移で commit_hash 埋め戻しができない~~ ✅ 修正済み (done-hash-backfill-2026-03-20 Phase A: DonePending/DoneTraced split + BackfillHash transition)
+
+### G-3. CI・検証
+
+- [ ] **WF-12** (LOW): テストランナー設定の混在 (§G-387)
+  - **課題**: nextest と cargo test の混在でデバッグ時の挙動が変化
+  - **提案**: `nextest run --nocapture` に統一
+
+- [ ] **WF-25** (MEDIUM): CI ゲートにカバレッジ目標の強制が存在しない
+  - **根拠**: ルール文書では「新規コード 80% 以上」を掲げているが、`ci-local` / `ci` は `llvm-cov-local` を依存に含めていない。
+  - **提案**: PR/track 完了時のみ coverage gate を opt-in 導入し、しきい値違反を fail させるか差分カバレッジをレポート必須化する。
+
+### G-3a. PR レビュー
+
+- [x] ~~**WF-30** (MEDIUM): PR body findings パーサーが限定バレット形式のみ認識~~ ✅ 修正済み (T004)
+  - **対応**: `- `, `* `, `•`, `+ `, 番号付きリスト (`1. `) をすべて認識。CommonMark 準拠コードブロック除外（backtick/tilde フェンス対応）も同時実装。テスト多数追加済み
+  - **出典**: NotebookLM 2026-03-16 指摘 7.3
+
+- [x] ~~**WF-42** (HIGH): `/track:pr-review` が Codex Cloud のレビューを検出できない~~ ✅ 修正済み (PR #38)
+  - **対応**: `chatgpt-codex-connector[bot]` を `CODEX_BOT_LOGINS` に追加。`list_reactions` API で zero-findings 検出（reaction + comment text fallback）。`poll_review_for_cycle` に timeout recovery + commit-scoped フィルタ追加。
+  - **出典**: PR #38 (review-workflow-fixes-2026-03-18)
+
+- [ ] **WF-42-residual** (LOW): zero-findings 検出の commit scope 制約
+  - **課題**: GitHub Reactions/Issue Comments API に `commit_id` フィールドがない。`+1` reaction や "Didn't find any major issues" コメントが PR レベルのシグナルであり、特定コミットに紐付けできない。`trigger_dt` フィルタで緩和しているが、新コミット push 後にトリガー前のレビュー結果が残っている場合に理論的に誤検出の可能性がある。
+  - **緩和策**: `head_commit` が既知の場合のみ zero-findings を受け入れ、standalone `poll_review` ではスキップ。`trigger_dt` フィルタで時間窓を最小化。
+  - **根本解決**: GitHub API が reactions/comments に `commit_id` を含めるまで不可能。または review API のみに依存する設計に移行。
+  - **出典**: Codex Cloud PR review rounds 11-24 (2026-03-18〜19)
+
+- [ ] **WF-42-residual-2** (LOW): private index swap 時の concurrent index update 喪失
+  - **課題**: `PrivateIndex` は操作開始時にインデックスをスナップショットし、最終的に `fs::rename` で実インデックスを置き換える。この間に他プロセスが `git add` した変更は失われる。
+  - **緩和策**: Claude Code の `block-direct-git-ops` hook が通常ワークフローでの uncontrolled staging を防止。`swap_into_real` が git の `index.lock` プロトコル（`O_CREAT|O_EXCL` → copy → rename）を使用して concurrent git 操作と排他。
+  - **根本解決**: git index の3-way merge（snapshot と real の差分を統合）。ただし実装コストが高く、単一オペレーターワークフローでは不要。
+  - **出典**: Codex Cloud PR review rounds 14-24 (2026-03-18〜19)
+
+### G-3a2. ローカルレビュー整合性
+
+- [ ] **WF-43** (MEDIUM): `record-round` に渡す verdict の虚偽申告を検出できない
+  - **根拠** (2026-03-24 CC-SDD-01 review): LLM が reviewer session log の実際の verdict と異なる値を `record-round` に渡した場合、domain は検出できない。`check-approved` は `Approved` を返してしまう
+  - **提案**: `record-round` が reviewer session log のパス（`tmp/reviewer-runtime/codex-session-*.log`）を受け取り、log 末尾の JSON verdict を独自にパースして、渡された verdict と一致するか検証する（verdict attestation）
+  - **緩和策**: 現在は `check-approved` の code hash 検証 + `/track:review` skill の Step 4.3 (Review state guard verification) で間接的に防止
+
+### G-3b. アクティベーション
+
+- [ ] **WF-31** (LOW): `track:activate` の部分失敗による main 汚染
+  - **課題**: activation commit を main 上で作成した後、`git switch` が失敗すると main に不要なコミットが残留。自動ロールバックなし
+  - **提案**: ブランチ作成を先に検証するか、switch 失敗時の `git reset --soft HEAD~1` ロールバックを導入
+  - **出典**: NotebookLM 2026-03-16 指摘 7.5
+
+### G-3c. 入力バリデーション
+
+- [ ] **WF-32** (LOW): `TrackId` / `TaskId` の最大長制限なし
+  - **課題**: `ids.rs` に文字数上限チェックがなく、LLM が極端に長い ID を生成するとファイルシステムのパス長制限超過で I/O エラー
+  - **提案**: `TrackId` に 80 文字程度の上限バリデーションを追加
+  - **出典**: NotebookLM 2026-03-16 指摘 8.1
+
+- [x] ~~**WF-33** (MEDIUM): `resolve_track_id_from_branch` のバリデーション欠如~~ ✅ 修正済み (T003)
+  - **対応**: 抽出後に `TrackId::new(slug)` でバリデーション実行。失敗時は `TrackResolutionError::InvalidTrackId` を返却。スペース含み・空文字のテスト追加済み
+  - **出典**: NotebookLM 2026-03-16 指摘 9.2
+
+### G-4. エージェント協調
+
+- [ ] **WF-16** (MEDIUM): LLM 間の伝言ゲーム依存 (§G-675)
+  - **課題**: Canonical Blocks の verbatim コピーを LLM に委ねる
+  - **提案**: 構造化データ (JSON) + システム側テンプレートレンダリング
+
+- [ ] **WF-17** (MEDIUM): 非同期キューと同期コミットの Traceability 喪失 (§G-685)
+  - **課題**: `pending-note.md` が単一ファイルで上書き → 以前のタスク Notes 消失
+  - **提案**: タスク ID 別ファイル、またはコミット時にバッチマージ
+
+- [ ] **WF-18** (LOW): セキュリティ検証の設定-コード分離違反 (§G-695)
+  - **課題**: `EXPECTED_DENY` を Python コードにハードコード
+  - **提案**: 設定ファイル駆動のデータ駆動型バリデーション
+
+- [ ] **WF-22** (MEDIUM): マルチエージェント間の会話履歴非共有 (§G-781)
+  - **課題**: エージェント間の引き継ぎがファイルベースのみ → 暗黙の意図が喪失
+  - **提案**: セッション間コンテキスト共有メカニズム（JSON ペイロード）
+
+- [ ] **WF-34** (MEDIUM): Claude/Codex capability 配置の最適化
+  - **課題**: 現在の default profile は `planner` / `debugger` を Codex に委譲しているが、Claude の 1M context 内に既にあるコードベース情報を活用できず、Codex への再送オーバーヘッドが大きい。特に planner はコンテキスト密度が高い作業であり、外部委譲の効率が悪い。debugger も同様にセッション内のエラー出力・直前の変更が既にある。
+  - **提案**:
+    - `planner`: Claude (Opus) をメインに変更。Codex は「設計の検証・セカンドオピニオン」に限定
+    - `debugger`: 通常デバッグは Claude が直接対応。所有権/ライフタイムの複雑な問題のみ Codex に escalate
+    - `reviewer`: Codex のまま維持（self-review バイアス回避のため外部 reviewer は必須）
+    - `researcher`: コードベース分析は Claude (Explore subagent)、外部リサーチは Gemini に使い分け
+  - **実装**: `agent-profiles.json` に新 profile（例: `claude-planner`）を追加し A/B 比較で効果測定
+  - **トレードオフ**: Claude 集中でコンテキスト切替コスト削減・レイテンシ改善が見込める一方、多様な視点が減る
+
+- [x] ~~**WF-35** (HIGH): FORBIDDEN_ALLOW から読み取り専用コマンドを解禁 + git 読み取りコマンド allow 追加~~ ✅ 修正済み
+  - **対応**: `head`/`tail`/`wc` を FORBIDDEN_ALLOW から削除し `permissions.allow` + `EXPECTED_OTHER_ALLOW` に移行。git 読み取りコマンド（`git status`, `git diff`, `git log`, `git branch --list`, `git rev-parse`, `git show`, `git ls-files`, `git notes show/list`）も allow 済み。`sort`/`uniq` は `sort -o` の書き込みリスクにより除外を維持
+
+- [ ] **WF-36** (HIGH): Review Escalation Threshold の機構化 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4
+- [x] ~~**WF-43** (CRITICAL): `record-round` → `check-approved` の code_hash 自己参照循環~~ ✅ 修正済み (PR #38)
+- [ ] **WF-40** (MEDIUM): `ReviewState::record_round` が Approved→Fast findings_remain で降格しない → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4
+- [ ] **WF-41** (LOW): `review_from_document` が偽の Fast ラウンドを合成 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4
+- [ ] **WF-38** (LOW): frontmatter パーサーの duplicate key 未検出 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §3
+- [ ] **WF-39** (MEDIUM): `/track:catchup` の責務分割 — bootstrap と briefing の分離 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4
+- [ ] **WF-37** (MEDIUM): `argv_has_rm` のランチャー後走査が過剰（false positive） → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §3
+- [x] ~~**WF-54** (MEDIUM): `track-commit-message` の review guard が planning artifacts 初回コミットをブロックする~~ ✅ done (PR #46, ci-guardrails-phase15-2026-03-20)
+  - **対応**: (B) を採用。`/track:plan` が metadata.json 作成時に review state `{status: "not_started", groups: {}}` を含める。`check-approved` が `NotStarted && groups.is_empty()` を許可（初回状態のみ、降格後は不可）
+
+---
+
+## H. 戦略的提案
+
+> H-1 (Rust 化パラダイムシフト) と H-2 (Harness v2 構想) は STRAT-03/09 で実現済み。
+> Phase 配置と実行順は [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md) Phase 6 + 依存関係を参照。
+
+### H-3. 方針を明示した戦略 TODO
+
+- [x] ~~**STRAT-02** (HIGH): ファイルロックを Rust デーモンへ集約~~ **スコープ除外 (2026-03-19)**
+  - **理由**: ファイルロックシステムが休眠状態（`SOTP_LOCK_ENABLED=1` 未設定）のまま 21 トラックが完了。worktree 分離 (SPEC-04) で並行実行の排他制御は物理的に解決されるため YAGNI 判断。必要になった時点で再評価
+
+- [x] ~~**STRAT-03** (HIGH): Python 依存からの脱却~~ ✅ 全 Phase 完了 (2026-03-16)
+  - ~~Phase 1: セキュリティ境界の Rust 完全移行~~ ✅ (`python-hook-launcher-removal-2026-03-15`)
+  - ~~Phase 2: Track state machine の Rust 化~~ ✅ (`statemachine-rust-2026-03-15`)
+  - ~~Phase 3: Git workflow wrapper の Rust 化~~ ✅ (`py-workflow-cleanup-2026-03-16`)
+  - ~~Phase 4: PR review orchestration の Rust 化~~ ✅ (`pr-review-rust-2026-03-16`)
+  - ~~Phase 5: verify script 群の Rust 化~~ ✅ (`verify-scripts-rust-2026-03-16`)
+  - ~~Phase 6: 残留 Python の optional utility 化~~ ✅ (`python-optional-2026-03-16`)
+  - **マイルストーン**: M1 ✅, M2 ✅, M3 ✅, M4 ✅
+
+- [x] ~~**STRAT-04** (MEDIUM): `registry.md` を Git 管理対象外にし完全生成ビューへ移行~~ ✅ done (PR #46, ci-guardrails-phase15-2026-03-20)
+  - **対応**: `.gitignore` に `track/registry.md` を追加。`cargo make track-sync-views` で生成のみ。CI は `verify-track-registry` を metadata.json ベースに移行予定
+
+- [ ] **STRAT-05** (HIGH): SSoT (`metadata.json`) と Git 履歴/コミット状態の整合戦略を定義する
+  - **背景**: `metadata.json` は論理状態の SSoT だが、実体コードは Git 履歴/working tree に存在する。`done` 済み未コミット、`git revert/reset`、競合解消後の巻き戻りで state drift が起こりうる。
+  - **方針**: 「タスク状態」と「Git 保存状態」の関係を型/状態遷移として定義し、必要なら `VerifiedDone` や `CommittedDone` のような明示状態を導入する。
+
+- [x] ~~**STRAT-06** (MEDIUM): generated view の Git 管理方針を `registry.md` だけでなく `plan.md` まで統一する~~ ✅ 方針確定 (ci-guardrails-phase15-2026-03-20)
+  - **決定**: registry.md は gitignore 化（共有リソースで diff ノイズ・マージ競合が多い）。plan.md は git tracked のまま維持（トラック専属で PR diff が有用）+ `sotp verify view-freshness` で SSoT との一貫性を CI 保証。用途の違いに基づく意図的な二重方針。
+
+- [ ] **STRAT-07** (HIGH): `worktree`・Docker Compose・CI の実行モデルを統一する
+  - **背景**: 並列作業では `git worktree` を使いたい一方、現在の compose/CI 周辺はリポジトリ直下の `.git` ディレクトリ前提が残り、worktree と構造的に噛み合わない。
+  - **方針**: 「本リポジトリ直下」「worktree」「CI container」のどこでも同じコマンド体系が動く実行モデルへ寄せる。
+
+- [ ] **STRAT-08** (MEDIUM): 外部非同期システム連携の state 永続化原則を定義する
+  - **背景**: 現在は `/track:pr-review` のような外部 API 連携が同期ポーリング主体で、中断時の再開情報を保持しない。
+  - **方針**: GitHub PR review などの外部非同期処理は、必ず run-id / trigger-id / status / timestamps を永続化し、resume/reconcile 可能にする。
+
+- [x] **STRAT-09** (MEDIUM): shell wrapper / `cargo make` 依存の縮退 ✅ 完了
+  - **背景**: `Makefile.toml` の `script_runner = "@shell"` と `$CARGO_MAKE_TASK_ARGS` 展開が多く、責務分散・quoting 脆弱性・追跡困難性を生んでいる。
+  - **方針**: 安全性や状態管理に関わる wrapper は shell 文字列組み立てをやめ、Rust CLI の引数パースへ集約する。
+  - **結果**: `sotp make` サブコマンド (26タスク) を新設。28タスクを `command + args` 形式に移行。T011-T012 (-exec daemon) は ROI が低いためスキップ。PR #30 でマージ済み。
+
+- [ ] **STRAT-10** (MEDIUM): トラック archive 後の Git ブランチ寿命管理を定義する
+  - **背景**: `track/archive/<id>` への物理移動後も `track/<id>` ブランチは残り続け、ファイル寿命と Git ref 寿命が分離している。
+  - **方針**: archive, merge, branch cleanup の責務境界を定義し、少なくとも「残す」「削除候補として表示」「手動 cleanup を必須化」のどれかをシステムとして明示する。
+
+- [ ] **STRAT-11** (MEDIUM): 多言語プロジェクト対応 — ハーネスの言語非依存化設計
+  - **詳細設計書**: [`tmp/multi-language-design-2026-03-18.md`](../../tmp/multi-language-design-2026-03-18.md)
+  - **背景**: ハーネスの核は言語非依存だが、CI ゲート・ルール・レイヤーチェックが Rust にハードコード。他言語プロジェクトでの利用が困難
+  - **方針**: 言語固有部分をプラグイン的に差し替え可能な設計へ移行（`harness.toml` + `.claude/rules/lang/` + 言語別 CI タスク）
+  - **実装ロードマップ**: Phase A（設定ファイル）→ B（ルール分離）→ C（CI ディスパッチ）→ D（テンプレートジェネレータ）
+  - **フレームワーク別相性**: Laravel ◎, React/Next.js ◎, FSD+Next.js ◎◎ — 詳細は設計書 §7-8 参照
+  - **関連**: SPEC-08, GAP-08
+
+### H-4. 実行順
+
+> 実行順は [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md) Phase 4/6 に統合済み。
+
+---
+
+## I. 仕様フィードバック・権限委譲 (SPEC)
+
+> **出典**: NotebookLM 音声分析 2026-03-18（3本）。分析レポート: `tmp/ma4/2026-03-18/analysis-report*.md`
+> Phase 配置は [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md) Phase 2〜4 を参照
+
+- [ ] **SPEC-01** (HIGH): Runtime Spec Evolution — 実装失敗→信号機自動降格ループ → Phase 2
+- [ ] **SPEC-02** (HIGH): 信号機ベース権限委譲ルーター — 人間/AI 境界の自動決定 → Phase 2
+- [ ] **SPEC-03** (MEDIUM): 信号機 🟡→🔵 自動昇格を CI 客観証拠に限定 → Phase 3
+- [ ] **SPEC-04** (MEDIUM): エフェメラル worktree 分離 — `/track:full-cycle` の物理的隔離 → Phase 4
+- [x] ~~**SPEC-05** (HIGH): Domain States 信号機 Stage 2 — per-state signal + 遷移関数検証 + spec.json `domain_state_signals`~~
+  - **完了**: syn AST 2-pass スキャン, transitions_to 検証, red==0 gate, Stage 1 前提条件チェック
+  - **完了日**: 2026-03-23 (PR #58)
+- [ ] **SPEC-06** (HIGH): リカバリー3層タクソノミー (Continuation/Rollback/Clean Restart) → Phase 2
+- [ ] **SPEC-07** (MEDIUM): Phase 0 不変条件宣言 (隔離・リセット・垂直スライス・HitL) → Phase 0
+- [ ] **SPEC-08** (MEDIUM): 垂直スライス原則 — 各 Phase 項目に検証コマンドを同時デプロイ
+- [ ] **SPEC-09** (LOW): Human-in-the-Loop マニフェストを TODO-PLAN 冒頭に追加
+
+---
+
+## J. Gemini 構造的 Gap 分析 (GAP)
+
+> **分析レポート**: `.claude/docs/research/gemini-gap-analysis-2026-03-18.md`
+> Phase 配置は [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md) Phase 4-5 を参照
+> リファクタリング関連 (GAP-03/04) は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §5 を参照
+
+- [x] ~~**GAP-01** (HIGH): `DocumentMeta` タイムスタンプの型化 (`String` → `chrono::DateTime<Utc>`)~~ ✅ done (PR #42)
+- [ ] **GAP-02** (MEDIUM): PR State Machine をドメイン層に導入 → Phase 5
+- [x] ~~**GAP-03** (LOW): `ReviewVerdict` / `ReviewPayloadVerdict` の重複~~ ✅ DM-01 で統合済み (PR #42)
+- [ ] **GAP-04** (MEDIUM): `StatusOverride` の表現力不足 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §5
+- [x] ~~**GAP-05** (HIGH): `is_test_file` のパス正規化欠如~~ ✅ done (PR #39)
+- [x] ~~**GAP-06** (LOW): `#![forbid(unsafe_code)]` 設定~~ ✅ done (PR #39)
+- [ ] **GAP-07** (MEDIUM): `AgentId` 衝突防止 (UUID v7 or PID+timestamp) → Phase 4
+- [ ] **GAP-08** (MEDIUM): Hook バッチ化 (`sotp hook dispatch-all`) → Phase 4
+- [ ] **GAP-09** (LOW): `verify-latest-track` をコンテナ実行に統一 → Phase 5
+- [ ] **GAP-10** (MEDIUM): spec attribution 検証を Scope/Constraints まで拡張 → Phase 5
+- [ ] **GAP-11** (MEDIUM): `tracing` 導入 (`eprintln!` → 構造化ログ) → Phase 5
+
+---
+
+## 優先順位・実行計画
+
+> Tier 分類と Phase 配置は [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md) に統合済み。
+> リファクタリング関連の導入順序は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §10 を参照。
+> 解決済み項目の詳細は `tmp/TODO-archived-2026-03-16.md` を参照。
+
+---
+
+## 追加 TODO（track 外）
+
+> ワークフロー改善系。関連する既存 TODO がある場合は ID を併記。
+
+- [ ] **SKILL.md と commands の重複解消** (MEDIUM) — `.claude/skills/track-plan/SKILL.md` と `.claude/commands/track/plan.md` に実行手順が重複しており、片方を更新するともう片方が古くなる。SKILL.md はスキルルーター用 description + Phase 概要のみに縮退し、実行仕様は commands に委譲する。他の track:* スキル/コマンドペアも同様に整理
+- [ ] **`/track:hotfix` コマンド** (MEDIUM) — ドキュメントのみ・1 ファイル修正などの軽微な変更にレビューサイクルをスキップして直接コミット可能にする。対象ファイルパターン（`*.md`, `LICENSE` 等）で許可範囲を制限。現状は README 1 行変更でもトラック作成 → レビュー → PR → マージが必要でオーバーヘッドが大きい
+- [ ] **LICENSE ファイル追加** (LOW) — `LICENSE-MIT` + `LICENSE-APACHE` を作成し、全 `Cargo.toml` の `license` フィールドに `MIT OR Apache-2.0` を設定
+- [ ] **TDD 状態マシンの強制** (HIGH) — `metadata.json` の task に `tdd_phase: red|green|refactor` を追加し、`sotp tdd advance` で CI 証拠付きの遷移を強制。Red→Green は CI fail 証拠、Green→Refactor は CI pass 証拠が必要。commit guard は `tdd_required` タスクの `tdd_phase` 完了を検査。→ [詳細](../../tmp/refactoring-plan-2026-03-19.md) §0-7。関連: HARNESS-03, WORKFLOW-04
+- [ ] **Yes/No 承認ダイアログの最小化** — `permissions.allow` に wrapper を事前登録。WF-35 で一部対応済み
+- [ ] **/track:review の reviewer provider 移譲強制** — hook で外部 subprocess 呼び出しを検証。関連: CLAUDE-BP-02, 10-guardrails.md
+- [ ] **track-local-review 出力改善** — verdict JSON を `tmp/reviews/<track-id>/round-<N>.json` に自動保存。関連: RVW-07
+- [ ] **レビュー結果の蓄積** — round 別 JSON 蓄積 + `track-review-history` タスク。関連: RVW-06
+- [x] ~~**Full model reviewer の --full-auto 必須化**~~ ✅ 解決済み (PR #29)
+- [ ] **PR body の自動更新** — `track-pr-push` 時に `gh pr edit --body-file` で body を再生成
+- [x] ~~**registry.md のコミット時自動再生成**~~ ✅ 不要化 — registry.md は gitignore 化 (STRAT-04, PR #46)。コミット対象外のため自動再生成は不要
+- [ ] **reviewer subagent の Bash timeout 10分引き上げ** — `/track:review` スキルまたは wrapper で設定
+- [ ] **Review escalation enforcement の機構化** (HIGH) — `record-round` に `--model-tier fast|full` フラグを追加し、domain 層で「全グループが fast zero_findings → full zero_findings の 2 段階を経たか」を追跡。`check-approved` が full model 確認なしのグループを拒否。現状はプロンプト依存で fast model pass のみでコミットできるすり抜けが発生した (2026-03-24 発見)。関連: WF-36, RVW-06
+
+---
+
+## CLI エラーハンドリング改善（未完了分）
+
+> 詳細は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §7 を参照
+
+- [ ] **ERR-09b** (MEDIUM): `activate.rs` (1000行超) のモジュール分割 → `branch.rs` / `preflight.rs` / `resume.rs`
+- [ ] **ERR-11** (LOW): `tracing` クレート導入（前提: `tech-stack.md` 更新）
+- [ ] **ERR-13** (LOW): コンテナ内 `-local` タスクの `cargo run` → `bin/sotp` 置換
+- [ ] **ERR-14** (LOW): `_agent_profiles.py` に `fast_model` バリデーション追加
+- [ ] **ERR-15** (MEDIUM): `bin/sotp` の staleness 検出
+- [ ] **ERR-16** (LOW): `test_make_wrappers.py` のテストカバレッジ拡大
+
+---
+
+## HUMAN_MEMO.md からの追加項目（2026-03-15 整理）
+
+> コード品質・責務分離の詳細は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §6 を参照
+
+### 並行処理・ファイル競合
+
+- [ ] **MEMO-01** (MEDIUM): 並列レビュー時のブリーフィングファイル同時書き込み → ランID/セッションID で分離
+
+### アーキテクチャ・コード品質
+
+- [ ] **MEMO-02** (MEDIUM): `DESIGN.md` 肥大化 → トラック別分割、インデックス化
+- [ ] **MEMO-03** (MEDIUM): CLI→domain 直接参照禁止 → `architecture-rules.json` / `deny.toml` にルール追加
+- [ ] **MEMO-04** (LOW): `validator`/`strum`/`derive_more` による簡約（計画着手時に調査）
+- [ ] **MEMO-05** (LOW): `.claude/rules/` の完全英語化
+- [ ] **MEMO-06** (LOW): 肥大化リスクファイル分割（`error.rs`, `codec.rs`, `fs_store.rs`, `track.rs`）
+
+---
+
+## NotebookLM レビュー追記（2026-03-13-001 のトリアージ）
+
+> 詳細は `tmp/TODO-archived-2026-03-16.md` の「既存 TODO で管理済み」「不採用」セクションを参照
+
+## NotebookLM レビュー追記（2026-03-16 のトリアージ）
+
+> 詳細は `tmp/NotebookLM-review-2026-03-16-triage.md` を参照
+
+新規 TODO 化した 13 件:
+- `SEC-12`: External Guides チェックサム/staleness 検知欠如
+- `SEC-13`: conch-parser ベンダリング保守方針
+- `SSoT-09`: TrackDocumentV2 の未知フィールド消失
+- `SSoT-10`: collect_track_branch_claims の単一破損ファイル全停止
+- `INF-13`: atomic_write のパーミッション未転写
+- `INF-14`: ホスト Rust ツールチェーン依存
+- `WF-26`: find_open_pr_with の First-Match Bias
+- `WF-27`: parse_dirty_worktree_paths のクォート未処理
+- `WF-28`: git notes add -f ハードコード
+- `WF-29`: commit → note の partial failure
+- `WF-30`: PR body findings パーサーの限定バレット
+- `WF-31`: track:activate の部分失敗 main 汚染
+- `WF-32`: TrackId/TaskId の最大長制限なし
+- `WF-33`: resolve_track_id_from_branch のバリデーション欠如
+
+既存 TODO で管理済み（10件）、不採用（21件）、事実誤認（4件）。
+
+---
+
+## NotebookLM 提案・音声レビュー
+
+> 詳細は以下を参照:
+> - `STRAT-02` 設計入力: `tmp/NotebookLM-suggestion-oneshot-2026-03-13-001.md`
+> - アーキテクチャ提案 (4件): `tmp/ma4/2026-03-16/` 配下トリアージファイル
+> - 音声レビュー (2026-03-16): `tmp/ma4/2026-03-16/`
+> - Phase 配置: [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md) Phase 7 将来構想
+
+**STRAT-02 設計入力** (NotebookLM oneshot 2026-03-13):
+Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 reap
+
+**アーキテクチャ提案** (NotebookLM 2026-03-16 指摘11):
+- AST認識型 3-Way Merge → STRAT-02 延長（ロック改善が先）
+- LSP (rust-analyzer) 直結コンテキスト → PoC: `sotp lsp find-references`
+- CoW エフェメラルサンドボックス → STRAT-07/SPEC-04 と合流
+- 自律的調停プロトコル (Rebuttal + Arbitration) → `/track:review` 拡張
+
+**音声レビュー** (2026-03-16): `/track:auto` 設計入力 3 件 + 既存 TODO 管理済み 3 件。独立 TODO 追加不要。
+
+---
+
+## 外部フレームワーク取り込み候補（HARNESS/Tsumiki/CC-SDD/WORKFLOW/CLAUDE-BP）
+
+> 詳細は [`tmp/adoption-candidates-2026-03-17.md`](../../tmp/adoption-candidates-2026-03-17.md) を参照
+> Phase 配置は [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md) を参照
+
+**Harness Engineering Best Practices 2026**:
+- [ ] **HARNESS-01** (MEDIUM): PostToolUse 構造化フィードバック統一 → Phase 5
+- [ ] **HARNESS-02** (MEDIUM): Linter 設定ファイル保護 hook
+- [ ] **HARNESS-03** (HIGH): Stop hook テスト通過ゲート → Phase 3
+- [ ] **HARNESS-04** (LOW): WHY/FIX/EXAMPLE エラーメッセージ
+- [ ] **HARNESS-05** (MEDIUM): ADR 導入 → Phase 6
+- [ ] **HARNESS-06** (LOW): CLAUDE.md スリム化
+- [ ] **HARNESS-07** (LOW): Ghost File / Comment Bloat 検出
+- [ ] **HARNESS-08** (MEDIUM): ブートストラップルーチン標準化 → Phase 5
+- [ ] **HARNESS-09** (LOW): フィードバックループ速度階層の明文化
+
+**Tsumiki フレームワーク**:
+- [x] ~~**TSUMIKI-01** (HIGH): 信号機評価 🔵🟡🔴~~
+  - **完了**: Stage 1 (spec signals, PR #55) + Stage 2 (domain state signals, PR #58) + spec.json SSoT (PR #57)
+  - **完了日**: 2026-03-23
+- [x] ~~**TSUMIKI-02** (MEDIUM): ソース帰属~~ ✅ Phase 1 完了
+- [ ] **TSUMIKI-03** (MEDIUM): 差分ヒアリング
+- [ ] **TSUMIKI-04** (MEDIUM): TDD 完了時の要件網羅率 → Phase 3
+
+**CC-SDD フレームワーク**:
+- [ ] **CC-SDD-01** (HIGH): 要件-タスク双方向トレーサビリティ → Phase 2
+- [ ] **CC-SDD-02** (MEDIUM): 明示的承認ゲート → Phase 2
+- [ ] **CC-SDD-03** (LOW): EARS 記法
+- [ ] **CC-SDD-04** (MEDIUM): Steering 自動生成 → Phase 6
+- [ ] **CC-SDD-05** (MEDIUM): 実装検証コマンド → Phase 3
+
+**Coding Agent Workflow 2026**:
+- [ ] **WORKFLOW-01** (MEDIUM): FIC 閾値管理
+- [ ] **WORKFLOW-02** (LOW): Best-of-N 並列戦略
+- [ ] **WORKFLOW-03** (MEDIUM): ドキュメント鮮度追跡
+- [ ] **WORKFLOW-04** (MEDIUM): マイクロタスク分解
+- [ ] **WORKFLOW-05** (LOW): Dual-Agent 自動化パターン
+- [ ] **WORKFLOW-06** (LOW): CLAUDE.md/rules サイズ検証
+- [ ] **WORKFLOW-07** (LOW): 理解負債の軽減策
+- [ ] **WORKFLOW-08** (LOW): Spec-as-Source 成熟度モデル
+
+**Claude Code Best Practices (公式)**:
+- [ ] **CLAUDE-BP-01** (MEDIUM): PreCompact 圧縮保存指示強化
+- [ ] **CLAUDE-BP-02** (MEDIUM): Writer/Reviewer 分離 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §8
+- [ ] **CLAUDE-BP-03** (LOW): Custom status line
+- [ ] **CLAUDE-BP-04** (LOW): Fan-out バッチパターン
+- [ ] **CLAUDE-BP-05** (MEDIUM): 2 回修正失敗 → /clear ルール化
+
+---
+
+## L. レビューサイクル品質改善 (RVW)
+
+> 詳細は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §2 を参照
+
+- [ ] **RVW-01** (HIGH): 共通 Frontmatter パーサー抽出 → `frontmatter.rs`
+- [ ] **RVW-02** (HIGH): conch-parser AST 直接走査による hand-rolled shell 解析の廃止
+- [ ] **RVW-03** (MEDIUM, IN PROGRESS): typed deserialization convention + canonical_modules serde 移行
+- [ ] **RVW-04** (LOW): `syn` crate による `is_inside_test_module` 置き換え + standalone テストファイル除外
+- [ ] **RVW-05** (LOW): `skip_command_launchers` の per-launcher フラグモデリング（RVW-02 で根本解決）
+- [x] ~~**WF-35** (HIGH): FORBIDDEN_ALLOW の読み取り専用コマンド緩和~~ ✅ 修正済み
+- [ ] **RVW-06** (HIGH): metadata.json にレビュー状態統合 + エスカレーション順序強制 + コミットガード
+- [ ] **RVW-07** (HIGH): Codex verdict 抽出の stderr フォールバック + セッションログ保存
+
+---
+
+## K. ドメインモデリング強化 (DM)
+
+> 詳細は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §0 を参照
+> Phase 配置: Phase 1.5 (1.5-1〜1.5-3)
+
+- [x] ~~**DM-01** (HIGH): `ReviewRoundResult::verdict: String` → `Verdict` enum（+ GAP-03 統合）~~ ✅ done (PR #42)
+- [x] ~~**DM-02** (HIGH): `PrReviewResult::state: String` → `GhReviewState` enum~~ ✅ done (PR #42)
+- [x] ~~**DM-03** (MEDIUM): `PrReviewFinding::severity: String` → `Severity` enum~~ ✅ done (PR #42)
+- [x] ~~**DM-04** (MEDIUM): `ReviewRoundResult::timestamp: String` → `chrono::DateTime<Utc>`~~ ✅ done (PR #42)
+
+---
+
+## J. CLI コマンド層の肥大化・ロジック流出 (CLI)
+
+> 詳細は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §1 を参照
+
+- [ ] **CLI-01** (HIGH): `pr.rs` (1432行) の review polling/parsing を usecase 層に移動 → 目標 ~500行
+- [x] ~~**CLI-02** (HIGH): `review.rs` (~2300行) の record-round/check-approved/resolve-escalation を usecase 層に移動 → 目標 ~700行~~ ✅ review-usecase-extraction-2026-03-20 + cli-review-module-split-2026-03-22 で完了。4ファイル分割、port traits を usecase に配置、hexagonal architecture convention 追加
+- [ ] **CLI-03** (LOW): CLI-01/02 完了後のコーディング原則適合チェック
+
+---
+
+## K. WF-36 Follow-up (Review Escalation Threshold)
+
+> **出典**: review-escalation-threshold-2026-03-19 の Codex reviewer findings (gpt-5.4)
+> **追加日**: 2026-03-19
+
+- [ ] **WF-44** (LOW): codec の phase/streak 不整合検出 — `phase=clear` だが `concern_streaks` に threshold 以上の streak がある矛盾状態を decode 時に検出・修復する
+- [ ] **WF-45** (MEDIUM): `render_review_payload()` で `category: null` を明示出力 — **DM-01 (Verdict enum 化) で自然消滅予定**
+- [x] ~~**WF-46** (LOW): codec の重複正規化後衝突検出~~ ✅ done-hash-backfill Phase D で実装済み (codec.rs L392-397)。**ユニットテスト未追加** — 1.5-13 トラックで追加予定
+- [ ] **WF-47** (MEDIUM): `findings_to_concerns()` を `record-round` CLI に自動配線 — 現在は `--concerns` の手動指定に依存。reviewer verdict JSON から concerns を自動抽出して渡すフローを構築する
+- [ ] **WF-48** (LOW): `ReviewEscalationState::with_fields` の threshold/block バリデーション — threshold=0 や空 concerns の Blocked を domain 層で拒否する（codec 層では検証済みだが domain API 自体は無防備）
+- [ ] **WF-49** (LOW): `update_escalation_after_record` の streak リセット方式 — 現在は absent concern を `retain` で削除。削除と「0 にリセット」は機能的に同等だが、`consecutive_rounds: 0` を保持して「過去に出現したが現在は連続していない」ことを表現可能にする
+- [ ] **WF-50** (LOW): `file_path_to_concern` の中間ディレクトリ保持 — `apps/cli/src/commands/review.rs` → `cli.commands.review` のように中間ディレクトリを含む。設計判断として粒度が細かい方が正確だが、同一ファイルの異なるパス表現で slug が分散するリスクあり
+- [ ] **WF-51** (LOW): `ReviewRoundResult::new`/`new_with_concerns` のバリデーション — **DM-01 (Verdict enum 化) で自然消滅予定**
+- [ ] **WF-52** (MEDIUM): CLI review コマンドの統合テスト — `record-round --concerns`, exit-code-3 escalation, `resolve-escalation` のパース・エラーメッセージを CLI レベルでテスト
+- [ ] **WF-53** (LOW): `file_path_to_concern` の absolute path 誤マッチ — `/opt/libs/repo/apps/cli/...` のようにチェックアウト外の `libs/` にマッチするケース。rfind で最後の `libs/`/`apps/` を使うか、workspace root 相対パスに正規化してから処理すべき
+- [ ] **WF-55** (HIGH): metadata.json SSoT 一貫化 — 全 track `.md` ファイルを metadata.json からの read-only view に統一。view は git tracked のまま維持し、`sotp verify view-freshness` で metadata.json ↔ view の一貫性を CI で保証する
+  - **設計方針**: B案（構造化フィールド + 散文は `Vec<String>` で格納）。plan.md の `summary` / `sections[].description` で実証済みのパターンを全ファイルに適用
+  - **view の git 管理方針**: tracked のまま維持（untrack しない）。理由: PR diff で view の変更が見える、CI artifact 生成の運用コスト不要、レビュー体験を損なわない。手動編集は `sotp verify view-freshness` で CI 検出・拒否
+  - **Phase 1**: `sotp verify view-freshness` + view-freshness CI ゲート
+    - `sotp verify view-freshness` を実装 — metadata.json から view を再生成し、既存 view と差分があれば CI fail
+    - plan.md + registry.md で先行導入
+    - `/track:plan` スキル定義に spec JSON テンプレートを組み込み（AI は穴埋めするだけ、編集コスト対策）
+  - **Phase 2**: verification.md を metadata.json に統合 + view 化
+    - Scope Verified セクション: plan.md のタスクチェックボックスと重複 → 削除
+    - Manual Verification Steps: `verification.steps[]` フィールド（`{ id, description, auto: bool }`）に構造化
+    - Result / verified_at: metadata.json のトップレベルフィールド
+    - view-freshness CI ゲートを verification.md にも拡張
+    - `schema_version: 4` で新フォーマットを区別。codec の `decode` に後方互換パス（`verification` フィールドが無い場合は verification.md を別途読む）を残し、既存トラックはマイグレーション不要
+  - **Phase 3**: spec.md を metadata.json に統合 + view 化
+    - `spec.goal: string`, `spec.scope: [{ phase, title, items[] }]`, `spec.out_of_scope: string[]`, `spec.constraints: string[]`
+    - `spec.acceptance_criteria: [{ id, description, phase, task_refs[] }]` — 要件トレーサビリティの構造的保証
+    - `spec.domain_states: [{ id, name, signal, description }]` — 信号機 (🔵🟡🔴) の機械検証基盤（`sotp verify spec-signals` で CI ゲート可能）
+    - 散文は `description: Vec<String>` で格納（Markdown 段落・箇条書きをそのまま保持）
+    - Mermaid 図は spec.md の責務外（plan.md / DESIGN.md の Canonical Blocks）
+    - `sotp verify metadata-schema` で spec/plan 境界を強制（spec に tasks/sections が入っていたら reject、plan に goal/acceptance_criteria が入っていたら reject）。domain 層の型定義が境界を強制するため、codec でコンパイルエラー = 物理的に混同不可能
+    - spec/plan 内容重複防止ルールを `project-docs/conventions/` に convention として文書化（spec.scope = 「何を」要件レベル、plan.sections = 「どうやって」実装レベル、spec.acceptance_criteria.task_refs が両者をリンク）
+  - **既存トラック互換**: 新規トラックのみ新フォーマット適用。完了/アーカイブ済みトラックはマイグレーション不要。`schema_version` で新旧を区別し、codec 内部で後方互換を吸収
+  - **ビジョンとの整合**: 探索的精緻化ループが SSoT 上で閉じる。信号機の `signal` フィールドが Phase 2 (TODO-PLAN 2-1 TSUMIKI-01) の基盤になる
+  - **実装タイミング**: CLI-02 完了後に metadata.json codec を触るタイミングで Phase 2-3 を実装するのが効率的
