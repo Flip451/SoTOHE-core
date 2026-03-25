@@ -117,7 +117,8 @@ Use `{fast_model}` for iterative rounds and `{model}` for the final confirmation
 When `--auto-record` is passed, the reviewer wrapper calls `record-round` internally after
 verdict extraction, applying diff scope filtering (RVW-11) and preventing verdict falsification
 (RVW-10). This replaces the manual Step 2e. The `--diff-base` flag controls the base ref for
-scope filtering (default: `main`).
+scope filtering (default: `main`). Parallel multi-group `--auto-record` is safe: the recording
+protocol retries on stale-hash conflicts (up to 3 retries with fresh index).
 
 ```
 Agent 1: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-domain.md --auto-record --track-id {track-id} --round-type {fast|final} --group domain --expected-groups {all-group-names} --diff-base main

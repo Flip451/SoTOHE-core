@@ -126,6 +126,12 @@ impl DiffScope {
     pub fn contains(&self, path: &RepoRelativePath) -> bool {
         self.files.contains(path)
     }
+
+    /// Returns `true` if no files are in this scope.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.files.is_empty()
+    }
 }
 
 // ---------------------------------------------------------------------------

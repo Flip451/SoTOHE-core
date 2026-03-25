@@ -60,51 +60,20 @@
     ]
   },
   "review": {
-    "code_hash": "1ac682748ed5de9061560b14ce1079a9bb84dda5",
+    "code_hash": "9286cc6e89bc3d8934d0eca01cfe0f3974e80fc0",
     "escalation": {
       "phase": {
         "type": "clear"
       },
       "recent_cycles": [
         {
-          "concerns": [
-            "consistency"
-          ],
+          "concerns": [],
           "groups": [
             "all"
           ],
           "round": 1,
           "round_type": "fast",
-          "timestamp": "2026-03-25T02:38:44Z"
-        },
-        {
-          "concerns": [
-            "testing"
-          ],
-          "groups": [
-            "all"
-          ],
-          "round": 2,
-          "round_type": "fast",
-          "timestamp": "2026-03-25T02:45:30Z"
-        },
-        {
-          "concerns": [],
-          "groups": [
-            "all"
-          ],
-          "round": 3,
-          "round_type": "fast",
-          "timestamp": "2026-03-25T02:47:59Z"
-        },
-        {
-          "concerns": [],
-          "groups": [
-            "all"
-          ],
-          "round": 4,
-          "round_type": "fast",
-          "timestamp": "2026-03-25T02:55:04Z"
+          "timestamp": "2026-03-25T04:35:57Z"
         },
         {
           "concerns": [],
@@ -113,7 +82,7 @@
           ],
           "round": 1,
           "round_type": "final",
-          "timestamp": "2026-03-25T02:55:19Z"
+          "timestamp": "2026-03-25T04:36:11Z"
         }
       ],
       "threshold": 3
@@ -121,13 +90,13 @@
     "groups": {
       "all": {
         "fast": {
-          "round": 4,
-          "timestamp": "2026-03-25T02:55:04Z",
+          "round": 1,
+          "timestamp": "2026-03-25T04:35:57Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-25T02:55:19Z",
+          "timestamp": "2026-03-25T04:36:11Z",
           "verdict": "zero_findings"
         }
       }
@@ -135,29 +104,29 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "done",
   "tasks": [
     {
       "description": "GitDiffScopeProvider contract tests — tempdir git fixture covering merge-base diff, staged changes, unstaged worktree changes, untracked files, renames, deletes, and error propagation",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "codex-reviewer agent tools: restriction verification — confirm Bash(cargo make track-local-review:*) actually limits tools, fix if not",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "review.md --auto-record full migration — update /track:review to always pass --auto-record flags, validate via this track's own review cycle",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "/track:plan skill に spec.json 生成後の信号機評価ステップを追加 — sotp track signals を自動実行して signals フィールドを埋める",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "RVW-13/15/17 Review infrastructure quality hardening",
-  "updated_at": "2026-03-25T02:55:19Z"
+  "updated_at": "2026-03-25T04:36:11Z"
 }

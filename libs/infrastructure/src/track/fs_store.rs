@@ -53,7 +53,7 @@ impl FsTrackStore {
     }
 
     /// Encodes and atomically writes `metadata.json` for a given track.
-    fn write_track(
+    pub(crate) fn write_track(
         &self,
         track: &TrackMetadata,
         meta: &DocumentMeta,
@@ -210,6 +210,8 @@ impl FsTrackStore {
     where
         F: FnOnce(&mut TrackMetadata, &mut DocumentMeta) -> Result<(), DomainError>,
     {
+        use fs4::fs_std::FileExt;
+
         let path = self.metadata_path(id);
 
         // Early return if metadata.json does not exist.
@@ -219,21 +221,40 @@ impl FsTrackStore {
             )));
         }
 
-        // Read current state.
+        // Acquire an exclusive advisory lock on a sibling `.lock` file.
+        // This serializes concurrent `with_locked_document` calls (e.g., parallel auto-record).
+        let lock_path = path.with_extension("json.lock");
+        let lock_file = std::fs::File::create(&lock_path).map_err(|e| {
+            TrackWriteError::Repository(RepositoryError::Message(format!(
+                "failed to create lock file {}: {e}",
+                lock_path.display()
+            )))
+        })?;
+        lock_file.lock_exclusive().map_err(|e| {
+            TrackWriteError::Repository(RepositoryError::Message(format!(
+                "failed to acquire exclusive lock on {}: {e}",
+                lock_path.display()
+            )))
+        })?;
+
+        // Read current state (under lock — guaranteed fresh).
         let (mut track, mut meta) =
             self.read_track(id).map_err(TrackWriteError::from)?.ok_or_else(|| {
                 TrackWriteError::Repository(RepositoryError::TrackNotFound(id.to_string()))
             })?;
 
         // Invoke the closure — the caller controls all mutations including timestamps.
-        f(&mut track, &mut meta).map_err(TrackWriteError::from)?;
+        let result = f(&mut track, &mut meta).map_err(TrackWriteError::from);
 
-        // Write the final state; `original_status` is cleared so encode()
-        // recomputes the status from the domain model.
-        meta.original_status = None;
-        self.write_track(&track, &meta).map_err(TrackWriteError::from)?;
+        if result.is_ok() {
+            // Write the final state; `original_status` is cleared so encode()
+            // recomputes the status from the domain model.
+            meta.original_status = None;
+            self.write_track(&track, &meta).map_err(TrackWriteError::from)?;
+        }
 
-        Ok(track)
+        // Lock is released when `lock_file` is dropped (end of scope).
+        result.map(|()| track)
     }
 }
 

@@ -2,6 +2,7 @@
 ---
 status: draft
 version: "1.0.0"
+signals: { blue: 12, yellow: 3, red: 0 }
 ---
 
 # RVW-13/15/17 Review infrastructure quality hardening
@@ -42,4 +43,9 @@ GitDiffScopeProvider のアダプタ契約テストを追加し、--auto-record 
 - project-docs/conventions/task-completion-flow.md
 - .claude/rules/05-testing.md
 - .claude/rules/07-dev-environment.md
+
+## Signal Summary
+
+### Stage 1: Spec Signals
+🔵 12  🟡 3  🔴 0
 
