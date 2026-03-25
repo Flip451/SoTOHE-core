@@ -10,21 +10,54 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 #[cfg(unix)]
 use std::os::unix::process::CommandExt;
 
+use usecase::review_workflow::scope::{DiffScopeProvider, ScopeFilteredPayload};
+use usecase::review_workflow::usecases::{RecordRoundProtocol, Verdict, record_round_typed};
 use usecase::review_workflow::{
-    ReviewFinalMessageState, ReviewVerdict, classify_review_verdict, extract_verdict_from_content,
-    normalize_final_message, parse_review_final_message, render_review_payload,
+    ReviewFinalMessageState, ReviewPayloadVerdict, ReviewVerdict, classify_review_verdict,
+    extract_verdict_from_content, findings_to_concerns, normalize_final_message,
+    parse_review_final_message, render_review_payload,
 };
 
 use super::{
     AutoManagedArtifacts, CodexInvocation, CodexLocalArgs, OutputLastMessagePath, POLL_INTERVAL,
-    REVIEW_RUNTIME_DIR, RenderedCommandResult, ReviewRunResult,
+    REVIEW_RUNTIME_DIR, RenderedCommandResult, ReviewRunResult, ValidatedAutoRecordArgs,
+    validate_auto_record_args,
 };
 
 #[cfg(test)]
 use super::CODEX_BIN_ENV;
 
 pub(super) fn execute_codex_local(args: &CodexLocalArgs) -> ExitCode {
-    let rendered = render_codex_local_result(args, run_codex_local(args));
+    // Step 1: Validate auto-record args before spawning Codex (fail fast).
+    let auto_record = match validate_auto_record_args(args) {
+        Ok(ar) => ar,
+        Err(err) => {
+            eprintln!("[ERROR] {err}");
+            return ExitCode::from(1);
+        }
+    };
+
+    // Step 2: Run Codex (existing flow).
+    let outcome = run_codex_local(args);
+
+    // Step 3: If auto-record is enabled, apply scope filter and record.
+    if let Some(validated) = auto_record {
+        let scope_provider = infrastructure::review_adapters::GitDiffScopeProvider;
+        let protocol = infrastructure::review_adapters::RecordRoundProtocolImpl {
+            items_dir: validated.items_dir.clone(),
+            group_display: validated.group_name.as_ref().to_owned(),
+        };
+        return execute_with_auto_record(
+            outcome,
+            validated,
+            args.timeout_seconds,
+            &scope_provider,
+            &protocol,
+        );
+    }
+
+    // Step 4: Original flow (no auto-record).
+    let rendered = render_codex_local_result(args, outcome);
     for line in rendered.stdout_lines {
         println!("{line}");
     }
@@ -32,6 +65,199 @@ pub(super) fn execute_codex_local(args: &CodexLocalArgs) -> ExitCode {
         eprintln!("{line}");
     }
     ExitCode::from(rendered.exit_code)
+}
+
+/// Applies scope filtering, calls `record_round_typed`, then emits the filtered verdict JSON.
+///
+/// `timeout_seconds` is forwarded to the non-actionable verdict rendering path
+/// (Timeout / ProcessFailed / LastMessageMissing) where it appears in the error message.
+///
+/// Generic over `DiffScopeProvider` and `RecordRoundProtocol` so tests can inject stubs.
+pub(super) fn execute_with_auto_record(
+    outcome: Result<ReviewRunResult, String>,
+    validated: ValidatedAutoRecordArgs,
+    timeout_seconds: u64,
+    scope_provider: &impl DiffScopeProvider,
+    protocol: &impl RecordRoundProtocol,
+) -> ExitCode {
+    // Handle non-success outcomes (spawn failure etc.) — skip auto-record.
+    let result = match outcome {
+        Ok(r) => r,
+        Err(err) => {
+            eprintln!("[ERROR] {err}");
+            return ExitCode::from(1);
+        }
+    };
+
+    match result.verdict {
+        ReviewVerdict::ZeroFindings | ReviewVerdict::FindingsRemain => {
+            record_auto_round(result, validated, scope_provider, protocol)
+        }
+        // Non-actionable verdicts (Timeout, ProcessFailed, LastMessageMissing):
+        // skip auto-record, use inline rendering.
+        ReviewVerdict::Timeout => render_non_actionable_timeout(&result, timeout_seconds),
+        ReviewVerdict::ProcessFailed => render_non_actionable_process_failed(result),
+        ReviewVerdict::LastMessageMissing => render_non_actionable_missing_message(&result),
+    }
+}
+
+/// Performs the scope-filter → record → emit flow for actionable verdicts.
+#[allow(clippy::too_many_lines)]
+fn record_auto_round(
+    result: ReviewRunResult,
+    validated: ValidatedAutoRecordArgs,
+    scope_provider: &impl DiffScopeProvider,
+    protocol: &impl RecordRoundProtocol,
+) -> ExitCode {
+    // Parse the payload for scope filtering.
+    let payload = match result.final_message.as_deref() {
+        Some(json) => match parse_review_final_message(Some(json)) {
+            ReviewFinalMessageState::Parsed(p) => p,
+            _ => {
+                eprintln!("[ERROR] auto-record: could not parse verdict payload");
+                if let Some(msg) = result.final_message {
+                    println!("{msg}");
+                }
+                return ExitCode::from(1);
+            }
+        },
+        None => {
+            eprintln!("[ERROR] auto-record: no verdict payload to record");
+            return ExitCode::from(1);
+        }
+    };
+
+    // Compute diff scope. On failure, skip filtering but still record the round.
+    let filtered = match scope_provider.changed_files(&validated.diff_base) {
+        Ok(scope) => {
+            let f = usecase::review_workflow::apply_scope_filter(payload, &scope);
+            let total = f.adjusted_payload.findings.len() + f.out_of_scope.len();
+            if !f.out_of_scope.is_empty() || f.unknown_path_count > 0 {
+                eprintln!(
+                    "[scope-filter] {} of {} findings out of scope, {} unknown paths",
+                    f.out_of_scope.len(),
+                    total,
+                    f.unknown_path_count
+                );
+            }
+            f
+        }
+        Err(err) => {
+            eprintln!("[WARNING] Failed to compute diff scope (recording unfiltered): {err}");
+            ScopeFilteredPayload {
+                adjusted_payload: payload,
+                out_of_scope: Vec::new(),
+                unknown_path_count: 0,
+            }
+        }
+    };
+
+    // Map ReviewPayloadVerdict → domain::Verdict.
+    let domain_verdict = match filtered.adjusted_payload.verdict {
+        ReviewPayloadVerdict::ZeroFindings => Verdict::ZeroFindings,
+        ReviewPayloadVerdict::FindingsRemain => Verdict::FindingsRemain,
+    };
+
+    // Extract concerns from in-scope findings.
+    let concerns = match findings_to_concerns(&filtered.adjusted_payload.findings) {
+        Ok(c) => c,
+        Err(err) => {
+            eprintln!("[ERROR] Failed to extract concerns: {err}");
+            Vec::new()
+        }
+    };
+
+    // Build timestamp.
+    let timestamp = match super::make_timestamp() {
+        Ok(ts) => ts,
+        Err(err) => {
+            eprintln!("[ERROR] {err}");
+            return ExitCode::from(1);
+        }
+    };
+
+    // Capture display strings before moving validated fields.
+    let group_display = validated.group_name.as_ref().to_owned();
+    let round_type_display = validated.round_type;
+
+    // Call record_round_typed.
+    use usecase::review_workflow::usecases::RecordRoundError;
+    match record_round_typed(
+        validated.track_id,
+        validated.round_type,
+        validated.group_name,
+        domain_verdict,
+        concerns,
+        validated.expected_groups,
+        timestamp,
+        protocol,
+    ) {
+        Ok(()) => {
+            eprintln!(
+                "[auto-record] Recorded {round_type_display} round for group \
+                 '{group_display}' (verdict: {domain_verdict})"
+            );
+        }
+        Err(RecordRoundError::EscalationBlocked(blocked)) => {
+            eprintln!("[auto-record] Escalation blocked: {}", blocked.join(", "));
+            // Do NOT print verdict JSON — recording failed, so the verdict is untrusted.
+            return ExitCode::from(3);
+        }
+        Err(RecordRoundError::Other(msg)) => {
+            // All recording failures are fatal — the core guarantee of auto-record
+            // is that verdicts are always persisted internally.
+            // Do NOT print verdict JSON — unrecorded verdicts must not be trusted.
+            eprintln!("[auto-record] Record failed: {msg}");
+            return ExitCode::from(1);
+        }
+    }
+
+    // Output the filtered verdict JSON to stdout.
+    if let Ok(json) = render_review_payload(&filtered.adjusted_payload) {
+        println!("{json}");
+    }
+
+    match filtered.adjusted_payload.verdict {
+        ReviewPayloadVerdict::ZeroFindings => ExitCode::from(0),
+        ReviewPayloadVerdict::FindingsRemain => ExitCode::from(2),
+    }
+}
+
+fn render_non_actionable_timeout(result: &ReviewRunResult, timeout_seconds: u64) -> ExitCode {
+    let msg = if result.output_last_message_auto_managed {
+        format!("[TIMEOUT] Local reviewer exceeded {timeout_seconds}s")
+    } else {
+        format!(
+            "[TIMEOUT] Local reviewer exceeded {timeout_seconds}s: {}",
+            result.output_last_message.display()
+        )
+    };
+    eprintln!("{msg}");
+    ExitCode::from(1)
+}
+
+fn render_non_actionable_process_failed(result: ReviewRunResult) -> ExitCode {
+    eprintln!("[ERROR] Local reviewer process failed");
+    if let Some(detail) = result.verdict_detail {
+        eprintln!("{detail}");
+    }
+    if let Some(message) = result.final_message {
+        eprintln!("{message}");
+    }
+    ExitCode::from(1)
+}
+
+fn render_non_actionable_missing_message(result: &ReviewRunResult) -> ExitCode {
+    let msg = if result.output_last_message_auto_managed {
+        "[ERROR] Local reviewer finished without a final message".to_owned()
+    } else {
+        format!(
+            "[ERROR] Local reviewer finished without a final message: {}",
+            result.output_last_message.display()
+        )
+    };
+    eprintln!("{msg}");
+    ExitCode::from(1)
 }
 
 pub(super) fn render_codex_local_result(

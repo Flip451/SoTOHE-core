@@ -104,25 +104,30 @@ DO NOT report findings about unchanged pre-existing code.
 ### 2c. Invoke reviewers in parallel
 
 Launch one reviewer per non-empty group, **in parallel** using Agent Teams
-(the Agent tool with `run_in_background: true`).
+(the Agent tool with `run_in_background: true` and `subagent_type: "codex-reviewer"`).
 
-**Agent tool usage constraint**: When spawning agents, instruct them to use the `Read` tool
-(not `Bash(grep ...)`, `Bash(cat ...)`, etc.) for reading output files and extracting results.
-Commands in the `FORBIDDEN_ALLOW` list trigger permission prompts and block automation.
+The `codex-reviewer` agent type restricts available tools to Bash + Read + Grep + Glob,
+and its system prompt enforces: run the command exactly as given, no `$?`/`2>&1`/shell
+expansion, no build commands, use Read (not Bash) for reading files.
 
 **When the provider has a CLI tool** (e.g., Codex CLI — the default profile):
 
 Use `{fast_model}` for iterative rounds and `{model}` for the final confirmation round (see Model escalation strategy).
 
+When `--auto-record` is passed, the reviewer wrapper calls `record-round` internally after
+verdict extraction, applying diff scope filtering (RVW-11) and preventing verdict falsification
+(RVW-10). This replaces the manual Step 2e. The `--diff-base` flag controls the base ref for
+scope filtering (default: `main`).
+
 ```
-Agent 1: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-domain.md
-Agent 2: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-infra.md
-Agent 3: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-usecase.md
-Agent 4: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-cli.md
-Agent 5: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-other.md
+Agent 1: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-domain.md --auto-record --track-id {track-id} --round-type {fast|final} --group domain --expected-groups {all-group-names} --diff-base main
+Agent 2: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-infra.md --auto-record --track-id {track-id} --round-type {fast|final} --group infra --expected-groups {all-group-names} --diff-base main
+Agent 3: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-usecase.md --auto-record --track-id {track-id} --round-type {fast|final} --group usecase --expected-groups {all-group-names} --diff-base main
+Agent 4: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-cli.md --auto-record --track-id {track-id} --round-type {fast|final} --group cli --expected-groups {all-group-names} --diff-base main
+Agent 5: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-other.md --auto-record --track-id {track-id} --round-type {fast|final} --group other --expected-groups {all-group-names} --diff-base main
 ```
 
-For the **final confirmation round**, replace `{fast_model}` with `{model}` in the commands above.
+For the **final confirmation round**, replace `{fast_model}` with `{model}` and `--round-type fast` with `--round-type final` in the commands above.
 
 **When the provider is `claude`** (e.g., `claude-heavy` profile):
 
@@ -162,9 +167,12 @@ one finding. The wrapper prints that final JSON payload as the last stdout line.
 
 ### 2e. Record round results
 
-After aggregating verdicts for each group, persist the result into `metadata.json` via
-`sotp review record-round`. This wires the reviewer output into the domain review state
-machine so that `check-approved` can enforce the review guard.
+**When `--auto-record` is used** (recommended): Step 2e is handled automatically by the
+reviewer wrapper. The wrapper applies diff scope filtering, extracts concerns, and calls
+`record-round` internally. Exit code 3 signals escalation block. No manual intervention needed.
+
+**Fallback (without `--auto-record`)**: If `--auto-record` is not used, manually persist
+the result into `metadata.json` via `sotp review record-round`:
 
 For **each non-empty group**, run (when the `<= 5 files` collapse rule was applied and a
 single reviewer invocation was used, treat all changed files as a single group named `all`
@@ -193,8 +201,8 @@ Do NOT pass `--concerns ""` — the empty-string argument breaks Claude Code per
 for `cargo make track-record-round`.
 
 **Error handling**:
-- If `record-round` returns exit code 3 (`EscalationActive`): stop the review loop and
-  report the escalation block to the user with the required resolution steps.
+- If `record-round` (or `--auto-record`) returns exit code 3 (`EscalationActive`): stop the
+  review loop and report the escalation block to the user with the required resolution steps.
 - If `record-round` fails with a stale-hash error (stderr contains "code hash mismatch"):
   the review state has been invalidated. Stop and re-run the review from Round 1 —
   proceeding would leave the review state inconsistent with the current code.
@@ -261,6 +269,18 @@ Execution:
 - **Final round (confirmation)**: When the fast model reports `zero_findings`, run one more round with `{model}` to catch deeper design issues.
 - If the full model also reports `zero_findings`: proceed to Step 4.
 - If the full model finds new issues: fix and return to the fast model loop.
+
+### Early-completion pipelining
+
+When groups are reviewed in parallel and some groups complete with `zero_findings` while
+others have `findings_remain`:
+
+- **Without `--auto-record`**: start fixes immediately for completed groups without waiting
+  for others. Launch the next review round per-group as fixes are ready.
+- **With `--auto-record`**: wait for ALL groups in the current round to complete recording
+  before starting any fixes. Each `record-round` captures a code hash; if fixes change
+  the tree between recordings, later groups will hit stale-code-hash and invalidate
+  review state. Only begin fixes after all groups have recorded.
 
 ### Loop guard
 

@@ -94,3 +94,5 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Reviewer model_profiles in agent-profiles.json](2026-03-17-0000-reviewer-model-profiles.md) | Accepted | 2026-03-17 |
 | [3-level signals with SignalBasis](2026-03-23-1010-three-level-signals.md) | Accepted | 2026-03-23 |
 | [Two-stage signal architecture](2026-03-23-1020-two-stage-signals.md) | Accepted | 2026-03-23 |
+| [DiffScope と scope filtering は usecase 層に配置](2026-03-25-0000-diff-scope-in-usecase.md) | Accepted | 2026-03-25 |
+| [パス正規化: exact match + fail-closed](2026-03-25-0010-path-normalization-exact-match.md) | Accepted | 2026-03-25 |

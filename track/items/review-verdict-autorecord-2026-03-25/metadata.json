@@ -1,0 +1,168 @@
+{
+  "branch": "track/review-verdict-autorecord-2026-03-25",
+  "created_at": "2026-03-25T00:00:00Z",
+  "id": "review-verdict-autorecord-2026-03-25",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "DiffScope + RepoRelativePath in usecase layer. DiffScopeProvider port with GitDiffScopeProvider adapter.",
+          "Path normalization: strip ./ and \\ separators, convert absolute to repo-relative.",
+          "Unknown paths treated as in-scope (fail-closed). Exact match only (no suffix match - ambiguous in monorepo)."
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001",
+          "T003"
+        ],
+        "title": "Scope filtering (RVW-11)"
+      },
+      {
+        "description": [
+          "Add record_round_typed() usecase entrypoint that accepts parsed domain types (RoundType, ReviewGroupName, Verdict, Vec<ReviewConcern>, etc.) directly.",
+          "Keep existing string-based record_round() as external CLI adapter only."
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "Typed record-round (RVW-10 prerequisite)"
+      },
+      {
+        "description": [
+          "Extend CodexLocalArgs with auto-record flags. Validate all args before spawning Codex (fail fast).",
+          "After verdict extraction: compute DiffScope, apply scope filter, extract concerns, call record_round_typed internally.",
+          "Exit codes: 0=zero_findings, 2=findings_remain, 1=error, 3=escalation."
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T004",
+          "T005"
+        ],
+        "title": "Auto-record CLI integration (RVW-10)"
+      },
+      {
+        "description": [
+          "Update review.md orchestrator command to pass --auto-record --diff-base main (Makefile.toml unchanged — existing wrapper passes args transparently).",
+          "Backward compatible: --auto-record disabled preserves current behavior."
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T006"
+        ],
+        "title": "Orchestrator integration"
+      }
+    ],
+    "summary": [
+      "RVW-10: verdict falsification prevention via --auto-record mode in codex-local (record-round called internally after verdict extraction).",
+      "RVW-11: diff scope enforcement via structural finding filtering (normalized repo-relative path matching, fail-closed for unknown paths)."
+    ]
+  },
+  "review": {
+    "code_hash": "057305c275b0d741653b09cbedbb20c9bce2d4e5",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-24T22:25:49Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-24T22:25:54Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 2,
+          "round_type": "fast",
+          "timestamp": "2026-03-24T23:15:17Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 3,
+          "round_type": "fast",
+          "timestamp": "2026-03-25T02:04:54Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 4,
+          "round_type": "fast",
+          "timestamp": "2026-03-25T02:09:03Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "all": {
+        "fast": {
+          "round": 4,
+          "timestamp": "2026-03-25T02:09:03Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-25T02:09:14Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "Usecase: scope.rs - DiffScope, RepoRelativePath, DiffScopeProvider port, classify/partition/apply_scope_filter + unit tests (TDD: classify InScope/OutOfScope/UnknownPath, partition, apply_scope_filter with adjusted verdict)",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "Usecase: record_round_typed() - typed entrypoint accepting parsed domain types directly (keep string-based record_round as CLI adapter) + unit tests (TDD: valid/invalid inputs, protocol delegation)",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "Infrastructure: GitDiffScopeProvider adapter (merge-base diff, renames, deletions, untracked files) + integration tests (TDD: diff against real git repo fixture)",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "CLI: Extended CodexLocalArgs (--auto-record, --track-id, --round-type, --group, --expected-groups, --items-dir, --diff-base) with pre-spawn validation + unit tests (TDD: arg validation, requires constraints)",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "CLI: auto-record execution flow in codex_local.rs (verdict -> scope filter -> concerns -> record_round_typed) + integration tests (TDD: mock codex binary, verify record-round called with correct verdict)",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "Integration: orchestrator command (.claude/commands/track/review.md) update to use --auto-record --diff-base (Makefile.toml unchanged — existing wrapper passes args transparently)",
+      "id": "T006",
+      "status": "done"
+    }
+  ],
+  "title": "RVW-10/11 Review verdict auto-record + diff scope enforcement",
+  "updated_at": "2026-03-25T02:09:14Z"
+}

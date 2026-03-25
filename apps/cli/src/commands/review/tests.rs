@@ -63,6 +63,14 @@ fn fake_args(
         briefing_file,
         prompt,
         output_last_message: Some(output_last_message),
+        // auto-record fields default to disabled
+        auto_record: false,
+        track_id: None,
+        round_type: None,
+        group: None,
+        expected_groups: Vec::new(),
+        items_dir: PathBuf::from("track/items"),
+        diff_base: "main".to_owned(),
     }
 }
 
@@ -459,6 +467,13 @@ fn run_codex_local_cleans_auto_managed_artifacts_when_spawn_fails() {
         briefing_file: None,
         prompt: Some("Review this implementation.".to_owned()),
         output_last_message: None,
+        auto_record: false,
+        track_id: None,
+        round_type: None,
+        group: None,
+        expected_groups: Vec::new(),
+        items_dir: PathBuf::from("track/items"),
+        diff_base: "main".to_owned(),
     };
 
     let err = run_codex_local(&args).unwrap_err();
@@ -960,6 +975,136 @@ fn status_succeeds_without_review_section() {
     assert_eq!(exit, std::process::ExitCode::SUCCESS);
 }
 
+// ---------------------------------------------------------------------------
+// validate_auto_record_args tests (T004)
+// ---------------------------------------------------------------------------
+
+use super::{CodexRoundTypeArg, validate_auto_record_args};
+
+/// Build a minimal `CodexLocalArgs` for testing validate_auto_record_args.
+/// `auto_record = false` by default; override fields as needed.
+fn make_codex_local_args_for_validation(
+    auto_record: bool,
+    track_id: Option<&str>,
+    round_type: Option<CodexRoundTypeArg>,
+    group: Option<&str>,
+    expected_groups: Vec<&str>,
+) -> CodexLocalArgs {
+    CodexLocalArgs {
+        model: "gpt-5.4".to_owned(),
+        timeout_seconds: 60,
+        briefing_file: None,
+        prompt: Some("dummy".to_owned()),
+        output_last_message: None,
+        auto_record,
+        track_id: track_id.map(str::to_owned),
+        round_type,
+        group: group.map(str::to_owned),
+        expected_groups: expected_groups.into_iter().map(str::to_owned).collect(),
+        items_dir: PathBuf::from("track/items"),
+        diff_base: "main".to_owned(),
+    }
+}
+
+#[test]
+fn test_validate_auto_record_args_disabled_returns_none() {
+    let args = make_codex_local_args_for_validation(false, None, None, None, vec![]);
+    let result = validate_auto_record_args(&args);
+    assert!(matches!(result, Ok(None)));
+}
+
+#[test]
+fn test_validate_auto_record_args_valid_returns_some() {
+    let args = make_codex_local_args_for_validation(
+        true,
+        Some("my-track"),
+        Some(CodexRoundTypeArg::Fast),
+        Some("infra-domain"),
+        vec!["infra-domain", "usecase"],
+    );
+    let result = validate_auto_record_args(&args);
+    assert!(result.is_ok());
+    let validated = result.unwrap();
+    assert!(validated.is_some());
+    let v = validated.unwrap();
+    assert_eq!(v.track_id.as_ref(), "my-track");
+    assert_eq!(v.round_type, domain::RoundType::Fast);
+    assert_eq!(v.group_name.as_ref(), "infra-domain");
+    assert_eq!(v.expected_groups.len(), 2);
+    assert_eq!(v.diff_base, "main");
+}
+
+#[test]
+fn test_validate_auto_record_args_missing_track_id_returns_error() {
+    let args = make_codex_local_args_for_validation(
+        true,
+        None,
+        Some(CodexRoundTypeArg::Final),
+        Some("cli"),
+        vec!["cli"],
+    );
+    let result = validate_auto_record_args(&args);
+    assert!(result.is_err());
+    assert!(result.unwrap_err().contains("--track-id"));
+}
+
+#[test]
+fn test_validate_auto_record_args_missing_round_type_returns_error() {
+    let args = make_codex_local_args_for_validation(
+        true,
+        Some("my-track"),
+        None,
+        Some("cli"),
+        vec!["cli"],
+    );
+    let result = validate_auto_record_args(&args);
+    assert!(result.is_err());
+    assert!(result.unwrap_err().contains("--round-type"));
+}
+
+#[test]
+fn test_validate_auto_record_args_missing_group_returns_error() {
+    let args = make_codex_local_args_for_validation(
+        true,
+        Some("my-track"),
+        Some(CodexRoundTypeArg::Fast),
+        None,
+        vec!["cli"],
+    );
+    let result = validate_auto_record_args(&args);
+    assert!(result.is_err());
+    assert!(result.unwrap_err().contains("--group"));
+}
+
+#[test]
+fn test_validate_auto_record_args_empty_expected_groups_returns_error() {
+    let args = make_codex_local_args_for_validation(
+        true,
+        Some("my-track"),
+        Some(CodexRoundTypeArg::Fast),
+        Some("cli"),
+        vec![],
+    );
+    let result = validate_auto_record_args(&args);
+    assert!(result.is_err());
+    assert!(result.unwrap_err().contains("--expected-groups"));
+}
+
+#[test]
+fn test_validate_auto_record_args_invalid_track_id_returns_error() {
+    // Track IDs must be lowercase slugs; uppercase letters are invalid.
+    let args = make_codex_local_args_for_validation(
+        true,
+        Some("Not A Valid ID"),
+        Some(CodexRoundTypeArg::Fast),
+        Some("cli"),
+        vec!["cli"],
+    );
+    let result = validate_auto_record_args(&args);
+    assert!(result.is_err());
+    assert!(result.unwrap_err().contains("--track-id"));
+}
+
 #[test]
 fn status_displays_per_group_fast_final_state() {
     use super::{StatusArgs, execute_status};
@@ -998,4 +1143,168 @@ fn status_displays_per_group_fast_final_state() {
     let args = StatusArgs { items_dir, track_id: "test-track".to_string() };
     let exit = execute_status(&args);
     assert_eq!(exit, std::process::ExitCode::SUCCESS);
+}
+
+// ---------------------------------------------------------------------------
+// T005: auto-record execution flow tests
+// ---------------------------------------------------------------------------
+
+/// Build a `CodexLocalArgs` with `auto_record = true` and all required fields set.
+#[allow(dead_code)]
+fn make_auto_record_args(dir: &std::path::Path, output_last_message: PathBuf) -> CodexLocalArgs {
+    CodexLocalArgs {
+        model: "gpt-5.4".to_owned(),
+        timeout_seconds: 10,
+        briefing_file: None,
+        prompt: Some("Review this.".to_owned()),
+        output_last_message: Some(output_last_message),
+        auto_record: true,
+        track_id: Some("my-track".to_owned()),
+        round_type: Some(super::CodexRoundTypeArg::Fast),
+        group: Some("codex".to_owned()),
+        expected_groups: vec!["codex".to_owned()],
+        items_dir: dir.join("items"),
+        diff_base: "main".to_owned(),
+    }
+}
+
+// Test 1: validate_auto_record_args failure causes execute_codex_local to exit 1
+// before spawning Codex (no SOTP_CODEX_BIN set, but validation should fail first).
+#[test]
+fn test_auto_record_validation_failure_exits_1() {
+    use super::codex_local::execute_codex_local;
+
+    // auto_record=true but track_id is missing → validation must fail
+    let dir = tempfile::tempdir().unwrap();
+    let output = dir.path().join("last.txt");
+    let args = CodexLocalArgs {
+        model: "gpt-5.4".to_owned(),
+        timeout_seconds: 10,
+        briefing_file: None,
+        prompt: Some("Review this.".to_owned()),
+        output_last_message: Some(output),
+        auto_record: true,
+        track_id: None, // missing — triggers validation error
+        round_type: Some(super::CodexRoundTypeArg::Fast),
+        group: Some("codex".to_owned()),
+        expected_groups: vec!["codex".to_owned()],
+        items_dir: dir.path().join("items"),
+        diff_base: "main".to_owned(),
+    };
+
+    let exit = execute_codex_local(&args);
+    assert_eq!(exit, std::process::ExitCode::from(1), "validation failure must exit 1");
+}
+
+// Test 2: execute_with_auto_record with zero_findings verdict calls record_round and exits 0.
+// Uses stub DiffScopeProvider and RecordRoundProtocol — no git or filesystem required.
+#[test]
+fn test_auto_record_zero_findings_calls_record_round() {
+    use std::cell::RefCell;
+    use usecase::review_workflow::ReviewVerdict;
+    use usecase::review_workflow::scope::{DiffScope, DiffScopeProvider, DiffScopeProviderError};
+    use usecase::review_workflow::usecases::{
+        RecordRoundProtocol, RecordRoundProtocolError, ReviewConcern, ReviewGroupName, RoundType,
+        Timestamp, TrackId, Verdict,
+    };
+
+    use super::ValidatedAutoRecordArgs;
+    use super::codex_local::execute_with_auto_record;
+
+    struct AlwaysEmptyScope;
+    impl DiffScopeProvider for AlwaysEmptyScope {
+        fn changed_files(&self, _base_ref: &str) -> Result<DiffScope, DiffScopeProviderError> {
+            Ok(DiffScope::new(std::iter::empty()))
+        }
+    }
+
+    struct CapturingProtocol {
+        called: RefCell<bool>,
+        verdict_received: RefCell<Option<Verdict>>,
+    }
+
+    impl CapturingProtocol {
+        fn new() -> Self {
+            Self { called: RefCell::new(false), verdict_received: RefCell::new(None) }
+        }
+    }
+
+    impl RecordRoundProtocol for CapturingProtocol {
+        fn execute(
+            &self,
+            _track_id: &TrackId,
+            _round_type: RoundType,
+            _group_name: ReviewGroupName,
+            verdict: Verdict,
+            _concerns: Vec<ReviewConcern>,
+            _expected_groups: Vec<ReviewGroupName>,
+            _timestamp: Timestamp,
+        ) -> Result<(), RecordRoundProtocolError> {
+            *self.called.borrow_mut() = true;
+            *self.verdict_received.borrow_mut() = Some(verdict);
+            Ok(())
+        }
+    }
+
+    let dir = tempfile::tempdir().unwrap();
+    let items_dir = dir.path().join("items");
+    fs::create_dir_all(&items_dir).unwrap();
+
+    let validated = ValidatedAutoRecordArgs {
+        track_id: TrackId::try_new("my-track").unwrap(),
+        round_type: RoundType::Fast,
+        group_name: ReviewGroupName::try_new("codex").unwrap(),
+        expected_groups: vec![ReviewGroupName::try_new("codex").unwrap()],
+        items_dir: items_dir.clone(),
+        diff_base: "main".to_owned(),
+    };
+
+    let outcome: Result<super::ReviewRunResult, String> = Ok(super::ReviewRunResult {
+        verdict: ReviewVerdict::ZeroFindings,
+        final_message: Some("{\"verdict\":\"zero_findings\",\"findings\":[]}".to_owned()),
+        output_last_message: PathBuf::from("tmp/out.txt"),
+        output_last_message_auto_managed: false,
+        verdict_detail: None,
+    });
+
+    let scope_provider = AlwaysEmptyScope;
+    let protocol = CapturingProtocol::new();
+
+    let exit = execute_with_auto_record(outcome, validated, 60, &scope_provider, &protocol);
+
+    assert_eq!(exit, std::process::ExitCode::from(0), "zero_findings must exit 0");
+    assert!(*protocol.called.borrow(), "record_round must have been called");
+    assert_eq!(
+        *protocol.verdict_received.borrow(),
+        Some(Verdict::ZeroFindings),
+        "verdict must be ZeroFindings"
+    );
+}
+
+// Test 3: auto_record=false uses the normal rendering flow (exit codes unchanged).
+#[test]
+fn test_auto_record_disabled_uses_normal_flow() {
+    let rendered = render_codex_local_result(
+        &fake_args(
+            Some("Review this.".to_owned()),
+            None,
+            PathBuf::from("tmp/reviewer-runtime/out.txt"),
+            1,
+        ),
+        Ok(super::ReviewRunResult {
+            verdict: usecase::review_workflow::ReviewVerdict::FindingsRemain,
+            final_message: Some(
+                "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: bug\",\"severity\":\"P1\",\"file\":null,\"line\":null}]}"
+                    .to_owned(),
+            ),
+            output_last_message: PathBuf::from("tmp/reviewer-runtime/out.txt"),
+            output_last_message_auto_managed: false,
+            verdict_detail: None,
+        }),
+    );
+
+    // Normal flow: findings_remain → exit 2
+    assert_eq!(rendered.exit_code, 2);
+    assert!(!rendered.stdout_lines.is_empty());
+    assert!(rendered.stderr_lines.is_empty());
 }
