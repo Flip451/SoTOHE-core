@@ -17,6 +17,7 @@
 | `vision.md` | プロジェクトビジョン（ハーネス vs テンプレート出力の区別） |
 | `progress-tracker.md` | 進捗管理（Gantt + バーンダウン + 完了ログ） |
 | `TODO-PLAN-v4-draft.md` | sotp CLI 外部ツール化のドラフト計画 |
+| `harness-design-analysis.md` | Anthropic harness design 記事の分析とロードマップへの示唆 |
 
 ## Rules
 

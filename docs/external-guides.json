@@ -14,5 +14,36 @@
       "Follow the source license terms recorded in each entry."
     ]
   },
-  "guides": []
+  "guides": [
+    {
+      "id": "harness-design-long-running-apps",
+      "title": "Harness Design for Long-Running Application Development",
+      "source_url": "https://www.anthropic.com/engineering/harness-design-long-running-apps",
+      "raw_url": null,
+      "license": "Anthropic Blog (All Rights Reserved)",
+      "cache_path": ".cache/external-guides/harness-design-long-running-apps.md",
+      "trigger_keywords": [
+        "harness",
+        "generator-evaluator",
+        "multi-agent",
+        "sprint contract",
+        "evaluator tuning",
+        "context degradation",
+        "capability assumption"
+      ],
+      "summary": [
+        "Generator-Evaluator pattern (GAN-inspired) separates execution from evaluation for better quality",
+        "Three-agent architecture: Planner → Generator → Evaluator with negotiated sprint contracts",
+        "Every harness component encodes an assumption about model limitations — stress-test when models improve",
+        "Evaluator tuning is iterative; initial versions exhibit poor judgment despite identifying real issues",
+        "File-based artifact handoff preserves clarity across agent sessions without context compaction"
+      ],
+      "project_usage": [
+        "Phase 2 CC-SDD-01/02: Apply sprint contracts — reviewer-testable acceptance criteria in verification.md",
+        "Phase 1.5-18: Record capability separation rationale in ADRs for future consolidation",
+        "Phase 3 WF-47/50/53: Add verdict accuracy metrics for evaluator tuning cycle",
+        "Phase 6 sotp init: Per-project capability selection based on complexity"
+      ]
+    }
+  ]
 }

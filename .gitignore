@@ -32,6 +32,9 @@ Thumbs.db
 # --- Stale lock directory from removed file-lock system (safe to delete locally) ---
 .locks/
 
+# --- Advisory lock files created by with_locked_document (fs4) ---
+*.json.lock
+
 # --- Legacy local cache ---
 __pycache__/
 *.pyc

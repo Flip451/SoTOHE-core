@@ -2,7 +2,7 @@
 
 > **出典**: `tmp/review-2026-03-10.md`（Gemini による包括的レビュー）
 > **作成日**: 2026-03-11
-> **最終更新**: 2026-03-19
+> **最終更新**: 2026-03-25
 > **アーカイブ**: 解決済み項目は `tmp/TODO-archived-2026-03-16.md` に移動済み
 > **全体計画**: [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md)（v3: ハーネス vs テンプレート出力の区別）
 > **全体計画 (旧版)**: `tmp/archive-2026-03-20/`
@@ -663,16 +663,23 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **TSUMIKI-04** (MEDIUM): TDD 完了時の要件網羅率 → Phase 3
 
 **CC-SDD フレームワーク**:
-- [ ] **CC-SDD-01** (HIGH): 要件-タスク双方向トレーサビリティ → Phase 2
-- [ ] **CC-SDD-02** (MEDIUM): 明示的承認ゲート → Phase 2
+- [x] **CC-SDD-01** (HIGH): 要件-タスク双方向トレーサビリティ — ✅ done (PR #60, track: req-task-traceability-2026-03-24)
+- [x] **CC-SDD-02** (MEDIUM): 明示的承認ゲート — ✅ done (PR #62, track: spec-approval-gate-2026-03-24)
 - [ ] **CC-SDD-03** (LOW): EARS 記法
 - [ ] **CC-SDD-04** (MEDIUM): Steering 自動生成 → Phase 6
 - [ ] **CC-SDD-05** (MEDIUM): 実装検証コマンド → Phase 3
 
 **Review Infrastructure 強化**:
-- [ ] **RVW-10** (HIGH): レビュー verdict 改竄防止 — track-local-review が record-round を直接呼ぶ `--auto-record` モード。オーケストレータを経由せず verdict を domain state に記録
-- [ ] **RVW-11** (MEDIUM): レビュー diff スコープ強制 — 変更範囲外ファイルの finding を構造的に除外。ブリーフィングに git diff 出力を自動埋め込み、または record-round に `--dismiss-out-of-scope` フラグを追加
+- [x] **RVW-10** (HIGH): レビュー verdict 改竄防止 — ✅ done (PR #63, track: review-verdict-autorecord-2026-03-25)
+- [x] **RVW-11** (MEDIUM): レビュー diff スコープ強制 — ✅ done (PR #63, track: review-verdict-autorecord-2026-03-25)
 - [ ] **RVW-12** (MEDIUM): 既存コード品質問題の修正 — guard/policy.rs バイパス (P0)、spec_frontmatter.rs trim_end (P1)、git_cli.rs branch_claims skip (P1)
+- [ ] **RVW-13** (HIGH): `--auto-record` end-to-end 実戦テスト — `/track:review` で `--auto-record` フラグを使った並列レビューの実運用確認。review.md に記載済みだが未使用
+- [ ] **RVW-14** (MEDIUM): path normalization 改善 — 絶対パス→repo-relative 変換（infra で repo root strip 後に usecase に渡す）、renamed file 旧パスの DiffScope 追加（`git diff --diff-filter=R --name-status`）、`looks_decorated()` の精度向上
+- [ ] **RVW-15** (MEDIUM): GitDiffScopeProvider テスト強化 — merge-base/staged/unstaged/untracked/rename/delete の契約テスト（tempdir git fixture）
+- [ ] **RVW-16** (LOW): escalation block (exit 3) 統合テスト — 実 escalation state を構築して auto-record の exit 3 パスを検証
+- [ ] **RVW-17** (MEDIUM): Agent hook empty stdin 根本対策 — `codex-reviewer` agent の `tools:` 制限検証。効かない場合は別の構造的対策（Agent 専用 hook bypass / envelope 生成）を検討
+- [ ] **RVW-18** (LOW): `codex-reviewer` agent `tools:` frontmatter 制限の動作検証 — `Bash(cargo make track-local-review:*)` が実際にツール制限として機能するか確認
+- [ ] **RVW-19** (LOW): record-round リトライジッターを `rand` クレートに置換 — 現在は `DefaultHasher` + pid + nanosecond で代用。`rand` はデファクトスタンダードなので依存追加して `thread_rng().gen_range(50..250)` に簡約
 
 **Coding Agent Workflow 2026**:
 - [ ] **WORKFLOW-01** (MEDIUM): FIC 閾値管理

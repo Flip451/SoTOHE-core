@@ -89,6 +89,8 @@ Phase 5        ワークフロー最適化
 | 1.5-17 | ~~WF-55 Phase 1: view-freshness CI~~ | S | ✅ done (PR #46) |
 | 1.5-18 | **capability 追加**: domain_modeler, spec_reviewer, acceptance_reviewer | S | 未着手 |
 | 1.5-25 | **RVW-03**: review.json 分離 — review state を metadata.json から独立ファイルに外部化。metadata tampering bypass を構造的に排除 ([ADR](../../knowledge/adr/2026-03-24-1200-review-state-trust-model.md)) | M | 未着手 |
+| 1.5-26 | ~~**RVW-10/11**: verdict auto-record + diff scope filtering~~ | M | ✅ done (PR #63, `review-verdict-autorecord-2026-03-25`) |
+| 1.5-27 | **RVW-13/15/17**: review infra quality hardening (GitDiffScope テスト, codex-reviewer agent 検証, auto-record e2e) | M | ▶ in_progress (`review-infra-quality-2026-03-25`) |
 
 ---
 
@@ -101,8 +103,8 @@ Phase 5        ワークフロー最適化
 | 2-1 | **TSUMIKI-01** Spec 信号機評価 (Stage 1) + Domain States 存在チェック (旧 2-7 最小版統合) | M | ✅ done |
 | 2-1b | **spec.json SSoT 化** — spec.md を rendered view に降格 | M | ✅ done (PR #57) |
 | 2-2 | **SPEC-05** Domain States 信号機 (Stage 2) + 遷移関数検証 + spec.json `domain_state_signals` | M | ✅ done (PR #58) |
-| 2-3 | **CC-SDD-01** 要件-タスク双方向トレーサビリティ | M | 未着手 |
-| 2-4 | **CC-SDD-02** 明示的承認ゲート | S | 未着手 |
+| 2-3 | ~~**CC-SDD-01** 要件-タスク双方向トレーサビリティ~~ | M | ✅ done (PR #60, `req-task-traceability-2026-03-24`) |
+| 2-4 | ~~**CC-SDD-02** 明示的承認ゲート~~ | S | ✅ done (PR #62, `spec-approval-gate-2026-03-24`) |
 | 2-5 | **TSUMIKI-03** 差分ヒアリング | S | 未着手 |
 | ~~2-6~~ | ~~**SSoT-07** 二重書き込み解消~~ | — | スキップ（spec.json SSoT + ADR + view-freshness CI で解決済み） |
 | ~~2-7~~ | ~~spec.md Domain States 必須化~~ | — | 2-1 に最小版統合、2-2 で完全実装 |
@@ -254,9 +256,11 @@ Phase 4 (インフラ)  Phase 5 (ワークフロー)  ← 並行可能
 
 | Phase | 項目 | 残 | 推定日数 |
 |---|---|---|---|
-| 1.5 | 18 | 10 | 3 日 |
-| 2 | 7 | 7 | 3 日 |
-| 3 | 11 | 11 | 5 日 |
+| 1.5 | 20 | 9 | 3 日 |
+| 2 | 7 | 1 | 0.5 日 |
+| 3 | 12 | 12 | 5 日 |
 | 4 | 8 | 6 | 3 日 |
 | 5 | 7 | 7 | 3 日 |
-| **合計** | **51** | **41** | **~17 日** |
+| **合計** | **54** | **35** | **~14.5 日** |
+
+> 更新: 2026-03-25。Phase 2 は CC-SDD-01/02 完了で残り TSUMIKI-03 のみ。Phase 1.5 に RVW-10/11 (done) + RVW-13/15/17 (in_progress) を追加。

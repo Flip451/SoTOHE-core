@@ -1,0 +1,132 @@
+{
+  "branch": "track/review-infra-quality-2026-03-25",
+  "created_at": "2026-03-25T02:30:00Z",
+  "id": "review-infra-quality-2026-03-25",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Create tempdir-based git fixture tests for GitDiffScopeProvider.",
+          "Cover: merge-base diff, staged changes, unstaged worktree modifications, untracked files, renames, deletes.",
+          "Verify error propagation: non-zero git exits return DiffScopeProviderError, not empty scope."
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "GitDiffScopeProvider contract tests (RVW-15)"
+      },
+      {
+        "description": [
+          "Test codex-reviewer agent with tools: Bash(cargo make track-local-review:*) restriction.",
+          "If tools: frontmatter is ignored by Claude Code, implement alternative structural enforcement.",
+          "Document findings in verification.md."
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "codex-reviewer agent verification (RVW-17/18)"
+      },
+      {
+        "description": [
+          "This track's own /track:review cycle uses --auto-record flags.",
+          "Validates the full flow: verdict extraction -> scope filter -> record-round internally.",
+          "No code changes needed if auto-record works correctly; document any issues found."
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "--auto-record end-to-end (RVW-13)"
+      },
+      {
+        "description": [
+          "Add sotp track signals invocation after spec.json creation in /track:plan skill.",
+          "Ensures signals field is populated automatically instead of remaining null."
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "Signal system integration in /track:plan"
+      }
+    ],
+    "summary": [
+      "RVW-15: GitDiffScopeProvider contract tests with tempdir git fixtures.",
+      "RVW-17/18: codex-reviewer agent tools: restriction verification and remediation.",
+      "RVW-13: --auto-record end-to-end validation via this track's own review cycle.",
+      "Signal system integration: /track:plan skill auto-evaluates signals after spec.json creation."
+    ]
+  },
+  "review": {
+    "code_hash": "9286cc6e89bc3d8934d0eca01cfe0f3974e80fc0",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 1,
+          "round_type": "fast",
+          "timestamp": "2026-03-25T04:35:57Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-25T04:36:11Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "all": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-25T04:35:57Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-25T04:36:11Z",
+          "verdict": "zero_findings"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "GitDiffScopeProvider contract tests — tempdir git fixture covering merge-base diff, staged changes, unstaged worktree changes, untracked files, renames, deletes, and error propagation",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "codex-reviewer agent tools: restriction verification — confirm Bash(cargo make track-local-review:*) actually limits tools, fix if not",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "review.md --auto-record full migration — update /track:review to always pass --auto-record flags, validate via this track's own review cycle",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "/track:plan skill に spec.json 生成後の信号機評価ステップを追加 — sotp track signals を自動実行して signals フィールドを埋める",
+      "id": "T004",
+      "status": "done"
+    }
+  ],
+  "title": "RVW-13/15/17 Review infrastructure quality hardening",
+  "updated_at": "2026-03-25T04:36:11Z"
+}
