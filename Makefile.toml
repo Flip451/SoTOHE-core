@@ -235,16 +235,18 @@ description = "[host] Build sotp CLI binary and install to bin/sotp (with runtim
 script_runner = "@shell"
 script = ['''
 TARGET_DIR="${CARGO_TARGET_DIR:-target}"
-cargo build -p cli --release && mkdir -p bin && rm -f bin/sotp && cp "$TARGET_DIR/release/sotp" bin/sotp || exit 1
-# Post-build verification: ensure the binary is actually executable on this system.
-# This catches glibc mismatch errors (e.g., building on a newer glibc host and running on WSL2).
-if bin/sotp --help >/dev/null 2>&1; then
+cargo build -p cli --release && mkdir -p bin && cp "$TARGET_DIR/release/sotp" bin/sotp.tmp || exit 1
+# Post-build verification: ensure the NEW binary is actually executable on this system.
+# Verify BEFORE replacing the old binary so a glibc mismatch doesn't destroy the working install.
+if bin/sotp.tmp --help >/dev/null 2>&1; then
+  mv -f bin/sotp.tmp bin/sotp || { echo "[ERROR] failed to install bin/sotp" >&2; exit 1; }
   echo "[OK] bin/sotp built and verified"
 else
-  echo "[ERROR] bin/sotp was built but cannot execute on this system." >&2
+  echo "[ERROR] bin/sotp.tmp was built but cannot execute on this system." >&2
   echo "        This usually means a glibc version mismatch." >&2
   echo "        Try building inside the tools container instead." >&2
-  rm -f bin/sotp
+  echo "        The previous bin/sotp (if any) was preserved." >&2
+  rm -f bin/sotp.tmp
   exit 1
 fi
 ''']

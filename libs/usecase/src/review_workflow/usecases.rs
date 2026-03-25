@@ -174,6 +174,49 @@ pub fn record_round(
         })
 }
 
+/// Typed record-round entrypoint for internal callers (e.g., auto-record).
+///
+/// Accepts parsed domain types directly, avoiding string round-trip.
+/// The existing `record_round()` remains as the CLI string-adapter.
+///
+/// # Errors
+///
+/// Returns `RecordRoundError` on protocol failure or escalation block.
+/// Typed record-round entrypoint for internal callers (e.g., auto-record).
+///
+/// Accepts parsed domain types directly, avoiding string round-trip.
+/// The caller constructs `RecordRoundProtocol` with the correct `items_dir`.
+///
+/// # Errors
+///
+/// Returns `RecordRoundError` on protocol failure or escalation block.
+#[allow(clippy::too_many_arguments)]
+pub fn record_round_typed(
+    track_id: TrackId,
+    round_type: RoundType,
+    group_name: ReviewGroupName,
+    verdict: Verdict,
+    concerns: Vec<ReviewConcern>,
+    expected_groups: Vec<ReviewGroupName>,
+    timestamp: Timestamp,
+    protocol: &impl RecordRoundProtocol,
+) -> Result<(), RecordRoundError> {
+    if expected_groups.is_empty() {
+        return Err(RecordRoundError::Other("expected_groups must not be empty".to_owned()));
+    }
+
+    protocol
+        .execute(&track_id, round_type, group_name, verdict, concerns, expected_groups, timestamp)
+        .map_err(|e| match e {
+            RecordRoundProtocolError::EscalationBlocked(c) => {
+                RecordRoundError::EscalationBlocked(c)
+            }
+            RecordRoundProtocolError::StaleHash(msg) | RecordRoundProtocolError::Other(msg) => {
+                RecordRoundError::Other(msg)
+            }
+        })
+}
+
 // ---------------------------------------------------------------------------
 // resolve-escalation: usecase orchestration via domain ports
 // ---------------------------------------------------------------------------
@@ -363,6 +406,8 @@ pub fn check_approved(
 #[cfg(test)]
 mod tests {
     #![allow(clippy::unwrap_used)]
+    #![allow(clippy::panic)]
+    #![allow(clippy::expect_used)]
 
     use std::collections::HashMap;
     use std::path::PathBuf;
@@ -555,5 +600,247 @@ mod tests {
         };
         let result = check_approved(input, &store, &store, &hasher);
         assert!(result.is_err(), "missing review should block code commits");
+    }
+
+    // ---------------------------------------------------------------------------
+    // Stub for RecordRoundProtocol
+    // ---------------------------------------------------------------------------
+
+    /// A configurable stub that returns a preset result from `execute`.
+    struct StubProtocol {
+        result: std::sync::Mutex<Option<Result<(), RecordRoundProtocolError>>>,
+        /// Captures the arguments passed to the last `execute` call.
+        last_call: std::sync::Mutex<Option<RecordRoundProtocolCallArgs>>,
+    }
+
+    struct RecordRoundProtocolCallArgs {
+        track_id: TrackId,
+        round_type: RoundType,
+        group_name: ReviewGroupName,
+        verdict: Verdict,
+        concerns: Vec<ReviewConcern>,
+        expected_groups: Vec<ReviewGroupName>,
+    }
+
+    impl StubProtocol {
+        fn returning_ok() -> Self {
+            Self {
+                result: std::sync::Mutex::new(Some(Ok(()))),
+                last_call: std::sync::Mutex::new(None),
+            }
+        }
+
+        fn returning_err(e: RecordRoundProtocolError) -> Self {
+            Self {
+                result: std::sync::Mutex::new(Some(Err(e))),
+                last_call: std::sync::Mutex::new(None),
+            }
+        }
+
+        fn last_call(&self) -> std::sync::MutexGuard<'_, Option<RecordRoundProtocolCallArgs>> {
+            self.last_call.lock().unwrap()
+        }
+    }
+
+    impl RecordRoundProtocol for StubProtocol {
+        fn execute(
+            &self,
+            track_id: &TrackId,
+            round_type: RoundType,
+            group_name: ReviewGroupName,
+            verdict: Verdict,
+            concerns: Vec<ReviewConcern>,
+            expected_groups: Vec<ReviewGroupName>,
+            _timestamp: Timestamp,
+        ) -> Result<(), RecordRoundProtocolError> {
+            *self.last_call.lock().unwrap() = Some(RecordRoundProtocolCallArgs {
+                track_id: track_id.clone(),
+                round_type,
+                group_name,
+                verdict,
+                concerns,
+                expected_groups,
+            });
+            self.result.lock().unwrap().take().expect("StubProtocol called more than once")
+        }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Helper constructors
+    // ---------------------------------------------------------------------------
+
+    fn make_track_id(s: &str) -> TrackId {
+        // TrackId requires lowercase slug format (e.g. "t001", not "T001").
+        TrackId::try_new(s).unwrap()
+    }
+
+    fn make_group(s: &str) -> ReviewGroupName {
+        ReviewGroupName::try_new(s).unwrap()
+    }
+
+    fn make_concern(s: &str) -> ReviewConcern {
+        ReviewConcern::try_new(s).unwrap()
+    }
+
+    fn make_timestamp() -> Timestamp {
+        Timestamp::new("2026-03-25T12:00:00Z").unwrap()
+    }
+
+    // ---------------------------------------------------------------------------
+    // Tests for record_round_typed
+    // ---------------------------------------------------------------------------
+
+    #[test]
+    fn test_record_round_typed_zero_findings_delegates_to_protocol() {
+        let track_id = make_track_id("t001");
+        let group = make_group("codex");
+        let expected_groups = vec![make_group("codex")];
+        let concerns: Vec<ReviewConcern> = vec![];
+        let ts = make_timestamp();
+        let stub = StubProtocol::returning_ok();
+        let result = record_round_typed(
+            track_id.clone(),
+            RoundType::Fast,
+            group.clone(),
+            Verdict::ZeroFindings,
+            concerns.clone(),
+            expected_groups.clone(),
+            ts,
+            &stub,
+        );
+
+        assert!(result.is_ok(), "zero_findings should succeed: {result:?}");
+        let call = stub.last_call();
+        let args = call.as_ref().expect("protocol.execute should have been called");
+        assert_eq!(args.track_id.as_ref(), "t001");
+        assert_eq!(args.round_type, RoundType::Fast);
+        assert_eq!(args.group_name, group);
+        assert_eq!(args.verdict, Verdict::ZeroFindings);
+        assert!(args.concerns.is_empty());
+        assert_eq!(args.expected_groups, expected_groups);
+    }
+
+    #[test]
+    fn test_record_round_typed_findings_remain_delegates_to_protocol() {
+        let track_id = make_track_id("t002");
+        let group = make_group("codex");
+        let expected_groups = vec![make_group("codex")];
+        let concerns = vec![make_concern("domain.review"), make_concern("infra.git")];
+        let ts = make_timestamp();
+        let stub = StubProtocol::returning_ok();
+        let result = record_round_typed(
+            track_id.clone(),
+            RoundType::Final,
+            group.clone(),
+            Verdict::FindingsRemain,
+            concerns.clone(),
+            expected_groups.clone(),
+            ts,
+            &stub,
+        );
+
+        assert!(result.is_ok(), "findings_remain with concerns should succeed: {result:?}");
+        let call = stub.last_call();
+        let args = call.as_ref().expect("protocol.execute should have been called");
+        assert_eq!(args.track_id.as_ref(), "t002");
+        assert_eq!(args.round_type, RoundType::Final);
+        assert_eq!(args.verdict, Verdict::FindingsRemain);
+        assert_eq!(args.concerns.len(), 2);
+        assert!(args.concerns.contains(&make_concern("domain.review")));
+        assert!(args.concerns.contains(&make_concern("infra.git")));
+    }
+
+    #[test]
+    fn test_record_round_typed_escalation_blocked_returns_error() {
+        let track_id = make_track_id("t003");
+        let group = make_group("codex");
+        let expected_groups = vec![make_group("codex")];
+        let blocked_concerns = vec!["domain.review".to_string(), "infra.git".to_string()];
+        let ts = make_timestamp();
+
+        let stub = StubProtocol::returning_err(RecordRoundProtocolError::EscalationBlocked(
+            blocked_concerns.clone(),
+        ));
+        let result = record_round_typed(
+            track_id,
+            RoundType::Fast,
+            group,
+            Verdict::FindingsRemain,
+            vec![],
+            expected_groups,
+            ts,
+            &stub,
+        );
+
+        assert!(result.is_err(), "escalation block should propagate as error");
+        match result.unwrap_err() {
+            RecordRoundError::EscalationBlocked(concerns) => {
+                assert_eq!(concerns, blocked_concerns);
+            }
+            other => panic!("expected EscalationBlocked, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_typed_stale_hash_returns_other_error() {
+        let track_id = make_track_id("t004");
+        let group = make_group("codex");
+        let expected_groups = vec![make_group("codex")];
+        let ts = make_timestamp();
+
+        let stub = StubProtocol::returning_err(RecordRoundProtocolError::StaleHash(
+            "hash mismatch: expected abc, got def".to_string(),
+        ));
+        let result = record_round_typed(
+            track_id,
+            RoundType::Fast,
+            group,
+            Verdict::ZeroFindings,
+            vec![],
+            expected_groups,
+            ts,
+            &stub,
+        );
+
+        assert!(result.is_err(), "stale hash should propagate as error");
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(
+                    msg.contains("hash mismatch"),
+                    "error message should contain original message: {msg}"
+                );
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_typed_empty_expected_groups_returns_error() {
+        let track_id = make_track_id("t005");
+        let group = make_group("codex");
+        let ts = make_timestamp();
+
+        let stub = StubProtocol::returning_ok();
+        let result = record_round_typed(
+            track_id,
+            RoundType::Fast,
+            group,
+            Verdict::ZeroFindings,
+            vec![],
+            vec![], // empty expected_groups
+            ts,
+            &stub,
+        );
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(
+                    msg.contains("expected_groups"),
+                    "error should mention expected_groups: {msg}"
+                );
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
     }
 }

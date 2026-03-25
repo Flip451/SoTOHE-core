@@ -36,7 +36,7 @@
         "task_refs": ["T005"]
       },
       {
-        "text": "Makefile.toml + orchestrator command (review.md) の --auto-record --diff-base 対応",
+        "text": "orchestrator command (review.md) の --auto-record --diff-base 対応（Makefile.toml は既存ラッパーが引数透過のため変更不要）",
         "sources": ["inference — integration requirement"],
         "task_refs": ["T006"]
       }

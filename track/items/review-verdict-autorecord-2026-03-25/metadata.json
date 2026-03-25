@@ -43,7 +43,7 @@
       },
       {
         "description": [
-          "Update review.md orchestrator command and Makefile.toml to pass --auto-record --diff-base main.",
+          "Update review.md orchestrator command to pass --auto-record --diff-base main (Makefile.toml unchanged — existing wrapper passes args transparently).",
           "Backward compatible: --auto-record disabled preserves current behavior."
         ],
         "id": "S4",
@@ -59,7 +59,7 @@
     ]
   },
   "review": {
-    "code_hash": "f47dabaccffec15a6301c83e88565a4b4648c1e3",
+    "code_hash": "057305c275b0d741653b09cbedbb20c9bce2d4e5",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -91,6 +91,24 @@
           "round": 2,
           "round_type": "fast",
           "timestamp": "2026-03-24T23:15:17Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 3,
+          "round_type": "fast",
+          "timestamp": "2026-03-25T02:04:54Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 4,
+          "round_type": "fast",
+          "timestamp": "2026-03-25T02:09:03Z"
         }
       ],
       "threshold": 3
@@ -98,13 +116,13 @@
     "groups": {
       "all": {
         "fast": {
-          "round": 2,
-          "timestamp": "2026-03-24T23:15:17Z",
+          "round": 4,
+          "timestamp": "2026-03-25T02:09:03Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-24T23:15:17Z",
+          "timestamp": "2026-03-25T02:09:14Z",
           "verdict": "zero_findings"
         }
       }
@@ -112,39 +130,39 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "done",
   "tasks": [
     {
       "description": "Usecase: scope.rs - DiffScope, RepoRelativePath, DiffScopeProvider port, classify/partition/apply_scope_filter + unit tests (TDD: classify InScope/OutOfScope/UnknownPath, partition, apply_scope_filter with adjusted verdict)",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Usecase: record_round_typed() - typed entrypoint accepting parsed domain types directly (keep string-based record_round as CLI adapter) + unit tests (TDD: valid/invalid inputs, protocol delegation)",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Infrastructure: GitDiffScopeProvider adapter (merge-base diff, renames, deletions, untracked files) + integration tests (TDD: diff against real git repo fixture)",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "CLI: Extended CodexLocalArgs (--auto-record, --track-id, --round-type, --group, --expected-groups, --items-dir, --diff-base) with pre-spawn validation + unit tests (TDD: arg validation, requires constraints)",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "CLI: auto-record execution flow in codex_local.rs (verdict -> scope filter -> concerns -> record_round_typed) + integration tests (TDD: mock codex binary, verify record-round called with correct verdict)",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
-      "description": "Integration: Makefile.toml + orchestrator command (.claude/commands/track/review.md) update to use --auto-record --diff-base",
+      "description": "Integration: orchestrator command (.claude/commands/track/review.md) update to use --auto-record --diff-base (Makefile.toml unchanged — existing wrapper passes args transparently)",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "RVW-10/11 Review verdict auto-record + diff scope enforcement",
-  "updated_at": "2026-03-24T23:15:17Z"
+  "updated_at": "2026-03-25T02:09:14Z"
 }

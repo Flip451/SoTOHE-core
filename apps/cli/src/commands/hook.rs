@@ -171,6 +171,12 @@ fn execute_dispatch(hook: CliHookName) -> ExitCode {
         return handle_error(is_post, &format!("failed to read stdin: {e}"));
     }
 
+    // Empty stdin = hook infrastructure did not provide an envelope.
+    // Fail-closed: block the command and report the error clearly.
+    if stdin_buf.trim().is_empty() {
+        return handle_error(is_post, "hook received empty stdin — no envelope to check");
+    }
+
     // Parse HookEnvelope (serde) — security fields have no default
     let envelope: HookEnvelope = match serde_json::from_str(&stdin_buf) {
         Ok(env) => env,

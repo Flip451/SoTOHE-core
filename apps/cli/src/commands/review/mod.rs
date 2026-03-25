@@ -39,6 +39,13 @@ pub enum ReviewCommand {
     Status(StatusArgs),
 }
 
+/// CLI round type for auto-record.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
+pub enum CodexRoundTypeArg {
+    Fast,
+    Final,
+}
+
 #[derive(Debug, Args)]
 #[command(group(
     ArgGroup::new("review_input")
@@ -66,6 +73,105 @@ pub struct CodexLocalArgs {
     #[cfg(test)]
     #[arg(long, hide = true)]
     pub(super) output_last_message: Option<PathBuf>,
+
+    /// Enable auto-record: call record-round internally after verdict extraction.
+    #[arg(long, default_value_t = false)]
+    pub(super) auto_record: bool,
+
+    /// Track ID for auto-record (required when --auto-record is set).
+    #[arg(long, requires = "auto_record")]
+    pub(super) track_id: Option<String>,
+
+    /// Round type for auto-record (required when --auto-record is set).
+    #[arg(long, requires = "auto_record", value_enum)]
+    pub(super) round_type: Option<CodexRoundTypeArg>,
+
+    /// Review group name for auto-record (required when --auto-record is set).
+    #[arg(long, requires = "auto_record")]
+    pub(super) group: Option<String>,
+
+    /// Comma-separated expected group names for auto-record.
+    #[arg(long, requires = "auto_record", value_delimiter = ',')]
+    pub(super) expected_groups: Vec<String>,
+
+    /// Path to track items directory.
+    #[arg(long, default_value = "track/items")]
+    pub(super) items_dir: PathBuf,
+
+    /// Base ref for diff scope computation.
+    #[arg(long, default_value = "main")]
+    pub(super) diff_base: String,
+}
+
+/// Pre-validated auto-record arguments ready for use after Codex completes.
+#[derive(Debug)]
+pub(super) struct ValidatedAutoRecordArgs {
+    pub(super) track_id: domain::TrackId,
+    pub(super) round_type: domain::RoundType,
+    pub(super) group_name: domain::ReviewGroupName,
+    pub(super) expected_groups: Vec<domain::ReviewGroupName>,
+    pub(super) items_dir: PathBuf,
+    pub(super) diff_base: String,
+}
+
+/// Validates auto-record arguments before spawning the Codex subprocess.
+///
+/// When `--auto-record` is set, all required fields must be present.
+/// Returns parsed domain types ready for use, or an error message.
+///
+/// # Errors
+///
+/// Returns a human-readable error string if required args are missing or invalid.
+pub(super) fn validate_auto_record_args(
+    args: &CodexLocalArgs,
+) -> Result<Option<ValidatedAutoRecordArgs>, String> {
+    if !args.auto_record {
+        return Ok(None);
+    }
+
+    let track_id_str = args.track_id.as_deref().ok_or("--auto-record requires --track-id")?;
+    let round_type = args.round_type.ok_or("--auto-record requires --round-type")?;
+    let group = args.group.as_deref().ok_or("--auto-record requires --group")?;
+
+    if args.expected_groups.is_empty() {
+        return Err("--auto-record requires --expected-groups".to_owned());
+    }
+
+    let track_id =
+        domain::TrackId::try_new(track_id_str).map_err(|e| format!("invalid --track-id: {e}"))?;
+    let group_name =
+        domain::ReviewGroupName::try_new(group).map_err(|e| format!("invalid --group: {e}"))?;
+    let expected_groups: Vec<domain::ReviewGroupName> = args
+        .expected_groups
+        .iter()
+        .map(|s| {
+            domain::ReviewGroupName::try_new(s.trim())
+                .map_err(|e| format!("invalid --expected-groups: {e}"))
+        })
+        .collect::<Result<_, _>>()?;
+
+    // Ensure --group is included in --expected-groups (otherwise the recorded
+    // round won't affect approval/escalation logic for this group).
+    if !expected_groups.contains(&group_name) {
+        return Err(format!(
+            "--group '{}' must be included in --expected-groups",
+            group_name.as_ref()
+        ));
+    }
+
+    let round_type = match round_type {
+        CodexRoundTypeArg::Fast => domain::RoundType::Fast,
+        CodexRoundTypeArg::Final => domain::RoundType::Final,
+    };
+
+    Ok(Some(ValidatedAutoRecordArgs {
+        track_id,
+        round_type,
+        group_name,
+        expected_groups,
+        items_dir: args.items_dir.clone(),
+        diff_base: args.diff_base.clone(),
+    }))
 }
 
 #[derive(Debug, Args)]

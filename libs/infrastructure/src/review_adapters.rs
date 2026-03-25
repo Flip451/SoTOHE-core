@@ -202,3 +202,129 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
         Ok(())
     }
 }
+
+// ---------------------------------------------------------------------------
+// GitDiffScopeProvider — Git-backed DiffScope adapter
+// ---------------------------------------------------------------------------
+
+use usecase::review_workflow::scope::{DiffScope, DiffScopeProviderError, RepoRelativePath};
+
+/// Git-backed [`DiffScopeProvider`] using merge-base diff.
+///
+/// Computes the set of changed files by:
+/// 1. Finding the merge-base between `HEAD` and `base_ref`.
+/// 2. Diffing `HEAD` against that merge-base (`--diff-filter=ACDMRT`).
+/// 3. Adding staged (cached) changes.
+/// 4. Adding untracked (non-ignored) files.
+pub struct GitDiffScopeProvider;
+
+impl usecase::review_workflow::scope::DiffScopeProvider for GitDiffScopeProvider {
+    fn changed_files(&self, base_ref: &str) -> Result<DiffScope, DiffScopeProviderError> {
+        use crate::git_cli::{GitRepository, SystemGitRepo};
+
+        let git = SystemGitRepo::discover()
+            .map_err(|e| DiffScopeProviderError::Other(format!("git error: {e}")))?;
+
+        // 1. Find merge-base between HEAD and base_ref.
+        let merge_base_output = git
+            .output(&["merge-base", "HEAD", base_ref])
+            .map_err(|e| DiffScopeProviderError::Other(format!("merge-base failed: {e}")))?;
+
+        if !merge_base_output.status.success() {
+            return Err(DiffScopeProviderError::UnknownBaseRef { base_ref: base_ref.to_owned() });
+        }
+
+        let merge_base = String::from_utf8_lossy(&merge_base_output.stdout).trim().to_owned();
+
+        let mut files = Vec::new();
+
+        // Helper: collect paths from git output, propagating errors.
+        let mut collect_paths =
+            |output: std::process::Output, label: &str| -> Result<(), DiffScopeProviderError> {
+                if !output.status.success() {
+                    let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+                    return Err(DiffScopeProviderError::Other(format!(
+                        "{label} failed (exit {}): {stderr}",
+                        output.status.code().unwrap_or(-1)
+                    )));
+                }
+                for line in String::from_utf8_lossy(&output.stdout).lines() {
+                    let trimmed = line.trim();
+                    if !trimmed.is_empty() {
+                        if let Some(path) = RepoRelativePath::normalize(trimmed) {
+                            files.push(path);
+                        }
+                    }
+                }
+                Ok(())
+            };
+
+        // 2. Files changed between merge-base and HEAD (committed, includes renames).
+        let diff_output = git
+            .output(&["diff", "--name-only", "--diff-filter=ACDMRT", &merge_base, "HEAD"])
+            .map_err(|e| DiffScopeProviderError::Other(format!("diff failed: {e}")))?;
+        collect_paths(diff_output, "diff merge-base..HEAD")?;
+
+        // 3. Staged but uncommitted changes.
+        let staged_output = git
+            .output(&["diff", "--name-only", "--cached"])
+            .map_err(|e| DiffScopeProviderError::Other(format!("staged diff failed: {e}")))?;
+        collect_paths(staged_output, "diff --cached")?;
+
+        // 4. Unstaged worktree modifications to tracked files.
+        let worktree_output = git
+            .output(&["diff", "--name-only"])
+            .map_err(|e| DiffScopeProviderError::Other(format!("worktree diff failed: {e}")))?;
+        collect_paths(worktree_output, "diff (worktree)")?;
+
+        // 5. Untracked (non-ignored) files.
+        let untracked_output = git
+            .output(&["ls-files", "--others", "--exclude-standard"])
+            .map_err(|e| DiffScopeProviderError::Other(format!("ls-files failed: {e}")))?;
+        collect_paths(untracked_output, "ls-files --others")?;
+
+        Ok(DiffScope::new(files))
+    }
+}
+
+// ---------------------------------------------------------------------------
+// GitDiffScopeProvider — tests (Red phase written first)
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
+mod tests {
+    use usecase::review_workflow::scope::{DiffScopeProvider, DiffScopeProviderError};
+
+    use super::*;
+
+    #[test]
+    fn test_git_diff_scope_provider_against_head() {
+        // Use HEAD as base_ref — always exists regardless of branch layout or shallow clone.
+        let provider = GitDiffScopeProvider;
+        let result = provider.changed_files("HEAD");
+        assert!(result.is_ok(), "changed_files(HEAD) failed: {result:?}");
+    }
+
+    #[test]
+    fn test_git_diff_scope_provider_unknown_base_ref() {
+        let provider = GitDiffScopeProvider;
+        let result = provider.changed_files("nonexistent-branch-xyz-999");
+        assert!(result.is_err());
+        match result {
+            Err(DiffScopeProviderError::UnknownBaseRef { base_ref }) => {
+                assert_eq!(base_ref, "nonexistent-branch-xyz-999");
+            }
+            other => panic!("expected UnknownBaseRef, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_git_diff_scope_provider_returns_diff_scope() {
+        // Use HEAD — always available, even in shallow clones and CI.
+        let provider = GitDiffScopeProvider;
+        let result = provider.changed_files("HEAD");
+        assert!(result.is_ok());
+        let _scope = result.unwrap();
+    }
+}

@@ -20,7 +20,7 @@ diff ファイルリストで findings をフィルタし、正規化された r
 - GitDiffScopeProvider infrastructure adapter (merge-base diff, renames, deletions, untracked files) [source: Codex planner analysis 2026-03-25] [tasks: T003]
 - CodexLocalArgs 拡張: --auto-record, --track-id, --round-type, --group, --expected-groups, --items-dir, --diff-base [source: knowledge/strategy/TODO.md §RVW-10] [tasks: T004]
 - auto-record 実行フロー: verdict 抽出 → scope filter → concerns 抽出 → record_round_typed 内部呼出 [source: knowledge/strategy/TODO.md §RVW-10, feedback — verdict falsification incident 2026-03-24] [tasks: T005]
-- Makefile.toml + orchestrator command (review.md) の --auto-record --diff-base 対応 [source: inference — integration requirement] [tasks: T006]
+- orchestrator command (review.md) の --auto-record --diff-base 対応（Makefile.toml は既存ラッパーが引数透過のため変更不要） [source: inference — integration requirement] [tasks: T006]
 
 ### Out of Scope
 - ReviewFinding / ReviewFinalPayload の domain 層移動（usecase 配置が正しいと確認済み） [source: Codex planner analysis 2026-03-25]
