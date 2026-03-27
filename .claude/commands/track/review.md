@@ -261,14 +261,23 @@ Parse the aggregated output:
 
 Use the reviewer provider's `fast_model` for iterative fix-verify rounds and escalate to `default_model` for final confirmation.
 
+**CRITICAL: fast model の zero_findings はレビュー完了の根拠にならない。**
+
+fast model レビューの役割は **安価に高速に明白な間違いを検出すること** であり、実装品質や設計品質の保証ではない。
+たとえ fast model が何度連続で zero_findings を返しても、それはレビュー完了を意味しない。
+レビュー完了は **full model の zero_findings** によってのみ確認される。
+
+fast model の zero_findings を根拠にレビュー終了を提案してはならない。
+fast model の zero_findings を根拠に「実質完了」「レビューは十分」と判断してはならない。
+
 Resolve models from `.claude/agent-profiles.json` using the `reviewer` capability:
 - `{fast_model}`: `provider_model_overrides` for reviewer, then `providers.<reviewer_provider>.fast_model`, then `default_model`. If none exist, skip `--model`.
 - `{model}`: `provider_model_overrides`, then `providers.<reviewer_provider>.default_model`. If none exist, skip `--model`.
 
 Execution:
-- **Iterative rounds (up to 5)**: Use the `reviewer` capability with `{fast_model}` for rapid feedback.
-- **Final round (confirmation)**: When the fast model reports `zero_findings`, run one more round with `{model}` to catch deeper design issues.
-- If the full model also reports `zero_findings`: proceed to Step 4.
+- **Iterative rounds**: Use the `reviewer` capability with `{fast_model}` for rapid feedback. Purpose: catch obvious errors cheaply before consuming full model budget.
+- **Final round (confirmation)**: When the fast model reports `zero_findings`, run one more round with `{model}` for a thorough, comprehensive review. The full model may find any category of issue the fast model missed (logic errors, test gaps, security concerns, etc.) — it is not limited to design-level findings.
+- If the full model also reports `zero_findings`: proceed to Step 4. **Only this constitutes review completion.**
 - If the full model finds new issues: fix and return to the fast model loop.
 
 ### Early-completion pipelining

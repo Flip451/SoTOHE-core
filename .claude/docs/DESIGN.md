@@ -1410,3 +1410,262 @@ New optional fields:
 
 `sotp spec approve <track-dir>` — reads spec.json, computes content hash, sets
 status=approved + approved_at + content_hash, writes back.
+
+## Tamper-Proof Review Verdict (tamper-proof-review-2026-03-26)
+
+Full design artifact: `knowledge/adr/2026-03-26-0010-tamper-proof-review-verdict.md`
+
+### Threat Model
+
+Claude Code (orchestrator) is untrusted. It can:
+1. Inject fabricated verdicts via `sotp review record-round --verdict`
+2. Write directly to `review.json` via Write/Edit tools
+3. Bypass auto-record and use manual record-round path
+
+The Rust CLI (`sotp`) is the trusted component, protected by the guard hook.
+
+### Architecture
+
+| Layer | Protection | Attack Vector |
+|-------|-----------|---------------|
+| CLI sealing | Remove `record-round` subcommand | Verdict injection |
+| Hook guard | `BlockProtectedReviewStateWrite` PreToolUse hook | Direct file tampering |
+| Provenance | `VerdictProvenance::TrustedSubprocess` with SHA-256 digests | Post-hoc tampering detection |
+| Verification | `check-approved --require-provenance` | CI gate |
+
+### Artifact Layout
+
+```text
+track/items/<id>/
+  review.json                        # schema_version: 2, rounds have provenance
+  review-artifacts/
+    <invocation-id>/
+      final-message.json             # canonical filtered payload
+      session.log                    # captured reviewer stderr
+      attestation.json               # sotp-generated attestation document
+```
+
+### Canonical Blocks
+
+```rust
+// domain/src/review/provenance.rs
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Sha256Hex(String);
+
+impl Sha256Hex {
+    pub fn new(value: impl Into<String>) -> Result<Self, ReviewError> {
+        let value = value.into();
+        let is_hex = value.len() == 64 && value.bytes().all(|b| b.is_ascii_hexdigit());
+        if !is_hex {
+            return Err(ReviewError::InvalidProvenance(
+                "sha256 digest must be 64 hex chars".to_owned(),
+            ));
+        }
+        Ok(Self(value.to_lowercase()))
+    }
+
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ReviewInvocationId(NonEmptyString);
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SessionDigest(Sha256Hex);
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PayloadDigest(Sha256Hex);
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AttestationDigest(Sha256Hex);
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProtectedArtifactRef {
+    path: NonEmptyString,
+    bytes: u64,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, strum::Display, strum::EnumString)]
+#[strum(serialize_all = "snake_case")]
+pub enum ReviewerKind {
+    CodexLocal,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, strum::Display, strum::EnumString)]
+#[strum(serialize_all = "snake_case")]
+/// Where the verdict JSON was extracted from.
+/// - `OutputLastMessage`: Codex `--output-last-message` file (primary path)
+/// - `SessionLogFallback`: session log (captured stderr + Codex diagnostic output),
+///   scanned bottom-up for JSON verdict blocks via `extract_verdict_from_content`.
+///   This is a fallback when the primary output-last-message file is empty.
+pub enum VerdictSource {
+    OutputLastMessage,
+    SessionLogFallback,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TrustedSubprocessProvenance {
+    invocation_id: ReviewInvocationId,
+    reviewer: ReviewerKind,
+    captured_at: Timestamp,
+    source: VerdictSource,
+    session_log: ProtectedArtifactRef,
+    session_digest: SessionDigest,
+    final_message: ProtectedArtifactRef,
+    payload_digest: PayloadDigest,
+    attestation: ProtectedArtifactRef,
+    attestation_digest: AttestationDigest,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum VerdictProvenance {
+    LegacyUnverified,
+    TrustedSubprocess(TrustedSubprocessProvenance),
+}
+```
+
+```rust
+// domain/src/review/types.rs — ReviewRoundResult gains provenance
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewRoundResult {
+    round: u32,
+    verdict: Verdict,
+    timestamp: crate::Timestamp,
+    concerns: Vec<super::concern::ReviewConcern>,
+    provenance: VerdictProvenance,
+}
+```
+
+```rust
+// usecase/src/review_workflow/usecases.rs — attested recording
+
+pub struct AttestedReviewRound {
+    pub round_type: RoundType,
+    pub group_name: ReviewGroupName,
+    pub expected_groups: Vec<ReviewGroupName>,
+    pub verdict: Verdict,
+    pub concerns: Vec<ReviewConcern>,
+    pub timestamp: Timestamp,
+    pub provenance: VerdictProvenance,
+    pub final_message_json: Vec<u8>,
+    pub session_log_bytes: Vec<u8>,
+    pub attestation_json: Vec<u8>,
+}
+
+pub trait RecordRoundProtocol {
+    /// Existing entrypoint — retained for backward compatibility during migration.
+    /// Will be removed after all callers migrate to `execute_attested`.
+    fn execute(
+        &self,
+        track_id: &TrackId,
+        round_type: RoundType,
+        group_name: ReviewGroupName,
+        verdict: Verdict,
+        concerns: Vec<ReviewConcern>,
+        expected_groups: Vec<ReviewGroupName>,
+        timestamp: Timestamp,
+    ) -> Result<(), RecordRoundProtocolError>;
+
+    /// New attested entrypoint — records verdict with provenance and evidence artifacts.
+    /// Introduced additively; becomes the sole entrypoint after migration Phase 2.
+    fn execute_attested(
+        &self,
+        track_id: &TrackId,
+        round: AttestedReviewRound,
+    ) -> Result<(), RecordRoundProtocolError>;
+}
+```
+
+```rust
+// usecase/src/review_workflow/usecases.rs — evidence verification
+
+pub trait ReviewEvidenceVerifier {
+    fn verify_round(
+        &self,
+        track_id: &TrackId,
+        group: &ReviewGroupName,
+        round_type: RoundType,
+        round: &ReviewRoundResult,
+    ) -> Result<ReviewEvidenceStatus, String>;
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ReviewEvidenceStatus {
+    Verified,
+    LegacyUnverified,
+    MissingArtifact { path: String },
+    DigestMismatch { path: String, expected: String, actual: String },
+    VerdictMismatch,
+}
+```
+
+```rust
+// infrastructure/src/review_store.rs — serde documents
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ReviewArtifactRefDocument {
+    pub path: String,
+    pub bytes: u64,
+    pub sha256: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum ReviewRoundProvenanceDocument {
+    LegacyUnverified,
+    TrustedSubprocess {
+        invocation_id: String,
+        reviewer: String,
+        captured_at: String,
+        source: String,
+        session_log: ReviewArtifactRefDocument,
+        final_message: ReviewArtifactRefDocument,
+        attestation: ReviewArtifactRefDocument,
+    },
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ReviewAttestationDocument {
+    pub schema_version: u32,
+    pub invocation_id: String,
+    pub reviewer: String,
+    pub model: String,
+    pub track_id: String,
+    pub round_type: String,
+    pub group: String,
+    pub expected_groups: Vec<String>,
+    pub captured_at: String,
+    pub source: String,
+    pub review_hash: String,
+    pub final_payload_sha256: String,
+    pub session_log_sha256: String,
+}
+```
+
+```rust
+// apps/cli/src/commands/review/mod.rs — sealed CLI (RecordRound removed)
+
+#[derive(Debug, clap::Subcommand)]
+pub enum ReviewCommand {
+    CodexLocal(CodexLocalArgs),
+    CheckApproved(CheckApprovedArgs),
+    ResolveEscalation(ResolveEscalationArgs),
+    Status(StatusArgs),
+}
+```
+
+```rust
+// domain/src/hook/types.rs — new hook variant
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HookName {
+    BlockDirectGitOps,
+    BlockTestFileDeletion,
+    BlockProtectedReviewStateWrite,
+}
+```
