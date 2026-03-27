@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "status": "not_started",
+  "code_hash": "7ebbe17f70d1aee775a0e27eb9efade41fd3e665",
+  "groups": {
+    "other": {
+      "fast": {
+        "round": 1,
+        "verdict": "findings_remain",
+        "timestamp": "2026-03-26T12:11:03Z",
+        "concerns": [
+          "security"
+        ]
+      }
+    }
+  },
+  "escalation": {
+    "threshold": 3,
+    "phase": {
+      "type": "clear"
+    },
+    "recent_cycles": [
+      {
+        "round_type": "fast",
+        "round": 1,
+        "timestamp": "2026-03-26T12:11:03Z",
+        "concerns": [
+          "security"
+        ],
+        "groups": [
+          "other"
+        ]
+      }
+    ],
+    "concern_streaks": {
+      "security": {
+        "consecutive_rounds": 1,
+        "last_round_type": "fast",
+        "last_round": 1,
+        "last_seen_at": "2026-03-26T12:11:03Z"
+      }
+    }
+  }
+}
