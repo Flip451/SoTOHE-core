@@ -13,16 +13,16 @@
 |---|---|---|---|---|---|
 | 0 | ✅ | 1 | 1 | 0 | — |
 | 1 | ✅ | 10 | 10 | 0 | — |
-| **1.5** | good enough | 24 | 14 | 10 (延期) | — |
-| **2** | **▶** | 8 | 3 | 5 | 2 日 |
-| 3 | — | 11 | 0 | 11 | 5 日 |
+| **1.5** | good enough | 30 | 16 | 12 (延期) + 2 planned | 4 日 |
+| **2** | **▶** | 7 | 6 | 1 (planned) | 0.5 日 |
+| 3 | — | 12 | 0 | 12 | 5 日 |
 | 4 | 一部 | 8 | 2 | 6 | 3 日 |
 | 5 | — | 7 | 0 | 7 | 3 日 |
-| **合計** | | **69** | **30** | **39** | **~13 日** |
+| **合計** | | **75** | **35** | **40** | **~15.5 日** |
 
 ---
 
-## Phase 1.5: ハーネス自身のコード品質改善 (▶)
+## Phase 1.5: ハーネス自身のコード品質改善 (good enough)
 
 | Track | ID | 規模 | 状態 | 完了日 | PR |
 |---|---|---|---|---|---|
@@ -40,8 +40,12 @@
 | H'' | `usecase-purity-error` (INF-17) | S | ✅ | 03-23 | #52 |
 | I | `domain-purity-ci` (INF-19) | S | ✅ | 03-23 | #53 |
 | J | `conch-parser-infra-move` (INF-20) | M | ✅ | 03-23 | #54 |
+| K | `review-verdict-autorecord` (RVW-10/11) | M | ✅ | 03-25 | #63 |
+| L | `review-infra-quality` (RVW-13/15/17) | M | ✅ | 03-25 | #64 |
+| M | `autorecord-stabilization` (WF-59) | M | planned | | |
+| N | `tamper-proof-review` (WF-43) | L | planned | | |
 
-**推奨実行順**: ~~A0~~ → ~~A~~ → ~~B~~ → ~~C~~ → ~~C'~~ → ~~H~~ → ~~H'~~ → ~~H''~~ → ~~I~~ → ~~J~~ → E → D → F → G
+**推奨実行順**: ~~A0~~ → ~~A~~ → ~~B~~ → ~~C~~ → ~~C'~~ → ~~H~~ → ~~H'~~ → ~~H''~~ → ~~I~~ → ~~J~~ → ~~K~~ → ~~L~~ → M → N → E → D → F → G
 
 ---
 
@@ -64,7 +68,11 @@ gantt
     H'' usecase-purity-error   :done, h3, 2026-03-23, 1d
     I domain-purity-ci         :done, i, 2026-03-23, 1d
     J conch-parser-infra-move  :done, j, 2026-03-23, 1d
-    E activate-module-split    :e, after j, 1d
+    K review-verdict-autorecord :done, k, 2026-03-25, 1d
+    L review-infra-quality     :done, l, 2026-03-25, 1d
+    M autorecord-stabilization :m, after l, 2d
+    N tamper-proof-review      :n, after m, 3d
+    E activate-module-split    :e, after n, 1d
     D pr-usecase-extract       :d, after e, 2d
     F parser-consolidation     :f, after d, 1d
     G structural-lockdown      :g, after f, 1d
@@ -83,7 +91,7 @@ gantt
     UX and Observability       :p5, after p4, 3d
 
     section Milestones
-    Phase 1.5 done             :milestone, after j, 0d
+    Phase 1.5 done             :milestone, after g, 0d
     Phase 3 done (Moat)        :milestone, after p3b, 0d
     All Phases done            :milestone, after p5, 0d
 ```
@@ -113,8 +121,15 @@ gantt
 | 03-23 | `adr-introduction` | #56 | — | knowledge/adr/ 新設, 17 ADR, DESIGN.md 分解 |
 | 03-23 | `spec-json-ssot` (2-1b) | #57 | 2 | spec.json SSoT 化, spec.md rendered view 降格, verifier 移行 |
 | 03-23 | `domain-state-signals` (2-2) | #58 | 2 | Stage 2 per-state signal, syn AST 2-pass, transitions_to 検証 |
+| 03-24 | `review-escalation-enforcement` | #59 | WF-36 | planning-only allowlist + review guard 強化 |
+| 03-24 | `req-task-traceability` (2-3) | #60 | 2 | CC-SDD-01 要件-タスク双方向トレーサビリティ |
+| 03-24 | `knowledge-strategy-move` | #61 | — | knowledge/strategy/ 再編成 |
+| 03-24 | `spec-approval-gate` (2-4) | #62 | 2 | CC-SDD-02 明示的承認ゲート |
+| 03-25 | `review-verdict-autorecord` (K) | #63 | 1.5 | RVW-10/11 verdict auto-record + diff scope filtering |
+| 03-25 | `review-infra-quality` (L) | #64 | 1.5 | RVW-13/15/17 GitDiffScope テスト, agent 検証, auto-record e2e |
+| 03-27 | `activate-vcsfix-plan-infra` | #66 | — | gitignore 修正 + track-local-plan planner infra |
 
-**実績ベロシティ**: 5 日間で 19 トラック (3.8/日)
+**実績ベロシティ**: 9 日間で 26 トラック (2.9/日)
 
 ---
 
@@ -128,10 +143,13 @@ gantt
 | 03-23 朝 | 27 | 8 (+ H, H', H'') | INF-15/16/17 完了。usecase purity CI ブロック化 |
 | 03-23 夜 | 25 | 10 (+ I, J) | INF-19/20 完了。domain purity CI + conch-parser 移動 |
 | **03-24 朝** | **21** | **14 (+ 2-1, ADR, 2-1b, 2-2)** | Phase 1.5 good enough 宣言。Phase 2: Stage 1+2 + spec.json SSoT 完了 |
-| Phase 2 完了 | 16 | 16 | |
-| Phase 3 完了 | 7 | 18 | テスト生成パイプライン完成 |
-| Phase 4 完了 | 1 | 21 | |
-| Phase 5 完了 | 0 | 22 | |
+| 03-24 夜 | 17 | 18 (+ escalation-enforcement, CC-SDD-01, strategy-move, CC-SDD-02) | Phase 2: 2-3, 2-4 完了。残り TSUMIKI-03 のみ |
+| 03-25 夜 | 15 | 20 (+ RVW-10/11, RVW-13/15/17) | Phase 1.5 review infra 完了 |
+| **03-27 夜** | **14** | **21 (+ activate-vcsfix-plan-infra)** | planner infra + gitignore bugfix。WF-59/WF-43 planned |
+| Phase 2 完了 | 13 | 22 | |
+| Phase 3 完了 | 1 | 34 | テスト生成パイプライン完成 |
+| Phase 4 完了 | — | — | |
+| Phase 5 完了 | 0 | — | |
 
 ---
 
