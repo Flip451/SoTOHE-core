@@ -44,9 +44,17 @@ profile `provider_model_overrides` > provider `default_model`.
 ### `planner` 向け Read-only 例
 
 ```bash
-codex exec --model {model} --sandbox read-only --full-auto \
-  "Review this Rust trait design: {description}" 2>/dev/null
+# ブリーフィングファイル経由（推奨 — hook にブロックされない）
+cargo make track-local-plan -- --model {model} --briefing-file tmp/planner-briefing.md
+
+# インラインプロンプト（プロンプトに git キーワードが含まれない場合のみ）
+cargo make track-local-plan -- --model {model} --prompt "Review this Rust trait design: {description}"
 ```
+
+> **Note**: ブリーフィングファイルにはどんなキーワードでも書ける。
+> `block-direct-git-ops` hook は Bash コマンド文字列のみをスキャンし、
+> ファイル内容はスキャンしない。git 操作に言及する設計レビューは
+> 必ずブリーフィングファイル経由で渡すこと。
 
 ### `reviewer` 向け local review 例
 

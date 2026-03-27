@@ -43,10 +43,14 @@ This includes string literals, prompt text, and heredocs.
 To avoid unnecessary retries:
 
 - `python3 -c`: do not embed code containing protected git keywords. Write a `.py` file, then run it.
-- `codex exec` / `gemini -p`: do not embed prompts containing protected git keywords. Write the prompt to a file first.
+- `codex exec` / `gemini -p`: do not embed prompts containing protected git keywords. Write the prompt to a briefing file first.
 - heredoc / `cat >`: also scanned. Use the Write/Edit tool instead.
 - **New file creation**: The `Write` tool rejects writes to unread files, so first `Read` the target path (an error is returned if the file does not exist). Then `Write` can create it. `touch` is in `FORBIDDEN_ALLOW` and must not be added to `allow`.
-- Fallback: when Codex review is blocked by the hook, write the prompt to a file and retry with `--briefing-file`.
+- Fallback: when Codex is blocked by the hook, use the repo-owned wrappers with `--briefing-file`:
+  - Planner: `cargo make track-local-plan -- --model {model} --briefing-file <path>`
+  - Reviewer: `cargo make track-local-review -- --model {model} --briefing-file <path>`
+  - These wrappers convert the briefing file path to `"Read {path} and perform the task"` internally, keeping git keywords out of the Bash command string.
+  - Note: `track-local-*` は Docker 内部用の `*-local` タスク（`fmt-local` 等）とは異なり、ホスト上で Codex を呼ぶラッパー。ガードレール「`*-local` を直接実行するな」の対象外。
 
 ## Review Escalation Threshold (Enforced by `sotp review record-round`)
 

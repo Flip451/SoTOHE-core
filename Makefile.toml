@@ -818,6 +818,11 @@ description = "[wrapper] Show PR check status"
 command = "bin/sotp"
 args = ["make", "track-pr-status", "${@}"]
 
+[tasks.track-local-plan]
+description = "[wrapper] Run the local Codex planner through the repo-owned Rust wrapper"
+script_runner = "@shell"
+script = ['bin/sotp make track-local-plan "$@"']
+
 [tasks.track-local-review]
 description = "[wrapper] Run the local Codex reviewer through the repo-owned Rust wrapper"
 script_runner = "@shell"

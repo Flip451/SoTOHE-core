@@ -60,6 +60,8 @@ pub enum MakeTask {
     TrackPrMerge,
     /// Show PR check status.
     TrackPrStatus,
+    /// Run the local Codex planner.
+    TrackLocalPlan,
     /// Run the local Codex reviewer.
     TrackLocalReview,
     /// Record a review round result into metadata.json.
@@ -168,6 +170,7 @@ fn run(args: MakeArgs) -> Result<ExitCode, CliError> {
         MakeTask::TrackTransition => dispatch_track_transition(&args.raw_args),
         MakeTask::TrackAddTask => dispatch_track_add_task(&args.raw_args),
         MakeTask::TrackSetOverride => dispatch_track_set_override(&args.raw_args),
+        MakeTask::TrackLocalPlan => dispatch_track_local_plan(&args.raw_args),
         MakeTask::TrackLocalReview => dispatch_track_local_review(&args.raw_args),
         MakeTask::TrackRecordRound => dispatch_track_record_round(&args.raw_args),
         MakeTask::TrackCheckApproved => dispatch_track_check_approved(&args.raw_args),
@@ -393,6 +396,15 @@ fn dispatch_track_set_override(raw_args: &[String]) -> Result<ExitCode, CliError
         args.extend_from_slice(&extra);
         run_sotp(&args)
     }
+}
+
+fn dispatch_track_local_plan(raw_args: &[String]) -> Result<ExitCode, CliError> {
+    let words = raw_args_to_words(raw_args);
+    // Filter out leading "--" separator if present
+    let filtered: Vec<&str> = words.iter().map(|s| s.as_str()).skip_while(|s| *s == "--").collect();
+    let mut args: Vec<&str> = vec!["plan", "codex-local"];
+    args.extend_from_slice(&filtered);
+    run_sotp(&args)
 }
 
 fn dispatch_track_local_review(raw_args: &[String]) -> Result<ExitCode, CliError> {

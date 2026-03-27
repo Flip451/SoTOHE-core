@@ -579,6 +579,7 @@
 - [ ] **PR body の自動更新** — `track-pr-push` 時に `gh pr edit --body-file` で body を再生成
 - [x] ~~**registry.md のコミット時自動再生成**~~ ✅ 不要化 — registry.md は gitignore 化 (STRAT-04, PR #46)。コミット対象外のため自動再生成は不要
 - [ ] **reviewer subagent の Bash timeout 10分引き上げ** — `/track:review` スキルまたは wrapper で設定
+- [ ] **track:activate の clean-worktree チェック再評価** (MEDIUM) — `persist_activation_commit()` は `git commit --only` で指定ファイルのみコミットするため、dirty worktree でも activation commit に無関係ファイルは混入しない。`activation_requires_clean_worktree` + `allowed_activation_dirty_paths` の allowlist 機構が本当に必要か検討。不要なら削除して activate.rs を簡素化。関連: ERR-09b（activate.rs モジュール分割）
 - [ ] **Review escalation enforcement の機構化** (HIGH) — `record-round` に `--model-tier fast|full` フラグを追加し、domain 層で「全グループが fast zero_findings → full zero_findings の 2 段階を経たか」を追跡。`check-approved` が full model 確認なしのグループを拒否。現状はプロンプト依存で fast model pass のみでコミットできるすり抜けが発生した (2026-03-24 発見)。関連: WF-36, RVW-06
 
 ---

@@ -45,66 +45,12 @@
     ]
   },
   "review": {
-    "code_hash": "95f389d0645354d248e4226917d6b757ef276635",
+    "code_hash": "db7490de7d3311fe730b820725c74f7870fb7f3d",
     "escalation": {
       "phase": {
         "type": "clear"
       },
       "recent_cycles": [
-        {
-          "concerns": [
-            "schema"
-          ],
-          "groups": [
-            "all"
-          ],
-          "round": 1,
-          "round_type": "fast",
-          "timestamp": "2026-03-27T04:57:46Z"
-        },
-        {
-          "concerns": [],
-          "groups": [
-            "all"
-          ],
-          "round": 2,
-          "round_type": "fast",
-          "timestamp": "2026-03-27T04:59:04Z"
-        },
-        {
-          "concerns": [
-            "traceability",
-            "verification"
-          ],
-          "groups": [
-            "all"
-          ],
-          "round": 1,
-          "round_type": "final",
-          "timestamp": "2026-03-27T05:03:58Z"
-        },
-        {
-          "concerns": [
-            "test_coverage"
-          ],
-          "groups": [
-            "all"
-          ],
-          "round": 3,
-          "round_type": "fast",
-          "timestamp": "2026-03-27T05:10:01Z"
-        },
-        {
-          "concerns": [
-            "test_coverage"
-          ],
-          "groups": [
-            "all"
-          ],
-          "round": 4,
-          "round_type": "fast",
-          "timestamp": "2026-03-27T05:15:48Z"
-        },
         {
           "concerns": [
             "traceability"
@@ -145,6 +91,66 @@
           "round": 2,
           "round_type": "final",
           "timestamp": "2026-03-27T05:42:20Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 8,
+          "round_type": "fast",
+          "timestamp": "2026-03-27T09:54:18Z"
+        },
+        {
+          "concerns": [
+            "logic"
+          ],
+          "groups": [
+            "all"
+          ],
+          "round": 9,
+          "round_type": "fast",
+          "timestamp": "2026-03-27T10:02:09Z"
+        },
+        {
+          "concerns": [
+            "test_coverage"
+          ],
+          "groups": [
+            "all"
+          ],
+          "round": 10,
+          "round_type": "fast",
+          "timestamp": "2026-03-27T10:30:19Z"
+        },
+        {
+          "concerns": [
+            "logic"
+          ],
+          "groups": [
+            "all"
+          ],
+          "round": 11,
+          "round_type": "fast",
+          "timestamp": "2026-03-27T11:06:25Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 12,
+          "round_type": "fast",
+          "timestamp": "2026-03-27T11:19:14Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-27T11:19:25Z"
         }
       ],
       "threshold": 3
@@ -152,68 +158,110 @@
     "groups": {
       "all": {
         "fast": {
-          "round": 7,
-          "timestamp": "2026-03-27T05:35:18Z",
+          "round": 12,
+          "timestamp": "2026-03-27T11:19:14Z",
           "verdict": "zero_findings"
         },
         "final": {
-          "round": 2,
-          "timestamp": "2026-03-27T05:42:20Z",
+          "round": 1,
+          "timestamp": "2026-03-27T11:19:25Z",
           "verdict": "zero_findings"
+        }
+      },
+      "cli": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-27T07:45:22Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "concerns": [
+            "correctness"
+          ],
+          "round": 1,
+          "timestamp": "2026-03-27T08:10:16Z",
+          "verdict": "findings_remain"
+        }
+      },
+      "infra": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-27T08:06:32Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-27T08:07:22Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "other": {
+        "fast": {
+          "round": 2,
+          "timestamp": "2026-03-27T08:05:25Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "concerns": [
+            "docs"
+          ],
+          "round": 1,
+          "timestamp": "2026-03-27T08:09:54Z",
+          "verdict": "findings_remain"
         }
       }
     },
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "done",
   "tasks": [
     {
       "description": "GITIGNORED_RENDERED_VIEWS 定数 + is_gitignored_rendered_view() ヘルパーを追加",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "activation_commit_paths() を抽出し、persist_activation_commit() でフィルタ適用",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "activation_artifact_paths() から registry.md 削除、spec.md 追加",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "既存テスト更新 + 回帰テスト追加（gitignored path 除外の確認）",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "sync_rendered_views() にドキュメントコメント追加（VCS フィルタは呼び出し側の責任）",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "sotp plan codex-local サブコマンド実装（CLI に Plan サブコマンド追加 + --briefing-file / --prompt、codex subprocess spawn、stdout 出力）",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Makefile.toml に track-local-plan タスク追加 + permissions.allow 登録",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": ".claude/rules/02-codex-delegation.md と 10-guardrails.md のドキュメント更新（briefing file パターン正式化）",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "scripts/test_make_wrappers.py に track-local-plan ラッパーの回帰テストケースを追加",
       "id": "T009",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "track:activate gitignore 修正 + planner 移譲 cargo make コマンド追加",
-  "updated_at": "2026-03-27T05:42:20Z"
+  "updated_at": "2026-03-27T11:19:25Z"
 }

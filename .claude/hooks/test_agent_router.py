@@ -141,7 +141,7 @@ class AgentRouterTest(unittest.TestCase):
                 capability="planner",
                 provider_label="Codex CLI",
                 capability_description=agent_router.CAPABILITY_DESCRIPTIONS["planner"],
-                provider_example='codex exec --model gpt-5.4 --sandbox read-only --full-auto "Review this Rust design: {description}"',
+                provider_example="cargo make track-local-plan -- --model gpt-5.4 --briefing-file '{briefing_file}'",
             ),
         )
 
