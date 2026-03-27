@@ -1,0 +1,167 @@
+{
+  "branch": null,
+  "created_at": "2026-03-26T12:00:00Z",
+  "id": "tamper-proof-review-2026-03-26",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "VerdictProvenance (LegacyUnverified | TrustedSubprocess) を ReviewRoundResult に追加。",
+          "SHA-256 ダイジェスト用 newtype 群、ReviewInvocationId、ProtectedArtifactRef を定義。",
+          "既存 review.json データは LegacyUnverified としてデコード。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001",
+          "T002",
+          "T003"
+        ],
+        "title": "Domain Provenance Model"
+      },
+      {
+        "description": [
+          "review.json schema_version 2 — ラウンドドキュメントに provenance フィールド追加。",
+          "review-artifacts/<invocation-id>/ にセッションログ、final-message、attestation を永続化。",
+          "ReviewAttestationDocument serde 型を定義。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T004",
+          "T005"
+        ],
+        "title": "Infrastructure Schema & Persistence"
+      },
+      {
+        "description": [
+          "AttestedReviewRound 型で verdict + provenance + evidence バイトを一体化。",
+          "RecordRoundProtocol::execute_attested() で review.json + artifacts をアトミック永続化。",
+          "codex-local --auto-record 内で provenance 生成（hash + attestation）を統合。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T006",
+          "T007",
+          "T008"
+        ],
+        "title": "Attested Recording Pipeline"
+      },
+      {
+        "description": [
+          "record-round サブコマンドを削除し、手動 verdict 注入を構造的に不可能にする。",
+          "ReviewEvidenceVerifier ポートで check-approved に provenance 検証ゲートを追加。",
+          "FsReviewEvidenceVerifier でファイル読込 + SHA-256 ダイジェスト照合を実装。"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T009",
+          "T010",
+          "T011"
+        ],
+        "title": "CLI Sealing & Verification"
+      },
+      {
+        "description": [
+          "BlockProtectedReviewStateWrite hook で review.json + review-artifacts/ への直接書込みをブロック。",
+          "settings.json に Write|Edit matcher hook 追加。",
+          "CI で --require-provenance を soft enforcement として導入。"
+        ],
+        "id": "S5",
+        "task_ids": [
+          "T012",
+          "T013",
+          "T014",
+          "T015"
+        ],
+        "title": "Write Guard & CI Enforcement"
+      }
+    ],
+    "summary": [
+      "レビュー verdict の改ざん防止を 4 層で実現する:",
+      "1. Domain: VerdictProvenance ADT で各ラウンドの出自を型レベルで保証",
+      "2. CLI 封鎖: record-round サブコマンド削除、codex-local --auto-record のみが verdict 記録可能",
+      "3. Hook ガード: review.json + review-artifacts/ への Write/Edit をブロック",
+      "4. Verification: check-approved --require-provenance で SHA-256 ダイジェスト整合性検証"
+    ]
+  },
+  "schema_version": 3,
+  "status": "planned",
+  "tasks": [
+    {
+      "description": "Domain: VerdictProvenance ADT + Sha256Hex + ReviewInvocationId + ProtectedArtifactRef + SessionDigest/PayloadDigest/AttestationDigest newtypes",
+      "id": "T001",
+      "status": "todo"
+    },
+    {
+      "description": "Domain: ReviewRoundResult に provenance フィールド追加 + コンストラクタ統一",
+      "id": "T002",
+      "status": "todo"
+    },
+    {
+      "description": "Domain: ReviewError に provenance 関連バリアント追加 (InvalidProvenance, MissingEvidence, EvidenceDigestMismatch 等)",
+      "id": "T003",
+      "status": "todo"
+    },
+    {
+      "description": "Infrastructure: review.json schema_version 2 — ReviewRoundDocument に Optional<provenance> + ReviewRoundProvenanceDocument + ReviewArtifactRefDocument serde 型",
+      "id": "T004",
+      "status": "todo"
+    },
+    {
+      "description": "Infrastructure: ReviewAttestationDocument serde 型 + review-artifacts/ ディレクトリ管理 (persist/load)",
+      "id": "T005",
+      "status": "todo"
+    },
+    {
+      "description": "Usecase: AttestedReviewRound 型 + RecordRoundProtocol::execute_attested() ポート + record_attested_round() usecase 関数",
+      "id": "T006",
+      "status": "todo"
+    },
+    {
+      "description": "Infrastructure: RecordRoundProtocolImpl::execute_attested() — アーティファクト永続化 + review.json + git add をアトミック実行",
+      "id": "T007",
+      "status": "todo"
+    },
+    {
+      "description": "CLI: codex-local --auto-record に provenance 生成統合 — session log hash + payload hash + attestation 生成 → AttestedReviewRound 構築",
+      "id": "T008",
+      "status": "todo"
+    },
+    {
+      "description": "CLI: RecordRound サブコマンド削除 — ReviewCommand enum から除去",
+      "id": "T009",
+      "status": "todo"
+    },
+    {
+      "description": "Usecase: ReviewEvidenceVerifier ポート + check_approved に require_provenance ゲート追加",
+      "id": "T010",
+      "status": "todo"
+    },
+    {
+      "description": "Infrastructure: FsReviewEvidenceVerifier — アーティファクトファイル読込 + SHA-256 検証 + attestation 整合性チェック",
+      "id": "T011",
+      "status": "todo"
+    },
+    {
+      "description": "Domain/Hook: BlockProtectedReviewStateWrite hook handler — Write/Edit で review.json + review-artifacts/ をブロック",
+      "id": "T012",
+      "status": "todo"
+    },
+    {
+      "description": "CLI/Settings: settings.json に Write|Edit matcher hook 追加 + verify-orchestra で hook 存在を検証",
+      "id": "T013",
+      "status": "todo"
+    },
+    {
+      "description": "CI: check-approved に --require-provenance フラグ追加 + cargo make ci での soft enforcement",
+      "id": "T014",
+      "status": "todo"
+    },
+    {
+      "description": "CI: --require-provenance を cargo make ci のデフォルトに昇格（hard enforcement — LegacyUnverified ラウンドを拒否）",
+      "id": "T015",
+      "status": "todo"
+    }
+  ],
+  "title": "レビュー verdict 改ざん防止 — provenance + write-guard + CLI 封鎖",
+  "updated_at": "2026-03-26T12:14:13Z"
+}

@@ -1,0 +1,250 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0.0",
+  "title": "レビュー verdict 改ざん防止",
+  "goal": [
+    "Claude Code（オーケストレーター）がレビュー verdict を改ざんできない構造を実現する。",
+    "Rust CLI (sotp) を唯一の信頼されたコンポーネントとし、verdict 記録パスを sotp 内部に限定する。",
+    "review.json と review-artifacts/ を Write/Edit ガードで保護し、SHA-256 ダイジェストで事後検証を可能にする。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "VerdictProvenance ADT を domain 層に追加し ReviewRoundResult に provenance フィールドを持たせる",
+        "sources": [
+          "ADR-2026-03-26-0010 §決定",
+          "ADR-2026-03-24-1200"
+        ],
+        "task_refs": [
+          "T001",
+          "T002",
+          "T003"
+        ]
+      },
+      {
+        "text": "review.json schema_version 2 — ラウンドに provenance ドキュメントを追加、既存データは LegacyUnverified",
+        "sources": [
+          "ADR-2026-03-26-0010 §決定"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "review-artifacts/<invocation-id>/ にセッションログ、final-message、attestation を永続化",
+        "sources": [
+          "ADR-2026-03-26-0010 §決定"
+        ],
+        "task_refs": [
+          "T005",
+          "T007"
+        ]
+      },
+      {
+        "text": "AttestedReviewRound 型 + RecordRoundProtocol::execute_attested() ポートを追加し、codex-local --auto-record 内で provenance 生成（session log hash + payload hash + attestation）を統合",
+        "sources": [
+          "ADR-2026-03-26-0010 §決定"
+        ],
+        "task_refs": [
+          "T006",
+          "T007",
+          "T008"
+        ]
+      },
+      {
+        "text": "RecordRound CLI サブコマンドを削除し、verdict 記録を codex-local --auto-record 内部に限定",
+        "sources": [
+          "ADR-2026-03-26-0010 §決定",
+          "ADR-2026-03-26-0010 §追加決定: record-round 削除の検証"
+        ],
+        "task_refs": [
+          "T009"
+        ]
+      },
+      {
+        "text": "BlockProtectedReviewStateWrite PreToolUse hook で review.json + review-artifacts/ への Write/Edit をブロック",
+        "sources": [
+          "ADR-2026-03-26-0010 §決定"
+        ],
+        "task_refs": [
+          "T012",
+          "T013"
+        ]
+      },
+      {
+        "text": "check-approved に --require-provenance フラグを追加し、provenance 付きラウンドの SHA-256 検証を実行",
+        "sources": [
+          "ADR-2026-03-26-0010 §決定"
+        ],
+        "task_refs": [
+          "T010",
+          "T011",
+          "T014",
+          "T015"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "ReviewReader/ReviewWriter ポート分離（review-port-separation トラックのスコープ）",
+        "sources": [
+          "ADR-2026-03-25-2125"
+        ]
+      },
+      {
+        "text": "既存 review.json のレガシーデータマイグレーション（LegacyUnverified として扱う）",
+        "sources": [
+          "ADR-2026-03-26-0010 §決定"
+        ]
+      },
+      {
+        "text": "暗号署名（HMAC, GPG 等）による reviewer output 検証",
+        "sources": [
+          "ADR-2026-03-26-0010 §決定"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "新規ロジックは Rust で実装する（Python 不可）",
+      "sources": [
+        "convention — .claude/rules/04-coding-principles.md"
+      ]
+    },
+    {
+      "text": "TDD ワークフローに従う（Red → Green → Refactor）",
+      "sources": [
+        "convention — .claude/rules/05-testing.md"
+      ]
+    },
+    {
+      "text": "ヘキサゴナルアーキテクチャ遵守 — domain 層は純粋、I/O は infrastructure 層のみ",
+      "sources": [
+        "convention — project-docs/conventions/hexagonal-architecture.md"
+      ]
+    },
+    {
+      "text": "domain 層で sha2 クレートを直接使用しない（SHA-256 計算は infrastructure 層）",
+      "sources": [
+        "convention — project-docs/conventions/hexagonal-architecture.md"
+      ]
+    },
+    {
+      "text": "review.json の後方互換 — provenance なしのラウンドは LegacyUnverified としてデコード",
+      "sources": [
+        "ADR-2026-03-26-0010 §決定"
+      ]
+    }
+  ],
+  "domain_states": [
+    {
+      "name": "VerdictProvenance",
+      "description": "LegacyUnverified | TrustedSubprocess — 各レビューラウンドの verdict 出自"
+    },
+    {
+      "name": "ReviewEvidenceStatus",
+      "description": "Verified | LegacyUnverified | MissingArtifact | DigestMismatch | VerdictMismatch — check-approved での provenance 検証結果"
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "ReviewError に provenance 関連バリアント (InvalidProvenance, MissingEvidence, EvidenceDigestMismatch) が追加され、provenance 検証失敗時に適切なエラーが返る",
+      "sources": [
+        "ADR-2026-03-26-0010 §決定"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "codex-local --auto-record で記録された verdict に TrustedSubprocess provenance が付与され、review.json に永続化される",
+      "sources": [
+        "ADR-2026-03-26-0010 §決定"
+      ],
+      "task_refs": [
+        "T006",
+        "T007",
+        "T008"
+      ]
+    },
+    {
+      "text": "sotp review record-round CLI サブコマンドが削除され、直接 verdict 注入が不可能になる",
+      "sources": [
+        "ADR-2026-03-26-0010 §決定"
+      ],
+      "task_refs": [
+        "T009"
+      ]
+    },
+    {
+      "text": "review-artifacts/<invocation-id>/ にセッションログ、final-message.json、attestation.json が永続化される",
+      "sources": [
+        "ADR-2026-03-26-0010 §決定"
+      ],
+      "task_refs": [
+        "T005",
+        "T007"
+      ]
+    },
+    {
+      "text": "check-approved --require-provenance が artifact の存在確認、digest 整合性、verdict 一致を検証し、いずれかの不一致でブロックする",
+      "sources": [
+        "ADR-2026-03-26-0010 §決定"
+      ],
+      "task_refs": [
+        "T010",
+        "T011",
+        "T014"
+      ]
+    },
+    {
+      "text": "cargo make ci がデフォルトで --require-provenance を有効にし、LegacyUnverified ラウンドを拒否する（hard enforcement）",
+      "sources": [
+        "ADR-2026-03-26-0010 §決定"
+      ],
+      "task_refs": [
+        "T015"
+      ]
+    },
+    {
+      "text": "Write/Edit で review.json および review-artifacts/ への書き込みが PreToolUse hook でブロックされる",
+      "sources": [
+        "ADR-2026-03-26-0010 §決定"
+      ],
+      "task_refs": [
+        "T012",
+        "T013"
+      ]
+    },
+    {
+      "text": "既存 review.json（provenance なし）が LegacyUnverified として正しくデコードされる",
+      "sources": [
+        "ADR-2026-03-26-0010 §決定"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "cargo make ci が通過する",
+      "sources": [
+        "convention — .claude/rules/07-dev-environment.md"
+      ],
+      "task_refs": [
+        "T014"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "project-docs/conventions/hexagonal-architecture.md",
+    "project-docs/conventions/security.md",
+    "project-docs/conventions/source-attribution.md"
+  ],
+  "signals": {
+    "blue": 22,
+    "yellow": 0,
+    "red": 0
+  }
+}
