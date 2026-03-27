@@ -1,0 +1,267 @@
+{
+  "branch": "track/activate-vcsfix-plan-infra-2026-03-27",
+  "created_at": "2026-03-27T12:00:00+09:00",
+  "id": "activate-vcsfix-plan-infra-2026-03-27",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "GITIGNORED_RENDERED_VIEWS 定数と is_gitignored_rendered_view() ヘルパーを activate.rs に追加。",
+          "activation_commit_paths() を抽出し persist_activation_commit() で gitignored パスをフィルタ。",
+          "activation_artifact_paths() から registry.md を削除し spec.md を追加。",
+          "既存テスト更新と回帰テスト追加。",
+          "sync_rendered_views() のドキュメントコメントに VCS フィルタ責任を明示。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001",
+          "T002",
+          "T003",
+          "T004",
+          "T005"
+        ],
+        "title": "Phase 1: activation gitignore 修正"
+      },
+      {
+        "description": [
+          "sotp plan codex-local サブコマンドを review codex-local と同じパターンで実装。",
+          "Makefile.toml に track-local-plan タスクを追加し permissions.allow に登録。",
+          "codex 移譲ドキュメント（02-codex-delegation.md, 10-guardrails.md）を更新し briefing file パターンを正式化。",
+          "scripts/test_make_wrappers.py に track-local-plan ラッパーの回帰テストケースを追加。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T006",
+          "T007",
+          "T008",
+          "T009"
+        ],
+        "title": "Phase 2: planner 移譲インフラ"
+      }
+    ],
+    "summary": [
+      "track:activate が gitignored な track/registry.md を staging しようとして失敗するバグの修正。",
+      "planner capability 移譲用の cargo make track-local-plan コマンドを追加し、briefing file 経由で Codex planner を呼び出せるようにする。"
+    ]
+  },
+  "review": {
+    "code_hash": "db7490de7d3311fe730b820725c74f7870fb7f3d",
+    "escalation": {
+      "phase": {
+        "type": "clear"
+      },
+      "recent_cycles": [
+        {
+          "concerns": [
+            "traceability"
+          ],
+          "groups": [
+            "all"
+          ],
+          "round": 5,
+          "round_type": "fast",
+          "timestamp": "2026-03-27T05:24:21Z"
+        },
+        {
+          "concerns": [
+            "architecture",
+            "test_coverage"
+          ],
+          "groups": [
+            "all"
+          ],
+          "round": 6,
+          "round_type": "fast",
+          "timestamp": "2026-03-27T05:30:33Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 7,
+          "round_type": "fast",
+          "timestamp": "2026-03-27T05:35:18Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 2,
+          "round_type": "final",
+          "timestamp": "2026-03-27T05:42:20Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 8,
+          "round_type": "fast",
+          "timestamp": "2026-03-27T09:54:18Z"
+        },
+        {
+          "concerns": [
+            "logic"
+          ],
+          "groups": [
+            "all"
+          ],
+          "round": 9,
+          "round_type": "fast",
+          "timestamp": "2026-03-27T10:02:09Z"
+        },
+        {
+          "concerns": [
+            "test_coverage"
+          ],
+          "groups": [
+            "all"
+          ],
+          "round": 10,
+          "round_type": "fast",
+          "timestamp": "2026-03-27T10:30:19Z"
+        },
+        {
+          "concerns": [
+            "logic"
+          ],
+          "groups": [
+            "all"
+          ],
+          "round": 11,
+          "round_type": "fast",
+          "timestamp": "2026-03-27T11:06:25Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 12,
+          "round_type": "fast",
+          "timestamp": "2026-03-27T11:19:14Z"
+        },
+        {
+          "concerns": [],
+          "groups": [
+            "all"
+          ],
+          "round": 1,
+          "round_type": "final",
+          "timestamp": "2026-03-27T11:19:25Z"
+        }
+      ],
+      "threshold": 3
+    },
+    "groups": {
+      "all": {
+        "fast": {
+          "round": 12,
+          "timestamp": "2026-03-27T11:19:14Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-27T11:19:25Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "cli": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-27T07:45:22Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "concerns": [
+            "correctness"
+          ],
+          "round": 1,
+          "timestamp": "2026-03-27T08:10:16Z",
+          "verdict": "findings_remain"
+        }
+      },
+      "infra": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-27T08:06:32Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-27T08:07:22Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "other": {
+        "fast": {
+          "round": 2,
+          "timestamp": "2026-03-27T08:05:25Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "concerns": [
+            "docs"
+          ],
+          "round": 1,
+          "timestamp": "2026-03-27T08:09:54Z",
+          "verdict": "findings_remain"
+        }
+      }
+    },
+    "status": "approved"
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "GITIGNORED_RENDERED_VIEWS 定数 + is_gitignored_rendered_view() ヘルパーを追加",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "activation_commit_paths() を抽出し、persist_activation_commit() でフィルタ適用",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "activation_artifact_paths() から registry.md 削除、spec.md 追加",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "既存テスト更新 + 回帰テスト追加（gitignored path 除外の確認）",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "sync_rendered_views() にドキュメントコメント追加（VCS フィルタは呼び出し側の責任）",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "sotp plan codex-local サブコマンド実装（CLI に Plan サブコマンド追加 + --briefing-file / --prompt、codex subprocess spawn、stdout 出力）",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "description": "Makefile.toml に track-local-plan タスク追加 + permissions.allow 登録",
+      "id": "T007",
+      "status": "done"
+    },
+    {
+      "description": ".claude/rules/02-codex-delegation.md と 10-guardrails.md のドキュメント更新（briefing file パターン正式化）",
+      "id": "T008",
+      "status": "done"
+    },
+    {
+      "description": "scripts/test_make_wrappers.py に track-local-plan ラッパーの回帰テストケースを追加",
+      "id": "T009",
+      "status": "done"
+    }
+  ],
+  "title": "track:activate gitignore 修正 + planner 移譲 cargo make コマンド追加",
+  "updated_at": "2026-03-27T11:19:25Z"
+}

@@ -55,7 +55,8 @@ class AgentProfilesTest(unittest.TestCase):
             agent_profiles.provider_label("planner", profiles=profiles), "Codex CLI"
         )
         self.assertIn(
-            "codex exec", agent_profiles.provider_example("planner", profiles=profiles)
+            "cargo make track-local-plan -- --model",
+            agent_profiles.provider_example("planner", profiles=profiles),
         )
         self.assertIn(
             "cargo make track-local-review -- --model",

@@ -2,6 +2,15 @@ use crate::CliError;
 
 use super::*;
 
+/// Rendered view paths that are gitignored and must never be passed to `git add`.
+const GITIGNORED_RENDERED_VIEWS: &[&str] = &["track/registry.md"];
+
+/// Returns true if `path` is a rendered view that is excluded from VCS tracking.
+fn is_gitignored_rendered_view(project_root: &std::path::Path, path: &std::path::Path) -> bool {
+    let relative = path.strip_prefix(project_root).unwrap_or(path);
+    GITIGNORED_RENDERED_VIEWS.iter().any(|ignored| relative == std::path::Path::new(ignored))
+}
+
 pub(super) fn execute_branch(action: BranchAction) -> Result<ExitCode, CliError> {
     match action {
         BranchAction::Create(args) => execute_activate(
@@ -268,13 +277,16 @@ pub(super) fn load_track_branch_record(
     load_explicit_track_branch_from_items_dir(project_root, items_dir, &track_dir)
 }
 
-fn persist_activation_commit(
-    repo: &impl GitRepository,
+/// Builds the list of repo-relative path strings to stage for an activation commit.
+///
+/// Paths in `rendered_paths` that match [`GITIGNORED_RENDERED_VIEWS`] (e.g. `track/registry.md`)
+/// are excluded so that a subsequent `git add` does not fail on gitignored files.
+fn activation_commit_paths(
     project_root: &std::path::Path,
     items_dir: &std::path::Path,
     track_id: &TrackId,
     rendered_paths: &[PathBuf],
-) -> Result<bool, String> {
+) -> Vec<String> {
     let metadata_path = items_dir
         .join(track_id.as_ref())
         .join("metadata.json")
@@ -282,12 +294,26 @@ fn persist_activation_commit(
         .unwrap_or(&items_dir.join(track_id.as_ref()).join("metadata.json"))
         .display()
         .to_string();
+
     let mut staged = std::collections::BTreeSet::from([metadata_path]);
     for path in rendered_paths {
+        if is_gitignored_rendered_view(project_root, path) {
+            continue;
+        }
         let relative = path.strip_prefix(project_root).unwrap_or(path);
         staged.insert(relative.display().to_string());
     }
-    let staged_paths = staged.into_iter().collect::<Vec<_>>();
+    staged.into_iter().collect()
+}
+
+fn persist_activation_commit(
+    repo: &impl GitRepository,
+    project_root: &std::path::Path,
+    items_dir: &std::path::Path,
+    track_id: &TrackId,
+    rendered_paths: &[PathBuf],
+) -> Result<bool, String> {
+    let staged_paths = activation_commit_paths(project_root, items_dir, track_id, rendered_paths);
 
     let mut status_args = vec!["status".to_owned(), "--porcelain".to_owned(), "--".to_owned()];
     status_args.extend(staged_paths.iter().cloned());
@@ -544,7 +570,14 @@ fn activation_artifact_paths(
         .unwrap_or(&items_dir.join(track_id.as_ref()).join("plan.md"))
         .display()
         .to_string();
-    std::collections::BTreeSet::from([metadata_path, plan_path, "track/registry.md".to_owned()])
+    let spec_path = items_dir
+        .join(track_id.as_ref())
+        .join("spec.md")
+        .strip_prefix(project_root)
+        .unwrap_or(&items_dir.join(track_id.as_ref()).join("spec.md"))
+        .display()
+        .to_string();
+    std::collections::BTreeSet::from([metadata_path, plan_path, spec_path])
 }
 
 pub(super) fn ensure_clean_worktree(
@@ -723,6 +756,7 @@ mod tests {
     use std::collections::HashMap;
     use std::fs;
     use std::os::unix::process::ExitStatusExt;
+    use std::path::PathBuf;
     use std::process::Output;
     use std::sync::Mutex;
 
@@ -733,10 +767,10 @@ mod tests {
     use super::super::{BranchMode, resolve_project_root};
     use super::load_track_branch_record;
     use super::{
-        activation_branch_create_base, activation_create_requires_main_branch,
-        activation_git_commands, activation_rejects_invalid_source_branch,
-        activation_requires_clean_worktree, activation_resume_allowed,
-        activation_resume_marker_path, allow_materialized_activation,
+        activation_artifact_paths, activation_branch_create_base, activation_commit_paths,
+        activation_create_requires_main_branch, activation_git_commands,
+        activation_rejects_invalid_source_branch, activation_requires_clean_worktree,
+        activation_resume_allowed, activation_resume_marker_path, allow_materialized_activation,
         allowed_activation_dirty_paths, clear_activation_resume_marker, ensure_clean_worktree,
         persist_activation_commit, preflight_branch_operation,
         should_persist_activation_side_effects, uses_legacy_branch_mode,
@@ -1262,7 +1296,7 @@ mod tests {
             std::collections::BTreeSet::from([
                 "track/items/demo/metadata.json".to_owned(),
                 "track/items/demo/plan.md".to_owned(),
-                "track/registry.md".to_owned(),
+                "track/items/demo/spec.md".to_owned(),
             ])
         );
         assert!(
@@ -1304,7 +1338,7 @@ mod tests {
             std::collections::BTreeSet::from([
                 "custom/track/items/demo/metadata.json".to_owned(),
                 "custom/track/items/demo/plan.md".to_owned(),
-                "track/registry.md".to_owned(),
+                "custom/track/items/demo/spec.md".to_owned(),
             ])
         );
     }
@@ -1315,14 +1349,14 @@ mod tests {
             current_branch: Some("main".to_owned()),
             outputs: HashMap::from([(
                 vec!["status".to_owned(), "--porcelain".to_owned()],
-                success_output(" M track/items/demo/metadata.json\n M track/registry.md\n"),
+                success_output(" M track/items/demo/metadata.json\n M track/items/demo/plan.md\n"),
             )]),
         };
 
         let allowed = std::collections::BTreeSet::from([
             "track/items/demo/metadata.json".to_owned(),
             "track/items/demo/plan.md".to_owned(),
-            "track/registry.md".to_owned(),
+            "track/items/demo/spec.md".to_owned(),
         ]);
 
         assert!(ensure_clean_worktree(&repo, &allowed).is_ok());
@@ -1341,11 +1375,41 @@ mod tests {
         let allowed = std::collections::BTreeSet::from([
             "track/items/demo/metadata.json".to_owned(),
             "track/items/demo/plan.md".to_owned(),
-            "track/registry.md".to_owned(),
+            "track/items/demo/spec.md".to_owned(),
         ]);
 
         let err = ensure_clean_worktree(&repo, &allowed).unwrap_err();
         assert!(err.contains("clean worktree"));
+    }
+
+    #[test]
+    fn persist_activation_commit_skips_gitignored_registry_view() {
+        // registry.md is gitignored; even when included in rendered_paths it must
+        // never appear in git add / git commit args.
+        let registry_path = PathBuf::from("track/registry.md");
+        let plan_path = PathBuf::from("track/items/demo/plan.md");
+
+        let paths = activation_commit_paths(
+            Path::new("."),
+            Path::new("track/items"),
+            &TrackId::try_new("demo").unwrap(),
+            &[registry_path, plan_path],
+        );
+
+        assert!(!paths.contains(&"track/registry.md".to_owned()), "registry.md must be excluded");
+        assert!(paths.contains(&"track/items/demo/metadata.json".to_owned()));
+        assert!(paths.contains(&"track/items/demo/plan.md".to_owned()));
+    }
+
+    #[test]
+    fn activation_artifact_paths_includes_spec_md_not_registry() {
+        let track_id = TrackId::try_new("demo").unwrap();
+        let paths = activation_artifact_paths(Path::new("."), Path::new("track/items"), &track_id);
+
+        assert!(paths.contains("track/items/demo/metadata.json"), "metadata.json must be present");
+        assert!(paths.contains("track/items/demo/plan.md"), "plan.md must be present");
+        assert!(paths.contains("track/items/demo/spec.md"), "spec.md must be present");
+        assert!(!paths.contains("track/registry.md"), "registry.md must not be present");
     }
 
     #[test]

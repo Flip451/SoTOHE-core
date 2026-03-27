@@ -242,6 +242,7 @@
       "Bash(cargo make track-pr-review)",
       "Bash(cargo make track-pr-merge:*)",
       "Bash(cargo make track-pr-status:*)",
+      "Bash(cargo make track-local-plan:*)",
       "Bash(cargo make track-local-review:*)",
       "Bash(cargo make track-record-round:*)",
       "Bash(cargo make track-check-approved:*)",

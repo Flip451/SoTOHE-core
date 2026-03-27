@@ -436,6 +436,10 @@ fn validate_track_document(
 
 /// Renders `plan.md` and `registry.md` from metadata.json and writes changed files atomically.
 ///
+/// Returned paths may include files ignored by version control (e.g., `track/registry.md`).
+/// Callers that stage paths for git operations must apply their own filtering to exclude
+/// gitignored entries.
+///
 /// # Errors
 /// Returns `RenderError` on file-system or metadata decode failure.
 pub fn sync_rendered_views(

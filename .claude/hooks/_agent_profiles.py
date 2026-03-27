@@ -33,7 +33,7 @@ WORKFLOW_HOST_MODEL_ALIASES = (
     WORKFLOW_HOST_MODEL_KEY,
 )
 SUPPORTED_WORKFLOW_HOST_PROVIDERS = ("claude", "codex")
-PLACEHOLDER_KEYS = ("task", "path", "model")
+PLACEHOLDER_KEYS = ("task", "path", "model", "briefing_file")
 
 
 class AgentProfilesError(ValueError):
@@ -508,6 +508,7 @@ def render_provider_example(
     capability: str,
     task: str = "{task}",
     file_path: str = "{path}",
+    briefing_file: str = "{briefing_file}",
     profiles: dict[str, Any] | None = None,
     path: str | Path | None = None,
 ) -> str:
@@ -525,6 +526,7 @@ def render_provider_example(
         "task": task,
         "path": file_path,
         "model": model or "",
+        "briefing_file": briefing_file,
     }
     if _looks_like_shell_command_template(example):
         return _render_shell_template(example, values)

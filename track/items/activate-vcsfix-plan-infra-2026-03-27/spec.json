@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0.0",
+  "title": "track:activate gitignore 修正 + planner 移譲 cargo make コマンド追加",
+  "goal": [
+    "track:activate が gitignored な rendered view (track/registry.md) を git add しようとして失敗するバグを修正する。",
+    "planner capability 移譲用の cargo make track-local-plan コマンドを追加し、hook にブロックされずにブリーフィングファイル経由で Codex planner を呼び出せるようにする。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "persist_activation_commit() で gitignored パスをフィルタする",
+        "sources": [
+          "apps/cli/src/commands/track/activate.rs L271-320"
+        ],
+        "task_refs": [
+          "T001",
+          "T002"
+        ]
+      },
+      {
+        "text": "activation_artifact_paths() から registry.md を削除し spec.md を追加する",
+        "sources": [
+          "apps/cli/src/commands/track/activate.rs L528-548"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "sync_rendered_views() のドキュメントコメントに VCS フィルタ責任を明示",
+        "sources": [
+          "libs/infrastructure/src/track/render.rs L441"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "sotp plan codex-local サブコマンドを review codex-local と同じパターンで実装",
+        "sources": [
+          "apps/cli/src/commands/review/codex_local.rs",
+          "discussion"
+        ],
+        "task_refs": [
+          "T006"
+        ]
+      },
+      {
+        "text": "Makefile.toml + permissions.allow に track-local-plan を登録",
+        "sources": [
+          "discussion"
+        ],
+        "task_refs": [
+          "T007"
+        ]
+      },
+      {
+        "text": "codex 移譲ドキュメント更新（briefing file パターン正式化）",
+        "sources": [
+          ".claude/rules/02-codex-delegation.md",
+          ".claude/rules/10-guardrails.md",
+          "discussion"
+        ],
+        "task_refs": [
+          "T008"
+        ]
+      },
+      {
+        "text": "scripts/test_make_wrappers.py に track-local-plan ラッパーの回帰テストケースを追加",
+        "sources": [
+          "inference — existing wrapper test pattern in scripts/test_make_wrappers.py"
+        ],
+        "task_refs": [
+          "T009"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "plan.md / spec.md の gitignore 化（これらは意図的に git-tracked）",
+        "sources": [
+          "discussion"
+        ]
+      },
+      {
+        "text": "render.rs の sync_rendered_views() 戻り値のセマンティクス変更",
+        "sources": [
+          "inference — Codex planner recommendation: render.rs should stay VCS-agnostic"
+        ]
+      },
+      {
+        "text": "planner の verdict 解析や auto-record（review 固有機能）",
+        "sources": [
+          "inference — planner output is free-form text, not structured verdict"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "新規ロジックは Rust で実装する",
+      "sources": [
+        "feedback — Rust-first policy"
+      ]
+    },
+    {
+      "text": "TDD ワークフロー必須（Red → Green → Refactor）",
+      "sources": [
+        "convention — .claude/rules/05-testing.md"
+      ]
+    },
+    {
+      "text": "reviewer review cycle を commit 前に実施する",
+      "sources": [
+        "convention — .claude/rules/10-guardrails.md"
+      ]
+    }
+  ],
+  "domain_states": [
+    {
+      "name": "GitignoredRenderedView",
+      "description": "sync_rendered_views() が返すパスのうち .gitignore に登録された rendered view（現在は track/registry.md のみ）"
+    },
+    {
+      "name": "TrackedRenderedView",
+      "description": "sync_rendered_views() が返すパスのうち git-tracked な rendered view（plan.md, spec.md）"
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "track:activate が gitignored な registry.md を含む rendered_paths で成功する",
+      "sources": [
+        "inference — primary bug fix validation"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T004"
+      ]
+    },
+    {
+      "text": "activation_artifact_paths() が metadata.json, plan.md, spec.md を返し registry.md を含まない",
+      "sources": [
+        "apps/cli/src/commands/track/activate.rs L528"
+      ],
+      "task_refs": [
+        "T003",
+        "T004"
+      ]
+    },
+    {
+      "text": "cargo make track-local-plan -- --briefing-file <path> で Codex planner を hook ブロックなしに呼び出せる（-- セパレータ必須）",
+      "sources": [
+        "discussion"
+      ],
+      "task_refs": [
+        "T006",
+        "T007"
+      ]
+    },
+    {
+      "text": "cargo make ci が通る",
+      "sources": [
+        "convention — .claude/rules/07-dev-environment.md"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T005",
+        "T006",
+        "T007",
+        "T008",
+        "T009"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "project-docs/conventions/source-attribution.md",
+    ".claude/rules/02-codex-delegation.md",
+    ".claude/rules/05-testing.md",
+    ".claude/rules/07-dev-environment.md",
+    ".claude/rules/10-guardrails.md",
+    "project-docs/conventions/hexagonal-architecture.md"
+  ],
+  "signals": {
+    "blue": 10,
+    "yellow": 6,
+    "red": 0
+  }
+}

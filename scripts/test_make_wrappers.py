@@ -365,6 +365,19 @@ class MakeWrappersTest(unittest.TestCase):
                 self.assertIn('"make"', task_body, f"{task_header} missing 'make' in args")
                 self.assertNotIn('script_runner', task_body, f"{task_header} should not use script_runner")
 
+    def test_track_local_plan_wrapper_delegates_to_sotp_make(self) -> None:
+        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
+        task_header = "[tasks.track-local-plan]"
+        task_start = makefile.index(task_header)
+        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+        task_body = (
+            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
+        )
+
+        self.assertIn('script_runner = "@shell"', task_body)
+        self.assertIn('bin/sotp make track-local-plan', task_body)
+        self.assertIn('"$@"', task_body)
+
     def test_track_local_review_wrapper_delegates_to_sotp_make(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
         task_header = "[tasks.track-local-review]"

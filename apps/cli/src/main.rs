@@ -50,6 +50,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::pr::PrCommand,
     },
+    /// Local planner workflow wrappers.
+    Plan {
+        #[command(subcommand)]
+        cmd: commands::plan::PlanCommand,
+    },
     /// Local review workflow wrappers.
     Review {
         #[command(subcommand)]
@@ -85,6 +90,7 @@ fn main() -> ExitCode {
         Some(CliCommand::Track { cmd }) => commands::track::execute(cmd),
         Some(CliCommand::Git { cmd }) => commands::git::execute(cmd),
         Some(CliCommand::Pr { cmd }) => commands::pr::execute(cmd),
+        Some(CliCommand::Plan { cmd }) => commands::plan::execute(cmd),
         Some(CliCommand::Review { cmd }) => commands::review::execute(cmd),
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
         Some(CliCommand::Spec { cmd }) => commands::spec::execute(cmd),

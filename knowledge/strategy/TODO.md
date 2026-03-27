@@ -429,6 +429,31 @@
 - [x] ~~**WF-54** (MEDIUM): `track-commit-message` の review guard が planning artifacts 初回コミットをブロックする~~ ✅ done (PR #46, ci-guardrails-phase15-2026-03-20)
   - **対応**: (B) を採用。`/track:plan` が metadata.json 作成時に review state `{status: "not_started", groups: {}}` を含める。`check-approved` が `NotStarted && groups.is_empty()` を許可（初回状態のみ、降格後は不可）
 
+- [ ] **WF-55** (HIGH): 実装フェーズでの設計判断エスカレーションフロー未定義
+  - **課題**: 実装者が spec/ADR に記載のない設計判断を独断で追加し、レビューで初めて発覚する（例: `FinalRequiresFastPassed` 制約）。未承認の制約がドメイン層に入り品質が低下
+  - **提案**: 実装中に仕様外の設計判断が必要になった場合、実装を一時停止して設計フェーズに戻り spec.md/ADR を更新するエスカレーションフローを `/track:implement` と `track/workflow.md` に定義する。判断基準: (1) 新しい enum variant / error type の追加、(2) 新しい状態遷移制約の追加、(3) 新しい port/trait の追加 — これらは実装者の裁量ではなく設計書への反映が必要
+  - **根拠**: review-port-separation track で `FinalRequiresFastPassed` が ADR/spec に記載なく実装に入り、後から除去が必要になった事例
+
+- [ ] **WF-56** (MEDIUM): planning-only コミットガードが ADR を拒否する
+  - **課題**: `track-commit-message` の planning-only allowlist が `knowledge/adr/` を許可しない。track artifacts と ADR を同時にコミットできず、ユーザーが手動 `git commit` に頼る必要がある
+  - **提案**: planning-only allowlist に `knowledge/adr/` と `knowledge/strategy/` を追加する。ADR は planning artifacts の一部であり、track と一緒にコミットされるべき
+  - **根拠**: autorecord-stabilization-2026-03-26 plan branch でコミット不能が発生（2026-03-27）
+
+- [ ] **WF-57** (LOW): `.lock` ファイル残骸が `verify-latest-track` を阻害する
+  - **課題**: 完了済みトラックの `metadata.json.lock`（fs4 ロック）が cleanup されずに残留。ディレクトリの存在だけで `verify-latest-track` がトラックを検出し、`metadata.json` 不在エラーとなる
+  - **提案**: (1) `/track:done` や `/track:archive` で `.lock` ファイルを cleanup する。(2) `verify-latest-track` が `.lock` のみのディレクトリをスキップする
+  - **根拠**: `review-json-separation-2026-03-25` で発生（2026-03-27）
+
+- [ ] **WF-58** (MEDIUM): `!` prefix コマンドが Claude Code ツールセッションの git state に反映されない
+  - **課題**: ユーザーが `! git restore --staged` や `! git rm --cached` を実行しても、Claude Code の Bash ツールから見える git index が更新されない。unstage 操作が hook でブロックされる場合の回避策として `!` を使うが、効果が確認できない
+  - **提案**: `cargo make` に unstage ラッパー（例: `cargo make unstage <path>`）を追加する
+  - **根拠**: review.json の unstage で発生（2026-03-27）
+
+- [ ] **WF-59** (HIGH): review hash の index 全体依存による auto-record 不安定性
+  - **課題**: `index_tree_hash_normalizing` が git index 全体の tree hash を計算するため、(1) 未ステージファイルで失敗、(2) 並列レビューグループ間で干渉、(3) 無関係ファイル変更で invalidate
+  - **対応**: ADR-2026-03-26-0000 で review-scope manifest hash への移行を決定。`autorecord-stabilization-2026-03-26` トラックで実装予定
+  - **根拠**: tamper-proof-review 計画レビュー中に繰り返し発生（2026-03-26〜27）
+
 ---
 
 ## H. 戦略的提案
@@ -554,6 +579,7 @@
 - [ ] **PR body の自動更新** — `track-pr-push` 時に `gh pr edit --body-file` で body を再生成
 - [x] ~~**registry.md のコミット時自動再生成**~~ ✅ 不要化 — registry.md は gitignore 化 (STRAT-04, PR #46)。コミット対象外のため自動再生成は不要
 - [ ] **reviewer subagent の Bash timeout 10分引き上げ** — `/track:review` スキルまたは wrapper で設定
+- [ ] **track:activate の clean-worktree チェック再評価** (MEDIUM) — `persist_activation_commit()` は `git commit --only` で指定ファイルのみコミットするため、dirty worktree でも activation commit に無関係ファイルは混入しない。`activation_requires_clean_worktree` + `allowed_activation_dirty_paths` の allowlist 機構が本当に必要か検討。不要なら削除して activate.rs を簡素化。関連: ERR-09b（activate.rs モジュール分割）
 - [ ] **Review escalation enforcement の機構化** (HIGH) — `record-round` に `--model-tier fast|full` フラグを追加し、domain 層で「全グループが fast zero_findings → full zero_findings の 2 段階を経たか」を追跡。`check-approved` が full model 確認なしのグループを拒否。現状はプロンプト依存で fast model pass のみでコミットできるすり抜けが発生した (2026-03-24 発見)。関連: WF-36, RVW-06
 
 ---
@@ -712,6 +738,8 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [x] ~~**WF-35** (HIGH): FORBIDDEN_ALLOW の読み取り専用コマンド緩和~~ ✅ 修正済み
 - [ ] **RVW-06** (HIGH): metadata.json にレビュー状態統合 + エスカレーション順序強制 + コミットガード
 - [ ] **RVW-07** (HIGH): Codex verdict 抽出の stderr フォールバック + セッションログ保存
+- [ ] **RVW-08** (HIGH): diff-scope filter (ScopeFilteredPayload) の削除 — レビューアの findings を勝手にフィルタして捨てるのは不適切。全 findings を漏れなく record-round に渡すべき。対象: `usecase/src/review_workflow/scope.rs` の `ScopeFilteredPayload` および `codex_local.rs` での適用箇所
+- [ ] **RVW-09** (MEDIUM): review invalidation のスコープ限定 — code_hash が review.json トップレベルに1つだけ存在し、hash mismatch 時に全グループがリセットされる。影響を受けたグループのみ invalidation すべき。対象: `domain/src/review/state.rs` の `invalidate()` メソッド
 
 ---
 
