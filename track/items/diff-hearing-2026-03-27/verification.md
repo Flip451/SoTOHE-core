@@ -17,12 +17,16 @@
 
 ## Result
 
-（実装完了後に記入）
+SKILL.md の Phase 1 Step 3-4 および Phase 3 Step 3 を差分ヒアリング対応に改修。
+- Step 3: 既存 spec.json 検出時に信号機評価で 4 カテゴリ分類（Blue/Yellow/Red/欠落）
+- Step 4: 差分ヒアリングモード（🟡🔴❌のみ質問）と全体ヒアリングモード（フォールバック）の条件分岐
+- Phase 3 Step 3: 差分ヒアリング実施時の提示形式（信頼性サマリー付き）と新規仕様の提示形式を分離
+- cargo make ci 全チェック通過（1530 tests, fmt, clippy, deny, verify-*）
 
 ## Open Issues
 
-（なし）
+なし
 
 ## verified_at
 
-（実装完了後に記入）
+2026-03-27
