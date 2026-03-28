@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "TSUMIKI-03 差分ヒアリング",
+  "goal": [
+    "/track:plan skill のヒアリングプロセスに差分ヒアリングを導入し、既存コンテキストから不足・曖昧な情報のみをユーザーに質問する。",
+    "毎回ゼロから聞き直す無駄を省き、仕様品質に直結する gap に集中する。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "SKILL.md Phase 1 Step 3 の改修 — 既存 spec.json 検出時にシグナル分類を実施",
+        "sources": [
+          "Tsumiki kairo-requirements Step 4",
+          "TODO-PLAN 2-5"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "SKILL.md Phase 1 Step 4 の改修 — 固定質問リストから差分ヒアリングフローへの置換",
+        "sources": [
+          "Tsumiki kairo-requirements Step 4",
+          "TODO-PLAN-v4-draft: plan skill プロンプト変更"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "SKILL.md Phase 3 Step 3 の改修 — 差分ヒアリング結果の提示形式追加",
+        "sources": [
+          "inference — Tsumiki の interview-record.md パターンを /track:plan の提示ステップに適用"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "既存 spec.json がない場合は従来の全体ヒアリングにフォールバック",
+        "sources": [
+          "inference — 後方互換性の確保"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "Rust コード（CLI コマンド、domain 型、usecase）の追加・変更",
+        "sources": [
+          "TODO-PLAN-v4-draft: plan skill プロンプト変更"
+        ]
+      },
+      {
+        "text": "spec.json スキーマの変更",
+        "sources": [
+          "inference — 既存の ConfidenceSignal + source tags で差分判定が可能"
+        ]
+      },
+      {
+        "text": "Tsumiki の interview-record.md 相当の専用ファイル生成",
+        "sources": [
+          "inference — S 難易度のスコープ制約、verification.md で代替可能"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "既存の信号機システム（ConfidenceSignal, SignalBasis, source tags）を差分判定の基盤とすること",
+      "sources": [
+        "convention — source-attribution.md",
+        "ADR 2026-03-23-1010-three-level-signals"
+      ]
+    },
+    {
+      "text": "Tsumiki のオリジナル概念（既存ドキュメントとの差分のみを聞く）に忠実であること",
+      "sources": [
+        "Tsumiki kairo-requirements Step 4",
+        "tsumiki-analysis-2026-03-17.md"
+      ]
+    },
+    {
+      "text": "SKILL.md の変更のみで完結すること（難易度 S）",
+      "sources": [
+        "TODO-PLAN-v4-draft: plan skill プロンプト変更"
+      ]
+    }
+  ],
+  "domain_states": [],
+  "acceptance_criteria": [
+    {
+      "text": "既存 spec.json がある track で /track:plan を実行すると、Blue signal の項目はスキップされ Yellow/Red/欠落の項目のみ質問される",
+      "sources": [
+        "Tsumiki kairo-requirements Step 4"
+      ],
+      "task_refs": [
+        "T001",
+        "T002"
+      ]
+    },
+    {
+      "text": "既存 spec.json がない新規 track で /track:plan を実行すると、従来通りの全体ヒアリングが行われる",
+      "sources": [
+        "inference — 後方互換性"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "Phase 3 の提示で、確定済み項目と新規確認項目が明確に区別される",
+      "sources": [
+        "inference — Tsumiki の interview-record.md の可視化パターンを応用"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "cargo make ci が全チェック通過する",
+      "sources": [
+        "convention — task-completion-flow.md"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "project-docs/conventions/source-attribution.md"
+  ],
+  "signals": {
+    "blue": 8,
+    "yellow": 6,
+    "red": 0
+  }
+}
