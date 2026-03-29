@@ -76,7 +76,7 @@
   },
   "review": {
     "base_ref": "main",
-    "code_hash": "rvw1:sha256:79b729b607cc38a2cbd91b0c04c3dd6e312ada4e6dbfb64f375fc48b94e92446",
+    "code_hash": "rvw1:sha256:53c161bff0031cea823d2de39284c62487f7db42487b68f418f75183b0da8325",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -85,55 +85,37 @@
         {
           "concerns": [],
           "groups": [
-            "other"
+            "domain"
           ],
           "round": 1,
           "round_type": "fast",
-          "timestamp": "2026-03-29T12:01:45Z"
+          "timestamp": "2026-03-29T23:00:36Z"
         },
         {
           "concerns": [],
           "groups": [
-            "other"
+            "domain"
           ],
           "round": 1,
           "round_type": "final",
-          "timestamp": "2026-03-29T12:01:52Z"
-        },
-        {
-          "concerns": [],
-          "groups": [
-            "other"
-          ],
-          "round": 2,
-          "round_type": "fast",
-          "timestamp": "2026-03-29T12:06:47Z"
-        },
-        {
-          "concerns": [],
-          "groups": [
-            "other"
-          ],
-          "round": 2,
-          "round_type": "final",
-          "timestamp": "2026-03-29T12:06:53Z"
+          "timestamp": "2026-03-29T23:03:31Z"
         }
       ],
       "threshold": 3
     },
     "expected_groups": [
-      "other"
+      "domain"
     ],
     "groups": {
-      "other": {
+      "domain": {
         "fast": {
-          "round": 2,
-          "timestamp": "2026-03-29T12:06:47Z",
+          "round": 1,
+          "timestamp": "2026-03-29T23:00:36Z",
           "verdict": "zero_findings"
         },
         "final": {
-          "round": 2,
-          "timestamp": "2026-03-29T12:06:53Z",
+          "round": 1,
+          "timestamp": "2026-03-29T23:03:31Z",
           "verdict": "zero_findings"
         }
       }
@@ -185,5 +167,5 @@
     }
   ],
   "title": "review.json 分離 + group 独立レビュー + per-group hash",
-  "updated_at": "2026-03-29T12:06:53Z"
+  "updated_at": "2026-03-29T23:03:31Z"
 }

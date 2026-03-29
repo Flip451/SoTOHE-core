@@ -87,6 +87,7 @@ For each non-empty group, build a briefing file at `tmp/reviewer-runtime/briefin
 - Proper error propagation (thiserror, #[source], #[from])
 - Architecture layer dependency direction (domain ← usecase ← infrastructure ← cli)
 - Idiomatic Rust (naming, patterns)
+- Enum-first: variant-dependent data must use enum variants, not struct + runtime validation (see .claude/rules/04-coding-principles.md § Enum-first)
 - Test coverage gaps
 - Security (input validation, error information leakage)
 

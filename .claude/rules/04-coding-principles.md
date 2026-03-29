@@ -2,7 +2,9 @@
 
 ## Make Illegal States Unrepresentable
 
-型システムで不正な状態を表現不可能にする：
+型システムで不正な状態を表現不可能にする。
+
+### Newtype パターン：プリミティブ値の制約
 
 ```rust
 // Bad: 空文字を許す
@@ -17,6 +19,47 @@ impl Email {
     }
 }
 ```
+
+### Enum-first パターン：バリアント依存データは enum で表現する
+
+状態ごとに持つべきデータが異なる場合、**struct + runtime validation ではなく enum の variant にデータを持たせる**。
+これにより不正な組み合わせがコンパイル時に排除される。
+
+```rust
+// Bad: struct + runtime validation — 不正状態がメモリ上に存在しうる
+struct Verdict {
+    kind: VerdictKind,           // ZeroFindings or FindingsRemain
+    findings: Vec<Finding>,      // ZeroFindings なのに findings が入りうる
+}
+impl Verdict {
+    fn new(kind: VerdictKind, findings: Vec<Finding>) -> Result<Self, Error> {
+        if kind == VerdictKind::ZeroFindings && !findings.is_empty() {
+            return Err(Error::Inconsistent); // runtime でしか防げない
+        }
+        Ok(Self { kind, findings })
+    }
+}
+
+// Good: enum — 不正状態が構造的に不可能
+enum Verdict {
+    ZeroFindings,                       // findings を持てない
+    FindingsRemain(Vec<Finding>),       // findings が必ずある
+}
+```
+
+**判断基準：**
+
+| パターン | 対処 |
+|---|---|
+| 状態ごとに持つデータが違う | → enum の variant にデータを持たせる |
+| struct + `Option<T>` で「この状態では None」 | → enum を検討（Option の None が特定状態と 1:1 対応なら enum が適切） |
+| struct + constructor validation で cross-field 制約 | → enum で構造的に排除できないか検討 |
+| 型で表現できない制約（例: Vec の non-empty） | → constructor validation は OK（型レベルの限界） |
+
+**プロジェクト内の良い例：**
+- `CodeHash`: `NotRecorded` | `Pending` | `Computed(String)` — 3 状態を struct + Option で表現せず enum
+- `ReviewGroupState`: `NoRounds` | `FastOnly(R)` | `FinalOnly(R)` | `BothRounds { fast, final }` — 組み合わせごとに variant
+- `GroupRoundVerdict`: `ZeroFindings` | `FindingsRemain(Vec<StoredFinding>)` — verdict と findings の不整合を構造的に排除
 
 ## Error Handling: Result and ? Operator
 

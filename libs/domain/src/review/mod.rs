@@ -4,6 +4,7 @@
 //! `NotStarted` → `FastPassed` → `Approved`, with `Invalidated` on code changes.
 
 pub mod concern;
+pub mod cycle;
 pub mod error;
 pub mod escalation;
 pub mod state;
@@ -13,6 +14,10 @@ pub mod types;
 mod tests;
 
 pub use concern::{ReviewConcern, ReviewConcernStreak, ReviewCycleSummary, file_path_to_concern};
+pub use cycle::{
+    CycleError, CycleGroupState, GroupRound, GroupRoundOutcome, GroupRoundVerdict,
+    NonEmptyFindings, ReviewCycle, ReviewJson, ReviewStalenessReason, StoredFinding,
+};
 pub use error::ReviewError;
 pub use escalation::{
     EscalationPhase, ReviewEscalationBlock, ReviewEscalationDecision, ReviewEscalationResolution,
