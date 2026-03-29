@@ -108,7 +108,7 @@
     "status": "invalidated"
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "blocked",
   "status_override": {
     "reason": "superseded by upcoming review.json / per-group review-state architecture track; this track is frozen and will not pursue further review-cycle convergence",
     "status": "blocked"

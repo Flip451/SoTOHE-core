@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Superseded by 2026-03-29-0947-review-json-per-group-review-state.md
 
 ## Context
 
