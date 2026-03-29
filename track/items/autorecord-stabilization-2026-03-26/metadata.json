@@ -15,7 +15,11 @@
         "task_ids": [
           "T001",
           "T002",
-          "T003"
+          "T003",
+          "T015",
+          "T016",
+          "T017",
+          "T018"
         ],
         "title": "Review Scope Policy 設定"
       },
@@ -50,9 +54,9 @@
       },
       {
         "description": [
-          "CodeHash::Pending の使用停止。",
-          "StoredReviewHash (Legacy/ReviewScopeV1) で hash version を判別。",
-          "legacy hash は check_commit_ready で明確な migration error を返す。"
+          "新規記録では CodeHash::Pending を使わず、rvw1:sha256:<hex> の Computed hash を使う。",
+          "CodeHash::computed で rvw1:sha256: format を strict validation。computed_unchecked で codec 用。",
+          "legacy hash は check_commit_ready で StaleCodeHash として拒否。"
         ],
         "id": "S4",
         "task_ids": [
@@ -70,7 +74,8 @@
           "T011",
           "T012",
           "T013",
-          "T014"
+          "T014",
+          "T019"
         ],
         "title": "テスト + Legacy 削除"
       }
@@ -78,84 +83,133 @@
     "summary": [
       "review hash を index 全体の tree hash から review-scope manifest hash に置き換える。",
       "track/review-scope.json で hash スコープポリシーを設定ファイル駆動にし、プロジェクト構造に依存しない汎用設計にする。",
-      "worktree から直接読むことで未ステージ問題を解消し、review.json を scope 外にすることで並列レビュー干渉を解消する。",
-      "stored hash format を rvw1:sha256:<hex> に version 付けし、legacy hash は migration error として検出する。"
+      "worktree から直接読むことで未ステージ問題を解消し、metadata.json.review サブツリーを normalize で除外することで並列レビュー干渉を解消する。",
+      "stored hash format を rvw1:sha256:<hex> に version 付けし、legacy / non-rvw1 hash は stale code hash として検出する。"
     ]
   },
+  "review": {
+    "escalation": {
+      "last_resolution": {
+        "blocked_concerns": [
+          "correctness"
+        ],
+        "decision": "continue_self_implementation",
+        "reinvention_check_ref": "tmp/reviewer-runtime/briefing-domain.md",
+        "resolved_at": "2026-03-28T02:48:36Z",
+        "summary": "All infra findings fixed R5-R9",
+        "workspace_search_ref": "tmp/reviewer-runtime/briefing-infra.md"
+      },
+      "phase": {
+        "type": "clear"
+      },
+      "threshold": 3
+    },
+    "groups": {},
+    "status": "invalidated"
+  },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
+  "status_override": {
+    "reason": "superseded by upcoming review.json / per-group review-state architecture track; this track is frozen and will not pursue further review-cycle convergence",
+    "status": "blocked"
+  },
   "tasks": [
     {
       "description": "track/review-scope.json スキーマ定義 + 初期設定ファイル作成（review_operational, planning_only, other_track, normalize セクション）",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Infrastructure: ReviewScopePolicyConfig serde 型 + review-scope.json ローダー",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Infrastructure: ReviewScopePolicy — config + track_id から構築、glob パターンによるパス分類 (classify/includes)",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Infrastructure: collect_review_scope() — git diff (merge-base + staged + unstaged + untracked) からスコープ内パスを収集",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Infrastructure: normalize_track_file_for_hash() — metadata.json の volatile フィールド正規化（設定ファイル駆動）",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Infrastructure: build_review_scope_manifest() + hash_review_scope() — manifest 構築 → SHA-256 → rvw1:sha256:<hex> 形式",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Usecase: GitHasher trait を review_hash(ReviewHashInput) に更新 + normalized_hash 互換 shim",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Infrastructure: SystemGitHasher に review_hash() を実装（collect → classify → read worktree → normalize → manifest → sha256）",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Infrastructure: RecordRoundProtocolImpl を single-phase に簡素化（Pending 不要、hash 1 回計算のみ）",
       "id": "T009",
-      "status": "todo"
+      "status": "done"
     },
     {
-      "description": "Domain: CodeHash::Pending の使用停止 + StoredReviewHash (Legacy/ReviewScopeV1) による legacy 判別",
+      "description": "Domain: 新規記録では CodeHash::Pending を使わず、CodeHash::computed rvw1 validation + computed_unchecked for codec を使う",
       "id": "T010",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "テスト: ReviewScopePolicy 分類テスト（TrackContent, Implementation, ReviewOperational, PlanningOnly, OtherTrack）",
       "id": "T011",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "テスト: review_hash contract テスト — 未ステージ成功、review.json 変更で hash 不変、無関係ファイル変更で hash 不変、実装ファイル変更で hash 変化",
       "id": "T012",
-      "status": "todo"
+      "status": "done"
     },
     {
-      "description": "テスト: legacy hash 検出 + migration error メッセージの検証",
+      "description": "テスト: legacy / non-rvw1 hash が stale code hash として拒否されることを検証",
       "id": "T013",
-      "status": "todo"
+      "status": "done"
     },
     {
-      "description": "Legacy 削除: index_tree_hash_normalizing を production path から除去 + record_round_with_pending の非推奨化",
+      "description": "Legacy 経路整理: index_tree_hash_normalizing + record_round_with_pending を production review path から除去",
       "id": "T014",
-      "status": "todo"
+      "status": "done"
+    },
+    {
+      "description": "review cycle の収束: metadata.json.review hash 除外の仕様変更（parallel auto-record 安全化）+ cross-group round alignment 制約撤廃 + verification.md / metadata 整合の最終更新。2026-03-29 に superseded by new review-state architecture として凍結し、残課題は後継トラックへ移管",
+      "id": "T019",
+      "status": "in_progress"
+    },
+    {
+      "description": "check_approved review-scope 整合: base_ref configurable, lazy hash, stale code hash invalidation 永続化",
+      "id": "T015",
+      "status": "done"
+    },
+    {
+      "description": "is_planning_only_path review-scope 整合: track_id パラメータ, review-operational 判定",
+      "id": "T016",
+      "status": "done"
+    },
+    {
+      "description": "CodeHash::computed rvw1 validation + computed_unchecked + NotRecorded bypass 修正",
+      "id": "T017",
+      "status": "done"
+    },
+    {
+      "description": "infrastructure hardening: discover_from, symlink, no-renames, rehash, canonicalize",
+      "id": "T018",
+      "status": "done"
     }
   ],
   "title": "review hash スコープ再設計 — review-scope manifest hash + 設定ファイル駆動ポリシー",
-  "updated_at": "2026-03-28T00:48:46Z"
+  "updated_at": "2026-03-29T07:12:23Z"
 }
