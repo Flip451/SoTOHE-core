@@ -192,6 +192,57 @@ pub fn check_cycle_staleness_any(
 }
 
 // ---------------------------------------------------------------------------
+// Check approved
+// ---------------------------------------------------------------------------
+
+/// Structured result for review-cycle approval checks.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CheckCycleApprovedResult {
+    /// All groups have approved fast + final rounds with current hashes.
+    Approved,
+    /// Not yet approved, with the reason.
+    NotApproved(CheckCycleApprovedReason),
+}
+
+/// Why the current review cycle is not approved.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CheckCycleApprovedReason {
+    /// No review cycle exists (review.json absent or empty).
+    NoCycle,
+    /// Current cycle is stale (policy/partition/hash changed).
+    Stale(ReviewStalenessReason),
+    /// Cycle exists and is fresh, but not all groups meet approval requirements.
+    ApprovalRequirementsNotMet,
+}
+
+/// Checks whether the current review cycle is fully approved.
+///
+/// 1. Fail-closed on NoCycle.
+/// 2. Check staleness — stale cycle means old rounds don't count.
+/// 3. Delegate to domain `all_groups_approved` for per-group fast+final check.
+#[must_use]
+pub fn check_cycle_approved(
+    review: &ReviewJson,
+    current: &ReviewPartitionSnapshot,
+    current_group_hashes: &std::collections::BTreeMap<ReviewGroupName, String>,
+) -> CheckCycleApprovedResult {
+    let Some(_cycle) = review.current_cycle() else {
+        return CheckCycleApprovedResult::NotApproved(CheckCycleApprovedReason::NoCycle);
+    };
+
+    if let Some(reason) = check_cycle_staleness_any(review, current, current_group_hashes) {
+        return CheckCycleApprovedResult::NotApproved(CheckCycleApprovedReason::Stale(reason));
+    }
+
+    // Safety: we just confirmed current_cycle() is Some
+    if review.current_cycle().is_some_and(|c| c.all_groups_approved(current_group_hashes)) {
+        CheckCycleApprovedResult::Approved
+    } else {
+        CheckCycleApprovedResult::NotApproved(CheckCycleApprovedReason::ApprovalRequirementsNotMet)
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -522,6 +573,106 @@ mod tests {
         assert_eq!(
             review.current_cycle().unwrap().group(&grn("domain")).unwrap().rounds().len(),
             1
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // check_cycle_approved tests
+    // -----------------------------------------------------------------------
+
+    fn fully_approved_review() -> (ReviewJson, ReviewPartitionSnapshot) {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        // domain already has fast zero_findings from review_with_cycle
+        // Add final for domain
+        record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Final,
+                timestamp: ts("2026-03-30T10:02:00Z"),
+                outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
+                group_hash: "hash-current".into(),
+            },
+        )
+        .unwrap();
+        // Add fast + final for other
+        record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("other"),
+                round_type: RoundType::Fast,
+                timestamp: ts("2026-03-30T10:03:00Z"),
+                outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
+                group_hash: "hash-other".into(),
+            },
+        )
+        .unwrap();
+        record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("other"),
+                round_type: RoundType::Final,
+                timestamp: ts("2026-03-30T10:04:00Z"),
+                outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
+                group_hash: "hash-other".into(),
+            },
+        )
+        .unwrap();
+        let snapshot = make_snapshot("sha256:b", "sha256:e");
+        (review, snapshot)
+    }
+
+    #[test]
+    fn test_check_approved_returns_approved() {
+        let (review, snapshot) = fully_approved_review();
+        let mut hashes = BTreeMap::new();
+        hashes.insert(grn("domain"), "hash-current".into());
+        hashes.insert(grn("other"), "hash-other".into());
+
+        let result = check_cycle_approved(&review, &snapshot, &hashes);
+        assert_eq!(result, CheckCycleApprovedResult::Approved);
+    }
+
+    #[test]
+    fn test_check_approved_no_cycle() {
+        let review = ReviewJson::new();
+        let snapshot = make_snapshot("sha256:b", "sha256:e");
+        let result = check_cycle_approved(&review, &snapshot, &BTreeMap::new());
+        assert_eq!(
+            result,
+            CheckCycleApprovedResult::NotApproved(CheckCycleApprovedReason::NoCycle)
+        );
+    }
+
+    #[test]
+    fn test_check_approved_stale_hash() {
+        let (review, _) = fully_approved_review();
+        // Use different base hash to trigger PolicyChanged
+        let snapshot = make_snapshot("sha256:different", "sha256:e");
+        let result = check_cycle_approved(&review, &snapshot, &BTreeMap::new());
+        assert_eq!(
+            result,
+            CheckCycleApprovedResult::NotApproved(CheckCycleApprovedReason::Stale(
+                ReviewStalenessReason::PolicyChanged
+            ))
+        );
+    }
+
+    #[test]
+    fn test_check_approved_missing_final() {
+        // review_with_cycle only has fast for domain, no final
+        let review = review_with_cycle("sha256:b", "sha256:e");
+        let snapshot = make_snapshot("sha256:b", "sha256:e");
+        let mut hashes = BTreeMap::new();
+        hashes.insert(grn("domain"), "hash-current".into());
+        hashes.insert(grn("other"), "".into());
+
+        let result = check_cycle_approved(&review, &snapshot, &hashes);
+        assert_eq!(
+            result,
+            CheckCycleApprovedResult::NotApproved(
+                CheckCycleApprovedReason::ApprovalRequirementsNotMet
+            )
         );
     }
 }
