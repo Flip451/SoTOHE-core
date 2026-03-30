@@ -1,6 +1,6 @@
 //! Atomic file write utility using tmp-in-same-dir + fsync + rename + parent fsync.
 
-use std::fs;
+use std::fs::{self, OpenOptions};
 use std::io::Write;
 use std::path::Path;
 
@@ -43,8 +43,8 @@ fn write_and_rename(
     parent: &Path,
     content: &[u8],
 ) -> std::io::Result<()> {
-    // Step 1: Write content to temp file.
-    let mut file = fs::File::create(tmp_path)?;
+    // Step 1: Write content to temp file (create_new prevents following pre-existing symlinks).
+    let mut file = OpenOptions::new().write(true).create_new(true).open(tmp_path)?;
     file.write_all(content)?;
 
     // Step 2: Fsync the file to ensure content is on disk.

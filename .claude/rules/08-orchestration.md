@@ -49,6 +49,12 @@ Operational split:
 - `docs/architecture-rules.json`: machine-readable layer dependency source of truth for `deny.toml` and `scripts/check_layers.py`
 - `.claude/agent-profiles.json`: capability-to-provider mapping source of truth
 
+## Planner Briefing Requirements (Provider-Agnostic)
+
+All planner briefings (regardless of provider — Codex, Claude, or future providers) must
+reference `.claude/rules/04-coding-principles.md` for type design patterns.
+The enum-first / typestate / hybrid decision table in that file is the source of truth.
+
 ## Delegation Rules
 
 Use the minimum capable capability first, then resolve it via `.claude/agent-profiles.json`.

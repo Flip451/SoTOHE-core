@@ -2,7 +2,7 @@
 
 ## ステータス
 
-承認済み（ADR-2026-03-24-1200 の実装方針を置き換え）
+Superseded by 2026-03-29-0947-review-json-per-group-review-state.md（ADR-2026-03-24-1200 の実装方針を置き換え → さらに 2026-03-29-0947 で per-group review model に発展）
 
 ## 背景
 

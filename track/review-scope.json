@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "review_operational": [
+    "track/items/<track-id>/review.json"
+  ],
+  "planning_only": [
+    ".claude/docs/**/*.md",
+    "docs/**/*.md",
+    "docs/**/*.json",
+    "knowledge/**/*.md",
+    "track/registry.md",
+    "track/tech-stack.md",
+    "track/workflow.md",
+    "DEVELOPER_AI_WORKFLOW.md",
+    "README.md",
+    "START_HERE_HUMAN.md",
+    "TRACK_TRACEABILITY.md"
+  ],
+  "other_track": [
+    "track/items/<other-track>/**",
+    "track/archive/**"
+  ],
+  "normalize": {
+    "**/metadata.json": {
+      "remove_fields": ["review"],
+      "fixed_fields": {
+        "updated_at": "1970-01-01T00:00:00Z"
+      }
+    }
+  }
+}

@@ -1,6 +1,8 @@
 //! Pure workflow rules for local reviewer verdict normalization.
 
 mod concern;
+pub mod cycle;
+pub mod groups;
 pub mod scope;
 pub mod usecases;
 mod verdict;

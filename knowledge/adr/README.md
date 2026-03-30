@@ -96,3 +96,6 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Two-stage signal architecture](2026-03-23-1020-two-stage-signals.md) | Accepted | 2026-03-23 |
 | [DiffScope と scope filtering は usecase 層に配置](2026-03-25-0000-diff-scope-in-usecase.md) | Accepted | 2026-03-25 |
 | [パス正規化: exact match + fail-closed](2026-03-25-0010-path-normalization-exact-match.md) | Accepted | 2026-03-25 |
+| [Review state trust model と metadata.json 自己参照問題](2026-03-24-1200-review-state-trust-model.md) | Superseded | 2026-03-24 |
+| [FsTrackStore + review.json: 関心事の分離](2026-03-25-2125-review-json-separation-of-concerns.md) | Superseded | 2026-03-25 |
+| [review.json 分離 + グループ独立レビュー状態](2026-03-29-0947-review-json-per-group-review-state.md) | Accepted | 2026-03-29 |

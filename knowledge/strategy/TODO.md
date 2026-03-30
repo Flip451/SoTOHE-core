@@ -266,6 +266,8 @@
   - **完了**: ShellParser port trait を domain に定義し、conch-parser 実装を infrastructure に移動。domain の I/O purity CI ゲートで今後の混入を防止。
   - **完了日**: 2026-03-23 (PR #54)
 
+- [x] ~~**INF-21** (HIGH): TODO ID 自動採番~~ ✅ `/todo-add` スキルとして実装（`.claude/commands/todo/add.md`）。既存最大 ID を grep で自動取得し次番号を付与。CI ゲートは費用対効果から見送り（発生頻度低、影響小）。2026-03-28
+
 ---
 
 ## G. ワークフロー・TDD (WF)
@@ -365,7 +367,7 @@
 
 ### G-3a2. ローカルレビュー整合性
 
-- [ ] **WF-43** (MEDIUM): `record-round` に渡す verdict の虚偽申告を検出できない
+- [ ] **WF-61** (MEDIUM): `record-round` に渡す verdict の虚偽申告を検出できない
   - **根拠** (2026-03-24 CC-SDD-01 review): LLM が reviewer session log の実際の verdict と異なる値を `record-round` に渡した場合、domain は検出できない。`check-approved` は `Approved` を返してしまう
   - **提案**: `record-round` が reviewer session log のパス（`tmp/reviewer-runtime/codex-session-*.log`）を受け取り、log 末尾の JSON verdict を独自にパースして、渡された verdict と一致するか検証する（verdict attestation）
   - **緩和策**: 現在は `check-approved` の code hash 検証 + `/track:review` skill の Step 4.3 (Review state guard verification) で間接的に防止
@@ -421,7 +423,7 @@
 
 - [ ] **WF-36** (HIGH): Review Escalation Threshold の機構化 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4
 - [x] ~~**WF-43** (CRITICAL): `record-round` → `check-approved` の code_hash 自己参照循環~~ ✅ 修正済み (PR #38)
-- [ ] **WF-40** (MEDIUM): `ReviewState::record_round` が Approved→Fast findings_remain で降格しない → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4
+- [ ] **WF-62** (MEDIUM): `ReviewState::record_round` が Approved→Fast findings_remain で降格しない → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4 (旧 WF-40)
 - [ ] **WF-41** (LOW): `review_from_document` が偽の Fast ラウンドを合成 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4
 - [ ] **WF-38** (LOW): frontmatter パーサーの duplicate key 未検出 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §3
 - [ ] **WF-39** (MEDIUM): `/track:catchup` の責務分割 — bootstrap と briefing の分離 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4
@@ -429,7 +431,7 @@
 - [x] ~~**WF-54** (MEDIUM): `track-commit-message` の review guard が planning artifacts 初回コミットをブロックする~~ ✅ done (PR #46, ci-guardrails-phase15-2026-03-20)
   - **対応**: (B) を採用。`/track:plan` が metadata.json 作成時に review state `{status: "not_started", groups: {}}` を含める。`check-approved` が `NotStarted && groups.is_empty()` を許可（初回状態のみ、降格後は不可）
 
-- [ ] **WF-55** (HIGH): 実装フェーズでの設計判断エスカレーションフロー未定義
+- [ ] **WF-65** (HIGH): 実装フェーズでの設計判断エスカレーションフロー未定義
   - **課題**: 実装者が spec/ADR に記載のない設計判断を独断で追加し、レビューで初めて発覚する（例: `FinalRequiresFastPassed` 制約）。未承認の制約がドメイン層に入り品質が低下
   - **提案**: 実装中に仕様外の設計判断が必要になった場合、実装を一時停止して設計フェーズに戻り spec.md/ADR を更新するエスカレーションフローを `/track:implement` と `track/workflow.md` に定義する。判断基準: (1) 新しい enum variant / error type の追加、(2) 新しい状態遷移制約の追加、(3) 新しい port/trait の追加 — これらは実装者の裁量ではなく設計書への反映が必要
   - **根拠**: review-port-separation track で `FinalRequiresFastPassed` が ADR/spec に記載なく実装に入り、後から除去が必要になった事例
@@ -453,6 +455,8 @@
   - **課題**: `index_tree_hash_normalizing` が git index 全体の tree hash を計算するため、(1) 未ステージファイルで失敗、(2) 並列レビューグループ間で干渉、(3) 無関係ファイル変更で invalidate
   - **対応**: ADR-2026-03-26-0000 で review-scope manifest hash への移行を決定。`autorecord-stabilization-2026-03-26` トラックで実装予定
   - **根拠**: tamper-proof-review 計画レビュー中に繰り返し発生（2026-03-26〜27）
+
+- [ ] **WF-60** (HIGH): 設計⇆実装の自動遷移 — reviewer finding が spec スコープ外を指摘した場合に、自動で planner に設計相談を escalation し、ADR/spec 更新後に実装に戻るフロー。autorecord-stabilization トラックでは spec 外の修正が大量に蓄積し事後的に spec を更新する事態になった。`/track:review` スキル内に scope guard + auto-escalation to planner を組み込み、(1) finding が spec の in_scope/out_of_scope に該当するか自動判定、(2) scope 外 → planner に設計相談を自動起動、(3) planner が spec 更新 or 別トラック化を判断、(4) spec 更新後に実装に復帰。手動介入なしに設計と実装のスコープ整合性を維持する仕組み
 
 ---
 
@@ -571,7 +575,7 @@
 - [ ] **`/track:hotfix` コマンド** (MEDIUM) — ドキュメントのみ・1 ファイル修正などの軽微な変更にレビューサイクルをスキップして直接コミット可能にする。対象ファイルパターン（`*.md`, `LICENSE` 等）で許可範囲を制限。現状は README 1 行変更でもトラック作成 → レビュー → PR → マージが必要でオーバーヘッドが大きい
 - [ ] **LICENSE ファイル追加** (LOW) — `LICENSE-MIT` + `LICENSE-APACHE` を作成し、全 `Cargo.toml` の `license` フィールドに `MIT OR Apache-2.0` を設定
 - [ ] **TDD 状態マシンの強制** (HIGH) — `metadata.json` の task に `tdd_phase: red|green|refactor` を追加し、`sotp tdd advance` で CI 証拠付きの遷移を強制。Red→Green は CI fail 証拠、Green→Refactor は CI pass 証拠が必要。commit guard は `tdd_required` タスクの `tdd_phase` 完了を検査。→ [詳細](../../tmp/refactoring-plan-2026-03-19.md) §0-7。関連: HARNESS-03, WORKFLOW-04
-- [ ] **Yes/No 承認ダイアログの最小化** — `permissions.allow` に wrapper を事前登録。WF-35 で一部対応済み
+- [ ] **Yes/No 承認ダイアログの最小化** — `permissions.allow` に wrapper を事前登録。WF-35 (FORBIDDEN_ALLOW 緩和) で一部対応済み
 - [ ] **/track:review の reviewer provider 移譲強制** — hook で外部 subprocess 呼び出しを検証。関連: CLAUDE-BP-02, 10-guardrails.md
 - [ ] **track-local-review 出力改善** — verdict JSON を `tmp/reviews/<track-id>/round-<N>.json` に自動保存。関連: RVW-07
 - [ ] **レビュー結果の蓄積** — round 別 JSON 蓄積 + `track-review-history` タスク。関連: RVW-06
@@ -735,11 +739,23 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **RVW-03** (MEDIUM, IN PROGRESS): typed deserialization convention + canonical_modules serde 移行
 - [ ] **RVW-04** (LOW): `syn` crate による `is_inside_test_module` 置き換え + standalone テストファイル除外
 - [ ] **RVW-05** (LOW): `skip_command_launchers` の per-launcher フラグモデリング（RVW-02 で根本解決）
-- [x] ~~**WF-35** (HIGH): FORBIDDEN_ALLOW の読み取り専用コマンド緩和~~ ✅ 修正済み
 - [ ] **RVW-06** (HIGH): metadata.json にレビュー状態統合 + エスカレーション順序強制 + コミットガード
 - [ ] **RVW-07** (HIGH): Codex verdict 抽出の stderr フォールバック + セッションログ保存
 - [ ] **RVW-08** (HIGH): diff-scope filter (ScopeFilteredPayload) の削除 — レビューアの findings を勝手にフィルタして捨てるのは不適切。全 findings を漏れなく record-round に渡すべき。対象: `usecase/src/review_workflow/scope.rs` の `ScopeFilteredPayload` および `codex_local.rs` での適用箇所
 - [ ] **RVW-09** (MEDIUM): review invalidation のスコープ限定 — code_hash が review.json トップレベルに1つだけ存在し、hash mismatch 時に全グループがリセットされる。影響を受けたグループのみ invalidation すべき。対象: `domain/src/review/state.rs` の `invalidate()` メソッド
+- [ ] **RVW-20** (HIGH): ACCEPTED finding の仕組み化 + dispute adjudication — orchestrator が briefing に ACCEPTED リストを自由に手書きして reviewer findings を握り潰すパターンを防止。(1) `sotp review accept-finding` CLI コマンドで accepted findings を metadata.json に SSoT 化、(2) `track-local-review` wrapper が briefing 生成時にストアから ACCEPTED を自動構築（手書き ACCEPTED は無視）、(3) briefing に `ACCEPTED` / `DO NOT re-report` を含む場合に hook で reject。`resolve-escalation` と同様に evidence + 理由を要求する。(4) reviewer と実装者の見解が対立する場合の adjudication フロー — `sotp review dispute` で dispute を記録、evidence（git show, ADR ref, テスト結果）を添付、planner capability または user が裁定、binding decision を metadata.json に保存して reviewer briefing に自動注入。NotebookLM 提案: レビュアーと被レビュー側の対立を調停する裁判所的仕組み
+- [ ] **RVW-21** (MEDIUM): per-group 独立レビュー進行 — 現在 `ReviewState.status` はトラックレベル単一で、全グループの fast 完了を待たないと final に進めない。`ReviewGroupState` に fast_passed/approved を持たせ、track-level status は全グループの aggregate で派生させることで、先に fast 完了したグループを独立に final に回せるようにする。初日（2026-03-18 `5aa94cc`）から全グループ同期が前提の設計。対象: `domain/src/review/state.rs` の `update_status_after_record`、`check_commit_ready`
+- [x] ~~**RVW-22** (MEDIUM): diff_base の review state 永続化~~ ✅ 修正済み (`ReviewState.base_ref` 永続化 + `check_approved` で persisted value を必須化)
+- [x] ~~**RVW-23** (HIGH): `is_planning_only_path` と `review-scope.json` の SSoT 統合~~ ✅ 修正済み (`detect_planning_only` が `ReviewScopePolicy` を `track/review-scope.json` から load して planning-only/review-operational 分類を config-driven に実施。ハードコード allowlist は削除済み)
+- [ ] **RVW-24** (HIGH): `update_status_after_record` の降格ロジック見直し — final round の findings_remain で `Approved` → `FastPassed` に戻し、fast round の findings_remain で `FastPassed`/`Approved` → `NotStarted` に戻す降格が過剰。1 件の finding 修正で全グループ × fast + final のフルサイクルやり直しが発生し、autorecord-stabilization トラックでは 20+ ラウンドの原因になった。review-scope hash が code freshness を保証しているため、status 降格は redundant。RVW-21 (per-group 独立進行) と組み合わせて降格ロジック自体の廃止を検討。導入: `42a667f` (2026-03-20, Phase C/D)。対象: `domain/src/review/state.rs` の `update_status_after_record`
+- [ ] **RVW-25** (HIGH): domain 値オブジェクト徹底 — `CodeHash::Computed(String)` の inner を `ReviewHash` newtype に置換し、rvw1 format を型レベルで保証。`computed_unchecked` も `ReviewHash::new_unchecked` に統一。同様に他の `String` wrapper（Timestamp, TrackId 等）で validation が constructor 以外に散逸していないか監査。`sotp verify domain-purity` に「newtype inner が String のまま」のチェックを追加して CI で検出。対象: `domain/src/review/types.rs`
+- [ ] **RVW-26** (MEDIUM): fast model recurrent false positive 対策 — gpt-5.4-mini が `scope.rs` の bare filename / mid-path traversal を 4 回連続で誤読。briefing にテスト名を明記しても再発。対策案: (1) fast model で同一 finding が N 回連続したら自動 skip して final に escalate、(2) finding の hash を記録し、ソース検証済み false positive を `metadata.json` に保存して briefing に自動注入（RVW-20 と統合）
+- [ ] **RVW-27** (LOW): codec `computed_unchecked` のロード時 format warning — 壊れた `rvw1:sha256:` hash がサイレントにロードされる。意図的設計（legacy 互換）だが、tracing::warn で検出可能にすべきか検討
+- [ ] **RVW-28** (LOW): `check_approved` の single-process 前提の明文化 — コメント追加済みだが、将来 daemon 化した場合の TOCTOU 対策が未設計。daemon 化時に advisory lock または optimistic concurrency control を導入する計画を記録
+- [x] ~~**RVW-29** (CRITICAL): Codex CLI `--full-auto` が `--sandbox read-only` を上書き~~ ✅ 解決: planner/reviewer 両方の wrapper から `--full-auto` を削除。`--sandbox read-only` のみで gpt-5.4 + `--output-schema` が安定動作することを 10/10 テストで確認（2026-03-28）。原因: `--full-auto` は Codex CLI の仕様で `--sandbox workspace-write` を強制するエイリアスであり、後続の `--sandbox read-only` は無視される。exec モードではデフォルトで `approval: never`（自動承認）のため `--full-auto` は不要。
+- [ ] **RVW-30** (HIGH): track-commit-message の add-all 自動実行 or check-approved の worktree/index 差分検出 — RecordRoundProtocolImpl が metadata.json をワークツリーに書くだけで git index を更新しないため、staging 漏れでコミット内容と承認状態が乖離する可能性がある。現状は /track:commit のプロンプト制約で保証しているが、コード上のガードがない。daemon 化や直接 CLI 利用が始まる前に仕組み化すべき
+- [ ] **RVW-31** (HIGH): review state を review.json に分離 + 内部 checksum による tamper detection
+- [ ] **RVW-32** (HIGH): same_round_and_zero_findings 制約の緩和 — 並列レビューで各グループの finding→fix サイクル回数が異なると round 番号が揃わず FastPassed/Approved への昇格がブロックされる。invalidation 時に round 番号がリセットされないことが根本原因。対策案: (1) invalidation 時に全グループの round カウンタをリセット、(2) runtime promotion では round 一致を要求せず verdict のみで判定し reload validation のみ strict に保つ、(3) RVW-31 (review.json 分離) と統合して round 管理を再設計 — (1) review state（status, code_hash, base_ref, expected_groups, groups, escalation）を metadata.json から review.json に移動、(2) review.json は review-operational（hash 対象外）なので並列 auto-record が安全に動作、(3) review.json 内に SHA-256 checksum フィールドを持たせ、record-round が更新時に再計算・check-approved が検証することで metadata tamper detection を維持。review-port-separation + tamper-proof-review の統合後継トラック。review-workflow-fixes-2026-03-18 の metadata tamper detection 契約を checksum ベースに移行する仕様変更を含む
 
 ---
 

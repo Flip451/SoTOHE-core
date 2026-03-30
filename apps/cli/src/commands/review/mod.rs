@@ -567,60 +567,183 @@ fn execute_status(args: &StatusArgs) -> ExitCode {
 }
 
 fn run_status(args: &StatusArgs) -> Result<(), String> {
-    use domain::{ReviewGroupName, TrackId, TrackReader};
+    use domain::{ReviewJsonReader, TrackId, TrackReader};
 
-    let store = infrastructure::track::fs_store::FsTrackStore::new(&args.items_dir);
     let track_id =
         TrackId::try_new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
-    let track = store
+
+    // Verify track exists in metadata.json (fail-closed on orphaned review.json)
+    let store = infrastructure::track::fs_store::FsTrackStore::new(&args.items_dir);
+    let _track = store
         .find(&track_id)
         .map_err(|e| format!("failed to read track: {e}"))?
         .ok_or_else(|| format!("track '{}' not found", track_id.as_ref()))?;
 
-    let review = match track.review() {
-        Some(r) => r,
+    // Read review.json (cycle-based model only — no legacy metadata.json fallback)
+    let json_store = infrastructure::review_json_store::FsReviewJsonStore::new(&args.items_dir);
+    let review_json = json_store
+        .find_review(&track_id)
+        .map_err(|e| format!("failed to read review.json: {e}"))?;
+
+    match review_json {
+        Some(rj) => run_status_review_json(&rj),
         None => {
-            println!("Review:        not configured (no review section in metadata.json)");
+            println!("Review status: NotStarted (no review.json)");
+            Ok(())
+        }
+    }
+}
+
+/// Displays review status from the new cycle-based review.json model.
+fn run_status_review_json(review: &domain::ReviewJson) -> Result<(), String> {
+    use domain::RoundType;
+
+    let cycle = match review.current_cycle() {
+        Some(c) => c,
+        None => {
+            println!("Review status: NoCycle (review.json exists but no cycles)");
             return Ok(());
         }
     };
 
-    println!("Review status: {:?}", review.status());
-    match review.code_hash_raw() {
-        domain::CodeHash::NotRecorded => println!("Code hash:     (not recorded)"),
-        domain::CodeHash::Pending => println!("Code hash:     PENDING (two-phase incomplete)"),
-        domain::CodeHash::Computed(h) => println!("Code hash:     {h}"),
-    }
+    println!("Review source: review.json (cycle-based)");
+    println!("Cycle ID:      {}", cycle.cycle_id());
+    println!("Started at:    {}", cycle.started_at());
+    println!("Base ref:      {}", cycle.base_ref());
+    println!("Policy hash:   {}", cycle.policy_hash());
 
-    let groups = review.groups();
-    if groups.is_empty() {
+    let group_count = cycle.groups().len();
+    if group_count == 0 {
         println!("Groups:        (none)");
     } else {
-        println!("Groups:");
-        let mut sorted_groups: Vec<(&ReviewGroupName, _)> = groups.iter().collect();
-        sorted_groups.sort_by_key(|(name, _)| name.as_ref().to_owned());
+        println!("Groups ({group_count}):");
+        let mut sorted: Vec<_> = cycle.groups().iter().collect();
+        sorted.sort_by_key(|(name, _)| name.to_string());
 
-        for (name, state) in sorted_groups {
-            let fast_status = match state.fast() {
-                Some(r) => format!("round {} — {:?}", r.round(), r.verdict()),
-                None => "(none)".to_string(),
+        for (name, state) in sorted {
+            let round_count = state.rounds().len();
+            let fast_latest = state.latest_round(RoundType::Fast);
+            let final_latest = state.latest_round(RoundType::Final);
+
+            let fast_str = format_round_status(fast_latest);
+            let final_str = format_round_status(final_latest);
+
+            // Check if final comes after latest fast (required for approval)
+            let ordering_ok = state.final_after_latest_fast();
+            let ordering_note = if fast_latest.is_some() && final_latest.is_some() && !ordering_ok {
+                " ⚠ Final must be rerun after latest Fast"
+            } else {
+                ""
             };
-            let final_status = match state.final_round() {
-                Some(r) => format!("round {} — {:?}", r.round(), r.verdict()),
-                None => "(none)".to_string(),
-            };
-            println!("  {name}:");
-            println!("    Fast:  {fast_status}");
-            println!("    Final: {final_status}");
+
+            println!(
+                "  {name} ({round_count} rounds, scope: {} files):{ordering_note}",
+                state.scope().len()
+            );
+            println!("    Fast:  {fast_str}");
+            println!("    Final: {final_str}");
         }
     }
 
-    let escalation = review.escalation();
-    if escalation.is_blocked() {
-        println!("Escalation:    BLOCKED");
-    } else {
-        println!("Escalation:    clear");
+    Ok(())
+}
+
+/// Formats the latest round status for display, distinguishing zero_findings,
+/// findings_remain, and failure outcomes.
+fn format_round_status(round: Option<&domain::GroupRound>) -> String {
+    use domain::GroupRoundOutcome;
+    let Some(r) = round else {
+        return "(none)".to_string();
+    };
+    match r.outcome() {
+        GroupRoundOutcome::Success(verdict) => {
+            if r.is_successful_zero_findings() {
+                format!("zero_findings (hash: {})", truncate_hash(r.hash()))
+            } else {
+                let count = verdict.findings().len();
+                format!("findings_remain ({count} findings, hash: {})", truncate_hash(r.hash()))
+            }
+        }
+        GroupRoundOutcome::Failure { error_message } => {
+            let msg = error_message.as_deref().unwrap_or("unknown error");
+            format!("FAILURE: {msg} (hash: {})", truncate_hash(r.hash()))
+        }
+    }
+}
+
+/// Truncates a hash string for display (first 16 chars + "...").
+fn truncate_hash(hash: &str) -> String {
+    // Use char_indices to avoid panic on multi-byte UTF-8
+    match hash.char_indices().nth(16) {
+        Some((byte_pos, _)) if hash.len() > 20 => format!("{}...", &hash[..byte_pos]),
+        _ => hash.to_owned(),
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod review_json_status_tests {
+    use super::*;
+    use domain::{GroupRound, GroupRoundVerdict, RoundType, StoredFinding, Timestamp};
+
+    fn ts(s: &str) -> Timestamp {
+        Timestamp::new(s).unwrap()
     }
 
-    Ok(())
+    #[test]
+    fn test_format_round_status_none() {
+        assert_eq!(format_round_status(None), "(none)");
+    }
+
+    #[test]
+    fn test_format_round_status_zero_findings() {
+        let round = GroupRound::success(
+            RoundType::Fast,
+            ts("2026-03-30T10:00:00Z"),
+            "short-hash",
+            GroupRoundVerdict::ZeroFindings,
+        )
+        .unwrap();
+        let result = format_round_status(Some(&round));
+        assert!(result.starts_with("zero_findings"));
+        assert!(result.contains("short-hash"));
+    }
+
+    #[test]
+    fn test_format_round_status_findings_remain() {
+        let findings = vec![StoredFinding::new("bug found", None, None, None)];
+        let verdict = GroupRoundVerdict::findings_remain(findings).unwrap();
+        let round = GroupRound::success(RoundType::Final, ts("2026-03-30T10:00:00Z"), "h", verdict)
+            .unwrap();
+        let result = format_round_status(Some(&round));
+        assert!(result.starts_with("findings_remain"));
+        assert!(result.contains("1 findings"));
+    }
+
+    #[test]
+    fn test_format_round_status_failure() {
+        let round = GroupRound::failure(
+            RoundType::Fast,
+            ts("2026-03-30T10:00:00Z"),
+            "h",
+            Some("timeout after 300s".into()),
+        )
+        .unwrap();
+        let result = format_round_status(Some(&round));
+        assert!(result.starts_with("FAILURE"));
+        assert!(result.contains("timeout after 300s"));
+    }
+
+    #[test]
+    fn test_truncate_hash_short() {
+        assert_eq!(truncate_hash("short"), "short");
+    }
+
+    #[test]
+    fn test_truncate_hash_long() {
+        let long = "a".repeat(64);
+        let result = truncate_hash(&long);
+        assert!(result.ends_with("..."));
+        assert_eq!(result.len(), 19); // 16 + "..."
+    }
 }

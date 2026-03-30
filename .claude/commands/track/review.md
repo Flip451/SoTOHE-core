@@ -87,6 +87,8 @@ For each non-empty group, build a briefing file at `tmp/reviewer-runtime/briefin
 - Proper error propagation (thiserror, #[source], #[from])
 - Architecture layer dependency direction (domain ← usecase ← infrastructure ← cli)
 - Idiomatic Rust (naming, patterns)
+- Enum-first: variant-dependent data must use enum variants, not struct + runtime validation (see .claude/rules/04-coding-principles.md § Enum-first)
+- Typestate: state transitions should use typestate pattern where feasible, not status field + runtime checks (see .claude/rules/04-coding-principles.md § Typestate)
 - Test coverage gaps
 - Security (input validation, error information leakage)
 
@@ -294,7 +296,7 @@ others have `findings_remain`:
 
 ### Loop guard
 
-- No fixed round limit for the fast reviewer. Continue fix → review cycles as long as progress is being made.
+- Soft round guideline: if fast reviewer exceeds **5 rounds**, consider whether splitting the remaining work into smaller tasks would be more effective. Continue beyond 5 rounds if each round makes clear progress, but be alert to diminishing returns on large diffs.
 - If the same finding recurs 3 times with no code change addressing it, stop and report to the user.
 - The final full-model confirmation round does not count toward the loop guard.
 - Between rounds, always run `cargo make ci-rust` to ensure fixes don't break the build.

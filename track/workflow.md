@@ -15,6 +15,7 @@
 9. **Layer 強制**: workspace の層依存ルールは `docs/architecture-rules.json` を真実の源泉として常に維持する
 10. **外部長文ガイドの節約参照**: 深い外部指針が必要な時は `docs/external-guides.json` と `docs/EXTERNAL_GUIDES.md` を先に確認し、必要時だけ原文キャッシュを読む
 11. **自己修復優先**: 実装が 3 回以上詰まった時は即 ABORT せず、debug/research フェーズで原因を切り分ける
+12. **レビューサーフェース最小化**: タスク単位でレビュー→コミットする。一括実装後の大量 diff レビューは避ける。レビューコストはコード量の二乗に近似するため（読解量 O(N) × 指摘数 O(N)）、M 分割で O(N^2/M) に削減できる
 
 ## Task Workflow
 
@@ -29,8 +30,9 @@ Specialist capability の実体は `.claude/agent-profiles.json` で決まる。
 5. **実装（Green）**: テストを通す最小限のコードを書く
 6. **リファクタリング**: `cargo make fmt` と `cargo make clippy` を適用する
 7. **詰まりの切り分け**: コンパイルエラーや失敗テストが続く場合は active profile の `debugger` / `researcher` capability と外部ガイド要約を使って debug/research を行う
-8. **品質ゲート**: `cargo make ci` を通す
-9. **コミット**: `/track:commit <message>` を使う
+8. **レビュー**: `reviewer` capability でレビュー。目標 <500 行/レビュー。5 round 超えたらタスク分割を検討する
+9. **品質ゲート**: `cargo make ci` を通す
+10. **コミット**: `/track:commit <message>` を使う
 
 `metadata.json` SSoT のタスク状態遷移や workflow traceability は
 `TRACK_TRACEABILITY.md` を参照する。
