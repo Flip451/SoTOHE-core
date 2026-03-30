@@ -44,6 +44,7 @@ struct CycleDocument {
     cycle_id: String,
     started_at: String,
     base_ref: String,
+    base_policy_hash: String,
     policy_hash: String,
     groups: BTreeMap<String, GroupDocument>,
 }
@@ -157,8 +158,15 @@ fn cycle_from_document(doc: CycleDocument) -> Result<ReviewCycle, ReviewJsonCode
         });
     }
     // Use the validated constructor — review.json from disk is untrusted input.
-    ReviewCycle::new(doc.cycle_id, started_at, doc.base_ref, doc.policy_hash, groups)
-        .map_err(ReviewJsonCodecError::from)
+    ReviewCycle::new(
+        doc.cycle_id,
+        started_at,
+        doc.base_ref,
+        doc.base_policy_hash,
+        doc.policy_hash,
+        groups,
+    )
+    .map_err(ReviewJsonCodecError::from)
 }
 
 fn group_from_document(doc: GroupDocument) -> Result<CycleGroupState, ReviewJsonCodecError> {
@@ -295,6 +303,7 @@ fn cycle_to_document(cycle: &ReviewCycle) -> CycleDocument {
         cycle_id: cycle.cycle_id().to_owned(),
         started_at: cycle.started_at().as_str().to_owned(),
         base_ref: cycle.base_ref().to_owned(),
+        base_policy_hash: cycle.base_policy_hash().to_owned(),
         policy_hash: cycle.policy_hash().to_owned(),
         groups,
     }
@@ -433,6 +442,7 @@ mod tests {
       "cycle_id": "2026-03-29T09:47:00Z",
       "started_at": "2026-03-29T09:47:00Z",
       "base_ref": "main",
+      "base_policy_hash": "sha256:abc123",
       "policy_hash": "sha256:abc123",
       "groups": {
         "domain": {
@@ -502,6 +512,7 @@ mod tests {
     "cycle_id": "c1",
     "started_at": "2026-03-29T09:00:00Z",
     "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
     "policy_hash": "sha256:abc",
     "groups": {
       "other": {
@@ -534,6 +545,7 @@ mod tests {
     "cycle_id": "c1",
     "started_at": "2026-03-29T09:00:00Z",
     "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
     "policy_hash": "sha256:abc",
     "groups": {
       "other": {
@@ -589,6 +601,7 @@ mod tests {
     "cycle_id": "c1",
     "started_at": "2026-03-29T09:00:00Z",
     "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
     "policy_hash": "sha256:abc",
     "groups": {
       "other": {
@@ -619,6 +632,7 @@ mod tests {
     "cycle_id": "c1",
     "started_at": "2026-03-29T09:00:00Z",
     "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
     "policy_hash": "sha256:abc",
     "groups": {
       "other": {
@@ -649,6 +663,7 @@ mod tests {
     "cycle_id": "c1",
     "started_at": "2026-03-29T09:00:00Z",
     "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
     "policy_hash": "sha256:abc",
     "groups": {
       "other": {
@@ -679,6 +694,7 @@ mod tests {
     "cycle_id": "c1",
     "started_at": "2026-03-29T09:00:00Z",
     "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
     "policy_hash": "sha256:abc",
     "groups": {
       "other": {
@@ -709,6 +725,7 @@ mod tests {
     "cycle_id": "c1",
     "started_at": "2026-03-29T09:00:00Z",
     "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
     "policy_hash": "sha256:abc",
     "groups": {
       "other": {
@@ -739,6 +756,7 @@ mod tests {
     "cycle_id": "c1",
     "started_at": "2026-03-29T09:00:00Z",
     "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
     "policy_hash": "sha256:abc",
     "groups": {
       "other": {
@@ -772,6 +790,7 @@ mod tests {
     "cycle_id": "c1",
     "started_at": "2026-03-29T09:00:00Z",
     "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
     "policy_hash": "sha256:abc",
     "groups": {
       "other": {
@@ -805,6 +824,7 @@ mod tests {
     "cycle_id": "c1",
     "started_at": "2026-03-29T09:00:00Z",
     "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
     "policy_hash": "sha256:abc",
     "groups": {
       "other": {
@@ -838,6 +858,7 @@ mod tests {
     "cycle_id": "c1",
     "started_at": "2026-03-29T09:00:00Z",
     "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
     "policy_hash": "sha256:abc",
     "groups": {
       "other": {
@@ -871,6 +892,7 @@ mod tests {
     "cycle_id": "c1",
     "started_at": "2026-03-29T09:00:00Z",
     "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
     "policy_hash": "sha256:abc",
     "groups": {
       "other": {
@@ -904,6 +926,7 @@ mod tests {
     "cycle_id": "c1",
     "started_at": "2026-03-29T09:00:00Z",
     "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
     "policy_hash": "sha256:abc",
     "groups": {
       "domain": {

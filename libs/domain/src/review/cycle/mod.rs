@@ -31,6 +31,9 @@ pub struct ReviewCycle {
     cycle_id: String,
     started_at: Timestamp,
     base_ref: String,
+    /// Hash of the base review-scope.json groups (before per-track override).
+    base_policy_hash: String,
+    /// Hash of the effective (resolved) groups policy after override application.
     policy_hash: String,
     groups: BTreeMap<ReviewGroupName, CycleGroupState>,
 }
@@ -45,6 +48,7 @@ impl ReviewCycle {
         cycle_id: impl Into<String>,
         started_at: Timestamp,
         base_ref: impl Into<String>,
+        base_policy_hash: impl Into<String>,
         policy_hash: impl Into<String>,
         groups: BTreeMap<ReviewGroupName, CycleGroupState>,
     ) -> Result<Self, CycleError> {
@@ -57,6 +61,7 @@ impl ReviewCycle {
             cycle_id: cycle_id.into(),
             started_at,
             base_ref: base_ref.into(),
+            base_policy_hash: base_policy_hash.into(),
             policy_hash: policy_hash.into(),
             groups,
         })
@@ -68,10 +73,11 @@ impl ReviewCycle {
         cycle_id: String,
         started_at: Timestamp,
         base_ref: String,
+        base_policy_hash: String,
         policy_hash: String,
         groups: BTreeMap<ReviewGroupName, CycleGroupState>,
     ) -> Self {
-        Self { cycle_id, started_at, base_ref, policy_hash, groups }
+        Self { cycle_id, started_at, base_ref, base_policy_hash, policy_hash, groups }
     }
 
     /// Returns the cycle ID.
@@ -92,7 +98,13 @@ impl ReviewCycle {
         &self.base_ref
     }
 
-    /// Returns the policy hash frozen at cycle start.
+    /// Returns the base policy hash (from review-scope.json, before override).
+    #[must_use]
+    pub fn base_policy_hash(&self) -> &str {
+        &self.base_policy_hash
+    }
+
+    /// Returns the effective policy hash frozen at cycle start (after override).
     #[must_use]
     pub fn policy_hash(&self) -> &str {
         &self.policy_hash
@@ -164,11 +176,15 @@ impl ReviewCycle {
     pub fn check_group_staleness(
         &self,
         group_name: &ReviewGroupName,
+        current_base_policy_hash: &str,
         current_policy_hash: &str,
         current_group_hash: Option<&str>,
     ) -> Option<ReviewStalenessReason> {
-        if self.policy_hash != current_policy_hash {
+        if self.base_policy_hash != current_base_policy_hash {
             return Some(ReviewStalenessReason::PolicyChanged);
+        }
+        if self.policy_hash != current_policy_hash {
+            return Some(ReviewStalenessReason::PartitionChanged);
         }
         // If the group doesn't exist in this cycle, partition changed
         let group_state = match self.groups.get(group_name) {
@@ -271,10 +287,18 @@ impl ReviewJson {
         cycle_id: impl Into<String>,
         started_at: Timestamp,
         base_ref: impl Into<String>,
+        base_policy_hash: impl Into<String>,
         policy_hash: impl Into<String>,
         groups: BTreeMap<ReviewGroupName, CycleGroupState>,
     ) -> Result<&mut ReviewCycle, CycleError> {
-        let cycle = ReviewCycle::new(cycle_id, started_at, base_ref, policy_hash, groups)?;
+        let cycle = ReviewCycle::new(
+            cycle_id,
+            started_at,
+            base_ref,
+            base_policy_hash,
+            policy_hash,
+            groups,
+        )?;
         self.cycles.push(cycle);
         self.cycles
             .last_mut()
@@ -339,6 +363,7 @@ mod tests {
             ts("2026-03-29T09:47:00Z"),
             "main",
             "sha256:abc123",
+            "sha256:abc123",
             sample_groups(),
         )
         .unwrap();
@@ -354,6 +379,7 @@ mod tests {
             ts("2026-03-29T09:00:00Z"),
             "main",
             "sha256:hash1",
+            "sha256:hash1",
             sample_groups(),
         )
         .unwrap();
@@ -361,6 +387,7 @@ mod tests {
             "cycle-2",
             ts("2026-03-29T10:00:00Z"),
             "main",
+            "sha256:hash2",
             "sha256:hash2",
             sample_groups(),
         )
@@ -374,8 +401,14 @@ mod tests {
         let mut rj = ReviewJson::new();
         let mut groups = BTreeMap::new();
         groups.insert(grn("domain"), CycleGroupState::new(vec![]));
-        let result =
-            rj.start_cycle("cycle-1", ts("2026-03-29T09:00:00Z"), "main", "sha256:abc", groups);
+        let result = rj.start_cycle(
+            "cycle-1",
+            ts("2026-03-29T09:00:00Z"),
+            "main",
+            "sha256:abc",
+            "sha256:abc",
+            groups,
+        );
         assert!(matches!(result, Err(CycleError::MissingOtherGroup)));
     }
 
@@ -400,8 +433,14 @@ mod tests {
     fn test_review_cycle_new_requires_other_group() {
         let mut groups = BTreeMap::new();
         groups.insert(grn("cli"), CycleGroupState::new(vec![]));
-        let result =
-            ReviewCycle::new("cycle-1", ts("2026-03-29T09:00:00Z"), "main", "sha256:abc", groups);
+        let result = ReviewCycle::new(
+            "cycle-1",
+            ts("2026-03-29T09:00:00Z"),
+            "main",
+            "sha256:abc",
+            "sha256:abc",
+            groups,
+        );
         assert!(matches!(result, Err(CycleError::MissingOtherGroup)));
     }
 
@@ -411,6 +450,7 @@ mod tests {
             "2026-03-29T09:47:00Z",
             ts("2026-03-29T09:47:00Z"),
             "main",
+            "sha256:abc123",
             "sha256:abc123",
             sample_groups(),
         )
@@ -428,6 +468,7 @@ mod tests {
             ts("2026-03-29T09:00:00Z"),
             "main",
             "sha256:abc",
+            "sha256:abc",
             sample_groups(),
         )
         .unwrap();
@@ -442,6 +483,7 @@ mod tests {
             "cycle-1",
             ts("2026-03-29T09:00:00Z"),
             "main",
+            "sha256:abc",
             "sha256:abc",
             sample_groups(),
         )
@@ -610,10 +652,12 @@ mod tests {
             ts("2026-03-29T09:00:00Z"),
             "main",
             "sha256:original",
+            "sha256:original",
             sample_groups(),
         )
         .unwrap();
-        let result = cycle.check_group_staleness(&grn("domain"), "sha256:changed", None);
+        let result =
+            cycle.check_group_staleness(&grn("domain"), "sha256:changed", "sha256:original", None);
         assert_eq!(result, Some(ReviewStalenessReason::PolicyChanged));
     }
 
@@ -624,10 +668,12 @@ mod tests {
             ts("2026-03-29T09:00:00Z"),
             "main",
             "sha256:abc",
+            "sha256:abc",
             sample_groups(),
         )
         .unwrap();
-        let result = cycle.check_group_staleness(&grn("new-group"), "sha256:abc", None);
+        let result =
+            cycle.check_group_staleness(&grn("new-group"), "sha256:abc", "sha256:abc", None);
         assert_eq!(result, Some(ReviewStalenessReason::PartitionChanged));
     }
 
@@ -644,9 +690,15 @@ mod tests {
             ts("2026-03-29T09:00:00Z"),
             "main".into(),
             "sha256:abc".into(),
+            "sha256:abc".into(),
             groups,
         );
-        let result = cycle.check_group_staleness(&grn("domain"), "sha256:abc", Some("hash-new"));
+        let result = cycle.check_group_staleness(
+            &grn("domain"),
+            "sha256:abc",
+            "sha256:abc",
+            Some("hash-new"),
+        );
         assert_eq!(result, Some(ReviewStalenessReason::HashMismatch));
     }
 
@@ -663,9 +715,15 @@ mod tests {
             ts("2026-03-29T09:00:00Z"),
             "main".into(),
             "sha256:abc".into(),
+            "sha256:abc".into(),
             groups,
         );
-        let result = cycle.check_group_staleness(&grn("domain"), "sha256:abc", Some("hash-new"));
+        let result = cycle.check_group_staleness(
+            &grn("domain"),
+            "sha256:abc",
+            "sha256:abc",
+            Some("hash-new"),
+        );
         assert_eq!(result, Some(ReviewStalenessReason::HashMismatch));
     }
 
@@ -676,10 +734,11 @@ mod tests {
             ts("2026-03-29T09:00:00Z"),
             "main",
             "sha256:abc",
+            "sha256:abc",
             sample_groups(),
         )
         .unwrap();
-        let result = cycle.check_group_staleness(&grn("domain"), "sha256:abc", None);
+        let result = cycle.check_group_staleness(&grn("domain"), "sha256:abc", "sha256:abc", None);
         assert_eq!(result, Some(ReviewStalenessReason::PartitionChanged));
     }
 
@@ -694,13 +753,16 @@ mod tests {
             ts("2026-03-29T09:00:00Z"),
             "main".into(),
             "sha256:abc".into(),
+            "sha256:abc".into(),
             groups,
         );
         assert!(
-            cycle.check_group_staleness(&grn("domain"), "sha256:abc", Some("hash-b")).is_none()
+            cycle
+                .check_group_staleness(&grn("domain"), "sha256:abc", "sha256:abc", Some("hash-b"))
+                .is_none()
         );
         assert_eq!(
-            cycle.check_group_staleness(&grn("domain"), "sha256:abc", Some("hash-a")),
+            cycle.check_group_staleness(&grn("domain"), "sha256:abc", "sha256:abc", Some("hash-a")),
             Some(ReviewStalenessReason::HashMismatch)
         );
     }
@@ -718,11 +780,17 @@ mod tests {
             ts("2026-03-29T09:00:00Z"),
             "main".into(),
             "sha256:abc".into(),
+            "sha256:abc".into(),
             groups,
         );
         assert!(
             cycle
-                .check_group_staleness(&grn("domain"), "sha256:abc", Some("hash-current"))
+                .check_group_staleness(
+                    &grn("domain"),
+                    "sha256:abc",
+                    "sha256:abc",
+                    Some("hash-current")
+                )
                 .is_none()
         );
     }
@@ -743,6 +811,7 @@ mod tests {
             "cycle-1".into(),
             ts("2026-03-29T09:00:00Z"),
             "main".into(),
+            "sha256:abc".into(),
             "sha256:abc".into(),
             groups,
         );
@@ -781,6 +850,7 @@ mod tests {
             ts("2026-03-29T09:00:00Z"),
             "main".into(),
             "sha256:abc".into(),
+            "sha256:abc".into(),
             groups,
         );
         let mut h = BTreeMap::new();
@@ -805,6 +875,7 @@ mod tests {
             ts("2026-03-29T09:00:00Z"),
             "main".into(),
             "sha256:abc".into(),
+            "sha256:abc".into(),
             groups,
         );
         let mut h = BTreeMap::new();
@@ -824,6 +895,7 @@ mod tests {
             "cycle-1".into(),
             ts("2026-03-29T09:00:00Z"),
             "main".into(),
+            "sha256:abc".into(),
             "sha256:abc".into(),
             groups,
         );
@@ -846,6 +918,7 @@ mod tests {
             "cycle-1".into(),
             ts("2026-03-29T09:00:00Z"),
             "main".into(),
+            "sha256:abc".into(),
             "sha256:abc".into(),
             groups,
         );
@@ -870,6 +943,7 @@ mod tests {
             ts("2026-03-29T09:00:00Z"),
             "main".into(),
             "sha256:abc".into(),
+            "sha256:abc".into(),
             groups,
         );
         let mut h = BTreeMap::new();
@@ -889,6 +963,7 @@ mod tests {
             "cycle-1".into(),
             ts("2026-03-29T09:00:00Z"),
             "main".into(),
+            "sha256:abc".into(),
             "sha256:abc".into(),
             groups,
         );
@@ -910,6 +985,7 @@ mod tests {
             "cycle-1".into(),
             ts("2026-03-29T09:00:00Z"),
             "main".into(),
+            "sha256:abc".into(),
             "sha256:abc".into(),
             groups,
         );

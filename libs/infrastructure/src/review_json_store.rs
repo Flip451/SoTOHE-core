@@ -176,6 +176,7 @@ mod tests {
             ts("2026-03-29T09:47:00Z"),
             "main",
             "sha256:policy123",
+            "sha256:policy123",
             groups,
         )
         .unwrap();

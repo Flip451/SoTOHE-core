@@ -83,21 +83,38 @@ impl GroupPartition {
 // ReviewPartitionSnapshot
 // ---------------------------------------------------------------------------
 
-/// A frozen snapshot of group partition + policy hash for cycle creation.
+/// A frozen snapshot of group partition + policy hashes for cycle creation.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReviewPartitionSnapshot {
+    /// Hash of the base review-scope.json groups (before per-track override).
+    base_policy_hash: String,
+    /// Hash of the effective (resolved) groups policy after override application.
     policy_hash: String,
     partition: GroupPartition,
 }
 
 impl ReviewPartitionSnapshot {
-    /// Creates a new partition snapshot.
+    /// Creates a new partition snapshot with both base and effective policy hashes.
     #[must_use]
-    pub fn new(policy_hash: impl Into<String>, partition: GroupPartition) -> Self {
-        Self { policy_hash: policy_hash.into(), partition }
+    pub fn new(
+        base_policy_hash: impl Into<String>,
+        policy_hash: impl Into<String>,
+        partition: GroupPartition,
+    ) -> Self {
+        Self {
+            base_policy_hash: base_policy_hash.into(),
+            policy_hash: policy_hash.into(),
+            partition,
+        }
     }
 
-    /// Returns the policy hash.
+    /// Returns the base policy hash (from review-scope.json, before override).
+    #[must_use]
+    pub fn base_policy_hash(&self) -> &str {
+        &self.base_policy_hash
+    }
+
+    /// Returns the effective policy hash (after override application).
     #[must_use]
     pub fn policy_hash(&self) -> &str {
         &self.policy_hash
@@ -199,7 +216,9 @@ mod tests {
         groups.insert(grn("other"), vec![]);
         let partition = GroupPartition::try_new(groups).unwrap();
 
-        let snapshot = ReviewPartitionSnapshot::new("sha256:abc123", partition.clone());
+        let snapshot =
+            ReviewPartitionSnapshot::new("sha256:base123", "sha256:abc123", partition.clone());
+        assert_eq!(snapshot.base_policy_hash(), "sha256:base123");
         assert_eq!(snapshot.policy_hash(), "sha256:abc123");
         assert_eq!(snapshot.partition(), &partition);
     }
