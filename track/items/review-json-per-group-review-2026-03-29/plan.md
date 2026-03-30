@@ -12,7 +12,7 @@ cycle には base_ref / policy_hash / frozen group scopes を保持し、group r
 stale reason ADT と latest-success 判定の入力モデルを固める。
 
 - [ ] Domain: ReviewCycle / ReviewGroupRound / ReviewStalenessReason の state model を定義
-- [ ] Infrastructure: review.json codec と永続化ポートを追加し、metadata.json から review state を切り離す
+- [~] Infrastructure: review.json codec と永続化ポートを追加し、metadata.json から review state を切り離す
 
 ## Policy Freeze & Partition
 

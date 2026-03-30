@@ -88,6 +88,7 @@ For each non-empty group, build a briefing file at `tmp/reviewer-runtime/briefin
 - Architecture layer dependency direction (domain ← usecase ← infrastructure ← cli)
 - Idiomatic Rust (naming, patterns)
 - Enum-first: variant-dependent data must use enum variants, not struct + runtime validation (see .claude/rules/04-coding-principles.md § Enum-first)
+- Typestate: state transitions should use typestate pattern where feasible, not status field + runtime checks (see .claude/rules/04-coding-principles.md § Typestate)
 - Test coverage gaps
 - Security (input validation, error information leakage)
 

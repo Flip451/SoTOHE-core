@@ -41,6 +41,35 @@ passwords, and other credential files).
   `.claude/settings.json` deny.
 - **Typical contents**: `local.toml`, `oauth/client.json`, environment-specific credential files.
 
+## Symlink Rejection in Infrastructure Adapters
+
+Infrastructure 層のファイル I/O アダプターは、対象ファイルとその親ディレクトリの symlink を事前に拒絶する。
+
+### ルール
+
+| 対象 | チェック |
+|---|---|
+| 読み書き対象ファイル（leaf） | `symlink_metadata()` で symlink なら fail-closed エラー |
+| 親ディレクトリ（track dir 等） | `symlink_metadata()` で symlink なら fail-closed エラー |
+| root ディレクトリ | CLI composition root から渡されるため信頼する |
+
+### 理由
+
+- symlink 経由のファイル差し替えにより、review state や metadata が外部パスに redirect される可能性がある
+- `std::fs::read_to_string` / `atomic_write_file` は symlink を透過的に follow する
+- tamper-proof 対策として、ファイルアクセス前に symlink を検出して拒絶する
+
+### 適用例
+
+- `FsReviewJsonStore`: `reject_symlink()` を read/write の前に呼び出し
+- `review_adapters.rs`: `open_regular_file_nofollow()` で no-follow open
+
+### 新規アダプター追加時
+
+1. ファイル I/O の前に `symlink_metadata()` で symlink チェックを追加する
+2. symlink の場合は fail-closed でエラーを返す（silent skip 禁止）
+3. テストで symlink 拒絶を検証する（プラットフォーム対応に注意）
+
 ## Enforcement
 
 When adding a new sensitive directory to this project:

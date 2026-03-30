@@ -24,7 +24,9 @@ pub use error::{
 };
 pub use ids::{CommitHash, NonEmptyString, ReviewGroupName, TaskId, TrackBranch, TrackId};
 pub use plan::{PlanSection, PlanView};
-pub use repository::{TrackReader, TrackWriter, WorktreeReader};
+pub use repository::{
+    ReviewJsonReader, ReviewJsonWriter, TrackReader, TrackWriter, WorktreeReader,
+};
 pub use review::{
     CodeHash, CycleError, CycleGroupState, EscalationPhase, GroupRound, GroupRoundOutcome,
     GroupRoundVerdict, NonEmptyFindings, ReviewConcern, ReviewConcernStreak, ReviewCycle,

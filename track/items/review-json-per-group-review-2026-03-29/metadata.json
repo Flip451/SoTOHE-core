@@ -76,7 +76,7 @@
   },
   "review": {
     "base_ref": "main",
-    "code_hash": "rvw1:sha256:53c161bff0031cea823d2de39284c62487f7db42487b68f418f75183b0da8325",
+    "code_hash": "rvw1:sha256:657044b2e566694c7a599ae73ec65c3de484fdc749cc8d04000657ddd9874187",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -85,37 +85,52 @@
         {
           "concerns": [],
           "groups": [
-            "domain"
+            "domain",
+            "infra"
           ],
           "round": 1,
           "round_type": "fast",
-          "timestamp": "2026-03-29T23:00:36Z"
+          "timestamp": "2026-03-30T01:11:23Z"
         },
         {
           "concerns": [],
           "groups": [
-            "domain"
+            "domain",
+            "infra"
           ],
           "round": 1,
           "round_type": "final",
-          "timestamp": "2026-03-29T23:03:31Z"
+          "timestamp": "2026-03-30T01:11:35Z"
         }
       ],
       "threshold": 3
     },
     "expected_groups": [
-      "domain"
+      "domain",
+      "infra"
     ],
     "groups": {
       "domain": {
         "fast": {
           "round": 1,
-          "timestamp": "2026-03-29T23:00:36Z",
+          "timestamp": "2026-03-30T01:11:14Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-29T23:03:31Z",
+          "timestamp": "2026-03-30T01:11:31Z",
+          "verdict": "zero_findings"
+        }
+      },
+      "infra": {
+        "fast": {
+          "round": 1,
+          "timestamp": "2026-03-30T01:11:23Z",
+          "verdict": "zero_findings"
+        },
+        "final": {
+          "round": 1,
+          "timestamp": "2026-03-30T01:11:35Z",
           "verdict": "zero_findings"
         }
       }
@@ -123,7 +138,7 @@
     "status": "approved"
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
   "tasks": [
     {
       "description": "Domain: ReviewCycle / ReviewGroupRound / ReviewStalenessReason の state model を定義",
@@ -133,7 +148,7 @@
     {
       "description": "Infrastructure: review.json codec と永続化ポートを追加し、metadata.json から review state を切り離す",
       "id": "T002",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Usecase/Infrastructure: track/review-scope.json の policy schema を groups 対応に拡張し、optional per-track review-groups.json override との 2 層 resolution で policy_hash と group partition を導出する",
@@ -167,5 +182,5 @@
     }
   ],
   "title": "review.json 分離 + group 独立レビュー + per-group hash",
-  "updated_at": "2026-03-29T23:03:31Z"
+  "updated_at": "2026-03-30T01:11:35Z"
 }

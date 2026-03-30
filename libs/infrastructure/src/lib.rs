@@ -5,6 +5,8 @@ pub mod agent_profiles;
 pub mod gh_cli;
 pub mod git_cli;
 pub mod review_adapters;
+pub mod review_json_codec;
+pub mod review_json_store;
 pub mod shell;
 pub mod spec;
 pub mod track;

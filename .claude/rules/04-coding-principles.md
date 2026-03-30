@@ -61,6 +61,63 @@ enum Verdict {
 - `ReviewGroupState`: `NoRounds` | `FastOnly(R)` | `FinalOnly(R)` | `BothRounds { fast, final }` — 組み合わせごとに variant
 - `GroupRoundVerdict`: `ZeroFindings` | `FindingsRemain(Vec<StoredFinding>)` — verdict と findings の不整合を構造的に排除
 
+### Typestate パターン：状態遷移をコンパイル時に強制する
+
+状態遷移がある場合、**単一の型 + status フィールド + runtime 遷移チェック** ではなく、
+**状態ごとに別の型** を定義して遷移メソッドの引数/戻り値で正しい遷移のみを許可する。
+
+```rust
+// Bad: runtime で遷移を検証 — 不正遷移がコンパイルを通る
+struct Review {
+    status: ReviewStatus,  // NotStarted, FastPassed, Approved
+}
+impl Review {
+    fn record_final(&mut self) -> Result<(), Error> {
+        if self.status != ReviewStatus::FastPassed {
+            return Err(Error::InvalidTransition); // runtime エラー
+        }
+        self.status = ReviewStatus::Approved;
+        Ok(())
+    }
+}
+
+// Good: typestate — 不正遷移がコンパイルエラーになる
+struct NotStarted;
+struct FastPassed { fast_hash: String }
+struct Approved { fast_hash: String, final_hash: String }
+
+struct Review<S> { state: S, /* 共通フィールド */ }
+
+impl Review<NotStarted> {
+    fn record_fast(self, hash: String) -> Review<FastPassed> {
+        Review { state: FastPassed { fast_hash: hash }, /* ... */ }
+    }
+}
+impl Review<FastPassed> {
+    fn record_final(self, hash: String) -> Review<Approved> {
+        Review { state: Approved { fast_hash: self.state.fast_hash, final_hash: hash }, /* ... */ }
+    }
+}
+// Review<NotStarted> に record_final() は存在しない → コンパイルエラー
+```
+
+**使い分け：enum-first vs typestate**
+
+| 要件 | 推奨パターン |
+|---|---|
+| 状態ごとにデータが違う（表現の問題） | → **enum-first** |
+| 状態遷移に制約がある（遷移の問題） | → **typestate** |
+| 両方 | → **typestate + 状態型を enum-first で設計** |
+| 状態が永続化から復元される（serde 必要） | → enum（typestate は永続化と相性が悪い） |
+| 状態数が多く組み合わせ爆発する | → enum + runtime validation（typestate の型爆発を避ける） |
+
+**typestate が適さないケース：**
+- 状態を JSON/DB から復元する必要がある（serde との統合が複雑）
+- 状態数が多い（型の数が爆発する）
+- 状態遷移がデータ駆動（外部入力で遷移先が決まる）
+
+これらの場合は enum + runtime validation が現実的。ただし「typestate で表現できないか」を最初に検討すること。
+
 ## Error Handling: Result and ? Operator
 
 `unwrap()` は本番コード禁止（テスト内のみ可）：
