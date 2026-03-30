@@ -29,7 +29,7 @@ record-round を review.json append-only 更新へ置き換える。
 group ごとの fast/final 履歴を保持し、zero_findings 済み group は他 group の round 進行に巻き込まない。
 per-group hash を cycle 開始時に frozen した group scope/base_ref/policy_hash で計算・保存する。
 
-- [ ] Usecase/Infrastructure: record-round を review.json append-only 更新 + per-group hash 記録へ置換
+- [~] Usecase/Infrastructure: record-round を review.json append-only 更新 + per-group hash 記録へ置換
 
 ## Approval Guard Rewrite
 

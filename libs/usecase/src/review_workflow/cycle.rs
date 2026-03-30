@@ -2,7 +2,10 @@
 //!
 //! Wraps domain-layer cycle operations with partition-snapshot–aware inputs.
 
-use domain::{CycleError, ReviewGroupName, ReviewJson, ReviewStalenessReason, Timestamp};
+use domain::{
+    CycleError, GroupRound, GroupRoundVerdict, ReviewGroupName, ReviewJson, ReviewStalenessReason,
+    RoundType, Timestamp,
+};
 
 use crate::review_workflow::groups::ReviewPartitionSnapshot;
 
@@ -38,6 +41,80 @@ pub fn start_review_cycle(
         input.snapshot.policy_hash(),
         groups,
     )?;
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// Record round
+// ---------------------------------------------------------------------------
+
+/// Outcome for recording a review round.
+pub enum RecordRoundOutcome {
+    /// Reviewer succeeded with a verdict.
+    Success(GroupRoundVerdict),
+    /// Reviewer failed (timeout, crash, etc.).
+    Failure { error_message: Option<String> },
+}
+
+/// Input for recording a group round.
+pub struct RecordCycleGroupRoundInput {
+    pub group_name: ReviewGroupName,
+    pub round_type: RoundType,
+    pub timestamp: Timestamp,
+    pub outcome: RecordRoundOutcome,
+    pub group_hash: String,
+}
+
+/// Errors from recording a group round.
+#[derive(Debug, thiserror::Error)]
+pub enum RecordCycleGroupRoundError {
+    #[error("no current review cycle exists")]
+    NoCurrentCycle,
+    #[error("group '{0}' not found in current cycle")]
+    UnknownGroup(ReviewGroupName),
+    #[error("cycle error: {0}")]
+    Cycle(#[from] CycleError),
+}
+
+/// Appends a review round to the specified group in the current cycle.
+///
+/// The caller is responsible for persisting the modified `ReviewJson` afterwards.
+/// Per-group hash should be computed externally from the frozen scope and current
+/// file contents.
+///
+/// # Errors
+/// Returns `RecordCycleGroupRoundError` if no cycle exists, group is unknown,
+/// or the round construction fails.
+pub fn record_cycle_group_round(
+    review: &mut ReviewJson,
+    input: RecordCycleGroupRoundInput,
+) -> Result<(), RecordCycleGroupRoundError> {
+    let cycle = review.current_cycle_mut().ok_or(RecordCycleGroupRoundError::NoCurrentCycle)?;
+    let group = cycle
+        .group_mut(&input.group_name)
+        .ok_or_else(|| RecordCycleGroupRoundError::UnknownGroup(input.group_name.clone()))?;
+
+    // Validate non-decreasing timestamp order before mutation
+    if let Some(last_round) = group.latest_round_any() {
+        if input.timestamp < *last_round.timestamp() {
+            return Err(RecordCycleGroupRoundError::Cycle(CycleError::Internal(format!(
+                "round timestamp {} is before last recorded timestamp {}",
+                input.timestamp,
+                last_round.timestamp()
+            ))));
+        }
+    }
+
+    let round = match input.outcome {
+        RecordRoundOutcome::Success(verdict) => {
+            GroupRound::success(input.round_type, input.timestamp, input.group_hash, verdict)?
+        }
+        RecordRoundOutcome::Failure { error_message } => {
+            GroupRound::failure(input.round_type, input.timestamp, input.group_hash, error_message)?
+        }
+    };
+
+    group.record_round(round);
     Ok(())
 }
 
@@ -321,5 +398,130 @@ mod tests {
         let current = make_snapshot("sha256:base", "sha256:eff");
         let result = check_cycle_staleness_any(&review, &current, &BTreeMap::new());
         assert!(result.is_none());
+    }
+
+    // -----------------------------------------------------------------------
+    // record_cycle_group_round tests
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_record_round_success_appends() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Final,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
+                group_hash: "hash-final".into(),
+            },
+        )
+        .unwrap();
+
+        let cycle = review.current_cycle().unwrap();
+        let domain = cycle.group(&grn("domain")).unwrap();
+        // Original fast round + new final round = 2
+        assert_eq!(domain.rounds().len(), 2);
+        assert!(domain.rounds().last().unwrap().is_successful_zero_findings());
+    }
+
+    #[test]
+    fn test_record_round_failure_appends() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Fast,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Failure { error_message: Some("timeout".into()) },
+                group_hash: "hash-fail".into(),
+            },
+        )
+        .unwrap();
+
+        let cycle = review.current_cycle().unwrap();
+        let domain = cycle.group(&grn("domain")).unwrap();
+        assert_eq!(domain.rounds().len(), 2);
+        assert!(!domain.rounds().last().unwrap().is_successful_zero_findings());
+    }
+
+    #[test]
+    fn test_record_round_other_group_does_not_affect_zero_findings_group() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        // domain has a zero_findings fast round from review_with_cycle
+        // Record a round on "other" — domain should be untouched
+        record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("other"),
+                round_type: RoundType::Fast,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
+                group_hash: "hash-other".into(),
+            },
+        )
+        .unwrap();
+
+        let cycle = review.current_cycle().unwrap();
+        // domain still has exactly 1 round
+        assert_eq!(cycle.group(&grn("domain")).unwrap().rounds().len(), 1);
+        // other now has 1 round
+        assert_eq!(cycle.group(&grn("other")).unwrap().rounds().len(), 1);
+    }
+
+    #[test]
+    fn test_record_round_no_cycle_returns_error() {
+        let mut review = ReviewJson::new();
+        let result = record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Fast,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
+                group_hash: "hash".into(),
+            },
+        );
+        assert!(matches!(result, Err(RecordCycleGroupRoundError::NoCurrentCycle)));
+    }
+
+    #[test]
+    fn test_record_round_unknown_group_returns_error() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        let result = record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("nonexistent"),
+                round_type: RoundType::Fast,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
+                group_hash: "hash".into(),
+            },
+        );
+        assert!(matches!(result, Err(RecordCycleGroupRoundError::UnknownGroup(_))));
+    }
+
+    #[test]
+    fn test_record_round_rejects_out_of_order_timestamp() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        // review_with_cycle records a round at 10:01:00Z
+        let result = record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Fast,
+                timestamp: ts("2026-03-30T09:00:00Z"), // before 10:01:00Z
+                outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
+                group_hash: "hash".into(),
+            },
+        );
+        assert!(matches!(result, Err(RecordCycleGroupRoundError::Cycle(_))));
+        // ReviewJson was not mutated
+        assert_eq!(
+            review.current_cycle().unwrap().group(&grn("domain")).unwrap().rounds().len(),
+            1
+        );
     }
 }

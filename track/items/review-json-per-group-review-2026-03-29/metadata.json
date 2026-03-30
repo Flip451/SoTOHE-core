@@ -76,7 +76,7 @@
   },
   "review": {
     "base_ref": "main",
-    "code_hash": "rvw1:sha256:7b013b4734522dd771c328357a29983de21b30ae085f82fbe6082fe81d2c2ee5",
+    "code_hash": "rvw1:sha256:d913c4ab3ad4ebd2a91c33b54338f4b30402ef3e08658e8303cb17b870c8992f",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -90,7 +90,7 @@
           ],
           "round": 1,
           "round_type": "fast",
-          "timestamp": "2026-03-30T02:37:59Z"
+          "timestamp": "2026-03-30T02:52:42Z"
         },
         {
           "concerns": [],
@@ -100,7 +100,7 @@
           ],
           "round": 1,
           "round_type": "final",
-          "timestamp": "2026-03-30T02:37:59Z"
+          "timestamp": "2026-03-30T02:52:42Z"
         }
       ],
       "threshold": 3
@@ -113,24 +113,24 @@
       "domain": {
         "fast": {
           "round": 1,
-          "timestamp": "2026-03-30T02:37:59Z",
+          "timestamp": "2026-03-30T02:52:42Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-30T02:37:59Z",
+          "timestamp": "2026-03-30T02:52:42Z",
           "verdict": "zero_findings"
         }
       },
       "infra": {
         "fast": {
           "round": 1,
-          "timestamp": "2026-03-30T02:37:59Z",
+          "timestamp": "2026-03-30T02:52:42Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-30T02:37:59Z",
+          "timestamp": "2026-03-30T02:52:42Z",
           "verdict": "zero_findings"
         }
       }
@@ -163,7 +163,7 @@
     {
       "description": "Usecase/Infrastructure: record-round を review.json append-only 更新 + per-group hash 記録へ置換",
       "id": "T005",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Usecase: check-approved を latest-success per-group fast/final 判定へ再設計し、global round sync を廃止",
@@ -182,5 +182,5 @@
     }
   ],
   "title": "review.json 分離 + group 独立レビュー + per-group hash",
-  "updated_at": "2026-03-30T02:37:59Z"
+  "updated_at": "2026-03-30T02:52:42Z"
 }
