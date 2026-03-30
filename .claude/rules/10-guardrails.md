@@ -11,6 +11,8 @@ Core guardrails:
 - Before committing code changes, run the `reviewer` capability review cycle
   (review -> fix -> review -> ... -> no findings). Do not commit until the reviewer
   reports zero findings. The reviewer provider is resolved via `.claude/agent-profiles.json`.
+- **Small task commits**: Prefer small, focused task commits (<500 lines). Review cost
+  grows super-linearly with diff size. Split large tasks into sub-tasks during planning.
 
 ## Permission Guardrails
 
