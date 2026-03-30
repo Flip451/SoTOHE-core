@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "auto-record review.json 書き込みパス接続 + sandbox 修正",
+  "goal": [
+    "前トラック (review-json-per-group-review) で構築済みの review.json domain model/infrastructure を record-round と check-approved の production code path に接続し、review state が review.json に正しく永続化されるようにする。",
+    "Codex CLI の --full-auto が --sandbox workspace-write を暗黙適用する問題を修正し、planner/reviewer が常に read-only sandbox で実行されることを保証する。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "RecordRoundProtocolImpl を FsReviewJsonStore 経由で review.json に書くよう書き換える",
+        "sources": [
+          "track/items/review-json-per-group-review-2026-03-29/spec.md §Acceptance Criteria"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "check-approved を ReviewJsonReader 経由で review.json から読むよう移行する",
+        "sources": [
+          "track/items/review-json-per-group-review-2026-03-29/spec.md §Acceptance Criteria"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "metadata.json の review セクションへの書き込みを停止する",
+        "sources": [
+          "track/items/review-json-per-group-review-2026-03-29/spec.md §Acceptance Criteria"
+        ],
+        "task_refs": [
+          "T002",
+          "T004"
+        ]
+      },
+      {
+        "text": "stage_bytes に --add フラグ追加（将来用）。review.json は review_operational ファイルとして cargo make add-all でコミット時に staging する設計",
+        "sources": [
+          "knowledge/adr/2026-03-29-0947-review-json-per-group-review-state.md"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "planner/reviewer の Codex 呼び出しから --full-auto を除去し --sandbox read-only を保証する",
+        "sources": [
+          ".claude/rules/02-codex-delegation.md §Sandbox and Hook Coverage Warning"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "per-group scope hash の実装: record-round で group の frozen scope ファイル群から review-scope manifest hash を計算し review.json に記録する",
+        "sources": [
+          "knowledge/adr/2026-03-29-0947-review-json-per-group-review-state.md §5"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "check-approved で各 group の latest round hash を current group-scope hash と照合し、hash mismatch を検出する",
+        "sources": [
+          "knowledge/adr/2026-03-29-0947-review-json-per-group-review-state.md §5"
+        ],
+        "task_refs": [
+          "T006"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "resolve-escalation の review.json 移行（別トラックで対応）",
+        "sources": [
+          "knowledge/adr/2026-03-29-0947-review-json-per-group-review-state.md"
+        ]
+      },
+      {
+        "text": "旧トラックの metadata.json review state → review.json 自動マイグレーション",
+        "sources": [
+          "track/items/review-json-per-group-review-2026-03-29/spec.md §Out of Scope"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "各タスクの diff は 500 行以下に抑える",
+      "sources": [
+        "feedback — small review surface policy"
+      ]
+    },
+    {
+      "text": "TDD ワークフロー必須",
+      "sources": [
+        "convention — .claude/rules/05-testing.md"
+      ]
+    },
+    {
+      "text": "hexagonal architecture: domain は infrastructure/cli に依存しない",
+      "sources": [
+        "convention — project-docs/conventions/hexagonal-architecture.md"
+      ]
+    },
+    {
+      "text": "新規トラック専用。旧トラックの後方互換は不要",
+      "sources": [
+        "track/items/review-json-per-group-review-2026-03-29/spec.md §Out of Scope"
+      ]
+    }
+  ],
+  "domain_states": [
+    {
+      "name": "broken",
+      "description": "record-round が metadata.json に書き、status が review.json を読む不整合状態（現状）"
+    },
+    {
+      "name": "wired_placeholder",
+      "description": "record-round と check-approved が review.json を読み書きするが、hash は placeholder (T001-T004)"
+    },
+    {
+      "name": "wired_complete",
+      "description": "per-group scope hash が ADR §5 準拠で計算・検証される完全状態 (T005-T006)"
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "record-round 実行後に track/items/<id>/review.json が作成・更新される",
+      "sources": [
+        "track/items/review-json-per-group-review-2026-03-29/spec.md §Acceptance Criteria"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "sotp review status が review.json から正しい review state を表示する（NotStarted ではなく実際の状態）",
+      "sources": [
+        "track/items/review-json-per-group-review-2026-03-29/spec.md §Acceptance Criteria"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "check-approved が review.json の cycle/group state から承認判定を行う",
+      "sources": [
+        "track/items/review-json-per-group-review-2026-03-29/spec.md §Acceptance Criteria"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "metadata.json に review セクションが書き込まれない",
+      "sources": [
+        "track/items/review-json-per-group-review-2026-03-29/spec.md §Acceptance Criteria"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "planner/reviewer の Codex 呼び出しに --full-auto が含まれず、--sandbox read-only が使用される",
+      "sources": [
+        ".claude/rules/02-codex-delegation.md §Sandbox and Hook Coverage Warning"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "cargo make ci が全チェック通過する",
+      "sources": [
+        "convention — .claude/rules/10-guardrails.md"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "record-round が group の frozen scope ファイル群から計算した per-group hash を review.json に記録する",
+      "sources": [
+        "knowledge/adr/2026-03-29-0947-review-json-per-group-review-state.md §5"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "check-approved が各 group の latest round hash を current scope hash と照合し、stale な場合にブロックする",
+      "sources": [
+        "knowledge/adr/2026-03-29-0947-review-json-per-group-review-state.md §5"
+      ],
+      "task_refs": [
+        "T006"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "project-docs/conventions/hexagonal-architecture.md",
+    ".claude/rules/05-testing.md",
+    ".claude/rules/10-guardrails.md",
+    ".claude/rules/02-codex-delegation.md"
+  ],
+  "signals": {
+    "blue": 21,
+    "yellow": 0,
+    "red": 0
+  }
+}

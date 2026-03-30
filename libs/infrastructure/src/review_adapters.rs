@@ -35,17 +35,56 @@ impl GitHasher for SystemGitHasher {
 }
 
 // ---------------------------------------------------------------------------
-// RecordRoundProtocol — two-phase git index commit
+// Symlink-safe lock file opener
 // ---------------------------------------------------------------------------
 
-/// Atomic two-phase record-round protocol using PrivateIndex.
+/// Opens a lock file safely, rejecting symlinks atomically via `O_NOFOLLOW`.
+///
+/// Uses `O_NOFOLLOW` to prevent symlink-following attacks without TOCTOU.
+/// On non-Unix platforms, falls back to a symlink_metadata pre-check.
+///
+/// # Errors
+///
+/// Returns an error if the path is a symlink or cannot be opened.
+fn open_lock_file_safe(path: &std::path::Path) -> Result<std::fs::File, std::io::Error> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        std::fs::OpenOptions::new()
+            .create(true)
+            .write(true)
+            .custom_flags(libc::O_NOFOLLOW)
+            .open(path)
+    }
+    #[cfg(not(unix))]
+    {
+        // Fallback: pre-check + open (TOCTOU possible but best-effort on non-Unix).
+        match std::fs::symlink_metadata(path) {
+            Ok(meta) if meta.file_type().is_symlink() => {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::InvalidInput,
+                    format!("lock path is a symlink: {}", path.display()),
+                ));
+            }
+            Ok(_) | Err(_) => {}
+        }
+        std::fs::OpenOptions::new().create(true).write(true).open(path)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// RecordRoundProtocol
+// ---------------------------------------------------------------------------
+
+/// Atomic record-round protocol that writes to review.json via PrivateIndex.
+///
+/// On first invocation for a track, auto-creates a review cycle with the
+/// expected groups. Subsequent calls append rounds to the existing cycle.
 pub struct RecordRoundProtocolImpl {
     pub items_dir: std::path::PathBuf,
     pub group_display: String,
+    pub base_ref: String,
 }
-
-/// Maximum retries for stale-hash conflicts from parallel recordings.
-const RECORD_ROUND_MAX_RETRIES: u8 = 3;
 
 impl RecordRoundProtocol for RecordRoundProtocolImpl {
     #[allow(clippy::too_many_lines)]
@@ -59,187 +98,168 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
         expected_groups: Vec<ReviewGroupName>,
         timestamp: Timestamp,
     ) -> Result<(), RecordRoundProtocolError> {
-        use domain::{ReviewRoundResult, ReviewState};
+        use std::collections::BTreeMap;
 
-        use crate::git_cli::private_index::PrivateIndex;
+        use domain::{
+            CycleGroupState, GroupRoundVerdict, ReviewJson, ReviewJsonReader, ReviewJsonWriter,
+            StoredFinding,
+        };
+
         use crate::git_cli::{GitRepository, SystemGitRepo};
-        use crate::track::fs_store::FsTrackStore;
+        use crate::review_json_store::FsReviewJsonStore;
 
         let git = SystemGitRepo::discover()
             .map_err(|e| RecordRoundProtocolError::Other(format!("git error: {e}")))?;
 
-        let metadata_abs = self.items_dir.join(track_id.as_ref()).join("metadata.json");
-        let metadata_rel = metadata_abs
-            .strip_prefix(git.root())
-            .unwrap_or(&metadata_abs)
-            .to_string_lossy()
-            .into_owned();
-
-        let store = FsTrackStore::new(&self.items_dir);
-
-        // Retry loop: parallel recordings can cause stale-hash conflicts.
-        // On conflict, recreate PrivateIndex from the (now-updated) real index and retry.
-        for attempt in 0..=RECORD_ROUND_MAX_RETRIES {
-            // Acquire a repo-wide exclusive advisory lock that spans the entire
-            // record-round protocol: PrivateIndex creation → metadata write → index swap.
-            // Repo-wide (not per-track) because PrivateIndex::swap_into_real replaces
-            // the shared .git/index — cross-track conflicts must also be serialized.
-            let lock_path = git.root().join(".git").join("sotp-record-round.lock");
-            let lock_file = std::fs::File::create(&lock_path).map_err(|e| {
+        // Acquire worktree-scoped exclusive advisory lock for the read-modify-write cycle.
+        // Placed at worktree root (not .git/) to support linked worktrees where .git is a file.
+        // Uses OpenOptions to reject symlinks (create_new fails if path exists as symlink).
+        let lock_path = git.root().join(".sotp-record-round.lock");
+        let lock_file = open_lock_file_safe(&lock_path).map_err(|e| {
+            RecordRoundProtocolError::Other(format!(
+                "failed to create lock file {}: {e}",
+                lock_path.display()
+            ))
+        })?;
+        {
+            use fs4::fs_std::FileExt;
+            lock_file.lock_exclusive().map_err(|e| {
                 RecordRoundProtocolError::Other(format!(
-                    "failed to create lock file {}: {e}",
+                    "failed to acquire lock on {}: {e}",
                     lock_path.display()
                 ))
             })?;
-            {
-                use fs4::fs_std::FileExt;
-                lock_file.lock_exclusive().map_err(|e| {
+        }
+
+        // Verify track exists with valid metadata.json (read + decode, fail-closed).
+        {
+            use crate::track::fs_store::FsTrackStore;
+            use domain::TrackReader;
+            let store = FsTrackStore::new(&self.items_dir);
+            store
+                .find(track_id)
+                .map_err(|e| {
                     RecordRoundProtocolError::Other(format!(
-                        "failed to acquire lock on {}: {e}",
-                        lock_path.display()
+                        "track '{}' metadata.json read/decode failed: {e}",
+                        track_id.as_ref()
+                    ))
+                })?
+                .ok_or_else(|| {
+                    RecordRoundProtocolError::Other(format!(
+                        "track '{}' not found",
+                        track_id.as_ref()
                     ))
                 })?;
+        }
+
+        let rj_store = FsReviewJsonStore::new(&self.items_dir);
+
+        // Load or create ReviewJson (under lock).
+        let mut review = rj_store
+            .find_review(track_id)
+            .map_err(|e| RecordRoundProtocolError::Other(format!("read review.json: {e}")))?
+            .unwrap_or_else(ReviewJson::new);
+
+        // Auto-create cycle if none exists.
+        if review.current_cycle().is_none() {
+            let cycle_id = timestamp.to_string();
+            let mut groups = BTreeMap::new();
+            for g in &expected_groups {
+                groups.insert(g.clone(), CycleGroupState::new(vec![]));
             }
-
-            let private_index =
-                PrivateIndex::from_current(&git).map_err(RecordRoundProtocolError::Other)?;
-
-            let pre_update_hash =
-                private_index.normalized_tree_hash(&git, &metadata_rel).map_err(|e| {
-                    RecordRoundProtocolError::Other(format!("normalized hash error: {e}"))
-                })?;
-
-            // Read current track state directly (lock is already held by us).
-            let (mut track, mut meta) = store
-                .find_with_meta(track_id)
-                .map_err(|e| RecordRoundProtocolError::Other(format!("read error: {e}")))?
-                .ok_or_else(|| {
-                    RecordRoundProtocolError::Other(format!("track {track_id} not found"))
-                })?;
-
-            let review = track.review_mut().get_or_insert_with(ReviewState::new);
-            let round_num = review
-                .groups()
-                .get(&group_name)
-                .and_then(|g| match round_type {
-                    domain::RoundType::Fast => g.fast().map(|r| r.round()),
-                    domain::RoundType::Final => g.final_round().map(|r| r.round()),
-                })
-                .map(|n| n.saturating_add(1))
-                .unwrap_or(1);
-
-            let result = if concerns.is_empty() {
-                ReviewRoundResult::new(round_num, verdict, timestamp.clone())
-            } else {
-                ReviewRoundResult::new_with_concerns(
-                    round_num,
-                    verdict,
+            // Ensure mandatory "other" group exists (required by start_cycle).
+            let other_key = ReviewGroupName::try_new("other").map_err(|e| {
+                RecordRoundProtocolError::Other(format!("invalid group name 'other': {e}"))
+            })?;
+            groups.entry(other_key).or_insert_with(|| CycleGroupState::new(vec![]));
+            review
+                .start_cycle(
+                    cycle_id,
                     timestamp.clone(),
-                    concerns.clone(),
+                    &self.base_ref,
+                    "sha256:none",
+                    "sha256:none",
+                    groups,
                 )
-            };
+                .map_err(|e| RecordRoundProtocolError::Other(format!("start_cycle: {e}")))?;
+        }
 
-            let mut stale_error: Option<String> = None;
-            match review.record_round_with_pending(
-                round_type,
-                &group_name,
-                result,
-                &expected_groups,
-                &pre_update_hash,
-            ) {
-                Ok(()) => {}
-                Err(domain::ReviewError::EscalationActive { concerns: blocked }) => {
-                    return Err(RecordRoundProtocolError::EscalationBlocked(blocked));
+        // Build GroupRoundVerdict from the verdict + concerns (fail-closed validation).
+        let group_verdict = match verdict {
+            domain::Verdict::ZeroFindings => {
+                if !concerns.is_empty() {
+                    return Err(RecordRoundProtocolError::Other(format!(
+                        "inconsistent input: zero_findings verdict with {} concerns",
+                        concerns.len()
+                    )));
                 }
-                Err(domain::ReviewError::StaleCodeHash { expected, actual }) => {
-                    stale_error = Some(format!(
-                        "code hash mismatch: review recorded against {expected}, \
-                         but current code is {actual}"
+                GroupRoundVerdict::ZeroFindings
+            }
+            domain::Verdict::FindingsRemain => {
+                if concerns.is_empty() {
+                    return Err(RecordRoundProtocolError::Other(
+                        "inconsistent input: findings_remain verdict with no concerns".to_owned(),
                     ));
-                    // Don't persist — retry will reload clean state from disk.
                 }
-                Err(e) => {
-                    return Err(RecordRoundProtocolError::Other(format!(
-                        "record_round_with_pending: {e}"
-                    )));
+                let findings: Vec<StoredFinding> = concerns
+                    .iter()
+                    .map(|c| StoredFinding::new(c.as_ref(), None, None, None))
+                    .collect();
+                GroupRoundVerdict::findings_remain(findings).map_err(|e| {
+                    RecordRoundProtocolError::Other(format!("verdict construction: {e}"))
+                })?
+            }
+        };
+
+        // Compute group hash using the same hasher as check_approved.
+        let group_hash = SystemGitHasher
+            .normalized_hash(&self.items_dir, track_id)
+            .map_err(|e| RecordRoundProtocolError::Other(format!("normalized hash error: {e}")))?;
+
+        // Guard: final round requires a prior successful fast round for this group.
+        if round_type == domain::RoundType::Final {
+            if let Some(cycle) = review.current_cycle() {
+                if let Some(group_state) = cycle.group(&group_name) {
+                    let has_fast_zero = group_state
+                        .latest_round(domain::RoundType::Fast)
+                        .is_some_and(|r| r.is_successful_zero_findings());
+                    if !has_fast_zero {
+                        return Err(RecordRoundProtocolError::Other(
+                            "final round requires a prior successful fast round".to_owned(),
+                        ));
+                    }
                 }
             }
+        }
 
-            if let Some(err_msg) = stale_error {
-                if attempt < RECORD_ROUND_MAX_RETRIES {
-                    let jitter_ms = {
-                        use std::collections::hash_map::DefaultHasher;
-                        use std::hash::{Hash, Hasher};
-                        let mut h = DefaultHasher::new();
-                        std::process::id().hash(&mut h);
-                        std::time::SystemTime::now()
-                            .duration_since(std::time::UNIX_EPOCH)
-                            .unwrap_or_default()
-                            .as_nanos()
-                            .hash(&mut h);
-                        h.finish() % 200 + 50 // 50-249ms
-                    };
-                    eprintln!(
-                        "[RETRY] Stale hash on attempt {attempt} — \
-                         retrying in {jitter_ms}ms with fresh index"
-                    );
-                    // Release lock before sleeping so peers can make progress.
-                    drop(lock_file);
-                    std::thread::sleep(std::time::Duration::from_millis(jitter_ms));
-                    continue;
-                }
-                // Final retry exhausted: persist the invalidated state so disk
-                // reflects the domain's invalidation (not stale approved/fast_passed).
-                meta.updated_at = timestamp.to_string();
-                meta.original_status = None;
-                if let Err(e) = store.write_track(&track, &meta) {
-                    return Err(RecordRoundProtocolError::Other(format!(
-                        "stale hash AND failed to persist invalidation: {err_msg}; write error: {e}"
-                    )));
-                }
-                return Err(RecordRoundProtocolError::StaleHash(err_msg));
-            }
+        // Append round via usecase function (enforces timestamp monotonicity).
+        usecase::review_workflow::cycle::record_cycle_group_round(
+            &mut review,
+            usecase::review_workflow::cycle::RecordCycleGroupRoundInput {
+                group_name: group_name.clone(),
+                round_type,
+                timestamp: timestamp.clone(),
+                outcome: usecase::review_workflow::cycle::RecordRoundOutcome::Success(
+                    group_verdict,
+                ),
+                group_hash,
+            },
+        )
+        .map_err(|e| RecordRoundProtocolError::Other(format!("record_cycle_group_round: {e}")))?;
 
-            // Two-phase write: stage pending state → compute hash → set hash → stage final.
-            meta.updated_at = timestamp.to_string();
-            meta.original_status = None;
+        // Write review.json to disk atomically.
+        // NOTE: review.json is NOT staged in the private index. It is a
+        // review_operational file that should not affect the code hash.
+        // Staging is handled by `cargo make add-all` at commit time.
+        rj_store
+            .save_review(track_id, &review)
+            .map_err(|e| RecordRoundProtocolError::Other(format!("save review.json: {e}")))?;
 
-            let pending_json = crate::track::codec::encode(&track, &meta)
-                .map_err(|e| RecordRoundProtocolError::Other(format!("codec encode: {e}")))?;
-            private_index
-                .stage_bytes(&git, &metadata_rel, format!("{pending_json}\n").as_bytes())
-                .map_err(RecordRoundProtocolError::Other)?;
-
-            let h1 = private_index
-                .normalized_tree_hash(&git, &metadata_rel)
-                .map_err(|e| RecordRoundProtocolError::Other(format!("post-hash: {e}")))?;
-
-            if let Some(r) = track.review_mut().as_mut() {
-                r.set_code_hash(h1)
-                    .map_err(|e| RecordRoundProtocolError::Other(format!("set_code_hash: {e}")))?;
-            }
-
-            let final_json = crate::track::codec::encode(&track, &meta)
-                .map_err(|e| RecordRoundProtocolError::Other(format!("codec final: {e}")))?;
-            private_index
-                .stage_bytes(&git, &metadata_rel, format!("{final_json}\n").as_bytes())
-                .map_err(RecordRoundProtocolError::Other)?;
-
-            // Write metadata.json to disk atomically (for other processes to read).
-            store
-                .write_track(&track, &meta)
-                .map_err(|e| RecordRoundProtocolError::Other(format!("write_track: {e}")))?;
-
-            private_index.swap_into_real().map_err(RecordRoundProtocolError::Other)?;
-
-            eprintln!(
-                "[OK] Recorded {round_type} round for group '{}' (verdict: {verdict})",
-                self.group_display
-            );
-            return Ok(());
-        } // end retry loop
-
-        Err(RecordRoundProtocolError::Other("record-round: max retries exceeded".to_owned()))
+        eprintln!(
+            "[OK] Recorded {round_type} round for group '{}' (verdict: {verdict})",
+            self.group_display
+        );
+        Ok(())
     }
 }
 

@@ -311,6 +311,12 @@
   - **課題**: `metadata.json` が `done` なら `registry.md` の Completed Tracks に載るため、`verification.md` が未実質完了でも完了扱いが表示されうる
   - **提案**: `done` 遷移に verification 完了を必須化する、または `VerifiedDone` 相当の状態/フラグを SSoT に導入
 
+- [ ] **WF-08b** (HIGH): Track 終了条件の厳格化 — acceptance criteria の実動作未検証
+  - **課題**: review-json-per-group-review-2026-03-29 で「record-round は review.json に記録」「metadata.json に review state を保存しない」という acceptance criteria が明記されていたにもかかわらず、実際には record-round が metadata.json にしか書いておらず review.json が一度も作成されない状態で Done になった。CI パス + reviewer zero_findings のみでは acceptance criteria の実動作を保証できない
+  - **根拠**: build 漏れ（bin/sotp 未リビルド）が直接原因だが、acceptance criteria に対する end-to-end 検証がワークフローに組み込まれていないことが構造的問題
+  - **提案**: (1) `/track:commit` 時に spec.json の acceptance_criteria を人間に明示的確認させるインタラクティブゲート（`verification.md` の実行を強制）、(2) acceptance criteria のうち自動検証可能なものは `sotp verify acceptance-criteria` として CI に組み込み、手動確認が必要なものは `verification.md` の `verified_at` 記入を `done` 遷移の前提条件にする、(3) `build-sotp` を `/track:commit` の前提条件に追加して bin/sotp の陳腐化を防止
+  - **出典**: 2026-03-30 review-json-per-group-review 不具合調査
+
 - [ ] **WF-26** (LOW): `find_open_pr_with` の First-Match Bias（一意性検証欠如）
   - **課題**: `gh_cli.rs` の `find_open_pr_with` が `.[0].number` で先頭要素を無条件取得。同一 head branch に複数 PR がある場合に意図しない PR を操作するリスク
   - **提案**: 配列長を検証し、複数 PR 存在時はエラーまたは警告を返す
@@ -755,6 +761,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [x] ~~**RVW-29** (CRITICAL): Codex CLI `--full-auto` が `--sandbox read-only` を上書き~~ ✅ 解決: planner/reviewer 両方の wrapper から `--full-auto` を削除。`--sandbox read-only` のみで gpt-5.4 + `--output-schema` が安定動作することを 10/10 テストで確認（2026-03-28）。原因: `--full-auto` は Codex CLI の仕様で `--sandbox workspace-write` を強制するエイリアスであり、後続の `--sandbox read-only` は無視される。exec モードではデフォルトで `approval: never`（自動承認）のため `--full-auto` は不要。
 - [ ] **RVW-30** (HIGH): track-commit-message の add-all 自動実行 or check-approved の worktree/index 差分検出 — RecordRoundProtocolImpl が metadata.json をワークツリーに書くだけで git index を更新しないため、staging 漏れでコミット内容と承認状態が乖離する可能性がある。現状は /track:commit のプロンプト制約で保証しているが、コード上のガードがない。daemon 化や直接 CLI 利用が始まる前に仕組み化すべき
 - [ ] **RVW-31** (HIGH): review state を review.json に分離 + 内部 checksum による tamper detection
+- [ ] **RVW-33** (MEDIUM): review.json cycle の frozen partition scope 接続 — RecordRoundProtocolImpl が auto-create する cycle は `CycleGroupState::new(vec![])` で空スコープを持つ。`ReviewPartitionSnapshot` + `to_cycle_groups()` を実装して review-scope.json のグループ定義から frozen file scope を cycle に記録する。check_approved での policy_hash/partition_changed 検証も同時に実装。前提: review-json-per-group-review の残課題
 - [ ] **RVW-32** (HIGH): same_round_and_zero_findings 制約の緩和 — 並列レビューで各グループの finding→fix サイクル回数が異なると round 番号が揃わず FastPassed/Approved への昇格がブロックされる。invalidation 時に round 番号がリセットされないことが根本原因。対策案: (1) invalidation 時に全グループの round カウンタをリセット、(2) runtime promotion では round 一致を要求せず verdict のみで判定し reload validation のみ strict に保つ、(3) RVW-31 (review.json 分離) と統合して round 管理を再設計 — (1) review state（status, code_hash, base_ref, expected_groups, groups, escalation）を metadata.json から review.json に移動、(2) review.json は review-operational（hash 対象外）なので並列 auto-record が安全に動作、(3) review.json 内に SHA-256 checksum フィールドを持たせ、record-round が更新時に再計算・check-approved が検証することで metadata tamper detection を維持。review-port-separation + tamper-proof-review の統合後継トラック。review-workflow-fixes-2026-03-18 の metadata tamper detection 契約を checksum ベースに移行する仕様変更を含む
 
 ---

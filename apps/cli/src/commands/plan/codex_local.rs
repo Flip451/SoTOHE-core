@@ -32,8 +32,7 @@ pub(super) fn execute_codex_local(args: &PlanCodexLocalArgs) -> ExitCode {
         }
     };
 
-    let full_auto = infrastructure::agent_profiles::resolve_full_auto_from_profiles(&args.model);
-    let invocation = build_codex_invocation(&args.model, &prompt, full_auto);
+    let invocation = build_codex_invocation(&args.model, &prompt);
     let timeout = Duration::from_secs(args.timeout_seconds);
 
     match run_codex_local_invocation(&invocation, timeout) {
@@ -66,20 +65,11 @@ pub(super) fn build_prompt(args: &PlanCodexLocalArgs) -> Result<String, String> 
 
 /// Build the Codex invocation for the planner.
 ///
-/// Uses `--sandbox read-only` always (planners should not write files).
-/// Adds `--full-auto` when resolved from agent-profiles.
-pub(super) fn build_codex_invocation(
-    model: &str,
-    prompt: &str,
-    full_auto: bool,
-) -> CodexInvocation {
+/// Always uses `--sandbox read-only`. Never uses `--full-auto` because Codex CLI
+/// treats it as an alias for `--sandbox workspace-write`, which would override
+/// our read-only constraint.
+pub(super) fn build_codex_invocation(model: &str, prompt: &str) -> CodexInvocation {
     let mut args = vec![OsString::from("exec"), OsString::from("--model"), OsString::from(model)];
-    if full_auto {
-        // --full-auto is required for full models (gpt-5.4 etc.) to produce output reliably.
-        // We re-apply --sandbox read-only AFTER --full-auto so the last-wins CLI semantics
-        // enforce read-only sandbox.
-        args.push(OsString::from("--full-auto"));
-    }
     args.extend([OsString::from("--sandbox"), OsString::from("read-only")]);
     args.push(OsString::from(prompt));
 

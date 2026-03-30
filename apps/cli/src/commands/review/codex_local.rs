@@ -46,6 +46,7 @@ pub(super) fn execute_codex_local(args: &CodexLocalArgs) -> ExitCode {
         let protocol = infrastructure::review_adapters::RecordRoundProtocolImpl {
             items_dir: validated.items_dir.clone(),
             group_display: validated.group_name.as_ref().to_owned(),
+            base_ref: validated.diff_base.clone(),
         };
         return execute_with_auto_record(
             outcome,
@@ -340,7 +341,6 @@ fn render_missing_message_failure(prefix: &str, result: &ReviewRunResult) -> Str
 
 pub(super) fn run_codex_local(args: &CodexLocalArgs) -> Result<ReviewRunResult, String> {
     let prompt = build_prompt(args)?;
-    let full_auto = infrastructure::agent_profiles::resolve_full_auto_from_profiles(&args.model);
     #[cfg(test)]
     let explicit_output_last_message = args.output_last_message.as_deref();
     #[cfg(not(test))]
@@ -358,7 +358,6 @@ pub(super) fn run_codex_local(args: &CodexLocalArgs) -> Result<ReviewRunResult, 
         &prompt,
         &output_last_message.path,
         &output_schema.path,
-        full_auto,
     );
     run_codex_invocation(
         &invocation,
@@ -441,17 +440,11 @@ pub(super) fn build_codex_invocation(
     prompt: &str,
     output_last_message: &Path,
     output_schema: &Path,
-    full_auto: bool,
 ) -> CodexInvocation {
     let mut args = vec![OsString::from("exec"), OsString::from("--model"), OsString::from(model)];
-    if full_auto {
-        // --full-auto is required for full models (gpt-5.4 etc.) to produce
-        // JSON verdicts reliably (see GitHub Issue #4181).
-        // However, --full-auto implicitly sets --sandbox workspace-write.
-        // We re-apply --sandbox read-only AFTER --full-auto so the last-wins
-        // CLI semantics enforce read-only sandbox for reviewers.
-        args.push(OsString::from("--full-auto"));
-    }
+    // Reviewers MUST use read-only sandbox. Do NOT use --full-auto here because it
+    // implies --sandbox workspace-write and Codex CLI applies it after our explicit
+    // --sandbox read-only, overriding the safety constraint.
     args.extend([OsString::from("--sandbox"), OsString::from("read-only")]);
     args.extend([OsString::from("--config"), OsString::from("model_reasoning_effort=\"high\"")]);
     args.extend([

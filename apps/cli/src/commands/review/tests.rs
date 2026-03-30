@@ -167,13 +167,12 @@ fn build_prompt_uses_briefing_file_reference() {
 }
 
 #[test]
-fn build_codex_invocation_omits_full_auto_when_false() {
+fn build_codex_invocation_always_uses_read_only_sandbox() {
     let invocation = build_codex_invocation(
         "gpt-5.3-codex-spark",
         "Review this change.",
         Path::new("tmp/reviewer-runtime/out.txt"),
         Path::new("tmp/reviewer-runtime/schema.json"),
-        false,
     );
     let rendered =
         invocation.args.iter().map(|arg| arg.to_string_lossy().to_string()).collect::<Vec<_>>();
@@ -186,30 +185,25 @@ fn build_codex_invocation_omits_full_auto_when_false() {
             .any(|pair| pair == ["--output-schema", "tmp/reviewer-runtime/schema.json"])
     );
     assert!(rendered.windows(2).any(|pair| pair == ["--model", "gpt-5.3-codex-spark"]));
+    // Reviewer must NEVER use --full-auto (it implies --sandbox workspace-write)
     assert!(!rendered.iter().any(|arg| arg == "--full-auto"));
 }
 
 #[test]
-fn build_codex_invocation_includes_full_auto_then_read_only_when_true() {
+fn build_codex_invocation_never_includes_full_auto_even_for_full_model() {
+    // --full-auto implies --sandbox workspace-write in Codex CLI,
+    // which would override our read-only constraint for reviewers.
     let invocation = build_codex_invocation(
         "gpt-5.4",
         "Review this change.",
         Path::new("tmp/reviewer-runtime/out.txt"),
         Path::new("tmp/reviewer-runtime/schema.json"),
-        true,
     );
     let rendered =
         invocation.args.iter().map(|arg| arg.to_string_lossy().to_string()).collect::<Vec<_>>();
 
-    assert_eq!(rendered.first().map(String::as_str), Some("exec"));
-    assert!(rendered.iter().any(|arg| arg == "--full-auto"));
-    // --sandbox read-only must appear AFTER --full-auto to override workspace-write
-    let full_auto_pos = rendered.iter().position(|a| a == "--full-auto").unwrap();
-    let sandbox_pos = rendered.windows(2).position(|p| p == ["--sandbox", "read-only"]).unwrap();
-    assert!(
-        sandbox_pos > full_auto_pos,
-        "--sandbox read-only must come after --full-auto to override its implicit workspace-write"
-    );
+    assert!(!rendered.iter().any(|arg| arg == "--full-auto"));
+    assert!(rendered.windows(2).any(|pair| pair == ["--sandbox", "read-only"]));
     assert!(rendered.windows(2).any(|pair| pair == ["--model", "gpt-5.4"]));
 }
 
@@ -645,7 +639,7 @@ fn write_agent_profiles(root: &Path, model_profiles_json: &str) {
 }
 
 #[test]
-fn run_codex_local_passes_full_auto_for_full_model() {
+fn run_codex_local_never_passes_full_auto_even_for_full_model() {
     let _lock = env_lock().lock().unwrap();
     let dir = tempfile::tempdir().unwrap();
     let _cwd = CurrentDirGuard::change_to(dir.path());
@@ -673,9 +667,10 @@ fn run_codex_local_passes_full_auto_for_full_model() {
 
     assert_eq!(result.verdict, ReviewVerdict::ZeroFindings);
     let args_content = fs::read_to_string(&args_file).unwrap();
+    // --full-auto implies --sandbox workspace-write; reviewers must never use it
     assert!(
-        args_content.contains("--full-auto"),
-        "expected --full-auto in args for full model, got: {args_content}"
+        !args_content.contains("--full-auto"),
+        "expected no --full-auto for reviewer (implies workspace-write), got: {args_content}"
     );
 }
 
@@ -712,11 +707,11 @@ fn run_codex_local_omits_full_auto_for_spark_model() {
 }
 
 #[test]
-fn run_codex_local_defaults_to_full_auto_when_profiles_missing() {
+fn run_codex_local_never_passes_full_auto_even_when_profiles_missing() {
     let _lock = env_lock().lock().unwrap();
     let dir = tempfile::tempdir().unwrap();
     let _cwd = CurrentDirGuard::change_to(dir.path());
-    // No agent-profiles.json written — file read should fail, fall back to full_auto=true
+    // No agent-profiles.json written — reviewer must still not use --full-auto
     let script = write_fake_codex_script(dir.path());
     let output = dir.path().join("last.txt");
     let args_file = dir.path().join("codex-args.txt");
@@ -737,9 +732,10 @@ fn run_codex_local_defaults_to_full_auto_when_profiles_missing() {
 
     assert_eq!(result.verdict, ReviewVerdict::ZeroFindings);
     let args_content = fs::read_to_string(&args_file).unwrap();
+    // --full-auto implies --sandbox workspace-write; reviewers must never use it
     assert!(
-        args_content.contains("--full-auto"),
-        "expected --full-auto (fail-closed) when profiles missing, got: {args_content}"
+        !args_content.contains("--full-auto"),
+        "expected no --full-auto for reviewer even when profiles missing, got: {args_content}"
     );
 }
 

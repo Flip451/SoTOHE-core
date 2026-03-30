@@ -356,6 +356,7 @@ fn run_record_round(
     let protocol = infrastructure::review_adapters::RecordRoundProtocolImpl {
         items_dir: args.items_dir.clone(),
         group_display: args.group.clone(),
+        base_ref: "main".to_owned(),
     };
     let timestamp =
         make_timestamp().map_err(usecase::review_workflow::usecases::RecordRoundError::Other)?;
@@ -435,6 +436,7 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
 fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
     let store = infrastructure::track::fs_store::FsTrackStore::new(&args.items_dir);
     let hasher = infrastructure::review_adapters::SystemGitHasher;
+    let review_store = infrastructure::review_json_store::FsReviewJsonStore::new(&args.items_dir);
 
     // Detect whether this is a planning-only commit from staged files.
     // Fail-closed: if detection fails, assume code files are present.
@@ -445,7 +447,13 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
         track_id: args.track_id.clone(),
         planning_only,
     };
-    usecase::review_workflow::usecases::check_approved(input, &store, &store, &hasher)
+    usecase::review_workflow::usecases::check_approved(
+        input,
+        &store,
+        &store,
+        &hasher,
+        &review_store,
+    )
 }
 
 /// Returns `true` if all staged files match the planning-only allowlist.
