@@ -76,7 +76,7 @@
   },
   "review": {
     "base_ref": "main",
-    "code_hash": "rvw1:sha256:d7c2a0c8d796738151602c0c8211e79ec2d27bfafbf5c076523d5c87fb53bba2",
+    "code_hash": "rvw1:sha256:38eca0eb5445c412158814ef1a8ebf9737e9923ab9cdefc037214e0d26783508",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -90,7 +90,7 @@
           ],
           "round": 1,
           "round_type": "fast",
-          "timestamp": "2026-03-30T03:10:42Z"
+          "timestamp": "2026-03-30T03:55:26Z"
         },
         {
           "concerns": [],
@@ -100,7 +100,7 @@
           ],
           "round": 1,
           "round_type": "final",
-          "timestamp": "2026-03-30T03:10:43Z"
+          "timestamp": "2026-03-30T03:55:26Z"
         }
       ],
       "threshold": 3
@@ -113,24 +113,24 @@
       "domain": {
         "fast": {
           "round": 1,
-          "timestamp": "2026-03-30T03:10:42Z",
+          "timestamp": "2026-03-30T03:55:26Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-30T03:10:43Z",
+          "timestamp": "2026-03-30T03:55:26Z",
           "verdict": "zero_findings"
         }
       },
       "infra": {
         "fast": {
           "round": 1,
-          "timestamp": "2026-03-30T03:10:42Z",
+          "timestamp": "2026-03-30T03:55:26Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-30T03:10:43Z",
+          "timestamp": "2026-03-30T03:55:26Z",
           "verdict": "zero_findings"
         }
       }
@@ -173,7 +173,7 @@
     {
       "description": "CLI: review status / stale reason / final requirement 表示を review.json ベースへ更新",
       "id": "T007",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Verification: codec/usecase/CLI 回帰テスト追加 + cargo make ci で全通確認",
@@ -182,5 +182,5 @@
     }
   ],
   "title": "review.json 分離 + group 独立レビュー + per-group hash",
-  "updated_at": "2026-03-30T03:10:43Z"
+  "updated_at": "2026-03-30T03:55:26Z"
 }
