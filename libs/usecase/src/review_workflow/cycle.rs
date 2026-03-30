@@ -675,4 +675,143 @@ mod tests {
             )
         );
     }
+
+    // -----------------------------------------------------------------------
+    // T008: Full workflow regression tests (acceptance criteria coverage)
+    // -----------------------------------------------------------------------
+
+    /// AC: new review cycle creation freezes base_ref, policy_hash, group scopes, mandatory other
+    #[test]
+    fn test_regression_cycle_creation_freezes_all_fields() {
+        let mut groups = BTreeMap::new();
+        groups.insert(grn("domain"), vec![]);
+        groups.insert(grn("infra"), vec![]);
+        groups.insert(grn("other"), vec![]);
+        let partition = GroupPartition::try_new(groups).unwrap();
+        let snapshot = ReviewPartitionSnapshot::new("sha256:base", "sha256:eff", partition);
+
+        let mut review = ReviewJson::new();
+        start_review_cycle(
+            &mut review,
+            StartReviewCycleInput {
+                cycle_id: "regression-1".into(),
+                started_at: ts("2026-03-30T12:00:00Z"),
+                base_ref: "main".into(),
+                snapshot,
+            },
+        )
+        .unwrap();
+
+        let cycle = review.current_cycle().unwrap();
+        assert_eq!(cycle.base_ref(), "main");
+        assert_eq!(cycle.base_policy_hash(), "sha256:base");
+        assert_eq!(cycle.policy_hash(), "sha256:eff");
+        assert_eq!(cycle.groups().len(), 3);
+        assert!(cycle.groups().contains_key(&grn("other")));
+    }
+
+    /// AC: zero_findings group is not invalidated by other group's round
+    #[test]
+    fn test_regression_zero_findings_group_independent() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        // domain has fast zero_findings
+
+        // Record multiple rounds on "other" — domain should be untouched
+        for i in 0..3 {
+            record_cycle_group_round(
+                &mut review,
+                RecordCycleGroupRoundInput {
+                    group_name: grn("other"),
+                    round_type: RoundType::Fast,
+                    timestamp: ts(&format!("2026-03-30T10:0{i}:00Z")),
+                    outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
+                    group_hash: format!("hash-other-{i}"),
+                },
+            )
+            .unwrap();
+        }
+
+        let cycle = review.current_cycle().unwrap();
+        assert_eq!(cycle.group(&grn("domain")).unwrap().rounds().len(), 1);
+        assert_eq!(cycle.group(&grn("other")).unwrap().rounds().len(), 3);
+    }
+
+    /// AC: stale cycle requires new cycle (old rounds don't count for approval)
+    #[test]
+    fn test_regression_stale_cycle_not_approved() {
+        let (review, _) = fully_approved_review();
+        let mut hashes = BTreeMap::new();
+        hashes.insert(grn("domain"), "hash-current".into());
+        hashes.insert(grn("other"), "hash-other".into());
+
+        // With matching snapshot → approved
+        let snapshot_match = make_snapshot("sha256:b", "sha256:e");
+        assert_eq!(
+            check_cycle_approved(&review, &snapshot_match, &hashes),
+            CheckCycleApprovedResult::Approved
+        );
+
+        // With changed base policy → stale, not approved
+        let snapshot_stale = make_snapshot("sha256:changed", "sha256:e");
+        assert!(matches!(
+            check_cycle_approved(&review, &snapshot_stale, &hashes),
+            CheckCycleApprovedResult::NotApproved(CheckCycleApprovedReason::Stale(_))
+        ));
+    }
+
+    /// AC: final round required for all groups (including other)
+    #[test]
+    fn test_regression_final_required_for_all_groups() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        let snapshot = make_snapshot("sha256:b", "sha256:e");
+
+        // Add fast + final for domain
+        record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Final,
+                timestamp: ts("2026-03-30T10:02:00Z"),
+                outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
+                group_hash: "hash-current".into(),
+            },
+        )
+        .unwrap();
+        // other has fast only — final missing
+        record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("other"),
+                round_type: RoundType::Fast,
+                timestamp: ts("2026-03-30T10:03:00Z"),
+                outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
+                group_hash: "hash-other".into(),
+            },
+        )
+        .unwrap();
+
+        let mut hashes = BTreeMap::new();
+        hashes.insert(grn("domain"), "hash-current".into());
+        hashes.insert(grn("other"), "hash-other".into());
+
+        // Fast-only for other → not approved (final required)
+        let result = check_cycle_approved(&review, &snapshot, &hashes);
+        assert_eq!(
+            result,
+            CheckCycleApprovedResult::NotApproved(
+                CheckCycleApprovedReason::ApprovalRequirementsNotMet
+            )
+        );
+    }
+
+    /// AC: NoCycle returns not-approved (planning-only check is CLI level)
+    #[test]
+    fn test_regression_no_cycle_not_approved() {
+        let review = ReviewJson::new();
+        let snapshot = make_snapshot("sha256:b", "sha256:e");
+        assert_eq!(
+            check_cycle_approved(&review, &snapshot, &BTreeMap::new()),
+            CheckCycleApprovedResult::NotApproved(CheckCycleApprovedReason::NoCycle)
+        );
+    }
 }

@@ -76,7 +76,7 @@
   },
   "review": {
     "base_ref": "main",
-    "code_hash": "rvw1:sha256:38eca0eb5445c412158814ef1a8ebf9737e9923ab9cdefc037214e0d26783508",
+    "code_hash": "rvw1:sha256:2fa175e5d5cdd9d1ce551260d7d32884a4b747c38f8e05f97b23608531dcfca1",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -90,7 +90,7 @@
           ],
           "round": 1,
           "round_type": "fast",
-          "timestamp": "2026-03-30T03:55:26Z"
+          "timestamp": "2026-03-30T04:03:20Z"
         },
         {
           "concerns": [],
@@ -100,7 +100,7 @@
           ],
           "round": 1,
           "round_type": "final",
-          "timestamp": "2026-03-30T03:55:26Z"
+          "timestamp": "2026-03-30T04:03:20Z"
         }
       ],
       "threshold": 3
@@ -113,24 +113,24 @@
       "domain": {
         "fast": {
           "round": 1,
-          "timestamp": "2026-03-30T03:55:26Z",
+          "timestamp": "2026-03-30T04:03:20Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-30T03:55:26Z",
+          "timestamp": "2026-03-30T04:03:20Z",
           "verdict": "zero_findings"
         }
       },
       "infra": {
         "fast": {
           "round": 1,
-          "timestamp": "2026-03-30T03:55:26Z",
+          "timestamp": "2026-03-30T04:03:20Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-30T03:55:26Z",
+          "timestamp": "2026-03-30T04:03:20Z",
           "verdict": "zero_findings"
         }
       }
@@ -178,9 +178,9 @@
     {
       "description": "Verification: codec/usecase/CLI 回帰テスト追加 + cargo make ci で全通確認",
       "id": "T008",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "title": "review.json 分離 + group 独立レビュー + per-group hash",
-  "updated_at": "2026-03-30T03:55:26Z"
+  "updated_at": "2026-03-30T04:03:20Z"
 }
