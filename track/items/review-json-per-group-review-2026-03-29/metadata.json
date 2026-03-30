@@ -76,7 +76,7 @@
   },
   "review": {
     "base_ref": "main",
-    "code_hash": "rvw1:sha256:657044b2e566694c7a599ae73ec65c3de484fdc749cc8d04000657ddd9874187",
+    "code_hash": "rvw1:sha256:1183a6c3e0b7a17bf13f46409c0e73d5af855a0599605dabfa908f7df5c14d33",
     "escalation": {
       "phase": {
         "type": "clear"
@@ -90,7 +90,7 @@
           ],
           "round": 1,
           "round_type": "fast",
-          "timestamp": "2026-03-30T01:11:23Z"
+          "timestamp": "2026-03-30T02:00:13Z"
         },
         {
           "concerns": [],
@@ -100,7 +100,7 @@
           ],
           "round": 1,
           "round_type": "final",
-          "timestamp": "2026-03-30T01:11:35Z"
+          "timestamp": "2026-03-30T02:00:13Z"
         }
       ],
       "threshold": 3
@@ -113,24 +113,24 @@
       "domain": {
         "fast": {
           "round": 1,
-          "timestamp": "2026-03-30T01:11:14Z",
+          "timestamp": "2026-03-30T02:00:13Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-30T01:11:31Z",
+          "timestamp": "2026-03-30T02:00:13Z",
           "verdict": "zero_findings"
         }
       },
       "infra": {
         "fast": {
           "round": 1,
-          "timestamp": "2026-03-30T01:11:23Z",
+          "timestamp": "2026-03-30T02:00:13Z",
           "verdict": "zero_findings"
         },
         "final": {
           "round": 1,
-          "timestamp": "2026-03-30T01:11:35Z",
+          "timestamp": "2026-03-30T02:00:13Z",
           "verdict": "zero_findings"
         }
       }
@@ -153,7 +153,7 @@
     {
       "description": "Usecase/Infrastructure: track/review-scope.json の policy schema を groups 対応に拡張し、optional per-track review-groups.json override との 2 層 resolution で policy_hash と group partition を導出する",
       "id": "T003",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Usecase: mandatory other と cycle freeze を実装し、scope drift を stale 扱いにする。base policy 変更は policy_changed、per-track groups override 変更は partition_changed として区別する",
@@ -182,5 +182,5 @@
     }
   ],
   "title": "review.json 分離 + group 独立レビュー + per-group hash",
-  "updated_at": "2026-03-30T01:11:35Z"
+  "updated_at": "2026-03-30T02:00:13Z"
 }

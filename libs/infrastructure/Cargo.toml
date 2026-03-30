@@ -23,6 +23,7 @@ thiserror.workspace = true
 toml.workspace = true
 sha2 = "0.10.9"
 fs4 = "0.13.1"
+globset = "0.4"
 
 [dev-dependencies]
 rstest = { workspace = true }

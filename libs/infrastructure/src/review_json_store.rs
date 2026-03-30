@@ -37,51 +37,19 @@ impl FsReviewJsonStore {
     }
 }
 
-/// Rejects symlinks at the given path and its parent directory (fail-closed).
+/// Checks symlinks on the path and all ancestors below `root` (fail-closed).
 ///
-/// Returns `Ok(false)` if the leaf path does not exist,
-/// `Ok(true)` if it exists and is a regular file,
-/// `Err` if any checked path component is a symlink or metadata cannot be read.
-fn reject_symlink(path: &std::path::Path) -> Result<bool, RepositoryError> {
-    // Check parent directory (track dir) — must not be a symlink
-    if let Some(parent) = path.parent() {
-        reject_symlink_single(parent)?;
-    }
-    // Check the leaf file itself
-    match path.symlink_metadata() {
-        Ok(meta) => {
-            if meta.file_type().is_symlink() {
-                Err(RepositoryError::Message(format!(
-                    "refusing to follow symlink: {}",
-                    path.display()
-                )))
-            } else {
-                Ok(true)
-            }
-        }
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),
-        Err(e) => Err(RepositoryError::Message(format!("failed to stat {}: {e}", path.display()))),
-    }
-}
-
-/// Rejects a single path if it is a symlink or cannot be inspected (fail-closed).
-/// Non-existent paths are allowed (the parent may not exist yet for writes).
-fn reject_symlink_single(path: &std::path::Path) -> Result<(), RepositoryError> {
-    match path.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => Err(RepositoryError::Message(format!(
-            "refusing to follow symlink in path: {}",
-            path.display()
-        ))),
-        Ok(_) => Ok(()),
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
-        Err(e) => Err(RepositoryError::Message(format!("failed to stat {}: {e}", path.display()))),
-    }
+/// Returns `Ok(false)` if the leaf does not exist, `Ok(true)` if it exists,
+/// `Err` if any component is a symlink or cannot be inspected.
+fn reject_symlink(path: &std::path::Path, root: &std::path::Path) -> Result<bool, RepositoryError> {
+    crate::track::symlink_guard::reject_symlinks_below(path, root)
+        .map_err(|e| RepositoryError::Message(e.to_string()))
 }
 
 impl ReviewJsonReader for FsReviewJsonStore {
     fn find_review(&self, id: &TrackId) -> Result<Option<ReviewJson>, TrackReadError> {
         let path = self.review_path(id);
-        if !reject_symlink(&path)? {
+        if !reject_symlink(&path, &self.root)? {
             return Ok(None);
         }
         let content = std::fs::read_to_string(&path).map_err(|e| {
@@ -98,7 +66,7 @@ impl ReviewJsonWriter for FsReviewJsonStore {
     fn save_review(&self, id: &TrackId, review: &ReviewJson) -> Result<(), TrackWriteError> {
         let path = self.review_path(id);
         // Reject symlinks before any write operation
-        if let Err(e) = reject_symlink(&path) {
+        if let Err(e) = reject_symlink(&path, &self.root) {
             return Err(TrackWriteError::from(e));
         }
         // Empty review (NoCycle) → remove the file to preserve None == NoCycle contract

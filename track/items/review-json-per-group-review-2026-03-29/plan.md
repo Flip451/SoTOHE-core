@@ -20,7 +20,7 @@ track/review-scope.json を policy source として使い、named groups と man
 review cycle 開始時に partition と policy_hash を固定し、cycle 中の drift は stale 扱いにする。
 scope は path list として cycle に保存する。
 
-- [ ] Usecase/Infrastructure: track/review-scope.json の policy schema を groups 対応に拡張し、optional per-track review-groups.json override との 2 層 resolution で policy_hash と group partition を導出する
+- [~] Usecase/Infrastructure: track/review-scope.json の policy schema を groups 対応に拡張し、optional per-track review-groups.json override との 2 層 resolution で policy_hash と group partition を導出する
 - [ ] Usecase: mandatory other と cycle freeze を実装し、scope drift を stale 扱いにする。base policy 変更は policy_changed、per-track groups override 変更は partition_changed として区別する
 
 ## Append-Only Recording
