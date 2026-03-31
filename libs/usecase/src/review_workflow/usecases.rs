@@ -399,18 +399,21 @@ pub fn check_approved(
             .to_string());
     };
 
-    // Compute per-group scope hashes from frozen scope files.
-    let mut current_group_hashes = std::collections::BTreeMap::new();
-    for (group_name, group_state) in cycle.groups() {
-        let group_hash = hasher
-            .group_scope_hash(group_state.scope())
-            .map_err(|e| format!("group scope hash error for '{}': {e}", group_name.as_ref()))?;
-        current_group_hashes.insert(group_name.clone(), group_hash);
-    }
-
     // Delegate to check_cycle_approved which performs full verification:
     // staleness (policy + partition + hash) + per-group fast/final check.
     if let Some(ref snapshot) = input.current_snapshot {
+        // Compute hashes from CURRENT partition (not frozen cycle scope) so that
+        // files added to a group after cycle start are reflected in the hash,
+        // causing a mismatch with the reviewed round hash.
+        let mut current_group_hashes = std::collections::BTreeMap::new();
+        for (group_name, paths) in snapshot.partition().groups() {
+            let scope: Vec<String> = paths.iter().map(|p| p.as_str().to_owned()).collect();
+            let group_hash = hasher.group_scope_hash(&scope).map_err(|e| {
+                format!("group scope hash error for '{}': {e}", group_name.as_ref())
+            })?;
+            current_group_hashes.insert(group_name.clone(), group_hash);
+        }
+
         match crate::review_workflow::cycle::check_cycle_approved(
             &review,
             snapshot,
@@ -422,8 +425,14 @@ pub fn check_approved(
             }
         }
     } else {
-        // Fallback when no snapshot provided: check per-group hashes only
-        // (no staleness detection). Used when CLI cannot compute the snapshot.
+        // Fallback when no snapshot provided: compute hashes from cycle's frozen scope.
+        let mut current_group_hashes = std::collections::BTreeMap::new();
+        for (group_name, group_state) in cycle.groups() {
+            let group_hash = hasher.group_scope_hash(group_state.scope()).map_err(|e| {
+                format!("group scope hash error for '{}': {e}", group_name.as_ref())
+            })?;
+            current_group_hashes.insert(group_name.clone(), group_hash);
+        }
         if review.current_cycle().is_some_and(|c| c.all_groups_approved(&current_group_hashes)) {
             Ok(())
         } else {
