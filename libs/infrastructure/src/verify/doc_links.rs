@@ -80,7 +80,11 @@ pub fn verify(root: &Path) -> VerifyOutcome {
                     continue;
                 }
 
-                let resolved = md_dir.join(path_part);
+                let resolved = if path_part.starts_with('/') {
+                    root.join(path_part.trim_start_matches('/'))
+                } else {
+                    md_dir.join(path_part)
+                };
                 if !resolved.exists() {
                     let rel_md = md_path.strip_prefix(root).unwrap_or(md_path);
                     findings.push(Finding::error(format!(
@@ -109,8 +113,8 @@ fn collect_md_files_recursive(
     dir: &Path,
     out: &mut Vec<std::path::PathBuf>,
 ) -> Result<(), std::io::Error> {
-    const SKIP_DIRS: &[&str] =
-        &["target", "target-", ".git", "node_modules", "vendor", ".cache", "tmp"];
+    const SKIP_EXACT: &[&str] = &["target", ".git", "node_modules", "vendor", ".cache", "tmp"];
+    const SKIP_PREFIXES: &[&str] = &["target-"];
 
     let entries = std::fs::read_dir(dir)?;
 
@@ -121,7 +125,9 @@ fn collect_md_files_recursive(
         let name = file_name.to_string_lossy();
 
         if path.is_dir() {
-            if SKIP_DIRS.iter().any(|&s| name == s || name.starts_with(s)) {
+            if SKIP_EXACT.iter().any(|&s| *name == *s)
+                || SKIP_PREFIXES.iter().any(|&p| name.starts_with(p))
+            {
                 continue;
             }
             collect_md_files_recursive(&path, out)?;
