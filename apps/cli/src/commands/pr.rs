@@ -351,26 +351,32 @@ where
     }
 }
 
-/// Checks that all tasks in the track metadata are resolved, without
-/// requiring the worktree to be clean. Used by `wait_and_merge` which
-/// validates a remote PR branch, not the local checkout.
+/// Checks that all tasks in the PR head commit's metadata are resolved.
+///
+/// Reads metadata.json from `origin/<branch>` via `git show` so it is
+/// independent of the local worktree state. This ensures the guard
+/// validates the committed content on the PR branch, not local edits.
 fn check_tasks_resolved(branch: &str, repo_root: &std::path::Path) -> ExitCode {
     if branch.starts_with("plan/") {
         return ExitCode::SUCCESS;
     }
 
     let track_id_str = branch.strip_prefix("track/").unwrap_or(branch);
-    let metadata_path = repo_root.join("track/items").join(track_id_str).join("metadata.json");
+    let blob_path = format!("track/items/{track_id_str}/metadata.json");
+    let git_ref = format!("origin/{branch}:{blob_path}");
 
-    if !metadata_path.exists() {
-        eprintln!("[BLOCKED] metadata.json not found at {}", metadata_path.display());
-        return ExitCode::FAILURE;
-    }
+    let output =
+        std::process::Command::new("git").args(["show", &git_ref]).current_dir(repo_root).output();
 
-    let json = match std::fs::read_to_string(&metadata_path) {
-        Ok(j) => j,
+    let json = match output {
+        Ok(o) if o.status.success() => String::from_utf8_lossy(&o.stdout).into_owned(),
+        Ok(o) => {
+            let stderr = String::from_utf8_lossy(&o.stderr);
+            eprintln!("[BLOCKED] metadata.json not found on origin/{branch}: {stderr}");
+            return ExitCode::FAILURE;
+        }
         Err(e) => {
-            eprintln!("[BLOCKED] failed to read metadata: {e}");
+            eprintln!("[BLOCKED] failed to run git show: {e}");
             return ExitCode::FAILURE;
         }
     };
@@ -1778,6 +1784,33 @@ mod tests {
     }
 
     // --- check_tasks_resolved tests ---
+    //
+    // check_tasks_resolved reads from origin/<branch> via `git show`.
+    // Tests set up a bare "origin" repo, push a branch with metadata, then
+    // add it as a remote to the working repo so `git show origin/...` works.
+
+    fn init_git_repo(dir: &Path) {
+        std::process::Command::new("git").args(["init"]).current_dir(dir).output().unwrap();
+        std::process::Command::new("git")
+            .args(["config", "user.email", "test@test.com"])
+            .current_dir(dir)
+            .output()
+            .unwrap();
+        std::process::Command::new("git")
+            .args(["config", "user.name", "Test"])
+            .current_dir(dir)
+            .output()
+            .unwrap();
+    }
+
+    fn git_add_commit(dir: &Path) {
+        std::process::Command::new("git").args(["add", "-A"]).current_dir(dir).output().unwrap();
+        std::process::Command::new("git")
+            .args(["commit", "-m", "test", "--allow-empty"])
+            .current_dir(dir)
+            .output()
+            .unwrap();
+    }
 
     fn write_metadata(dir: &Path, track_id: &str, tasks_json: &str) {
         let track_dir = dir.join("track/items").join(track_id);
@@ -1801,33 +1834,84 @@ mod tests {
         std::fs::write(track_dir.join("metadata.json"), json).unwrap();
     }
 
+    /// Creates a bare repo as "origin", writes metadata on a branch, and
+    /// sets up the working repo with that origin so `git show origin/...` works.
+    fn setup_origin_with_metadata(
+        track_id: &str,
+        tasks_json: &str,
+    ) -> (tempfile::TempDir, tempfile::TempDir) {
+        // Create a source repo with the branch and metadata
+        let src = tempfile::tempdir().unwrap();
+        init_git_repo(src.path());
+        git_add_commit(src.path()); // initial commit on default branch
+
+        // Create and switch to track branch
+        let branch = format!("track/{track_id}");
+        std::process::Command::new("git")
+            .args(["checkout", "-b", &branch])
+            .current_dir(src.path())
+            .output()
+            .unwrap();
+        write_metadata(src.path(), track_id, tasks_json);
+        git_add_commit(src.path());
+
+        // Create a bare clone as "origin"
+        let origin = tempfile::tempdir().unwrap();
+        std::process::Command::new("git")
+            .args([
+                "clone",
+                "--bare",
+                src.path().to_str().unwrap(),
+                origin.path().to_str().unwrap(),
+            ])
+            .output()
+            .unwrap();
+
+        // Create a working repo that uses this origin
+        let work = tempfile::tempdir().unwrap();
+        init_git_repo(work.path());
+        git_add_commit(work.path());
+        std::process::Command::new("git")
+            .args(["remote", "add", "origin", origin.path().to_str().unwrap()])
+            .current_dir(work.path())
+            .output()
+            .unwrap();
+        std::process::Command::new("git")
+            .args(["fetch", "origin"])
+            .current_dir(work.path())
+            .output()
+            .unwrap();
+
+        // Return (work, origin) — origin must be kept alive
+        (work, origin)
+    }
+
     #[test]
     fn check_tasks_resolved_blocks_on_unresolved_tasks() {
-        let dir = tempfile::tempdir().unwrap();
-        write_metadata(
-            dir.path(),
+        let (work, _origin) = setup_origin_with_metadata(
             "my-track",
             r#"{"id": "T1", "description": "Task", "status": "todo"}"#,
         );
-        let result = super::check_tasks_resolved("track/my-track", dir.path());
+        let result = super::check_tasks_resolved("track/my-track", work.path());
         assert_eq!(result, ExitCode::FAILURE);
     }
 
     #[test]
     fn check_tasks_resolved_passes_with_all_done() {
-        let dir = tempfile::tempdir().unwrap();
-        write_metadata(
-            dir.path(),
+        let (work, _origin) = setup_origin_with_metadata(
             "my-track",
             r#"{"id": "T1", "description": "Task", "status": "done", "commit_hash": "abc1234"}"#,
         );
-        let result = super::check_tasks_resolved("track/my-track", dir.path());
+        let result = super::check_tasks_resolved("track/my-track", work.path());
         assert_eq!(result, ExitCode::SUCCESS);
     }
 
     #[test]
     fn check_tasks_resolved_blocks_on_missing_metadata() {
         let dir = tempfile::tempdir().unwrap();
+        init_git_repo(dir.path());
+        git_add_commit(dir.path());
+        // No origin remote — git show will fail → fail-closed
         let result = super::check_tasks_resolved("track/my-track", dir.path());
         assert_eq!(result, ExitCode::FAILURE);
     }
