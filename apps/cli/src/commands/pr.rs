@@ -430,6 +430,11 @@ fn wait_and_merge(pr: &str, interval: u64, timeout: u64, method: &str) -> ExitCo
             return ExitCode::FAILURE;
         }
     };
+    // Fetch the PR head ref so the local remote-tracking branch is current.
+    if let Err(e) = repo.output(&["fetch", "origin", &branch]) {
+        eprintln!("[ERROR] failed to fetch origin/{branch}: {e}");
+        return ExitCode::FAILURE;
+    }
     let guard_result = check_tasks_resolved(&branch, repo.root());
     if guard_result != ExitCode::SUCCESS {
         return guard_result;
