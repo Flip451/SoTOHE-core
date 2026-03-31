@@ -367,13 +367,21 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
             let other_key = ReviewGroupName::try_new("other").map_err(|e| {
                 RecordRoundProtocolError::Other(format!("invalid group name 'other': {e}"))
             })?;
+            // Filter to expected_groups. Files from non-expected groups are
+            // re-mapped to "other" so they are still covered by the review scope
+            // (fail-closed: no files silently dropped).
             let mut filtered_groups = std::collections::BTreeMap::new();
             for (name, paths) in full_partition.groups() {
                 if expected_groups.contains(name) || *name == other_key {
                     filtered_groups.insert(name.clone(), paths.clone());
+                } else {
+                    // Re-map to "other" so these files are not silently dropped.
+                    filtered_groups
+                        .entry(other_key.clone())
+                        .or_default()
+                        .extend(paths.iter().cloned());
                 }
             }
-            // Ensure "other" exists even if not in the full partition result.
             filtered_groups.entry(other_key).or_default();
             let partition =
                 usecase::review_workflow::groups::GroupPartition::try_new(filtered_groups)
