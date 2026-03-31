@@ -1,78 +1,87 @@
 {
-  "schema_version": 3,
-  "id": "pr-review-flow-fix-2026-03-31",
   "branch": "track/pr-review-flow-fix-2026-03-31",
-  "title": "Phase D: PR review flow fix (WF-66/ERR-08)",
-  "status": "planned",
   "created_at": "2026-03-31T12:46:15Z",
-  "updated_at": "2026-03-31T12:46:15Z",
-  "tasks": [
-    {
-      "id": "T001",
-      "description": "check_task_completion_guard を push() と review_cycle() から削除し wait_and_merge_with() に移動",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T002",
-      "description": "track-pr-merge のみがタスク完了を要求するよう SKILL.md (pr-review.md, merge.md) を更新",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T003",
-      "description": "review_cycle() の trigger state (PR番号, comment ID, timestamp) を tmp/pr-review-state/<track-id>.json に永続化",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T004",
-      "description": "track-pr-review --resume サブコマンド追加 (永続化 state から poll を再開)",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T005",
-      "description": "テスト: 未完了タスクがある状態で push + PR review が通ること、wait_and_merge で未完了タスクがブロックされること",
-      "status": "todo",
-      "commit_hash": null
-    }
-  ],
+  "id": "pr-review-flow-fix-2026-03-31",
   "plan": {
-    "summary": [
-      "push() と review_cycle() から check_task_completion_guard を削除し、wait_and_merge_with() のみで実行するよう移動する (WF-66)。",
-      "review_cycle() の trigger state を JSON ファイルに永続化し --resume で再開可能にする (ERR-08)。"
-    ],
     "sections": [
       {
-        "id": "S1",
-        "title": "タスク完了ガードの移動 (WF-66)",
         "description": [
           "pr.rs の push() (line 170-175) と review_cycle() (line 657-662) から check_task_completion_guard 呼び出しを削除。",
           "wait_and_merge_with() の冒頭 (merge 前) に同ガードを追加。",
           "これにより中間 push と PR review が未完了タスクでもブロックされなくなり、merge のみがタスク完了を要求する。"
         ],
-        "task_ids": ["T001", "T002"]
+        "id": "S1",
+        "task_ids": [
+          "T001",
+          "T002",
+          "T006"
+        ],
+        "title": "タスク完了ガードの移動 (WF-66)"
       },
       {
-        "id": "S2",
-        "title": "PR review 中断耐性 (ERR-08)",
         "description": [
           "review_cycle() で @codex review をポストした直後に trigger state (PR番号, comment ID, trigger_timestamp, head_hash) を tmp/pr-review-state/<track-id>.json に保存。",
           "新しい --resume フラグで既存の state ファイルからポーリングを再開可能にする。",
           "state ファイルが存在しない場合や古い場合は通常フローにフォールバック。"
         ],
-        "task_ids": ["T003", "T004"]
+        "id": "S2",
+        "task_ids": [
+          "T003",
+          "T004"
+        ],
+        "title": "PR review 中断耐性 (ERR-08)"
       },
       {
-        "id": "S3",
-        "title": "テスト",
         "description": [
           "push() が未完了タスクでも成功すること、wait_and_merge_with() が未完了タスクでブロックすることを検証。",
           "trigger state の永続化と復元の往復テスト。"
         ],
-        "task_ids": ["T005"]
+        "id": "S3",
+        "task_ids": [
+          "T005"
+        ],
+        "title": "テスト"
       }
+    ],
+    "summary": [
+      "push() と review_cycle() から check_task_completion_guard を削除し、wait_and_merge_with() のみで実行するよう移動する (WF-66)。",
+      "review_cycle() の trigger state を JSON ファイルに永続化し --resume で再開可能にする (ERR-08)。"
     ]
-  }
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "check_task_completion_guard を push() と review_cycle() から削除し wait_and_merge_with() に移動",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "track-pr-merge のみがタスク完了を要求するよう SKILL.md (pr-review.md, merge.md) を更新",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "review_cycle() の trigger state (PR番号, comment ID, timestamp) を tmp/pr-review-state/<track-id>.json に永続化",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "track-pr-review --resume サブコマンド追加 (永続化 state から poll を再開)",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "テスト: 未完了タスクがある状態で push + PR review が通ること、wait_and_merge で未完了タスクがブロックされること",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "check_approved: review未開始(NotStarted/no review.json)はコミット許可",
+      "id": "T006",
+      "status": "done"
+    }
+  ],
+  "title": "Phase D: PR review flow fix (WF-66/ERR-08)",
+  "updated_at": "2026-03-31T13:16:24Z"
 }

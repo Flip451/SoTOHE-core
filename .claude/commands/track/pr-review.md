@@ -29,6 +29,9 @@ Run the following wrappers in sequence:
 cargo make track-pr-push
 ```
 
+> **Note**: `track-pr-push` does NOT enforce task completion. Push is allowed with unresolved tasks.
+> Task completion is only enforced at merge time (`track-pr-merge` / `/track:merge`).
+
 Then:
 
 ```bash

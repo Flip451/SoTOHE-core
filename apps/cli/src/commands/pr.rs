@@ -94,6 +94,9 @@ pub struct ReviewCycleArgs {
     /// Explicit track ID (required on plan/ branches, ignored on track/ branches).
     #[arg(long)]
     pub track_id: Option<String>,
+    /// Resume polling from a previously persisted trigger state file.
+    #[arg(long)]
+    pub resume: bool,
 }
 
 pub fn execute(cmd: PrCommand) -> ExitCode {
@@ -146,7 +149,7 @@ pub fn execute(cmd: PrCommand) -> ExitCode {
                 }
             }
         }
-        PrCommand::ReviewCycle(args) => match review_cycle(args.track_id.as_deref()) {
+        PrCommand::ReviewCycle(args) => match review_cycle(args.track_id.as_deref(), args.resume) {
             Ok(code) => code,
             Err(err) => {
                 eprintln!("{err}");
@@ -166,13 +169,6 @@ fn resolve_branch_context(explicit_track_id: Option<&str>) -> Result<PrBranchCon
 
 fn push(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
     let ctx = resolve_branch_context(explicit_track_id)?;
-
-    // Run task completion guard (skip for plan/ branches).
-    let repo_for_guard = SystemGitRepo::discover()?;
-    let result = check_task_completion_guard(&ctx.branch, repo_for_guard.root());
-    if result != ExitCode::SUCCESS {
-        return Ok(result);
-    }
 
     let repo = SystemGitRepo::discover()?;
     println!("Pushing {} to origin...", ctx.branch);
@@ -453,6 +449,30 @@ where
 }
 
 fn wait_and_merge(pr: &str, interval: u64, timeout: u64, method: &str) -> ExitCode {
+    // Task completion guard: block merge if tasks are unresolved (WF-66).
+    let repo = match SystemGitRepo::discover() {
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!("[ERROR] {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let branch = match repo.current_branch() {
+        Ok(Some(b)) => b,
+        Ok(None) => {
+            eprintln!("[ERROR] could not determine current branch");
+            return ExitCode::FAILURE;
+        }
+        Err(e) => {
+            eprintln!("[ERROR] {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let guard_result = check_task_completion_guard(&branch, repo.root());
+    if guard_result != ExitCode::SUCCESS {
+        return guard_result;
+    }
+
     let client = SystemGhClient;
     wait_and_merge_with(pr, interval, timeout, method, &client, &thread::sleep)
 }
@@ -631,7 +651,56 @@ where
 // T006: review-cycle
 // ---------------------------------------------------------------------------
 
-fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
+/// Trigger state persisted to `tmp/pr-review-state/<track-id>.json` (ERR-08).
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+struct TriggerState {
+    pr_number: String,
+    trigger_timestamp: String,
+    head_hash: Option<String>,
+    track_id: String,
+}
+
+/// Returns the path to the trigger state file for the given track ID.
+fn trigger_state_path(track_id: &str) -> PathBuf {
+    PathBuf::from("tmp/pr-review-state").join(format!("{track_id}.json"))
+}
+
+/// Saves trigger state to disk for later `--resume`.
+fn save_trigger_state(state: &TriggerState) -> Result<(), CliError> {
+    let path = trigger_state_path(&state.track_id);
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|e| {
+            CliError::Message(format!("failed to create dir {}: {e}", parent.display()))
+        })?;
+    }
+    let json = serde_json::to_string_pretty(state)
+        .map_err(|e| CliError::Message(format!("failed to serialize trigger state: {e}")))?;
+    fs::write(&path, json)
+        .map_err(|e| CliError::Message(format!("failed to write {}: {e}", path.display())))?;
+    println!("[OK] Saved trigger state to {}", path.display());
+    Ok(())
+}
+
+/// Loads trigger state from disk. Returns `None` if file does not exist.
+fn load_trigger_state(track_id: &str) -> Result<Option<TriggerState>, CliError> {
+    let path = trigger_state_path(track_id);
+    if !path.exists() {
+        return Ok(None);
+    }
+    let json = fs::read_to_string(&path)
+        .map_err(|e| CliError::Message(format!("failed to read {}: {e}", path.display())))?;
+    let state: TriggerState = serde_json::from_str(&json)
+        .map_err(|e| CliError::Message(format!("failed to parse trigger state: {e}")))?;
+    Ok(Some(state))
+}
+
+/// Removes trigger state file after a successful review cycle.
+fn cleanup_trigger_state(track_id: &str) {
+    let path = trigger_state_path(track_id);
+    let _ = fs::remove_file(path);
+}
+
+fn review_cycle(explicit_track_id: Option<&str>, resume: bool) -> Result<ExitCode, CliError> {
     // Fail-closed: must be on a track/ branch (not plan/)
     let repo = SystemGitRepo::discover()?;
 
@@ -652,49 +721,69 @@ fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
         ));
     }
 
+    let track_id = branch.strip_prefix("track/").unwrap_or(&branch).to_owned();
     let client = SystemGhClient;
 
-    // Step 1: Push (with task completion guard)
-    let ctx = resolve_branch_context(explicit_track_id)?;
-    let guard_result = check_task_completion_guard(&ctx.branch, repo.root());
-    if guard_result != ExitCode::SUCCESS {
-        return Ok(guard_result);
-    }
-    println!("Pushing {} to origin...", ctx.branch);
-    repo.push_branch(&ctx.branch)?;
-    println!("[OK] Pushed {}", ctx.branch);
+    // --resume: reload trigger state and skip push/trigger steps.
+    let (pr_number, trigger_timestamp, head_ref_owned) = if resume {
+        let state = load_trigger_state(&track_id)?.ok_or_else(|| {
+            CliError::Message(format!(
+                "no trigger state file found for track '{track_id}'. \
+                 Run without --resume to start a new review cycle."
+            ))
+        })?;
+        println!("[OK] Resumed trigger state for PR #{}", state.pr_number);
+        (state.pr_number, state.trigger_timestamp, state.head_hash)
+    } else {
+        // Step 1: Push
+        let ctx = resolve_branch_context(explicit_track_id)?;
+        println!("Pushing {} to origin...", ctx.branch);
+        repo.push_branch(&ctx.branch)?;
+        println!("[OK] Pushed {}", ctx.branch);
 
-    // Step 2: Ensure PR
-    let pr_number = match ensure_pr_for_cycle(&ctx, "main", &client)? {
-        Some(pr) => pr,
-        None => return Ok(ExitCode::FAILURE),
+        // Step 2: Ensure PR
+        let pr_number = match ensure_pr_for_cycle(&ctx, "main", &client)? {
+            Some(pr) => pr,
+            None => return Ok(ExitCode::FAILURE),
+        };
+
+        let nwo = client.repo_nwo()?;
+
+        // Step 3: Trigger new review.
+        let response = client.post_issue_comment(&nwo, &pr_number, "@codex review")?;
+        let trigger_timestamp = serde_json::from_str::<serde_json::Value>(&response)
+            .ok()
+            .and_then(|v| v.get("created_at")?.as_str().map(String::from))
+            .unwrap_or_default();
+        println!("[OK] Posted '@codex review' on PR #{pr_number} at {trigger_timestamp}");
+
+        if trigger_timestamp.is_empty() {
+            return Err(CliError::Message(
+                "could not determine trigger timestamp from API response".to_owned(),
+            ));
+        }
+
+        // Resolve HEAD commit for timeout recovery commit-id filtering.
+        let head_hash = repo
+            .output(&["rev-parse", "HEAD"])
+            .ok()
+            .filter(|o| o.status.success())
+            .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned());
+
+        // Persist trigger state for --resume (ERR-08).
+        let state = TriggerState {
+            pr_number: pr_number.clone(),
+            trigger_timestamp: trigger_timestamp.clone(),
+            head_hash: head_hash.clone(),
+            track_id: track_id.clone(),
+        };
+        save_trigger_state(&state)?;
+
+        (pr_number, trigger_timestamp, head_hash)
     };
 
     let nwo = client.repo_nwo()?;
-
-    // Step 3: Trigger new review.
-    // Always post a fresh trigger — timeout recovery (at the end of polling)
-    // handles the case where a prior review exists but was missed.
-    let response = client.post_issue_comment(&nwo, &pr_number, "@codex review")?;
-    let trigger_timestamp = serde_json::from_str::<serde_json::Value>(&response)
-        .ok()
-        .and_then(|v| v.get("created_at")?.as_str().map(String::from))
-        .unwrap_or_default();
-    println!("[OK] Posted '@codex review' on PR #{pr_number} at {trigger_timestamp}");
-
-    if trigger_timestamp.is_empty() {
-        return Err(CliError::Message(
-            "could not determine trigger timestamp from API response".to_owned(),
-        ));
-    }
-
-    // Resolve HEAD commit for timeout recovery commit-id filtering.
-    let head_hash = repo
-        .output(&["rev-parse", "HEAD"])
-        .ok()
-        .filter(|o| o.status.success())
-        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned());
-    let head_ref = head_hash.as_deref();
+    let head_ref = head_ref_owned.as_deref();
 
     // Step 4: Poll for review
     let poll_result = poll_review_for_cycle(
@@ -707,7 +796,7 @@ fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
         head_ref,
     )?;
 
-    match poll_result {
+    let result = match poll_result {
         PollReviewResult::ZeroFindings => {
             println!();
             println!("=== PR Review Result: PASS ===");
@@ -725,7 +814,14 @@ fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
 
             if parsed.passed { Ok(ExitCode::SUCCESS) } else { Ok(ExitCode::FAILURE) }
         }
+    };
+
+    // Clean up trigger state on successful completion (not on timeout).
+    if matches!(&result, Ok(code) if *code == ExitCode::SUCCESS) {
+        cleanup_trigger_state(&track_id);
     }
+
+    result
 }
 
 /// Pick the latest completed bot review from a slice, by `submitted_at` then `id`.
