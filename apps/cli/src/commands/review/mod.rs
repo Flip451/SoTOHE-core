@@ -491,10 +491,14 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
             // false positive when the cycle was created with a subset of groups.
             let other_key =
                 domain::ReviewGroupName::try_new("other").map_err(|e| format!("{e}"))?;
+            // Filter to cycle's group set, re-mapping non-cycle groups to "other"
+            // so their files still contribute to the scope hash (fail-closed).
             let mut filtered = std::collections::BTreeMap::new();
             for (name, paths) in full_partition.groups() {
                 if cycle_group_names.contains(name) {
                     filtered.insert(name.clone(), paths.clone());
+                } else {
+                    filtered.entry(other_key.clone()).or_default().extend(paths.iter().cloned());
                 }
             }
             filtered.entry(other_key).or_default();
