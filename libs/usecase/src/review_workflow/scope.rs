@@ -132,6 +132,12 @@ impl DiffScope {
     pub fn is_empty(&self) -> bool {
         self.files.is_empty()
     }
+
+    /// Returns the files as a sorted slice of [`RepoRelativePath`]s.
+    #[must_use]
+    pub fn files(&self) -> Vec<&RepoRelativePath> {
+        self.files.iter().collect()
+    }
 }
 
 // ---------------------------------------------------------------------------

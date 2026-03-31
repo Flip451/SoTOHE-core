@@ -806,7 +806,7 @@ args = ["make", "track-pr", "${@}"]
 [tasks.track-pr-review]
 description = "[wrapper] Run full PR review cycle: push, ensure PR, trigger @codex review, poll, parse"
 command = "bin/sotp"
-args = ["make", "track-pr-review"]
+args = ["make", "track-pr-review", "${@}"]
 
 [tasks.track-pr-merge]
 description = "[wrapper] Wait for PR checks to pass, then merge"

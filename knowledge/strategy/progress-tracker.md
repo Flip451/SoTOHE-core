@@ -13,12 +13,12 @@
 |---|---|---|---|---|---|
 | 0 | ✅ | 1 | 1 | 0 | — |
 | 1 | ✅ | 10 | 10 | 0 | — |
-| **1.5** | good enough | 30 | 16 | 12 (延期) + 2 planned | 4 日 |
-| **2** | **▶** | 7 | 6 | 1 (planned) | 0.5 日 |
+| **1.5** | good enough | 30 | 18 | 11 (延期) + 1 planned | 3.5 日 |
+| **2** | **✅** | 7 | 7 | 0 | — |
 | 3 | — | 12 | 0 | 12 | 5 日 |
 | 4 | 一部 | 8 | 2 | 6 | 3 日 |
 | 5 | — | 7 | 0 | 7 | 3 日 |
-| **合計** | | **75** | **35** | **40** | **~15.5 日** |
+| **合計** | | **75** | **38** | **37** | **~14.5 日** |
 
 ---
 
@@ -42,7 +42,9 @@
 | J | `conch-parser-infra-move` (INF-20) | M | ✅ | 03-23 | #54 |
 | K | `review-verdict-autorecord` (RVW-10/11) | M | ✅ | 03-25 | #63 |
 | L | `review-infra-quality` (RVW-13/15/17) | M | ✅ | 03-25 | #64 |
-| M | `autorecord-stabilization` (WF-59) | M | planned | | |
+| M | `autorecord-stabilization` (WF-59) | M | ✅ (superseded) | 03-29 | — |
+| M' | `review-json-per-group-review` (RVW-21/31/32) | M | ✅ | 03-30 | — |
+| M'' | `autorecord-reviewjson-wiring` (RVW-33) | M | ✅ | 03-31 | #69 |
 | N | `tamper-proof-review` (WF-43) | L | planned | | |
 
 **推奨実行順**: ~~A0~~ → ~~A~~ → ~~B~~ → ~~C~~ → ~~C'~~ → ~~H~~ → ~~H'~~ → ~~H''~~ → ~~I~~ → ~~J~~ → ~~K~~ → ~~L~~ → M → N → E → D → F → G
@@ -70,15 +72,15 @@ gantt
     J conch-parser-infra-move  :done, j, 2026-03-23, 1d
     K review-verdict-autorecord :done, k, 2026-03-25, 1d
     L review-infra-quality     :done, l, 2026-03-25, 1d
-    M autorecord-stabilization :m, after l, 2d
+    M autorecord-stabilization :done, m, 2026-03-26, 3d
     N tamper-proof-review      :n, after m, 3d
     E activate-module-split    :e, after n, 1d
     D pr-usecase-extract       :d, after e, 2d
     F parser-consolidation     :f, after d, 1d
     G structural-lockdown      :g, after f, 1d
 
-    section Phase 2 Spec Quality
-    Signals and Traceability   :p2, after g, 3d
+    section Phase 2 Spec Quality (✅)
+    Signals and Traceability   :done, p2, 2026-03-23, 5d
 
     section Phase 3 Test Generation (Moat)
     BRIDGE-01 and Templates    :p3a, after p2, 3d
@@ -128,8 +130,12 @@ gantt
 | 03-25 | `review-verdict-autorecord` (K) | #63 | 1.5 | RVW-10/11 verdict auto-record + diff scope filtering |
 | 03-25 | `review-infra-quality` (L) | #64 | 1.5 | RVW-13/15/17 GitDiffScope テスト, agent 検証, auto-record e2e |
 | 03-27 | `activate-vcsfix-plan-infra` | #66 | — | gitignore 修正 + track-local-plan planner infra |
+| 03-28 | `diff-hearing` (2-5) | — | 2 | TSUMIKI-03 差分ヒアリング（SKILL.md prompt 変更のみ） |
+| 03-29 | `autorecord-stabilization` (M) | — | 1.5 | WF-59 manifest hash 実装完了。superseded by review.json arch |
+| 03-30 | `review-json-per-group-review` | — | 1.5 | RVW-21/31/32 review.json 分離 + per-group 独立進行 |
+| 03-31 | `autorecord-reviewjson-wiring` | #69 | 1.5 | review.json write/read path 接続 + per-group scope hash |
 
-**実績ベロシティ**: 9 日間で 26 トラック (2.9/日)
+**実績ベロシティ**: 13 日間で 30 トラック (2.3/日)
 
 ---
 
@@ -146,7 +152,10 @@ gantt
 | 03-24 夜 | 17 | 18 (+ escalation-enforcement, CC-SDD-01, strategy-move, CC-SDD-02) | Phase 2: 2-3, 2-4 完了。残り TSUMIKI-03 のみ |
 | 03-25 夜 | 15 | 20 (+ RVW-10/11, RVW-13/15/17) | Phase 1.5 review infra 完了 |
 | **03-27 夜** | **14** | **21 (+ activate-vcsfix-plan-infra)** | planner infra + gitignore bugfix。WF-59/WF-43 planned |
-| Phase 2 完了 | 13 | 22 | |
+| 03-28 夜 | 13 | 22 (+ diff-hearing) | TSUMIKI-03 完了。Phase 2 残り 0 |
+| 03-29 夜 | 12 | 23 (+ autorecord-stabilization) | WF-59 manifest hash 実装。superseded |
+| 03-30 夜 | 11 | 24 (+ review-json-per-group-review) | RVW-21/31/32 完了 |
+| **03-31 朝** | **10** | **25 (+ autorecord-reviewjson-wiring)** | **Phase 2 ✅。Phase 1.5: 18 done / 12 remaining** |
 | Phase 3 完了 | 1 | 34 | テスト生成パイプライン完成 |
 | Phase 4 完了 | — | — | |
 | Phase 5 完了 | 0 | — | |

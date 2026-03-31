@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0.0",
+  "title": "Phase D: PR review flow fix (WF-66/ERR-08)",
+  "goal": [
+    "PR review フローにおける 2 つの問題を解消する:",
+    "1. WF-66: push() と review_cycle() の check_task_completion_guard が中間 push をブロックし、PR review を利用不能にする",
+    "2. ERR-08: review_cycle() のポーリングが中断されると trigger state が失われ、再開できない"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "check_task_completion_guard を push() と review_cycle() から削除し wait_and_merge_with() に移動",
+        "sources": [
+          "knowledge/strategy/rvw-remediation-plan.md §Phase D T001"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "SKILL.md (pr-review.md, merge.md) の更新: merge のみがタスク完了を要求する旨を明記",
+        "sources": [
+          "knowledge/strategy/rvw-remediation-plan.md §Phase D T002"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "review_cycle() の trigger state を tmp/pr-review-state/<track-id>.json に永続化",
+        "sources": [
+          "knowledge/strategy/rvw-remediation-plan.md §Phase D T003"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "track-pr-review --resume サブコマンドの追加",
+        "sources": [
+          "knowledge/strategy/rvw-remediation-plan.md §Phase D T004"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "ガード移動とresume機能のテスト",
+        "sources": [
+          "knowledge/strategy/rvw-remediation-plan.md §Phase D T005"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "他の Phase (A/B/C/E/F/G) の修正",
+        "sources": [
+          "knowledge/strategy/rvw-remediation-plan.md §Phase D"
+        ]
+      },
+      {
+        "text": "PR review の verdict 解析ロジック変更",
+        "sources": [
+          "inference -- Phase D はフロー制御のみ"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "変更は apps/cli/src/commands/pr.rs と SKILL docs のみ。domain/usecase/infrastructure 層への変更なし",
+      "sources": [
+        "inference -- Phase D はCLI層フロー制御"
+      ]
+    },
+    {
+      "text": "TDD: テストを先に書く",
+      "sources": [
+        "convention -- .claude/rules/05-testing.md"
+      ]
+    },
+    {
+      "text": "unwrap() は本番コード禁止",
+      "sources": [
+        "convention -- .claude/rules/04-coding-principles.md"
+      ]
+    },
+    {
+      "text": "tmp/ ディレクトリは .gitignore 済み（state ファイルはコミットされない）",
+      "sources": [
+        "inference -- transient state は git 管理外"
+      ]
+    }
+  ],
+  "domain_states": [
+    {
+      "name": "TriggerState",
+      "description": "PR review の trigger 情報を保持する構造体: pr_number, comment_id, trigger_timestamp, head_hash, track_id"
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "未完了タスクがある状態で cargo make track-pr-push が成功する",
+      "sources": [
+        "knowledge/strategy/TODO.md §WF-66"
+      ],
+      "task_refs": [
+        "T001",
+        "T005"
+      ]
+    },
+    {
+      "text": "未完了タスクがある状態で cargo make track-pr-review が成功する",
+      "sources": [
+        "knowledge/strategy/TODO.md §WF-66"
+      ],
+      "task_refs": [
+        "T001",
+        "T005"
+      ]
+    },
+    {
+      "text": "cargo make track-pr-merge が未完了タスクでブロックする",
+      "sources": [
+        "knowledge/strategy/rvw-remediation-plan.md §Phase D T001"
+      ],
+      "task_refs": [
+        "T001",
+        "T005"
+      ]
+    },
+    {
+      "text": "review_cycle() 中断後に --resume で poll を再開できる",
+      "sources": [
+        "knowledge/strategy/TODO.md §ERR-08"
+      ],
+      "task_refs": [
+        "T003",
+        "T004"
+      ]
+    },
+    {
+      "text": "cargo make ci が通る",
+      "sources": [
+        "convention -- .claude/rules/07-dev-environment.md"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T005"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "project-docs/conventions/task-completion-flow.md"
+  ],
+  "signals": {
+    "blue": 13,
+    "yellow": 3,
+    "red": 0
+  }
+}

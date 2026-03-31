@@ -58,7 +58,7 @@ file to exactly one observation group:
 | Group | Scope | Files matching |
 |-------|-------|----------------|
 | **domain** | Type design, invariants, business rules, trait signatures (ports) | `libs/domain/**` |
-| **infra** | I/O correctness, parsing, adapters, external dependencies. Include related domain trait signatures in briefing as context. | `libs/infrastructure/**` |
+| **infrastructure** | I/O correctness, parsing, adapters, external dependencies. Include related domain trait signatures in briefing as context. | `libs/infrastructure/**` |
 | **usecase** | Workflow logic, error propagation, functional correctness | `libs/usecase/**` |
 | **cli** | CLI error handling, exit codes, user-facing messages, functional regressions | `apps/cli/**` |
 | **other** | Workflow docs, skill definitions, track artifacts, scripts, config | Everything else (`.claude/**`, `track/**`, `DEVELOPER_AI_WORKFLOW.md`, `scripts/**`, `Cargo.*`, etc.) |
@@ -124,7 +124,7 @@ protocol retries on stale-hash conflicts (up to 3 retries with fresh index).
 
 ```
 Agent 1: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-domain.md --auto-record --track-id {track-id} --round-type {fast|final} --group domain --expected-groups {all-group-names} --diff-base main
-Agent 2: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-infra.md --auto-record --track-id {track-id} --round-type {fast|final} --group infra --expected-groups {all-group-names} --diff-base main
+Agent 2: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-infrastructure.md --auto-record --track-id {track-id} --round-type {fast|final} --group infrastructure --expected-groups {all-group-names} --diff-base main
 Agent 3: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-usecase.md --auto-record --track-id {track-id} --round-type {fast|final} --group usecase --expected-groups {all-group-names} --diff-base main
 Agent 4: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-cli.md --auto-record --track-id {track-id} --round-type {fast|final} --group cli --expected-groups {all-group-names} --diff-base main
 Agent 5: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-other.md --auto-record --track-id {track-id} --round-type {fast|final} --group other --expected-groups {all-group-names} --diff-base main
@@ -320,7 +320,7 @@ After the reviewer reports zero findings:
 
 After execution, summarize:
 1. Total review rounds completed
-2. Reviewer groups used and parallelization (e.g., "3 parallel groups: infra-domain, usecase, cli")
+2. Reviewer groups used and parallelization (e.g., "3 parallel groups: infrastructure, usecase, cli")
 3. Findings per round (count and severity breakdown, grouped by layer)
 4. Fixes applied (with file references)
 5. Final CI result

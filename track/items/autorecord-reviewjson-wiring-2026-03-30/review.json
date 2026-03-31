@@ -1,0 +1,600 @@
+{
+  "schema_version": 1,
+  "cycles": [
+    {
+      "cycle_id": "2026-03-30T13:57:32Z",
+      "started_at": "2026-03-30T13:57:32Z",
+      "base_ref": "main",
+      "base_policy_hash": "sha256:none",
+      "policy_hash": "sha256:none",
+      "groups": {
+        "cli": {
+          "scope": [],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T13:58:31Z",
+              "hash": "5ec8c34c19830a75579029faec632d1e5831970a",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "regression",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:03:28Z",
+              "hash": "60362766803a14472f17a3199c8218bdbe9ab61b",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:21:57Z",
+              "hash": "325366e31f7f60a5bdf1dedf460b10eba1e1770b",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:34:34Z",
+              "hash": "ef11de2dd6af72c54fa2b331e845599265df18cf",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:43:03Z",
+              "hash": "ec5df288b5363ee01f7d3fab5b096b6c74ebda8a",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:00:31Z",
+              "hash": "962ce7779f785e3cf3d2b040ea5e5ce947c7cc20",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "test_coverage",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:07:37Z",
+              "hash": "af3aba918be1635264e68cdf37e932e3b20dd1ee",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:17:47Z",
+              "hash": "642a4ab3b2f677a311888007ccf82bfdb0fbdd27",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T23:22:12Z",
+              "hash": "d45794dc4cfa7d7dd37512d85883ccd0684f7014",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        },
+        "infra": {
+          "scope": [],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T13:59:18Z",
+              "hash": "ce3c0936e015de087a30243eb0138625498b2f8d",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "validation",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:06:40Z",
+              "hash": "ef9631fb4e6c4495a788bbe7d16d8c177d04ee6e",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "correctness",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:12:56Z",
+              "hash": "597604924e3b4503e9fcdb399949662819e5bff0",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "correctness",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:19:04Z",
+              "hash": "062967c8ad2375e6564c8a0f98b435fa8ce3feab",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:31:32Z",
+              "hash": "6c621bd4471073e1e5a1bc2ba5b0873bde04eac6",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "validation",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:44:52Z",
+              "hash": "fe9cf762a9ee4624caf41498424f9fe32ae5d9a1",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:51:51Z",
+              "hash": "82be6a573d956c1a00e6aa204f14b9757a810515",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "security",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:08:48Z",
+              "hash": "025d8a4a4ce521effbadec8b90a9f9d177ed8db9",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:18:34Z",
+              "hash": "edd3ec7434ff19a6072bd98d406bae1449467336",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "correctness",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:26:29Z",
+              "hash": "b1f669b88619051946d3ea45ba42e8ef78f2f857",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "correctness",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:31:07Z",
+              "hash": "edf6e996f2f2cfd52d0268b5a080cf5b0cb22495",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "security",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T23:23:02Z",
+              "hash": "fe6b9ed616ca6ab89adffc479872a5d020b8e1d4",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "correctness",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "other": {
+          "scope": [],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T13:57:32Z",
+              "hash": "353581523c392c601ad1e49a38791a9aab4f0ccd",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:26:45Z",
+              "hash": "ae2b87ef19a58537fb1af4cf5c60a46e6423707c",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:35:31Z",
+              "hash": "0296e48d933301536571b647dd9a564816aa5094",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:42:58Z",
+              "hash": "858117130c6f65214dc1dd42623bbe6932bf7e81",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:02:37Z",
+              "hash": "691d596d54f783eff740feba156f729bbab1275d",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:06:48Z",
+              "hash": "49b810aa8313af8b362f16f9e74b422cc6aa54ea",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "testing",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:11:41Z",
+              "hash": "f6c1d8b356e271ce536238964e59021686357ac6",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:16:59Z",
+              "hash": "cad46f6df1eeb2adba8ea1246ca5216015ba327c",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T23:21:05Z",
+              "hash": "18f50a7a95f25544b400491ef5d50a0a3a4f71e2",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "correctness",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "usecase": {
+          "scope": [],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T13:59:44Z",
+              "hash": "8558d9fb9125a350bfd3dd483c627629045fd16d",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:25:37Z",
+              "hash": "31537c6d669eba7271025f716a0cf9a60bb76af3",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:32:25Z",
+              "hash": "42d4c84a66786355834d117d2fe82ca5a94282da",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:44:17Z",
+              "hash": "7576cb53dbc36c624155ba67be51e0739c78c207",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T14:56:32Z",
+              "hash": "8bc092dba6863653b57ebe9c546026417cf36239",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "logic",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:07:06Z",
+              "hash": "4e77b03095887459bc6bbbb8675644a8a3b70cd1",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:15:42Z",
+              "hash": "170f068fd24bf60e83adc21bfef1a2e0fc0b44d3",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "security",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:25:42Z",
+              "hash": "adf877bd1078d6e88cbff0123504ec4c424b24ec",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "correctness",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T15:30:58Z",
+              "hash": "895298804d606a66b6df2d331256f248a0c1461e",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "testing",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-03-30T23:21:32Z",
+              "hash": "b24944fdc974197acdbff9c8ac7abe49e93bad39",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "correctness",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

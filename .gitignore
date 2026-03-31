@@ -9,6 +9,7 @@ target-*/
 
 # --- Tooling caches / outputs ---
 .claude/logs/
+.sotp-record-round.lock
 
 # --- Environment / secrets ---
 .env

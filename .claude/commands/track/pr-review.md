@@ -29,6 +29,9 @@ Run the following wrappers in sequence:
 cargo make track-pr-push
 ```
 
+> **Note**: `track-pr-push` does NOT enforce task completion. Push is allowed with unresolved tasks.
+> Task completion is only enforced at merge time (`track-pr-merge` / `/track:merge`).
+
 Then:
 
 ```bash
@@ -73,6 +76,13 @@ The review is asynchronous. After posting `@codex review`, the script polls GitH
 If the poll times out:
 - **No bot activity**: Suggests the Codex Cloud GitHub App is not installed.
 - **Bot active but no review**: The review is still in progress. Try again later.
+
+## Accepted findings
+
+When a reviewer finding is valid but intentionally deferred (e.g., edge case not applicable
+to the current workflow), record it in the **PR body** under an `## Accepted Findings` section
+with a table: `| Finding | Reason |`. This makes the acceptance visible to the reviewer on
+subsequent rounds and serves as a documented decision.
 
 ## Behavior
 
