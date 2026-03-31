@@ -438,6 +438,7 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
 }
 
 fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
+    use domain::ReviewJsonReader;
     use infrastructure::git_cli::{GitRepository, SystemGitRepo};
     use infrastructure::review_group_policy::{
         ResolvedReviewGroupPolicy, load_review_groups_override,
@@ -453,12 +454,21 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
     let planning_only = detect_planning_only().unwrap_or(false);
 
     // Compute current partition snapshot for full staleness detection (fail-closed).
+    // Uses the cycle's frozen base_ref (not hardcoded "main") for diff computation.
     let current_snapshot = {
         let git = SystemGitRepo::discover().map_err(|e| format!("{e}"))?;
-        let scope_json = git.root().join("track/review-scope.json");
-        let base_groups = infrastructure::review_adapters::load_base_review_groups(&scope_json)?;
         let track_id_parsed =
             domain::TrackId::try_new(&args.track_id).map_err(|e| format!("{e}"))?;
+
+        // Read cycle's base_ref from review.json.
+        let base_ref = review_store
+            .find_review(&track_id_parsed)
+            .map_err(|e| format!("failed to read review.json: {e}"))?
+            .and_then(|r| r.current_cycle().map(|c| c.base_ref().to_owned()))
+            .unwrap_or_else(|| "main".to_owned());
+
+        let scope_json = git.root().join("track/review-scope.json");
+        let base_groups = infrastructure::review_adapters::load_base_review_groups(&scope_json)?;
         let override_config = load_review_groups_override(&args.items_dir, &track_id_parsed)
             .map_err(|e| format!("{e}"))?;
 
@@ -467,9 +477,9 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
         let policy = ResolvedReviewGroupPolicy::resolve(&base_groups, override_config.as_ref())
             .map_err(|e| format!("{e}"))?;
 
-        // Get changed files for partition.
+        // Get changed files using cycle's base_ref.
         let diff_scope = infrastructure::review_adapters::GitDiffScopeProvider
-            .changed_files("main")
+            .changed_files(&base_ref)
             .map_err(|e| format!("{e}"))?;
         let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
         let partition = policy.partition(&diff_files).map_err(|e| format!("{e}"))?;
