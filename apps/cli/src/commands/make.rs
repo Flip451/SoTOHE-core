@@ -266,8 +266,8 @@ fn dispatch_track_resolve(raw_args: &[String]) -> Result<ExitCode, CliError> {
 fn dispatch_track_pr_review(raw_args: &[String]) -> Result<ExitCode, CliError> {
     let words = raw_args_to_words(raw_args);
     let mut args: Vec<&str> = vec!["pr", "review-cycle"];
-    if words.iter().any(|w| w == "--resume") {
-        args.push("--resume");
+    for w in &words {
+        args.push(w);
     }
     run_sotp(&args)
 }
