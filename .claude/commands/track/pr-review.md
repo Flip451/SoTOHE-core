@@ -77,6 +77,13 @@ If the poll times out:
 - **No bot activity**: Suggests the Codex Cloud GitHub App is not installed.
 - **Bot active but no review**: The review is still in progress. Try again later.
 
+## Accepted findings
+
+When a reviewer finding is valid but intentionally deferred (e.g., edge case not applicable
+to the current workflow), record it in the **PR body** under an `## Accepted Findings` section
+with a table: `| Finding | Reason |`. This makes the acceptance visible to the reviewer on
+subsequent rounds and serves as a documented decision.
+
 ## Behavior
 
 After execution, summarize:
