@@ -2,7 +2,7 @@
 
 > **出典**: `tmp/review-2026-03-10.md`（Gemini による包括的レビュー）
 > **作成日**: 2026-03-11
-> **最終更新**: 2026-03-25
+> **最終更新**: 2026-03-31
 > **アーカイブ**: 解決済み項目は `tmp/TODO-archived-2026-03-16.md` に移動済み
 > **全体計画**: [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md)（v3: ハーネス vs テンプレート出力の区別）
 > **全体計画 (旧版)**: `tmp/archive-2026-03-20/`
@@ -10,6 +10,7 @@
 > **ハーネスサーベイ**: `tmp/agent-harness-survey-2026-03-17.md`（Spec Kit, OpenSpec, SpecPulse, ECC, Anthropic 公式, Symphony）
 > **取り込み推奨一覧**: `tmp/adoption-candidates-2026-03-17.md`（全 35 件、ロードマップ付き）
 > **リファクタリング計画**: [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md)（対象タスク + ドメインモデリング + 再発防止メカニズム）
+> **レビュープロセス監査**: [`knowledge/research/2026-03-31-2112-review-process-audit.md`](../research/2026-03-31-2112-review-process-audit.md)（RVW-37〜43 採番元、legacy 深刻度再評価）
 > **進捗管理**: [`knowledge/strategy/progress-tracker.md`](progress-tracker.md)（v3）
 
 ---
@@ -429,7 +430,7 @@
 
 - [ ] **WF-36** (HIGH): Review Escalation Threshold の機構化 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4
 - [x] ~~**WF-43** (CRITICAL): `record-round` → `check-approved` の code_hash 自己参照循環~~ ✅ 修正済み (PR #38)
-- [ ] **WF-62** (MEDIUM): `ReviewState::record_round` が Approved→Fast findings_remain で降格しない → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4 (旧 WF-40)
+- [ ] **WF-62** (~~MEDIUM~~ → LOW, legacy model — production 未使用): `ReviewState::record_round` が Approved→Fast findings_remain で降格しない → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4 (旧 WF-40)
 - [ ] **WF-41** (LOW): `review_from_document` が偽の Fast ラウンドを合成 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4
 - [ ] **WF-38** (LOW): frontmatter パーサーの duplicate key 未検出 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §3
 - [ ] **WF-39** (MEDIUM): `/track:catchup` の責務分割 — bootstrap と briefing の分離 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4
@@ -457,10 +458,8 @@
   - **提案**: `cargo make` に unstage ラッパー（例: `cargo make unstage <path>`）を追加する
   - **根拠**: review.json の unstage で発生（2026-03-27）
 
-- [ ] **WF-59** (HIGH): review hash の index 全体依存による auto-record 不安定性
-  - **課題**: `index_tree_hash_normalizing` が git index 全体の tree hash を計算するため、(1) 未ステージファイルで失敗、(2) 並列レビューグループ間で干渉、(3) 無関係ファイル変更で invalidate
-  - **対応**: ADR-2026-03-26-0000 で review-scope manifest hash への移行を決定。`autorecord-stabilization-2026-03-26` トラックで実装予定
-  - **根拠**: tamper-proof-review 計画レビュー中に繰り返し発生（2026-03-26〜27）
+- [x] ~~**WF-59** (HIGH): review hash の index 全体依存による auto-record 不安定性~~ ✅ done (`autorecord-stabilization-2026-03-26` で review-scope manifest hash を実装、後続トラックで運用)
+  - **対応**: ADR-2026-03-26-0000 に基づき review-scope manifest hash に移行。`track/review-scope.json` による scope-aware 分類、worktree 直接読み取り、volatile field 正規化、`rvw1:sha256:<hex>` 形式を実装。`review-json-per-group-review-2026-03-29` + `autorecord-reviewjson-wiring-2026-03-30` で per-group scope hash として運用
 
 - [ ] **WF-66** (MEDIUM): `track-pr-push` のタスク完了ガードが中間 push をブロックする
   - **課題**: `apps/cli/src/commands/pr.rs` の push ガードが全タスク完了を要求するため、中間コミットの push + PR review ができない。レビュー中に追加タスクを切ると push 不可になる
@@ -700,7 +699,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
   - **完了**: Stage 1 (spec signals, PR #55) + Stage 2 (domain state signals, PR #58) + spec.json SSoT (PR #57)
   - **完了日**: 2026-03-23
 - [x] ~~**TSUMIKI-02** (MEDIUM): ソース帰属~~ ✅ Phase 1 完了
-- [ ] **TSUMIKI-03** (MEDIUM): 差分ヒアリング
+- [x] ~~**TSUMIKI-03** (MEDIUM): 差分ヒアリング~~ ✅ done (`diff-hearing-2026-03-27`)
 - [ ] **TSUMIKI-04** (MEDIUM): TDD 完了時の要件網羅率 → Phase 3
 
 **CC-SDD フレームワーク**:
@@ -753,24 +752,34 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **RVW-06** (HIGH): metadata.json にレビュー状態統合 + エスカレーション順序強制 + コミットガード
 - [ ] **RVW-07** (HIGH): Codex verdict 抽出の stderr フォールバック + セッションログ保存
 - [ ] **RVW-08** (HIGH): diff-scope filter (ScopeFilteredPayload) の削除 — レビューアの findings を勝手にフィルタして捨てるのは不適切。全 findings を漏れなく record-round に渡すべき。対象: `usecase/src/review_workflow/scope.rs` の `ScopeFilteredPayload` および `codex_local.rs` での適用箇所
-- [ ] **RVW-09** (MEDIUM): review invalidation のスコープ限定 — code_hash が review.json トップレベルに1つだけ存在し、hash mismatch 時に全グループがリセットされる。影響を受けたグループのみ invalidation すべき。対象: `domain/src/review/state.rs` の `invalidate()` メソッド
+- [ ] **RVW-09** (~~MEDIUM~~ → LOW, legacy model — production 未使用): review invalidation のスコープ限定 — code_hash が review.json トップレベルに1つだけ存在し、hash mismatch 時に全グループがリセットされる。影響を受けたグループのみ invalidation すべき。対象: `domain/src/review/state.rs` の `invalidate()` メソッド
 - [ ] **RVW-20** (HIGH): ACCEPTED finding の仕組み化 + dispute adjudication — orchestrator が briefing に ACCEPTED リストを自由に手書きして reviewer findings を握り潰すパターンを防止。(1) `sotp review accept-finding` CLI コマンドで accepted findings を metadata.json に SSoT 化、(2) `track-local-review` wrapper が briefing 生成時にストアから ACCEPTED を自動構築（手書き ACCEPTED は無視）、(3) briefing に `ACCEPTED` / `DO NOT re-report` を含む場合に hook で reject。`resolve-escalation` と同様に evidence + 理由を要求する。(4) reviewer と実装者の見解が対立する場合の adjudication フロー — `sotp review dispute` で dispute を記録、evidence（git show, ADR ref, テスト結果）を添付、planner capability または user が裁定、binding decision を metadata.json に保存して reviewer briefing に自動注入。NotebookLM 提案: レビュアーと被レビュー側の対立を調停する裁判所的仕組み
-- [ ] **RVW-21** (MEDIUM): per-group 独立レビュー進行 — 現在 `ReviewState.status` はトラックレベル単一で、全グループの fast 完了を待たないと final に進めない。`ReviewGroupState` に fast_passed/approved を持たせ、track-level status は全グループの aggregate で派生させることで、先に fast 完了したグループを独立に final に回せるようにする。初日（2026-03-18 `5aa94cc`）から全グループ同期が前提の設計。対象: `domain/src/review/state.rs` の `update_status_after_record`、`check_commit_ready`
+- [x] ~~**RVW-21** (MEDIUM): per-group 独立レビュー進行~~ ✅ done (`review-json-per-group-review-2026-03-29`)
+  - **対応**: `ReviewCycle` / `ReviewGroupRound` ドメインモデルを導入。per-group 独立の fast/final 進行を実現。global round 同期を廃止し、latest-success per-group 判定に移行
 - [x] ~~**RVW-22** (MEDIUM): diff_base の review state 永続化~~ ✅ 修正済み (`ReviewState.base_ref` 永続化 + `check_approved` で persisted value を必須化)
 - [x] ~~**RVW-23** (HIGH): `is_planning_only_path` と `review-scope.json` の SSoT 統合~~ ✅ 修正済み (`detect_planning_only` が `ReviewScopePolicy` を `track/review-scope.json` から load して planning-only/review-operational 分類を config-driven に実施。ハードコード allowlist は削除済み)
-- [ ] **RVW-24** (HIGH): `update_status_after_record` の降格ロジック見直し — final round の findings_remain で `Approved` → `FastPassed` に戻し、fast round の findings_remain で `FastPassed`/`Approved` → `NotStarted` に戻す降格が過剰。1 件の finding 修正で全グループ × fast + final のフルサイクルやり直しが発生し、autorecord-stabilization トラックでは 20+ ラウンドの原因になった。review-scope hash が code freshness を保証しているため、status 降格は redundant。RVW-21 (per-group 独立進行) と組み合わせて降格ロジック自体の廃止を検討。導入: `42a667f` (2026-03-20, Phase C/D)。対象: `domain/src/review/state.rs` の `update_status_after_record`
+- [ ] **RVW-24** (~~HIGH~~ → LOW, legacy model — production 未使用): `update_status_after_record` の降格ロジック見直し — final round の findings_remain で `Approved` → `FastPassed` に戻し、fast round の findings_remain で `FastPassed`/`Approved` → `NotStarted` に戻す降格が過剰。1 件の finding 修正で全グループ × fast + final のフルサイクルやり直しが発生し、autorecord-stabilization トラックでは 20+ ラウンドの原因になった。review-scope hash が code freshness を保証しているため、status 降格は redundant。RVW-21 (per-group 独立進行) と組み合わせて降格ロジック自体の廃止を検討。導入: `42a667f` (2026-03-20, Phase C/D)。対象: `domain/src/review/state.rs` の `update_status_after_record`
 - [ ] **RVW-25** (HIGH): domain 値オブジェクト徹底 — `CodeHash::Computed(String)` の inner を `ReviewHash` newtype に置換し、rvw1 format を型レベルで保証。`computed_unchecked` も `ReviewHash::new_unchecked` に統一。同様に他の `String` wrapper（Timestamp, TrackId 等）で validation が constructor 以外に散逸していないか監査。`sotp verify domain-purity` に「newtype inner が String のまま」のチェックを追加して CI で検出。対象: `domain/src/review/types.rs`
 - [ ] **RVW-26** (MEDIUM): fast model recurrent false positive 対策 — gpt-5.4-mini が `scope.rs` の bare filename / mid-path traversal を 4 回連続で誤読。briefing にテスト名を明記しても再発。対策案: (1) fast model で同一 finding が N 回連続したら自動 skip して final に escalate、(2) finding の hash を記録し、ソース検証済み false positive を `metadata.json` に保存して briefing に自動注入（RVW-20 と統合）
 - [ ] **RVW-27** (LOW): codec `computed_unchecked` のロード時 format warning — 壊れた `rvw1:sha256:` hash がサイレントにロードされる。意図的設計（legacy 互換）だが、tracing::warn で検出可能にすべきか検討
 - [ ] **RVW-28** (LOW): `check_approved` の single-process 前提の明文化 — コメント追加済みだが、将来 daemon 化した場合の TOCTOU 対策が未設計。daemon 化時に advisory lock または optimistic concurrency control を導入する計画を記録
 - [x] ~~**RVW-29** (CRITICAL): Codex CLI `--full-auto` が `--sandbox read-only` を上書き~~ ✅ 解決: planner/reviewer 両方の wrapper から `--full-auto` を削除。`--sandbox read-only` のみで gpt-5.4 + `--output-schema` が安定動作することを 10/10 テストで確認（2026-03-28）。原因: `--full-auto` は Codex CLI の仕様で `--sandbox workspace-write` を強制するエイリアスであり、後続の `--sandbox read-only` は無視される。exec モードではデフォルトで `approval: never`（自動承認）のため `--full-auto` は不要。
 - [ ] **RVW-30** (HIGH): track-commit-message の add-all 自動実行 or check-approved の worktree/index 差分検出 — RecordRoundProtocolImpl が metadata.json をワークツリーに書くだけで git index を更新しないため、staging 漏れでコミット内容と承認状態が乖離する可能性がある。現状は /track:commit のプロンプト制約で保証しているが、コード上のガードがない。daemon 化や直接 CLI 利用が始まる前に仕組み化すべき
-- [ ] **RVW-31** (HIGH): review state を review.json に分離 + 内部 checksum による tamper detection
+- [x] ~~**RVW-31** (HIGH): review state を review.json に分離 + 内部 checksum による tamper detection~~ ✅ done (`review-json-per-group-review-2026-03-29` + `autorecord-reviewjson-wiring-2026-03-30`)
+  - **対応**: review state を metadata.json から review.json に完全分離。ReviewCycle モデルで per-group 管理。RecordRoundProtocolImpl が FsReviewJsonStore 経由で review.json に書き込み、check-approved が review.json から読み取り。policy_hash + partition 変更検出で staleness 検証
 - [x] ~~**RVW-33** (MEDIUM): review.json cycle の frozen partition scope 接続~~ ✅ 解決: autorecord-reviewjson-wiring T005/T006 で per-group scope hash を実装。`group_scope_hash` が worktree ファイル内容を直接読み SHA-256 manifest hash を構築（git 非依存）。record-round (write) と check_approved (read) の両方が per-group scope hash を使用。auto-create cycle の空スコープ問題は T007 で対応予定。policy_hash/partition_changed 検証は cycle.rs の `check_cycle_approved` / `check_cycle_staleness_any` で実装済み
 - [ ] **RVW-34** (MEDIUM): StoredFinding lossy conversion — `RecordRoundProtocolImpl` が findings_remain verdict を review.json に記録する際、`findings_to_concerns()` で生成した concern slug を `StoredFinding::new(slug, None, None, None)` に変換するため、元の message/severity/file/line が消失する。修正には `RecordRoundProtocol` trait に `findings: Vec<StoredFinding>` パラメータを追加し、元データを保持する必要がある
+- [ ] **RVW-37** (CRITICAL): review.md グループ名 `infra` vs `infrastructure` 不一致 — `.claude/commands/track/review.md` が `--group infra` を渡すが `track/review-scope.json` は `infrastructure` を定義。`check-approved` のパーティション比較でキー不一致が発生しレビュー承認が通らない。review.md を `infrastructure` に統一する。出典: review-process-audit-2026-03-31
+- [ ] **RVW-38** (HIGH): `FindingDocument` / `StoredFinding` に `category` フィールドなし — reviewer が返す `category` が review.json のラウンドトリップで消失。`findings_to_concerns()` の第 1 段階（reviewer 提供 category）が機能しない。`review_json_codec.rs` の `FindingDocument` と `domain/src/review/cycle/round_types.rs` の `StoredFinding` に `category: Option<String>` を追加。`REVIEW_OUTPUT_SCHEMA_JSON` の `category` required 指定と Rust `#[serde(default)]` の乖離も同時修正。出典: review-process-audit-2026-03-31
+- [ ] **RVW-39** (HIGH): timeout/ProcessFailed 時の review.json stale 放置 — `codex_local.rs` で Timeout/ProcessFailed 時に auto-record がスキップされ review.json が更新されない。次ラウンドでコード変更があると hash mismatch で invalidation cascade。提案: (1) failed/timeout を informational round として review.json に記録、(2) stderr に stale 警告出力。出典: review-process-audit-2026-03-31
+- [ ] **RVW-40** (MEDIUM): `RecordRoundProtocolImpl::execute` の巨大関数分割 — 295 行で `#[allow(clippy::too_many_lines)]`。policy resolution + diff 取得が cycle auto-create と scope hash 計算で 2 回重複。policy resolution 結果をキャッシュして共有すべき。出典: review-process-audit-2026-03-31
+- [ ] **RVW-41** (MEDIUM): `check_approved` の `_writer: &impl TrackWriter` 未使用パラメータ削除 — `usecases.rs` line 352。API の誤解を招く dead parameter。出典: review-process-audit-2026-03-31
+- [ ] **RVW-42** (MEDIUM): corrupted partial output で session log fallback 不発 — `codex_local.rs` の session log fallback が `Missing` 状態でのみ起動し、`Invalid`（部分的に壊れた JSON）では試行されない。`Invalid` でも fallback を試行すべき。出典: review-process-audit-2026-03-31
+- [ ] **RVW-43** (LOW): policy hash の `unwrap_or_default` → `expect` — `review_group_policy.rs` line 273。`serde_json::Value` の serialization は実質失敗不可能だが、将来の変更で全ポリシーが同一 hash になる silent bug の footgun。出典: review-process-audit-2026-03-31
 - [ ] **RVW-35** (LOW): `normalize_track_file_for_hash` の group_scope_hash 統合 — `group_scope_hash` は生ファイル内容を SHA-256 する。metadata.json が scope に含まれる場合、`updated_at` 等の volatile fields が変更されるだけで hash が変わりうる。`tmp/transition-backup/review_scope.rs` の正規化ロジックを移植して volatile fields を除外すべき
 - [ ] **RVW-36** (HIGH): Codex CLI 上限到達時のレビュー fallback — Codex 週間上限に達すると local reviewer が使えず、review.json に zero_findings を記録できないためコミットが不可能になる。claude-heavy profile の Claude reviewer で record-round を実行するパス、または check-approved の一時的バイパス機構が必要
-- [ ] **RVW-32** (HIGH): same_round_and_zero_findings 制約の緩和 — 並列レビューで各グループの finding→fix サイクル回数が異なると round 番号が揃わず FastPassed/Approved への昇格がブロックされる。invalidation 時に round 番号がリセットされないことが根本原因。対策案: (1) invalidation 時に全グループの round カウンタをリセット、(2) runtime promotion では round 一致を要求せず verdict のみで判定し reload validation のみ strict に保つ、(3) RVW-31 (review.json 分離) と統合して round 管理を再設計 — (1) review state（status, code_hash, base_ref, expected_groups, groups, escalation）を metadata.json から review.json に移動、(2) review.json は review-operational（hash 対象外）なので並列 auto-record が安全に動作、(3) review.json 内に SHA-256 checksum フィールドを持たせ、record-round が更新時に再計算・check-approved が検証することで metadata tamper detection を維持。review-port-separation + tamper-proof-review の統合後継トラック。review-workflow-fixes-2026-03-18 の metadata tamper detection 契約を checksum ベースに移行する仕様変更を含む
+- [x] ~~**RVW-32** (HIGH): same_round_and_zero_findings 制約の緩和~~ ✅ done (`review-json-per-group-review-2026-03-29`)
+  - **対応**: global round 同期を廃止。per-group の latest-success 判定に移行し、round 番号不一致による昇格ブロックを解消。review.json 分離 (RVW-31) と統合して実装
 
 ---
 

@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "RVW-37: review.md グループ名 infra → infrastructure 統一",
+  "goal": [
+    "review.md (SKILL.md) のレビューグループ名を track/review-scope.json と一致させ、check-approved のパーティション比較が正しく動作するようにする。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "review.md 内のグループ分類テーブルで 'infra' → 'infrastructure' に変更",
+        "sources": ["[audit:review-process-audit-2026-03-31§2.1]"],
+        "task_refs": ["T001"]
+      },
+      {
+        "text": "review.md 内の cargo make track-local-review 呼び出し例で --group infra → --group infrastructure に変更",
+        "sources": ["[audit:review-process-audit-2026-03-31§2.1]"],
+        "task_refs": ["T002"]
+      },
+      {
+        "text": "review.md 内のサマリー出力例の infra 表記を修正",
+        "sources": ["[audit:review-process-audit-2026-03-31§2.1]"],
+        "task_refs": ["T003"]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "Rust コードの変更（CLI, domain, usecase, infrastructure 層はすべて変更なし）",
+        "sources": ["[design:rvw-remediation-plan§PhaseA]"]
+      },
+      {
+        "text": "review-scope.json の変更（正式名 'infrastructure' が既に定義済み）",
+        "sources": ["[code:track/review-scope.json:10]"]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "Rust コード変更なし — SKILL.md のみの修正",
+      "sources": ["[design:rvw-remediation-plan§PhaseA]"]
+    }
+  ],
+  "domain_states": [],
+  "acceptance_criteria": [
+    {
+      "text": "review.md 内に 'infra' 単独のグループ名参照が存在しないこと（grep -w infra で 0 件）",
+      "sources": ["[audit:review-process-audit-2026-03-31§2.1]"],
+      "task_refs": ["T001", "T002", "T003"]
+    },
+    {
+      "text": "review.md 内のグループ名が track/review-scope.json の groups キーと完全一致すること",
+      "sources": ["[code:track/review-scope.json]"],
+      "task_refs": ["T001", "T002", "T003"]
+    }
+  ],
+  "additional_sections": [],
+  "related_conventions": [],
+  "signals": null
+}

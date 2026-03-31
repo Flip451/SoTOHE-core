@@ -29,7 +29,7 @@ After approval — create track artifacts:
   - `created_at` (ISO 8601)
   - `updated_at` (ISO 8601)
   - `tasks`: array of task objects (`{id, description, status, commit_hash}`)
-  - `plan`: `{summary, sections}` where sections reference task IDs
+  - `plan`: `{summary, sections}` where `summary` is an array of strings and each section has `{id, title, description, task_ids}` (`description` is an array of strings, `task_ids` references task IDs)
 - After writing metadata.json, create and switch to the track branch:
   - Run `cargo make track-branch-create '<track-id>'` to create branch `track/<track-id>` and switch to it.
   - If branch creation fails (e.g. branch already exists), switch to it with `cargo make track-branch-switch '<track-id>'` instead.
