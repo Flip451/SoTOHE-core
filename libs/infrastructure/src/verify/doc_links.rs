@@ -52,7 +52,8 @@ pub fn verify(root: &Path) -> VerifyOutcome {
         let mut in_fenced_block = false;
 
         for (line_num, line) in content.lines().enumerate() {
-            if line.trim_start().starts_with("```") {
+            let trimmed = line.trim_start();
+            if trimmed.starts_with("```") || trimmed.starts_with("~~~") {
                 in_fenced_block = !in_fenced_block;
                 continue;
             }
@@ -72,8 +73,15 @@ pub fn verify(root: &Path) -> VerifyOutcome {
                     continue;
                 }
 
-                // Strip optional title attribute: [text](path "title")
-                let link_target = link_target.split('"').next().unwrap_or(link_target).trim();
+                // Strip optional title attribute: [text](path "title") or [text](path 'title')
+                let link_target = link_target
+                    .split('"')
+                    .next()
+                    .unwrap_or(link_target)
+                    .split('\'')
+                    .next()
+                    .unwrap_or(link_target)
+                    .trim();
                 // Strip anchor fragment from path
                 let path_part = link_target.split('#').next().unwrap_or(link_target);
                 if path_part.is_empty() {
