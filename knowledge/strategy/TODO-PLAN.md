@@ -56,6 +56,7 @@ Phase 5        ワークフロー最適化
 ## Phase 1.5: ハーネス自身のコード品質改善（▶ 進行中）
 
 > **詳細計画**: [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md)
+> **Review 改善計画**: [`knowledge/strategy/rvw-remediation-plan.md`](../../knowledge/strategy/rvw-remediation-plan.md)（Phase A-J、58 件、~13-16 日）
 
 **目標**: CLI 肥大化解消 + domain 型化。テンプレート開発の生産性向上。
 
@@ -88,15 +89,15 @@ Phase 5        ワークフロー最適化
 | 1.5-24 | ~~INF-20: `conch-parser` を domain → infrastructure に移動~~ | M | ✅ done (PR #54) |
 | 1.5-17 | ~~WF-55 Phase 1: view-freshness CI~~ | S | ✅ done (PR #46) |
 | 1.5-18 | **capability 追加**: domain_modeler, spec_reviewer, acceptance_reviewer | S | 未着手 |
-| 1.5-25 | **RVW-03**: review.json 分離 — review state を metadata.json から独立ファイルに外部化。metadata tampering bypass を構造的に排除 ([ADR](../../knowledge/adr/2026-03-24-1200-review-state-trust-model.md)) | M | 未着手 |
+| 1.5-25 | ~~**RVW-03**: review.json 分離 — review state を metadata.json から独立ファイルに外部化。metadata tampering bypass を構造的に排除 ([ADR](../../knowledge/adr/2026-03-24-1200-review-state-trust-model.md))~~ | M | ✅ done (`review-json-per-group-review-2026-03-29` + `autorecord-reviewjson-wiring-2026-03-30`) |
 | 1.5-26 | ~~**RVW-10/11**: verdict auto-record + diff scope filtering~~ | M | ✅ done (PR #63, `review-verdict-autorecord-2026-03-25`) |
 | 1.5-27 | ~~**RVW-13/15/17**: review infra quality hardening (GitDiffScope テスト, codex-reviewer agent 検証, auto-record e2e)~~ | M | ✅ done (PR #64, `review-infra-quality-2026-03-25`) |
-| 1.5-28 | **WF-59**: review-scope manifest hash — review hash を index 全体から scope-aware manifest hash に移行 ([ADR](../../knowledge/adr/2026-03-26-0000-review-scope-manifest-hash.md)) | M | planned (`autorecord-stabilization-2026-03-26`) |
+| 1.5-28 | ~~**WF-59**: review-scope manifest hash — review hash を index 全体から scope-aware manifest hash に移行 ([ADR](../../knowledge/adr/2026-03-26-0000-review-scope-manifest-hash.md))~~ | M | ✅ done (`autorecord-stabilization-2026-03-26` で実装、後続トラックで運用) |
 | 1.5-29 | **WF-43**: verdict 改ざん防止 — provenance + write-guard + CLI 封鎖 + SHA-256 検証 | L | planned (`tamper-proof-review-2026-03-26`) |
 
 ---
 
-## Phase 2: 仕様品質（テスト生成の入力品質保証）
+## Phase 2: ✅ 完了
 
 **目標**: 信号機 + トレーサビリティを最小セットで導入。
 
@@ -107,7 +108,7 @@ Phase 5        ワークフロー最適化
 | 2-2 | **SPEC-05** Domain States 信号機 (Stage 2) + 遷移関数検証 + spec.json `domain_state_signals` | M | ✅ done (PR #58) |
 | 2-3 | ~~**CC-SDD-01** 要件-タスク双方向トレーサビリティ~~ | M | ✅ done (PR #60, `req-task-traceability-2026-03-24`) |
 | 2-4 | ~~**CC-SDD-02** 明示的承認ゲート~~ | S | ✅ done (PR #62, `spec-approval-gate-2026-03-24`) |
-| 2-5 | **TSUMIKI-03** 差分ヒアリング | S | ▶ planned (`diff-hearing-2026-03-27`) |
+| 2-5 | ~~**TSUMIKI-03** 差分ヒアリング~~ | S | ✅ done (`diff-hearing-2026-03-27`) |
 | ~~2-6~~ | ~~**SSoT-07** 二重書き込み解消~~ | — | スキップ（spec.json SSoT + ADR + view-freshness CI で解決済み） |
 | ~~2-7~~ | ~~spec.md Domain States 必須化~~ | — | 2-1 に最小版統合、2-2 で完全実装 |
 
@@ -243,7 +244,7 @@ Phase 0 (✅) + Phase 1 (✅)
     ↓
 Phase 1.5 (▶ ハーネス自身の品質改善)
     ↓ domain 型化完了、CLI が薄くなる
-Phase 2 (仕様品質 — テスト生成の入力品質)
+Phase 2 (✅ 仕様品質 — テスト生成の入力品質)
     ↓ 信号機 + Domain States + トレーサビリティが整う
 Phase 3 (テスト生成パイプライン) ← Moat
     ↓ テンプレートが「spec → テスト → 実装」を提供
@@ -258,11 +259,11 @@ Phase 4 (インフラ)  Phase 5 (ワークフロー)  ← 並行可能
 
 | Phase | 項目 | 残 | 推定日数 |
 |---|---|---|---|
-| 1.5 | 30 | 14 | 4 日 |
-| 2 | 7 | 1 | 0.5 日 |
+| 1.5 | 30 | 12 | 3.5 日 |
+| 2 | 7 | 0 | — |
 | 3 | 12 | 12 | 5 日 |
 | 4 | 8 | 6 | 3 日 |
 | 5 | 7 | 7 | 3 日 |
-| **合計** | **64** | **40** | **~15.5 日** |
+| **合計** | **64** | **37** | **~14.5 日** |
 
-> 更新: 2026-03-27。Phase 1.5: 全30項目（16 done, 12 延期, 2 planned）に再集計。Phase 2: TSUMIKI-03 planned (`diff-hearing-2026-03-27`)。
+> 更新: 2026-03-31。Phase 1.5: 全30項目（18 done, 11 未着手, 1 planned）。Phase 2: ✅ 全完了（TSUMIKI-03 done by `diff-hearing-2026-03-27`）。1.5-25 (review.json 分離) done by `review-json-per-group-review` + `autorecord-reviewjson-wiring`。1.5-28 (WF-59 manifest hash) done by `autorecord-stabilization`。

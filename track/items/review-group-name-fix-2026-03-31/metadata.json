@@ -1,0 +1,47 @@
+{
+  "branch": "track/review-group-name-fix-2026-03-31",
+  "created_at": "2026-03-31T12:25:07Z",
+  "id": "review-group-name-fix-2026-03-31",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "review.md 内の 3 箇所で 'infra' を 'infrastructure' に置換。",
+          "briefing ファイル名も briefing-infrastructure.md に変更。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001",
+          "T002",
+          "T003"
+        ],
+        "title": "グループ名統一"
+      }
+    ],
+    "summary": [
+      "review.md (SKILL.md) のグループ名 'infra' を track/review-scope.json の正式名 'infrastructure' に統一する。",
+      "Rust コード変更なし。SKILL.md 内の 3 箇所を置換するのみ。"
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "review.md のグループ分類テーブルで infra → infrastructure に変更",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "review.md の cargo make track-local-review 呼び出し例で --group infra → --group infrastructure に変更",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "review.md のサマリー出力例で infra-domain → infrastructure 等の表記を修正",
+      "id": "T003",
+      "status": "done"
+    }
+  ],
+  "title": "RVW-37: review.md グループ名 infra → infrastructure 統一",
+  "updated_at": "2026-03-31T12:32:56Z"
+}

@@ -380,9 +380,8 @@ UTC の ISO 8601 形式（例: `2026-03-28T00:12:22Z`）を使用する。
 このコマンドの出力をそのまま `created_at` と `updated_at` に使う。手入力や推定は禁止。
 
 1. `track/items/<id>/` ディレクトリを作成（safe slug + timestamp/id で衝突回避）
-2. `metadata.json` (SSoT) を作成（schema_version 3, tasks, plan sections, review section）
-   - `review` section を必ず含める: `{"status": "not_started", "groups": {}}` (WF-54)
-   - review section が absent の metadata.json は check-approved でエラーになる（fail-closed）
+2. `metadata.json` (SSoT) を作成（schema_version 3, tasks, plan sections）
+   - review state は `review.json` で管理される（metadata.json には含めない）
 3. `plan.md` を `metadata.json` から `render_plan()` で生成（直接書き込み禁止）
 4. `spec.json` (仕様 SSoT) を作成（schema_version 1, status, version, title, goal, scope, constraints, domain_states, acceptance_criteria, additional_sections, related_conventions）
    - Scope, Constraints, Acceptance Criteria の各要件に `sources` 配列でソース帰属を付与する
