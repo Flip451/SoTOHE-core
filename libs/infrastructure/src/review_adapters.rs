@@ -57,16 +57,32 @@ impl GitHasher for SystemGitHasher {
         //             "<path>\tDELETED\n" for missing files (tombstone).
         let mut manifest = String::new();
         for path in &sorted_scope {
-            // Reject absolute paths and parent traversal to prevent repo escape.
+            // Reject absolute paths (Unix and Windows) and parent traversal.
             // Check path segments (not substring) to allow valid names like "v1..v2.md".
-            if path.starts_with('/')
-                || std::path::Path::new(path)
-                    .components()
-                    .any(|c| matches!(c, std::path::Component::ParentDir))
             {
-                return Err(format!("invalid scope path (traversal or absolute): {path}"));
+                let p = std::path::Path::new(path);
+                let has_traversal_or_absolute = p.components().any(|c| {
+                    matches!(
+                        c,
+                        std::path::Component::ParentDir
+                            | std::path::Component::RootDir
+                            | std::path::Component::Prefix(_)
+                    )
+                });
+                if has_traversal_or_absolute {
+                    return Err(format!("invalid scope path (traversal or absolute): {path}"));
+                }
             }
+            // Resolve and verify the file stays within the repo root to block
+            // symlinked parent directories that O_NOFOLLOW alone cannot catch.
             let abs_path = root.join(path);
+            if let Ok(resolved) = abs_path.canonicalize() {
+                if !resolved.starts_with(&root) {
+                    return Err(format!("scope path escapes repo root via symlink: {path}"));
+                }
+            }
+            // If canonicalize fails (file doesn't exist), the open_nofollow_read
+            // below will return NotFound → DELETED tombstone, which is safe.
             // Design: hash reads from worktree (not git index) per ADR §5.
             // Git is only used for diff detection; hash must be staging-independent.
             // Pre-commit workflow ensures add-all aligns index with worktree.

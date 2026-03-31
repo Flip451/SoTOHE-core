@@ -17,24 +17,29 @@
       {
         "description": [
           "RecordRoundProtocolImpl を FsReviewJsonStore 経由で review.json に書くよう書き換える。",
-          "cycle auto-creation、group round append を実装する。review.json は review_operational ファイルとして cargo make add-all でコミット時に staging する。"
+          "cycle auto-creation、group round append を実装する。review.json は review_operational ファイルとして cargo make add-all でコミット時に staging する。",
+          "auto-create cycle 時に DiffScopeProvider + ReviewGroupPolicy から real frozen scope を取得し、空 scope を解消する。"
         ],
         "id": "S2",
         "task_ids": [
           "T002",
           "T004",
-          "T005"
+          "T005",
+          "T007"
         ],
         "title": "Write path 接続"
       },
       {
         "description": [
-          "check-approved を ReviewJsonReader 経由で review.json から読むよう移行する。"
+          "check-approved を ReviewJsonReader 経由で review.json から読むよう移行する。",
+          "CLI で policy_hash を計算して check_approved に渡し、check_cycle_approved への委譲を完了する。"
         ],
         "id": "S3",
         "task_ids": [
           "T003",
-          "T006"
+          "T006",
+          "T008",
+          "T009"
         ],
         "title": "Read path 移行"
       }
@@ -46,7 +51,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "done",
+  "status": "in_progress",
   "tasks": [
     {
       "description": "Fix --full-auto sandbox override: remove --full-auto from planner and reviewer Codex invocations (it implies --sandbox workspace-write, overriding read-only). Update tests to assert --full-auto is never present.",
@@ -77,8 +82,23 @@
       "description": "Implement check-approved per-group scope hash verification: validate each group latest round hash against current group-scope hash computed from frozen scope files and base_ref.",
       "id": "T006",
       "status": "done"
+    },
+    {
+      "description": "Wire DiffScopeProvider + ResolvedReviewGroupPolicy into RecordRoundProtocolImpl auto-create cycle: use DiffScopeProvider to get changed files, classify via review group policy, call start_review_cycle with real frozen scope instead of empty CycleGroupState::new(vec![]). Scope limited to infrastructure layer wiring.",
+      "id": "T007",
+      "status": "todo"
+    },
+    {
+      "description": "Wire current_policy_hash into CLI check-approved: compute ResolvedReviewGroupPolicy::policy_hash() in run_check_approved and pass to CheckApprovedInput.current_policy_hash (currently None). Enables policy staleness detection.",
+      "id": "T008",
+      "status": "todo"
+    },
+    {
+      "description": "Delegate check_approved to check_cycle_approved: pass ReviewPartitionSnapshot (computed from current DiffScope + policy) from CLI into check_approved, replace inline per-group loop with check_cycle_approved which includes full staleness + partition drift detection.",
+      "id": "T009",
+      "status": "todo"
     }
   ],
   "title": "auto-record review.json 書き込みパス接続 + sandbox 修正",
-  "updated_at": "2026-03-31T00:48:03Z"
+  "updated_at": "2026-03-31T03:49:16Z"
 }
