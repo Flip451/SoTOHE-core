@@ -700,11 +700,89 @@ fn cleanup_trigger_state(track_id: &str) {
     let _ = fs::remove_file(path);
 }
 
+/// Resumes a previously saved trigger state, validating HEAD hasn't changed.
+fn resume_trigger_state(
+    track_id: &str,
+    repo: &SystemGitRepo,
+) -> Result<(String, String, Option<String>), CliError> {
+    let state = load_trigger_state(track_id)?.ok_or_else(|| {
+        CliError::Message(format!(
+            "no trigger state file found for track '{track_id}'. \
+             Run without --resume to start a new review cycle."
+        ))
+    })?;
+
+    // Reject resume if HEAD has changed since the trigger was posted.
+    let current_head = repo
+        .output(&["rev-parse", "HEAD"])
+        .ok()
+        .filter(|o| o.status.success())
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned());
+    if let (Some(saved), Some(current)) = (&state.head_hash, &current_head) {
+        if saved != current {
+            cleanup_trigger_state(track_id);
+            return Err(CliError::Message(format!(
+                "HEAD has changed since trigger was posted \
+                 (saved={saved}, current={current}). \
+                 Run without --resume to start a new review cycle."
+            )));
+        }
+    }
+
+    println!("[OK] Resumed trigger state for PR #{}", state.pr_number);
+    Ok((state.pr_number, state.trigger_timestamp, state.head_hash))
+}
+
+/// Pushes, ensures PR, triggers review, and persists trigger state.
+fn trigger_new_review(
+    explicit_track_id: Option<&str>,
+    track_id: &str,
+    repo: &SystemGitRepo,
+    client: &SystemGhClient,
+) -> Result<Option<(String, String, Option<String>)>, CliError> {
+    let ctx = resolve_branch_context(explicit_track_id)?;
+    println!("Pushing {} to origin...", ctx.branch);
+    repo.push_branch(&ctx.branch)?;
+    println!("[OK] Pushed {}", ctx.branch);
+
+    let pr_number = match ensure_pr_for_cycle(&ctx, "main", client)? {
+        Some(pr) => pr,
+        None => return Ok(None),
+    };
+
+    let nwo = client.repo_nwo()?;
+    let response = client.post_issue_comment(&nwo, &pr_number, "@codex review")?;
+    let trigger_timestamp = serde_json::from_str::<serde_json::Value>(&response)
+        .ok()
+        .and_then(|v| v.get("created_at")?.as_str().map(String::from))
+        .unwrap_or_default();
+    println!("[OK] Posted '@codex review' on PR #{pr_number} at {trigger_timestamp}");
+
+    if trigger_timestamp.is_empty() {
+        return Err(CliError::Message(
+            "could not determine trigger timestamp from API response".to_owned(),
+        ));
+    }
+
+    let head_hash = repo
+        .output(&["rev-parse", "HEAD"])
+        .ok()
+        .filter(|o| o.status.success())
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned());
+
+    save_trigger_state(&TriggerState {
+        pr_number: pr_number.clone(),
+        trigger_timestamp: trigger_timestamp.clone(),
+        head_hash: head_hash.clone(),
+        track_id: track_id.to_owned(),
+    })?;
+
+    Ok(Some((pr_number, trigger_timestamp, head_hash)))
+}
+
 fn review_cycle(explicit_track_id: Option<&str>, resume: bool) -> Result<ExitCode, CliError> {
-    // Fail-closed: must be on a track/ branch (not plan/)
     let repo = SystemGitRepo::discover()?;
 
-    // Fail-closed: validate reviewer provider (resolve from repo root)
     let profiles_path = repo.root().join(".claude/agent-profiles.json");
     let profiles_content = std::fs::read_to_string(&profiles_path).map_err(|e| {
         CliError::Message(format!("failed to read {}: {e}", profiles_path.display()))
@@ -724,62 +802,13 @@ fn review_cycle(explicit_track_id: Option<&str>, resume: bool) -> Result<ExitCod
     let track_id = branch.strip_prefix("track/").unwrap_or(&branch).to_owned();
     let client = SystemGhClient;
 
-    // --resume: reload trigger state and skip push/trigger steps.
     let (pr_number, trigger_timestamp, head_ref_owned) = if resume {
-        let state = load_trigger_state(&track_id)?.ok_or_else(|| {
-            CliError::Message(format!(
-                "no trigger state file found for track '{track_id}'. \
-                 Run without --resume to start a new review cycle."
-            ))
-        })?;
-        println!("[OK] Resumed trigger state for PR #{}", state.pr_number);
-        (state.pr_number, state.trigger_timestamp, state.head_hash)
+        resume_trigger_state(&track_id, &repo)?
     } else {
-        // Step 1: Push
-        let ctx = resolve_branch_context(explicit_track_id)?;
-        println!("Pushing {} to origin...", ctx.branch);
-        repo.push_branch(&ctx.branch)?;
-        println!("[OK] Pushed {}", ctx.branch);
-
-        // Step 2: Ensure PR
-        let pr_number = match ensure_pr_for_cycle(&ctx, "main", &client)? {
-            Some(pr) => pr,
+        match trigger_new_review(explicit_track_id, &track_id, &repo, &client)? {
+            Some(tuple) => tuple,
             None => return Ok(ExitCode::FAILURE),
-        };
-
-        let nwo = client.repo_nwo()?;
-
-        // Step 3: Trigger new review.
-        let response = client.post_issue_comment(&nwo, &pr_number, "@codex review")?;
-        let trigger_timestamp = serde_json::from_str::<serde_json::Value>(&response)
-            .ok()
-            .and_then(|v| v.get("created_at")?.as_str().map(String::from))
-            .unwrap_or_default();
-        println!("[OK] Posted '@codex review' on PR #{pr_number} at {trigger_timestamp}");
-
-        if trigger_timestamp.is_empty() {
-            return Err(CliError::Message(
-                "could not determine trigger timestamp from API response".to_owned(),
-            ));
         }
-
-        // Resolve HEAD commit for timeout recovery commit-id filtering.
-        let head_hash = repo
-            .output(&["rev-parse", "HEAD"])
-            .ok()
-            .filter(|o| o.status.success())
-            .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned());
-
-        // Persist trigger state for --resume (ERR-08).
-        let state = TriggerState {
-            pr_number: pr_number.clone(),
-            trigger_timestamp: trigger_timestamp.clone(),
-            head_hash: head_hash.clone(),
-            track_id: track_id.clone(),
-        };
-        save_trigger_state(&state)?;
-
-        (pr_number, trigger_timestamp, head_hash)
     };
 
     let nwo = client.repo_nwo()?;
