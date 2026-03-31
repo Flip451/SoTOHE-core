@@ -420,6 +420,17 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
             .map_err(|e| RecordRoundProtocolError::Other(format!("start_cycle: {e}")))?;
         }
 
+        // Validate that the current group exists in the cycle (fail-fast).
+        if let Some(cycle) = review.current_cycle() {
+            if cycle.group(&group_name).is_none() {
+                return Err(RecordRoundProtocolError::Other(format!(
+                    "group '{}' not found in current cycle (available: {:?})",
+                    group_name,
+                    cycle.group_names().map(|n| n.to_string()).collect::<Vec<_>>()
+                )));
+            }
+        }
+
         // Build GroupRoundVerdict from the verdict + concerns (fail-closed validation).
         let group_verdict = match verdict {
             domain::Verdict::ZeroFindings => {
@@ -448,12 +459,15 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
         };
 
         // Compute per-group scope hash from CURRENT partition (not frozen scope).
-        // This ensures the hash reflects the actual code at review time, including
-        // files added after cycle creation. check_approved also uses current partition,
-        // so both sides hash the same file set.
+        // Uses the cycle's frozen base_ref for diff computation (not self.base_ref)
+        // to ensure consistency with check_approved.
         let group_scope: Vec<String> = {
+            let cycle_base_ref = review
+                .current_cycle()
+                .map(|c| c.base_ref().to_owned())
+                .unwrap_or_else(|| self.base_ref.clone());
             let diff_scope = GitDiffScopeProvider
-                .changed_files(&self.base_ref)
+                .changed_files(&cycle_base_ref)
                 .map_err(|e| RecordRoundProtocolError::Other(format!("diff scope: {e}")))?;
             let scope_json_path = git.root().join("track/review-scope.json");
             let base_groups = load_base_review_groups(&scope_json_path).map_err(|e| {
