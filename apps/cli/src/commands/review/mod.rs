@@ -204,6 +204,10 @@ pub struct RecordRoundArgs {
     /// Track ID.
     #[arg(long)]
     track_id: String,
+
+    /// Base ref for diff scope computation.
+    #[arg(long, default_value = "main")]
+    diff_base: String,
 }
 
 #[derive(Debug, Args)]
@@ -356,7 +360,7 @@ fn run_record_round(
     let protocol = infrastructure::review_adapters::RecordRoundProtocolImpl {
         items_dir: args.items_dir.clone(),
         group_display: args.group.clone(),
-        base_ref: "main".to_owned(),
+        base_ref: args.diff_base.clone(),
     };
     let timestamp =
         make_timestamp().map_err(usecase::review_workflow::usecases::RecordRoundError::Other)?;
