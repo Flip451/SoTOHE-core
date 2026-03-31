@@ -58,7 +58,12 @@ impl GitHasher for SystemGitHasher {
         let mut manifest = String::new();
         for path in &sorted_scope {
             // Reject absolute paths and parent traversal to prevent repo escape.
-            if path.starts_with('/') || path.contains("..") {
+            // Check path segments (not substring) to allow valid names like "v1..v2.md".
+            if path.starts_with('/')
+                || std::path::Path::new(path)
+                    .components()
+                    .any(|c| matches!(c, std::path::Component::ParentDir))
+            {
                 return Err(format!("invalid scope path (traversal or absolute): {path}"));
             }
             let abs_path = root.join(path);
@@ -754,6 +759,20 @@ mod tests {
         let result = run_hasher_in_dir(path, &scope);
         assert!(result.is_err(), "parent traversal must be rejected");
         assert!(result.unwrap_err().contains("traversal or absolute"));
+    }
+
+    #[test]
+    fn test_group_scope_hash_allows_double_dot_in_filename() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        // File with ".." in its name (not a traversal).
+        std::fs::write(path.join("v1..v2.md"), "changelog").unwrap();
+
+        let scope = vec!["v1..v2.md".to_owned()];
+        let result = run_hasher_in_dir(path, &scope);
+        assert!(result.is_ok(), "double-dot in filename must be allowed: {result:?}");
     }
 
     #[test]
