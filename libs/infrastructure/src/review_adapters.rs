@@ -57,7 +57,14 @@ impl GitHasher for SystemGitHasher {
         //             "<path>\tDELETED\n" for missing files (tombstone).
         let mut manifest = String::new();
         for path in &sorted_scope {
+            // Reject absolute paths and parent traversal to prevent repo escape.
+            if path.starts_with('/') || path.contains("..") {
+                return Err(format!("invalid scope path (traversal or absolute): {path}"));
+            }
             let abs_path = root.join(path);
+            // Design: hash reads from worktree (not git index) per ADR §5.
+            // Git is only used for diff detection; hash must be staging-independent.
+            // Pre-commit workflow ensures add-all aligns index with worktree.
             match open_nofollow_read(&abs_path) {
                 Ok(mut file) => {
                     let mut bytes = Vec::new();
@@ -240,6 +247,10 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
                 groups.insert(g.clone(), CycleGroupState::new(vec![]));
             }
             // Ensure mandatory "other" group exists (required by start_cycle).
+            // Design: auto-create uses empty scope intentionally. The formal cycle
+            // creation path (start_review_cycle + ReviewPartitionSnapshot) populates
+            // real file scopes from DiffScopeProvider. Auto-create is a simplified
+            // fallback for the first record-round invocation.
             let other_key = ReviewGroupName::try_new("other").map_err(|e| {
                 RecordRoundProtocolError::Other(format!("invalid group name 'other': {e}"))
             })?;
@@ -719,6 +730,30 @@ mod tests {
             hash_with_deleted, hash_without_deleted,
             "missing file should contribute a DELETED tombstone to the hash"
         );
+    }
+
+    #[test]
+    fn test_group_scope_hash_rejects_absolute_path() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        let scope = vec!["/etc/passwd".to_owned()];
+        let result = run_hasher_in_dir(path, &scope);
+        assert!(result.is_err(), "absolute path must be rejected");
+        assert!(result.unwrap_err().contains("traversal or absolute"));
+    }
+
+    #[test]
+    fn test_group_scope_hash_rejects_parent_traversal() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        let scope = vec!["../../../etc/passwd".to_owned()];
+        let result = run_hasher_in_dir(path, &scope);
+        assert!(result.is_err(), "parent traversal must be rejected");
+        assert!(result.unwrap_err().contains("traversal or absolute"));
     }
 
     #[test]
