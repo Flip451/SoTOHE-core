@@ -58,12 +58,12 @@
     ]
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
   "tasks": [
     {
       "description": "Add failing tests for new paths and temporary dual-read compatibility in planning-only detection, git staging allowlists, verifier lookups, Python scripts, and hook output",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Implement sotp verify doc-links subcommand with tempdir-based tests (generic Markdown link existence check, not wired into CI yet)",
@@ -102,5 +102,5 @@
     }
   ],
   "title": "ドキュメント群の knowledge ディレクトリへの集約と整理",
-  "updated_at": "2026-03-30T07:30:39Z"
+  "updated_at": "2026-03-31T15:46:52Z"
 }

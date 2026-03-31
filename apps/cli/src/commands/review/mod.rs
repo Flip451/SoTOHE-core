@@ -609,6 +609,7 @@ fn is_planning_only_path(path: &str) -> bool {
         ".claude/agent-profiles.json",
         ".claude/settings.json",
         ".claude/settings.local.json",
+        "architecture-rules.json",
     ];
 
     if EXACT_FILES.contains(&path) {

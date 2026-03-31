@@ -765,6 +765,17 @@ fn planning_only_path_accepts_doc_and_config_files() {
     assert!(is_planning_only_path("project-docs/conventions/hexagonal-architecture.md"));
     assert!(is_planning_only_path("docs/architecture-rules.json"));
     assert!(is_planning_only_path("knowledge/adr/2026-03-11-0000-foo.md"));
+    // New knowledge/ subdirectories (post-consolidation paths)
+    assert!(is_planning_only_path("knowledge/conventions/hexagonal-architecture.md"));
+    assert!(is_planning_only_path("knowledge/external/POLICY.md"));
+    assert!(is_planning_only_path("knowledge/external/guides.json"));
+    assert!(is_planning_only_path("knowledge/research/version-baseline-2026-03-11.md"));
+    assert!(is_planning_only_path("knowledge/designs/auto-mode-design.md"));
+    assert!(is_planning_only_path("knowledge/schemas/auto-state-schema.md"));
+    assert!(is_planning_only_path("knowledge/WORKFLOW.md"));
+    assert!(is_planning_only_path("knowledge/architecture.md"));
+    // Root-level architecture-rules.json (moved from docs/)
+    assert!(is_planning_only_path("architecture-rules.json"));
     assert!(is_planning_only_path("CLAUDE.md"));
     assert!(is_planning_only_path("DEVELOPER_AI_WORKFLOW.md"));
     assert!(is_planning_only_path("TRACK_TRACEABILITY.md"));
