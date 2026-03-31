@@ -25,6 +25,17 @@ pub trait GitHasher {
     ///
     /// Returns a human-readable error string on failure.
     fn normalized_hash(&self, items_dir: &Path, track_id: &TrackId) -> Result<String, String>;
+
+    /// Computes a deterministic hash over the worktree file contents for the given
+    /// scope files (repo-relative paths).
+    ///
+    /// The hash is computed from a sorted manifest of `(path, sha256_of_content)`
+    /// entries read from the worktree. Empty scope returns a deterministic empty hash.
+    ///
+    /// # Errors
+    ///
+    /// Returns a human-readable error string on failure.
+    fn group_scope_hash(&self, scope: &[String]) -> Result<String, String>;
 }
 
 /// Port for the atomic two-phase record-round protocol.
@@ -335,6 +346,11 @@ pub struct CheckApprovedInput {
     /// config, etc.). The NotStarted+empty-groups fast-path is only allowed in this
     /// case. When `false`, code files are staged and a completed review is required.
     pub planning_only: bool,
+    /// Current effective policy hash (from review-scope.json + per-track override).
+    /// When `Some`, the cycle's frozen `policy_hash` is compared against this value
+    /// to detect policy staleness. When `None`, the staleness check is skipped
+    /// (backward-compatible fallback).
+    pub current_policy_hash: Option<String>,
 }
 
 /// Orchestrates check-approved: read review.json → check cycle approval.
@@ -398,12 +414,26 @@ pub fn check_approved(
             .to_string());
     };
 
-    // Check that all groups have successful fast + final rounds.
-    let code_hash = hasher
-        .normalized_hash(&input.items_dir, &track_id)
-        .map_err(|e| format!("normalized hash error: {e}"))?;
+    // Policy staleness check: if the caller provides the current policy hash,
+    // verify it matches the cycle's frozen policy_hash. A mismatch means the
+    // review-scope.json or per-track override changed after the cycle started.
+    if let Some(ref current_hash) = input.current_policy_hash {
+        if cycle.policy_hash() != current_hash {
+            return Err(format!(
+                "[BLOCKED] Review cycle is stale: policy hash changed \
+                 (cycle: '{}', current: '{current_hash}'). Start a new review cycle.",
+                cycle.policy_hash()
+            ));
+        }
+    }
 
+    // Check that all groups have successful fast + final rounds with per-group scope hash.
     for (group_name, group_state) in cycle.groups() {
+        // Compute per-group scope hash from the frozen scope files.
+        let group_hash = hasher
+            .group_scope_hash(group_state.scope())
+            .map_err(|e| format!("group scope hash error for '{}': {e}", group_name.as_ref()))?;
+
         let fast = group_state.latest_round(domain::RoundType::Fast);
         let final_r = group_state.latest_round(domain::RoundType::Final);
 
@@ -421,17 +451,17 @@ pub fn check_approved(
                         group_name.as_ref()
                     ));
                 }
-                // Both fast and final must match current code hash.
-                if f.hash() != code_hash {
+                // Both fast and final must match current per-group scope hash.
+                if f.hash() != group_hash {
                     return Err(format!(
-                        "[BLOCKED] Group '{}': fast round hash '{}' does not match current code hash '{code_hash}'",
+                        "[BLOCKED] Group '{}': fast round hash '{}' does not match current scope hash '{group_hash}'",
                         group_name.as_ref(),
                         f.hash()
                     ));
                 }
-                if fin.hash() != code_hash {
+                if fin.hash() != group_hash {
                     return Err(format!(
-                        "[BLOCKED] Group '{}': final round hash '{}' does not match current code hash '{code_hash}'",
+                        "[BLOCKED] Group '{}': final round hash '{}' does not match current scope hash '{group_hash}'",
                         group_name.as_ref(),
                         fin.hash()
                     ));
@@ -478,12 +508,22 @@ mod tests {
 
     struct FixedHasher(String);
 
+    impl FixedHasher {
+        fn new(hash: &str) -> Self {
+            Self(hash.to_owned())
+        }
+    }
+
     impl GitHasher for FixedHasher {
         fn normalized_hash(
             &self,
             _items_dir: &Path,
             _track_id: &TrackId,
         ) -> Result<String, String> {
+            Ok(self.0.clone())
+        }
+
+        fn group_scope_hash(&self, _scope: &[String]) -> Result<String, String> {
             Ok(self.0.clone())
         }
     }
@@ -591,11 +631,12 @@ mod tests {
         store.save(&track).unwrap();
         let review_store = MemReviewStore::default();
 
-        let hasher = FixedHasher("abc123".to_string());
+        let hasher = FixedHasher::new("abc123");
         let input = CheckApprovedInput {
             items_dir: PathBuf::from("track/items"),
             track_id: "test-track".to_string(),
             planning_only: true,
+            current_policy_hash: None,
         };
 
         let result = check_approved(input, &store, &store, &hasher, &review_store);
@@ -609,11 +650,12 @@ mod tests {
         store.save(&track).unwrap();
         let review_store = MemReviewStore::default();
 
-        let hasher = FixedHasher("abc123".to_string());
+        let hasher = FixedHasher::new("abc123");
         let input = CheckApprovedInput {
             items_dir: PathBuf::from("track/items"),
             track_id: "test-track".to_string(),
             planning_only: false,
+            current_policy_hash: None,
         };
 
         let result = check_approved(input, &store, &store, &hasher, &review_store);
@@ -630,11 +672,12 @@ mod tests {
         let track_id = TrackId::try_new("test-track").unwrap();
         review_store.save_review(&track_id, make_review_with_approved_cycle(code_hash));
 
-        let hasher = FixedHasher(code_hash.to_string());
+        let hasher = FixedHasher::new(code_hash);
         let input = CheckApprovedInput {
             items_dir: PathBuf::from("track/items"),
             track_id: "test-track".to_string(),
             planning_only: false,
+            current_policy_hash: None,
         };
 
         let result = check_approved(input, &store, &store, &hasher, &review_store);
@@ -651,11 +694,12 @@ mod tests {
         review_store
             .save_review(&track_id, make_review_with_approved_cycle("rvw1:sha256:old-hash"));
 
-        let hasher = FixedHasher("rvw1:sha256:new-hash".to_string());
+        let hasher = FixedHasher::new("rvw1:sha256:new-hash");
         let input = CheckApprovedInput {
             items_dir: PathBuf::from("track/items"),
             track_id: "test-track".to_string(),
             planning_only: false,
+            current_policy_hash: None,
         };
 
         let result = check_approved(input, &store, &store, &hasher, &review_store);
@@ -691,11 +735,12 @@ mod tests {
         let track_id = TrackId::try_new("test-track").unwrap();
         review_store.save_review(&track_id, rj);
 
-        let hasher = FixedHasher(code_hash.to_string());
+        let hasher = FixedHasher::new(code_hash);
         let input = CheckApprovedInput {
             items_dir: PathBuf::from("track/items"),
             track_id: "test-track".to_string(),
             planning_only: false,
+            current_policy_hash: None,
         };
 
         let result = check_approved(input, &store, &store, &hasher, &review_store);

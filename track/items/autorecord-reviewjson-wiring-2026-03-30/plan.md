@@ -18,11 +18,11 @@ cycle auto-creation、group round append を実装する。review.json は revie
 
 - [x] Wire RecordRoundProtocolImpl to write review.json via FsReviewJsonStore: auto-create cycle if none exists, append group round, persist via save_review. Remove metadata.json review state writes. Add TDD tests.
 - [x] Add --add flag to private_index stage_bytes for future use. review.json is staged by cargo make add-all at commit time (review_operational file). Clean up metadata.json review section remnants. Verify cargo make ci passes end-to-end.
-- [ ] Implement per-group scope hash: replace placeholder normalized_tree_hash with review-scope manifest hash computed from group frozen scope files per ADR section 5. Wire ReviewPartitionSnapshot to cycle creation for frozen scope and to_cycle_groups on GroupPartition.
+- [x] Implement per-group scope hash: replace placeholder normalized_tree_hash with review-scope manifest hash computed from group frozen scope files per ADR section 5. Wire ReviewPartitionSnapshot to cycle creation for frozen scope and to_cycle_groups on GroupPartition.
 
 ## Read path 移行
 
 check-approved を ReviewJsonReader 経由で review.json から読むよう移行する。
 
 - [x] Migrate check-approved to read from review.json via ReviewJsonReader instead of metadata.json legacy ReviewState. Update tests.
-- [ ] Implement check-approved per-group scope hash verification: validate each group latest round hash against current group-scope hash computed from frozen scope files and base_ref.
+- [x] Implement check-approved per-group scope hash verification: validate each group latest round hash against current group-scope hash computed from frozen scope files and base_ref.

@@ -32,11 +32,83 @@ impl GitHasher for SystemGitHasher {
 
         git.index_tree_hash_normalizing(&metadata_rel).map_err(|e| format!("{e}"))
     }
+
+    fn group_scope_hash(&self, scope: &[String]) -> Result<String, String> {
+        use std::io::Read as _;
+
+        use sha2::Digest;
+
+        use crate::git_cli::{GitRepository, SystemGitRepo};
+
+        if scope.is_empty() {
+            let digest = sha2::Sha256::digest(b"");
+            return Ok(format!("rvw1:sha256:{digest:x}"));
+        }
+
+        let git = SystemGitRepo::discover().map_err(|e| format!("git error: {e}"))?;
+        let root = git.root().to_path_buf();
+
+        // Sort scope paths for deterministic manifest.
+        let mut sorted_scope: Vec<&str> = scope.iter().map(String::as_str).collect();
+        sorted_scope.sort();
+
+        // Build manifest from worktree file contents (git-independent).
+        // Each entry: "<path>\t<sha256_of_content>\n" for existing files,
+        //             "<path>\tDELETED\n" for missing files (tombstone).
+        let mut manifest = String::new();
+        for path in &sorted_scope {
+            let abs_path = root.join(path);
+            match open_nofollow_read(&abs_path) {
+                Ok(mut file) => {
+                    let mut bytes = Vec::new();
+                    file.read_to_end(&mut bytes)
+                        .map_err(|e| format!("failed to read {path}: {e}"))?;
+                    let file_hash = sha2::Sha256::digest(&bytes);
+                    manifest.push_str(&format!("{path}\t{file_hash:x}\n"));
+                }
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                    manifest.push_str(&format!("{path}\tDELETED\n"));
+                }
+                Err(e) => {
+                    return Err(format!("failed to open {path}: {e}"));
+                }
+            }
+        }
+
+        let digest = sha2::Sha256::digest(manifest.as_bytes());
+        Ok(format!("rvw1:sha256:{digest:x}"))
+    }
 }
 
 // ---------------------------------------------------------------------------
-// Symlink-safe lock file opener
+// Symlink-safe file openers
 // ---------------------------------------------------------------------------
+
+/// Opens a file for reading, rejecting symlinks atomically via `O_NOFOLLOW`.
+///
+/// # Errors
+///
+/// Returns an error if the path is a symlink or cannot be opened.
+fn open_nofollow_read(path: &std::path::Path) -> Result<std::fs::File, std::io::Error> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        std::fs::OpenOptions::new().read(true).custom_flags(libc::O_NOFOLLOW).open(path)
+    }
+    #[cfg(not(unix))]
+    {
+        match std::fs::symlink_metadata(path) {
+            Ok(meta) if meta.file_type().is_symlink() => {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::InvalidInput,
+                    format!("path is a symlink: {}", path.display()),
+                ));
+            }
+            Ok(_) | Err(_) => {}
+        }
+        std::fs::File::open(path)
+    }
+}
 
 /// Opens a lock file safely, rejecting symlinks atomically via `O_NOFOLLOW`.
 ///
@@ -211,10 +283,15 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
             }
         };
 
-        // Compute group hash using the same hasher as check_approved.
+        // Compute per-group scope hash from the frozen scope files in the cycle.
+        let group_scope: Vec<String> = review
+            .current_cycle()
+            .and_then(|c| c.group(&group_name))
+            .map(|g| g.scope().to_vec())
+            .unwrap_or_default();
         let group_hash = SystemGitHasher
-            .normalized_hash(&self.items_dir, track_id)
-            .map_err(|e| RecordRoundProtocolError::Other(format!("normalized hash error: {e}")))?;
+            .group_scope_hash(&group_scope)
+            .map_err(|e| RecordRoundProtocolError::Other(format!("group scope hash error: {e}")))?;
 
         // Guard: final round requires a prior successful fast round for this group.
         if round_type == domain::RoundType::Final {
@@ -545,5 +622,120 @@ mod tests {
         // No changes from base — scope should be empty.
         let scope = run_provider_in_dir(path, "main").unwrap();
         assert!(scope.is_empty(), "scope should be empty when there are no branch changes");
+    }
+
+    // -----------------------------------------------------------------------
+    // SystemGitHasher::group_scope_hash contract tests
+    // -----------------------------------------------------------------------
+
+    use usecase::review_workflow::usecases::GitHasher;
+
+    fn run_hasher_in_dir(dir: &std::path::Path, scope: &[String]) -> Result<String, String> {
+        let original = std::env::current_dir().unwrap();
+        std::env::set_current_dir(dir).unwrap();
+        let result = SystemGitHasher.group_scope_hash(scope);
+        std::env::set_current_dir(original).unwrap();
+        result
+    }
+
+    #[test]
+    fn test_group_scope_hash_empty_scope_returns_deterministic_hash() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        let hash1 = run_hasher_in_dir(path, &[]).unwrap();
+        let hash2 = run_hasher_in_dir(path, &[]).unwrap();
+        assert!(hash1.starts_with("rvw1:sha256:"), "hash should have rvw1 prefix: {hash1}");
+        assert_eq!(hash1, hash2, "empty scope hash must be deterministic");
+    }
+
+    #[test]
+    fn test_group_scope_hash_deterministic_for_same_worktree_files() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        std::fs::write(path.join("feature.rs"), "pub fn feature() {}").unwrap();
+
+        let scope = vec!["feature.rs".to_owned()];
+        let hash1 = run_hasher_in_dir(path, &scope).unwrap();
+        let hash2 = run_hasher_in_dir(path, &scope).unwrap();
+        assert_eq!(hash1, hash2, "same file content must produce same hash");
+        assert!(hash1.starts_with("rvw1:sha256:"));
+    }
+
+    #[test]
+    fn test_group_scope_hash_changes_when_content_changes() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        let scope = vec!["feature.rs".to_owned()];
+
+        std::fs::write(path.join("feature.rs"), "pub fn v1() {}").unwrap();
+        let hash_v1 = run_hasher_in_dir(path, &scope).unwrap();
+
+        std::fs::write(path.join("feature.rs"), "pub fn v2() {}").unwrap();
+        let hash_v2 = run_hasher_in_dir(path, &scope).unwrap();
+
+        assert_ne!(hash_v1, hash_v2, "different content must produce different hash");
+    }
+
+    #[test]
+    fn test_group_scope_hash_only_includes_scope_files() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        std::fs::write(path.join("a.rs"), "pub fn a() {}").unwrap();
+        std::fs::write(path.join("b.rs"), "pub fn b() {}").unwrap();
+
+        let scope_a = vec!["a.rs".to_owned()];
+        let scope_ab = vec!["a.rs".to_owned(), "b.rs".to_owned()];
+
+        let hash_a = run_hasher_in_dir(path, &scope_a).unwrap();
+        let hash_ab = run_hasher_in_dir(path, &scope_ab).unwrap();
+
+        assert_ne!(hash_a, hash_ab, "different scope sets must produce different hashes");
+    }
+
+    #[test]
+    fn test_group_scope_hash_deleted_file_produces_tombstone() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        std::fs::write(path.join("exists.rs"), "pub fn ok() {}").unwrap();
+
+        let scope = vec!["exists.rs".to_owned(), "deleted.rs".to_owned()];
+        let hash_with_deleted = run_hasher_in_dir(path, &scope).unwrap();
+
+        let scope_only = vec!["exists.rs".to_owned()];
+        let hash_without_deleted = run_hasher_in_dir(path, &scope_only).unwrap();
+
+        // Missing files get DELETED tombstone, so the hashes differ.
+        assert_ne!(
+            hash_with_deleted, hash_without_deleted,
+            "missing file should contribute a DELETED tombstone to the hash"
+        );
+    }
+
+    #[test]
+    fn test_group_scope_hash_not_affected_by_staging() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        // Write a file but do NOT stage it.
+        std::fs::write(path.join("unstaged.rs"), "pub fn unstaged() {}").unwrap();
+        let scope = vec!["unstaged.rs".to_owned()];
+        let hash_unstaged = run_hasher_in_dir(path, &scope).unwrap();
+
+        // Now stage the same file — hash should not change.
+        Command::new("git").args(["add", "unstaged.rs"]).current_dir(path).output().unwrap();
+        let hash_staged = run_hasher_in_dir(path, &scope).unwrap();
+
+        assert_eq!(hash_unstaged, hash_staged, "hash must not be affected by git staging state");
     }
 }

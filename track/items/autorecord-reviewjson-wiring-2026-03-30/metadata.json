@@ -46,7 +46,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "description": "Fix --full-auto sandbox override: remove --full-auto from planner and reviewer Codex invocations (it implies --sandbox workspace-write, overriding read-only). Update tests to assert --full-auto is never present.",
@@ -71,14 +71,14 @@
     {
       "description": "Implement per-group scope hash: replace placeholder normalized_tree_hash with review-scope manifest hash computed from group frozen scope files per ADR section 5. Wire ReviewPartitionSnapshot to cycle creation for frozen scope and to_cycle_groups on GroupPartition.",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Implement check-approved per-group scope hash verification: validate each group latest round hash against current group-scope hash computed from frozen scope files and base_ref.",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "auto-record review.json 書き込みパス接続 + sandbox 修正",
-  "updated_at": "2026-03-30T10:19:41Z"
+  "updated_at": "2026-03-31T00:48:03Z"
 }

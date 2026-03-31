@@ -446,6 +446,7 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
         items_dir: args.items_dir.clone(),
         track_id: args.track_id.clone(),
         planning_only,
+        current_policy_hash: None, // TODO: compute from review-scope.json + per-track override
     };
     usecase::review_workflow::usecases::check_approved(
         input,
