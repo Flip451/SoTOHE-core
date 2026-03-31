@@ -51,7 +51,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "description": "Fix --full-auto sandbox override: remove --full-auto from planner and reviewer Codex invocations (it implies --sandbox workspace-write, overriding read-only). Update tests to assert --full-auto is never present.",
@@ -96,9 +96,9 @@
     {
       "description": "Delegate check_approved to check_cycle_approved: pass ReviewPartitionSnapshot (computed from current DiffScope + policy) from CLI into check_approved, replace inline per-group loop with check_cycle_approved which includes full staleness + partition drift detection.",
       "id": "T009",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "auto-record review.json 書き込みパス接続 + sandbox 修正",
-  "updated_at": "2026-03-31T04:24:06Z"
+  "updated_at": "2026-03-31T07:19:36Z"
 }

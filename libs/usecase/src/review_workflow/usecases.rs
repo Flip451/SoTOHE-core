@@ -331,11 +331,11 @@ pub struct CheckApprovedInput {
     /// config, etc.). The NotStarted+empty-groups fast-path is only allowed in this
     /// case. When `false`, code files are staged and a completed review is required.
     pub planning_only: bool,
-    /// Current effective policy hash (from review-scope.json + per-track override).
-    /// When `Some`, the cycle's frozen `policy_hash` is compared against this value
-    /// to detect policy staleness. When `None`, the staleness check is skipped
-    /// (backward-compatible fallback).
-    pub current_policy_hash: Option<String>,
+    /// Current partition snapshot (policy hashes + group partition) for staleness
+    /// detection. When `Some`, `check_cycle_approved` performs full staleness +
+    /// partition drift + per-group hash verification. When `None`, falls back to
+    /// per-group hash check only (no staleness detection).
+    pub current_snapshot: Option<crate::review_workflow::groups::ReviewPartitionSnapshot>,
 }
 
 /// Orchestrates check-approved: read review.json → check cycle approval.
@@ -399,82 +399,37 @@ pub fn check_approved(
             .to_string());
     };
 
-    // Policy staleness check: if the caller provides the current policy hash,
-    // verify it matches the cycle's frozen policy_hash. A mismatch means the
-    // review-scope.json or per-track override changed after the cycle started.
-    if let Some(ref current_hash) = input.current_policy_hash {
-        if cycle.policy_hash() != current_hash {
-            return Err(format!(
-                "[BLOCKED] Review cycle is stale: policy hash changed \
-                 (cycle: '{}', current: '{current_hash}'). Start a new review cycle.",
-                cycle.policy_hash()
-            ));
-        }
-    }
-
-    // Check that all groups have successful fast + final rounds with per-group scope hash.
+    // Compute per-group scope hashes from frozen scope files.
+    let mut current_group_hashes = std::collections::BTreeMap::new();
     for (group_name, group_state) in cycle.groups() {
-        // Compute per-group scope hash from the frozen scope files.
         let group_hash = hasher
             .group_scope_hash(group_state.scope())
             .map_err(|e| format!("group scope hash error for '{}': {e}", group_name.as_ref()))?;
-
-        let fast = group_state.latest_round(domain::RoundType::Fast);
-        let final_r = group_state.latest_round(domain::RoundType::Final);
-
-        match (fast, final_r) {
-            (Some(f), Some(fin)) => {
-                if !f.is_successful_zero_findings() {
-                    return Err(format!(
-                        "[BLOCKED] Group '{}': latest fast round is not zero_findings",
-                        group_name.as_ref()
-                    ));
-                }
-                if !fin.is_successful_zero_findings() {
-                    return Err(format!(
-                        "[BLOCKED] Group '{}': latest final round is not zero_findings",
-                        group_name.as_ref()
-                    ));
-                }
-                // Both fast and final must match current per-group scope hash.
-                if f.hash() != group_hash {
-                    return Err(format!(
-                        "[BLOCKED] Group '{}': fast round hash '{}' does not match current scope hash '{group_hash}'",
-                        group_name.as_ref(),
-                        f.hash()
-                    ));
-                }
-                if fin.hash() != group_hash {
-                    return Err(format!(
-                        "[BLOCKED] Group '{}': final round hash '{}' does not match current scope hash '{group_hash}'",
-                        group_name.as_ref(),
-                        fin.hash()
-                    ));
-                }
-                // Final must come after the latest fast (append-only ordering).
-                if !group_state.final_after_latest_fast() {
-                    return Err(format!(
-                        "[BLOCKED] Group '{}': final round does not come after the latest fast round",
-                        group_name.as_ref()
-                    ));
-                }
-            }
-            (Some(_), None) => {
-                return Err(format!(
-                    "[BLOCKED] Group '{}': missing final round (fast-only is insufficient)",
-                    group_name.as_ref()
-                ));
-            }
-            _ => {
-                return Err(format!(
-                    "[BLOCKED] Group '{}': no review rounds recorded",
-                    group_name.as_ref()
-                ));
-            }
-        }
+        current_group_hashes.insert(group_name.clone(), group_hash);
     }
 
-    Ok(())
+    // Delegate to check_cycle_approved which performs full verification:
+    // staleness (policy + partition + hash) + per-group fast/final check.
+    if let Some(ref snapshot) = input.current_snapshot {
+        match crate::review_workflow::cycle::check_cycle_approved(
+            &review,
+            snapshot,
+            &current_group_hashes,
+        ) {
+            crate::review_workflow::cycle::CheckCycleApprovedResult::Approved => Ok(()),
+            crate::review_workflow::cycle::CheckCycleApprovedResult::NotApproved(reason) => {
+                Err(format!("[BLOCKED] {reason:?}"))
+            }
+        }
+    } else {
+        // Fallback when no snapshot provided: check per-group hashes only
+        // (no staleness detection). Used when CLI cannot compute the snapshot.
+        if review.current_cycle().is_some_and(|c| c.all_groups_approved(&current_group_hashes)) {
+            Ok(())
+        } else {
+            Err("[BLOCKED] Review cycle not fully approved (missing fast+final zero_findings for all groups)".to_string())
+        }
+    }
 }
 
 #[cfg(test)]
@@ -613,7 +568,7 @@ mod tests {
             items_dir: PathBuf::from("track/items"),
             track_id: "test-track".to_string(),
             planning_only: true,
-            current_policy_hash: None,
+            current_snapshot: None,
         };
 
         let result = check_approved(input, &store, &store, &hasher, &review_store);
@@ -632,7 +587,7 @@ mod tests {
             items_dir: PathBuf::from("track/items"),
             track_id: "test-track".to_string(),
             planning_only: false,
-            current_policy_hash: None,
+            current_snapshot: None,
         };
 
         let result = check_approved(input, &store, &store, &hasher, &review_store);
@@ -654,7 +609,7 @@ mod tests {
             items_dir: PathBuf::from("track/items"),
             track_id: "test-track".to_string(),
             planning_only: false,
-            current_policy_hash: None,
+            current_snapshot: None,
         };
 
         let result = check_approved(input, &store, &store, &hasher, &review_store);
@@ -676,7 +631,7 @@ mod tests {
             items_dir: PathBuf::from("track/items"),
             track_id: "test-track".to_string(),
             planning_only: false,
-            current_policy_hash: None,
+            current_snapshot: None,
         };
 
         let result = check_approved(input, &store, &store, &hasher, &review_store);
@@ -717,12 +672,12 @@ mod tests {
             items_dir: PathBuf::from("track/items"),
             track_id: "test-track".to_string(),
             planning_only: false,
-            current_policy_hash: None,
+            current_snapshot: None,
         };
 
         let result = check_approved(input, &store, &store, &hasher, &review_store);
         assert!(result.is_err(), "fast-only should block");
-        assert!(result.unwrap_err().contains("missing final"));
+        assert!(result.unwrap_err().contains("[BLOCKED]"));
     }
 
     // ---------------------------------------------------------------------------

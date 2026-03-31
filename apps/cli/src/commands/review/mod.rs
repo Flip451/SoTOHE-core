@@ -442,6 +442,7 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
     use infrastructure::review_group_policy::{
         ResolvedReviewGroupPolicy, load_review_groups_override,
     };
+    use usecase::review_workflow::scope::DiffScopeProvider;
 
     let store = infrastructure::track::fs_store::FsTrackStore::new(&args.items_dir);
     let hasher = infrastructure::review_adapters::SystemGitHasher;
@@ -451,26 +452,40 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
     // Fail-closed: if detection fails, assume code files are present.
     let planning_only = detect_planning_only().unwrap_or(false);
 
-    // Compute current effective policy hash for staleness detection.
-    // Fail-open: if policy resolution fails, skip staleness check (None).
-    let current_policy_hash = (|| -> Result<String, String> {
+    // Compute current partition snapshot for full staleness detection (fail-closed).
+    let current_snapshot = {
         let git = SystemGitRepo::discover().map_err(|e| format!("{e}"))?;
         let scope_json = git.root().join("track/review-scope.json");
         let base_groups = infrastructure::review_adapters::load_base_review_groups(&scope_json)?;
-        let track_id = domain::TrackId::try_new(&args.track_id).map_err(|e| format!("{e}"))?;
-        let override_config =
-            load_review_groups_override(&args.items_dir, &track_id).map_err(|e| format!("{e}"))?;
+        let track_id_parsed =
+            domain::TrackId::try_new(&args.track_id).map_err(|e| format!("{e}"))?;
+        let override_config = load_review_groups_override(&args.items_dir, &track_id_parsed)
+            .map_err(|e| format!("{e}"))?;
+
+        let base_policy =
+            ResolvedReviewGroupPolicy::resolve(&base_groups, None).map_err(|e| format!("{e}"))?;
         let policy = ResolvedReviewGroupPolicy::resolve(&base_groups, override_config.as_ref())
             .map_err(|e| format!("{e}"))?;
-        Ok(policy.policy_hash().to_owned())
-    })()
-    .ok();
+
+        // Get changed files for partition.
+        let diff_scope = infrastructure::review_adapters::GitDiffScopeProvider
+            .changed_files("main")
+            .map_err(|e| format!("{e}"))?;
+        let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
+        let partition = policy.partition(&diff_files).map_err(|e| format!("{e}"))?;
+
+        usecase::review_workflow::groups::ReviewPartitionSnapshot::new(
+            base_policy.policy_hash(),
+            policy.policy_hash(),
+            partition,
+        )
+    };
 
     let input = usecase::review_workflow::usecases::CheckApprovedInput {
         items_dir: args.items_dir.clone(),
         track_id: args.track_id.clone(),
         planning_only,
-        current_policy_hash,
+        current_snapshot: Some(current_snapshot),
     };
     usecase::review_workflow::usecases::check_approved(
         input,
