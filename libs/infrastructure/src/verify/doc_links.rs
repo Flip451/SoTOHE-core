@@ -121,11 +121,6 @@ fn collect_md_files_recursive(
         let name = file_name.to_string_lossy();
 
         if path.is_dir() {
-            // Skip hidden directories
-            if name.starts_with('.') {
-                continue;
-            }
-            // Skip known non-doc directories
             if SKIP_DIRS.iter().any(|&s| name == s || name.starts_with(s)) {
                 continue;
             }
@@ -216,11 +211,19 @@ mod tests {
     }
 
     #[test]
-    fn test_hidden_directories_are_skipped() {
+    fn test_dotfile_directories_are_scanned() {
         let tmp = TempDir::new().unwrap();
-        write_file(tmp.path(), ".hidden/broken.md", "See [x](nonexistent.md).");
+        write_file(tmp.path(), ".claude/rules/test.md", "See [x](nonexistent.md).");
         let outcome = verify(tmp.path());
-        assert!(outcome.is_ok(), "hidden directories should be skipped");
+        assert!(outcome.has_errors(), "dotfile directories should be scanned for doc links");
+    }
+
+    #[test]
+    fn test_git_directory_is_skipped() {
+        let tmp = TempDir::new().unwrap();
+        write_file(tmp.path(), ".git/hooks/broken.md", "See [x](nonexistent.md).");
+        let outcome = verify(tmp.path());
+        assert!(outcome.is_ok(), ".git directory should be skipped");
     }
 
     #[test]
