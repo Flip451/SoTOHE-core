@@ -35,6 +35,9 @@ Thumbs.db
 # --- Advisory lock files created by with_locked_document (fs4) ---
 *.json.lock
 
+# --- Runtime lock files (review cycle mutual exclusion) ---
+.sotp-record-round.lock
+
 # --- Legacy local cache ---
 __pycache__/
 *.pyc
