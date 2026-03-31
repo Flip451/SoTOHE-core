@@ -449,20 +449,18 @@ where
 }
 
 fn wait_and_merge(pr: &str, interval: u64, timeout: u64, method: &str) -> ExitCode {
-    // Task completion guard: block merge if tasks are unresolved (WF-66).
-    let repo = match SystemGitRepo::discover() {
-        Ok(r) => r,
+    // Task completion guard: validate against the PR's head branch, not the
+    // local checkout, so the correct track metadata is checked (WF-66).
+    let client = SystemGhClient;
+    let branch = match client.pr_head_branch(pr) {
+        Ok(b) => b,
         Err(e) => {
-            eprintln!("[ERROR] {e}");
+            eprintln!("[ERROR] failed to resolve PR head branch: {e}");
             return ExitCode::FAILURE;
         }
     };
-    let branch = match repo.current_branch() {
-        Ok(Some(b)) => b,
-        Ok(None) => {
-            eprintln!("[ERROR] could not determine current branch");
-            return ExitCode::FAILURE;
-        }
+    let repo = match SystemGitRepo::discover() {
+        Ok(r) => r,
         Err(e) => {
             eprintln!("[ERROR] {e}");
             return ExitCode::FAILURE;
@@ -473,7 +471,6 @@ fn wait_and_merge(pr: &str, interval: u64, timeout: u64, method: &str) -> ExitCo
         return guard_result;
     }
 
-    let client = SystemGhClient;
     wait_and_merge_with(pr, interval, timeout, method, &client, &thread::sleep)
 }
 
