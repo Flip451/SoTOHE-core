@@ -259,7 +259,7 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
         group_name: ReviewGroupName,
         verdict: Verdict,
         concerns: Vec<ReviewConcern>,
-        _expected_groups: Vec<ReviewGroupName>,
+        expected_groups: Vec<ReviewGroupName>,
         timestamp: Timestamp,
     ) -> Result<(), RecordRoundProtocolError> {
         use domain::{
@@ -357,10 +357,29 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
             .map_err(|e| RecordRoundProtocolError::Other(format!("resolve group policy: {e}")))?;
 
             // 3. Partition changed files into groups with real frozen scope.
+            // Filter to expected_groups only (+ mandatory "other") to respect
+            // the --expected-groups contract and avoid requiring review for
+            // groups the caller didn't request.
             let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
-            let partition = policy
+            let full_partition = policy
                 .partition(&diff_files)
                 .map_err(|e| RecordRoundProtocolError::Other(format!("partition: {e}")))?;
+            let other_key = ReviewGroupName::try_new("other").map_err(|e| {
+                RecordRoundProtocolError::Other(format!("invalid group name 'other': {e}"))
+            })?;
+            let mut filtered_groups = std::collections::BTreeMap::new();
+            for (name, paths) in full_partition.groups() {
+                if expected_groups.contains(name) || *name == other_key {
+                    filtered_groups.insert(name.clone(), paths.clone());
+                }
+            }
+            // Ensure "other" exists even if not in the full partition result.
+            filtered_groups.entry(other_key).or_default();
+            let partition =
+                usecase::review_workflow::groups::GroupPartition::try_new(filtered_groups)
+                    .map_err(|e| {
+                        RecordRoundProtocolError::Other(format!("partition filter: {e}"))
+                    })?;
             // Compute base policy hash separately (before override).
             let base_policy =
                 crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(&base_groups, None)
