@@ -461,8 +461,15 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
         .find_review(&track_id_parsed)
         .ok()
         .flatten()
-        .and_then(|r| r.current_cycle().map(|c| c.base_ref().to_owned()))
-        .map(|base_ref| -> Result<_, String> {
+        .and_then(|r| {
+            r.current_cycle().map(|c| {
+                let base_ref = c.base_ref().to_owned();
+                let cycle_group_names: std::collections::BTreeSet<_> =
+                    c.group_names().cloned().collect();
+                (base_ref, cycle_group_names)
+            })
+        })
+        .map(|(base_ref, cycle_group_names)| -> Result<_, String> {
             let git = SystemGitRepo::discover().map_err(|e| format!("{e}"))?;
             let scope_json = git.root().join("track/review-scope.json");
             let base_groups =
@@ -479,7 +486,21 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
                 .changed_files(&base_ref)
                 .map_err(|e| format!("{e}"))?;
             let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
-            let partition = policy.partition(&diff_files).map_err(|e| format!("{e}"))?;
+            let full_partition = policy.partition(&diff_files).map_err(|e| format!("{e}"))?;
+
+            // Filter partition to match cycle's group set to avoid PartitionChanged
+            // false positive when the cycle was created with a subset of groups.
+            let other_key =
+                domain::ReviewGroupName::try_new("other").map_err(|e| format!("{e}"))?;
+            let mut filtered = std::collections::BTreeMap::new();
+            for (name, paths) in full_partition.groups() {
+                if cycle_group_names.contains(name) {
+                    filtered.insert(name.clone(), paths.clone());
+                }
+            }
+            filtered.entry(other_key).or_default();
+            let partition = usecase::review_workflow::groups::GroupPartition::try_new(filtered)
+                .map_err(|e| format!("{e}"))?;
 
             Ok(usecase::review_workflow::groups::ReviewPartitionSnapshot::new(
                 base_policy.policy_hash(),
