@@ -9,7 +9,7 @@
 ファイル移動前にテスト基盤を整え、各タスクの CI 通過を保証する。
 
 - [x] Add failing tests for new paths and temporary dual-read compatibility in planning-only detection, git staging allowlists, verifier lookups, Python scripts, and hook output
-- [ ] Implement sotp verify doc-links subcommand with tempdir-based tests (generic Markdown link existence check, not wired into CI yet)
+- [x] Implement sotp verify doc-links subcommand with tempdir-based tests (generic Markdown link existence check, not wired into CI yet)
 
 ## Phase B: CI 設定ファイルと規約の移行
 

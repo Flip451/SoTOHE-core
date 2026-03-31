@@ -6,6 +6,7 @@
 pub mod architecture_rules;
 pub mod canonical_modules;
 pub mod convention_docs;
+pub mod doc_links;
 pub mod doc_patterns;
 pub mod domain_purity;
 pub mod domain_strings;

@@ -68,7 +68,7 @@
     {
       "description": "Implement sotp verify doc-links subcommand with tempdir-based tests (generic Markdown link existence check, not wired into CI yet)",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Move docs/architecture-rules.json to repo root, update all Rust const/doc-comment/test references, Python scripts, and config files",
@@ -102,5 +102,5 @@
     }
   ],
   "title": "ドキュメント群の knowledge ディレクトリへの集約と整理",
-  "updated_at": "2026-03-31T15:46:52Z"
+  "updated_at": "2026-03-31T15:54:17Z"
 }

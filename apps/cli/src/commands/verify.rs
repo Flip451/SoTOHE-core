@@ -43,6 +43,8 @@ pub enum VerifyCommand {
     DomainStrings(VerifyArgs),
     /// Check libs/usecase/src/ for hexagonal purity violations (forbidden patterns).
     UsecasePurity(VerifyArgs),
+    /// Check that local file links in Markdown documents resolve to existing files.
+    DocLinks(VerifyArgs),
     /// Check that plan.md files are up-to-date with metadata.json renderings.
     ViewFreshness(VerifyArgs),
     /// Check spec.md source tag signals match frontmatter and red == 0 gate.
@@ -117,6 +119,9 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
             "verify usecase purity",
             infrastructure::verify::usecase_purity::verify(&args.project_root),
         ),
+        VerifyCommand::DocLinks(args) => {
+            ("verify doc links", infrastructure::verify::doc_links::verify(&args.project_root))
+        }
         VerifyCommand::ViewFreshness(args) => (
             "verify view freshness",
             infrastructure::verify::view_freshness::verify(&args.project_root),
