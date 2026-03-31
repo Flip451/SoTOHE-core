@@ -72,6 +72,8 @@ pub fn verify(root: &Path) -> VerifyOutcome {
                     continue;
                 }
 
+                // Strip optional title attribute: [text](path "title")
+                let link_target = link_target.split('"').next().unwrap_or(link_target).trim();
                 // Strip anchor fragment from path
                 let path_part = link_target.split('#').next().unwrap_or(link_target);
                 if path_part.is_empty() {
@@ -110,10 +112,7 @@ fn collect_md_files_recursive(
     const SKIP_DIRS: &[&str] =
         &["target", "target-", ".git", "node_modules", "vendor", ".cache", "tmp"];
 
-    let entries = match std::fs::read_dir(dir) {
-        Ok(e) => e,
-        Err(_) => return Ok(()),
-    };
+    let entries = std::fs::read_dir(dir)?;
 
     for entry in entries {
         let entry = entry?;
@@ -242,6 +241,15 @@ mod tests {
         );
         let outcome = verify(tmp.path());
         assert!(outcome.is_ok(), "links inside fenced code blocks should be skipped");
+    }
+
+    #[test]
+    fn test_link_with_title_attribute_resolves_path() {
+        let tmp = TempDir::new().unwrap();
+        write_file(tmp.path(), "target.md", "# Target");
+        write_file(tmp.path(), "index.md", r#"See [t](target.md "hover text")."#);
+        let outcome = verify(tmp.path());
+        assert!(outcome.is_ok(), "link with title attribute should resolve path part");
     }
 
     #[test]
