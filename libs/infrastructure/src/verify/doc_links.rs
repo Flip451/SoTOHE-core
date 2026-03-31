@@ -49,10 +49,14 @@ pub fn verify(root: &Path) -> VerifyOutcome {
         };
 
         let md_dir = md_path.parent().unwrap_or(root);
+        let mut in_fenced_block = false;
 
         for (line_num, line) in content.lines().enumerate() {
-            // Skip fenced code blocks
             if line.trim_start().starts_with("```") {
+                in_fenced_block = !in_fenced_block;
+                continue;
+            }
+            if in_fenced_block {
                 continue;
             }
 
@@ -226,5 +230,25 @@ mod tests {
         write_file(tmp.path(), "index.md", "See [a](a.md) and [b](b.md).");
         let outcome = verify(tmp.path());
         assert_eq!(outcome.findings().len(), 2, "both broken links should be reported");
+    }
+
+    #[test]
+    fn test_links_inside_fenced_code_blocks_are_skipped() {
+        let tmp = TempDir::new().unwrap();
+        write_file(
+            tmp.path(),
+            "index.md",
+            "text\n```\nSee [broken](nonexistent.md)\n```\nmore text",
+        );
+        let outcome = verify(tmp.path());
+        assert!(outcome.is_ok(), "links inside fenced code blocks should be skipped");
+    }
+
+    #[test]
+    fn test_link_after_fenced_block_is_checked() {
+        let tmp = TempDir::new().unwrap();
+        write_file(tmp.path(), "index.md", "```\ncode\n```\nSee [broken](nonexistent.md)");
+        let outcome = verify(tmp.path());
+        assert!(outcome.has_errors(), "link after fenced block should be checked");
     }
 }
