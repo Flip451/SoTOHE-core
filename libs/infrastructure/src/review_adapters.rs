@@ -293,12 +293,12 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
             })?;
         }
 
-        // Verify track exists with valid metadata.json (read + decode, fail-closed).
+        // Verify track exists and check escalation gate (fail-closed).
         {
             use crate::track::fs_store::FsTrackStore;
             use domain::TrackReader;
             let store = FsTrackStore::new(&self.items_dir);
-            store
+            let track = store
                 .find(track_id)
                 .map_err(|e| {
                     RecordRoundProtocolError::Other(format!(
@@ -312,6 +312,15 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
                         track_id.as_ref()
                     ))
                 })?;
+
+            // Escalation gate: reject if metadata.json has an active escalation block.
+            if let Some(review_state) = track.review() {
+                if let domain::EscalationPhase::Blocked(block) = review_state.escalation().phase() {
+                    let concerns: Vec<_> =
+                        block.concerns().iter().map(|c| c.as_ref().to_owned()).collect();
+                    return Err(RecordRoundProtocolError::EscalationBlocked(concerns));
+                }
+            }
         }
 
         let rj_store = FsReviewJsonStore::new(&self.items_dir);
