@@ -29,5 +29,5 @@ CLI で policy_hash を計算して check_approved に渡し、check_cycle_appro
 
 - [x] Migrate check-approved to read from review.json via ReviewJsonReader instead of metadata.json legacy ReviewState. Update tests.
 - [x] Implement check-approved per-group scope hash verification: validate each group latest round hash against current group-scope hash computed from frozen scope files and base_ref.
-- [ ] Wire current_policy_hash into CLI check-approved: compute ResolvedReviewGroupPolicy::policy_hash() in run_check_approved and pass to CheckApprovedInput.current_policy_hash (currently None). Enables policy staleness detection.
+- [x] Wire current_policy_hash into CLI check-approved: compute ResolvedReviewGroupPolicy::policy_hash() in run_check_approved and pass to CheckApprovedInput.current_policy_hash (currently None). Enables policy staleness detection.
 - [ ] Delegate check_approved to check_cycle_approved: pass ReviewPartitionSnapshot (computed from current DiffScope + policy) from CLI into check_approved, replace inline per-group loop with check_cycle_approved which includes full staleness + partition drift detection.

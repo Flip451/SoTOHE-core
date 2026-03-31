@@ -91,7 +91,7 @@
     {
       "description": "Wire current_policy_hash into CLI check-approved: compute ResolvedReviewGroupPolicy::policy_hash() in run_check_approved and pass to CheckApprovedInput.current_policy_hash (currently None). Enables policy staleness detection.",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Delegate check_approved to check_cycle_approved: pass ReviewPartitionSnapshot (computed from current DiffScope + policy) from CLI into check_approved, replace inline per-group loop with check_cycle_approved which includes full staleness + partition drift detection.",
@@ -100,5 +100,5 @@
     }
   ],
   "title": "auto-record review.json 書き込みパス接続 + sandbox 修正",
-  "updated_at": "2026-03-31T04:17:58Z"
+  "updated_at": "2026-03-31T04:24:06Z"
 }

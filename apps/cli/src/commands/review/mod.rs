@@ -438,6 +438,11 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
 }
 
 fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
+    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+    use infrastructure::review_group_policy::{
+        ResolvedReviewGroupPolicy, load_review_groups_override,
+    };
+
     let store = infrastructure::track::fs_store::FsTrackStore::new(&args.items_dir);
     let hasher = infrastructure::review_adapters::SystemGitHasher;
     let review_store = infrastructure::review_json_store::FsReviewJsonStore::new(&args.items_dir);
@@ -446,11 +451,26 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
     // Fail-closed: if detection fails, assume code files are present.
     let planning_only = detect_planning_only().unwrap_or(false);
 
+    // Compute current effective policy hash for staleness detection.
+    // Fail-open: if policy resolution fails, skip staleness check (None).
+    let current_policy_hash = (|| -> Result<String, String> {
+        let git = SystemGitRepo::discover().map_err(|e| format!("{e}"))?;
+        let scope_json = git.root().join("track/review-scope.json");
+        let base_groups = infrastructure::review_adapters::load_base_review_groups(&scope_json)?;
+        let track_id = domain::TrackId::try_new(&args.track_id).map_err(|e| format!("{e}"))?;
+        let override_config =
+            load_review_groups_override(&args.items_dir, &track_id).map_err(|e| format!("{e}"))?;
+        let policy = ResolvedReviewGroupPolicy::resolve(&base_groups, override_config.as_ref())
+            .map_err(|e| format!("{e}"))?;
+        Ok(policy.policy_hash().to_owned())
+    })()
+    .ok();
+
     let input = usecase::review_workflow::usecases::CheckApprovedInput {
         items_dir: args.items_dir.clone(),
         track_id: args.track_id.clone(),
         planning_only,
-        current_policy_hash: None, // TODO: compute from review-scope.json + per-track override
+        current_policy_hash,
     };
     usecase::review_workflow::usecases::check_approved(
         input,

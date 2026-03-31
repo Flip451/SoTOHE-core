@@ -15,7 +15,7 @@ use usecase::review_workflow::usecases::{
 ///
 /// # Errors
 /// Returns a string error on I/O or JSON parse failure.
-fn load_base_review_groups(
+pub fn load_base_review_groups(
     path: &std::path::Path,
 ) -> Result<std::collections::BTreeMap<String, crate::review_group_policy::ReviewGroupConfig>, String>
 {
