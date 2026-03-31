@@ -431,9 +431,18 @@ fn wait_and_merge(pr: &str, interval: u64, timeout: u64, method: &str) -> ExitCo
         }
     };
     // Fetch the PR head ref so the local remote-tracking branch is current.
-    if let Err(e) = repo.output(&["fetch", "origin", &branch]) {
-        eprintln!("[ERROR] failed to fetch origin/{branch}: {e}");
-        return ExitCode::FAILURE;
+    // Fail closed: check both spawn error and non-zero exit code.
+    match repo.output(&["fetch", "origin", &branch]) {
+        Ok(o) if !o.status.success() => {
+            let stderr = String::from_utf8_lossy(&o.stderr);
+            eprintln!("[ERROR] git fetch origin/{branch} failed: {stderr}");
+            return ExitCode::FAILURE;
+        }
+        Err(e) => {
+            eprintln!("[ERROR] failed to run git fetch: {e}");
+            return ExitCode::FAILURE;
+        }
+        Ok(_) => {}
     }
     let guard_result = check_tasks_resolved(&branch, repo.root());
     if guard_result != ExitCode::SUCCESS {
