@@ -159,7 +159,7 @@ fn run(args: MakeArgs) -> Result<ExitCode, CliError> {
         MakeTask::TrackSwitchMain => dispatch_track_switch_main(),
         MakeTask::TrackSyncViews => dispatch_track_sync_views(&args.raw_args),
         MakeTask::TrackResolve => dispatch_track_resolve(&args.raw_args),
-        MakeTask::TrackPrReview => dispatch_track_pr_review(),
+        MakeTask::TrackPrReview => dispatch_track_pr_review(&args.raw_args),
         MakeTask::TrackPrPush => dispatch_track_pr_push(&args.raw_args),
         MakeTask::TrackPrEnsure => dispatch_track_pr_ensure(&args.raw_args),
         MakeTask::TrackPr => dispatch_track_pr(&args.raw_args),
@@ -263,8 +263,13 @@ fn dispatch_track_resolve(raw_args: &[String]) -> Result<ExitCode, CliError> {
     run_sotp(&args)
 }
 
-fn dispatch_track_pr_review() -> Result<ExitCode, CliError> {
-    run_sotp(&["pr", "review-cycle"])
+fn dispatch_track_pr_review(raw_args: &[String]) -> Result<ExitCode, CliError> {
+    let words = raw_args_to_words(raw_args);
+    let mut args: Vec<&str> = vec!["pr", "review-cycle"];
+    for w in &words {
+        args.push(w);
+    }
+    run_sotp(&args)
 }
 
 fn dispatch_track_pr_push(raw_args: &[String]) -> Result<ExitCode, CliError> {

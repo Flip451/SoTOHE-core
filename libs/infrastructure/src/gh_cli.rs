@@ -150,6 +150,17 @@ pub trait GhClient {
             stderr: "not implemented".to_owned(),
         })
     }
+
+    /// Return the head branch name for a PR (e.g. `track/my-feature`).
+    ///
+    /// # Errors
+    /// Returns `GhError::CommandFailed` if the gh command fails.
+    fn pr_head_branch(&self, _pr: &str) -> Result<String, GhError> {
+        Err(GhError::CommandFailed {
+            command: "pr_head_branch".to_owned(),
+            stderr: "not implemented".to_owned(),
+        })
+    }
 }
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -209,6 +220,10 @@ impl GhClient for SystemGhClient {
 
     fn repo_nwo(&self) -> Result<String, GhError> {
         repo_nwo_with(&run_gh)
+    }
+
+    fn pr_head_branch(&self, pr: &str) -> Result<String, GhError> {
+        pr_head_branch_with(pr, &run_gh)
     }
 }
 
@@ -427,6 +442,25 @@ where
     }
     let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
     Err(GhError::CommandFailed { command: "repo view".to_owned(), stderr })
+}
+
+fn pr_head_branch_with<F>(pr: &str, run_gh: &F) -> Result<String, GhError>
+where
+    F: Fn(&[&str]) -> Result<Output, GhError>,
+{
+    let output = run_gh(&["pr", "view", pr, "--json", "headRefName", "-q", ".headRefName"])?;
+    if output.status.success() {
+        let branch = String::from_utf8_lossy(&output.stdout).trim().to_owned();
+        if branch.is_empty() || branch == "null" {
+            return Err(GhError::CommandFailed {
+                command: format!("pr view {pr}"),
+                stderr: "headRefName is empty or null".to_owned(),
+            });
+        }
+        return Ok(branch);
+    }
+    let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
+    Err(GhError::CommandFailed { command: format!("pr view {pr}"), stderr })
 }
 
 fn decode_pr_checks(stdout: &[u8], pr: &str) -> Result<Vec<PrCheckRecord>, GhError> {

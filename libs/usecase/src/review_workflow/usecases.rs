@@ -379,24 +379,15 @@ pub fn check_approved(
         .find_review(&track_id)
         .map_err(|e| format!("failed to read review.json: {e}"))?;
 
-    // No review.json → no review cycle started yet.
+    // No review.json → review never started. Allow commit (WF-66: user may
+    // choose PR-based review instead of local review).
     let Some(review) = review_json else {
-        if input.planning_only {
-            return Ok(());
-        }
-        return Err("[BLOCKED] Review not started: no review.json found. \
-             Run /track:review first."
-            .to_string());
+        return Ok(());
     };
 
     // No current cycle → same as not started.
     let Some(cycle) = review.current_cycle() else {
-        if input.planning_only {
-            return Ok(());
-        }
-        return Err("[BLOCKED] Review not started: review.json has no active cycle. \
-             Run /track:review first."
-            .to_string());
+        return Ok(());
     };
 
     // Delegate to check_cycle_approved which performs full verification:
@@ -585,7 +576,9 @@ mod tests {
     }
 
     #[test]
-    fn check_approved_planning_only_false_with_no_review_json_is_blocked() {
+    fn check_approved_no_review_json_allows_commit() {
+        // WF-66: review never started (NotStarted) should allow commit.
+        // User may choose PR-based review instead of local review.
         let store = MemStore::default();
         let track = make_track("test-track");
         store.save(&track).unwrap();
@@ -600,7 +593,7 @@ mod tests {
         };
 
         let result = check_approved(input, &store, &store, &hasher, &review_store);
-        assert!(result.is_err(), "planning_only=false + no review.json should block");
+        assert!(result.is_ok(), "no review.json (NotStarted) should allow commit: {result:?}");
     }
 
     #[test]

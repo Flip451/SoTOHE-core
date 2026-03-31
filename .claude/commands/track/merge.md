@@ -24,10 +24,11 @@ cargo make track-pr-merge <pr_number> --method <method>
 ```
 
 This executes `bin/sotp pr wait-and-merge` which:
-1. Polls `gh pr checks` every 15 seconds (10 minute timeout)
-2. On all checks passed: merges via `gh pr merge --<method>`
-3. On any check failed: stops and reports failures
-4. On timeout: stops and reports pending checks
+1. **Task completion guard**: blocks merge if any tasks in `metadata.json` are unresolved (not done/skipped). This is the only command that enforces task completion — push and PR review are allowed with unresolved tasks.
+2. Polls `gh pr checks` every 15 seconds (10 minute timeout)
+3. On all checks passed: merges via `gh pr merge --<method>`
+4. On any check failed: stops and reports failures
+5. On timeout: stops and reports pending checks
 
 ## Step 2: Post-merge
 

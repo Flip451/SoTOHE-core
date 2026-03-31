@@ -94,6 +94,9 @@ pub struct ReviewCycleArgs {
     /// Explicit track ID (required on plan/ branches, ignored on track/ branches).
     #[arg(long)]
     pub track_id: Option<String>,
+    /// Resume polling from a previously persisted trigger state file.
+    #[arg(long)]
+    pub resume: bool,
 }
 
 pub fn execute(cmd: PrCommand) -> ExitCode {
@@ -146,7 +149,7 @@ pub fn execute(cmd: PrCommand) -> ExitCode {
                 }
             }
         }
-        PrCommand::ReviewCycle(args) => match review_cycle(args.track_id.as_deref()) {
+        PrCommand::ReviewCycle(args) => match review_cycle(args.track_id.as_deref(), args.resume) {
             Ok(code) => code,
             Err(err) => {
                 eprintln!("{err}");
@@ -167,13 +170,6 @@ fn resolve_branch_context(explicit_track_id: Option<&str>) -> Result<PrBranchCon
 fn push(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
     let ctx = resolve_branch_context(explicit_track_id)?;
 
-    // Run task completion guard (skip for plan/ branches).
-    let repo_for_guard = SystemGitRepo::discover()?;
-    let result = check_task_completion_guard(&ctx.branch, repo_for_guard.root());
-    if result != ExitCode::SUCCESS {
-        return Ok(result);
-    }
-
     let repo = SystemGitRepo::discover()?;
     println!("Pushing {} to origin...", ctx.branch);
     repo.push_branch(&ctx.branch)?;
@@ -185,103 +181,6 @@ fn push(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
 ///
 /// Returns `ExitCode::SUCCESS` if the guard passes, `ExitCode::FAILURE` otherwise.
 /// Skips the check for `plan/` branches (planning-only, no code tasks).
-fn check_task_completion_guard(branch: &str, repo_root: &std::path::Path) -> ExitCode {
-    // Skip guard for plan/ branches.
-    if branch.starts_with("plan/") {
-        return ExitCode::SUCCESS;
-    }
-
-    let track_id_str = branch.strip_prefix("track/").unwrap_or(branch);
-    let metadata_path = repo_root.join("track/items").join(track_id_str).join("metadata.json");
-
-    if !metadata_path.exists() {
-        eprintln!("[BLOCKED] metadata.json not found at {}", metadata_path.display());
-        eprintln!("Cannot verify task completion without metadata.json.");
-        return ExitCode::FAILURE;
-    }
-
-    // Fail-closed: if metadata.json has uncommitted or untracked changes, block push.
-    // Check both staged/unstaged modifications (git diff HEAD) and untracked status (git status --porcelain).
-    let metadata_relative = format!("track/items/{track_id_str}/metadata.json");
-
-    // Check modified (committed vs worktree)
-    let diff_result = std::process::Command::new("git")
-        .args(["diff", "--name-only", "HEAD", "--", &metadata_relative])
-        .current_dir(repo_root)
-        .output();
-    match diff_result {
-        Ok(output) if output.status.success() => {
-            if !String::from_utf8_lossy(&output.stdout).trim().is_empty() {
-                eprintln!("[BLOCKED] metadata.json has uncommitted changes");
-                eprintln!("Commit your task state transitions before pushing PR.");
-                return ExitCode::FAILURE;
-            }
-        }
-        _ => {
-            // git command failed — fail-closed
-            eprintln!("[BLOCKED] failed to check metadata.json dirty state");
-            return ExitCode::FAILURE;
-        }
-    }
-
-    // Check untracked (new file not yet committed)
-    let status_result = std::process::Command::new("git")
-        .args(["status", "--porcelain", "--", &metadata_relative])
-        .current_dir(repo_root)
-        .output();
-    match status_result {
-        Ok(output) if output.status.success() => {
-            let status_output = String::from_utf8_lossy(&output.stdout);
-            if status_output.contains('?') {
-                eprintln!("[BLOCKED] metadata.json is untracked (not committed)");
-                eprintln!("Commit your track artifacts before pushing PR.");
-                return ExitCode::FAILURE;
-            }
-        }
-        _ => {
-            eprintln!("[BLOCKED] failed to check metadata.json tracked state");
-            return ExitCode::FAILURE;
-        }
-    }
-
-    let json = match std::fs::read_to_string(&metadata_path) {
-        Ok(j) => j,
-        Err(e) => {
-            eprintln!("[BLOCKED] failed to read metadata: {e}");
-            return ExitCode::FAILURE;
-        }
-    };
-
-    let (track, _) = match infrastructure::track::codec::decode(&json) {
-        Ok(t) => t,
-        Err(e) => {
-            eprintln!("[BLOCKED] failed to decode metadata: {e}");
-            return ExitCode::FAILURE;
-        }
-    };
-
-    if !track.all_tasks_resolved() {
-        let unresolved: Vec<String> = track
-            .tasks()
-            .iter()
-            .filter(|t| {
-                !matches!(
-                    t.status(),
-                    domain::TaskStatus::DonePending
-                        | domain::TaskStatus::DoneTraced { .. }
-                        | domain::TaskStatus::Skipped
-                )
-            })
-            .map(|t| format!("{} ({})", t.id(), t.status().kind()))
-            .collect();
-        eprintln!("[BLOCKED] Track has unresolved tasks: {}", unresolved.join(", "));
-        eprintln!("Run track-transition to mark tasks as done before pushing PR.");
-        return ExitCode::FAILURE;
-    }
-
-    ExitCode::SUCCESS
-}
-
 fn ensure_pr(explicit_track_id: Option<&str>, base: &str) -> Result<ExitCode, CliError> {
     let ctx = resolve_branch_context(explicit_track_id)?;
     let client = SystemGhClient;
@@ -452,8 +351,104 @@ where
     }
 }
 
+/// Checks that all tasks in the PR head commit's metadata are resolved.
+///
+/// Reads metadata.json from `origin/<branch>` via `git show` so it is
+/// independent of the local worktree state. This ensures the guard
+/// validates the committed content on the PR branch, not local edits.
+fn check_tasks_resolved(branch: &str, repo_root: &std::path::Path) -> ExitCode {
+    if branch.starts_with("plan/") {
+        return ExitCode::SUCCESS;
+    }
+
+    let track_id_str = branch.strip_prefix("track/").unwrap_or(branch);
+    let blob_path = format!("track/items/{track_id_str}/metadata.json");
+    let git_ref = format!("origin/{branch}:{blob_path}");
+
+    let output =
+        std::process::Command::new("git").args(["show", &git_ref]).current_dir(repo_root).output();
+
+    let json = match output {
+        Ok(o) if o.status.success() => String::from_utf8_lossy(&o.stdout).into_owned(),
+        Ok(o) => {
+            let stderr = String::from_utf8_lossy(&o.stderr);
+            eprintln!("[BLOCKED] metadata.json not found on origin/{branch}: {stderr}");
+            return ExitCode::FAILURE;
+        }
+        Err(e) => {
+            eprintln!("[BLOCKED] failed to run git show: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    let (track, _) = match infrastructure::track::codec::decode(&json) {
+        Ok(t) => t,
+        Err(e) => {
+            eprintln!("[BLOCKED] failed to decode metadata: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    if !track.all_tasks_resolved() {
+        let unresolved: Vec<String> = track
+            .tasks()
+            .iter()
+            .filter(|t| {
+                !matches!(
+                    t.status(),
+                    domain::TaskStatus::DonePending
+                        | domain::TaskStatus::DoneTraced { .. }
+                        | domain::TaskStatus::Skipped
+                )
+            })
+            .map(|t| format!("{} ({})", t.id(), t.status().kind()))
+            .collect();
+        eprintln!("[BLOCKED] Track has unresolved tasks: {}", unresolved.join(", "));
+        eprintln!("Run track-transition to mark tasks as done before merging.");
+        return ExitCode::FAILURE;
+    }
+
+    ExitCode::SUCCESS
+}
+
 fn wait_and_merge(pr: &str, interval: u64, timeout: u64, method: &str) -> ExitCode {
+    // Task completion guard: validate against the PR's head branch metadata,
+    // not the local checkout. Skips worktree dirty checks since the PR branch
+    // may not be checked out locally (WF-66).
     let client = SystemGhClient;
+    let branch = match client.pr_head_branch(pr) {
+        Ok(b) => b,
+        Err(e) => {
+            eprintln!("[ERROR] failed to resolve PR head branch: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let repo = match SystemGitRepo::discover() {
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!("[ERROR] {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+    // Fetch the PR head ref so the local remote-tracking branch is current.
+    // Fail closed: check both spawn error and non-zero exit code.
+    match repo.output(&["fetch", "origin", &branch]) {
+        Ok(o) if !o.status.success() => {
+            let stderr = String::from_utf8_lossy(&o.stderr);
+            eprintln!("[ERROR] git fetch origin/{branch} failed: {stderr}");
+            return ExitCode::FAILURE;
+        }
+        Err(e) => {
+            eprintln!("[ERROR] failed to run git fetch: {e}");
+            return ExitCode::FAILURE;
+        }
+        Ok(_) => {}
+    }
+    let guard_result = check_tasks_resolved(&branch, repo.root());
+    if guard_result != ExitCode::SUCCESS {
+        return guard_result;
+    }
+
     wait_and_merge_with(pr, interval, timeout, method, &client, &thread::sleep)
 }
 
@@ -631,11 +626,140 @@ where
 // T006: review-cycle
 // ---------------------------------------------------------------------------
 
-fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
-    // Fail-closed: must be on a track/ branch (not plan/)
+/// Trigger state persisted to `tmp/pr-review-state/<track-id>.json` (ERR-08).
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
+struct TriggerState {
+    pr_number: String,
+    trigger_timestamp: String,
+    head_hash: Option<String>,
+    track_id: String,
+}
+
+/// Returns the path to the trigger state file for the given track ID,
+/// anchored to the git repo root so it is stable regardless of CWD.
+fn trigger_state_path(track_id: &str) -> PathBuf {
+    let root = SystemGitRepo::discover().map(|r| r.root().to_path_buf()).unwrap_or_default();
+    root.join("tmp/pr-review-state").join(format!("{track_id}.json"))
+}
+
+/// Saves trigger state to disk for later `--resume`.
+fn save_trigger_state(state: &TriggerState) -> Result<(), CliError> {
+    let path = trigger_state_path(&state.track_id);
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|e| {
+            CliError::Message(format!("failed to create dir {}: {e}", parent.display()))
+        })?;
+    }
+    let json = serde_json::to_string_pretty(state)
+        .map_err(|e| CliError::Message(format!("failed to serialize trigger state: {e}")))?;
+    fs::write(&path, json)
+        .map_err(|e| CliError::Message(format!("failed to write {}: {e}", path.display())))?;
+    println!("[OK] Saved trigger state to {}", path.display());
+    Ok(())
+}
+
+/// Loads trigger state from disk. Returns `None` if file does not exist.
+fn load_trigger_state(track_id: &str) -> Result<Option<TriggerState>, CliError> {
+    let path = trigger_state_path(track_id);
+    if !path.exists() {
+        return Ok(None);
+    }
+    let json = fs::read_to_string(&path)
+        .map_err(|e| CliError::Message(format!("failed to read {}: {e}", path.display())))?;
+    let state: TriggerState = serde_json::from_str(&json)
+        .map_err(|e| CliError::Message(format!("failed to parse trigger state: {e}")))?;
+    Ok(Some(state))
+}
+
+/// Removes trigger state file after a successful review cycle.
+fn cleanup_trigger_state(track_id: &str) {
+    let path = trigger_state_path(track_id);
+    let _ = fs::remove_file(path);
+}
+
+/// Resumes a previously saved trigger state, validating HEAD hasn't changed.
+fn resume_trigger_state(
+    track_id: &str,
+    repo: &SystemGitRepo,
+) -> Result<(String, String, Option<String>), CliError> {
+    let state = load_trigger_state(track_id)?.ok_or_else(|| {
+        CliError::Message(format!(
+            "no trigger state file found for track '{track_id}'. \
+             Run without --resume to start a new review cycle."
+        ))
+    })?;
+
+    // Reject resume if HEAD has changed since the trigger was posted.
+    let current_head = repo
+        .output(&["rev-parse", "HEAD"])
+        .ok()
+        .filter(|o| o.status.success())
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned());
+    if let (Some(saved), Some(current)) = (&state.head_hash, &current_head) {
+        if saved != current {
+            cleanup_trigger_state(track_id);
+            return Err(CliError::Message(format!(
+                "HEAD has changed since trigger was posted \
+                 (saved={saved}, current={current}). \
+                 Run without --resume to start a new review cycle."
+            )));
+        }
+    }
+
+    println!("[OK] Resumed trigger state for PR #{}", state.pr_number);
+    Ok((state.pr_number, state.trigger_timestamp, state.head_hash))
+}
+
+/// Pushes, ensures PR, triggers review, and persists trigger state.
+fn trigger_new_review(
+    explicit_track_id: Option<&str>,
+    track_id: &str,
+    repo: &SystemGitRepo,
+    client: &SystemGhClient,
+) -> Result<Option<(String, String, Option<String>)>, CliError> {
+    let ctx = resolve_branch_context(explicit_track_id)?;
+    println!("Pushing {} to origin...", ctx.branch);
+    repo.push_branch(&ctx.branch)?;
+    println!("[OK] Pushed {}", ctx.branch);
+
+    let pr_number = match ensure_pr_for_cycle(&ctx, "main", client)? {
+        Some(pr) => pr,
+        None => return Ok(None),
+    };
+
+    let nwo = client.repo_nwo()?;
+    let response = client.post_issue_comment(&nwo, &pr_number, "@codex review")?;
+    let trigger_timestamp = serde_json::from_str::<serde_json::Value>(&response)
+        .ok()
+        .and_then(|v| v.get("created_at")?.as_str().map(String::from))
+        .unwrap_or_default();
+    println!("[OK] Posted '@codex review' on PR #{pr_number} at {trigger_timestamp}");
+
+    if trigger_timestamp.is_empty() {
+        return Err(CliError::Message(
+            "could not determine trigger timestamp from API response".to_owned(),
+        ));
+    }
+
+    let head_hash = repo
+        .output(&["rev-parse", "HEAD"])
+        .ok()
+        .filter(|o| o.status.success())
+        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned());
+
+    save_trigger_state(&TriggerState {
+        pr_number: pr_number.clone(),
+        trigger_timestamp: trigger_timestamp.clone(),
+        head_hash: head_hash.clone(),
+        track_id: track_id.to_owned(),
+    })?;
+
+    Ok(Some((pr_number, trigger_timestamp, head_hash)))
+}
+
+fn review_cycle(explicit_track_id: Option<&str>, resume: bool) -> Result<ExitCode, CliError> {
     let repo = SystemGitRepo::discover()?;
 
-    // Fail-closed: validate reviewer provider (resolve from repo root)
     let profiles_path = repo.root().join(".claude/agent-profiles.json");
     let profiles_content = std::fs::read_to_string(&profiles_path).map_err(|e| {
         CliError::Message(format!("failed to read {}: {e}", profiles_path.display()))
@@ -652,49 +776,20 @@ fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
         ));
     }
 
+    let track_id = branch.strip_prefix("track/").unwrap_or(&branch).to_owned();
     let client = SystemGhClient;
 
-    // Step 1: Push (with task completion guard)
-    let ctx = resolve_branch_context(explicit_track_id)?;
-    let guard_result = check_task_completion_guard(&ctx.branch, repo.root());
-    if guard_result != ExitCode::SUCCESS {
-        return Ok(guard_result);
-    }
-    println!("Pushing {} to origin...", ctx.branch);
-    repo.push_branch(&ctx.branch)?;
-    println!("[OK] Pushed {}", ctx.branch);
-
-    // Step 2: Ensure PR
-    let pr_number = match ensure_pr_for_cycle(&ctx, "main", &client)? {
-        Some(pr) => pr,
-        None => return Ok(ExitCode::FAILURE),
+    let (pr_number, trigger_timestamp, head_ref_owned) = if resume {
+        resume_trigger_state(&track_id, &repo)?
+    } else {
+        match trigger_new_review(explicit_track_id, &track_id, &repo, &client)? {
+            Some(tuple) => tuple,
+            None => return Ok(ExitCode::FAILURE),
+        }
     };
 
     let nwo = client.repo_nwo()?;
-
-    // Step 3: Trigger new review.
-    // Always post a fresh trigger — timeout recovery (at the end of polling)
-    // handles the case where a prior review exists but was missed.
-    let response = client.post_issue_comment(&nwo, &pr_number, "@codex review")?;
-    let trigger_timestamp = serde_json::from_str::<serde_json::Value>(&response)
-        .ok()
-        .and_then(|v| v.get("created_at")?.as_str().map(String::from))
-        .unwrap_or_default();
-    println!("[OK] Posted '@codex review' on PR #{pr_number} at {trigger_timestamp}");
-
-    if trigger_timestamp.is_empty() {
-        return Err(CliError::Message(
-            "could not determine trigger timestamp from API response".to_owned(),
-        ));
-    }
-
-    // Resolve HEAD commit for timeout recovery commit-id filtering.
-    let head_hash = repo
-        .output(&["rev-parse", "HEAD"])
-        .ok()
-        .filter(|o| o.status.success())
-        .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned());
-    let head_ref = head_hash.as_deref();
+    let head_ref = head_ref_owned.as_deref();
 
     // Step 4: Poll for review
     let poll_result = poll_review_for_cycle(
@@ -707,7 +802,7 @@ fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
         head_ref,
     )?;
 
-    match poll_result {
+    let result = match poll_result {
         PollReviewResult::ZeroFindings => {
             println!();
             println!("=== PR Review Result: PASS ===");
@@ -725,7 +820,14 @@ fn review_cycle(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
 
             if parsed.passed { Ok(ExitCode::SUCCESS) } else { Ok(ExitCode::FAILURE) }
         }
+    };
+
+    // Clean up trigger state on successful completion (not on timeout).
+    if matches!(&result, Ok(code) if *code == ExitCode::SUCCESS) {
+        cleanup_trigger_state(&track_id);
     }
+
+    result
 }
 
 /// Pick the latest completed bot review from a slice, by `submitted_at` then `id`.
@@ -1695,7 +1797,11 @@ mod tests {
         assert_eq!(result.unwrap(), ExitCode::FAILURE);
     }
 
-    // --- check_task_completion_guard tests ---
+    // --- check_tasks_resolved tests ---
+    //
+    // check_tasks_resolved reads from origin/<branch> via `git show`.
+    // Tests set up a bare "origin" repo, push a branch with metadata, then
+    // add it as a remote to the working repo so `git show origin/...` works.
 
     fn init_git_repo(dir: &Path) {
         std::process::Command::new("git").args(["init"]).current_dir(dir).output().unwrap();
@@ -1742,98 +1848,93 @@ mod tests {
         std::fs::write(track_dir.join("metadata.json"), json).unwrap();
     }
 
+    /// Creates a bare repo as "origin", writes metadata on a branch, and
+    /// sets up the working repo with that origin so `git show origin/...` works.
+    fn setup_origin_with_metadata(
+        track_id: &str,
+        tasks_json: &str,
+    ) -> (tempfile::TempDir, tempfile::TempDir) {
+        // Create a source repo with the branch and metadata
+        let src = tempfile::tempdir().unwrap();
+        init_git_repo(src.path());
+        git_add_commit(src.path()); // initial commit on default branch
+
+        // Create and switch to track branch
+        let branch = format!("track/{track_id}");
+        std::process::Command::new("git")
+            .args(["checkout", "-b", &branch])
+            .current_dir(src.path())
+            .output()
+            .unwrap();
+        write_metadata(src.path(), track_id, tasks_json);
+        git_add_commit(src.path());
+
+        // Create a bare clone as "origin"
+        let origin = tempfile::tempdir().unwrap();
+        std::process::Command::new("git")
+            .args([
+                "clone",
+                "--bare",
+                src.path().to_str().unwrap(),
+                origin.path().to_str().unwrap(),
+            ])
+            .output()
+            .unwrap();
+
+        // Create a working repo that uses this origin
+        let work = tempfile::tempdir().unwrap();
+        init_git_repo(work.path());
+        git_add_commit(work.path());
+        std::process::Command::new("git")
+            .args(["remote", "add", "origin", origin.path().to_str().unwrap()])
+            .current_dir(work.path())
+            .output()
+            .unwrap();
+        std::process::Command::new("git")
+            .args(["fetch", "origin"])
+            .current_dir(work.path())
+            .output()
+            .unwrap();
+
+        // Return (work, origin) — origin must be kept alive
+        (work, origin)
+    }
+
     #[test]
-    fn check_task_completion_guard_blocks_on_unresolved_tasks() {
-        let dir = tempfile::tempdir().unwrap();
-        init_git_repo(dir.path());
-        write_metadata(
-            dir.path(),
+    fn check_tasks_resolved_blocks_on_unresolved_tasks() {
+        let (work, _origin) = setup_origin_with_metadata(
             "my-track",
             r#"{"id": "T1", "description": "Task", "status": "todo"}"#,
         );
-        git_add_commit(dir.path());
-        let result = super::check_task_completion_guard("track/my-track", dir.path());
+        let result = super::check_tasks_resolved("track/my-track", work.path());
         assert_eq!(result, ExitCode::FAILURE);
     }
 
     #[test]
-    fn check_task_completion_guard_passes_with_all_done() {
-        let dir = tempfile::tempdir().unwrap();
-        init_git_repo(dir.path());
-        write_metadata(
-            dir.path(),
+    fn check_tasks_resolved_passes_with_all_done() {
+        let (work, _origin) = setup_origin_with_metadata(
             "my-track",
             r#"{"id": "T1", "description": "Task", "status": "done", "commit_hash": "abc1234"}"#,
         );
-        git_add_commit(dir.path());
-        let result = super::check_task_completion_guard("track/my-track", dir.path());
+        let result = super::check_tasks_resolved("track/my-track", work.path());
         assert_eq!(result, ExitCode::SUCCESS);
     }
 
     #[test]
-    fn check_task_completion_guard_blocks_on_missing_metadata() {
+    fn check_tasks_resolved_blocks_on_missing_metadata() {
         let dir = tempfile::tempdir().unwrap();
         init_git_repo(dir.path());
-        git_add_commit(dir.path()); // empty initial commit
-        // No metadata.json written
-        let result = super::check_task_completion_guard("track/my-track", dir.path());
+        git_add_commit(dir.path());
+        // No origin remote — git show will fail → fail-closed
+        let result = super::check_tasks_resolved("track/my-track", dir.path());
         assert_eq!(result, ExitCode::FAILURE);
     }
 
     #[test]
-    fn check_task_completion_guard_skips_for_plan_branch() {
+    fn check_tasks_resolved_skips_for_plan_branch() {
         let dir = tempfile::tempdir().unwrap();
-        // No metadata.json — but plan/ branch should skip guard entirely
-        let result = super::check_task_completion_guard("plan/my-track", dir.path());
+        let result = super::check_tasks_resolved("plan/my-track", dir.path());
         assert_eq!(result, ExitCode::SUCCESS);
-    }
-
-    #[test]
-    fn check_task_completion_guard_blocks_on_dirty_metadata() {
-        let dir = tempfile::tempdir().unwrap();
-        init_git_repo(dir.path());
-        write_metadata(
-            dir.path(),
-            "my-track",
-            r#"{"id": "T1", "description": "Task", "status": "todo"}"#,
-        );
-        git_add_commit(dir.path());
-        // Now modify metadata without committing (dirty worktree)
-        write_metadata(
-            dir.path(),
-            "my-track",
-            r#"{"id": "T1", "description": "Task", "status": "done", "commit_hash": "abc1234"}"#,
-        );
-        let result = super::check_task_completion_guard("track/my-track", dir.path());
-        assert_eq!(result, ExitCode::FAILURE, "dirty metadata should block push");
-    }
-
-    #[test]
-    fn check_task_completion_guard_blocks_on_untracked_metadata() {
-        let dir = tempfile::tempdir().unwrap();
-        init_git_repo(dir.path());
-        git_add_commit(dir.path()); // empty initial commit
-        // Write metadata but don't add/commit (untracked)
-        write_metadata(
-            dir.path(),
-            "my-track",
-            r#"{"id": "T1", "description": "Task", "status": "done", "commit_hash": "abc1234"}"#,
-        );
-        let result = super::check_task_completion_guard("track/my-track", dir.path());
-        assert_eq!(result, ExitCode::FAILURE, "untracked metadata should block push");
-    }
-
-    #[test]
-    fn check_task_completion_guard_blocks_on_non_git_directory() {
-        let dir = tempfile::tempdir().unwrap();
-        // No git init — git commands will fail → fail-closed
-        write_metadata(
-            dir.path(),
-            "my-track",
-            r#"{"id": "T1", "description": "Task", "status": "done", "commit_hash": "abc1234"}"#,
-        );
-        let result = super::check_task_completion_guard("track/my-track", dir.path());
-        assert_eq!(result, ExitCode::FAILURE, "non-git directory should fail-closed");
     }
 
     #[test]
