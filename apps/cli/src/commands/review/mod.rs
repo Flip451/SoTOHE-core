@@ -459,8 +459,7 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
     let track_id_parsed = domain::TrackId::try_new(&args.track_id).map_err(|e| format!("{e}"))?;
     let current_snapshot = review_store
         .find_review(&track_id_parsed)
-        .ok()
-        .flatten()
+        .map_err(|e| format!("failed to read review.json: {e}"))?
         .and_then(|r| {
             r.current_cycle().map(|c| {
                 let base_ref = c.base_ref().to_owned();
