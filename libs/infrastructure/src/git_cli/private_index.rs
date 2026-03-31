@@ -258,8 +258,15 @@ impl PrivateIndex {
         let blob_hash = String::from_utf8_lossy(&hash_output.stdout).trim().to_owned();
 
         // Step 2: Update the private index entry.
+        // Always pass --add so that brand-new files (e.g. review.json on first
+        // record-round) are accepted. For existing files --add is a no-op.
         let update_output = std::process::Command::new("git")
-            .args(["update-index", "--cacheinfo", &format!("100644,{blob_hash},{rel_path}")])
+            .args([
+                "update-index",
+                "--add",
+                "--cacheinfo",
+                &format!("100644,{blob_hash},{rel_path}"),
+            ])
             .current_dir(git.root())
             .env("GIT_INDEX_FILE", &self.temp_path)
             .output()

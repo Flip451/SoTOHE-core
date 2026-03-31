@@ -204,6 +204,10 @@ pub struct RecordRoundArgs {
     /// Track ID.
     #[arg(long)]
     track_id: String,
+
+    /// Base ref for diff scope computation.
+    #[arg(long, default_value = "main")]
+    diff_base: String,
 }
 
 #[derive(Debug, Args)]
@@ -356,6 +360,7 @@ fn run_record_round(
     let protocol = infrastructure::review_adapters::RecordRoundProtocolImpl {
         items_dir: args.items_dir.clone(),
         group_display: args.group.clone(),
+        base_ref: args.diff_base.clone(),
     };
     let timestamp =
         make_timestamp().map_err(usecase::review_workflow::usecases::RecordRoundError::Other)?;
@@ -433,19 +438,94 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
 }
 
 fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
+    use domain::ReviewJsonReader;
+    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+    use infrastructure::review_group_policy::{
+        ResolvedReviewGroupPolicy, load_review_groups_override,
+    };
+    use usecase::review_workflow::scope::DiffScopeProvider;
+
     let store = infrastructure::track::fs_store::FsTrackStore::new(&args.items_dir);
     let hasher = infrastructure::review_adapters::SystemGitHasher;
+    let review_store = infrastructure::review_json_store::FsReviewJsonStore::new(&args.items_dir);
 
     // Detect whether this is a planning-only commit from staged files.
     // Fail-closed: if detection fails, assume code files are present.
     let planning_only = detect_planning_only().unwrap_or(false);
 
+    // Compute current partition snapshot only when a review cycle exists.
+    // Deferred: planning-only commits with no cycle should not be blocked by
+    // snapshot computation errors (e.g., missing base_ref).
+    let track_id_parsed = domain::TrackId::try_new(&args.track_id).map_err(|e| format!("{e}"))?;
+    let current_snapshot = review_store
+        .find_review(&track_id_parsed)
+        .map_err(|e| format!("failed to read review.json: {e}"))?
+        .and_then(|r| {
+            r.current_cycle().map(|c| {
+                let base_ref = c.base_ref().to_owned();
+                let cycle_group_names: std::collections::BTreeSet<_> =
+                    c.group_names().cloned().collect();
+                (base_ref, cycle_group_names)
+            })
+        })
+        .map(|(base_ref, cycle_group_names)| -> Result<_, String> {
+            let git = SystemGitRepo::discover().map_err(|e| format!("{e}"))?;
+            let scope_json = git.root().join("track/review-scope.json");
+            let base_groups =
+                infrastructure::review_adapters::load_base_review_groups(&scope_json)?;
+            let override_config = load_review_groups_override(&args.items_dir, &track_id_parsed)
+                .map_err(|e| format!("{e}"))?;
+
+            let base_policy = ResolvedReviewGroupPolicy::resolve(&base_groups, None)
+                .map_err(|e| format!("{e}"))?;
+            let policy = ResolvedReviewGroupPolicy::resolve(&base_groups, override_config.as_ref())
+                .map_err(|e| format!("{e}"))?;
+
+            let diff_scope = infrastructure::review_adapters::GitDiffScopeProvider
+                .changed_files(&base_ref)
+                .map_err(|e| format!("{e}"))?;
+            let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
+            let full_partition = policy.partition(&diff_files).map_err(|e| format!("{e}"))?;
+
+            // Filter partition to match cycle's group set to avoid PartitionChanged
+            // false positive when the cycle was created with a subset of groups.
+            let other_key =
+                domain::ReviewGroupName::try_new("other").map_err(|e| format!("{e}"))?;
+            // Filter to cycle's group set, re-mapping non-cycle groups to "other"
+            // so their files still contribute to the scope hash (fail-closed).
+            let mut filtered = std::collections::BTreeMap::new();
+            for (name, paths) in full_partition.groups() {
+                if cycle_group_names.contains(name) {
+                    filtered.insert(name.clone(), paths.clone());
+                } else {
+                    filtered.entry(other_key.clone()).or_default().extend(paths.iter().cloned());
+                }
+            }
+            filtered.entry(other_key).or_default();
+            let partition = usecase::review_workflow::groups::GroupPartition::try_new(filtered)
+                .map_err(|e| format!("{e}"))?;
+
+            Ok(usecase::review_workflow::groups::ReviewPartitionSnapshot::new(
+                base_policy.policy_hash(),
+                policy.policy_hash(),
+                partition,
+            ))
+        })
+        .transpose()?;
+
     let input = usecase::review_workflow::usecases::CheckApprovedInput {
         items_dir: args.items_dir.clone(),
         track_id: args.track_id.clone(),
         planning_only,
+        current_snapshot,
     };
-    usecase::review_workflow::usecases::check_approved(input, &store, &store, &hasher)
+    usecase::review_workflow::usecases::check_approved(
+        input,
+        &store,
+        &store,
+        &hasher,
+        &review_store,
+    )
 }
 
 /// Returns `true` if all staged files match the planning-only allowlist.

@@ -311,6 +311,12 @@
   - **課題**: `metadata.json` が `done` なら `registry.md` の Completed Tracks に載るため、`verification.md` が未実質完了でも完了扱いが表示されうる
   - **提案**: `done` 遷移に verification 完了を必須化する、または `VerifiedDone` 相当の状態/フラグを SSoT に導入
 
+- [ ] **WF-08b** (HIGH): Track 終了条件の厳格化 — acceptance criteria の実動作未検証
+  - **課題**: review-json-per-group-review-2026-03-29 で「record-round は review.json に記録」「metadata.json に review state を保存しない」という acceptance criteria が明記されていたにもかかわらず、実際には record-round が metadata.json にしか書いておらず review.json が一度も作成されない状態で Done になった。CI パス + reviewer zero_findings のみでは acceptance criteria の実動作を保証できない
+  - **根拠**: build 漏れ（bin/sotp 未リビルド）が直接原因だが、acceptance criteria に対する end-to-end 検証がワークフローに組み込まれていないことが構造的問題
+  - **提案**: (1) `/track:commit` 時に spec.json の acceptance_criteria を人間に明示的確認させるインタラクティブゲート（`verification.md` の実行を強制）、(2) acceptance criteria のうち自動検証可能なものは `sotp verify acceptance-criteria` として CI に組み込み、手動確認が必要なものは `verification.md` の `verified_at` 記入を `done` 遷移の前提条件にする、(3) `build-sotp` を `/track:commit` の前提条件に追加して bin/sotp の陳腐化を防止
+  - **出典**: 2026-03-30 review-json-per-group-review 不具合調査
+
 - [ ] **WF-26** (LOW): `find_open_pr_with` の First-Match Bias（一意性検証欠如）
   - **課題**: `gh_cli.rs` の `find_open_pr_with` が `.[0].number` で先頭要素を無条件取得。同一 head branch に複数 PR がある場合に意図しない PR を操作するリスク
   - **提案**: 配列長を検証し、複数 PR 存在時はエラーまたは警告を返す
@@ -455,6 +461,11 @@
   - **課題**: `index_tree_hash_normalizing` が git index 全体の tree hash を計算するため、(1) 未ステージファイルで失敗、(2) 並列レビューグループ間で干渉、(3) 無関係ファイル変更で invalidate
   - **対応**: ADR-2026-03-26-0000 で review-scope manifest hash への移行を決定。`autorecord-stabilization-2026-03-26` トラックで実装予定
   - **根拠**: tamper-proof-review 計画レビュー中に繰り返し発生（2026-03-26〜27）
+
+- [ ] **WF-66** (MEDIUM): `track-pr-push` のタスク完了ガードが中間 push をブロックする
+  - **課題**: `apps/cli/src/commands/pr.rs` の push ガードが全タスク完了を要求するため、中間コミットの push + PR review ができない。レビュー中に追加タスクを切ると push 不可になる
+  - **提案**: タスク完了ガードを `track-pr-push` から `track-pr-merge` に移動。push は常に許可し、merge 時にタスク完了を強制する
+  - **根拠**: autorecord-reviewjson-wiring T007-T009 追加後に PR review の push がブロックされた（2026-03-31）
 
 - [ ] **WF-60** (HIGH): 設計⇆実装の自動遷移 — reviewer finding が spec スコープ外を指摘した場合に、自動で planner に設計相談を escalation し、ADR/spec 更新後に実装に戻るフロー。autorecord-stabilization トラックでは spec 外の修正が大量に蓄積し事後的に spec を更新する事態になった。`/track:review` スキル内に scope guard + auto-escalation to planner を組み込み、(1) finding が spec の in_scope/out_of_scope に該当するか自動判定、(2) scope 外 → planner に設計相談を自動起動、(3) planner が spec 更新 or 別トラック化を判断、(4) spec 更新後に実装に復帰。手動介入なしに設計と実装のスコープ整合性を維持する仕組み
 
@@ -755,6 +766,10 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [x] ~~**RVW-29** (CRITICAL): Codex CLI `--full-auto` が `--sandbox read-only` を上書き~~ ✅ 解決: planner/reviewer 両方の wrapper から `--full-auto` を削除。`--sandbox read-only` のみで gpt-5.4 + `--output-schema` が安定動作することを 10/10 テストで確認（2026-03-28）。原因: `--full-auto` は Codex CLI の仕様で `--sandbox workspace-write` を強制するエイリアスであり、後続の `--sandbox read-only` は無視される。exec モードではデフォルトで `approval: never`（自動承認）のため `--full-auto` は不要。
 - [ ] **RVW-30** (HIGH): track-commit-message の add-all 自動実行 or check-approved の worktree/index 差分検出 — RecordRoundProtocolImpl が metadata.json をワークツリーに書くだけで git index を更新しないため、staging 漏れでコミット内容と承認状態が乖離する可能性がある。現状は /track:commit のプロンプト制約で保証しているが、コード上のガードがない。daemon 化や直接 CLI 利用が始まる前に仕組み化すべき
 - [ ] **RVW-31** (HIGH): review state を review.json に分離 + 内部 checksum による tamper detection
+- [x] ~~**RVW-33** (MEDIUM): review.json cycle の frozen partition scope 接続~~ ✅ 解決: autorecord-reviewjson-wiring T005/T006 で per-group scope hash を実装。`group_scope_hash` が worktree ファイル内容を直接読み SHA-256 manifest hash を構築（git 非依存）。record-round (write) と check_approved (read) の両方が per-group scope hash を使用。auto-create cycle の空スコープ問題は T007 で対応予定。policy_hash/partition_changed 検証は cycle.rs の `check_cycle_approved` / `check_cycle_staleness_any` で実装済み
+- [ ] **RVW-34** (MEDIUM): StoredFinding lossy conversion — `RecordRoundProtocolImpl` が findings_remain verdict を review.json に記録する際、`findings_to_concerns()` で生成した concern slug を `StoredFinding::new(slug, None, None, None)` に変換するため、元の message/severity/file/line が消失する。修正には `RecordRoundProtocol` trait に `findings: Vec<StoredFinding>` パラメータを追加し、元データを保持する必要がある
+- [ ] **RVW-35** (LOW): `normalize_track_file_for_hash` の group_scope_hash 統合 — `group_scope_hash` は生ファイル内容を SHA-256 する。metadata.json が scope に含まれる場合、`updated_at` 等の volatile fields が変更されるだけで hash が変わりうる。`tmp/transition-backup/review_scope.rs` の正規化ロジックを移植して volatile fields を除外すべき
+- [ ] **RVW-36** (HIGH): Codex CLI 上限到達時のレビュー fallback — Codex 週間上限に達すると local reviewer が使えず、review.json に zero_findings を記録できないためコミットが不可能になる。claude-heavy profile の Claude reviewer で record-round を実行するパス、または check-approved の一時的バイパス機構が必要
 - [ ] **RVW-32** (HIGH): same_round_and_zero_findings 制約の緩和 — 並列レビューで各グループの finding→fix サイクル回数が異なると round 番号が揃わず FastPassed/Approved への昇格がブロックされる。invalidation 時に round 番号がリセットされないことが根本原因。対策案: (1) invalidation 時に全グループの round カウンタをリセット、(2) runtime promotion では round 一致を要求せず verdict のみで判定し reload validation のみ strict に保つ、(3) RVW-31 (review.json 分離) と統合して round 管理を再設計 — (1) review state（status, code_hash, base_ref, expected_groups, groups, escalation）を metadata.json から review.json に移動、(2) review.json は review-operational（hash 対象外）なので並列 auto-record が安全に動作、(3) review.json 内に SHA-256 checksum フィールドを持たせ、record-round が更新時に再計算・check-approved が検証することで metadata tamper detection を維持。review-port-separation + tamper-proof-review の統合後継トラック。review-workflow-fixes-2026-03-18 の metadata tamper detection 契約を checksum ベースに移行する仕様変更を含む
 
 ---

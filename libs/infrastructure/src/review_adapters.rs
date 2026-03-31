@@ -1,51 +1,261 @@
 //! Infrastructure adapters for review workflow port traits.
 //!
-//! - `RecordRoundProtocolImpl`: the genuinely complex two-phase git index
-//!   commit protocol (PrivateIndex + stage + hash + swap).
-//! - `SystemGitHasher`: thin delegation to `SystemGitRepo` for normalised hash.
-
-use std::path::Path;
+//! - `RecordRoundProtocolImpl`: atomic record-round protocol that writes to
+//!   review.json with real frozen scope from DiffScopeProvider.
+//! - `SystemGitHasher`: worktree content-based per-group scope hash.
 
 use domain::{ReviewConcern, ReviewGroupName, RoundType, Timestamp, TrackId, Verdict};
 use usecase::review_workflow::usecases::{
     GitHasher, RecordRoundProtocol, RecordRoundProtocolError,
 };
 
+/// Loads the `groups` field from `review-scope.json`.
+///
+/// Returns an empty map if the file lacks a `groups` field.
+///
+/// # Errors
+/// Returns a string error on I/O or JSON parse failure.
+pub fn load_base_review_groups(
+    path: &std::path::Path,
+) -> Result<std::collections::BTreeMap<String, crate::review_group_policy::ReviewGroupConfig>, String>
+{
+    let content =
+        std::fs::read_to_string(path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    let doc: serde_json::Value =
+        serde_json::from_str(&content).map_err(|e| format!("parse {}: {e}", path.display()))?;
+    let Some(groups_val) = doc.get("groups") else {
+        return Ok(std::collections::BTreeMap::new());
+    };
+    serde_json::from_value(groups_val.clone())
+        .map_err(|e| format!("parse groups in {}: {e}", path.display()))
+}
+
 // ---------------------------------------------------------------------------
 // GitHasher — thin delegation
 // ---------------------------------------------------------------------------
 
-/// Computes normalised git tree hashes via `SystemGitRepo`.
+/// Computes review-scope content hashes from worktree files.
 pub struct SystemGitHasher;
 
 impl GitHasher for SystemGitHasher {
-    fn normalized_hash(&self, items_dir: &Path, track_id: &TrackId) -> Result<String, String> {
+    fn group_scope_hash(&self, scope: &[String]) -> Result<String, String> {
+        use std::io::Read as _;
+
+        use sha2::Digest;
+
         use crate::git_cli::{GitRepository, SystemGitRepo};
 
-        let git = SystemGitRepo::discover().map_err(|e| format!("git error: {e}"))?;
-        let metadata_abs = items_dir.join(track_id.as_ref()).join("metadata.json");
-        let metadata_rel = metadata_abs
-            .strip_prefix(git.root())
-            .unwrap_or(&metadata_abs)
-            .to_string_lossy()
-            .into_owned();
+        if scope.is_empty() {
+            let digest = sha2::Sha256::digest(b"");
+            return Ok(format!("rvw1:sha256:{digest:x}"));
+        }
 
-        git.index_tree_hash_normalizing(&metadata_rel).map_err(|e| format!("{e}"))
+        let git = SystemGitRepo::discover().map_err(|e| format!("git error: {e}"))?;
+        let root = git.root().to_path_buf();
+
+        // Sort scope paths for deterministic manifest.
+        let mut sorted_scope: Vec<&str> = scope.iter().map(String::as_str).collect();
+        sorted_scope.sort();
+
+        // Build manifest from worktree file contents (git-independent).
+        // Each entry: "<path>\t<sha256_of_content>\n" for existing files,
+        //             "<path>\tDELETED\n" for missing files (tombstone).
+        let mut manifest = String::new();
+        for path in &sorted_scope {
+            // Reject absolute paths (Unix and Windows) and parent traversal.
+            // Check path segments (not substring) to allow valid names like "v1..v2.md".
+            {
+                let p = std::path::Path::new(path);
+                let has_traversal_or_absolute = p.components().any(|c| {
+                    matches!(
+                        c,
+                        std::path::Component::ParentDir
+                            | std::path::Component::RootDir
+                            | std::path::Component::Prefix(_)
+                    )
+                });
+                if has_traversal_or_absolute {
+                    return Err(format!("invalid scope path (traversal or absolute): {path}"));
+                }
+            }
+            // Design: hash reads from worktree (not git index) per ADR §5.
+            // Git is only used for diff detection; hash must be staging-independent.
+            // Pre-commit workflow ensures add-all aligns index with worktree.
+            let abs_path = root.join(path);
+            match open_nofollow_read(&abs_path) {
+                Ok(mut file) => {
+                    // Reject non-regular files (FIFO, device, etc.) to prevent
+                    // hangs on read_to_end. Must check AFTER open to avoid TOCTOU.
+                    let meta =
+                        file.metadata().map_err(|e| format!("failed to stat {path}: {e}"))?;
+                    if !meta.is_file() {
+                        return Err(format!("scope path is not a regular file: {path}"));
+                    }
+                    // Post-open verification: check the opened fd's real path
+                    // stays within repo root. This closes the TOCTOU gap between
+                    // path resolution and file open — we verify the OPENED file,
+                    // not the path we intended to open.
+                    verify_fd_within_root(&file, &root, path)?;
+                    let mut bytes = Vec::new();
+                    file.read_to_end(&mut bytes)
+                        .map_err(|e| format!("failed to read {path}: {e}"))?;
+                    let file_hash = sha2::Sha256::digest(&bytes);
+                    manifest.push_str(&format!("{path}\t{file_hash:x}\n"));
+                }
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                    manifest.push_str(&format!("{path}\tDELETED\n"));
+                }
+                Err(e) => {
+                    return Err(format!("failed to open {path}: {e}"));
+                }
+            }
+        }
+
+        let digest = sha2::Sha256::digest(manifest.as_bytes());
+        Ok(format!("rvw1:sha256:{digest:x}"))
     }
 }
 
 // ---------------------------------------------------------------------------
-// RecordRoundProtocol — two-phase git index commit
+// Post-open fd verification
 // ---------------------------------------------------------------------------
 
-/// Atomic two-phase record-round protocol using PrivateIndex.
+/// Verifies that an opened file descriptor refers to a file inside `root`.
+///
+/// On Unix, uses `/proc/self/fd/<fd>` readlink to get the real path of the
+/// opened file and checks it starts with `root`. This closes the TOCTOU gap
+/// between path resolution and open.
+///
+/// On non-Unix, falls back to a no-op (O_NOFOLLOW + path component checks
+/// are the best available defense).
+///
+/// # Errors
+/// Returns an error string if the file escapes the repo root.
+fn verify_fd_within_root(
+    file: &std::fs::File,
+    root: &std::path::Path,
+    scope_path: &str,
+) -> Result<(), String> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::io::AsRawFd;
+        let fd = file.as_raw_fd();
+        let proc_path = format!("/proc/self/fd/{fd}");
+        match std::fs::read_link(&proc_path) {
+            Ok(real_path) => {
+                let canon_root = root
+                    .canonicalize()
+                    .map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
+                if !real_path.starts_with(&canon_root) {
+                    return Err(format!(
+                        "scope path escapes repo root via symlink: {scope_path} \
+                         (resolved to {})",
+                        real_path.display()
+                    ));
+                }
+            }
+            Err(_) => {
+                // /proc not available (e.g., macOS, FreeBSD).
+                // Fall back to pre-open canonicalize check (TOCTOU possible
+                // but best-effort on systems without /proc).
+                let abs_path = root.join(scope_path);
+                if let Ok(resolved) = abs_path.canonicalize() {
+                    let canon_root = root
+                        .canonicalize()
+                        .map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
+                    if !resolved.starts_with(&canon_root) {
+                        return Err(format!(
+                            "scope path escapes repo root via symlink: {scope_path}"
+                        ));
+                    }
+                }
+            }
+        }
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = (file, root, scope_path);
+    }
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// Symlink-safe file openers
+// ---------------------------------------------------------------------------
+
+/// Opens a file for reading, rejecting symlinks atomically via `O_NOFOLLOW`.
+///
+/// # Errors
+///
+/// Returns an error if the path is a symlink or cannot be opened.
+fn open_nofollow_read(path: &std::path::Path) -> Result<std::fs::File, std::io::Error> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        std::fs::OpenOptions::new().read(true).custom_flags(libc::O_NOFOLLOW).open(path)
+    }
+    #[cfg(not(unix))]
+    {
+        match std::fs::symlink_metadata(path) {
+            Ok(meta) if meta.file_type().is_symlink() => {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::InvalidInput,
+                    format!("path is a symlink: {}", path.display()),
+                ));
+            }
+            Ok(_) | Err(_) => {}
+        }
+        std::fs::File::open(path)
+    }
+}
+
+/// Opens a lock file safely, rejecting symlinks atomically via `O_NOFOLLOW`.
+///
+/// Uses `O_NOFOLLOW` to prevent symlink-following attacks without TOCTOU.
+/// On non-Unix platforms, falls back to a symlink_metadata pre-check.
+///
+/// # Errors
+///
+/// Returns an error if the path is a symlink or cannot be opened.
+fn open_lock_file_safe(path: &std::path::Path) -> Result<std::fs::File, std::io::Error> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        std::fs::OpenOptions::new()
+            .create(true)
+            .write(true)
+            .custom_flags(libc::O_NOFOLLOW)
+            .open(path)
+    }
+    #[cfg(not(unix))]
+    {
+        // Fallback: pre-check + open (TOCTOU possible but best-effort on non-Unix).
+        match std::fs::symlink_metadata(path) {
+            Ok(meta) if meta.file_type().is_symlink() => {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::InvalidInput,
+                    format!("lock path is a symlink: {}", path.display()),
+                ));
+            }
+            Ok(_) | Err(_) => {}
+        }
+        std::fs::OpenOptions::new().create(true).write(true).open(path)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// RecordRoundProtocol
+// ---------------------------------------------------------------------------
+
+/// Atomic record-round protocol that writes to review.json via PrivateIndex.
+///
+/// On first invocation for a track, auto-creates a review cycle with the
+/// expected groups. Subsequent calls append rounds to the existing cycle.
 pub struct RecordRoundProtocolImpl {
     pub items_dir: std::path::PathBuf,
     pub group_display: String,
+    pub base_ref: String,
 }
-
-/// Maximum retries for stale-hash conflicts from parallel recordings.
-const RECORD_ROUND_MAX_RETRIES: u8 = 3;
 
 impl RecordRoundProtocol for RecordRoundProtocolImpl {
     #[allow(clippy::too_many_lines)]
@@ -59,187 +269,289 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
         expected_groups: Vec<ReviewGroupName>,
         timestamp: Timestamp,
     ) -> Result<(), RecordRoundProtocolError> {
-        use domain::{ReviewRoundResult, ReviewState};
+        use domain::{
+            GroupRoundVerdict, ReviewJson, ReviewJsonReader, ReviewJsonWriter, StoredFinding,
+        };
+        use usecase::review_workflow::scope::DiffScopeProvider;
 
-        use crate::git_cli::private_index::PrivateIndex;
         use crate::git_cli::{GitRepository, SystemGitRepo};
-        use crate::track::fs_store::FsTrackStore;
+        use crate::review_json_store::FsReviewJsonStore;
 
         let git = SystemGitRepo::discover()
             .map_err(|e| RecordRoundProtocolError::Other(format!("git error: {e}")))?;
 
-        let metadata_abs = self.items_dir.join(track_id.as_ref()).join("metadata.json");
-        let metadata_rel = metadata_abs
-            .strip_prefix(git.root())
-            .unwrap_or(&metadata_abs)
-            .to_string_lossy()
-            .into_owned();
-
-        let store = FsTrackStore::new(&self.items_dir);
-
-        // Retry loop: parallel recordings can cause stale-hash conflicts.
-        // On conflict, recreate PrivateIndex from the (now-updated) real index and retry.
-        for attempt in 0..=RECORD_ROUND_MAX_RETRIES {
-            // Acquire a repo-wide exclusive advisory lock that spans the entire
-            // record-round protocol: PrivateIndex creation → metadata write → index swap.
-            // Repo-wide (not per-track) because PrivateIndex::swap_into_real replaces
-            // the shared .git/index — cross-track conflicts must also be serialized.
-            let lock_path = git.root().join(".git").join("sotp-record-round.lock");
-            let lock_file = std::fs::File::create(&lock_path).map_err(|e| {
+        // Acquire worktree-scoped exclusive advisory lock for the read-modify-write cycle.
+        // Placed at worktree root (not .git/) to support linked worktrees where .git is a file.
+        // Uses OpenOptions to reject symlinks (create_new fails if path exists as symlink).
+        let lock_path = git.root().join(".sotp-record-round.lock");
+        let lock_file = open_lock_file_safe(&lock_path).map_err(|e| {
+            RecordRoundProtocolError::Other(format!(
+                "failed to create lock file {}: {e}",
+                lock_path.display()
+            ))
+        })?;
+        {
+            use fs4::fs_std::FileExt;
+            lock_file.lock_exclusive().map_err(|e| {
                 RecordRoundProtocolError::Other(format!(
-                    "failed to create lock file {}: {e}",
+                    "failed to acquire lock on {}: {e}",
                     lock_path.display()
                 ))
             })?;
-            {
-                use fs4::fs_std::FileExt;
-                lock_file.lock_exclusive().map_err(|e| {
+        }
+
+        // Verify track exists and check escalation gate (fail-closed).
+        {
+            use crate::track::fs_store::FsTrackStore;
+            use domain::TrackReader;
+            let store = FsTrackStore::new(&self.items_dir);
+            let track = store
+                .find(track_id)
+                .map_err(|e| {
                     RecordRoundProtocolError::Other(format!(
-                        "failed to acquire lock on {}: {e}",
-                        lock_path.display()
+                        "track '{}' metadata.json read/decode failed: {e}",
+                        track_id.as_ref()
+                    ))
+                })?
+                .ok_or_else(|| {
+                    RecordRoundProtocolError::Other(format!(
+                        "track '{}' not found",
+                        track_id.as_ref()
                     ))
                 })?;
-            }
 
-            let private_index =
-                PrivateIndex::from_current(&git).map_err(RecordRoundProtocolError::Other)?;
-
-            let pre_update_hash =
-                private_index.normalized_tree_hash(&git, &metadata_rel).map_err(|e| {
-                    RecordRoundProtocolError::Other(format!("normalized hash error: {e}"))
-                })?;
-
-            // Read current track state directly (lock is already held by us).
-            let (mut track, mut meta) = store
-                .find_with_meta(track_id)
-                .map_err(|e| RecordRoundProtocolError::Other(format!("read error: {e}")))?
-                .ok_or_else(|| {
-                    RecordRoundProtocolError::Other(format!("track {track_id} not found"))
-                })?;
-
-            let review = track.review_mut().get_or_insert_with(ReviewState::new);
-            let round_num = review
-                .groups()
-                .get(&group_name)
-                .and_then(|g| match round_type {
-                    domain::RoundType::Fast => g.fast().map(|r| r.round()),
-                    domain::RoundType::Final => g.final_round().map(|r| r.round()),
-                })
-                .map(|n| n.saturating_add(1))
-                .unwrap_or(1);
-
-            let result = if concerns.is_empty() {
-                ReviewRoundResult::new(round_num, verdict, timestamp.clone())
-            } else {
-                ReviewRoundResult::new_with_concerns(
-                    round_num,
-                    verdict,
-                    timestamp.clone(),
-                    concerns.clone(),
-                )
-            };
-
-            let mut stale_error: Option<String> = None;
-            match review.record_round_with_pending(
-                round_type,
-                &group_name,
-                result,
-                &expected_groups,
-                &pre_update_hash,
-            ) {
-                Ok(()) => {}
-                Err(domain::ReviewError::EscalationActive { concerns: blocked }) => {
-                    return Err(RecordRoundProtocolError::EscalationBlocked(blocked));
-                }
-                Err(domain::ReviewError::StaleCodeHash { expected, actual }) => {
-                    stale_error = Some(format!(
-                        "code hash mismatch: review recorded against {expected}, \
-                         but current code is {actual}"
-                    ));
-                    // Don't persist — retry will reload clean state from disk.
-                }
-                Err(e) => {
-                    return Err(RecordRoundProtocolError::Other(format!(
-                        "record_round_with_pending: {e}"
-                    )));
+            // Escalation gate: reject if metadata.json has an active escalation block.
+            if let Some(review_state) = track.review() {
+                if let domain::EscalationPhase::Blocked(block) = review_state.escalation().phase() {
+                    let concerns: Vec<_> =
+                        block.concerns().iter().map(|c| c.as_ref().to_owned()).collect();
+                    return Err(RecordRoundProtocolError::EscalationBlocked(concerns));
                 }
             }
+        }
 
-            if let Some(err_msg) = stale_error {
-                if attempt < RECORD_ROUND_MAX_RETRIES {
-                    let jitter_ms = {
-                        use std::collections::hash_map::DefaultHasher;
-                        use std::hash::{Hash, Hasher};
-                        let mut h = DefaultHasher::new();
-                        std::process::id().hash(&mut h);
-                        std::time::SystemTime::now()
-                            .duration_since(std::time::UNIX_EPOCH)
-                            .unwrap_or_default()
-                            .as_nanos()
-                            .hash(&mut h);
-                        h.finish() % 200 + 50 // 50-249ms
-                    };
-                    eprintln!(
-                        "[RETRY] Stale hash on attempt {attempt} — \
-                         retrying in {jitter_ms}ms with fresh index"
-                    );
-                    // Release lock before sleeping so peers can make progress.
-                    drop(lock_file);
-                    std::thread::sleep(std::time::Duration::from_millis(jitter_ms));
-                    continue;
+        let rj_store = FsReviewJsonStore::new(&self.items_dir);
+
+        // Load or create ReviewJson (under lock).
+        let mut review = rj_store
+            .find_review(track_id)
+            .map_err(|e| RecordRoundProtocolError::Other(format!("read review.json: {e}")))?
+            .unwrap_or_else(ReviewJson::new);
+
+        // Auto-create cycle if none exists, using real frozen scope from DiffScopeProvider.
+        if review.current_cycle().is_none() {
+            let cycle_id = timestamp.to_string();
+
+            // 1. Get changed files via DiffScopeProvider.
+            let diff_scope = GitDiffScopeProvider
+                .changed_files(&self.base_ref)
+                .map_err(|e| RecordRoundProtocolError::Other(format!("diff scope: {e}")))?;
+
+            // 2. Load group policy from review-scope.json (+ optional per-track override).
+            let scope_json_path = git.root().join("track/review-scope.json");
+            let base_groups = load_base_review_groups(&scope_json_path).map_err(|e| {
+                RecordRoundProtocolError::Other(format!("load review-scope.json groups: {e}"))
+            })?;
+            let override_config =
+                crate::review_group_policy::load_review_groups_override(&self.items_dir, track_id)
+                    .map_err(|e| {
+                        RecordRoundProtocolError::Other(format!("load review-groups override: {e}"))
+                    })?;
+            let policy = crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(
+                &base_groups,
+                override_config.as_ref(),
+            )
+            .map_err(|e| RecordRoundProtocolError::Other(format!("resolve group policy: {e}")))?;
+
+            // 3. Partition changed files into groups with real frozen scope.
+            // Filter to expected_groups only (+ mandatory "other") to respect
+            // the --expected-groups contract and avoid requiring review for
+            // groups the caller didn't request.
+            let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
+            let full_partition = policy
+                .partition(&diff_files)
+                .map_err(|e| RecordRoundProtocolError::Other(format!("partition: {e}")))?;
+            let other_key = ReviewGroupName::try_new("other").map_err(|e| {
+                RecordRoundProtocolError::Other(format!("invalid group name 'other': {e}"))
+            })?;
+            // Filter to expected_groups. Files from non-expected groups are
+            // re-mapped to "other" so they are still covered by the review scope
+            // (fail-closed: no files silently dropped).
+            let mut filtered_groups = std::collections::BTreeMap::new();
+            for (name, paths) in full_partition.groups() {
+                if expected_groups.contains(name) || *name == other_key {
+                    filtered_groups.insert(name.clone(), paths.clone());
+                } else {
+                    // Re-map to "other" so these files are not silently dropped.
+                    filtered_groups
+                        .entry(other_key.clone())
+                        .or_default()
+                        .extend(paths.iter().cloned());
                 }
-                // Final retry exhausted: persist the invalidated state so disk
-                // reflects the domain's invalidation (not stale approved/fast_passed).
-                meta.updated_at = timestamp.to_string();
-                meta.original_status = None;
-                if let Err(e) = store.write_track(&track, &meta) {
-                    return Err(RecordRoundProtocolError::Other(format!(
-                        "stale hash AND failed to persist invalidation: {err_msg}; write error: {e}"
-                    )));
-                }
-                return Err(RecordRoundProtocolError::StaleHash(err_msg));
             }
-
-            // Two-phase write: stage pending state → compute hash → set hash → stage final.
-            meta.updated_at = timestamp.to_string();
-            meta.original_status = None;
-
-            let pending_json = crate::track::codec::encode(&track, &meta)
-                .map_err(|e| RecordRoundProtocolError::Other(format!("codec encode: {e}")))?;
-            private_index
-                .stage_bytes(&git, &metadata_rel, format!("{pending_json}\n").as_bytes())
-                .map_err(RecordRoundProtocolError::Other)?;
-
-            let h1 = private_index
-                .normalized_tree_hash(&git, &metadata_rel)
-                .map_err(|e| RecordRoundProtocolError::Other(format!("post-hash: {e}")))?;
-
-            if let Some(r) = track.review_mut().as_mut() {
-                r.set_code_hash(h1)
-                    .map_err(|e| RecordRoundProtocolError::Other(format!("set_code_hash: {e}")))?;
-            }
-
-            let final_json = crate::track::codec::encode(&track, &meta)
-                .map_err(|e| RecordRoundProtocolError::Other(format!("codec final: {e}")))?;
-            private_index
-                .stage_bytes(&git, &metadata_rel, format!("{final_json}\n").as_bytes())
-                .map_err(RecordRoundProtocolError::Other)?;
-
-            // Write metadata.json to disk atomically (for other processes to read).
-            store
-                .write_track(&track, &meta)
-                .map_err(|e| RecordRoundProtocolError::Other(format!("write_track: {e}")))?;
-
-            private_index.swap_into_real().map_err(RecordRoundProtocolError::Other)?;
-
-            eprintln!(
-                "[OK] Recorded {round_type} round for group '{}' (verdict: {verdict})",
-                self.group_display
+            filtered_groups.entry(other_key).or_default();
+            let partition =
+                usecase::review_workflow::groups::GroupPartition::try_new(filtered_groups)
+                    .map_err(|e| {
+                        RecordRoundProtocolError::Other(format!("partition filter: {e}"))
+                    })?;
+            // Compute base policy hash separately (before override).
+            let base_policy =
+                crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(&base_groups, None)
+                    .map_err(|e| {
+                        RecordRoundProtocolError::Other(format!("resolve base policy: {e}"))
+                    })?;
+            let snapshot = usecase::review_workflow::groups::ReviewPartitionSnapshot::new(
+                base_policy.policy_hash(),
+                policy.policy_hash(),
+                partition,
             );
-            return Ok(());
-        } // end retry loop
 
-        Err(RecordRoundProtocolError::Other("record-round: max retries exceeded".to_owned()))
+            // 4. Start cycle with real frozen scope via usecase function.
+            usecase::review_workflow::cycle::start_review_cycle(
+                &mut review,
+                usecase::review_workflow::cycle::StartReviewCycleInput {
+                    cycle_id,
+                    started_at: timestamp.clone(),
+                    base_ref: self.base_ref.clone(),
+                    snapshot,
+                },
+            )
+            .map_err(|e| RecordRoundProtocolError::Other(format!("start_cycle: {e}")))?;
+        }
+
+        // Validate that the current group exists in the cycle (fail-fast).
+        if let Some(cycle) = review.current_cycle() {
+            if cycle.group(&group_name).is_none() {
+                return Err(RecordRoundProtocolError::Other(format!(
+                    "group '{}' not found in current cycle (available: {:?})",
+                    group_name,
+                    cycle.group_names().map(|n| n.to_string()).collect::<Vec<_>>()
+                )));
+            }
+        }
+
+        // Build GroupRoundVerdict from the verdict + concerns (fail-closed validation).
+        let group_verdict = match verdict {
+            domain::Verdict::ZeroFindings => {
+                if !concerns.is_empty() {
+                    return Err(RecordRoundProtocolError::Other(format!(
+                        "inconsistent input: zero_findings verdict with {} concerns",
+                        concerns.len()
+                    )));
+                }
+                GroupRoundVerdict::ZeroFindings
+            }
+            domain::Verdict::FindingsRemain => {
+                if concerns.is_empty() {
+                    return Err(RecordRoundProtocolError::Other(
+                        "inconsistent input: findings_remain verdict with no concerns".to_owned(),
+                    ));
+                }
+                let findings: Vec<StoredFinding> = concerns
+                    .iter()
+                    .map(|c| StoredFinding::new(c.as_ref(), None, None, None))
+                    .collect();
+                GroupRoundVerdict::findings_remain(findings).map_err(|e| {
+                    RecordRoundProtocolError::Other(format!("verdict construction: {e}"))
+                })?
+            }
+        };
+
+        // Compute per-group scope hash from CURRENT partition (not frozen scope).
+        // Uses the cycle's frozen base_ref for diff computation (not self.base_ref)
+        // to ensure consistency with check_approved.
+        let group_scope: Vec<String> = {
+            let cycle_base_ref = review
+                .current_cycle()
+                .map(|c| c.base_ref().to_owned())
+                .unwrap_or_else(|| self.base_ref.clone());
+            let diff_scope = GitDiffScopeProvider
+                .changed_files(&cycle_base_ref)
+                .map_err(|e| RecordRoundProtocolError::Other(format!("diff scope: {e}")))?;
+            let scope_json_path = git.root().join("track/review-scope.json");
+            let base_groups = load_base_review_groups(&scope_json_path).map_err(|e| {
+                RecordRoundProtocolError::Other(format!("load review-scope.json groups: {e}"))
+            })?;
+            let override_config =
+                crate::review_group_policy::load_review_groups_override(&self.items_dir, track_id)
+                    .map_err(|e| {
+                        RecordRoundProtocolError::Other(format!("load review-groups override: {e}"))
+                    })?;
+            let policy = crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(
+                &base_groups,
+                override_config.as_ref(),
+            )
+            .map_err(|e| RecordRoundProtocolError::Other(format!("resolve group policy: {e}")))?;
+            let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
+            let full_partition = policy
+                .partition(&diff_files)
+                .map_err(|e| RecordRoundProtocolError::Other(format!("partition: {e}")))?;
+
+            // Find this group's files in the current partition, with remap to "other".
+            let other_key = ReviewGroupName::try_new("other")
+                .map_err(|e| RecordRoundProtocolError::Other(format!("invalid group name: {e}")))?;
+            if group_name == other_key {
+                // "other" includes its own files + files from non-expected groups
+                let mut paths: Vec<String> = Vec::new();
+                for (name, group_paths) in full_partition.groups() {
+                    if *name == other_key || !expected_groups.contains(name) {
+                        paths.extend(group_paths.iter().map(|p| p.as_str().to_owned()));
+                    }
+                }
+                paths
+            } else {
+                full_partition
+                    .groups()
+                    .get(&group_name)
+                    .map(|paths| paths.iter().map(|p| p.as_str().to_owned()).collect())
+                    .unwrap_or_default()
+            }
+        };
+        let group_hash = SystemGitHasher
+            .group_scope_hash(&group_scope)
+            .map_err(|e| RecordRoundProtocolError::Other(format!("group scope hash error: {e}")))?;
+
+        // Guard: final round requires a prior successful fast round for this group.
+        if round_type == domain::RoundType::Final {
+            if let Some(cycle) = review.current_cycle() {
+                if let Some(group_state) = cycle.group(&group_name) {
+                    let has_fast_zero = group_state
+                        .latest_round(domain::RoundType::Fast)
+                        .is_some_and(|r| r.is_successful_zero_findings());
+                    if !has_fast_zero {
+                        return Err(RecordRoundProtocolError::Other(
+                            "final round requires a prior successful fast round".to_owned(),
+                        ));
+                    }
+                }
+            }
+        }
+
+        // Append round via usecase function (enforces timestamp monotonicity).
+        usecase::review_workflow::cycle::record_cycle_group_round(
+            &mut review,
+            usecase::review_workflow::cycle::RecordCycleGroupRoundInput {
+                group_name: group_name.clone(),
+                round_type,
+                timestamp: timestamp.clone(),
+                outcome: usecase::review_workflow::cycle::RecordRoundOutcome::Success(
+                    group_verdict,
+                ),
+                group_hash,
+            },
+        )
+        .map_err(|e| RecordRoundProtocolError::Other(format!("record_cycle_group_round: {e}")))?;
+
+        // Write review.json to disk atomically.
+        // NOTE: review.json is NOT staged in the private index. It is a
+        // review_operational file that should not affect the code hash.
+        // Staging is handled by `cargo make add-all` at commit time.
+        rj_store
+            .save_review(track_id, &review)
+            .map_err(|e| RecordRoundProtocolError::Other(format!("save review.json: {e}")))?;
+
+        Ok(())
     }
 }
 
@@ -525,5 +837,158 @@ mod tests {
         // No changes from base — scope should be empty.
         let scope = run_provider_in_dir(path, "main").unwrap();
         assert!(scope.is_empty(), "scope should be empty when there are no branch changes");
+    }
+
+    // -----------------------------------------------------------------------
+    // SystemGitHasher::group_scope_hash contract tests
+    // -----------------------------------------------------------------------
+
+    use usecase::review_workflow::usecases::GitHasher;
+
+    fn run_hasher_in_dir(dir: &std::path::Path, scope: &[String]) -> Result<String, String> {
+        let original = std::env::current_dir().unwrap();
+        std::env::set_current_dir(dir).unwrap();
+        let result = SystemGitHasher.group_scope_hash(scope);
+        std::env::set_current_dir(original).unwrap();
+        result
+    }
+
+    #[test]
+    fn test_group_scope_hash_empty_scope_returns_deterministic_hash() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        let hash1 = run_hasher_in_dir(path, &[]).unwrap();
+        let hash2 = run_hasher_in_dir(path, &[]).unwrap();
+        assert!(hash1.starts_with("rvw1:sha256:"), "hash should have rvw1 prefix: {hash1}");
+        assert_eq!(hash1, hash2, "empty scope hash must be deterministic");
+    }
+
+    #[test]
+    fn test_group_scope_hash_deterministic_for_same_worktree_files() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        std::fs::write(path.join("feature.rs"), "pub fn feature() {}").unwrap();
+
+        let scope = vec!["feature.rs".to_owned()];
+        let hash1 = run_hasher_in_dir(path, &scope).unwrap();
+        let hash2 = run_hasher_in_dir(path, &scope).unwrap();
+        assert_eq!(hash1, hash2, "same file content must produce same hash");
+        assert!(hash1.starts_with("rvw1:sha256:"));
+    }
+
+    #[test]
+    fn test_group_scope_hash_changes_when_content_changes() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        let scope = vec!["feature.rs".to_owned()];
+
+        std::fs::write(path.join("feature.rs"), "pub fn v1() {}").unwrap();
+        let hash_v1 = run_hasher_in_dir(path, &scope).unwrap();
+
+        std::fs::write(path.join("feature.rs"), "pub fn v2() {}").unwrap();
+        let hash_v2 = run_hasher_in_dir(path, &scope).unwrap();
+
+        assert_ne!(hash_v1, hash_v2, "different content must produce different hash");
+    }
+
+    #[test]
+    fn test_group_scope_hash_only_includes_scope_files() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        std::fs::write(path.join("a.rs"), "pub fn a() {}").unwrap();
+        std::fs::write(path.join("b.rs"), "pub fn b() {}").unwrap();
+
+        let scope_a = vec!["a.rs".to_owned()];
+        let scope_ab = vec!["a.rs".to_owned(), "b.rs".to_owned()];
+
+        let hash_a = run_hasher_in_dir(path, &scope_a).unwrap();
+        let hash_ab = run_hasher_in_dir(path, &scope_ab).unwrap();
+
+        assert_ne!(hash_a, hash_ab, "different scope sets must produce different hashes");
+    }
+
+    #[test]
+    fn test_group_scope_hash_deleted_file_produces_tombstone() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        std::fs::write(path.join("exists.rs"), "pub fn ok() {}").unwrap();
+
+        let scope = vec!["exists.rs".to_owned(), "deleted.rs".to_owned()];
+        let hash_with_deleted = run_hasher_in_dir(path, &scope).unwrap();
+
+        let scope_only = vec!["exists.rs".to_owned()];
+        let hash_without_deleted = run_hasher_in_dir(path, &scope_only).unwrap();
+
+        // Missing files get DELETED tombstone, so the hashes differ.
+        assert_ne!(
+            hash_with_deleted, hash_without_deleted,
+            "missing file should contribute a DELETED tombstone to the hash"
+        );
+    }
+
+    #[test]
+    fn test_group_scope_hash_rejects_absolute_path() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        let scope = vec!["/etc/passwd".to_owned()];
+        let result = run_hasher_in_dir(path, &scope);
+        assert!(result.is_err(), "absolute path must be rejected");
+        assert!(result.unwrap_err().contains("traversal or absolute"));
+    }
+
+    #[test]
+    fn test_group_scope_hash_rejects_parent_traversal() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        let scope = vec!["../../../etc/passwd".to_owned()];
+        let result = run_hasher_in_dir(path, &scope);
+        assert!(result.is_err(), "parent traversal must be rejected");
+        assert!(result.unwrap_err().contains("traversal or absolute"));
+    }
+
+    #[test]
+    fn test_group_scope_hash_allows_double_dot_in_filename() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        // File with ".." in its name (not a traversal).
+        std::fs::write(path.join("v1..v2.md"), "changelog").unwrap();
+
+        let scope = vec!["v1..v2.md".to_owned()];
+        let result = run_hasher_in_dir(path, &scope);
+        assert!(result.is_ok(), "double-dot in filename must be allowed: {result:?}");
+    }
+
+    #[test]
+    fn test_group_scope_hash_not_affected_by_staging() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        // Write a file but do NOT stage it.
+        std::fs::write(path.join("unstaged.rs"), "pub fn unstaged() {}").unwrap();
+        let scope = vec!["unstaged.rs".to_owned()];
+        let hash_unstaged = run_hasher_in_dir(path, &scope).unwrap();
+
+        // Now stage the same file — hash should not change.
+        Command::new("git").args(["add", "unstaged.rs"]).current_dir(path).output().unwrap();
+        let hash_staged = run_hasher_in_dir(path, &scope).unwrap();
+
+        assert_eq!(hash_unstaged, hash_staged, "hash must not be affected by git staging state");
     }
 }

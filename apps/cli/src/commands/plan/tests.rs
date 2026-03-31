@@ -91,14 +91,15 @@ fn build_prompt_with_missing_briefing_file_returns_error() {
 // ---------------------------------------------------------------------------
 
 #[test]
-fn build_codex_invocation_without_full_auto_omits_full_auto_flag() {
-    let invocation = build_codex_invocation("gpt-5.3-codex-spark", "Design this module.", false);
+fn build_codex_invocation_always_uses_read_only_sandbox() {
+    let invocation = build_codex_invocation("gpt-5.3-codex-spark", "Design this module.");
     let rendered: Vec<String> =
         invocation.args.iter().map(|arg| arg.to_string_lossy().to_string()).collect();
 
     assert_eq!(rendered.first().map(String::as_str), Some("exec"));
     assert!(rendered.windows(2).any(|pair| pair == ["--sandbox", "read-only"]));
     assert!(rendered.windows(2).any(|pair| pair == ["--model", "gpt-5.3-codex-spark"]));
+    // Planner must NEVER use --full-auto (it implies --sandbox workspace-write)
     assert!(!rendered.iter().any(|arg| arg == "--full-auto"));
     // No --output-schema or --output-last-message (planner is simpler than reviewer)
     assert!(!rendered.iter().any(|arg| arg == "--output-schema"));
@@ -106,22 +107,21 @@ fn build_codex_invocation_without_full_auto_omits_full_auto_flag() {
 }
 
 #[test]
-fn build_codex_invocation_with_full_auto_includes_full_auto_before_read_only() {
-    let invocation = build_codex_invocation("gpt-5.4", "Design this module.", true);
+fn build_codex_invocation_never_includes_full_auto_even_for_full_model() {
+    // --full-auto implies --sandbox workspace-write in Codex CLI,
+    // which would override our read-only constraint for planners.
+    let invocation = build_codex_invocation("gpt-5.4", "Design this module.");
     let rendered: Vec<String> =
         invocation.args.iter().map(|arg| arg.to_string_lossy().to_string()).collect();
 
-    assert!(rendered.iter().any(|arg| arg == "--full-auto"));
-    // --sandbox read-only must appear AFTER --full-auto (last-wins semantics)
-    let full_auto_pos = rendered.iter().position(|arg| arg == "--full-auto").unwrap();
-    let sandbox_pos = rendered.iter().position(|arg| arg == "read-only").unwrap();
-    assert!(full_auto_pos < sandbox_pos, "--full-auto must come before read-only");
+    assert!(!rendered.iter().any(|arg| arg == "--full-auto"));
+    assert!(rendered.windows(2).any(|pair| pair == ["--sandbox", "read-only"]));
 }
 
 #[test]
 fn build_codex_invocation_includes_prompt_as_last_arg() {
     let prompt = "Please analyze this trait design.";
-    let invocation = build_codex_invocation("gpt-5.4", prompt, false);
+    let invocation = build_codex_invocation("gpt-5.4", prompt);
     let rendered: Vec<String> =
         invocation.args.iter().map(|arg| arg.to_string_lossy().to_string()).collect();
 
@@ -133,7 +133,7 @@ fn build_codex_invocation_uses_codex_as_default_bin() {
     let _lock = env_lock().lock().unwrap();
     let _guard = EnvVarGuard::set(CODEX_BIN_ENV, std::ffi::OsStr::new(""));
 
-    let invocation = build_codex_invocation("gpt-5.4", "prompt", false);
+    let invocation = build_codex_invocation("gpt-5.4", "prompt");
 
     assert_eq!(invocation.bin, OsString::from("codex"));
 }
@@ -143,7 +143,7 @@ fn build_codex_invocation_uses_env_override_for_bin() {
     let _lock = env_lock().lock().unwrap();
     let _guard = EnvVarGuard::set(CODEX_BIN_ENV, std::ffi::OsStr::new("/custom/codex"));
 
-    let invocation = build_codex_invocation("gpt-5.4", "prompt", false);
+    let invocation = build_codex_invocation("gpt-5.4", "prompt");
 
     assert_eq!(invocation.bin, OsString::from("/custom/codex"));
 }
@@ -183,7 +183,7 @@ fn run_codex_local_invocation_happy_path_returns_exit_code_zero() {
     let _bin = EnvVarGuard::set(CODEX_BIN_ENV, script.as_os_str());
     let _exit = EnvVarGuard::set("SOTP_FAKE_CODEX_EXIT_CODE", std::ffi::OsStr::new("0"));
 
-    let invocation = build_codex_invocation("gpt-5.4", "Plan this feature.", true);
+    let invocation = build_codex_invocation("gpt-5.4", "Plan this feature.");
     let result = run_codex_local_invocation(&invocation, Duration::from_secs(10)).unwrap();
 
     assert_eq!(result.exit_code, 0);
@@ -198,7 +198,7 @@ fn run_codex_local_invocation_propagates_nonzero_exit_code() {
     let _bin = EnvVarGuard::set(CODEX_BIN_ENV, script.as_os_str());
     let _exit = EnvVarGuard::set("SOTP_FAKE_CODEX_EXIT_CODE", std::ffi::OsStr::new("42"));
 
-    let invocation = build_codex_invocation("gpt-5.4", "Plan this feature.", true);
+    let invocation = build_codex_invocation("gpt-5.4", "Plan this feature.");
     let result = run_codex_local_invocation(&invocation, Duration::from_secs(10)).unwrap();
 
     assert_eq!(result.exit_code, 42);
@@ -213,7 +213,7 @@ fn run_codex_local_invocation_returns_exit_code_1_on_timeout() {
     let _bin = EnvVarGuard::set(CODEX_BIN_ENV, script.as_os_str());
     let _sleep = EnvVarGuard::set("SOTP_FAKE_CODEX_SLEEP_SECONDS", std::ffi::OsStr::new("30"));
 
-    let invocation = build_codex_invocation("gpt-5.4", "Plan this feature.", true);
+    let invocation = build_codex_invocation("gpt-5.4", "Plan this feature.");
     // Timeout of 0 seconds triggers immediate timeout
     let result = run_codex_local_invocation(&invocation, Duration::from_secs(0)).unwrap();
 

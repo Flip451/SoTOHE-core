@@ -1,5 +1,28 @@
 {
   "version": 1,
+  "groups": {
+    "domain": {
+      "patterns": ["libs/domain/**"]
+    },
+    "usecase": {
+      "patterns": ["libs/usecase/**"]
+    },
+    "infrastructure": {
+      "patterns": ["libs/infrastructure/**"]
+    },
+    "cli": {
+      "patterns": ["apps/**"]
+    },
+    "harness-policy": {
+      "patterns": [
+        ".claude/commands/**", ".claude/rules/**",
+        ".claude/agent-profiles.json", ".claude/settings*.json",
+        ".claude/permission-extensions.json",
+        "project-docs/conventions/**",
+        "AGENTS.md", "CLAUDE.md"
+      ]
+    }
+  },
   "review_operational": [
     "track/items/<track-id>/review.json"
   ],
