@@ -462,6 +462,11 @@
   - **対応**: ADR-2026-03-26-0000 で review-scope manifest hash への移行を決定。`autorecord-stabilization-2026-03-26` トラックで実装予定
   - **根拠**: tamper-proof-review 計画レビュー中に繰り返し発生（2026-03-26〜27）
 
+- [ ] **WF-66** (MEDIUM): `track-pr-push` のタスク完了ガードが中間 push をブロックする
+  - **課題**: `apps/cli/src/commands/pr.rs` の push ガードが全タスク完了を要求するため、中間コミットの push + PR review ができない。レビュー中に追加タスクを切ると push 不可になる
+  - **提案**: タスク完了ガードを `track-pr-push` から `track-pr-merge` に移動。push は常に許可し、merge 時にタスク完了を強制する
+  - **根拠**: autorecord-reviewjson-wiring T007-T009 追加後に PR review の push がブロックされた（2026-03-31）
+
 - [ ] **WF-60** (HIGH): 設計⇆実装の自動遷移 — reviewer finding が spec スコープ外を指摘した場合に、自動で planner に設計相談を escalation し、ADR/spec 更新後に実装に戻るフロー。autorecord-stabilization トラックでは spec 外の修正が大量に蓄積し事後的に spec を更新する事態になった。`/track:review` スキル内に scope guard + auto-escalation to planner を組み込み、(1) finding が spec の in_scope/out_of_scope に該当するか自動判定、(2) scope 外 → planner に設計相談を自動起動、(3) planner が spec 更新 or 別トラック化を判断、(4) spec 更新後に実装に復帰。手動介入なしに設計と実装のスコープ整合性を維持する仕組み
 
 ---

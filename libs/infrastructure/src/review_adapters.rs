@@ -1,38 +1,43 @@
 //! Infrastructure adapters for review workflow port traits.
 //!
-//! - `RecordRoundProtocolImpl`: the genuinely complex two-phase git index
-//!   commit protocol (PrivateIndex + stage + hash + swap).
-//! - `SystemGitHasher`: thin delegation to `SystemGitRepo` for normalised hash.
-
-use std::path::Path;
+//! - `RecordRoundProtocolImpl`: atomic record-round protocol that writes to
+//!   review.json with real frozen scope from DiffScopeProvider.
+//! - `SystemGitHasher`: worktree content-based per-group scope hash.
 
 use domain::{ReviewConcern, ReviewGroupName, RoundType, Timestamp, TrackId, Verdict};
 use usecase::review_workflow::usecases::{
     GitHasher, RecordRoundProtocol, RecordRoundProtocolError,
 };
 
+/// Loads the `groups` field from `review-scope.json`.
+///
+/// Returns an empty map if the file lacks a `groups` field.
+///
+/// # Errors
+/// Returns a string error on I/O or JSON parse failure.
+fn load_base_review_groups(
+    path: &std::path::Path,
+) -> Result<std::collections::BTreeMap<String, crate::review_group_policy::ReviewGroupConfig>, String>
+{
+    let content =
+        std::fs::read_to_string(path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    let doc: serde_json::Value =
+        serde_json::from_str(&content).map_err(|e| format!("parse {}: {e}", path.display()))?;
+    let Some(groups_val) = doc.get("groups") else {
+        return Ok(std::collections::BTreeMap::new());
+    };
+    serde_json::from_value(groups_val.clone())
+        .map_err(|e| format!("parse groups in {}: {e}", path.display()))
+}
+
 // ---------------------------------------------------------------------------
 // GitHasher — thin delegation
 // ---------------------------------------------------------------------------
 
-/// Computes normalised git tree hashes via `SystemGitRepo`.
+/// Computes review-scope content hashes from worktree files.
 pub struct SystemGitHasher;
 
 impl GitHasher for SystemGitHasher {
-    fn normalized_hash(&self, items_dir: &Path, track_id: &TrackId) -> Result<String, String> {
-        use crate::git_cli::{GitRepository, SystemGitRepo};
-
-        let git = SystemGitRepo::discover().map_err(|e| format!("git error: {e}"))?;
-        let metadata_abs = items_dir.join(track_id.as_ref()).join("metadata.json");
-        let metadata_rel = metadata_abs
-            .strip_prefix(git.root())
-            .unwrap_or(&metadata_abs)
-            .to_string_lossy()
-            .into_owned();
-
-        git.index_tree_hash_normalizing(&metadata_rel).map_err(|e| format!("{e}"))
-    }
-
     fn group_scope_hash(&self, scope: &[String]) -> Result<String, String> {
         use std::io::Read as _;
 
@@ -73,21 +78,17 @@ impl GitHasher for SystemGitHasher {
                     return Err(format!("invalid scope path (traversal or absolute): {path}"));
                 }
             }
-            // Resolve and verify the file stays within the repo root to block
-            // symlinked parent directories that O_NOFOLLOW alone cannot catch.
-            let abs_path = root.join(path);
-            if let Ok(resolved) = abs_path.canonicalize() {
-                if !resolved.starts_with(&root) {
-                    return Err(format!("scope path escapes repo root via symlink: {path}"));
-                }
-            }
-            // If canonicalize fails (file doesn't exist), the open_nofollow_read
-            // below will return NotFound → DELETED tombstone, which is safe.
             // Design: hash reads from worktree (not git index) per ADR §5.
             // Git is only used for diff detection; hash must be staging-independent.
             // Pre-commit workflow ensures add-all aligns index with worktree.
+            let abs_path = root.join(path);
             match open_nofollow_read(&abs_path) {
                 Ok(mut file) => {
+                    // Post-open verification: check the opened fd's real path
+                    // stays within repo root. This closes the TOCTOU gap between
+                    // path resolution and file open — we verify the OPENED file,
+                    // not the path we intended to open.
+                    verify_fd_within_root(&file, &root, path)?;
                     let mut bytes = Vec::new();
                     file.read_to_end(&mut bytes)
                         .map_err(|e| format!("failed to read {path}: {e}"))?;
@@ -106,6 +107,69 @@ impl GitHasher for SystemGitHasher {
         let digest = sha2::Sha256::digest(manifest.as_bytes());
         Ok(format!("rvw1:sha256:{digest:x}"))
     }
+}
+
+// ---------------------------------------------------------------------------
+// Post-open fd verification
+// ---------------------------------------------------------------------------
+
+/// Verifies that an opened file descriptor refers to a file inside `root`.
+///
+/// On Unix, uses `/proc/self/fd/<fd>` readlink to get the real path of the
+/// opened file and checks it starts with `root`. This closes the TOCTOU gap
+/// between path resolution and open.
+///
+/// On non-Unix, falls back to a no-op (O_NOFOLLOW + path component checks
+/// are the best available defense).
+///
+/// # Errors
+/// Returns an error string if the file escapes the repo root.
+fn verify_fd_within_root(
+    file: &std::fs::File,
+    root: &std::path::Path,
+    scope_path: &str,
+) -> Result<(), String> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::io::AsRawFd;
+        let fd = file.as_raw_fd();
+        let proc_path = format!("/proc/self/fd/{fd}");
+        match std::fs::read_link(&proc_path) {
+            Ok(real_path) => {
+                let canon_root = root
+                    .canonicalize()
+                    .map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
+                if !real_path.starts_with(&canon_root) {
+                    return Err(format!(
+                        "scope path escapes repo root via symlink: {scope_path} \
+                         (resolved to {})",
+                        real_path.display()
+                    ));
+                }
+            }
+            Err(_) => {
+                // /proc not available (e.g., macOS, FreeBSD).
+                // Fall back to pre-open canonicalize check (TOCTOU possible
+                // but best-effort on systems without /proc).
+                let abs_path = root.join(scope_path);
+                if let Ok(resolved) = abs_path.canonicalize() {
+                    let canon_root = root
+                        .canonicalize()
+                        .map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
+                    if !resolved.starts_with(&canon_root) {
+                        return Err(format!(
+                            "scope path escapes repo root via symlink: {scope_path}"
+                        ));
+                    }
+                }
+            }
+        }
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = (file, root, scope_path);
+    }
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------
@@ -195,15 +259,13 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
         group_name: ReviewGroupName,
         verdict: Verdict,
         concerns: Vec<ReviewConcern>,
-        expected_groups: Vec<ReviewGroupName>,
+        _expected_groups: Vec<ReviewGroupName>,
         timestamp: Timestamp,
     ) -> Result<(), RecordRoundProtocolError> {
-        use std::collections::BTreeMap;
-
         use domain::{
-            CycleGroupState, GroupRoundVerdict, ReviewJson, ReviewJsonReader, ReviewJsonWriter,
-            StoredFinding,
+            GroupRoundVerdict, ReviewJson, ReviewJsonReader, ReviewJsonWriter, StoredFinding,
         };
+        use usecase::review_workflow::scope::DiffScopeProvider;
 
         use crate::git_cli::{GitRepository, SystemGitRepo};
         use crate::review_json_store::FsReviewJsonStore;
@@ -260,32 +322,59 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
             .map_err(|e| RecordRoundProtocolError::Other(format!("read review.json: {e}")))?
             .unwrap_or_else(ReviewJson::new);
 
-        // Auto-create cycle if none exists.
+        // Auto-create cycle if none exists, using real frozen scope from DiffScopeProvider.
         if review.current_cycle().is_none() {
             let cycle_id = timestamp.to_string();
-            let mut groups = BTreeMap::new();
-            for g in &expected_groups {
-                groups.insert(g.clone(), CycleGroupState::new(vec![]));
-            }
-            // Ensure mandatory "other" group exists (required by start_cycle).
-            // Design: auto-create uses empty scope intentionally. The formal cycle
-            // creation path (start_review_cycle + ReviewPartitionSnapshot) populates
-            // real file scopes from DiffScopeProvider. Auto-create is a simplified
-            // fallback for the first record-round invocation.
-            let other_key = ReviewGroupName::try_new("other").map_err(|e| {
-                RecordRoundProtocolError::Other(format!("invalid group name 'other': {e}"))
+
+            // 1. Get changed files via DiffScopeProvider.
+            let diff_scope = GitDiffScopeProvider
+                .changed_files(&self.base_ref)
+                .map_err(|e| RecordRoundProtocolError::Other(format!("diff scope: {e}")))?;
+
+            // 2. Load group policy from review-scope.json (+ optional per-track override).
+            let scope_json_path = git.root().join("track/review-scope.json");
+            let base_groups = load_base_review_groups(&scope_json_path).map_err(|e| {
+                RecordRoundProtocolError::Other(format!("load review-scope.json groups: {e}"))
             })?;
-            groups.entry(other_key).or_insert_with(|| CycleGroupState::new(vec![]));
-            review
-                .start_cycle(
+            let override_config =
+                crate::review_group_policy::load_review_groups_override(&self.items_dir, track_id)
+                    .map_err(|e| {
+                        RecordRoundProtocolError::Other(format!("load review-groups override: {e}"))
+                    })?;
+            let policy = crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(
+                &base_groups,
+                override_config.as_ref(),
+            )
+            .map_err(|e| RecordRoundProtocolError::Other(format!("resolve group policy: {e}")))?;
+
+            // 3. Partition changed files into groups with real frozen scope.
+            let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
+            let partition = policy
+                .partition(&diff_files)
+                .map_err(|e| RecordRoundProtocolError::Other(format!("partition: {e}")))?;
+            // Compute base policy hash separately (before override).
+            let base_policy =
+                crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(&base_groups, None)
+                    .map_err(|e| {
+                        RecordRoundProtocolError::Other(format!("resolve base policy: {e}"))
+                    })?;
+            let snapshot = usecase::review_workflow::groups::ReviewPartitionSnapshot::new(
+                base_policy.policy_hash(),
+                policy.policy_hash(),
+                partition,
+            );
+
+            // 4. Start cycle with real frozen scope via usecase function.
+            usecase::review_workflow::cycle::start_review_cycle(
+                &mut review,
+                usecase::review_workflow::cycle::StartReviewCycleInput {
                     cycle_id,
-                    timestamp.clone(),
-                    &self.base_ref,
-                    "sha256:none",
-                    "sha256:none",
-                    groups,
-                )
-                .map_err(|e| RecordRoundProtocolError::Other(format!("start_cycle: {e}")))?;
+                    started_at: timestamp.clone(),
+                    base_ref: self.base_ref.clone(),
+                    snapshot,
+                },
+            )
+            .map_err(|e| RecordRoundProtocolError::Other(format!("start_cycle: {e}")))?;
         }
 
         // Build GroupRoundVerdict from the verdict + concerns (fail-closed validation).
@@ -364,10 +453,6 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
             .save_review(track_id, &review)
             .map_err(|e| RecordRoundProtocolError::Other(format!("save review.json: {e}")))?;
 
-        eprintln!(
-            "[OK] Recorded {round_type} round for group '{}' (verdict: {verdict})",
-            self.group_display
-        );
         Ok(())
     }
 }

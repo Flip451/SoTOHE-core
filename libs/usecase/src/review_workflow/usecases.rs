@@ -6,7 +6,7 @@
 //!   infrastructure protocol (two-phase git index commit) that cannot be
 //!   decomposed into simple Load→domain→Save.
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 pub use domain::{
     DomainError, ReviewConcern, ReviewEscalationDecision, ReviewGroupName, ReviewStatus, RoundType,
@@ -17,15 +17,8 @@ pub use domain::{
 // Application-level port traits (implemented by infrastructure)
 // ---------------------------------------------------------------------------
 
-/// Port for computing the normalised git tree hash of a track's metadata.
+/// Port for computing review-scope content hashes.
 pub trait GitHasher {
-    /// Computes the normalised tree hash for the given track.
-    ///
-    /// # Errors
-    ///
-    /// Returns a human-readable error string on failure.
-    fn normalized_hash(&self, items_dir: &Path, track_id: &TrackId) -> Result<String, String>;
-
     /// Computes a deterministic hash over the worktree file contents for the given
     /// scope files (repo-relative paths).
     ///
@@ -185,14 +178,6 @@ pub fn record_round(
         })
 }
 
-/// Typed record-round entrypoint for internal callers (e.g., auto-record).
-///
-/// Accepts parsed domain types directly, avoiding string round-trip.
-/// The existing `record_round()` remains as the CLI string-adapter.
-///
-/// # Errors
-///
-/// Returns `RecordRoundError` on protocol failure or escalation block.
 /// Typed record-round entrypoint for internal callers (e.g., auto-record).
 ///
 /// Accepts parsed domain types directly, avoiding string round-trip.
@@ -515,14 +500,6 @@ mod tests {
     }
 
     impl GitHasher for FixedHasher {
-        fn normalized_hash(
-            &self,
-            _items_dir: &Path,
-            _track_id: &TrackId,
-        ) -> Result<String, String> {
-            Ok(self.0.clone())
-        }
-
         fn group_scope_hash(&self, _scope: &[String]) -> Result<String, String> {
             Ok(self.0.clone())
         }

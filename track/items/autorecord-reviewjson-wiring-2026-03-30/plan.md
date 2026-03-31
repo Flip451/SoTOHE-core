@@ -20,7 +20,7 @@ auto-create cycle 時に DiffScopeProvider + ReviewGroupPolicy から real froze
 - [x] Wire RecordRoundProtocolImpl to write review.json via FsReviewJsonStore: auto-create cycle if none exists, append group round, persist via save_review. Remove metadata.json review state writes. Add TDD tests.
 - [x] Add --add flag to private_index stage_bytes for future use. review.json is staged by cargo make add-all at commit time (review_operational file). Clean up metadata.json review section remnants. Verify cargo make ci passes end-to-end.
 - [x] Implement per-group scope hash: replace placeholder normalized_tree_hash with review-scope manifest hash computed from group frozen scope files per ADR section 5. Wire ReviewPartitionSnapshot to cycle creation for frozen scope and to_cycle_groups on GroupPartition.
-- [ ] Wire DiffScopeProvider + ResolvedReviewGroupPolicy into RecordRoundProtocolImpl auto-create cycle: use DiffScopeProvider to get changed files, classify via review group policy, call start_review_cycle with real frozen scope instead of empty CycleGroupState::new(vec![]). Scope limited to infrastructure layer wiring.
+- [x] Wire DiffScopeProvider + ResolvedReviewGroupPolicy into RecordRoundProtocolImpl auto-create cycle: use DiffScopeProvider to get changed files, classify via review group policy, call start_review_cycle with real frozen scope instead of empty CycleGroupState::new(vec![]). Scope limited to infrastructure layer wiring.
 
 ## Read path 移行
 

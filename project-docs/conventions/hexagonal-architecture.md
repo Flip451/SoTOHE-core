@@ -89,10 +89,10 @@ Good:
 pub fn check_approved(
     input: CheckApprovedInput,
     reader: &impl TrackReader,      // domain port
-    writer: &impl TrackWriter,      // domain port
     hasher: &impl GitHasher,        // usecase port
+    review_reader: &impl ReviewJsonReader,  // domain port
 ) -> Result<(), String> {
-    let hash = hasher.normalized_hash(&input.items_dir, &track_id)?;
+    let scope_hash = hasher.group_scope_hash(group_state.scope())?;
     let track = reader.find(&track_id)?;
     // domain logic...
     Ok(())
