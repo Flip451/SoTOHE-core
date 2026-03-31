@@ -84,6 +84,13 @@ impl GitHasher for SystemGitHasher {
             let abs_path = root.join(path);
             match open_nofollow_read(&abs_path) {
                 Ok(mut file) => {
+                    // Reject non-regular files (FIFO, device, etc.) to prevent
+                    // hangs on read_to_end. Must check AFTER open to avoid TOCTOU.
+                    let meta =
+                        file.metadata().map_err(|e| format!("failed to stat {path}: {e}"))?;
+                    if !meta.is_file() {
+                        return Err(format!("scope path is not a regular file: {path}"));
+                    }
                     // Post-open verification: check the opened fd's real path
                     // stays within repo root. This closes the TOCTOU gap between
                     // path resolution and file open — we verify the OPENED file,
@@ -440,12 +447,53 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
             }
         };
 
-        // Compute per-group scope hash from the frozen scope files in the cycle.
-        let group_scope: Vec<String> = review
-            .current_cycle()
-            .and_then(|c| c.group(&group_name))
-            .map(|g| g.scope().to_vec())
-            .unwrap_or_default();
+        // Compute per-group scope hash from CURRENT partition (not frozen scope).
+        // This ensures the hash reflects the actual code at review time, including
+        // files added after cycle creation. check_approved also uses current partition,
+        // so both sides hash the same file set.
+        let group_scope: Vec<String> = {
+            let diff_scope = GitDiffScopeProvider
+                .changed_files(&self.base_ref)
+                .map_err(|e| RecordRoundProtocolError::Other(format!("diff scope: {e}")))?;
+            let scope_json_path = git.root().join("track/review-scope.json");
+            let base_groups = load_base_review_groups(&scope_json_path).map_err(|e| {
+                RecordRoundProtocolError::Other(format!("load review-scope.json groups: {e}"))
+            })?;
+            let override_config =
+                crate::review_group_policy::load_review_groups_override(&self.items_dir, track_id)
+                    .map_err(|e| {
+                        RecordRoundProtocolError::Other(format!("load review-groups override: {e}"))
+                    })?;
+            let policy = crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(
+                &base_groups,
+                override_config.as_ref(),
+            )
+            .map_err(|e| RecordRoundProtocolError::Other(format!("resolve group policy: {e}")))?;
+            let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
+            let full_partition = policy
+                .partition(&diff_files)
+                .map_err(|e| RecordRoundProtocolError::Other(format!("partition: {e}")))?;
+
+            // Find this group's files in the current partition, with remap to "other".
+            let other_key = ReviewGroupName::try_new("other")
+                .map_err(|e| RecordRoundProtocolError::Other(format!("invalid group name: {e}")))?;
+            if group_name == other_key {
+                // "other" includes its own files + files from non-expected groups
+                let mut paths: Vec<String> = Vec::new();
+                for (name, group_paths) in full_partition.groups() {
+                    if *name == other_key || !expected_groups.contains(name) {
+                        paths.extend(group_paths.iter().map(|p| p.as_str().to_owned()));
+                    }
+                }
+                paths
+            } else {
+                full_partition
+                    .groups()
+                    .get(&group_name)
+                    .map(|paths| paths.iter().map(|p| p.as_str().to_owned()).collect())
+                    .unwrap_or_default()
+            }
+        };
         let group_hash = SystemGitHasher
             .group_scope_hash(&group_scope)
             .map_err(|e| RecordRoundProtocolError::Other(format!("group scope hash error: {e}")))?;
