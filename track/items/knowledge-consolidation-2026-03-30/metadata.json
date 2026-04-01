@@ -93,7 +93,7 @@
     {
       "description": "Create knowledge/README.md (index with reading order) and knowledge/architecture.md (slimmed DESIGN.md without Canonical Blocks), update all .claude/docs/DESIGN.md references",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Wire verify doc-links into cargo make ci, remove temporary dual-read compatibility fallbacks, delete abolished directories (.claude/docs/, project-docs/, docs/), final reference sweep",
@@ -102,5 +102,5 @@
     }
   ],
   "title": "ドキュメント群の knowledge ディレクトリへの集約と整理",
-  "updated_at": "2026-04-01T03:08:11Z"
+  "updated_at": "2026-04-01T03:11:44Z"
 }
