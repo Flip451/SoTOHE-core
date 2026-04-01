@@ -37,7 +37,7 @@ Read project context from:
 
 ```
 .claude/docs/DESIGN.md          # Architecture decisions
-.claude/docs/research/          # Research results (crate info, etc.)
+knowledge/research/             # Research results (crate info, etc.)
 .claude/rules/                  # Coding principles (Rust)
 track/tech-stack.md         # Technology stack definition
 knowledge/conventions/README.md

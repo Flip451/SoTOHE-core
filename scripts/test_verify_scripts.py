@@ -275,7 +275,7 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertIn("follow-up", conventions_doc)
         self.assertIn("Do not stop right after file creation", conventions_doc)
 
-        workflow_doc = (PROJECT_ROOT / ".claude" / "docs" / "WORKFLOW.md").read_text(
+        workflow_doc = (PROJECT_ROOT / "knowledge" / "WORKFLOW.md").read_text(
             encoding="utf-8"
         )
         self.assertIn("cargo make tools-up", workflow_doc)

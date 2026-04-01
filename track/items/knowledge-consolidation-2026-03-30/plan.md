@@ -25,7 +25,7 @@ project-docs/conventions/ を knowledge/conventions/ に移動し、規約イン
 WORKFLOW.md, research, designs, schemas を knowledge/ に移動する。
 
 - [x] Move docs/EXTERNAL_GUIDES.md to knowledge/external/POLICY.md and docs/external-guides.json to knowledge/external/guides.json, update workflow and command references, delete docs/README.md (content absorbed into knowledge/README.md) and docs/ directory
-- [ ] Move .claude/docs/WORKFLOW.md, .claude/docs/research/, .claude/docs/designs/, .claude/docs/schemas/ into knowledge/, update review-scope.json and hook references
+- [x] Move .claude/docs/WORKFLOW.md, .claude/docs/research/, .claude/docs/designs/, .claude/docs/schemas/ into knowledge/, update review-scope.json and hook references
 
 ## Phase D: アーキテクチャドキュメントと最終整備
 

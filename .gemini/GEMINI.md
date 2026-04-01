@@ -64,8 +64,8 @@ Read from:
 ```
 track/tech-stack.md         # Tech stack (Rust version, crates in use)
 track/items/<id>/spec.md   # Feature specification
-.claude/docs/research/          # Save your research results here
-.claude/docs/libraries/         # Save crate documentation here
+knowledge/research/             # Save your research results here
+knowledge/research/             # Save crate documentation here
 ```
 
 If Claude Code provides profile context, prefer the resolved capability rather than assuming a fixed role split.

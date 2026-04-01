@@ -11,7 +11,7 @@
 - `track/items/<id>/plan.md`
 - `track/items/<id>/verification.md`
 - `.claude/docs/DESIGN.md`
-- `.claude/docs/WORKFLOW.md`
+- `knowledge/WORKFLOW.md`
 - `knowledge/adr/README.md`
 - `knowledge/strategy/TODO-PLAN.md`
 - `.claude/agent-profiles.json`

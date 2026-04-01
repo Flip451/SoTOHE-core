@@ -72,7 +72,7 @@ The blocked message instructs the developer to execute three steps:
 
 1. **Workspace Search**: Use `Grep` to check whether existing code solves the problem.
 2. **Reinvention Check**: Invoke the `researcher` capability to survey crates.io.
-   Save results to `.claude/docs/research/reinvention-check-{concern}.md`.
+   Save results to `knowledge/research/reinvention-check-{concern}.md`.
 3. **Decision**: Run `sotp review resolve-escalation` with evidence:
    ```
    sotp review resolve-escalation \
@@ -137,6 +137,6 @@ Inline review within Claude Code's main context (self-review) is not a substitut
 Operational details live in:
 
 - `track/workflow.md`
-- `.claude/docs/WORKFLOW.md`
+- `knowledge/WORKFLOW.md`
 - `.claude/settings.json`
 - `.claude/hooks/`

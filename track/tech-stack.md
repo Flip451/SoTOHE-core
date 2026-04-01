@@ -81,7 +81,7 @@ apps/cli             # CLI エントリーポイント + composition root（usec
 ## Version Baseline
 
 - **最新調査日**: 2026-03-11
-- **調査ログ**: `.claude/docs/research/version-baseline-2026-03-11.md`
+- **調査ログ**: `knowledge/research/version-baseline-2026-03-11.md`
 - **反映対象**: `Cargo.toml`, `Dockerfile`, `Makefile.toml`（ツールバージョン指定がある場合）
 
 ## 変更履歴

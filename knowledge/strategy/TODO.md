@@ -551,7 +551,7 @@
 
 ## J. Gemini 構造的 Gap 分析 (GAP)
 
-> **分析レポート**: `.claude/docs/research/gemini-gap-analysis-2026-03-18.md`
+> **分析レポート**: `knowledge/research/gemini-gap-analysis-2026-03-18.md`
 > Phase 配置は [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md) Phase 4-5 を参照
 > リファクタリング関連 (GAP-03/04) は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §5 を参照
 

@@ -15,7 +15,7 @@ RESEARCH_SUGGESTION_TEMPLATE = (
     "{prefix} For '{query}', "
     "consider using the `{capability}` capability via {provider_label} instead of WebSearch/WebFetch. "
     "Example: `{provider_example}` "
-    "Save research results to .claude/docs/research/."
+    "Save research results to knowledge/research/."
 )
 
 

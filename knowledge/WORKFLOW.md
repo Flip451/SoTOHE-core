@@ -30,7 +30,7 @@ Architecture-focused changes:
    └── /architecture-customizer             # crate map, dependency direction, enforcement rules
 
 Version Baseline (Phase 1) required steps:
-- Create `.claude/docs/research/version-baseline-YYYY-MM-DD.md`
+- Create `knowledge/research/version-baseline-YYYY-MM-DD.md`
 - Review `Cargo.toml` `rust-version`
 - Review `Dockerfile` `RUST_VERSION` and tool version ARGs
 - Update `track/tech-stack.md` MSRV and changelog

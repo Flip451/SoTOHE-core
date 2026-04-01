@@ -134,7 +134,7 @@ Claude Code may summarize or translate surrounding explanation text, but must no
 translate, normalize, or partially copy blocks inside `## Canonical Blocks`.
 
 If a Canonical Block cannot be embedded directly due to document format constraints, store the
-full specialist output in `.claude/docs/research/{capability}-{feature}.md` and reference it from
+full specialist output in `knowledge/research/{capability}-{feature}.md` and reference it from
 the derived document instead of rewriting the block.
 
 ## Language Protocol

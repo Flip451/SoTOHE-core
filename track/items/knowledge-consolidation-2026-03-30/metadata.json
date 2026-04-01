@@ -88,7 +88,7 @@
     {
       "description": "Move .claude/docs/WORKFLOW.md, .claude/docs/research/, .claude/docs/designs/, .claude/docs/schemas/ into knowledge/, update review-scope.json and hook references",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Create knowledge/README.md (index with reading order) and knowledge/architecture.md (slimmed DESIGN.md without Canonical Blocks), update all .claude/docs/DESIGN.md references",
@@ -102,5 +102,5 @@
     }
   ],
   "title": "ドキュメント群の knowledge ディレクトリへの集約と整理",
-  "updated_at": "2026-04-01T02:27:57Z"
+  "updated_at": "2026-04-01T03:08:11Z"
 }
