@@ -452,14 +452,9 @@ impl SpecDocument {
         &self.hearing_history
     }
 
-    /// Appends a hearing record to the history.
+    /// Appends a hearing record to the history (append-only).
     pub fn append_hearing_record(&mut self, record: HearingRecord) {
         self.hearing_history.push(record);
-    }
-
-    /// Sets hearing history (used by codec decode).
-    pub fn set_hearing_history(&mut self, history: Vec<HearingRecord>) {
-        self.hearing_history = history;
     }
 
     /// Marks this spec as approved with the given timestamp and content hash.

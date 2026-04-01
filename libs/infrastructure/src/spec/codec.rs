@@ -248,10 +248,9 @@ pub fn decode(json: &str) -> Result<SpecDocument, SpecCodecError> {
         dto.content_hash,
     )?;
 
-    // Decode hearing history
-    let hearing_history = decode_hearing_history(&dto.hearing_history)?;
-    if !hearing_history.is_empty() {
-        doc.set_hearing_history(hearing_history);
+    // Decode hearing history (append-only)
+    for record in decode_hearing_history(&dto.hearing_history)? {
+        doc.append_hearing_record(record);
     }
 
     // Auto-demote: if status is Approved but content hash doesn't match, revert to Draft.
