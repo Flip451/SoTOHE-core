@@ -91,6 +91,15 @@ pub fn verify(root: &Path) -> VerifyOutcome {
                 } else {
                     md_dir.join(path_part)
                 };
+
+                // Skip links that resolve into tmp/ (gitignored scratch files)
+                if let Ok(rel) = resolved.strip_prefix(root) {
+                    let first = rel.components().next();
+                    if first.is_some_and(|c| c.as_os_str() == "tmp") {
+                        continue;
+                    }
+                }
+
                 if !resolved.exists() {
                     let rel_md = md_path.strip_prefix(root).unwrap_or(md_path);
                     findings.push(Finding::error(format!(
