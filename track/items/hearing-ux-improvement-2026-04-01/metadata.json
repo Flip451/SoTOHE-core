@@ -66,7 +66,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "description": "TSUMIKI-06 モード選択 — SKILL.md に Step 0 挿入（Full/Focused/Quick）",
@@ -86,9 +86,9 @@
     {
       "description": "CI 検証 — cargo make ci 全チェック通過",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "TSUMIKI-05/06/07 ヒアリング UX 改善",
-  "updated_at": "2026-04-01T08:48:29Z"
+  "updated_at": "2026-04-01T08:53:41Z"
 }
