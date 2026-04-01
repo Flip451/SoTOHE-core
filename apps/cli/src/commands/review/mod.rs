@@ -601,7 +601,7 @@ fn is_planning_only_path(path: &str) -> bool {
         ".claude/agent-profiles.json",
         ".claude/settings.json",
         ".claude/settings.local.json",
-        ".claude/docs/DESIGN.md",
+        "knowledge/DESIGN.md",
         "architecture-rules.json",
     ];
 

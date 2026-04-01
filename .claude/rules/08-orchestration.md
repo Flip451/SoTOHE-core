@@ -31,7 +31,7 @@ Read these first before planning or implementation:
 - `track/items/<id>/plan.md`
 - `track/items/<id>/verification.md`
 - `TRACK_TRACEABILITY.md`
-- `.claude/docs/DESIGN.md`
+- `knowledge/DESIGN.md`
 - `.claude/rules/`
 - `knowledge/external/POLICY.md`
 - `knowledge/external/guides.json`

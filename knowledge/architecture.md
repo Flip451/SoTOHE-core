@@ -1,6 +1,6 @@
 # Architecture Overview
 
-> Slimmed summary of `.claude/docs/DESIGN.md` without Canonical Blocks.
+> Slimmed summary of `knowledge/DESIGN.md` without Canonical Blocks.
 > For full type definitions and specialist-generated blocks, see DESIGN.md.
 
 ## Overview
@@ -43,10 +43,10 @@ Layer rules are enforced by `architecture-rules.json` at repo root.
 
 ## Key Design Decisions
 
-See `.claude/docs/DESIGN.md` → "Key Design Decisions" table for the full list
+See `knowledge/DESIGN.md` → "Key Design Decisions" table for the full list
 with ADR links.
 
 ## Canonical Blocks
 
-Not included here. See `.claude/docs/DESIGN.md` → "Canonical Blocks" section
+Not included here. See `knowledge/DESIGN.md` → "Canonical Blocks" section
 for specialist-generated type definitions and module trees.

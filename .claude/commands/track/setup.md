@@ -10,7 +10,7 @@ Execution rules:
 - Read `knowledge/external/POLICY.md` and `knowledge/external/guides.json`.
 - Ensure `track/registry.md` exists; if missing, create it with a minimal template list section.
 - Ensure the track convention includes `track/items/<id>/metadata.json` and `verification.md` alongside `spec.md` and `plan.md`.
-- Confirm required top-level docs exist (`CLAUDE.md`, `knowledge/WORKFLOW.md`, `.claude/docs/DESIGN.md`).
+- Confirm required top-level docs exist (`CLAUDE.md`, `knowledge/WORKFLOW.md`, `knowledge/DESIGN.md`).
 - Strict tech-stack guardrails are on by default. Only template maintainers may disable them locally for template work via `TRACK_TEMPLATE_DEV=1` or an untracked `.track-template-dev` marker.
 - Do not start implementation work in this command.
 - Summarize what was initialized and what TODO items must be filled next.

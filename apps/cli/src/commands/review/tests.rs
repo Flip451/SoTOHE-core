@@ -757,7 +757,7 @@ fn planning_only_path_accepts_track_files() {
 fn planning_only_path_accepts_doc_and_config_files() {
     use super::is_planning_only_path;
 
-    assert!(is_planning_only_path(".claude/docs/DESIGN.md"));
+    assert!(is_planning_only_path("knowledge/DESIGN.md"));
     assert!(is_planning_only_path(".claude/commands/track/review.md"));
     assert!(is_planning_only_path(".claude/rules/04-coding-principles.md"));
     assert!(is_planning_only_path(".claude/agent-profiles.json"));
@@ -844,7 +844,7 @@ fn planning_only_path_all_planning_staged_is_planning_only() {
     let staged = [
         "track/items/my-track/metadata.json",
         "track/registry.md",
-        ".claude/docs/DESIGN.md",
+        "knowledge/DESIGN.md",
         "CLAUDE.md",
     ];
     assert!(staged.iter().all(|f| is_planning_only_path(f)));

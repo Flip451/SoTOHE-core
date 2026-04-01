@@ -104,7 +104,7 @@ into the `record-round` CLI command directly. The calling orchestrator must pass
 
 ### Design Reference
 
-Full design with Canonical Blocks: `.claude/docs/DESIGN.md` → "Review Escalation Threshold (WF-36)"
+Full design with Canonical Blocks: `knowledge/DESIGN.md` → "Review Escalation Threshold (WF-36)"
 
 ### Known Limitation (CLI-02)
 

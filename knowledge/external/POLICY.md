@@ -128,6 +128,6 @@ AI が読む順番:
 - `track/tech-stack.md`
 - `track/items/<id>/spec.md`
 - `track/items/<id>/plan.md`
-- `.claude/docs/DESIGN.md`
+- `knowledge/DESIGN.md`
 
 外部ガイドは「参照元」であり、最終的なプロジェクト判断はこのリポジトリ内文書へ落とし込む。

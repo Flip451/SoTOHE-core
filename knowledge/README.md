@@ -27,4 +27,4 @@ and architecture decisions live here.
 ## Related Top-Level Files
 
 - `architecture-rules.json` — Machine-readable layer dependency rules (repo root)
-- `.claude/docs/DESIGN.md` — Architecture decisions with Canonical Blocks
+- `knowledge/DESIGN.md` — Architecture decisions with Canonical Blocks

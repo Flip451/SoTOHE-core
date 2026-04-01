@@ -10,7 +10,7 @@
 - `track/items/<id>/spec.md`
 - `track/items/<id>/plan.md`
 - `track/items/<id>/verification.md`
-- `.claude/docs/DESIGN.md`
+- `knowledge/DESIGN.md`
 - `knowledge/WORKFLOW.md`
 - `knowledge/adr/README.md`
 - `knowledge/strategy/TODO-PLAN.md`
@@ -37,7 +37,7 @@
 - orchestration / delegation: `.claude/rules/08-orchestration.md`
 - maintainer checklist: `.claude/rules/09-maintainer-checklist.md`
 - guardrails: `.claude/rules/10-guardrails.md`
-- `.claude/docs/DESIGN.md`
+- `knowledge/DESIGN.md`
 - `.claude/agent-profiles.json`
 - `.claude/rules/02-codex-delegation.md`
 - `.claude/rules/03-gemini-delegation.md`

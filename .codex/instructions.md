@@ -36,7 +36,7 @@ Claude Code (Orchestrator)
 Read project context from:
 
 ```
-.claude/docs/DESIGN.md          # Architecture decisions
+knowledge/DESIGN.md             # Architecture decisions
 knowledge/research/             # Research results (crate info, etc.)
 .claude/rules/                  # Coding principles (Rust)
 track/tech-stack.md         # Technology stack definition

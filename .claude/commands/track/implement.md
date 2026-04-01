@@ -15,7 +15,7 @@ Execution:
 - Read the current track's `spec.md`, `plan.md`, and `metadata.json` before implementation.
 - If the resolved track is branchless planning-only (`status=planned`, `branch=null`), stop immediately and instruct the user to run `/track:activate <track-id>`. Do not transition tasks, do not write implementation code, and do not treat this as an implicit branch-creation step.
 - Read every convention file listed in the `## Related Conventions (Required Reading)` section of `spec.md` (or `plan.md` for legacy tracks without `spec.json`) before writing code.
-- For exact type signatures, trait definitions, module trees, and Mermaid diagrams, prefer `## Canonical Blocks` in `plan.md` and `.claude/docs/DESIGN.md` over surrounding prose.
+- For exact type signatures, trait definitions, module trees, and Mermaid diagrams, prefer `## Canonical Blocks` in `plan.md` and `knowledge/DESIGN.md` over surrounding prose.
 - Identify the target task(s) from the approved plan. If `$ARGUMENTS` is provided, map it to the relevant plan scope.
 - Use `cargo make track-transition <track_dir> <task_id> in_progress` to mark selected tasks as `in_progress` in `metadata.json` and auto-render `plan.md` + `registry.md`. Do NOT edit `plan.md` directly — it is a read-only view rendered from metadata.json (SSoT).
 - Before using `cargo make *-exec` commands or Agent Teams fast loops, confirm `cargo make tools-up` has already started `tools-daemon`. If not, either start it first or fall back to `run --rm` tasks.

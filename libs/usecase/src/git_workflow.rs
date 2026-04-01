@@ -183,7 +183,7 @@ pub fn validate_planning_only_commit_paths(
                 path.as_str(),
                 "track/registry.md"
                     | "track/tech-stack.md"
-                    | ".claude/docs/DESIGN.md"
+                    | "knowledge/DESIGN.md"
                     | "knowledge/architecture.md"
                     | "architecture-rules.json"
             )
@@ -446,7 +446,7 @@ mod tests {
                 "track/items/example/spec.md".to_owned(),
                 "track/registry.md".to_owned(),
                 "track/tech-stack.md".to_owned(),
-                ".claude/docs/DESIGN.md".to_owned(),
+                "knowledge/DESIGN.md".to_owned(),
             ],
         );
 
