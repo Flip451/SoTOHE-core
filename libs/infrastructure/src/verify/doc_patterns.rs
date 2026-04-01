@@ -220,22 +220,22 @@ static REQUIRED_LINES: &[RequireLine] = &[
 static CONVENTIONS_REQUIRED_LINES: &[RequireLine] = &[
     RequireLine {
         rel_path: "CLAUDE.md",
-        pattern: "project-docs/conventions/",
+        pattern: "knowledge/conventions/",
         label: "CLAUDE project conventions reference",
     },
     RequireLine {
         rel_path: ".codex/instructions.md",
-        pattern: "project-docs/conventions/",
+        pattern: "knowledge/conventions/",
         label: "Codex project conventions reference",
     },
     RequireLine {
         rel_path: "DEVELOPER_AI_WORKFLOW.md",
-        pattern: "project-docs/conventions/",
+        pattern: "knowledge/conventions/",
         label: "developer workflow project conventions reference",
     },
     RequireLine {
         rel_path: "docs/README.md",
-        pattern: "project-docs/conventions/",
+        pattern: "knowledge/conventions/",
         label: "docs README project conventions reference",
     },
 ];

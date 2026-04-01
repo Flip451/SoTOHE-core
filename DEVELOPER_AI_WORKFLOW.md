@@ -117,7 +117,7 @@ flowchart TD
 
 - `/track:*` を入口にして、仕様から計画、実装、レビュー、コミットまでを一貫して進める
 - `track/items/` の `spec.md` / `plan.md` / `verification.md` を常に最新の正式な状態に保つ
-- `project-docs/conventions/` にプロジェクト固有の実装規約を集約し、テンプレート共通ルールと分離する
+- `knowledge/conventions/` にプロジェクト固有の実装規約を集約し、テンプレート共通ルールと分離する
 - Claude Code を主操作面にしつつ、必要なときだけ内部で specialist capability と Agent Teams を使う
 - ローカル実行は `docker compose` 前提で統一する
 - compose 実行は host UID/GID に寄せ、repo bind mount の `target/` と `./.cache/cargo/` を共有する
@@ -125,14 +125,14 @@ flowchart TD
 ## 1.1 ドキュメントの責務分離
 
 - `track/`: テンプレート共通のワークフロー、品質ゲート、トラック運用
-- `project-docs/conventions/`: プロジェクト固有のコーディング規約、設計制約、計装方針など
+- `knowledge/conventions/`: プロジェクト固有のコーディング規約、設計制約、計装方針など
 - `docs/`: 利用者向けガイド、補助資料、外部長文ガイド運用
 
-実装判断に迷ったら、まず `track/tech-stack.md` と `project-docs/conventions/README.md` を確認する。
+実装判断に迷ったら、まず `track/tech-stack.md` と `knowledge/conventions/README.md` を確認する。
 
 ## 1.2 Project Conventions は早めに整備する
 
-`Project Conventions` は補助情報ではなく、プロジェクト固有ルールの正本として扱う。`project-docs/conventions/` は、実装・レビュー・AI 委譲の判断基準になる正式な文書群である。
+`Project Conventions` は補助情報ではなく、プロジェクト固有ルールの正本として扱う。`knowledge/conventions/` は、実装・レビュー・AI 委譲の判断基準になる正式な文書群である。
 
 繰り返し参照される判断基準、設計制約、計装方針、テスト方針があるなら、会話やレビューコメントに閉じず `Project Conventions` へ昇格させる。
 
@@ -144,7 +144,7 @@ flowchart TD
 
 1. `[Claude Code]` `/conventions:add api-design`
 2. Claude Code が必要なら title, slug, 目的文だけ補足確認する
-3. Claude Code が `project-docs/conventions/<slug>.md` を作成し、`README.md` の索引を更新する
+3. Claude Code が `knowledge/conventions/<slug>.md` を作成し、`README.md` の索引を更新する
 4. Claude Code が `cargo make conventions-verify-index` と `cargo make verify-arch-docs` で整合を確認する
 
 ## 2. 役割分担

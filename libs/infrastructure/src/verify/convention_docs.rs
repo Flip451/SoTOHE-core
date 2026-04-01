@@ -47,7 +47,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     if !readme_path.is_file() {
         if has_convention_docs {
             return VerifyOutcome::from_findings(vec![Finding::error(
-                "project-docs/conventions contains convention documents but is missing README.md"
+                "knowledge/conventions contains convention documents but is missing README.md"
                     .to_owned(),
             )]);
         }
@@ -59,7 +59,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
         Ok(c) => c,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![Finding::error(format!(
-                "Cannot read project-docs/conventions/README.md: {e}"
+                "Cannot read knowledge/conventions/README.md: {e}"
             ))]);
         }
     };
@@ -82,7 +82,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
         Some(m) => m.as_str().to_owned(),
         None => {
             return VerifyOutcome::from_findings(vec![Finding::error(
-                "README index markers not found in project-docs/conventions/README.md".to_owned(),
+                "README index markers not found in knowledge/conventions/README.md".to_owned(),
             )]);
         }
     };

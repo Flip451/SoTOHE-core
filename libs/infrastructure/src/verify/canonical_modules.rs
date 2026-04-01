@@ -296,7 +296,7 @@ mod tests {
                 "concern": "shell-parsing",
                 "forbidden_patterns": ["fn\\s+normalize_separators"],
                 "allowed_in": ["libs/domain/src/guard/"],
-                "convention": "project-docs/conventions/shell-parsing.md",
+                "convention": "knowledge/conventions/shell-parsing.md",
                 "rationale": "test"
             }]
         }"#,

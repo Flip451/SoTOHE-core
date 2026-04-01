@@ -25,7 +25,7 @@ Read these first before planning or implementation:
 - `track/tech-stack.md`
 - `track/workflow.md`
 - `track/registry.md`
-- `project-docs/conventions/README.md`
+- `knowledge/conventions/README.md`
 - `track/items/<id>/metadata.json`
 - `track/items/<id>/spec.md`
 - `track/items/<id>/plan.md`
@@ -42,7 +42,7 @@ Operational split:
 - `DEVELOPER_AI_WORKFLOW.md`: user-facing operating guide
 - `CLAUDE.md`: maintainer/reference guide
 - `track/workflow.md`: day-to-day workflow rules
-- `project-docs/conventions/`: project-specific engineering rules and implementation policies
+- `knowledge/conventions/`: project-specific engineering rules and implementation policies
 - `TRACK_TRACEABILITY.md`: `plan.md` state transitions and registry update rules
 - `docs/external-guides.json`: registry for long-form external guides cached outside git
 - `docs/EXTERNAL_GUIDES.md`: operating policy for external long-form guides

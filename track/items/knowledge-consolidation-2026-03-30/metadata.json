@@ -78,7 +78,7 @@
     {
       "description": "Move project-docs/conventions/ to knowledge/conventions/, update convention index tooling, Rust verify modules, architecture-rules.json internal convention field, and all doc references",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Move docs/EXTERNAL_GUIDES.md to knowledge/external/POLICY.md and docs/external-guides.json to knowledge/external/guides.json, update workflow and command references, delete docs/README.md (content absorbed into knowledge/README.md) and docs/ directory",
@@ -102,5 +102,5 @@
     }
   ],
   "title": "ドキュメント群の knowledge ディレクトリへの集約と整理",
-  "updated_at": "2026-04-01T00:33:26Z"
+  "updated_at": "2026-04-01T00:50:26Z"
 }

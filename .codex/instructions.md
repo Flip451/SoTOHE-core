@@ -40,12 +40,12 @@ Read project context from:
 .claude/docs/research/          # Research results (crate info, etc.)
 .claude/rules/                  # Coding principles (Rust)
 track/tech-stack.md         # Technology stack definition
-project-docs/conventions/README.md
+knowledge/conventions/README.md
 track/items/<id>/spec.md   # Feature specification
 track/items/<id>/plan.md   # Implementation plan
 ```
 
-If `project-docs/conventions/` exists, treat it as the source of truth for project-specific implementation rules.
+If `knowledge/conventions/` exists, treat it as the source of truth for project-specific implementation rules.
 
 **Always check these before giving advice.**
 If Claude Code provides profile context, prefer the capability it resolved rather than assuming a fixed role split.

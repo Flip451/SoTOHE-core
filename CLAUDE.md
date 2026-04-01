@@ -16,8 +16,8 @@
 - `knowledge/strategy/TODO-PLAN.md`
 - `.claude/agent-profiles.json`
 - `.claude/rules/`
-- `project-docs/conventions/README.md`
-- `project-docs/conventions/`
+- `knowledge/conventions/README.md`
+- `knowledge/conventions/`
 - `architecture-rules.json`
 - `docs/EXTERNAL_GUIDES.md`
 - `docs/external-guides.json`
@@ -30,7 +30,7 @@
 - `architecture-rules.json` が workspace 構造と layer policy の SSoT
 - workspace tree は `cargo make workspace-tree` / `cargo make workspace-tree-full`
 - `track/tech-stack.md` に未解決 `TODO:` がある間は実装開始禁止
-- `project-docs/conventions/` への参照を維持すること
+- `knowledge/conventions/` への参照を維持すること
 - 変更前に `.claude/rules/08-orchestration.md` `09-maintainer-checklist.md` `10-guardrails.md` を読むこと
 
 詳細:

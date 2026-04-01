@@ -464,7 +464,7 @@ class ArchitectureRulesTest(unittest.TestCase):
                 }
             ],
             "extra_dirs": [
-                {"path": "project-docs/conventions", "label": "project rules"},
+                {"path": "knowledge/conventions", "label": "project rules"},
                 {"path": "track/items/<id>", "label": "active track"},
             ],
         }
@@ -473,7 +473,7 @@ class ArchitectureRulesTest(unittest.TestCase):
             rules, include_extra_dirs=True
         )
 
-        self.assertIn("project-docs/", rendered)
+        self.assertIn("knowledge/", rendered)
         self.assertIn("└── conventions/", rendered)
         self.assertIn("# domain crate", rendered)
         self.assertIn("# project rules", rendered)

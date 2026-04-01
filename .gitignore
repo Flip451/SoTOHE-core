@@ -18,7 +18,7 @@ target-*/
 *.pem
 *.key
 
-# --- Project-specific sensitive directories (see project-docs/conventions/security.md) ---
+# --- Project-specific sensitive directories (see knowledge/conventions/security.md) ---
 private/
 config/secrets/
 

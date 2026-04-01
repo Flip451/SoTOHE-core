@@ -30,7 +30,7 @@ Summarize the current project state for the newcomer:
 3. Read the current track's `spec.md` and `plan.md` if one exists
 4. Read `track/tech-stack.md` — highlight any unresolved `TODO:` items
 5. Show recent git log (last 10 commits) for context
-6. Read `project-docs/conventions/README.md` — list active convention docs
+6. Read `knowledge/conventions/README.md` — list active convention docs
 
 ### Phase 4: External guides setup (optional)
 

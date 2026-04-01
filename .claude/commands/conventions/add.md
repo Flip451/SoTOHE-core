@@ -2,10 +2,10 @@
 description: Add a new project convention document and update the conventions index.
 ---
 
-Create a new document under `project-docs/conventions/` and keep the conventions index in sync.
+Create a new document under `knowledge/conventions/` and keep the conventions index in sync.
 
 Execution rules:
-- First read `project-docs/conventions/README.md`.
+- First read `knowledge/conventions/README.md`.
 - Ask only for missing values. Minimum required input is the convention name.
 - If the user gives a free-form title or non-ASCII name, suggest and confirm an ASCII kebab-case slug separately.
 - Suggest a concise title and one-line purpose summary if the user did not provide them.

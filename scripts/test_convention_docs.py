@@ -21,7 +21,7 @@ class ConventionDocsTest(unittest.TestCase):
     def test_add_document_creates_file_and_updates_index(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            conventions = root / "project-docs" / "conventions"
+            conventions = root / "knowledge" / "conventions"
             conventions.mkdir(parents=True, exist_ok=True)
             (conventions / "README.md").write_text(README_TEMPLATE, encoding="utf-8")
 
@@ -53,7 +53,7 @@ class ConventionDocsTest(unittest.TestCase):
     def test_add_document_rejects_duplicate(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            conventions = root / "project-docs" / "conventions"
+            conventions = root / "knowledge" / "conventions"
             conventions.mkdir(parents=True, exist_ok=True)
             (conventions / "README.md").write_text(README_TEMPLATE, encoding="utf-8")
             (conventions / "api-design.md").write_text(
@@ -73,7 +73,7 @@ class ConventionDocsTest(unittest.TestCase):
     def test_add_document_requires_slug_for_non_ascii_name(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            conventions = root / "project-docs" / "conventions"
+            conventions = root / "knowledge" / "conventions"
             conventions.mkdir(parents=True, exist_ok=True)
             (conventions / "README.md").write_text(README_TEMPLATE, encoding="utf-8")
 
@@ -90,7 +90,7 @@ class ConventionDocsTest(unittest.TestCase):
     def test_add_document_rejects_missing_readme_without_partial_write(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            conventions = root / "project-docs" / "conventions"
+            conventions = root / "knowledge" / "conventions"
             conventions.mkdir(parents=True, exist_ok=True)
 
             with mock.patch.object(convention_docs, "project_root", return_value=root):
@@ -107,7 +107,7 @@ class ConventionDocsTest(unittest.TestCase):
     def test_add_document_rejects_missing_markers_without_partial_write(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            conventions = root / "project-docs" / "conventions"
+            conventions = root / "knowledge" / "conventions"
             conventions.mkdir(parents=True, exist_ok=True)
             (conventions / "README.md").write_text(
                 "# Project Conventions\n", encoding="utf-8"
@@ -127,7 +127,7 @@ class ConventionDocsTest(unittest.TestCase):
     def test_add_document_accepts_non_ascii_name_with_slug(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            conventions = root / "project-docs" / "conventions"
+            conventions = root / "knowledge" / "conventions"
             conventions.mkdir(parents=True, exist_ok=True)
             (conventions / "README.md").write_text(README_TEMPLATE, encoding="utf-8")
 
@@ -152,7 +152,7 @@ class ConventionDocsTest(unittest.TestCase):
     def test_add_document_accepts_cargo_make_separator(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            conventions = root / "project-docs" / "conventions"
+            conventions = root / "knowledge" / "conventions"
             conventions.mkdir(parents=True, exist_ok=True)
             (conventions / "README.md").write_text(README_TEMPLATE, encoding="utf-8")
 
@@ -167,7 +167,7 @@ class ConventionDocsTest(unittest.TestCase):
     def test_add_document_rejects_non_kebab_case_slug(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            conventions = root / "project-docs" / "conventions"
+            conventions = root / "knowledge" / "conventions"
             conventions.mkdir(parents=True, exist_ok=True)
             (conventions / "README.md").write_text(README_TEMPLATE, encoding="utf-8")
 
@@ -190,7 +190,7 @@ class ConventionDocsTest(unittest.TestCase):
     def test_verify_index_detects_out_of_sync_readme(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            conventions = root / "project-docs" / "conventions"
+            conventions = root / "knowledge" / "conventions"
             conventions.mkdir(parents=True, exist_ok=True)
             (conventions / "README.md").write_text(
                 README_TEMPLATE.replace(
@@ -215,7 +215,7 @@ class ConventionDocsTest(unittest.TestCase):
     def test_update_index_repairs_out_of_sync_readme(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            conventions = root / "project-docs" / "conventions"
+            conventions = root / "knowledge" / "conventions"
             conventions.mkdir(parents=True, exist_ok=True)
             (conventions / "README.md").write_text(
                 README_TEMPLATE.replace(
@@ -241,7 +241,7 @@ class ConventionDocsTest(unittest.TestCase):
     def test_update_index_rejects_missing_readme(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            (root / "project-docs" / "conventions").mkdir(parents=True, exist_ok=True)
+            (root / "knowledge" / "conventions").mkdir(parents=True, exist_ok=True)
 
             with mock.patch.object(convention_docs, "project_root", return_value=root):
                 stderr = io.StringIO()
@@ -254,7 +254,7 @@ class ConventionDocsTest(unittest.TestCase):
     def test_verify_index_rejects_missing_readme(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            (root / "project-docs" / "conventions").mkdir(parents=True, exist_ok=True)
+            (root / "knowledge" / "conventions").mkdir(parents=True, exist_ok=True)
 
             with mock.patch.object(convention_docs, "project_root", return_value=root):
                 stderr = io.StringIO()
@@ -267,7 +267,7 @@ class ConventionDocsTest(unittest.TestCase):
     def test_verify_index_accepts_synced_readme(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            conventions = root / "project-docs" / "conventions"
+            conventions = root / "knowledge" / "conventions"
             conventions.mkdir(parents=True, exist_ok=True)
             (conventions / "README.md").write_text(README_TEMPLATE, encoding="utf-8")
             (conventions / "api-design.md").write_text(
@@ -283,7 +283,7 @@ class ConventionDocsTest(unittest.TestCase):
     def test_update_readme_index_uses_recommended_order(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            conventions = root / "project-docs" / "conventions"
+            conventions = root / "knowledge" / "conventions"
             conventions.mkdir(parents=True, exist_ok=True)
             (conventions / "README.md").write_text(README_TEMPLATE, encoding="utf-8")
             (conventions / "testing.md").write_text("# Testing\n", encoding="utf-8")

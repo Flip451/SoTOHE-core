@@ -384,7 +384,7 @@ mod tests {
     fn test_evaluate_in_scope_subsection_counted() {
         // ### In Scope must be under ## Scope to be counted
         let body =
-            "## Scope\n### In Scope\n- item [source: convention — project-docs/conventions/x.md]\n";
+            "## Scope\n### In Scope\n- item [source: convention — knowledge/conventions/x.md]\n";
         let counts = evaluate(body);
         assert_eq!(counts.blue(), 1);
     }

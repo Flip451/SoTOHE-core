@@ -9,7 +9,7 @@
 - 外部公開を想定した開発ドキュメント
 - 外部長文ガイドの運用方針と索引
 
-プロジェクト固有の実装規約は `project-docs/conventions/` で管理し、`docs/` に混在させないでください。
+プロジェクト固有の実装規約は `knowledge/conventions/` で管理し、`docs/` に混在させないでください。
 
 ## What Should Not Be Stored Here
 
@@ -22,4 +22,4 @@
 
 - `EXTERNAL_GUIDES.md`: 外部長文ドキュメントの運用方針
 - `external-guides.json`: 外部長文ドキュメントの索引
-- `../project-docs/conventions/`: プロジェクト固有の設計・実装規約
+- `../knowledge/conventions/`: プロジェクト固有の設計・実装規約

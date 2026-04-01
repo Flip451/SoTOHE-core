@@ -116,12 +116,12 @@ Per `tmp/refactoring-plan-2026-03-19.md` CLI-02, this should be extracted to
 
 Before writing new parsing/analysis logic, verify the following:
 
-1. Check whether a related convention exists in `project-docs/conventions/`
+1. Check whether a related convention exists in `knowledge/conventions/`
 2. Use `Grep` to search for similar utilities in other crates within the workspace
 3. Check whether a matching concern exists in `canonical_modules` in `architecture-rules.json`
 4. If none of the above finds a match, have the `researcher` capability perform a quick survey of crates.io for equivalent functionality
 
-Reference: `project-docs/conventions/shell-parsing.md`
+Reference: `knowledge/conventions/shell-parsing.md`
 
 ## Reviewer Capability Constraint
 

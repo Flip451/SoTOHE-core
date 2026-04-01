@@ -15,7 +15,7 @@ Every requirement, constraint, and acceptance criterion in `spec.md` must carry 
 |-----|---------|---------|
 | `[source: <document> §<section>]` | Explicit reference to a document, section, or external standard | `[source: PRD §3.2]`, `[source: track/tech-stack.md]` |
 | `[source: feedback — <context>]` | User feedback or correction recorded in memory/history | `[source: feedback — Rust-first policy]` |
-| `[source: convention — <file>]` | Established project convention with specific file reference | `[source: convention — project-docs/conventions/security.md]` |
+| `[source: convention — <file>]` | Established project convention with specific file reference | `[source: convention — knowledge/conventions/security.md]` |
 | `[source: inference — <reason>]` | Inferred from context, conventions, or common practice; not explicitly stated | `[source: inference — security best practice]` |
 | `[source: discussion]` | Agreed upon in team discussion or user conversation | `[source: discussion]` |
 
