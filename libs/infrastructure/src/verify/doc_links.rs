@@ -61,7 +61,9 @@ pub fn verify(root: &Path) -> VerifyOutcome {
                 continue;
             }
 
-            for cap in link_re.captures_iter(line) {
+            // Strip inline code spans before scanning for links
+            let line_without_code = strip_inline_code(line);
+            for cap in link_re.captures_iter(&line_without_code) {
                 let link_target = &cap[2];
 
                 // Skip URLs, anchors, and mailto
@@ -92,14 +94,6 @@ pub fn verify(root: &Path) -> VerifyOutcome {
                     md_dir.join(path_part)
                 };
 
-                // Skip links that resolve into tmp/ (gitignored scratch files)
-                if let Ok(rel) = resolved.strip_prefix(root) {
-                    let first = rel.components().next();
-                    if first.is_some_and(|c| c.as_os_str() == "tmp") {
-                        continue;
-                    }
-                }
-
                 if !resolved.exists() {
                     let rel_md = md_path.strip_prefix(root).unwrap_or(md_path);
                     findings.push(Finding::error(format!(
@@ -118,6 +112,26 @@ pub fn verify(root: &Path) -> VerifyOutcome {
 
 /// Recursively collect all `.md` files under `root`, skipping hidden directories
 /// and common non-doc directories.
+/// Remove inline code spans (`` `...` ``) from a line so that link-like
+/// syntax inside code is not treated as an actual Markdown link.
+fn strip_inline_code(line: &str) -> String {
+    let mut result = String::with_capacity(line.len());
+    let mut chars = line.chars();
+    while let Some(c) = chars.next() {
+        if c == '`' {
+            // Skip until closing backtick
+            for inner in chars.by_ref() {
+                if inner == '`' {
+                    break;
+                }
+            }
+        } else {
+            result.push(c);
+        }
+    }
+    result
+}
+
 fn collect_md_files(root: &Path) -> Result<Vec<std::path::PathBuf>, std::io::Error> {
     let mut result = Vec::new();
     collect_md_files_recursive(root, &mut result)?;
@@ -246,6 +260,15 @@ mod tests {
         write_file(tmp.path(), ".git/hooks/broken.md", "See [x](nonexistent.md).");
         let outcome = verify(tmp.path());
         assert!(outcome.is_ok(), ".git directory should be skipped");
+    }
+
+    #[test]
+    fn test_links_to_tmp_are_detected_as_broken() {
+        let tmp = TempDir::new().unwrap();
+        // Links to tmp/ (gitignored) should be caught as broken
+        write_file(tmp.path(), "knowledge/strategy/plan.md", "See [detail](../../tmp/scratch.md).");
+        let outcome = verify(tmp.path());
+        assert!(outcome.has_errors(), "links to tmp/ should be detected as broken");
     }
 
     #[test]

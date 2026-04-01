@@ -30,4 +30,4 @@ Convention から関連 ADR にリンクするには `## Decision Reference` セ
 ## Decision Reference
 
 - [knowledge/adr/README.md](../../knowledge/adr/README.md) — ADR テンプレート・索引
-- [tmp/knowledge-restructure-design-2026-03-20.md](../../tmp/knowledge-restructure-design-2026-03-20.md) — 元の設計メモ
+- [knowledge-restructure-design-2026-03-20.md](../strategy/knowledge-restructure-design-2026-03-20.md) — 元の設計メモ

@@ -9,7 +9,7 @@
 > **SDD 比較レポート**: `tmp/sdd-comparison-report-2026-03-17.md`（Tsumiki vs CC-SDD vs SoTOHE-core）
 > **ハーネスサーベイ**: `tmp/agent-harness-survey-2026-03-17.md`（Spec Kit, OpenSpec, SpecPulse, ECC, Anthropic 公式, Symphony）
 > **取り込み推奨一覧**: `tmp/adoption-candidates-2026-03-17.md`（全 35 件、ロードマップ付き）
-> **リファクタリング計画**: [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md)（対象タスク + ドメインモデリング + 再発防止メカニズム）
+> **リファクタリング計画**: [`tmp/refactoring-plan-2026-03-19.md`](./refactoring-plan-2026-03-19.md)（対象タスク + ドメインモデリング + 再発防止メカニズム）
 > **レビュープロセス監査**: [`knowledge/research/2026-03-31-2112-review-process-audit.md`](../research/2026-03-31-2112-review-process-audit.md)（RVW-37〜43 採番元、legacy 深刻度再評価）
 > **進捗管理**: [`knowledge/strategy/progress-tracker.md`](progress-tracker.md)（v3）
 
@@ -42,7 +42,7 @@
 
 ### A-3a. Guard 再帰パース強化（bash-write-guard 残留リスク）
 
-- [ ] **SEC-14** (LOW-MEDIUM → HIGH): shell `-c` payload の再帰パース不足 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §3
+- [ ] **SEC-14** (LOW-MEDIUM → HIGH): shell `-c` payload の再帰パース不足 → [詳細](./refactoring-plan-2026-03-19.md) §3
   - **追加根拠** (2026-03-24 CC-SDD-01 review): `bin/sotp` 上書きガード (`guard/policy.rs:191`) がトップレベルコマンドのみ検査するため、`sh -c 'cp target/release/sotp bin/sotp'` でバイパス可能。`-c` payload の再帰パースが必要
 
 - [x] ~~**SEC-15** (LOW-MEDIUM): heredoc body の再帰パース不足~~ ✅ bash-write-guard で対応済み
@@ -114,7 +114,7 @@
   - **課題**: metadata.json がスナップショット型、誰がいつ変更したか不明
   - **提案**: イベントソーシングモデル（Append-only ログ）
 
-- [ ] **SSoT-07** (MEDIUM): SSoT と AI プロンプトの矛盾 — Split-brain (§C-464) → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §5
+- [ ] **SSoT-07** (MEDIUM): SSoT と AI プロンプトの矛盾 — Split-brain (§C-464) → [詳細](./refactoring-plan-2026-03-19.md) §5
 
 - [x] ~~**SSoT-09** (MEDIUM): `TrackDocumentV2` の未知フィールドサイレント消失~~ ✅ 修正済み
   - **対応**: `TrackDocumentV2` に `#[serde(flatten)] pub extra: serde_json::Map<String, Value>` を追加。`DocumentMeta` にも `extra` フィールドを追加し、read-modify-write 全経路で未知フィールドを保全。テスト 3 本追加済み
@@ -428,13 +428,13 @@
 - [x] ~~**WF-35** (HIGH): FORBIDDEN_ALLOW から読み取り専用コマンドを解禁 + git 読み取りコマンド allow 追加~~ ✅ 修正済み
   - **対応**: `head`/`tail`/`wc` を FORBIDDEN_ALLOW から削除し `permissions.allow` + `EXPECTED_OTHER_ALLOW` に移行。git 読み取りコマンド（`git status`, `git diff`, `git log`, `git branch --list`, `git rev-parse`, `git show`, `git ls-files`, `git notes show/list`）も allow 済み。`sort`/`uniq` は `sort -o` の書き込みリスクにより除外を維持
 
-- [ ] **WF-36** (HIGH): Review Escalation Threshold の機構化 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4
+- [ ] **WF-36** (HIGH): Review Escalation Threshold の機構化 → [詳細](./refactoring-plan-2026-03-19.md) §4
 - [x] ~~**WF-43** (CRITICAL): `record-round` → `check-approved` の code_hash 自己参照循環~~ ✅ 修正済み (PR #38)
-- [ ] **WF-62** (~~MEDIUM~~ → LOW, legacy model — production 未使用): `ReviewState::record_round` が Approved→Fast findings_remain で降格しない → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4 (旧 WF-40)
-- [ ] **WF-41** (LOW): `review_from_document` が偽の Fast ラウンドを合成 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4
-- [ ] **WF-38** (LOW): frontmatter パーサーの duplicate key 未検出 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §3
-- [ ] **WF-39** (MEDIUM): `/track:catchup` の責務分割 — bootstrap と briefing の分離 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §4
-- [ ] **WF-37** (MEDIUM): `argv_has_rm` のランチャー後走査が過剰（false positive） → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §3
+- [ ] **WF-62** (~~MEDIUM~~ → LOW, legacy model — production 未使用): `ReviewState::record_round` が Approved→Fast findings_remain で降格しない → [詳細](./refactoring-plan-2026-03-19.md) §4 (旧 WF-40)
+- [ ] **WF-41** (LOW): `review_from_document` が偽の Fast ラウンドを合成 → [詳細](./refactoring-plan-2026-03-19.md) §4
+- [ ] **WF-38** (LOW): frontmatter パーサーの duplicate key 未検出 → [詳細](./refactoring-plan-2026-03-19.md) §3
+- [ ] **WF-39** (MEDIUM): `/track:catchup` の責務分割 — bootstrap と briefing の分離 → [詳細](./refactoring-plan-2026-03-19.md) §4
+- [ ] **WF-37** (MEDIUM): `argv_has_rm` のランチャー後走査が過剰（false positive） → [詳細](./refactoring-plan-2026-03-19.md) §3
 - [x] ~~**WF-54** (MEDIUM): `track-commit-message` の review guard が planning artifacts 初回コミットをブロックする~~ ✅ done (PR #46, ci-guardrails-phase15-2026-03-20)
   - **対応**: (B) を採用。`/track:plan` が metadata.json 作成時に review state `{status: "not_started", groups: {}}` を含める。`check-approved` が `NotStarted && groups.is_empty()` を許可（初回状態のみ、降格後は不可）
 
@@ -517,7 +517,7 @@
   - **方針**: archive, merge, branch cleanup の責務境界を定義し、少なくとも「残す」「削除候補として表示」「手動 cleanup を必須化」のどれかをシステムとして明示する。
 
 - [ ] **STRAT-11** (MEDIUM): 多言語プロジェクト対応 — ハーネスの言語非依存化設計
-  - **詳細設計書**: [`tmp/multi-language-design-2026-03-18.md`](../../tmp/multi-language-design-2026-03-18.md)
+  - **詳細設計書**: [`tmp/multi-language-design-2026-03-18.md`](./multi-language-design-2026-03-18.md)
   - **背景**: ハーネスの核は言語非依存だが、CI ゲート・ルール・レイヤーチェックが Rust にハードコード。他言語プロジェクトでの利用が困難
   - **方針**: 言語固有部分をプラグイン的に差し替え可能な設計へ移行（`harness.toml` + `.claude/rules/lang/` + 言語別 CI タスク）
   - **実装ロードマップ**: Phase A（設定ファイル）→ B（ルール分離）→ C（CI ディスパッチ）→ D（テンプレートジェネレータ）
@@ -553,12 +553,12 @@
 
 > **分析レポート**: `knowledge/research/gemini-gap-analysis-2026-03-18.md`
 > Phase 配置は [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md) Phase 4-5 を参照
-> リファクタリング関連 (GAP-03/04) は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §5 を参照
+> リファクタリング関連 (GAP-03/04) は [`tmp/refactoring-plan-2026-03-19.md`](./refactoring-plan-2026-03-19.md) §5 を参照
 
 - [x] ~~**GAP-01** (HIGH): `DocumentMeta` タイムスタンプの型化 (`String` → `chrono::DateTime<Utc>`)~~ ✅ done (PR #42)
 - [ ] **GAP-02** (MEDIUM): PR State Machine をドメイン層に導入 → Phase 5
 - [x] ~~**GAP-03** (LOW): `ReviewVerdict` / `ReviewPayloadVerdict` の重複~~ ✅ DM-01 で統合済み (PR #42)
-- [ ] **GAP-04** (MEDIUM): `StatusOverride` の表現力不足 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §5
+- [ ] **GAP-04** (MEDIUM): `StatusOverride` の表現力不足 → [詳細](./refactoring-plan-2026-03-19.md) §5
 - [x] ~~**GAP-05** (HIGH): `is_test_file` のパス正規化欠如~~ ✅ done (PR #39)
 - [x] ~~**GAP-06** (LOW): `#![forbid(unsafe_code)]` 設定~~ ✅ done (PR #39)
 - [ ] **GAP-07** (MEDIUM): `AgentId` 衝突防止 (UUID v7 or PID+timestamp) → Phase 4
@@ -572,7 +572,7 @@
 ## 優先順位・実行計画
 
 > Tier 分類と Phase 配置は [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md) に統合済み。
-> リファクタリング関連の導入順序は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §10 を参照。
+> リファクタリング関連の導入順序は [`tmp/refactoring-plan-2026-03-19.md`](./refactoring-plan-2026-03-19.md) §10 を参照。
 > 解決済み項目の詳細は `tmp/TODO-archived-2026-03-16.md` を参照。
 
 ---
@@ -584,7 +584,7 @@
 - [ ] **SKILL.md と commands の重複解消** (MEDIUM) — `.claude/skills/track-plan/SKILL.md` と `.claude/commands/track/plan.md` に実行手順が重複しており、片方を更新するともう片方が古くなる。SKILL.md はスキルルーター用 description + Phase 概要のみに縮退し、実行仕様は commands に委譲する。他の track:* スキル/コマンドペアも同様に整理
 - [ ] **`/track:hotfix` コマンド** (MEDIUM) — ドキュメントのみ・1 ファイル修正などの軽微な変更にレビューサイクルをスキップして直接コミット可能にする。対象ファイルパターン（`*.md`, `LICENSE` 等）で許可範囲を制限。現状は README 1 行変更でもトラック作成 → レビュー → PR → マージが必要でオーバーヘッドが大きい
 - [ ] **LICENSE ファイル追加** (LOW) — `LICENSE-MIT` + `LICENSE-APACHE` を作成し、全 `Cargo.toml` の `license` フィールドに `MIT OR Apache-2.0` を設定
-- [ ] **TDD 状態マシンの強制** (HIGH) — `metadata.json` の task に `tdd_phase: red|green|refactor` を追加し、`sotp tdd advance` で CI 証拠付きの遷移を強制。Red→Green は CI fail 証拠、Green→Refactor は CI pass 証拠が必要。commit guard は `tdd_required` タスクの `tdd_phase` 完了を検査。→ [詳細](../../tmp/refactoring-plan-2026-03-19.md) §0-7。関連: HARNESS-03, WORKFLOW-04
+- [ ] **TDD 状態マシンの強制** (HIGH) — `metadata.json` の task に `tdd_phase: red|green|refactor` を追加し、`sotp tdd advance` で CI 証拠付きの遷移を強制。Red→Green は CI fail 証拠、Green→Refactor は CI pass 証拠が必要。commit guard は `tdd_required` タスクの `tdd_phase` 完了を検査。→ [詳細](./refactoring-plan-2026-03-19.md) §0-7。関連: HARNESS-03, WORKFLOW-04
 - [ ] **Yes/No 承認ダイアログの最小化** — `permissions.allow` に wrapper を事前登録。WF-35 (FORBIDDEN_ALLOW 緩和) で一部対応済み
 - [ ] **/track:review の reviewer provider 移譲強制** — hook で外部 subprocess 呼び出しを検証。関連: CLAUDE-BP-02, 10-guardrails.md
 - [ ] **track-local-review 出力改善** — verdict JSON を `tmp/reviews/<track-id>/round-<N>.json` に自動保存。関連: RVW-07
@@ -600,7 +600,7 @@
 
 ## CLI エラーハンドリング改善（未完了分）
 
-> 詳細は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §7 を参照
+> 詳細は [`tmp/refactoring-plan-2026-03-19.md`](./refactoring-plan-2026-03-19.md) §7 を参照
 
 - [ ] **ERR-09b** (MEDIUM): `activate.rs` (1000行超) のモジュール分割 → `branch.rs` / `preflight.rs` / `resume.rs`
 - [ ] **ERR-11** (LOW): `tracing` クレート導入（前提: `tech-stack.md` 更新）
@@ -613,7 +613,7 @@
 
 ## HUMAN_MEMO.md からの追加項目（2026-03-15 整理）
 
-> コード品質・責務分離の詳細は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §6 を参照
+> コード品質・責務分離の詳細は [`tmp/refactoring-plan-2026-03-19.md`](./refactoring-plan-2026-03-19.md) §6 を参照
 
 ### 並行処理・ファイル競合
 
@@ -680,7 +680,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 
 ## 外部フレームワーク取り込み候補（HARNESS/Tsumiki/CC-SDD/WORKFLOW/CLAUDE-BP）
 
-> 詳細は [`tmp/adoption-candidates-2026-03-17.md`](../../tmp/adoption-candidates-2026-03-17.md) を参照
+> 詳細は [`tmp/adoption-candidates-2026-03-17.md`](./adoption-candidates-2026-03-17.md) を参照
 > Phase 配置は [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md) を参照
 
 **Harness Engineering Best Practices 2026**:
@@ -733,7 +733,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 
 **Claude Code Best Practices (公式)**:
 - [ ] **CLAUDE-BP-01** (MEDIUM): PreCompact 圧縮保存指示強化
-- [ ] **CLAUDE-BP-02** (MEDIUM): Writer/Reviewer 分離 → [詳細](../../tmp/refactoring-plan-2026-03-19.md) §8
+- [ ] **CLAUDE-BP-02** (MEDIUM): Writer/Reviewer 分離 → [詳細](./refactoring-plan-2026-03-19.md) §8
 - [ ] **CLAUDE-BP-03** (LOW): Custom status line
 - [ ] **CLAUDE-BP-04** (LOW): Fan-out バッチパターン
 - [ ] **CLAUDE-BP-05** (MEDIUM): 2 回修正失敗 → /clear ルール化
@@ -742,7 +742,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 
 ## L. レビューサイクル品質改善 (RVW)
 
-> 詳細は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §2 を参照
+> 詳細は [`tmp/refactoring-plan-2026-03-19.md`](./refactoring-plan-2026-03-19.md) §2 を参照
 
 - [ ] **RVW-01** (HIGH): 共通 Frontmatter パーサー抽出 → `frontmatter.rs`
 - [ ] **RVW-02** (HIGH): conch-parser AST 直接走査による hand-rolled shell 解析の廃止
@@ -785,7 +785,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 
 ## K. ドメインモデリング強化 (DM)
 
-> 詳細は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §0 を参照
+> 詳細は [`tmp/refactoring-plan-2026-03-19.md`](./refactoring-plan-2026-03-19.md) §0 を参照
 > Phase 配置: Phase 1.5 (1.5-1〜1.5-3)
 
 - [x] ~~**DM-01** (HIGH): `ReviewRoundResult::verdict: String` → `Verdict` enum（+ GAP-03 統合）~~ ✅ done (PR #42)
@@ -797,7 +797,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 
 ## J. CLI コマンド層の肥大化・ロジック流出 (CLI)
 
-> 詳細は [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md) §1 を参照
+> 詳細は [`tmp/refactoring-plan-2026-03-19.md`](./refactoring-plan-2026-03-19.md) §1 を参照
 
 - [ ] **CLI-01** (HIGH): `pr.rs` (1432行) の review polling/parsing を usecase 層に移動 → 目標 ~500行
 - [x] ~~**CLI-02** (HIGH): `review.rs` (~2300行) の record-round/check-approved/resolve-escalation を usecase 層に移動 → 目標 ~700行~~ ✅ review-usecase-extraction-2026-03-20 + cli-review-module-split-2026-03-22 で完了。4ファイル分割、port traits を usecase に配置、hexagonal architecture convention 追加

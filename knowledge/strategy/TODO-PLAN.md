@@ -55,7 +55,7 @@ Phase 5        ワークフロー最適化
 
 ## Phase 1.5: ハーネス自身のコード品質改善（▶ 進行中）
 
-> **詳細計画**: [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md)
+> **詳細計画**: [`tmp/refactoring-plan-2026-03-19.md`](./refactoring-plan-2026-03-19.md)
 > **Review 改善計画**: [`knowledge/strategy/rvw-remediation-plan.md`](../../knowledge/strategy/rvw-remediation-plan.md)（Phase A-J、58 件、~13-16 日）
 
 **目標**: CLI 肥大化解消 + domain 型化。テンプレート開発の生産性向上。
