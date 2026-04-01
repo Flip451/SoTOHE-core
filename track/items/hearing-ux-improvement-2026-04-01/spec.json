@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "TSUMIKI-05/06/07 ヒアリング UX 改善",
+  "goal": [
+    "/track:plan skill のヒアリング UX を tsumiki の優れたパターンに基づいて改善する。",
+    "構造化質問（AskUserQuestion + multiSelect）、作業規模選定（Full/Focused/Quick）、ヒアリング記録（hearing_history）を導入し、",
+    "Phase 3（テスト生成パイプライン）に渡す spec の入力品質を向上させる。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "SKILL.md Phase 1 の前に Step 0（モード選択）を挿入: Full/Focused/Quick の 3 モード",
+        "sources": [
+          "tsumiki kairo-requirements Stage 2 (Full/Lightweight/Custom)",
+          "knowledge/research/tsumiki-hearing-deep-dive-2026-04-01.md §6 Priority 2"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "Focused/Quick モードでの Phase 1.5（planner review）・Phase 2（Agent Teams）スキップを明示的例外として定義",
+        "sources": [
+          "knowledge/research/2026-04-01-1546-planner-hearing-ux.md §2 TSUMIKI-06 Q2/Q3"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "HearingMode enum (Full/Focused/Quick), HearingSignalSnapshot, HearingSignalDelta, HearingRecord を domain 層に追加",
+        "sources": [
+          "knowledge/research/2026-04-01-1546-planner-hearing-ux.md §Canonical Blocks"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "spec.json に hearing_history フィールドを追加（append-only、content_hash 計算から除外）",
+        "sources": [
+          "knowledge/research/tsumiki-hearing-deep-dive-2026-04-01.md §6 Priority 3",
+          "knowledge/research/2026-04-01-1546-planner-hearing-ux.md §2 TSUMIKI-07 Q1/Q4"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "render_spec() に Hearing History セクション追加（最新 5 件テーブル）",
+        "sources": [
+          "knowledge/research/2026-04-01-1546-planner-hearing-ux.md §2 TSUMIKI-07 Q3"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "SKILL.md Step 4a を AskUserQuestion + multiSelect パターンに書き換え（カテゴリ別バッチ、5 項目上限/回）",
+        "sources": [
+          "tsumiki kairo-requirements Stage 4 (AskUserQuestion + multiSelect)",
+          "knowledge/research/tsumiki-hearing-deep-dive-2026-04-01.md §6 Priority 1"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "Modify 選択時の個別フォロー AskUserQuestion によるテキスト取得",
+        "sources": [
+          "knowledge/research/2026-04-01-1546-planner-hearing-ux.md §2 TSUMIKI-05 Q3"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "EARS 記法の導入（CC-SDD-03、Phase 3 候補）",
+        "sources": [
+          "knowledge/strategy/TODO-PLAN.md Phase 3"
+        ]
+      },
+      {
+        "text": "シグナル伝播 spec→task（TSUMIKI-08、Phase 3）",
+        "sources": [
+          "knowledge/strategy/TODO-PLAN.md 3-13"
+        ]
+      },
+      {
+        "text": "spec.json schema_version の変更（1 のまま後方互換追加）",
+        "sources": [
+          "inference — 既存フィールドパターンに準拠"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "TSUMIKI-05/06 は SKILL.md プロンプト改修のみ（Rust コード変更なし）",
+      "sources": [
+        "knowledge/strategy/TODO-PLAN.md Phase 2b"
+      ]
+    },
+    {
+      "text": "TSUMIKI-07 は domain + infrastructure + render の 3 層変更が必要",
+      "sources": [
+        "knowledge/research/2026-04-01-1546-planner-hearing-ux.md §1"
+      ]
+    },
+    {
+      "text": "hearing_history は content_hash 計算から除外すること（approval 無効化防止）",
+      "sources": [
+        "knowledge/research/2026-04-01-1546-planner-hearing-ux.md §3 TSUMIKI-07"
+      ]
+    },
+    {
+      "text": "hearing_history は append-only（削除・変更メソッドなし）",
+      "sources": [
+        "knowledge/research/2026-04-01-1546-planner-hearing-ux.md §2 TSUMIKI-07 Q4"
+      ]
+    },
+    {
+      "text": "既存の差分ヒアリング spec.json 更新ロジック（source tagging rules）を維持すること",
+      "sources": [
+        "knowledge/research/2026-04-01-1546-planner-hearing-ux.md §1 TSUMIKI-05"
+      ]
+    }
+  ],
+  "domain_states": [],
+  "acceptance_criteria": [
+    {
+      "text": "/track:plan 実行時に Full/Focused/Quick モード選択が AskUserQuestion で提示される",
+      "sources": [
+        "tsumiki kairo-requirements Stage 2"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "Focused モードで Phase 1.5（planner review）と Phase 2（Agent Teams）がスキップされる",
+      "sources": [
+        "knowledge/research/2026-04-01-1546-planner-hearing-ux.md §2 TSUMIKI-06 Q2/Q3"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "spec.json が存在しない場合に Focused/Quick を選択すると Full にフォールバックする",
+      "sources": [
+        "knowledge/research/2026-04-01-1546-planner-hearing-ux.md §3 TSUMIKI-06"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "HearingRecord の codec roundtrip テストが通る（encode → decode で同一）",
+      "sources": [
+        "convention — .claude/rules/05-testing.md"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "hearing_history 付き spec.json を content_hash 計算しても、hearing_history の追加で hash が変化しない",
+      "sources": [
+        "knowledge/research/2026-04-01-1546-planner-hearing-ux.md §3 TSUMIKI-07"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "hearing_history が空の旧 spec.json ファイルが正常にデシリアライズされる（後方互換）",
+      "sources": [
+        "inference — schema_version 1 維持の制約"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "render_spec() が hearing_history を最新 5 件のテーブルとして出力する",
+      "sources": [
+        "knowledge/research/2026-04-01-1546-planner-hearing-ux.md §2 TSUMIKI-07 Q3"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "差分ヒアリングの Yellow/Red/Missing 項目が AskUserQuestion + multiSelect で提示される（カテゴリ別バッチ、5 項目上限）",
+      "sources": [
+        "tsumiki kairo-requirements Stage 4",
+        "knowledge/research/2026-04-01-1546-planner-hearing-ux.md §2 TSUMIKI-05 Q1"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "cargo make ci が全チェック通過する",
+      "sources": [
+        "convention — .claude/rules/07-dev-environment.md"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "knowledge/conventions/source-attribution.md"
+  ],
+  "signals": {
+    "blue": 22,
+    "yellow": 2,
+    "red": 0
+  }
+}

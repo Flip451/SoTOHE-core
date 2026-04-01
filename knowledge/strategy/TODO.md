@@ -701,6 +701,13 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [x] ~~**TSUMIKI-02** (MEDIUM): ソース帰属~~ ✅ Phase 1 完了
 - [x] ~~**TSUMIKI-03** (MEDIUM): 差分ヒアリング~~ ✅ done (`diff-hearing-2026-03-27`)
 - [ ] **TSUMIKI-04** (MEDIUM): TDD 完了時の要件網羅率 → Phase 3
+- [ ] **TSUMIKI-05** (MEDIUM): 構造化ヒアリング UX — AskUserQuestion + multiSelect による選択肢型質問。自由記述 Markdown から構造化質問へ移行 → Phase 2b
+  - **出典**: `knowledge/research/tsumiki-hearing-deep-dive-2026-04-01.md` §6 Priority 1
+- [ ] **TSUMIKI-06** (LOW): ヒアリング作業規模選定 — Full/Focused/Quick モードで /track:plan のヒアリング深度を選択 → Phase 2b
+  - **出典**: tsumiki kairo-requirements Stage 2 (Full/Lightweight/Custom)
+- [ ] **TSUMIKI-07** (LOW): ヒアリング記録 — spec.json に hearing_history を追加し、ヒアリングプロセスの信号変化を追跡可能にする → Phase 2b
+  - **出典**: tsumiki interview-record.md パターン
+- [ ] **TSUMIKI-08** (MEDIUM): シグナル伝播 — spec.json の信号を metadata.json タスクに worst-case 伝播。🔴依存タスクの implementing 遷移をブロック → Phase 3
 
 **CC-SDD フレームワーク**:
 - [x] **CC-SDD-01** (HIGH): 要件-タスク双方向トレーサビリティ — ✅ done (PR #60, track: req-task-traceability-2026-03-24)
