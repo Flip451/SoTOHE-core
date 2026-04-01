@@ -21,7 +21,8 @@
 Phase 0 (✅)   基盤: shell wrapper Rust 化
 Phase 1 (✅)   クイックウィン: 事故予防 + spec テンプレート基盤
 Phase 1.5 (▶)  ハーネス自身のコード品質改善（CLI 肥大化解消 + domain 型化）
-Phase 2        仕様品質: 信号機 + トレーサビリティ（テスト生成の入力品質保証）
+Phase 2 (✅)   仕様品質: 信号機 + トレーサビリティ（テスト生成の入力品質保証）
+Phase 2b       ヒアリング UX 改善: 構造化質問 + モード選択 + プロセス記録（Phase 3 の入力品質向上）
 Phase 3        テンプレートツール: spec → テスト生成パイプライン + BRIDGE-01 ← Moat
 Phase 4        インフラ: 必要最小限
 Phase 5        ワークフロー最適化
@@ -170,6 +171,28 @@ Stage 2 (Track B = 2-2):
 
 ---
 
+## Phase 2b: ヒアリング UX 改善（Phase 3 の入力品質向上）
+
+**目標**: Phase 3 のテスト生成パイプラインに渡す spec の品質を、ヒアリング UX の改善で底上げする。
+Phase 2 で構築した信号機基盤の上に、tsumiki の優れた UX パターンを取り込む。
+
+**背景**: `knowledge/research/tsumiki-hearing-deep-dive-2026-04-01.md` の分析で、
+SoTOHE-core は信号機バックエンド（型付き・決定論的・検証付き）で tsumiki を超えているが、
+ヒアリング UX（構造化質問・モード選択・プロセス記録）が大幅に弱いことが判明。
+Phase 3 の設計品質に直結するため、Phase 3 開始前に投資する。
+
+**スコープ**: SKILL.md プロンプト改修（TSUMIKI-05/06）+ spec.json スキーマ拡張と Rust domain/infra/render 実装（TSUMIKI-07）。
+
+| # | 項目 | 難易度 | 状態 |
+|---|---|---|---|
+| 2b-1 | **TSUMIKI-05** 構造化ヒアリング UX — AskUserQuestion + multiSelect で 🟡/🔴/❌ 項目を選択肢型質問に変換。自由記述 Markdown 壁からの脱却 | S | 未着手 |
+| 2b-2 | **TSUMIKI-06** ヒアリング作業規模選定 — Full/Focused/Quick モード。小機能で全フロー実行を回避 | S | 未着手 |
+| 2b-3 | **TSUMIKI-07** ヒアリング記録 — spec.json に `hearing_history` 追加。信号変化デルタ・質問数・追加/修正項目数を記録 | S | 未着手 |
+
+**依存関係**: Phase 2（信号機 + spec.json SSoT）完了が前提。Phase 1.5 の残タスクとは独立。
+
+---
+
 ## Phase 3: テンプレートツール — テスト生成パイプライン（Moat）
 
 **目標**: テンプレートが生成するプロジェクトに対して、spec → テスト自動生成の仕組みを提供する。
@@ -196,6 +219,7 @@ Stage 2 (Track B = 2-2):
 | 3-10 | WF-47/50/53 findings 自動配線 | M | review 改善 |
 | 3-11 | WF-49 streak リセット | S | 監査証跡 |
 | 3-12 | **spec ↔ code 整合性チェック** | M | spec の Domain States と code の domain 型の一致を検証。BRIDGE-01 の出力と spec.md の Domain States セクションを突合し、未実装・不一致を検出 |
+| 3-13 | **TSUMIKI-08** シグナル伝播 — spec.json 信号 → metadata.json タスクへ worst-case 伝播。🔴依存タスクの implementing 遷移ブロック | M | CC-SDD-01 トレーサビリティ + TSUMIKI-01 信号機の統合。task_refs 逆引きで実現 |
 
 ### テンプレートが推奨する生成プロジェクトの設計
 
@@ -246,6 +270,8 @@ Phase 1.5 (▶ ハーネス自身の品質改善)
     ↓ domain 型化完了、CLI が薄くなる
 Phase 2 (✅ 仕様品質 — テスト生成の入力品質)
     ↓ 信号機 + Domain States + トレーサビリティが整う
+Phase 2b (ヒアリング UX — Phase 3 の spec 入力品質向上)
+    ↓ 構造化質問 + モード選択で spec の精度向上
 Phase 3 (テスト生成パイプライン) ← Moat
     ↓ テンプレートが「spec → テスト → 実装」を提供
 Phase 4 (インフラ)  Phase 5 (ワークフロー)  ← 並行可能
@@ -261,9 +287,10 @@ Phase 4 (インフラ)  Phase 5 (ワークフロー)  ← 並行可能
 |---|---|---|---|
 | 1.5 | 30 | 12 | 3.5 日 |
 | 2 | 7 | 0 | — |
-| 3 | 12 | 12 | 5 日 |
+| 2b | 3 | 3 | 1 日 |
+| 3 | 13 | 13 | 5.5 日 |
 | 4 | 8 | 6 | 3 日 |
 | 5 | 7 | 7 | 3 日 |
-| **合計** | **64** | **37** | **~14.5 日** |
+| **合計** | **68** | **41** | **~16 日** |
 
-> 更新: 2026-03-31。Phase 1.5: 全30項目（18 done, 11 未着手, 1 planned）。Phase 2: ✅ 全完了（TSUMIKI-03 done by `diff-hearing-2026-03-27`）。1.5-25 (review.json 分離) done by `review-json-per-group-review` + `autorecord-reviewjson-wiring`。1.5-28 (WF-59 manifest hash) done by `autorecord-stabilization`。
+> 更新: 2026-04-01。Phase 2b 新設（TSUMIKI-05/06/07、ヒアリング UX 改善 3 件）。Phase 3 に 3-13 TSUMIKI-08（シグナル伝播）追加。出典: `knowledge/research/tsumiki-hearing-deep-dive-2026-04-01.md`。

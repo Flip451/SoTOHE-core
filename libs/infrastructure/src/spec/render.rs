@@ -190,6 +190,26 @@ pub fn render_spec(doc: &SpecDocument) -> String {
     let summary = render_signal_summary(doc);
     out.push_str(&summary);
 
+    // Hearing History (TSUMIKI-07) — last 5 entries, most recent first.
+    let history = doc.hearing_history();
+    if !history.is_empty() {
+        out.push_str("## Hearing History\n");
+        out.push('\n');
+        out.push_str("| Date | Mode | Questions | Added | Modified |\n");
+        out.push_str("|------|------|-----------|-------|----------|\n");
+        for record in history.iter().rev().take(5) {
+            out.push_str(&format!(
+                "| {} | {} | {} | {} | {} |\n",
+                record.date(),
+                record.mode().as_str(),
+                record.questions_asked(),
+                record.items_added(),
+                record.items_modified(),
+            ));
+        }
+        out.push('\n');
+    }
+
     out
 }
 

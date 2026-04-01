@@ -48,7 +48,54 @@ Track Workflow との連携：
 
 ---
 
+## Phase 0: MODE SELECTION（ヒアリング作業規模選定 — TSUMIKI-06）
+
+既存の `spec.json` が見つかった場合、ヒアリングの深度をユーザーに選択させる。
+新規 track（spec.json なし）の場合は自動的に Full モードにフォールバックし、このステップをスキップする。
+
+```
+AskUserQuestion:
+  question: |
+    このトラックには既存の spec.json があります（signals: {blue}/{yellow}/{red}、最終更新: {date}）。
+    ヒアリングの深度を選択してください。
+  options:
+    - "Full — 全フェーズ実行（researcher + planner + 差分ヒアリング）"
+    - "Focused — 研究/設計フェーズをスキップし、差分ヒアリングのみ実施"
+    - "Quick — Blue サマリーを表示し、変更点のみ自由記述で受け付ける"
+```
+
+#### モード別フェーズスキップ定義
+
+| フェーズ | Full | Focused | Quick |
+|---------|------|---------|-------|
+| Phase 1 Step 1-2（researcher） | ✅ 実行 | ❌ スキップ | ❌ スキップ |
+| Phase 1 Step 3（spec.json 分類） | ✅ 実行 | ✅ 実行 | ✅ 実行（Blue サマリー生成に必要） |
+| Phase 1 Step 4（差分ヒアリング） | ✅ 実行 | ✅ 実行 | 簡易版（※） |
+| Phase 1 Step 5（tech-stack） | ✅ 実行 | ⚠️ 警告のみ | ❌ スキップ |
+| Phase 1.5（planner review） | ✅ 実行 | ❌ スキップ | ❌ スキップ |
+| Phase 2（Agent Teams） | ✅ 実行 | ❌ スキップ | ❌ スキップ |
+| Phase 3（計画統合・承認） | ✅ 実行 | ✅ 実行 | ✅ 実行 |
+
+（※）Quick モードの Step 4: Blue 項目のサマリーを表示し「変更がある項目はありますか？」と自由記述で質問する。
+構造化質問（AskUserQuestion + multiSelect）は使わない。
+ユーザーが変更を申告した場合は spec.json を更新し、**Step 4a と同じ信号再評価パイプライン**を実行する:
+1. `bin/sotp track signals <track-id>` — Stage 1 信号再計算
+2. `bin/sotp track domain-state-signals <track-id>` — domain_states がある場合
+3. `cargo make track-sync-views` — spec.md + plan.md + registry.md 再生成
+
+**Phase 1.5 スキップの明示的例外**: SKILL.md Phase 1.5 は「すべての機能で planner capability による設計レビューを実施する」と定義しているが、
+Focused/Quick モードは既存 spec の軽微な更新を目的としており、アーキテクチャ変更を伴わないため例外とする。
+ヒアリング中にアーキテクチャ変更が判明した場合は、Full モードで再実行すること。
+
+**spec.json 未検出時のフォールバック**: spec.json が存在しない場合、Focused/Quick は適用不可のため Full モードに自動フォールバックする。
+ユーザーには「新規 track のため Full モードで実行します」と通知する。
+
+---
+
 ## Phase 1: UNDERSTAND（researcher capability + Claude Lead）
+
+> **注**: Focused モードでは Step 1-2 をスキップし、Step 3 から開始する。
+> Quick モードでは Step 1-2 をスキップし、Step 3（分類）→ Step 4（簡易版）を実行する。
 
 ### Step 1: Version Baseline Research with active `researcher` capability (必須)
 
@@ -137,26 +184,100 @@ ls track/items/
 
 ### Step 4: Requirements Gathering（差分ヒアリング対応）
 
-#### 4a. 差分ヒアリングモード（既存 spec.json あり）
+> **Quick モード**: 以下の 4a/4b をスキップし、代わりに Blue 項目のサマリーを表示して
+> 「変更がある項目はありますか？新しく追加したい項目はありますか？」と自由記述で質問する。
+> ユーザーの回答があれば spec.json を更新し、なければそのまま Phase 3 に進む。
 
-Step 3a の分類結果に基づき、🟡🔴❌ の項目のみをユーザーに質問する：
+#### 4a. 差分ヒアリングモード（既存 spec.json あり — Full/Focused モード、TSUMIKI-05）
 
-```markdown
-## 差分ヒアリング: {feature}
+Step 3a の分類結果に基づき、構造化質問（AskUserQuestion + multiSelect）で🟡🔴❌の項目をユーザーに確認する。
 
-### 確定済み項目（Blue — 変更なければスキップ）
-- {Blue 項目のリスト — source tag 付き}
-> 上記は前回の仕様から変更がなければそのまま引き継ぎます。変更がある場合はお知らせください。
+##### 4a-1. Blue 項目サマリー（インタラクティブではない）
 
-### 確認が必要な項目（Yellow — 推定に基づく）
-{Yellow 項目ごとに、推定の根拠と確認質問を提示}
+まず確定済み（Blue）項目の要約を表示する：
 
-### 議論が必要な項目（Red — 根拠なし）
-{Red 項目ごとに、具体的な質問を提示}
-
-### 不足している可能性がある項目
-{コード分析・convention から検出された欠落候補}
 ```
+🔵 確定済み項目（{N} 件）— 変更なければそのまま引き継ぎます:
+- {Blue 項目 1} [source: ...]
+- {Blue 項目 2} [source: ...]
+...
+変更がある項目がある場合は、以降の質問で「上記の確定済み項目に変更あり」を選んでください。
+```
+
+##### 4a-2. Yellow 項目の確認（AskUserQuestion バッチ）
+
+Yellow 項目をカテゴリ別バッチ（**最大 5 項目/回**）で質問する。
+
+```
+AskUserQuestion:
+  question: |
+    以下の項目は推定に基づいています。確認してください。
+    1. {Yellow 項目テキスト} [source: {推定根拠}]
+    2. {Yellow 項目テキスト} [source: {推定根拠}]
+    ...
+  options:
+    - "全て確認 — 現状のまま承認"
+    - "1 を修正したい"
+    - "2 を修正したい"
+    ...
+    - "項目を削除したい（番号を指定）"
+    - "上記の確定済み項目（Blue）にも変更あり"
+```
+
+「修正したい」が選ばれた項目には、個別にフォローアップ質問を行う：
+
+```
+AskUserQuestion:
+  question: |
+    項目「{Yellow 項目テキスト}」をどう修正しますか？
+  options:
+    - "{修正候補 A — コンテキストから推定}"
+    - "{修正候補 B — コンテキストから推定}"
+    - "その他（自由記述）"
+```
+
+「その他」が選ばれた場合は自由記述で回答を受け取る。
+
+##### 4a-3. Red 項目の議論（AskUserQuestion バッチ）
+
+Red 項目（根拠なし）をバッチで質問する。各項目にコンテキストベースの選択肢 2-3 個を生成する。
+
+```
+AskUserQuestion:
+  question: |
+    以下の項目は根拠がありません。方針を決めてください。
+    1. {Red 項目テキスト}
+  options:
+    - "{具体的な選択肢 A — コードベース/convention から推定}"
+    - "{具体的な選択肢 B — 一般的なベストプラクティス}"
+    - "この項目を削除"
+    - "その他（自由記述）"
+```
+
+##### 4a-4. Missing 項目の補完（AskUserQuestion バッチ）
+
+欠落候補をバッチで質問する。
+
+```
+AskUserQuestion:
+  question: |
+    以下の項目が仕様から欠落している可能性があります。
+    1. {欠落候補の説明}
+    2. {欠落候補の説明}
+  options:
+    - "1 を spec に追加"
+    - "2 を spec に追加"
+    - "両方追加"
+    - "追加不要"
+    - "詳しく教えてほしい"
+```
+
+「詳しく教えてほしい」が選ばれた項目は、追加の説明を提示した上で再質問する。
+
+##### 4a-5. ショートサーキット
+
+全項目が Blue（Yellow/Red/Missing が 0 件）の場合、4a-2〜4a-4 をスキップし、
+Blue サマリーのみ表示して「変更がありますか？」と自由記述で質問する（Quick モード相当）。
 
 ユーザーの回答後、以下の手順で `spec.json` を更新する：
 
@@ -194,9 +315,13 @@ Step 3a の分類結果に基づき、🟡🔴❌ の項目のみをユーザー
 4. テスト戦略（ユニット・統合・E2E）は？
 5. パフォーマンス要件は？
 
-### Step 5: Interactive Tech Stack Setup (必須)
+### Step 5: Interactive Tech Stack Setup (Full モード: 必須 / Focused: 警告のみ / Quick: スキップ)
 
-`track/tech-stack.md` を開き、以下をユーザーと対話して更新する：
+> **Focused モード**: `track/tech-stack.md` に `TODO:` が残っていても警告のみで続行する。
+> ヒアリング内容が tech-stack に関わる場合はユーザーに通知し、Full モードでの再実行を推奨する。
+> **Quick モード**: このステップをスキップする。
+
+`track/tech-stack.md` を開き、以下をユーザーと対話して更新する（Full モード）：
 1. Rust Edition（2024固定）と MSRV
 2. Web フレームワーク
 3. DB ライブラリ / DB / マイグレーション
@@ -204,13 +329,16 @@ Step 3a の分類結果に基づき、🟡🔴❌ の項目のみをユーザー
 5. 認証方式
 6. 設定管理方式
 
-`TODO:` が 1つでも残っている場合、Phase 2 に進まない。
+Full モード: `TODO:` が 1つでも残っている場合、Phase 2 に進まない。
 
 ---
 
 ## Phase 1.5: DESIGN REVIEW（planner capability — 必須）
 
-**難易度にかかわらず、すべての機能で planner capability による設計レビューを実施する。**
+> **Focused/Quick モードではこの Phase をスキップする。**
+> ヒアリング中にアーキテクチャ変更が判明した場合は Full モードで再実行すること。
+
+**Full モードでは、難易度にかかわらず、すべての機能で planner capability による設計レビューを実施する。**
 「S 難易度」「プロンプト変更のみ」であっても、実装の前に planner に以下を確認させる：
 
 1. 変更が影響する**全てのデータフロー**（読込→処理→永続化→再評価）を列挙
@@ -232,7 +360,9 @@ planner の出力は `knowledge/research/{YYYY-MM-DD-HHMM}-planner-{feature}.md`
 
 ## Phase 2: RESEARCH & DESIGN（Agent Teams — Parallel）
 
-Claude Code Agent Teams を使って並列実行する：
+> **Focused/Quick モードではこの Phase をスキップする。**
+
+Claude Code Agent Teams を使って並列実行する（Full モードのみ）：
 
 ```
 Spawn two teammates:
@@ -265,7 +395,8 @@ Teammate 2 — Planner / Architect capability（既定 profile では Codex CLI 
 ### Step 1: Synthesize Results
 
 Researcher と Architect の結果を統合する。
-`track/tech-stack.md` に `TODO:` が残っている場合はここで停止し、ユーザーに確認する。
+**Full モードのみ**: `track/tech-stack.md` に `TODO:` が残っている場合はここで停止し、ユーザーに確認する。
+Focused/Quick モードでは `TODO:` 残存は警告のみで続行する（Step 5 と同じポリシー）。
 
 **Canonical Block preservation rule:**
 When copying `planner` capability output into `plan.md` or `DESIGN.md`, copy every block inside
