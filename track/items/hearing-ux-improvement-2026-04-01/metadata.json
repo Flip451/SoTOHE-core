@@ -76,7 +76,7 @@
     {
       "description": "TSUMIKI-07 HearingRecord — Rust domain + infra + render 実装（TDD）",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "TSUMIKI-05 構造化質問 — SKILL.md Step 4a を AskUserQuestion + multiSelect に書き換え",
@@ -90,5 +90,5 @@
     }
   ],
   "title": "TSUMIKI-05/06/07 ヒアリング UX 改善",
-  "updated_at": "2026-04-01T07:38:25Z"
+  "updated_at": "2026-04-01T08:20:03Z"
 }

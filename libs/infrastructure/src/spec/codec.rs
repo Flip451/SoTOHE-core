@@ -3,8 +3,9 @@
 //! Mirrors the pattern of `crate::track::codec` but for the spec document schema.
 
 use domain::{
-    ConfidenceSignal, DomainStateEntry, DomainStateSignal, SignalCounts, SpecDocument,
-    SpecRequirement, SpecScope, SpecSection, SpecStatus, SpecValidationError, TaskId, Timestamp,
+    ConfidenceSignal, DomainStateEntry, DomainStateSignal, HearingMode, HearingRecord,
+    HearingSignalDelta, HearingSignalSnapshot, SignalCounts, SpecDocument, SpecRequirement,
+    SpecScope, SpecSection, SpecStatus, SpecValidationError, TaskId, Timestamp,
 };
 use serde::{Deserialize, Serialize};
 
@@ -66,6 +67,26 @@ struct SpecDocumentDto {
     pub approved_at: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub content_hash: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub hearing_history: Vec<HearingRecordDto>,
+}
+
+/// DTO for a hearing session record.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct HearingRecordDto {
+    pub date: String,
+    pub mode: String,
+    pub signal_delta: HearingSignalDeltaDto,
+    pub questions_asked: u32,
+    pub items_added: u32,
+    pub items_modified: u32,
+}
+
+/// DTO for signal delta (before + after snapshots).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct HearingSignalDeltaDto {
+    pub before: SignalCountsDto,
+    pub after: SignalCountsDto,
 }
 
 /// DTO for a single requirement (text + provenance sources + task references).
@@ -227,6 +248,12 @@ pub fn decode(json: &str) -> Result<SpecDocument, SpecCodecError> {
         dto.content_hash,
     )?;
 
+    // Decode hearing history
+    let hearing_history = decode_hearing_history(&dto.hearing_history)?;
+    if !hearing_history.is_empty() {
+        doc.set_hearing_history(hearing_history);
+    }
+
     // Auto-demote: if status is Approved but content hash doesn't match, revert to Draft.
     if doc.status() == SpecStatus::Approved {
         let current_hash = compute_content_hash(&doc)?;
@@ -236,6 +263,48 @@ pub fn decode(json: &str) -> Result<SpecDocument, SpecCodecError> {
     }
 
     Ok(doc)
+}
+
+fn decode_hearing_history(dtos: &[HearingRecordDto]) -> Result<Vec<HearingRecord>, SpecCodecError> {
+    dtos.iter()
+        .enumerate()
+        .map(|(i, dto)| {
+            let date = Timestamp::new(&dto.date).map_err(|e| SpecCodecError::InvalidField {
+                field: format!("hearing_history[{i}].date"),
+                reason: e.to_string(),
+            })?;
+            let mode = hearing_mode_from_str(&dto.mode).map_err(|reason| {
+                SpecCodecError::InvalidField { field: format!("hearing_history[{i}].mode"), reason }
+            })?;
+            let before = HearingSignalSnapshot::new(
+                dto.signal_delta.before.blue,
+                dto.signal_delta.before.yellow,
+                dto.signal_delta.before.red,
+            );
+            let after = HearingSignalSnapshot::new(
+                dto.signal_delta.after.blue,
+                dto.signal_delta.after.yellow,
+                dto.signal_delta.after.red,
+            );
+            Ok(HearingRecord::new(
+                date,
+                mode,
+                HearingSignalDelta::new(before, after),
+                dto.questions_asked,
+                dto.items_added,
+                dto.items_modified,
+            ))
+        })
+        .collect()
+}
+
+fn hearing_mode_from_str(s: &str) -> Result<HearingMode, String> {
+    match s {
+        "full" => Ok(HearingMode::Full),
+        "focused" => Ok(HearingMode::Focused),
+        "quick" => Ok(HearingMode::Quick),
+        other => Err(format!("unknown hearing mode: {other}")),
+    }
 }
 
 /// Parses a status string into `SpecStatus`.
@@ -429,6 +498,29 @@ fn spec_document_to_dto(doc: &SpecDocument) -> SpecDocumentDto {
             .map(|sigs| sigs.iter().map(domain_state_signal_to_dto).collect()),
         approved_at: doc.approved_at().map(|ts| ts.as_str().to_owned()),
         content_hash: doc.content_hash().map(|s| s.to_owned()),
+        hearing_history: doc.hearing_history().iter().map(hearing_record_to_dto).collect(),
+    }
+}
+
+fn hearing_record_to_dto(rec: &HearingRecord) -> HearingRecordDto {
+    HearingRecordDto {
+        date: rec.date().as_str().to_owned(),
+        mode: rec.mode().as_str().to_owned(),
+        signal_delta: HearingSignalDeltaDto {
+            before: SignalCountsDto {
+                blue: rec.signal_delta().before().blue(),
+                yellow: rec.signal_delta().before().yellow(),
+                red: rec.signal_delta().before().red(),
+            },
+            after: SignalCountsDto {
+                blue: rec.signal_delta().after().blue(),
+                yellow: rec.signal_delta().after().yellow(),
+                red: rec.signal_delta().after().red(),
+            },
+        },
+        questions_asked: rec.questions_asked(),
+        items_added: rec.items_added(),
+        items_modified: rec.items_modified(),
     }
 }
 
@@ -1263,5 +1355,80 @@ mod tests {
             "decode should auto-demote when content hash mismatches"
         );
         assert!(reloaded.approved_at().is_none(), "auto-demote should clear approved_at");
+    }
+
+    // --- Hearing history (TSUMIKI-07) ---
+
+    #[test]
+    fn test_hearing_history_roundtrip() {
+        let json = r#"{
+            "schema_version": 1,
+            "status": "draft",
+            "version": "1.0",
+            "title": "Feature",
+            "scope": {"in_scope": [], "out_of_scope": []},
+            "hearing_history": [
+                {
+                    "date": "2026-04-01T10:00:00Z",
+                    "mode": "focused",
+                    "signal_delta": {
+                        "before": {"blue": 5, "yellow": 3, "red": 2},
+                        "after": {"blue": 8, "yellow": 2, "red": 0}
+                    },
+                    "questions_asked": 4,
+                    "items_added": 1,
+                    "items_modified": 3
+                }
+            ]
+        }"#;
+        let doc = decode(json).unwrap();
+        assert_eq!(doc.hearing_history().len(), 1);
+        let rec = &doc.hearing_history()[0];
+        assert_eq!(rec.mode(), domain::HearingMode::Focused);
+        assert_eq!(rec.signal_delta().before().blue(), 5);
+        assert_eq!(rec.signal_delta().after().red(), 0);
+        assert_eq!(rec.questions_asked(), 4);
+
+        // Re-encode and decode again
+        let re_encoded = encode(&doc).unwrap();
+        let doc2 = decode(&re_encoded).unwrap();
+        assert_eq!(doc2.hearing_history().len(), 1);
+        assert_eq!(doc2.hearing_history()[0].mode(), domain::HearingMode::Focused);
+    }
+
+    #[test]
+    fn test_hearing_history_backward_compat() {
+        // Old spec.json without hearing_history should decode fine
+        let json = r#"{"schema_version":1,"status":"draft","version":"1.0","title":"Old","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let doc = decode(json).unwrap();
+        assert!(doc.hearing_history().is_empty());
+    }
+
+    #[test]
+    fn test_hearing_history_excluded_from_content_hash() {
+        let base_json = r#"{"schema_version":1,"status":"draft","version":"1.0","title":"Feature","scope":{"in_scope":[],"out_of_scope":[]}}"#;
+        let with_history = r#"{
+            "schema_version": 1,
+            "status": "draft",
+            "version": "1.0",
+            "title": "Feature",
+            "scope": {"in_scope": [], "out_of_scope": []},
+            "hearing_history": [
+                {
+                    "date": "2026-04-01T10:00:00Z",
+                    "mode": "full",
+                    "signal_delta": {
+                        "before": {"blue": 0, "yellow": 0, "red": 0},
+                        "after": {"blue": 5, "yellow": 1, "red": 0}
+                    },
+                    "questions_asked": 3,
+                    "items_added": 2,
+                    "items_modified": 0
+                }
+            ]
+        }"#;
+        let h1 = compute_content_hash(&decode(base_json).unwrap()).unwrap();
+        let h2 = compute_content_hash(&decode(with_history).unwrap()).unwrap();
+        assert_eq!(h1, h2, "hearing_history must not affect content_hash");
     }
 }

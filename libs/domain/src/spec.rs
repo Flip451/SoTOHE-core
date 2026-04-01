@@ -358,6 +358,7 @@ pub struct SpecDocument {
     domain_state_signals: Option<Vec<DomainStateSignal>>,
     approved_at: Option<Timestamp>,
     content_hash: Option<String>,
+    hearing_history: Vec<HearingRecord>,
 }
 
 impl SpecDocument {
@@ -419,6 +420,7 @@ impl SpecDocument {
             domain_state_signals,
             approved_at,
             content_hash,
+            hearing_history: vec![],
         })
     }
 
@@ -442,6 +444,22 @@ impl SpecDocument {
     #[must_use]
     pub fn content_hash(&self) -> Option<&str> {
         self.content_hash.as_deref()
+    }
+
+    /// Returns the hearing history (append-only audit trail).
+    #[must_use]
+    pub fn hearing_history(&self) -> &[HearingRecord] {
+        &self.hearing_history
+    }
+
+    /// Appends a hearing record to the history.
+    pub fn append_hearing_record(&mut self, record: HearingRecord) {
+        self.hearing_history.push(record);
+    }
+
+    /// Sets hearing history (used by codec decode).
+    pub fn set_hearing_history(&mut self, history: Vec<HearingRecord>) {
+        self.hearing_history = history;
     }
 
     /// Marks this spec as approved with the given timestamp and content hash.
@@ -802,6 +820,142 @@ impl CoverageResult {
     #[must_use]
     pub fn total(&self) -> u32 {
         self.covered + self.uncovered.len() as u32
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Hearing record types (TSUMIKI-07)
+// ---------------------------------------------------------------------------
+
+/// Workload mode for a hearing session.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum HearingMode {
+    Full,
+    Focused,
+    Quick,
+}
+
+impl HearingMode {
+    #[must_use]
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Full => "full",
+            Self::Focused => "focused",
+            Self::Quick => "quick",
+        }
+    }
+}
+
+impl fmt::Display for HearingMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+/// Signal counts snapshot for before/after comparison.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct HearingSignalSnapshot {
+    blue: u32,
+    yellow: u32,
+    red: u32,
+}
+
+impl HearingSignalSnapshot {
+    #[must_use]
+    pub fn new(blue: u32, yellow: u32, red: u32) -> Self {
+        Self { blue, yellow, red }
+    }
+
+    #[must_use]
+    pub fn blue(&self) -> u32 {
+        self.blue
+    }
+    #[must_use]
+    pub fn yellow(&self) -> u32 {
+        self.yellow
+    }
+    #[must_use]
+    pub fn red(&self) -> u32 {
+        self.red
+    }
+}
+
+impl From<SignalCounts> for HearingSignalSnapshot {
+    fn from(c: SignalCounts) -> Self {
+        Self::new(c.blue(), c.yellow(), c.red())
+    }
+}
+
+/// Before/after signal delta for a hearing session.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HearingSignalDelta {
+    before: HearingSignalSnapshot,
+    after: HearingSignalSnapshot,
+}
+
+impl HearingSignalDelta {
+    #[must_use]
+    pub fn new(before: HearingSignalSnapshot, after: HearingSignalSnapshot) -> Self {
+        Self { before, after }
+    }
+
+    #[must_use]
+    pub fn before(&self) -> &HearingSignalSnapshot {
+        &self.before
+    }
+    #[must_use]
+    pub fn after(&self) -> &HearingSignalSnapshot {
+        &self.after
+    }
+}
+
+/// A single hearing session record (append-only audit trail).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HearingRecord {
+    date: Timestamp,
+    mode: HearingMode,
+    signal_delta: HearingSignalDelta,
+    questions_asked: u32,
+    items_added: u32,
+    items_modified: u32,
+}
+
+impl HearingRecord {
+    #[must_use]
+    pub fn new(
+        date: Timestamp,
+        mode: HearingMode,
+        signal_delta: HearingSignalDelta,
+        questions_asked: u32,
+        items_added: u32,
+        items_modified: u32,
+    ) -> Self {
+        Self { date, mode, signal_delta, questions_asked, items_added, items_modified }
+    }
+
+    #[must_use]
+    pub fn date(&self) -> &Timestamp {
+        &self.date
+    }
+    #[must_use]
+    pub fn mode(&self) -> HearingMode {
+        self.mode
+    }
+    #[must_use]
+    pub fn signal_delta(&self) -> &HearingSignalDelta {
+        &self.signal_delta
+    }
+    #[must_use]
+    pub fn questions_asked(&self) -> u32 {
+        self.questions_asked
+    }
+    #[must_use]
+    pub fn items_added(&self) -> u32 {
+        self.items_added
+    }
+    #[must_use]
+    pub fn items_modified(&self) -> u32 {
+        self.items_modified
     }
 }
 
@@ -1852,5 +2006,56 @@ mod tests {
         let valid = make_task_id_set(&["T001"]);
         let invalid = doc.validate_all_task_refs(&valid);
         assert!(invalid.is_empty());
+    }
+
+    // --- HearingRecord (TSUMIKI-07) ---
+
+    #[test]
+    fn test_hearing_mode_as_str() {
+        assert_eq!(HearingMode::Full.as_str(), "full");
+        assert_eq!(HearingMode::Focused.as_str(), "focused");
+        assert_eq!(HearingMode::Quick.as_str(), "quick");
+    }
+
+    #[test]
+    fn test_hearing_signal_snapshot_from_signal_counts() {
+        let counts = SignalCounts::new(10, 3, 1);
+        let snap = HearingSignalSnapshot::from(counts);
+        assert_eq!(snap.blue(), 10);
+        assert_eq!(snap.yellow(), 3);
+        assert_eq!(snap.red(), 1);
+    }
+
+    #[test]
+    fn test_hearing_record_accessors() {
+        let ts = Timestamp::new("2026-04-01T10:00:00Z").unwrap();
+        let delta = HearingSignalDelta::new(
+            HearingSignalSnapshot::new(5, 3, 2),
+            HearingSignalSnapshot::new(8, 2, 0),
+        );
+        let rec = HearingRecord::new(ts.clone(), HearingMode::Focused, delta, 4, 1, 3);
+        assert_eq!(rec.date(), &ts);
+        assert_eq!(rec.mode(), HearingMode::Focused);
+        assert_eq!(rec.signal_delta().before().blue(), 5);
+        assert_eq!(rec.signal_delta().after().blue(), 8);
+        assert_eq!(rec.questions_asked(), 4);
+        assert_eq!(rec.items_added(), 1);
+        assert_eq!(rec.items_modified(), 3);
+    }
+
+    #[test]
+    fn test_document_hearing_history_append() {
+        let mut doc = make_doc();
+        assert!(doc.hearing_history().is_empty());
+
+        let ts = Timestamp::new("2026-04-01T10:00:00Z").unwrap();
+        let delta = HearingSignalDelta::new(
+            HearingSignalSnapshot::new(0, 0, 0),
+            HearingSignalSnapshot::new(5, 1, 0),
+        );
+        let rec = HearingRecord::new(ts, HearingMode::Full, delta, 5, 3, 0);
+        doc.append_hearing_record(rec);
+        assert_eq!(doc.hearing_history().len(), 1);
+        assert_eq!(doc.hearing_history()[0].mode(), HearingMode::Full);
     }
 }
