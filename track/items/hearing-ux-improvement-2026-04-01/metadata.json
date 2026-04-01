@@ -81,7 +81,7 @@
     {
       "description": "TSUMIKI-05 構造化質問 — SKILL.md Step 4a を AskUserQuestion + multiSelect に書き換え",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "CI 検証 — cargo make ci 全チェック通過",
@@ -90,5 +90,5 @@
     }
   ],
   "title": "TSUMIKI-05/06/07 ヒアリング UX 改善",
-  "updated_at": "2026-04-01T08:20:03Z"
+  "updated_at": "2026-04-01T08:48:29Z"
 }
