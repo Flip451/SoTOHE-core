@@ -1,58 +1,23 @@
 {
-  "schema_version": 3,
-  "id": "hearing-ux-improvement-2026-04-01",
   "branch": "track/hearing-ux-improvement-2026-04-01",
-  "title": "TSUMIKI-05/06/07 ヒアリング UX 改善",
-  "status": "planned",
   "created_at": "2026-04-01T07:02:17Z",
-  "updated_at": "2026-04-01T07:02:17Z",
-  "tasks": [
-    {
-      "id": "T001",
-      "description": "TSUMIKI-06 モード選択 — SKILL.md に Step 0 挿入（Full/Focused/Quick）",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T002",
-      "description": "TSUMIKI-07 HearingRecord — Rust domain + infra + render 実装（TDD）",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T003",
-      "description": "TSUMIKI-05 構造化質問 — SKILL.md Step 4a を AskUserQuestion + multiSelect に書き換え",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T004",
-      "description": "CI 検証 — cargo make ci 全チェック通過",
-      "status": "todo",
-      "commit_hash": null
-    }
-  ],
+  "id": "hearing-ux-improvement-2026-04-01",
   "plan": {
-    "summary": [
-      "Phase 2b: ヒアリング UX 改善。tsumiki の優れた UX パターンを取り込み、/track:plan の仕様ヒアリング品質を向上させる。",
-      "Phase 3（テスト生成パイプライン）の spec 入力品質に直結する投資。",
-      "SKILL.md プロンプト改修 + spec.json 軽微スキーマ拡張（hearing_history）。"
-    ],
     "sections": [
       {
-        "id": "S1",
-        "title": "モード選択（TSUMIKI-06）",
         "description": [
           "SKILL.md Phase 1 の前に Step 0 を挿入。AskUserQuestion で Full/Focused/Quick を選択させる。",
           "Full: 全フェーズ実行（現行動作）。Focused: researcher/planner スキップ、差分ヒアリングのみ。Quick: Blue サマリー表示、自由記述変更のみ。",
           "Focused/Quick モードでは Phase 1.5（planner review）と Phase 2（Agent Teams）をスキップする明示的例外を記載。",
           "spec.json が存在しない場合は Full にフォールバック。"
         ],
-        "task_ids": ["T001"]
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "モード選択（TSUMIKI-06）"
       },
       {
-        "id": "S2",
-        "title": "HearingRecord スキーマ（TSUMIKI-07）",
         "description": [
           "domain 層: HearingMode enum (Full/Focused/Quick), HearingSignalSnapshot, HearingSignalDelta, HearingRecord を追加。",
           "infrastructure 層: HearingRecordDto, HearingSignalDeltaDto を追加。SpecDocumentDto に hearing_history フィールド追加。",
@@ -61,11 +26,13 @@
           "append-only: append_hearing_record() のみ、削除/変更メソッドなし。",
           "TDD: domain 型テスト → codec roundtrip テスト → render テスト → content_hash 除外テスト。"
         ],
-        "task_ids": ["T002"]
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "HearingRecord スキーマ（TSUMIKI-07）"
       },
       {
-        "id": "S3",
-        "title": "構造化質問（TSUMIKI-05）",
         "description": [
           "SKILL.md Step 4a の Markdown 壁を AskUserQuestion + multiSelect パターンに置換。",
           "カテゴリ別バッチ（5 項目上限/回）: Yellow → Red → Missing の順。",
@@ -74,17 +41,54 @@
           "全項目 Blue の場合は Quick 相当にショートサーキット。",
           "既存の spec.json 更新ロジック（source tagging rules）を維持。"
         ],
-        "task_ids": ["T003"]
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "構造化質問（TSUMIKI-05）"
       },
       {
-        "id": "S4",
-        "title": "CI 検証",
         "description": [
           "cargo make ci で全チェック通過を確認。",
           "既存テストの破壊がないこと。新規 Rust コード（T002）のカバレッジ 80% 以上。"
         ],
-        "task_ids": ["T004"]
+        "id": "S4",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "CI 検証"
       }
+    ],
+    "summary": [
+      "Phase 2b: ヒアリング UX 改善。tsumiki の優れた UX パターンを取り込み、/track:plan の仕様ヒアリング品質を向上させる。",
+      "Phase 3（テスト生成パイプライン）の spec 入力品質に直結する投資。",
+      "SKILL.md プロンプト改修 + spec.json 軽微スキーマ拡張（hearing_history）。"
     ]
-  }
+  },
+  "schema_version": 3,
+  "status": "in_progress",
+  "tasks": [
+    {
+      "description": "TSUMIKI-06 モード選択 — SKILL.md に Step 0 挿入（Full/Focused/Quick）",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "TSUMIKI-07 HearingRecord — Rust domain + infra + render 実装（TDD）",
+      "id": "T002",
+      "status": "todo"
+    },
+    {
+      "description": "TSUMIKI-05 構造化質問 — SKILL.md Step 4a を AskUserQuestion + multiSelect に書き換え",
+      "id": "T003",
+      "status": "todo"
+    },
+    {
+      "description": "CI 検証 — cargo make ci 全チェック通過",
+      "id": "T004",
+      "status": "todo"
+    }
+  ],
+  "title": "TSUMIKI-05/06/07 ヒアリング UX 改善",
+  "updated_at": "2026-04-01T07:38:25Z"
 }

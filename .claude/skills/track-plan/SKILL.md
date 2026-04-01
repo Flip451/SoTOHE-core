@@ -48,7 +48,49 @@ Track Workflow との連携：
 
 ---
 
+## Phase 0: MODE SELECTION（ヒアリング作業規模選定 — TSUMIKI-06）
+
+既存の `spec.json` が見つかった場合、ヒアリングの深度をユーザーに選択させる。
+新規 track（spec.json なし）の場合は自動的に Full モードにフォールバックし、このステップをスキップする。
+
+```
+AskUserQuestion:
+  question: |
+    このトラックには既存の spec.json があります（signals: {blue}/{yellow}/{red}、最終更新: {date}）。
+    ヒアリングの深度を選択してください。
+  options:
+    - "Full — 全フェーズ実行（researcher + planner + 差分ヒアリング）"
+    - "Focused — 研究/設計フェーズをスキップし、差分ヒアリングのみ実施"
+    - "Quick — Blue サマリーを表示し、変更点のみ自由記述で受け付ける"
+```
+
+#### モード別フェーズスキップ定義
+
+| フェーズ | Full | Focused | Quick |
+|---------|------|---------|-------|
+| Phase 1 Step 1-2（researcher） | ✅ 実行 | ❌ スキップ | ❌ スキップ |
+| Phase 1 Step 3（spec.json 分類） | ✅ 実行 | ✅ 実行 | ❌ スキップ |
+| Phase 1 Step 4（差分ヒアリング） | ✅ 実行 | ✅ 実行 | 簡易版（※） |
+| Phase 1 Step 5（tech-stack） | ✅ 実行 | ⚠️ 警告のみ | ❌ スキップ |
+| Phase 1.5（planner review） | ✅ 実行 | ❌ スキップ | ❌ スキップ |
+| Phase 2（Agent Teams） | ✅ 実行 | ❌ スキップ | ❌ スキップ |
+| Phase 3（計画統合・承認） | ✅ 実行 | ✅ 実行 | ✅ 実行 |
+
+（※）Quick モードの Step 4: Blue 項目のサマリーを表示し「変更がある項目はありますか？」と自由記述で質問する。
+構造化質問（AskUserQuestion + multiSelect）は使わない。
+
+**Phase 1.5 スキップの明示的例外**: SKILL.md Phase 1.5 は「すべての機能で planner capability による設計レビューを実施する」と定義しているが、
+Focused/Quick モードは既存 spec の軽微な更新を目的としており、アーキテクチャ変更を伴わないため例外とする。
+ヒアリング中にアーキテクチャ変更が判明した場合は、Full モードで再実行すること。
+
+**spec.json 未検出時のフォールバック**: spec.json が存在しない場合、Focused/Quick は適用不可のため Full モードに自動フォールバックする。
+ユーザーには「新規 track のため Full モードで実行します」と通知する。
+
+---
+
 ## Phase 1: UNDERSTAND（researcher capability + Claude Lead）
+
+> **注**: Focused/Quick モードでは Step 1-2 をスキップし、Step 3 から開始する。
 
 ### Step 1: Version Baseline Research with active `researcher` capability (必須)
 
@@ -137,7 +179,11 @@ ls track/items/
 
 ### Step 4: Requirements Gathering（差分ヒアリング対応）
 
-#### 4a. 差分ヒアリングモード（既存 spec.json あり）
+> **Quick モード**: 以下の 4a/4b をスキップし、代わりに Blue 項目のサマリーを表示して
+> 「変更がある項目はありますか？新しく追加したい項目はありますか？」と自由記述で質問する。
+> ユーザーの回答があれば spec.json を更新し、なければそのまま Phase 3 に進む。
+
+#### 4a. 差分ヒアリングモード（既存 spec.json あり — Full/Focused モード）
 
 Step 3a の分類結果に基づき、🟡🔴❌ の項目のみをユーザーに質問する：
 
@@ -210,7 +256,10 @@ Step 3a の分類結果に基づき、🟡🔴❌ の項目のみをユーザー
 
 ## Phase 1.5: DESIGN REVIEW（planner capability — 必須）
 
-**難易度にかかわらず、すべての機能で planner capability による設計レビューを実施する。**
+> **Focused/Quick モードではこの Phase をスキップする。**
+> ヒアリング中にアーキテクチャ変更が判明した場合は Full モードで再実行すること。
+
+**Full モードでは、難易度にかかわらず、すべての機能で planner capability による設計レビューを実施する。**
 「S 難易度」「プロンプト変更のみ」であっても、実装の前に planner に以下を確認させる：
 
 1. 変更が影響する**全てのデータフロー**（読込→処理→永続化→再評価）を列挙
@@ -232,7 +281,9 @@ planner の出力は `knowledge/research/{YYYY-MM-DD-HHMM}-planner-{feature}.md`
 
 ## Phase 2: RESEARCH & DESIGN（Agent Teams — Parallel）
 
-Claude Code Agent Teams を使って並列実行する：
+> **Focused/Quick モードではこの Phase をスキップする。**
+
+Claude Code Agent Teams を使って並列実行する（Full モードのみ）：
 
 ```
 Spawn two teammates:
