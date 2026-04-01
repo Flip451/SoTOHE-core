@@ -39,7 +39,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     }
 
     // Convention docs checks — only when conventions are bootstrapped.
-    let conventions_readme = root.join("project-docs").join("conventions").join("README.md");
+    let conventions_readme = root.join("knowledge").join("conventions").join("README.md");
     if conventions_readme.is_file() {
         for check in CONVENTIONS_REQUIRED_FILES {
             outcome.merge(require_file(root, check.rel_path, check.label));

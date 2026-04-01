@@ -32,7 +32,7 @@ static FILE_ORDER: &[(&str, u32)] = &[
 /// Returns error findings when the README is missing, markers are absent,
 /// or the index block does not match the expected content.
 pub fn verify(root: &Path) -> VerifyOutcome {
-    let conventions_dir = root.join("project-docs").join("conventions");
+    let conventions_dir = root.join("knowledge").join("conventions");
     let readme_path = conventions_dir.join("README.md");
 
     let has_convention_docs = conventions_dir.is_dir()
@@ -166,7 +166,7 @@ mod tests {
     use super::*;
 
     fn setup_conventions(root: &Path, files: &[(&str, &str)], readme_content: &str) {
-        let dir = root.join("project-docs").join("conventions");
+        let dir = root.join("knowledge").join("conventions");
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("README.md"), readme_content).unwrap();
         for (name, content) in files {
@@ -184,7 +184,7 @@ mod tests {
     #[test]
     fn test_synced_index_passes() {
         let tmp = TempDir::new().unwrap();
-        let dir = tmp.path().join("project-docs").join("conventions");
+        let dir = tmp.path().join("knowledge").join("conventions");
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("security.md"), "# Security\nRules here.\n").unwrap();
 
@@ -223,7 +223,7 @@ mod tests {
     #[test]
     fn test_convention_docs_without_readme_fails() {
         let tmp = TempDir::new().unwrap();
-        let dir = tmp.path().join("project-docs").join("conventions");
+        let dir = tmp.path().join("knowledge").join("conventions");
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("security.md"), "# Security\n").unwrap();
         let outcome = verify(tmp.path());
