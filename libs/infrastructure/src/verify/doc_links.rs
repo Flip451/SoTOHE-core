@@ -119,7 +119,8 @@ fn collect_md_files_recursive(
     dir: &Path,
     out: &mut Vec<std::path::PathBuf>,
 ) -> Result<(), std::io::Error> {
-    const SKIP_EXACT: &[&str] = &["target", ".git", "node_modules", "vendor", ".cache", "tmp"];
+    const SKIP_EXACT: &[&str] =
+        &["target", ".git", "node_modules", "vendor", ".cache", "tmp", "track"];
     const SKIP_PREFIXES: &[&str] = &["target-"];
 
     let entries = std::fs::read_dir(dir)?;
