@@ -78,6 +78,10 @@ AskUserQuestion:
 
 （※）Quick モードの Step 4: Blue 項目のサマリーを表示し「変更がある項目はありますか？」と自由記述で質問する。
 構造化質問（AskUserQuestion + multiSelect）は使わない。
+ユーザーが変更を申告した場合は spec.json を更新し、**Step 4a と同じ信号再評価パイプライン**を実行する:
+1. `bin/sotp track signals <track-id>` — Stage 1 信号再計算
+2. `bin/sotp track domain-state-signals <track-id>` — domain_states がある場合
+3. `cargo make track-sync-views` — spec.md + plan.md + registry.md 再生成
 
 **Phase 1.5 スキップの明示的例外**: SKILL.md Phase 1.5 は「すべての機能で planner capability による設計レビューを実施する」と定義しているが、
 Focused/Quick モードは既存 spec の軽微な更新を目的としており、アーキテクチャ変更を伴わないため例外とする。
@@ -90,7 +94,8 @@ Focused/Quick モードは既存 spec の軽微な更新を目的としており
 
 ## Phase 1: UNDERSTAND（researcher capability + Claude Lead）
 
-> **注**: Focused/Quick モードでは Step 1-2 をスキップし、Step 3 から開始する。
+> **注**: Focused モードでは Step 1-2 をスキップし、Step 3 から開始する。
+> Quick モードでは Step 1-3 をスキップし、Step 4（簡易版）から開始する。
 
 ### Step 1: Version Baseline Research with active `researcher` capability (必須)
 
