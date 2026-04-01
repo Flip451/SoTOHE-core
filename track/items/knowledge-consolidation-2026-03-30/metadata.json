@@ -58,7 +58,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "description": "Add failing tests for new paths and temporary dual-read compatibility in planning-only detection, git staging allowlists, verifier lookups, Python scripts, and hook output",
@@ -98,9 +98,9 @@
     {
       "description": "Wire verify doc-links into cargo make ci, remove temporary dual-read compatibility fallbacks, delete abolished directories (.claude/docs/, project-docs/, docs/), final reference sweep",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "ドキュメント群の knowledge ディレクトリへの集約と整理",
-  "updated_at": "2026-04-01T03:11:44Z"
+  "updated_at": "2026-04-01T03:14:28Z"
 }

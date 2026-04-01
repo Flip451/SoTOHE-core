@@ -33,4 +33,4 @@ knowledge/README.md と knowledge/architecture.md を作成する。
 verify doc-links を CI に組み込み、互換性フォールバックを削除し、旧ディレクトリを廃止する。
 
 - [x] Create knowledge/README.md (index with reading order) and knowledge/architecture.md (slimmed DESIGN.md without Canonical Blocks), update all .claude/docs/DESIGN.md references
-- [ ] Wire verify doc-links into cargo make ci, remove temporary dual-read compatibility fallbacks, delete abolished directories (.claude/docs/, project-docs/, docs/), final reference sweep
+- [x] Wire verify doc-links into cargo make ci, remove temporary dual-read compatibility fallbacks, delete abolished directories (.claude/docs/, project-docs/, docs/), final reference sweep

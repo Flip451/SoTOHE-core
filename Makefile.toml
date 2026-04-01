@@ -584,7 +584,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local CI checks"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-spec-coverage-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-spec-coverage-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
@@ -592,7 +592,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-spec-coverage-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-spec-coverage-local"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -684,6 +684,18 @@ description = "[gate] Verify workspace architecture docs sync (docker compose)"
 dependencies = ["prepare-local-cache-dirs"]
 command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-arch-docs-local"]
+
+[tasks.verify-doc-links-local]
+private = true
+description = "[internal] Verify local Markdown links resolve to existing files"
+script_runner = "@shell"
+script = ['cargo run --quiet -p cli -- verify doc-links']
+
+[tasks.verify-doc-links]
+description = "[gate] Verify Markdown doc links (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-doc-links-local"]
 
 [tasks.verify-plan-progress]
 description = "[gate] Verify track plan status consistency (docker compose)"

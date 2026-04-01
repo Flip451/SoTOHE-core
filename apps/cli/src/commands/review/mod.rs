@@ -591,8 +591,7 @@ fn extract_paths_from_name_status(output: &str) -> Vec<&str> {
 /// a documentation directory from bypassing the review guard. Unknown extensions
 /// are treated as code (fail-closed).
 fn is_planning_only_path(path: &str) -> bool {
-    const PREFIXES: &[&str] =
-        &["track/", ".claude/commands/", ".claude/docs/", ".claude/rules/", "knowledge/"];
+    const PREFIXES: &[&str] = &["track/", ".claude/commands/", ".claude/rules/", "knowledge/"];
     // Exact config files that are always planning-only.
     const EXACT_FILES: &[&str] = &[
         "CLAUDE.md",
@@ -602,6 +601,7 @@ fn is_planning_only_path(path: &str) -> bool {
         ".claude/agent-profiles.json",
         ".claude/settings.json",
         ".claude/settings.local.json",
+        ".claude/docs/DESIGN.md",
         "architecture-rules.json",
     ];
 
