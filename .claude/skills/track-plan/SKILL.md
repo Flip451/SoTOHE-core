@@ -325,7 +325,8 @@ Teammate 2 — Planner / Architect capability（既定 profile では Codex CLI 
 ### Step 1: Synthesize Results
 
 Researcher と Architect の結果を統合する。
-`track/tech-stack.md` に `TODO:` が残っている場合はここで停止し、ユーザーに確認する。
+**Full モードのみ**: `track/tech-stack.md` に `TODO:` が残っている場合はここで停止し、ユーザーに確認する。
+Focused/Quick モードでは `TODO:` 残存は警告のみで続行する（Step 5 と同じポリシー）。
 
 **Canonical Block preservation rule:**
 When copying `planner` capability output into `plan.md` or `DESIGN.md`, copy every block inside
