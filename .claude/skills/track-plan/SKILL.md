@@ -280,7 +280,7 @@ may be summarized.
 
 ### Step 2: Create TDD Implementation Plan
 
-`project-docs/conventions/README.md` を読み、この機能に関連する convention ドキュメントを特定する。
+`knowledge/conventions/README.md` を読み、この機能に関連する convention ドキュメントを特定する。
 `plan.md` には `## 関連規約（実装前に必読）` セクションを設け、該当 convention の repo-relative path を通常の箇条書きで列挙する。該当なしの場合は「なし」と明記する。`- [ ]` checkbox 形式は task parser と衝突するため使わない。
 
 Rust TDD を前提としたタスク順序：
@@ -386,7 +386,7 @@ UTC の ISO 8601 形式（例: `2026-03-28T00:12:22Z`）を使用する。
 4. `spec.json` (仕様 SSoT) を作成（schema_version 1, status, version, title, goal, scope, constraints, domain_states, acceptance_criteria, additional_sections, related_conventions）
    - Scope, Constraints, Acceptance Criteria の各要件に `sources` 配列でソース帰属を付与する
    - Source タグの種類（5 種）: document, feedback, convention, inference, discussion
-   - 参照: `project-docs/conventions/source-attribution.md`
+   - 参照: `knowledge/conventions/source-attribution.md`
    - `related_conventions` に関連規約ファイルパスを含める
 5. `cargo make track-sync-views` で `spec.md` を `spec.json` から自動生成（直接書き込み禁止）
 6. `verification.md` を初期化（scope verified, manual steps, result, verified_at）

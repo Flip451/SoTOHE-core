@@ -1,12 +1,12 @@
 //! Verify that Rust source files do not exceed configured line limits.
 //!
-//! Configuration is read from `docs/architecture-rules.json` → `module_limits`.
+//! Configuration is read from `architecture-rules.json` → `module_limits`.
 
 use std::path::Path;
 
 use domain::verify::{Finding, VerifyOutcome};
 
-const ARCH_RULES_FILE: &str = "docs/architecture-rules.json";
+const ARCH_RULES_FILE: &str = "architecture-rules.json";
 
 /// Check `.rs` file sizes against `module_limits` in architecture-rules.json.
 ///
@@ -132,8 +132,6 @@ mod tests {
     use super::*;
 
     fn setup_rules(root: &Path, max: usize, warn: usize, excludes: &[&str]) {
-        let dir = root.join("docs");
-        std::fs::create_dir_all(&dir).unwrap();
         let rules = serde_json::json!({
             "version": 2,
             "module_limits": {
@@ -207,8 +205,6 @@ mod tests {
     #[test]
     fn test_module_size_no_module_limits_section_passes() {
         let tmp = TempDir::new().unwrap();
-        let dir = tmp.path().join("docs");
-        std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(tmp.path().join(ARCH_RULES_FILE), r#"{"version": 2}"#).unwrap();
         write_rs_file(tmp.path(), "src/huge.rs", 9999);
         let outcome = verify(tmp.path());

@@ -5,7 +5,7 @@
 
 索引の真実の源泉:
 
-- `docs/external-guides.json`
+- `knowledge/external/guides.json`
 
 原文キャッシュの保存先:
 
@@ -21,7 +21,7 @@
 - 運用チェックリスト
 - ORM / SQL / migration の深いベストプラクティス文書
 
-実際の登録対象は `docs/external-guides.json` を真実の源泉とする。
+実際の登録対象は `knowledge/external/guides.json` を真実の源泉とする。
 
 狙い:
 
@@ -52,11 +52,11 @@ cargo make guides-fetch <guide-id>
 
 新しい外部ガイドを索引へ追加する場合は、Claude Code から `/guide:add` を使う。
 不足している項目だけを確認し、正規化した `id` / `raw_url` / `cache_path` を提案した上で
-`docs/external-guides.json` を更新する想定とする。
+`knowledge/external/guides.json` を更新する想定とする。
 
 ### 利用時
 
-1. `docs/external-guides.json` の要約・トリガー語・用途を見る
+1. `knowledge/external/guides.json` の要約・トリガー語・用途を見る
 2. 関連性が高い時だけ `.cache/external-guides/...` の本文を読む
 3. 採用した判断を `track/spec` / `track/plan` / 設計文書に要約で残す
 
@@ -73,7 +73,7 @@ cargo make guides-clean <guide-id>   # 個別キャッシュ削除
 
 ### 更新時
 
-1. `docs/external-guides.json` の索引情報を更新する
+1. `knowledge/external/guides.json` の索引情報を更新する
 2. 追加するガイドには `id`, `source_url`, `raw_url`, `license`, `cache_path`, `trigger_keywords`, `summary`, `project_usage` を揃えて記述する
 3. `cargo make guides-list` と `cargo make guides-usage` で表示内容を確認する
 4. 必要なら `cargo make guides-fetch <guide-id>` でローカルキャッシュを再取得する
@@ -83,8 +83,8 @@ cargo make guides-clean <guide-id>   # 個別キャッシュ削除
 
 AI が読む順番:
 
-1. `docs/external-guides.json`
-2. この `docs/EXTERNAL_GUIDES.md`
+1. `knowledge/external/guides.json`
+2. この `knowledge/external/POLICY.md`
 3. 必要時のみローカルキャッシュ本文
 
 避けること:
@@ -106,15 +106,15 @@ AI が読む順番:
 
 ## 5. 著作権とライセンス
 
-- 原文取得前に出典とライセンスを `docs/external-guides.json` に記録する
+- 原文取得前に出典とライセンスを `knowledge/external/guides.json` に記録する
 - 原文はローカルキャッシュとして保持し、git には含めない
 - AI 応答や設計文書では長文引用を避け、要約・解釈・適用方針に変換する
 
 ## 6. 役割分担
 
-- `docs/external-guides.json`
+- `knowledge/external/guides.json`
   - 外部ドキュメント索引の真実の源泉
-- `docs/EXTERNAL_GUIDES.md`
+- `knowledge/external/POLICY.md`
   - 運用方針と参照手順
 - `.cache/external-guides/`
   - ローカルキャッシュ済み原文
@@ -128,6 +128,6 @@ AI が読む順番:
 - `track/tech-stack.md`
 - `track/items/<id>/spec.md`
 - `track/items/<id>/plan.md`
-- `.claude/docs/DESIGN.md`
+- `knowledge/DESIGN.md`
 
 外部ガイドは「参照元」であり、最終的なプロジェクト判断はこのリポジトリ内文書へ落とし込む。

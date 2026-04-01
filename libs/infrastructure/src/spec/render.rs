@@ -57,7 +57,7 @@ use domain::{
 /// Free-form line 1
 ///
 /// ## Related Conventions (Required Reading)
-/// - project-docs/conventions/source-attribution.md
+/// - knowledge/conventions/source-attribution.md
 /// ```
 #[must_use]
 pub fn render_spec(doc: &SpecDocument) -> String {
@@ -401,7 +401,7 @@ mod tests {
             vec![
                 SpecSection::new("Custom Section Title", vec!["Free-form line 1".into()]).unwrap(),
             ],
-            vec!["project-docs/conventions/source-attribution.md".into()],
+            vec!["knowledge/conventions/source-attribution.md".into()],
             Some(SignalCounts::new(15, 0, 0)),
             None,
             None,
@@ -758,7 +758,7 @@ mod tests {
         let doc = make_full_doc();
         let output = render_spec(&doc);
         assert!(output.contains("## Related Conventions (Required Reading)\n"));
-        assert!(output.contains("- project-docs/conventions/source-attribution.md\n"));
+        assert!(output.contains("- knowledge/conventions/source-attribution.md\n"));
     }
 
     #[test]
@@ -824,7 +824,7 @@ Goal paragraph line 1
 Free-form line 1
 
 ## Related Conventions (Required Reading)
-- project-docs/conventions/source-attribution.md
+- knowledge/conventions/source-attribution.md
 
 ## Signal Summary
 

@@ -53,7 +53,7 @@ def project_root() -> Path:
 
 
 def conventions_dir() -> Path:
-    return project_root() / "project-docs" / "conventions"
+    return project_root() / "knowledge" / "conventions"
 
 
 def readme_path() -> Path:
@@ -278,7 +278,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     add_parser.add_argument(
         "--slug",
-        help="ASCII kebab-case file name to use under project-docs/conventions/.",
+        help="ASCII kebab-case file name to use under knowledge/conventions/.",
     )
     add_parser.add_argument(
         "--title",

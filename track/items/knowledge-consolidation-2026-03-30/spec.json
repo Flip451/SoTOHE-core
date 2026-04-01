@@ -1,0 +1,265 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "ドキュメント群の knowledge ディレクトリへの集約と整理",
+  "goal": [
+    "3箇所に分散したドキュメント群（.claude/docs/, project-docs/, docs/）を既存の knowledge/ ディレクトリに集約し、プロジェクト知識の統一的なアクセスポイントを確立する。ルートレベルの CLAUDE.md 等は Claude Code の自動読み込み対象のため移動しない。",
+    "汎用的なドキュメントリンク存在チェック（sotp verify doc-links）を CI に追加し、今後のファイル移動・リネーム時のリンク切れを自動検出する。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": ".claude/docs/ 配下の全ファイル（DESIGN.md, WORKFLOW.md, research/, designs/, schemas/）を knowledge/ に移行する",
+        "sources": [
+          "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md"
+        ],
+        "task_refs": [
+          "T006",
+          "T007"
+        ]
+      },
+      {
+        "text": "project-docs/conventions/ を knowledge/conventions/ に移行する",
+        "sources": [
+          "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "docs/ 配下のファイルを knowledge/external/ と repo root に分散移行する",
+        "sources": [
+          "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md"
+        ],
+        "task_refs": [
+          "T003",
+          "T005"
+        ]
+      },
+      {
+        "text": "移行に伴う全参照パスの更新（Rust ソース、Python スクリプト、設定ファイル、ドキュメント）",
+        "sources": [
+          "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md"
+        ],
+        "task_refs": [
+          "T001",
+          "T003",
+          "T004",
+          "T005",
+          "T006",
+          "T007"
+        ]
+      },
+      {
+        "text": "sotp verify doc-links サブコマンドの実装と CI への組み込み",
+        "sources": [
+          "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md"
+        ],
+        "task_refs": [
+          "T002",
+          "T008"
+        ]
+      },
+      {
+        "text": "DESIGN.md を knowledge/architecture.md にスリム化（Canonical Blocks 削除）",
+        "sources": [
+          "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md"
+        ],
+        "task_refs": [
+          "T007"
+        ]
+      },
+      {
+        "text": "knowledge/README.md の作成（索引 + 読み順）",
+        "sources": [
+          "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md"
+        ],
+        "task_refs": [
+          "T007"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "完了済みトラック（track/items/*, track/archive/*）内の歴史的参照の更新",
+        "sources": [
+          "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md §Consequences"
+        ]
+      },
+      {
+        "text": ".claude/rules/, .claude/commands/, .claude/skills/ ディレクトリの移動（ハーネス設定として .claude/ に残留）",
+        "sources": [
+          "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md §Decision"
+        ]
+      },
+      {
+        "text": "track/ ディレクトリの移動（ワークフローステートマシンとして独立維持）",
+        "sources": [
+          "CLAUDE.md §優先参照"
+        ]
+      },
+      {
+        "text": "ルートレベルの CLAUDE.md, DEVELOPER_AI_WORKFLOW.md 等の移動（Claude Code が自動読み込みする）",
+        "sources": [
+          "CLAUDE.md §優先参照"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "各タスクの diff は 500 行以下に抑える",
+      "sources": [
+        "feedback — small review surface policy"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T005",
+        "T006",
+        "T007",
+        "T008"
+      ]
+    },
+    {
+      "text": "TDD ワークフロー必須: 失敗テストを先に書いてから実装",
+      "sources": [
+        "convention — .claude/rules/05-testing.md"
+      ]
+    },
+    {
+      "text": "domain 層はパス定数を持たない（hexagonal architecture 制約）",
+      "sources": [
+        "convention — project-docs/conventions/hexagonal-architecture.md"
+      ]
+    },
+    {
+      "text": "各タスク完了後に cargo make ci が通ること",
+      "sources": [
+        "convention — .claude/rules/10-guardrails.md"
+      ]
+    },
+    {
+      "text": "新規ロジックは Rust で実装する（Rust-first ポリシー）",
+      "sources": [
+        "feedback — Rust-first policy"
+      ]
+    },
+    {
+      "text": "段階的ハードカット方式（シンボリックリンク不使用）。一時的な dual-read 互換性をコードに追加",
+      "sources": [
+        "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md"
+      ]
+    }
+  ],
+  "domain_states": [
+    {
+      "name": "scattered",
+      "description": "ドキュメントが 5 箇所に分散している現状（移行前）"
+    },
+    {
+      "name": "migrating",
+      "description": "ファイル移動中、一時的な dual-read 互換性が有効な状態"
+    },
+    {
+      "name": "consolidated",
+      "description": "全ドキュメントが knowledge/ に集約され、旧パスが廃止された状態"
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": ".claude/docs/, project-docs/, docs/ ディレクトリが削除されている",
+      "sources": [
+        "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md"
+      ],
+      "task_refs": [
+        "T008"
+      ]
+    },
+    {
+      "text": "knowledge/ 配下に architecture.md, WORKFLOW.md, conventions/ (9 convention .md + README.md), research/ (既存 + .claude/docs/research/ 由来 13 ファイル統合), designs/ (3 design + 2 schema = 5 ファイル), external/ (POLICY.md + guides.json) が存在し、各ディレクトリが空でないこと",
+      "sources": [
+        "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md"
+      ],
+      "task_refs": [
+        "T004",
+        "T005",
+        "T006",
+        "T007"
+      ]
+    },
+    {
+      "text": "architecture-rules.json が repo root に存在する",
+      "sources": [
+        "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "cargo make ci が全チェック通過する（verify doc-links 含む）",
+      "sources": [
+        "convention — .claude/rules/10-guardrails.md"
+      ],
+      "task_refs": [
+        "T008"
+      ]
+    },
+    {
+      "text": "sotp verify doc-links が Markdown 内の相対パスリンク存在を検証できる",
+      "sources": [
+        "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "Rust ソース内の旧パス定数（ARCH_RULES_FILE 等）が新パスに更新されている",
+      "sources": [
+        "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md §Decision"
+      ],
+      "task_refs": [
+        "T003",
+        "T004"
+      ]
+    },
+    {
+      "text": "planning-only 判定（review/mod.rs, git_workflow.rs）が新パスに対応している",
+      "sources": [
+        "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md §Decision"
+      ],
+      "task_refs": [
+        "T001",
+        "T006",
+        "T007"
+      ]
+    },
+    {
+      "text": "knowledge/README.md に統一的な索引と読み順が記載されている",
+      "sources": [
+        "knowledge/adr/2026-03-30-0546-knowledge-directory-consolidation.md"
+      ],
+      "task_refs": [
+        "T007"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "project-docs/conventions/hexagonal-architecture.md",
+    "project-docs/conventions/source-attribution.md",
+    "project-docs/conventions/adr.md",
+    ".claude/rules/05-testing.md",
+    ".claude/rules/10-guardrails.md"
+  ],
+  "signals": {
+    "blue": 25,
+    "yellow": 0,
+    "red": 0
+  }
+}

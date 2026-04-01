@@ -4,8 +4,8 @@
 > **前版**: `knowledge/strategy/TODO-PLAN.md` (v3)
 > **ビジョン**: [`knowledge/strategy/vision.md`](vision.md) ← v4 採用時に改訂
 > **変更理由**: sotp CLI をスタンドアロンツールとして切り出し、テンプレートは sotp ワークフローを前提とする方針に転換
-> **分析レポート**: [`tmp/template-overfitting-analysis-2026-03-23.md`](../../tmp/template-overfitting-analysis-2026-03-23.md)
-> **リファクタリング詳細**: [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md)
+> **分析レポート**: [`tmp/template-overfitting-analysis-2026-03-23.md`](./template-overfitting-analysis-2026-03-23.md)
+> **リファクタリング詳細**: [`tmp/refactoring-plan-2026-03-19.md`](./refactoring-plan-2026-03-19.md)
 > **進捗管理**: [`knowledge/strategy/progress-tracker.md`](progress-tracker.md) ← v4 採用時に改訂
 > **TODO 詳細**: [`knowledge/strategy/TODO.md`](TODO.md)
 
@@ -58,7 +58,7 @@ Phase 6        テンプレート外枠（scaffold）
 
 ## Phase 1.5: sotp CLI 品質改善 + 論理分離（▶ 進行中）
 
-> **詳細計画**: [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md)
+> **詳細計画**: [`tmp/refactoring-plan-2026-03-19.md`](./refactoring-plan-2026-03-19.md)
 
 **目標**: CLI 肥大化解消 + domain 型化 + sotp とテンプレートの論理的境界を確立。
 

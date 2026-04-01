@@ -72,7 +72,7 @@ The blocked message instructs the developer to execute three steps:
 
 1. **Workspace Search**: Use `Grep` to check whether existing code solves the problem.
 2. **Reinvention Check**: Invoke the `researcher` capability to survey crates.io.
-   Save results to `.claude/docs/research/reinvention-check-{concern}.md`.
+   Save results to `knowledge/research/reinvention-check-{concern}.md`.
 3. **Decision**: Run `sotp review resolve-escalation` with evidence:
    ```
    sotp review resolve-escalation \
@@ -104,7 +104,7 @@ into the `record-round` CLI command directly. The calling orchestrator must pass
 
 ### Design Reference
 
-Full design with Canonical Blocks: `.claude/docs/DESIGN.md` → "Review Escalation Threshold (WF-36)"
+Full design with Canonical Blocks: `knowledge/DESIGN.md` → "Review Escalation Threshold (WF-36)"
 
 ### Known Limitation (CLI-02)
 
@@ -116,12 +116,12 @@ Per `tmp/refactoring-plan-2026-03-19.md` CLI-02, this should be extracted to
 
 Before writing new parsing/analysis logic, verify the following:
 
-1. Check whether a related convention exists in `project-docs/conventions/`
+1. Check whether a related convention exists in `knowledge/conventions/`
 2. Use `Grep` to search for similar utilities in other crates within the workspace
-3. Check whether a matching concern exists in `canonical_modules` in `docs/architecture-rules.json`
+3. Check whether a matching concern exists in `canonical_modules` in `architecture-rules.json`
 4. If none of the above finds a match, have the `researcher` capability perform a quick survey of crates.io for equivalent functionality
 
-Reference: `project-docs/conventions/shell-parsing.md`
+Reference: `knowledge/conventions/shell-parsing.md`
 
 ## Reviewer Capability Constraint
 
@@ -137,6 +137,6 @@ Inline review within Claude Code's main context (self-review) is not a substitut
 Operational details live in:
 
 - `track/workflow.md`
-- `.claude/docs/WORKFLOW.md`
+- `knowledge/WORKFLOW.md`
 - `.claude/settings.json`
 - `.claude/hooks/`

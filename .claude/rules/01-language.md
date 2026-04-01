@@ -23,9 +23,9 @@ All Rust code in English:
 
 ## Documentation
 
-- Technical docs (`.claude/docs/DESIGN.md`, `.claude/docs/research/`): English（Codex/Gemini との連携のため）
+- Technical docs (`knowledge/DESIGN.md`, `knowledge/research/`): English（Codex/Gemini との連携のため）
 - Track specification files (`spec.md`, `plan.md`, `verification.md`): 日本語可（開発者向けの仕様書）
 - `plan.md` 内の `## Canonical Blocks`: verbatim English（specialist 出力をそのまま保持）
 - `track/workflow.md`, `track/tech-stack.md`, `track/product*.md`: 日本語可
-- `project-docs/conventions/`: 日本語可
+- `knowledge/conventions/`: 日本語可
 - README: 日本語可

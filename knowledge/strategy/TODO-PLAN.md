@@ -55,7 +55,7 @@ Phase 5        ワークフロー最適化
 
 ## Phase 1.5: ハーネス自身のコード品質改善（▶ 進行中）
 
-> **詳細計画**: [`tmp/refactoring-plan-2026-03-19.md`](../../tmp/refactoring-plan-2026-03-19.md)
+> **詳細計画**: [`tmp/refactoring-plan-2026-03-19.md`](./refactoring-plan-2026-03-19.md)
 > **Review 改善計画**: [`knowledge/strategy/rvw-remediation-plan.md`](../../knowledge/strategy/rvw-remediation-plan.md)（Phase A-J、58 件、~13-16 日）
 
 **目標**: CLI 肥大化解消 + domain 型化。テンプレート開発の生産性向上。
@@ -92,7 +92,7 @@ Phase 5        ワークフロー最適化
 | 1.5-25 | ~~**RVW-03**: review.json 分離 — review state を metadata.json から独立ファイルに外部化。metadata tampering bypass を構造的に排除 ([ADR](../../knowledge/adr/2026-03-24-1200-review-state-trust-model.md))~~ | M | ✅ done (`review-json-per-group-review-2026-03-29` + `autorecord-reviewjson-wiring-2026-03-30`) |
 | 1.5-26 | ~~**RVW-10/11**: verdict auto-record + diff scope filtering~~ | M | ✅ done (PR #63, `review-verdict-autorecord-2026-03-25`) |
 | 1.5-27 | ~~**RVW-13/15/17**: review infra quality hardening (GitDiffScope テスト, codex-reviewer agent 検証, auto-record e2e)~~ | M | ✅ done (PR #64, `review-infra-quality-2026-03-25`) |
-| 1.5-28 | ~~**WF-59**: review-scope manifest hash — review hash を index 全体から scope-aware manifest hash に移行 ([ADR](../../knowledge/adr/2026-03-26-0000-review-scope-manifest-hash.md))~~ | M | ✅ done (`autorecord-stabilization-2026-03-26` で実装、後続トラックで運用) |
+| 1.5-28 | ~~**WF-59**: review-scope manifest hash — review hash を index 全体から scope-aware manifest hash に移行 (ADR pending)~~ | M | ✅ done (`autorecord-stabilization-2026-03-26` で実装、後続トラックで運用) |
 | 1.5-29 | **WF-43**: verdict 改ざん防止 — provenance + write-guard + CLI 封鎖 + SHA-256 検証 | L | planned (`tamper-proof-review-2026-03-26`) |
 
 ---

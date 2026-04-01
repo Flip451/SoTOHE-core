@@ -48,19 +48,19 @@ Note: See `.claude/agent-profiles.json` for which provider handles each capabili
 
 | Decision | ADR | Date |
 |----------|-----|------|
-| TrackStatus derived from tasks, not stored | [ADR](../../knowledge/adr/2026-03-11-0000-track-status-derived.md) | 2026-03-11 |
-| TaskStatus::Done owns Option\<CommitHash\> | [ADR](../../knowledge/adr/2026-03-11-0010-done-owns-commit-hash.md) | 2026-03-11 |
-| TaskTransition as explicit enum commands | [ADR](../../knowledge/adr/2026-03-11-0020-task-transition-enum.md) | 2026-03-11 |
-| StatusOverride auto-clears on all-resolved | [ADR](../../knowledge/adr/2026-03-11-0030-status-override-auto-clear.md) | 2026-03-11 |
-| Plan-task referential integrity at construction | [ADR](../../knowledge/adr/2026-03-11-0040-plan-task-integrity.md) | 2026-03-11 |
-| Fail-closed hook error handling | [ADR](../../knowledge/adr/2026-03-11-0050-fail-closed-hooks.md) | 2026-03-11 |
-| ~~Shell guard in domain layer (no trait)~~ | [ADR (superseded)](../../knowledge/adr/2026-03-11-0060-shell-guard-in-domain.md) | 2026-03-11 |
-| INF-20: ShellParser port + ConchShellParser adapter | [ADR](../../knowledge/adr/2026-03-23-1000-shell-parser-port.md) | 2026-03-23 |
-| conch-parser for shell AST (vendored, patched) | [ADR](../../knowledge/adr/2026-03-11-0070-conch-parser-selection.md) | 2026-03-11 |
-| Guard policy: ban edge-case-producing patterns | [ADR](../../knowledge/adr/2026-03-11-0080-guard-policy-ban-patterns.md) | 2026-03-11 |
-| Reviewer model_profiles in agent-profiles.json | [ADR](../../knowledge/adr/2026-03-17-0000-reviewer-model-profiles.md) | 2026-03-17 |
-| TSUMIKI-01/SPEC-05: 3-level signals with SignalBasis | [ADR](../../knowledge/adr/2026-03-23-1010-three-level-signals.md) | 2026-03-23 |
-| Two-stage signal architecture | [ADR](../../knowledge/adr/2026-03-23-1020-two-stage-signals.md) | 2026-03-23 |
+| TrackStatus derived from tasks, not stored | [ADR](adr/2026-03-11-0000-track-status-derived.md) | 2026-03-11 |
+| TaskStatus::Done owns Option\<CommitHash\> | [ADR](adr/2026-03-11-0010-done-owns-commit-hash.md) | 2026-03-11 |
+| TaskTransition as explicit enum commands | [ADR](adr/2026-03-11-0020-task-transition-enum.md) | 2026-03-11 |
+| StatusOverride auto-clears on all-resolved | [ADR](adr/2026-03-11-0030-status-override-auto-clear.md) | 2026-03-11 |
+| Plan-task referential integrity at construction | [ADR](adr/2026-03-11-0040-plan-task-integrity.md) | 2026-03-11 |
+| Fail-closed hook error handling | [ADR](adr/2026-03-11-0050-fail-closed-hooks.md) | 2026-03-11 |
+| ~~Shell guard in domain layer (no trait)~~ | [ADR (superseded)](adr/2026-03-11-0060-shell-guard-in-domain.md) | 2026-03-11 |
+| INF-20: ShellParser port + ConchShellParser adapter | [ADR](adr/2026-03-23-1000-shell-parser-port.md) | 2026-03-23 |
+| conch-parser for shell AST (vendored, patched) | [ADR](adr/2026-03-11-0070-conch-parser-selection.md) | 2026-03-11 |
+| Guard policy: ban edge-case-producing patterns | [ADR](adr/2026-03-11-0080-guard-policy-ban-patterns.md) | 2026-03-11 |
+| Reviewer model_profiles in agent-profiles.json | [ADR](adr/2026-03-17-0000-reviewer-model-profiles.md) | 2026-03-17 |
+| TSUMIKI-01/SPEC-05: 3-level signals with SignalBasis | [ADR](adr/2026-03-23-1010-three-level-signals.md) | 2026-03-23 |
+| Two-stage signal architecture | [ADR](adr/2026-03-23-1020-two-stage-signals.md) | 2026-03-23 |
 | CC-SDD-02: SpecStatus enum + content hash auto-demotion | — | 2026-03-24 |
 
 ## Crate Selection

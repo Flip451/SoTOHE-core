@@ -82,7 +82,7 @@ class ArchitectureRulesTest(unittest.TestCase):
             root = Path(tmp_dir)
             docs_dir = root / "docs"
             docs_dir.mkdir(parents=True, exist_ok=True)
-            (docs_dir / "architecture-rules.json").write_text(
+            (root / "architecture-rules.json").write_text(
                 json.dumps(
                     {
                         "version": 1,
@@ -143,7 +143,7 @@ class ArchitectureRulesTest(unittest.TestCase):
             root = Path(tmp_dir)
             docs_dir = root / "docs"
             docs_dir.mkdir(parents=True, exist_ok=True)
-            (docs_dir / "architecture-rules.json").write_text(
+            (root / "architecture-rules.json").write_text(
                 json.dumps(
                     {
                         "version": 1,
@@ -177,7 +177,7 @@ class ArchitectureRulesTest(unittest.TestCase):
             root = Path(tmp_dir)
             docs_dir = root / "docs"
             docs_dir.mkdir(parents=True, exist_ok=True)
-            (docs_dir / "architecture-rules.json").write_text(
+            (root / "architecture-rules.json").write_text(
                 json.dumps(
                     {
                         "version": 1,
@@ -234,7 +234,7 @@ class ArchitectureRulesTest(unittest.TestCase):
             root = Path(tmp_dir)
             docs_dir = root / "docs"
             docs_dir.mkdir(parents=True, exist_ok=True)
-            (docs_dir / "architecture-rules.json").write_text(
+            (root / "architecture-rules.json").write_text(
                 json.dumps(
                     {
                         "version": 1,
@@ -290,7 +290,7 @@ class ArchitectureRulesTest(unittest.TestCase):
             root = Path(tmp_dir)
             docs_dir = root / "docs"
             docs_dir.mkdir(parents=True, exist_ok=True)
-            (docs_dir / "architecture-rules.json").write_text(
+            (root / "architecture-rules.json").write_text(
                 json.dumps(
                     {
                         "version": 1,
@@ -323,7 +323,7 @@ class ArchitectureRulesTest(unittest.TestCase):
             root = Path(tmp_dir)
             docs_dir = root / "docs"
             docs_dir.mkdir(parents=True, exist_ok=True)
-            (docs_dir / "architecture-rules.json").write_text(
+            (root / "architecture-rules.json").write_text(
                 json.dumps(
                     {
                         "version": 1,
@@ -464,7 +464,7 @@ class ArchitectureRulesTest(unittest.TestCase):
                 }
             ],
             "extra_dirs": [
-                {"path": "project-docs/conventions", "label": "project rules"},
+                {"path": "knowledge/conventions", "label": "project rules"},
                 {"path": "track/items/<id>", "label": "active track"},
             ],
         }
@@ -473,7 +473,7 @@ class ArchitectureRulesTest(unittest.TestCase):
             rules, include_extra_dirs=True
         )
 
-        self.assertIn("project-docs/", rendered)
+        self.assertIn("knowledge/", rendered)
         self.assertIn("└── conventions/", rendered)
         self.assertIn("# domain crate", rendered)
         self.assertIn("# project rules", rendered)
@@ -643,7 +643,7 @@ class ArchitectureRulesTest(unittest.TestCase):
             root = Path(tmp_dir)
             docs_dir = root / "docs"
             docs_dir.mkdir(parents=True, exist_ok=True)
-            (docs_dir / "architecture-rules.json").write_text(
+            (root / "architecture-rules.json").write_text(
                 json.dumps({"version": 1, "layers": []}, ensure_ascii=False, indent=2)
                 + "\n",
                 encoding="utf-8",

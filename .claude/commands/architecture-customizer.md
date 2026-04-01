@@ -7,7 +7,7 @@ Canonical wrapper for workspace architecture changes in this template.
 Execution:
 - Clarify the target architecture in Japanese with a concrete crate map before any edits.
 - Translate the target architecture into explicit dependency rules and denial reasons.
-- Update `docs/architecture-rules.json` first, then enforcement, then crate layout, then documentation.
+- Update `architecture-rules.json` first, then enforcement, then crate layout, then documentation.
 - Run the architecture validation gates in order and stop if any gate fails.
 - The default template uses `apps/` and `libs/`, but other workspace roots are allowed if enforcement and docs stay in sync.
 
@@ -16,7 +16,7 @@ Required workflow:
 2. Define which crates may depend on which crates.
 3. Update architecture enforcement:
    - `Cargo.toml`
-   - `docs/architecture-rules.json`
+   - `architecture-rules.json`
    - `deny.toml`
    - `scripts/check_layers.py`
    - `Makefile.toml`

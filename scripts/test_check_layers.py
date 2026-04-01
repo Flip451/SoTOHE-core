@@ -276,7 +276,7 @@ class CheckLayersTest(unittest.TestCase):
             root = Path(tmp_dir)
             docs_dir = root / "docs"
             docs_dir.mkdir(parents=True, exist_ok=True)
-            (docs_dir / "architecture-rules.json").write_text(
+            (root / "architecture-rules.json").write_text(
                 json.dumps(self.rules(), ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
             )

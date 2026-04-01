@@ -54,7 +54,7 @@ Before committing:
    - `track/items/<id>/`
    - `track/registry.md`
    - `track/tech-stack.md`
-   - `.claude/docs/DESIGN.md`
+   - `knowledge/DESIGN.md`
    If staged changes exceed that allowlist, stop and require `/track:activate <track-id>` first.
 
 ## Step 2: Guarded commit

@@ -12,8 +12,8 @@
 6. **CI グリーン**: `cargo make ci`（docker compose内実行）が通らない限りコミットしない
 7. **No Panics in Production**: `unwrap()` は本番コードでは使用しない
 8. **Rust Edition 2024**: 新規コードは Rust Edition 2024 前提で作成する
-9. **Layer 強制**: workspace の層依存ルールは `docs/architecture-rules.json` を真実の源泉として常に維持する
-10. **外部長文ガイドの節約参照**: 深い外部指針が必要な時は `docs/external-guides.json` と `docs/EXTERNAL_GUIDES.md` を先に確認し、必要時だけ原文キャッシュを読む
+9. **Layer 強制**: workspace の層依存ルールは `architecture-rules.json` を真実の源泉として常に維持する
+10. **外部長文ガイドの節約参照**: 深い外部指針が必要な時は `knowledge/external/guides.json` と `knowledge/external/POLICY.md` を先に確認し、必要時だけ原文キャッシュを読む
 11. **自己修復優先**: 実装が 3 回以上詰まった時は即 ABORT せず、debug/research フェーズで原因を切り分ける
 12. **レビューサーフェース最小化**: タスク単位でレビュー→コミットする。一括実装後の大量 diff レビューは避ける。レビューコストはコード量の二乗に近似するため（読解量 O(N) × 指摘数 O(N)）、M 分割で O(N^2/M) に削減できる
 
@@ -48,8 +48,8 @@ Specialist capability の実体は `.claude/agent-profiles.json` で決まる。
 
 補足:
 
-- `/track:plan`, `/track:implement`, `/track:review`, `/track:full-cycle` では、ユーザープロンプトと最新トラックの `spec.md` / `plan.md` を走査し、`docs/external-guides.json` の `trigger_keywords` に一致した要約が自動で追加コンテキストに注入される
-- 層依存ルールを変更する場合は `docs/architecture-rules.json` を起点に `deny.toml` を更新する（`cargo make check-layers` で検証）
+- `/track:plan`, `/track:implement`, `/track:review`, `/track:full-cycle` では、ユーザープロンプトと最新トラックの `spec.md` / `plan.md` を走査し、`knowledge/external/guides.json` の `trigger_keywords` に一致した要約が自動で追加コンテキストに注入される
+- 層依存ルールを変更する場合は `architecture-rules.json` を起点に `deny.toml` を更新する（`cargo make check-layers` で検証）
 
 ### トラック成果物の作成
 

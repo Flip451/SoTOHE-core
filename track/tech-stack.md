@@ -18,7 +18,7 @@
 - **エラー型**: `thiserror` (`#[derive(Error)]`) でドメインエラーを定義
 - **Repository 契約**: 現行テンプレートでは同期トレイトを前提とする
   理由: async DB を採用する場合は async runtime の決定に加えて `domain/usecase/infrastructure` の repository 契約変更が必要になるため、採用時にまとめて見直す
-- **機械可読 SoT**: `docs/architecture-rules.json`
+- **機械可読 SoT**: `architecture-rules.json`
 
 ### Workspace 構成（標準）
 
@@ -34,9 +34,9 @@ apps/cli             # CLI エントリーポイント + composition root（usec
 - `domain` は `usecase/infrastructure/cli` へ依存してはいけない
 - `usecase` は `infrastructure/cli` へ依存してはいけない
 - `infrastructure` は `domain` と `usecase` に依存可能（usecase port trait を実装するため）。`cli` へは依存してはいけない
-- `deny.toml` と `sotp verify layers` は `docs/architecture-rules.json` と同期させる
+- `deny.toml` と `sotp verify layers` は `architecture-rules.json` と同期させる
 - ルール検証: `cargo make check-layers` と `cargo make deny`
-- 詳細: `project-docs/conventions/hexagonal-architecture.md`
+- 詳細: `knowledge/conventions/hexagonal-architecture.md`
 
 ## Web レイヤー
 
@@ -81,7 +81,7 @@ apps/cli             # CLI エントリーポイント + composition root（usec
 ## Version Baseline
 
 - **最新調査日**: 2026-03-11
-- **調査ログ**: `.claude/docs/research/version-baseline-2026-03-11.md`
+- **調査ログ**: `knowledge/research/version-baseline-2026-03-11.md`
 - **反映対象**: `Cargo.toml`, `Dockerfile`, `Makefile.toml`（ツールバージョン指定がある場合）
 
 ## 変更履歴

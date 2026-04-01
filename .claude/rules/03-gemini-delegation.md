@@ -50,7 +50,7 @@ gemini -p "Extract from /path/to/file.pdf: {what to extract}" 2>/dev/null
 
 ## Output
 
-調査結果は `.claude/docs/research/{topic}.md` に保存する。
+調査結果は `knowledge/research/{topic}.md` に保存する。
 
 ## Language Protocol
 

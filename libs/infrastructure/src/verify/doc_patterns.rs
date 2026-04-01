@@ -39,7 +39,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     }
 
     // Convention docs checks — only when conventions are bootstrapped.
-    let conventions_readme = root.join("project-docs").join("conventions").join("README.md");
+    let conventions_readme = root.join("knowledge").join("conventions").join("README.md");
     if conventions_readme.is_file() {
         for check in CONVENTIONS_REQUIRED_FILES {
             outcome.merge(require_file(root, check.rel_path, check.label));
@@ -87,7 +87,7 @@ fn require_line(root: &Path, rel_path: &str, pattern: &str, label: &str) -> Veri
 
 static REQUIRED_FILES: &[RequireFile] = &[
     RequireFile {
-        rel_path: "docs/architecture-rules.json",
+        rel_path: "architecture-rules.json",
         label: "architecture rules source of truth",
     },
     RequireFile { rel_path: "scripts/architecture_rules.py", label: "architecture rules helper" },
@@ -220,23 +220,18 @@ static REQUIRED_LINES: &[RequireLine] = &[
 static CONVENTIONS_REQUIRED_LINES: &[RequireLine] = &[
     RequireLine {
         rel_path: "CLAUDE.md",
-        pattern: "project-docs/conventions/",
+        pattern: "knowledge/conventions/",
         label: "CLAUDE project conventions reference",
     },
     RequireLine {
         rel_path: ".codex/instructions.md",
-        pattern: "project-docs/conventions/",
+        pattern: "knowledge/conventions/",
         label: "Codex project conventions reference",
     },
     RequireLine {
         rel_path: "DEVELOPER_AI_WORKFLOW.md",
-        pattern: "project-docs/conventions/",
+        pattern: "knowledge/conventions/",
         label: "developer workflow project conventions reference",
-    },
-    RequireLine {
-        rel_path: "docs/README.md",
-        pattern: "project-docs/conventions/",
-        label: "docs README project conventions reference",
     },
 ];
 

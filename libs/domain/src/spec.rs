@@ -981,7 +981,7 @@ mod tests {
             vec![DomainStateEntry::new("Draft", "Initial", None).unwrap()],
             vec![SpecRequirement::new("AC 1", vec![]).unwrap()],
             vec![],
-            vec!["project-docs/conventions/hex.md".into()],
+            vec!["knowledge/conventions/hex.md".into()],
             None,
             None,
             None,

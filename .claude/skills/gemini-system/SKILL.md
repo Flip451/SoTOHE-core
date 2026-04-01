@@ -126,7 +126,7 @@ For multimodal files (PDF, image, etc.), use path-in-prompt instead of stdin red
 3. **Save results** before deleting the briefing file
 
    ```bash
-   # Save to .claude/docs/research/{topic}.md via Write tool
+   # Save to knowledge/research/{topic}.md via Write tool
    ```
 
 4. **Delete the briefing file** (Claude Code uses Bash tool)
@@ -163,8 +163,8 @@ Use this file-based pattern when content is long or contains special characters.
 Always save research results before discarding the briefing file:
 
 ```
-.claude/docs/research/{topic}.md       # research results
-.claude/docs/libraries/{crate-name}.md # crate-specific notes
+knowledge/research/{topic}.md       # research results
+knowledge/research/{crate-name}.md  # crate-specific notes
 ```
 
 ## Execution Tips

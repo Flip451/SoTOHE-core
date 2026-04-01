@@ -91,7 +91,7 @@ cargo make tools-down
 - Create or reuse the active track PR: `cargo make track-pr-ensure`
 - Run the PR review helper: `cargo make track-pr-review`
 
-外部長文ガイドの運用ルールは `docs/EXTERNAL_GUIDES.md` を参照する。
+外部長文ガイドの運用ルールは `knowledge/external/POLICY.md` を参照する。
 `.claude/agent-profiles.json` の `workflow_host_provider` / `workflow_host_model` は、残存 migration compatibility surface が消えるまで host-side workflow provider を表す設定である。
 
 ## Git Notes (Optional)

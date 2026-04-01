@@ -492,7 +492,7 @@ mod tests {
   "domain_states": [{ "name": "Draft", "description": "Initial state" }],
   "acceptance_criteria": [{ "text": "AC 1", "sources": ["PRD §4.1"] }],
   "additional_sections": [{ "title": "Custom Section", "content": ["Line 1"] }],
-  "related_conventions": ["project-docs/conventions/source-attribution.md"],
+  "related_conventions": ["knowledge/conventions/source-attribution.md"],
   "signals": { "blue": 15, "yellow": 0, "red": 0 }
 }"#;
 
@@ -533,7 +533,7 @@ mod tests {
         assert_eq!(doc.additional_sections().len(), 1);
         assert_eq!(doc.additional_sections()[0].title(), "Custom Section");
         assert_eq!(doc.additional_sections()[0].content(), &["Line 1"]);
-        assert_eq!(doc.related_conventions(), &["project-docs/conventions/source-attribution.md"]);
+        assert_eq!(doc.related_conventions(), &["knowledge/conventions/source-attribution.md"]);
         let signals = doc.signals().unwrap();
         assert_eq!(signals.blue(), 15);
         assert_eq!(signals.yellow(), 0);

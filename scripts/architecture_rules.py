@@ -21,7 +21,7 @@ def project_root() -> Path:
 
 
 def rules_path() -> Path:
-    return project_root() / "docs" / "architecture-rules.json"
+    return project_root() / "architecture-rules.json"
 
 
 def cargo_toml_path() -> Path:
@@ -316,7 +316,7 @@ def render_workspace_tree(rules: dict, *, include_extra_dirs: bool) -> str:
 
 def verify_sync(root: Path | None = None) -> list[str]:
     repo_root = root or project_root()
-    rules_file = repo_root / "docs" / "architecture-rules.json"
+    rules_file = repo_root / "architecture-rules.json"
     cargo_file = repo_root / "Cargo.toml"
     deny_file = repo_root / "deny.toml"
 
@@ -394,7 +394,7 @@ def run_verify_sync() -> int:
         for error in errors:
             print(f"[ERROR] {error}", file=sys.stderr)
         return 1
-    print("[OK] docs/architecture-rules.json matches Cargo.toml and deny.toml")
+    print("[OK] architecture-rules.json matches Cargo.toml and deny.toml")
     return 0
 
 

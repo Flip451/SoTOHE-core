@@ -10,7 +10,7 @@ Always consider:
 
 - user-facing docs:
   - `DEVELOPER_AI_WORKFLOW.md`
-  - `.claude/docs/WORKFLOW.md`
+  - `knowledge/WORKFLOW.md`
 - track docs:
   - `track/workflow.md`
   - `track/tech-stack.md`

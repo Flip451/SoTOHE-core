@@ -73,7 +73,7 @@ Save analysis output before deleting the snapshot:
 
 ```bash
 # Claude Code saves via Write tool to:
-# .claude/docs/research/{feature}-codebase.md
+# knowledge/research/{feature}-codebase.md
 ```
 
 ### Step 4: Delete snapshot
@@ -111,4 +111,4 @@ rm tmp/repomix-snapshot.md
 - `tmp/` is gitignored — snapshot never pollutes commits
 - repomix respects `.gitignore` by default (`target/`, `.cache/` are excluded)
 - Add `--compress` or narrow with `--include` if output is too large
-- Always save analysis results to `.claude/docs/research/{topic}.md` before deleting the snapshot
+- Always save analysis results to `knowledge/research/{topic}.md` before deleting the snapshot

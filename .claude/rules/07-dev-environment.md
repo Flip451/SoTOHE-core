@@ -150,7 +150,7 @@ Return markdown table with: item | current | latest | recommendation.
 Include source links." 2>/dev/null
 ```
 
-調査結果を `.claude/docs/research/version-baseline-YYYY-MM-DD.md` に保存し、
+調査結果を `knowledge/research/version-baseline-YYYY-MM-DD.md` に保存し、
 `Cargo.toml` / `Dockerfile` / `track/tech-stack.md` に反映してから実装を開始する。
 
 ## Lint & Format

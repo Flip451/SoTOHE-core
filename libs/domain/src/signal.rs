@@ -280,7 +280,7 @@ mod tests {
     )]
     #[case::feedback("feedback — Rust-first policy", Some(SignalBasis::Feedback))]
     #[case::convention(
-        "convention — project-docs/conventions/security.md",
+        "convention — knowledge/conventions/security.md",
         Some(SignalBasis::Convention)
     )]
     #[case::discussion("discussion", Some(SignalBasis::Discussion))]

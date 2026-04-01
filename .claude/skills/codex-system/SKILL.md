@@ -311,4 +311,4 @@ Verify the fix in {file}:{line range}. Any remaining bugs?
 - Always ask in English for best results
 - Pass full error messages including error codes
 - Include relevant code context (not just the error line)
-- Save important design decisions to `.claude/docs/DESIGN.md`
+- Save important design decisions to `knowledge/DESIGN.md`

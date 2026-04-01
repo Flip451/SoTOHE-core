@@ -10,8 +10,8 @@ use domain::verify::{Finding, VerifyOutcome};
 /// Verify architecture rules synchronization.
 ///
 /// Checks:
-/// 1. `docs/architecture-rules.json` matches `Cargo.toml` workspace members.
-/// 2. `docs/architecture-rules.json` matches `deny.toml` deny rules.
+/// 1. `architecture-rules.json` matches `Cargo.toml` workspace members.
+/// 2. `architecture-rules.json` matches `deny.toml` deny rules.
 /// 3. Each workspace member path appears in `Cargo.toml` and `track/tech-stack.md`.
 ///
 /// # Errors
@@ -59,7 +59,7 @@ struct LayerRule {
 }
 
 fn load_rules(root: &Path) -> Result<serde_json::Value, String> {
-    let path = root.join("docs").join("architecture-rules.json");
+    let path = root.join("architecture-rules.json");
     let content = std::fs::read_to_string(&path)
         .map_err(|e| format!("Cannot read {}: {e}", path.display()))?;
     serde_json::from_str(&content).map_err(|e| format!("Invalid JSON in {}: {e}", path.display()))
@@ -400,7 +400,7 @@ mod tests {
     fn setup_rules(root: &Path) {
         write_file(
             root,
-            "docs/architecture-rules.json",
+            "architecture-rules.json",
             r#"{
   "layers": [
     {"crate": "domain", "path": "libs/domain", "may_depend_on": [], "deny_reason": "controlled"},

@@ -365,9 +365,9 @@ class ExternalGuidesTest(unittest.TestCase):
         registry = json.loads(json.dumps(self.registry))
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            docs_dir = root / "docs"
-            docs_dir.mkdir(parents=True, exist_ok=True)
-            registry_file = docs_dir / "external-guides.json"
+            ext_dir = root / "knowledge" / "external"
+            ext_dir.mkdir(parents=True, exist_ok=True)
+            registry_file = ext_dir / "guides.json"
             registry_file.write_text(
                 json.dumps(registry, ensure_ascii=False, indent=2), encoding="utf-8"
             )
@@ -412,9 +412,9 @@ class ExternalGuidesTest(unittest.TestCase):
         registry = json.loads(json.dumps(self.registry))
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
-            docs_dir = root / "docs"
-            docs_dir.mkdir(parents=True, exist_ok=True)
-            registry_file = docs_dir / "external-guides.json"
+            ext_dir = root / "knowledge" / "external"
+            ext_dir.mkdir(parents=True, exist_ok=True)
+            registry_file = ext_dir / "guides.json"
             registry_file.write_text(
                 json.dumps(registry, ensure_ascii=False, indent=2), encoding="utf-8"
             )

@@ -19,13 +19,13 @@
         "prev_was_fd_digit"
       ],
       "allowed_in": ["libs/domain/src/guard/", "libs/infrastructure/src/shell/"],
-      "convention": "project-docs/conventions/shell-parsing.md",
+      "convention": "knowledge/conventions/shell-parsing.md",
       "rationale": "All shell command parsing must use the ShellParser port (domain::guard::ShellParser) with ConchShellParser adapter (infrastructure::shell)"
     }
   ],
   "extra_dirs": [
     {
-      "path": "project-docs/conventions",
+      "path": "knowledge/conventions",
       "label": "project-specific engineering rules"
     },
     {
