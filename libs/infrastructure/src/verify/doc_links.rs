@@ -74,13 +74,11 @@ pub fn verify(root: &Path) -> VerifyOutcome {
                 }
 
                 // Strip optional title attribute: [text](path "title") or [text](path 'title')
+                // Split on space+quote to avoid truncating apostrophes in filenames.
                 let link_target = link_target
-                    .split('"')
-                    .next()
-                    .unwrap_or(link_target)
-                    .split('\'')
-                    .next()
-                    .unwrap_or(link_target)
+                    .split_once(" \"")
+                    .or_else(|| link_target.split_once(" '"))
+                    .map_or(link_target, |(path, _)| path)
                     .trim();
                 // Strip anchor fragment from path
                 let path_part = link_target.split('#').next().unwrap_or(link_target);
