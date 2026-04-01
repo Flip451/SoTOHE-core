@@ -43,7 +43,7 @@ def project_root() -> Path:
 
 
 def registry_path() -> Path:
-    return project_root() / "docs" / "external-guides.json"
+    return project_root() / "knowledge" / "external" / "guides.json"
 
 
 def load_registry() -> dict:

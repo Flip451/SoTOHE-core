@@ -33,8 +33,8 @@ Read these first before planning or implementation:
 - `TRACK_TRACEABILITY.md`
 - `.claude/docs/DESIGN.md`
 - `.claude/rules/`
-- `docs/EXTERNAL_GUIDES.md`
-- `docs/external-guides.json`
+- `knowledge/external/POLICY.md`
+- `knowledge/external/guides.json`
 - `architecture-rules.json`
 
 Operational split:
@@ -44,8 +44,8 @@ Operational split:
 - `track/workflow.md`: day-to-day workflow rules
 - `knowledge/conventions/`: project-specific engineering rules and implementation policies
 - `TRACK_TRACEABILITY.md`: `plan.md` state transitions and registry update rules
-- `docs/external-guides.json`: registry for long-form external guides cached outside git
-- `docs/EXTERNAL_GUIDES.md`: operating policy for external long-form guides
+- `knowledge/external/guides.json`: registry for long-form external guides cached outside git
+- `knowledge/external/POLICY.md`: operating policy for external long-form guides
 - `architecture-rules.json`: machine-readable layer dependency source of truth for `deny.toml` and `scripts/check_layers.py`
 - `.claude/agent-profiles.json`: capability-to-provider mapping source of truth
 

@@ -19,8 +19,8 @@
 - `knowledge/conventions/README.md`
 - `knowledge/conventions/`
 - `architecture-rules.json`
-- `docs/EXTERNAL_GUIDES.md`
-- `docs/external-guides.json`
+- `knowledge/external/POLICY.md`
+- `knowledge/external/guides.json`
 - `TRACK_TRACEABILITY.md`
 
 運用要点:

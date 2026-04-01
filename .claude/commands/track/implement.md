@@ -20,7 +20,7 @@ Execution:
 - Use `cargo make track-transition <track_dir> <task_id> in_progress` to mark selected tasks as `in_progress` in `metadata.json` and auto-render `plan.md` + `registry.md`. Do NOT edit `plan.md` directly — it is a read-only view rendered from metadata.json (SSoT).
 - Before using `cargo make *-exec` commands or Agent Teams fast loops, confirm `cargo make tools-up` has already started `tools-daemon`. If not, either start it first or fall back to `run --rm` tasks.
 - Run Agent Teams based parallel implementation for the current approved plan.
-- Use any auto-injected external guide summaries from `docs/external-guides.json` before opening cached raw guide documents.
+- Use any auto-injected external guide summaries from `knowledge/external/guides.json` before opening cached raw guide documents.
 - If `$ARGUMENTS` is provided, treat it as implementation scope.
 - Do not modify dependencies or rewrite `Cargo.lock` from multiple workers at once. Serialize `cargo add`, `cargo update`, and any `Cargo.lock`-changing step through a single worker, then resume parallel work.
 - Parallel workers should prefer `cargo make test-one-exec {test_name}` for single-test validation. Reserve full-suite commands (`test-exec`, `check-exec`) for integration phases or a single worker to avoid `target/` build lock contention.

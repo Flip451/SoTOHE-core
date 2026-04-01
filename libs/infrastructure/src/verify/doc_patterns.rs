@@ -233,11 +233,6 @@ static CONVENTIONS_REQUIRED_LINES: &[RequireLine] = &[
         pattern: "knowledge/conventions/",
         label: "developer workflow project conventions reference",
     },
-    RequireLine {
-        rel_path: "docs/README.md",
-        pattern: "knowledge/conventions/",
-        label: "docs README project conventions reference",
-    },
 ];
 
 #[cfg(test)]

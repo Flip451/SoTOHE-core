@@ -7,7 +7,7 @@ Run track workflow setup for this repository.
 Execution rules:
 - Verify that `python3` is available because Claude hooks and external guide tasks depend on it.
 - Read `track/workflow.md`, `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md`.
-- Read `docs/EXTERNAL_GUIDES.md` and `docs/external-guides.json`.
+- Read `knowledge/external/POLICY.md` and `knowledge/external/guides.json`.
 - Ensure `track/registry.md` exists; if missing, create it with a minimal template list section.
 - Ensure the track convention includes `track/items/<id>/metadata.json` and `verification.md` alongside `spec.md` and `plan.md`.
 - Confirm required top-level docs exist (`CLAUDE.md`, `.claude/docs/WORKFLOW.md`, `.claude/docs/DESIGN.md`).

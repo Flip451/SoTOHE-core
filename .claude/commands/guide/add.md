@@ -2,10 +2,10 @@
 description: Add a new external long-form guide entry interactively.
 ---
 
-Register a new external guide in `docs/external-guides.json` with minimal user effort.
+Register a new external guide in `knowledge/external/guides.json` with minimal user effort.
 
 Execution rules:
-- First read `docs/EXTERNAL_GUIDES.md` and `docs/external-guides.json`.
+- First read `knowledge/external/POLICY.md` and `knowledge/external/guides.json`.
 - Ask the user only for missing values. Minimum required fields are:
   - source URL
   - title
@@ -19,7 +19,7 @@ Execution rules:
   - summary bullets
   - project usage bullets
 - Before writing, show the final normalized entry to the user and get confirmation.
-- After confirmation, update `docs/external-guides.json`.
+- After confirmation, update `knowledge/external/guides.json`.
 - Then run:
   - `cargo make guides-list`
 - Offer `cargo make guides-fetch <id>` as the next step, but do not require it if network is unavailable.

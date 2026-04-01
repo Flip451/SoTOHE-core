@@ -592,7 +592,7 @@ fn extract_paths_from_name_status(output: &str) -> Vec<&str> {
 /// are treated as code (fail-closed).
 fn is_planning_only_path(path: &str) -> bool {
     const PREFIXES: &[&str] =
-        &["track/", ".claude/commands/", ".claude/docs/", ".claude/rules/", "docs/", "knowledge/"];
+        &["track/", ".claude/commands/", ".claude/docs/", ".claude/rules/", "knowledge/"];
     // Exact config files that are always planning-only.
     const EXACT_FILES: &[&str] = &[
         "CLAUDE.md",

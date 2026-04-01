@@ -83,7 +83,7 @@
     {
       "description": "Move docs/EXTERNAL_GUIDES.md to knowledge/external/POLICY.md and docs/external-guides.json to knowledge/external/guides.json, update workflow and command references, delete docs/README.md (content absorbed into knowledge/README.md) and docs/ directory",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Move .claude/docs/WORKFLOW.md, .claude/docs/research/, .claude/docs/designs/, .claude/docs/schemas/ into knowledge/, update review-scope.json and hook references",
@@ -102,5 +102,5 @@
     }
   ],
   "title": "ドキュメント群の knowledge ディレクトリへの集約と整理",
-  "updated_at": "2026-04-01T00:50:26Z"
+  "updated_at": "2026-04-01T02:27:57Z"
 }

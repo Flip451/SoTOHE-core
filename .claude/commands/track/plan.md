@@ -13,7 +13,7 @@ Execution:
   1. Understand: codebase and version baseline
   2. Research & design: Gemini/Codex collaboration as needed
   3. Plan & approve: produce plan and request user approval
-- If `$ARGUMENTS` matches `docs/external-guides.json` `trigger_keywords`, use the injected guide summaries before opening cached raw documents.
+- If `$ARGUMENTS` matches `knowledge/external/guides.json` `trigger_keywords`, use the injected guide summaries before opening cached raw documents.
 - Keep `.claude/docs/DESIGN.md` in English for cross-provider compatibility, but keep crate/module names aligned with `plan.md`.
 - When the `planner` capability response contains a `## Canonical Blocks` section, copy every block in that section verbatim into `plan.md` or `DESIGN.md`. Do not summarize, translate, or rewrite those blocks. Surrounding explanation text may be summarized in Japanese for `plan.md`.
 

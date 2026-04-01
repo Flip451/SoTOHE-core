@@ -34,7 +34,7 @@ Summarize the current project state for the newcomer:
 
 ### Phase 4: External guides setup (optional)
 
-If `docs/external-guides.json` has entries:
+If `knowledge/external/guides.json` has entries:
 1. Run `cargo make guides-fetch` to download cached guides
 2. Report which guides were fetched and their purpose
 
