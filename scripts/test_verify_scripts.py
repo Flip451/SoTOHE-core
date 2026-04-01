@@ -202,7 +202,7 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertIn("レビューや運用判断が必要なとき", onboarding)
         self.assertIn("2章（対応付けルール）", onboarding)
         self.assertIn("4章（Interactive Implementation Contract）", onboarding)
-        self.assertIn("docs/architecture-rules.json", onboarding)
+        self.assertIn("architecture-rules.json", onboarding)
         self.assertIn("layers[].path", onboarding)
         self.assertIn("workspace member", onboarding)
         self.assertIn("project-docs/**", onboarding)

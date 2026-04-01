@@ -8,9 +8,9 @@ use std::process::Command;
 
 use domain::verify::{Finding, VerifyOutcome};
 
-const ARCH_RULES_FILE: &str = "docs/architecture-rules.json";
+const ARCH_RULES_FILE: &str = "architecture-rules.json";
 
-/// A parsed layer rule from `docs/architecture-rules.json`.
+/// A parsed layer rule from `architecture-rules.json`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct LayerRule {
     crate_name: String,
@@ -20,7 +20,7 @@ struct LayerRule {
 
 /// Check layer dependency constraints for all workspace crates.
 ///
-/// Loads `docs/architecture-rules.json`, runs `cargo metadata`, and verifies
+/// Loads `architecture-rules.json`, runs `cargo metadata`, and verifies
 /// that no workspace crate depends on another crate outside its allowed set.
 ///
 /// # Errors
@@ -112,7 +112,7 @@ pub fn verify_with_metadata(
     if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
 }
 
-/// Read and parse `docs/architecture-rules.json` from the project root.
+/// Read and parse `architecture-rules.json` from the project root.
 fn load_architecture_rules(root: &Path) -> Result<serde_json::Value, String> {
     let path = root.join(ARCH_RULES_FILE);
     let content = std::fs::read_to_string(&path)

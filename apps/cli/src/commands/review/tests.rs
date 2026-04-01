@@ -763,7 +763,7 @@ fn planning_only_path_accepts_doc_and_config_files() {
     assert!(is_planning_only_path(".claude/agent-profiles.json"));
     assert!(is_planning_only_path(".claude/settings.json"));
     assert!(is_planning_only_path("project-docs/conventions/hexagonal-architecture.md"));
-    assert!(is_planning_only_path("docs/architecture-rules.json"));
+    assert!(is_planning_only_path("architecture-rules.json"));
     assert!(is_planning_only_path("knowledge/adr/2026-03-11-0000-foo.md"));
     // New knowledge/ subdirectories (post-consolidation paths)
     assert!(is_planning_only_path("knowledge/conventions/hexagonal-architecture.md"));

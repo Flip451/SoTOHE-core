@@ -118,7 +118,7 @@ Before writing new parsing/analysis logic, verify the following:
 
 1. Check whether a related convention exists in `project-docs/conventions/`
 2. Use `Grep` to search for similar utilities in other crates within the workspace
-3. Check whether a matching concern exists in `canonical_modules` in `docs/architecture-rules.json`
+3. Check whether a matching concern exists in `canonical_modules` in `architecture-rules.json`
 4. If none of the above finds a match, have the `researcher` capability perform a quick survey of crates.io for equivalent functionality
 
 Reference: `project-docs/conventions/shell-parsing.md`

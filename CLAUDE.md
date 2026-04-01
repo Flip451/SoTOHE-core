@@ -18,7 +18,7 @@
 - `.claude/rules/`
 - `project-docs/conventions/README.md`
 - `project-docs/conventions/`
-- `docs/architecture-rules.json`
+- `architecture-rules.json`
 - `docs/EXTERNAL_GUIDES.md`
 - `docs/external-guides.json`
 - `TRACK_TRACEABILITY.md`
@@ -27,7 +27,7 @@
 - 公開 UI は `/track:*`
 - 旧 alias より `/track:*` を優先
 - `plan.md` は `metadata.json` から render される read-only view
-- `docs/architecture-rules.json` が workspace 構造と layer policy の SSoT
+- `architecture-rules.json` が workspace 構造と layer policy の SSoT
 - workspace tree は `cargo make workspace-tree` / `cargo make workspace-tree-full`
 - `track/tech-stack.md` に未解決 `TODO:` がある間は実装開始禁止
 - `project-docs/conventions/` への参照を維持すること

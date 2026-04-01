@@ -87,7 +87,7 @@ fn require_line(root: &Path, rel_path: &str, pattern: &str, label: &str) -> Veri
 
 static REQUIRED_FILES: &[RequireFile] = &[
     RequireFile {
-        rel_path: "docs/architecture-rules.json",
+        rel_path: "architecture-rules.json",
         label: "architecture rules source of truth",
     },
     RequireFile { rel_path: "scripts/architecture_rules.py", label: "architecture rules helper" },

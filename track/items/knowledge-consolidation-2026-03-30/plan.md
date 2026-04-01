@@ -16,7 +16,7 @@
 architecture-rules.json を repo root に移動し、Rust/Python の参照を更新する。
 project-docs/conventions/ を knowledge/conventions/ に移動し、規約インデックスツールを更新する。
 
-- [ ] Move docs/architecture-rules.json to repo root, update all Rust const/doc-comment/test references, Python scripts, and config files
+- [x] Move docs/architecture-rules.json to repo root, update all Rust const/doc-comment/test references, Python scripts, and config files
 - [ ] Move project-docs/conventions/ to knowledge/conventions/, update convention index tooling, Rust verify modules, architecture-rules.json internal convention field, and all doc references
 
 ## Phase C: 外部ガイドとドキュメントの移行

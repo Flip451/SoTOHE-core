@@ -35,7 +35,7 @@ Read these first before planning or implementation:
 - `.claude/rules/`
 - `docs/EXTERNAL_GUIDES.md`
 - `docs/external-guides.json`
-- `docs/architecture-rules.json`
+- `architecture-rules.json`
 
 Operational split:
 
@@ -46,7 +46,7 @@ Operational split:
 - `TRACK_TRACEABILITY.md`: `plan.md` state transitions and registry update rules
 - `docs/external-guides.json`: registry for long-form external guides cached outside git
 - `docs/EXTERNAL_GUIDES.md`: operating policy for external long-form guides
-- `docs/architecture-rules.json`: machine-readable layer dependency source of truth for `deny.toml` and `scripts/check_layers.py`
+- `architecture-rules.json`: machine-readable layer dependency source of truth for `deny.toml` and `scripts/check_layers.py`
 - `.claude/agent-profiles.json`: capability-to-provider mapping source of truth
 
 ## Planner Briefing Requirements (Provider-Agnostic)

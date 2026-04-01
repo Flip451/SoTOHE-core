@@ -19,7 +19,7 @@ infrastructure  → domain, usecase
 CLI             → domain, usecase, infrastructure（composition root）
 ```
 
-`docs/architecture-rules.json` と `deny.toml` で強制。`cargo make check-layers` + `cargo make deny` で検証。
+`architecture-rules.json` と `deny.toml` で強制。`cargo make check-layers` + `cargo make deny` で検証。
 
 ## Port Placement Rules
 
@@ -124,7 +124,7 @@ pub fn check_approved(input: CheckApprovedInput) -> Result<(), String> {
 
 ## Related Documents
 
-- `docs/architecture-rules.json`: レイヤー依存ルールの SSoT
+- `architecture-rules.json`: レイヤー依存ルールの SSoT
 - `deny.toml`: Cargo レベルのレイヤー強制
 - `.claude/rules/04-coding-principles.md`: Trait-Based Abstraction
 - `track/tech-stack.md`: アーキテクチャパターンの決定

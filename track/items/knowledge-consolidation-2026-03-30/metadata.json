@@ -73,7 +73,7 @@
     {
       "description": "Move docs/architecture-rules.json to repo root, update all Rust const/doc-comment/test references, Python scripts, and config files",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Move project-docs/conventions/ to knowledge/conventions/, update convention index tooling, Rust verify modules, architecture-rules.json internal convention field, and all doc references",
@@ -102,5 +102,5 @@
     }
   ],
   "title": "ドキュメント群の knowledge ディレクトリへの集約と整理",
-  "updated_at": "2026-03-31T15:54:17Z"
+  "updated_at": "2026-04-01T00:33:26Z"
 }

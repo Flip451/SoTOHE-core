@@ -2,7 +2,7 @@
 //!
 //! Scans Rust source files for forbidden patterns that indicate
 //! reimplementation of functionality owned by a canonical module.
-//! Rules are declared in `docs/architecture-rules.json` under
+//! Rules are declared in `architecture-rules.json` under
 //! `canonical_modules`.
 
 use std::path::Path;
@@ -11,7 +11,7 @@ use domain::verify::{Finding, VerifyOutcome};
 use regex::Regex;
 use serde::Deserialize;
 
-const ARCH_RULES_FILE: &str = "docs/architecture-rules.json";
+const ARCH_RULES_FILE: &str = "architecture-rules.json";
 
 /// Raw deserialization target for `architecture-rules.json`.
 /// Invalid data (missing fields, wrong types) causes a serde error
@@ -316,7 +316,7 @@ mod tests {
         // Create architecture rules
         std::fs::create_dir_all(root.join("docs")).unwrap();
         std::fs::write(
-            root.join("docs/architecture-rules.json"),
+            root.join("architecture-rules.json"),
             r#"{
                 "version": 2,
                 "canonical_modules": [{
@@ -345,7 +345,7 @@ mod tests {
 
         std::fs::create_dir_all(root.join("docs")).unwrap();
         std::fs::write(
-            root.join("docs/architecture-rules.json"),
+            root.join("architecture-rules.json"),
             r#"{
                 "version": 2,
                 "canonical_modules": [{
@@ -374,7 +374,7 @@ mod tests {
 
         std::fs::create_dir_all(root.join("docs")).unwrap();
         std::fs::write(
-            root.join("docs/architecture-rules.json"),
+            root.join("architecture-rules.json"),
             r#"{
                 "version": 2,
                 "canonical_modules": [{
@@ -409,7 +409,7 @@ mod tests {
 
         std::fs::create_dir_all(root.join("docs")).unwrap();
         std::fs::write(
-            root.join("docs/architecture-rules.json"),
+            root.join("architecture-rules.json"),
             r#"{
                 "version": 2,
                 "canonical_modules": [{

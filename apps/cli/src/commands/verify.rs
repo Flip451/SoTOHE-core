@@ -313,7 +313,7 @@ mod tests {
     fn test_canonical_modules_subcommand_returns_success_for_clean_project() {
         let tmp = TempDir::new().unwrap();
         // No architecture-rules.json → canonical_modules section absent → pass
-        write_file(tmp.path(), "docs/architecture-rules.json", r#"{"version": 2}"#);
+        write_file(tmp.path(), "architecture-rules.json", r#"{"version": 2}"#);
         let exit = execute(VerifyCommand::CanonicalModules(make_args(tmp.path())));
         assert_eq!(exit, ExitCode::SUCCESS);
     }
@@ -321,7 +321,7 @@ mod tests {
     #[test]
     fn test_canonical_modules_subcommand_returns_failure_for_missing_rules_file() {
         let tmp = TempDir::new().unwrap();
-        // No docs/architecture-rules.json at all → error
+        // No architecture-rules.json at all → error
         let exit = execute(VerifyCommand::CanonicalModules(make_args(tmp.path())));
         assert_eq!(exit, ExitCode::FAILURE);
     }
@@ -333,7 +333,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         write_file(
             tmp.path(),
-            "docs/architecture-rules.json",
+            "architecture-rules.json",
             r#"{"version":2,"module_limits":{"max_lines":700,"warn_lines":400,"exclude":[]}}"#,
         );
         write_file(tmp.path(), "src/small.rs", "fn main() {}\n");

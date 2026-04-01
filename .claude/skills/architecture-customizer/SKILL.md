@@ -1,6 +1,6 @@
 ---
 name: architecture-customizer
-description: Customize or migrate the Rust workspace architecture (layer names, crate boundaries, dependency direction) safely. Use when users want to change layered architecture structure, rename/move crates, switch architecture style, or update enforcement rules across docs/architecture-rules.json, Cargo.toml, deny.toml, scripts/check_layers.py, Makefile tasks, and track docs.
+description: Customize or migrate the Rust workspace architecture (layer names, crate boundaries, dependency direction) safely. Use when users want to change layered architecture structure, rename/move crates, switch architecture style, or update enforcement rules across architecture-rules.json, Cargo.toml, deny.toml, scripts/check_layers.py, Makefile tasks, and track docs.
 ---
 
 # /architecture-customizer — Workspace Architecture Migration Workflow
@@ -25,14 +25,14 @@ Write the target map before any edits using workspace member paths:
 ...
 ```
 
-Default template examples often use `apps/<entry>` and `libs/<layer>`, but other roots are allowed if `docs/architecture-rules.json`, enforcement, and docs are updated together.
+Default template examples often use `apps/<entry>` and `libs/<layer>`, but other roots are allowed if `architecture-rules.json`, enforcement, and docs are updated together.
 
 Define which crates may depend on which crates.
 
 ## Step 2: Update Enforcement Rules
 
 1. Update workspace members in `Cargo.toml`.
-2. Update `docs/architecture-rules.json` first.
+2. Update `architecture-rules.json` first.
 3. Update layer policy in `deny.toml` (`deny = [...]` wrappers).
 4. Update `scripts/check_layers.py` crate names and forbidden edges.
 5. Update `Makefile.toml` task names if any crates were renamed (e.g., `check-layers-local` already references crate names via `scripts/check_layers.py`).
