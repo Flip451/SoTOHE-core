@@ -69,7 +69,7 @@ AskUserQuestion:
 | フェーズ | Full | Focused | Quick |
 |---------|------|---------|-------|
 | Phase 1 Step 1-2（researcher） | ✅ 実行 | ❌ スキップ | ❌ スキップ |
-| Phase 1 Step 3（spec.json 分類） | ✅ 実行 | ✅ 実行 | ❌ スキップ |
+| Phase 1 Step 3（spec.json 分類） | ✅ 実行 | ✅ 実行 | ✅ 実行（Blue サマリー生成に必要） |
 | Phase 1 Step 4（差分ヒアリング） | ✅ 実行 | ✅ 実行 | 簡易版（※） |
 | Phase 1 Step 5（tech-stack） | ✅ 実行 | ⚠️ 警告のみ | ❌ スキップ |
 | Phase 1.5（planner review） | ✅ 実行 | ❌ スキップ | ❌ スキップ |
@@ -95,7 +95,7 @@ Focused/Quick モードは既存 spec の軽微な更新を目的としており
 ## Phase 1: UNDERSTAND（researcher capability + Claude Lead）
 
 > **注**: Focused モードでは Step 1-2 をスキップし、Step 3 から開始する。
-> Quick モードでは Step 1-3 をスキップし、Step 4（簡易版）から開始する。
+> Quick モードでは Step 1-2 をスキップし、Step 3（分類）→ Step 4（簡易版）を実行する。
 
 ### Step 1: Version Baseline Research with active `researcher` capability (必須)
 
@@ -245,9 +245,13 @@ Step 3a の分類結果に基づき、🟡🔴❌ の項目のみをユーザー
 4. テスト戦略（ユニット・統合・E2E）は？
 5. パフォーマンス要件は？
 
-### Step 5: Interactive Tech Stack Setup (必須)
+### Step 5: Interactive Tech Stack Setup (Full モード: 必須 / Focused: 警告のみ / Quick: スキップ)
 
-`track/tech-stack.md` を開き、以下をユーザーと対話して更新する：
+> **Focused モード**: `track/tech-stack.md` に `TODO:` が残っていても警告のみで続行する。
+> ヒアリング内容が tech-stack に関わる場合はユーザーに通知し、Full モードでの再実行を推奨する。
+> **Quick モード**: このステップをスキップする。
+
+`track/tech-stack.md` を開き、以下をユーザーと対話して更新する（Full モード）：
 1. Rust Edition（2024固定）と MSRV
 2. Web フレームワーク
 3. DB ライブラリ / DB / マイグレーション
@@ -255,7 +259,7 @@ Step 3a の分類結果に基づき、🟡🔴❌ の項目のみをユーザー
 5. 認証方式
 6. 設定管理方式
 
-`TODO:` が 1つでも残っている場合、Phase 2 に進まない。
+Full モード: `TODO:` が 1つでも残っている場合、Phase 2 に進まない。
 
 ---
 
