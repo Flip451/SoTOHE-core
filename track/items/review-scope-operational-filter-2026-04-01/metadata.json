@@ -1,0 +1,75 @@
+{
+  "branch": "track/review-scope-operational-filter-2026-04-01",
+  "created_at": "2026-04-01T13:59:38Z",
+  "id": "review-scope-operational-filter-2026-04-01",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "review-scope.json から review_operational パターンを読み込む。",
+          "<track-id> プレースホルダーを実際の track ID で展開する。",
+          "TrackId は validated slug なので glob injection は不可能。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Operational Pattern Loading"
+      },
+      {
+        "description": [
+          "展開済み operational パターンで diff ファイルリストをフィルタ。",
+          "review_adapters.rs の execute() 内の2箇所 + review/mod.rs の check-approved 1箇所に適用。",
+          "review_adapters.rs が 994 行のため、ヘルパーは review_group_policy.rs または新モジュールに配置。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "Pre-partition Filter"
+      },
+      {
+        "description": [
+          "cycle 作成時に review.json が scope に含まれない検証。",
+          "連続 record-round で hash が安定する検証。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T003",
+          "T004"
+        ],
+        "title": "Regression Tests"
+      }
+    ],
+    "summary": [
+      "review-scope.json の review_operational パターンで review.json を diff scope から除外し、multi-group レビューの check-approved が安定動作するようにする。",
+      "partition() は変更せず、その前段で operational ファイルをフィルタする。"
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "review_operational ローダー + <track-id> placeholder 展開のテスト・実装",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "pre-partition フィルタヘルパー: operational パターンにマッチするパスを diff リストから除外するテスト・実装",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "回帰テスト: cycle 作成時に review.json が frozen scope に含まれないことを検証",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "回帰テスト: 連続 record-round で review.json 変更後も other グループの hash が安定することを検証",
+      "id": "T004",
+      "status": "done"
+    }
+  ],
+  "title": "review_operational パターンによる review.json scope 除外",
+  "updated_at": "2026-04-02T00:28:30Z"
+}

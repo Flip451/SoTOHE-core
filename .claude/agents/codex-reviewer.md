@@ -31,3 +31,11 @@ After the command completes, report:
 1. Exit code (0 = zero_findings, 2/105 = findings_remain, 1 = error, 3 = escalation blocked)
 2. The verdict JSON from the last line of stdout
 3. Any errors
+
+## Verdict Accuracy (CRITICAL)
+
+- Copy the verdict JSON **verbatim** from the command output — do NOT paraphrase, summarize, or rewrite it
+- Do NOT modify file paths in findings (e.g., do NOT shorten `review/mod.rs` to `review.rs`)
+- Do NOT invent or infer findings that are not in the actual verdict JSON
+- If the verdict JSON is not found in stdout, check the session log file and copy from there
+- When reporting findings in your summary, quote the exact `message`, `file`, and `line` from the JSON

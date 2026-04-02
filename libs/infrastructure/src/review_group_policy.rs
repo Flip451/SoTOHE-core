@@ -275,6 +275,102 @@ impl ResolvedReviewGroupPolicy {
 }
 
 // ---------------------------------------------------------------------------
+// Operational file exclusion
+// ---------------------------------------------------------------------------
+
+/// Result of loading `review-scope.json` in one pass.
+#[derive(Debug)]
+pub struct ReviewScopeConfig {
+    /// Named group definitions (`groups` field).
+    pub groups: BTreeMap<String, ReviewGroupConfig>,
+    /// Compiled operational exclusion matchers (`review_operational` field,
+    /// with `<track-id>` expanded).
+    pub operational_matchers: Vec<GlobMatcher>,
+}
+
+/// Loads both `groups` and `review_operational` from `review-scope.json` in a
+/// single file read, avoiding TOCTOU between the two data sets.
+///
+/// `<track-id>` placeholders in `review_operational` patterns are expanded
+/// with the given track ID.
+///
+/// # Errors
+///
+/// Returns a string error on I/O, JSON parse, or glob compilation failure.
+pub fn load_review_scope_config(
+    review_scope_path: &Path,
+    track_id: &TrackId,
+) -> Result<ReviewScopeConfig, String> {
+    let content = std::fs::read_to_string(review_scope_path)
+        .map_err(|e| format!("read {}: {e}", review_scope_path.display()))?;
+    let doc: serde_json::Value = serde_json::from_str(&content)
+        .map_err(|e| format!("parse {}: {e}", review_scope_path.display()))?;
+
+    // Fail-closed: reject non-object top-level values.
+    if !doc.is_object() {
+        return Err(format!(
+            "{}: top-level value must be a JSON object",
+            review_scope_path.display()
+        ));
+    }
+
+    // Parse groups (fail-closed: missing groups field is an error)
+    let groups = match doc.get("groups") {
+        Some(v) => serde_json::from_value(v.clone())
+            .map_err(|e| format!("parse groups in {}: {e}", review_scope_path.display()))?,
+        None => {
+            return Err(format!(
+                "{}: missing required 'groups' field",
+                review_scope_path.display()
+            ));
+        }
+    };
+
+    // Parse and compile operational matchers
+    let operational_matchers = compile_operational_matchers(&doc, track_id)?;
+
+    Ok(ReviewScopeConfig { groups, operational_matchers })
+}
+
+/// Compiles operational matchers from a pre-parsed JSON document.
+fn compile_operational_matchers(
+    doc: &serde_json::Value,
+    track_id: &TrackId,
+) -> Result<Vec<GlobMatcher>, String> {
+    let arr = match doc.get("review_operational") {
+        Some(v) => v.as_array().ok_or_else(|| "review_operational must be an array".to_owned())?,
+        None => return Ok(Vec::new()),
+    };
+    let mut matchers = Vec::with_capacity(arr.len());
+    for pat_val in arr {
+        let raw = pat_val
+            .as_str()
+            .ok_or_else(|| "review_operational entries must be strings".to_owned())?;
+        let expanded = raw.replace("<track-id>", track_id.as_ref());
+        let glob = GlobBuilder::new(&expanded)
+            .literal_separator(true)
+            .build()
+            .map_err(|e| format!("bad operational glob '{expanded}': {e}"))?;
+        matchers.push(glob.compile_matcher());
+    }
+    Ok(matchers)
+}
+
+/// Filters out paths that match any operational glob matcher.
+///
+/// Returns a new vec with only non-operational paths.
+#[must_use]
+pub fn filter_operational(
+    paths: &[RepoRelativePath],
+    matchers: &[GlobMatcher],
+) -> Vec<RepoRelativePath> {
+    if matchers.is_empty() {
+        return paths.to_vec();
+    }
+    paths.iter().filter(|p| !matchers.iter().any(|m| m.is_match(p.as_str()))).cloned().collect()
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -538,5 +634,138 @@ mod tests {
         let result =
             load_review_groups_override(dir.path(), &TrackId::try_new("my-track").unwrap());
         assert!(matches!(result, Err(GroupPolicyError::Parse { .. })));
+    }
+
+    // -----------------------------------------------------------------------
+    // Operational exclusion tests (T001/T002)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_load_operational_matchers_expands_track_id() {
+        let dir = tempfile::tempdir().unwrap();
+        let scope_file = dir.path().join("review-scope.json");
+        std::fs::write(
+            &scope_file,
+            r#"{"groups": {}, "review_operational": ["track/items/<track-id>/review.json"]}"#,
+        )
+        .unwrap();
+
+        let track_id = TrackId::try_new("my-track-2026-04-01").unwrap();
+        let matchers =
+            load_review_scope_config(&scope_file, &track_id).unwrap().operational_matchers;
+
+        assert_eq!(matchers.len(), 1);
+        assert!(matchers[0].is_match("track/items/my-track-2026-04-01/review.json"));
+        assert!(!matchers[0].is_match("track/items/other-track/review.json"));
+    }
+
+    #[test]
+    fn test_load_operational_matchers_missing_field_returns_empty() {
+        let dir = tempfile::tempdir().unwrap();
+        let scope_file = dir.path().join("review-scope.json");
+        std::fs::write(&scope_file, r#"{"groups": {}}"#).unwrap();
+
+        let track_id = TrackId::try_new("my-track").unwrap();
+        let matchers =
+            load_review_scope_config(&scope_file, &track_id).unwrap().operational_matchers;
+
+        assert!(matchers.is_empty());
+    }
+
+    #[test]
+    fn test_filter_operational_removes_matching_paths() {
+        let dir = tempfile::tempdir().unwrap();
+        let scope_file = dir.path().join("review-scope.json");
+        std::fs::write(
+            &scope_file,
+            r#"{"groups": {}, "review_operational": ["track/items/<track-id>/review.json"]}"#,
+        )
+        .unwrap();
+
+        let track_id = TrackId::try_new("my-track").unwrap();
+        let matchers =
+            load_review_scope_config(&scope_file, &track_id).unwrap().operational_matchers;
+
+        let paths = vec![
+            path("libs/domain/src/lib.rs"),
+            path("track/items/my-track/review.json"),
+            path("track/items/my-track/metadata.json"),
+        ];
+        let filtered = filter_operational(&paths, &matchers);
+
+        assert_eq!(filtered.len(), 2);
+        assert!(filtered.iter().any(|p| p.as_str() == "libs/domain/src/lib.rs"));
+        assert!(filtered.iter().any(|p| p.as_str() == "track/items/my-track/metadata.json"));
+        assert!(!filtered.iter().any(|p| p.as_str().contains("review.json")));
+    }
+
+    #[test]
+    fn test_filter_operational_no_matchers_returns_all() {
+        let paths = vec![path("a.rs"), path("b.rs")];
+        let filtered = filter_operational(&paths, &[]);
+
+        assert_eq!(filtered.len(), 2);
+    }
+
+    // Negative-path tests for load_review_scope_config
+
+    #[test]
+    fn test_load_review_scope_config_non_array_operational_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let scope_file = dir.path().join("review-scope.json");
+        std::fs::write(&scope_file, r#"{"groups": {}, "review_operational": "not-an-array"}"#)
+            .unwrap();
+
+        let track_id = TrackId::try_new("my-track").unwrap();
+        let result = load_review_scope_config(&scope_file, &track_id);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("must be an array"));
+    }
+
+    #[test]
+    fn test_load_review_scope_config_non_string_entry_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let scope_file = dir.path().join("review-scope.json");
+        std::fs::write(&scope_file, r#"{"groups": {}, "review_operational": [123]}"#).unwrap();
+
+        let track_id = TrackId::try_new("my-track").unwrap();
+        let result = load_review_scope_config(&scope_file, &track_id);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("must be strings"));
+    }
+
+    #[test]
+    fn test_load_review_scope_config_invalid_json_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let scope_file = dir.path().join("review-scope.json");
+        std::fs::write(&scope_file, "not json").unwrap();
+
+        let track_id = TrackId::try_new("my-track").unwrap();
+        let result = load_review_scope_config(&scope_file, &track_id);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_load_review_scope_config_non_object_top_level_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let scope_file = dir.path().join("review-scope.json");
+        std::fs::write(&scope_file, "[]").unwrap();
+
+        let track_id = TrackId::try_new("my-track").unwrap();
+        let result = load_review_scope_config(&scope_file, &track_id);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("must be a JSON object"));
+    }
+
+    #[test]
+    fn test_load_review_scope_config_missing_groups_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let scope_file = dir.path().join("review-scope.json");
+        std::fs::write(&scope_file, r#"{"review_operational": []}"#).unwrap();
+
+        let track_id = TrackId::try_new("my-track").unwrap();
+        let result = load_review_scope_config(&scope_file, &track_id);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("missing required 'groups'"));
     }
 }

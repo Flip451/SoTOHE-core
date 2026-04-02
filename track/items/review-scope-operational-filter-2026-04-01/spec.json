@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "review_operational パターンによる review.json scope 除外",
+  "goal": [
+    "review-scope.json の review_operational パターンを実行時に展開・適用し、review.json 等の operational ファイルを review scope から除外する。",
+    "これにより multi-group レビューの check-approved が安定動作し、review.json 変更による hash 循環を解消する。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "review_operational パターンのローディングと <track-id> placeholder 展開",
+        "sources": [
+          "track/review-scope.json §review_operational"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "partition 前の pre-filter: operational パターンにマッチするパスを diff リストから除外",
+        "sources": [
+          "inference — partition() は変更せず前段でフィルタ"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "execute() の2箇所（新規 cycle 作成 + 既存 cycle 追記）+ check-approved の1箇所への適用",
+        "sources": [
+          "libs/infrastructure/src/review_adapters.rs §execute",
+          "apps/cli/src/commands/review/mod.rs §run_check_approved"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "回帰テスト: review.json が frozen scope に含まれないこと、連続 record-round で hash が安定すること",
+        "sources": [
+          "discussion"
+        ],
+        "task_refs": [
+          "T003",
+          "T004"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "partition() の変更（既存のグループ分類ロジックは変更しない）",
+        "sources": [
+          "inference — 既存テスト安定性"
+        ]
+      },
+      {
+        "text": "RVW-34 (StoredFinding lossy conversion) の修正",
+        "sources": [
+          "knowledge/strategy/TODO.md §RVW-34"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "review_adapters.rs が 994 行のため、新ロジックは別モジュールに配置",
+      "sources": [
+        "architecture-rules.json §module_limits"
+      ]
+    },
+    {
+      "text": "TDD: テストを先に書く",
+      "sources": [
+        "convention — .claude/rules/05-testing.md"
+      ]
+    },
+    {
+      "text": "パニック禁止",
+      "sources": [
+        "convention — .claude/rules/04-coding-principles.md"
+      ]
+    }
+  ],
+  "domain_states": [],
+  "acceptance_criteria": [
+    {
+      "text": "review.json が other グループの frozen scope に含まれない",
+      "sources": [
+        "discussion"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "連続 record-round 後も other グループの hash が変化しない（review.json 変更の影響を受けない）",
+      "sources": [
+        "discussion"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "既存の partition() テストが全てパスする",
+      "sources": [
+        "inference — 既存テスト安定性"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "cargo make ci が通る",
+      "sources": [
+        "convention — .claude/rules/07-dev-environment.md"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T003",
+        "T004"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "knowledge/conventions/hexagonal-architecture.md"
+  ],
+  "signals": {
+    "blue": 7,
+    "yellow": 6,
+    "red": 0
+  }
+}
