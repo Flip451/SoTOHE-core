@@ -404,6 +404,28 @@
                 "verdict": "zero_findings",
                 "findings": []
               }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T11:22:53Z",
+              "hash": "rvw1:sha256:1631b14e6efc53c0000009c6089b22964ae77dfa1d748d6a759d5590f901fb1f",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T11:23:56Z",
+              "hash": "rvw1:sha256:1631b14e6efc53c0000009c6089b22964ae77dfa1d748d6a759d5590f901fb1f",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
             }
           ]
         }
