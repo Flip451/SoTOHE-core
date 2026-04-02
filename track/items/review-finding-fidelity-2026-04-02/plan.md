@@ -1,0 +1,36 @@
+<!-- Generated from metadata.json — DO NOT EDIT DIRECTLY -->
+# RVW-34: RecordRoundProtocol findings fidelity fix
+
+RVW-34: RecordRoundProtocolImpl が findings_remain verdict を review.json に記録する際、findings_to_concerns() で生成した concern slug を StoredFinding::new(slug, None, None, None) に変換するため、元の message/severity/file/line が消失する問題を修正する。
+RecordRoundProtocol trait に findings: Vec<StoredFinding> パラメータを追加し、呼び出し元から reviewer の完全な findings データを直接渡す方式に変更する。
+concerns（エスカレーション用）と findings（データ保持用）は両方保持する。変換関数は usecase 層に配置する。
+
+## RecordRoundProtocol trait extension + infra implementation update
+
+RecordRoundProtocol::execute に findings: Vec<StoredFinding> パラメータを追加する。
+RecordRoundProtocolImpl::execute の lossy 変換コード（review_adapters.rs:458-461）を削除し、渡された findings を直接 GroupRoundVerdict::findings_remain() に使用する。
+findings_remain 時は findings と concerns 両方 non-empty を検証、zero_findings 時は両方 empty を検証する（fail-closed）。
+Planner 判断: Vec<StoredFinding> をそのまま使う（NonEmpty wrapper は不適切。zero_findings では空リストを渡す必要があり、domain 層の GroupRoundVerdict::findings_remain() が既に非空を保証する）。
+
+- [ ] Add findings parameter to RecordRoundProtocol trait and update RecordRoundProtocolImpl to use passed findings instead of reconstructing from concern slugs
+
+## Conversion function + call site updates
+
+usecase 層（verdict.rs 付近）に review_findings_to_stored() 変換関数を追加する。ReviewFinding（usecase）→ StoredFinding（domain）の変換を担当。
+record_round()（string-based entrypoint）: 既にパース済みの ReviewPayload.findings から Vec<StoredFinding> を構築して protocol.execute() に渡す。RecordRoundInput への新フィールド追加は不要（verdict JSON 内に findings が含まれている）。
+record_round_typed(): findings パラメータを追加して protocol.execute() に転送する。
+CLI auto-record path（codex_local.rs:162-194）: findings_to_concerns() に加えて review_findings_to_stored() も呼び出し、record_round_typed() に両方渡す。
+
+- [ ] Add ReviewFinding-to-StoredFinding conversion function in usecase layer and update record_round / record_round_typed / CLI auto-record call sites to pass findings through
+
+## Test updates + round-trip fidelity tests
+
+StubProtocol と RecordRoundProtocolCallArgs に findings: Vec<StoredFinding> フィールドを追加する。
+既存テストを新シグネチャに合わせて更新する。
+TDD シーケンス（Planner 指定）:
+1. usecase テスト: record_round() に findings 付き verdict JSON を渡し、protocol が完全な StoredFinding を受信することを検証
+2. record_round_typed テスト: findings が unchanged で転送されることを検証
+3. CLI auto-record テスト: findings_remain で message/severity/file/line が保持されることを検証
+4. infra テスト: RecordRoundProtocolImpl が review.json に完全な findings を書き込むことを検証
+
+- [ ] Update StubProtocol and existing tests, add round-trip fidelity tests verifying message/severity/file/line survive the full chain
