@@ -35,6 +35,9 @@ pub struct ReviewCycle {
     base_policy_hash: String,
     /// Hash of the effective (resolved) groups policy after override application.
     policy_hash: String,
+    /// HEAD SHA of the last approved commit. When set, used as the diff base
+    /// instead of `base_ref` for incremental review scope computation.
+    approved_head: Option<super::types::ApprovedHead>,
     groups: BTreeMap<ReviewGroupName, CycleGroupState>,
 }
 
@@ -63,6 +66,7 @@ impl ReviewCycle {
             base_ref: base_ref.into(),
             base_policy_hash: base_policy_hash.into(),
             policy_hash: policy_hash.into(),
+            approved_head: None,
             groups,
         })
     }
@@ -75,9 +79,18 @@ impl ReviewCycle {
         base_ref: String,
         base_policy_hash: String,
         policy_hash: String,
+        approved_head: Option<super::types::ApprovedHead>,
         groups: BTreeMap<ReviewGroupName, CycleGroupState>,
     ) -> Self {
-        Self { cycle_id, started_at, base_ref, base_policy_hash, policy_hash, groups }
+        Self {
+            cycle_id,
+            started_at,
+            base_ref,
+            base_policy_hash,
+            policy_hash,
+            approved_head,
+            groups,
+        }
     }
 
     /// Returns the cycle ID.
@@ -108,6 +121,29 @@ impl ReviewCycle {
     #[must_use]
     pub fn policy_hash(&self) -> &str {
         &self.policy_hash
+    }
+
+    /// Returns the approved HEAD SHA, if set.
+    #[must_use]
+    pub fn approved_head(&self) -> Option<&super::types::ApprovedHead> {
+        self.approved_head.as_ref()
+    }
+
+    /// Sets the approved HEAD SHA (called after a successful commit).
+    ///
+    /// # Precondition
+    ///
+    /// The caller MUST ensure that the review cycle is fully approved
+    /// (`check-approved` passed) before calling this method. Setting
+    /// `approved_head` on an unapproved cycle would cause subsequent
+    /// reviews to use an incorrect diff base, silently narrowing scope.
+    ///
+    /// This precondition is enforced at the call site (`track-commit-message`
+    /// runs `check-approved` before commit, and `persist_approved_head` runs
+    /// after commit success), not in the domain layer, because approval
+    /// verification requires infrastructure (git hash computation).
+    pub fn set_approved_head(&mut self, head: super::types::ApprovedHead) {
+        self.approved_head = Some(head);
     }
 
     /// Returns the groups map.
@@ -634,6 +670,77 @@ mod tests {
         assert!(f.line().is_none());
     }
 
+    // -- ReviewCycle approved_head --
+
+    #[test]
+    fn test_review_cycle_new_has_no_approved_head() {
+        let cycle = ReviewCycle::new(
+            "cycle-1",
+            ts("2026-03-29T09:00:00Z"),
+            "main",
+            "sha256:abc",
+            "sha256:abc",
+            sample_groups(),
+        )
+        .unwrap();
+        assert!(cycle.approved_head().is_none());
+    }
+
+    #[test]
+    fn test_review_cycle_set_approved_head() {
+        let mut cycle = ReviewCycle::new(
+            "cycle-1",
+            ts("2026-03-29T09:00:00Z"),
+            "main",
+            "sha256:abc",
+            "sha256:abc",
+            sample_groups(),
+        )
+        .unwrap();
+        let head =
+            super::super::types::ApprovedHead::try_new("abcdef0123456789abcdef0123456789abcdef01")
+                .unwrap();
+        cycle.set_approved_head(head);
+        assert_eq!(
+            cycle.approved_head().unwrap().as_str(),
+            "abcdef0123456789abcdef0123456789abcdef01"
+        );
+    }
+
+    #[test]
+    fn test_review_cycle_from_parts_preserves_approved_head() {
+        let head =
+            super::super::types::ApprovedHead::try_new("abcdef0123456789abcdef0123456789abcdef01")
+                .unwrap();
+        let cycle = ReviewCycle::from_parts(
+            "cycle-1".into(),
+            ts("2026-03-29T09:00:00Z"),
+            "main".into(),
+            "sha256:abc".into(),
+            "sha256:abc".into(),
+            Some(head),
+            sample_groups(),
+        );
+        assert_eq!(
+            cycle.approved_head().unwrap().as_str(),
+            "abcdef0123456789abcdef0123456789abcdef01"
+        );
+    }
+
+    #[test]
+    fn test_review_cycle_from_parts_none_approved_head() {
+        let cycle = ReviewCycle::from_parts(
+            "cycle-1".into(),
+            ts("2026-03-29T09:00:00Z"),
+            "main".into(),
+            "sha256:abc".into(),
+            "sha256:abc".into(),
+            None,
+            sample_groups(),
+        );
+        assert!(cycle.approved_head().is_none());
+    }
+
     // -- ReviewStalenessReason --
 
     #[test]
@@ -691,6 +798,7 @@ mod tests {
             "main".into(),
             "sha256:abc".into(),
             "sha256:abc".into(),
+            None,
             groups,
         );
         let result = cycle.check_group_staleness(
@@ -716,6 +824,7 @@ mod tests {
             "main".into(),
             "sha256:abc".into(),
             "sha256:abc".into(),
+            None,
             groups,
         );
         let result = cycle.check_group_staleness(
@@ -754,6 +863,7 @@ mod tests {
             "main".into(),
             "sha256:abc".into(),
             "sha256:abc".into(),
+            None,
             groups,
         );
         assert!(
@@ -781,6 +891,7 @@ mod tests {
             "main".into(),
             "sha256:abc".into(),
             "sha256:abc".into(),
+            None,
             groups,
         );
         assert!(
@@ -813,6 +924,7 @@ mod tests {
             "main".into(),
             "sha256:abc".into(),
             "sha256:abc".into(),
+            None,
             groups,
         );
         let mut h = BTreeMap::new();
@@ -851,6 +963,7 @@ mod tests {
             "main".into(),
             "sha256:abc".into(),
             "sha256:abc".into(),
+            None,
             groups,
         );
         let mut h = BTreeMap::new();
@@ -876,6 +989,7 @@ mod tests {
             "main".into(),
             "sha256:abc".into(),
             "sha256:abc".into(),
+            None,
             groups,
         );
         let mut h = BTreeMap::new();
@@ -897,6 +1011,7 @@ mod tests {
             "main".into(),
             "sha256:abc".into(),
             "sha256:abc".into(),
+            None,
             groups,
         );
         let mut h = BTreeMap::new();
@@ -920,6 +1035,7 @@ mod tests {
             "main".into(),
             "sha256:abc".into(),
             "sha256:abc".into(),
+            None,
             groups,
         );
         let mut h = BTreeMap::new();
@@ -944,6 +1060,7 @@ mod tests {
             "main".into(),
             "sha256:abc".into(),
             "sha256:abc".into(),
+            None,
             groups,
         );
         let mut h = BTreeMap::new();
@@ -965,6 +1082,7 @@ mod tests {
             "main".into(),
             "sha256:abc".into(),
             "sha256:abc".into(),
+            None,
             groups,
         );
         let mut h = BTreeMap::new();
@@ -987,6 +1105,7 @@ mod tests {
             "main".into(),
             "sha256:abc".into(),
             "sha256:abc".into(),
+            None,
             groups,
         );
         let mut h = BTreeMap::new();

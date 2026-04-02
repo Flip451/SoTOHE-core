@@ -28,9 +28,9 @@ pub use repository::{
     ReviewJsonReader, ReviewJsonWriter, TrackReader, TrackWriter, WorktreeReader,
 };
 pub use review::{
-    CodeHash, CycleError, CycleGroupState, EscalationPhase, GroupRound, GroupRoundOutcome,
-    GroupRoundVerdict, NonEmptyFindings, ReviewConcern, ReviewConcernStreak, ReviewCycle,
-    ReviewCycleSummary, ReviewError, ReviewEscalationBlock, ReviewEscalationDecision,
+    ApprovedHead, CodeHash, CycleError, CycleGroupState, EscalationPhase, GroupRound,
+    GroupRoundOutcome, GroupRoundVerdict, NonEmptyFindings, ReviewConcern, ReviewConcernStreak,
+    ReviewCycle, ReviewCycleSummary, ReviewError, ReviewEscalationBlock, ReviewEscalationDecision,
     ReviewEscalationResolution, ReviewEscalationState, ReviewGroupState, ReviewJson,
     ReviewRoundResult, ReviewStalenessReason, ReviewState, ReviewStatus, RoundType, StoredFinding,
     Verdict,

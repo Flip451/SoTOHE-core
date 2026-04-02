@@ -46,6 +46,7 @@ struct CycleDocument {
     base_ref: String,
     base_policy_hash: String,
     policy_hash: String,
+    approved_head: Option<String>,
     groups: BTreeMap<String, GroupDocument>,
 }
 
@@ -157,8 +158,19 @@ fn cycle_from_document(doc: CycleDocument) -> Result<ReviewCycle, ReviewJsonCode
             reason: "group name normalization caused key collision".into(),
         });
     }
+    // Parse approved_head if present.
+    let approved_head = doc
+        .approved_head
+        .map(|sha| {
+            domain::ApprovedHead::try_new(sha).map_err(|e| ReviewJsonCodecError::InvalidField {
+                field: "approved_head".into(),
+                reason: format!("{e}"),
+            })
+        })
+        .transpose()?;
+
     // Use the validated constructor — review.json from disk is untrusted input.
-    ReviewCycle::new(
+    let mut cycle = ReviewCycle::new(
         doc.cycle_id,
         started_at,
         doc.base_ref,
@@ -166,7 +178,12 @@ fn cycle_from_document(doc: CycleDocument) -> Result<ReviewCycle, ReviewJsonCode
         doc.policy_hash,
         groups,
     )
-    .map_err(ReviewJsonCodecError::from)
+    .map_err(ReviewJsonCodecError::from)?;
+
+    if let Some(head) = approved_head {
+        cycle.set_approved_head(head);
+    }
+    Ok(cycle)
 }
 
 fn group_from_document(doc: GroupDocument) -> Result<CycleGroupState, ReviewJsonCodecError> {
@@ -305,6 +322,7 @@ fn cycle_to_document(cycle: &ReviewCycle) -> CycleDocument {
         base_ref: cycle.base_ref().to_owned(),
         base_policy_hash: cycle.base_policy_hash().to_owned(),
         policy_hash: cycle.policy_hash().to_owned(),
+        approved_head: cycle.approved_head().map(|h| h.as_str().to_owned()),
         groups,
     }
 }
@@ -938,5 +956,92 @@ mod tests {
 }"#;
         let result = decode(json);
         assert!(matches!(result, Err(ReviewJsonCodecError::Cycle(_))));
+    }
+
+    // -- approved_head round-trip tests --
+
+    #[test]
+    fn test_approved_head_null_round_trips() {
+        let json = r#"{
+  "schema_version": 1,
+  "cycles": [{
+    "cycle_id": "c1",
+    "started_at": "2026-04-02T00:00:00Z",
+    "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
+    "policy_hash": "sha256:abc",
+    "approved_head": null,
+    "groups": {
+      "other": {
+        "scope": [],
+        "rounds": []
+      }
+    }
+  }]
+}"#;
+        let review = decode(json).unwrap();
+        let cycle = review.current_cycle().unwrap();
+        assert!(cycle.approved_head().is_none());
+
+        let encoded = encode(&review).unwrap();
+        let decoded = decode(&encoded).unwrap();
+        assert!(decoded.current_cycle().unwrap().approved_head().is_none());
+    }
+
+    #[test]
+    fn test_approved_head_sha_round_trips() {
+        let json = r#"{
+  "schema_version": 1,
+  "cycles": [{
+    "cycle_id": "c1",
+    "started_at": "2026-04-02T00:00:00Z",
+    "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
+    "policy_hash": "sha256:abc",
+    "approved_head": "abcdef0123456789abcdef0123456789abcdef01",
+    "groups": {
+      "other": {
+        "scope": [],
+        "rounds": []
+      }
+    }
+  }]
+}"#;
+        let review = decode(json).unwrap();
+        let cycle = review.current_cycle().unwrap();
+        assert_eq!(
+            cycle.approved_head().unwrap().as_str(),
+            "abcdef0123456789abcdef0123456789abcdef01"
+        );
+
+        let encoded = encode(&review).unwrap();
+        let decoded = decode(&encoded).unwrap();
+        assert_eq!(
+            decoded.current_cycle().unwrap().approved_head().unwrap().as_str(),
+            "abcdef0123456789abcdef0123456789abcdef01"
+        );
+    }
+
+    #[test]
+    fn test_approved_head_invalid_sha_rejected() {
+        let json = r#"{
+  "schema_version": 1,
+  "cycles": [{
+    "cycle_id": "c1",
+    "started_at": "2026-04-02T00:00:00Z",
+    "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
+    "policy_hash": "sha256:abc",
+    "approved_head": "not-a-valid-sha",
+    "groups": {
+      "other": {
+        "scope": [],
+        "rounds": []
+      }
+    }
+  }]
+}"#;
+        let result = decode(json);
+        assert!(result.is_err());
     }
 }

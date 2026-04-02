@@ -37,6 +37,8 @@ pub enum ReviewCommand {
     ResolveEscalation(ResolveEscalationArgs),
     /// Show per-group Fast/Final review state for a track.
     Status(StatusArgs),
+    /// Set approved_head in review.json (recovery command for post-commit persistence failure).
+    SetApprovedHead(SetApprovedHeadArgs),
 }
 
 /// CLI round type for auto-record.
@@ -264,6 +266,17 @@ pub struct StatusArgs {
     track_id: String,
 }
 
+#[derive(Debug, Args)]
+pub struct SetApprovedHeadArgs {
+    /// Path to the track items directory.
+    #[arg(long, default_value = "track/items")]
+    items_dir: PathBuf,
+
+    /// Track ID.
+    #[arg(long)]
+    track_id: String,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct ReviewRunResult {
     pub(super) verdict: ReviewVerdict,
@@ -324,6 +337,7 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
         ReviewCommand::CheckApproved(args) => execute_check_approved(&args),
         ReviewCommand::ResolveEscalation(args) => execute_resolve_escalation(&args),
         ReviewCommand::Status(args) => execute_status(&args),
+        ReviewCommand::SetApprovedHead(args) => execute_set_approved_head(&args),
     }
 }
 
@@ -462,13 +476,13 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
         .map_err(|e| format!("failed to read review.json: {e}"))?
         .and_then(|r| {
             r.current_cycle().map(|c| {
-                let base_ref = c.base_ref().to_owned();
+                let diff_base = infrastructure::review_adapters::effective_diff_base(c);
                 let cycle_group_names: std::collections::BTreeSet<_> =
                     c.group_names().cloned().collect();
-                (base_ref, cycle_group_names)
+                (diff_base, cycle_group_names)
             })
         })
-        .map(|(base_ref, cycle_group_names)| -> Result<_, String> {
+        .map(|(diff_base, cycle_group_names)| -> Result<_, String> {
             let git = SystemGitRepo::discover().map_err(|e| format!("{e}"))?;
             let scope_json = git.root().join("track/review-scope.json");
             let scope_config = infrastructure::review_group_policy::load_review_scope_config(
@@ -485,7 +499,7 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
                     .map_err(|e| format!("{e}"))?;
 
             let diff_scope = infrastructure::review_adapters::GitDiffScopeProvider
-                .changed_files(&base_ref)
+                .changed_files(&diff_base)
                 .map_err(|e| format!("{e}"))?;
             let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
             let filtered_files = infrastructure::review_group_policy::filter_operational(
@@ -636,6 +650,69 @@ fn is_planning_only_path(path: &str) -> bool {
 // ---------------------------------------------------------------------------
 // status: Show per-group Fast/Final review state
 // ---------------------------------------------------------------------------
+
+fn execute_set_approved_head(args: &SetApprovedHeadArgs) -> ExitCode {
+    match run_set_approved_head(args) {
+        Ok(()) => {
+            eprintln!("[OK] approved_head updated");
+            ExitCode::SUCCESS
+        }
+        Err(msg) => {
+            eprintln!("[ERROR] {msg}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn run_set_approved_head(args: &SetApprovedHeadArgs) -> Result<(), String> {
+    use domain::{ApprovedHead, ReviewJsonReader, ReviewJsonWriter, TrackId};
+
+    let track_id =
+        TrackId::try_new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
+
+    // Verify current branch matches the requested track to prevent cross-track corruption.
+    let current_branch = std::process::Command::new("git")
+        .args(["rev-parse", "--abbrev-ref", "HEAD"])
+        .output()
+        .map_err(|e| format!("failed to detect branch: {e}"))?;
+    if !current_branch.status.success() {
+        return Err("failed to detect current branch (git rev-parse failed)".to_owned());
+    }
+    let branch_name = String::from_utf8_lossy(&current_branch.stdout).trim().to_owned();
+    let expected_branch = format!("track/{}", args.track_id);
+    if branch_name != expected_branch {
+        return Err(format!(
+            "current branch '{branch_name}' does not match track branch '{expected_branch}'. \
+             Run this command from the correct track branch to prevent cross-track corruption."
+        ));
+    }
+
+    let store = infrastructure::review_json_store::FsReviewJsonStore::new(&args.items_dir);
+
+    let mut review = store
+        .find_review(&track_id)
+        .map_err(|e| format!("failed to read review.json: {e}"))?
+        .ok_or_else(|| "no review.json found".to_owned())?;
+
+    let cycle =
+        review.current_cycle_mut().ok_or_else(|| "no current cycle in review.json".to_owned())?;
+
+    // Resolve HEAD SHA
+    let head_output = std::process::Command::new("git")
+        .args(["rev-parse", "HEAD"])
+        .output()
+        .map_err(|e| format!("failed to run git rev-parse: {e}"))?;
+    if !head_output.status.success() {
+        return Err("git rev-parse HEAD failed".to_owned());
+    }
+    let head_sha = String::from_utf8_lossy(&head_output.stdout).trim().to_owned();
+    let approved_head = ApprovedHead::try_new(&head_sha).map_err(|e| format!("{e}"))?;
+
+    cycle.set_approved_head(approved_head);
+    store.save_review(&track_id, &review).map_err(|e| format!("{e}"))?;
+    eprintln!("[set-approved-head] Recorded: {head_sha}");
+    Ok(())
+}
 
 fn execute_status(args: &StatusArgs) -> ExitCode {
     match run_status(args) {
