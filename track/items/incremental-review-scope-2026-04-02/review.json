@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "cycles": [
+    {
+      "cycle_id": "2026-04-02T07:29:58Z",
+      "started_at": "2026-04-02T07:29:58Z",
+      "base_ref": "main",
+      "base_policy_hash": "sha256:6171417213e49310b369c3ce4303bee111250ac00bdc96209211cf8501b0417e",
+      "policy_hash": "sha256:6171417213e49310b369c3ce4303bee111250ac00bdc96209211cf8501b0417e",
+      "groups": {
+        "other": {
+          "scope": [
+            "knowledge/strategy/TODO.md",
+            "track/items/incremental-review-scope-2026-04-02/metadata.json",
+            "track/items/incremental-review-scope-2026-04-02/plan.md",
+            "track/items/incremental-review-scope-2026-04-02/spec.json",
+            "track/items/incremental-review-scope-2026-04-02/spec.md",
+            "track/items/incremental-review-scope-2026-04-02/verification.md"
+          ],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T07:29:58Z",
+              "hash": "rvw1:sha256:3a10da7742e84a30b35232959c4bbfb3768a24e027bff5c54aa7cbe67bf664fe",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T07:32:02Z",
+              "hash": "rvw1:sha256:3a10da7742e84a30b35232959c4bbfb3768a24e027bff5c54aa7cbe67bf664fe",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,273 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0.0",
+  "title": "Incremental review scope: approved_head で差分ベースをインクリメンタルにする",
+  "goal": [
+    "check-approved と record-round が main からの累積 diff ではなく、前回承認済みコミット以降のインクリメンタル diff を使うように変更する。",
+    "これにより track branch 上で複数回コミットする際、前回コミット済みファイルの再レビューが不要になる。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "domain 層に ApprovedHead newtype を追加（validated git SHA、40文字 hex 検証）",
+        "sources": [
+          "inference — Codex planner design + user feedback: newtype for clean implementation"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "ReviewCycle に approved_head: Option<ApprovedHead> フィールドを追加（getter/setter、None 初期化）",
+        "sources": [
+          "inference — Codex planner design decision: store per-cycle in review.json"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "review_json_codec の CycleDocument に approved_head を追加（required、null or SHA string）",
+        "sources": [
+          "inference — Codex planner design decision"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "infra 層に effective_diff_base ヘルパーを実装（approved_head 優先、無効時 base_ref フォールバック）",
+        "sources": [
+          "inference — Codex planner design decision: infra layer for git ref resolution"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "RecordRoundProtocolImpl::execute の diff scope 計算で effective_diff_base を使用",
+        "sources": [
+          "inference — root cause fix for cumulative diff problem"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "check-approved snapshot 構築で effective_diff_base を使用",
+        "sources": [
+          "inference — both code paths must use same diff base"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "track-commit-message で commit 成功後に HEAD SHA を approved_head として review.json に永続化",
+        "sources": [
+          "inference — Codex planner design decision: auto-record in commit wrapper"
+        ],
+        "task_refs": [
+          "T006"
+        ]
+      },
+      {
+        "text": "sotp review set-approved-head リカバリコマンド（保存失敗時の再試行手段）",
+        "sources": [
+          "discussion — user feedback: recovery command needed for persistence failure"
+        ],
+        "task_refs": [
+          "T006"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "旧 review.json の後方互換（新規トラックのみ使用）",
+        "sources": [
+          "feedback — Rust-first policy, feedback_no_legacy_migration.md"
+        ]
+      },
+      {
+        "text": "RVW-44: reset-cycle CLI コマンド（別トラック）",
+        "sources": [
+          "knowledge/strategy/TODO.md §RVW-44"
+        ]
+      },
+      {
+        "text": "RVW-47: review status コマンド（別トラック）",
+        "sources": [
+          "knowledge/strategy/TODO.md §RVW-47"
+        ]
+      },
+      {
+        "text": "レビュー呼び出しフロー自体の変更（スコープ計算のみ変更）",
+        "sources": [
+          "inference — minimal change surface"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "TDD ワークフロー必須（Red → Green → Refactor）",
+      "sources": [
+        "convention — .claude/rules/05-testing.md"
+      ]
+    },
+    {
+      "text": "同期のみ（async なし）",
+      "sources": [
+        "track/tech-stack.md"
+      ]
+    },
+    {
+      "text": "ライブラリコードでパニック禁止",
+      "sources": [
+        "convention — .claude/rules/04-coding-principles.md"
+      ]
+    },
+    {
+      "text": "レイヤー依存方向の厳守: domain → (なし), usecase → domain, infra → domain+usecase, cli → all",
+      "sources": [
+        "architecture-rules.json"
+      ]
+    },
+    {
+      "text": "ApprovedHead は domain 層の newtype（validated git SHA, 40文字 hex）",
+      "sources": [
+        "discussion — user preference for clean implementation over raw String"
+      ]
+    },
+    {
+      "text": "effective_diff_base ヘルパーは infra 層に配置（git ref 解決が infra の責務）",
+      "sources": [
+        "inference — Codex planner design decision"
+      ]
+    },
+    {
+      "text": "approved_head が無効（rebase 後等）の場合は base_ref にフォールバック（fail-closed: スコープが累積に拡大）",
+      "sources": [
+        "inference — Codex planner design decision: fail-closed fallback"
+      ]
+    },
+    {
+      "text": "commit 成功後の approved_head 保存失敗時: commit は巻き戻さずエラー報告のみ。リカバリは set-approved-head コマンドで対応",
+      "sources": [
+        "discussion — user feedback: recovery command needed"
+      ]
+    }
+  ],
+  "domain_states": [
+    {
+      "name": "NoApprovedHead",
+      "description": "approved_head = None. First commit on track branch / after review.json reset. Diff base = base_ref (main)"
+    },
+    {
+      "name": "ApprovedHeadSet",
+      "description": "approved_head = Some(SHA). Subsequent commits use this as diff base for incremental scope"
+    },
+    {
+      "name": "ApprovedHeadInvalid",
+      "description": "approved_head SHA no longer exists (e.g. after rebase). Falls back to base_ref (fail-closed)"
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "ApprovedHead newtype が domain 層に存在し、40文字 hex を検証するコンストラクタを持つ",
+      "sources": [
+        "discussion — user preference"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "ReviewCycle が approved_head: Option<ApprovedHead> を保持し getter/setter がある",
+      "sources": [
+        "inference — Codex planner design"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "review.json の encode/decode で approved_head が round-trip する",
+      "sources": [
+        "inference — codec correctness"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "approved_head が有効な場合、record-round と check-approved が approved_head を diff base として使用する",
+      "sources": [
+        "inference — core requirement"
+      ],
+      "task_refs": [
+        "T004",
+        "T005"
+      ]
+    },
+    {
+      "text": "approved_head が無効な場合、base_ref にフォールバックする（fail-closed）",
+      "sources": [
+        "inference — Codex planner design"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "回帰テスト: 承認コミット後に TODO.md のみ変更 → スコープが前回のコードファイルに再拡大しない",
+      "sources": [
+        "inference — the bug this track fixes"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "track-commit-message が commit 成功後に HEAD SHA を approved_head として review.json に記録する",
+      "sources": [
+        "inference — Codex planner design"
+      ],
+      "task_refs": [
+        "T006"
+      ]
+    },
+    {
+      "text": "sotp review set-approved-head コマンドが存在し、保存失敗時のリカバリに使用できる",
+      "sources": [
+        "discussion — user feedback"
+      ],
+      "task_refs": [
+        "T006"
+      ]
+    },
+    {
+      "text": "cargo make ci が通る",
+      "sources": [
+        "convention — track/workflow.md §Quality Gates"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T005",
+        "T006"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "knowledge/conventions/source-attribution.md"
+  ],
+  "signals": {
+    "blue": 8,
+    "yellow": 21,
+    "red": 0
+  }
+}
