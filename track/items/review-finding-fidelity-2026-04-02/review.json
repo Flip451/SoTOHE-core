@@ -2,12 +2,135 @@
   "schema_version": 1,
   "cycles": [
     {
-      "cycle_id": "2026-04-02T02:17:47Z",
-      "started_at": "2026-04-02T02:17:47Z",
+      "cycle_id": "2026-04-02T03:33:50Z",
+      "started_at": "2026-04-02T03:33:50Z",
       "base_ref": "main",
       "base_policy_hash": "sha256:6171417213e49310b369c3ce4303bee111250ac00bdc96209211cf8501b0417e",
       "policy_hash": "sha256:6171417213e49310b369c3ce4303bee111250ac00bdc96209211cf8501b0417e",
       "groups": {
+        "harness-policy": {
+          "scope": [
+            ".claude/commands/track/commit.md"
+          ],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T03:34:10Z",
+              "hash": "rvw1:sha256:9713a5d5ce2e5c3b444057531b369432214ef1285c43493bacce807e50e34120",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T03:37:32Z",
+              "hash": "rvw1:sha256:9713a5d5ce2e5c3b444057531b369432214ef1285c43493bacce807e50e34120",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "correctness",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T03:43:10Z",
+              "hash": "rvw1:sha256:56e069e00e107ace94acd248f6d853119153ad6b13d71c97272d7e93ab099ba2",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "correctness",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T03:46:45Z",
+              "hash": "rvw1:sha256:56e069e00e107ace94acd248f6d853119153ad6b13d71c97272d7e93ab099ba2",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T03:49:21Z",
+              "hash": "rvw1:sha256:56e069e00e107ace94acd248f6d853119153ad6b13d71c97272d7e93ab099ba2",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "correctness",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T03:53:07Z",
+              "hash": "rvw1:sha256:1496874a28a1631592773bba6153c794e15fdc50651226c428a672b4cf6b94ac",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "workflow",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T03:56:13Z",
+              "hash": "rvw1:sha256:1496874a28a1631592773bba6153c794e15fdc50651226c428a672b4cf6b94ac",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T03:58:20Z",
+              "hash": "rvw1:sha256:1496874a28a1631592773bba6153c794e15fdc50651226c428a672b4cf6b94ac",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        },
         "other": {
           "scope": [
             "track/items/review-finding-fidelity-2026-04-02/metadata.json",
@@ -21,48 +144,7 @@
               "round_type": "fast",
               "success": "success",
               "error_message": null,
-              "timestamp": "2026-04-02T02:17:47Z",
-              "hash": "rvw1:sha256:e77963d6eb2b6089f81962da9f84082cf8253751e90d2a77eca8d21ca48d1f75",
-              "verdict": {
-                "verdict": "zero_findings",
-                "findings": []
-              }
-            },
-            {
-              "round_type": "final",
-              "success": "success",
-              "error_message": null,
-              "timestamp": "2026-04-02T02:21:15Z",
-              "hash": "rvw1:sha256:e77963d6eb2b6089f81962da9f84082cf8253751e90d2a77eca8d21ca48d1f75",
-              "verdict": {
-                "verdict": "findings_remain",
-                "findings": [
-                  {
-                    "message": "process",
-                    "severity": null,
-                    "file": null,
-                    "line": null
-                  },
-                  {
-                    "message": "scope",
-                    "severity": null,
-                    "file": null,
-                    "line": null
-                  },
-                  {
-                    "message": "testing",
-                    "severity": null,
-                    "file": null,
-                    "line": null
-                  }
-                ]
-              }
-            },
-            {
-              "round_type": "fast",
-              "success": "success",
-              "error_message": null,
-              "timestamp": "2026-04-02T02:23:44Z",
+              "timestamp": "2026-04-02T03:33:50Z",
               "hash": "rvw1:sha256:7d24e19f4a25bce611ebebb985be3ba0f80ac8d1606b25927bd626e3debf2950",
               "verdict": {
                 "verdict": "zero_findings",
@@ -73,7 +155,7 @@
               "round_type": "final",
               "success": "success",
               "error_message": null,
-              "timestamp": "2026-04-02T02:25:32Z",
+              "timestamp": "2026-04-02T03:37:00Z",
               "hash": "rvw1:sha256:7d24e19f4a25bce611ebebb985be3ba0f80ac8d1606b25927bd626e3debf2950",
               "verdict": {
                 "verdict": "zero_findings",
