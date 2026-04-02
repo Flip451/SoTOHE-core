@@ -349,27 +349,34 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
 
             // 2. Load group policy from review-scope.json (+ optional per-track override).
             let scope_json_path = git.root().join("track/review-scope.json");
-            let base_groups = load_base_review_groups(&scope_json_path).map_err(|e| {
-                RecordRoundProtocolError::Other(format!("load review-scope.json groups: {e}"))
-            })?;
+            let scope_config =
+                crate::review_group_policy::load_review_scope_config(&scope_json_path, track_id)
+                    .map_err(|e| {
+                        RecordRoundProtocolError::Other(format!("load review-scope.json: {e}"))
+                    })?;
             let override_config =
                 crate::review_group_policy::load_review_groups_override(&self.items_dir, track_id)
                     .map_err(|e| {
                         RecordRoundProtocolError::Other(format!("load review-groups override: {e}"))
                     })?;
             let policy = crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(
-                &base_groups,
+                &scope_config.groups,
                 override_config.as_ref(),
             )
             .map_err(|e| RecordRoundProtocolError::Other(format!("resolve group policy: {e}")))?;
 
-            // 3. Partition changed files into groups with real frozen scope.
+            // 3. Filter out operational files, then partition.
+            let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
+            let filtered_files = crate::review_group_policy::filter_operational(
+                &diff_files,
+                &scope_config.operational_matchers,
+            );
+
             // Filter to expected_groups only (+ mandatory "other") to respect
             // the --expected-groups contract and avoid requiring review for
             // groups the caller didn't request.
-            let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
             let full_partition = policy
-                .partition(&diff_files)
+                .partition(&filtered_files)
                 .map_err(|e| RecordRoundProtocolError::Other(format!("partition: {e}")))?;
             let other_key = ReviewGroupName::try_new("other").map_err(|e| {
                 RecordRoundProtocolError::Other(format!("invalid group name 'other': {e}"))
@@ -396,11 +403,11 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
                         RecordRoundProtocolError::Other(format!("partition filter: {e}"))
                     })?;
             // Compute base policy hash separately (before override).
-            let base_policy =
-                crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(&base_groups, None)
-                    .map_err(|e| {
-                        RecordRoundProtocolError::Other(format!("resolve base policy: {e}"))
-                    })?;
+            let base_policy = crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(
+                &scope_config.groups,
+                None,
+            )
+            .map_err(|e| RecordRoundProtocolError::Other(format!("resolve base policy: {e}")))?;
             let snapshot = usecase::review_workflow::groups::ReviewPartitionSnapshot::new(
                 base_policy.policy_hash(),
                 policy.policy_hash(),
@@ -470,22 +477,28 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
                 .changed_files(&cycle_base_ref)
                 .map_err(|e| RecordRoundProtocolError::Other(format!("diff scope: {e}")))?;
             let scope_json_path = git.root().join("track/review-scope.json");
-            let base_groups = load_base_review_groups(&scope_json_path).map_err(|e| {
-                RecordRoundProtocolError::Other(format!("load review-scope.json groups: {e}"))
-            })?;
+            let scope_config =
+                crate::review_group_policy::load_review_scope_config(&scope_json_path, track_id)
+                    .map_err(|e| {
+                        RecordRoundProtocolError::Other(format!("load review-scope.json: {e}"))
+                    })?;
             let override_config =
                 crate::review_group_policy::load_review_groups_override(&self.items_dir, track_id)
                     .map_err(|e| {
                         RecordRoundProtocolError::Other(format!("load review-groups override: {e}"))
                     })?;
             let policy = crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(
-                &base_groups,
+                &scope_config.groups,
                 override_config.as_ref(),
             )
             .map_err(|e| RecordRoundProtocolError::Other(format!("resolve group policy: {e}")))?;
             let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
+            let filtered_files = crate::review_group_policy::filter_operational(
+                &diff_files,
+                &scope_config.operational_matchers,
+            );
             let full_partition = policy
-                .partition(&diff_files)
+                .partition(&filtered_files)
                 .map_err(|e| RecordRoundProtocolError::Other(format!("partition: {e}")))?;
 
             // Find this group's files in the current partition, with remap to "other".

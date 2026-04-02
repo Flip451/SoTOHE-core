@@ -1,0 +1,282 @@
+{
+  "schema_version": 1,
+  "cycles": [
+    {
+      "cycle_id": "2026-04-01T23:54:42Z",
+      "started_at": "2026-04-01T23:54:42Z",
+      "base_ref": "main",
+      "base_policy_hash": "sha256:6171417213e49310b369c3ce4303bee111250ac00bdc96209211cf8501b0417e",
+      "policy_hash": "sha256:6171417213e49310b369c3ce4303bee111250ac00bdc96209211cf8501b0417e",
+      "groups": {
+        "cli": {
+          "scope": [
+            "apps/cli/src/commands/review/mod.rs"
+          ],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-01T23:56:53Z",
+              "hash": "rvw1:sha256:da6a120284c358dbb9e17e9b1a5ae9bea1d5c59bbb81124499a42d1901ad26d4",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-01T23:58:21Z",
+              "hash": "rvw1:sha256:da6a120284c358dbb9e17e9b1a5ae9bea1d5c59bbb81124499a42d1901ad26d4",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T00:02:02Z",
+              "hash": "rvw1:sha256:da6a120284c358dbb9e17e9b1a5ae9bea1d5c59bbb81124499a42d1901ad26d4",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        },
+        "harness-policy": {
+          "scope": [
+            ".claude/agents/codex-reviewer.md",
+            ".claude/commands/track/plan.md",
+            ".claude/commands/track/review.md"
+          ],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-01T23:58:54Z",
+              "hash": "rvw1:sha256:a6058adaa4a9837aef1214b88abb19d8f84a8a6342771a8f7a62249df73b7cf3",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T00:00:16Z",
+              "hash": "rvw1:sha256:a6058adaa4a9837aef1214b88abb19d8f84a8a6342771a8f7a62249df73b7cf3",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T00:02:32Z",
+              "hash": "rvw1:sha256:a6058adaa4a9837aef1214b88abb19d8f84a8a6342771a8f7a62249df73b7cf3",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "workflow_consistency",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T00:08:38Z",
+              "hash": "rvw1:sha256:4eae75328f39e9edb8bb3da8ba9ec20724a6c558581b617dd7a9bb64f43703eb",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "workflow_correctness",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T00:14:41Z",
+              "hash": "rvw1:sha256:c660f2728e39a88c1274d076773bb8188602e7997790da1b30f59aae7a038706",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T00:22:35Z",
+              "hash": "rvw1:sha256:c660f2728e39a88c1274d076773bb8188602e7997790da1b30f59aae7a038706",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T00:26:46Z",
+              "hash": "rvw1:sha256:c660f2728e39a88c1274d076773bb8188602e7997790da1b30f59aae7a038706",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        },
+        "infrastructure": {
+          "scope": [
+            "libs/infrastructure/src/review_adapters.rs",
+            "libs/infrastructure/src/review_group_policy.rs"
+          ],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-01T23:54:42Z",
+              "hash": "rvw1:sha256:bd55c498c077b047ec98cf500e4e0b4d7446227bc4aee4b567716d4a71b8c272",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-01T23:59:08Z",
+              "hash": "rvw1:sha256:bd55c498c077b047ec98cf500e4e0b4d7446227bc4aee4b567716d4a71b8c272",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T00:02:28Z",
+              "hash": "rvw1:sha256:bd55c498c077b047ec98cf500e4e0b4d7446227bc4aee4b567716d4a71b8c272",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "architecture",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T00:09:47Z",
+              "hash": "rvw1:sha256:bd55c498c077b047ec98cf500e4e0b4d7446227bc4aee4b567716d4a71b8c272",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        },
+        "other": {
+          "scope": [
+            "track/items/review-scope-operational-filter-2026-04-01/metadata.json",
+            "track/items/review-scope-operational-filter-2026-04-01/plan.md",
+            "track/items/review-scope-operational-filter-2026-04-01/spec.json",
+            "track/items/review-scope-operational-filter-2026-04-01/spec.md",
+            "track/items/review-scope-operational-filter-2026-04-01/verification.md",
+            "track/review-scope.json"
+          ],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-01T23:57:16Z",
+              "hash": "rvw1:sha256:8868c5ba56c0b17215f182247e611b6145e314861fdcb63ac7989dd98506a591",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T00:01:11Z",
+              "hash": "rvw1:sha256:8868c5ba56c0b17215f182247e611b6145e314861fdcb63ac7989dd98506a591",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T00:01:30Z",
+              "hash": "rvw1:sha256:8868c5ba56c0b17215f182247e611b6145e314861fdcb63ac7989dd98506a591",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "testing",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  },
+                  {
+                    "message": "workflow",
+                    "severity": null,
+                    "file": null,
+                    "line": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T00:08:01Z",
+              "hash": "rvw1:sha256:8868c5ba56c0b17215f182247e611b6145e314861fdcb63ac7989dd98506a591",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

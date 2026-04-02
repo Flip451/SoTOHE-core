@@ -52,21 +52,47 @@ focused briefing and reviewer invocation. All groups run **in parallel** via Age
 
 ### 2a. Classify changed files into groups
 
-Use `git diff main --name-only` (or equivalent) to get the full changed file list. Assign each
-file to exactly one observation group:
+Get the full changed file list including staged, unstaged, and untracked files.
+Use `{base}` as the diff base (default: `main`; must match `--diff-base` passed to `--auto-record`):
+- `git diff {base}...HEAD --name-only` for committed changes (merge-base diff)
+- `git diff --cached --name-only` for staged-only changes
+- `git diff --name-only` for unstaged worktree changes
+- `git ls-files --others --exclude-standard` for untracked files (e.g., new track artifacts)
+- Merge all lists and deduplicate.
+- Note: when using `--auto-record`, `review_operational` files (e.g., `review.json`) are
+  automatically excluded by the infrastructure before partition. In manual fallback mode,
+  the orchestrator should exclude files matching `review_operational` patterns from
+  `track/review-scope.json` before assigning groups.
+- Assign each remaining file to exactly one observation group:
+
+The authoritative group definitions are in `track/review-scope.json`. Per-track overrides
+can be placed at `track/items/<track-id>/review-groups.json` — when present, its `groups`
+object **replaces** the base groups entirely. Check for a per-track override before using
+the base definitions. The table below is a summary of the base groups — if they diverge
+from `review-scope.json`, the JSON file wins.
 
 | Group | Scope | Files matching |
 |-------|-------|----------------|
 | **domain** | Type design, invariants, business rules, trait signatures (ports) | `libs/domain/**` |
-| **infrastructure** | I/O correctness, parsing, adapters, external dependencies. Include related domain trait signatures in briefing as context. | `libs/infrastructure/**` |
+| **infrastructure** | I/O correctness, parsing, adapters, external dependencies | `libs/infrastructure/**` |
 | **usecase** | Workflow logic, error propagation, functional correctness | `libs/usecase/**` |
-| **cli** | CLI error handling, exit codes, user-facing messages, functional regressions | `apps/cli/**` |
-| **other** | Workflow docs, skill definitions, track artifacts, scripts, config | Everything else (`.claude/**`, `track/**`, `DEVELOPER_AI_WORKFLOW.md`, `scripts/**`, `Cargo.*`, etc.) |
+| **cli** | CLI error handling, exit codes, user-facing messages | `apps/**` |
+| **harness-policy** | Workflow commands, rules, agent profiles, conventions | `.claude/commands/**`, `.claude/rules/**`, `.claude/agents/**`, `.claude/agent-profiles.json`, `.claude/settings*.json`, `.claude/permission-extensions.json`, `knowledge/conventions/**`, `AGENTS.md`, `CLAUDE.md` |
+| **other** | Track artifacts, scripts, config, docs not covered above | Everything else (`track/**`, `scripts/**`, `Cargo.*`, etc.) |
 
 If a group has zero changed files, skip it (do not invoke a reviewer for empty scope).
 
-If the total changed files are small (≤ 5 files across all groups), collapse into a single
-reviewer invocation instead of splitting — parallel overhead is not worthwhile.
+If the total changed files are small (≤ 5 files) AND all belong to **a single group**,
+collapse into a single reviewer invocation instead of splitting — parallel overhead is
+not worthwhile. Use the actual group name from the partition (e.g., `other` for planning
+artifacts). Do NOT use a synthetic group name like `all` — `record-round` only recognizes
+group names produced by `partition()`: named groups from the active policy
+(base `track/review-scope.json` or per-track `review-groups.json` override)
+plus the implicit `other` fallback group.
+
+If files span **multiple groups**, use the normal parallel pattern even for ≤ 5 files.
+`--auto-record` records exactly one group per invocation, so multi-group collapsed reviews
+would leave some groups unrecorded.
 
 ### 2b. Build per-group briefing
 
@@ -119,18 +145,23 @@ Use `{fast_model}` for iterative rounds and `{model}` for the final confirmation
 When `--auto-record` is passed, the reviewer wrapper calls `record-round` internally after
 verdict extraction, applying diff scope filtering (RVW-11) and preventing verdict falsification
 (RVW-10). This replaces the manual Step 2e. The `--diff-base` flag controls the base ref for
-scope filtering (default: `main`). Parallel multi-group `--auto-record` is safe: the recording
-protocol retries on stale-hash conflicts (up to 3 retries with fresh index).
+scope filtering (default: `main`). Parallel multi-group `--auto-record` is safe: each group's
+hash is computed from its own scope files only, so parallel recordings do not conflict.
 
 ```
 Agent 1: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-domain.md --auto-record --track-id {track-id} --round-type {fast|final} --group domain --expected-groups {all-group-names} --diff-base main
 Agent 2: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-infrastructure.md --auto-record --track-id {track-id} --round-type {fast|final} --group infrastructure --expected-groups {all-group-names} --diff-base main
 Agent 3: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-usecase.md --auto-record --track-id {track-id} --round-type {fast|final} --group usecase --expected-groups {all-group-names} --diff-base main
 Agent 4: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-cli.md --auto-record --track-id {track-id} --round-type {fast|final} --group cli --expected-groups {all-group-names} --diff-base main
-Agent 5: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-other.md --auto-record --track-id {track-id} --round-type {fast|final} --group other --expected-groups {all-group-names} --diff-base main
+Agent 5: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-harness-policy.md --auto-record --track-id {track-id} --round-type {fast|final} --group harness-policy --expected-groups {all-group-names} --diff-base main
+Agent 6: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-other.md --auto-record --track-id {track-id} --round-type {fast|final} --group other --expected-groups {all-group-names} --diff-base main
 ```
 
 For the **final confirmation round**, replace `{fast_model}` with `{model}` and `--round-type fast` with `--round-type final` in the commands above.
+
+**Note**: The examples above use the base group names. If a per-track `review-groups.json`
+override exists (see Step 2a), replace the group names with the override-defined names.
+Only include non-empty groups in `--expected-groups` (consistent with the skip-empty rule).
 
 **When the provider is `claude`** (e.g., `claude-heavy` profile):
 
@@ -175,20 +206,20 @@ reviewer wrapper. The wrapper applies diff scope filtering, extracts concerns, a
 `record-round` internally. Exit code 3 signals escalation block. No manual intervention needed.
 
 **Fallback (without `--auto-record`)**: If `--auto-record` is not used, manually persist
-the result into `metadata.json` via `sotp review record-round`:
+the result into `review.json` via `sotp review record-round`:
 
-For **each non-empty group**, run (when the `<= 5 files` collapse rule was applied and a
-single reviewer invocation was used, treat all changed files as a single group named `all`
-and pass `--expected-groups all`):
+For **each non-empty group**, run (when the `<= 5 files` collapse rule was applied,
+use the actual layer-classified group name, not `all` — see Step 2a):
 
 ```bash
-bin/sotp review record-round \
+cargo make track-record-round \
   --track-id {track-id} \
   --round-type {fast|final} \
   --group {group-name} \
   --verdict '{aggregated verdict JSON for this group}' \
   --expected-groups {comma-separated list of all non-empty group names} \
-  --concerns {comma-separated concern slugs extracted from findings, empty for zero_findings} \
+  --diff-base {base} \
+  --concerns {comma-separated concern slugs — omit this flag entirely for zero_findings} \
   --items-dir track/items
 ```
 
@@ -209,8 +240,12 @@ for `cargo make track-record-round`.
 - If `record-round` fails with a stale-hash error (stderr contains "code hash mismatch"):
   the review state has been invalidated. Stop and re-run the review from Round 1 —
   proceeding would leave the review state inconsistent with the current code.
-- If `record-round` fails with any other error: report but continue (fail-open for recording;
-  the review cycle itself is not blocked by a recording failure).
+- If `record-round` fails with any other error:
+  - **With `--auto-record`**: fail-closed (exit 1, verdict not printed). The round must be
+    retried — unrecorded verdicts are not trusted.
+  - **Without `--auto-record` (manual fallback)**: retry the `record-round` command.
+    Do not start fixes until all groups in the current round are successfully recorded —
+    unrecorded groups leave `check-approved` blocked.
 
 ## Step 3: Review → Fix → Review loop
 
@@ -237,6 +272,10 @@ For each finding:
 4. P1 and P2: implement the fix.
 5. If the finding requires a new test, add it.
 6. Run `cargo make ci` (or `cargo make ci-rust` for fast inner loop) to verify fixes compile and pass.
+
+**Note**: `cargo make add-all` (staging) is NOT required between review rounds.
+The review hash (`rvw1:` prefix) is computed from worktree file contents, not the git index
+(see `review_adapters.rs` / ADR §5). Staging is only needed before `/track:commit`.
 
 ### Round N (fix verification)
 
@@ -287,12 +326,15 @@ Execution:
 When groups are reviewed in parallel and some groups complete with `zero_findings` while
 others have `findings_remain`:
 
-- **Without `--auto-record`**: start fixes immediately for completed groups without waiting
-  for others. Launch the next review round per-group as fixes are ready.
-- **With `--auto-record`**: wait for ALL groups in the current round to complete recording
-  before starting any fixes. Each `record-round` captures a code hash; if fixes change
-  the tree between recordings, later groups will hit stale-code-hash and invalidate
-  review state. Only begin fixes after all groups have recorded.
+- **With `--auto-record`** (recommended): start fixes immediately for completed groups
+  without waiting for others. `group_scope_hash` is computed per-group from that group's
+  scope files only, so modifying files in one group's scope does not affect another
+  group's hash. Launch the next review round per-group as fixes are ready.
+  Avoid modifying files that belong to a still-running group's scope.
+- **Without `--auto-record`** (manual fallback): wait for all groups to be recorded
+  before starting fixes. The manual `track-record-round` creates the cycle from the
+  current diff on the first record, so fixes before all groups are recorded can freeze
+  a post-fix scope.
 
 ### Loop guard
 

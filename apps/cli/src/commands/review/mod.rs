@@ -471,21 +471,28 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
         .map(|(base_ref, cycle_group_names)| -> Result<_, String> {
             let git = SystemGitRepo::discover().map_err(|e| format!("{e}"))?;
             let scope_json = git.root().join("track/review-scope.json");
-            let base_groups =
-                infrastructure::review_adapters::load_base_review_groups(&scope_json)?;
+            let scope_config = infrastructure::review_group_policy::load_review_scope_config(
+                &scope_json,
+                &track_id_parsed,
+            )?;
             let override_config = load_review_groups_override(&args.items_dir, &track_id_parsed)
                 .map_err(|e| format!("{e}"))?;
 
-            let base_policy = ResolvedReviewGroupPolicy::resolve(&base_groups, None)
+            let base_policy = ResolvedReviewGroupPolicy::resolve(&scope_config.groups, None)
                 .map_err(|e| format!("{e}"))?;
-            let policy = ResolvedReviewGroupPolicy::resolve(&base_groups, override_config.as_ref())
-                .map_err(|e| format!("{e}"))?;
+            let policy =
+                ResolvedReviewGroupPolicy::resolve(&scope_config.groups, override_config.as_ref())
+                    .map_err(|e| format!("{e}"))?;
 
             let diff_scope = infrastructure::review_adapters::GitDiffScopeProvider
                 .changed_files(&base_ref)
                 .map_err(|e| format!("{e}"))?;
             let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
-            let full_partition = policy.partition(&diff_files).map_err(|e| format!("{e}"))?;
+            let filtered_files = infrastructure::review_group_policy::filter_operational(
+                &diff_files,
+                &scope_config.operational_matchers,
+            );
+            let full_partition = policy.partition(&filtered_files).map_err(|e| format!("{e}"))?;
 
             // Filter partition to match cycle's group set to avoid PartitionChanged
             // false positive when the cycle was created with a subset of groups.
