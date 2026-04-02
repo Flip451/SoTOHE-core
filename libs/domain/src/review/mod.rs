@@ -25,7 +25,7 @@ pub use escalation::{
 };
 pub use state::ReviewState;
 pub use types::{
-    CodeHash, ModelProfile, ReviewGroupState, ReviewRoundResult, ReviewStatus, RoundType, Verdict,
-    extract_verdict_json_candidates_compact, extract_verdict_json_candidates_multiline,
-    resolve_full_auto,
+    ApprovedHead, CodeHash, ModelProfile, ReviewGroupState, ReviewRoundResult, ReviewStatus,
+    RoundType, Verdict, extract_verdict_json_candidates_compact,
+    extract_verdict_json_candidates_multiline, resolve_full_auto,
 };
