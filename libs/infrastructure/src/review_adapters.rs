@@ -466,15 +466,15 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
         };
 
         // Compute per-group scope hash from CURRENT partition (not frozen scope).
-        // Uses the cycle's frozen base_ref for diff computation (not self.base_ref)
-        // to ensure consistency with check_approved.
+        // Uses effective_diff_base (approved_head if set, else base_ref) for
+        // incremental scope computation to avoid re-reviewing previously committed files.
         let group_scope: Vec<String> = {
-            let cycle_base_ref = review
+            let diff_base = review
                 .current_cycle()
-                .map(|c| c.base_ref().to_owned())
+                .map(effective_diff_base)
                 .unwrap_or_else(|| self.base_ref.clone());
             let diff_scope = GitDiffScopeProvider
-                .changed_files(&cycle_base_ref)
+                .changed_files(&diff_base)
                 .map_err(|e| RecordRoundProtocolError::Other(format!("diff scope: {e}")))?;
             let scope_json_path = git.root().join("track/review-scope.json");
             let scope_config =
@@ -565,6 +565,45 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
             .map_err(|e| RecordRoundProtocolError::Other(format!("save review.json: {e}")))?;
 
         Ok(())
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Incremental diff base resolution
+// ---------------------------------------------------------------------------
+
+/// Resolves the effective diff base for review scope computation.
+///
+/// Prefers the cycle's `approved_head` (incremental base from the last approved commit)
+/// over `base_ref` (typically "main"). Falls back to `base_ref` when:
+/// - `approved_head` is `None` (first commit on the track branch)
+/// - `approved_head` SHA is invalid (e.g., after a rebase)
+///
+/// This is fail-closed: fallback expands the scope to the cumulative branch diff.
+pub fn effective_diff_base(cycle: &domain::ReviewCycle) -> String {
+    match cycle.approved_head() {
+        Some(head) => {
+            // Verify approved_head is a valid commit AND an ancestor of HEAD.
+            // Without ancestor check, a tampered approved_head could point to a
+            // descendant/sibling commit, causing merge-base to collapse to HEAD
+            // and silently shrinking the review scope (fail-open).
+            let is_ancestor = std::process::Command::new("git")
+                .args(["merge-base", "--is-ancestor", head.as_str(), "HEAD"])
+                .output();
+            match is_ancestor {
+                Ok(output) if output.status.success() => head.as_str().to_owned(),
+                _ => {
+                    eprintln!(
+                        "[incremental-scope] approved_head {} is not an ancestor of HEAD, \
+                         falling back to base_ref {}",
+                        head,
+                        cycle.base_ref()
+                    );
+                    cycle.base_ref().to_owned()
+                }
+            }
+        }
+        None => cycle.base_ref().to_owned(),
     }
 }
 
@@ -1003,5 +1042,73 @@ mod tests {
         let hash_staged = run_hasher_in_dir(path, &scope).unwrap();
 
         assert_eq!(hash_unstaged, hash_staged, "hash must not be affected by git staging state");
+    }
+
+    // -----------------------------------------------------------------------
+    // effective_diff_base tests
+    // -----------------------------------------------------------------------
+
+    fn make_cycle_with_approved_head(
+        base_ref: &str,
+        approved_head: Option<domain::ApprovedHead>,
+    ) -> domain::ReviewCycle {
+        let mut groups = std::collections::BTreeMap::new();
+        let other = domain::ReviewGroupName::try_new("other").unwrap();
+        groups.insert(other, domain::CycleGroupState::new(vec![]));
+        domain::ReviewCycle::from_parts(
+            "c1".into(),
+            domain::Timestamp::new("2026-04-02T00:00:00Z").unwrap(),
+            base_ref.into(),
+            "sha256:abc".into(),
+            "sha256:abc".into(),
+            approved_head,
+            groups,
+        )
+    }
+
+    #[test]
+    fn test_effective_diff_base_none_returns_base_ref() {
+        let cycle = make_cycle_with_approved_head("main", None);
+        assert_eq!(effective_diff_base(&cycle), "main");
+    }
+
+    #[test]
+    fn test_effective_diff_base_valid_ancestor_returns_sha() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        // Get the initial commit SHA (which is an ancestor of HEAD on test-branch).
+        let initial_sha =
+            Command::new("git").args(["rev-parse", "main"]).current_dir(path).output().unwrap();
+        let sha = String::from_utf8_lossy(&initial_sha.stdout).trim().to_owned();
+        let approved = domain::ApprovedHead::try_new(&sha).unwrap();
+
+        let cycle = make_cycle_with_approved_head("main", Some(approved));
+
+        let original = std::env::current_dir().unwrap();
+        std::env::set_current_dir(path).unwrap();
+        let result = effective_diff_base(&cycle);
+        std::env::set_current_dir(original).unwrap();
+
+        assert_eq!(result, sha);
+    }
+
+    #[test]
+    fn test_effective_diff_base_invalid_sha_falls_back() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let repo = setup_test_repo();
+        let path = repo.path();
+
+        let fake_sha =
+            domain::ApprovedHead::try_new("0000000000000000000000000000000000000000").unwrap();
+        let cycle = make_cycle_with_approved_head("main", Some(fake_sha));
+
+        let original = std::env::current_dir().unwrap();
+        std::env::set_current_dir(path).unwrap();
+        let result = effective_diff_base(&cycle);
+        std::env::set_current_dir(original).unwrap();
+
+        assert_eq!(result, "main", "invalid SHA should fall back to base_ref");
     }
 }

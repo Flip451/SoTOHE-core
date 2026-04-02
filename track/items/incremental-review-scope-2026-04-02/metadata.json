@@ -1,60 +1,10 @@
 {
-  "schema_version": 3,
-  "id": "incremental-review-scope-2026-04-02",
   "branch": "track/incremental-review-scope-2026-04-02",
-  "title": "Incremental review scope: approved_head で差分ベースをインクリメンタルにする",
-  "status": "planned",
   "created_at": "2026-04-02T06:25:42Z",
-  "updated_at": "2026-04-02T06:25:42Z",
-  "tasks": [
-    {
-      "id": "T001",
-      "description": "Add ApprovedHead newtype (domain layer, validated git SHA) and approved_head: Option<ApprovedHead> to ReviewCycle with getter/setter, initialize to None in start_review_cycle",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T002",
-      "description": "Update review_json_codec CycleDocument to encode/decode approved_head (required field, null or SHA string)",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T003",
-      "description": "Extract effective_diff_base infra helper: prefer approved_head, fallback to base_ref on missing/invalid ref",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T004",
-      "description": "Wire record-round to use effective_diff_base for scope computation + regression test (approved commit does not re-expand scope)",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T005",
-      "description": "Wire check-approved snapshot construction to effective_diff_base + invalid approved_head fallback test",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T006",
-      "description": "Update track-commit-message to persist HEAD SHA as approved_head after successful commit + add sotp review set-approved-head retry command for failure recovery",
-      "status": "todo",
-      "commit_hash": null
-    }
-  ],
+  "id": "incremental-review-scope-2026-04-02",
   "plan": {
-    "summary": [
-      "check-approved と record-round が main からの累積 diff ではなく、前回承認済みコミット以降のインクリメンタル diff を使うように変更する。",
-      "ReviewCycle に approved_head: Option<ApprovedHead> を追加し、commit 成功後に HEAD SHA を review.json に記録する。",
-      "次のレビューサイクルでは approved_head を diff base として使用し、前回コミット済みファイルを再レビュー対象から除外する。",
-      "approved_head が無効（rebase 後等）の場合は base_ref (main) にフォールバック（fail-closed）。"
-    ],
     "sections": [
       {
-        "id": "S1",
-        "title": "Domain + Codec: approved_head フィールド追加",
         "description": [
           "domain 層に ApprovedHead newtype を追加（validated git SHA、コンストラクタで 40 文字 hex を検証）。",
           "ReviewCycle に approved_head: Option<ApprovedHead> を追加。getter (approved_head()) と setter (set_approved_head()) を実装。",
@@ -62,41 +12,95 @@
           "CycleDocument に approved_head フィールドを追加（required、null or SHA string）。",
           "旧 review.json の後方互換は不要（新規トラックのみ使用）。"
         ],
-        "task_ids": ["T001", "T002"]
+        "id": "S1",
+        "task_ids": [
+          "T001",
+          "T002"
+        ],
+        "title": "Domain + Codec: approved_head フィールド追加"
       },
       {
-        "id": "S2",
-        "title": "Infra: effective_diff_base ヘルパー",
         "description": [
           "infra 層に effective_diff_base ヘルパーを実装。",
           "ロジック: approved_head があればそれを使用、なければ base_ref にフォールバック。",
           "approved_head の SHA が無効（git ref 解決失敗）の場合も base_ref にフォールバック（fail-closed: スコープが累積に拡大）。",
           "Planner 判断: infra 層に配置（git ref 解決が infra の責務）。"
         ],
-        "task_ids": ["T003"]
+        "id": "S2",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "Infra: effective_diff_base ヘルパー"
       },
       {
-        "id": "S3",
-        "title": "record-round + check-approved の結合",
         "description": [
           "RecordRoundProtocolImpl::execute の diff scope 計算で effective_diff_base を使用。",
           "check-approved の snapshot 構築でも同じヘルパーを使用。",
           "回帰テスト: 承認コミット後に TODO.md のみ変更 → スコープが前回のコードファイルに再拡大しないことを検証。",
           "invalid approved_head テスト: SHA が無効時に base_ref にフォールバックすることを検証。"
         ],
-        "task_ids": ["T004", "T005"]
+        "id": "S3",
+        "task_ids": [
+          "T004",
+          "T005"
+        ],
+        "title": "record-round + check-approved の結合"
       },
       {
-        "id": "S4",
-        "title": "Commit wrapper: approved_head 自動記録",
         "description": [
           "track-commit-message wrapper で commit 成功後に HEAD SHA を resolve し、review.json の current_cycle.approved_head に永続化。",
           "review.json が存在しない場合は no-op。",
           "保存失敗時: commit は巻き戻さずエラー報告。",
           "リカバリ用コマンド sotp review set-approved-head --track-id <id> を追加（保存失敗時の再試行手段）。"
         ],
-        "task_ids": ["T006"]
+        "id": "S4",
+        "task_ids": [
+          "T006"
+        ],
+        "title": "Commit wrapper: approved_head 自動記録"
       }
+    ],
+    "summary": [
+      "check-approved と record-round が main からの累積 diff ではなく、前回承認済みコミット以降のインクリメンタル diff を使うように変更する。",
+      "ReviewCycle に approved_head: Option<ApprovedHead> を追加し、commit 成功後に HEAD SHA を review.json に記録する。",
+      "次のレビューサイクルでは approved_head を diff base として使用し、前回コミット済みファイルを再レビュー対象から除外する。",
+      "approved_head が無効（rebase 後等）の場合は base_ref (main) にフォールバック（fail-closed）。"
     ]
-  }
+  },
+  "schema_version": 3,
+  "status": "in_progress",
+  "tasks": [
+    {
+      "description": "Add ApprovedHead newtype (domain layer, validated git SHA) and approved_head: Option<ApprovedHead> to ReviewCycle with getter/setter, initialize to None in start_review_cycle",
+      "id": "T001",
+      "status": "in_progress"
+    },
+    {
+      "description": "Update review_json_codec CycleDocument to encode/decode approved_head (required field, null or SHA string)",
+      "id": "T002",
+      "status": "in_progress"
+    },
+    {
+      "description": "Extract effective_diff_base infra helper: prefer approved_head, fallback to base_ref on missing/invalid ref",
+      "id": "T003",
+      "status": "in_progress"
+    },
+    {
+      "description": "Wire record-round to use effective_diff_base for scope computation + regression test (approved commit does not re-expand scope)",
+      "id": "T004",
+      "status": "in_progress"
+    },
+    {
+      "description": "Wire check-approved snapshot construction to effective_diff_base + invalid approved_head fallback test",
+      "id": "T005",
+      "status": "in_progress"
+    },
+    {
+      "description": "Update track-commit-message to persist HEAD SHA as approved_head after successful commit + add sotp review set-approved-head retry command for failure recovery",
+      "id": "T006",
+      "status": "in_progress"
+    }
+  ],
+  "title": "Incremental review scope: approved_head で差分ベースをインクリメンタルにする",
+  "updated_at": "2026-04-02T07:37:48Z"
 }

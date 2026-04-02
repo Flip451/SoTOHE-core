@@ -523,7 +523,73 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
         eprintln!("[track-commit-message] Review approved");
     }
 
-    run_sotp(&["git", "commit-from-file", "tmp/track-commit/commit-message.txt", "--cleanup"])
+    let commit_result =
+        run_sotp(&["git", "commit-from-file", "tmp/track-commit/commit-message.txt", "--cleanup"])?;
+    if commit_result != ExitCode::SUCCESS {
+        return Ok(commit_result);
+    }
+
+    // Post-commit: persist HEAD SHA as approved_head in review.json for incremental scope.
+    if let Some(ref track_id) = resolve_track_id_from_branch() {
+        if let Err(msg) = persist_approved_head(track_id) {
+            eprintln!("[track-commit-message] WARNING: approved_head persistence failed: {msg}");
+            // Machine-readable status on stdout for callers to detect and auto-recover.
+            println!("[track-commit-message] COMMIT_OK");
+            println!("[track-commit-message] APPROVED_HEAD_FAILED");
+            eprintln!(
+                "[track-commit-message] Recovery: run `bin/sotp review set-approved-head \
+                 --track-id {track_id} --items-dir track/items`"
+            );
+            // Return success — commit already succeeded. Caller should check
+            // stdout for APPROVED_HEAD_FAILED and run recovery if needed.
+        }
+    }
+
+    Ok(ExitCode::SUCCESS)
+}
+
+/// Persists the current HEAD SHA as `approved_head` in the track's review.json.
+///
+/// No-op if review.json does not exist or has no current cycle.
+///
+/// # Errors
+/// Returns a human-readable error string on failure.
+fn persist_approved_head(track_id: &str) -> Result<(), String> {
+    use domain::{ApprovedHead, ReviewJsonReader, ReviewJsonWriter, TrackId};
+
+    let track_id = TrackId::try_new(track_id).map_err(|e| format!("{e}"))?;
+    let store = infrastructure::review_json_store::FsReviewJsonStore::new(std::path::Path::new(
+        "track/items",
+    ));
+
+    let mut review = match store.find_review(&track_id).map_err(|e| format!("{e}"))? {
+        Some(r) => r,
+        None => return Ok(()), // no review.json — no-op
+    };
+
+    if review.current_cycle().is_none() {
+        return Ok(()); // no cycle — no-op
+    }
+
+    // Resolve HEAD SHA
+    let head_output = std::process::Command::new("git")
+        .args(["rev-parse", "HEAD"])
+        .output()
+        .map_err(|e| format!("failed to run git rev-parse: {e}"))?;
+    if !head_output.status.success() {
+        return Err("git rev-parse HEAD failed".to_owned());
+    }
+    let head_sha = String::from_utf8_lossy(&head_output.stdout).trim().to_owned();
+    let approved_head = ApprovedHead::try_new(&head_sha).map_err(|e| format!("{e}"))?;
+
+    review
+        .current_cycle_mut()
+        .ok_or_else(|| "no current cycle".to_owned())?
+        .set_approved_head(approved_head);
+
+    store.save_review(&track_id, &review).map_err(|e| format!("{e}"))?;
+    eprintln!("[track-commit-message] Recorded approved_head: {head_sha}");
+    Ok(())
 }
 
 /// Resolves the track ID from the current git branch.

@@ -33,6 +33,45 @@ impl Verdict {
     }
 }
 
+/// A validated git commit SHA (40-character hexadecimal string).
+///
+/// Used to record the HEAD SHA of the last approved commit, enabling
+/// incremental review scope computation on track branches.
+///
+/// # Errors
+/// Returns `ReviewError::InvalidConcern` if the string is not exactly
+/// 40 lowercase hexadecimal characters.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApprovedHead(String);
+
+impl ApprovedHead {
+    /// Creates a new `ApprovedHead` from a 40-character hex string.
+    ///
+    /// # Errors
+    /// Returns `ReviewError::InvalidConcern` if validation fails.
+    pub fn try_new(sha: impl Into<String>) -> Result<Self, ReviewError> {
+        let s = sha.into();
+        if s.len() != 40 || !s.chars().all(|c| c.is_ascii_hexdigit()) {
+            return Err(ReviewError::InvalidConcern(format!(
+                "approved_head must be a 40-character hex SHA, got: {s}"
+            )));
+        }
+        Ok(Self(s.to_ascii_lowercase()))
+    }
+
+    /// Returns the SHA string.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl std::fmt::Display for ApprovedHead {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.0)
+    }
+}
+
 /// Code hash state for review freshness tracking.
 ///
 /// Three-state ADT replacing `Option<CodeHash>`:
@@ -333,4 +372,58 @@ pub fn extract_verdict_json_candidates_multiline(content: &str) -> Vec<String> {
         end = close;
     }
     candidates
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_approved_head_valid_lowercase() {
+        let sha = "abcdef0123456789abcdef0123456789abcdef01";
+        let head = ApprovedHead::try_new(sha).unwrap();
+        assert_eq!(head.as_str(), sha);
+    }
+
+    #[test]
+    fn test_approved_head_valid_uppercase_normalizes() {
+        let sha = "ABCDEF0123456789ABCDEF0123456789ABCDEF01";
+        let head = ApprovedHead::try_new(sha).unwrap();
+        assert_eq!(head.as_str(), sha.to_ascii_lowercase());
+    }
+
+    #[test]
+    fn test_approved_head_too_short_returns_error() {
+        let result = ApprovedHead::try_new("abcdef");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_approved_head_too_long_returns_error() {
+        let sha = "abcdef0123456789abcdef0123456789abcdef010";
+        assert_eq!(sha.len(), 41);
+        let result = ApprovedHead::try_new(sha);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_approved_head_non_hex_returns_error() {
+        let sha = "ghijkl0123456789abcdef0123456789abcdef01";
+        let result = ApprovedHead::try_new(sha);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_approved_head_empty_returns_error() {
+        let result = ApprovedHead::try_new("");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_approved_head_display() {
+        let sha = "abcdef0123456789abcdef0123456789abcdef01";
+        let head = ApprovedHead::try_new(sha).unwrap();
+        assert_eq!(format!("{head}"), sha);
+    }
 }

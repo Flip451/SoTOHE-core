@@ -14,8 +14,8 @@ start_review_cycle で approved_head: None で初期化。
 CycleDocument に approved_head フィールドを追加（required、null or SHA string）。
 旧 review.json の後方互換は不要（新規トラックのみ使用）。
 
-- [ ] Add ApprovedHead newtype (domain layer, validated git SHA) and approved_head: Option<ApprovedHead> to ReviewCycle with getter/setter, initialize to None in start_review_cycle
-- [ ] Update review_json_codec CycleDocument to encode/decode approved_head (required field, null or SHA string)
+- [~] Add ApprovedHead newtype (domain layer, validated git SHA) and approved_head: Option<ApprovedHead> to ReviewCycle with getter/setter, initialize to None in start_review_cycle
+- [~] Update review_json_codec CycleDocument to encode/decode approved_head (required field, null or SHA string)
 
 ## Infra: effective_diff_base ヘルパー
 
@@ -24,7 +24,7 @@ infra 層に effective_diff_base ヘルパーを実装。
 approved_head の SHA が無効（git ref 解決失敗）の場合も base_ref にフォールバック（fail-closed: スコープが累積に拡大）。
 Planner 判断: infra 層に配置（git ref 解決が infra の責務）。
 
-- [ ] Extract effective_diff_base infra helper: prefer approved_head, fallback to base_ref on missing/invalid ref
+- [~] Extract effective_diff_base infra helper: prefer approved_head, fallback to base_ref on missing/invalid ref
 
 ## record-round + check-approved の結合
 
@@ -33,8 +33,8 @@ check-approved の snapshot 構築でも同じヘルパーを使用。
 回帰テスト: 承認コミット後に TODO.md のみ変更 → スコープが前回のコードファイルに再拡大しないことを検証。
 invalid approved_head テスト: SHA が無効時に base_ref にフォールバックすることを検証。
 
-- [ ] Wire record-round to use effective_diff_base for scope computation + regression test (approved commit does not re-expand scope)
-- [ ] Wire check-approved snapshot construction to effective_diff_base + invalid approved_head fallback test
+- [~] Wire record-round to use effective_diff_base for scope computation + regression test (approved commit does not re-expand scope)
+- [~] Wire check-approved snapshot construction to effective_diff_base + invalid approved_head fallback test
 
 ## Commit wrapper: approved_head 自動記録
 
@@ -43,4 +43,4 @@ review.json が存在しない場合は no-op。
 保存失敗時: commit は巻き戻さずエラー報告。
 リカバリ用コマンド sotp review set-approved-head --track-id <id> を追加（保存失敗時の再試行手段）。
 
-- [ ] Update track-commit-message to persist HEAD SHA as approved_head after successful commit + add sotp review set-approved-head retry command for failure recovery
+- [~] Update track-commit-message to persist HEAD SHA as approved_head after successful commit + add sotp review set-approved-head retry command for failure recovery
