@@ -50,6 +50,7 @@ pub trait RecordRoundProtocol {
         group_name: ReviewGroupName,
         verdict: Verdict,
         concerns: Vec<ReviewConcern>,
+        findings: Vec<domain::StoredFinding>,
         expected_groups: Vec<ReviewGroupName>,
         timestamp: Timestamp,
     ) -> Result<(), RecordRoundProtocolError>;
@@ -89,6 +90,108 @@ impl From<String> for RecordRoundError {
     }
 }
 
+fn validate_round_verdict_inputs(
+    verdict: &Verdict,
+    concerns: &[ReviewConcern],
+    findings: &[domain::StoredFinding],
+) -> Result<(), RecordRoundError> {
+    validate_stored_findings(findings)?;
+
+    match verdict {
+        Verdict::ZeroFindings => {
+            if !concerns.is_empty() {
+                return Err(RecordRoundError::Other(format!(
+                    "zero_findings requires empty concerns (got {})",
+                    concerns.len()
+                )));
+            }
+            if !findings.is_empty() {
+                return Err(RecordRoundError::Other(format!(
+                    "zero_findings requires empty findings (got {})",
+                    findings.len()
+                )));
+            }
+        }
+        Verdict::FindingsRemain => {
+            if concerns.is_empty() {
+                return Err(RecordRoundError::Other(
+                    "findings_remain requires at least one concern".to_owned(),
+                ));
+            }
+            if findings.is_empty() {
+                return Err(RecordRoundError::Other(
+                    "findings_remain requires at least one finding".to_owned(),
+                ));
+            }
+            validate_findings_concern_coverage(concerns, findings)?;
+        }
+    }
+
+    Ok(())
+}
+
+fn validate_stored_findings(findings: &[domain::StoredFinding]) -> Result<(), RecordRoundError> {
+    for finding in findings {
+        if finding.message().trim().is_empty() {
+            return Err(RecordRoundError::Other(
+                "findings entries must include a non-empty `message`".to_owned(),
+            ));
+        }
+        if finding.severity().is_some_and(|value| value.trim().is_empty()) {
+            return Err(RecordRoundError::Other(
+                "findings entries must use `severity: null` or a non-empty string".to_owned(),
+            ));
+        }
+        if finding.file().is_some_and(|value| value.trim().is_empty()) {
+            return Err(RecordRoundError::Other(
+                "findings entries must use `file: null` or a non-empty string".to_owned(),
+            ));
+        }
+        if finding.line() == Some(0) {
+            return Err(RecordRoundError::Other(
+                "findings entries must use `line: null` or a 1-based line number".to_owned(),
+            ));
+        }
+        if finding.category().is_some_and(|value| value.trim().is_empty()) {
+            return Err(RecordRoundError::Other(
+                "findings entries must use `category: null` or a non-empty string".to_owned(),
+            ));
+        }
+    }
+
+    Ok(())
+}
+
+fn validate_findings_concern_coverage(
+    concerns: &[ReviewConcern],
+    findings: &[domain::StoredFinding],
+) -> Result<(), RecordRoundError> {
+    let supplied: std::collections::BTreeSet<_> =
+        concerns.iter().map(|concern| concern.as_ref().to_owned()).collect();
+    let derived: std::collections::BTreeSet<_> =
+        findings.iter().map(stored_finding_concern).collect();
+
+    if derived.is_subset(&supplied) {
+        Ok(())
+    } else {
+        Err(RecordRoundError::Other(format!(
+            "findings_remain concerns must include all findings-derived concerns (supplied: {:?}, derived: {:?})",
+            supplied, derived
+        )))
+    }
+}
+
+fn stored_finding_concern(finding: &domain::StoredFinding) -> String {
+    if let Some(category) = finding.category() {
+        category.trim().to_lowercase()
+    } else if let Some(file) = finding.file() {
+        let slug = domain::review::file_path_to_concern(file.trim()).to_lowercase();
+        if slug.trim().is_empty() { "other".to_owned() } else { slug }
+    } else {
+        "other".to_owned()
+    }
+}
+
 /// Parses raw string arguments and delegates to the infrastructure protocol.
 ///
 /// # Errors
@@ -100,6 +203,7 @@ pub fn record_round(
 ) -> Result<(), RecordRoundError> {
     use crate::review_workflow::{
         ReviewFinalMessageState, ReviewPayloadVerdict, parse_review_final_message,
+        review_findings_to_stored,
     };
 
     let round_type = match input.round_type.as_str() {
@@ -142,11 +246,14 @@ pub fn record_round(
     };
 
     let final_message_state = parse_review_final_message(Some(&input.verdict));
-    let verdict = match &final_message_state {
-        ReviewFinalMessageState::Parsed(payload) => match payload.verdict {
-            ReviewPayloadVerdict::ZeroFindings => Verdict::ZeroFindings,
-            ReviewPayloadVerdict::FindingsRemain => Verdict::FindingsRemain,
-        },
+    let (verdict, findings) = match &final_message_state {
+        ReviewFinalMessageState::Parsed(payload) => {
+            let verdict = match payload.verdict {
+                ReviewPayloadVerdict::ZeroFindings => Verdict::ZeroFindings,
+                ReviewPayloadVerdict::FindingsRemain => Verdict::FindingsRemain,
+            };
+            (verdict, review_findings_to_stored(&payload.findings))
+        }
         ReviewFinalMessageState::Missing => {
             return Err(RecordRoundError::Other("--verdict is required".to_owned()));
         }
@@ -158,6 +265,8 @@ pub fn record_round(
     let track_id = TrackId::try_new(&input.track_id)
         .map_err(|e| RecordRoundError::Other(format!("invalid track id: {e}")))?;
 
+    validate_round_verdict_inputs(&verdict, &concerns, &findings)?;
+
     protocol
         .execute(
             &track_id,
@@ -165,6 +274,7 @@ pub fn record_round(
             group_name,
             verdict,
             concerns,
+            findings,
             expected_groups,
             input.timestamp,
         )
@@ -193,6 +303,7 @@ pub fn record_round_typed(
     group_name: ReviewGroupName,
     verdict: Verdict,
     concerns: Vec<ReviewConcern>,
+    findings: Vec<domain::StoredFinding>,
     expected_groups: Vec<ReviewGroupName>,
     timestamp: Timestamp,
     protocol: &impl RecordRoundProtocol,
@@ -201,8 +312,19 @@ pub fn record_round_typed(
         return Err(RecordRoundError::Other("expected_groups must not be empty".to_owned()));
     }
 
+    validate_round_verdict_inputs(&verdict, &concerns, &findings)?;
+
     protocol
-        .execute(&track_id, round_type, group_name, verdict, concerns, expected_groups, timestamp)
+        .execute(
+            &track_id,
+            round_type,
+            group_name,
+            verdict,
+            concerns,
+            findings,
+            expected_groups,
+            timestamp,
+        )
         .map_err(|e| match e {
             RecordRoundProtocolError::EscalationBlocked(c) => {
                 RecordRoundError::EscalationBlocked(c)
@@ -699,6 +821,7 @@ mod tests {
         group_name: ReviewGroupName,
         verdict: Verdict,
         concerns: Vec<ReviewConcern>,
+        findings: Vec<domain::StoredFinding>,
         expected_groups: Vec<ReviewGroupName>,
     }
 
@@ -730,6 +853,7 @@ mod tests {
             group_name: ReviewGroupName,
             verdict: Verdict,
             concerns: Vec<ReviewConcern>,
+            findings: Vec<domain::StoredFinding>,
             expected_groups: Vec<ReviewGroupName>,
             _timestamp: Timestamp,
         ) -> Result<(), RecordRoundProtocolError> {
@@ -739,6 +863,7 @@ mod tests {
                 group_name,
                 verdict,
                 concerns,
+                findings,
                 expected_groups,
             });
             self.result.lock().unwrap().take().expect("StubProtocol called more than once")
@@ -762,8 +887,261 @@ mod tests {
         ReviewConcern::try_new(s).unwrap()
     }
 
+    fn make_stored_finding(
+        message: &str,
+        severity: Option<&str>,
+        file: Option<&str>,
+        line: Option<u64>,
+    ) -> domain::StoredFinding {
+        domain::StoredFinding::new(
+            message,
+            severity.map(str::to_owned),
+            file.map(str::to_owned),
+            line,
+        )
+    }
+
     fn make_timestamp() -> Timestamp {
         Timestamp::new("2026-03-25T12:00:00Z").unwrap()
+    }
+
+    // ---------------------------------------------------------------------------
+    // Tests for record_round
+    // ---------------------------------------------------------------------------
+
+    #[test]
+    fn test_record_round_with_findings_remain_payload_passes_full_findings_to_protocol() {
+        let stub = StubProtocol::returning_ok();
+        let input = RecordRoundInput {
+            round_type: "fast".to_owned(),
+            group: "codex".to_owned(),
+            verdict: r#"{"verdict":"findings_remain","findings":[{"message":"P1: preserve me","severity":"P1","file":"libs/usecase/src/review_workflow/usecases.rs","line":123,"category":"domain.review"}]}"#.to_owned(),
+            expected_groups: "codex".to_owned(),
+            concerns: "domain.review".to_owned(),
+            items_dir: PathBuf::from("track/items"),
+            track_id: "t010".to_owned(),
+            timestamp: make_timestamp(),
+        };
+
+        let result = record_round(input, &stub);
+
+        assert!(result.is_ok(), "record_round should delegate findings_remain payload: {result:?}");
+        let call = stub.last_call();
+        let args = call.as_ref().expect("protocol.execute should have been called");
+        assert_eq!(
+            args.findings,
+            vec![
+                make_stored_finding(
+                    "P1: preserve me",
+                    Some("P1"),
+                    Some("libs/usecase/src/review_workflow/usecases.rs"),
+                    Some(123),
+                )
+                .with_category(Some("domain.review".to_owned()))
+            ]
+        );
+    }
+
+    #[test]
+    fn test_record_round_with_findings_remain_payload_and_missing_category_passes_none_to_protocol()
+    {
+        let stub = StubProtocol::returning_ok();
+        let input = RecordRoundInput {
+            round_type: "fast".to_owned(),
+            group: "codex".to_owned(),
+            verdict: r#"{"verdict":"findings_remain","findings":[{"message":"P1: preserve me","severity":"P1","file":"libs/usecase/src/review_workflow/usecases.rs","line":123}]}"#.to_owned(),
+            expected_groups: "codex".to_owned(),
+            concerns: "usecase.review_workflow.usecases".to_owned(),
+            items_dir: PathBuf::from("track/items"),
+            track_id: "t010a".to_owned(),
+            timestamp: make_timestamp(),
+        };
+
+        let result = record_round(input, &stub);
+
+        assert!(
+            result.is_ok(),
+            "record_round should preserve missing category as None: {result:?}"
+        );
+        let call = stub.last_call();
+        let args = call.as_ref().expect("protocol.execute should have been called");
+        assert_eq!(
+            args.findings,
+            vec![make_stored_finding(
+                "P1: preserve me",
+                Some("P1"),
+                Some("libs/usecase/src/review_workflow/usecases.rs"),
+                Some(123),
+            )]
+        );
+    }
+
+    #[test]
+    fn test_record_round_with_findings_remain_payload_and_blank_category_returns_error() {
+        let stub = StubProtocol::returning_ok();
+        let input = RecordRoundInput {
+            round_type: "fast".to_owned(),
+            group: "codex".to_owned(),
+            verdict: r#"{"verdict":"findings_remain","findings":[{"message":"P1: preserve me","severity":"P1","file":"libs/usecase/src/review_workflow/usecases.rs","line":123,"category":" "}]} "#.trim().to_owned(),
+            expected_groups: "codex".to_owned(),
+            concerns: "domain.review".to_owned(),
+            items_dir: PathBuf::from("track/items"),
+            track_id: "t010b".to_owned(),
+            timestamp: make_timestamp(),
+        };
+
+        let result = record_round(input, &stub);
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(msg.contains("category"), "error should mention blank category: {msg}");
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called for invalid input");
+    }
+
+    #[test]
+    fn test_record_round_with_findings_remain_payload_and_empty_concerns_returns_error() {
+        let stub = StubProtocol::returning_ok();
+        let input = RecordRoundInput {
+            round_type: "fast".to_owned(),
+            group: "codex".to_owned(),
+            verdict: r#"{"verdict":"findings_remain","findings":[{"message":"P1: preserve me","severity":"P1","file":"libs/usecase/src/review_workflow/usecases.rs","line":123,"category":"domain.review"}]}"#.to_owned(),
+            expected_groups: "codex".to_owned(),
+            concerns: String::new(),
+            items_dir: PathBuf::from("track/items"),
+            track_id: "t011".to_owned(),
+            timestamp: make_timestamp(),
+        };
+
+        let result = record_round(input, &stub);
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(
+                    msg.contains("at least one concern"),
+                    "error should mention concerns: {msg}"
+                );
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called for invalid input");
+    }
+
+    #[test]
+    fn test_record_round_with_findings_remain_payload_and_mismatched_concerns_returns_error() {
+        let stub = StubProtocol::returning_ok();
+        let input = RecordRoundInput {
+            round_type: "fast".to_owned(),
+            group: "codex".to_owned(),
+            verdict: r#"{"verdict":"findings_remain","findings":[{"message":"P1: preserve me","severity":"P1","file":"libs/usecase/src/review_workflow/usecases.rs","line":123,"category":"domain.review"}]}"#.to_owned(),
+            expected_groups: "codex".to_owned(),
+            concerns: "infra.git".to_owned(),
+            items_dir: PathBuf::from("track/items"),
+            track_id: "t011a".to_owned(),
+            timestamp: make_timestamp(),
+        };
+
+        let result = record_round(input, &stub);
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(
+                    msg.contains("findings-derived concerns"),
+                    "error should mention concern coverage: {msg}"
+                );
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called for invalid input");
+    }
+
+    #[test]
+    fn test_record_round_with_zero_findings_payload_and_non_empty_concerns_returns_error() {
+        let stub = StubProtocol::returning_ok();
+        let input = RecordRoundInput {
+            round_type: "fast".to_owned(),
+            group: "codex".to_owned(),
+            verdict: r#"{"verdict":"zero_findings","findings":[]}"#.to_owned(),
+            expected_groups: "codex".to_owned(),
+            concerns: "domain.review".to_owned(),
+            items_dir: PathBuf::from("track/items"),
+            track_id: "t012".to_owned(),
+            timestamp: make_timestamp(),
+        };
+
+        let result = record_round(input, &stub);
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(msg.contains("empty concerns"), "error should mention concerns: {msg}");
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called for invalid input");
+    }
+
+    #[test]
+    fn test_record_round_with_findings_remain_payload_and_empty_findings_returns_error() {
+        let stub = StubProtocol::returning_ok();
+        let input = RecordRoundInput {
+            round_type: "fast".to_owned(),
+            group: "codex".to_owned(),
+            verdict: r#"{"verdict":"findings_remain","findings":[]}"#.to_owned(),
+            expected_groups: "codex".to_owned(),
+            concerns: "domain.review".to_owned(),
+            items_dir: PathBuf::from("track/items"),
+            track_id: "t013".to_owned(),
+            timestamp: make_timestamp(),
+        };
+
+        let result = record_round(input, &stub);
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(
+                    msg.contains("`findings_remain` payload must include at least one finding"),
+                    "error should mention findings payload validation: {msg}"
+                );
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called for invalid input");
+    }
+
+    #[test]
+    fn test_record_round_with_zero_findings_payload_and_non_empty_findings_returns_error() {
+        let stub = StubProtocol::returning_ok();
+        let input = RecordRoundInput {
+            round_type: "fast".to_owned(),
+            group: "codex".to_owned(),
+            verdict: r#"{"verdict":"zero_findings","findings":[{"message":"P1: should fail","severity":"P1","file":"libs/usecase/src/review_workflow/usecases.rs","line":123,"category":"domain.review"}]}"#.to_owned(),
+            expected_groups: "codex".to_owned(),
+            concerns: String::new(),
+            items_dir: PathBuf::from("track/items"),
+            track_id: "t014".to_owned(),
+            timestamp: make_timestamp(),
+        };
+
+        let result = record_round(input, &stub);
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(
+                    msg.contains("`zero_findings` payload must use an empty `findings` array"),
+                    "error should mention findings payload validation: {msg}"
+                );
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called for invalid input");
     }
 
     // ---------------------------------------------------------------------------
@@ -776,6 +1154,7 @@ mod tests {
         let group = make_group("codex");
         let expected_groups = vec![make_group("codex")];
         let concerns: Vec<ReviewConcern> = vec![];
+        let findings: Vec<domain::StoredFinding> = vec![];
         let ts = make_timestamp();
         let stub = StubProtocol::returning_ok();
         let result = record_round_typed(
@@ -784,6 +1163,7 @@ mod tests {
             group.clone(),
             Verdict::ZeroFindings,
             concerns.clone(),
+            findings.clone(),
             expected_groups.clone(),
             ts,
             &stub,
@@ -797,15 +1177,26 @@ mod tests {
         assert_eq!(args.group_name, group);
         assert_eq!(args.verdict, Verdict::ZeroFindings);
         assert!(args.concerns.is_empty());
+        assert!(args.findings.is_empty());
         assert_eq!(args.expected_groups, expected_groups);
     }
 
     #[test]
-    fn test_record_round_typed_findings_remain_delegates_to_protocol() {
+    fn test_record_round_typed_findings_remain_delegates_findings_to_protocol() {
         let track_id = make_track_id("t002");
         let group = make_group("codex");
         let expected_groups = vec![make_group("codex")];
-        let concerns = vec![make_concern("domain.review"), make_concern("infra.git")];
+        let concerns = vec![make_concern("domain.review"), make_concern("other")];
+        let findings = vec![
+            make_stored_finding(
+                "P1: preserve me",
+                Some("P1"),
+                Some("libs/domain/src/lib.rs"),
+                Some(9),
+            )
+            .with_category(Some("domain.review".to_owned())),
+            make_stored_finding("P0: still here", Some("P0"), None, None),
+        ];
         let ts = make_timestamp();
         let stub = StubProtocol::returning_ok();
         let result = record_round_typed(
@@ -814,6 +1205,7 @@ mod tests {
             group.clone(),
             Verdict::FindingsRemain,
             concerns.clone(),
+            findings.clone(),
             expected_groups.clone(),
             ts,
             &stub,
@@ -827,7 +1219,8 @@ mod tests {
         assert_eq!(args.verdict, Verdict::FindingsRemain);
         assert_eq!(args.concerns.len(), 2);
         assert!(args.concerns.contains(&make_concern("domain.review")));
-        assert!(args.concerns.contains(&make_concern("infra.git")));
+        assert!(args.concerns.contains(&make_concern("other")));
+        assert_eq!(args.findings, findings);
     }
 
     #[test]
@@ -837,6 +1230,16 @@ mod tests {
         let expected_groups = vec![make_group("codex")];
         let blocked_concerns = vec!["domain.review".to_string(), "infra.git".to_string()];
         let ts = make_timestamp();
+        let concerns = vec![make_concern("domain.review")];
+        let findings = vec![
+            make_stored_finding(
+                "P1: preserve me",
+                Some("P1"),
+                Some("libs/domain/src/lib.rs"),
+                Some(12),
+            )
+            .with_category(Some("domain.review".to_owned())),
+        ];
 
         let stub = StubProtocol::returning_err(RecordRoundProtocolError::EscalationBlocked(
             blocked_concerns.clone(),
@@ -846,7 +1249,8 @@ mod tests {
             RoundType::Fast,
             group,
             Verdict::FindingsRemain,
-            vec![],
+            concerns,
+            findings,
             expected_groups,
             ts,
             &stub,
@@ -876,6 +1280,7 @@ mod tests {
             RoundType::Fast,
             group,
             Verdict::ZeroFindings,
+            vec![],
             vec![],
             expected_groups,
             ts,
@@ -907,6 +1312,7 @@ mod tests {
             group,
             Verdict::ZeroFindings,
             vec![],
+            vec![],
             vec![], // empty expected_groups
             ts,
             &stub,
@@ -922,5 +1328,273 @@ mod tests {
             }
             other => panic!("expected Other, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn test_record_round_typed_findings_remain_with_empty_findings_returns_error() {
+        let track_id = make_track_id("t006");
+        let group = make_group("codex");
+        let expected_groups = vec![make_group("codex")];
+        let concerns = vec![make_concern("domain.review")];
+        let ts = make_timestamp();
+        let stub = StubProtocol::returning_ok();
+
+        let result = record_round_typed(
+            track_id,
+            RoundType::Fast,
+            group,
+            Verdict::FindingsRemain,
+            concerns,
+            vec![],
+            expected_groups,
+            ts,
+            &stub,
+        );
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(
+                    msg.contains("at least one finding"),
+                    "error should mention findings: {msg}"
+                );
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called for invalid input");
+    }
+
+    #[test]
+    fn test_record_round_typed_findings_remain_with_empty_concerns_returns_error() {
+        let track_id = make_track_id("t007");
+        let group = make_group("codex");
+        let expected_groups = vec![make_group("codex")];
+        let findings = vec![make_stored_finding("P1: preserve me", Some("P1"), None, None)];
+        let ts = make_timestamp();
+        let stub = StubProtocol::returning_ok();
+
+        let result = record_round_typed(
+            track_id,
+            RoundType::Fast,
+            group,
+            Verdict::FindingsRemain,
+            vec![],
+            findings,
+            expected_groups,
+            ts,
+            &stub,
+        );
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(
+                    msg.contains("at least one concern"),
+                    "error should mention concerns: {msg}"
+                );
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called for invalid input");
+    }
+
+    #[test]
+    fn test_record_round_typed_findings_remain_with_mismatched_concerns_returns_error() {
+        let track_id = make_track_id("t007a");
+        let group = make_group("codex");
+        let expected_groups = vec![make_group("codex")];
+        let concerns = vec![make_concern("infra.git")];
+        let findings = vec![
+            make_stored_finding(
+                "P1: preserve me",
+                Some("P1"),
+                Some("libs/usecase/src/review_workflow/usecases.rs"),
+                Some(123),
+            )
+            .with_category(Some("domain.review".to_owned())),
+        ];
+        let ts = make_timestamp();
+        let stub = StubProtocol::returning_ok();
+
+        let result = record_round_typed(
+            track_id,
+            RoundType::Fast,
+            group,
+            Verdict::FindingsRemain,
+            concerns,
+            findings,
+            expected_groups,
+            ts,
+            &stub,
+        );
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(
+                    msg.contains("findings-derived concerns"),
+                    "error should mention concern coverage: {msg}"
+                );
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called for invalid input");
+    }
+
+    #[test]
+    fn test_record_round_typed_zero_findings_with_non_empty_findings_returns_error() {
+        let track_id = make_track_id("t008");
+        let group = make_group("codex");
+        let expected_groups = vec![make_group("codex")];
+        let findings = vec![make_stored_finding("P1: should fail", Some("P1"), None, None)];
+        let ts = make_timestamp();
+        let stub = StubProtocol::returning_ok();
+
+        let result = record_round_typed(
+            track_id,
+            RoundType::Fast,
+            group,
+            Verdict::ZeroFindings,
+            vec![],
+            findings,
+            expected_groups,
+            ts,
+            &stub,
+        );
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(msg.contains("empty findings"), "error should mention findings: {msg}");
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called for invalid input");
+    }
+
+    #[test]
+    fn test_record_round_typed_zero_findings_with_non_empty_concerns_returns_error() {
+        let track_id = make_track_id("t009");
+        let group = make_group("codex");
+        let expected_groups = vec![make_group("codex")];
+        let concerns = vec![make_concern("domain.review")];
+        let ts = make_timestamp();
+        let stub = StubProtocol::returning_ok();
+
+        let result = record_round_typed(
+            track_id,
+            RoundType::Fast,
+            group,
+            Verdict::ZeroFindings,
+            concerns,
+            vec![],
+            expected_groups,
+            ts,
+            &stub,
+        );
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(msg.contains("empty concerns"), "error should mention concerns: {msg}");
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called for invalid input");
+    }
+
+    #[test]
+    fn test_record_round_typed_findings_remain_with_blank_file_returns_error() {
+        let track_id = make_track_id("t010");
+        let group = make_group("codex");
+        let expected_groups = vec![make_group("codex")];
+        let concerns = vec![make_concern("domain.review")];
+        let findings = vec![make_stored_finding("P1: invalid", Some("P1"), Some(" "), Some(7))];
+        let ts = make_timestamp();
+        let stub = StubProtocol::returning_ok();
+
+        let result = record_round_typed(
+            track_id,
+            RoundType::Fast,
+            group,
+            Verdict::FindingsRemain,
+            concerns,
+            findings,
+            expected_groups,
+            ts,
+            &stub,
+        );
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(msg.contains("file"), "error should mention file validation: {msg}");
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called for invalid input");
+    }
+
+    #[test]
+    fn test_record_round_typed_findings_remain_with_whitespace_padded_file_uses_trimmed_concern() {
+        let track_id = make_track_id("t010b");
+        let group = make_group("codex");
+        let expected_groups = vec![make_group("codex")];
+        let concerns = vec![make_concern("usecase.foo")];
+        let findings = vec![make_stored_finding(
+            "P1: trimmed",
+            Some("P1"),
+            Some(" libs/usecase/src/foo.rs "),
+            Some(7),
+        )];
+        let ts = make_timestamp();
+        let stub = StubProtocol::returning_ok();
+
+        let result = record_round_typed(
+            track_id,
+            RoundType::Fast,
+            group,
+            Verdict::FindingsRemain,
+            concerns,
+            findings,
+            expected_groups,
+            ts,
+            &stub,
+        );
+
+        assert!(result.is_ok(), "whitespace-padded file should still validate: {result:?}");
+        assert!(stub.last_call().is_some(), "protocol should be called for valid input");
+    }
+
+    #[test]
+    fn test_record_round_typed_findings_remain_with_blank_message_returns_error() {
+        let track_id = make_track_id("t011");
+        let group = make_group("codex");
+        let expected_groups = vec![make_group("codex")];
+        let concerns = vec![make_concern("domain.review")];
+        let findings = vec![make_stored_finding(" ", Some("P1"), None, Some(7))];
+        let ts = make_timestamp();
+        let stub = StubProtocol::returning_ok();
+
+        let result = record_round_typed(
+            track_id,
+            RoundType::Fast,
+            group,
+            Verdict::FindingsRemain,
+            concerns,
+            findings,
+            expected_groups,
+            ts,
+            &stub,
+        );
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(msg.contains("message"), "error should mention message validation: {msg}");
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called for invalid input");
     }
 }

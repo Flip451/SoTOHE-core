@@ -22,6 +22,14 @@ fn env_lock() -> &'static Mutex<()> {
     LOCK.get_or_init(|| Mutex::new(()))
 }
 
+fn grn(raw: &str) -> domain::ReviewGroupName {
+    domain::ReviewGroupName::try_new(raw).unwrap()
+}
+
+fn repo_path(raw: &str) -> usecase::review_workflow::scope::RepoRelativePath {
+    usecase::review_workflow::scope::RepoRelativePath::normalize(raw).unwrap()
+}
+
 struct EnvVarGuard {
     key: &'static str,
     original: Option<OsString>,
@@ -265,6 +273,33 @@ fn render_codex_local_result_emits_findings_json_to_stdout() {
 }
 
 #[test]
+fn filter_partition_to_cycle_groups_preserves_remapped_paths_alongside_other_group() {
+    use std::collections::{BTreeMap, BTreeSet};
+
+    let mut groups = BTreeMap::new();
+    groups.insert(grn("cli"), vec![repo_path("apps/cli/src/commands/review/tests.rs")]);
+    groups.insert(grn("harness-policy"), vec![repo_path(".claude/commands/track/commit.md")]);
+    groups.insert(grn("other"), vec![repo_path("Cargo.lock")]);
+    let full_partition = usecase::review_workflow::groups::GroupPartition::try_new(groups).unwrap();
+
+    let cycle_groups: BTreeSet<_> = [grn("cli"), grn("other")].into_iter().collect();
+    let filtered = super::filter_partition_to_cycle_groups(&full_partition, &cycle_groups);
+
+    assert!(filtered.is_ok(), "partition filter should succeed: {filtered:?}");
+    let filtered = match filtered {
+        Ok(filtered) => filtered,
+        Err(err) => panic!("partition filter should succeed: {err}"),
+    };
+    let other_paths: Vec<_> =
+        filtered.groups()[&grn("other")].iter().map(|path| path.as_str()).collect();
+    assert!(
+        other_paths.contains(&".claude/commands/track/commit.md"),
+        "remapped harness-policy path must be preserved in other: {other_paths:?}"
+    );
+    assert!(other_paths.contains(&"Cargo.lock"), "native other path must be preserved");
+}
+
+#[test]
 fn render_codex_local_result_hides_auto_managed_path_for_timeout() {
     let rendered = render_codex_local_result(
         &fake_args(
@@ -368,7 +403,7 @@ fn run_codex_local_reports_findings_when_final_message_is_present() {
     assert_eq!(
         result.final_message.as_deref(),
         Some(
-            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: review finding\",\"severity\":\"P1\",\"file\":null,\"line\":null}]}"
+            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: review finding\",\"severity\":\"P1\",\"file\":null,\"line\":null,\"category\":null}]}"
         )
     );
 }
@@ -1203,79 +1238,214 @@ fn test_auto_record_validation_failure_exits_1() {
     assert_eq!(exit, std::process::ExitCode::from(1), "validation failure must exit 1");
 }
 
+struct AutoRecordEmptyScope;
+
+impl usecase::review_workflow::scope::DiffScopeProvider for AutoRecordEmptyScope {
+    fn changed_files(
+        &self,
+        _base_ref: &str,
+    ) -> Result<
+        usecase::review_workflow::scope::DiffScope,
+        usecase::review_workflow::scope::DiffScopeProviderError,
+    > {
+        Ok(usecase::review_workflow::scope::DiffScope::new(std::iter::empty()))
+    }
+}
+
+struct AutoRecordCliOnlyScope;
+
+impl usecase::review_workflow::scope::DiffScopeProvider for AutoRecordCliOnlyScope {
+    fn changed_files(
+        &self,
+        _base_ref: &str,
+    ) -> Result<
+        usecase::review_workflow::scope::DiffScope,
+        usecase::review_workflow::scope::DiffScopeProviderError,
+    > {
+        Ok(usecase::review_workflow::scope::DiffScope::new([
+            usecase::review_workflow::scope::RepoRelativePath::normalize(
+                "apps/cli/src/commands/review/codex_local.rs",
+            )
+            .unwrap(),
+        ]))
+    }
+}
+
+struct CapturingFindingsProtocol {
+    concerns_received: std::cell::RefCell<Vec<usecase::review_workflow::usecases::ReviewConcern>>,
+    findings_received: std::cell::RefCell<Vec<domain::StoredFinding>>,
+}
+
+impl CapturingFindingsProtocol {
+    fn new() -> Self {
+        Self {
+            concerns_received: std::cell::RefCell::new(Vec::new()),
+            findings_received: std::cell::RefCell::new(Vec::new()),
+        }
+    }
+}
+
+impl usecase::review_workflow::usecases::RecordRoundProtocol for CapturingFindingsProtocol {
+    fn execute(
+        &self,
+        _track_id: &usecase::review_workflow::usecases::TrackId,
+        _round_type: usecase::review_workflow::usecases::RoundType,
+        _group_name: usecase::review_workflow::usecases::ReviewGroupName,
+        _verdict: usecase::review_workflow::usecases::Verdict,
+        concerns: Vec<usecase::review_workflow::usecases::ReviewConcern>,
+        findings: Vec<domain::StoredFinding>,
+        _expected_groups: Vec<usecase::review_workflow::usecases::ReviewGroupName>,
+        _timestamp: usecase::review_workflow::usecases::Timestamp,
+    ) -> Result<(), usecase::review_workflow::usecases::RecordRoundProtocolError> {
+        *self.concerns_received.borrow_mut() = concerns;
+        *self.findings_received.borrow_mut() = findings;
+        Ok(())
+    }
+}
+
+struct CapturingVerdictProtocol {
+    called: std::cell::RefCell<bool>,
+    verdict_received: std::cell::RefCell<Option<usecase::review_workflow::usecases::Verdict>>,
+    concerns_received: std::cell::RefCell<Vec<usecase::review_workflow::usecases::ReviewConcern>>,
+    findings_received: std::cell::RefCell<Vec<domain::StoredFinding>>,
+}
+
+impl CapturingVerdictProtocol {
+    fn new() -> Self {
+        Self {
+            called: std::cell::RefCell::new(false),
+            verdict_received: std::cell::RefCell::new(None),
+            concerns_received: std::cell::RefCell::new(Vec::new()),
+            findings_received: std::cell::RefCell::new(Vec::new()),
+        }
+    }
+}
+
+impl usecase::review_workflow::usecases::RecordRoundProtocol for CapturingVerdictProtocol {
+    fn execute(
+        &self,
+        _track_id: &usecase::review_workflow::usecases::TrackId,
+        _round_type: usecase::review_workflow::usecases::RoundType,
+        _group_name: usecase::review_workflow::usecases::ReviewGroupName,
+        verdict: usecase::review_workflow::usecases::Verdict,
+        concerns: Vec<usecase::review_workflow::usecases::ReviewConcern>,
+        findings: Vec<domain::StoredFinding>,
+        _expected_groups: Vec<usecase::review_workflow::usecases::ReviewGroupName>,
+        _timestamp: usecase::review_workflow::usecases::Timestamp,
+    ) -> Result<(), usecase::review_workflow::usecases::RecordRoundProtocolError> {
+        *self.called.borrow_mut() = true;
+        *self.verdict_received.borrow_mut() = Some(verdict);
+        *self.concerns_received.borrow_mut() = concerns;
+        *self.findings_received.borrow_mut() = findings;
+        Ok(())
+    }
+}
+
+#[derive(Clone)]
+struct SharedBufferWriter(std::rc::Rc<std::cell::RefCell<Vec<u8>>>);
+
+impl SharedBufferWriter {
+    fn new(buffer: std::rc::Rc<std::cell::RefCell<Vec<u8>>>) -> Self {
+        Self(buffer)
+    }
+}
+
+impl std::io::Write for SharedBufferWriter {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        self.0.borrow_mut().extend_from_slice(buf);
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+
+struct RejectingProtocol {
+    error: usecase::review_workflow::usecases::RecordRoundProtocolError,
+}
+
+impl RejectingProtocol {
+    fn other(message: &str) -> Self {
+        Self {
+            error: usecase::review_workflow::usecases::RecordRoundProtocolError::Other(
+                message.to_owned(),
+            ),
+        }
+    }
+}
+
+impl usecase::review_workflow::usecases::RecordRoundProtocol for RejectingProtocol {
+    fn execute(
+        &self,
+        _track_id: &usecase::review_workflow::usecases::TrackId,
+        _round_type: usecase::review_workflow::usecases::RoundType,
+        _group_name: usecase::review_workflow::usecases::ReviewGroupName,
+        _verdict: usecase::review_workflow::usecases::Verdict,
+        _concerns: Vec<usecase::review_workflow::usecases::ReviewConcern>,
+        _findings: Vec<domain::StoredFinding>,
+        _expected_groups: Vec<usecase::review_workflow::usecases::ReviewGroupName>,
+        _timestamp: usecase::review_workflow::usecases::Timestamp,
+    ) -> Result<(), usecase::review_workflow::usecases::RecordRoundProtocolError> {
+        Err(match &self.error {
+            usecase::review_workflow::usecases::RecordRoundProtocolError::EscalationBlocked(
+                blocked,
+            ) => usecase::review_workflow::usecases::RecordRoundProtocolError::EscalationBlocked(
+                blocked.clone(),
+            ),
+            usecase::review_workflow::usecases::RecordRoundProtocolError::StaleHash(msg) => {
+                usecase::review_workflow::usecases::RecordRoundProtocolError::StaleHash(msg.clone())
+            }
+            usecase::review_workflow::usecases::RecordRoundProtocolError::Other(msg) => {
+                usecase::review_workflow::usecases::RecordRoundProtocolError::Other(msg.clone())
+            }
+        })
+    }
+}
+
+fn auto_record_validated_args(items_dir: PathBuf) -> super::ValidatedAutoRecordArgs {
+    super::ValidatedAutoRecordArgs {
+        track_id: usecase::review_workflow::usecases::TrackId::try_new("my-track").unwrap(),
+        round_type: usecase::review_workflow::usecases::RoundType::Fast,
+        group_name: usecase::review_workflow::usecases::ReviewGroupName::try_new("codex").unwrap(),
+        expected_groups: vec![
+            usecase::review_workflow::usecases::ReviewGroupName::try_new("codex").unwrap(),
+        ],
+        items_dir,
+        diff_base: "main".to_owned(),
+    }
+}
+
+fn review_run_result_with_payload(
+    verdict: ReviewVerdict,
+    payload: &str,
+) -> Result<ReviewRunResult, String> {
+    Ok(ReviewRunResult {
+        verdict,
+        final_message: Some(payload.to_owned()),
+        output_last_message: PathBuf::from("tmp/out.txt"),
+        output_last_message_auto_managed: false,
+        verdict_detail: None,
+    })
+}
+
 // Test 2: execute_with_auto_record with zero_findings verdict calls record_round and exits 0.
 // Uses stub DiffScopeProvider and RecordRoundProtocol — no git or filesystem required.
 #[test]
 fn test_auto_record_zero_findings_calls_record_round() {
-    use std::cell::RefCell;
-    use usecase::review_workflow::ReviewVerdict;
-    use usecase::review_workflow::scope::{DiffScope, DiffScopeProvider, DiffScopeProviderError};
-    use usecase::review_workflow::usecases::{
-        RecordRoundProtocol, RecordRoundProtocolError, ReviewConcern, ReviewGroupName, RoundType,
-        Timestamp, TrackId, Verdict,
-    };
-
-    use super::ValidatedAutoRecordArgs;
     use super::codex_local::execute_with_auto_record;
-
-    struct AlwaysEmptyScope;
-    impl DiffScopeProvider for AlwaysEmptyScope {
-        fn changed_files(&self, _base_ref: &str) -> Result<DiffScope, DiffScopeProviderError> {
-            Ok(DiffScope::new(std::iter::empty()))
-        }
-    }
-
-    struct CapturingProtocol {
-        called: RefCell<bool>,
-        verdict_received: RefCell<Option<Verdict>>,
-    }
-
-    impl CapturingProtocol {
-        fn new() -> Self {
-            Self { called: RefCell::new(false), verdict_received: RefCell::new(None) }
-        }
-    }
-
-    impl RecordRoundProtocol for CapturingProtocol {
-        fn execute(
-            &self,
-            _track_id: &TrackId,
-            _round_type: RoundType,
-            _group_name: ReviewGroupName,
-            verdict: Verdict,
-            _concerns: Vec<ReviewConcern>,
-            _expected_groups: Vec<ReviewGroupName>,
-            _timestamp: Timestamp,
-        ) -> Result<(), RecordRoundProtocolError> {
-            *self.called.borrow_mut() = true;
-            *self.verdict_received.borrow_mut() = Some(verdict);
-            Ok(())
-        }
-    }
 
     let dir = tempfile::tempdir().unwrap();
     let items_dir = dir.path().join("items");
     fs::create_dir_all(&items_dir).unwrap();
 
-    let validated = ValidatedAutoRecordArgs {
-        track_id: TrackId::try_new("my-track").unwrap(),
-        round_type: RoundType::Fast,
-        group_name: ReviewGroupName::try_new("codex").unwrap(),
-        expected_groups: vec![ReviewGroupName::try_new("codex").unwrap()],
-        items_dir: items_dir.clone(),
-        diff_base: "main".to_owned(),
-    };
-
-    let outcome: Result<super::ReviewRunResult, String> = Ok(super::ReviewRunResult {
-        verdict: ReviewVerdict::ZeroFindings,
-        final_message: Some("{\"verdict\":\"zero_findings\",\"findings\":[]}".to_owned()),
-        output_last_message: PathBuf::from("tmp/out.txt"),
-        output_last_message_auto_managed: false,
-        verdict_detail: None,
-    });
-
-    let scope_provider = AlwaysEmptyScope;
-    let protocol = CapturingProtocol::new();
+    let validated = auto_record_validated_args(items_dir.clone());
+    let outcome = review_run_result_with_payload(
+        ReviewVerdict::ZeroFindings,
+        "{\"verdict\":\"zero_findings\",\"findings\":[]}",
+    );
+    let scope_provider = AutoRecordEmptyScope;
+    let protocol = CapturingVerdictProtocol::new();
 
     let exit = execute_with_auto_record(outcome, validated, 60, &scope_provider, &protocol);
 
@@ -1283,8 +1453,297 @@ fn test_auto_record_zero_findings_calls_record_round() {
     assert!(*protocol.called.borrow(), "record_round must have been called");
     assert_eq!(
         *protocol.verdict_received.borrow(),
-        Some(Verdict::ZeroFindings),
+        Some(usecase::review_workflow::usecases::Verdict::ZeroFindings),
         "verdict must be ZeroFindings"
+    );
+    assert!(
+        protocol.findings_received.borrow().is_empty(),
+        "zero_findings must pass an empty findings list"
+    );
+}
+
+#[test]
+fn test_auto_record_findings_remain_preserves_in_scope_findings_metadata() {
+    use super::codex_local::{
+        emit_rendered_command_result_with_writers, render_execute_with_auto_record,
+    };
+
+    let dir = tempfile::tempdir().unwrap();
+    let items_dir = dir.path().join("items");
+    fs::create_dir_all(&items_dir).unwrap();
+
+    let validated = auto_record_validated_args(items_dir);
+    let outcome = review_run_result_with_payload(
+        ReviewVerdict::FindingsRemain,
+        r#"{
+                "verdict":"findings_remain",
+                "findings":[
+                    {
+                        "message":"P1: keep metadata",
+                        "severity":"P1",
+                        "file":"apps/cli/src/commands/review/codex_local.rs",
+                        "line":77,
+                        "category":"cli.review"
+                    },
+                    {
+                        "message":"P1: drop me as out of scope",
+                        "severity":"P1",
+                        "file":"libs/usecase/src/review_workflow/usecases.rs",
+                        "line":99,
+                        "category":"domain.review"
+                    }
+                ]
+            }"#,
+    );
+    let scope_provider = AutoRecordCliOnlyScope;
+    let protocol = CapturingFindingsProtocol::new();
+
+    let rendered =
+        render_execute_with_auto_record(outcome, validated, 60, &scope_provider, &protocol);
+    let mut stdout = Vec::new();
+    let mut stderr = Vec::new();
+    emit_rendered_command_result_with_writers(&rendered, &mut stdout, &mut stderr).unwrap();
+    let merged = std::rc::Rc::new(std::cell::RefCell::new(Vec::new()));
+    let mut merged_stdout = SharedBufferWriter::new(merged.clone());
+    let mut merged_stderr = SharedBufferWriter::new(merged.clone());
+    emit_rendered_command_result_with_writers(&rendered, &mut merged_stdout, &mut merged_stderr)
+        .unwrap();
+
+    assert_eq!(rendered.exit_code, 2, "findings_remain must exit 2");
+    assert_eq!(
+        protocol.concerns_received.borrow().as_slice(),
+        &[usecase::review_workflow::usecases::ReviewConcern::try_new("cli.review").unwrap()],
+        "recorded concerns must come from the scope-filtered payload"
+    );
+    assert_eq!(
+        String::from_utf8(stdout).unwrap().lines().collect::<Vec<_>>(),
+        vec![
+            r#"{"verdict":"findings_remain","findings":[{"message":"P1: keep metadata","severity":"P1","file":"apps/cli/src/commands/review/codex_local.rs","line":77,"category":"cli.review"}]}"#
+        ],
+        "production output writer must emit the scope-filtered in-scope payload to stdout"
+    );
+    assert!(
+        String::from_utf8(stderr).unwrap().contains("[auto-record] Recorded"),
+        "production output writer must route auto-record status to stderr"
+    );
+    assert_eq!(
+        String::from_utf8(merged.borrow().clone()).unwrap().lines().last(),
+        Some(
+            r#"{"verdict":"findings_remain","findings":[{"message":"P1: keep metadata","severity":"P1","file":"apps/cli/src/commands/review/codex_local.rs","line":77,"category":"cli.review"}]}"#
+        ),
+        "merged output must keep the machine-readable verdict JSON as the final line"
+    );
+    let findings = protocol.findings_received.borrow();
+    assert_eq!(findings.len(), 1, "out-of-scope findings must be removed before recording");
+    assert_eq!(
+        findings.as_slice(),
+        &[domain::StoredFinding::new(
+            "P1: keep metadata",
+            Some("P1".to_owned()),
+            Some("apps/cli/src/commands/review/codex_local.rs".to_owned()),
+            Some(77),
+        )
+        .with_category(Some("cli.review".to_owned()))]
+    );
+    assert!(
+        findings.iter().all(|finding| finding.message() != "P1: drop me as out of scope"),
+        "recorded findings must come from the scope-filtered payload"
+    );
+}
+
+#[test]
+fn test_auto_record_all_out_of_scope_findings_downgrades_to_zero_findings() {
+    use super::codex_local::{
+        emit_rendered_command_result_with_writers, render_execute_with_auto_record,
+    };
+
+    let dir = tempfile::tempdir().unwrap();
+    let items_dir = dir.path().join("items");
+    fs::create_dir_all(&items_dir).unwrap();
+
+    let validated = auto_record_validated_args(items_dir);
+    let outcome = review_run_result_with_payload(
+        ReviewVerdict::FindingsRemain,
+        r#"{
+                "verdict":"findings_remain",
+                "findings":[
+                    {
+                        "message":"P1: out of scope finding",
+                        "severity":"P1",
+                        "file":"libs/usecase/src/review_workflow/usecases.rs",
+                        "line":99,
+                        "category":"domain.review"
+                    }
+                ]
+            }"#,
+    );
+    let scope_provider = AutoRecordEmptyScope;
+    let protocol = CapturingVerdictProtocol::new();
+
+    let rendered =
+        render_execute_with_auto_record(outcome, validated, 60, &scope_provider, &protocol);
+    let mut stdout = Vec::new();
+    let mut stderr = Vec::new();
+    emit_rendered_command_result_with_writers(&rendered, &mut stdout, &mut stderr).unwrap();
+    let merged = std::rc::Rc::new(std::cell::RefCell::new(Vec::new()));
+    let mut merged_stdout = SharedBufferWriter::new(merged.clone());
+    let mut merged_stderr = SharedBufferWriter::new(merged.clone());
+    emit_rendered_command_result_with_writers(&rendered, &mut merged_stdout, &mut merged_stderr)
+        .unwrap();
+
+    assert_eq!(rendered.exit_code, 0, "all out-of-scope findings must downgrade to zero_findings");
+    assert_eq!(
+        *protocol.verdict_received.borrow(),
+        Some(usecase::review_workflow::usecases::Verdict::ZeroFindings),
+        "protocol must receive the downgraded zero_findings verdict"
+    );
+    assert!(
+        protocol.concerns_received.borrow().is_empty(),
+        "downgraded zero_findings must record an empty concerns list"
+    );
+    assert_eq!(
+        String::from_utf8(stdout).unwrap().lines().collect::<Vec<_>>(),
+        vec!["{\"verdict\":\"zero_findings\",\"findings\":[]}"],
+        "production output writer must emit the filtered downgraded payload to stdout"
+    );
+    let stderr = String::from_utf8(stderr).unwrap();
+    assert!(
+        stderr.contains("[scope-filter] 1 of 1 findings out of scope, 0 unknown paths"),
+        "production output writer must emit scope-filter diagnostics to stderr"
+    );
+    assert!(
+        stderr.contains("[auto-record] Recorded"),
+        "production output writer must route auto-record status to stderr"
+    );
+    assert_eq!(
+        String::from_utf8(merged.borrow().clone()).unwrap().lines().collect::<Vec<_>>(),
+        vec![
+            "[scope-filter] 1 of 1 findings out of scope, 0 unknown paths",
+            "[auto-record] Recorded fast round for group 'codex' (verdict: zero_findings)",
+            "{\"verdict\":\"zero_findings\",\"findings\":[]}",
+        ],
+        "merged output must preserve diagnostics before the final machine-readable verdict"
+    );
+    assert!(
+        protocol.findings_received.borrow().is_empty(),
+        "downgraded zero_findings must record an empty findings list"
+    );
+}
+
+#[test]
+fn test_auto_record_record_failure_preserves_scope_filter_diagnostics() {
+    use super::codex_local::{
+        emit_rendered_command_result_with_writers, render_execute_with_auto_record,
+    };
+
+    let dir = tempfile::tempdir().unwrap();
+    let items_dir = dir.path().join("items");
+    fs::create_dir_all(&items_dir).unwrap();
+
+    let validated = auto_record_validated_args(items_dir);
+    let outcome = review_run_result_with_payload(
+        ReviewVerdict::FindingsRemain,
+        r#"{
+                "verdict":"findings_remain",
+                "findings":[
+                    {
+                        "message":"P1: out of scope finding",
+                        "severity":"P1",
+                        "file":"libs/usecase/src/review_workflow/usecases.rs",
+                        "line":99,
+                        "category":"domain.review"
+                    }
+                ]
+            }"#,
+    );
+    let scope_provider = AutoRecordEmptyScope;
+    let protocol = RejectingProtocol::other("boom");
+
+    let rendered =
+        render_execute_with_auto_record(outcome, validated, 60, &scope_provider, &protocol);
+    let mut stdout = Vec::new();
+    let mut stderr = Vec::new();
+    emit_rendered_command_result_with_writers(&rendered, &mut stdout, &mut stderr).unwrap();
+
+    assert_eq!(rendered.exit_code, 1, "record failure must exit 1");
+    assert!(stdout.is_empty(), "record failure must not emit verdict JSON");
+    assert_eq!(
+        String::from_utf8(stderr).unwrap().lines().collect::<Vec<_>>(),
+        vec![
+            "[scope-filter] 1 of 1 findings out of scope, 0 unknown paths",
+            "[auto-record] Record failed: boom",
+        ],
+        "record failure must retain prior scope-filter diagnostics"
+    );
+}
+
+#[test]
+fn test_auto_record_parse_failure_suppresses_untrusted_verdict_json() {
+    use super::codex_local::{
+        emit_rendered_command_result_with_writers, render_execute_with_auto_record,
+    };
+
+    let dir = tempfile::tempdir().unwrap();
+    let items_dir = dir.path().join("items");
+    fs::create_dir_all(&items_dir).unwrap();
+
+    let validated = auto_record_validated_args(items_dir);
+    let outcome = review_run_result_with_payload(
+        ReviewVerdict::FindingsRemain,
+        r#"{"verdict":"findings_remain","findings":[]}"#,
+    );
+    let scope_provider = AutoRecordEmptyScope;
+    let protocol = CapturingVerdictProtocol::new();
+
+    let rendered =
+        render_execute_with_auto_record(outcome, validated, 60, &scope_provider, &protocol);
+    let mut stdout = Vec::new();
+    let mut stderr = Vec::new();
+    emit_rendered_command_result_with_writers(&rendered, &mut stdout, &mut stderr).unwrap();
+
+    assert_eq!(rendered.exit_code, 1, "parse failure must exit 1");
+    assert!(stdout.is_empty(), "parse failure must not emit untrusted verdict JSON");
+    assert_eq!(
+        String::from_utf8(stderr).unwrap().lines().collect::<Vec<_>>(),
+        vec!["[ERROR] auto-record: could not parse verdict payload"],
+        "parse failure must report the payload error on stderr only"
+    );
+    assert!(
+        protocol.verdict_received.borrow().is_none(),
+        "parse failure must not invoke record_round"
+    );
+}
+
+#[test]
+fn test_non_unix_fallback_command_result_keeps_stdout_json_only() {
+    use super::codex_local::emit_non_unix_fallback_command_result;
+
+    let rendered = super::RenderedCommandResult {
+        exit_code: 2,
+        stdout_lines: vec!["{\"verdict\":\"findings_remain\",\"findings\":[]}".to_owned()],
+        stderr_lines: vec![
+            "[scope-filter] 1 of 1 findings out of scope, 0 unknown paths".to_owned(),
+            "[auto-record] Recorded final round for group 'cli' (verdict: findings_remain)"
+                .to_owned(),
+        ],
+    };
+    let mut stdout = Vec::new();
+    let mut stderr = Vec::new();
+
+    emit_non_unix_fallback_command_result(&rendered, &mut stdout, &mut stderr).unwrap();
+
+    assert_eq!(
+        String::from_utf8(stdout).unwrap().lines().collect::<Vec<_>>(),
+        vec!["{\"verdict\":\"findings_remain\",\"findings\":[]}"],
+        "fallback writer must preserve stdout as JSON-only"
+    );
+    assert_eq!(
+        String::from_utf8(stderr).unwrap().lines().collect::<Vec<_>>(),
+        vec![
+            "[scope-filter] 1 of 1 findings out of scope, 0 unknown paths",
+            "[auto-record] Recorded final round for group 'cli' (verdict: findings_remain)",
+        ],
+        "fallback writer must keep diagnostics on stderr"
     );
 }
 

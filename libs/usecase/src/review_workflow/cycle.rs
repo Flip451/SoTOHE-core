@@ -3,8 +3,8 @@
 //! Wraps domain-layer cycle operations with partition-snapshot–aware inputs.
 
 use domain::{
-    CycleError, GroupRound, GroupRoundVerdict, ReviewGroupName, ReviewJson, ReviewStalenessReason,
-    RoundType, Timestamp,
+    CycleError, GroupRound, GroupRoundVerdict, ReviewConcern, ReviewGroupName, ReviewJson,
+    ReviewStalenessReason, RoundType, Timestamp,
 };
 
 use crate::review_workflow::groups::ReviewPartitionSnapshot;
@@ -63,6 +63,7 @@ pub struct RecordCycleGroupRoundInput {
     pub timestamp: Timestamp,
     pub outcome: RecordRoundOutcome,
     pub group_hash: String,
+    pub concerns: Vec<ReviewConcern>,
 }
 
 /// Errors from recording a group round.
@@ -72,6 +73,10 @@ pub enum RecordCycleGroupRoundError {
     NoCurrentCycle,
     #[error("group '{0}' not found in current cycle")]
     UnknownGroup(ReviewGroupName),
+    #[error("invalid findings: {0}")]
+    InvalidFindings(String),
+    #[error("invalid concerns: {0}")]
+    InvalidConcerns(String),
     #[error("cycle error: {0}")]
     Cycle(#[from] CycleError),
 }
@@ -89,6 +94,10 @@ pub fn record_cycle_group_round(
     review: &mut ReviewJson,
     input: RecordCycleGroupRoundInput,
 ) -> Result<(), RecordCycleGroupRoundError> {
+    let normalized_concerns = normalize_round_concerns(input.concerns);
+    validate_record_round_findings(&input.outcome)?;
+    validate_record_round_concerns(&input.outcome, &normalized_concerns)?;
+
     let cycle = review.current_cycle_mut().ok_or(RecordCycleGroupRoundError::NoCurrentCycle)?;
     let group = cycle
         .group_mut(&input.group_name)
@@ -108,14 +117,119 @@ pub fn record_cycle_group_round(
     let round = match input.outcome {
         RecordRoundOutcome::Success(verdict) => {
             GroupRound::success(input.round_type, input.timestamp, input.group_hash, verdict)?
+                .with_concerns(normalized_concerns)
         }
         RecordRoundOutcome::Failure { error_message } => {
             GroupRound::failure(input.round_type, input.timestamp, input.group_hash, error_message)?
+                .with_concerns(normalized_concerns)
         }
     };
 
     group.record_round(round);
     Ok(())
+}
+
+fn validate_record_round_findings(
+    outcome: &RecordRoundOutcome,
+) -> Result<(), RecordCycleGroupRoundError> {
+    let RecordRoundOutcome::Success(GroupRoundVerdict::FindingsRemain(findings)) = outcome else {
+        return Ok(());
+    };
+
+    for finding in findings.as_slice() {
+        if finding.message().trim().is_empty() {
+            return Err(RecordCycleGroupRoundError::InvalidFindings(
+                "findings entries must include a non-empty `message`".to_owned(),
+            ));
+        }
+        if finding.severity().is_some_and(|value| value.trim().is_empty()) {
+            return Err(RecordCycleGroupRoundError::InvalidFindings(
+                "findings entries must use `severity: null` or a non-empty string".to_owned(),
+            ));
+        }
+        if finding.file().is_some_and(|value| value.trim().is_empty()) {
+            return Err(RecordCycleGroupRoundError::InvalidFindings(
+                "findings entries must use `file: null` or a non-empty string".to_owned(),
+            ));
+        }
+        if finding.line() == Some(0) {
+            return Err(RecordCycleGroupRoundError::InvalidFindings(
+                "findings entries must use `line: null` or a 1-based line number".to_owned(),
+            ));
+        }
+        if finding.category().is_some_and(|value| value.trim().is_empty()) {
+            return Err(RecordCycleGroupRoundError::InvalidFindings(
+                "findings entries must use `category: null` or a non-empty string".to_owned(),
+            ));
+        }
+    }
+
+    Ok(())
+}
+
+fn normalize_round_concerns(concerns: Vec<ReviewConcern>) -> Vec<ReviewConcern> {
+    concerns.into_iter().collect::<std::collections::BTreeSet<_>>().into_iter().collect()
+}
+
+fn validate_record_round_concerns(
+    outcome: &RecordRoundOutcome,
+    concerns: &[ReviewConcern],
+) -> Result<(), RecordCycleGroupRoundError> {
+    match outcome {
+        RecordRoundOutcome::Success(GroupRoundVerdict::FindingsRemain(_)) => {
+            if concerns.is_empty() {
+                return Err(RecordCycleGroupRoundError::InvalidConcerns(
+                    "findings_remain round requires at least one concern".into(),
+                ));
+            }
+            validate_findings_remain_concerns(outcome, concerns)?;
+        }
+        RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings)
+        | RecordRoundOutcome::Failure { .. } => {
+            if !concerns.is_empty() {
+                return Err(RecordCycleGroupRoundError::InvalidConcerns(format!(
+                    "only findings_remain rounds may persist concerns (got {})",
+                    concerns.len()
+                )));
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn validate_findings_remain_concerns(
+    outcome: &RecordRoundOutcome,
+    concerns: &[ReviewConcern],
+) -> Result<(), RecordCycleGroupRoundError> {
+    let RecordRoundOutcome::Success(GroupRoundVerdict::FindingsRemain(findings)) = outcome else {
+        return Ok(());
+    };
+
+    let supplied: std::collections::BTreeSet<_> =
+        concerns.iter().map(|concern| concern.as_ref().to_owned()).collect();
+    let derived: std::collections::BTreeSet<_> =
+        findings.as_slice().iter().map(stored_finding_concern).collect();
+
+    if !derived.is_subset(&supplied) {
+        return Err(RecordCycleGroupRoundError::InvalidConcerns(format!(
+            "findings_remain round concerns must include all findings-derived concerns (supplied: {:?}, derived: {:?})",
+            supplied, derived
+        )));
+    }
+
+    Ok(())
+}
+
+fn stored_finding_concern(finding: &domain::StoredFinding) -> String {
+    if let Some(category) = finding.category() {
+        category.trim().to_lowercase()
+    } else if let Some(file) = finding.file() {
+        let slug = domain::review::file_path_to_concern(file.trim()).to_lowercase();
+        if slug.trim().is_empty() { "other".to_owned() } else { slug }
+    } else {
+        "other".to_owned()
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -466,6 +580,7 @@ mod tests {
                 timestamp: ts("2026-03-30T10:05:00Z"),
                 outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
                 group_hash: "hash-final".into(),
+                concerns: Vec::new(),
             },
         )
         .unwrap();
@@ -488,6 +603,7 @@ mod tests {
                 timestamp: ts("2026-03-30T10:05:00Z"),
                 outcome: RecordRoundOutcome::Failure { error_message: Some("timeout".into()) },
                 group_hash: "hash-fail".into(),
+                concerns: Vec::new(),
             },
         )
         .unwrap();
@@ -496,6 +612,249 @@ mod tests {
         let domain = cycle.group(&grn("domain")).unwrap();
         assert_eq!(domain.rounds().len(), 2);
         assert!(!domain.rounds().last().unwrap().is_successful_zero_findings());
+    }
+
+    #[test]
+    fn test_record_round_success_persists_concerns() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        let concerns = vec![ReviewConcern::try_new("other").unwrap()];
+        let findings =
+            vec![domain::StoredFinding::new("P1: keep concern", Some("P1".into()), None, None)];
+        record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Final,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Success(
+                    GroupRoundVerdict::findings_remain(findings).unwrap(),
+                ),
+                group_hash: "hash-final".into(),
+                concerns: concerns.clone(),
+            },
+        )
+        .unwrap();
+
+        let cycle = review.current_cycle().unwrap();
+        let domain = cycle.group(&grn("domain")).unwrap();
+        assert_eq!(domain.rounds().last().unwrap().concerns(), concerns.as_slice());
+    }
+
+    #[test]
+    fn test_record_round_zero_findings_rejects_concerns() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        let result = record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Final,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
+                group_hash: "hash-final".into(),
+                concerns: vec![ReviewConcern::try_new("domain.review").unwrap()],
+            },
+        );
+
+        assert!(matches!(result, Err(RecordCycleGroupRoundError::InvalidConcerns(_))));
+    }
+
+    #[test]
+    fn test_record_round_failure_rejects_concerns() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        let result = record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Final,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Failure { error_message: Some("timeout".into()) },
+                group_hash: "hash-final".into(),
+                concerns: vec![ReviewConcern::try_new("domain.review").unwrap()],
+            },
+        );
+
+        assert!(matches!(result, Err(RecordCycleGroupRoundError::InvalidConcerns(_))));
+    }
+
+    #[test]
+    fn test_record_round_findings_remain_requires_concerns() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        let findings =
+            vec![domain::StoredFinding::new("P1: keep concern", Some("P1".into()), None, None)];
+        let result = record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Final,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Success(
+                    GroupRoundVerdict::findings_remain(findings).unwrap(),
+                ),
+                group_hash: "hash-final".into(),
+                concerns: Vec::new(),
+            },
+        );
+
+        assert!(matches!(result, Err(RecordCycleGroupRoundError::InvalidConcerns(_))));
+    }
+
+    #[test]
+    fn test_record_round_findings_remain_rejects_mismatched_concerns() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        let findings = vec![
+            domain::StoredFinding::new("P1: keep concern", Some("P1".into()), None, None)
+                .with_category(Some("domain.review".into())),
+        ];
+        let result = record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Final,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Success(
+                    GroupRoundVerdict::findings_remain(findings).unwrap(),
+                ),
+                group_hash: "hash-final".into(),
+                concerns: vec![ReviewConcern::try_new("infra.git").unwrap()],
+            },
+        );
+
+        assert!(matches!(result, Err(RecordCycleGroupRoundError::InvalidConcerns(_))));
+    }
+
+    #[test]
+    fn test_record_round_findings_remain_accepts_mixed_case_file_concern() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        let findings = vec![domain::StoredFinding::new(
+            "P1: keep concern",
+            Some("P1".into()),
+            Some("apps/CLI/src/Foo.rs".into()),
+            Some(10),
+        )];
+        let result = record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Final,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Success(
+                    GroupRoundVerdict::findings_remain(findings).unwrap(),
+                ),
+                group_hash: "hash-final".into(),
+                concerns: vec![ReviewConcern::try_new("cli.foo").unwrap()],
+            },
+        );
+
+        assert!(result.is_ok(), "mixed-case file-derived concern should normalize");
+    }
+
+    #[test]
+    fn test_record_round_findings_remain_accepts_whitespace_padded_file_concern() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        let findings = vec![domain::StoredFinding::new(
+            "P1: keep concern",
+            Some("P1".into()),
+            Some(" libs/usecase/src/foo.rs ".into()),
+            Some(10),
+        )];
+        let result = record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Final,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Success(
+                    GroupRoundVerdict::findings_remain(findings).unwrap(),
+                ),
+                group_hash: "hash-final".into(),
+                concerns: vec![ReviewConcern::try_new("usecase.foo").unwrap()],
+            },
+        );
+
+        assert!(result.is_ok(), "whitespace-padded file-derived concern should normalize");
+    }
+
+    #[test]
+    fn test_record_round_findings_remain_deduplicates_concerns() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        let findings = vec![
+            domain::StoredFinding::new("P1: keep concern", Some("P1".into()), None, Some(10))
+                .with_category(Some("domain.review".into())),
+        ];
+        record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Final,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Success(
+                    GroupRoundVerdict::findings_remain(findings).unwrap(),
+                ),
+                group_hash: "hash-final".into(),
+                concerns: vec![
+                    ReviewConcern::try_new("domain.review").unwrap(),
+                    ReviewConcern::try_new("domain.review").unwrap(),
+                ],
+            },
+        )
+        .unwrap();
+
+        let cycle = review.current_cycle().unwrap();
+        let domain = cycle.group(&grn("domain")).unwrap();
+        assert_eq!(
+            domain.rounds().last().unwrap().concerns(),
+            [ReviewConcern::try_new("domain.review").unwrap()].as_slice()
+        );
+    }
+
+    #[test]
+    fn test_record_round_findings_remain_rejects_blank_file() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        let findings = vec![domain::StoredFinding::new(
+            "P1: keep concern",
+            Some("P1".into()),
+            Some(" ".into()),
+            Some(10),
+        )];
+        let result = record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Final,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Success(
+                    GroupRoundVerdict::findings_remain(findings).unwrap(),
+                ),
+                group_hash: "hash-final".into(),
+                concerns: vec![ReviewConcern::try_new("other").unwrap()],
+            },
+        );
+
+        assert!(matches!(result, Err(RecordCycleGroupRoundError::InvalidFindings(_))));
+    }
+
+    #[test]
+    fn test_record_round_findings_remain_rejects_blank_category() {
+        let mut review = review_with_cycle("sha256:b", "sha256:e");
+        let findings = vec![
+            domain::StoredFinding::new("P1: keep concern", Some("P1".into()), None, Some(10))
+                .with_category(Some(" ".into())),
+        ];
+        let result = record_cycle_group_round(
+            &mut review,
+            RecordCycleGroupRoundInput {
+                group_name: grn("domain"),
+                round_type: RoundType::Final,
+                timestamp: ts("2026-03-30T10:05:00Z"),
+                outcome: RecordRoundOutcome::Success(
+                    GroupRoundVerdict::findings_remain(findings).unwrap(),
+                ),
+                group_hash: "hash-final".into(),
+                concerns: vec![ReviewConcern::try_new("other").unwrap()],
+            },
+        );
+
+        assert!(matches!(result, Err(RecordCycleGroupRoundError::InvalidFindings(_))));
     }
 
     #[test]
@@ -511,6 +870,7 @@ mod tests {
                 timestamp: ts("2026-03-30T10:05:00Z"),
                 outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
                 group_hash: "hash-other".into(),
+                concerns: Vec::new(),
             },
         )
         .unwrap();
@@ -533,6 +893,7 @@ mod tests {
                 timestamp: ts("2026-03-30T10:05:00Z"),
                 outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
                 group_hash: "hash".into(),
+                concerns: Vec::new(),
             },
         );
         assert!(matches!(result, Err(RecordCycleGroupRoundError::NoCurrentCycle)));
@@ -549,6 +910,7 @@ mod tests {
                 timestamp: ts("2026-03-30T10:05:00Z"),
                 outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
                 group_hash: "hash".into(),
+                concerns: Vec::new(),
             },
         );
         assert!(matches!(result, Err(RecordCycleGroupRoundError::UnknownGroup(_))));
@@ -566,6 +928,7 @@ mod tests {
                 timestamp: ts("2026-03-30T09:00:00Z"), // before 10:01:00Z
                 outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
                 group_hash: "hash".into(),
+                concerns: Vec::new(),
             },
         );
         assert!(matches!(result, Err(RecordCycleGroupRoundError::Cycle(_))));
@@ -592,6 +955,7 @@ mod tests {
                 timestamp: ts("2026-03-30T10:02:00Z"),
                 outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
                 group_hash: "hash-current".into(),
+                concerns: Vec::new(),
             },
         )
         .unwrap();
@@ -604,6 +968,7 @@ mod tests {
                 timestamp: ts("2026-03-30T10:03:00Z"),
                 outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
                 group_hash: "hash-other".into(),
+                concerns: Vec::new(),
             },
         )
         .unwrap();
@@ -615,6 +980,7 @@ mod tests {
                 timestamp: ts("2026-03-30T10:04:00Z"),
                 outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
                 group_hash: "hash-other".into(),
+                concerns: Vec::new(),
             },
         )
         .unwrap();
@@ -726,6 +1092,7 @@ mod tests {
                     timestamp: ts(&format!("2026-03-30T10:0{i}:00Z")),
                     outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
                     group_hash: format!("hash-other-{i}"),
+                    concerns: Vec::new(),
                 },
             )
             .unwrap();
@@ -774,6 +1141,7 @@ mod tests {
                 timestamp: ts("2026-03-30T10:02:00Z"),
                 outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
                 group_hash: "hash-current".into(),
+                concerns: Vec::new(),
             },
         )
         .unwrap();
@@ -786,6 +1154,7 @@ mod tests {
                 timestamp: ts("2026-03-30T10:03:00Z"),
                 outcome: RecordRoundOutcome::Success(GroupRoundVerdict::ZeroFindings),
                 group_hash: "hash-other".into(),
+                concerns: Vec::new(),
             },
         )
         .unwrap();

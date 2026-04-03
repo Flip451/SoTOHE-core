@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 use thiserror::Error;
 
+use domain::StoredFinding;
 pub use domain::review::{ModelProfile, resolve_full_auto};
 
 /// Errors returned by review workflow functions.
@@ -30,19 +31,29 @@ pub const REVIEW_OUTPUT_SCHEMA_JSON: &str = r##"{
   "required": ["verdict", "findings"],
   "additionalProperties": false,
   "$defs": {
+    "non_blank_string": {
+      "type": "string",
+      "pattern": ".*\\S.*"
+    },
+    "nullable_non_blank_string": {
+      "anyOf": [
+        { "$ref": "#/$defs/non_blank_string" },
+        { "type": "null" }
+      ]
+    },
     "finding": {
       "type": "object",
       "properties": {
-        "message": { "type": "string" },
-        "severity": { "type": ["string", "null"] },
-        "file": { "type": ["string", "null"] },
+        "message": { "$ref": "#/$defs/non_blank_string" },
+        "severity": { "$ref": "#/$defs/nullable_non_blank_string" },
+        "file": { "$ref": "#/$defs/nullable_non_blank_string" },
         "line": { "type": ["integer", "null"], "minimum": 1 },
         "category": {
-          "type": ["string", "null"],
-          "description": "Optional concern category for escalation tracking"
+          "$ref": "#/$defs/nullable_non_blank_string",
+          "description": "Nullable concern category for escalation tracking"
         }
       },
-      "required": ["message", "severity", "file", "line", "category"],
+      "required": ["message", "severity", "file", "line"],
       "additionalProperties": false
     }
   }
@@ -102,8 +113,24 @@ pub struct ReviewFinding {
     pub file: Option<String>,
     #[serde(default)]
     pub line: Option<u64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
     pub category: Option<String>,
+}
+
+#[must_use]
+pub fn review_findings_to_stored(findings: &[ReviewFinding]) -> Vec<StoredFinding> {
+    findings
+        .iter()
+        .map(|finding| {
+            StoredFinding::new(
+                finding.message.clone(),
+                finding.severity.clone(),
+                finding.file.clone(),
+                finding.line,
+            )
+            .with_category(finding.category.clone())
+        })
+        .collect()
 }
 
 #[must_use]
@@ -226,6 +253,13 @@ pub(crate) fn validate_review_payload(
     if payload.findings.iter().any(|finding| finding.line == Some(0)) {
         return Err("findings entries must use `line: null` or a 1-based line number".to_owned());
     }
+    if payload
+        .findings
+        .iter()
+        .any(|finding| finding.category.as_deref().is_some_and(|value| value.trim().is_empty()))
+    {
+        return Err("findings entries must use `category: null` or a non-empty string".to_owned());
+    }
 
     match payload.verdict {
         ReviewPayloadVerdict::ZeroFindings if !payload.findings.is_empty() => {
@@ -330,8 +364,6 @@ impl<'de> Visitor<'de> for ReviewFindingShapeVisitor {
         let mut seen_severity = false;
         let mut seen_file = false;
         let mut seen_line = false;
-        let mut seen_category = false;
-
         while let Some(key) = map.next_key::<String>()? {
             match key.as_str() {
                 "message" => {
@@ -363,11 +395,7 @@ impl<'de> Visitor<'de> for ReviewFindingShapeVisitor {
                     seen_line = true;
                 }
                 "category" => {
-                    if seen_category {
-                        return Err(de::Error::duplicate_field("category"));
-                    }
                     let _: Option<String> = map.next_value()?;
-                    seen_category = true;
                 }
                 other => {
                     return Err(de::Error::unknown_field(
@@ -392,5 +420,61 @@ impl<'de> Visitor<'de> for ReviewFindingShapeVisitor {
         }
 
         Ok(ReviewFindingShape)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{
+        ReviewFinalMessageState, ReviewFinalPayload, ReviewFinding, ReviewPayloadVerdict,
+        parse_review_final_message, render_review_payload,
+    };
+
+    #[test]
+    fn test_parse_review_final_message_accepts_missing_category_field_as_none() {
+        let state = parse_review_final_message(Some(
+            r#"{"verdict":"findings_remain","findings":[{"message":"P1","severity":"P1","file":null,"line":1}]}"#,
+        ));
+
+        assert!(matches!(state, ReviewFinalMessageState::Parsed(_)));
+        if let ReviewFinalMessageState::Parsed(payload) = state {
+            assert_eq!(payload.findings.len(), 1);
+            assert_eq!(
+                payload.findings.first().map(|finding| finding.category.clone()),
+                Some(None)
+            );
+        }
+    }
+
+    #[test]
+    fn test_render_review_payload_preserves_null_category_field() {
+        let payload = ReviewFinalPayload {
+            verdict: ReviewPayloadVerdict::FindingsRemain,
+            findings: vec![ReviewFinding {
+                message: "P1".to_owned(),
+                severity: Some("P1".to_owned()),
+                file: None,
+                line: Some(1),
+                category: None,
+            }],
+        };
+
+        let json = render_review_payload(&payload);
+        assert!(json.is_ok(), "render_review_payload should serialize null category: {json:?}");
+        let json = json.unwrap_or_default();
+
+        assert!(
+            json.contains(r#""category":null"#),
+            "rendered payload must preserve a required null category field: {json}"
+        );
+    }
+
+    #[test]
+    fn test_parse_review_final_message_rejects_blank_category_field() {
+        let state = parse_review_final_message(Some(
+            r#"{"verdict":"findings_remain","findings":[{"message":"P1","severity":"P1","file":"src/lib.rs","line":1,"category":" "}]} "#.trim(),
+        ));
+
+        assert!(matches!(state, ReviewFinalMessageState::Invalid { .. }));
     }
 }

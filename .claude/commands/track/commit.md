@@ -35,27 +35,13 @@ Before committing:
    - explicit planning-only `<track-id>` selector on a non-track branch
    - otherwise latest materialized active track (non-archived, non-done, `branch != null`) for read-only context only
    - do not execute a guarded commit from a non-track branch without the explicit planning-only selector
-4. If the current track exists, read `track/registry.md` and confirm it reflects the current track status, next command, and completion state.
-5. When updating `track/registry.md`, use `sync_rendered_views()` to regenerate from metadata.json. Registry rendering is deterministic from metadata alone — do not pass branch context.
-6. If `track/registry.md` is stale for the current track, update and stage it as part of this same commit (pre-commit step, not post-commit):
-   - If the track status is `"archived"`: the track should already be in the `Archived Tracks` section. Verify registry reflects this. No Active/Completed table changes needed.
-   - If this is a **completion commit** — all tasks in `metadata.json` are resolved (`"status": "done"` or `"status": "skipped"`) (metadata.json is SSoT) — take these actions:
-     1. Remove the track row from the `Active Tracks` table.
-     2. Add a new row to `Completed Tracks` with columns `Track | Result | Updated` (e.g., `Done | YYYY-MM-DD`).
-     3. In the `Current Focus` section, set `Latest active track` to the next remaining active track, or `None yet` if none remain. Set `Next recommended command` and `Last updated` accordingly.
-   - Otherwise (mid-track commit): update the `Status`, `Next`, and `Updated` columns in-place under `Active Tracks`, and update `Last updated` in `Current Focus`.
-   - After editing `track/registry.md`, write its path to `tmp/track-commit/add-paths.txt`, then run:
-
-     ```bash
-     cargo make track-add-paths
-     ```
-
-7. If the selected track is branchless planning-only (`status=planned`, `branch=null`), enforce the planning-only allowlist before committing:
+4. `track/registry.md` is a generated view (gitignored, not version-controlled). Do NOT attempt to stage or commit it. If the current track's `plan.md` or `spec.md` views appear stale, run `cargo make track-sync-views` to regenerate them. Note: this command syncs views for ALL tracks, so when staging for commit, only include the current track's files — do not stage other tracks' regenerated views. This is purely about commit scope; staging does not affect review hash computation (hashes are worktree-based).
+5. If the selected track is branchless planning-only (`status=planned`, `branch=null`), enforce the planning-only allowlist before committing:
    - `track/items/<id>/`
-   - `track/registry.md`
    - `track/tech-stack.md`
    - `knowledge/DESIGN.md`
    If staged changes exceed that allowlist, stop and require `/track:activate <track-id>` first.
+   Note: `track/registry.md` is gitignored and never committed — it is excluded from this allowlist.
 
 ## Step 2: Guarded commit
 
@@ -116,6 +102,6 @@ After execution, report:
 
 1. Commit result (success/failure) and commit hash
 2. Commit message used
-3. `track/registry.md` status: updated / already current / skipped (reason)
+3. `track/registry.md` status: regenerated locally via `track-sync-views` / already current / skipped (gitignored, not committed)
 4. Git note status: applied (source: generated tmp scratch file) or skipped (reason)
 5. Next recommended action

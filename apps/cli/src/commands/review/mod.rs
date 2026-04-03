@@ -510,21 +510,7 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
 
             // Filter partition to match cycle's group set to avoid PartitionChanged
             // false positive when the cycle was created with a subset of groups.
-            let other_key =
-                domain::ReviewGroupName::try_new("other").map_err(|e| format!("{e}"))?;
-            // Filter to cycle's group set, re-mapping non-cycle groups to "other"
-            // so their files still contribute to the scope hash (fail-closed).
-            let mut filtered = std::collections::BTreeMap::new();
-            for (name, paths) in full_partition.groups() {
-                if cycle_group_names.contains(name) {
-                    filtered.insert(name.clone(), paths.clone());
-                } else {
-                    filtered.entry(other_key.clone()).or_default().extend(paths.iter().cloned());
-                }
-            }
-            filtered.entry(other_key).or_default();
-            let partition = usecase::review_workflow::groups::GroupPartition::try_new(filtered)
-                .map_err(|e| format!("{e}"))?;
+            let partition = filter_partition_to_cycle_groups(&full_partition, &cycle_group_names)?;
 
             Ok(usecase::review_workflow::groups::ReviewPartitionSnapshot::new(
                 base_policy.policy_hash(),
@@ -547,6 +533,26 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
         &hasher,
         &review_store,
     )
+}
+
+fn filter_partition_to_cycle_groups(
+    full_partition: &usecase::review_workflow::groups::GroupPartition,
+    cycle_group_names: &std::collections::BTreeSet<domain::ReviewGroupName>,
+) -> Result<usecase::review_workflow::groups::GroupPartition, String> {
+    let other_key = domain::ReviewGroupName::try_new("other").map_err(|e| format!("{e}"))?;
+    let mut filtered: std::collections::BTreeMap<
+        domain::ReviewGroupName,
+        Vec<usecase::review_workflow::scope::RepoRelativePath>,
+    > = std::collections::BTreeMap::new();
+    for (name, paths) in full_partition.groups() {
+        if cycle_group_names.contains(name) && *name != other_key {
+            filtered.entry(name.clone()).or_default().extend(paths.iter().cloned());
+        } else {
+            filtered.entry(other_key.clone()).or_default().extend(paths.iter().cloned());
+        }
+    }
+    filtered.entry(other_key).or_default();
+    usecase::review_workflow::groups::GroupPartition::try_new(filtered).map_err(|e| format!("{e}"))
 }
 
 /// Returns `true` if all staged files match the planning-only allowlist.

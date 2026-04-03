@@ -1,7 +1,7 @@
 //! Subprocess management for the local Codex-backed reviewer.
 
 use std::ffi::OsString;
-use std::io::{BufRead, BufReader, Write};
+use std::io::{self, BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, ExitCode, Stdio};
 use std::thread;
@@ -15,7 +15,7 @@ use usecase::review_workflow::usecases::{RecordRoundProtocol, Verdict, record_ro
 use usecase::review_workflow::{
     ReviewFinalMessageState, ReviewPayloadVerdict, ReviewVerdict, classify_review_verdict,
     extract_verdict_from_content, findings_to_concerns, normalize_final_message,
-    parse_review_final_message, render_review_payload,
+    parse_review_final_message, render_review_payload, review_findings_to_stored,
 };
 
 use super::{
@@ -59,11 +59,9 @@ pub(super) fn execute_codex_local(args: &CodexLocalArgs) -> ExitCode {
 
     // Step 4: Original flow (no auto-record).
     let rendered = render_codex_local_result(args, outcome);
-    for line in rendered.stdout_lines {
-        println!("{line}");
-    }
-    for line in rendered.stderr_lines {
-        eprintln!("{line}");
+    if let Err(err) = emit_rendered_command_result_stdio(&rendered) {
+        eprintln!("[ERROR] failed to emit reviewer output: {err}");
+        return ExitCode::from(1);
     }
     ExitCode::from(rendered.exit_code)
 }
@@ -81,50 +79,290 @@ pub(super) fn execute_with_auto_record(
     scope_provider: &impl DiffScopeProvider,
     protocol: &impl RecordRoundProtocol,
 ) -> ExitCode {
+    let rendered = render_execute_with_auto_record(
+        outcome,
+        validated,
+        timeout_seconds,
+        scope_provider,
+        protocol,
+    );
+    if let Err(err) = emit_rendered_command_result_stdio(&rendered) {
+        eprintln!("[ERROR] failed to emit reviewer output: {err}");
+        return ExitCode::from(1);
+    }
+    ExitCode::from(rendered.exit_code)
+}
+
+fn emit_rendered_command_result_stdio(rendered: &RenderedCommandResult) -> io::Result<()> {
+    #[cfg(unix)]
+    {
+        for line in &rendered.stderr_lines {
+            write_fd_line(libc::STDERR_FILENO, line)?;
+        }
+        for line in &rendered.stdout_lines {
+            write_fd_line(libc::STDOUT_FILENO, line)?;
+        }
+        Ok(())
+    }
+    #[cfg(windows)]
+    {
+        emit_windows_command_result(rendered)
+    }
+    #[cfg(all(not(unix), not(windows)))]
+    {
+        emit_non_unix_fallback_command_result(
+            rendered,
+            &mut std::io::stdout(),
+            &mut std::io::stderr(),
+        )
+    }
+}
+
+#[cfg_attr(not(test), allow(dead_code))]
+pub(super) fn emit_rendered_command_result_with_writers(
+    rendered: &RenderedCommandResult,
+    stdout: &mut impl Write,
+    stderr: &mut impl Write,
+) -> std::io::Result<()> {
+    for line in &rendered.stderr_lines {
+        writeln!(stderr, "{line}")?;
+        stderr.flush()?;
+    }
+    for line in &rendered.stdout_lines {
+        writeln!(stdout, "{line}")?;
+        stdout.flush()?;
+    }
+    Ok(())
+}
+
+#[cfg_attr(not(test), allow(dead_code))]
+pub(super) fn emit_non_unix_fallback_command_result(
+    rendered: &RenderedCommandResult,
+    stdout: &mut impl Write,
+    stderr: &mut impl Write,
+) -> std::io::Result<()> {
+    emit_rendered_command_result_with_writers(rendered, stdout, stderr)
+}
+
+#[cfg(unix)]
+fn write_fd_line(fd: libc::c_int, line: &str) -> io::Result<()> {
+    let mut buf = Vec::with_capacity(line.len() + 1);
+    buf.extend_from_slice(line.as_bytes());
+    buf.push(b'\n');
+
+    let mut written = 0usize;
+    while written < buf.len() {
+        let Some(remaining) = buf.get(written..) else {
+            break;
+        };
+        // Safety: `buf` is kept alive for the duration of the syscall, `fd` is one of the
+        // standard output descriptors, and we handle partial writes / EINTR explicitly.
+        let result = unsafe { libc::write(fd, remaining.as_ptr().cast(), remaining.len()) };
+        if result < 0 {
+            let err = io::Error::last_os_error();
+            if err.kind() == io::ErrorKind::Interrupted {
+                continue;
+            }
+            return Err(err);
+        }
+        written += result as usize;
+    }
+    Ok(())
+}
+
+#[cfg(windows)]
+fn emit_windows_command_result(rendered: &RenderedCommandResult) -> io::Result<()> {
+    use windows_sys::Win32::System::Console::{STD_ERROR_HANDLE, STD_OUTPUT_HANDLE};
+
+    for line in &rendered.stderr_lines {
+        write_windows_handle_line(STD_ERROR_HANDLE, line)?;
+    }
+    for line in &rendered.stdout_lines {
+        write_windows_handle_line(STD_OUTPUT_HANDLE, line)?;
+    }
+    Ok(())
+}
+
+#[cfg(windows)]
+fn write_windows_handle_line(std_handle: u32, line: &str) -> io::Result<()> {
+    use windows_sys::Win32::Foundation::{GetLastError, INVALID_HANDLE_VALUE};
+    use windows_sys::Win32::Storage::FileSystem::WriteFile;
+    use windows_sys::Win32::System::Console::{GetConsoleMode, GetStdHandle, WriteConsoleW};
+
+    // Safety: `std_handle` is one of the standard console handles and the returned handle is
+    // used only for synchronous writes in this function.
+    let handle = unsafe { GetStdHandle(std_handle) };
+    if handle.is_null() || handle == INVALID_HANDLE_VALUE {
+        let err = unsafe { GetLastError() };
+        return Err(io::Error::from_raw_os_error(err as i32));
+    }
+
+    let mut console_mode = 0u32;
+    // Safety: `handle` is a valid standard handle and `console_mode` is a valid out-pointer.
+    let is_console = unsafe { GetConsoleMode(handle, &mut console_mode) } != 0;
+    if is_console {
+        let mut wide = line.encode_utf16().collect::<Vec<u16>>();
+        wide.push(b'\r' as u16);
+        wide.push(b'\n' as u16);
+        let mut written = 0usize;
+        while written < wide.len() {
+            let remaining = &wide[written..];
+            let chunk_len = remaining.len().min(u32::MAX as usize) as u32;
+            let mut chunk_written = 0u32;
+            // Safety: `remaining` stays alive for the syscall, the handle is a valid console
+            // handle, and the pointers are valid for the duration of the call.
+            let result = unsafe {
+                WriteConsoleW(
+                    handle,
+                    remaining.as_ptr().cast(),
+                    chunk_len,
+                    &mut chunk_written,
+                    std::ptr::null_mut(),
+                )
+            };
+            if result == 0 {
+                let err = unsafe { GetLastError() };
+                return Err(io::Error::from_raw_os_error(err as i32));
+            }
+            if chunk_written == 0 {
+                return Err(io::Error::new(
+                    io::ErrorKind::WriteZero,
+                    "failed to write reviewer output to Windows console handle",
+                ));
+            }
+            written += chunk_written as usize;
+        }
+        return Ok(());
+    }
+
+    let mut buf = Vec::with_capacity(line.len() + 2);
+    buf.extend_from_slice(line.as_bytes());
+    buf.push(b'\r');
+    buf.push(b'\n');
+
+    let mut written = 0usize;
+    while written < buf.len() {
+        let remaining = &buf[written..];
+        let chunk_len = remaining.len().min(u32::MAX as usize) as u32;
+        let mut chunk_written = 0u32;
+        // Safety: `remaining` stays alive for the syscall, the handle is a valid stdio handle,
+        // and `chunk_written` / overlapped pointers are valid for the duration of the call.
+        let result = unsafe {
+            WriteFile(
+                handle,
+                remaining.as_ptr().cast(),
+                chunk_len,
+                &mut chunk_written,
+                std::ptr::null_mut(),
+            )
+        };
+        if result == 0 {
+            let err = unsafe { GetLastError() };
+            return Err(io::Error::from_raw_os_error(err as i32));
+        }
+        if chunk_written == 0 {
+            return Err(io::Error::new(
+                io::ErrorKind::WriteZero,
+                "failed to write reviewer output to Windows stdio handle",
+            ));
+        }
+        written += chunk_written as usize;
+    }
+    Ok(())
+}
+
+pub(super) fn render_execute_with_auto_record(
+    outcome: Result<ReviewRunResult, String>,
+    validated: ValidatedAutoRecordArgs,
+    timeout_seconds: u64,
+    scope_provider: &impl DiffScopeProvider,
+    protocol: &impl RecordRoundProtocol,
+) -> RenderedCommandResult {
     // Handle non-success outcomes (spawn failure etc.) — skip auto-record.
     let result = match outcome {
         Ok(r) => r,
         Err(err) => {
-            eprintln!("[ERROR] {err}");
-            return ExitCode::from(1);
+            return RenderedCommandResult {
+                exit_code: 1,
+                stdout_lines: Vec::new(),
+                stderr_lines: vec![format!("[ERROR] {err}")],
+            };
         }
     };
 
     match result.verdict {
         ReviewVerdict::ZeroFindings | ReviewVerdict::FindingsRemain => {
-            record_auto_round(result, validated, scope_provider, protocol)
+            render_record_auto_round(result, validated, scope_provider, protocol)
         }
         // Non-actionable verdicts (Timeout, ProcessFailed, LastMessageMissing):
         // skip auto-record, use inline rendering.
-        ReviewVerdict::Timeout => render_non_actionable_timeout(&result, timeout_seconds),
-        ReviewVerdict::ProcessFailed => render_non_actionable_process_failed(result),
-        ReviewVerdict::LastMessageMissing => render_non_actionable_missing_message(&result),
+        ReviewVerdict::Timeout => RenderedCommandResult {
+            exit_code: 1,
+            stdout_lines: Vec::new(),
+            stderr_lines: vec![if result.output_last_message_auto_managed {
+                format!("[TIMEOUT] Local reviewer exceeded {timeout_seconds}s")
+            } else {
+                format!(
+                    "[TIMEOUT] Local reviewer exceeded {timeout_seconds}s: {}",
+                    result.output_last_message.display()
+                )
+            }],
+        },
+        ReviewVerdict::ProcessFailed => {
+            let mut stderr_lines = vec!["[ERROR] Local reviewer process failed".to_owned()];
+            if let Some(detail) = result.verdict_detail {
+                stderr_lines.push(detail);
+            }
+            if let Some(message) = result.final_message {
+                stderr_lines.push(message);
+            }
+            RenderedCommandResult { exit_code: 1, stdout_lines: Vec::new(), stderr_lines }
+        }
+        ReviewVerdict::LastMessageMissing => RenderedCommandResult {
+            exit_code: 1,
+            stdout_lines: Vec::new(),
+            stderr_lines: vec![if result.output_last_message_auto_managed {
+                "[ERROR] Local reviewer finished without a final message".to_owned()
+            } else {
+                format!(
+                    "[ERROR] Local reviewer finished without a final message: {}",
+                    result.output_last_message.display()
+                )
+            }],
+        },
     }
 }
 
 /// Performs the scope-filter → record → emit flow for actionable verdicts.
 #[allow(clippy::too_many_lines)]
-fn record_auto_round(
+fn render_record_auto_round(
     result: ReviewRunResult,
     validated: ValidatedAutoRecordArgs,
     scope_provider: &impl DiffScopeProvider,
     protocol: &impl RecordRoundProtocol,
-) -> ExitCode {
+) -> RenderedCommandResult {
+    let mut stderr_lines = Vec::new();
+
     // Parse the payload for scope filtering.
     let payload = match result.final_message.as_deref() {
         Some(json) => match parse_review_final_message(Some(json)) {
             ReviewFinalMessageState::Parsed(p) => p,
             _ => {
-                eprintln!("[ERROR] auto-record: could not parse verdict payload");
-                if let Some(msg) = result.final_message {
-                    println!("{msg}");
-                }
-                return ExitCode::from(1);
+                stderr_lines
+                    .push("[ERROR] auto-record: could not parse verdict payload".to_owned());
+                return RenderedCommandResult {
+                    exit_code: 1,
+                    stdout_lines: Vec::new(),
+                    stderr_lines,
+                };
             }
         },
         None => {
-            eprintln!("[ERROR] auto-record: no verdict payload to record");
-            return ExitCode::from(1);
+            return RenderedCommandResult {
+                exit_code: 1,
+                stdout_lines: Vec::new(),
+                stderr_lines: vec!["[ERROR] auto-record: no verdict payload to record".to_owned()],
+            };
         }
     };
 
@@ -134,17 +372,19 @@ fn record_auto_round(
             let f = usecase::review_workflow::apply_scope_filter(payload, &scope);
             let total = f.adjusted_payload.findings.len() + f.out_of_scope.len();
             if !f.out_of_scope.is_empty() || f.unknown_path_count > 0 {
-                eprintln!(
+                stderr_lines.push(format!(
                     "[scope-filter] {} of {} findings out of scope, {} unknown paths",
                     f.out_of_scope.len(),
                     total,
                     f.unknown_path_count
-                );
+                ));
             }
             f
         }
         Err(err) => {
-            eprintln!("[WARNING] Failed to compute diff scope (recording unfiltered): {err}");
+            stderr_lines.push(format!(
+                "[WARNING] Failed to compute diff scope (recording unfiltered): {err}"
+            ));
             ScopeFilteredPayload {
                 adjusted_payload: payload,
                 out_of_scope: Vec::new(),
@@ -167,13 +407,14 @@ fn record_auto_round(
             Vec::new()
         }
     };
+    let findings = review_findings_to_stored(&filtered.adjusted_payload.findings);
 
     // Build timestamp.
     let timestamp = match super::make_timestamp() {
         Ok(ts) => ts,
         Err(err) => {
-            eprintln!("[ERROR] {err}");
-            return ExitCode::from(1);
+            stderr_lines.push(format!("[ERROR] {err}"));
+            return RenderedCommandResult { exit_code: 1, stdout_lines: Vec::new(), stderr_lines };
         }
     };
 
@@ -189,76 +430,40 @@ fn record_auto_round(
         validated.group_name,
         domain_verdict,
         concerns,
+        findings,
         validated.expected_groups,
         timestamp,
         protocol,
     ) {
         Ok(()) => {
-            eprintln!(
+            stderr_lines.push(format!(
                 "[auto-record] Recorded {round_type_display} round for group \
                  '{group_display}' (verdict: {domain_verdict})"
-            );
+            ));
         }
         Err(RecordRoundError::EscalationBlocked(blocked)) => {
-            eprintln!("[auto-record] Escalation blocked: {}", blocked.join(", "));
             // Do NOT print verdict JSON — recording failed, so the verdict is untrusted.
-            return ExitCode::from(3);
+            stderr_lines.push(format!("[auto-record] Escalation blocked: {}", blocked.join(", ")));
+            return RenderedCommandResult { exit_code: 3, stdout_lines: Vec::new(), stderr_lines };
         }
         Err(RecordRoundError::Other(msg)) => {
             // All recording failures are fatal — the core guarantee of auto-record
             // is that verdicts are always persisted internally.
             // Do NOT print verdict JSON — unrecorded verdicts must not be trusted.
-            eprintln!("[auto-record] Record failed: {msg}");
-            return ExitCode::from(1);
+            stderr_lines.push(format!("[auto-record] Record failed: {msg}"));
+            return RenderedCommandResult { exit_code: 1, stdout_lines: Vec::new(), stderr_lines };
         }
     }
 
     // Output the filtered verdict JSON to stdout.
-    if let Ok(json) = render_review_payload(&filtered.adjusted_payload) {
-        println!("{json}");
-    }
+    let stdout_lines = render_review_payload(&filtered.adjusted_payload)
+        .map_or_else(|_| Vec::new(), |json| vec![json]);
 
-    match filtered.adjusted_payload.verdict {
-        ReviewPayloadVerdict::ZeroFindings => ExitCode::from(0),
-        ReviewPayloadVerdict::FindingsRemain => ExitCode::from(2),
-    }
-}
-
-fn render_non_actionable_timeout(result: &ReviewRunResult, timeout_seconds: u64) -> ExitCode {
-    let msg = if result.output_last_message_auto_managed {
-        format!("[TIMEOUT] Local reviewer exceeded {timeout_seconds}s")
-    } else {
-        format!(
-            "[TIMEOUT] Local reviewer exceeded {timeout_seconds}s: {}",
-            result.output_last_message.display()
-        )
+    let exit_code = match filtered.adjusted_payload.verdict {
+        ReviewPayloadVerdict::ZeroFindings => 0,
+        ReviewPayloadVerdict::FindingsRemain => 2,
     };
-    eprintln!("{msg}");
-    ExitCode::from(1)
-}
-
-fn render_non_actionable_process_failed(result: ReviewRunResult) -> ExitCode {
-    eprintln!("[ERROR] Local reviewer process failed");
-    if let Some(detail) = result.verdict_detail {
-        eprintln!("{detail}");
-    }
-    if let Some(message) = result.final_message {
-        eprintln!("{message}");
-    }
-    ExitCode::from(1)
-}
-
-fn render_non_actionable_missing_message(result: &ReviewRunResult) -> ExitCode {
-    let msg = if result.output_last_message_auto_managed {
-        "[ERROR] Local reviewer finished without a final message".to_owned()
-    } else {
-        format!(
-            "[ERROR] Local reviewer finished without a final message: {}",
-            result.output_last_message.display()
-        )
-    };
-    eprintln!("{msg}");
-    ExitCode::from(1)
+    RenderedCommandResult { exit_code, stdout_lines, stderr_lines }
 }
 
 pub(super) fn render_codex_local_result(

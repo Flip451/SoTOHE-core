@@ -18,4 +18,5 @@ pub use verdict::{
     ReviewFinding, ReviewPayloadVerdict, ReviewVerdict, ReviewWorkflowError,
     classify_review_verdict, extract_verdict_from_content, normalize_final_message,
     parse_review_final_message, render_review_payload, resolve_full_auto,
+    review_findings_to_stored,
 };
