@@ -6,7 +6,10 @@
 
 use crate::Timestamp;
 
-use super::super::types::{RoundType, Verdict};
+use super::super::{
+    ReviewConcern,
+    types::{RoundType, Verdict},
+};
 
 // ---------------------------------------------------------------------------
 // ReviewStalenessReason
@@ -81,6 +84,7 @@ pub struct StoredFinding {
     severity: Option<String>,
     file: Option<String>,
     line: Option<u64>,
+    category: Option<String>,
 }
 
 impl StoredFinding {
@@ -92,7 +96,14 @@ impl StoredFinding {
         file: Option<String>,
         line: Option<u64>,
     ) -> Self {
-        Self { message: message.into(), severity, file, line }
+        Self { message: message.into(), severity, file, line, category: None }
+    }
+
+    /// Returns a new finding with category metadata attached.
+    #[must_use]
+    pub fn with_category(mut self, category: Option<String>) -> Self {
+        self.category = category;
+        self
     }
 
     /// Returns the finding message.
@@ -117,6 +128,12 @@ impl StoredFinding {
     #[must_use]
     pub fn line(&self) -> Option<u64> {
         self.line
+    }
+
+    /// Returns the concern category, if any.
+    #[must_use]
+    pub fn category(&self) -> Option<&str> {
+        self.category.as_deref()
     }
 }
 
@@ -226,6 +243,7 @@ pub struct GroupRound {
     round_type: RoundType,
     timestamp: Timestamp,
     hash: String,
+    concerns: Vec<ReviewConcern>,
     outcome: GroupRoundOutcome,
 }
 
@@ -260,6 +278,7 @@ impl GroupRound {
             round_type,
             timestamp,
             hash: Self::validate_hash(hash)?,
+            concerns: Vec::new(),
             outcome: GroupRoundOutcome::Success(verdict),
         })
     }
@@ -278,8 +297,16 @@ impl GroupRound {
             round_type,
             timestamp,
             hash: Self::validate_hash(hash)?,
+            concerns: Vec::new(),
             outcome: GroupRoundOutcome::Failure { error_message },
         })
+    }
+
+    /// Returns a new round with persisted concerns attached.
+    #[must_use]
+    pub fn with_concerns(mut self, concerns: Vec<ReviewConcern>) -> Self {
+        self.concerns = concerns;
+        self
     }
 
     /// Returns the round type (fast or final).
@@ -304,6 +331,12 @@ impl GroupRound {
     #[must_use]
     pub fn hash(&self) -> &str {
         &self.hash
+    }
+
+    /// Returns the persisted concerns for this round.
+    #[must_use]
+    pub fn concerns(&self) -> &[ReviewConcern] {
+        &self.concerns
     }
 
     /// Returns `true` if this round was successful with zero findings.

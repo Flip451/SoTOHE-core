@@ -4,11 +4,11 @@
 //! serde-annotated DTOs for JSON serialization. Domain types have no
 //! serde derives per hexagonal architecture convention.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use domain::{
-    CycleError, CycleGroupState, GroupRound, GroupRoundOutcome, GroupRoundVerdict, ReviewCycle,
-    ReviewGroupName, ReviewJson, RoundType, StoredFinding, Timestamp,
+    CycleError, CycleGroupState, GroupRound, GroupRoundOutcome, GroupRoundVerdict, ReviewConcern,
+    ReviewCycle, ReviewGroupName, ReviewJson, RoundType, StoredFinding, Timestamp,
 };
 use serde::{Deserialize, Serialize};
 
@@ -65,7 +65,113 @@ struct RoundDocument {
     error_message: Option<String>,
     timestamp: String,
     hash: String,
+    #[serde(default, skip_serializing_if = "ConcernsField::is_missing")]
+    concerns: ConcernsField,
     verdict: Option<VerdictDocument>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+enum ConcernsField {
+    #[default]
+    Missing,
+    Null,
+    Present(Vec<ReviewConcern>),
+}
+
+impl ConcernsField {
+    fn is_missing(&self) -> bool {
+        matches!(self, Self::Missing)
+    }
+}
+
+impl Serialize for ConcernsField {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            Self::Missing | Self::Null => serializer.serialize_none(),
+            Self::Present(concerns) => concerns
+                .iter()
+                .map(|concern| concern.as_ref().to_owned())
+                .collect::<Vec<_>>()
+                .serialize(serializer),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for ConcernsField {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct ConcernsFieldVisitor;
+
+        impl<'de> serde::de::Visitor<'de> for ConcernsFieldVisitor {
+            type Value = ConcernsField;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("null or an array of concern strings")
+            }
+
+            fn visit_none<E>(self) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                Ok(ConcernsField::Null)
+            }
+
+            fn visit_unit<E>(self) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                Ok(ConcernsField::Null)
+            }
+
+            fn visit_some<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                let concerns = Vec::<String>::deserialize(deserializer)?;
+                let mut seen = BTreeSet::new();
+                let mut parsed = Vec::with_capacity(concerns.len());
+                for concern in concerns {
+                    let concern =
+                        ReviewConcern::try_new(concern).map_err(serde::de::Error::custom)?;
+                    if !seen.insert(concern.clone()) {
+                        return Err(serde::de::Error::custom(
+                            "round concerns must not contain duplicates",
+                        ));
+                    }
+                    parsed.push(concern);
+                }
+                Ok(ConcernsField::Present(parsed))
+            }
+
+            fn visit_seq<A>(self, seq: A) -> Result<Self::Value, A::Error>
+            where
+                A: serde::de::SeqAccess<'de>,
+            {
+                let concerns =
+                    Vec::<String>::deserialize(serde::de::value::SeqAccessDeserializer::new(seq))?;
+                let mut seen = BTreeSet::new();
+                let mut parsed = Vec::with_capacity(concerns.len());
+                for concern in concerns {
+                    let concern =
+                        ReviewConcern::try_new(concern).map_err(serde::de::Error::custom)?;
+                    if !seen.insert(concern.clone()) {
+                        return Err(serde::de::Error::custom(
+                            "round concerns must not contain duplicates",
+                        ));
+                    }
+                    parsed.push(concern);
+                }
+                Ok(ConcernsField::Present(parsed))
+            }
+        }
+
+        deserializer.deserialize_option(ConcernsFieldVisitor)
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -82,6 +188,8 @@ struct FindingDocument {
     severity: Option<String>,
     file: Option<String>,
     line: Option<u64>,
+    #[serde(default)]
+    category: Option<String>,
 }
 
 // ---------------------------------------------------------------------------
@@ -129,7 +237,7 @@ pub fn encode(review: &ReviewJson) -> Result<String, ReviewJsonCodecError> {
             }
         }
     }
-    let doc = document_from_review_json(review);
+    let doc = document_from_review_json(review)?;
     let json = serde_json::to_string_pretty(&doc)?;
     Ok(json)
 }
@@ -195,6 +303,7 @@ fn group_from_document(doc: GroupDocument) -> Result<CycleGroupState, ReviewJson
 fn round_from_document(doc: RoundDocument) -> Result<GroupRound, ReviewJsonCodecError> {
     let round_type = parse_round_type(&doc.round_type)?;
     let timestamp = parse_timestamp(&doc.timestamp, "timestamp")?;
+    let concerns = concerns_from_document(doc.concerns)?;
 
     match doc.success.as_str() {
         "success" => {
@@ -209,7 +318,9 @@ fn round_from_document(doc: RoundDocument) -> Result<GroupRound, ReviewJsonCodec
                 reason: "successful round must have a verdict".into(),
             })?;
             let verdict = verdict_from_document(verdict_doc)?;
-            let round = GroupRound::success(round_type, timestamp, doc.hash, verdict)?;
+            let concerns = normalized_decoded_round_concerns(&verdict, concerns)?;
+            let round = GroupRound::success(round_type, timestamp, doc.hash, verdict)?
+                .with_concerns(concerns);
             Ok(round)
         }
         "failure" => {
@@ -219,7 +330,24 @@ fn round_from_document(doc: RoundDocument) -> Result<GroupRound, ReviewJsonCodec
                     reason: "failed round must not have a verdict".into(),
                 });
             }
-            let round = GroupRound::failure(round_type, timestamp, doc.hash, doc.error_message)?;
+            let concerns = match concerns {
+                ConcernsField::Missing => Vec::new(),
+                ConcernsField::Null => {
+                    return Err(ReviewJsonCodecError::InvalidField {
+                        field: "concerns".into(),
+                        reason: "round concerns must not be null".into(),
+                    });
+                }
+                ConcernsField::Present(concerns) if !concerns.is_empty() => {
+                    return Err(ReviewJsonCodecError::InvalidField {
+                        field: "concerns".into(),
+                        reason: "failed round must not persist concerns".into(),
+                    });
+                }
+                ConcernsField::Present(concerns) => concerns,
+            };
+            let round = GroupRound::failure(round_type, timestamp, doc.hash, doc.error_message)?
+                .with_concerns(concerns);
             Ok(round)
         }
         other => Err(ReviewJsonCodecError::InvalidField {
@@ -257,13 +385,26 @@ fn verdict_from_document(doc: VerdictDocument) -> Result<GroupRoundVerdict, Revi
 }
 
 fn finding_from_document(doc: FindingDocument) -> Result<StoredFinding, ReviewJsonCodecError> {
-    validate_finding_fields(&doc.message, doc.severity.as_deref(), doc.file.as_deref(), doc.line)?;
-    Ok(StoredFinding::new(doc.message, doc.severity, doc.file, doc.line))
+    validate_finding_fields(
+        &doc.message,
+        doc.severity.as_deref(),
+        doc.file.as_deref(),
+        doc.line,
+        doc.category.as_deref(),
+    )?;
+    Ok(StoredFinding::new(doc.message, doc.severity, doc.file, doc.line)
+        .with_category(doc.category))
 }
 
 /// Validates finding field invariants shared by decode and encode paths.
 fn validate_stored_finding(finding: &StoredFinding) -> Result<(), ReviewJsonCodecError> {
-    validate_finding_fields(finding.message(), finding.severity(), finding.file(), finding.line())
+    validate_finding_fields(
+        finding.message(),
+        finding.severity(),
+        finding.file(),
+        finding.line(),
+        finding.category(),
+    )
 }
 
 fn validate_finding_fields(
@@ -271,6 +412,7 @@ fn validate_finding_fields(
     severity: Option<&str>,
     file: Option<&str>,
     line: Option<u64>,
+    category: Option<&str>,
 ) -> Result<(), ReviewJsonCodecError> {
     if message.trim().is_empty() {
         return Err(ReviewJsonCodecError::InvalidField {
@@ -296,27 +438,132 @@ fn validate_finding_fields(
             reason: "finding line must be null or a 1-based line number".into(),
         });
     }
+    if category.is_some_and(|s| s.trim().is_empty()) {
+        return Err(ReviewJsonCodecError::InvalidField {
+            field: "category".into(),
+            reason: "finding category must be null or a non-empty string".into(),
+        });
+    }
     Ok(())
+}
+
+fn concerns_from_document(concerns: ConcernsField) -> Result<ConcernsField, ReviewJsonCodecError> {
+    Ok(concerns)
+}
+
+fn validate_round_concerns(
+    verdict: &GroupRoundVerdict,
+    concerns: &ConcernsField,
+) -> Result<(), ReviewJsonCodecError> {
+    if matches!(concerns, ConcernsField::Null) {
+        return Err(ReviewJsonCodecError::InvalidField {
+            field: "concerns".into(),
+            reason: "round concerns must not be null".into(),
+        });
+    }
+    if verdict.is_zero_findings()
+        && matches!(concerns, ConcernsField::Present(concerns) if !concerns.is_empty())
+    {
+        return Err(ReviewJsonCodecError::InvalidField {
+            field: "concerns".into(),
+            reason: "zero_findings round must not persist concerns".into(),
+        });
+    }
+    Ok(())
+}
+
+fn normalized_decoded_round_concerns(
+    verdict: &GroupRoundVerdict,
+    concerns: ConcernsField,
+) -> Result<Vec<ReviewConcern>, ReviewJsonCodecError> {
+    validate_round_concerns(verdict, &concerns)?;
+
+    let GroupRoundVerdict::FindingsRemain(findings) = verdict else {
+        return Ok(match concerns {
+            ConcernsField::Missing | ConcernsField::Null => Vec::new(),
+            ConcernsField::Present(concerns) => concerns,
+        });
+    };
+
+    let derived_strings: Vec<_> = findings.as_slice().iter().map(stored_finding_concern).collect();
+    let concerns = match concerns {
+        ConcernsField::Missing => {
+            let backfilled = derived_strings
+                .iter()
+                .cloned()
+                .map(|concern| {
+                    ReviewConcern::try_new(concern).map_err(|e| {
+                        ReviewJsonCodecError::InvalidField {
+                            field: "concerns".into(),
+                            reason: format!("{e}"),
+                        }
+                    })
+                })
+                .collect::<Result<BTreeSet<_>, _>>()?
+                .into_iter()
+                .collect();
+            return Ok(backfilled);
+        }
+        ConcernsField::Null => {
+            return Err(ReviewJsonCodecError::InvalidField {
+                field: "concerns".into(),
+                reason: "round concerns must not be null".into(),
+            });
+        }
+        ConcernsField::Present(concerns) => concerns,
+    };
+
+    let supplied: BTreeSet<_> =
+        concerns.iter().map(|concern| concern.as_ref().to_owned()).collect();
+    let derived: BTreeSet<_> = derived_strings.into_iter().collect();
+
+    if !derived.is_subset(&supplied) {
+        return Err(ReviewJsonCodecError::InvalidField {
+            field: "concerns".into(),
+            reason: format!(
+                "findings_remain round concerns must include all findings-derived concerns (supplied: {:?}, derived: {:?})",
+                supplied, derived
+            ),
+        });
+    }
+
+    Ok(concerns)
+}
+
+fn stored_finding_concern(finding: &StoredFinding) -> String {
+    if let Some(category) = finding.category() {
+        category.trim().to_lowercase()
+    } else if let Some(file) = finding.file() {
+        let slug = domain::review::file_path_to_concern(file.trim()).to_lowercase();
+        if slug.trim().is_empty() { "other".to_owned() } else { slug }
+    } else {
+        "other".to_owned()
+    }
 }
 
 // ---------------------------------------------------------------------------
 // Domain → Document
 // ---------------------------------------------------------------------------
 
-fn document_from_review_json(review: &ReviewJson) -> ReviewJsonDocument {
-    ReviewJsonDocument {
+fn document_from_review_json(
+    review: &ReviewJson,
+) -> Result<ReviewJsonDocument, ReviewJsonCodecError> {
+    Ok(ReviewJsonDocument {
         schema_version: review.schema_version(),
-        cycles: review.cycles().iter().map(cycle_to_document).collect(),
-    }
+        cycles: review.cycles().iter().map(cycle_to_document).collect::<Result<Vec<_>, _>>()?,
+    })
 }
 
-fn cycle_to_document(cycle: &ReviewCycle) -> CycleDocument {
+fn cycle_to_document(cycle: &ReviewCycle) -> Result<CycleDocument, ReviewJsonCodecError> {
     let groups = cycle
         .groups()
         .iter()
-        .map(|(name, state)| (name.to_string(), group_to_document(state)))
-        .collect();
-    CycleDocument {
+        .map(|(name, state)| {
+            let group = group_to_document(state)?;
+            Ok::<(String, GroupDocument), ReviewJsonCodecError>((name.to_string(), group))
+        })
+        .collect::<Result<BTreeMap<_, _>, _>>()?;
+    Ok(CycleDocument {
         cycle_id: cycle.cycle_id().to_owned(),
         started_at: cycle.started_at().as_str().to_owned(),
         base_ref: cycle.base_ref().to_owned(),
@@ -324,31 +571,56 @@ fn cycle_to_document(cycle: &ReviewCycle) -> CycleDocument {
         policy_hash: cycle.policy_hash().to_owned(),
         approved_head: cycle.approved_head().map(|h| h.as_str().to_owned()),
         groups,
-    }
+    })
 }
 
-fn group_to_document(state: &CycleGroupState) -> GroupDocument {
-    GroupDocument {
+fn group_to_document(state: &CycleGroupState) -> Result<GroupDocument, ReviewJsonCodecError> {
+    Ok(GroupDocument {
         scope: state.scope().to_vec(),
-        rounds: state.rounds().iter().map(round_to_document).collect(),
-    }
+        rounds: state.rounds().iter().map(round_to_document).collect::<Result<Vec<_>, _>>()?,
+    })
 }
 
-fn round_to_document(round: &GroupRound) -> RoundDocument {
+fn round_to_document(round: &GroupRound) -> Result<RoundDocument, ReviewJsonCodecError> {
     let (success, error_message, verdict) = match round.outcome() {
         GroupRoundOutcome::Success(v) => ("success".to_owned(), None, Some(verdict_to_document(v))),
         GroupRoundOutcome::Failure { error_message } => {
             ("failure".to_owned(), error_message.clone(), None)
         }
     };
-    RoundDocument {
+    Ok(RoundDocument {
         round_type: round_type_to_string(round.round_type()),
         success,
         error_message,
         timestamp: round.timestamp().as_str().to_owned(),
         hash: round.hash().to_owned(),
+        concerns: ConcernsField::Present(normalized_round_concerns(round)?),
         verdict,
+    })
+}
+
+fn normalized_round_concerns(
+    round: &GroupRound,
+) -> Result<Vec<ReviewConcern>, ReviewJsonCodecError> {
+    match round.outcome() {
+        GroupRoundOutcome::Success(GroupRoundVerdict::FindingsRemain(findings)) => {
+            let mut concerns = round.concerns().iter().cloned().collect::<BTreeSet<_>>();
+            for finding in findings.as_slice() {
+                concerns.insert(stored_finding_review_concern(finding)?);
+            }
+            Ok(concerns.into_iter().collect())
+        }
+        GroupRoundOutcome::Success(GroupRoundVerdict::ZeroFindings)
+        | GroupRoundOutcome::Failure { .. } => Ok(Vec::new()),
     }
+}
+
+fn stored_finding_review_concern(
+    finding: &StoredFinding,
+) -> Result<ReviewConcern, ReviewJsonCodecError> {
+    ReviewConcern::try_new(stored_finding_concern(finding)).map_err(|e| {
+        ReviewJsonCodecError::InvalidField { field: "concerns".into(), reason: format!("{e}") }
+    })
 }
 
 fn verdict_to_document(verdict: &GroupRoundVerdict) -> VerdictDocument {
@@ -369,6 +641,7 @@ fn finding_to_document(finding: &StoredFinding) -> FindingDocument {
         severity: finding.severity().map(str::to_owned),
         file: finding.file().map(str::to_owned),
         line: finding.line(),
+        category: finding.category().map(str::to_owned),
     }
 }
 
@@ -574,10 +847,11 @@ mod tests {
           "error_message": null,
           "timestamp": "2026-03-29T09:01:00Z",
           "hash": "rvw1:sha256:xyz",
+          "concerns": ["domain.review"],
           "verdict": {
             "verdict": "findings_remain",
             "findings": [
-              {"message": "bug found", "severity": "P1", "file": "src/lib.rs", "line": 42}
+              {"message": "bug found", "severity": "P1", "file": "src/lib.rs", "line": 42, "category": "domain.review"}
             ]
           }
         }]
@@ -592,6 +866,283 @@ mod tests {
         assert!(!round.is_successful_zero_findings());
         assert_eq!(round.outcome().verdict().unwrap().findings().len(), 1);
         assert_eq!(round.outcome().verdict().unwrap().findings()[0].message(), "bug found");
+        assert_eq!(round.concerns(), &[ReviewConcern::try_new("domain.review").unwrap()]);
+        assert_eq!(
+            round.outcome().verdict().unwrap().findings()[0].category(),
+            Some("domain.review")
+        );
+    }
+
+    #[test]
+    fn test_decode_accepts_missing_round_concerns_for_backward_compatibility() {
+        let review = decode(sample_json()).unwrap();
+        let cycle = review.current_cycle().unwrap();
+        let domain = cycle.group(&ReviewGroupName::try_new("domain").unwrap()).unwrap();
+
+        assert!(
+            domain.rounds()[0].concerns().is_empty(),
+            "older review.json rounds without concerns must still decode"
+        );
+    }
+
+    #[test]
+    fn test_decode_backfills_missing_findings_round_concerns_for_backward_compatibility() {
+        let json = r#"{
+  "schema_version": 1,
+  "cycles": [{
+    "cycle_id": "c1",
+    "started_at": "2026-03-29T09:00:00Z",
+    "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
+    "policy_hash": "sha256:abc",
+    "groups": {
+      "other": {
+        "scope": [],
+        "rounds": [{
+          "round_type": "final",
+          "success": "success",
+          "error_message": null,
+          "timestamp": "2026-03-29T09:01:00Z",
+          "hash": "rvw1:sha256:xyz",
+          "verdict": {
+            "verdict": "findings_remain",
+            "findings": [
+              {"message": "bug found", "severity": "P1", "file": null, "line": null, "category": "domain.review"}
+            ]
+          }
+        }]
+      }
+    }
+  }]
+}"#;
+
+        let review = decode(json).unwrap();
+        let round = review
+            .current_cycle()
+            .unwrap()
+            .group(&ReviewGroupName::try_new("other").unwrap())
+            .unwrap()
+            .rounds()
+            .last()
+            .unwrap();
+
+        assert_eq!(round.concerns(), &[ReviewConcern::try_new("domain.review").unwrap()]);
+    }
+
+    #[test]
+    fn test_decode_backfills_missing_findings_round_concerns_from_mixed_case_file() {
+        let json = r#"{
+  "schema_version": 1,
+  "cycles": [{
+    "cycle_id": "c1",
+    "started_at": "2026-03-29T09:00:00Z",
+    "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
+    "policy_hash": "sha256:abc",
+    "groups": {
+      "other": {
+        "scope": [],
+        "rounds": [{
+          "round_type": "final",
+          "success": "success",
+          "error_message": null,
+          "timestamp": "2026-03-29T09:01:00Z",
+          "hash": "rvw1:sha256:xyz",
+          "verdict": {
+            "verdict": "findings_remain",
+            "findings": [
+              {"message": "bug found", "severity": "P1", "file": "apps/CLI/src/Foo.rs", "line": 10}
+            ]
+          }
+        }]
+      }
+    }
+  }]
+}"#;
+
+        let review = decode(json).unwrap();
+        let round = review
+            .current_cycle()
+            .unwrap()
+            .group(&ReviewGroupName::try_new("other").unwrap())
+            .unwrap()
+            .rounds()
+            .last()
+            .unwrap();
+
+        assert_eq!(round.concerns(), &[ReviewConcern::try_new("cli.foo").unwrap()]);
+    }
+
+    #[test]
+    fn test_encode_decode_roundtrip_preserves_round_concerns() {
+        let json = r#"{
+  "schema_version": 1,
+  "cycles": [{
+    "cycle_id": "c1",
+    "started_at": "2026-03-29T09:00:00Z",
+    "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
+    "policy_hash": "sha256:abc",
+    "groups": {
+      "other": {
+        "scope": [],
+        "rounds": [{
+          "round_type": "final",
+          "success": "success",
+          "error_message": null,
+          "timestamp": "2026-03-29T09:01:00Z",
+          "hash": "rvw1:sha256:xyz",
+          "concerns": ["cli.review", "domain.review"],
+          "verdict": {
+            "verdict": "findings_remain",
+            "findings": [
+              {"message": "bug found", "severity": "P1", "file": null, "line": null, "category": "domain.review"}
+            ]
+          }
+        }]
+      }
+    }
+  }]
+}"#;
+
+        let review = decode(json).unwrap();
+        let encoded = encode(&review).unwrap();
+        let decoded = decode(&encoded).unwrap();
+        let round = &decoded
+            .current_cycle()
+            .unwrap()
+            .group(&ReviewGroupName::try_new("other").unwrap())
+            .unwrap()
+            .rounds()[0];
+
+        assert_eq!(
+            round.concerns(),
+            &[
+                ReviewConcern::try_new("cli.review").unwrap(),
+                ReviewConcern::try_new("domain.review").unwrap(),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_encode_decode_roundtrip_deduplicates_findings_remain_round_concerns() {
+        let mut review = decode(sample_json()).unwrap();
+        let cycle = review.current_cycle_mut().unwrap();
+        let other = cycle.group_mut(&ReviewGroupName::try_new("other").unwrap()).unwrap();
+        let findings = vec![StoredFinding::new("bug found", Some("P1".into()), None, None)];
+        let round = GroupRound::success(
+            RoundType::Final,
+            Timestamp::new("2026-03-29T09:01:00Z").unwrap(),
+            "rvw1:sha256:xyz",
+            GroupRoundVerdict::findings_remain(findings).unwrap(),
+        )
+        .unwrap()
+        .with_concerns(vec![
+            ReviewConcern::try_new("domain.review").unwrap(),
+            ReviewConcern::try_new("domain.review").unwrap(),
+            ReviewConcern::try_new("cli.review").unwrap(),
+        ]);
+        other.record_round(round);
+
+        let encoded = encode(&review).unwrap();
+        let decoded = decode(&encoded).unwrap();
+        let round = decoded
+            .current_cycle()
+            .unwrap()
+            .group(&ReviewGroupName::try_new("other").unwrap())
+            .unwrap()
+            .rounds()
+            .last()
+            .unwrap();
+
+        assert_eq!(
+            round.concerns(),
+            &[
+                ReviewConcern::try_new("cli.review").unwrap(),
+                ReviewConcern::try_new("domain.review").unwrap(),
+                ReviewConcern::try_new("other").unwrap(),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_encode_decode_roundtrip_backfills_findings_derived_concerns() {
+        let mut review = decode(sample_json()).unwrap();
+        let cycle = review.current_cycle_mut().unwrap();
+        let other = cycle.group_mut(&ReviewGroupName::try_new("other").unwrap()).unwrap();
+        let findings = vec![
+            StoredFinding::new("bug found", Some("P1".into()), None, None)
+                .with_category(Some("domain.review".into())),
+        ];
+        let round = GroupRound::success(
+            RoundType::Final,
+            Timestamp::new("2026-03-29T09:01:00Z").unwrap(),
+            "rvw1:sha256:xyz",
+            GroupRoundVerdict::findings_remain(findings).unwrap(),
+        )
+        .unwrap()
+        .with_concerns(vec![ReviewConcern::try_new("other").unwrap()]);
+        other.record_round(round);
+
+        let encoded = encode(&review).unwrap();
+        let decoded = decode(&encoded).unwrap();
+        let round = decoded
+            .current_cycle()
+            .unwrap()
+            .group(&ReviewGroupName::try_new("other").unwrap())
+            .unwrap()
+            .rounds()
+            .last()
+            .unwrap();
+
+        assert_eq!(
+            round.concerns(),
+            &[
+                ReviewConcern::try_new("domain.review").unwrap(),
+                ReviewConcern::try_new("other").unwrap(),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_encode_decode_roundtrip_strips_non_findings_round_concerns() {
+        let mut review = decode(sample_json()).unwrap();
+        let cycle = review.current_cycle_mut().unwrap();
+
+        let zero_round = GroupRound::success(
+            RoundType::Final,
+            Timestamp::new("2026-03-29T09:49:00Z").unwrap(),
+            "rvw1:sha256:zero",
+            GroupRoundVerdict::ZeroFindings,
+        )
+        .unwrap()
+        .with_concerns(vec![ReviewConcern::try_new("domain.review").unwrap()]);
+        cycle
+            .group_mut(&ReviewGroupName::try_new("domain").unwrap())
+            .unwrap()
+            .record_round(zero_round);
+
+        let failure_round = GroupRound::failure(
+            RoundType::Fast,
+            Timestamp::new("2026-03-29T09:50:00Z").unwrap(),
+            "rvw1:sha256:fail",
+            Some("timeout".into()),
+        )
+        .unwrap()
+        .with_concerns(vec![ReviewConcern::try_new("cli.review").unwrap()]);
+        cycle
+            .group_mut(&ReviewGroupName::try_new("other").unwrap())
+            .unwrap()
+            .record_round(failure_round);
+
+        let encoded = encode(&review).unwrap();
+        let decoded = decode(&encoded).unwrap();
+        let cycle = decoded.current_cycle().unwrap();
+        let domain = cycle.group(&ReviewGroupName::try_new("domain").unwrap()).unwrap();
+        let other = cycle.group(&ReviewGroupName::try_new("other").unwrap()).unwrap();
+
+        assert!(domain.rounds().last().unwrap().concerns().is_empty());
+        assert!(other.rounds().last().unwrap().concerns().is_empty());
     }
 
     #[test]
@@ -899,6 +1450,145 @@ mod tests {
         let result = decode(json);
         assert!(
             matches!(result, Err(ReviewJsonCodecError::InvalidField { field, .. }) if field == "file")
+        );
+    }
+
+    #[test]
+    fn test_decode_rejects_finding_with_blank_category() {
+        let json = r#"{
+  "schema_version": 1,
+  "cycles": [{
+    "cycle_id": "c1",
+    "started_at": "2026-03-29T09:00:00Z",
+    "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
+    "policy_hash": "sha256:abc",
+    "groups": {
+      "other": {
+        "scope": [],
+        "rounds": [{
+          "round_type": "fast",
+          "success": "success",
+          "error_message": null,
+          "timestamp": "2026-03-29T09:01:00Z",
+          "hash": "rvw1:sha256:xyz",
+          "verdict": {
+            "verdict": "findings_remain",
+            "findings": [{"message": "bug", "severity": null, "file": null, "line": null, "category": " "}]
+          }
+        }]
+      }
+    }
+  }]
+}"#;
+        let result = decode(json);
+        assert!(
+            matches!(result, Err(ReviewJsonCodecError::InvalidField { field, .. }) if field == "category")
+        );
+    }
+
+    #[test]
+    fn test_decode_rejects_findings_round_missing_derived_concern() {
+        let json = r#"{
+  "schema_version": 1,
+  "cycles": [{
+    "cycle_id": "c1",
+    "started_at": "2026-03-29T09:00:00Z",
+    "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
+    "policy_hash": "sha256:abc",
+    "groups": {
+      "other": {
+        "scope": [],
+        "rounds": [{
+          "round_type": "fast",
+          "success": "success",
+          "error_message": null,
+          "timestamp": "2026-03-29T09:01:00Z",
+          "hash": "rvw1:sha256:xyz",
+          "concerns": ["other"],
+          "verdict": {
+            "verdict": "findings_remain",
+            "findings": [{"message": "bug", "severity": null, "file": null, "line": null, "category": "domain.review"}]
+          }
+        }]
+      }
+    }
+  }]
+}"#;
+        let result = decode(json);
+        assert!(
+            matches!(result, Err(ReviewJsonCodecError::InvalidField { field, .. }) if field == "concerns")
+        );
+    }
+
+    #[test]
+    fn test_decode_rejects_findings_round_with_explicit_empty_concerns() {
+        let json = r#"{
+  "schema_version": 1,
+  "cycles": [{
+    "cycle_id": "c1",
+    "started_at": "2026-03-29T09:00:00Z",
+    "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
+    "policy_hash": "sha256:abc",
+    "groups": {
+      "other": {
+        "scope": [],
+        "rounds": [{
+          "round_type": "fast",
+          "success": "success",
+          "error_message": null,
+          "timestamp": "2026-03-29T09:01:00Z",
+          "hash": "rvw1:sha256:xyz",
+          "concerns": [],
+          "verdict": {
+            "verdict": "findings_remain",
+            "findings": [{"message": "bug", "severity": null, "file": null, "line": null, "category": "domain.review"}]
+          }
+        }]
+      }
+    }
+  }]
+}"#;
+        let result = decode(json);
+        assert!(
+            matches!(result, Err(ReviewJsonCodecError::InvalidField { field, .. }) if field == "concerns")
+        );
+    }
+
+    #[test]
+    fn test_decode_rejects_findings_round_with_null_concerns() {
+        let json = r#"{
+  "schema_version": 1,
+  "cycles": [{
+    "cycle_id": "c1",
+    "started_at": "2026-03-29T09:00:00Z",
+    "base_ref": "main",
+    "base_policy_hash": "sha256:abc",
+    "policy_hash": "sha256:abc",
+    "groups": {
+      "other": {
+        "scope": [],
+        "rounds": [{
+          "round_type": "fast",
+          "success": "success",
+          "error_message": null,
+          "timestamp": "2026-03-29T09:01:00Z",
+          "hash": "rvw1:sha256:xyz",
+          "concerns": null,
+          "verdict": {
+            "verdict": "findings_remain",
+            "findings": [{"message": "bug", "severity": null, "file": null, "line": null, "category": "domain.review"}]
+          }
+        }]
+      }
+    }
+  }]
+}"#;
+        let result = decode(json);
+        assert!(
+            matches!(result, Err(ReviewJsonCodecError::InvalidField { field, .. }) if field == "concerns")
         );
     }
 

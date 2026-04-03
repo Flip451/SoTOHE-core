@@ -774,7 +774,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **RVW-30** (HIGH): track-commit-message の add-all 自動実行 or check-approved の worktree/index 差分検出 — RecordRoundProtocolImpl が metadata.json をワークツリーに書くだけで git index を更新しないため、staging 漏れでコミット内容と承認状態が乖離する可能性がある。現状は /track:commit のプロンプト制約で保証しているが、コード上のガードがない。daemon 化や直接 CLI 利用が始まる前に仕組み化すべき
 - [x] ~~**RVW-31** (HIGH): review state を review.json に分離 + 内部 checksum による tamper detection~~ ✅ done (`review-json-per-group-review-2026-03-29` + `autorecord-reviewjson-wiring-2026-03-30`)
   - **対応**: review state を metadata.json から review.json に完全分離。ReviewCycle モデルで per-group 管理。RecordRoundProtocolImpl が FsReviewJsonStore 経由で review.json に書き込み、check-approved が review.json から読み取り。policy_hash + partition 変更検出で staleness 検証
-- [x] ~~**RVW-33** (MEDIUM): review.json cycle の frozen partition scope 接続~~ ✅ 解決: autorecord-reviewjson-wiring T005/T006 で per-group scope hash を実装。`group_scope_hash` が worktree ファイル内容を直接読み SHA-256 manifest hash を構築（git 非依存）。record-round (write) と check_approved (read) の両方が per-group scope hash を使用。auto-create cycle の空スコープ問題は T007 で対応予定。policy_hash/partition_changed 検証は cycle.rs の `check_cycle_approved` / `check_cycle_staleness_any` で実装済み
+- [x] ~~**RVW-33** (MEDIUM): review.json cycle の frozen partition scope 接続~~ ✅ 解決: autorecord-reviewjson-wiring T005/T006 で per-group scope hash を実装。`group_scope_hash` が worktree ファイル内容を直接読み SHA-256 manifest hash を構築（git 非依存）。record-round (write) と check_approved (read) の両方が per-group scope hash を使用。policy_hash/partition_changed 検証は cycle.rs の `check_cycle_approved` / `check_cycle_staleness_any` で実装済み。T007-T009 で露呈した後続の運用問題は frozen partition scope そのものの未実装ではなく、別フォローアップ（例: WF-66）として継続管理
 - [ ] **RVW-34** (MEDIUM): StoredFinding lossy conversion — `RecordRoundProtocolImpl` が findings_remain verdict を review.json に記録する際、`findings_to_concerns()` で生成した concern slug を `StoredFinding::new(slug, None, None, None)` に変換するため、元の message/severity/file/line が消失する。修正には `RecordRoundProtocol` trait に `findings: Vec<StoredFinding>` パラメータを追加し、元データを保持する必要がある
 - [ ] **RVW-37** (CRITICAL): review.md グループ名 `infra` vs `infrastructure` 不一致 — `.claude/commands/track/review.md` が `--group infra` を渡すが `track/review-scope.json` は `infrastructure` を定義。`check-approved` のパーティション比較でキー不一致が発生しレビュー承認が通らない。review.md を `infrastructure` に統一する。出典: review-process-audit-2026-03-31
 - [ ] **RVW-38** (HIGH): `FindingDocument` / `StoredFinding` に `category` フィールドなし — reviewer が返す `category` が review.json のラウンドトリップで消失。`findings_to_concerns()` の第 1 段階（reviewer 提供 category）が機能しない。`review_json_codec.rs` の `FindingDocument` と `domain/src/review/cycle/round_types.rs` の `StoredFinding` に `category: Option<String>` を追加。`REVIEW_OUTPUT_SCHEMA_JSON` の `category` required 指定と Rust `#[serde(default)]` の乖離も同時修正。出典: review-process-audit-2026-03-31
@@ -794,6 +794,10 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **RVW-48** (LOW): `sotp diff-groups` コマンド — 現在の diff を review-scope.json でグループ分類して表示。`--expected-groups` を手動で組み立てる必要がなくなる
 - [ ] **RVW-49** (LOW): `sotp review scope-check` コマンド — review.json のサイクルスコープと現在の worktree diff を比較し、スコープ不整合（リセットが必要か）を事前検知
 - [ ] **RVW-50** (MEDIUM): partition → record-round → review.json の結合テスト強化 — 個々のコンポーネントは正しくても境界面のバリデーションが手薄。RVW-34 T003 完了後のフォローアップ候補
+- [ ] **RVW-51** (MEDIUM): auto-record verdict 反転バグ — Codex が zero_findings を返したのに review.json に findings_remain が記録されるケースを確認。RVW-34（lossy conversion）とは別問題。review flow を fail-closed 側へ誤誘導し approval/commit を不正にブロックしうるため、LOW ではなく MEDIUM 相当。verdict 変換か前ラウンド verdict の再利用、またはセッションログの誤抽出の可能性。発見: 2026-04-02 incremental-review-scope セッション
+- [ ] **RVW-52** (MEDIUM): `/track:done` で approved_head 書き込み後の dirty review.json を処理 — 最後のコミット後に persist_approved_head が review.json を変更するため、worktree が dirty になり track-switch-main が失敗する。review.json を破棄するのではなく、approved_head を保持したまま clean に戻せる同期フロー（例: commit/note への取り込み、または別の永続化ポイント）が必要
+- [ ] **RVW-53** (LOW): `/track:commit` に APPROVED_HEAD_FAILED 自動リカバリを追加 — track-commit-message の stdout に APPROVED_HEAD_FAILED が出たら即座に `bin/sotp review set-approved-head` を実行する指示をスキル定義に追加
+- [ ] **RVW-54** (MEDIUM): CLI 統合テストハーネス構築 — make.rs の persist_approved_head、review/mod.rs の set-approved-head 等、git repo + プロセス実行を伴う CLI パスのテスト基盤が存在しない。infra 層の setup_test_repo パターンを CLI 層にも導入すべき
 
 ---
 
@@ -826,7 +830,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 
 - [ ] **WF-44** (LOW): codec の phase/streak 不整合検出 — `phase=clear` だが `concern_streaks` に threshold 以上の streak がある矛盾状態を decode 時に検出・修復する
 - [ ] **WF-45** (MEDIUM): `render_review_payload()` で `category: null` を明示出力 — **DM-01 (Verdict enum 化) で自然消滅予定**
-- [x] ~~**WF-46** (LOW): codec の重複正規化後衝突検出~~ ✅ done-hash-backfill Phase D で実装済み (codec.rs L392-397)。**ユニットテスト未追加** — 1.5-13 トラックで追加予定
+- [ ] **WF-46** (LOW): codec の重複正規化後衝突検出の完遂 — collision 検出ロジック自体は done-hash-backfill Phase D で実装済み (codec.rs L392-397) だが、duplicate normalization 後衝突ケースのユニットテスト backfill が未了。回帰テスト追加まで close しない
 - [ ] **WF-47** (MEDIUM): `findings_to_concerns()` を `record-round` CLI に自動配線 — 現在は `--concerns` の手動指定に依存。reviewer verdict JSON から concerns を自動抽出して渡すフローを構築する
 - [ ] **WF-48** (LOW): `ReviewEscalationState::with_fields` の threshold/block バリデーション — threshold=0 や空 concerns の Blocked を domain 層で拒否する（codec 層では検証済みだが domain API 自体は無防備）
 - [ ] **WF-49** (LOW): `update_escalation_after_record` の streak リセット方式 — 現在は absent concern を `retain` で削除。削除と「0 にリセット」は機能的に同等だが、`consecutive_rounds: 0` を保持して「過去に出現したが現在は連続していない」ことを表現可能にする

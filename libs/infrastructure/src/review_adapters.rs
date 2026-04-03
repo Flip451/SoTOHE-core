@@ -257,6 +257,176 @@ pub struct RecordRoundProtocolImpl {
     pub base_ref: String,
 }
 
+fn filter_partition_to_expected_groups(
+    full_partition: &usecase::review_workflow::groups::GroupPartition,
+    expected_groups: &[ReviewGroupName],
+) -> Result<usecase::review_workflow::groups::GroupPartition, RecordRoundProtocolError> {
+    let other_key = ReviewGroupName::try_new("other")
+        .map_err(|e| RecordRoundProtocolError::Other(format!("invalid group name 'other': {e}")))?;
+    let mut filtered_groups: std::collections::BTreeMap<
+        ReviewGroupName,
+        Vec<usecase::review_workflow::scope::RepoRelativePath>,
+    > = std::collections::BTreeMap::new();
+    for (name, paths) in full_partition.groups() {
+        if expected_groups.contains(name) && *name != other_key {
+            filtered_groups.entry(name.clone()).or_default().extend(paths.iter().cloned());
+        } else {
+            filtered_groups.entry(other_key.clone()).or_default().extend(paths.iter().cloned());
+        }
+    }
+    filtered_groups.entry(other_key).or_default();
+    usecase::review_workflow::groups::GroupPartition::try_new(filtered_groups)
+        .map_err(|e| RecordRoundProtocolError::Other(format!("partition filter: {e}")))
+}
+
+fn normalized_expected_groups(
+    expected_groups: &[ReviewGroupName],
+) -> Result<std::collections::BTreeSet<ReviewGroupName>, RecordRoundProtocolError> {
+    let other_key = ReviewGroupName::try_new("other")
+        .map_err(|e| RecordRoundProtocolError::Other(format!("invalid group name 'other': {e}")))?;
+    let mut normalized: std::collections::BTreeSet<_> = expected_groups.iter().cloned().collect();
+    normalized.insert(other_key);
+    Ok(normalized)
+}
+
+fn validate_expected_groups_against_cycle(
+    cycle: &domain::ReviewCycle,
+    expected_groups: &[ReviewGroupName],
+) -> Result<(), RecordRoundProtocolError> {
+    let expected = normalized_expected_groups(expected_groups)?;
+    let actual: std::collections::BTreeSet<_> = cycle.group_names().cloned().collect();
+    if actual == expected {
+        return Ok(());
+    }
+
+    let missing: Vec<_> = actual.difference(&expected).map(ToString::to_string).collect();
+    let unexpected: Vec<_> = expected.difference(&actual).map(ToString::to_string).collect();
+    Err(RecordRoundProtocolError::Other(format!(
+        "expected_groups must match the current cycle groups (missing: {:?}, unexpected: {:?})",
+        missing, unexpected
+    )))
+}
+
+fn load_current_review_partition(
+    git_root: &std::path::Path,
+    items_dir: &std::path::Path,
+    track_id: &TrackId,
+    diff_base: &str,
+) -> Result<
+    (
+        crate::review_group_policy::ReviewScopeConfig,
+        crate::review_group_policy::ResolvedReviewGroupPolicy,
+        usecase::review_workflow::groups::GroupPartition,
+    ),
+    RecordRoundProtocolError,
+> {
+    use usecase::review_workflow::scope::DiffScopeProvider;
+
+    let diff_scope = GitDiffScopeProvider
+        .changed_files(diff_base)
+        .map_err(|e| RecordRoundProtocolError::Other(format!("diff scope: {e}")))?;
+    let scope_json_path = git_root.join("track/review-scope.json");
+    let scope_config =
+        crate::review_group_policy::load_review_scope_config(&scope_json_path, track_id)
+            .map_err(|e| RecordRoundProtocolError::Other(format!("load review-scope.json: {e}")))?;
+    let override_config = crate::review_group_policy::load_review_groups_override(
+        items_dir, track_id,
+    )
+    .map_err(|e| RecordRoundProtocolError::Other(format!("load review-groups override: {e}")))?;
+    let policy = crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(
+        &scope_config.groups,
+        override_config.as_ref(),
+    )
+    .map_err(|e| RecordRoundProtocolError::Other(format!("resolve group policy: {e}")))?;
+    let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
+    let filtered_files = crate::review_group_policy::filter_operational(
+        &diff_files,
+        &scope_config.operational_matchers,
+    );
+    let full_partition = policy
+        .partition(&filtered_files)
+        .map_err(|e| RecordRoundProtocolError::Other(format!("partition: {e}")))?;
+
+    Ok((scope_config, policy, full_partition))
+}
+
+fn maybe_derive_stored_finding_concern(
+    finding: &domain::StoredFinding,
+) -> Result<ReviewConcern, RecordRoundProtocolError> {
+    match finding.category() {
+        Some(category) if category.trim().is_empty() => {
+            return Err(RecordRoundProtocolError::Other(
+                "derive finding concern: blank category is invalid".to_owned(),
+            ));
+        }
+        Some(category) => {
+            return ReviewConcern::try_new(category).map_err(|e| {
+                RecordRoundProtocolError::Other(format!("derive finding concern: {e}"))
+            });
+        }
+        None => {}
+    }
+
+    match finding.file() {
+        Some(file) if file.trim().is_empty() => Err(RecordRoundProtocolError::Other(
+            "derive finding concern: blank file is invalid".to_owned(),
+        )),
+        Some(file) => {
+            let slug = domain::review::file_path_to_concern(file.trim()).to_lowercase();
+            let concern = if slug.trim().is_empty() { "other" } else { slug.as_str() };
+            ReviewConcern::try_new(concern).map_err(|e| {
+                RecordRoundProtocolError::Other(format!("derive finding concern: {e}"))
+            })
+        }
+        None => ReviewConcern::try_new("other")
+            .map_err(|e| RecordRoundProtocolError::Other(format!("derive finding concern: {e}"))),
+    }
+}
+
+fn derive_stored_finding_concerns(
+    findings: &[domain::StoredFinding],
+) -> Result<std::collections::BTreeSet<ReviewConcern>, RecordRoundProtocolError> {
+    let mut set = std::collections::BTreeSet::new();
+    for finding in findings {
+        set.insert(maybe_derive_stored_finding_concern(finding)?);
+    }
+    Ok(set)
+}
+
+fn validate_stored_findings(
+    findings: &[domain::StoredFinding],
+) -> Result<(), RecordRoundProtocolError> {
+    for finding in findings {
+        if finding.message().trim().is_empty() {
+            return Err(RecordRoundProtocolError::Other(
+                "findings entries must include a non-empty `message`".to_owned(),
+            ));
+        }
+        if finding.severity().is_some_and(|value| value.trim().is_empty()) {
+            return Err(RecordRoundProtocolError::Other(
+                "findings entries must use `severity: null` or a non-empty string".to_owned(),
+            ));
+        }
+        if finding.file().is_some_and(|value| value.trim().is_empty()) {
+            return Err(RecordRoundProtocolError::Other(
+                "findings entries must use `file: null` or a non-empty string".to_owned(),
+            ));
+        }
+        if finding.line() == Some(0) {
+            return Err(RecordRoundProtocolError::Other(
+                "findings entries must use `line: null` or a 1-based line number".to_owned(),
+            ));
+        }
+        if finding.category().is_some_and(|value| value.trim().is_empty()) {
+            return Err(RecordRoundProtocolError::Other(
+                "findings entries must use `category: null` or a non-empty string".to_owned(),
+            ));
+        }
+    }
+
+    Ok(())
+}
+
 impl RecordRoundProtocol for RecordRoundProtocolImpl {
     #[allow(clippy::too_many_lines)]
     fn execute(
@@ -266,16 +436,13 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
         group_name: ReviewGroupName,
         verdict: Verdict,
         concerns: Vec<ReviewConcern>,
+        findings: Vec<domain::StoredFinding>,
         expected_groups: Vec<ReviewGroupName>,
         timestamp: Timestamp,
     ) -> Result<(), RecordRoundProtocolError> {
-        use domain::{
-            GroupRoundVerdict, ReviewJson, ReviewJsonReader, ReviewJsonWriter, StoredFinding,
-        };
-        use usecase::review_workflow::scope::DiffScopeProvider;
-
         use crate::git_cli::{GitRepository, SystemGitRepo};
         use crate::review_json_store::FsReviewJsonStore;
+        use domain::{GroupRoundVerdict, ReviewJson, ReviewJsonReader, ReviewJsonWriter};
 
         let git = SystemGitRepo::discover()
             .map_err(|e| RecordRoundProtocolError::Other(format!("git error: {e}")))?;
@@ -338,70 +505,25 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
             .map_err(|e| RecordRoundProtocolError::Other(format!("read review.json: {e}")))?
             .unwrap_or_else(ReviewJson::new);
 
+        validate_stored_findings(&findings)?;
+
         // Auto-create cycle if none exists, using real frozen scope from DiffScopeProvider.
         if review.current_cycle().is_none() {
             let cycle_id = timestamp.to_string();
 
-            // 1. Get changed files via DiffScopeProvider.
-            let diff_scope = GitDiffScopeProvider
-                .changed_files(&self.base_ref)
-                .map_err(|e| RecordRoundProtocolError::Other(format!("diff scope: {e}")))?;
-
-            // 2. Load group policy from review-scope.json (+ optional per-track override).
-            let scope_json_path = git.root().join("track/review-scope.json");
-            let scope_config =
-                crate::review_group_policy::load_review_scope_config(&scope_json_path, track_id)
-                    .map_err(|e| {
-                        RecordRoundProtocolError::Other(format!("load review-scope.json: {e}"))
-                    })?;
-            let override_config =
-                crate::review_group_policy::load_review_groups_override(&self.items_dir, track_id)
-                    .map_err(|e| {
-                        RecordRoundProtocolError::Other(format!("load review-groups override: {e}"))
-                    })?;
-            let policy = crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(
-                &scope_config.groups,
-                override_config.as_ref(),
-            )
-            .map_err(|e| RecordRoundProtocolError::Other(format!("resolve group policy: {e}")))?;
-
-            // 3. Filter out operational files, then partition.
-            let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
-            let filtered_files = crate::review_group_policy::filter_operational(
-                &diff_files,
-                &scope_config.operational_matchers,
-            );
-
+            let (scope_config, policy, full_partition) = load_current_review_partition(
+                git.root(),
+                &self.items_dir,
+                track_id,
+                &self.base_ref,
+            )?;
             // Filter to expected_groups only (+ mandatory "other") to respect
             // the --expected-groups contract and avoid requiring review for
             // groups the caller didn't request.
-            let full_partition = policy
-                .partition(&filtered_files)
-                .map_err(|e| RecordRoundProtocolError::Other(format!("partition: {e}")))?;
-            let other_key = ReviewGroupName::try_new("other").map_err(|e| {
-                RecordRoundProtocolError::Other(format!("invalid group name 'other': {e}"))
-            })?;
             // Filter to expected_groups. Files from non-expected groups are
             // re-mapped to "other" so they are still covered by the review scope
             // (fail-closed: no files silently dropped).
-            let mut filtered_groups = std::collections::BTreeMap::new();
-            for (name, paths) in full_partition.groups() {
-                if expected_groups.contains(name) || *name == other_key {
-                    filtered_groups.insert(name.clone(), paths.clone());
-                } else {
-                    // Re-map to "other" so these files are not silently dropped.
-                    filtered_groups
-                        .entry(other_key.clone())
-                        .or_default()
-                        .extend(paths.iter().cloned());
-                }
-            }
-            filtered_groups.entry(other_key).or_default();
-            let partition =
-                usecase::review_workflow::groups::GroupPartition::try_new(filtered_groups)
-                    .map_err(|e| {
-                        RecordRoundProtocolError::Other(format!("partition filter: {e}"))
-                    })?;
+            let partition = filter_partition_to_expected_groups(&full_partition, &expected_groups)?;
             // Compute base policy hash separately (before override).
             let base_policy = crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(
                 &scope_config.groups,
@@ -429,6 +551,7 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
 
         // Validate that the current group exists in the cycle (fail-fast).
         if let Some(cycle) = review.current_cycle() {
+            validate_expected_groups_against_cycle(cycle, &expected_groups)?;
             if cycle.group(&group_name).is_none() {
                 return Err(RecordRoundProtocolError::Other(format!(
                     "group '{}' not found in current cycle (available: {:?})",
@@ -447,6 +570,12 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
                         concerns.len()
                     )));
                 }
+                if !findings.is_empty() {
+                    return Err(RecordRoundProtocolError::Other(format!(
+                        "inconsistent input: zero_findings verdict with {} findings",
+                        findings.len()
+                    )));
+                }
                 GroupRoundVerdict::ZeroFindings
             }
             domain::Verdict::FindingsRemain => {
@@ -455,10 +584,20 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
                         "inconsistent input: findings_remain verdict with no concerns".to_owned(),
                     ));
                 }
-                let findings: Vec<StoredFinding> = concerns
-                    .iter()
-                    .map(|c| StoredFinding::new(c.as_ref(), None, None, None))
-                    .collect();
+                if findings.is_empty() {
+                    return Err(RecordRoundProtocolError::Other(
+                        "inconsistent input: findings_remain verdict with no findings".to_owned(),
+                    ));
+                }
+                let derived_concerns = derive_stored_finding_concerns(&findings)?;
+                let supplied_concerns: std::collections::BTreeSet<_> =
+                    concerns.iter().cloned().collect();
+                if !derived_concerns.is_subset(&supplied_concerns) {
+                    return Err(RecordRoundProtocolError::Other(format!(
+                        "inconsistent input: findings_remain concerns must include all findings-derived concerns (supplied: {:?}, derived: {:?})",
+                        supplied_concerns, derived_concerns
+                    )));
+                }
                 GroupRoundVerdict::findings_remain(findings).map_err(|e| {
                     RecordRoundProtocolError::Other(format!("verdict construction: {e}"))
                 })?
@@ -473,53 +612,16 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
                 .current_cycle()
                 .map(effective_diff_base)
                 .unwrap_or_else(|| self.base_ref.clone());
-            let diff_scope = GitDiffScopeProvider
-                .changed_files(&diff_base)
-                .map_err(|e| RecordRoundProtocolError::Other(format!("diff scope: {e}")))?;
-            let scope_json_path = git.root().join("track/review-scope.json");
-            let scope_config =
-                crate::review_group_policy::load_review_scope_config(&scope_json_path, track_id)
-                    .map_err(|e| {
-                        RecordRoundProtocolError::Other(format!("load review-scope.json: {e}"))
-                    })?;
-            let override_config =
-                crate::review_group_policy::load_review_groups_override(&self.items_dir, track_id)
-                    .map_err(|e| {
-                        RecordRoundProtocolError::Other(format!("load review-groups override: {e}"))
-                    })?;
-            let policy = crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(
-                &scope_config.groups,
-                override_config.as_ref(),
-            )
-            .map_err(|e| RecordRoundProtocolError::Other(format!("resolve group policy: {e}")))?;
-            let diff_files: Vec<_> = diff_scope.files().into_iter().cloned().collect();
-            let filtered_files = crate::review_group_policy::filter_operational(
-                &diff_files,
-                &scope_config.operational_matchers,
-            );
-            let full_partition = policy
-                .partition(&filtered_files)
-                .map_err(|e| RecordRoundProtocolError::Other(format!("partition: {e}")))?;
+            let (_, _, full_partition) =
+                load_current_review_partition(git.root(), &self.items_dir, track_id, &diff_base)?;
+            let filtered_partition =
+                filter_partition_to_expected_groups(&full_partition, &expected_groups)?;
 
-            // Find this group's files in the current partition, with remap to "other".
-            let other_key = ReviewGroupName::try_new("other")
-                .map_err(|e| RecordRoundProtocolError::Other(format!("invalid group name: {e}")))?;
-            if group_name == other_key {
-                // "other" includes its own files + files from non-expected groups
-                let mut paths: Vec<String> = Vec::new();
-                for (name, group_paths) in full_partition.groups() {
-                    if *name == other_key || !expected_groups.contains(name) {
-                        paths.extend(group_paths.iter().map(|p| p.as_str().to_owned()));
-                    }
-                }
-                paths
-            } else {
-                full_partition
-                    .groups()
-                    .get(&group_name)
-                    .map(|paths| paths.iter().map(|p| p.as_str().to_owned()).collect())
-                    .unwrap_or_default()
-            }
+            filtered_partition
+                .groups()
+                .get(&group_name)
+                .map(|paths| paths.iter().map(|p| p.as_str().to_owned()).collect())
+                .unwrap_or_default()
         };
         let group_hash = SystemGitHasher
             .group_scope_hash(&group_scope)
@@ -552,6 +654,7 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
                     group_verdict,
                 ),
                 group_hash,
+                concerns,
             },
         )
         .map_err(|e| RecordRoundProtocolError::Other(format!("record_cycle_group_round: {e}")))?;
@@ -701,6 +804,7 @@ mod tests {
     use std::process::Command;
     use std::sync::Mutex;
 
+    use domain::{ReviewJsonReader, TrackWriter};
     use usecase::review_workflow::scope::{DiffScopeProvider, DiffScopeProviderError};
 
     use super::*;
@@ -765,6 +869,103 @@ mod tests {
     /// Returns `true` if `scope` contains a [`RepoRelativePath`] for `raw`.
     fn scope_contains(scope: &DiffScope, raw: &str) -> bool {
         RepoRelativePath::normalize(raw).is_some_and(|p| scope.contains(&p))
+    }
+
+    fn sample_track(id: &str) -> domain::TrackMetadata {
+        let task_id = domain::TaskId::try_new("T1").unwrap();
+        let task = domain::TrackTask::new(task_id.clone(), "Implement feature").unwrap();
+        let section = domain::PlanSection::new("S1", "Build", Vec::new(), vec![task_id]).unwrap();
+        let plan = domain::PlanView::new(Vec::new(), vec![section]);
+
+        domain::TrackMetadata::new(
+            domain::TrackId::try_new(id).unwrap(),
+            "Test Track",
+            vec![task],
+            plan,
+            None,
+        )
+        .unwrap()
+    }
+
+    fn run_protocol_in_dir<F, T>(dir: &std::path::Path, f: F) -> T
+    where
+        F: FnOnce() -> T,
+    {
+        let original = std::env::current_dir().unwrap();
+        std::env::set_current_dir(dir).unwrap();
+        let result = f();
+        std::env::set_current_dir(original).unwrap();
+        result
+    }
+
+    fn setup_record_round_fixture() -> (
+        tempfile::TempDir,
+        std::path::PathBuf,
+        domain::TrackId,
+        RecordRoundProtocolImpl,
+        domain::ReviewGroupName,
+    ) {
+        let repo = setup_test_repo();
+        let path = repo.path().to_path_buf();
+
+        std::fs::create_dir_all(path.join("track")).unwrap();
+        std::fs::write(
+            path.join("track/review-scope.json"),
+            r#"{"groups": {}, "review_operational": ["track/items/<track-id>/review.json"]}"#,
+        )
+        .unwrap();
+
+        let items_dir = path.join("track/items");
+        let track_store = crate::track::fs_store::FsTrackStore::new(&items_dir);
+        let track_id = domain::TrackId::try_new("test-track").unwrap();
+        track_store.save(&sample_track(track_id.as_ref())).unwrap();
+
+        let protocol = RecordRoundProtocolImpl {
+            items_dir: items_dir.clone(),
+            group_display: "Codex".to_owned(),
+            base_ref: "main".to_owned(),
+        };
+        let group_name = domain::ReviewGroupName::try_new("other").unwrap();
+
+        (repo, path, track_id, protocol, group_name)
+    }
+
+    fn setup_named_group_record_round_fixture(
+        group_name: &str,
+        scope_json: &str,
+        changed_file: &str,
+    ) -> (
+        tempfile::TempDir,
+        std::path::PathBuf,
+        domain::TrackId,
+        RecordRoundProtocolImpl,
+        domain::ReviewGroupName,
+    ) {
+        let repo = setup_test_repo();
+        let path = repo.path().to_path_buf();
+
+        std::fs::create_dir_all(path.join("track")).unwrap();
+        std::fs::write(path.join("track/review-scope.json"), scope_json).unwrap();
+
+        let changed_abs = path.join(changed_file);
+        if let Some(parent) = changed_abs.parent() {
+            std::fs::create_dir_all(parent).unwrap();
+        }
+        std::fs::write(&changed_abs, "// changed").unwrap();
+
+        let items_dir = path.join("track/items");
+        let track_store = crate::track::fs_store::FsTrackStore::new(&items_dir);
+        let track_id = domain::TrackId::try_new("test-track").unwrap();
+        track_store.save(&sample_track(track_id.as_ref())).unwrap();
+
+        let protocol = RecordRoundProtocolImpl {
+            items_dir: items_dir.clone(),
+            group_display: "Codex".to_owned(),
+            base_ref: "main".to_owned(),
+        };
+        let group_name = domain::ReviewGroupName::try_new(group_name).unwrap();
+
+        (repo, path, track_id, protocol, group_name)
     }
 
     // -----------------------------------------------------------------------
@@ -1044,6 +1245,647 @@ mod tests {
         assert_eq!(hash_unstaged, hash_staged, "hash must not be affected by git staging state");
     }
 
+    #[test]
+    fn test_record_round_protocol_impl_findings_remain_persists_full_findings() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+        let items_dir = path.join("track/items");
+        let concerns = vec![domain::ReviewConcern::try_new("domain.review").unwrap()];
+        let findings = vec![
+            domain::StoredFinding::new(
+                "P1: preserve me",
+                Some("P1".to_owned()),
+                Some("libs/domain/src/review.rs".to_owned()),
+                Some(41),
+            )
+            .with_category(Some("domain.review".to_owned())),
+        ];
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::FindingsRemain,
+                concerns,
+                findings.clone(),
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-02T01:00:00Z").unwrap(),
+            )
+        });
+
+        assert!(result.is_ok(), "protocol should persist findings_remain verdict: {result:?}");
+
+        let review = crate::review_json_store::FsReviewJsonStore::new(&items_dir)
+            .find_review(&track_id)
+            .unwrap()
+            .unwrap();
+        let round = review
+            .current_cycle()
+            .unwrap()
+            .group(&group_name)
+            .unwrap()
+            .latest_round(domain::RoundType::Fast)
+            .unwrap();
+
+        match round.outcome() {
+            domain::GroupRoundOutcome::Success(verdict) => {
+                assert_eq!(verdict.findings(), findings.as_slice());
+                assert_eq!(
+                    round.concerns(),
+                    &[domain::ReviewConcern::try_new("domain.review").unwrap()]
+                );
+            }
+            outcome => panic!("expected successful round, got {outcome:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_zero_findings_with_concerns_returns_error() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::ZeroFindings,
+                vec![domain::ReviewConcern::try_new("domain.review").unwrap()],
+                Vec::new(),
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-02T01:00:00Z").unwrap(),
+            )
+        });
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundProtocolError::Other(err) => {
+                assert!(
+                    err.contains("zero_findings verdict with 1 concerns"),
+                    "unexpected error: {err}"
+                );
+            }
+            err => panic!("expected Other error, got {err:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_zero_findings_with_findings_returns_error() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::ZeroFindings,
+                Vec::new(),
+                vec![domain::StoredFinding::new("P1: invalid", Some("P1".to_owned()), None, None)],
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-02T01:00:00Z").unwrap(),
+            )
+        });
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundProtocolError::Other(err) => {
+                assert!(
+                    err.contains("zero_findings verdict with 1 findings"),
+                    "unexpected error: {err}"
+                );
+            }
+            err => panic!("expected Other error, got {err:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_findings_remain_without_concerns_returns_error() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::FindingsRemain,
+                Vec::new(),
+                vec![domain::StoredFinding::new("P1: invalid", Some("P1".to_owned()), None, None)],
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-02T01:00:00Z").unwrap(),
+            )
+        });
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundProtocolError::Other(err) => {
+                assert!(
+                    err.contains("findings_remain verdict with no concerns"),
+                    "unexpected error: {err}"
+                );
+            }
+            err => panic!("expected Other error, got {err:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_findings_remain_without_findings_returns_error() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::FindingsRemain,
+                vec![domain::ReviewConcern::try_new("domain.review").unwrap()],
+                Vec::new(),
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-02T01:00:00Z").unwrap(),
+            )
+        });
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundProtocolError::Other(err) => {
+                assert!(
+                    err.contains("findings_remain verdict with no findings"),
+                    "unexpected error: {err}"
+                );
+            }
+            err => panic!("expected Other error, got {err:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_findings_remain_with_mismatched_concerns_returns_error() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::FindingsRemain,
+                vec![domain::ReviewConcern::try_new("domain.review").unwrap()],
+                vec![
+                    domain::StoredFinding::new(
+                        "P1: invalid",
+                        Some("P1".to_owned()),
+                        Some("apps/cli/src/commands/review.rs".to_owned()),
+                        None,
+                    )
+                    .with_category(Some("cli.review".to_owned())),
+                ],
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-02T01:00:00Z").unwrap(),
+            )
+        });
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundProtocolError::Other(err) => {
+                assert!(
+                    err.contains("must include all findings-derived concerns"),
+                    "unexpected error: {err}"
+                );
+            }
+            err => panic!("expected Other error, got {err:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_findings_remain_with_missing_metadata_derives_other_concern()
+    {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+        let items_dir = path.join("track/items");
+        let concerns = vec![domain::ReviewConcern::try_new("other").unwrap()];
+        let findings = vec![domain::StoredFinding::new(
+            "P1: preserve free-form finding",
+            Some("P1".to_owned()),
+            None,
+            None,
+        )];
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::FindingsRemain,
+                concerns,
+                findings.clone(),
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-03T01:00:00Z").unwrap(),
+            )
+        });
+
+        assert!(
+            result.is_ok(),
+            "protocol should preserve findings when opaque metadata falls back to `other`: {result:?}"
+        );
+
+        let review = crate::review_json_store::FsReviewJsonStore::new(&items_dir)
+            .find_review(&track_id)
+            .unwrap()
+            .unwrap();
+        let round = review
+            .current_cycle()
+            .unwrap()
+            .group(&group_name)
+            .unwrap()
+            .latest_round(domain::RoundType::Fast)
+            .unwrap();
+
+        match round.outcome() {
+            domain::GroupRoundOutcome::Success(verdict) => {
+                assert_eq!(verdict.findings(), findings.as_slice());
+                assert_eq!(round.concerns(), &[domain::ReviewConcern::try_new("other").unwrap()]);
+            }
+            outcome => panic!("expected successful round, got {outcome:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_findings_remain_accepts_mixed_case_file_concern() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::FindingsRemain,
+                vec![domain::ReviewConcern::try_new("cli.foo").unwrap()],
+                vec![domain::StoredFinding::new(
+                    "P1: mixed case file path",
+                    Some("P1".to_owned()),
+                    Some("apps/CLI/src/Foo.rs".to_owned()),
+                    Some(10),
+                )],
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-03T01:00:00Z").unwrap(),
+            )
+        });
+
+        assert!(result.is_ok(), "mixed-case file-derived concern should normalize: {result:?}");
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_findings_remain_preserves_out_of_band_concerns() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+        let items_dir = path.join("track/items");
+        let concerns = vec![
+            domain::ReviewConcern::try_new("cli.review").unwrap(),
+            domain::ReviewConcern::try_new("domain.review").unwrap(),
+            domain::ReviewConcern::try_new("other").unwrap(),
+        ];
+        let findings = vec![
+            domain::StoredFinding::new(
+                "P1: keep derived concern",
+                Some("P1".to_owned()),
+                Some("apps/cli/src/commands/review/codex_local.rs".to_owned()),
+                Some(77),
+            )
+            .with_category(Some("cli.review".to_owned())),
+            domain::StoredFinding::new(
+                "P1: preserve free-form finding",
+                Some("P1".to_owned()),
+                None,
+                None,
+            ),
+        ];
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::FindingsRemain,
+                concerns.clone(),
+                findings.clone(),
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-03T01:00:00Z").unwrap(),
+            )
+        });
+
+        assert!(result.is_ok(), "extra out-of-band concerns should be preserved: {result:?}");
+
+        let review = crate::review_json_store::FsReviewJsonStore::new(&items_dir)
+            .find_review(&track_id)
+            .unwrap()
+            .unwrap();
+        let round = review
+            .current_cycle()
+            .unwrap()
+            .group(&group_name)
+            .unwrap()
+            .latest_round(domain::RoundType::Fast)
+            .unwrap();
+
+        match round.outcome() {
+            domain::GroupRoundOutcome::Success(verdict) => {
+                assert_eq!(verdict.findings(), findings.as_slice());
+                assert_eq!(round.concerns(), concerns.as_slice());
+            }
+            outcome => panic!("expected successful round, got {outcome:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_findings_remain_with_blank_category_returns_error() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::FindingsRemain,
+                vec![domain::ReviewConcern::try_new("domain.review").unwrap()],
+                vec![
+                    domain::StoredFinding::new(
+                        "P1: invalid",
+                        Some("P1".to_owned()),
+                        Some("apps/cli/src/commands/review.rs".to_owned()),
+                        None,
+                    )
+                    .with_category(Some(" ".to_owned())),
+                ],
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-03T01:00:00Z").unwrap(),
+            )
+        });
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundProtocolError::Other(err) => {
+                assert!(err.contains("category"), "unexpected error: {err}");
+            }
+            err => panic!("expected Other error, got {err:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_findings_remain_with_blank_file_and_category_returns_error()
+    {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::FindingsRemain,
+                vec![domain::ReviewConcern::try_new("domain.review").unwrap()],
+                vec![
+                    domain::StoredFinding::new(
+                        "P1: invalid",
+                        Some("P1".to_owned()),
+                        Some(" ".to_owned()),
+                        Some(1),
+                    )
+                    .with_category(Some("domain.review".to_owned())),
+                ],
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-03T01:00:00Z").unwrap(),
+            )
+        });
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundProtocolError::Other(err) => {
+                assert!(err.contains("file"), "unexpected error: {err}");
+            }
+            err => panic!("expected Other error, got {err:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_findings_remain_with_blank_message_returns_error() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::FindingsRemain,
+                vec![domain::ReviewConcern::try_new("domain.review").unwrap()],
+                vec![domain::StoredFinding::new(
+                    " ",
+                    Some("P1".to_owned()),
+                    Some("apps/cli/src/commands/review.rs".to_owned()),
+                    Some(1),
+                )],
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-03T01:00:00Z").unwrap(),
+            )
+        });
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundProtocolError::Other(err) => {
+                assert!(err.contains("message"), "unexpected error: {err}");
+            }
+            err => panic!("expected Other error, got {err:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_findings_remain_with_blank_severity_returns_error() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::FindingsRemain,
+                vec![domain::ReviewConcern::try_new("domain.review").unwrap()],
+                vec![domain::StoredFinding::new(
+                    "P1: invalid",
+                    Some(" ".to_owned()),
+                    Some("apps/cli/src/commands/review.rs".to_owned()),
+                    Some(1),
+                )],
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-03T01:00:00Z").unwrap(),
+            )
+        });
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundProtocolError::Other(err) => {
+                assert!(err.contains("severity"), "unexpected error: {err}");
+            }
+            err => panic!("expected Other error, got {err:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_findings_remain_with_zero_line_returns_error() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::FindingsRemain,
+                vec![domain::ReviewConcern::try_new("domain.review").unwrap()],
+                vec![domain::StoredFinding::new(
+                    "P1: invalid",
+                    Some("P1".to_owned()),
+                    Some("apps/cli/src/commands/review.rs".to_owned()),
+                    Some(0),
+                )],
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-03T01:00:00Z").unwrap(),
+            )
+        });
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundProtocolError::Other(err) => {
+                assert!(err.contains("line"), "unexpected error: {err}");
+            }
+            err => panic!("expected Other error, got {err:?}"),
+        }
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_excludes_review_json_from_round_hashes() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_record_round_fixture();
+        let items_dir = path.join("track/items");
+
+        std::fs::write(path.join("notes.txt"), "stays in other group").unwrap();
+
+        let fast_result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::ZeroFindings,
+                vec![],
+                vec![],
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-03T02:00:00Z").unwrap(),
+            )
+        });
+        assert!(fast_result.is_ok(), "fast round should succeed: {fast_result:?}");
+
+        let review = crate::review_json_store::FsReviewJsonStore::new(&items_dir)
+            .find_review(&track_id)
+            .unwrap()
+            .unwrap();
+        let group_state = review.current_cycle().unwrap().group(&group_name).unwrap();
+        assert!(
+            !group_state.scope().iter().any(|path| path.ends_with("/review.json")),
+            "review.json must be excluded from frozen scope: {:?}",
+            group_state.scope()
+        );
+        let fast_hash =
+            group_state.latest_round(domain::RoundType::Fast).unwrap().hash().to_owned();
+
+        let final_result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Final,
+                group_name.clone(),
+                domain::Verdict::ZeroFindings,
+                vec![],
+                vec![],
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-03T02:05:00Z").unwrap(),
+            )
+        });
+        assert!(final_result.is_ok(), "final round should succeed: {final_result:?}");
+
+        let review = crate::review_json_store::FsReviewJsonStore::new(&items_dir)
+            .find_review(&track_id)
+            .unwrap()
+            .unwrap();
+        let final_hash = review
+            .current_cycle()
+            .unwrap()
+            .group(&group_name)
+            .unwrap()
+            .latest_round(domain::RoundType::Final)
+            .unwrap()
+            .hash()
+            .to_owned();
+        assert_eq!(
+            fast_hash, final_hash,
+            "review.json write must not change the other-group hash between rounds"
+        );
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_rejects_expected_group_mismatch_for_existing_cycle() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_named_group_record_round_fixture(
+            "infrastructure",
+            r#"{
+                "groups": {
+                    "infrastructure": { "patterns": ["libs/infrastructure/**"] }
+                },
+                "review_operational": ["track/items/<track-id>/review.json"]
+            }"#,
+            "libs/infrastructure/src/lib.rs",
+        );
+
+        let fast_result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::ZeroFindings,
+                vec![],
+                vec![],
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-03T03:00:00Z").unwrap(),
+            )
+        });
+        assert!(fast_result.is_ok(), "fast round should succeed: {fast_result:?}");
+
+        let mismatch_result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Final,
+                group_name.clone(),
+                domain::Verdict::ZeroFindings,
+                vec![],
+                vec![],
+                vec![domain::ReviewGroupName::try_new("other").unwrap()],
+                domain::Timestamp::new("2026-04-03T03:05:00Z").unwrap(),
+            )
+        });
+        assert!(mismatch_result.is_err(), "mismatched expected_groups must fail closed");
+        match mismatch_result.unwrap_err() {
+            RecordRoundProtocolError::Other(err) => {
+                assert!(
+                    err.contains("expected_groups must match the current cycle groups"),
+                    "unexpected error: {err}"
+                );
+            }
+            err => panic!("expected Other error, got {err:?}"),
+        }
+    }
+
     // -----------------------------------------------------------------------
     // effective_diff_base tests
     // -----------------------------------------------------------------------
@@ -1110,5 +1952,45 @@ mod tests {
         std::env::set_current_dir(original).unwrap();
 
         assert_eq!(result, "main", "invalid SHA should fall back to base_ref");
+    }
+
+    #[test]
+    fn test_filter_partition_to_expected_groups_preserves_remapped_paths_alongside_other_group() {
+        let mut groups = std::collections::BTreeMap::new();
+        groups.insert(
+            ReviewGroupName::try_new("usecase").unwrap(),
+            vec![RepoRelativePath::normalize("libs/usecase/src/lib.rs").unwrap()],
+        );
+        groups.insert(
+            ReviewGroupName::try_new("harness-policy").unwrap(),
+            vec![RepoRelativePath::normalize(".claude/commands/track/commit.md").unwrap()],
+        );
+        groups.insert(
+            ReviewGroupName::try_new("other").unwrap(),
+            vec![RepoRelativePath::normalize("Cargo.lock").unwrap()],
+        );
+        let full_partition =
+            usecase::review_workflow::groups::GroupPartition::try_new(groups).unwrap();
+        let expected = vec![
+            ReviewGroupName::try_new("usecase").unwrap(),
+            ReviewGroupName::try_new("other").unwrap(),
+        ];
+
+        let filtered = filter_partition_to_expected_groups(&full_partition, &expected);
+
+        assert!(filtered.is_ok(), "expected-group filter should succeed: {filtered:?}");
+        let filtered = match filtered {
+            Ok(filtered) => filtered,
+            Err(err) => panic!("expected-group filter should succeed: {err:?}"),
+        };
+        let other_paths: Vec<_> = filtered.groups()[&ReviewGroupName::try_new("other").unwrap()]
+            .iter()
+            .map(|path| path.as_str())
+            .collect();
+        assert!(
+            other_paths.contains(&".claude/commands/track/commit.md"),
+            "remapped harness-policy path must be preserved in other: {other_paths:?}"
+        );
+        assert!(other_paths.contains(&"Cargo.lock"), "native other path must be preserved");
     }
 }

@@ -2,23 +2,43 @@
   "schema_version": 1,
   "cycles": [
     {
-      "cycle_id": "2026-04-02T03:33:50Z",
-      "started_at": "2026-04-02T03:33:50Z",
+      "cycle_id": "2026-04-02T12:43:00Z",
+      "started_at": "2026-04-02T12:43:00Z",
       "base_ref": "main",
       "base_policy_hash": "sha256:6171417213e49310b369c3ce4303bee111250ac00bdc96209211cf8501b0417e",
       "policy_hash": "sha256:6171417213e49310b369c3ce4303bee111250ac00bdc96209211cf8501b0417e",
+      "approved_head": null,
       "groups": {
-        "harness-policy": {
+        "cli": {
           "scope": [
-            ".claude/commands/track/commit.md"
+            "apps/cli/src/commands/review/codex_local.rs",
+            "apps/cli/src/commands/review/tests.rs"
           ],
           "rounds": [
             {
               "round_type": "fast",
               "success": "success",
               "error_message": null,
-              "timestamp": "2026-04-02T03:34:10Z",
-              "hash": "rvw1:sha256:9713a5d5ce2e5c3b444057531b369432214ef1285c43493bacce807e50e34120",
+              "timestamp": "2026-04-02T12:43:00Z",
+              "hash": "rvw1:sha256:f2ec3c14d12a01e1902f392b42cc7ff26544acabbc5fcbd34bac09923ab08e47",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Auto-record still does not preserve full finding metadata after scope filtering: `review_findings_to_stored()` only copies message/severity/file/line, and `record_auto_round()` records that narrowed type here. Any category/provenance carried in the parsed finding is silently dropped for the mixed-scope path, so the new persistence path does not meet the stated preservation goal.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/codex_local.rs",
+                    "line": 170
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T12:44:40Z",
+              "hash": "rvw1:sha256:f2ec3c14d12a01e1902f392b42cc7ff26544acabbc5fcbd34bac09923ab08e47",
               "verdict": {
                 "verdict": "zero_findings",
                 "findings": []
@@ -28,44 +48,8 @@
               "round_type": "final",
               "success": "success",
               "error_message": null,
-              "timestamp": "2026-04-02T03:37:32Z",
-              "hash": "rvw1:sha256:9713a5d5ce2e5c3b444057531b369432214ef1285c43493bacce807e50e34120",
-              "verdict": {
-                "verdict": "findings_remain",
-                "findings": [
-                  {
-                    "message": "correctness",
-                    "severity": null,
-                    "file": null,
-                    "line": null
-                  }
-                ]
-              }
-            },
-            {
-              "round_type": "fast",
-              "success": "success",
-              "error_message": null,
-              "timestamp": "2026-04-02T03:43:10Z",
-              "hash": "rvw1:sha256:56e069e00e107ace94acd248f6d853119153ad6b13d71c97272d7e93ab099ba2",
-              "verdict": {
-                "verdict": "findings_remain",
-                "findings": [
-                  {
-                    "message": "correctness",
-                    "severity": null,
-                    "file": null,
-                    "line": null
-                  }
-                ]
-              }
-            },
-            {
-              "round_type": "fast",
-              "success": "success",
-              "error_message": null,
-              "timestamp": "2026-04-02T03:46:45Z",
-              "hash": "rvw1:sha256:56e069e00e107ace94acd248f6d853119153ad6b13d71c97272d7e93ab099ba2",
+              "timestamp": "2026-04-02T23:15:00Z",
+              "hash": "rvw1:sha256:f2ec3c14d12a01e1902f392b42cc7ff26544acabbc5fcbd34bac09923ab08e47",
               "verdict": {
                 "verdict": "zero_findings",
                 "findings": []
@@ -75,44 +59,19 @@
               "round_type": "final",
               "success": "success",
               "error_message": null,
-              "timestamp": "2026-04-02T03:49:21Z",
-              "hash": "rvw1:sha256:56e069e00e107ace94acd248f6d853119153ad6b13d71c97272d7e93ab099ba2",
+              "timestamp": "2026-04-02T23:21:46Z",
+              "hash": "rvw1:sha256:f2ec3c14d12a01e1902f392b42cc7ff26544acabbc5fcbd34bac09923ab08e47",
               "verdict": {
-                "verdict": "findings_remain",
-                "findings": [
-                  {
-                    "message": "correctness",
-                    "severity": null,
-                    "file": null,
-                    "line": null
-                  }
-                ]
+                "verdict": "zero_findings",
+                "findings": []
               }
             },
             {
               "round_type": "fast",
               "success": "success",
               "error_message": null,
-              "timestamp": "2026-04-02T03:53:07Z",
-              "hash": "rvw1:sha256:1496874a28a1631592773bba6153c794e15fdc50651226c428a672b4cf6b94ac",
-              "verdict": {
-                "verdict": "findings_remain",
-                "findings": [
-                  {
-                    "message": "workflow",
-                    "severity": null,
-                    "file": null,
-                    "line": null
-                  }
-                ]
-              }
-            },
-            {
-              "round_type": "fast",
-              "success": "success",
-              "error_message": null,
-              "timestamp": "2026-04-02T03:56:13Z",
-              "hash": "rvw1:sha256:1496874a28a1631592773bba6153c794e15fdc50651226c428a672b4cf6b94ac",
+              "timestamp": "2026-04-03T00:36:16Z",
+              "hash": "rvw1:sha256:d8ba7e91ab5b7e09f0cf10b50d1cda5b4bcc15b79be80daf7f6d00f89c8bdfab",
               "verdict": {
                 "verdict": "zero_findings",
                 "findings": []
@@ -122,8 +81,909 @@
               "round_type": "final",
               "success": "success",
               "error_message": null,
-              "timestamp": "2026-04-02T03:58:20Z",
-              "hash": "rvw1:sha256:1496874a28a1631592773bba6153c794e15fdc50651226c428a672b4cf6b94ac",
+              "timestamp": "2026-04-03T00:37:41Z",
+              "hash": "rvw1:sha256:d8ba7e91ab5b7e09f0cf10b50d1cda5b4bcc15b79be80daf7f6d00f89c8bdfab",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T00:43:09Z",
+              "hash": "rvw1:sha256:d8ba7e91ab5b7e09f0cf10b50d1cda5b4bcc15b79be80daf7f6d00f89c8bdfab",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`test_auto_record_findings_remain_preserves_in_scope_findings_metadata` only captures `findings` and drops the `concerns` argument (`_concerns` at line 1256), so it cannot detect regressions where auto-record still derives escalation concerns from the wrong payload. `execute_with_auto_record` computes concerns before converting findings (`codex_local.rs:162-170`), so a bug that preserves stored finding metadata but keeps the out-of-scope `domain.review` concern, or loses the in-scope `cli.review` concern, would still pass this refactored fidelity test while breaking escalation behavior.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/tests.rs",
+                    "line": 1256
+                  },
+                  {
+                    "message": "`test_auto_record_all_out_of_scope_findings_downgrades_to_zero_findings` asserts only the exit code and protocol inputs; it never verifies the filtered JSON emitted by `execute_with_auto_record`. The production path records first and then prints the adjusted payload (`codex_local.rs:219-225`), so a regression that records a downgraded `zero_findings` round but still prints the original `findings_remain` payload would escape this refactor and leave CLI consumers with the wrong verdict.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/tests.rs",
+                    "line": 1416
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T00:50:17Z",
+              "hash": "rvw1:sha256:70ea618e626382a459ccc3f401ed75bda58fc572b683a5f4a3360620a74e5ef3",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`test_auto_record_findings_remain_preserves_in_scope_findings_metadata` now calls `render_execute_with_auto_record`, but it never asserts on `rendered.stdout_lines`. The test will still pass if the persisted `StoredFinding` is filtered correctly while the emitted JSON remains unfiltered or drops the retained finding/category, which is exactly the user-visible fidelity this refactor is supposed to protect.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/tests.rs",
+                    "line": 1402
+                  },
+                  {
+                    "message": "`CapturingVerdictProtocol` discards the `concerns` argument, and the all-out-of-scope downgrade test relies on it. That means a regression where `findings_remain` is downgraded to `zero_findings` but the recorded concerns are still non-empty would go undetected, even though concerns feed escalation/blocking logic. The downgrade-path test needs to assert that recorded concerns are empty as well.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/tests.rs",
+                    "line": 1294
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T00:54:29Z",
+              "hash": "rvw1:sha256:6e5dac877700e4c58aef1370f81a1ac622bbdee809e2fb9f5cf5f6584a7d2f39",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: `test_auto_record_findings_remain_preserves_in_scope_findings_metadata` and `test_auto_record_all_out_of_scope_findings_downgrades_to_zero_findings` now call `render_execute_with_auto_record` instead of `execute_with_auto_record`, so they no longer exercise the production path that actually prints the filtered payload to stdout/stderr. A regression in `execute_with_auto_record` that re-emits the original unfiltered JSON, suppresses output, or writes to the wrong stream would still pass these tests, which weakens the CLI fidelity coverage this refactor is supposed to provide.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/tests.rs",
+                    "line": 1370
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:01:31Z",
+              "hash": "rvw1:sha256:a61c8e9aa3a6d0f2c4907b7c71192a1c27390c57f90f8ac33c2c1837accd6d06",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: `write_rendered_command_result()` now flushes all `stdout_lines` before any `stderr_lines`, which reverses the auto-record success-path emission order. `render_record_auto_round()` still queues scope/record diagnostics on stderr and the verdict payload on stdout, so a merged stream (`2>&1`) now ends with `[auto-record] Recorded …` instead of the JSON verdict. Any wrapper that consumes the final merged line as the machine-readable payload will break, and the new tests only check `stderr.contains(...)`, so this fidelity regression is currently untested.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/codex_local.rs",
+                    "line": 105
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:13:46Z",
+              "hash": "rvw1:sha256:9219f912605fa9c1e0fda7e61867fdbd73eb64d8eaece6dd71658746879c3da3",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`write_rendered_command_result` only serializes into separate `stdout`/`stderr` handles, so the new \"JSON last\" contract is not actually enforced for real process output. The tests use an in-memory merged writer, but a caller that captures the real fds (for example `2>&1` or a CI log collector) can still observe the stderr diagnostics and the final verdict JSON reordered by buffering, which breaks the fidelity fix this change is trying to provide.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/codex_local.rs",
+                    "line": 100
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:17:41Z",
+              "hash": "rvw1:sha256:948624f672c18cc74b9d4db65677554f01d65063df3d5f8533aef572fa7c1d18",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The refactor drops any scope-filter diagnostics accumulated before `make_timestamp()` or `record_round_typed()` fails, because the early-return branches here build a fresh `RenderedCommandResult` instead of returning the existing `stderr_lines`. If auto-record emits `[scope-filter] ...` and then exits via one of these paths, that diagnostic disappears from the user's output, which regresses the fidelity guarantee this change is supposed to preserve.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/codex_local.rs",
+                    "line": 252
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:22:32Z",
+              "hash": "rvw1:sha256:20900095e3778754194daa5597221d65cff9af9245f5b6c5e14da97ae161a6c8",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`emit_rendered_command_result_stdio()` calls `write_rendered_command_result()` in the `#[cfg(not(unix))]` branch, but that helper is compiled only under `#[cfg(test)]`. A normal non-Unix build will fail to resolve the symbol, so this refactor breaks cross-platform compilation.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/codex_local.rs",
+                    "line": 109
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:24:33Z",
+              "hash": "rvw1:sha256:812dfb796736080749d6ffc94ba822cb9d9be9f42e5ed941608a124f884c95b2",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The `#[cfg(not(unix))]` fallback now rejects any `RenderedCommandResult` that has both stderr and stdout content. That is the normal shape of every successful auto-record run, and also the parse-failure recovery path, so on Windows/other non-Unix targets `execute_with_auto_record` will now return an emission error and exit 1 instead of printing the verdict JSON.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/codex_local.rs",
+                    "line": 109
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:29:37Z",
+              "hash": "rvw1:sha256:a956b741ec699e41deecffd382e37d35949b2a518eb24fe5d88f78b29b60f0ec",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:33:20Z",
+              "hash": "rvw1:sha256:a956b741ec699e41deecffd382e37d35949b2a518eb24fe5d88f78b29b60f0ec",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: The new output-order coverage never exercises the actual `#[cfg(not(unix))]` emission path. The added tests only call `write_rendered_command_result` with in-memory buffers, while production non-Unix behavior goes through `emit_rendered_command_result_stdio()` and real `std::io::stdout()/stderr()` handles in `apps/cli/src/commands/review/codex_local.rs:107-109`. That leaves the Windows/non-Unix fallback this change is meant to protect unverified, so a regression in merged-output ordering or flushing on the real handles would still pass.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/tests.rs",
+                    "line": 1432
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:38:09Z",
+              "hash": "rvw1:sha256:dc728a4a0bf7638583ac56d5f8867b1238186f2f2b88d392705a106cab75103f",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: The `#[cfg(not(unix))]` fallback still does not prove or guarantee the merged-output ordering that this patch is trying to restore. At [apps/cli/src/commands/review/codex_local.rs:107] it emits diagnostics via `stderr()` and the verdict via `stdout()` as two independent stdio streams, so on Windows/non-Unix runners a merged `2>&1` capture can still observe stderr after the final JSON. The new tests in `tests.rs` only call `emit_rendered_command_result_with_writers` with in-memory buffers, including a synthetic shared buffer, so they never exercise `emit_rendered_command_result_stdio` under `cfg(not(unix))` or a real merged stdio capture. That leaves the platform-specific fallback behavior unvalidated and the JSON-last contract regressible on non-Unix.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/codex_local.rs",
+                    "line": 107
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:44:06Z",
+              "hash": "rvw1:sha256:d66fa1a690d96ce6d750de7d800772637e2111193c861f0555ae0e9787fa2ddd",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`emit_non_unix_fallback_command_result` sends every `stderr_lines` entry to `stdout` whenever a verdict payload exists. On non-Unix platforms, successful auto-record runs therefore put scope-filter/recording diagnostics in the same stream as the machine-readable verdict JSON, so callers can no longer parse `stdout` as JSON-only output. The new test at `apps/cli/src/commands/review/tests.rs:1646` hard-codes that degraded behavior instead of catching it.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/codex_local.rs",
+                    "line": 144
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T03:17:29Z",
+              "hash": "rvw1:sha256:091f438f88e599e1b1e0565c1ad5d2938a1f005c6b03f73517f3dd65dabc5b96",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:26:32Z",
+              "hash": "rvw1:sha256:9a196dc99f8bcde34d4843e635637211eb01beb7abd4b67964daf38b2910a123",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The new Windows stdio path cannot compile as written because `write_windows_handle_line` imports `windows_sys::Win32::Storage::FileSystem::WriteFile`, but the newly added `windows-sys` dependency enables only `Win32_Foundation`, `Win32_Storage_FileSystem`, and `Win32_System_Console`. In `windows-sys 0.59`, `WriteFile` is gated behind the `Win32_System_IO` feature, so any Windows build now fails with an unresolved import before this path can be used.",
+                    "severity": "P1",
+                    "file": "apps/cli/Cargo.toml",
+                    "line": 31
+                  },
+                  {
+                    "message": "The new Windows handle validation uses `if handle == 0 || handle == INVALID_HANDLE_VALUE`, but in `windows-sys 0.59` `HANDLE` is a raw pointer type (`*mut c_void`), so comparing it to the integer literal `0` does not type-check on Windows. Even after fixing the missing feature gate, this `#[cfg(windows)]` code still fails to compile until the null check is written with `handle.is_null()` (or equivalent).",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/codex_local.rs",
+                    "line": 199
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:30:32Z",
+              "hash": "rvw1:sha256:8c6b7109a7179ebf5e3466e30c96a715caa47258fa1bafa007cb9931b741d47e",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`write_windows_handle_line` now sends every line through `WriteFile` on the raw stdio handle, but Windows console handles are not byte-oriented UTF-8 sinks. On an attached console this will emit bytes in the active code page instead of using `WriteConsoleW`, so any non-ASCII finding message/category/path is corrupted and the \"JSON-only stdout\" contract no longer holds for interactive Windows runs. Rust's own stdio keeps a separate console path for exactly this case.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/codex_local.rs",
+                    "line": 189
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:34:40Z",
+              "hash": "rvw1:sha256:3489cc45abb7437f98a6e712e9ffe820507b32d754acd0812963a0bb115b9c49",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:40:25Z",
+              "hash": "rvw1:sha256:3489cc45abb7437f98a6e712e9ffe820507b32d754acd0812963a0bb115b9c49",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The new Windows stdio path writes only `\\n` terminators (`WriteConsoleW` at line 205, and `WriteFile` in the fallback branch) instead of Windows line endings. Because these raw handle writes bypass Rust/C-runtime text translation, interactive Windows consoles will not return to column 0 between lines, so diagnostics and the final JSON line render incorrectly. This regresses the output contract on Windows; emit `\\r\\n` on the Windows path instead.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/codex_local.rs",
+                    "line": 205
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:45:33Z",
+              "hash": "rvw1:sha256:4827bcb53eed8a06f3cc70e1ea62a156c8b6209f9d8785c4130ef10ee1a56487",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:47:29Z",
+              "hash": "rvw1:sha256:4827bcb53eed8a06f3cc70e1ea62a156c8b6209f9d8785c4130ef10ee1a56487",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T05:54:15Z",
+              "hash": "rvw1:sha256:4827bcb53eed8a06f3cc70e1ea62a156c8b6209f9d8785c4130ef10ee1a56487",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T06:19:34Z",
+              "hash": "rvw1:sha256:d802c644eecc103e77f38070d25ebb2e5de1e143a5514c5a2f2e1fd7bb038963",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`render_record_auto_round` still copies `result.final_message` into `stdout_lines` when `parse_review_final_message` rejects the payload. That means an auto-record run can emit a syntactically valid verdict JSON like `{\"verdict\":\"findings_remain\",\"findings\":[]}` even though recording failed and the code returns exit 1, so downstream tooling can still consume an unrecorded verdict. This violates the auto-record guarantee to suppress untrusted verdict JSON on failure.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/codex_local.rs",
+                    "line": 353
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T06:24:18Z",
+              "hash": "rvw1:sha256:b66767d205ae36f1982a4495d15843dff89e6accf96d7c9f3fbf9b45cf9092a6",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T06:28:03Z",
+              "hash": "rvw1:sha256:b66767d205ae36f1982a4495d15843dff89e6accf96d7c9f3fbf9b45cf9092a6",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T06:31:42Z",
+              "hash": "rvw1:sha256:b66767d205ae36f1982a4495d15843dff89e6accf96d7c9f3fbf9b45cf9092a6",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T07:51:11Z",
+              "hash": "rvw1:sha256:70306698df8f1ffa7d930a059e2c411bea7ede1ce1e3490511e72f73616823a7",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T07:59:15Z",
+              "hash": "rvw1:sha256:70306698df8f1ffa7d930a059e2c411bea7ede1ce1e3490511e72f73616823a7",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T08:11:46Z",
+              "hash": "rvw1:sha256:9f58d36f5606598c521bdb91077c769ca1656b8538105fc833fe08f964211b7a",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T08:15:46Z",
+              "hash": "rvw1:sha256:9f58d36f5606598c521bdb91077c769ca1656b8538105fc833fe08f964211b7a",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        },
+        "infrastructure": {
+          "scope": [
+            "libs/infrastructure/src/review_adapters.rs"
+          ],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T13:02:54Z",
+              "hash": "rvw1:sha256:2873937a8258475270354fea2c3345a0e3059ca2c1020d23155f4f945f3103cc",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T23:16:35Z",
+              "hash": "rvw1:sha256:2873937a8258475270354fea2c3345a0e3059ca2c1020d23155f4f945f3103cc",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T23:24:07Z",
+              "hash": "rvw1:sha256:2873937a8258475270354fea2c3345a0e3059ca2c1020d23155f4f945f3103cc",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: The new coverage only exercises the happy-path `findings_remain` round-trip. There is still no test in this file that verifies the fail-closed checks for inconsistent `zero_findings`/`findings_remain` inputs at lines 442-467, so a regression could silently re-allow mismatched `verdict`/`concerns`/`findings` combinations without being caught.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_adapters.rs",
+                    "line": 1082
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T23:31:58Z",
+              "hash": "rvw1:sha256:bb476fd31ac92f6cf8c3f137268fa449b00706de9c9186f75e3c4c2cc65f13cc",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Direct `findings` persistence no longer enforces any correspondence between the persisted `StoredFinding`s and the separately supplied `concerns`. In the `FindingsRemain` branch this code only checks that both vectors are non-empty, so a caller can submit `concerns=[domain.review]` while persisting unrelated findings and the protocol will accept it. That breaks the fail-closed contract at this boundary: downstream concern-based escalation/state can now diverge from what was actually written to `review.json`. The new tests only cover empty/non-empty cases, so this regression is not caught.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_adapters.rs",
+                    "line": 457
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T23:35:04Z",
+              "hash": "rvw1:sha256:3d3b5515ebe7d0741d0a5462973e0159149953ce4c2b3cab0e281fbd123a66cf",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: `stored_findings_to_concern_set()` re-derives concerns from `StoredFinding.file()` only, then `execute()` rejects any `findings_remain` call whose supplied concerns differ from that lossy reconstruction. Auto-record does not use that rule: it derives concerns from reviewer findings with `category` taking precedence over `file`, so a valid payload like `{category:\"shell-parsing\", file:\"apps/cli/src/commands/review.rs\"}` will arrive here with concern `shell-parsing` but be rejected as inconsistent because this code derives `apps.cli`. Since `StoredFinding` does not preserve `category`, this validation blocks legitimate auto-record rounds and the current tests never cover the category-driven path. Either persist category in `StoredFinding` and derive with the same precedence, or stop validating concerns against lossy stored findings.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_adapters.rs",
+                    "line": 260
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T23:41:15Z",
+              "hash": "rvw1:sha256:589cb53b490e6bd57c1f21cd85edb46142c97994b478b24c72e2e8388d492dbf",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:06:58Z",
+              "hash": "rvw1:sha256:503f9c47b94de9b7a64796802cec2a973942c18b91b8b05035ddef5c2bee8499",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`execute()` now requires the caller-supplied `concerns` set to exactly match the concerns re-derived from each stored finding. Because the public verdict schema still allows `file` and `category` to be `null`, a valid `findings_remain` round that carries only free-form messages and relies on `--concerns` for escalation tracking will now be rejected after this code falls back to `other`. That is a correctness regression introduced by the fidelity change: previously record-round could persist those findings, but now it fails unless every finding redundantly includes concern-derivable metadata.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_adapters.rs",
+                    "line": 501
+                  },
+                  {
+                    "message": "The new category validation is inconsistent with the protocol path: `review_adapters` treats blank categories as \"missing\" when deriving concerns, but `validate_finding_fields()` rejects the same blank category during encode. A reviewer payload that emits `\"category\": \"\"` can therefore pass record-round validation and then fail only when `review.json` is written, which is a new write-time regression for otherwise accepted finding payloads.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_json_codec.rs",
+                    "line": 315
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:14:39Z",
+              "hash": "rvw1:sha256:7c5f2356574de7efedc9f56fab3ba0bf2f34c359ec42d1edbcc203839334a17e",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:30:46Z",
+              "hash": "rvw1:sha256:7c5f2356574de7efedc9f56fab3ba0bf2f34c359ec42d1edbcc203839334a17e",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: `stored_findings_to_concern_set_if_complete()` disables concern validation for the entire payload as soon as one finding lacks both `category` and `file`. In a mixed payload, derivable concerns from the other findings are no longer enforced, so `execute()` will accept arbitrary `concerns` and record the wrong escalation categories. Example: one finding with `category=\"cli.review\"` plus one free-form finding with no metadata now passes with supplied concerns `[domain.review]`, silently dropping the known `cli.review` concern. Validation should still require all derivable concerns to be present instead of bailing out completely.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_adapters.rs",
+                    "line": 292
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:39:01Z",
+              "hash": "rvw1:sha256:7a6b74743fbfd562507c1128decefba90f620f6323421a968c69713b1363df4e",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: [libs/infrastructure/src/review_adapters.rs:515] now accepts `findings_remain` rounds where some findings have neither `category` nor `file`, as long as the caller supplies any superset of the derivable concerns. That manual concern data is then dropped on write, because the persisted schema in [libs/infrastructure/src/review_json_codec.rs:62] / [libs/infrastructure/src/review_json_codec.rs:388] stores only the findings and has no field for the caller-supplied concern set. A round like `{category:null,file:null}` + `concerns=[\"domain.review\"]` is accepted, but after encode/decode there is no way to recover `domain.review`, so concern fidelity is lost for exactly the partial-metadata case this change is trying to support.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_adapters.rs",
+                    "line": 515
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:45:44Z",
+              "hash": "rvw1:sha256:0f7e492aeeeec1ed21a6014ea035ff850a40c03d5c845ddffd8773897017e69f",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: `execute()` now rejects any `findings_remain` round whose supplied `concerns` do not exactly equal the concerns re-derived from each persisted finding (`derive_stored_finding_concerns` + set-equality check). That is too strict for the persisted schema you just introduced: `review_json_codec` explicitly supports findings with `file: null` and `category: null`, so callers can legitimately preserve free-form findings while supplying escalation concerns out-of-band. With the new check, those rounds are rejected unless the concern set collapses to `other`, which is a behavior regression from the fidelity change and blocks valid persistence cases.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_adapters.rs",
+                    "line": 511
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T03:18:31Z",
+              "hash": "rvw1:sha256:d95bac9b572953d8f40149bb28ba91e8df9e194b4f46d1d778585795f050d913",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`round_to_document` now writes `round.concerns()` verbatim, but `round_from_document` rejects duplicate concerns and rejects any non-empty concerns on `zero_findings`/`failure` rounds. That makes the codec one-way: a round constructed in memory with duplicate concerns, or a failure/zero-findings round carrying concerns, will serialize successfully and then become unreadable on the next load. The encoder needs to enforce or canonicalize the same concern invariants the decoder now requires.",
+                    "severity": "P0",
+                    "file": "libs/infrastructure/src/review_json_codec.rs",
+                    "line": 409
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T03:25:25Z",
+              "hash": "rvw1:sha256:eeb5ac24c55646002925adbd941a470582417c9ac71f082f4201ad57343d906c",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`review_json_codec` still lets `findings_remain` rounds drop findings-derived concerns. `round_from_document` only rejects concerns on `zero_findings`/failure rounds, and `normalized_round_concerns` later just serializes `round.concerns()` back out, so a hand-edited or programmatically constructed round like `{findings:[{category:\"domain.review\"}], concerns:[\"other\"]}` loads and saves successfully. Escalation tracking consumes `round.concerns()` only, so this undercounts repeated concerns and bypasses the new fail-closed invariant despite `RecordRoundProtocolImpl` enforcing it on the main write path.",
+                    "severity": "P0",
+                    "file": "libs/infrastructure/src/review_json_codec.rs",
+                    "line": 199
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T03:30:10Z",
+              "hash": "rvw1:sha256:62156eecc721a6d0eead16f0b5dffde93c3887fc8f500a80831187ad8c046fb6",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`round_from_document` now unconditionally enforces findings-derived concerns on every `findings_remain` round after deserializing `concerns` with `#[serde(default)]`. For legacy `review.json` files that predate the new field, omitted concerns become `[]`, so decode now rejects existing persisted rounds like `track/items/autorecord-reviewjson-wiring-2026-03-30/review.json` even though this change is supposed to stay backward-compatible with older rounds without `concerns`. The derived-concern check needs to distinguish \"field absent in old data\" from \"field present but incomplete\".",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_json_codec.rs",
+                    "line": 218
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T03:37:55Z",
+              "hash": "rvw1:sha256:7253e66edaffa89566031a70f2d9c649f43811e3299dad564fe8b8b1b5db07e1",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`RoundDocument.concerns` is deserialized as `Option<Vec<String>>`, so Serde collapses both a missing field and an explicit `\"concerns\": null` into `None`. `normalized_decoded_round_concerns` then treats that `None` as the legacy 'field absent' case and backfills derived concerns, which means a `findings_remain` round can still omit persisted findings-derived concerns by using `null` and bypass the intended fail-closed rejection.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_json_codec.rs",
+                    "line": 69
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T03:45:59Z",
+              "hash": "rvw1:sha256:a1bd3b5c10a37281dd5eb96d8b1ecbb9641cdff69bd7d003a9e1671f201a3c0c",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:25:53Z",
+              "hash": "rvw1:sha256:74421a0c128b82f6096f720dbb9be3f27d7e657a360c779839310f59f0bd7a52",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:39:13Z",
+              "hash": "rvw1:sha256:74421a0c128b82f6096f720dbb9be3f27d7e657a360c779839310f59f0bd7a52",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T05:48:24Z",
+              "hash": "rvw1:sha256:b6146d2ce399508477801ddb0cc9ce7338e4e18a3eddd8a013b7540514a37044",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T05:54:31Z",
+              "hash": "rvw1:sha256:b6146d2ce399508477801ddb0cc9ce7338e4e18a3eddd8a013b7540514a37044",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T06:18:52Z",
+              "hash": "rvw1:sha256:39ba04b016f8e547cf81765e4fa19b689a639c626300303c599b315964ded5e7",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T06:25:34Z",
+              "hash": "rvw1:sha256:39ba04b016f8e547cf81765e4fa19b689a639c626300303c599b315964ded5e7",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T06:31:24Z",
+              "hash": "rvw1:sha256:39ba04b016f8e547cf81765e4fa19b689a639c626300303c599b315964ded5e7",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T07:51:04Z",
+              "hash": "rvw1:sha256:914e8c947d922edea9e149861880be11127f8e7d56ba8f8e9819edb5dde0b268",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`RecordRoundProtocolImpl::execute` now persists `findings` without revalidating the full `StoredFinding` contract, and `maybe_derive_stored_finding_concern()` returns early on `category`, so a blank `file` is never rejected when a category is present. A direct caller can therefore write malformed findings (for example `message: \"\"`, `line: 0`, or `file: \" \"` with a category) into `review.json`, which the usecase layer would otherwise reject.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_adapters.rs",
+                    "line": 327
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T07:57:12Z",
+              "hash": "rvw1:sha256:030f163225de453f89f72501b74866b9aa22d49a2e5d32fb8f7e4202aa9e949c",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The new blank-`severity` rejection path in `validate_stored_findings()` has no corresponding error-case test. That leaves a public `RecordRoundProtocol::execute` branch uncovered, so a regression here could ship unnoticed.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_adapters.rs",
+                    "line": 334
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T08:01:38Z",
+              "hash": "rvw1:sha256:7030991ab249acb3700cf5b67477e7042c2fa722fb40ec1b8eb0e270d88b73f7",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T08:06:19Z",
+              "hash": "rvw1:sha256:7030991ab249acb3700cf5b67477e7042c2fa722fb40ec1b8eb0e270d88b73f7",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T08:10:32Z",
+              "hash": "rvw1:sha256:f46fd1ec351ecfe9dfb574740ef2d25423594f10102418d905595993fdc559ad",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T08:17:10Z",
+              "hash": "rvw1:sha256:f46fd1ec351ecfe9dfb574740ef2d25423594f10102418d905595993fdc559ad",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`RecordRoundProtocolImpl` still builds both the cycle snapshot and the per-round scope hash from raw `changed_files()` output plus `load_base_review_groups()`, so the `review_operational` exclusions in `track/review-scope.json` are never applied here. After the first auto-record writes `track/items/<track-id>/review.json`, the next partition/hash computation pulls that file into the mandatory `other` group, changing the approval hash even when no code changed and leaving the cycle stale until `other` is re-reviewed.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_adapters.rs",
+                    "line": 352
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T08:22:49Z",
+              "hash": "rvw1:sha256:4c3e6e8b393d9eed9a222aa82b8b3aa3fa4263ba9fe2fc731d465c19e95f04b2",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`filter_partition_to_expected_groups` now treats `expected_groups` as a hard whitelist for every group, not just for remapping into `other`. If a later `execute()` call records a valid `group_name` but the caller omits that group from `expected_groups`, this branch hashes an empty scope and persists the wrong round hash instead of the group's actual files. The protocol never validates that `expected_groups` matches the current cycle, so this can silently corrupt approval/staleness checks.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_adapters.rs",
+                    "line": 588
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T08:26:43Z",
+              "hash": "rvw1:sha256:bbcdcbbd8d46b0e531052e7bdc0c6ce7a094d81a24ca0b2b0292eb23af6b5581",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T08:30:05Z",
+              "hash": "rvw1:sha256:bbcdcbbd8d46b0e531052e7bdc0c6ce7a094d81a24ca0b2b0292eb23af6b5581",
               "verdict": {
                 "verdict": "zero_findings",
                 "findings": []
@@ -133,6 +993,7 @@
         },
         "other": {
           "scope": [
+            "knowledge/strategy/TODO.md",
             "track/items/review-finding-fidelity-2026-04-02/metadata.json",
             "track/items/review-finding-fidelity-2026-04-02/plan.md",
             "track/items/review-finding-fidelity-2026-04-02/spec.json",
@@ -144,8 +1005,8 @@
               "round_type": "fast",
               "success": "success",
               "error_message": null,
-              "timestamp": "2026-04-02T03:33:50Z",
-              "hash": "rvw1:sha256:7d24e19f4a25bce611ebebb985be3ba0f80ac8d1606b25927bd626e3debf2950",
+              "timestamp": "2026-04-02T13:03:22Z",
+              "hash": "rvw1:sha256:cfe81899beeb7be3cc7fad6023739cec66a0404ff8e352a56bd2cee6ea84c16e",
               "verdict": {
                 "verdict": "zero_findings",
                 "findings": []
@@ -155,8 +1016,681 @@
               "round_type": "final",
               "success": "success",
               "error_message": null,
-              "timestamp": "2026-04-02T03:37:00Z",
-              "hash": "rvw1:sha256:7d24e19f4a25bce611ebebb985be3ba0f80ac8d1606b25927bd626e3debf2950",
+              "timestamp": "2026-04-02T23:17:03Z",
+              "hash": "rvw1:sha256:cfe81899beeb7be3cc7fad6023739cec66a0404ff8e352a56bd2cee6ea84c16e",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T23:24:45Z",
+              "hash": "rvw1:sha256:cfe81899beeb7be3cc7fad6023739cec66a0404ff8e352a56bd2cee6ea84c16e",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`RVW-33` is checked off as resolved, but the same entry still says `auto-create cycle` has an `empty-scope` problem that is only \"scheduled for T007\". Closing the checkbox while the remaining failure mode is still pending can cause this unresolved review-cycle bug to drop out of active triage, which is a workflow regression in the tracker itself.",
+                    "severity": "P1",
+                    "file": "knowledge/strategy/TODO.md",
+                    "line": 777
+                  },
+                  {
+                    "message": "`WF-46` is marked complete even though the entry explicitly says unit tests are still missing. Under this repository's policy, leaving behavior untested is a P1 coverage gap, and keeping the item checked off makes that remaining test work easy to miss.",
+                    "severity": "P1",
+                    "file": "knowledge/strategy/TODO.md",
+                    "line": 833
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T23:31:18Z",
+              "hash": "rvw1:sha256:40e560f1a00294a7ac5aa08204ff13d6c3008d9776311156100c9c965a747bc1",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`RVW-51` is marked `LOW`, but the bug it describes is not low-severity: if a real `zero_findings` review is persisted as `findings_remain`, the review flow fail-closes and can incorrectly block approval/commits. This is at least a medium correctness issue, so the checklist state under-prioritizes an active workflow-corrupting bug.",
+                    "severity": "P1",
+                    "file": "knowledge/strategy/TODO.md",
+                    "line": 797
+                  },
+                  {
+                    "message": "`RVW-52` includes 'auto stage + amend' as a candidate fix after `persist_approved_head` writes `review.json`, but that is self-invalidating: `persist_approved_head` records the current post-commit `HEAD`, and amending that commit changes `HEAD` again immediately. The stored `approved_head` would be stale as soon as the amend finishes, so this proposed checklist state is internally inconsistent and would preserve incorrect incremental-review state.",
+                    "severity": "P1",
+                    "file": "knowledge/strategy/TODO.md",
+                    "line": 798
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T23:34:49Z",
+              "hash": "rvw1:sha256:1c474afd1814255e7c6cc6409be5aaa69e46eb387530750a09c20f65189bb90d",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:04:57Z",
+              "hash": "rvw1:sha256:720caab9fb2e7f259cfa70ed456996607ffec6d17daaee98cb5f0f11bc27976f",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`RVW-52` presents \"discard the `review.json` changes in `/track:done`\" as a viable fix, but `approved_head` now lives in `review.json` and is the persisted diff base for the next incremental review cycle. Dropping that file after the final commit would erase the newly recorded review anchor and silently regress back to full-diff reviews. This TODO should only allow cleanup strategies that preserve or relocate `approved_head` first.",
+                    "severity": "P1",
+                    "file": "knowledge/strategy/TODO.md",
+                    "line": 798
+                  },
+                  {
+                    "message": "`WF-46` is now marked done even though the regression test for the new collision detector is still missing and has been split into a separate LOW-priority backlog item. Because this validation guards review-state integrity, closing the parent finding before the error-path test exists weakens the tracking signal for an unfinished safety check and makes it easier to ship future changes without any regression coverage on the guard.",
+                    "severity": "P1",
+                    "file": "knowledge/strategy/TODO.md",
+                    "line": 833
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:12:34Z",
+              "hash": "rvw1:sha256:2218154f89d9d8929f01b4510c8fac8aff6954bb78bf4d0b2b23f6c26db1c807",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:30:36Z",
+              "hash": "rvw1:sha256:2218154f89d9d8929f01b4510c8fac8aff6954bb78bf4d0b2b23f6c26db1c807",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:37:11Z",
+              "hash": "rvw1:sha256:625ce278e3452aa0ee67952256596193b6ed0c5c1bbc4e029ce8c87d83e540cd",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T05:51:11Z",
+              "hash": "rvw1:sha256:625ce278e3452aa0ee67952256596193b6ed0c5c1bbc4e029ce8c87d83e540cd",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T06:06:34Z",
+              "hash": "rvw1:sha256:625ce278e3452aa0ee67952256596193b6ed0c5c1bbc4e029ce8c87d83e540cd",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T06:32:49Z",
+              "hash": "rvw1:sha256:625ce278e3452aa0ee67952256596193b6ed0c5c1bbc4e029ce8c87d83e540cd",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T06:35:43Z",
+              "hash": "rvw1:sha256:625ce278e3452aa0ee67952256596193b6ed0c5c1bbc4e029ce8c87d83e540cd",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        },
+        "usecase": {
+          "scope": [
+            "libs/usecase/src/review_workflow/mod.rs",
+            "libs/usecase/src/review_workflow/usecases.rs",
+            "libs/usecase/src/review_workflow/verdict.rs"
+          ],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T12:47:27Z",
+              "hash": "rvw1:sha256:a818e0c48e11774a0a566c204ea90d7b9e26d50284632ee4d6fc7f3b3a5aedab",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`record_round_typed` now accepts a free-form `Verdict`/`findings` pair and forwards it unchanged. That weakens the invariant enforced by `record_round`: callers can supply `ZeroFindings` with a non-empty list or `FindingsRemain` with an empty list, and the usecase layer will only rely on each `RecordRoundProtocol` implementation to reject it. The new typed entry point should fail closed at this boundary instead of allowing impossible states through.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/usecases.rs",
+                    "line": 196
+                  },
+                  {
+                    "message": "Missing regression coverage for the new findings-preservation path's fail-closed cases. The added tests cover the happy path, but there is still no direct test for `findings_remain` with an empty findings array or `zero_findings` with a non-empty findings array, which the contract explicitly relies on. Without those tests, a regression in the new conversion path can slip through.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/usecases.rs",
+                    "line": 807
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T12:50:38Z",
+              "hash": "rvw1:sha256:6bb632f8d960c95c21ded5a4ca7ba0cc5f8d8f81bb2758d8eba7ed3c7f96d67d",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The new fail-closed validator is not fully regression-covered. These tests prove the happy path and the empty-findings/zero-findings rejection, but they never exercise the new `findings_remain`-with-empty-`concerns` branch, and they do not cover the string `record_round()` path for the new findings-preservation flow. A regression in the shared validator or the JSON-to-`StoredFinding` conversion would slip through.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/usecases.rs",
+                    "line": 93
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T12:54:30Z",
+              "hash": "rvw1:sha256:4c3b9bcfe545645c76e746d24afb64e4f8684e989df75d72cace3e7f81515a55",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Missing regression coverage for the new `Verdict::ZeroFindings` + non-empty `concerns` fail-closed branch in `validate_round_verdict_inputs`. The current tests cover the findings-remain empty-input cases and zero-findings with non-empty findings, but they never exercise this validator path in either `record_round` or `record_round_typed`, so a regression here would slip through.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/usecases.rs",
+                    "line": 99
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T12:59:59Z",
+              "hash": "rvw1:sha256:f4f6fe9da200af682875f11ed2c94b8fda3c2ab0421d82009c0a6194eb91807e",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`record_round()`'s new verdict/concern/finding validation is not fully covered on the string-path entrypoint: there is no test for `findings_remain` with an empty `findings` array or `zero_findings` with non-empty `findings`. The typed path covers those cases, but regressions in the parsed-JSON path would still slip through.",
+                    "severity": "P1",
+                    "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_workflow/usecases.rs",
+                    "line": 203
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T13:01:12Z",
+              "hash": "rvw1:sha256:0dafcdfb59d730b8a6b2c364bb84f7dae82f2ebc0b2e156deddab93addad9d34",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T23:16:00Z",
+              "hash": "rvw1:sha256:0dafcdfb59d730b8a6b2c364bb84f7dae82f2ebc0b2e156deddab93addad9d34",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-02T23:22:26Z",
+              "hash": "rvw1:sha256:0dafcdfb59d730b8a6b2c364bb84f7dae82f2ebc0b2e156deddab93addad9d34",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:03:44Z",
+              "hash": "rvw1:sha256:ef0ea79aa82a300692be0917a6e8d30a0c9c66f445834e842487bc111bbf7f19",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: `parse_review_final_message()` does not actually enforce the schema's required `category` field. `ReviewFinding` deserializes `category` with `#[serde(default)]`, and `ReviewFindingShapeVisitor` never emits `missing_field(\"category\")`, so payloads that omit reviewer-supplied categories are accepted and then recorded with `category: None`. That silently degrades finding fidelity and changes downstream concern/escalation classification from reviewer-provided category to file-path/`other` fallback.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/verdict.rs",
+                    "line": 106
+                  },
+                  {
+                    "message": "P1: blank `category` values are not rejected here even though other finding fields are trimmed and validated. A payload like `\"category\":\" \"` passes `validate_review_payload()`, gets stored via `review_findings_to_stored()`, and only later loses meaning or trips concern-derivation checks. For the fidelity changes, this should fail closed at parse time just like blank `file`/`severity` do.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/verdict.rs",
+                    "line": 223
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:12:52Z",
+              "hash": "rvw1:sha256:a93ec47f406913ae7f427301f0925d0973f0e0264c0cbeb8ba65f0756e66aa00",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: `ReviewFinding.category` is now mandatory on input, but serialization still uses `skip_serializing_if = \"Option::is_none\"`, so a valid payload containing `\"category\": null` is re-emitted without the `category` field. `render_review_payload()` round-trips parsed reviewer output back to JSON, and the new shape validator rejects that JSON as missing `category`, so findings with a null category can no longer be auto-recorded or consumed downstream after this change.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/verdict.rs",
+                    "line": 106
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:18:54Z",
+              "hash": "rvw1:sha256:5b6261e95f7298173ae50f86f896aab4bdcdbea5c3a4d81b16238d6dcc744848",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:29:18Z",
+              "hash": "rvw1:sha256:5b6261e95f7298173ae50f86f896aab4bdcdbea5c3a4d81b16238d6dcc744848",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: Requiring every finding JSON object to include an explicit `category` key is a backwards-incompatible parser change. `parse_review_final_message` now marks payloads that omit the field as invalid, and callers like `extract_verdict_from_content`/`record_round` treat that as a hard failure. Because `category` is still modeled as `Option<String>` and downstream concern handling already tolerates `None`, older reviewer outputs that omit `category` will now fail to record or classify instead of preserving their findings.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/verdict.rs",
+                    "line": 416
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:39:20Z",
+              "hash": "rvw1:sha256:d9abb4ccb7fbc41191f3e562f61267c366fead1934881fb2062a946b112c0db0",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`parse_review_final_message()` now treats a missing finding `category` as valid, but `REVIEW_OUTPUT_SCHEMA_JSON` still keeps `\"category\"` in the finding `required` list. Because the CLI publishes this schema for external validator/model tooling, older payloads that omit `category` will still be rejected before they reach the relaxed parser, so the missing-category compatibility change is incomplete.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/verdict.rs",
+                    "line": 46
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T01:44:39Z",
+              "hash": "rvw1:sha256:27b6984489f8db24e770fe5c790b21e04e42d1fd4e6237c24eaeb76bd65e8165",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: `REVIEW_OUTPUT_SCHEMA_JSON` advertises `category` as any string-or-null, but `validate_review_payload` rejects blank/whitespace-only categories. That means a reviewer payload with `\"category\":\"\"` or `\" \"` can satisfy the published schema yet still be rejected by `parse_review_final_message`, causing `record_round`/auto-record to fail despite conforming to the advertised contract. Tighten the schema for `category` or relax the validator so they stay aligned.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/verdict.rs",
+                    "line": 41
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T03:17:02Z",
+              "hash": "rvw1:sha256:aa7fcde50eaf87adf0ae9424f0ecc8775ccd3116a65c8ae1f46161214f1a3e8b",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: `record_cycle_group_round` now unconditionally attaches `input.concerns` to both successful and failed rounds. That allows direct callers to construct `zero_findings` or failed rounds with persisted concerns, even though the review JSON codec rejects both shapes on reload. The result is an invalid `review.json` that can be written but not read back unless this usecase enforces the same concern invariants before calling `with_concerns()`.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/cycle.rs",
+                    "line": 109
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T03:26:06Z",
+              "hash": "rvw1:sha256:efbde70a45184e89ab60789dc2fba41aa94a4fb8bd5f0186d680c8b1cbf1d34a",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "record_cycle_group_round still fail-opens on inconsistent findings_remain concerns. validate_record_round_concerns only enforces empty vs non-empty, so a caller can append a round whose stored findings imply concern domain.review while persisting concerns like [infra.git]. That writes incorrect round-level concerns into the in-memory review state and can drop escalation metadata before review.json persistence.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/cycle.rs",
+                    "line": 128
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T03:32:05Z",
+              "hash": "rvw1:sha256:88a33eacb497fba076d976cdcdd5658af266d5b98647a8314fb82b95ef06b10e",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`stored_finding_concern()` normalizes `category` to lowercase but leaves file-derived slugs in their original case, while `concerns` have already been normalized through `ReviewConcern`. A valid `findings_remain` round with a mixed-case file path (for example `apps/CLI/src/Foo.rs` and concern `cli.foo`) will therefore be rejected here as a mismatch even though the protocol accepted it. Lowercase the `file_path_to_concern()` result before comparing subsets.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/cycle.rs",
+                    "line": 182
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T03:40:01Z",
+              "hash": "rvw1:sha256:5254ddbc02f6f519bab58c25f16213bff3f81c93c3947a6c6b9246d4b4ffd7f6",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`validate_round_verdict_inputs()` only checks empty-vs-nonempty, so `record_round()`/`record_round_typed()` still accept `findings_remain` inputs whose `concerns` omit a finding-derived concern whenever the injected `RecordRoundProtocol` does not re-validate them. That leaves a business invariant in the adapter instead of the use-case boundary and creates a fail-open path for inconsistent rounds.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/usecases.rs",
+                    "line": 93
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T03:45:20Z",
+              "hash": "rvw1:sha256:5254ddbc02f6f519bab58c25f16213bff3f81c93c3947a6c6b9246d4b4ffd7f6",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`record_round_typed()` still only checks finding/count cardinality, and `record_cycle_group_round()` derives concerns from stored findings without validating the individual `StoredFinding` fields. A `findings_remain` round built through the typed API can therefore persist schema-invalid findings such as a blank `message` or whitespace-only `file`; the latter is even coerced to `other` by `stored_finding_concern()`, so it passes concern-subset validation and gets written into review state despite the new JSON validator rejecting it.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/cycle.rs",
+                    "line": 178
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T03:52:58Z",
+              "hash": "rvw1:sha256:f0494668e7fac2153482b2cfe454c246dad89106289af88aab006e6760a4bd16",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`validate_round_verdict_inputs()` never checks that `concerns` cover the findings-derived concerns, so both `record_round()` and `record_round_typed()` still accept `findings_remain` inputs whose persisted concern list under-reports the stored findings. The bundled infrastructure adapter rejects this later, but the usecase port is now fail-open: any other `RecordRoundProtocol` implementation can persist a round that violates the new concern-coverage invariant.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/usecases.rs",
+                    "line": 93
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T03:55:06Z",
+              "hash": "rvw1:sha256:e14532f64f280bb3a58095dae1c8356f430dce357621814b8dc6a6d01acdd68f",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:00:27Z",
+              "hash": "rvw1:sha256:2901485938ac81e48a67eeef6bf4559ab359dda16ab731ed7924d7c72cab3812",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`record_cycle_group_round()` still never validates the `StoredFinding` fields inside a `GroupRoundVerdict::FindingsRemain`. A caller can build a verdict with a blank `message`/`severity`/`file`/`category` or `line == 0`, provide a matching concern such as `other`, and this function will append the round because `validate_record_round_concerns()` only checks concern coverage before mutating `ReviewJson`. That leaves a public usecase path that can write schema-invalid findings into in-memory review state despite the new typed-path validation in `record_round_typed()`.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/cycle.rs",
+                    "line": 95
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:01:09Z",
+              "hash": "rvw1:sha256:2901485938ac81e48a67eeef6bf4559ab359dda16ab731ed7924d7c72cab3812",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`record_cycle_group_round()` still accepts schema-invalid stored findings from direct callers. `validate_findings_remain_concerns()` only checks concern coverage, and `stored_finding_concern()` turns a whitespace-only `file` into `other` instead of rejecting it, so a `FindingsRemain` outcome with `StoredFinding::new(\"msg\", Some(\"P1\".into()), Some(\" \".into()), Some(1))` plus concern `other` is recorded into the in-memory cycle. That bypasses the new blank-field protections outside `record_round_typed()`/the protocol path and later makes `review.json` fail to encode.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/cycle.rs",
+                    "line": 155
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:09:29Z",
+              "hash": "rvw1:sha256:f4495a6063f0be4fed8645c76131b4c9316379a5065aac276dcf6412f6a423fe",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "P1: `record_cycle_group_round()` still accepts duplicate concerns from typed callers. `validate_findings_remain_concerns()` collapses the supplied vector into a `BTreeSet` for subset checking, then `with_concerns(input.concerns)` persists the original `Vec` unchanged, so invalid round concerns can still enter in-memory review state despite the new fail-closed checks.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/cycle.rs",
+                    "line": 204
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:14:34Z",
+              "hash": "rvw1:sha256:f3c3722b29f0370ed829178cc079afece6387e3cde2b75190a4370994972f058",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:15:53Z",
+              "hash": "rvw1:sha256:f3c3722b29f0370ed829178cc079afece6387e3cde2b75190a4370994972f058",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:41:37Z",
+              "hash": "rvw1:sha256:a576d18436180ff1b6c8d4561c71cde0f8bd7b6c085454be6d24da9b02a03941",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`stored_finding_concern()` lowercases file-derived slugs but still feeds the raw `file` into `file_path_to_concern()` here (and in the matching helper added to `cycle.rs`). For a schema-valid finding like `{\"file\":\" libs/usecase/src/foo.rs \"}`, the trailing space prevents `.rs` stripping, so the derived concern becomes `usecase.foo.rs ` instead of `usecase.foo`. Because supplied concerns are normalized through `ReviewConcern`, the new subset check rejects these otherwise-valid `findings_remain` rounds.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/usecases.rs",
+                    "line": 188
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:48:01Z",
+              "hash": "rvw1:sha256:460286119ae1ef174de4e99a204fbdf16228146d9cbcf70bd7cc97a4f96401bd",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T04:53:51Z",
+              "hash": "rvw1:sha256:58c0d5ab56b6c9013a1ec48cbef94ee5ed0130adfa4df9e78e815f7d4c615bca",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T05:54:20Z",
+              "hash": "rvw1:sha256:58c0d5ab56b6c9013a1ec48cbef94ee5ed0130adfa4df9e78e815f7d4c615bca",
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`finding_to_concern` returns as soon as `category` is present, so it never validates an accompanying `file`. A direct caller can pass a schema-invalid finding like `{ \"category\": \"domain.review\", \"file\": \" \" }` and still get a valid concern back, which breaks the intended blank-field parity for `file` on this public usecase API.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/concern.rs",
+                    "line": 16
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T06:00:21Z",
+              "hash": "rvw1:sha256:135f14be2e64ce761c63b3a5e97918b17525c4c13bb9b1746b64ed95a3367202",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T06:34:44Z",
+              "hash": "rvw1:sha256:135f14be2e64ce761c63b3a5e97918b17525c4c13bb9b1746b64ed95a3367202",
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T06:38:39Z",
+              "hash": "rvw1:sha256:135f14be2e64ce761c63b3a5e97918b17525c4c13bb9b1746b64ed95a3367202",
               "verdict": {
                 "verdict": "zero_findings",
                 "findings": []

@@ -654,11 +654,13 @@ mod tests {
 
     #[test]
     fn test_stored_finding_all_fields() {
-        let f = StoredFinding::new("msg", Some("P1".into()), Some("src/main.rs".into()), Some(42));
+        let f = StoredFinding::new("msg", Some("P1".into()), Some("src/main.rs".into()), Some(42))
+            .with_category(Some("domain.review".into()));
         assert_eq!(f.message(), "msg");
         assert_eq!(f.severity(), Some("P1"));
         assert_eq!(f.file(), Some("src/main.rs"));
         assert_eq!(f.line(), Some(42));
+        assert_eq!(f.category(), Some("domain.review"));
     }
 
     #[test]
@@ -668,6 +670,7 @@ mod tests {
         assert!(f.severity().is_none());
         assert!(f.file().is_none());
         assert!(f.line().is_none());
+        assert!(f.category().is_none());
     }
 
     // -- ReviewCycle approved_head --
