@@ -14,7 +14,7 @@ mod tests;
 
 use codex_local::execute_codex_local;
 
-const DEFAULT_TIMEOUT_SECONDS: u64 = 1800;
+const DEFAULT_TIMEOUT_SECONDS: u64 = 600;
 
 fn make_timestamp() -> Result<domain::Timestamp, String> {
     let s = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
@@ -438,6 +438,14 @@ fn run_resolve_escalation(args: &ResolveEscalationArgs) -> Result<String, String
 // check-approved: Verify review.status == approved with current code hash
 // ---------------------------------------------------------------------------
 
+#[cfg(test)]
+fn remap_partition_to_cycle_groups(
+    partition: usecase::review_workflow::groups::GroupPartition,
+    cycle_group_names: &std::collections::BTreeSet<domain::ReviewGroupName>,
+) -> Result<usecase::review_workflow::groups::GroupPartition, String> {
+    partition.remap_to_group_names(cycle_group_names).map_err(|e| format!("{e}"))
+}
+
 fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
     match run_check_approved(args) {
         Ok(()) => {
@@ -474,15 +482,8 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
     let current_snapshot = review_store
         .find_review(&track_id_parsed)
         .map_err(|e| format!("failed to read review.json: {e}"))?
-        .and_then(|r| {
-            r.current_cycle().map(|c| {
-                let diff_base = infrastructure::review_adapters::effective_diff_base(c);
-                let cycle_group_names: std::collections::BTreeSet<_> =
-                    c.group_names().cloned().collect();
-                (diff_base, cycle_group_names)
-            })
-        })
-        .map(|(diff_base, cycle_group_names)| -> Result<_, String> {
+        .and_then(|r| r.current_cycle().map(infrastructure::review_adapters::effective_diff_base))
+        .map(|diff_base| -> Result<_, String> {
             let git = SystemGitRepo::discover().map_err(|e| format!("{e}"))?;
             let scope_json = git.root().join("track/review-scope.json");
             let scope_config = infrastructure::review_group_policy::load_review_scope_config(
@@ -506,11 +507,7 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
                 &diff_files,
                 &scope_config.operational_matchers,
             );
-            let full_partition = policy.partition(&filtered_files).map_err(|e| format!("{e}"))?;
-
-            // Filter partition to match cycle's group set to avoid PartitionChanged
-            // false positive when the cycle was created with a subset of groups.
-            let partition = filter_partition_to_cycle_groups(&full_partition, &cycle_group_names)?;
+            let partition = policy.partition(&filtered_files).map_err(|e| format!("{e}"))?;
 
             Ok(usecase::review_workflow::groups::ReviewPartitionSnapshot::new(
                 base_policy.policy_hash(),
@@ -533,26 +530,6 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
         &hasher,
         &review_store,
     )
-}
-
-fn filter_partition_to_cycle_groups(
-    full_partition: &usecase::review_workflow::groups::GroupPartition,
-    cycle_group_names: &std::collections::BTreeSet<domain::ReviewGroupName>,
-) -> Result<usecase::review_workflow::groups::GroupPartition, String> {
-    let other_key = domain::ReviewGroupName::try_new("other").map_err(|e| format!("{e}"))?;
-    let mut filtered: std::collections::BTreeMap<
-        domain::ReviewGroupName,
-        Vec<usecase::review_workflow::scope::RepoRelativePath>,
-    > = std::collections::BTreeMap::new();
-    for (name, paths) in full_partition.groups() {
-        if cycle_group_names.contains(name) && *name != other_key {
-            filtered.entry(name.clone()).or_default().extend(paths.iter().cloned());
-        } else {
-            filtered.entry(other_key.clone()).or_default().extend(paths.iter().cloned());
-        }
-    }
-    filtered.entry(other_key).or_default();
-    usecase::review_workflow::groups::GroupPartition::try_new(filtered).map_err(|e| format!("{e}"))
 }
 
 /// Returns `true` if all staged files match the planning-only allowlist.

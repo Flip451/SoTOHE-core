@@ -5,6 +5,7 @@ use super::{
     codex_local::build_prompt, codex_local::render_codex_local_result,
     codex_local::run_codex_local,
 };
+use clap::Parser;
 use std::env;
 use std::ffi::OsString;
 use std::fs;
@@ -146,6 +147,10 @@ message="${SOTP_FAKE_CODEX_MESSAGE:-}"
 if [ -n "$message" ] && [ -n "$out" ]; then
   printf '%s\n' "$message" > "$out"
 fi
+stdout_message="${SOTP_FAKE_CODEX_STDOUT_MESSAGE:-}"
+if [ -n "$stdout_message" ]; then
+  printf '%s\n' "$stdout_message" >&2
+fi
 exit "${SOTP_FAKE_CODEX_EXIT_CODE:-0}"
 "#,
     )
@@ -253,7 +258,7 @@ fn render_codex_local_result_emits_findings_json_to_stdout() {
         Ok(ReviewRunResult {
             verdict: ReviewVerdict::FindingsRemain,
             final_message: Some(
-                "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: finding\",\"severity\":\"P1\",\"file\":null,\"line\":null}]}".to_owned(),
+                "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: finding\",\"severity\":\"P1\",\"file\":null,\"line\":null,\"category\":null}]}".to_owned(),
             ),
             output_last_message: PathBuf::from("tmp/reviewer-runtime/out.txt"),
             output_last_message_auto_managed: false,
@@ -265,7 +270,7 @@ fn render_codex_local_result_emits_findings_json_to_stdout() {
     assert_eq!(
         rendered.stdout_lines,
         vec![
-            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: finding\",\"severity\":\"P1\",\"file\":null,\"line\":null}]}"
+            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: finding\",\"severity\":\"P1\",\"file\":null,\"line\":null,\"category\":null}]}"
                 .to_owned(),
         ]
     );
@@ -273,7 +278,32 @@ fn render_codex_local_result_emits_findings_json_to_stdout() {
 }
 
 #[test]
-fn filter_partition_to_cycle_groups_preserves_remapped_paths_alongside_other_group() {
+fn review_snapshot_partition_preserves_all_policy_groups() {
+    use std::collections::BTreeMap;
+
+    let mut groups = BTreeMap::new();
+    groups.insert(grn("cli"), vec![repo_path("apps/cli/src/commands/review/tests.rs")]);
+    groups.insert(grn("harness-policy"), vec![repo_path(".claude/commands/track/commit.md")]);
+    groups.insert(grn("other"), vec![repo_path("Cargo.lock")]);
+    let full_partition = usecase::review_workflow::groups::GroupPartition::try_new(groups).unwrap();
+
+    let harness_paths: Vec<_> =
+        full_partition.groups()[&grn("harness-policy")].iter().map(|path| path.as_str()).collect();
+    let other_paths: Vec<_> =
+        full_partition.groups()[&grn("other")].iter().map(|path| path.as_str()).collect();
+    assert!(
+        full_partition.groups().contains_key(&grn("harness-policy")),
+        "full snapshot should retain named groups for PartitionChanged detection"
+    );
+    assert!(
+        harness_paths.contains(&".claude/commands/track/commit.md"),
+        "named group path must stay in harness-policy: {harness_paths:?}"
+    );
+    assert!(other_paths.contains(&"Cargo.lock"), "native other path must be preserved");
+}
+
+#[test]
+fn remap_partition_to_cycle_groups_preserves_subset_cycle_compatibility() {
     use std::collections::{BTreeMap, BTreeSet};
 
     let mut groups = BTreeMap::new();
@@ -282,21 +312,110 @@ fn filter_partition_to_cycle_groups_preserves_remapped_paths_alongside_other_gro
     groups.insert(grn("other"), vec![repo_path("Cargo.lock")]);
     let full_partition = usecase::review_workflow::groups::GroupPartition::try_new(groups).unwrap();
 
-    let cycle_groups: BTreeSet<_> = [grn("cli"), grn("other")].into_iter().collect();
-    let filtered = super::filter_partition_to_cycle_groups(&full_partition, &cycle_groups);
+    let cycle_group_names: BTreeSet<_> = [grn("cli"), grn("other")].into_iter().collect();
+    let remapped = super::remap_partition_to_cycle_groups(full_partition, &cycle_group_names)
+        .expect("subset cycle remap should succeed");
 
-    assert!(filtered.is_ok(), "partition filter should succeed: {filtered:?}");
-    let filtered = match filtered {
-        Ok(filtered) => filtered,
-        Err(err) => panic!("partition filter should succeed: {err}"),
-    };
+    assert_eq!(remapped.expected_groups(), vec![grn("cli"), grn("other")]);
     let other_paths: Vec<_> =
-        filtered.groups()[&grn("other")].iter().map(|path| path.as_str()).collect();
+        remapped.groups()[&grn("other")].iter().map(|path| path.as_str()).collect();
     assert!(
         other_paths.contains(&".claude/commands/track/commit.md"),
-        "remapped harness-policy path must be preserved in other: {other_paths:?}"
+        "non-cycle named groups should fold into other for legacy subset cycles"
     );
-    assert!(other_paths.contains(&"Cargo.lock"), "native other path must be preserved");
+    assert!(other_paths.contains(&"Cargo.lock"), "existing other paths must be preserved");
+}
+
+#[test]
+fn remapped_subset_cycle_snapshot_stays_approvable_for_legacy_cycle() {
+    use std::collections::{BTreeMap, BTreeSet};
+
+    let mut partition_groups = BTreeMap::new();
+    partition_groups.insert(grn("cli"), vec![repo_path("apps/cli/src/commands/review/tests.rs")]);
+    partition_groups.insert(grn("usecase"), vec![repo_path("libs/usecase/src/lib.rs")]);
+    partition_groups.insert(grn("other"), vec![repo_path("Cargo.lock")]);
+    let full_partition =
+        usecase::review_workflow::groups::GroupPartition::try_new(partition_groups).unwrap();
+
+    let cycle_group_names: BTreeSet<_> = [grn("usecase"), grn("other")].into_iter().collect();
+    let remapped = super::remap_partition_to_cycle_groups(full_partition, &cycle_group_names)
+        .expect("subset cycle remap should succeed");
+    let snapshot = usecase::review_workflow::groups::ReviewPartitionSnapshot::new(
+        "sha256:none",
+        "sha256:none",
+        remapped,
+    );
+
+    let ts = domain::Timestamp::new("2026-04-03T00:00:00Z").unwrap();
+    let mut usecase_group =
+        domain::CycleGroupState::new(vec!["libs/usecase/src/lib.rs".to_owned()]);
+    usecase_group.record_round(
+        domain::GroupRound::success(
+            domain::RoundType::Fast,
+            ts.clone(),
+            "hash-usecase",
+            domain::GroupRoundVerdict::ZeroFindings,
+        )
+        .unwrap(),
+    );
+    usecase_group.record_round(
+        domain::GroupRound::success(
+            domain::RoundType::Final,
+            ts.clone(),
+            "hash-usecase",
+            domain::GroupRoundVerdict::ZeroFindings,
+        )
+        .unwrap(),
+    );
+    let mut other_group =
+        domain::CycleGroupState::new(vec!["apps/cli/src/commands/review/tests.rs".to_owned()]);
+    other_group.record_round(
+        domain::GroupRound::success(
+            domain::RoundType::Fast,
+            ts.clone(),
+            "hash-other",
+            domain::GroupRoundVerdict::ZeroFindings,
+        )
+        .unwrap(),
+    );
+    other_group.record_round(
+        domain::GroupRound::success(
+            domain::RoundType::Final,
+            ts,
+            "hash-other",
+            domain::GroupRoundVerdict::ZeroFindings,
+        )
+        .unwrap(),
+    );
+
+    let mut review = domain::ReviewJson::new();
+    review
+        .start_cycle(
+            "cycle-1",
+            domain::Timestamp::new("2026-04-03T00:00:00Z").unwrap(),
+            "main",
+            "sha256:none",
+            "sha256:none",
+            BTreeMap::from([(grn("usecase"), usecase_group), (grn("other"), other_group)]),
+        )
+        .unwrap();
+
+    let current_hashes = BTreeMap::from([
+        (grn("usecase"), "hash-usecase".to_owned()),
+        (grn("other"), "hash-other".to_owned()),
+    ]);
+
+    let result = usecase::review_workflow::cycle::check_cycle_approved(
+        &review,
+        &snapshot,
+        &current_hashes,
+        Some("rvw1:sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+    );
+    assert_eq!(
+        result,
+        usecase::review_workflow::cycle::CheckCycleApprovedResult::Approved,
+        "legacy subset cycles should remain approvable after CLI remap"
+    );
 }
 
 #[test]
@@ -387,7 +506,7 @@ fn run_codex_local_reports_findings_when_final_message_is_present() {
     let _message = EnvVarGuard::set(
         "SOTP_FAKE_CODEX_MESSAGE",
         std::ffi::OsStr::new(
-            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: review finding\",\"severity\":\"P1\",\"file\":null,\"line\":null}]}",
+            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: review finding\",\"severity\":\"P1\",\"file\":null,\"line\":null,\"category\":null}]}",
         ),
     );
 
@@ -409,6 +528,68 @@ fn run_codex_local_reports_findings_when_final_message_is_present() {
 }
 
 #[test]
+fn run_codex_local_accepts_missing_category_payload_for_backward_compatibility() {
+    let _lock = env_lock().lock().unwrap();
+    let dir = tempfile::tempdir().unwrap();
+    let script = write_fake_codex_script(dir.path());
+    let output = dir.path().join("last.txt");
+    let _bin = EnvVarGuard::set(CODEX_BIN_ENV, script.as_os_str());
+    let _message = EnvVarGuard::set(
+        "SOTP_FAKE_CODEX_MESSAGE",
+        std::ffi::OsStr::new(
+            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: legacy finding\",\"severity\":\"P1\",\"file\":null,\"line\":null}]}",
+        ),
+    );
+
+    let result = run_codex_local(&fake_args(
+        Some("Review this implementation.".to_owned()),
+        None,
+        output,
+        1,
+    ))
+    .unwrap();
+
+    assert_eq!(result.verdict, ReviewVerdict::FindingsRemain);
+    assert_eq!(
+        result.final_message.as_deref(),
+        Some(
+            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: legacy finding\",\"severity\":\"P1\",\"file\":null,\"line\":null,\"category\":null}]}"
+        )
+    );
+}
+
+#[test]
+fn run_codex_local_session_log_fallback_accepts_missing_category_payload() {
+    let _lock = env_lock().lock().unwrap();
+    let dir = tempfile::tempdir().unwrap();
+    let script = write_fake_codex_script(dir.path());
+    let output = dir.path().join("last.txt");
+    let _bin = EnvVarGuard::set(CODEX_BIN_ENV, script.as_os_str());
+    let _stdout = EnvVarGuard::set(
+        "SOTP_FAKE_CODEX_STDOUT_MESSAGE",
+        std::ffi::OsStr::new(
+            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: legacy fallback\",\"severity\":\"P1\",\"file\":null,\"line\":null}]}",
+        ),
+    );
+
+    let result = run_codex_local(&fake_args(
+        Some("Review this implementation.".to_owned()),
+        None,
+        output,
+        1,
+    ))
+    .unwrap();
+
+    assert_eq!(result.verdict, ReviewVerdict::FindingsRemain);
+    assert_eq!(
+        result.final_message.as_deref(),
+        Some(
+            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: legacy fallback\",\"severity\":\"P1\",\"file\":null,\"line\":null,\"category\":null}]}"
+        )
+    );
+}
+
+#[test]
 fn run_codex_local_reports_process_failed_when_findings_payload_has_nonzero_exit() {
     let _lock = env_lock().lock().unwrap();
     let dir = tempfile::tempdir().unwrap();
@@ -418,7 +599,7 @@ fn run_codex_local_reports_process_failed_when_findings_payload_has_nonzero_exit
     let _message = EnvVarGuard::set(
         "SOTP_FAKE_CODEX_MESSAGE",
         std::ffi::OsStr::new(
-            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: review finding\",\"severity\":\"P1\",\"file\":null,\"line\":null}]}",
+            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: review finding\",\"severity\":\"P1\",\"file\":null,\"line\":null,\"category\":null}]}",
         ),
     );
     let _code = EnvVarGuard::set("SOTP_FAKE_CODEX_EXIT_CODE", std::ffi::OsStr::new("1"));
@@ -590,6 +771,30 @@ fn run_codex_local_reports_timeout() {
 
     assert_eq!(result.verdict, ReviewVerdict::Timeout);
     assert_eq!(result.final_message, None);
+}
+
+#[derive(Parser)]
+struct TestReviewCli {
+    #[command(subcommand)]
+    command: super::ReviewCommand,
+}
+
+#[test]
+fn review_codex_local_cli_defaults_timeout_to_600_seconds() {
+    let cli = TestReviewCli::try_parse_from([
+        "test",
+        "codex-local",
+        "--model",
+        "gpt-5.4",
+        "--prompt",
+        "Review this implementation.",
+    ])
+    .expect("codex-local args should parse");
+
+    match cli.command {
+        super::ReviewCommand::CodexLocal(args) => assert_eq!(args.timeout_seconds, 600),
+        other => panic!("expected codex-local command, got {other:?}"),
+    }
 }
 
 #[cfg(unix)]
@@ -1715,6 +1920,50 @@ fn test_auto_record_parse_failure_suppresses_untrusted_verdict_json() {
 }
 
 #[test]
+fn test_auto_record_accepts_missing_category_payload_for_backward_compatibility() {
+    use super::codex_local::{
+        emit_rendered_command_result_with_writers, render_execute_with_auto_record,
+    };
+
+    let dir = tempfile::tempdir().unwrap();
+    let items_dir = dir.path().join("items");
+    fs::create_dir_all(&items_dir).unwrap();
+
+    let validated = auto_record_validated_args(items_dir);
+    let outcome = review_run_result_with_payload(
+        ReviewVerdict::FindingsRemain,
+        r#"{"verdict":"findings_remain","findings":[{"message":"P1: legacy finding","severity":"P1","file":"apps/cli/src/commands/review/codex_local.rs","line":7}]}"#,
+    );
+    let scope_provider = AutoRecordCliOnlyScope;
+    let protocol = CapturingFindingsProtocol::new();
+
+    let rendered =
+        render_execute_with_auto_record(outcome, validated, 60, &scope_provider, &protocol);
+    let mut stdout = Vec::new();
+    let mut stderr = Vec::new();
+    emit_rendered_command_result_with_writers(&rendered, &mut stdout, &mut stderr).unwrap();
+
+    assert_eq!(rendered.exit_code, 2, "legacy payload should still auto-record");
+    assert_eq!(
+        protocol.findings_received.borrow().as_slice(),
+        &[domain::StoredFinding::new(
+            "P1: legacy finding",
+            Some("P1".to_owned()),
+            Some("apps/cli/src/commands/review/codex_local.rs".to_owned()),
+            Some(7),
+        )
+        .with_category(None)]
+    );
+    assert_eq!(
+        String::from_utf8(stdout).unwrap().lines().collect::<Vec<_>>(),
+        vec![
+            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: legacy finding\",\"severity\":\"P1\",\"file\":\"apps/cli/src/commands/review/codex_local.rs\",\"line\":7,\"category\":null}]}"
+        ],
+        "legacy findings should be canonicalized through the compatibility path"
+    );
+}
+
+#[test]
 fn test_non_unix_fallback_command_result_keeps_stdout_json_only() {
     use super::codex_local::emit_non_unix_fallback_command_result;
 
@@ -1760,7 +2009,7 @@ fn test_auto_record_disabled_uses_normal_flow() {
         Ok(super::ReviewRunResult {
             verdict: usecase::review_workflow::ReviewVerdict::FindingsRemain,
             final_message: Some(
-                "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: bug\",\"severity\":\"P1\",\"file\":null,\"line\":null}]}"
+                "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: bug\",\"severity\":\"P1\",\"file\":null,\"line\":null,\"category\":null}]}"
                     .to_owned(),
             ),
             output_last_message: PathBuf::from("tmp/reviewer-runtime/out.txt"),

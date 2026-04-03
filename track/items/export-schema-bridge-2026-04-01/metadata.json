@@ -1,0 +1,123 @@
+{
+  "schema_version": 3,
+  "id": "export-schema-bridge-2026-04-01",
+  "branch": "track/export-schema-bridge-2026-04-01",
+  "title": "BRIDGE-01: sotp export-schema — pub シグネチャ抽出 CLI",
+  "status": "planned",
+  "created_at": "2026-04-01T10:39:52Z",
+  "updated_at": "2026-04-01T10:39:52Z",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Domain types (ExportedSchema, SchemaCrate, SchemaModule, SchemaItem enum) + unit tests",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Extract shared infra helpers from domain_scanner.rs (source discovery, parse, pub check) — no behavior change",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "Schema extractor snippet-level tests + implementation (struct/enum/trait/InherentImpl/type alias/const, pub(crate) exclusion)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "Directory-level tests (multi-file module trees, multiple crate roots, --layer resolution, architecture-rules.json loader)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T005",
+      "description": "Text and JSON renderers + golden tests (module hierarchy, schema_version: 1, stable ordering)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T006",
+      "description": "CLI subcommand (sotp export-schema) + integration tests (positional paths, --layer, --format, --project-root, error cases)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "Update strategy docs: rename command in vision.md/TODO-PLAN.md and align TODO.md Phase 3 roadmap with BRIDGE-01",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "syn AST を使って Rust ソースの pub シグネチャを抽出する sotp export-schema コマンドを実装する。",
+      "既存 domain_scanner.rs と共通パース基盤を共有し、CodeScanResult は変更しない。",
+      "text/json 両形式出力、複数パス・--layer 指定、architecture-rules.json 自動解決をサポート。"
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Domain Model",
+        "description": [
+          "ExportedSchema, SchemaCrate, SchemaModule, SchemaItem enum を libs/domain に追加。",
+          "SchemaItem は Struct/Enum/Trait/TypeAlias/Constant/InherentImpl の6バリアント。",
+          "private フィールドは has_private_fields フラグで表現。",
+          "ModulePath でモジュール階層を保持。"
+        ],
+        "task_ids": ["T001"]
+      },
+      {
+        "id": "S2",
+        "title": "Shared Infrastructure Helpers",
+        "description": [
+          "domain_scanner.rs から共通ロジック（ソース収集、ファイルパース、pub判定）を抽出。",
+          "domain_scanner の CodeScanResult API は変更しない。",
+          "既存テストが全てパスすることを確認。"
+        ],
+        "task_ids": ["T002"]
+      },
+      {
+        "id": "S3",
+        "title": "Schema Extraction",
+        "description": [
+          "export_schema.rs + schema_collect.rs で syn AST から SchemaItem を収集。",
+          "スニペットテスト（struct, enum, trait, InherentImpl, type alias, const, pub(crate) 除外）。",
+          "ディレクトリテスト（マルチファイル、マルチクレート、--layer 解決）。",
+          "architecture-rules.json のレイヤー解決用ローダーを独立化。"
+        ],
+        "task_ids": ["T003", "T004"]
+      },
+      {
+        "id": "S4",
+        "title": "Output Rendering",
+        "description": [
+          "text 形式: モジュール階層を保持した Rust 風シグネチャ。",
+          "json 形式: schema_version: 1, crate/module/item 順ソート。",
+          "golden テストで出力安定性を保証。"
+        ],
+        "task_ids": ["T005"]
+      },
+      {
+        "id": "S5",
+        "title": "CLI Integration",
+        "description": [
+          "sotp export-schema をトップレベルサブコマンドとして追加。",
+          "引数: positional paths, --layer, --format text|json, --project-root。",
+          "CLI 統合テスト（stdout, エラーケース）。"
+        ],
+        "task_ids": ["T006"]
+      },
+      {
+        "id": "S6",
+        "title": "Documentation Update",
+        "description": [
+          "vision.md と TODO-PLAN.md のコマンド名を sotp export-schema に更新。",
+          "TODO.md の Phase 3 roadmap 記述と最終更新日を今回の戦略更新に合わせる。"
+        ],
+        "task_ids": ["T007"]
+      }
+    ]
+  }
+}

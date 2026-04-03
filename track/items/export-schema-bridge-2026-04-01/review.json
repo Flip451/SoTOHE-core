@@ -1,0 +1,1733 @@
+{
+  "schema_version": 1,
+  "cycles": [
+    {
+      "cycle_id": "2026-04-03T13:36:58Z",
+      "started_at": "2026-04-03T13:36:58Z",
+      "base_ref": "main",
+      "base_policy_hash": "sha256:6171417213e49310b369c3ce4303bee111250ac00bdc96209211cf8501b0417e",
+      "policy_hash": "sha256:6171417213e49310b369c3ce4303bee111250ac00bdc96209211cf8501b0417e",
+      "approved_head": null,
+      "groups": {
+        "cli": {
+          "scope": [
+            "apps/cli/src/commands/review/tests.rs"
+          ],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:36:58Z",
+              "hash": "rvw1:sha256:e1931d0148635d7349c7191febab23eac4901c79311fa0066f76ecc4aaf29092",
+              "concerns": [
+                "correctness"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`parse_review_final_message_compatible` relaxes more than just `category`: `CategoryBridgeReviewFinding` makes `severity`, `file`, and `line` optional, so `record_round` now accepts payloads missing those fields as `Parsed` and persists them. That weakens validation compared to the previous parser and can store malformed findings instead of rejecting them.",
+                    "severity": "P1",
+                    "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_workflow/verdict.rs",
+                    "line": 647,
+                    "category": "correctness"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:46:19Z",
+              "hash": "rvw1:sha256:622729eeefa1cdc60a86b3382101a5b57b2eac22918265de137547b953937dad",
+              "concerns": [
+                "security"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The reviewer-wrapper verifier no longer enforces any `timeout` wrapper for the local Codex commands. These target entries now only require `--sandbox read-only --full-auto`, so a config can drop the process deadline entirely and still pass verification, which regresses the hang-protection guardrail for review runs.",
+                    "severity": "P1",
+                    "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/orchestra.rs",
+                    "line": 343,
+                    "category": "security"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:49:06Z",
+              "hash": "rvw1:sha256:622729eeefa1cdc60a86b3382101a5b57b2eac22918265de137547b953937dad",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:01:39Z",
+              "hash": "rvw1:sha256:43cd3e59db17f4d76f67418a6db0bb22016f76eba043a2e7858820e6a24af1eb",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:05:36Z",
+              "hash": "rvw1:sha256:43cd3e59db17f4d76f67418a6db0bb22016f76eba043a2e7858820e6a24af1eb",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:25:17Z",
+              "hash": "rvw1:sha256:b42001cb9ac1721de0ccf0e3009f969b5c211653135eabf9df1cb568479f251b",
+              "concerns": [
+                "cli.commands.review.mod"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Passing `full_partition` here changes the staleness contract for `check_approved`: `check_cycle_approved` compares the current partition key set against the frozen cycle key set, so any cycle started before an extra named group was introduced, or any cycle that intentionally tracked only a subset of groups, will now be rejected as `PartitionChanged` even when the relevant groups are unchanged. The previous remap-to-cycle-groups step was needed to keep existing cycles approvable.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/mod.rs",
+                    "line": 504,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:31:19Z",
+              "hash": "rvw1:sha256:21cfaf493cd4d212a5e04261af3fa473cd707fa1e22df5ec642218716ae98d79",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:35:29Z",
+              "hash": "rvw1:sha256:21cfaf493cd4d212a5e04261af3fa473cd707fa1e22df5ec642218716ae98d79",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:45:46Z",
+              "hash": "rvw1:sha256:3fe8f40c784e8425eb6363bd43376c276e8bc1950c25ce608a3993188cdd5317",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:53:31Z",
+              "hash": "rvw1:sha256:3fe8f40c784e8425eb6363bd43376c276e8bc1950c25ce608a3993188cdd5317",
+              "concerns": [
+                "cli.commands.review.mod",
+                "cli.commands.review.tests"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The new backward-compatibility coverage only exercises payloads read directly from `codex-last-message` and the auto-record helper; nothing tests the `run_codex_local` session-log fallback when that file is empty. That leaves one of the explicitly required legacy-ingestion paths unverified, so a regression there would again reject valid legacy reviewer payloads without any test failure.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/tests.rs",
+                    "line": 526,
+                    "category": null
+                  },
+                  {
+                    "message": "The 600-second timeout fix only changes `DEFAULT_TIMEOUT_SECONDS`; there is still no CLI parsing regression test asserting that `sotp review codex-local` defaults to 600 seconds. Since this exact contract already drifted once, it can silently regress again without any automated signal.",
+                    "severity": "P1",
+                    "file": "apps/cli/src/commands/review/mod.rs",
+                    "line": 17,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:01:24Z",
+              "hash": "rvw1:sha256:2dcf448b65918cc4051be82bbef4e98ca8cf5e52f759cbba49b34257b1a4b796",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:10:52Z",
+              "hash": "rvw1:sha256:2dcf448b65918cc4051be82bbef4e98ca8cf5e52f759cbba49b34257b1a4b796",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:18:17Z",
+              "hash": "rvw1:sha256:2dcf448b65918cc4051be82bbef4e98ca8cf5e52f759cbba49b34257b1a4b796",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:28:54Z",
+              "hash": "rvw1:sha256:2dcf448b65918cc4051be82bbef4e98ca8cf5e52f759cbba49b34257b1a4b796",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        },
+        "domain": {
+          "scope": [
+            "libs/domain/src/review/cycle/mod.rs"
+          ],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:38:09Z",
+              "hash": "rvw1:sha256:35b65cd376149842f89b6b8b77431cdb027d92331147ad93d4f76535014f87fd",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:48:35Z",
+              "hash": "rvw1:sha256:35b65cd376149842f89b6b8b77431cdb027d92331147ad93d4f76535014f87fd",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:05:49Z",
+              "hash": "rvw1:sha256:35b65cd376149842f89b6b8b77431cdb027d92331147ad93d4f76535014f87fd",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:34:48Z",
+              "hash": "rvw1:sha256:35b65cd376149842f89b6b8b77431cdb027d92331147ad93d4f76535014f87fd",
+              "concerns": [
+                "architecture"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Hard-coding `EMPTY_GROUP_SCOPE_HASH` in the domain layer couples approval/staleness to the current `rvw1:sha256:` encoding. If the scope-hash format/version changes, unchanged empty groups will start failing `all_groups_approved()` and `check_group_staleness()` even though the rest of the system still works with the new hashes. This special case should consume the canonical empty-scope hash from the hashing boundary or persisted cycle data instead of embedding an infrastructure hash literal in domain logic.",
+                    "severity": "P1",
+                    "file": "libs/domain/src/review/cycle/mod.rs",
+                    "line": 20,
+                    "category": "architecture"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:41:23Z",
+              "hash": "rvw1:sha256:e6858335fde336c6531f100af40a9f411aa7b43543a74d4c73c2c80a33ab262a",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:45:51Z",
+              "hash": "rvw1:sha256:e6858335fde336c6531f100af40a9f411aa7b43543a74d4c73c2c80a33ab262a",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:51:21Z",
+              "hash": "rvw1:sha256:e6858335fde336c6531f100af40a9f411aa7b43543a74d4c73c2c80a33ab262a",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:10:06Z",
+              "hash": "rvw1:sha256:e6858335fde336c6531f100af40a9f411aa7b43543a74d4c73c2c80a33ab262a",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:16:51Z",
+              "hash": "rvw1:sha256:e6858335fde336c6531f100af40a9f411aa7b43543a74d4c73c2c80a33ab262a",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:29:29Z",
+              "hash": "rvw1:sha256:e6858335fde336c6531f100af40a9f411aa7b43543a74d4c73c2c80a33ab262a",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        },
+        "harness-policy": {
+          "scope": [
+            ".claude/agent-profiles.json",
+            ".claude/commands/track/review.md",
+            ".claude/rules/02-codex-delegation.md"
+          ],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:38:16Z",
+              "hash": "rvw1:sha256:f9db2637fc6571085017ccd169987a793ab00baf4fe9139c6ef2ed59dcc074ad",
+              "concerns": [
+                "compatibility"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The new backward-compatibility parser is not wired into the main auto-record path. `render_record_auto_round` still calls `parse_review_final_message` directly, so reviewer output that omits `category` is rejected before it ever reaches `record_round`, which defeats the migration added in `verdict.rs`.",
+                    "severity": "P1",
+                    "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+                    "line": 348,
+                    "category": "compatibility"
+                  },
+                  {
+                    "message": "The session-log fallback still uses the strict parser, so legacy payloads without `category` cannot be recovered when `--output-last-message` is missing or empty. `extract_verdict_from_content` should use the compatible parser (or the fallback path will continue to misclassify older reviewer runs as missing/failed).",
+                    "severity": "P1",
+                    "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_workflow/verdict.rs",
+                    "line": 252,
+                    "category": "compatibility"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:47:18Z",
+              "hash": "rvw1:sha256:f9db2637fc6571085017ccd169987a793ab00baf4fe9139c6ef2ed59dcc074ad",
+              "concerns": [
+                "correctness"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`validate_expected_groups_against_cycle` still compares the full cycle key set against `--expected-groups` after normalizing in `other`. That makes the new subset/empty-group flow unusable: any auto-record run that omits an empty group (especially the implicit `other` bucket) will be rejected after the cycle is created, so the added compatibility path cannot actually record rounds for the documented command shapes.",
+                    "severity": "P1",
+                    "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_adapters.rs",
+                    "line": 296,
+                    "category": "correctness"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:49:02Z",
+              "hash": "rvw1:sha256:f9db2637fc6571085017ccd169987a793ab00baf4fe9139c6ef2ed59dcc074ad",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:05:48Z",
+              "hash": "rvw1:sha256:f9db2637fc6571085017ccd169987a793ab00baf4fe9139c6ef2ed59dcc074ad",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:13:22Z",
+              "hash": "rvw1:sha256:35d39dfacce0af89e16335a07f12ab887179c51e8831358f387f3b5d2c672c1b",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:14:47Z",
+              "hash": "rvw1:sha256:35d39dfacce0af89e16335a07f12ab887179c51e8831358f387f3b5d2c672c1b",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:36:05Z",
+              "hash": "rvw1:sha256:35d39dfacce0af89e16335a07f12ab887179c51e8831358f387f3b5d2c672c1b",
+              "concerns": [
+                ".claude.agent-profiles.json",
+                ".claude.rules.02-codex-delegation.md"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The updated read-only Codex `invoke_examples` no longer carry the documented `timeout 600` guardrail. These templates are rendered by hooks such as `.claude/hooks/error-to-codex.py`, so debugger/researcher guidance will now instruct users to launch unbounded Codex subprocesses instead of the 600-second-bounded commands the policy requires.",
+                    "severity": "P1",
+                    "file": ".claude/agent-profiles.json",
+                    "line": 42,
+                    "category": null
+                  },
+                  {
+                    "message": "This rule now states that direct Codex CLI calls standardize on `timeout 600`, but the edited debugger example still shows a bare `codex exec --sandbox read-only ...` command. That leaves the policy self-contradictory and weakens the timeout guardrail the change was supposed to preserve.",
+                    "severity": "P1",
+                    "file": ".claude/rules/02-codex-delegation.md",
+                    "line": 82,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:46:51Z",
+              "hash": "rvw1:sha256:145a329d30baf6d69462d3f77534626fcca640478bd8683e111e92f0813f0e09",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:52:30Z",
+              "hash": "rvw1:sha256:145a329d30baf6d69462d3f77534626fcca640478bd8683e111e92f0813f0e09",
+              "concerns": [
+                ".claude.agent-profiles.json"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Prefixing the Codex invoke examples with `timeout 600` makes `.claude/hooks/_agent_profiles.py::provider_command_prefixes()` emit `timeout` as an active-provider prefix, and `.claude/hooks/error-to-codex.py::should_ignore_command()` then suppresses debugger guidance for any unrelated `timeout ...` Bash command. That silently weakens the error hook for timed build/script invocations; keep `codex` as the leading token in these examples or teach the hook to unwrap wrappers before matching prefixes.",
+                    "severity": "P1",
+                    "file": ".claude/agent-profiles.json",
+                    "line": 42,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:57:19Z",
+              "hash": "rvw1:sha256:145a329d30baf6d69462d3f77534626fcca640478bd8683e111e92f0813f0e09",
+              "concerns": [
+                ".claude.agent-profiles.json"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Adding `timeout 600` to the Codex read-only invoke examples breaks hook-side command filtering: `error-to-codex.should_ignore_command()` still matches raw prefixes like `codex`, so `timeout 600 codex exec ...` is no longer recognized as an existing Codex invocation and can recurse the error hook on its own suggestion.",
+                    "severity": "P1",
+                    "file": ".claude/agent-profiles.json",
+                    "line": 42,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:02:11Z",
+              "hash": "rvw1:sha256:c86e3a26f9bbb2bc3ea9d087e4597022eb21acb46f64ad41ec45ad543951959b",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:11:18Z",
+              "hash": "rvw1:sha256:c86e3a26f9bbb2bc3ea9d087e4597022eb21acb46f64ad41ec45ad543951959b",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:17:20Z",
+              "hash": "rvw1:sha256:c86e3a26f9bbb2bc3ea9d087e4597022eb21acb46f64ad41ec45ad543951959b",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:28:25Z",
+              "hash": "rvw1:sha256:c86e3a26f9bbb2bc3ea9d087e4597022eb21acb46f64ad41ec45ad543951959b",
+              "concerns": [
+                "workflow"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Defining `--expected-groups` as only the non-empty groups in the current review run breaks the early-completion flow later in this doc. When a follow-up rerun reviews just one ready group, `track-local-review --auto-record` will record that subset and `record-round` will evaluate status/escalation against only that subset, so outstanding groups from the same cycle can be ignored and the track can advance to `fast_passed`/`approved` early. `--expected-groups` needs to stay bound to the full non-empty group set for the cycle, not the current rerun subset.",
+                    "severity": "P1",
+                    "file": ".claude/commands/track/review.md",
+                    "line": 152,
+                    "category": "workflow"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:34:46Z",
+              "hash": "rvw1:sha256:9c6b2bdca853d3f1b82eea19ea096215877bc5f29bcca95d217d38b6e3daadb8",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:38:52Z",
+              "hash": "rvw1:sha256:9c6b2bdca853d3f1b82eea19ea096215877bc5f29bcca95d217d38b6e3daadb8",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        },
+        "infrastructure": {
+          "scope": [
+            "libs/infrastructure/src/review_adapters.rs",
+            "libs/infrastructure/src/verify/orchestra.rs"
+          ],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:37:53Z",
+              "hash": "rvw1:sha256:20e7703e19a5ba163ad31a450f036cf9f64932311779d304589c46c4bc2c7169",
+              "concerns": [
+                "backward-compatibility"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`extract_verdict_from_content` still routes candidates through the strict parser, so legacy reviewer JSON that omits `category` is no longer recoverable from session logs. The same strict parser is also still used by the CLI auto-record path, which means the new compatibility parser is only applied in `record_round` and not end-to-end.",
+                    "severity": "P1",
+                    "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_workflow/verdict.rs",
+                    "line": 255,
+                    "category": "backward-compatibility"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:47:41Z",
+              "hash": "rvw1:sha256:be120c0784aea5be69caad2988107c20bd5620e7f67cc551cf76dafa8a3b3987",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:48:31Z",
+              "hash": "rvw1:sha256:be120c0784aea5be69caad2988107c20bd5620e7f67cc551cf76dafa8a3b3987",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:04:27Z",
+              "hash": "rvw1:sha256:e84bde1fb693128ecd0935c3a0c391b71b685ad0533116f7165bc0a064006c7d",
+              "concerns": [
+                "infrastructure.verify.orchestra"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`verify_override_first_model_resolution` now requires `codex exec --model {model} --sandbox read-only --full-auto`, but `.claude/skills/track-plan/SKILL.md:383` documents the planner command as `codex exec --model {model} --sandbox read-only` without `--full-auto`. `cargo make verify-orchestra` will flag the current repo even when the guidance is correct.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/verify/orchestra.rs",
+                    "line": 324,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:08:02Z",
+              "hash": "rvw1:sha256:e84bde1fb693128ecd0935c3a0c391b71b685ad0533116f7165bc0a064006c7d",
+              "concerns": [
+                "infrastructure.verify.orchestra"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Reviewer-wrapper guidance verification no longer asserts the timeout contract. The prior `timeout 180` / `timeout 600` checks were removed and replaced with a generic `--sandbox read-only --full-auto` fragment, so the documented 600-second local-review timeout can drift without failing `verify`.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/verify/orchestra.rs",
+                    "line": 356,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:09:55Z",
+              "hash": "rvw1:sha256:dad17cb0db82b0def631d4d40391f856104e68e313db02d8e68c66538e1026ca",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:12:40Z",
+              "hash": "rvw1:sha256:342caeb855cba24e851a28ad61c657f7220626174c94e12dd37c61b14a45cf23",
+              "concerns": [
+                "infrastructure.review_adapters",
+                "infrastructure.verify.orchestra"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Relaxing the cycle check to allow `expected_groups` to be only a subset of the stored cycle groups means callers can record rounds while omitting groups from the promotion set. Because cycle promotion/escalation bookkeeping still uses `expected_groups` as the closure set, this can mark a cycle `FastPassed`/`Approved` before every group in the stored cycle has been reviewed.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_adapters.rs",
+                    "line": 296,
+                    "category": null
+                  },
+                  {
+                    "message": "The reviewer-wrapper verification no longer asserts a concrete timeout contract for `track-local-review`; it only checks a prose sentence. That weakens the guardrail against timeout drift, so the docs can keep claiming the intended 600-second local-review timeout even if the wrapper/default timeout diverges and `verify` will still pass.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/verify/orchestra.rs",
+                    "line": 364,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:13:23Z",
+              "hash": "rvw1:sha256:342caeb855cba24e851a28ad61c657f7220626174c94e12dd37c61b14a45cf23",
+              "concerns": [
+                "infrastructure.review_adapters"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`validate_expected_groups_against_cycle()` was relaxed from exact match to subset matching. That lets a caller record a round for a cycle while omitting other cycle groups from `--expected-groups`; the only remaining check is that the current `group_name` exists in the cycle, not that it was declared in the expected set. This weakens the fail-closed scope boundary and can hide partial-review mismatches.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_adapters.rs",
+                    "line": 296,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:20:50Z",
+              "hash": "rvw1:sha256:bd66043f1e3ffab151cf9a32a6d2e255e5bc731db74946daa6c156200b6ab8a2",
+              "concerns": [
+                "infrastructure.verify.orchestra"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "This new guardrail text hardcodes a 600-second local-review timeout, but the reviewer wrapper still defaults `timeout_seconds` to 1800s in the runtime CLI. That makes the verification/docs drift from actual behavior and can hide a timeout mismatch instead of catching it.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/verify/orchestra.rs",
+                    "line": 364,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:26:29Z",
+              "hash": "rvw1:sha256:bd66043f1e3ffab151cf9a32a6d2e255e5bc731db74946daa6c156200b6ab8a2",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:31:40Z",
+              "hash": "rvw1:sha256:bd66043f1e3ffab151cf9a32a6d2e255e5bc731db74946daa6c156200b6ab8a2",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:37:58Z",
+              "hash": "rvw1:sha256:bd66043f1e3ffab151cf9a32a6d2e255e5bc731db74946daa6c156200b6ab8a2",
+              "concerns": [
+                "infrastructure.review_adapters",
+                "infrastructure.verify.orchestra"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Relaxing `expected_groups` to a subset here makes legacy truncated cycles recordable again, but it never repairs the stored cycle topology. `check-approved` still compares the cycle key set against the full current partition, so an old `{usecase,other}` cycle under a `{cli,usecase,other}` policy remains permanently `PartitionChanged` and can never be approved. The new upgrade-path tests only cover `record_round`, so this regression is still user-visible.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/review_adapters.rs",
+                    "line": 296,
+                    "category": null
+                  },
+                  {
+                    "message": "`verify_override_first_model_resolution` does exact substring matches, so switching the track-plan forbidden pattern to the templated `...{model}...` form weakens the guardrail: it no longer catches the stale hard-coded command this check was added to ban. A doc can regress to `codex exec --model gpt-5.3-codex --sandbox read-only --full-auto ...` and `verify-orchestra` will still pass because the literal `{model}` placeholder is absent.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/verify/orchestra.rs",
+                    "line": 331,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:45:49Z",
+              "hash": "rvw1:sha256:c206fb7756e78c0c4f2479e41689595eb5037549681087ccc2a8cc18abf8a7f5",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:54:43Z",
+              "hash": "rvw1:sha256:c206fb7756e78c0c4f2479e41689595eb5037549681087ccc2a8cc18abf8a7f5",
+              "concerns": [
+                "infrastructure.verify.orchestra"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`verify_override_first_model_resolution` now forbids only the exact substring `--sandbox read-only --full-auto \"` for `track-plan` guidance. A stale planner example written in the common multiline form (`--sandbox read-only --full-auto \\\n  \"...`) will evade this check, so `verify-orchestra` no longer reliably catches the read-only `--full-auto` snippet the briefing says must be forbidden.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/verify/orchestra.rs",
+                    "line": 332,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:02:39Z",
+              "hash": "rvw1:sha256:4b50236f2ae42b4ffc177d7b88e0dfcd94ce059d97d9a1ae76aff8f9286a3e05",
+              "concerns": [
+                "infrastructure.verify.orchestra"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The reviewer-wrapper check no longer enforces the actual `timeout` contract at the command level. It only requires prose that mentions the 600-second timeout, so a doc change can drop the deadline from the local-review example and still pass verification.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/verify/orchestra.rs",
+                    "line": 369,
+                    "category": null
+                  },
+                  {
+                    "message": "`verify_reviewer_wrapper_guidance` uses a raw substring search for `--sandbox read-only --full-auto` with no shell-continuation normalization. A stale multiline example like `--sandbox read-only \\\\\\n  --full-auto` can evade the guardrail and still pass.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/verify/orchestra.rs",
+                    "line": 949,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:11:33Z",
+              "hash": "rvw1:sha256:64ca450facbe3ffe410540823bf307ae9ab18ee0c1e8b1ccc7ae7fce9f7f0870",
+              "concerns": [
+                "infrastructure.verify.orchestra"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The new `track-plan` guardrail only forbids the exact substring `--sandbox read-only --full-auto \"`, so a stale example formatted without that trailing quote, or split across lines differently, will evade detection. That weakens the check the briefing says must ban the read-only `--full-auto` form regardless of formatting.",
+                    "severity": "P1",
+                    "file": "libs/infrastructure/src/verify/orchestra.rs",
+                    "line": 332,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:18:02Z",
+              "hash": "rvw1:sha256:fdf94c4b3b76c0d42ba31c1978404b2c6626639d1651703924932fe79dbf7b86",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:30:13Z",
+              "hash": "rvw1:sha256:fdf94c4b3b76c0d42ba31c1978404b2c6626639d1651703924932fe79dbf7b86",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        },
+        "other": {
+          "scope": [
+            ".claude/skills/codex-system/SKILL.md",
+            ".claude/skills/track-plan/SKILL.md",
+            "knowledge/strategy/TODO-PLAN.md",
+            "knowledge/strategy/TODO.md",
+            "knowledge/strategy/vision.md",
+            "track/items/export-schema-bridge-2026-04-01/metadata.json",
+            "track/items/export-schema-bridge-2026-04-01/plan.md",
+            "track/items/export-schema-bridge-2026-04-01/spec.json",
+            "track/items/export-schema-bridge-2026-04-01/spec.md",
+            "track/items/export-schema-bridge-2026-04-01/verification.md"
+          ],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:38:20Z",
+              "hash": "rvw1:sha256:257ef93ad85d51b9219321c75877c68cbc8f7103f847692035646486856fe0f2",
+              "concerns": [
+                "compatibility"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`extract_verdict_from_content` still scans session logs with the strict parser, so when `codex-last-message` is empty/missing the fallback cannot recover legacy payloads without `category` and the run is downgraded to `Missing`/`ProcessFailed`.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/verdict.rs",
+                    "line": 255,
+                    "category": "compatibility"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:46:00Z",
+              "hash": "rvw1:sha256:257ef93ad85d51b9219321c75877c68cbc8f7103f847692035646486856fe0f2",
+              "concerns": [
+                "compatibility",
+                "security"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`parse_review_final_message_compatible` still cannot accept legacy payloads that omit `category`: the bridge path calls `validate_review_json_shape_bridge_missing_category`, but that validator still requires `category`, so the code falls through to the strict parser and rejects the old shape. The backward-compatibility migration is therefore ineffective.",
+                    "severity": "P1",
+                    "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_workflow/verdict.rs",
+                    "line": 328,
+                    "category": "compatibility"
+                  },
+                  {
+                    "message": "The reviewer-wrapper verifier no longer enforces `timeout` around Codex invocations. The updated checks only look for `--sandbox read-only --full-auto`, so a doc change can remove the timeout entirely and still pass verification, weakening the hang-prevention guardrail.",
+                    "severity": "P1",
+                    "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/orchestra.rs",
+                    "line": 357,
+                    "category": "security"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:48:42Z",
+              "hash": "rvw1:sha256:257ef93ad85d51b9219321c75877c68cbc8f7103f847692035646486856fe0f2",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:05:22Z",
+              "hash": "rvw1:sha256:257ef93ad85d51b9219321c75877c68cbc8f7103f847692035646486856fe0f2",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:34:23Z",
+              "hash": "rvw1:sha256:257ef93ad85d51b9219321c75877c68cbc8f7103f847692035646486856fe0f2",
+              "concerns": [
+                "track.items.export-schema-bridge-2026-04-01.verification.md"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The track artifacts now require cross-layer export, but the updated strategy docs still define BRIDGE-01 as domain-only. `verification.md` explicitly asks reviewers to run `sotp export-schema libs/domain/src libs/usecase/src`, and `spec.json` accepts multi-path aggregation, while `knowledge/strategy/vision.md` and `knowledge/strategy/TODO-PLAN.md` still describe BRIDGE-01 as extracting signatures from the generated project's `libs/domain/src` / domain layer only. That contradiction leaves implementers unclear whether exporting non-domain layers is in scope for this track.",
+                    "severity": "P1",
+                    "file": "track/items/export-schema-bridge-2026-04-01/verification.md",
+                    "line": 17,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:42:00Z",
+              "hash": "rvw1:sha256:47c94df2f2a10bea6db9c474326a1457f3ab1261786588e03757cef04eeb10bc",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:45:17Z",
+              "hash": "rvw1:sha256:e88e5fcad5ba6762c0a316fd3a4f02d1e60b16426c4cb0b6e86701a2a76ddbf2",
+              "concerns": [
+                "knowledge.strategy.todo-plan.md"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Phase 3 still lists `spec ↔ code 整合性チェック` as BRIDGE-01 work, but `track/items/export-schema-bridge-2026-04-01/spec.json:106` now explicitly defers that check to a separate track after BRIDGE-01. That leaves the planning docs internally inconsistent about whether 3-12 is in scope here.",
+                    "severity": "P1",
+                    "file": "knowledge/strategy/TODO-PLAN.md",
+                    "line": 221,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:49:24Z",
+              "hash": "rvw1:sha256:6062a88a58784dc042016fec2c406af2d7f7fd826bd77fe34b1063e33f5c3c92",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:52:35Z",
+              "hash": "rvw1:sha256:6062a88a58784dc042016fec2c406af2d7f7fd826bd77fe34b1063e33f5c3c92",
+              "concerns": [
+                "track.items.export-schema-bridge-2026-04-01.verification.md"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`spec.json` makes trait-impl method export explicitly out of scope for v1, but the verification checklist only covers `pub(crate)` exclusion and the happy-path output cases. As written, an implementation that accidentally exports trait-impl methods could still pass every listed verification step, so the main extractor scope boundary is not actually being checked.",
+                    "severity": "P1",
+                    "file": "track/items/export-schema-bridge-2026-04-01/verification.md",
+                    "line": 5,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:56:37Z",
+              "hash": "rvw1:sha256:9d58b7c9f4ea01565960670d576ce5d3a5f75dd85eed1fa65e388f622bbcd7f2",
+              "concerns": [
+                ".claude.commands.track.review.md",
+                "test coverage"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`{reviewed-group-names}` is never defined anywhere in this doc, so the Step 2c examples no longer spell out a runnable `--expected-groups` value. The later note and the `record-round` example still require the comma-separated list of non-empty group names.",
+                    "severity": "P1",
+                    "file": ".claude/commands/track/review.md",
+                    "line": 153,
+                    "category": null
+                  },
+                  {
+                    "message": "The verification checklist never exercises a public `trait` definition export, so the spec's in-scope trait-item behavior has no concrete validation step. The only functional case here checks inherent-vs-trait-impl exclusion.",
+                    "severity": "P1",
+                    "file": "track/items/export-schema-bridge-2026-04-01/verification.md",
+                    "line": 15,
+                    "category": "test coverage"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:00:41Z",
+              "hash": "rvw1:sha256:9d58b7c9f4ea01565960670d576ce5d3a5f75dd85eed1fa65e388f622bbcd7f2",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:09:43Z",
+              "hash": "rvw1:sha256:d523463ef23e78d7bfd9cf0fca6f7a5a64a7ff3420bdeed7173b467b2a2ab145",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:16:55Z",
+              "hash": "rvw1:sha256:d523463ef23e78d7bfd9cf0fca6f7a5a64a7ff3420bdeed7173b467b2a2ab145",
+              "concerns": [
+                "traceability"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The new `cargo make ci` acceptance criterion is not represented in the task breakdown or plan sections, so the spec now contains a requirement without a traceable owner. Add a dedicated task/section for the CI gate, or move this check out of acceptance criteria and keep it only in `verification.md`.",
+                    "severity": "P1",
+                    "file": "track/items/export-schema-bridge-2026-04-01/spec.json",
+                    "line": 242,
+                    "category": "traceability"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:21:38Z",
+              "hash": "rvw1:sha256:ea89d91891c3e1a20c8d5a957df2ea86faff423e8aa71b26da61ce04aa890096",
+              "concerns": [
+                "track.items.export-schema-bridge-2026-04-01.spec.json",
+                "track.items.export-schema-bridge-2026-04-01.verification.md"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The Stage 1 signal summary is stale: the underlying scoped items classify to 8 blue / 17 yellow, not 13 / 13. Because the hearing flow uses these counts to decide whether to skip structured questioning, the rendered summary can under-report how much needs confirmation.",
+                    "severity": "P1",
+                    "file": "track/items/export-schema-bridge-2026-04-01/spec.json",
+                    "line": 246,
+                    "category": null
+                  },
+                  {
+                    "message": "The verification checklist only requires that a public `trait` appears in the output; it never checks that trait method signatures are exported. Since `scope.in_scope` explicitly includes `trait (メソッド)`, an implementation could drop all trait methods and still pass verification.",
+                    "severity": "P1",
+                    "file": "track/items/export-schema-bridge-2026-04-01/verification.md",
+                    "line": 6,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:23:27Z",
+              "hash": "rvw1:sha256:563a6163d2b98da32a67ee4d028854fd49eb771c68cceec2f7965413ea973544",
+              "concerns": [
+                "consistency"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Rendered spec metadata is stale: `spec.json` records signal counts as blue/yellow/red = 8/17/0, but the generated `spec.md` frontmatter still says 13/13/0. That breaks the required consistency between the SSoT and the rendered view.",
+                    "severity": "P1",
+                    "file": "track/items/export-schema-bridge-2026-04-01/spec.md",
+                    "line": 5,
+                    "category": "consistency"
+                  },
+                  {
+                    "message": "The BRIDGE-01 strategy docs still use bare `export-schema` in the proptest/typestate table instead of the standardized `sotp export-schema`, so the command-name update is only partial. The same stale wording also appears in `knowledge/strategy/vision.md:191`.",
+                    "severity": "P1",
+                    "file": "knowledge/strategy/TODO-PLAN.md",
+                    "line": 205,
+                    "category": "consistency"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:25:33Z",
+              "hash": "rvw1:sha256:3e9066da5861e06356429f084a09f0170f59142239553a8c39858e5c1b0e9e08",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:28:54Z",
+              "hash": "rvw1:sha256:3e9066da5861e06356429f084a09f0170f59142239553a8c39858e5c1b0e9e08",
+              "concerns": [
+                "traceability"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "T007 records the documentation update scope as only `vision.md` and `TODO-PLAN.md`, but this review group also modifies `knowledge/strategy/TODO.md` to add Phase 3 items. That leaves a strategy-doc change outside the track's declared scope and verification surface, so BRIDGE-01 can be marked complete without anyone checking whether `TODO.md` stayed aligned with the new plan.",
+                    "severity": "P1",
+                    "file": "track/items/export-schema-bridge-2026-04-01/spec.json",
+                    "line": 77,
+                    "category": "traceability"
+                  },
+                  {
+                    "message": "`knowledge/strategy/TODO.md` still says `最終更新: 2026-03-31` even though this patch adds 2026-04-01 updates below. Because this header is the document's audit metadata, the stale date makes the strategy index self-contradictory and weakens change traceability.",
+                    "severity": "P1",
+                    "file": "knowledge/strategy/TODO.md",
+                    "line": 5,
+                    "category": "traceability"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:34:28Z",
+              "hash": "rvw1:sha256:bcd7ada8c750c12d03ce7fc14aa9efd4e7b2e024c83a64fa1511cf7ee30f448b",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:37:50Z",
+              "hash": "rvw1:sha256:bcd7ada8c750c12d03ce7fc14aa9efd4e7b2e024c83a64fa1511cf7ee30f448b",
+              "concerns": [
+                "track.items.export-schema-bridge-2026-04-01.verification.md"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "T007's verification is unsatisfiable as written: this step requires `knowledge/strategy/TODO.md` to contain `sotp export-schema`, but the current change to that file only updates the timestamp and adds no command reference. That leaves the track artifacts internally inconsistent and guarantees the documentation acceptance check will fail unless TODO.md is actually updated or the criterion is narrowed to the files that changed command text.",
+                    "severity": "P1",
+                    "file": "track/items/export-schema-bridge-2026-04-01/verification.md",
+                    "line": 24,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:41:48Z",
+              "hash": "rvw1:sha256:a3841b6c72bb5b69cc6381ee9e820de456b2de63085540fe84c7793f3092ae0c",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:43:51Z",
+              "hash": "rvw1:sha256:a3841b6c72bb5b69cc6381ee9e820de456b2de63085540fe84c7793f3092ae0c",
+              "concerns": [
+                "knowledge.strategy.todo-plan.md",
+                "track.items.export-schema-bridge-2026-04-01.spec.json"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "T007's acceptance criteria now require `knowledge/strategy/TODO.md` to be aligned with the BRIDGE-01 roadmap, but this change only updates that file's timestamp. `TODO.md` still has no BRIDGE-01 / `sotp export-schema` roadmap entry, so the new acceptance check cannot actually pass and the planning artifacts are no longer internally consistent.",
+                    "severity": "P1",
+                    "file": "track/items/export-schema-bridge-2026-04-01/spec.json",
+                    "line": 233,
+                    "category": null
+                  },
+                  {
+                    "message": "The command rename is still incomplete in the updated Phase 3 roadmap section: this row keeps the old bare `export-schema` wording even though the surrounding edits standardize on `sotp export-schema`. That leaves the strategy docs inconsistent with the track's documented rename goal.",
+                    "severity": "P1",
+                    "file": "knowledge/strategy/TODO-PLAN.md",
+                    "line": 212,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:46:26Z",
+              "hash": "rvw1:sha256:f48095c13a02338b51623e7d8d3c46d9764caf5d0c5951bf68ed05de4e10e4e4",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:48:30Z",
+              "hash": "rvw1:sha256:f48095c13a02338b51623e7d8d3c46d9764caf5d0c5951bf68ed05de4e10e4e4",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        },
+        "usecase": {
+          "scope": [
+            "libs/usecase/src/review_workflow/cycle.rs",
+            "libs/usecase/src/review_workflow/groups.rs",
+            "libs/usecase/src/review_workflow/mod.rs",
+            "libs/usecase/src/review_workflow/usecases.rs",
+            "libs/usecase/src/review_workflow/verdict.rs"
+          ],
+          "rounds": [
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:38:55Z",
+              "hash": "rvw1:sha256:320c1ff9e2a0d5c5d1f877c4430e729102df7e02fbe45b3239371452f3e636a5",
+              "concerns": [
+                "correctness",
+                "security"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The new backward-compatible final-message parser is only wired into `record_round`; the actual auto-record ingestion path still uses the strict parser (`render_record_auto_round` in `apps/cli/src/commands/review/codex_local.rs:348`) and the session-log fallback still calls the strict candidate parser (`libs/usecase/src/review_workflow/verdict.rs:252`). As a result, legacy reviewer payloads that omit `category` are still rejected in the main flow, and if `output_last_message` contains an invalid payload the log fallback is never reached because it only runs on `Missing`.",
+                    "severity": "P1",
+                    "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+                    "line": 348,
+                    "category": "correctness"
+                  },
+                  {
+                    "message": "The verifier no longer checks that reviewer commands are wrapped in `timeout`; the required snippets were weakened to only match `--sandbox read-only --full-auto`. That means a config can drop the timeout entirely and still pass `verify_reviewer_wrapper_guidance`, which weakens the guardrail against hung reviewer processes.",
+                    "severity": "P1",
+                    "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/orchestra.rs",
+                    "line": 345,
+                    "category": "security"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:45:04Z",
+              "hash": "rvw1:sha256:7af4adfdc021af8241ff8acbb2d3ddf87e7769d59a55d014895dfb180c2a90a2",
+              "concerns": [
+                "correctness",
+                "security"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "The compatibility parser is broader than the migration target: `CategoryBridgeReviewFindingShapeVisitor` makes `severity`, `file`, and `line` optional, so `parse_review_final_message_compatible` now accepts payloads that are missing more than just `category`. That lets malformed findings pass validation and be persisted by `record_round` instead of being rejected.",
+                    "severity": "P1",
+                    "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_workflow/verdict.rs",
+                    "line": 555,
+                    "category": "correctness"
+                  },
+                  {
+                    "message": "The reviewer-wrapper verification was weakened by dropping the timeout requirement from `REVIEW_WRAPPER_TARGETS`. The check now passes as long as the docs mention `cargo make track-local-review`, even if the wrapper is no longer wrapped in `timeout`, which removes the guard against hung reviewer processes.",
+                    "severity": "P1",
+                    "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/orchestra.rs",
+                    "line": 357,
+                    "category": "security"
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:49:52Z",
+              "hash": "rvw1:sha256:7af4adfdc021af8241ff8acbb2d3ddf87e7769d59a55d014895dfb180c2a90a2",
+              "concerns": [
+                "usecase.review_workflow.verdict"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Direct `serde_json::from_str::<ReviewFinalPayload>` still accepts missing `category` because `ReviewFinding.category` remains `#[serde(default)]`. The required-category rule is only enforced by `parse_review_final_message[_compatible]`, so any caller that deserializes the public payload type directly can bypass the new contract and silently normalize malformed reviewer output.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/verdict.rs",
+                    "line": 113,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T13:55:32Z",
+              "hash": "rvw1:sha256:8fb08a92ee2725699d8897a8ea3b7aed4fe7866e325099a020ec9316a15ae4cc",
+              "concerns": [
+                "usecase.review_workflow.usecases"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Filtering `current_snapshot.partition()` down to `cycle_group_names` before calling `check_cycle_approved()` hides partition drift. Any file moved out of `other` into a newly introduced group gets folded back into `other`, so the merged hash can stay unchanged and a stale cycle can still be approved instead of surfacing `PartitionChanged`.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/usecases.rs",
+                    "line": 518,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:03:16Z",
+              "hash": "rvw1:sha256:6c72466ef844340b261859b003fb901608168d04863488bdda1f98fbc7604770",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:07:47Z",
+              "hash": "rvw1:sha256:6c72466ef844340b261859b003fb901608168d04863488bdda1f98fbc7604770",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:22:14Z",
+              "hash": "rvw1:sha256:4c2f671d5feb59d12c5ff65465495b8426d2ad0f1a03a38f8b14bdea7036eddc",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:37:15Z",
+              "hash": "rvw1:sha256:d3b65214f045458e767730a10b5d6a8718f987d4bef60ef46cb01b6a9aedfc1f",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:43:44Z",
+              "hash": "rvw1:sha256:1df6ec6b2400c791537147930c5b32a4ce037f544500347bb11de05655431d01",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:48:35Z",
+              "hash": "rvw1:sha256:1df6ec6b2400c791537147930c5b32a4ce037f544500347bb11de05655431d01",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T14:54:25Z",
+              "hash": "rvw1:sha256:1df6ec6b2400c791537147930c5b32a4ce037f544500347bb11de05655431d01",
+              "concerns": [
+                "usecase.review_workflow.usecases"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`check_approved` still hashes `snapshot.partition().groups()` exactly as supplied and never remaps that snapshot onto the active cycle's group set before calling `check_cycle_approved`. That leaves the new frozen-group hash semantics CLI-only: any other caller that passes a natural current snapshot will keep getting `PartitionChanged` as soon as the current partition contains groups outside the frozen cycle, instead of exercising the intended hash/empty-scope bridge. The usecase should normalize to `cycle.group_names()` itself or explicitly require a pre-remapped snapshot.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/usecases.rs",
+                    "line": 536,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:03:03Z",
+              "hash": "rvw1:sha256:081ae0824a3593021f16f8f13992680cd0102946426296378136b3cbab83e795",
+              "concerns": [
+                "usecase.review_workflow.usecases"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "`check_approved_remaps_snapshot_to_cycle_groups` uses a `FixedHasher` that returns the same hash for every scope, so it does not verify that non-cycle files are actually folded into `other`; a buggy remap that drops those paths would still pass. Add a scope-sensitive assertion or inspect the remapped partition directly.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/usecases.rs",
+                    "line": 828,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:11:09Z",
+              "hash": "rvw1:sha256:c89c67efae21eaa50f8ee2776df45e0fa223ee5cdd50efff25bee38c0bd8a3d1",
+              "concerns": [
+                "usecase.review_workflow.usecases"
+              ],
+              "verdict": {
+                "verdict": "findings_remain",
+                "findings": [
+                  {
+                    "message": "Remapping `current_snapshot.partition()` to the frozen cycle group set before `check_cycle_approved()` can hide partition drift. If files are moved out of `other` into a newly introduced group, they get folded back into `other`, so the merged hash can still match the frozen cycle and a stale review may pass as `Approved` instead of surfacing `PartitionChanged`.",
+                    "severity": "P1",
+                    "file": "libs/usecase/src/review_workflow/usecases.rs",
+                    "line": 539,
+                    "category": null
+                  }
+                ]
+              }
+            },
+            {
+              "round_type": "fast",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:18:16Z",
+              "hash": "rvw1:sha256:8fa24d94bf9bb4416834daf6f41aec93529c3d17a98b51efdb2cd2c2b3551a48",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            },
+            {
+              "round_type": "final",
+              "success": "success",
+              "error_message": null,
+              "timestamp": "2026-04-03T15:31:19Z",
+              "hash": "rvw1:sha256:8fa24d94bf9bb4416834daf6f41aec93529c3d17a98b51efdb2cd2c2b3551a48",
+              "concerns": [],
+              "verdict": {
+                "verdict": "zero_findings",
+                "findings": []
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

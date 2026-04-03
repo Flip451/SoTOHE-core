@@ -181,6 +181,20 @@ fn validate_findings_concern_coverage(
     }
 }
 
+fn validate_group_in_expected_groups(
+    group_name: &ReviewGroupName,
+    expected_groups: &[ReviewGroupName],
+) -> Result<(), RecordRoundError> {
+    if expected_groups.contains(group_name) {
+        Ok(())
+    } else {
+        Err(RecordRoundError::Other(format!(
+            "group '{}' must be included in expected_groups",
+            group_name.as_ref()
+        )))
+    }
+}
+
 fn stored_finding_concern(finding: &domain::StoredFinding) -> String {
     if let Some(category) = finding.category() {
         category.trim().to_lowercase()
@@ -190,6 +204,28 @@ fn stored_finding_concern(finding: &domain::StoredFinding) -> String {
     } else {
         "other".to_owned()
     }
+}
+
+fn reclassified_paths_outside_cycle_groups(
+    cycle: &domain::ReviewCycle,
+    snapshot: &crate::review_workflow::groups::ReviewPartitionSnapshot,
+    cycle_group_names: &std::collections::BTreeSet<ReviewGroupName>,
+) -> Vec<String> {
+    let frozen_scope_paths: std::collections::BTreeSet<&str> = cycle
+        .groups()
+        .values()
+        .flat_map(|group_state| group_state.scope().iter().map(String::as_str))
+        .collect();
+
+    snapshot
+        .partition()
+        .groups()
+        .iter()
+        .filter(|(group_name, _)| !cycle_group_names.contains(*group_name))
+        .flat_map(|(_, paths)| paths.iter().map(|path| path.as_str()))
+        .filter(|path| frozen_scope_paths.contains(*path))
+        .map(str::to_owned)
+        .collect()
 }
 
 /// Parses raw string arguments and delegates to the infrastructure protocol.
@@ -202,7 +238,7 @@ pub fn record_round(
     protocol: &impl RecordRoundProtocol,
 ) -> Result<(), RecordRoundError> {
     use crate::review_workflow::{
-        ReviewFinalMessageState, ReviewPayloadVerdict, parse_review_final_message,
+        ReviewFinalMessageState, ReviewPayloadVerdict, parse_review_final_message_compatible,
         review_findings_to_stored,
     };
 
@@ -233,6 +269,7 @@ pub fn record_round(
 
     let group_name = ReviewGroupName::try_new(input.group.as_str())
         .map_err(|e| RecordRoundError::Other(format!("invalid group name: {e}")))?;
+    validate_group_in_expected_groups(&group_name, &expected_groups)?;
 
     let concerns: Vec<ReviewConcern> = if input.concerns.trim().is_empty() {
         Vec::new()
@@ -245,7 +282,7 @@ pub fn record_round(
             .collect()
     };
 
-    let final_message_state = parse_review_final_message(Some(&input.verdict));
+    let final_message_state = parse_review_final_message_compatible(Some(&input.verdict));
     let (verdict, findings) = match &final_message_state {
         ReviewFinalMessageState::Parsed(payload) => {
             let verdict = match payload.verdict {
@@ -311,6 +348,7 @@ pub fn record_round_typed(
     if expected_groups.is_empty() {
         return Err(RecordRoundError::Other("expected_groups must not be empty".to_owned()));
     }
+    validate_group_in_expected_groups(&group_name, &expected_groups)?;
 
     validate_round_verdict_inputs(&verdict, &concerns, &findings)?;
 
@@ -514,12 +552,38 @@ pub fn check_approved(
 
     // Delegate to check_cycle_approved which performs full verification:
     // staleness (policy + partition + hash) + per-group fast/final check.
+    let empty_scope_hash = hasher
+        .group_scope_hash(&[])
+        .map_err(|e| format!("group scope hash error for empty scope: {e}"))?;
     if let Some(ref snapshot) = input.current_snapshot {
+        let cycle_group_names: std::collections::BTreeSet<_> =
+            cycle.group_names().cloned().collect();
+        let reclassified_paths =
+            reclassified_paths_outside_cycle_groups(cycle, snapshot, &cycle_group_names);
+        if !reclassified_paths.is_empty() {
+            return Err(format!(
+                "[BLOCKED] {:?}",
+                crate::review_workflow::cycle::CheckCycleApprovedReason::Stale(
+                    domain::ReviewStalenessReason::PartitionChanged,
+                )
+            ));
+        }
+        let remapped_partition = snapshot
+            .partition()
+            .clone()
+            .remap_to_group_names(&cycle_group_names)
+            .map_err(|e| format!("partition remap error: {e}"))?;
+        let remapped_snapshot = crate::review_workflow::groups::ReviewPartitionSnapshot::new(
+            snapshot.base_policy_hash(),
+            snapshot.policy_hash(),
+            remapped_partition,
+        );
+
         // Compute hashes from CURRENT partition (not frozen cycle scope) so that
         // files added to a group after cycle start are reflected in the hash,
         // causing a mismatch with the reviewed round hash.
         let mut current_group_hashes = std::collections::BTreeMap::new();
-        for (group_name, paths) in snapshot.partition().groups() {
+        for (group_name, paths) in remapped_snapshot.partition().groups() {
             let scope: Vec<String> = paths.iter().map(|p| p.as_str().to_owned()).collect();
             let group_hash = hasher.group_scope_hash(&scope).map_err(|e| {
                 format!("group scope hash error for '{}': {e}", group_name.as_ref())
@@ -529,8 +593,9 @@ pub fn check_approved(
 
         match crate::review_workflow::cycle::check_cycle_approved(
             &review,
-            snapshot,
+            &remapped_snapshot,
             &current_group_hashes,
+            Some(empty_scope_hash.as_str()),
         ) {
             crate::review_workflow::cycle::CheckCycleApprovedResult::Approved => Ok(()),
             crate::review_workflow::cycle::CheckCycleApprovedResult::NotApproved(reason) => {
@@ -546,7 +611,9 @@ pub fn check_approved(
             })?;
             current_group_hashes.insert(group_name.clone(), group_hash);
         }
-        if review.current_cycle().is_some_and(|c| c.all_groups_approved(&current_group_hashes)) {
+        if review.current_cycle().is_some_and(|c| {
+            c.all_groups_approved(&current_group_hashes, Some(empty_scope_hash.as_str()))
+        }) {
             Ok(())
         } else {
             Err("[BLOCKED] Review cycle not fully approved (missing fast+final zero_findings for all groups)".to_string())
@@ -579,6 +646,28 @@ mod tests {
     impl GitHasher for FixedHasher {
         fn group_scope_hash(&self, _scope: &[String]) -> Result<String, String> {
             Ok(self.0.clone())
+        }
+    }
+
+    struct ScopeAwareHasher {
+        hashes: HashMap<Vec<String>, String>,
+    }
+
+    impl ScopeAwareHasher {
+        fn new(entries: Vec<(Vec<&str>, &str)>) -> Self {
+            let hashes = entries
+                .into_iter()
+                .map(|(scope, hash)| {
+                    (scope.into_iter().map(str::to_owned).collect::<Vec<_>>(), hash.to_owned())
+                })
+                .collect();
+            Self { hashes }
+        }
+    }
+
+    impl GitHasher for ScopeAwareHasher {
+        fn group_scope_hash(&self, scope: &[String]) -> Result<String, String> {
+            self.hashes.get(scope).cloned().ok_or_else(|| format!("unexpected scope: {scope:?}"))
         }
     }
 
@@ -651,11 +740,18 @@ mod tests {
     }
 
     fn make_review_with_approved_cycle(code_hash: &str) -> domain::ReviewJson {
+        make_review_with_scoped_approved_cycle(vec![], code_hash)
+    }
+
+    fn make_review_with_scoped_approved_cycle(
+        scope: Vec<&str>,
+        code_hash: &str,
+    ) -> domain::ReviewJson {
         use std::collections::BTreeMap;
         let grn = domain::ReviewGroupName::try_new("other").unwrap();
         let ts = domain::Timestamp::new("2026-03-30T08:00:00Z").unwrap();
         let mut groups = BTreeMap::new();
-        let mut gs = domain::CycleGroupState::new(vec![]);
+        let mut gs = domain::CycleGroupState::new(scope.into_iter().map(str::to_owned).collect());
         let fast = domain::GroupRound::success(
             domain::RoundType::Fast,
             ts.clone(),
@@ -761,6 +857,100 @@ mod tests {
         let result = check_approved(input, &store, &store, &hasher, &review_store);
         assert!(result.is_err(), "stale hash should block");
         assert!(result.unwrap_err().contains("[BLOCKED]"));
+    }
+
+    #[test]
+    fn check_approved_remaps_snapshot_to_cycle_groups() {
+        use std::collections::BTreeMap;
+
+        let store = MemStore::default();
+        let track = make_track("test-track");
+        store.save(&track).unwrap();
+        let review_store = MemReviewStore::default();
+        let track_id = TrackId::try_new("test-track").unwrap();
+        review_store.save_review(&track_id, make_review_with_approved_cycle("rvw1:sha256:abc123"));
+
+        let mut groups = BTreeMap::new();
+        groups.insert(
+            domain::ReviewGroupName::try_new("cli").unwrap(),
+            vec![
+                crate::review_workflow::scope::RepoRelativePath::normalize("apps/cli/src/lib.rs")
+                    .unwrap(),
+            ],
+        );
+        groups.insert(domain::ReviewGroupName::try_new("other").unwrap(), vec![]);
+        let partition = crate::review_workflow::groups::GroupPartition::try_new(groups).unwrap();
+        let snapshot = crate::review_workflow::groups::ReviewPartitionSnapshot::new(
+            "sha256:none",
+            "sha256:none",
+            partition,
+        );
+
+        let hasher = ScopeAwareHasher::new(vec![
+            (vec![], "rvw1:sha256:empty"),
+            (vec!["apps/cli/src/lib.rs"], "rvw1:sha256:abc123"),
+        ]);
+        let input = CheckApprovedInput {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "test-track".to_string(),
+            planning_only: false,
+            current_snapshot: Some(snapshot),
+        };
+
+        let result = check_approved(input, &store, &store, &hasher, &review_store);
+        assert!(
+            result.is_ok(),
+            "extra snapshot groups should be remapped into the cycle groups: {result:?}"
+        );
+    }
+
+    #[test]
+    fn check_approved_blocks_when_extra_group_reclassifies_existing_cycle_scope() {
+        use std::collections::BTreeMap;
+
+        let store = MemStore::default();
+        let track = make_track("test-track");
+        store.save(&track).unwrap();
+        let review_store = MemReviewStore::default();
+        let track_id = TrackId::try_new("test-track").unwrap();
+        review_store.save_review(
+            &track_id,
+            make_review_with_scoped_approved_cycle(
+                vec!["apps/cli/src/lib.rs"],
+                "rvw1:sha256:abc123",
+            ),
+        );
+
+        let mut groups = BTreeMap::new();
+        groups.insert(
+            domain::ReviewGroupName::try_new("cli").unwrap(),
+            vec![
+                crate::review_workflow::scope::RepoRelativePath::normalize("apps/cli/src/lib.rs")
+                    .unwrap(),
+            ],
+        );
+        groups.insert(domain::ReviewGroupName::try_new("other").unwrap(), vec![]);
+        let partition = crate::review_workflow::groups::GroupPartition::try_new(groups).unwrap();
+        let snapshot = crate::review_workflow::groups::ReviewPartitionSnapshot::new(
+            "sha256:none",
+            "sha256:none",
+            partition,
+        );
+
+        let hasher = ScopeAwareHasher::new(vec![
+            (vec![], "rvw1:sha256:empty"),
+            (vec!["apps/cli/src/lib.rs"], "rvw1:sha256:abc123"),
+        ]);
+        let input = CheckApprovedInput {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "test-track".to_string(),
+            planning_only: false,
+            current_snapshot: Some(snapshot),
+        };
+
+        let result = check_approved(input, &store, &store, &hasher, &review_store);
+        assert!(result.is_err(), "reclassified frozen scope should block approval");
+        assert!(result.unwrap_err().contains("PartitionChanged"));
     }
 
     #[test]
@@ -943,8 +1133,7 @@ mod tests {
     }
 
     #[test]
-    fn test_record_round_with_findings_remain_payload_and_missing_category_passes_none_to_protocol()
-    {
+    fn test_record_round_with_findings_remain_payload_and_missing_category_remains_compatible() {
         let stub = StubProtocol::returning_ok();
         let input = RecordRoundInput {
             round_type: "fast".to_owned(),
@@ -961,9 +1150,10 @@ mod tests {
 
         assert!(
             result.is_ok(),
-            "record_round should preserve missing category as None: {result:?}"
+            "missing category should remain accepted for backward compatibility"
         );
         let call = stub.last_call();
+        assert!(call.is_some(), "protocol.execute should be called for backward-compatible input");
         let args = call.as_ref().expect("protocol.execute should have been called");
         assert_eq!(
             args.findings,
@@ -1053,6 +1243,35 @@ mod tests {
                 assert!(
                     msg.contains("findings-derived concerns"),
                     "error should mention concern coverage: {msg}"
+                );
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called for invalid input");
+    }
+
+    #[test]
+    fn test_record_round_with_group_missing_from_expected_groups_returns_error() {
+        let stub = StubProtocol::returning_ok();
+        let input = RecordRoundInput {
+            round_type: "fast".to_owned(),
+            group: "codex".to_owned(),
+            verdict: r#"{"verdict":"zero_findings","findings":[]}"#.to_owned(),
+            expected_groups: "other".to_owned(),
+            concerns: String::new(),
+            items_dir: PathBuf::from("track/items"),
+            track_id: "t011b".to_owned(),
+            timestamp: make_timestamp(),
+        };
+
+        let result = record_round(input, &stub);
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(
+                    msg.contains("must be included"),
+                    "error should mention expected_groups containment: {msg}"
                 );
             }
             other => panic!("expected Other, got {other:?}"),
@@ -1328,6 +1547,38 @@ mod tests {
             }
             other => panic!("expected Other, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn test_record_round_typed_group_missing_from_expected_groups_returns_error() {
+        let track_id = make_track_id("t005b");
+        let group = make_group("codex");
+        let ts = make_timestamp();
+
+        let stub = StubProtocol::returning_ok();
+        let result = record_round_typed(
+            track_id,
+            RoundType::Fast,
+            group,
+            Verdict::ZeroFindings,
+            vec![],
+            vec![],
+            vec![make_group("other")],
+            ts,
+            &stub,
+        );
+
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            RecordRoundError::Other(msg) => {
+                assert!(
+                    msg.contains("must be included"),
+                    "error should mention expected_groups containment: {msg}"
+                );
+            }
+            other => panic!("expected Other, got {other:?}"),
+        }
+        assert!(stub.last_call().is_none(), "protocol must not be called");
     }
 
     #[test]

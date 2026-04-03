@@ -251,6 +251,7 @@ pub fn check_review_cycle_staleness(
     group_name: &ReviewGroupName,
     current: &ReviewPartitionSnapshot,
     current_group_hash: Option<&str>,
+    empty_scope_hash: Option<&str>,
 ) -> Option<ReviewStalenessReason> {
     let cycle = review.current_cycle()?;
     cycle.check_group_staleness(
@@ -258,6 +259,7 @@ pub fn check_review_cycle_staleness(
         current.base_policy_hash(),
         current.policy_hash(),
         current_group_hash,
+        empty_scope_hash,
     )
 }
 
@@ -270,6 +272,7 @@ pub fn check_cycle_staleness_any(
     review: &ReviewJson,
     current: &ReviewPartitionSnapshot,
     current_group_hashes: &std::collections::BTreeMap<ReviewGroupName, String>,
+    empty_scope_hash: Option<&str>,
 ) -> Option<ReviewStalenessReason> {
     let cycle = review.current_cycle()?;
 
@@ -297,6 +300,7 @@ pub fn check_cycle_staleness_any(
             current.base_policy_hash(),
             current.policy_hash(),
             current_hash,
+            empty_scope_hash,
         ) {
             return Some(reason);
         }
@@ -339,17 +343,23 @@ pub fn check_cycle_approved(
     review: &ReviewJson,
     current: &ReviewPartitionSnapshot,
     current_group_hashes: &std::collections::BTreeMap<ReviewGroupName, String>,
+    empty_scope_hash: Option<&str>,
 ) -> CheckCycleApprovedResult {
     let Some(_cycle) = review.current_cycle() else {
         return CheckCycleApprovedResult::NotApproved(CheckCycleApprovedReason::NoCycle);
     };
 
-    if let Some(reason) = check_cycle_staleness_any(review, current, current_group_hashes) {
+    if let Some(reason) =
+        check_cycle_staleness_any(review, current, current_group_hashes, empty_scope_hash)
+    {
         return CheckCycleApprovedResult::NotApproved(CheckCycleApprovedReason::Stale(reason));
     }
 
     // Safety: we just confirmed current_cycle() is Some
-    if review.current_cycle().is_some_and(|c| c.all_groups_approved(current_group_hashes)) {
+    if review
+        .current_cycle()
+        .is_some_and(|c| c.all_groups_approved(current_group_hashes, empty_scope_hash))
+    {
         CheckCycleApprovedResult::Approved
     } else {
         CheckCycleApprovedResult::NotApproved(CheckCycleApprovedReason::ApprovalRequirementsNotMet)
@@ -372,6 +382,9 @@ mod tests {
 
     use super::*;
     use crate::review_workflow::groups::GroupPartition;
+
+    const EMPTY_SCOPE_HASH: &str =
+        "rvw1:sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
 
     fn ts(s: &str) -> Timestamp {
         Timestamp::new(s).unwrap()
@@ -458,8 +471,13 @@ mod tests {
     fn test_staleness_none_when_unchanged() {
         let review = review_with_cycle("sha256:base", "sha256:eff");
         let current = make_snapshot("sha256:base", "sha256:eff");
-        let result =
-            check_review_cycle_staleness(&review, &grn("domain"), &current, Some("hash-current"));
+        let result = check_review_cycle_staleness(
+            &review,
+            &grn("domain"),
+            &current,
+            Some("hash-current"),
+            Some(EMPTY_SCOPE_HASH),
+        );
         assert!(result.is_none());
     }
 
@@ -467,8 +485,13 @@ mod tests {
     fn test_staleness_policy_changed_when_base_differs() {
         let review = review_with_cycle("sha256:base-old", "sha256:eff");
         let current = make_snapshot("sha256:base-new", "sha256:eff");
-        let result =
-            check_review_cycle_staleness(&review, &grn("domain"), &current, Some("hash-current"));
+        let result = check_review_cycle_staleness(
+            &review,
+            &grn("domain"),
+            &current,
+            Some("hash-current"),
+            Some(EMPTY_SCOPE_HASH),
+        );
         assert_eq!(result, Some(ReviewStalenessReason::PolicyChanged));
     }
 
@@ -476,8 +499,13 @@ mod tests {
     fn test_staleness_partition_changed_when_effective_differs() {
         let review = review_with_cycle("sha256:base", "sha256:eff-old");
         let current = make_snapshot("sha256:base", "sha256:eff-new");
-        let result =
-            check_review_cycle_staleness(&review, &grn("domain"), &current, Some("hash-current"));
+        let result = check_review_cycle_staleness(
+            &review,
+            &grn("domain"),
+            &current,
+            Some("hash-current"),
+            Some(EMPTY_SCOPE_HASH),
+        );
         assert_eq!(result, Some(ReviewStalenessReason::PartitionChanged));
     }
 
@@ -491,6 +519,7 @@ mod tests {
             &grn("new-group"),
             &current,
             Some("hash-current"),
+            Some(EMPTY_SCOPE_HASH),
         );
         assert_eq!(result, Some(ReviewStalenessReason::PartitionChanged));
     }
@@ -499,8 +528,13 @@ mod tests {
     fn test_staleness_hash_mismatch() {
         let review = review_with_cycle("sha256:base", "sha256:eff");
         let current = make_snapshot("sha256:base", "sha256:eff");
-        let result =
-            check_review_cycle_staleness(&review, &grn("domain"), &current, Some("hash-changed"));
+        let result = check_review_cycle_staleness(
+            &review,
+            &grn("domain"),
+            &current,
+            Some("hash-changed"),
+            Some(EMPTY_SCOPE_HASH),
+        );
         assert_eq!(result, Some(ReviewStalenessReason::HashMismatch));
     }
 
@@ -508,8 +542,13 @@ mod tests {
     fn test_staleness_returns_none_for_empty_review() {
         let review = ReviewJson::new();
         let current = make_snapshot("sha256:base", "sha256:eff");
-        let result =
-            check_review_cycle_staleness(&review, &grn("domain"), &current, Some("hash-current"));
+        let result = check_review_cycle_staleness(
+            &review,
+            &grn("domain"),
+            &current,
+            Some("hash-current"),
+            Some(EMPTY_SCOPE_HASH),
+        );
         assert!(result.is_none());
     }
 
@@ -523,9 +562,9 @@ mod tests {
         let current = make_snapshot("sha256:base", "sha256:eff");
         let mut hashes = BTreeMap::new();
         hashes.insert(grn("domain"), "hash-current".into());
-        hashes.insert(grn("other"), "".into());
+        hashes.insert(grn("other"), EMPTY_SCOPE_HASH.into());
 
-        let result = check_cycle_staleness_any(&review, &current, &hashes);
+        let result = check_cycle_staleness_any(&review, &current, &hashes, Some(EMPTY_SCOPE_HASH));
         assert!(result.is_none());
     }
 
@@ -541,7 +580,7 @@ mod tests {
         let current = ReviewPartitionSnapshot::new("sha256:base", "sha256:eff", partition);
         let hashes = BTreeMap::new();
 
-        let result = check_cycle_staleness_any(&review, &current, &hashes);
+        let result = check_cycle_staleness_any(&review, &current, &hashes, Some(EMPTY_SCOPE_HASH));
         assert_eq!(result, Some(ReviewStalenessReason::PartitionChanged));
     }
 
@@ -551,9 +590,9 @@ mod tests {
         let current = make_snapshot("sha256:base", "sha256:eff");
         let mut hashes = BTreeMap::new();
         hashes.insert(grn("domain"), "hash-changed".into());
-        hashes.insert(grn("other"), "".into());
+        hashes.insert(grn("other"), EMPTY_SCOPE_HASH.into());
 
-        let result = check_cycle_staleness_any(&review, &current, &hashes);
+        let result = check_cycle_staleness_any(&review, &current, &hashes, Some(EMPTY_SCOPE_HASH));
         assert_eq!(result, Some(ReviewStalenessReason::HashMismatch));
     }
 
@@ -561,7 +600,8 @@ mod tests {
     fn test_any_staleness_returns_none_for_empty_review() {
         let review = ReviewJson::new();
         let current = make_snapshot("sha256:base", "sha256:eff");
-        let result = check_cycle_staleness_any(&review, &current, &BTreeMap::new());
+        let result =
+            check_cycle_staleness_any(&review, &current, &BTreeMap::new(), Some(EMPTY_SCOPE_HASH));
         assert!(result.is_none());
     }
 
@@ -995,7 +1035,7 @@ mod tests {
         hashes.insert(grn("domain"), "hash-current".into());
         hashes.insert(grn("other"), "hash-other".into());
 
-        let result = check_cycle_approved(&review, &snapshot, &hashes);
+        let result = check_cycle_approved(&review, &snapshot, &hashes, Some(EMPTY_SCOPE_HASH));
         assert_eq!(result, CheckCycleApprovedResult::Approved);
     }
 
@@ -1003,7 +1043,8 @@ mod tests {
     fn test_check_approved_no_cycle() {
         let review = ReviewJson::new();
         let snapshot = make_snapshot("sha256:b", "sha256:e");
-        let result = check_cycle_approved(&review, &snapshot, &BTreeMap::new());
+        let result =
+            check_cycle_approved(&review, &snapshot, &BTreeMap::new(), Some(EMPTY_SCOPE_HASH));
         assert_eq!(
             result,
             CheckCycleApprovedResult::NotApproved(CheckCycleApprovedReason::NoCycle)
@@ -1015,7 +1056,8 @@ mod tests {
         let (review, _) = fully_approved_review();
         // Use different base hash to trigger PolicyChanged
         let snapshot = make_snapshot("sha256:different", "sha256:e");
-        let result = check_cycle_approved(&review, &snapshot, &BTreeMap::new());
+        let result =
+            check_cycle_approved(&review, &snapshot, &BTreeMap::new(), Some(EMPTY_SCOPE_HASH));
         assert_eq!(
             result,
             CheckCycleApprovedResult::NotApproved(CheckCycleApprovedReason::Stale(
@@ -1031,9 +1073,9 @@ mod tests {
         let snapshot = make_snapshot("sha256:b", "sha256:e");
         let mut hashes = BTreeMap::new();
         hashes.insert(grn("domain"), "hash-current".into());
-        hashes.insert(grn("other"), "".into());
+        hashes.insert(grn("other"), EMPTY_SCOPE_HASH.into());
 
-        let result = check_cycle_approved(&review, &snapshot, &hashes);
+        let result = check_cycle_approved(&review, &snapshot, &hashes, Some(EMPTY_SCOPE_HASH));
         assert_eq!(
             result,
             CheckCycleApprovedResult::NotApproved(
@@ -1114,14 +1156,14 @@ mod tests {
         // With matching snapshot → approved
         let snapshot_match = make_snapshot("sha256:b", "sha256:e");
         assert_eq!(
-            check_cycle_approved(&review, &snapshot_match, &hashes),
+            check_cycle_approved(&review, &snapshot_match, &hashes, Some(EMPTY_SCOPE_HASH)),
             CheckCycleApprovedResult::Approved
         );
 
         // With changed base policy → stale, not approved
         let snapshot_stale = make_snapshot("sha256:changed", "sha256:e");
         assert!(matches!(
-            check_cycle_approved(&review, &snapshot_stale, &hashes),
+            check_cycle_approved(&review, &snapshot_stale, &hashes, Some(EMPTY_SCOPE_HASH)),
             CheckCycleApprovedResult::NotApproved(CheckCycleApprovedReason::Stale(_))
         ));
     }
@@ -1164,7 +1206,7 @@ mod tests {
         hashes.insert(grn("other"), "hash-other".into());
 
         // Fast-only for other → not approved (final required)
-        let result = check_cycle_approved(&review, &snapshot, &hashes);
+        let result = check_cycle_approved(&review, &snapshot, &hashes, Some(EMPTY_SCOPE_HASH));
         assert_eq!(
             result,
             CheckCycleApprovedResult::NotApproved(
@@ -1179,7 +1221,7 @@ mod tests {
         let review = ReviewJson::new();
         let snapshot = make_snapshot("sha256:b", "sha256:e");
         assert_eq!(
-            check_cycle_approved(&review, &snapshot, &BTreeMap::new()),
+            check_cycle_approved(&review, &snapshot, &BTreeMap::new(), Some(EMPTY_SCOPE_HASH)),
             CheckCycleApprovedResult::NotApproved(CheckCycleApprovedReason::NoCycle)
         );
     }

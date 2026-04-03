@@ -70,6 +70,14 @@ class PostToolHooksTest(unittest.TestCase):
                 error_to_codex.should_ignore_command("codex exec --model gpt-5.4")
             )
 
+    def test_error_to_codex_ignores_timeout_wrapped_active_provider_commands(self) -> None:
+        with self.with_profile("default"):
+            self.assertTrue(
+                error_to_codex.should_ignore_command(
+                    "timeout 600 codex exec --model gpt-5.4 --sandbox read-only"
+                )
+            )
+
     def test_error_to_codex_does_not_detect_errors_in_clean_output(self) -> None:
         self.assertEqual(
             error_to_codex.detect_errors("Build succeeded. 3 tests passed."), []

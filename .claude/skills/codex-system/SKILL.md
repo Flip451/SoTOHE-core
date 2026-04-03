@@ -36,8 +36,8 @@ All templates below use `{model}` as a placeholder. Replace it with the actual v
 Append `--config model_reasoning_effort="{effort}"` to control reasoning depth:
 
 ```bash
-timeout 180 codex exec --model {model} --config model_reasoning_effort="high" \
-  --sandbox read-only --full-auto "{task}" 2>&1
+timeout 600 codex exec --model {model} --config model_reasoning_effort="high" \
+  --sandbox read-only "{task}" 2>&1
 ```
 
 Values: `low`, `medium`, `high`. Default varies by model. Use `high` for complex design/review tasks.
@@ -56,7 +56,7 @@ Values: `low`, `medium`, `high`. Default varies by model. Use `high` for complex
 ### Architecture Design
 
 ```bash
-timeout 180 codex exec --model {model} --sandbox read-only --full-auto "
+timeout 600 codex exec --model {model} --sandbox read-only "
 Design Rust architecture for: {feature description}
 
 Current context:
@@ -76,7 +76,7 @@ Provide:
 ### Ownership/Lifetime Design
 
 ```bash
-timeout 180 codex exec --model {model} --sandbox read-only --full-auto "
+timeout 600 codex exec --model {model} --sandbox read-only "
 Design the ownership model for:
 
 {struct or function description}
@@ -94,7 +94,7 @@ Provide:
 ### Compiler Error Diagnosis
 
 ```bash
-timeout 180 codex exec --model {model} --sandbox read-only --full-auto "
+timeout 600 codex exec --model {model} --sandbox read-only "
 Diagnose this Rust compiler error:
 
 Error code: {E0XXX}
@@ -112,7 +112,7 @@ and suggest a fix that preserves the intended semantics.
 ### Implementation Planning
 
 ```bash
-timeout 180 codex exec --model {model} --sandbox read-only --full-auto "
+timeout 600 codex exec --model {model} --sandbox read-only "
 Create a TDD implementation plan for: {feature}
 
 Requirements: {list of requirements}
@@ -161,11 +161,11 @@ inconsistent payloads fail-closed:
 or
 
 ```json
-{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}
+{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123,"category":null}]}
 ```
 
 Every object field is required by the output schema. When a finding does not have a concrete
-severity, file, or line, use `null` for that field instead of omitting it.
+severity, file, line, or category, use `null` for that field instead of omitting it.
 `zero_findings` must use an empty `findings` array, and `findings_remain` must include at least
 one finding. The wrapper prints that final JSON payload as the last stdout line.
 
@@ -199,8 +199,8 @@ Prefer writing content to a file over inline embedding when:
 
    For other read-only Codex consultations, direct `codex exec` is still fine:
 
-   ```bash
-   timeout 180 codex exec --model {model} --sandbox read-only --full-auto \
+```bash
+   timeout 600 codex exec --model {model} --sandbox read-only \
      "Read tmp/codex-briefing.md and perform the task described there." 2>&1
    ```
 

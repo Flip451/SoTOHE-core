@@ -39,12 +39,12 @@
         "debugger"
       ],
       "invoke_examples": {
-        "default": "codex exec --model {model} --sandbox read-only --full-auto \"{task}\"",
+        "default": "timeout 600 codex exec --model {model} --sandbox read-only \"{task}\"",
         "planner": "cargo make track-local-plan -- --model {model} --briefing-file {briefing_file}",
-        "researcher": "codex exec --model {model} --sandbox read-only --full-auto \"Research this Rust topic: {task}\"",
+        "researcher": "timeout 600 codex exec --model {model} --sandbox read-only \"Research this Rust topic: {task}\"",
         "implementer": "codex exec --model {model} --sandbox workspace-write --full-auto \"{task}\"",
         "reviewer": "cargo make track-local-review -- --model {model} --prompt \"{task}\"",
-        "debugger": "codex exec --model {model} --sandbox read-only --full-auto \"{task}\""
+        "debugger": "timeout 600 codex exec --model {model} --sandbox read-only \"{task}\""
       }
     },
     "gemini": {

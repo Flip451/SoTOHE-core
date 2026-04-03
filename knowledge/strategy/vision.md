@@ -165,12 +165,12 @@ libs/domain/src/review/
 
 ## 7. BRIDGE-01: テンプレートが提供するテスト生成ツール
 
-### `sotp domain export-schema`
+### `sotp export-schema`
 
-**生成プロジェクトの** `libs/domain/src/` を `syn` でパースし、`pub` なアイテムのシグネチャだけ抽出：
+**生成プロジェクトの** 1 つ以上の Rust source root（例: `libs/domain/src/`, `libs/usecase/src/`）を `syn` でパースし、`pub` なアイテムのシグネチャだけ抽出：
 
 ```
-入力: 生成プロジェクトの libs/domain/src/**/*.rs
+入力: 生成プロジェクトの libs/domain/src/**/*.rs, libs/usecase/src/**/*.rs, ...
 出力:
   pub enum Verdict { ZeroFindings, FindingsRemain }
   pub struct ReviewConcern(...)
@@ -178,6 +178,7 @@ libs/domain/src/review/
   impl FastPassed { pub fn pass_final(self) -> Approved; }
 ```
 
+- デフォルトの主要対象は domain layer だが、multi-path 指定で他 layer も集約できる
 - 関数の存在 = 有効な遷移。不在 = 無効な遷移（テスト不要）
 - `pub(crate)` や非 pub は除外（内部実装）
 - 29K LOC → 数百行。AI のコンテキスト効率が桁違い
@@ -187,7 +188,7 @@ libs/domain/src/review/
 | 手法 | 入力 | 出力 |
 |---|---|---|
 | spec 例 → テスト変換 | spec.md の Given/When/Then | `#[test]` 関数 |
-| proptest + typestate | export-schema のシグネチャ | `proptest!` マクロ |
+| proptest + typestate | `sotp export-schema` のシグネチャ | `proptest!` マクロ |
 | usecase モック自動生成 | usecase の `impl Fn` シグネチャ | クロージャモックテスト |
 
 ---
@@ -206,7 +207,7 @@ libs/domain/src/review/
 ## 9. 多言語展開
 
 検証レベル Gold/Silver/Bronze の枠組みは維持。
-テスト生成パイプライン（`sotp domain export-schema` + テストスケルトン生成）は
+テスト生成パイプライン（`sotp export-schema` + テストスケルトン生成）は
 `syn` を言語別パーサーに差し替えれば他言語にも適用可能。
 
 詳細: `tmp/multi-language-design-2026-03-18.md`

@@ -380,7 +380,7 @@ Teammate 2 — Planner / Architect capability（既定 profile では Codex CLI 
   - Design error types hierarchy
   - Create step-by-step implementation plan considering Rust's type system
   - Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.codex` first, then `providers.codex.default_model`
-  - Command: codex exec --model {model} --sandbox read-only --full-auto "
+  - Command: timeout 600 codex exec --model {model} --sandbox read-only "
       Design Rust architecture for: {feature}
       Current codebase patterns: {summary from Phase 1}
       Requirements: {requirements from Phase 1}

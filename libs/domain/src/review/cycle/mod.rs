@@ -184,7 +184,11 @@ impl ReviewCycle {
     /// ensuring fail-closed behavior. This is the per-group check used by
     /// `check-approved`.
     #[must_use]
-    pub fn all_groups_approved(&self, current_hashes: &BTreeMap<ReviewGroupName, String>) -> bool {
+    pub fn all_groups_approved(
+        &self,
+        current_hashes: &BTreeMap<ReviewGroupName, String>,
+        empty_scope_hash: Option<&str>,
+    ) -> bool {
         // Fail-closed: partition must match exactly
         if self.groups.len() != current_hashes.len() {
             return false;
@@ -194,6 +198,9 @@ impl ReviewCycle {
                 Some(h) => h,
                 None => return false,
             };
+            if group_state.scope().is_empty() && group_state.is_empty() {
+                return Some(current.as_str()) == empty_scope_hash;
+            }
             let fast_ok = group_state
                 .latest_round(RoundType::Fast)
                 .is_some_and(|r| r.is_successful_zero_findings() && r.hash() == current);
@@ -215,6 +222,7 @@ impl ReviewCycle {
         current_base_policy_hash: &str,
         current_policy_hash: &str,
         current_group_hash: Option<&str>,
+        empty_scope_hash: Option<&str>,
     ) -> Option<ReviewStalenessReason> {
         if self.base_policy_hash != current_base_policy_hash {
             return Some(ReviewStalenessReason::PolicyChanged);
@@ -239,6 +247,8 @@ impl ReviewCycle {
             if round.hash() != current_hash {
                 return Some(ReviewStalenessReason::HashMismatch);
             }
+        } else if group_state.scope().is_empty() && Some(current_hash) != empty_scope_hash {
+            return Some(ReviewStalenessReason::HashMismatch);
         }
         None
     }
@@ -357,6 +367,9 @@ impl Default for ReviewJson {
 mod tests {
     use super::*;
     use crate::review::types::Verdict;
+
+    const EMPTY_SCOPE_HASH: &str =
+        "rvw1:sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
 
     fn ts(s: &str) -> Timestamp {
         Timestamp::new(s).unwrap()
@@ -766,8 +779,13 @@ mod tests {
             sample_groups(),
         )
         .unwrap();
-        let result =
-            cycle.check_group_staleness(&grn("domain"), "sha256:changed", "sha256:original", None);
+        let result = cycle.check_group_staleness(
+            &grn("domain"),
+            "sha256:changed",
+            "sha256:original",
+            None,
+            Some(EMPTY_SCOPE_HASH),
+        );
         assert_eq!(result, Some(ReviewStalenessReason::PolicyChanged));
     }
 
@@ -782,8 +800,13 @@ mod tests {
             sample_groups(),
         )
         .unwrap();
-        let result =
-            cycle.check_group_staleness(&grn("new-group"), "sha256:abc", "sha256:abc", None);
+        let result = cycle.check_group_staleness(
+            &grn("new-group"),
+            "sha256:abc",
+            "sha256:abc",
+            None,
+            Some(EMPTY_SCOPE_HASH),
+        );
         assert_eq!(result, Some(ReviewStalenessReason::PartitionChanged));
     }
 
@@ -809,6 +832,7 @@ mod tests {
             "sha256:abc",
             "sha256:abc",
             Some("hash-new"),
+            Some(EMPTY_SCOPE_HASH),
         );
         assert_eq!(result, Some(ReviewStalenessReason::HashMismatch));
     }
@@ -835,6 +859,7 @@ mod tests {
             "sha256:abc",
             "sha256:abc",
             Some("hash-new"),
+            Some(EMPTY_SCOPE_HASH),
         );
         assert_eq!(result, Some(ReviewStalenessReason::HashMismatch));
     }
@@ -850,8 +875,63 @@ mod tests {
             sample_groups(),
         )
         .unwrap();
-        let result = cycle.check_group_staleness(&grn("domain"), "sha256:abc", "sha256:abc", None);
+        let result = cycle.check_group_staleness(
+            &grn("domain"),
+            "sha256:abc",
+            "sha256:abc",
+            None,
+            Some(EMPTY_SCOPE_HASH),
+        );
         assert_eq!(result, Some(ReviewStalenessReason::PartitionChanged));
+    }
+
+    #[test]
+    fn test_check_group_staleness_empty_scope_without_rounds_is_hash_mismatch_when_scope_changes() {
+        let mut groups = sample_groups();
+        groups.insert(grn("cli"), CycleGroupState::new(vec![]));
+        let cycle = ReviewCycle::from_parts(
+            "cycle-1".into(),
+            ts("2026-03-29T09:00:00Z"),
+            "main".into(),
+            "sha256:abc".into(),
+            "sha256:abc".into(),
+            None,
+            groups,
+        );
+        let result = cycle.check_group_staleness(
+            &grn("cli"),
+            "sha256:abc",
+            "sha256:abc",
+            Some("rvw1:sha256:not-empty"),
+            Some(EMPTY_SCOPE_HASH),
+        );
+        assert_eq!(result, Some(ReviewStalenessReason::HashMismatch));
+    }
+
+    #[test]
+    fn test_check_group_staleness_empty_scope_without_rounds_is_fresh_when_still_empty() {
+        let mut groups = sample_groups();
+        groups.insert(grn("cli"), CycleGroupState::new(vec![]));
+        let cycle = ReviewCycle::from_parts(
+            "cycle-1".into(),
+            ts("2026-03-29T09:00:00Z"),
+            "main".into(),
+            "sha256:abc".into(),
+            "sha256:abc".into(),
+            None,
+            groups,
+        );
+        assert!(
+            cycle
+                .check_group_staleness(
+                    &grn("cli"),
+                    "sha256:abc",
+                    "sha256:abc",
+                    Some(EMPTY_SCOPE_HASH),
+                    Some(EMPTY_SCOPE_HASH),
+                )
+                .is_none()
+        );
     }
 
     #[test]
@@ -871,11 +951,23 @@ mod tests {
         );
         assert!(
             cycle
-                .check_group_staleness(&grn("domain"), "sha256:abc", "sha256:abc", Some("hash-b"))
+                .check_group_staleness(
+                    &grn("domain"),
+                    "sha256:abc",
+                    "sha256:abc",
+                    Some("hash-b"),
+                    Some(EMPTY_SCOPE_HASH),
+                )
                 .is_none()
         );
         assert_eq!(
-            cycle.check_group_staleness(&grn("domain"), "sha256:abc", "sha256:abc", Some("hash-a")),
+            cycle.check_group_staleness(
+                &grn("domain"),
+                "sha256:abc",
+                "sha256:abc",
+                Some("hash-a"),
+                Some(EMPTY_SCOPE_HASH),
+            ),
             Some(ReviewStalenessReason::HashMismatch)
         );
     }
@@ -903,7 +995,8 @@ mod tests {
                     &grn("domain"),
                     "sha256:abc",
                     "sha256:abc",
-                    Some("hash-current")
+                    Some("hash-current"),
+                    Some(EMPTY_SCOPE_HASH),
                 )
                 .is_none()
         );
@@ -933,7 +1026,7 @@ mod tests {
         let mut h = BTreeMap::new();
         h.insert(grn("domain"), "hash-a".into());
         h.insert(grn("other"), "hash-a".into());
-        assert!(!cycle.all_groups_approved(&h));
+        assert!(!cycle.all_groups_approved(&h, Some(EMPTY_SCOPE_HASH)));
     }
 
     #[test]
@@ -972,7 +1065,59 @@ mod tests {
         let mut h = BTreeMap::new();
         h.insert(grn("domain"), "hash-a".into());
         h.insert(grn("other"), "hash-a".into());
-        assert!(cycle.all_groups_approved(&h));
+        assert!(cycle.all_groups_approved(&h, Some(EMPTY_SCOPE_HASH)));
+    }
+
+    #[test]
+    fn test_all_groups_approved_treats_unchanged_empty_scope_without_rounds_as_approved() {
+        let mut groups = sample_groups();
+        groups.insert(grn("cli"), CycleGroupState::new(vec![]));
+        for (name, gs) in groups.iter_mut() {
+            if *name != grn("cli") {
+                gs.record_round(success_round(RoundType::Fast, "hash-a", "2026-03-29T09:00:00Z"));
+                gs.record_round(success_round(RoundType::Final, "hash-a", "2026-03-29T09:01:00Z"));
+            }
+        }
+        let cycle = ReviewCycle::from_parts(
+            "cycle-1".into(),
+            ts("2026-03-29T09:00:00Z"),
+            "main".into(),
+            "sha256:abc".into(),
+            "sha256:abc".into(),
+            None,
+            groups,
+        );
+        let mut h = BTreeMap::new();
+        h.insert(grn("cli"), EMPTY_SCOPE_HASH.into());
+        h.insert(grn("domain"), "hash-a".into());
+        h.insert(grn("other"), "hash-a".into());
+        assert!(cycle.all_groups_approved(&h, Some(EMPTY_SCOPE_HASH)));
+    }
+
+    #[test]
+    fn test_all_groups_approved_rejects_empty_scope_that_gained_files_without_rounds() {
+        let mut groups = sample_groups();
+        groups.insert(grn("cli"), CycleGroupState::new(vec![]));
+        for (name, gs) in groups.iter_mut() {
+            if *name != grn("cli") {
+                gs.record_round(success_round(RoundType::Fast, "hash-a", "2026-03-29T09:00:00Z"));
+                gs.record_round(success_round(RoundType::Final, "hash-a", "2026-03-29T09:01:00Z"));
+            }
+        }
+        let cycle = ReviewCycle::from_parts(
+            "cycle-1".into(),
+            ts("2026-03-29T09:00:00Z"),
+            "main".into(),
+            "sha256:abc".into(),
+            "sha256:abc".into(),
+            None,
+            groups,
+        );
+        let mut h = BTreeMap::new();
+        h.insert(grn("cli"), "rvw1:sha256:not-empty".into());
+        h.insert(grn("domain"), "hash-a".into());
+        h.insert(grn("other"), "hash-a".into());
+        assert!(!cycle.all_groups_approved(&h, Some(EMPTY_SCOPE_HASH)));
     }
 
     #[test]
@@ -998,7 +1143,7 @@ mod tests {
         let mut h = BTreeMap::new();
         h.insert(grn("domain"), "hash-a".into());
         h.insert(grn("other"), "hash-a".into());
-        assert!(!cycle.all_groups_approved(&h));
+        assert!(!cycle.all_groups_approved(&h, Some(EMPTY_SCOPE_HASH)));
     }
 
     #[test]
@@ -1020,7 +1165,7 @@ mod tests {
         let mut h = BTreeMap::new();
         h.insert(grn("domain"), "hash-new".into());
         h.insert(grn("other"), "hash-old".into());
-        assert!(!cycle.all_groups_approved(&h));
+        assert!(!cycle.all_groups_approved(&h, Some(EMPTY_SCOPE_HASH)));
     }
 
     #[test]
@@ -1044,7 +1189,7 @@ mod tests {
         let mut h = BTreeMap::new();
         h.insert(grn("domain"), "hash-new".into());
         h.insert(grn("other"), "hash-new".into());
-        assert!(!cycle.all_groups_approved(&h));
+        assert!(!cycle.all_groups_approved(&h, Some(EMPTY_SCOPE_HASH)));
     }
 
     #[test]
@@ -1069,7 +1214,7 @@ mod tests {
         let mut h = BTreeMap::new();
         h.insert(grn("domain"), "hash-a".into());
         h.insert(grn("other"), "hash-a".into());
-        assert!(!cycle.all_groups_approved(&h));
+        assert!(!cycle.all_groups_approved(&h, Some(EMPTY_SCOPE_HASH)));
     }
 
     #[test]
@@ -1092,7 +1237,7 @@ mod tests {
         h.insert(grn("domain"), "hash-a".into());
         h.insert(grn("other"), "hash-a".into());
         h.insert(grn("new-group"), "hash-a".into());
-        assert!(!cycle.all_groups_approved(&h));
+        assert!(!cycle.all_groups_approved(&h, Some(EMPTY_SCOPE_HASH)));
     }
 
     #[test]
@@ -1113,7 +1258,7 @@ mod tests {
         );
         let mut h = BTreeMap::new();
         h.insert(grn("domain"), "hash-a".into());
-        assert!(!cycle.all_groups_approved(&h));
+        assert!(!cycle.all_groups_approved(&h, Some(EMPTY_SCOPE_HASH)));
     }
 
     // -- Group-independent round progression --

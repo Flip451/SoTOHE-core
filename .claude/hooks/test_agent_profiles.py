@@ -227,6 +227,23 @@ class AgentProfilesTest(unittest.TestCase):
         self.assertNotIn("inactivecli", prefixes)
         self.assertNotIn("Continue", prefixes)
 
+    def test_provider_command_prefixes_ignore_timeout_wrapper(self) -> None:
+        def mutator(profiles: dict) -> None:
+            codex = profiles["providers"]["codex"]["invoke_examples"]
+            codex["default"] = 'timeout 600 codex exec --model {model} --sandbox read-only "{task}"'
+            codex["researcher"] = (
+                'timeout 600 codex exec --model {model} --sandbox read-only '
+                '"Research this Rust topic: {task}"'
+            )
+            codex["debugger"] = 'timeout 600 codex exec --model {model} --sandbox read-only "{task}"'
+
+        path = self.write_mutated_profiles(mutator)
+
+        prefixes = agent_profiles.provider_command_prefixes(path=path)
+
+        self.assertIn("codex", prefixes)
+        self.assertNotIn("timeout", prefixes)
+
     # ----------------------------------------------------------------
     # Task A: Model injection tests
     # ----------------------------------------------------------------

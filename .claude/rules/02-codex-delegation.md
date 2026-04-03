@@ -66,8 +66,8 @@ cargo make track-local-review -- --model {model} --prompt \
 local reviewer wrapper は `--output-schema` で final message の JSON shape を固定し、
 wrapper 側でも verdict/findings の整合性を fail-closed で検証する。
 `zero_findings` は `{"verdict":"zero_findings","findings":[]}`、
-findings がある場合は `{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}` を返す前提で扱う。
-object field はすべて required なので、severity / file / line が不明な場合も field 自体は省略せず `null` を使う。
+findings がある場合は `{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123,"category":null}]}` を返す前提で扱う。
+object field はすべて required なので、severity / file / line / category が不明な場合も field 自体は省略せず `null` を使う。
 
 ### `implementer` 向け With file access 例
 
@@ -79,7 +79,7 @@ codex exec --model {model} --sandbox workspace-write --full-auto \
 ### `debugger` 向け Rust Compiler Error 診断例
 
 ```bash
-codex exec --model {model} --sandbox read-only --full-auto "
+timeout 600 codex exec --model {model} --sandbox read-only "
 Debug this Rust compiler error:
 Error code: E0XXX
 Full error: {error message}

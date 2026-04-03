@@ -300,40 +300,56 @@ const ALLOWED_EXTRA_GIT_SUBCOMMANDS: &[&str] =
 
 // ---------------------------------------------------------------------------
 // Constants: model resolution targets
-// (path, label, required_snippets, forbidden_snippets)
 // ---------------------------------------------------------------------------
 
-const MODEL_RESOLUTION_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
-    (
-        ".claude/skills/codex-system/SKILL.md",
-        "codex-system override-first resolution",
-        &[
+struct GuidanceTarget {
+    path: &'static str,
+    label: &'static str,
+    required_snippets: &'static [&'static str],
+    forbidden_snippets: &'static [&'static str],
+}
+
+const MODEL_RESOLUTION_TARGETS: &[GuidanceTarget] = &[
+    GuidanceTarget {
+        path: ".claude/skills/codex-system/SKILL.md",
+        label: "codex-system override-first resolution",
+        required_snippets: &[
             "profiles.<active_profile>.provider_model_overrides.codex  \u{2192}  {model}",
             "fallback: providers.codex.default_model  \u{2192}  {model}",
         ],
-        &[
+        forbidden_snippets: &[
             "read `providers.codex.default_model` from `.claude/agent-profiles.json` and pass as `--model {model}`",
         ],
-    ),
-    (
-        ".claude/skills/track-plan/SKILL.md",
-        "track-plan override-first resolution",
-        &[
+    },
+    GuidanceTarget {
+        path: ".claude/skills/track-plan/SKILL.md",
+        label: "track-plan override-first resolution",
+        required_snippets: &[
             "Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.codex` first, then `providers.codex.default_model`",
         ],
-        &["codex exec --model gpt-5.3-codex --sandbox read-only --full-auto \""],
-    ),
-    (
-        ".claude/commands/track/review.md",
-        "track review override-first resolution",
-        &[
+        // Read-only planner examples must not keep the stale `--full-auto` form,
+        // regardless of whether the example hard-codes a model or uses `{model}`.
+        forbidden_snippets: &["--sandbox read-only --full-auto"],
+    },
+    GuidanceTarget {
+        path: ".claude/commands/track/review.md",
+        label: "track review override-first resolution",
+        required_snippets: &[
             "provider_model_overrides",
             "providers.<reviewer_provider>.fast_model",
             "providers.<reviewer_provider>.default_model",
         ],
-        &["Read the provider's `default_model` to get `{model}`."],
-    ),
+        forbidden_snippets: &["Read the provider's `default_model` to get `{model}`."],
+    },
 ];
+
+fn normalize_shell_continuations(content: &str) -> String {
+    content.replace("\\\r\n", " ").replace("\\\n", " ")
+}
+
+fn compact_whitespace(content: &str) -> String {
+    content.split_whitespace().collect::<Vec<_>>().join(" ")
+}
 
 // ---------------------------------------------------------------------------
 // Constants: reviewer wrapper guidance
@@ -345,54 +361,47 @@ const REVIEW_WRAPPER_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
         ".claude/agent-profiles.json",
         "agent profile reviewer wrapper path",
         &["cargo make track-local-review -- --model {model} --prompt \\\"{task}\\\""],
-        &["codex exec review --uncommitted --json --model {model} --full-auto"],
+        &["codex exec review --uncommitted --json", "--sandbox read-only --full-auto"],
     ),
     (
         ".claude/commands/track/review.md",
         "track review wrapper path",
         &[
+            "Use the repo-owned wrapper so the 600-second local-review timeout and final verdict parsing stay under repo control.",
             "cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-",
             "{\"verdict\":\"zero_findings\",\"findings\":[]}",
-            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"describe the bug\",\"severity\":\"P1\",\"file\":\"path/to/file.rs\",\"line\":123}]}",
+            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"describe the bug\",\"severity\":\"P1\",\"file\":\"path/to/file.rs\",\"line\":123,\"category\":null}]}",
             "Every object field is required by the output schema.",
             "use `null` for that field instead of omitting it.",
         ],
-        &[
-            "timeout 180 codex exec --model {model} --sandbox read-only --full-auto",
-            "timeout 600 codex exec --model {model} --sandbox read-only --full-auto",
-        ],
+        &["codex exec review --uncommitted --json", "--sandbox read-only --full-auto"],
     ),
     (
         ".claude/skills/codex-system/SKILL.md",
         "codex-system reviewer wrapper path",
         &[
+            "For the local reviewer loop, prefer the repo-owned wrapper so timeout and final verdict stay under repo control.",
             "cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md",
             "cargo make track-local-review -- --model {model} --prompt \"",
             "{\"verdict\":\"zero_findings\",\"findings\":[]}",
-            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"describe the bug\",\"severity\":\"P1\",\"file\":\"path/to/file.rs\",\"line\":123}]}",
+            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"describe the bug\",\"severity\":\"P1\",\"file\":\"path/to/file.rs\",\"line\":123,\"category\":null}]}",
             "Every object field is required by the output schema.",
             "use `null` for that field instead of omitting it.",
         ],
-        &[
-            "timeout 180 codex exec --model {model} --sandbox read-only --full-auto \\\n  \"Review this Rust implementation: {description}\"",
-            "timeout 600 codex exec --model {model} --sandbox read-only --full-auto \\\n  \"Review this Rust implementation: {description}\"",
-            "codex exec review --uncommitted --json --model {model} --full-auto",
-        ],
+        &["--sandbox read-only --full-auto", "codex exec review --uncommitted --json"],
     ),
     (
         ".claude/rules/02-codex-delegation.md",
         "codex delegation reviewer wrapper path",
         &[
+            "Codex CLI 呼び出しと repo-owned local reviewer wrapper のデフォルトタイムアウトは **600 秒**。",
+            "direct CLI では `timeout 600 codex exec ...`、local reviewer では `cargo make track-local-review ...` を標準とする。",
             "cargo make track-local-review -- --model {model} --prompt \\",
             "{\"verdict\":\"zero_findings\",\"findings\":[]}",
-            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"describe the bug\",\"severity\":\"P1\",\"file\":\"path/to/file.rs\",\"line\":123}]}",
+            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"describe the bug\",\"severity\":\"P1\",\"file\":\"path/to/file.rs\",\"line\":123,\"category\":null}]}",
             "field \u{81ea}\u{4f53}\u{306f}\u{7701}\u{7565}\u{305b}\u{305a} `null` \u{3092}\u{4f7f}\u{3046}\u{3002}",
         ],
-        &[
-            "timeout 180 codex exec --model {model} --sandbox read-only --full-auto \\\n  \"Review this Rust implementation: {description}\"",
-            "timeout 600 codex exec --model {model} --sandbox read-only --full-auto \\\n  \"Review this Rust implementation: {description}\"",
-            "codex exec review --uncommitted --json --model {model} --full-auto",
-        ],
+        &["--sandbox read-only --full-auto", "codex exec review --uncommitted --json"],
     ),
 ];
 
@@ -867,34 +876,52 @@ fn scan_dir_for_gpt_pattern(dir: &Path, outcome: &mut VerifyOutcome) -> Result<(
 
 /// Verify override-first model resolution guidance in target files.
 fn verify_override_first_model_resolution(root: &Path, outcome: &mut VerifyOutcome) {
-    for (rel_path, label, required_snippets, forbidden_snippets) in MODEL_RESOLUTION_TARGETS {
-        let path = root.join(rel_path);
+    for target in MODEL_RESOLUTION_TARGETS {
+        let path = root.join(target.path);
         if !path.is_file() {
-            outcome.add(Finding::error(format!("Missing model resolution target: {rel_path}")));
+            outcome
+                .add(Finding::error(format!("Missing model resolution target: {}", target.path)));
             continue;
         }
         let content = match std::fs::read_to_string(&path) {
             Ok(c) => c,
             Err(e) => {
-                outcome.add(Finding::error(format!("Cannot read {rel_path}: {e}")));
+                outcome.add(Finding::error(format!("Cannot read {}: {e}", target.path)));
                 continue;
             }
         };
+        let normalized_content = normalize_shell_continuations(&content);
+        let compact_content = compact_whitespace(&normalized_content);
 
-        let missing: Vec<&&str> =
-            required_snippets.iter().filter(|s| !content.contains(**s)).collect();
+        let missing: Vec<&&str> = target
+            .required_snippets
+            .iter()
+            .filter(|s| {
+                let compact_snippet = compact_whitespace(s);
+                !content.contains(**s)
+                    && !normalized_content.contains(**s)
+                    && !compact_content.contains(&compact_snippet)
+            })
+            .collect();
         if !missing.is_empty() {
             let joined: Vec<&str> = missing.iter().map(|s| **s).collect();
             outcome.add(Finding::error(format!(
-                "{rel_path} is missing canonical override-first guidance for {label}: {}",
+                "{} is missing canonical override-first guidance for {}: {}",
+                target.path,
+                target.label,
                 joined.join("; ")
             )));
         }
 
-        for forbidden in *forbidden_snippets {
-            if content.contains(*forbidden) {
+        for forbidden in target.forbidden_snippets {
+            let compact_forbidden = compact_whitespace(forbidden);
+            if content.contains(*forbidden)
+                || normalized_content.contains(*forbidden)
+                || compact_content.contains(&compact_forbidden)
+            {
                 outcome.add(Finding::error(format!(
-                    "{rel_path} still contains stale default_model-only guidance: {forbidden}"
+                    "{} still contains stale default_model-only guidance: {forbidden}",
+                    target.path
                 )));
             }
         }
@@ -916,9 +943,18 @@ fn verify_reviewer_wrapper_guidance(root: &Path, outcome: &mut VerifyOutcome) {
                 continue;
             }
         };
+        let normalized_content = normalize_shell_continuations(&content);
+        let compact_content = compact_whitespace(&normalized_content);
 
-        let missing: Vec<&&str> =
-            required_snippets.iter().filter(|s| !content.contains(**s)).collect();
+        let missing: Vec<&&str> = required_snippets
+            .iter()
+            .filter(|s| {
+                let compact_snippet = compact_whitespace(s);
+                !content.contains(**s)
+                    && !normalized_content.contains(**s)
+                    && !compact_content.contains(&compact_snippet)
+            })
+            .collect();
         if !missing.is_empty() {
             let joined: Vec<&str> = missing.iter().map(|s| **s).collect();
             outcome.add(Finding::error(format!(
@@ -928,7 +964,11 @@ fn verify_reviewer_wrapper_guidance(root: &Path, outcome: &mut VerifyOutcome) {
         }
 
         for forbidden in *forbidden_snippets {
-            if content.contains(*forbidden) {
+            let compact_forbidden = compact_whitespace(forbidden);
+            if content.contains(*forbidden)
+                || normalized_content.contains(*forbidden)
+                || compact_content.contains(&compact_forbidden)
+            {
                 outcome.add(Finding::error(format!(
                     "{rel_path} still contains stale reviewer command guidance: {forbidden}"
                 )));
@@ -1615,6 +1655,111 @@ mod tests {
         assert!(outcome.has_errors());
         let msgs: Vec<&str> = outcome.findings().iter().map(|f| f.message()).collect();
         assert!(msgs.iter().any(|m| m.contains("Missing settings file")));
+    }
+
+    fn write_model_resolution_targets(root: &Path) {
+        for target in MODEL_RESOLUTION_TARGETS {
+            let path = root.join(target.path);
+            if let Some(parent) = path.parent() {
+                std::fs::create_dir_all(parent).unwrap();
+            }
+            let content = format!("{}\n", target.required_snippets.join("\n"));
+            std::fs::write(path, content).unwrap();
+        }
+    }
+
+    #[test]
+    fn test_verify_override_first_model_resolution_rejects_track_plan_full_auto_fragment() {
+        let tmp = TempDir::new().unwrap();
+        write_model_resolution_targets(tmp.path());
+
+        let track_plan = tmp.path().join(".claude/skills/track-plan/SKILL.md");
+        std::fs::write(
+            &track_plan,
+            concat!(
+                "Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.codex` first, then `providers.codex.default_model`\n",
+                "timeout 600 codex exec --model {model} --sandbox read-only \\\n",
+                "  --full-auto\n",
+            ),
+        )
+        .unwrap();
+
+        let mut outcome = VerifyOutcome::pass();
+        verify_override_first_model_resolution(tmp.path(), &mut outcome);
+        assert!(outcome.has_errors());
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|finding| { finding.message().contains("--sandbox read-only --full-auto") })
+        );
+    }
+
+    fn write_reviewer_wrapper_targets(root: &Path) {
+        for (rel_path, _, required_snippets, _) in REVIEW_WRAPPER_TARGETS {
+            let path = root.join(rel_path);
+            if let Some(parent) = path.parent() {
+                std::fs::create_dir_all(parent).unwrap();
+            }
+            let content = format!("{}\n", required_snippets.join("\n"));
+            std::fs::write(path, content).unwrap();
+        }
+    }
+
+    #[test]
+    fn test_verify_reviewer_wrapper_guidance_rejects_direct_codex_review_command() {
+        let tmp = TempDir::new().unwrap();
+        write_reviewer_wrapper_targets(tmp.path());
+
+        let agent_profiles = tmp.path().join(".claude/agent-profiles.json");
+        std::fs::write(
+            &agent_profiles,
+            concat!(
+                "cargo make track-local-review -- --model {model} --prompt \\\"{task}\\\"\n",
+                "codex exec review --uncommitted --json --model {model}\n",
+            ),
+        )
+        .unwrap();
+
+        let mut outcome = VerifyOutcome::pass();
+        verify_reviewer_wrapper_guidance(tmp.path(), &mut outcome);
+        assert!(outcome.has_errors());
+        assert!(outcome.findings().iter().any(|finding| {
+            finding.message().contains("codex exec review --uncommitted --json")
+        }));
+    }
+
+    #[test]
+    fn test_verify_reviewer_wrapper_guidance_rejects_multiline_full_auto_fragment() {
+        let tmp = TempDir::new().unwrap();
+        write_reviewer_wrapper_targets(tmp.path());
+
+        let skill = tmp.path().join(".claude/skills/codex-system/SKILL.md");
+        std::fs::write(
+            &skill,
+            concat!(
+                "For the local reviewer loop, prefer the repo-owned wrapper so timeout and final verdict stay under repo control.\n",
+                "cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md\n",
+                "cargo make track-local-review -- --model {model} --prompt \"\n",
+                "{\"verdict\":\"zero_findings\",\"findings\":[]}\n",
+                "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"describe the bug\",\"severity\":\"P1\",\"file\":\"path/to/file.rs\",\"line\":123,\"category\":null}]}\n",
+                "Every object field is required by the output schema.\n",
+                "use `null` for that field instead of omitting it.\n",
+                "timeout 600 codex exec --model {model} --sandbox read-only \\\n",
+                "  --full-auto \"stale\"\n",
+            ),
+        )
+        .unwrap();
+
+        let mut outcome = VerifyOutcome::pass();
+        verify_reviewer_wrapper_guidance(tmp.path(), &mut outcome);
+        assert!(outcome.has_errors());
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|finding| { finding.message().contains("--sandbox read-only --full-auto") })
+        );
     }
 
     // -----------------------------------------------------------------------

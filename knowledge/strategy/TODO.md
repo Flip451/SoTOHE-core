@@ -2,7 +2,7 @@
 
 > **出典**: `tmp/review-2026-03-10.md`（Gemini による包括的レビュー）
 > **作成日**: 2026-03-11
-> **最終更新**: 2026-03-31
+> **最終更新**: 2026-04-03
 > **アーカイブ**: 解決済み項目は `tmp/TODO-archived-2026-03-16.md` に移動済み
 > **全体計画**: [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md)（v3: ハーネス vs テンプレート出力の区別）
 > **全体計画 (旧版)**: `tmp/archive-2026-03-20/`
@@ -693,6 +693,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **HARNESS-07** (LOW): Ghost File / Comment Bloat 検出
 - [ ] **HARNESS-08** (MEDIUM): ブートストラップルーチン標準化 → Phase 5
 - [ ] **HARNESS-09** (LOW): フィードバックループ速度階層の明文化
+- [ ] **BRIDGE-01** (MEDIUM): `sotp export-schema` — 生成プロジェクトの Rust source roots から pub シグネチャを抽出し、テスト生成 AI の型コンテキストを供給 → Phase 3
 
 **Tsumiki フレームワーク**:
 - [x] ~~**TSUMIKI-01** (HIGH): 信号機評価 🔵🟡🔴~~
@@ -701,18 +702,17 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [x] ~~**TSUMIKI-02** (MEDIUM): ソース帰属~~ ✅ Phase 1 完了
 - [x] ~~**TSUMIKI-03** (MEDIUM): 差分ヒアリング~~ ✅ done (`diff-hearing-2026-03-27`)
 - [ ] **TSUMIKI-04** (MEDIUM): TDD 完了時の要件網羅率 → Phase 3
-- [ ] **TSUMIKI-05** (MEDIUM): 構造化ヒアリング UX — AskUserQuestion + multiSelect による選択肢型質問。自由記述 Markdown から構造化質問へ移行 → Phase 2b
-  - **出典**: `knowledge/research/tsumiki-hearing-deep-dive-2026-04-01.md` §6 Priority 1
-- [ ] **TSUMIKI-06** (LOW): ヒアリング作業規模選定 — Full/Focused/Quick モードで /track:plan のヒアリング深度を選択 → Phase 2b
-  - **出典**: tsumiki kairo-requirements Stage 2 (Full/Lightweight/Custom)
-- [ ] **TSUMIKI-07** (LOW): ヒアリング記録 — spec.json に hearing_history を追加し、ヒアリングプロセスの信号変化を追跡可能にする → Phase 2b
-  - **出典**: tsumiki interview-record.md パターン
+- [x] ~~**TSUMIKI-05** (MEDIUM): 構造化ヒアリング UX~~ ✅ done (`hearing-ux-improvement-2026-04-01`)
+- [x] ~~**TSUMIKI-06** (LOW): ヒアリング作業規模選定~~ ✅ done (`hearing-ux-improvement-2026-04-01`)
+- [x] ~~**TSUMIKI-07** (LOW): ヒアリング記録~~ ✅ done (`hearing-ux-improvement-2026-04-01`)
 - [ ] **TSUMIKI-08** (MEDIUM): シグナル伝播 — spec.json の信号を metadata.json タスクに worst-case 伝播。🔴依存タスクの implementing 遷移をブロック → Phase 3
+- [ ] **TSUMIKI-09** (MEDIUM): ヒアリング記録の質問粒度向上 — hearing_history に質問-回答ペアを保存し、「なぜ仕様が変わったか」の証跡を残す → Phase 3
+  - **出典**: `knowledge/research/tsumiki-hearing-deep-dive-2026-04-01.md` §5.2 (interview-record.md パターンの詳細版)
 
 **CC-SDD フレームワーク**:
 - [x] **CC-SDD-01** (HIGH): 要件-タスク双方向トレーサビリティ — ✅ done (PR #60, track: req-task-traceability-2026-03-24)
 - [x] **CC-SDD-02** (MEDIUM): 明示的承認ゲート — ✅ done (PR #62, track: spec-approval-gate-2026-03-24)
-- [ ] **CC-SDD-03** (LOW): EARS 記法
+- [ ] **CC-SDD-03** (LOW): EARS 記法 — spec.json の要件に When/If/While/Shall 構造を導入。3-2（spec → テストスケルトン）と同時実装が効率的 → Phase 3
 - [ ] **CC-SDD-04** (MEDIUM): Steering 自動生成 → Phase 6
 - [ ] **CC-SDD-05** (MEDIUM): 実装検証コマンド → Phase 3
 

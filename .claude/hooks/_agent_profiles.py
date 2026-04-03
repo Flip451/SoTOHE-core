@@ -611,7 +611,15 @@ def provider_command_prefixes(
             stripped = example.strip()
             if not stripped:
                 continue
-            token = stripped.split()[0]
+            try:
+                parts = shlex.split(stripped)
+            except ValueError:
+                parts = stripped.split()
+            if not parts:
+                continue
+            token = parts[0]
+            if token == "timeout" and len(parts) >= 3:
+                token = parts[2]
             if token.startswith(("/", "./", "../")) or (
                 token[0].islower() and token[0].isascii()
             ):

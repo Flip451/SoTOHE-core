@@ -78,9 +78,12 @@ def should_ignore_command(command: str) -> bool:
     if any(stripped.startswith(ignore) for ignore in IGNORE_COMMANDS):
         return True
     try:
-        lowered = " ".join(shlex.split(stripped.lower()))
+        parts = shlex.split(stripped.lower())
     except ValueError:
-        lowered = " ".join(stripped.lower().split())
+        parts = stripped.lower().split()
+    if parts[:2] == ["timeout", "600"] and len(parts) >= 3:
+        parts = parts[2:]
+    lowered = " ".join(parts)
     if any(target in lowered for target in TARGETED_TEST_BUILD_COMMANDS):
         return True
     return any(

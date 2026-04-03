@@ -58,6 +58,41 @@ impl GroupPartition {
         &self.groups
     }
 
+    /// Remaps this partition to the supplied group set, folding every non-member
+    /// named group into the mandatory `other` bucket.
+    ///
+    /// The returned partition always preserves the requested group keys, even when
+    /// their current scope is empty.
+    ///
+    /// # Errors
+    /// Returns `GroupPartitionError` if the mandatory `other` group cannot be
+    /// constructed.
+    pub fn remap_to_group_names(
+        &self,
+        group_names: &std::collections::BTreeSet<ReviewGroupName>,
+    ) -> Result<Self, GroupPartitionError> {
+        let other_key = ReviewGroupName::try_new("other")
+            .map_err(|e| GroupPartitionError::InvalidOtherName(e.to_string()))?;
+        let mut filtered: BTreeMap<ReviewGroupName, Vec<RepoRelativePath>> = BTreeMap::new();
+
+        for name in group_names {
+            if *name != other_key {
+                filtered.entry(name.clone()).or_default();
+            }
+        }
+
+        for (name, paths) in &self.groups {
+            if group_names.contains(name) && *name != other_key {
+                filtered.entry(name.clone()).or_default().extend(paths.iter().cloned());
+            } else {
+                filtered.entry(other_key.clone()).or_default().extend(paths.iter().cloned());
+            }
+        }
+
+        filtered.entry(other_key).or_default();
+        Self::try_new(filtered)
+    }
+
     /// Returns the sorted list of expected group names.
     #[must_use]
     pub fn expected_groups(&self) -> Vec<ReviewGroupName> {
@@ -221,5 +256,44 @@ mod tests {
         assert_eq!(snapshot.base_policy_hash(), "sha256:base123");
         assert_eq!(snapshot.policy_hash(), "sha256:abc123");
         assert_eq!(snapshot.partition(), &partition);
+    }
+
+    #[test]
+    fn test_remap_to_group_names_folds_non_members_into_other() {
+        let mut groups = BTreeMap::new();
+        groups.insert(grn("other"), vec![path("README.md")]);
+        groups.insert(grn("cli"), vec![path("apps/cli/src/lib.rs")]);
+        groups.insert(grn("usecase"), vec![path("libs/usecase/src/lib.rs")]);
+        let partition = GroupPartition::try_new(groups).unwrap();
+
+        let filtered = partition
+            .remap_to_group_names(&[grn("usecase"), grn("other")].into_iter().collect())
+            .unwrap();
+
+        assert_eq!(filtered.expected_groups(), vec![grn("other"), grn("usecase")]);
+        assert_eq!(
+            filtered.groups()[&grn("other")].iter().map(|path| path.as_str()).collect::<Vec<_>>(),
+            vec!["apps/cli/src/lib.rs", "README.md"]
+        );
+        assert_eq!(
+            filtered.groups()[&grn("usecase")].iter().map(|path| path.as_str()).collect::<Vec<_>>(),
+            vec!["libs/usecase/src/lib.rs"]
+        );
+    }
+
+    #[test]
+    fn test_remap_to_group_names_preserves_requested_empty_groups() {
+        let mut groups = BTreeMap::new();
+        groups.insert(grn("other"), vec![]);
+        groups.insert(grn("cli"), vec![]);
+        groups.insert(grn("usecase"), vec![path("libs/usecase/src/lib.rs")]);
+        let partition = GroupPartition::try_new(groups).unwrap();
+
+        let filtered = partition
+            .remap_to_group_names(&[grn("cli"), grn("usecase"), grn("other")].into_iter().collect())
+            .unwrap();
+
+        assert!(filtered.groups().contains_key(&grn("cli")));
+        assert!(filtered.groups()[&grn("cli")].is_empty());
     }
 }

@@ -257,26 +257,30 @@ pub struct RecordRoundProtocolImpl {
     pub base_ref: String,
 }
 
-fn filter_partition_to_expected_groups(
+fn filter_partition_to_group_names(
+    full_partition: &usecase::review_workflow::groups::GroupPartition,
+    group_names: &std::collections::BTreeSet<ReviewGroupName>,
+) -> Result<usecase::review_workflow::groups::GroupPartition, RecordRoundProtocolError> {
+    full_partition
+        .remap_to_group_names(group_names)
+        .map_err(|e| RecordRoundProtocolError::Other(format!("partition filter: {e}")))
+}
+
+fn ensure_expected_groups_supported(
     full_partition: &usecase::review_workflow::groups::GroupPartition,
     expected_groups: &[ReviewGroupName],
-) -> Result<usecase::review_workflow::groups::GroupPartition, RecordRoundProtocolError> {
-    let other_key = ReviewGroupName::try_new("other")
-        .map_err(|e| RecordRoundProtocolError::Other(format!("invalid group name 'other': {e}")))?;
-    let mut filtered_groups: std::collections::BTreeMap<
-        ReviewGroupName,
-        Vec<usecase::review_workflow::scope::RepoRelativePath>,
-    > = std::collections::BTreeMap::new();
-    for (name, paths) in full_partition.groups() {
-        if expected_groups.contains(name) && *name != other_key {
-            filtered_groups.entry(name.clone()).or_default().extend(paths.iter().cloned());
-        } else {
-            filtered_groups.entry(other_key.clone()).or_default().extend(paths.iter().cloned());
-        }
+) -> Result<(), RecordRoundProtocolError> {
+    let expected = normalized_expected_groups(expected_groups)?;
+    let available: std::collections::BTreeSet<_> =
+        full_partition.groups().keys().cloned().collect();
+    if !expected.is_subset(&available) {
+        let missing: Vec<_> = expected.difference(&available).map(ToString::to_string).collect();
+        return Err(RecordRoundProtocolError::Other(format!(
+            "expected_groups must be supported by the current partition (missing: {:?})",
+            missing
+        )));
     }
-    filtered_groups.entry(other_key).or_default();
-    usecase::review_workflow::groups::GroupPartition::try_new(filtered_groups)
-        .map_err(|e| RecordRoundProtocolError::Other(format!("partition filter: {e}")))
+    Ok(())
 }
 
 fn normalized_expected_groups(
@@ -293,17 +297,19 @@ fn validate_expected_groups_against_cycle(
     cycle: &domain::ReviewCycle,
     expected_groups: &[ReviewGroupName],
 ) -> Result<(), RecordRoundProtocolError> {
+    // This only verifies that the caller's requested review set fits within the
+    // frozen cycle topology. Approval still keys off the cycle's full stored
+    // group set via `ReviewCycle::all_groups_approved`, not `expected_groups`.
     let expected = normalized_expected_groups(expected_groups)?;
     let actual: std::collections::BTreeSet<_> = cycle.group_names().cloned().collect();
-    if actual == expected {
+    let unexpected: Vec<_> = expected.difference(&actual).map(ToString::to_string).collect();
+    if unexpected.is_empty() {
         return Ok(());
     }
 
-    let missing: Vec<_> = actual.difference(&expected).map(ToString::to_string).collect();
-    let unexpected: Vec<_> = expected.difference(&actual).map(ToString::to_string).collect();
     Err(RecordRoundProtocolError::Other(format!(
-        "expected_groups must match the current cycle groups (missing: {:?}, unexpected: {:?})",
-        missing, unexpected
+        "expected_groups must be a subset of the current cycle groups (unexpected: {:?})",
+        unexpected
     )))
 }
 
@@ -506,6 +512,12 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
             .unwrap_or_else(ReviewJson::new);
 
         validate_stored_findings(&findings)?;
+        if !expected_groups.contains(&group_name) {
+            return Err(RecordRoundProtocolError::Other(format!(
+                "group '{}' must be included in expected_groups",
+                group_name.as_ref()
+            )));
+        }
 
         // Auto-create cycle if none exists, using real frozen scope from DiffScopeProvider.
         if review.current_cycle().is_none() {
@@ -517,23 +529,17 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
                 track_id,
                 &self.base_ref,
             )?;
-            // Filter to expected_groups only (+ mandatory "other") to respect
-            // the --expected-groups contract and avoid requiring review for
-            // groups the caller didn't request.
-            // Filter to expected_groups. Files from non-expected groups are
-            // re-mapped to "other" so they are still covered by the review scope
-            // (fail-closed: no files silently dropped).
-            let partition = filter_partition_to_expected_groups(&full_partition, &expected_groups)?;
             // Compute base policy hash separately (before override).
             let base_policy = crate::review_group_policy::ResolvedReviewGroupPolicy::resolve(
                 &scope_config.groups,
                 None,
             )
             .map_err(|e| RecordRoundProtocolError::Other(format!("resolve base policy: {e}")))?;
+            ensure_expected_groups_supported(&full_partition, &expected_groups)?;
             let snapshot = usecase::review_workflow::groups::ReviewPartitionSnapshot::new(
                 base_policy.policy_hash(),
                 policy.policy_hash(),
-                partition,
+                full_partition,
             );
 
             // 4. Start cycle with real frozen scope via usecase function.
@@ -614,8 +620,13 @@ impl RecordRoundProtocol for RecordRoundProtocolImpl {
                 .unwrap_or_else(|| self.base_ref.clone());
             let (_, _, full_partition) =
                 load_current_review_partition(git.root(), &self.items_dir, track_id, &diff_base)?;
-            let filtered_partition =
-                filter_partition_to_expected_groups(&full_partition, &expected_groups)?;
+            let filtered_partition = if let Some(cycle) = review.current_cycle() {
+                let cycle_group_names: std::collections::BTreeSet<_> =
+                    cycle.group_names().cloned().collect();
+                filter_partition_to_group_names(&full_partition, &cycle_group_names)?
+            } else {
+                full_partition
+            };
 
             filtered_partition
                 .groups()
@@ -804,7 +815,7 @@ mod tests {
     use std::process::Command;
     use std::sync::Mutex;
 
-    use domain::{ReviewJsonReader, TrackWriter};
+    use domain::{ReviewJsonReader, ReviewJsonWriter, TrackWriter};
     use usecase::review_workflow::scope::{DiffScopeProvider, DiffScopeProviderError};
 
     use super::*;
@@ -1870,7 +1881,7 @@ mod tests {
                 domain::Verdict::ZeroFindings,
                 vec![],
                 vec![],
-                vec![domain::ReviewGroupName::try_new("other").unwrap()],
+                vec![domain::ReviewGroupName::try_new("cli").unwrap()],
                 domain::Timestamp::new("2026-04-03T03:05:00Z").unwrap(),
             )
         });
@@ -1878,7 +1889,7 @@ mod tests {
         match mismatch_result.unwrap_err() {
             RecordRoundProtocolError::Other(err) => {
                 assert!(
-                    err.contains("expected_groups must match the current cycle groups"),
+                    err.contains("must be included in expected_groups"),
                     "unexpected error: {err}"
                 );
             }
@@ -1975,8 +1986,9 @@ mod tests {
             ReviewGroupName::try_new("usecase").unwrap(),
             ReviewGroupName::try_new("other").unwrap(),
         ];
+        let normalized_expected = normalized_expected_groups(&expected).unwrap();
 
-        let filtered = filter_partition_to_expected_groups(&full_partition, &expected);
+        let filtered = filter_partition_to_group_names(&full_partition, &normalized_expected);
 
         assert!(filtered.is_ok(), "expected-group filter should succeed: {filtered:?}");
         let filtered = match filtered {
@@ -1992,5 +2004,275 @@ mod tests {
             "remapped harness-policy path must be preserved in other: {other_paths:?}"
         );
         assert!(other_paths.contains(&"Cargo.lock"), "native other path must be preserved");
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_starts_cycle_with_full_partition() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_named_group_record_round_fixture(
+            "usecase",
+            r#"{
+                "groups": {
+                    "cli": { "patterns": ["apps/cli/**"] },
+                    "usecase": { "patterns": ["libs/usecase/**"] }
+                },
+                "review_operational": ["track/items/<track-id>/review.json"]
+            }"#,
+            "libs/usecase/src/lib.rs",
+        );
+        let items_dir = path.join("track/items");
+        let cli_group = ReviewGroupName::try_new("cli").unwrap();
+        let expected_groups = vec![group_name.clone()];
+
+        let fast_result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::ZeroFindings,
+                vec![],
+                vec![],
+                expected_groups.clone(),
+                domain::Timestamp::new("2026-04-03T04:00:00Z").unwrap(),
+            )
+        });
+        assert!(fast_result.is_ok(), "fast round should succeed: {fast_result:?}");
+
+        let review = crate::review_json_store::FsReviewJsonStore::new(&items_dir)
+            .find_review(&track_id)
+            .unwrap()
+            .unwrap();
+        let cycle = review.current_cycle().unwrap();
+        assert!(
+            cycle.group(&cli_group).is_some(),
+            "cycle should preserve empty groups from the active policy"
+        );
+        assert!(
+            cycle.group(&ReviewGroupName::try_new("other").unwrap()).is_some(),
+            "cycle must still preserve the mandatory other group"
+        );
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_allows_subset_expected_groups_against_subset_cycle() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_named_group_record_round_fixture(
+            "usecase",
+            r#"{
+                "groups": {
+                    "cli": { "patterns": ["apps/cli/**"] },
+                    "usecase": { "patterns": ["libs/usecase/**"] }
+                },
+                "review_operational": ["track/items/<track-id>/review.json"]
+            }"#,
+            "libs/usecase/src/lib.rs",
+        );
+        let expected_groups = vec![group_name.clone()];
+
+        let fast_result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::ZeroFindings,
+                vec![],
+                vec![],
+                expected_groups.clone(),
+                domain::Timestamp::new("2026-04-03T04:00:00Z").unwrap(),
+            )
+        });
+        assert!(fast_result.is_ok(), "fast round should succeed: {fast_result:?}");
+
+        let final_result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Final,
+                group_name.clone(),
+                domain::Verdict::ZeroFindings,
+                vec![],
+                vec![],
+                expected_groups.clone(),
+                domain::Timestamp::new("2026-04-03T04:05:00Z").unwrap(),
+            )
+        });
+        assert!(final_result.is_ok(), "final round should succeed: {final_result:?}");
+    }
+
+    #[test]
+    fn test_ensure_expected_groups_supported_accepts_subset_of_partition_groups() {
+        let mut groups = std::collections::BTreeMap::new();
+        groups.insert(
+            ReviewGroupName::try_new("cli").unwrap(),
+            vec![RepoRelativePath::normalize("apps/cli/src/lib.rs").unwrap()],
+        );
+        groups.insert(
+            ReviewGroupName::try_new("usecase").unwrap(),
+            vec![RepoRelativePath::normalize("libs/usecase/src/lib.rs").unwrap()],
+        );
+        groups.insert(
+            ReviewGroupName::try_new("other").unwrap(),
+            vec![RepoRelativePath::normalize("Cargo.lock").unwrap()],
+        );
+        let full_partition =
+            usecase::review_workflow::groups::GroupPartition::try_new(groups).unwrap();
+
+        let result = ensure_expected_groups_supported(
+            &full_partition,
+            &[ReviewGroupName::try_new("usecase").unwrap()],
+        );
+
+        assert!(result.is_ok(), "subset support check should succeed: {result:?}");
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_allows_truncated_expected_groups_for_active_cycle() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_named_group_record_round_fixture(
+            "usecase",
+            r#"{
+                "groups": {
+                    "cli": { "patterns": ["apps/cli/**"] },
+                    "usecase": { "patterns": ["libs/usecase/**"] }
+                },
+                "review_operational": ["track/items/<track-id>/review.json"]
+            }"#,
+            "libs/usecase/src/lib.rs",
+        );
+        let items_dir = path.join("track/items");
+        let review_store = crate::review_json_store::FsReviewJsonStore::new(&items_dir);
+        let mut review = domain::ReviewJson::new();
+        let mut groups = std::collections::BTreeMap::new();
+        groups.insert(
+            ReviewGroupName::try_new("cli").unwrap(),
+            domain::CycleGroupState::new(vec!["apps/cli/src/lib.rs".into()]),
+        );
+        groups.insert(
+            group_name.clone(),
+            domain::CycleGroupState::new(vec!["libs/usecase/src/lib.rs".into()]),
+        );
+        groups.insert(
+            ReviewGroupName::try_new("other").unwrap(),
+            domain::CycleGroupState::new(vec![]),
+        );
+        review
+            .start_cycle(
+                "2026-04-03T03:55:00Z",
+                domain::Timestamp::new("2026-04-03T03:55:00Z").unwrap(),
+                "main",
+                "sha256:base",
+                "sha256:effective",
+                groups,
+            )
+            .unwrap();
+        review_store.save_review(&track_id, &review).unwrap();
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::ZeroFindings,
+                vec![],
+                vec![],
+                vec![group_name.clone()],
+                domain::Timestamp::new("2026-04-03T04:00:00Z").unwrap(),
+            )
+        });
+        assert!(result.is_ok(), "subset expected_groups should remain acceptable: {result:?}");
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_accepts_existing_subset_cycle_after_upgrade() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_named_group_record_round_fixture(
+            "usecase",
+            r#"{
+                "groups": {
+                    "cli": { "patterns": ["apps/cli/**"] },
+                    "usecase": { "patterns": ["libs/usecase/**"] }
+                },
+                "review_operational": ["track/items/<track-id>/review.json"]
+            }"#,
+            "libs/usecase/src/lib.rs",
+        );
+        let items_dir = path.join("track/items");
+        let review_store = crate::review_json_store::FsReviewJsonStore::new(&items_dir);
+        let mut review = domain::ReviewJson::new();
+        let mut groups = std::collections::BTreeMap::new();
+        groups.insert(
+            group_name.clone(),
+            domain::CycleGroupState::new(vec!["libs/usecase/src/lib.rs".into()]),
+        );
+        groups.insert(
+            ReviewGroupName::try_new("other").unwrap(),
+            domain::CycleGroupState::new(vec![]),
+        );
+        review
+            .start_cycle(
+                "2026-04-03T03:55:00Z",
+                domain::Timestamp::new("2026-04-03T03:55:00Z").unwrap(),
+                "main",
+                "sha256:base",
+                "sha256:effective",
+                groups,
+            )
+            .unwrap();
+        review_store.save_review(&track_id, &review).unwrap();
+
+        let expected_groups = vec![group_name.clone()];
+        let fast_result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::ZeroFindings,
+                vec![],
+                vec![],
+                expected_groups.clone(),
+                domain::Timestamp::new("2026-04-03T04:00:00Z").unwrap(),
+            )
+        });
+        assert!(
+            fast_result.is_ok(),
+            "existing subset cycle should remain recordable: {fast_result:?}"
+        );
+    }
+
+    #[test]
+    fn test_record_round_protocol_impl_rejects_unknown_expected_group() {
+        let _guard = CWD_LOCK.lock().unwrap();
+        let (_repo, path, track_id, protocol, group_name) = setup_named_group_record_round_fixture(
+            "usecase",
+            r#"{
+                "groups": {
+                    "cli": { "patterns": ["apps/cli/**"] },
+                    "usecase": { "patterns": ["libs/usecase/**"] }
+                },
+                "review_operational": ["track/items/<track-id>/review.json"]
+            }"#,
+            "libs/usecase/src/lib.rs",
+        );
+        let expected_groups =
+            vec![group_name.clone(), ReviewGroupName::try_new("ghost-group").unwrap()];
+
+        let result = run_protocol_in_dir(&path, || {
+            protocol.execute(
+                &track_id,
+                domain::RoundType::Fast,
+                group_name.clone(),
+                domain::Verdict::ZeroFindings,
+                vec![],
+                vec![],
+                expected_groups.clone(),
+                domain::Timestamp::new("2026-04-03T04:00:00Z").unwrap(),
+            )
+        });
+        assert!(result.is_err(), "unknown expected group must fail fast");
+        match result.unwrap_err() {
+            RecordRoundProtocolError::Other(err) => {
+                assert!(err.contains("ghost-group"), "unexpected error: {err}");
+            }
+            err => panic!("expected Other error, got {err:?}"),
+        }
     }
 }

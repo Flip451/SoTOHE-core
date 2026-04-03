@@ -43,6 +43,7 @@ Arguments:
   2. Fall back to `providers.<provider>.default_model`.
   3. If neither is set (e.g., `claude` provider has no `default_model`), `{model}` is not needed — skip the `--model` flag.
 - When the resolved provider has a CLI tool (e.g., Codex CLI), invoke via `cargo make track-local-review` (external subprocess).
+- Use the repo-owned wrapper so the 600-second local-review timeout and final verdict parsing stay under repo control.
 - When the resolved provider is `claude` (e.g., `claude-heavy` profile), invoke via Claude Code subagent with `subagent_type: "Explore"` using the same briefing files and JSON verdict format. No `--model` flag is needed. Do not perform inline review in the main conversation context.
 
 ## Step 2: Prepare review briefings (parallel observation split)
@@ -124,7 +125,7 @@ For each non-empty group, build a briefing file at `tmp/reviewer-runtime/briefin
 Report findings as JSON:
 {"verdict":"zero_findings","findings":[]}
 or
-{"verdict":"findings_remain","findings":[{"message":"...","severity":"P1","file":"path","line":123}]}
+{"verdict":"findings_remain","findings":[{"message":"...","severity":"P1","file":"path","line":123,"category":null}]}
 DO NOT report findings about test code using unwrap/expect — that is allowed.
 DO NOT report findings about unchanged pre-existing code.
 ```
@@ -148,13 +149,18 @@ verdict extraction, applying diff scope filtering (RVW-11) and preventing verdic
 scope filtering (default: `main`). Parallel multi-group `--auto-record` is safe: each group's
 hash is computed from its own scope files only, so parallel recordings do not conflict.
 
+Let `{reviewed-group-names}` mean the comma-separated list of all non-empty groups in the
+current review cycle, and keep that same set for every follow-up rerun in the cycle. For
+example, if the cycle started with `cli,infrastructure,other`, keep using that full set even
+when rerunning only `other`.
+
 ```
-Agent 1: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-domain.md --auto-record --track-id {track-id} --round-type {fast|final} --group domain --expected-groups {all-group-names} --diff-base main
-Agent 2: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-infrastructure.md --auto-record --track-id {track-id} --round-type {fast|final} --group infrastructure --expected-groups {all-group-names} --diff-base main
-Agent 3: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-usecase.md --auto-record --track-id {track-id} --round-type {fast|final} --group usecase --expected-groups {all-group-names} --diff-base main
-Agent 4: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-cli.md --auto-record --track-id {track-id} --round-type {fast|final} --group cli --expected-groups {all-group-names} --diff-base main
-Agent 5: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-harness-policy.md --auto-record --track-id {track-id} --round-type {fast|final} --group harness-policy --expected-groups {all-group-names} --diff-base main
-Agent 6: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-other.md --auto-record --track-id {track-id} --round-type {fast|final} --group other --expected-groups {all-group-names} --diff-base main
+Agent 1: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-domain.md --auto-record --track-id {track-id} --round-type {fast|final} --group domain --expected-groups {reviewed-group-names} --diff-base main
+Agent 2: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-infrastructure.md --auto-record --track-id {track-id} --round-type {fast|final} --group infrastructure --expected-groups {reviewed-group-names} --diff-base main
+Agent 3: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-usecase.md --auto-record --track-id {track-id} --round-type {fast|final} --group usecase --expected-groups {reviewed-group-names} --diff-base main
+Agent 4: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-cli.md --auto-record --track-id {track-id} --round-type {fast|final} --group cli --expected-groups {reviewed-group-names} --diff-base main
+Agent 5: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-harness-policy.md --auto-record --track-id {track-id} --round-type {fast|final} --group harness-policy --expected-groups {reviewed-group-names} --diff-base main
+Agent 6: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-other.md --auto-record --track-id {track-id} --round-type {fast|final} --group other --expected-groups {reviewed-group-names} --diff-base main
 ```
 
 For the **final confirmation round**, replace `{fast_model}` with `{model}` and `--round-type fast` with `--round-type final` in the commands above.
@@ -191,11 +197,11 @@ inconsistent payloads fail-closed:
 or
 
 ```json
-{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}
+{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123,"category":null}]}
 ```
 
 Every object field is required by the output schema. When a finding does not have a concrete
-severity, file, or line, use `null` for that field instead of omitting it.
+severity, file, line, or category, use `null` for that field instead of omitting it.
 `zero_findings` must use an empty `findings` array, and `findings_remain` must include at least
 one finding. The wrapper prints that final JSON payload as the last stdout line.
 

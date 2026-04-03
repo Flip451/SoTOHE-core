@@ -17,6 +17,6 @@ pub use verdict::{
     ModelProfile, REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewFinalPayload,
     ReviewFinding, ReviewPayloadVerdict, ReviewVerdict, ReviewWorkflowError,
     classify_review_verdict, extract_verdict_from_content, normalize_final_message,
-    parse_review_final_message, render_review_payload, resolve_full_auto,
-    review_findings_to_stored,
+    parse_review_final_message, parse_review_final_message_compatible, render_review_payload,
+    resolve_full_auto, review_findings_to_stored,
 };

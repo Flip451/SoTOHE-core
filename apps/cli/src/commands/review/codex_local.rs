@@ -15,7 +15,7 @@ use usecase::review_workflow::usecases::{RecordRoundProtocol, Verdict, record_ro
 use usecase::review_workflow::{
     ReviewFinalMessageState, ReviewPayloadVerdict, ReviewVerdict, classify_review_verdict,
     extract_verdict_from_content, findings_to_concerns, normalize_final_message,
-    parse_review_final_message, render_review_payload, review_findings_to_stored,
+    parse_review_final_message_compatible, render_review_payload, review_findings_to_stored,
 };
 
 use super::{
@@ -345,7 +345,7 @@ fn render_record_auto_round(
 
     // Parse the payload for scope filtering.
     let payload = match result.final_message.as_deref() {
-        Some(json) => match parse_review_final_message(Some(json)) {
+        Some(json) => match parse_review_final_message_compatible(Some(json)) {
             ReviewFinalMessageState::Parsed(p) => p,
             _ => {
                 stderr_lines
@@ -763,7 +763,7 @@ fn run_codex_child(
     }
 
     let raw_final_message = read_final_message(&output_last_message.path)?;
-    let final_message_state = parse_review_final_message(raw_final_message.as_deref());
+    let final_message_state = parse_review_final_message_compatible(raw_final_message.as_deref());
 
     // Fallback: if codex-last-message is empty, try extracting verdict from session log.
     let final_message_state = if matches!(final_message_state, ReviewFinalMessageState::Missing) {
