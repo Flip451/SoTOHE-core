@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Review System v2: frozen scope 廃止とスコープ独立型レビュー",
+  "goal": [
+    "既存のレビューシステム (v1) を完全に置き換える。",
+    "frozen scope を廃止し、毎回 diff から動的にスコープを計算するスコープ独立型レビューシステムを実装する。",
+    "v1 の構造的問題（frozen scope / current partition / check_approved のスコープ不整合、has_scope_drift によるサイクル全体無効化、ワークフローアーティファクトのハッシュ循環）を根本解決する。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "Domain 純粋型: ScopeName, ReviewTarget, ReviewHash, Verdict, FastVerdict, Finding, ReviewOutcome<V>, ReviewState",
+        "sources": [
+          "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "Domain port traits: ReviewReader, ReviewWriter, CommitHashReader, CommitHashWriter",
+        "sources": [
+          "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "UseCase port traits (Reviewer, DiffGetter, ReviewHasher) + ReviewCycle<R,H,D> オーケストレーター",
+        "sources": [
+          "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "Infrastructure: SystemReviewHasher (v1 移植), GitDiffGetter (v1 移植, merge-base セマンティクス), ReviewScopeConfig glob 分類",
+        "sources": [
+          "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "Infrastructure: review.json v2 codec + FsReviewReader/Writer (fs4 locking) + FsCommitHashReader/Writer (.commit_hash)",
+        "sources": [
+          "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "CLI 統合: check-approved, review status, record-round を v2 API に接続 + composition root + review-scope.json パターン拡張",
+        "sources": [
+          "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+        ],
+        "task_refs": [
+          "T006"
+        ]
+      },
+      {
+        "text": "v1 レビューコード削除: domain ReviewCycle, CycleGroupState, frozen scope 関連型, usecase RecordRoundProtocol, infra 旧 codec",
+        "sources": [
+          "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+        ],
+        "task_refs": [
+          "T007"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "ポリシー変更による他スコープの approval 自動無効化（accepted risk, 手動 reset で対応）",
+        "sources": [
+          "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+        ]
+      },
+      {
+        "text": "check-approved と commit 間の TOCTOU 完全解決（accepted risk, single-user 前提）",
+        "sources": [
+          "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+        ]
+      },
+      {
+        "text": "git index ベースのハッシュ計算（worktree ベースを維持, add-all で同期）",
+        "sources": [
+          "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "Domain 型は純粋（I/O なし）。port trait の呼び出しは usecase 以上",
+      "sources": [
+        "convention — knowledge/conventions/hexagonal-architecture.md"
+      ]
+    },
+    {
+      "text": "永続化 port は domain 層、アプリケーション port は usecase 層に配置",
+      "sources": [
+        "convention — knowledge/conventions/hexagonal-architecture.md"
+      ]
+    },
+    {
+      "text": "TDD: テストを先に書く（Red → Green → Refactor）",
+      "sources": [
+        "convention — .claude/rules/05-testing.md"
+      ]
+    },
+    {
+      "text": "パニック禁止（unwrap/expect/panic/todo は非テストコードで使用不可）",
+      "sources": [
+        "convention — .claude/rules/04-coding-principles.md"
+      ]
+    },
+    {
+      "text": "同期のみ（async なし）",
+      "sources": [
+        "track/tech-stack.md"
+      ]
+    },
+    {
+      "text": "review.json の並行書き込みは fs4::lock_exclusive で保護",
+      "sources": [
+        "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+      ]
+    }
+  ],
+  "domain_states": [
+    {
+      "name": "ReviewState::Required(NotStarted)",
+      "description": "final 未実施。レビューが必要"
+    },
+    {
+      "name": "ReviewState::Required(FindingsRemain)",
+      "description": "最新 final が findings_remain。修正後に再レビューが必要"
+    },
+    {
+      "name": "ReviewState::Required(StaleHash)",
+      "description": "最新 final のハッシュと現在のハッシュが不一致。コード変更後の再レビューが必要"
+    },
+    {
+      "name": "ReviewState::NotRequired(Empty)",
+      "description": "スコープに対象ファイルなし。レビュー不要"
+    },
+    {
+      "name": "ReviewState::NotRequired(ZeroFindings)",
+      "description": "最新 final が zero_findings かつハッシュ一致。approved"
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "全スコープが NotRequired の場合のみ check-approved が成功する",
+      "sources": [
+        "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+      ],
+      "task_refs": [
+        "T003",
+        "T006"
+      ]
+    },
+    {
+      "text": "before/after hash 比較でレビュー中のファイル変更を検出し FileChangedDuringReview を返す",
+      "sources": [
+        "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "1 つのスコープの変更が他のスコープの approval を無効化しない",
+      "sources": [
+        "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": ".commit_hash 進行後、diff スコープがインクリメンタルに縮小する",
+      "sources": [
+        "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+      ],
+      "task_refs": [
+        "T004",
+        "T005"
+      ]
+    },
+    {
+      "text": "review.json v2 (schema_version: 2) がスコープ毎の rounds 履歴（findings 含む）を保持する",
+      "sources": [
+        "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "v1 の frozen scope 関連コード (CycleGroupState, has_scope_drift, ReviewPartitionSnapshot 等) が完全に削除される",
+      "sources": [
+        "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+      ],
+      "task_refs": [
+        "T007"
+      ]
+    },
+    {
+      "text": "cargo make ci が全て通過する（v1 テストの v2 移行を含む）",
+      "sources": [
+        "convention — .claude/rules/07-dev-environment.md"
+      ],
+      "task_refs": [
+        "T007"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "knowledge/conventions/hexagonal-architecture.md",
+    "knowledge/conventions/source-attribution.md"
+  ],
+  "signals": {
+    "blue": 23,
+    "yellow": 0,
+    "red": 0
+  }
+}
