@@ -81,6 +81,9 @@ impl FsReviewStore {
     fn write_doc(&self, doc: &ReviewJsonV2) -> Result<(), ReviewWriterError> {
         use fs4::fs_std::FileExt;
 
+        // Reject symlinks on the target path to prevent symlink traversal attacks
+        reject_symlink(&self.path)?;
+
         if let Some(parent) = self.path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
                 ReviewWriterError::Io(format!("create dir {}: {e}", parent.display()))
@@ -360,5 +363,16 @@ fn parse_verdict(
                 .map_err(|e| ReviewReaderError::Codec(format!("verdict construction: {e}")))
         }
         other => Err(ReviewReaderError::Codec(format!("unknown verdict: {other}"))),
+    }
+}
+
+/// Rejects a path if it is a symlink, preventing symlink traversal on writes.
+fn reject_symlink(path: &std::path::Path) -> Result<(), ReviewWriterError> {
+    match std::fs::symlink_metadata(path) {
+        Ok(meta) if meta.file_type().is_symlink() => Err(ReviewWriterError::Io(format!(
+            "refusing to write through symlink: {}",
+            path.display()
+        ))),
+        _ => Ok(()),
     }
 }

@@ -51,12 +51,14 @@ impl DiffGetter for GitDiffGetter {
                 )));
             }
             for line in String::from_utf8_lossy(&output.stdout).lines() {
-                let trimmed = line.trim();
-                if trimmed.is_empty() {
+                // Only strip trailing \n/\r (git output), NOT leading/trailing spaces
+                // (filenames with spaces are valid repo-relative paths)
+                let stripped = line.trim_end_matches(['\n', '\r']);
+                if stripped.is_empty() {
                     continue;
                 }
                 // Normalize: replace backslash, strip leading ./
-                let normalized = trimmed.replace('\\', "/");
+                let normalized = stripped.replace('\\', "/");
                 let normalized = normalized.strip_prefix("./").unwrap_or(&normalized);
                 if let Ok(fp) = FilePath::new(normalized) {
                     set.insert(fp);
