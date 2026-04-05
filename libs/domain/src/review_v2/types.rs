@@ -22,8 +22,10 @@ impl FilePath {
         if s.is_empty() {
             return Err(FilePathError::Empty);
         }
-        // Reject Unix absolute and Windows drive prefix (e.g. C:/ or C:\)
-        if s.starts_with('/') || s.get(1..3).is_some_and(|prefix| prefix == ":\\" || prefix == ":/")
+        // Reject Unix absolute, Windows drive prefix (C:/ C:\), and UNC/rooted paths (\)
+        if s.starts_with('/')
+            || s.starts_with('\\')
+            || s.get(1..3).is_some_and(|prefix| prefix == ":\\" || prefix == ":/")
         {
             return Err(FilePathError::Absolute(s));
         }
