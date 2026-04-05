@@ -62,20 +62,30 @@ impl FsReviewStore {
     }
 
     fn read_doc(&self) -> Result<ReviewJsonV2, ReviewReaderError> {
-        match std::fs::read_to_string(&self.path) {
-            Ok(content) => {
-                let doc: ReviewJsonV2 = serde_json::from_str(&content).map_err(|e| {
-                    ReviewReaderError::Codec(format!("parse {}: {e}", self.path.display()))
-                })?;
-                if doc.schema_version != 2 {
-                    // v1 or unknown — treat as empty (ADR: v1 is ignored)
-                    return Ok(ReviewJsonV2::empty());
-                }
-                Ok(doc)
+        let content = match std::fs::read_to_string(&self.path) {
+            Ok(c) => c,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                return Ok(ReviewJsonV2::empty());
             }
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(ReviewJsonV2::empty()),
-            Err(e) => Err(ReviewReaderError::Io(format!("read {}: {e}", self.path.display()))),
+            Err(e) => {
+                return Err(ReviewReaderError::Io(format!("read {}: {e}", self.path.display())));
+            }
+        };
+
+        // Check schema_version first to avoid serde failure on v1 fields
+        let envelope: serde_json::Value = serde_json::from_str(&content)
+            .map_err(|e| ReviewReaderError::Codec(format!("parse {}: {e}", self.path.display())))?;
+        let version =
+            envelope.get("schema_version").and_then(serde_json::Value::as_u64).unwrap_or(0);
+        if version != 2 {
+            // v1 or unknown — treat as empty (ADR: v1 is ignored)
+            return Ok(ReviewJsonV2::empty());
         }
+
+        let doc: ReviewJsonV2 = serde_json::from_value(envelope).map_err(|e| {
+            ReviewReaderError::Codec(format!("parse v2 {}: {e}", self.path.display()))
+        })?;
+        Ok(doc)
     }
 
     fn write_doc(&self, doc: &ReviewJsonV2) -> Result<(), ReviewWriterError> {
