@@ -180,6 +180,12 @@ impl FsReviewStore {
     }
 
     fn read_doc_inner(&self, reject_future: bool) -> Result<ReviewJsonV2, PersistenceError> {
+        // Reject symlinks on the read path to prevent review state injection
+        // (e.g., a symlinked review.json pointing to an external zero_findings file).
+        reject_symlinks_below(&self.path, &self.trusted_root).map_err(|source| {
+            PersistenceError::Io { operation: "symlink check", path: self.path.clone(), source }
+        })?;
+
         let content = match std::fs::read_to_string(&self.path) {
             Ok(c) => c,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
@@ -199,8 +205,39 @@ impl FsReviewStore {
                 operation: "parse",
                 detail: format!("{}: {e}", self.path.display()),
             })?;
-        let version =
-            envelope.get("schema_version").and_then(serde_json::Value::as_u64).unwrap_or(0);
+
+        // Distinguish explicit schema_version from missing/malformed.
+        // Missing or non-numeric schema_version in an existing file is malformed,
+        // not legacy — silently treating it as empty could drop scope history on writes.
+        let version_field = envelope.get("schema_version");
+        let version = match version_field.and_then(serde_json::Value::as_u64) {
+            Some(v) => v,
+            None if version_field.is_none() || content.trim().is_empty() => {
+                // File exists but is empty or has no schema_version field at all.
+                // On write path this is malformed; on read path treat as empty (fail-closed).
+                if reject_future {
+                    return Err(PersistenceError::Codec {
+                        operation: "validate schema_version",
+                        detail: format!(
+                            "{}: missing or non-numeric schema_version",
+                            self.path.display()
+                        ),
+                    });
+                }
+                return Ok(ReviewJsonV2::empty());
+            }
+            None => {
+                // schema_version present but not a valid u64 (e.g., string, float, null)
+                return Err(PersistenceError::Codec {
+                    operation: "validate schema_version",
+                    detail: format!(
+                        "{}: schema_version is not a valid integer: {:?}",
+                        self.path.display(),
+                        version_field
+                    ),
+                });
+            }
+        };
 
         if version == 2 {
             let doc: ReviewJsonV2 =
@@ -211,7 +248,7 @@ impl FsReviewStore {
             return Ok(doc);
         }
 
-        // v1 (known legacy) → treat as empty
+        // v1 (known legacy, explicit schema_version: 1 or 0) → treat as empty
         if version <= 1 {
             return Ok(ReviewJsonV2::empty());
         }
@@ -684,5 +721,70 @@ mod tests {
         let content = std::fs::read_to_string(dir.path().join("review.json")).unwrap();
         let value: serde_json::Value = serde_json::from_str(&content).unwrap();
         assert_eq!(value["schema_version"], 2);
+    }
+
+    // ── symlink rejection on read (P0 fix) ──────────────────────────
+
+    #[cfg(unix)]
+    #[test]
+    fn test_read_rejects_symlinked_review_json() {
+        let dir = tempfile::tempdir().unwrap();
+        let real_dir = tempfile::tempdir().unwrap();
+
+        // Create a real review.json with zero_findings in a different directory
+        let real_path = real_dir.path().join("review.json");
+        std::fs::write(&real_path, r#"{"schema_version":2,"scopes":{}}"#).unwrap();
+
+        // Symlink review.json → real_path
+        let link_path = dir.path().join("review.json");
+        std::os::unix::fs::symlink(&real_path, &link_path).unwrap();
+
+        let store = make_store(dir.path());
+        let result = store.read_latest_finals();
+        assert!(result.is_err(), "should reject symlinked review.json on read");
+    }
+
+    // ── malformed schema_version (P1 fix) ───────────────────────────
+
+    #[test]
+    fn test_write_rejects_malformed_schema_version() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("review.json");
+
+        // Write a file with schema_version as a string (non-numeric)
+        std::fs::write(&path, r#"{"schema_version":"two","scopes":{}}"#).unwrap();
+
+        let store = make_store(dir.path());
+        let scope = sample_scope();
+        let result = store.write_verdict(&scope, &Verdict::ZeroFindings, &sample_hash());
+        assert!(result.is_err(), "should reject non-numeric schema_version on write");
+    }
+
+    #[test]
+    fn test_write_rejects_missing_schema_version() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("review.json");
+
+        // Write a file with no schema_version field
+        std::fs::write(&path, r#"{"scopes":{}}"#).unwrap();
+
+        let store = make_store(dir.path());
+        let scope = sample_scope();
+        let result = store.write_verdict(&scope, &Verdict::ZeroFindings, &sample_hash());
+        assert!(result.is_err(), "should reject missing schema_version on write");
+    }
+
+    #[test]
+    fn test_read_treats_missing_schema_version_as_empty() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("review.json");
+
+        // Write a file with no schema_version field
+        std::fs::write(&path, r#"{"scopes":{}}"#).unwrap();
+
+        let store = make_store(dir.path());
+        // Read path should treat as empty (fail-closed), not error
+        let map = store.read_latest_finals().unwrap();
+        assert!(map.is_empty());
     }
 }
