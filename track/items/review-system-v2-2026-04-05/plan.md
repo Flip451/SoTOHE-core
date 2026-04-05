@@ -12,7 +12,7 @@ ScopeName, ReviewTarget, ReviewHash, Verdict, FastVerdict, Finding, ReviewOutcom
 Make Illegal States Unrepresentable: Verdict::FindingsRemain は非空保証、Finding::new は空 message 拒否。
 全型に unit test を追加。
 
-- [ ] Domain 純粋型 (ScopeName, ReviewTarget, ReviewHash, Verdict, FastVerdict, Finding, ReviewOutcome<V>, ReviewState) + unit tests
+- [x] Domain 純粋型 (ScopeName, ReviewTarget, ReviewHash, Verdict, FastVerdict, Finding, ReviewOutcome<V>, ReviewState) + unit tests
 - [ ] Domain port traits (ReviewReader, ReviewWriter, CommitHashReader, CommitHashWriter)
 
 ## UseCase: ReviewCycle

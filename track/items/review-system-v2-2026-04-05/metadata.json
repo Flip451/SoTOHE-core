@@ -90,12 +90,12 @@
     ]
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
   "tasks": [
     {
       "description": "Domain 純粋型 (ScopeName, ReviewTarget, ReviewHash, Verdict, FastVerdict, Finding, ReviewOutcome<V>, ReviewState) + unit tests",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Domain port traits (ReviewReader, ReviewWriter, CommitHashReader, CommitHashWriter)",
@@ -129,5 +129,5 @@
     }
   ],
   "title": "Review System v2: frozen scope 廃止とスコープ独立型レビュー",
-  "updated_at": "2026-04-05T02:08:59Z"
+  "updated_at": "2026-04-04T17:35:36Z"
 }

@@ -10,6 +10,7 @@ mod ids;
 mod plan;
 mod repository;
 pub mod review;
+pub mod review_v2;
 mod signal;
 pub mod spec;
 mod timestamp;
