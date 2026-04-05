@@ -546,14 +546,11 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
             );
             post_commit_failed = true;
         }
-        // v1: write approved_head to review.json (kept for backwards compat, T007 cleanup)
+        // v1: write approved_head to review.json (kept for backwards compat, T007 cleanup).
+        // Soft failure only — v1 codec cannot read v2 review.json, so this will
+        // fail on v2 tracks. Do NOT set post_commit_failed for v1 legacy errors.
         if let Err(msg) = persist_approved_head(track_id) {
-            eprintln!("[track-commit-message] WARNING: approved_head persistence failed: {msg}");
-            eprintln!(
-                "[track-commit-message] Recovery: run `bin/sotp review set-approved-head \
-                 --track-id {track_id} --items-dir track/items`"
-            );
-            post_commit_failed = true;
+            eprintln!("[track-commit-message] NOTE: v1 approved_head skipped: {msg}");
         }
     }
 
