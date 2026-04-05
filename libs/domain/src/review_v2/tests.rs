@@ -1,6 +1,6 @@
 use rstest::rstest;
 
-use super::error::{FindingError, ReviewHashError, ScopeNameError, VerdictError};
+use super::error::{FilePathError, FindingError, ReviewHashError, ScopeNameError, VerdictError};
 use super::types::*;
 
 // ── helpers ───────────────────────────────────────────────────────────
@@ -75,16 +75,26 @@ fn test_scope_name_equality() {
 // ── FilePath ──────────────────────────────────────────────────────────
 
 #[test]
-fn test_file_path_preserves_value() {
-    let fp = FilePath::new("libs/domain/src/lib.rs");
+fn test_file_path_with_valid_path_succeeds() {
+    let fp = FilePath::new("libs/domain/src/lib.rs").unwrap();
     assert_eq!(fp.as_str(), "libs/domain/src/lib.rs");
     assert_eq!(fp.to_string(), "libs/domain/src/lib.rs");
 }
 
 #[test]
+fn test_file_path_with_empty_returns_error() {
+    assert!(matches!(FilePath::new(""), Err(FilePathError::Empty)));
+}
+
+#[test]
+fn test_file_path_with_absolute_path_returns_error() {
+    assert!(matches!(FilePath::new("/etc/passwd"), Err(FilePathError::Absolute(_))));
+}
+
+#[test]
 fn test_file_path_ordering() {
-    let a = FilePath::new("a.rs");
-    let b = FilePath::new("b.rs");
+    let a = FilePath::new("a.rs").unwrap();
+    let b = FilePath::new("b.rs").unwrap();
     assert!(a < b);
 }
 
@@ -99,7 +109,8 @@ fn test_review_target_empty() {
 
 #[test]
 fn test_review_target_with_files() {
-    let target = ReviewTarget::new(vec![FilePath::new("a.rs"), FilePath::new("b.rs")]);
+    let target =
+        ReviewTarget::new(vec![FilePath::new("a.rs").unwrap(), FilePath::new("b.rs").unwrap()]);
     assert!(!target.is_empty());
     assert_eq!(target.files().len(), 2);
 }

@@ -1,19 +1,30 @@
 use std::fmt;
 
-use super::error::{FindingError, ReviewHashError, ScopeNameError, VerdictError};
+use super::error::{FilePathError, FindingError, ReviewHashError, ScopeNameError, VerdictError};
 
 // ── FilePath ──────────────────────────────────────────────────────────
 
-/// A repo-relative file path used in review scope classification and hashing.
+/// A validated repo-relative file path used in review scope classification and hashing.
+///
+/// Rejects empty strings and absolute paths (starting with `/`).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct FilePath(String);
 
 impl FilePath {
-    /// Creates a new file path.
+    /// Creates a validated repo-relative file path.
     ///
-    /// No validation — the path is assumed to be repo-relative.
-    pub fn new(s: impl Into<String>) -> Self {
-        Self(s.into())
+    /// # Errors
+    /// - `FilePathError::Empty` if empty
+    /// - `FilePathError::Absolute` if the path starts with `/`
+    pub fn new(s: impl Into<String>) -> Result<Self, FilePathError> {
+        let s = s.into();
+        if s.is_empty() {
+            return Err(FilePathError::Empty);
+        }
+        if s.starts_with('/') {
+            return Err(FilePathError::Absolute(s));
+        }
+        Ok(Self(s))
     }
 
     pub fn as_str(&self) -> &str {

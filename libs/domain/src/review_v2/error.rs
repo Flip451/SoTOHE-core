@@ -25,6 +25,15 @@ pub enum FindingError {
     EmptyMessage,
 }
 
+/// Errors from `FilePath::new` construction.
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum FilePathError {
+    #[error("file path must not be empty")]
+    Empty,
+    #[error("file path must be repo-relative, not absolute: {0}")]
+    Absolute(String),
+}
+
 /// Errors from `ReviewHashValue::new` construction.
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
 pub enum ReviewHashError {
