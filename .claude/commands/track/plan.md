@@ -17,6 +17,12 @@ Execution:
 - Keep `knowledge/DESIGN.md` in English for cross-provider compatibility, but keep crate/module names aligned with `plan.md`.
 - When the `planner` capability response contains a `## Canonical Blocks` section, copy every block in that section verbatim into `plan.md` or `DESIGN.md`. Do not summarize, translate, or rewrite those blocks. Surrounding explanation text may be summarized in Japanese for `plan.md`.
 
+**ADR Cross-Validation (Phase 3 Step 2.5):**
+- If `knowledge/adr/` contains an ADR for this feature, cross-validate the plan's task list against the ADR section-by-section before presenting to user.
+- Check: layer placement match, error types included, behavioral contracts captured, deprecation lists complete, migration steps documented.
+- If gaps are found, supplement task descriptions before presenting the plan for approval. ADR is the SSoT for design decisions.
+- See `SKILL.md` Phase 3 Step 2.5 for the full checklist.
+
 After approval — create track artifacts:
 - Remind the user that unresolved `track/tech-stack.md` `TODO:` entries will fail CI.
 - Create a new directory under `track/items/` using a safe slug and timestamp/id as needed to avoid collisions.

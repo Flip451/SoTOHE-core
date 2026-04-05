@@ -425,6 +425,32 @@ Rust TDD を前提としたタスク順序：
 7. 統合テスト
 8. `cargo make ci` 全チェック
 
+### Step 2.5: ADR Cross-Validation（ADR 突合検証 — ADR がある場合は必須）
+
+`knowledge/adr/` に本機能に関連する ADR が存在する場合、plan のタスクリストを ADR と Section 単位で突合検証する。
+ADR が存在しない場合（新規設計等）はこのステップをスキップする。
+
+**検証手順:**
+
+1. ADR を Section ごとに読む（レイヤー配置表、型定義、port 定義、usecase フロー、永続化、マイグレーション、廃止概念）
+2. 各 Section の項目を plan のタスク description と照合し、以下を検査する
+
+**検査チェックリスト:**
+
+| チェック項目 | 説明 |
+|---|---|
+| レイヤー配置一致 | ADR のレイヤー配置表と plan のタスク配置（domain/usecase/infra/CLI）が一致しているか。ADR の配置を勝手に変更していないか |
+| Error 型の網羅 | ADR に定義された全 error 型が plan のタスク description に含まれているか。Error 型は happy-path 型と同格に扱う |
+| 振る舞い契約 | 型シグネチャに現れない設計判断（fail-closed, 永続化責務の分離, init/reset セマンティクス, TOCTOU accepted risk 等）が plan に反映されているか |
+| 廃止対象の網羅 | ADR の「廃止される概念」表の全項目が cleanup タスクに含まれているか |
+| マイグレーション手順 | v1→v2 移行手順が plan に含まれているか |
+| 分類・フィルタルール | ADR に記載された分類ルール（multi-scope match, operational 除外等）が description に含まれているか |
+
+**漏れが見つかった場合:**
+- タスク description を補完してから Step 3 に進む
+- ADR のレイヤー配置と plan が矛盾する場合は plan を修正する（ADR が SSoT）
+- ADR 自体に誤り（typo 等）が見つかった場合は報告し、ADR 修正後に plan に反映する
+
 ### Step 3: Present to User（日本語）
 
 差分ヒアリングを実施した場合は、確定済み項目と新規確認項目を明確に区別して提示する。
