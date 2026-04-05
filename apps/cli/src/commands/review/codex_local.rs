@@ -42,6 +42,9 @@ fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, String> {
     let scope = map_group_to_scope(validated.group_name.as_ref())?;
 
     // Step 5: Run review via ReviewCycle (hash_before → Codex → hash_after).
+    // Note: v2 writes verdicts directly to review.json via ReviewWriter.
+    // v1 escalation (record_round → concerns → metadata.json) is intentionally
+    // NOT preserved — it will be re-designed in v2 terms in a future track.
     match validated.round_type {
         domain::RoundType::Final => match comp.cycle.review(&scope) {
             Ok(ReviewOutcome::Skipped) => {

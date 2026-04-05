@@ -476,10 +476,15 @@ fn run_codex_child(
 
 /// Terminates the reviewer child process.
 ///
-/// Uses `child.kill()` (safe cross-platform API). Process group kill (`killpg`)
-/// is intentionally deferred — it requires `unsafe` which is `#[forbid]`'d in
-/// this crate. Callers that need process-group termination should implement it
-/// at the CLI layer where `unsafe` is permitted.
+/// Uses `child.kill()` (safe cross-platform API) to kill the direct child only.
+/// Descendant processes spawned by the child are NOT terminated here.
+///
+/// # Why no process group kill
+///
+/// `killpg(2)` requires `unsafe` which is `#[forbid(unsafe_code)]` in this crate.
+/// Process group termination is intentionally deferred to the CLI layer
+/// (`apps/cli`) where `unsafe` is permitted. This is an accepted architectural
+/// constraint — see `#[forbid(unsafe_code)]` policy for infrastructure crate.
 fn terminate_reviewer_child(child: &mut Child) -> Result<(), String> {
     child.kill().map_err(|e| format!("failed to kill reviewer child: {e}"))
 }
