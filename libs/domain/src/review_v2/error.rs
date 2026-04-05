@@ -46,19 +46,32 @@ pub enum ReviewHashError {
 /// Errors from `ReviewReader` port operations.
 #[derive(Debug, Error)]
 pub enum ReviewReaderError {
+    /// File system I/O failure.
     #[error("review reader I/O error: {0}")]
     Io(String),
+    /// JSON parsing failure (file is not valid JSON).
     #[error("review reader codec error: {0}")]
     Codec(String),
+    /// Valid JSON but contains domain-invalid data (bad scope, hash, verdict, finding).
+    #[error("review reader invalid data: {0}")]
+    InvalidData(String),
 }
 
 /// Errors from `ReviewWriter` port operations.
 #[derive(Debug, Error)]
 pub enum ReviewWriterError {
+    /// File system I/O failure.
     #[error("review writer I/O error: {0}")]
     Io(String),
+    /// JSON serialization failure.
     #[error("review writer codec error: {0}")]
     Codec(String),
+    /// Refusing to overwrite a `review.json` with a newer schema version.
+    #[error(
+        "review.json has schema_version {version} (unknown future version); \
+         refusing to overwrite. Run init() to reset."
+    )]
+    IncompatibleSchema { version: u64 },
 }
 
 /// Errors from `CommitHashReader` / `CommitHashWriter` port operations.

@@ -1,13 +1,16 @@
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use domain::CommitHash;
 use domain::review_v2::{
     CommitHashError, CommitHashReader, CommitHashWriter, FastVerdict, Finding, ReviewHash,
     ReviewReader, ReviewReaderError, ReviewWriter, ReviewWriterError, ScopeName, Verdict,
 };
+use fs4::fs_std::FileExt;
 
 use crate::git_cli::{GitRepository, SystemGitRepo};
+use crate::track::atomic_write::atomic_write_file;
+use crate::track::symlink_guard::reject_symlinks_below;
 
 // ── review.json v2 serde types ────────────────────────────────────────
 
@@ -48,53 +51,163 @@ impl ReviewJsonV2 {
     }
 }
 
+// ── Internal error type ──────────────────────────────────────────────
+
+/// Structured internal error for persistence operations.
+/// Converted to domain error types (`ReviewReaderError` / `ReviewWriterError`)
+/// at the port boundary — never exposed outside this module.
+#[derive(Debug)]
+enum PersistenceError {
+    Io { operation: &'static str, path: PathBuf, source: std::io::Error },
+    Codec { operation: &'static str, detail: String },
+    FutureSchema { version: u64 },
+}
+
+impl PersistenceError {
+    fn into_writer_error(self) -> ReviewWriterError {
+        match self {
+            Self::Io { operation, path, source } => {
+                ReviewWriterError::Io(format!("{operation} {}: {source}", path.display()))
+            }
+            Self::Codec { operation, detail } => {
+                ReviewWriterError::Codec(format!("{operation}: {detail}"))
+            }
+            Self::FutureSchema { version } => ReviewWriterError::IncompatibleSchema { version },
+        }
+    }
+
+    fn into_reader_error(self) -> ReviewReaderError {
+        match self {
+            Self::Io { operation, path, source } => {
+                ReviewReaderError::Io(format!("{operation} {}: {source}", path.display()))
+            }
+            Self::Codec { operation, detail } => {
+                ReviewReaderError::Codec(format!("{operation}: {detail}"))
+            }
+            Self::FutureSchema { version } => ReviewReaderError::InvalidData(format!(
+                "review.json has schema_version {version} (unknown future version)"
+            )),
+        }
+    }
+}
+
+// ── Write guard (RAII lock holder) ───────────────────────────────────
+
+/// RAII guard that validates the write path and holds an exclusive `fs4` lock
+/// on `<path>.json.lock`. Lock is released on drop.
+struct WriteGuard {
+    _lock: std::fs::File,
+}
+
+impl WriteGuard {
+    /// Validates the path for symlinks below `trusted_root`, ensures the parent
+    /// directory exists, and acquires an exclusive lock on `<path>.json.lock`.
+    fn acquire(path: &Path, trusted_root: &Path) -> Result<Self, PersistenceError> {
+        reject_symlinks_below(path, trusted_root).map_err(|source| PersistenceError::Io {
+            operation: "symlink check",
+            path: path.to_owned(),
+            source,
+        })?;
+
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).map_err(|source| PersistenceError::Io {
+                operation: "create dir",
+                path: parent.to_owned(),
+                source,
+            })?;
+        }
+
+        let lock_path = path.with_extension("json.lock");
+        let lock_file = std::fs::OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(false)
+            .open(&lock_path)
+            .map_err(|source| PersistenceError::Io {
+                operation: "open lock",
+                path: lock_path.clone(),
+                source,
+            })?;
+
+        lock_file.lock_exclusive().map_err(|source| PersistenceError::Io {
+            operation: "acquire lock",
+            path: lock_path,
+            source,
+        })?;
+
+        Ok(Self { _lock: lock_file })
+    }
+}
+
+/// Serializes `doc` to pretty JSON and writes it atomically (tmp + fsync + rename).
+/// Must be called while a `WriteGuard` is held.
+fn write_atomic(path: &Path, doc: &ReviewJsonV2) -> Result<(), PersistenceError> {
+    let json = serde_json::to_string_pretty(doc)
+        .map_err(|e| PersistenceError::Codec { operation: "serialize", detail: e.to_string() })?;
+    atomic_write_file(path, json.as_bytes()).map_err(|source| PersistenceError::Io {
+        operation: "atomic write",
+        path: path.to_owned(),
+        source,
+    })
+}
+
 // ── FsReviewReader / FsReviewWriter ───────────────────────────────────
 
 /// Filesystem-based review.json v2 reader/writer with fs4 file locking.
 pub struct FsReviewStore {
     path: PathBuf,
+    trusted_root: PathBuf,
 }
 
 impl FsReviewStore {
     #[must_use]
-    pub fn new(review_json_path: PathBuf) -> Self {
-        Self { path: review_json_path }
+    pub fn new(review_json_path: PathBuf, trusted_root: PathBuf) -> Self {
+        Self { path: review_json_path, trusted_root }
     }
 
     /// Reads review.json for read-only queries.
     /// v1/missing → empty (fail-closed: all scopes need review).
     /// Future versions (>2) → empty (same rationale).
     fn read_doc(&self) -> Result<ReviewJsonV2, ReviewReaderError> {
-        self.read_doc_inner(false).map_err(|e| ReviewReaderError::Io(e.to_string()))
+        self.read_doc_inner(false).map_err(PersistenceError::into_reader_error)
     }
 
     /// Reads review.json for read-modify-write.
     /// v1/missing → empty (safe to init).
     /// Future versions (>2) → error (refuse to overwrite unknown format).
     fn read_doc_for_write(&self) -> Result<ReviewJsonV2, ReviewWriterError> {
-        self.read_doc_inner(true)
+        self.read_doc_inner(true).map_err(PersistenceError::into_writer_error)
     }
 
-    fn read_doc_inner(&self, reject_future: bool) -> Result<ReviewJsonV2, ReviewWriterError> {
+    fn read_doc_inner(&self, reject_future: bool) -> Result<ReviewJsonV2, PersistenceError> {
         let content = match std::fs::read_to_string(&self.path) {
             Ok(c) => c,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
                 return Ok(ReviewJsonV2::empty());
             }
             Err(e) => {
-                return Err(ReviewWriterError::Io(format!("read {}: {e}", self.path.display())));
+                return Err(PersistenceError::Io {
+                    operation: "read",
+                    path: self.path.clone(),
+                    source: e,
+                });
             }
         };
 
-        let envelope: serde_json::Value = serde_json::from_str(&content)
-            .map_err(|e| ReviewWriterError::Codec(format!("parse {}: {e}", self.path.display())))?;
+        let envelope: serde_json::Value =
+            serde_json::from_str(&content).map_err(|e| PersistenceError::Codec {
+                operation: "parse",
+                detail: format!("{}: {e}", self.path.display()),
+            })?;
         let version =
             envelope.get("schema_version").and_then(serde_json::Value::as_u64).unwrap_or(0);
 
         if version == 2 {
-            let doc: ReviewJsonV2 = serde_json::from_value(envelope).map_err(|e| {
-                ReviewWriterError::Codec(format!("parse v2 {}: {e}", self.path.display()))
-            })?;
+            let doc: ReviewJsonV2 =
+                serde_json::from_value(envelope).map_err(|e| PersistenceError::Codec {
+                    operation: "parse v2",
+                    detail: format!("{}: {e}", self.path.display()),
+                })?;
             return Ok(doc);
         }
 
@@ -105,10 +218,7 @@ impl FsReviewStore {
 
         // Future version (>2)
         if reject_future {
-            return Err(ReviewWriterError::Codec(format!(
-                "review.json has schema_version {version} (unknown future version); \
-                 refusing to overwrite. Run init() to reset."
-            )));
+            return Err(PersistenceError::FutureSchema { version });
         }
 
         // Read-only path: treat as empty (fail-closed)
@@ -116,38 +226,9 @@ impl FsReviewStore {
     }
 
     fn write_doc(&self, doc: &ReviewJsonV2) -> Result<(), ReviewWriterError> {
-        use fs4::fs_std::FileExt;
-
-        // Reject symlinks on the target path to prevent symlink traversal attacks
-        reject_symlink_chain(&self.path)?;
-
-        if let Some(parent) = self.path.parent() {
-            std::fs::create_dir_all(parent).map_err(|e| {
-                ReviewWriterError::Io(format!("create dir {}: {e}", parent.display()))
-            })?;
-        }
-
-        // Lock on a stable .lock file (not self.path, which gets replaced by rename)
-        let lock_path = self.path.with_extension("json.lock");
-        let lock_file = std::fs::OpenOptions::new()
-            .create(true)
-            .write(true)
-            .truncate(false)
-            .open(&lock_path)
-            .map_err(|e| {
-                ReviewWriterError::Io(format!("open lock {}: {e}", lock_path.display()))
-            })?;
-
-        lock_file
-            .lock_exclusive()
-            .map_err(|e| ReviewWriterError::Io(format!("lock {}: {e}", lock_path.display())))?;
-
-        let json = serde_json::to_string_pretty(doc)
-            .map_err(|e| ReviewWriterError::Codec(format!("serialize review.json: {e}")))?;
-        atomic_write(&self.path, &json)?;
-
-        drop(lock_file);
-        Ok(())
+        let _guard = WriteGuard::acquire(&self.path, &self.trusted_root)
+            .map_err(PersistenceError::into_writer_error)?;
+        write_atomic(&self.path, doc).map_err(PersistenceError::into_writer_error)
     }
 
     /// Atomically reads, appends a round, and writes under exclusive lock.
@@ -159,30 +240,8 @@ impl FsReviewStore {
         findings: &[Finding],
         hash: &ReviewHash,
     ) -> Result<(), ReviewWriterError> {
-        use fs4::fs_std::FileExt;
-
-        // Reject symlinks on the target path and all ancestors
-        reject_symlink_chain(&self.path)?;
-
-        if let Some(parent) = self.path.parent() {
-            std::fs::create_dir_all(parent).map_err(|e| {
-                ReviewWriterError::Io(format!("create dir {}: {e}", parent.display()))
-            })?;
-        }
-
-        // Lock on a stable .lock file (not self.path, which gets replaced by rename)
-        let lock_path = self.path.with_extension("json.lock");
-        let lock_file = std::fs::OpenOptions::new()
-            .create(true)
-            .write(true)
-            .truncate(false)
-            .open(&lock_path)
-            .map_err(|e| {
-                ReviewWriterError::Io(format!("open lock {}: {e}", lock_path.display()))
-            })?;
-        lock_file
-            .lock_exclusive()
-            .map_err(|e| ReviewWriterError::Io(format!("lock {}: {e}", lock_path.display())))?;
+        let _guard = WriteGuard::acquire(&self.path, &self.trusted_root)
+            .map_err(PersistenceError::into_writer_error)?;
 
         // Read under lock (reject future schema versions to prevent overwrite)
         let mut doc = self.read_doc_for_write()?;
@@ -208,14 +267,7 @@ impl FsReviewStore {
             at: now,
         });
 
-        // Write under the same lock (atomic: tmp + rename)
-        let json = serde_json::to_string_pretty(&doc)
-            .map_err(|e| ReviewWriterError::Codec(format!("serialize review.json: {e}")))?;
-        atomic_write(&self.path, &json)?;
-
-        // Lock released on drop
-        drop(lock_file);
-        Ok(())
+        write_atomic(&self.path, &doc).map_err(PersistenceError::into_writer_error)
     }
 }
 
@@ -236,7 +288,7 @@ impl ReviewReader for FsReviewStore {
                     ReviewHash::Empty
                 } else {
                     ReviewHash::computed(&round.hash).map_err(|e| {
-                        ReviewReaderError::Codec(format!("invalid hash in review.json: {e}"))
+                        ReviewReaderError::InvalidData(format!("invalid hash in review.json: {e}"))
                     })?
                 };
                 result.insert(scope, (verdict, hash));
@@ -279,29 +331,8 @@ impl ReviewWriter for FsReviewStore {
     }
 
     fn reset(&self) -> Result<(), ReviewWriterError> {
-        use fs4::fs_std::FileExt;
-
-        reject_symlink_chain(&self.path)?;
-
-        if let Some(parent) = self.path.parent() {
-            std::fs::create_dir_all(parent).map_err(|e| {
-                ReviewWriterError::Io(format!("create dir {}: {e}", parent.display()))
-            })?;
-        }
-
-        // Use the same .lock file as append_round to serialize
-        let lock_path = self.path.with_extension("json.lock");
-        let lock_file = std::fs::OpenOptions::new()
-            .create(true)
-            .write(true)
-            .truncate(false)
-            .open(&lock_path)
-            .map_err(|e| {
-                ReviewWriterError::Io(format!("open lock {}: {e}", lock_path.display()))
-            })?;
-        lock_file
-            .lock_exclusive()
-            .map_err(|e| ReviewWriterError::Io(format!("lock {}: {e}", lock_path.display())))?;
+        let _guard = WriteGuard::acquire(&self.path, &self.trusted_root)
+            .map_err(PersistenceError::into_writer_error)?;
 
         // Archive existing file if present
         if self.path.exists() {
@@ -320,12 +351,8 @@ impl ReviewWriter for FsReviewStore {
         }
 
         // Create fresh review.json (does NOT clear .commit_hash per ADR)
-        let json = serde_json::to_string_pretty(&ReviewJsonV2::empty())
-            .map_err(|e| ReviewWriterError::Codec(format!("serialize: {e}")))?;
-        atomic_write(&self.path, &json)?;
-
-        drop(lock_file);
-        Ok(())
+        write_atomic(&self.path, &ReviewJsonV2::empty())
+            .map_err(PersistenceError::into_writer_error)
     }
 }
 
@@ -379,13 +406,8 @@ impl CommitHashWriter for FsCommitHashStore {
                 CommitHashError::Io(format!("create dir {}: {e}", parent.display()))
             })?;
         }
-        // Atomic write: tmp file + rename
-        let tmp_path = self.path.with_extension("tmp");
-        std::fs::write(&tmp_path, hash.as_ref())
-            .map_err(|e| CommitHashError::Io(format!("write {}: {e}", tmp_path.display())))?;
-        std::fs::rename(&tmp_path, &self.path)
-            .map_err(|e| CommitHashError::Io(format!("rename {}: {e}", self.path.display())))?;
-        Ok(())
+        atomic_write_file(&self.path, hash.as_ref().as_bytes())
+            .map_err(|e| CommitHashError::Io(format!("atomic write {}: {e}", self.path.display())))
     }
 
     fn clear(&self) -> Result<(), CommitHashError> {
@@ -406,7 +428,7 @@ fn parse_scope_name(key: &str) -> Result<ScopeName, ReviewReaderError> {
     } else {
         MainScopeName::new(key)
             .map(ScopeName::Main)
-            .map_err(|e| ReviewReaderError::Codec(format!("invalid scope key '{key}': {e}")))
+            .map_err(|e| ReviewReaderError::InvalidData(format!("invalid scope key '{key}': {e}")))
     }
 }
 
@@ -428,42 +450,239 @@ fn parse_verdict(
                         f.category.clone(),
                     )
                     .map_err(|e| {
-                        ReviewReaderError::Codec(format!("invalid finding in review.json: {e}"))
+                        ReviewReaderError::InvalidData(format!(
+                            "invalid finding in review.json: {e}"
+                        ))
                     })
                 })
                 .collect();
             let domain_findings = domain_findings?;
             Verdict::findings_remain(domain_findings)
-                .map_err(|e| ReviewReaderError::Codec(format!("verdict construction: {e}")))
+                .map_err(|e| ReviewReaderError::InvalidData(format!("verdict construction: {e}")))
         }
-        other => Err(ReviewReaderError::Codec(format!("unknown verdict: {other}"))),
+        other => Err(ReviewReaderError::InvalidData(format!("unknown verdict: {other}"))),
     }
 }
 
-/// Writes content to a file atomically via tmp + rename.
-fn atomic_write(path: &std::path::Path, content: &str) -> Result<(), ReviewWriterError> {
-    let tmp_path = path.with_extension("tmp");
-    std::fs::write(&tmp_path, content)
-        .map_err(|e| ReviewWriterError::Io(format!("write {}: {e}", tmp_path.display())))?;
-    std::fs::rename(&tmp_path, path)
-        .map_err(|e| ReviewWriterError::Io(format!("rename {}: {e}", path.display())))?;
-    Ok(())
-}
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
+mod tests {
+    use super::*;
+    use domain::review_v2::{
+        FastVerdict, Finding, MainScopeName, ReviewHash, ReviewReader, ReviewWriter, ScopeName,
+        Verdict,
+    };
 
-/// Rejects a path if it or any ancestor is a symlink.
-fn reject_symlink_chain(path: &std::path::Path) -> Result<(), ReviewWriterError> {
-    let mut current = std::path::PathBuf::new();
-    for component in path.components() {
-        current.push(component);
-        match std::fs::symlink_metadata(&current) {
-            Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(ReviewWriterError::Io(format!(
-                    "refusing to write through symlink: {}",
-                    current.display()
-                )));
+    fn make_store(dir: &std::path::Path) -> FsReviewStore {
+        FsReviewStore::new(dir.join("review.json"), dir.to_path_buf())
+    }
+
+    fn sample_scope() -> ScopeName {
+        ScopeName::Main(MainScopeName::new("domain").unwrap())
+    }
+
+    fn sample_hash() -> ReviewHash {
+        ReviewHash::computed("rvw1:sha256:abcdef0123456789").unwrap()
+    }
+
+    fn sample_finding() -> Finding {
+        Finding::new(
+            "test finding",
+            Some("P2".to_owned()),
+            Some("lib.rs".to_owned()),
+            Some(42),
+            Some("style".to_owned()),
+        )
+        .unwrap()
+    }
+
+    // ── init / read basics ──────────────────────────────────────────
+
+    #[test]
+    fn test_read_missing_file_returns_empty_map() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = make_store(dir.path());
+        let result = store.read_latest_finals().unwrap();
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn test_init_creates_v2_empty_doc() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = make_store(dir.path());
+        store.init().unwrap();
+
+        let content = std::fs::read_to_string(dir.path().join("review.json")).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&content).unwrap();
+        assert_eq!(value["schema_version"], 2);
+        assert!(value["scopes"].as_object().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_read_after_init_returns_empty_map() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = make_store(dir.path());
+        store.init().unwrap();
+        let result = store.read_latest_finals().unwrap();
+        assert!(result.is_empty());
+    }
+
+    // ── write_verdict round trips ───────────────────────────────────
+
+    #[test]
+    fn test_write_zero_findings_round_trip() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = make_store(dir.path());
+        let scope = sample_scope();
+        let hash = sample_hash();
+
+        store.write_verdict(&scope, &Verdict::ZeroFindings, &hash).unwrap();
+        let map = store.read_latest_finals().unwrap();
+
+        assert_eq!(map.len(), 1);
+        let (verdict, read_hash) = map.get(&scope).unwrap();
+        assert!(matches!(verdict, Verdict::ZeroFindings));
+        assert_eq!(read_hash, &hash);
+    }
+
+    #[test]
+    fn test_write_findings_remain_round_trip() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = make_store(dir.path());
+        let scope = sample_scope();
+        let hash = sample_hash();
+        let finding = sample_finding();
+        let verdict = Verdict::findings_remain(vec![finding.clone()]).unwrap();
+
+        store.write_verdict(&scope, &verdict, &hash).unwrap();
+        let map = store.read_latest_finals().unwrap();
+
+        let (read_verdict, _) = map.get(&scope).unwrap();
+        match read_verdict {
+            Verdict::FindingsRemain(nef) => {
+                assert_eq!(nef.as_slice().len(), 1);
+                assert_eq!(nef.as_slice()[0].message(), "test finding");
+                assert_eq!(nef.as_slice()[0].severity(), Some("P2"));
+                assert_eq!(nef.as_slice()[0].file(), Some("lib.rs"));
+                assert_eq!(nef.as_slice()[0].line(), Some(42));
+                assert_eq!(nef.as_slice()[0].category(), Some("style"));
             }
-            _ => {}
+            _ => panic!("expected FindingsRemain"),
         }
     }
-    Ok(())
+
+    #[test]
+    fn test_write_fast_verdict_not_in_latest_finals() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = make_store(dir.path());
+        let scope = sample_scope();
+        let hash = sample_hash();
+
+        store.write_fast_verdict(&scope, &FastVerdict::ZeroFindings, &hash).unwrap();
+        let map = store.read_latest_finals().unwrap();
+        // fast rounds are not "final" rounds, so should not appear
+        assert!(map.is_empty());
+    }
+
+    #[test]
+    fn test_multiple_rounds_returns_latest_final() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = make_store(dir.path());
+        let scope = sample_scope();
+        let hash = sample_hash();
+
+        // First final round: findings_remain
+        let finding = sample_finding();
+        let v1 = Verdict::findings_remain(vec![finding]).unwrap();
+        store.write_verdict(&scope, &v1, &hash).unwrap();
+
+        // Second final round: zero_findings
+        store.write_verdict(&scope, &Verdict::ZeroFindings, &hash).unwrap();
+
+        let map = store.read_latest_finals().unwrap();
+        let (verdict, _) = map.get(&scope).unwrap();
+        assert!(matches!(verdict, Verdict::ZeroFindings));
+    }
+
+    // ── reset ────────────────────────────────────────────────────────
+
+    #[test]
+    fn test_reset_archives_and_creates_fresh() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = make_store(dir.path());
+        let scope = sample_scope();
+        let hash = sample_hash();
+
+        // Write something
+        store.write_verdict(&scope, &Verdict::ZeroFindings, &hash).unwrap();
+        assert!(dir.path().join("review.json").exists());
+
+        // Reset
+        store.reset().unwrap();
+
+        // Archive file should exist (review-<timestamp>.json)
+        let archive_files: Vec<_> = std::fs::read_dir(dir.path())
+            .unwrap()
+            .filter_map(|e| e.ok())
+            .filter(|e| {
+                e.file_name()
+                    .to_str()
+                    .is_some_and(|n| n.starts_with("review-") && n.ends_with(".json"))
+            })
+            .collect();
+        assert_eq!(archive_files.len(), 1, "expected exactly one archive file");
+
+        // New review.json should be fresh (empty scopes)
+        let map = store.read_latest_finals().unwrap();
+        assert!(map.is_empty());
+    }
+
+    // ── empty hash round trip ───────────────────────────────────────
+
+    #[test]
+    fn test_write_empty_hash_round_trip() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = make_store(dir.path());
+        let scope = sample_scope();
+
+        store.write_verdict(&scope, &Verdict::ZeroFindings, &ReviewHash::Empty).unwrap();
+        let map = store.read_latest_finals().unwrap();
+        let (_, read_hash) = map.get(&scope).unwrap();
+        assert!(read_hash.is_empty());
+    }
+
+    // ── multiple scopes ─────────────────────────────────────────────
+
+    #[test]
+    fn test_multiple_scopes_independent() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = make_store(dir.path());
+        let scope1 = ScopeName::Main(MainScopeName::new("domain").unwrap());
+        let scope2 = ScopeName::Other;
+        let hash = sample_hash();
+
+        store.write_verdict(&scope1, &Verdict::ZeroFindings, &hash).unwrap();
+        let finding = sample_finding();
+        let v2 = Verdict::findings_remain(vec![finding]).unwrap();
+        store.write_verdict(&scope2, &v2, &hash).unwrap();
+
+        let map = store.read_latest_finals().unwrap();
+        assert_eq!(map.len(), 2);
+        assert!(matches!(map.get(&scope1).unwrap().0, Verdict::ZeroFindings));
+        assert!(matches!(map.get(&scope2).unwrap().0, Verdict::FindingsRemain(_)));
+    }
+
+    // ── init is idempotent ──────────────────────────────────────────
+
+    #[test]
+    fn test_init_idempotent() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = make_store(dir.path());
+        store.init().unwrap();
+        store.init().unwrap(); // second call should not fail
+
+        let content = std::fs::read_to_string(dir.path().join("review.json")).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&content).unwrap();
+        assert_eq!(value["schema_version"], 2);
+    }
 }
