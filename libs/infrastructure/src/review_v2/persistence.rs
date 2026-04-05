@@ -108,6 +108,7 @@ impl FsReviewStore {
         Ok(())
     }
 
+    /// Atomically reads, appends a round, and writes under exclusive lock.
     fn append_round(
         &self,
         scope: &ScopeName,
@@ -116,6 +117,26 @@ impl FsReviewStore {
         findings: &[Finding],
         hash: &ReviewHash,
     ) -> Result<(), ReviewWriterError> {
+        use fs4::fs_std::FileExt;
+
+        if let Some(parent) = self.path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| {
+                ReviewWriterError::Io(format!("create dir {}: {e}", parent.display()))
+            })?;
+        }
+
+        // Acquire exclusive lock BEFORE reading to prevent TOCTOU
+        let lock_file = std::fs::OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(false)
+            .open(&self.path)
+            .map_err(|e| ReviewWriterError::Io(format!("open {}: {e}", self.path.display())))?;
+        lock_file
+            .lock_exclusive()
+            .map_err(|e| ReviewWriterError::Io(format!("lock {}: {e}", self.path.display())))?;
+
+        // Read under lock
         let mut doc = self.read_doc().map_err(|e| ReviewWriterError::Io(e.to_string()))?;
 
         let scope_key = scope.to_string();
@@ -139,7 +160,15 @@ impl FsReviewStore {
             at: now,
         });
 
-        self.write_doc(&doc)
+        // Write under the same lock
+        let json = serde_json::to_string_pretty(&doc)
+            .map_err(|e| ReviewWriterError::Codec(format!("serialize review.json: {e}")))?;
+        std::fs::write(&self.path, json)
+            .map_err(|e| ReviewWriterError::Io(format!("write {}: {e}", self.path.display())))?;
+
+        // Lock released on drop
+        drop(lock_file);
+        Ok(())
     }
 }
 
@@ -312,9 +341,9 @@ fn parse_verdict(
     match verdict_str {
         "zero_findings" => Ok(Verdict::ZeroFindings),
         "findings_remain" => {
-            let domain_findings: Vec<Finding> = findings
+            let domain_findings: Result<Vec<Finding>, _> = findings
                 .iter()
-                .filter_map(|f| {
+                .map(|f| {
                     Finding::new(
                         &f.message,
                         f.severity.clone(),
@@ -322,17 +351,14 @@ fn parse_verdict(
                         f.line,
                         f.category.clone(),
                     )
-                    .ok()
+                    .map_err(|e| {
+                        ReviewReaderError::Codec(format!("invalid finding in review.json: {e}"))
+                    })
                 })
                 .collect();
-            if domain_findings.is_empty() {
-                // findings_remain with no valid findings → treat as zero_findings
-                // (fail-closed: require review)
-                Ok(Verdict::ZeroFindings)
-            } else {
-                Verdict::findings_remain(domain_findings)
-                    .map_err(|e| ReviewReaderError::Codec(format!("verdict construction: {e}")))
-            }
+            let domain_findings = domain_findings?;
+            Verdict::findings_remain(domain_findings)
+                .map_err(|e| ReviewReaderError::Codec(format!("verdict construction: {e}")))
         }
         other => Err(ReviewReaderError::Codec(format!("unknown verdict: {other}"))),
     }
