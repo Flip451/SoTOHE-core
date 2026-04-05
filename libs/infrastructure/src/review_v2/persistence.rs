@@ -183,7 +183,7 @@ impl ReviewReader for FsReviewStore {
             // Find the latest "final" round
             let latest_final = entry.rounds.iter().rev().find(|r| r.round_type == "final");
             if let Some(round) = latest_final {
-                let scope = parse_scope_name(scope_key);
+                let scope = parse_scope_name(scope_key)?;
                 let verdict = parse_verdict(&round.verdict, &round.findings)?;
                 let hash = if round.hash.is_empty() {
                     ReviewHash::Empty
@@ -322,15 +322,14 @@ impl CommitHashWriter for FsCommitHashStore {
 
 // ── Helpers ───────────────────────────────────────────────────────────
 
-fn parse_scope_name(key: &str) -> ScopeName {
+fn parse_scope_name(key: &str) -> Result<ScopeName, ReviewReaderError> {
     use domain::review_v2::MainScopeName;
     if key == "other" {
-        ScopeName::Other
+        Ok(ScopeName::Other)
     } else {
-        match MainScopeName::new(key) {
-            Ok(name) => ScopeName::Main(name),
-            Err(_) => ScopeName::Other, // fail-closed: unrecognized → other
-        }
+        MainScopeName::new(key)
+            .map(ScopeName::Main)
+            .map_err(|e| ReviewReaderError::Codec(format!("invalid scope key '{key}': {e}")))
     }
 }
 
