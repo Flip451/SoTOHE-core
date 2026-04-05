@@ -111,7 +111,7 @@
     {
       "description": "UseCase port traits (Reviewer + ReviewerError, DiffGetter + DiffGetError, ReviewHasher + ReviewHasherError) + ReviewCycle<R,H,D> + ReviewCycleError + unit tests with mock ports",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Infrastructure: SystemReviewHasher (sorted manifest, tombstone, rvw1: prefix, O_NOFOLLOW, post-open repo root validation) + GitDiffGetter (merge-base, 4-source union) — v1 migration",
@@ -140,5 +140,5 @@
     }
   ],
   "title": "Review System v2: frozen scope 廃止とスコープ独立型レビュー",
-  "updated_at": "2026-04-05T03:43:23Z"
+  "updated_at": "2026-04-05T03:47:12Z"
 }

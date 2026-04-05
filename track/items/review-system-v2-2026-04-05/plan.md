@@ -26,7 +26,7 @@ before/after hash 比較、UnknownScope、FileChangedDuringReview、空スコー
 ReviewCycle は永続化しない — review()/fast_review() の結果を永続化するのは呼び出し側（CLI）の責務。
 mock port を使った unit test で全フローを検証。
 
-- [ ] UseCase port traits (Reviewer + ReviewerError, DiffGetter + DiffGetError, ReviewHasher + ReviewHasherError) + ReviewCycle<R,H,D> + ReviewCycleError + unit tests with mock ports
+- [x] UseCase port traits (Reviewer + ReviewerError, DiffGetter + DiffGetError, ReviewHasher + ReviewHasherError) + ReviewCycle<R,H,D> + ReviewCycleError + unit tests with mock ports
 
 ## Infrastructure: ハッシュ・diff（v1 移植）
 
