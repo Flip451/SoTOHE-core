@@ -44,6 +44,7 @@ Arguments:
   3. If neither is set (e.g., `claude` provider has no `default_model`), `{model}` is not needed — skip the `--model` flag.
 - When the resolved provider has a CLI tool (e.g., Codex CLI), invoke via `cargo make track-local-review` (external subprocess).
 - When the resolved provider is `claude` (e.g., `claude-heavy` profile), invoke via Claude Code subagent with `subagent_type: "Explore"` using the same briefing files and JSON verdict format. No `--model` flag is needed. Do not perform inline review in the main conversation context.
+  > **Note (RV2-04)**: v2 auto-record is Codex-only (built into `bin/sotp review codex-local`). Claude subagent verdict persistence is **not yet implemented** in v2 (tracked as RV2-04 in `knowledge/strategy/TODO-PLAN.md`). Until RV2-04 is implemented, `track-check-approved` (Step 4) **cannot be satisfied** with the `claude-heavy` profile. Use the default Codex profile instead.
 
 ## Step 2: Prepare review briefings (parallel observation split)
 
@@ -53,13 +54,13 @@ focused briefing and reviewer invocation. All groups run **in parallel** via Age
 ### 2a. Classify changed files into groups
 
 Get the full changed file list including staged, unstaged, and untracked files.
-Use `{base}` as the diff base (default: `main`; must match `--diff-base` passed to `--auto-record`):
+Use `{base}` as the diff base (default: `.commit_hash` → fallback to `main`):
 - `git diff {base}...HEAD --name-only` for committed changes (merge-base diff)
 - `git diff --cached --name-only` for staged-only changes
 - `git diff --name-only` for unstaged worktree changes
 - `git ls-files --others --exclude-standard` for untracked files (e.g., new track artifacts)
 - Merge all lists and deduplicate.
-- Note: when using `--auto-record`, `review_operational` files (e.g., `review.json`) are
+- Note: `review_operational` files (e.g., `review.json`) are
   automatically excluded by the infrastructure before partition. In manual fallback mode,
   the orchestrator should exclude files matching `review_operational` patterns from
   `track/review-scope.json` before assigning groups.
@@ -91,7 +92,7 @@ group names produced by `partition()`: named groups from the active policy
 plus the implicit `other` fallback group.
 
 If files span **multiple groups**, use the normal parallel pattern even for ≤ 5 files.
-`--auto-record` records exactly one group per invocation, so multi-group collapsed reviews
+Auto-record records exactly one scope per invocation, so multi-scope collapsed reviews
 would leave some groups unrecorded.
 
 ### 2b. Build per-group briefing
@@ -118,6 +119,12 @@ For each non-empty group, build a briefing file at `tmp/reviewer-runtime/briefin
 - Test coverage gaps
 - Security (input validation, error information leakage)
 
+## Architecture Verification Checklist (see knowledge/conventions/impl-delegation-arch-guard.md)
+- ADR/plan で指定された型が正しい層に配置されているか
+- CLI が composition root パターンに従っているか（usecase 呼び出しのみ）
+- usecase ロジックが CLI に漏れていないか
+- NullXxx による usecase bypass がないか（status/check-approved 用途を除く）
+
 ## Known Accepted Deviations
 {any scope-specific notes, e.g. "lock.rs and hook.rs are intentionally unchanged"}
 
@@ -142,28 +149,27 @@ expansion, no build commands, use Read (not Bash) for reading files.
 
 Use `{fast_model}` for iterative rounds and `{model}` for the final confirmation round (see Model escalation strategy).
 
-When `--auto-record` is passed, the reviewer wrapper calls `record-round` internally after
-verdict extraction, applying diff scope filtering (RVW-11) and preventing verdict falsification
-(RVW-10). This replaces the manual Step 2e. The `--diff-base` flag controls the base ref for
-scope filtering (default: `main`). Parallel multi-group `--auto-record` is safe: each group's
-hash is computed from its own scope files only, so parallel recordings do not conflict.
+Auto-record is always on (v2). Verdicts are written directly to `review.json` after each
+Codex run. The scope file list is automatically injected into the prompt so each reviewer
+focuses on the correct files. Parallel per-scope reviews are safe: each scope's hash is
+computed from its own files only.
 
 ```
-Agent 1: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-domain.md --auto-record --track-id {track-id} --round-type {fast|final} --group domain --expected-groups {all-group-names} --diff-base main
-Agent 2: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-infrastructure.md --auto-record --track-id {track-id} --round-type {fast|final} --group infrastructure --expected-groups {all-group-names} --diff-base main
-Agent 3: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-usecase.md --auto-record --track-id {track-id} --round-type {fast|final} --group usecase --expected-groups {all-group-names} --diff-base main
-Agent 4: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-cli.md --auto-record --track-id {track-id} --round-type {fast|final} --group cli --expected-groups {all-group-names} --diff-base main
-Agent 5: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-harness-policy.md --auto-record --track-id {track-id} --round-type {fast|final} --group harness-policy --expected-groups {all-group-names} --diff-base main
-Agent 6: cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-other.md --auto-record --track-id {track-id} --round-type {fast|final} --group other --expected-groups {all-group-names} --diff-base main
+Agent 1: cargo make track-local-review -- --model {fast_model} --round-type {fast|final} --group domain --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-domain.md
+Agent 2: cargo make track-local-review -- --model {fast_model} --round-type {fast|final} --group infrastructure --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-infrastructure.md
+Agent 3: cargo make track-local-review -- --model {fast_model} --round-type {fast|final} --group usecase --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-usecase.md
+Agent 4: cargo make track-local-review -- --model {fast_model} --round-type {fast|final} --group cli --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-cli.md
+Agent 5: cargo make track-local-review -- --model {fast_model} --round-type {fast|final} --group harness-policy --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-harness-policy.md
+Agent 6: cargo make track-local-review -- --model {fast_model} --round-type {fast|final} --group other --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-other.md
 ```
 
-For the **final confirmation round**, replace `{fast_model}` with `{model}` and `--round-type fast` with `--round-type final` in the commands above.
-
-**Note**: The examples above use the base group names. If a per-track `review-groups.json`
-override exists (see Step 2a), replace the group names with the override-defined names.
-Only include non-empty groups in `--expected-groups` (consistent with the skip-empty rule).
+For the **final confirmation round**, replace `{fast_model}` with `{model}`.
 
 **When the provider is `claude`** (e.g., `claude-heavy` profile):
+
+> **Limitation (RV2-04)**: v2 auto-record is Codex-only. Claude subagent verdicts are
+> **not persisted** to `review.json`. `track-check-approved` cannot be satisfied with the
+> `claude-heavy` profile until RV2-04 is implemented. Use the default Codex profile instead.
 
 Launch one Claude Code subagent per group with `subagent_type: "Explore"`.
 Each subagent reads its briefing file and returns a JSON verdict in the same format.
@@ -201,51 +207,15 @@ one finding. The wrapper prints that final JSON payload as the last stdout line.
 
 ### 2e. Record round results
 
-**When `--auto-record` is used** (recommended): Step 2e is handled automatically by the
-reviewer wrapper. The wrapper applies diff scope filtering, extracts concerns, and calls
-`record-round` internally. Exit code 3 signals escalation block. No manual intervention needed.
+**Auto-record (v2, Codex-only, always on)**: Step 2e is handled automatically by the
+`bin/sotp review codex-local` wrapper. Verdicts are written to `review.json` after each
+Codex invocation. Manual `record-round` has been removed to prevent verdict falsification.
 
-**Fallback (without `--auto-record`)**: If `--auto-record` is not used, manually persist
-the result into `review.json` via `sotp review record-round`:
-
-For **each non-empty group**, run (when the `<= 5 files` collapse rule was applied,
-use the actual layer-classified group name, not `all` — see Step 2a):
-
-```bash
-cargo make track-record-round \
-  --track-id {track-id} \
-  --round-type {fast|final} \
-  --group {group-name} \
-  --verdict '{aggregated verdict JSON for this group}' \
-  --expected-groups {comma-separated list of all non-empty group names} \
-  --diff-base {base} \
-  --concerns {comma-separated concern slugs — omit this flag entirely for zero_findings} \
-  --items-dir track/items
-```
-
-**Concern extraction**: For `findings_remain` verdicts, extract concern slugs from findings
-using `findings_to_concerns()` 3-stage fallback:
-1. Use the finding's `category` field if present (e.g., `"security"`, `"logic_error"`).
-2. If no category, derive from the `file` field (e.g., `libs/domain/src/review.rs` → `domain.review`).
-3. If neither is available, use `"other"`.
-4. Deduplicate concerns before passing to `--concerns`.
-
-For `zero_findings` verdicts, **omit the `--concerns` flag entirely** (the CLI default is empty).
-Do NOT pass `--concerns ""` — the empty-string argument breaks Claude Code permission matching
-for `cargo make track-record-round`.
+> Claude subagent verdicts are **not auto-recorded** in v2 (RV2-04). See Step 1 and Step 2c.
 
 **Error handling**:
-- If `record-round` (or `--auto-record`) returns exit code 3 (`EscalationActive`): stop the
-  review loop and report the escalation block to the user with the required resolution steps.
-- If `record-round` fails with a stale-hash error (stderr contains "code hash mismatch"):
-  the review state has been invalidated. Stop and re-run the review from Round 1 —
-  proceeding would leave the review state inconsistent with the current code.
-- If `record-round` fails with any other error:
-  - **With `--auto-record`**: fail-closed (exit 1, verdict not printed). The round must be
-    retried — unrecorded verdicts are not trusted.
-  - **Without `--auto-record` (manual fallback)**: retry the `record-round` command.
-    Do not start fixes until all groups in the current round are successfully recorded —
-    unrecorded groups leave `check-approved` blocked.
+- If auto-record fails (exit 1, verdict not printed): the round must be retried.
+  Unrecorded verdicts are not trusted.
 
 ## Step 3: Review → Fix → Review loop
 
@@ -326,15 +296,11 @@ Execution:
 When groups are reviewed in parallel and some groups complete with `zero_findings` while
 others have `findings_remain`:
 
-- **With `--auto-record`** (recommended): start fixes immediately for completed groups
+- **Parallel fixes** (v2): start fixes immediately for completed scopes
   without waiting for others. `group_scope_hash` is computed per-group from that group's
   scope files only, so modifying files in one group's scope does not affect another
   group's hash. Launch the next review round per-group as fixes are ready.
   Avoid modifying files that belong to a still-running group's scope.
-- **Without `--auto-record`** (manual fallback): wait for all groups to be recorded
-  before starting fixes. The manual `track-record-round` creates the cycle from the
-  current diff on the first record, so fixes before all groups are recorded can freeze
-  a post-fix scope.
 
 ### Loop guard
 
@@ -348,15 +314,12 @@ others have `findings_remain`:
 After the reviewer reports zero findings:
 1. Run `cargo make ci` (full CI, not just ci-rust) to confirm all checks pass.
 2. If CI fails, fix and re-run (this does not reset the review loop counter).
-3. **Review state guard verification (mandatory)**: Run `bin/sotp review check-approved --track-id {track-id} --items-dir track/items`
+3. **Review state guard verification (mandatory)**: Run `cargo make track-check-approved -- --track-id {track-id}`
    to confirm the review state is `Approved`. This is the authoritative readiness check —
    do NOT declare "Ready" based solely on reviewer stdout verdicts.
    - If `check-approved` returns exit code 0: review is complete. Proceed to "Ready".
    - If `check-approved` returns non-zero: review is NOT complete. Diagnose the cause
-     (missing `record-round` calls, stale code hash, escalation block) and resolve before
-     declaring readiness.
-   - This step catches cases where `record-round` was accidentally skipped or where
-     the code hash was invalidated between the last review and CI.
+     (stale code hash, auto-record failure) and resolve before declaring readiness.
 
 ## Behavior
 

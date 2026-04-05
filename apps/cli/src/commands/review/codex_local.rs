@@ -1,655 +1,187 @@
 //! Subprocess management for the local Codex-backed reviewer.
 
-use std::ffi::OsString;
-use std::io::{self, BufRead, BufReader, Write};
-use std::path::{Path, PathBuf};
-use std::process::{Child, Command, ExitCode, Stdio};
-use std::thread;
-use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use std::io::{self, Write};
+use std::process::ExitCode;
+use std::time::Duration;
 
-#[cfg(unix)]
-use std::os::unix::process::CommandExt;
+use domain::review_v2::{ReviewOutcome, ReviewWriter};
+use infrastructure::review_v2::CodexReviewer;
+use usecase::review_workflow::{ReviewFinalPayload, ReviewPayloadVerdict, render_review_payload};
 
-use usecase::review_workflow::scope::{DiffScopeProvider, ScopeFilteredPayload};
-use usecase::review_workflow::usecases::{RecordRoundProtocol, Verdict, record_round_typed};
-use usecase::review_workflow::{
-    ReviewFinalMessageState, ReviewPayloadVerdict, ReviewVerdict, classify_review_verdict,
-    extract_verdict_from_content, findings_to_concerns, normalize_final_message,
-    parse_review_final_message, render_review_payload, review_findings_to_stored,
-};
-
-use super::{
-    AutoManagedArtifacts, CodexInvocation, CodexLocalArgs, OutputLastMessagePath, POLL_INTERVAL,
-    REVIEW_RUNTIME_DIR, RenderedCommandResult, ReviewRunResult, ValidatedAutoRecordArgs,
-    validate_auto_record_args,
-};
-
-#[cfg(test)]
-use super::CODEX_BIN_ENV;
+use super::{CodexLocalArgs, validate_auto_record_args};
 
 pub(super) fn execute_codex_local(args: &CodexLocalArgs) -> ExitCode {
-    // Step 1: Validate auto-record args before spawning Codex (fail fast).
-    let auto_record = match validate_auto_record_args(args) {
-        Ok(ar) => ar,
-        Err(err) => {
-            eprintln!("[ERROR] {err}");
-            return ExitCode::from(1);
+    match run_execute_codex_local(args) {
+        Ok(code) => ExitCode::from(code),
+        Err(msg) => {
+            eprintln!("{msg}");
+            ExitCode::from(1)
         }
-    };
-
-    // Step 2: Run Codex (existing flow).
-    let outcome = run_codex_local(args);
-
-    // Step 3: If auto-record is enabled, apply scope filter and record.
-    if let Some(validated) = auto_record {
-        let scope_provider = infrastructure::review_adapters::GitDiffScopeProvider;
-        let protocol = infrastructure::review_adapters::RecordRoundProtocolImpl {
-            items_dir: validated.items_dir.clone(),
-            group_display: validated.group_name.as_ref().to_owned(),
-            base_ref: validated.diff_base.clone(),
-        };
-        return execute_with_auto_record(
-            outcome,
-            validated,
-            args.timeout_seconds,
-            &scope_provider,
-            &protocol,
-        );
     }
-
-    // Step 4: Original flow (no auto-record).
-    let rendered = render_codex_local_result(args, outcome);
-    if let Err(err) = emit_rendered_command_result_stdio(&rendered) {
-        eprintln!("[ERROR] failed to emit reviewer output: {err}");
-        return ExitCode::from(1);
-    }
-    ExitCode::from(rendered.exit_code)
 }
 
-/// Applies scope filtering, calls `record_round_typed`, then emits the filtered verdict JSON.
+fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, String> {
+    // Step 1: Validate record args before building composition (fail fast).
+    let validated = validate_auto_record_args(args)?;
+
+    // Step 2: Build base prompt. The scope file list is appended by
+    // CodexReviewer::build_full_prompt when it receives the ReviewTarget.
+    let base_prompt = build_base_prompt(args)?;
+
+    // Step 3: Build v2 composition with real CodexReviewer.
+    let track_id = domain::TrackId::try_new(validated.track_id.as_ref())
+        .map_err(|e| format!("[ERROR] invalid track id: {e}"))?;
+    let timeout = Duration::from_secs(args.timeout_seconds);
+    let reviewer = CodexReviewer::new(&args.model, timeout, base_prompt)
+        .with_scope_label(validated.group_name.as_ref());
+    let comp =
+        super::compose_v2::build_review_v2_with_reviewer(&track_id, &validated.items_dir, reviewer)
+            .map_err(|e| format!("[ERROR] v2 composition failed: {e}"))?;
+
+    // Step 4: Map --group to ScopeName.
+    let scope = map_group_to_scope(validated.group_name.as_ref())?;
+
+    // Step 5: Run review via ReviewCycle (hash_before → Codex → hash_after).
+    match validated.round_type {
+        domain::RoundType::Final => match comp.cycle.review(&scope) {
+            Ok(ReviewOutcome::Skipped) => {
+                emit_skip_output(validated.group_name.as_ref())?;
+                Ok(0)
+            }
+            Ok(ReviewOutcome::Reviewed { verdict, hash, .. }) => {
+                comp.review_store
+                    .write_verdict(&scope, &verdict, &hash)
+                    .map_err(|e| format!("[ERROR] record failed: {e}"))?;
+                emit_verdict_output_final(&verdict)
+            }
+            Err(e) => Err(format!("[ERROR] {e}")),
+        },
+        domain::RoundType::Fast => match comp.cycle.fast_review(&scope) {
+            Ok(ReviewOutcome::Skipped) => {
+                emit_skip_output(validated.group_name.as_ref())?;
+                Ok(0)
+            }
+            Ok(ReviewOutcome::Reviewed { verdict, hash, .. }) => {
+                comp.review_store
+                    .write_fast_verdict(&scope, &verdict, &hash)
+                    .map_err(|e| format!("[ERROR] record failed: {e}"))?;
+                emit_verdict_output_fast(&verdict)
+            }
+            Err(e) => Err(format!("[ERROR] {e}")),
+        },
+    }
+}
+
+/// Builds the base prompt from CLI args (briefing file or inline prompt).
 ///
-/// `timeout_seconds` is forwarded to the non-actionable verdict rendering path
-/// (Timeout / ProcessFailed / LastMessageMissing) where it appears in the error message.
+/// The scope file list is NOT appended here — `CodexReviewer::build_full_prompt`
+/// appends it when it receives the `ReviewTarget` from `ReviewCycle`.
 ///
-/// Generic over `DiffScopeProvider` and `RecordRoundProtocol` so tests can inject stubs.
-pub(super) fn execute_with_auto_record(
-    outcome: Result<ReviewRunResult, String>,
-    validated: ValidatedAutoRecordArgs,
-    timeout_seconds: u64,
-    scope_provider: &impl DiffScopeProvider,
-    protocol: &impl RecordRoundProtocol,
-) -> ExitCode {
-    let rendered = render_execute_with_auto_record(
-        outcome,
-        validated,
-        timeout_seconds,
-        scope_provider,
-        protocol,
-    );
-    if let Err(err) = emit_rendered_command_result_stdio(&rendered) {
-        eprintln!("[ERROR] failed to emit reviewer output: {err}");
-        return ExitCode::from(1);
-    }
-    ExitCode::from(rendered.exit_code)
-}
-
-fn emit_rendered_command_result_stdio(rendered: &RenderedCommandResult) -> io::Result<()> {
-    #[cfg(unix)]
-    {
-        for line in &rendered.stderr_lines {
-            write_fd_line(libc::STDERR_FILENO, line)?;
-        }
-        for line in &rendered.stdout_lines {
-            write_fd_line(libc::STDOUT_FILENO, line)?;
-        }
-        Ok(())
-    }
-    #[cfg(windows)]
-    {
-        emit_windows_command_result(rendered)
-    }
-    #[cfg(all(not(unix), not(windows)))]
-    {
-        emit_non_unix_fallback_command_result(
-            rendered,
-            &mut std::io::stdout(),
-            &mut std::io::stderr(),
-        )
-    }
-}
-
-#[cfg_attr(not(test), allow(dead_code))]
-pub(super) fn emit_rendered_command_result_with_writers(
-    rendered: &RenderedCommandResult,
-    stdout: &mut impl Write,
-    stderr: &mut impl Write,
-) -> std::io::Result<()> {
-    for line in &rendered.stderr_lines {
-        writeln!(stderr, "{line}")?;
-        stderr.flush()?;
-    }
-    for line in &rendered.stdout_lines {
-        writeln!(stdout, "{line}")?;
-        stdout.flush()?;
-    }
-    Ok(())
-}
-
-#[cfg_attr(not(test), allow(dead_code))]
-pub(super) fn emit_non_unix_fallback_command_result(
-    rendered: &RenderedCommandResult,
-    stdout: &mut impl Write,
-    stderr: &mut impl Write,
-) -> std::io::Result<()> {
-    emit_rendered_command_result_with_writers(rendered, stdout, stderr)
-}
-
-#[cfg(unix)]
-fn write_fd_line(fd: libc::c_int, line: &str) -> io::Result<()> {
-    let mut buf = Vec::with_capacity(line.len() + 1);
-    buf.extend_from_slice(line.as_bytes());
-    buf.push(b'\n');
-
-    let mut written = 0usize;
-    while written < buf.len() {
-        let Some(remaining) = buf.get(written..) else {
-            break;
-        };
-        // Safety: `buf` is kept alive for the duration of the syscall, `fd` is one of the
-        // standard output descriptors, and we handle partial writes / EINTR explicitly.
-        let result = unsafe { libc::write(fd, remaining.as_ptr().cast(), remaining.len()) };
-        if result < 0 {
-            let err = io::Error::last_os_error();
-            if err.kind() == io::ErrorKind::Interrupted {
-                continue;
-            }
-            return Err(err);
-        }
-        written += result as usize;
-    }
-    Ok(())
-}
-
-#[cfg(windows)]
-fn emit_windows_command_result(rendered: &RenderedCommandResult) -> io::Result<()> {
-    use windows_sys::Win32::System::Console::{STD_ERROR_HANDLE, STD_OUTPUT_HANDLE};
-
-    for line in &rendered.stderr_lines {
-        write_windows_handle_line(STD_ERROR_HANDLE, line)?;
-    }
-    for line in &rendered.stdout_lines {
-        write_windows_handle_line(STD_OUTPUT_HANDLE, line)?;
-    }
-    Ok(())
-}
-
-#[cfg(windows)]
-fn write_windows_handle_line(std_handle: u32, line: &str) -> io::Result<()> {
-    use windows_sys::Win32::Foundation::{GetLastError, INVALID_HANDLE_VALUE};
-    use windows_sys::Win32::Storage::FileSystem::WriteFile;
-    use windows_sys::Win32::System::Console::{GetConsoleMode, GetStdHandle, WriteConsoleW};
-
-    // Safety: `std_handle` is one of the standard console handles and the returned handle is
-    // used only for synchronous writes in this function.
-    let handle = unsafe { GetStdHandle(std_handle) };
-    if handle.is_null() || handle == INVALID_HANDLE_VALUE {
-        let err = unsafe { GetLastError() };
-        return Err(io::Error::from_raw_os_error(err as i32));
-    }
-
-    let mut console_mode = 0u32;
-    // Safety: `handle` is a valid standard handle and `console_mode` is a valid out-pointer.
-    let is_console = unsafe { GetConsoleMode(handle, &mut console_mode) } != 0;
-    if is_console {
-        let mut wide = line.encode_utf16().collect::<Vec<u16>>();
-        wide.push(b'\r' as u16);
-        wide.push(b'\n' as u16);
-        let mut written = 0usize;
-        while written < wide.len() {
-            let remaining = &wide[written..];
-            let chunk_len = remaining.len().min(u32::MAX as usize) as u32;
-            let mut chunk_written = 0u32;
-            // Safety: `remaining` stays alive for the syscall, the handle is a valid console
-            // handle, and the pointers are valid for the duration of the call.
-            let result = unsafe {
-                WriteConsoleW(
-                    handle,
-                    remaining.as_ptr().cast(),
-                    chunk_len,
-                    &mut chunk_written,
-                    std::ptr::null_mut(),
-                )
-            };
-            if result == 0 {
-                let err = unsafe { GetLastError() };
-                return Err(io::Error::from_raw_os_error(err as i32));
-            }
-            if chunk_written == 0 {
-                return Err(io::Error::new(
-                    io::ErrorKind::WriteZero,
-                    "failed to write reviewer output to Windows console handle",
-                ));
-            }
-            written += chunk_written as usize;
-        }
-        return Ok(());
-    }
-
-    let mut buf = Vec::with_capacity(line.len() + 2);
-    buf.extend_from_slice(line.as_bytes());
-    buf.push(b'\r');
-    buf.push(b'\n');
-
-    let mut written = 0usize;
-    while written < buf.len() {
-        let remaining = &buf[written..];
-        let chunk_len = remaining.len().min(u32::MAX as usize) as u32;
-        let mut chunk_written = 0u32;
-        // Safety: `remaining` stays alive for the syscall, the handle is a valid stdio handle,
-        // and `chunk_written` / overlapped pointers are valid for the duration of the call.
-        let result = unsafe {
-            WriteFile(
-                handle,
-                remaining.as_ptr().cast(),
-                chunk_len,
-                &mut chunk_written,
-                std::ptr::null_mut(),
-            )
-        };
-        if result == 0 {
-            let err = unsafe { GetLastError() };
-            return Err(io::Error::from_raw_os_error(err as i32));
-        }
-        if chunk_written == 0 {
-            return Err(io::Error::new(
-                io::ErrorKind::WriteZero,
-                "failed to write reviewer output to Windows stdio handle",
-            ));
-        }
-        written += chunk_written as usize;
-    }
-    Ok(())
-}
-
-pub(super) fn render_execute_with_auto_record(
-    outcome: Result<ReviewRunResult, String>,
-    validated: ValidatedAutoRecordArgs,
-    timeout_seconds: u64,
-    scope_provider: &impl DiffScopeProvider,
-    protocol: &impl RecordRoundProtocol,
-) -> RenderedCommandResult {
-    // Handle non-success outcomes (spawn failure etc.) — skip auto-record.
-    let result = match outcome {
-        Ok(r) => r,
-        Err(err) => {
-            return RenderedCommandResult {
-                exit_code: 1,
-                stdout_lines: Vec::new(),
-                stderr_lines: vec![format!("[ERROR] {err}")],
-            };
-        }
-    };
-
-    match result.verdict {
-        ReviewVerdict::ZeroFindings | ReviewVerdict::FindingsRemain => {
-            render_record_auto_round(result, validated, scope_provider, protocol)
-        }
-        // Non-actionable verdicts (Timeout, ProcessFailed, LastMessageMissing):
-        // skip auto-record, use inline rendering.
-        ReviewVerdict::Timeout => RenderedCommandResult {
-            exit_code: 1,
-            stdout_lines: Vec::new(),
-            stderr_lines: vec![if result.output_last_message_auto_managed {
-                format!("[TIMEOUT] Local reviewer exceeded {timeout_seconds}s")
-            } else {
-                format!(
-                    "[TIMEOUT] Local reviewer exceeded {timeout_seconds}s: {}",
-                    result.output_last_message.display()
-                )
-            }],
-        },
-        ReviewVerdict::ProcessFailed => {
-            let mut stderr_lines = vec!["[ERROR] Local reviewer process failed".to_owned()];
-            if let Some(detail) = result.verdict_detail {
-                stderr_lines.push(detail);
-            }
-            if let Some(message) = result.final_message {
-                stderr_lines.push(message);
-            }
-            RenderedCommandResult { exit_code: 1, stdout_lines: Vec::new(), stderr_lines }
-        }
-        ReviewVerdict::LastMessageMissing => RenderedCommandResult {
-            exit_code: 1,
-            stdout_lines: Vec::new(),
-            stderr_lines: vec![if result.output_last_message_auto_managed {
-                "[ERROR] Local reviewer finished without a final message".to_owned()
-            } else {
-                format!(
-                    "[ERROR] Local reviewer finished without a final message: {}",
-                    result.output_last_message.display()
-                )
-            }],
-        },
-    }
-}
-
-/// Performs the scope-filter → record → emit flow for actionable verdicts.
-#[allow(clippy::too_many_lines)]
-fn render_record_auto_round(
-    result: ReviewRunResult,
-    validated: ValidatedAutoRecordArgs,
-    scope_provider: &impl DiffScopeProvider,
-    protocol: &impl RecordRoundProtocol,
-) -> RenderedCommandResult {
-    let mut stderr_lines = Vec::new();
-
-    // Parse the payload for scope filtering.
-    let payload = match result.final_message.as_deref() {
-        Some(json) => match parse_review_final_message(Some(json)) {
-            ReviewFinalMessageState::Parsed(p) => p,
-            _ => {
-                stderr_lines
-                    .push("[ERROR] auto-record: could not parse verdict payload".to_owned());
-                return RenderedCommandResult {
-                    exit_code: 1,
-                    stdout_lines: Vec::new(),
-                    stderr_lines,
-                };
-            }
-        },
-        None => {
-            return RenderedCommandResult {
-                exit_code: 1,
-                stdout_lines: Vec::new(),
-                stderr_lines: vec!["[ERROR] auto-record: no verdict payload to record".to_owned()],
-            };
-        }
-    };
-
-    // Compute diff scope. On failure, skip filtering but still record the round.
-    let filtered = match scope_provider.changed_files(&validated.diff_base) {
-        Ok(scope) => {
-            let f = usecase::review_workflow::apply_scope_filter(payload, &scope);
-            let total = f.adjusted_payload.findings.len() + f.out_of_scope.len();
-            if !f.out_of_scope.is_empty() || f.unknown_path_count > 0 {
-                stderr_lines.push(format!(
-                    "[scope-filter] {} of {} findings out of scope, {} unknown paths",
-                    f.out_of_scope.len(),
-                    total,
-                    f.unknown_path_count
-                ));
-            }
-            f
-        }
-        Err(err) => {
-            stderr_lines.push(format!(
-                "[WARNING] Failed to compute diff scope (recording unfiltered): {err}"
-            ));
-            ScopeFilteredPayload {
-                adjusted_payload: payload,
-                out_of_scope: Vec::new(),
-                unknown_path_count: 0,
-            }
-        }
-    };
-
-    // Map ReviewPayloadVerdict → domain::Verdict.
-    let domain_verdict = match filtered.adjusted_payload.verdict {
-        ReviewPayloadVerdict::ZeroFindings => Verdict::ZeroFindings,
-        ReviewPayloadVerdict::FindingsRemain => Verdict::FindingsRemain,
-    };
-
-    // Extract concerns from in-scope findings.
-    let concerns = match findings_to_concerns(&filtered.adjusted_payload.findings) {
-        Ok(c) => c,
-        Err(err) => {
-            eprintln!("[ERROR] Failed to extract concerns: {err}");
-            Vec::new()
-        }
-    };
-    let findings = review_findings_to_stored(&filtered.adjusted_payload.findings);
-
-    // Build timestamp.
-    let timestamp = match super::make_timestamp() {
-        Ok(ts) => ts,
-        Err(err) => {
-            stderr_lines.push(format!("[ERROR] {err}"));
-            return RenderedCommandResult { exit_code: 1, stdout_lines: Vec::new(), stderr_lines };
-        }
-    };
-
-    // Capture display strings before moving validated fields.
-    let group_display = validated.group_name.as_ref().to_owned();
-    let round_type_display = validated.round_type;
-
-    // Call record_round_typed.
-    use usecase::review_workflow::usecases::RecordRoundError;
-    match record_round_typed(
-        validated.track_id,
-        validated.round_type,
-        validated.group_name,
-        domain_verdict,
-        concerns,
-        findings,
-        validated.expected_groups,
-        timestamp,
-        protocol,
-    ) {
-        Ok(()) => {
-            stderr_lines.push(format!(
-                "[auto-record] Recorded {round_type_display} round for group \
-                 '{group_display}' (verdict: {domain_verdict})"
-            ));
-        }
-        Err(RecordRoundError::EscalationBlocked(blocked)) => {
-            // Do NOT print verdict JSON — recording failed, so the verdict is untrusted.
-            stderr_lines.push(format!("[auto-record] Escalation blocked: {}", blocked.join(", ")));
-            return RenderedCommandResult { exit_code: 3, stdout_lines: Vec::new(), stderr_lines };
-        }
-        Err(RecordRoundError::Other(msg)) => {
-            // All recording failures are fatal — the core guarantee of auto-record
-            // is that verdicts are always persisted internally.
-            // Do NOT print verdict JSON — unrecorded verdicts must not be trusted.
-            stderr_lines.push(format!("[auto-record] Record failed: {msg}"));
-            return RenderedCommandResult { exit_code: 1, stdout_lines: Vec::new(), stderr_lines };
-        }
-    }
-
-    // Output the filtered verdict JSON to stdout.
-    let stdout_lines = render_review_payload(&filtered.adjusted_payload)
-        .map_or_else(|_| Vec::new(), |json| vec![json]);
-
-    let exit_code = match filtered.adjusted_payload.verdict {
-        ReviewPayloadVerdict::ZeroFindings => 0,
-        ReviewPayloadVerdict::FindingsRemain => 2,
-    };
-    RenderedCommandResult { exit_code, stdout_lines, stderr_lines }
-}
-
-pub(super) fn render_codex_local_result(
-    args: &CodexLocalArgs,
-    outcome: Result<ReviewRunResult, String>,
-) -> RenderedCommandResult {
-    match outcome {
-        Ok(result) => match result.verdict {
-            ReviewVerdict::ZeroFindings => render_final_json_or_failure(
-                result,
-                0,
-                "[ERROR] Local reviewer reported zero findings without a final JSON payload",
-            ),
-            ReviewVerdict::FindingsRemain => render_final_json_or_failure(
-                result,
-                2,
-                "[ERROR] Local reviewer reported findings without a final JSON payload",
-            ),
-            ReviewVerdict::Timeout => RenderedCommandResult {
-                exit_code: 1,
-                stdout_lines: Vec::new(),
-                stderr_lines: vec![render_missing_message_failure(
-                    &format!("[TIMEOUT] Local reviewer exceeded {}s", args.timeout_seconds),
-                    &result,
-                )],
-            },
-            ReviewVerdict::ProcessFailed => {
-                let mut stderr_lines = vec!["[ERROR] Local reviewer process failed".to_owned()];
-                if let Some(detail) = result.verdict_detail {
-                    stderr_lines.push(detail);
-                }
-                if let Some(message) = result.final_message {
-                    stderr_lines.push(message);
-                }
-                RenderedCommandResult { exit_code: 1, stdout_lines: Vec::new(), stderr_lines }
-            }
-            ReviewVerdict::LastMessageMissing => RenderedCommandResult {
-                exit_code: 1,
-                stdout_lines: Vec::new(),
-                stderr_lines: vec![render_missing_message_failure(
-                    "[ERROR] Local reviewer finished without a final message",
-                    &result,
-                )],
-            },
-        },
-        Err(err) => RenderedCommandResult {
-            exit_code: 1,
-            stdout_lines: Vec::new(),
-            stderr_lines: vec![format!("local reviewer failed: {err}")],
-        },
-    }
-}
-
-fn render_final_json_or_failure(
-    result: ReviewRunResult,
-    success_exit_code: u8,
-    missing_payload_message: &str,
-) -> RenderedCommandResult {
-    match result.final_message {
-        Some(message) => RenderedCommandResult {
-            exit_code: success_exit_code,
-            stdout_lines: vec![message],
-            stderr_lines: Vec::new(),
-        },
-        None => RenderedCommandResult {
-            exit_code: 1,
-            stdout_lines: Vec::new(),
-            stderr_lines: vec![render_missing_message_failure(missing_payload_message, &result)],
-        },
-    }
-}
-
-fn render_missing_message_failure(prefix: &str, result: &ReviewRunResult) -> String {
-    if result.output_last_message_auto_managed {
-        prefix.to_owned()
-    } else {
-        format!("{prefix}: {}", result.output_last_message.display())
-    }
-}
-
-pub(super) fn run_codex_local(args: &CodexLocalArgs) -> Result<ReviewRunResult, String> {
-    let prompt = build_prompt(args)?;
-    #[cfg(test)]
-    let explicit_output_last_message = args.output_last_message.as_deref();
-    #[cfg(not(test))]
-    let explicit_output_last_message: Option<&Path> = None;
-
-    let output_last_message = prepare_output_last_message_path(explicit_output_last_message)?;
-    let output_schema = prepare_output_schema_path()?;
-    let session_log = prepare_session_log_path()?;
-    // Session log is NOT auto-managed — it persists for post-run traceability/debugging.
-    let _cleanup = AutoManagedArtifacts::new([&output_last_message, &output_schema]);
-    reset_output_last_message(&output_last_message.path)?;
-    write_output_schema(&output_schema.path)?;
-    let invocation = build_codex_invocation(
-        &args.model,
-        &prompt,
-        &output_last_message.path,
-        &output_schema.path,
-    );
-    run_codex_invocation(
-        &invocation,
-        Duration::from_secs(args.timeout_seconds),
-        output_last_message,
-        &session_log.path,
-    )
-}
-
-pub(super) fn build_prompt(args: &CodexLocalArgs) -> Result<String, String> {
-    let prompt = if let Some(path) = &args.briefing_file {
+/// # Errors
+/// Returns an error if the briefing file does not exist or neither arg is provided.
+pub(super) fn build_base_prompt(args: &CodexLocalArgs) -> Result<String, String> {
+    if let Some(path) = &args.briefing_file {
         if !path.is_file() {
             return Err(format!("briefing file not found: {}", path.display()));
         }
-        format!("Read {} and perform the task described there.", path.display())
+        Ok(format!("Read {} and perform the task described there.", path.display()))
     } else {
         args.prompt
             .clone()
-            .ok_or_else(|| "either --briefing-file or --prompt is required".to_owned())?
-    };
-
-    Ok(prompt)
+            .ok_or_else(|| "either --briefing-file or --prompt is required".to_owned())
+    }
 }
 
-fn prepare_output_last_message_path(path: Option<&Path>) -> Result<OutputLastMessagePath, String> {
-    let (path, auto_managed) = match path {
-        Some(path) => (path.to_path_buf(), false),
-        None => {
-            let timestamp = SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .map_err(|err| format!("failed to compute timestamp: {err}"))?
-                .as_millis();
-            (
-                PathBuf::from(REVIEW_RUNTIME_DIR)
-                    .join(format!("codex-last-message-{}-{timestamp}.txt", std::process::id())),
-                true,
-            )
+/// Alias for test compatibility — tests.rs imports `build_prompt` by this name.
+#[cfg(test)]
+pub(super) use build_base_prompt as build_prompt;
+
+/// Maps a group name string to a `ScopeName`.
+fn map_group_to_scope(group: &str) -> Result<domain::review_v2::ScopeName, String> {
+    if group == "other" {
+        Ok(domain::review_v2::ScopeName::Other)
+    } else {
+        domain::review_v2::MainScopeName::new(group)
+            .map(domain::review_v2::ScopeName::Main)
+            .map_err(|e| format!("[ERROR] invalid scope name: {e}"))
+    }
+}
+
+/// Prints the skip message and zero_findings JSON for an empty scope.
+fn emit_skip_output(scope: &str) -> Result<(), String> {
+    eprintln!("[auto-record] Scope '{scope}' is empty, skipping");
+    emit_stdout_line(r#"{"verdict":"zero_findings","findings":[]}"#)
+}
+
+/// Emits the final verdict JSON to stdout and returns the appropriate exit code.
+fn emit_verdict_output_final(verdict: &domain::review_v2::Verdict) -> Result<u8, String> {
+    let (payload, exit_code) = match verdict {
+        domain::review_v2::Verdict::ZeroFindings => (
+            ReviewFinalPayload { verdict: ReviewPayloadVerdict::ZeroFindings, findings: vec![] },
+            0u8,
+        ),
+        domain::review_v2::Verdict::FindingsRemain(nef) => {
+            let findings = nef.as_slice().iter().map(finding_to_review_finding).collect();
+            (ReviewFinalPayload { verdict: ReviewPayloadVerdict::FindingsRemain, findings }, 2u8)
         }
     };
-
-    let parent = path.parent().ok_or_else(|| {
-        format!("output-last-message path must have a parent directory: {}", path.display())
-    })?;
-    std::fs::create_dir_all(parent)
-        .map_err(|err| format!("failed to create {}: {err}", parent.display()))?;
-
-    Ok(OutputLastMessagePath { path, auto_managed })
+    let json = render_review_payload(&payload).map_err(|e| format!("[ERROR] {e}"))?;
+    emit_stdout_line(&json)?;
+    Ok(exit_code)
 }
 
-fn reset_output_last_message(path: &Path) -> Result<(), String> {
-    std::fs::write(path, "").map_err(|err| {
-        format!("failed to initialize reviewer final message {}: {err}", path.display())
-    })
+/// Emits the fast verdict JSON to stdout and returns the appropriate exit code.
+fn emit_verdict_output_fast(verdict: &domain::review_v2::FastVerdict) -> Result<u8, String> {
+    let (payload, exit_code) = match verdict {
+        domain::review_v2::FastVerdict::ZeroFindings => (
+            ReviewFinalPayload { verdict: ReviewPayloadVerdict::ZeroFindings, findings: vec![] },
+            0u8,
+        ),
+        domain::review_v2::FastVerdict::FindingsRemain(nef) => {
+            let findings = nef.as_slice().iter().map(finding_to_review_finding).collect();
+            (ReviewFinalPayload { verdict: ReviewPayloadVerdict::FindingsRemain, findings }, 2u8)
+        }
+    };
+    let json = render_review_payload(&payload).map_err(|e| format!("[ERROR] {e}"))?;
+    emit_stdout_line(&json)?;
+    Ok(exit_code)
 }
 
-fn prepare_output_schema_path() -> Result<OutputLastMessagePath, String> {
-    let timestamp = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_err(|err| format!("failed to compute timestamp: {err}"))?
-        .as_millis();
-    let path = PathBuf::from(REVIEW_RUNTIME_DIR)
-        .join(format!("codex-output-schema-{}-{timestamp}.json", std::process::id()));
-    let parent = path.parent().ok_or_else(|| {
-        format!("output-schema path must have a parent directory: {}", path.display())
-    })?;
-    std::fs::create_dir_all(parent)
-        .map_err(|err| format!("failed to create {}: {err}", parent.display()))?;
-
-    Ok(OutputLastMessagePath { path, auto_managed: true })
+/// Converts a domain `Finding` to a `ReviewFinding` for JSON serialization.
+fn finding_to_review_finding(
+    f: &domain::review_v2::Finding,
+) -> usecase::review_workflow::ReviewFinding {
+    usecase::review_workflow::ReviewFinding {
+        message: f.message().to_owned(),
+        severity: f.severity().map(str::to_owned),
+        file: f.file().map(str::to_owned),
+        line: f.line(),
+        category: f.category().map(str::to_owned),
+    }
 }
 
-fn write_output_schema(path: &Path) -> Result<(), String> {
-    use usecase::review_workflow::REVIEW_OUTPUT_SCHEMA_JSON;
-    std::fs::write(path, REVIEW_OUTPUT_SCHEMA_JSON)
-        .map_err(|err| format!("failed to write reviewer output schema {}: {err}", path.display()))
+fn emit_stdout_line(line: &str) -> Result<(), String> {
+    writeln!(io::stdout(), "{line}").map_err(|e| format!("failed to write stdout: {e}"))
 }
 
+// ---------------------------------------------------------------------------
+// Test shim — provides stable test surface for tests.rs
+// ---------------------------------------------------------------------------
+//
+// Tests that call `run_codex_local` or `build_codex_invocation` directly
+// continue to work. This shim reimplements the subprocess pipeline using the
+// same types (`CodexInvocation`, `ReviewRunResult`, `OutputLastMessagePath`)
+// that live in mod.rs under `#[cfg(test)]`.
+
+#[cfg(test)]
 pub(super) fn build_codex_invocation(
     model: &str,
     prompt: &str,
-    output_last_message: &Path,
-    output_schema: &Path,
-) -> CodexInvocation {
+    output_last_message: &std::path::Path,
+    output_schema: &std::path::Path,
+) -> super::CodexInvocation {
+    use std::ffi::OsString;
     let mut args = vec![OsString::from("exec"), OsString::from("--model"), OsString::from(model)];
-    // Reviewers MUST use read-only sandbox. Do NOT use --full-auto here because it
-    // implies --sandbox workspace-write and Codex CLI applies it after our explicit
-    // --sandbox read-only, overriding the safety constraint.
     args.extend([OsString::from("--sandbox"), OsString::from("read-only")]);
     args.extend([OsString::from("--config"), OsString::from("model_reasoning_effort=\"high\"")]);
     args.extend([
@@ -659,88 +191,163 @@ pub(super) fn build_codex_invocation(
         output_last_message.as_os_str().to_os_string(),
         OsString::from(prompt),
     ]);
-
-    CodexInvocation { bin: codex_bin(), args }
+    super::CodexInvocation { bin: codex_bin(), args }
 }
 
-fn codex_bin() -> OsString {
-    #[cfg(test)]
-    if let Some(value) = std::env::var_os(CODEX_BIN_ENV).filter(|value| !value.is_empty()) {
-        return value;
+#[cfg(test)]
+fn codex_bin() -> std::ffi::OsString {
+    if let Some(v) = std::env::var_os(super::CODEX_BIN_ENV).filter(|v| !v.is_empty()) {
+        return v;
     }
-
-    OsString::from("codex")
+    std::ffi::OsString::from("codex")
 }
 
-fn spawn_codex(
-    invocation: &CodexInvocation,
-    session_log_path: &Path,
-) -> Result<(Child, Option<thread::JoinHandle<()>>), String> {
+#[cfg(test)]
+pub(super) fn run_codex_local(args: &CodexLocalArgs) -> Result<super::ReviewRunResult, String> {
+    let prompt = build_base_prompt(args)?;
+
+    let output_last_message_path = prepare_output_last_message(args)?;
+    let output_schema_path = prepare_timestamped_path("codex-output-schema", "json")?;
+    let session_log_path = prepare_timestamped_path("codex-session", "log")?;
+
+    // Only auto-managed paths are cleaned up on drop; explicit (test-provided) paths persist.
+    let mut cleanup_paths = vec![output_schema_path.clone()];
+    if output_last_message_path.auto_managed {
+        cleanup_paths.push(output_last_message_path.path.clone());
+    }
+    let _cleanup = TestArtifactCleanup(cleanup_paths);
+
+    std::fs::write(&output_last_message_path.path, "")
+        .map_err(|e| format!("failed to init output-last-message: {e}"))?;
+    std::fs::write(&output_schema_path, usecase::review_workflow::REVIEW_OUTPUT_SCHEMA_JSON)
+        .map_err(|e| format!("failed to write output-schema: {e}"))?;
+
+    let invocation = build_codex_invocation(
+        &args.model,
+        &prompt,
+        &output_last_message_path.path,
+        &output_schema_path,
+    );
+    run_codex_invocation(
+        &invocation,
+        Duration::from_secs(args.timeout_seconds),
+        output_last_message_path,
+        &session_log_path,
+    )
+}
+
+#[cfg(test)]
+fn prepare_output_last_message(
+    args: &CodexLocalArgs,
+) -> Result<super::OutputLastMessagePath, String> {
+    if let Some(path) = &args.output_last_message {
+        let parent =
+            path.parent().ok_or_else(|| format!("path has no parent: {}", path.display()))?;
+        std::fs::create_dir_all(parent)
+            .map_err(|e| format!("failed to create {}: {e}", parent.display()))?;
+        return Ok(super::OutputLastMessagePath { path: path.clone(), auto_managed: false });
+    }
+    let path = prepare_timestamped_path("codex-last-message", "txt")?;
+    Ok(super::OutputLastMessagePath { path, auto_managed: true })
+}
+
+#[cfg(test)]
+fn prepare_timestamped_path(prefix: &str, ext: &str) -> Result<std::path::PathBuf, String> {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let ts = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|e| format!("timestamp error: {e}"))?
+        .as_millis();
+    let path = std::path::PathBuf::from(super::REVIEW_RUNTIME_DIR)
+        .join(format!("{prefix}-{}-{ts}.{ext}", std::process::id()));
+    let parent = path.parent().ok_or_else(|| format!("path has no parent: {}", path.display()))?;
+    std::fs::create_dir_all(parent)
+        .map_err(|e| format!("failed to create {}: {e}", parent.display()))?;
+    Ok(path)
+}
+
+#[cfg(test)]
+struct TestArtifactCleanup(Vec<std::path::PathBuf>);
+
+#[cfg(test)]
+impl Drop for TestArtifactCleanup {
+    fn drop(&mut self) {
+        for p in &self.0 {
+            let _ = std::fs::remove_file(p);
+        }
+    }
+}
+
+#[cfg(test)]
+fn run_codex_invocation(
+    invocation: &super::CodexInvocation,
+    timeout: Duration,
+    output_last_message: super::OutputLastMessagePath,
+    session_log_path: &std::path::Path,
+) -> Result<super::ReviewRunResult, String> {
+    use std::io::BufRead;
+    use std::process::{Command, Stdio};
+    use std::thread;
+
+    let log_file = std::fs::File::create(session_log_path)
+        .map_err(|e| format!("failed to create session log: {e}"))?;
+
     let mut command = Command::new(&invocation.bin);
-    command.args(&invocation.args).stdin(Stdio::null()).stdout(Stdio::inherit());
+    command
+        .args(&invocation.args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::piped());
 
-    // Capture stderr to a session log file while also forwarding to inherited stderr.
-    // Open the log file before spawning so we fail early on I/O errors.
-    let log_file = std::fs::File::create(session_log_path).map_err(|err| {
-        format!("failed to create session log {}: {err}", session_log_path.display())
-    })?;
-
-    command.stderr(Stdio::piped());
-    configure_child_process_group(&mut command);
+    #[cfg(unix)]
+    {
+        use std::os::unix::process::CommandExt;
+        command.process_group(0);
+    }
 
     let mut child = command
         .spawn()
-        .map_err(|err| format!("failed to spawn {}: {err}", invocation.bin.to_string_lossy()))?;
+        .map_err(|e| format!("failed to spawn {}: {e}", invocation.bin.to_string_lossy()))?;
 
-    // Spawn a tee thread that copies stderr to both the log file and the real stderr.
     let stderr_pipe = child.stderr.take();
     let tee_handle = stderr_pipe.map(|pipe| {
         thread::spawn(move || {
-            tee_stderr_to_file(pipe, log_file);
+            let reader = std::io::BufReader::new(pipe);
+            let mut lf = log_file;
+            for line in reader.lines() {
+                match line {
+                    Ok(l) => {
+                        let _ = writeln!(lf, "{l}");
+                        eprintln!("{l}");
+                    }
+                    Err(_) => break,
+                }
+            }
+            let _ = lf.flush();
         })
     });
 
-    Ok((child, tee_handle))
+    let (timed_out, exit_success) =
+        poll_child_with_timeout(&mut child, tee_handle, timeout, session_log_path)?;
+
+    parse_codex_output(output_last_message, session_log_path, timed_out, exit_success)
 }
 
-/// Copies lines from a pipe to both a log file and inherited stderr.
-fn tee_stderr_to_file(pipe: std::process::ChildStderr, mut log_file: std::fs::File) {
-    let reader = BufReader::new(pipe);
-    for line in reader.lines() {
-        match line {
-            Ok(line) => {
-                let _ = writeln!(log_file, "{line}");
-                eprintln!("{line}");
-            }
-            Err(_) => break,
-        }
-    }
-    let _ = log_file.flush();
-}
-
-fn run_codex_invocation(
-    invocation: &CodexInvocation,
+/// Polls a child process until it exits or the timeout elapses, then joins the tee thread.
+#[cfg(test)]
+fn poll_child_with_timeout(
+    child: &mut std::process::Child,
+    tee_handle: Option<std::thread::JoinHandle<()>>,
     timeout: Duration,
-    output_last_message: OutputLastMessagePath,
-    session_log_path: &Path,
-) -> Result<ReviewRunResult, String> {
-    let (child, tee_handle) = spawn_codex(invocation, session_log_path)?;
-    run_codex_child(child, tee_handle, timeout, output_last_message, session_log_path)
-}
-
-fn run_codex_child(
-    mut child: Child,
-    tee_handle: Option<thread::JoinHandle<()>>,
-    timeout: Duration,
-    output_last_message: OutputLastMessagePath,
-    session_log_path: &Path,
-) -> Result<ReviewRunResult, String> {
-    let start = Instant::now();
+    _session_log_path: &std::path::Path,
+) -> Result<(bool, bool), String> {
+    use std::thread;
+    let start = std::time::Instant::now();
     let mut timed_out = false;
     let mut exit_success = false;
 
     loop {
-        match child.try_wait().map_err(|err| format!("failed to poll reviewer child: {err}"))? {
+        match child.try_wait().map_err(|e| format!("failed to poll reviewer child: {e}"))? {
             Some(status) => {
                 exit_success = status.success();
                 break;
@@ -748,35 +355,52 @@ fn run_codex_child(
             None => {
                 if start.elapsed() >= timeout {
                     timed_out = true;
-                    terminate_reviewer_child(&mut child)?;
-                    child.wait().map_err(|err| format!("failed to reap reviewer child: {err}"))?;
+                    terminate_child(child)?;
+                    child.wait().map_err(|e| format!("failed to reap child: {e}"))?;
                     break;
                 }
-                thread::sleep(POLL_INTERVAL);
+                thread::sleep(super::POLL_INTERVAL);
             }
         }
     }
 
-    // Wait for the tee thread to finish flushing the log file.
-    if let Some(handle) = tee_handle {
-        let _ = handle.join();
+    if let Some(h) = tee_handle {
+        let _ = h.join();
     }
+    Ok((timed_out, exit_success))
+}
 
-    let raw_final_message = read_final_message(&output_last_message.path)?;
-    let final_message_state = parse_review_final_message(raw_final_message.as_deref());
+/// Reads and parses the Codex output files into a `ReviewRunResult`.
+#[cfg(test)]
+fn parse_codex_output(
+    output_last_message: super::OutputLastMessagePath,
+    session_log_path: &std::path::Path,
+    timed_out: bool,
+    exit_success: bool,
+) -> Result<super::ReviewRunResult, String> {
+    let raw_content = match std::fs::read_to_string(&output_last_message.path) {
+        Ok(c) => usecase::review_workflow::normalize_final_message(&c),
+        Err(e) if e.kind() == io::ErrorKind::NotFound => None,
+        Err(e) => return Err(format!("failed to read output-last-message: {e}")),
+    };
 
-    // Fallback: if codex-last-message is empty, try extracting verdict from session log.
-    let final_message_state = if matches!(final_message_state, ReviewFinalMessageState::Missing) {
+    let final_message_state =
+        usecase::review_workflow::parse_review_final_message(raw_content.as_deref());
+
+    let final_message_state = if matches!(
+        final_message_state,
+        usecase::review_workflow::ReviewFinalMessageState::Missing
+    ) {
         let fallback = std::fs::read_to_string(session_log_path)
             .ok()
-            .and_then(|content| extract_verdict_from_content(&content));
+            .and_then(|c| usecase::review_workflow::extract_verdict_from_content(&c));
         match fallback {
-            Some(fallback_state) => {
+            Some(s) => {
                 eprintln!(
                     "[INFO] Verdict extracted from session log fallback: {}",
                     session_log_path.display()
                 );
-                fallback_state
+                s
             }
             None => final_message_state,
         }
@@ -785,20 +409,24 @@ fn run_codex_child(
     };
 
     let final_message = match &final_message_state {
-        ReviewFinalMessageState::Parsed(payload) => {
-            Some(render_review_payload(payload).map_err(|e| e.to_string())?)
+        usecase::review_workflow::ReviewFinalMessageState::Parsed(p) => {
+            Some(usecase::review_workflow::render_review_payload(p).map_err(|e| e.to_string())?)
         }
-        _ => raw_final_message,
+        _ => raw_content,
     };
-    let verdict = classify_review_verdict(timed_out, exit_success, &final_message_state);
+    let verdict = usecase::review_workflow::classify_review_verdict(
+        timed_out,
+        exit_success,
+        &final_message_state,
+    );
     let verdict_detail = match &final_message_state {
-        ReviewFinalMessageState::Invalid { reason } => {
+        usecase::review_workflow::ReviewFinalMessageState::Invalid { reason } => {
             Some(format!("invalid reviewer final payload: {reason}"))
         }
         _ => None,
     };
 
-    Ok(ReviewRunResult {
+    Ok(super::ReviewRunResult {
         verdict,
         final_message,
         output_last_message: output_last_message.path,
@@ -807,85 +435,50 @@ fn run_codex_child(
     })
 }
 
-pub(super) fn prepare_session_log_path() -> Result<OutputLastMessagePath, String> {
-    let timestamp = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_err(|err| format!("failed to compute timestamp: {err}"))?
-        .as_millis();
-    let path = PathBuf::from(REVIEW_RUNTIME_DIR)
-        .join(format!("codex-session-{}-{timestamp}.log", std::process::id()));
-    let parent = path.parent().ok_or_else(|| {
-        format!("session log path must have a parent directory: {}", path.display())
-    })?;
-    std::fs::create_dir_all(parent)
-        .map_err(|err| format!("failed to create {}: {err}", parent.display()))?;
-
-    Ok(OutputLastMessagePath { path, auto_managed: true })
-}
-
-fn read_final_message(path: &Path) -> Result<Option<String>, String> {
-    match std::fs::read_to_string(path) {
-        Ok(content) => Ok(normalize_final_message(&content)),
-        Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(None),
-        Err(err) => Err(format!("failed to read reviewer final message {}: {err}", path.display())),
-    }
-}
-
 #[cfg(unix)]
-fn configure_child_process_group(command: &mut Command) {
-    command.process_group(0);
-}
-
-#[cfg(not(unix))]
-fn configure_child_process_group(_command: &mut Command) {}
-
-#[cfg(unix)]
-fn terminate_reviewer_child(child: &mut Child) -> Result<(), String> {
-    let process_group = i32::try_from(child.id())
-        .map_err(|_| format!("reviewer child pid does not fit into i32: {}", child.id()))?;
-    // Safety: `killpg` is called with the child process group id created by `process_group(0)`.
-    let result = unsafe { libc::killpg(process_group, libc::SIGKILL) };
+#[cfg(test)]
+fn terminate_child(child: &mut std::process::Child) -> Result<(), String> {
+    let pid = i32::try_from(child.id())
+        .map_err(|_| format!("child pid does not fit i32: {}", child.id()))?;
+    // Safety: killpg sends SIGKILL to the process group created by process_group(0) above.
+    let result = unsafe { libc::killpg(pid, libc::SIGKILL) };
     if result == 0 {
         Ok(())
     } else {
-        let err = std::io::Error::last_os_error();
+        let err = io::Error::last_os_error();
         if err.raw_os_error() == Some(libc::ESRCH) {
             Ok(())
         } else {
-            Err(format!("failed to terminate reviewer child process group {process_group}: {err}"))
+            Err(format!("failed to kill reviewer process group {pid}: {err}"))
         }
     }
 }
 
 #[cfg(windows)]
-fn terminate_reviewer_child(child: &mut Child) -> Result<(), String> {
-    if child.try_wait().map_err(|err| format!("failed to poll reviewer child: {err}"))?.is_some() {
+#[cfg(test)]
+fn terminate_child(child: &mut std::process::Child) -> Result<(), String> {
+    use std::process::{Command, Stdio};
+    if child.try_wait().map_err(|e| format!("failed to poll child: {e}"))?.is_some() {
         return Ok(());
     }
-
     let status = Command::new("taskkill")
         .args(["/PID", &child.id().to_string(), "/T", "/F"])
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .status()
-        .map_err(|err| {
-            format!("failed to spawn taskkill for reviewer child {}: {err}", child.id())
-        })?;
+        .map_err(|e| format!("taskkill failed: {e}"))?;
     if status.success() {
         Ok(())
-    } else if child
-        .try_wait()
-        .map_err(|err| format!("failed to poll reviewer child after taskkill: {err}"))?
-        .is_some()
-    {
+    } else if child.try_wait().map_err(|e| format!("poll after taskkill: {e}"))?.is_some() {
         Ok(())
     } else {
-        Err(format!("failed to terminate reviewer child process tree {} via taskkill", child.id()))
+        Err(format!("failed to terminate child {} via taskkill", child.id()))
     }
 }
 
 #[cfg(all(not(unix), not(windows)))]
-fn terminate_reviewer_child(child: &mut Child) -> Result<(), String> {
-    child.kill().map_err(|err| format!("failed to terminate reviewer child: {err}"))
+#[cfg(test)]
+fn terminate_child(child: &mut std::process::Child) -> Result<(), String> {
+    child.kill().map_err(|e| format!("failed to kill child: {e}"))
 }

@@ -48,12 +48,9 @@ pub const REVIEW_OUTPUT_SCHEMA_JSON: &str = r##"{
         "severity": { "$ref": "#/$defs/nullable_non_blank_string" },
         "file": { "$ref": "#/$defs/nullable_non_blank_string" },
         "line": { "type": ["integer", "null"], "minimum": 1 },
-        "category": {
-          "$ref": "#/$defs/nullable_non_blank_string",
-          "description": "Nullable concern category for escalation tracking"
-        }
+        "category": { "$ref": "#/$defs/nullable_non_blank_string" }
       },
-      "required": ["message", "severity", "file", "line"],
+      "required": ["message", "severity", "file", "line", "category"],
       "additionalProperties": false
     }
   }
@@ -418,6 +415,8 @@ impl<'de> Visitor<'de> for ReviewFindingShapeVisitor {
         if !seen_line {
             return Err(de::Error::missing_field("line"));
         }
+        // category is optional in the parser (tolerant) even though the schema
+        // advertises it as required — existing reviewer prompts may omit it.
 
         Ok(ReviewFindingShape)
     }
@@ -432,6 +431,7 @@ mod tests {
 
     #[test]
     fn test_parse_review_final_message_accepts_missing_category_field_as_none() {
+        // Parser is tolerant: category is optional even though schema advertises it as required
         let state = parse_review_final_message(Some(
             r#"{"verdict":"findings_remain","findings":[{"message":"P1","severity":"P1","file":null,"line":1}]}"#,
         ));

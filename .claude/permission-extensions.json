@@ -1,7 +1,8 @@
 {
   "extra_allow": [
     "Bash(cargo make spec-approve:*)",
-    "Bash(cargo make track-record-round:*)",
+    "Bash(cargo make track-review-status:*)",
+    "Bash(cargo make track-set-commit-hash:*)",
     "Bash(cargo make track-check-approved:*)",
     "Bash(cargo make track-local-plan:*)"
   ]

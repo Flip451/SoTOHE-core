@@ -943,13 +943,12 @@ mod tests {
     }
 
     #[test]
-    fn test_record_round_with_findings_remain_payload_and_missing_category_passes_none_to_protocol()
-    {
+    fn test_record_round_with_findings_remain_payload_and_null_category_passes_none_to_protocol() {
         let stub = StubProtocol::returning_ok();
         let input = RecordRoundInput {
             round_type: "fast".to_owned(),
             group: "codex".to_owned(),
-            verdict: r#"{"verdict":"findings_remain","findings":[{"message":"P1: preserve me","severity":"P1","file":"libs/usecase/src/review_workflow/usecases.rs","line":123}]}"#.to_owned(),
+            verdict: r#"{"verdict":"findings_remain","findings":[{"message":"P1: preserve me","severity":"P1","file":"libs/usecase/src/review_workflow/usecases.rs","line":123,"category":null}]}"#.to_owned(),
             expected_groups: "codex".to_owned(),
             concerns: "usecase.review_workflow.usecases".to_owned(),
             items_dir: PathBuf::from("track/items"),
@@ -959,10 +958,7 @@ mod tests {
 
         let result = record_round(input, &stub);
 
-        assert!(
-            result.is_ok(),
-            "record_round should preserve missing category as None: {result:?}"
-        );
+        assert!(result.is_ok(), "record_round should preserve null category as None: {result:?}");
         let call = stub.last_call();
         let args = call.as_ref().expect("protocol.execute should have been called");
         assert_eq!(

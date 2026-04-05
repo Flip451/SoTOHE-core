@@ -862,3 +862,15 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
   - **既存トラック互換**: 新規トラックのみ新フォーマット適用。完了/アーカイブ済みトラックはマイグレーション不要。`schema_version` で新旧を区別し、codec 内部で後方互換を吸収
   - **ビジョンとの整合**: 探索的精緻化ループが SSoT 上で閉じる。信号機の `signal` フィールドが Phase 2 (TODO-PLAN 2-1 TSUMIKI-01) の基盤になる
   - **実装タイミング**: CLI-02 完了後に metadata.json codec を触るタイミングで Phase 2-3 を実装するのが効率的
+
+---
+
+## L. Review System v2 Follow-up
+
+> **出典**: review-system-v2-2026-04-05 セッション 3 のレビューサイクルで特定
+> **追加日**: 2026-04-05
+
+- [ ] **RV2-01** (HIGH): `is_planning_only_path` のハードコーディング廃止 — review-scope.json の groups を参照して「いずれかのスコープに属するファイルは planning-only ではない」と動的に判定する。現在は PREFIXES/EXACT_FILES/REVIEW_REQUIRED_FILES を手動管理しており review-scope.json と二重管理になっている
+- [ ] **RV2-02** (MEDIUM): サブエージェントによる修正+レビューの自律ループ — `/track:review` で各スコープに Agent を spawn し、修正→リビルド→再レビュー→zero_findings まで自律的に回す。orchestrator はステータス監視と full model 昇格のみ担当
+- [ ] **RV2-03** (LOW): `ReviewState::Running` の追加 — 並列レビュー時に「レビュー実行中」を区別し、重複起動防止と進捗可視化を可能にする。`ReviewState::Running { started_at: Timestamp }` を enum variant として追加
+- [ ] **RV2-04** (HIGH): `/track:review` SKILL の v2 対応 — v1 の group-based ワークフロー（cycle 作成→record-round→check-approved）を v2 の scope-based ワークフロー（status→codex-local per scope→check-approved）に更新
