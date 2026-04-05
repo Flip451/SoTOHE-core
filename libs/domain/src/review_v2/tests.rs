@@ -1,7 +1,9 @@
 use rstest::rstest;
 
 use super::error::{FilePathError, FindingError, ReviewHashError, ScopeNameError, VerdictError};
+use super::scope_config::ReviewScopeConfig;
 use super::types::*;
+use crate::TrackId;
 
 // ── helpers ───────────────────────────────────────────────────────────
 
@@ -332,4 +334,146 @@ fn test_review_state_is_approved(#[case] state: ReviewState, #[case] expected: b
 #[case::approved(ReviewState::NotRequired(NotRequiredReason::ZeroFindings), "approved")]
 fn test_review_state_display(#[case] state: ReviewState, #[case] expected: &str) {
     assert_eq!(state.to_string(), expected);
+}
+
+// ── ReviewScopeConfig ─────────────────────────────────────────────────
+
+fn track_id() -> TrackId {
+    TrackId::try_new("my-track-2026-04-05").unwrap()
+}
+
+fn fp(s: &str) -> FilePath {
+    FilePath::new(s).unwrap()
+}
+
+fn basic_entries() -> Vec<(String, Vec<String>)> {
+    vec![
+        ("domain".to_owned(), vec!["libs/domain/**".to_owned()]),
+        ("infrastructure".to_owned(), vec!["libs/infrastructure/**".to_owned()]),
+        ("cli".to_owned(), vec!["apps/**".to_owned()]),
+    ]
+}
+
+#[test]
+fn test_scope_config_classify_named_scope() {
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), vec![], vec![]).unwrap();
+    let files = vec![fp("libs/domain/src/lib.rs")];
+    let classified = config.classify(&files);
+
+    assert_eq!(
+        classified.get(&ScopeName::Main(MainScopeName::new("domain").unwrap())).unwrap().len(),
+        1
+    );
+    assert!(!classified.contains_key(&ScopeName::Other));
+}
+
+#[test]
+fn test_scope_config_classify_unmatched_goes_to_other() {
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), vec![], vec![]).unwrap();
+    let files = vec![fp("Cargo.toml"), fp("Makefile.toml")];
+    let classified = config.classify(&files);
+
+    assert_eq!(classified.get(&ScopeName::Other).unwrap().len(), 2);
+}
+
+#[test]
+fn test_scope_config_classify_multi_scope_match_includes_both() {
+    let entries = vec![
+        ("broad".to_owned(), vec!["libs/**".to_owned()]),
+        ("domain".to_owned(), vec!["libs/domain/**".to_owned()]),
+    ];
+    let config = ReviewScopeConfig::new(&track_id(), entries, vec![], vec![]).unwrap();
+    let files = vec![fp("libs/domain/src/lib.rs")];
+    let classified = config.classify(&files);
+
+    // File should be in BOTH scopes (ADR: multi-scope match → include in both)
+    assert!(classified.contains_key(&ScopeName::Main(MainScopeName::new("broad").unwrap())));
+    assert!(classified.contains_key(&ScopeName::Main(MainScopeName::new("domain").unwrap())));
+}
+
+#[test]
+fn test_scope_config_classify_operational_excluded() {
+    let operational = vec!["track/items/<track-id>/review.json".to_owned()];
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), operational, vec![]).unwrap();
+    let files =
+        vec![fp("libs/domain/src/lib.rs"), fp("track/items/my-track-2026-04-05/review.json")];
+    let classified = config.classify(&files);
+
+    // review.json should be excluded
+    let all_files: Vec<&FilePath> = classified.values().flatten().collect();
+    assert_eq!(all_files.len(), 1);
+    assert_eq!(all_files[0].as_str(), "libs/domain/src/lib.rs");
+}
+
+#[test]
+fn test_scope_config_classify_other_track_excluded() {
+    let other_track = vec!["track/items/<other-track>/**".to_owned()];
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), vec![], other_track).unwrap();
+    let files =
+        vec![fp("libs/domain/src/lib.rs"), fp("track/items/other-track-2026-03-01/metadata.json")];
+    let classified = config.classify(&files);
+
+    let all_files: Vec<&FilePath> = classified.values().flatten().collect();
+    assert_eq!(all_files.len(), 1);
+    assert_eq!(all_files[0].as_str(), "libs/domain/src/lib.rs");
+}
+
+#[test]
+fn test_scope_config_contains_scope_named() {
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), vec![], vec![]).unwrap();
+    assert!(config.contains_scope(&ScopeName::Main(MainScopeName::new("domain").unwrap())));
+    assert!(!config.contains_scope(&ScopeName::Main(MainScopeName::new("unknown").unwrap())));
+}
+
+#[test]
+fn test_scope_config_contains_scope_other_always_true() {
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), vec![], vec![]).unwrap();
+    assert!(config.contains_scope(&ScopeName::Other));
+}
+
+#[test]
+fn test_scope_config_all_scope_names_includes_other() {
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), vec![], vec![]).unwrap();
+    let names = config.all_scope_names();
+
+    assert!(names.contains(&ScopeName::Other));
+    assert!(names.contains(&ScopeName::Main(MainScopeName::new("domain").unwrap())));
+    assert!(names.contains(&ScopeName::Main(MainScopeName::new("infrastructure").unwrap())));
+    assert!(names.contains(&ScopeName::Main(MainScopeName::new("cli").unwrap())));
+    assert_eq!(names.len(), 4); // domain + infrastructure + cli + other
+}
+
+#[test]
+fn test_scope_config_get_scope_names() {
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), vec![], vec![]).unwrap();
+    let files = vec![fp("libs/domain/src/lib.rs"), fp("Cargo.toml")];
+    let names = config.get_scope_names(&files);
+
+    assert!(names.contains(&ScopeName::Main(MainScopeName::new("domain").unwrap())));
+    assert!(names.contains(&ScopeName::Other));
+    assert_eq!(names.len(), 2);
+}
+
+#[test]
+fn test_scope_config_rejects_reserved_other_scope_name() {
+    let entries = vec![("other".to_owned(), vec!["**".to_owned()])];
+    let result = ReviewScopeConfig::new(&track_id(), entries, vec![], vec![]);
+    assert!(result.is_err());
+}
+
+#[test]
+fn test_scope_config_empty_entries() {
+    let config = ReviewScopeConfig::new(&track_id(), vec![], vec![], vec![]).unwrap();
+    let files = vec![fp("anything.rs")];
+    let classified = config.classify(&files);
+
+    // Everything goes to Other
+    assert_eq!(classified.get(&ScopeName::Other).unwrap().len(), 1);
+}
+
+#[test]
+fn test_scope_config_empty_files() {
+    let config = ReviewScopeConfig::new(&track_id(), basic_entries(), vec![], vec![]).unwrap();
+    let classified = config.classify(&[]);
+    assert!(classified.is_empty());
 }

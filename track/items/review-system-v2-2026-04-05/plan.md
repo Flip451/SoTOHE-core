@@ -16,7 +16,7 @@ ReviewScopeConfig: 純粋分類ロジック（globset 依存）。classify, get_
 
 - [x] Domain 純粋型 (ScopeName, ReviewTarget, ReviewHash, Verdict, FastVerdict, Finding, ReviewOutcome<V>, ReviewState) + unit tests
 - [ ] Domain port traits (ReviewReader + ReviewReaderError, ReviewWriter + ReviewWriterError including init/reset semantics: reset archives then creates new review.json without clearing .commit_hash, CommitHashReader + CommitHashWriter + CommitHashError)
-- [ ] Domain: ReviewScopeConfig (classify, get_scope_names, contains_scope, all_scope_names) + ScopeConfigError + globset dependency + operational/other_track exclusion + placeholder expansion (<track-id>, <other-track>) + multi-scope match: file in multiple named scopes → include in both + unit tests
+- [x] Domain: ReviewScopeConfig (classify, get_scope_names, contains_scope, all_scope_names) + ScopeConfigError + globset dependency + operational/other_track exclusion + placeholder expansion (<track-id>, <other-track>) + multi-scope match: file in multiple named scopes → include in both + unit tests
 
 ## UseCase: ReviewCycle
 

@@ -40,3 +40,16 @@ pub enum ReviewHashError {
     #[error("review hash must start with 'rvw1:sha256:' and contain hex digits: {0}")]
     InvalidFormat(String),
 }
+
+/// Errors from `ReviewScopeConfig::new` construction.
+#[derive(Debug, Error)]
+pub enum ScopeConfigError {
+    #[error("invalid scope name: {0}")]
+    InvalidScopeName(#[from] ScopeNameError),
+    #[error("invalid glob pattern '{pattern}': {source}")]
+    InvalidPattern { pattern: String, source: globset::Error },
+    #[error("invalid operational glob pattern '{pattern}': {source}")]
+    InvalidOperationalPattern { pattern: String, source: globset::Error },
+    #[error("invalid other_track glob pattern '{pattern}': {source}")]
+    InvalidOtherTrackPattern { pattern: String, source: globset::Error },
+}
