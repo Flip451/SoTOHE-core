@@ -90,23 +90,26 @@ impl FsReviewStore {
             })?;
         }
 
-        let file = std::fs::OpenOptions::new()
+        // Lock on a stable .lock file (not self.path, which gets replaced by rename)
+        let lock_path = self.path.with_extension("json.lock");
+        let lock_file = std::fs::OpenOptions::new()
             .create(true)
             .write(true)
             .truncate(false)
-            .open(&self.path)
-            .map_err(|e| ReviewWriterError::Io(format!("open {}: {e}", self.path.display())))?;
+            .open(&lock_path)
+            .map_err(|e| {
+                ReviewWriterError::Io(format!("open lock {}: {e}", lock_path.display()))
+            })?;
 
-        file.lock_exclusive()
-            .map_err(|e| ReviewWriterError::Io(format!("lock {}: {e}", self.path.display())))?;
+        lock_file
+            .lock_exclusive()
+            .map_err(|e| ReviewWriterError::Io(format!("lock {}: {e}", lock_path.display())))?;
 
         let json = serde_json::to_string_pretty(doc)
             .map_err(|e| ReviewWriterError::Codec(format!("serialize review.json: {e}")))?;
         atomic_write(&self.path, &json)?;
 
-        // Lock released on drop
-        drop(file);
-
+        drop(lock_file);
         Ok(())
     }
 
@@ -130,16 +133,19 @@ impl FsReviewStore {
             })?;
         }
 
-        // Acquire exclusive lock BEFORE reading to prevent TOCTOU
+        // Lock on a stable .lock file (not self.path, which gets replaced by rename)
+        let lock_path = self.path.with_extension("json.lock");
         let lock_file = std::fs::OpenOptions::new()
             .create(true)
             .write(true)
             .truncate(false)
-            .open(&self.path)
-            .map_err(|e| ReviewWriterError::Io(format!("open {}: {e}", self.path.display())))?;
+            .open(&lock_path)
+            .map_err(|e| {
+                ReviewWriterError::Io(format!("open lock {}: {e}", lock_path.display()))
+            })?;
         lock_file
             .lock_exclusive()
-            .map_err(|e| ReviewWriterError::Io(format!("lock {}: {e}", self.path.display())))?;
+            .map_err(|e| ReviewWriterError::Io(format!("lock {}: {e}", lock_path.display())))?;
 
         // Read under lock
         let mut doc = self.read_doc().map_err(|e| ReviewWriterError::Io(e.to_string()))?;
