@@ -395,20 +395,30 @@ impl ReviewWriter for FsReviewStore {
 
 // ── FsCommitHashReader / FsCommitHashWriter ───────────────────────────
 
-/// Filesystem-based .commit_hash reader with ancestry validation.
+/// Filesystem-based .commit_hash reader/writer with ancestry validation.
 pub struct FsCommitHashStore {
     path: PathBuf,
+    trusted_root: PathBuf,
 }
 
 impl FsCommitHashStore {
     #[must_use]
-    pub fn new(commit_hash_path: PathBuf) -> Self {
-        Self { path: commit_hash_path }
+    pub fn new(commit_hash_path: PathBuf, trusted_root: PathBuf) -> Self {
+        Self { path: commit_hash_path, trusted_root }
+    }
+
+    /// Rejects symlinks on the path below trusted_root, mapping to `CommitHashError::Io`.
+    fn reject_symlinks(&self) -> Result<(), CommitHashError> {
+        reject_symlinks_below(&self.path, &self.trusted_root)
+            .map_err(|e| CommitHashError::Io(format!("symlink check {}: {e}", self.path.display())))
+            .map(|_| ())
     }
 }
 
 impl CommitHashReader for FsCommitHashStore {
     fn read(&self) -> Result<Option<CommitHash>, CommitHashError> {
+        self.reject_symlinks()?;
+
         let content = match std::fs::read_to_string(&self.path) {
             Ok(c) => c,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
@@ -438,6 +448,8 @@ impl CommitHashReader for FsCommitHashStore {
 
 impl CommitHashWriter for FsCommitHashStore {
     fn write(&self, hash: &CommitHash) -> Result<(), CommitHashError> {
+        self.reject_symlinks()?;
+
         if let Some(parent) = self.path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
                 CommitHashError::Io(format!("create dir {}: {e}", parent.display()))
@@ -448,6 +460,8 @@ impl CommitHashWriter for FsCommitHashStore {
     }
 
     fn clear(&self) -> Result<(), CommitHashError> {
+        self.reject_symlinks()?;
+
         match std::fs::remove_file(&self.path) {
             Ok(()) => Ok(()),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
