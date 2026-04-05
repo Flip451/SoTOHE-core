@@ -8,6 +8,7 @@ use std::process::ExitCode;
 use std::time::Duration;
 
 use clap::{ArgGroup, Args, Subcommand};
+use infrastructure::git_cli::GitRepository;
 #[cfg(test)]
 use usecase::review_workflow::ReviewVerdict;
 
@@ -348,7 +349,15 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
     // When review.json exists but is corrupt/unreadable, the store returns
     // empty state (all NotStarted) as fail-closed — we must NOT bypass in
     // that case, so we require the file to be absent.
-    let review_json = args.items_dir.join(&args.track_id).join("review.json");
+    // Resolve review.json relative to the git root (same as build_review_v2)
+    // to avoid CWD-dependent path mismatch.
+    let git = infrastructure::git_cli::SystemGitRepo::discover()
+        .map_err(|e| format!("git discover: {e}"))?;
+    let review_json = if args.items_dir.is_absolute() {
+        args.items_dir.join(&args.track_id).join("review.json")
+    } else {
+        git.root().join(&args.items_dir).join(&args.track_id).join("review.json")
+    };
     let all_not_started = required.iter().all(|(_, state)| {
         matches!(state, ReviewState::Required(domain::review_v2::RequiredReason::NotStarted))
     });
