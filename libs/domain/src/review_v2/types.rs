@@ -73,7 +73,7 @@ impl MainScopeName {
         if !s.is_ascii() {
             return Err(ScopeNameError::NotAscii);
         }
-        if s == "other" {
+        if s.eq_ignore_ascii_case("other") {
             return Err(ScopeNameError::Reserved);
         }
         Ok(Self(s))

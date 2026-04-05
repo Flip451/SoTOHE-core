@@ -496,7 +496,11 @@ fn parse_verdict(
     findings: &[FindingEntry],
 ) -> Result<Verdict, ReviewReaderError> {
     match verdict_str {
-        "zero_findings" => Ok(Verdict::ZeroFindings),
+        "zero_findings" if findings.is_empty() => Ok(Verdict::ZeroFindings),
+        "zero_findings" => Err(ReviewReaderError::InvalidData(format!(
+            "zero_findings verdict has {} findings attached (expected 0)",
+            findings.len()
+        ))),
         "findings_remain" => {
             let domain_findings: Result<Vec<Finding>, _> = findings
                 .iter()
