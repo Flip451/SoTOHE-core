@@ -102,10 +102,9 @@ impl FsReviewStore {
 
         let json = serde_json::to_string_pretty(doc)
             .map_err(|e| ReviewWriterError::Codec(format!("serialize review.json: {e}")))?;
-        std::fs::write(&self.path, json)
-            .map_err(|e| ReviewWriterError::Io(format!("write {}: {e}", self.path.display())))?;
+        atomic_write(&self.path, &json)?;
 
-        // Lock released on drop (fs4::unlock requires Rust 1.89+, MSRV is 1.85)
+        // Lock released on drop
         drop(file);
 
         Ok(())
@@ -166,11 +165,10 @@ impl FsReviewStore {
             at: now,
         });
 
-        // Write under the same lock
+        // Write under the same lock (atomic: tmp + rename)
         let json = serde_json::to_string_pretty(&doc)
             .map_err(|e| ReviewWriterError::Codec(format!("serialize review.json: {e}")))?;
-        std::fs::write(&self.path, json)
-            .map_err(|e| ReviewWriterError::Io(format!("write {}: {e}", self.path.display())))?;
+        atomic_write(&self.path, &json)?;
 
         // Lock released on drop
         drop(lock_file);
@@ -367,6 +365,16 @@ fn parse_verdict(
         }
         other => Err(ReviewReaderError::Codec(format!("unknown verdict: {other}"))),
     }
+}
+
+/// Writes content to a file atomically via tmp + rename.
+fn atomic_write(path: &std::path::Path, content: &str) -> Result<(), ReviewWriterError> {
+    let tmp_path = path.with_extension("tmp");
+    std::fs::write(&tmp_path, content)
+        .map_err(|e| ReviewWriterError::Io(format!("write {}: {e}", tmp_path.display())))?;
+    std::fs::rename(&tmp_path, path)
+        .map_err(|e| ReviewWriterError::Io(format!("rename {}: {e}", path.display())))?;
+    Ok(())
 }
 
 /// Rejects a path if it or any ancestor is a symlink.
