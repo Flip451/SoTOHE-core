@@ -61,31 +61,58 @@ impl FsReviewStore {
         Self { path: review_json_path }
     }
 
+    /// Reads review.json for read-only queries.
+    /// v1/missing → empty (fail-closed: all scopes need review).
+    /// Future versions (>2) → empty (same rationale).
     fn read_doc(&self) -> Result<ReviewJsonV2, ReviewReaderError> {
+        self.read_doc_inner(false).map_err(|e| ReviewReaderError::Io(e.to_string()))
+    }
+
+    /// Reads review.json for read-modify-write.
+    /// v1/missing → empty (safe to init).
+    /// Future versions (>2) → error (refuse to overwrite unknown format).
+    fn read_doc_for_write(&self) -> Result<ReviewJsonV2, ReviewWriterError> {
+        self.read_doc_inner(true)
+    }
+
+    fn read_doc_inner(&self, reject_future: bool) -> Result<ReviewJsonV2, ReviewWriterError> {
         let content = match std::fs::read_to_string(&self.path) {
             Ok(c) => c,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
                 return Ok(ReviewJsonV2::empty());
             }
             Err(e) => {
-                return Err(ReviewReaderError::Io(format!("read {}: {e}", self.path.display())));
+                return Err(ReviewWriterError::Io(format!("read {}: {e}", self.path.display())));
             }
         };
 
-        // Check schema_version first to avoid serde failure on v1 fields
         let envelope: serde_json::Value = serde_json::from_str(&content)
-            .map_err(|e| ReviewReaderError::Codec(format!("parse {}: {e}", self.path.display())))?;
+            .map_err(|e| ReviewWriterError::Codec(format!("parse {}: {e}", self.path.display())))?;
         let version =
             envelope.get("schema_version").and_then(serde_json::Value::as_u64).unwrap_or(0);
-        if version != 2 {
-            // v1 or unknown — treat as empty (ADR: v1 is ignored)
+
+        if version == 2 {
+            let doc: ReviewJsonV2 = serde_json::from_value(envelope).map_err(|e| {
+                ReviewWriterError::Codec(format!("parse v2 {}: {e}", self.path.display()))
+            })?;
+            return Ok(doc);
+        }
+
+        // v1 (known legacy) → treat as empty
+        if version <= 1 {
             return Ok(ReviewJsonV2::empty());
         }
 
-        let doc: ReviewJsonV2 = serde_json::from_value(envelope).map_err(|e| {
-            ReviewReaderError::Codec(format!("parse v2 {}: {e}", self.path.display()))
-        })?;
-        Ok(doc)
+        // Future version (>2)
+        if reject_future {
+            return Err(ReviewWriterError::Codec(format!(
+                "review.json has schema_version {version} (unknown future version); \
+                 refusing to overwrite. Run init() to reset."
+            )));
+        }
+
+        // Read-only path: treat as empty (fail-closed)
+        Ok(ReviewJsonV2::empty())
     }
 
     fn write_doc(&self, doc: &ReviewJsonV2) -> Result<(), ReviewWriterError> {
@@ -157,8 +184,8 @@ impl FsReviewStore {
             .lock_exclusive()
             .map_err(|e| ReviewWriterError::Io(format!("lock {}: {e}", lock_path.display())))?;
 
-        // Read under lock
-        let mut doc = self.read_doc().map_err(|e| ReviewWriterError::Io(e.to_string()))?;
+        // Read under lock (reject future schema versions to prevent overwrite)
+        let mut doc = self.read_doc_for_write()?;
 
         let scope_key = scope.to_string();
         let entry = doc.scopes.entry(scope_key).or_insert_with(|| ScopeEntry { rounds: vec![] });
