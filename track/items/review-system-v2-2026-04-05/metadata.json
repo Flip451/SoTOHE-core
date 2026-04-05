@@ -106,7 +106,7 @@
     {
       "description": "Domain port traits (ReviewReader + ReviewReaderError, ReviewWriter + ReviewWriterError including init/reset semantics: reset archives then creates new review.json without clearing .commit_hash, CommitHashReader + CommitHashWriter + CommitHashError)",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "UseCase port traits (Reviewer + ReviewerError, DiffGetter + DiffGetError, ReviewHasher + ReviewHasherError) + ReviewCycle<R,H,D> + ReviewCycleError + unit tests with mock ports",
@@ -140,5 +140,5 @@
     }
   ],
   "title": "Review System v2: frozen scope 廃止とスコープ独立型レビュー",
-  "updated_at": "2026-04-05T03:24:06Z"
+  "updated_at": "2026-04-05T03:43:23Z"
 }

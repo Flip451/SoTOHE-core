@@ -1,9 +1,10 @@
-//! Review System v2 domain types.
+//! Review System v2 domain types and ports.
 //!
-//! Pure data types with constructor validation for the scope-independent
-//! review system. No I/O, no port traits (those are in T002).
+//! Pure data types with constructor validation, scope classification,
+//! and persistence port traits for the scope-independent review system.
 
 pub mod error;
+pub mod ports;
 pub mod scope_config;
 pub mod types;
 
@@ -12,8 +13,10 @@ pub mod types;
 mod tests;
 
 pub use error::{
-    FilePathError, FindingError, ReviewHashError, ScopeConfigError, ScopeNameError, VerdictError,
+    CommitHashError, FilePathError, FindingError, ReviewHashError, ReviewReaderError,
+    ReviewWriterError, ScopeConfigError, ScopeNameError, VerdictError,
 };
+pub use ports::{CommitHashReader, CommitHashWriter, ReviewReader, ReviewWriter};
 pub use scope_config::ReviewScopeConfig;
 pub use types::{
     FastVerdict, FilePath, Finding, LogInfo, MainScopeName, NonEmptyFindings, NotRequiredReason,

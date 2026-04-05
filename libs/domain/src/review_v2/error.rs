@@ -43,6 +43,33 @@ pub enum ReviewHashError {
     InvalidFormat(String),
 }
 
+/// Errors from `ReviewReader` port operations.
+#[derive(Debug, Error)]
+pub enum ReviewReaderError {
+    #[error("review reader I/O error: {0}")]
+    Io(String),
+    #[error("review reader codec error: {0}")]
+    Codec(String),
+}
+
+/// Errors from `ReviewWriter` port operations.
+#[derive(Debug, Error)]
+pub enum ReviewWriterError {
+    #[error("review writer I/O error: {0}")]
+    Io(String),
+    #[error("review writer codec error: {0}")]
+    Codec(String),
+}
+
+/// Errors from `CommitHashReader` / `CommitHashWriter` port operations.
+#[derive(Debug, Error)]
+pub enum CommitHashError {
+    #[error("commit hash I/O error: {0}")]
+    Io(String),
+    #[error("commit hash format error: {0}")]
+    Format(String),
+}
+
 /// Errors from `ReviewScopeConfig::new` construction.
 #[derive(Debug, Error)]
 pub enum ScopeConfigError {
