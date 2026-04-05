@@ -241,9 +241,10 @@ impl ReviewWriter for FsReviewStore {
 
         // Archive existing file if present
         if self.path.exists() {
-            let now = chrono::Utc::now().format("%Y%m%dT%H%M%SZ").to_string();
-            let pid = std::process::id();
-            let archive_name = format!("review-{now}-{pid}.json");
+            let now = chrono::Utc::now();
+            let ts = now.format("%Y%m%dT%H%M%SZ").to_string();
+            let nanos = now.timestamp_subsec_nanos();
+            let archive_name = format!("review-{ts}-{nanos}.json");
             if let Some(parent) = self.path.parent() {
                 let archive_path = parent.join(archive_name);
                 std::fs::rename(&self.path, &archive_path).map_err(|e| ReviewWriterError::Io {
