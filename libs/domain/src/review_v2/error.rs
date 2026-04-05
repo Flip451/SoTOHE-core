@@ -32,6 +32,8 @@ pub enum FilePathError {
     Empty,
     #[error("file path must be repo-relative, not absolute: {0}")]
     Absolute(String),
+    #[error("file path must not contain '..' traversal: {0}")]
+    Traversal(String),
 }
 
 /// Errors from `ReviewHashValue::new` construction.

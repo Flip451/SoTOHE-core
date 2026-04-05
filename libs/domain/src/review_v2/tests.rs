@@ -94,6 +94,18 @@ fn test_file_path_with_absolute_path_returns_error() {
 }
 
 #[test]
+fn test_file_path_with_traversal_returns_error() {
+    assert!(matches!(FilePath::new("../secrets.txt"), Err(FilePathError::Traversal(_))));
+    assert!(matches!(FilePath::new("libs/../../etc/passwd"), Err(FilePathError::Traversal(_))));
+}
+
+#[test]
+fn test_file_path_with_dotdot_in_name_accepted() {
+    // "..foo" is not a traversal component — only ".." alone is
+    assert!(FilePath::new("libs/..hidden/file.rs").is_ok());
+}
+
+#[test]
 fn test_file_path_ordering() {
     let a = FilePath::new("a.rs").unwrap();
     let b = FilePath::new("b.rs").unwrap();

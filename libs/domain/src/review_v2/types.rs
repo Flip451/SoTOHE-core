@@ -6,7 +6,7 @@ use super::error::{FilePathError, FindingError, ReviewHashError, ScopeNameError,
 
 /// A validated repo-relative file path used in review scope classification and hashing.
 ///
-/// Rejects empty strings and absolute paths (starting with `/`).
+/// Rejects empty strings, absolute paths, and `..` traversal components.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct FilePath(String);
 
@@ -16,6 +16,7 @@ impl FilePath {
     /// # Errors
     /// - `FilePathError::Empty` if empty
     /// - `FilePathError::Absolute` if the path starts with `/`
+    /// - `FilePathError::Traversal` if the path contains `..` components
     pub fn new(s: impl Into<String>) -> Result<Self, FilePathError> {
         let s = s.into();
         if s.is_empty() {
@@ -23,6 +24,9 @@ impl FilePath {
         }
         if s.starts_with('/') {
             return Err(FilePathError::Absolute(s));
+        }
+        if s.split('/').any(|seg| seg == "..") {
+            return Err(FilePathError::Traversal(s));
         }
         Ok(Self(s))
     }
