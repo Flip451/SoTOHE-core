@@ -8,6 +8,7 @@ pub mod review_adapters;
 pub mod review_group_policy;
 pub mod review_json_codec;
 pub mod review_json_store;
+pub mod review_v2;
 pub mod shell;
 pub mod spec;
 pub mod track;

@@ -116,7 +116,7 @@
     {
       "description": "Infrastructure: SystemReviewHasher (sorted manifest, tombstone, rvw1: prefix, O_NOFOLLOW, post-open repo root validation) + GitDiffGetter (merge-base, 4-source union) — v1 migration",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Infrastructure: FsReviewReader/Writer (review.json v2 codec, fs4 locking) + FsCommitHashReader/Writer (.commit_hash, ancestry validation: fail → None fail-closed, atomic write, clear) + .commit_hash を .gitignore に追加",
@@ -140,5 +140,5 @@
     }
   ],
   "title": "Review System v2: frozen scope 廃止とスコープ独立型レビュー",
-  "updated_at": "2026-04-05T03:47:12Z"
+  "updated_at": "2026-04-05T04:18:53Z"
 }

@@ -33,7 +33,7 @@ mock port を使った unit test で全フローを検証。
 v1 SystemGitHasher を SystemReviewHasher に移植（ソート済みマニフェスト、tombstone、rvw1: 接頭辞、O_NOFOLLOW）。
 v1 GitDiffScopeProvider を GitDiffGetter に移植（merge-base セマンティクス、4 ソース和集合）。
 
-- [ ] Infrastructure: SystemReviewHasher (sorted manifest, tombstone, rvw1: prefix, O_NOFOLLOW, post-open repo root validation) + GitDiffGetter (merge-base, 4-source union) — v1 migration
+- [x] Infrastructure: SystemReviewHasher (sorted manifest, tombstone, rvw1: prefix, O_NOFOLLOW, post-open repo root validation) + GitDiffGetter (merge-base, 4-source union) — v1 migration
 
 ## Infrastructure: 永続化
 
