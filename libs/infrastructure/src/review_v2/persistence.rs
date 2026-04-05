@@ -200,6 +200,13 @@ impl FsReviewStore {
             }
         };
 
+        // Empty file (e.g., interrupted write, accidental truncation) → treat as empty
+        // rather than failing with a codec error. This preserves the fail-closed invariant
+        // (all scopes need review) without blocking status/approval queries.
+        if content.trim().is_empty() {
+            return Ok(ReviewJsonV2::empty());
+        }
+
         let envelope: serde_json::Value =
             serde_json::from_str(&content).map_err(|e| PersistenceError::Codec {
                 operation: "parse",
@@ -374,7 +381,8 @@ impl ReviewWriter for FsReviewStore {
         // Archive existing file if present
         if self.path.exists() {
             let now = chrono::Utc::now().format("%Y%m%dT%H%M%SZ").to_string();
-            let archive_name = format!("review-{now}.json");
+            let pid = std::process::id();
+            let archive_name = format!("review-{now}-{pid}.json");
             if let Some(parent) = self.path.parent() {
                 let archive_path = parent.join(archive_name);
                 std::fs::rename(&self.path, &archive_path).map_err(|e| {
@@ -798,6 +806,33 @@ mod tests {
 
         let store = make_store(dir.path());
         // Read path should treat as empty (fail-closed), not error
+        let map = store.read_latest_finals().unwrap();
+        assert!(map.is_empty());
+    }
+
+    // ── empty file handling ─────────────────────────────────────────
+
+    #[test]
+    fn test_read_empty_file_returns_empty_map() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("review.json");
+
+        // Zero-length file (e.g., interrupted write)
+        std::fs::write(&path, "").unwrap();
+
+        let store = make_store(dir.path());
+        let map = store.read_latest_finals().unwrap();
+        assert!(map.is_empty());
+    }
+
+    #[test]
+    fn test_read_whitespace_only_file_returns_empty_map() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("review.json");
+
+        std::fs::write(&path, "  \n  ").unwrap();
+
+        let store = make_store(dir.path());
         let map = store.read_latest_finals().unwrap();
         assert!(map.is_empty());
     }
