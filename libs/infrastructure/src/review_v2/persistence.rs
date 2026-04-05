@@ -82,7 +82,7 @@ impl FsReviewStore {
         use fs4::fs_std::FileExt;
 
         // Reject symlinks on the target path to prevent symlink traversal attacks
-        reject_symlink(&self.path)?;
+        reject_symlink_chain(&self.path)?;
 
         if let Some(parent) = self.path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
@@ -121,6 +121,9 @@ impl FsReviewStore {
         hash: &ReviewHash,
     ) -> Result<(), ReviewWriterError> {
         use fs4::fs_std::FileExt;
+
+        // Reject symlinks on the target path and all ancestors
+        reject_symlink_chain(&self.path)?;
 
         if let Some(parent) = self.path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
@@ -366,13 +369,20 @@ fn parse_verdict(
     }
 }
 
-/// Rejects a path if it is a symlink, preventing symlink traversal on writes.
-fn reject_symlink(path: &std::path::Path) -> Result<(), ReviewWriterError> {
-    match std::fs::symlink_metadata(path) {
-        Ok(meta) if meta.file_type().is_symlink() => Err(ReviewWriterError::Io(format!(
-            "refusing to write through symlink: {}",
-            path.display()
-        ))),
-        _ => Ok(()),
+/// Rejects a path if it or any ancestor is a symlink.
+fn reject_symlink_chain(path: &std::path::Path) -> Result<(), ReviewWriterError> {
+    let mut current = std::path::PathBuf::new();
+    for component in path.components() {
+        current.push(component);
+        match std::fs::symlink_metadata(&current) {
+            Ok(meta) if meta.file_type().is_symlink() => {
+                return Err(ReviewWriterError::Io(format!(
+                    "refusing to write through symlink: {}",
+                    current.display()
+                )));
+            }
+            _ => {}
+        }
     }
+    Ok(())
 }
