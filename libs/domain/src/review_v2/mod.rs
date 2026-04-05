@@ -10,8 +10,9 @@ pub mod types;
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests;
 
-pub use error::{FindingError, ScopeNameError, VerdictError};
+pub use error::{FindingError, ReviewHashError, ScopeNameError, VerdictError};
 pub use types::{
-    FastVerdict, FilePath, Finding, LogInfo, MainScopeName, NotRequiredReason, RequiredReason,
-    ReviewHash, ReviewOutcome, ReviewState, ReviewTarget, ScopeName, Verdict,
+    FastVerdict, FilePath, Finding, LogInfo, MainScopeName, NonEmptyFindings, NotRequiredReason,
+    RequiredReason, ReviewHash, ReviewHashValue, ReviewOutcome, ReviewState, ReviewTarget,
+    ScopeName, Verdict,
 };

@@ -1,6 +1,6 @@
 use rstest::rstest;
 
-use super::error::{FindingError, ScopeNameError, VerdictError};
+use super::error::{FindingError, ReviewHashError, ScopeNameError, VerdictError};
 use super::types::*;
 
 // ── helpers ───────────────────────────────────────────────────────────
@@ -18,6 +18,10 @@ fn finding_full() -> Finding {
         Some("correctness".to_owned()),
     )
     .unwrap()
+}
+
+fn valid_hash() -> ReviewHash {
+    ReviewHash::computed("rvw1:sha256:abc123def456").unwrap()
 }
 
 // ── MainScopeName ─────────────────────────────────────────────────────
@@ -100,7 +104,24 @@ fn test_review_target_with_files() {
     assert_eq!(target.files().len(), 2);
 }
 
-// ── ReviewHash ────────────────────────────────────────────────────────
+// ── ReviewHashValue / ReviewHash ──────────────────────────────────────
+
+#[test]
+fn test_review_hash_value_with_valid_format_succeeds() {
+    let v = ReviewHashValue::new("rvw1:sha256:abc123def456").unwrap();
+    assert_eq!(v.as_str(), "rvw1:sha256:abc123def456");
+}
+
+#[rstest]
+#[case::empty("")]
+#[case::no_prefix("sha256:abc123")]
+#[case::wrong_prefix("rvw2:sha256:abc123")]
+#[case::empty_hex("rvw1:sha256:")]
+#[case::non_hex_chars("rvw1:sha256:xyz")]
+#[case::uppercase_hex("rvw1:sha256:ABC123")]
+fn test_review_hash_value_with_invalid_format_returns_error(#[case] input: &str) {
+    assert!(matches!(ReviewHashValue::new(input), Err(ReviewHashError::InvalidFormat(_))));
+}
 
 #[test]
 fn test_review_hash_empty_is_empty() {
@@ -109,18 +130,33 @@ fn test_review_hash_empty_is_empty() {
 
 #[test]
 fn test_review_hash_computed_is_not_empty() {
-    let hash = ReviewHash::Computed("rvw1:sha256:abc123".to_owned());
-    assert!(!hash.is_empty());
+    assert!(!valid_hash().is_empty());
+}
+
+#[test]
+fn test_review_hash_computed_as_str() {
+    let hash = valid_hash();
+    assert_eq!(hash.as_str(), Some("rvw1:sha256:abc123def456"));
+}
+
+#[test]
+fn test_review_hash_empty_as_str() {
+    assert_eq!(ReviewHash::Empty.as_str(), None);
 }
 
 #[test]
 fn test_review_hash_equality() {
-    let a = ReviewHash::Computed("rvw1:sha256:abc".to_owned());
-    let b = ReviewHash::Computed("rvw1:sha256:abc".to_owned());
-    let c = ReviewHash::Computed("rvw1:sha256:def".to_owned());
+    let a = ReviewHash::computed("rvw1:sha256:abc").unwrap();
+    let b = ReviewHash::computed("rvw1:sha256:abc").unwrap();
+    let c = ReviewHash::computed("rvw1:sha256:def").unwrap();
     assert_eq!(a, b);
     assert_ne!(a, c);
     assert_ne!(a, ReviewHash::Empty);
+}
+
+#[test]
+fn test_review_hash_computed_rejects_invalid_format() {
+    assert!(ReviewHash::computed("not-a-hash").is_err());
 }
 
 // ── Finding ───────────────────────────────────────────────────────────
@@ -158,6 +194,26 @@ fn test_finding_with_whitespace_only_message_returns_error() {
     ));
 }
 
+// ── NonEmptyFindings ──────────────────────────────────────────────────
+
+#[test]
+fn test_non_empty_findings_with_findings_succeeds() {
+    let nef = NonEmptyFindings::new(vec![finding("bug")]).unwrap();
+    assert_eq!(nef.as_slice().len(), 1);
+}
+
+#[test]
+fn test_non_empty_findings_with_empty_vec_returns_error() {
+    assert!(matches!(NonEmptyFindings::new(vec![]), Err(VerdictError::EmptyFindings)));
+}
+
+#[test]
+fn test_non_empty_findings_into_vec() {
+    let nef = NonEmptyFindings::new(vec![finding("a"), finding("b")]).unwrap();
+    let v = nef.into_vec();
+    assert_eq!(v.len(), 2);
+}
+
 // ── Verdict ───────────────────────────────────────────────────────────
 
 #[test]
@@ -169,7 +225,7 @@ fn test_verdict_zero_findings() {
 #[test]
 fn test_verdict_findings_remain_with_findings_succeeds() {
     let v = Verdict::findings_remain(vec![finding("bug")]).unwrap();
-    assert!(matches!(v, Verdict::FindingsRemain(ref findings) if findings.len() == 1));
+    assert!(matches!(v, Verdict::FindingsRemain(ref nef) if nef.as_slice().len() == 1));
 }
 
 #[test]
@@ -180,8 +236,8 @@ fn test_verdict_findings_remain_with_empty_vec_returns_error() {
 #[test]
 fn test_verdict_findings_remain_with_multiple_findings() {
     let v = Verdict::findings_remain(vec![finding("bug1"), finding("bug2")]).unwrap();
-    if let Verdict::FindingsRemain(findings) = v {
-        assert_eq!(findings.len(), 2);
+    if let Verdict::FindingsRemain(nef) = v {
+        assert_eq!(nef.as_slice().len(), 2);
     } else {
         panic!("expected FindingsRemain");
     }
@@ -198,7 +254,7 @@ fn test_fast_verdict_zero_findings() {
 #[test]
 fn test_fast_verdict_findings_remain_succeeds() {
     let v = FastVerdict::findings_remain(vec![finding("issue")]).unwrap();
-    assert!(matches!(v, FastVerdict::FindingsRemain(ref findings) if findings.len() == 1));
+    assert!(matches!(v, FastVerdict::FindingsRemain(ref nef) if nef.as_slice().len() == 1));
 }
 
 #[test]
@@ -221,7 +277,7 @@ fn test_review_outcome_reviewed() {
     let outcome: ReviewOutcome<Verdict> = ReviewOutcome::Reviewed {
         verdict: Verdict::ZeroFindings,
         log_info: LogInfo::new("ok"),
-        hash: ReviewHash::Computed("rvw1:sha256:abc".to_owned()),
+        hash: valid_hash(),
     };
     assert!(matches!(outcome, ReviewOutcome::Reviewed { .. }));
 }
@@ -237,7 +293,7 @@ fn test_review_outcome_fast_verdict() {
     let outcome: ReviewOutcome<FastVerdict> = ReviewOutcome::Reviewed {
         verdict: FastVerdict::ZeroFindings,
         log_info: LogInfo::new("fast pass"),
-        hash: ReviewHash::Computed("rvw1:sha256:def".to_owned()),
+        hash: valid_hash(),
     };
     assert!(matches!(outcome, ReviewOutcome::Reviewed { .. }));
 }

@@ -1,6 +1,6 @@
 use std::fmt;
 
-use super::error::{FindingError, ScopeNameError, VerdictError};
+use super::error::{FindingError, ReviewHashError, ScopeNameError, VerdictError};
 
 // ── FilePath ──────────────────────────────────────────────────────────
 
@@ -108,21 +108,76 @@ impl ReviewTarget {
     }
 }
 
-// ── ReviewHash ────────────────────────────────────────────────────────
+// ── ReviewHashValue / ReviewHash ──────────────────────────────────────
+
+/// A validated review hash string.
+///
+/// Format: `"rvw1:sha256:<hex>"` where `<hex>` is one or more lowercase hex digits.
+/// The inner `String` is private — construction only through `new()`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewHashValue(String);
+
+impl ReviewHashValue {
+    const PREFIX: &str = "rvw1:sha256:";
+
+    /// Creates a validated review hash value.
+    ///
+    /// # Errors
+    /// Returns `ReviewHashError::InvalidFormat` if the value does not match
+    /// `"rvw1:sha256:<hex>"`.
+    pub fn new(s: impl Into<String>) -> Result<Self, ReviewHashError> {
+        let s = s.into();
+        match s.strip_prefix(Self::PREFIX) {
+            Some(hex)
+                if !hex.is_empty()
+                    && hex.chars().all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase()) =>
+            {
+                Ok(Self(s))
+            }
+            _ => Err(ReviewHashError::InvalidFormat(s)),
+        }
+    }
+
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl fmt::Display for ReviewHashValue {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.0)
+    }
+}
 
 /// Hash of a review scope's file contents.
 ///
-/// `Computed(String)` holds a `"rvw1:sha256:<hex>"` value.
+/// `Computed(ReviewHashValue)` holds a validated `"rvw1:sha256:<hex>"` value.
 /// `Empty` indicates no files in the scope.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ReviewHash {
-    Computed(String),
+    Computed(ReviewHashValue),
     Empty,
 }
 
 impl ReviewHash {
+    /// Creates a `Computed` variant with format validation.
+    ///
+    /// # Errors
+    /// Returns `ReviewHashError::InvalidFormat` if the value is not valid.
+    pub fn computed(s: impl Into<String>) -> Result<Self, ReviewHashError> {
+        Ok(Self::Computed(ReviewHashValue::new(s)?))
+    }
+
     pub fn is_empty(&self) -> bool {
         matches!(self, ReviewHash::Empty)
+    }
+
+    /// Returns the hash string if `Computed`, `None` if `Empty`.
+    pub fn as_str(&self) -> Option<&str> {
+        match self {
+            ReviewHash::Computed(v) => Some(v.as_str()),
+            ReviewHash::Empty => None,
+        }
     }
 }
 
@@ -180,15 +235,46 @@ impl Finding {
     }
 }
 
+// ── NonEmptyFindings ──────────────────────────────────────────────────
+
+/// A non-empty collection of findings.
+///
+/// Guarantees at least one `Finding` is present. The inner `Vec` is private —
+/// construction only through `new()`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NonEmptyFindings(Vec<Finding>);
+
+impl NonEmptyFindings {
+    /// Creates a validated non-empty findings collection.
+    ///
+    /// # Errors
+    /// Returns `VerdictError::EmptyFindings` if `findings` is empty.
+    pub fn new(findings: Vec<Finding>) -> Result<Self, VerdictError> {
+        if findings.is_empty() {
+            return Err(VerdictError::EmptyFindings);
+        }
+        Ok(Self(findings))
+    }
+
+    pub fn as_slice(&self) -> &[Finding] {
+        &self.0
+    }
+
+    pub fn into_vec(self) -> Vec<Finding> {
+        self.0
+    }
+}
+
 // ── Verdict / FastVerdict ─────────────────────────────────────────────
 
 /// Final review verdict for a scope.
 ///
-/// Invariant: `FindingsRemain` always contains at least one finding.
+/// Invariant: `FindingsRemain` always contains at least one finding
+/// (enforced by `NonEmptyFindings`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Verdict {
     ZeroFindings,
-    FindingsRemain(Vec<Finding>),
+    FindingsRemain(NonEmptyFindings),
 }
 
 impl Verdict {
@@ -197,10 +283,7 @@ impl Verdict {
     /// # Errors
     /// Returns `VerdictError::EmptyFindings` if `findings` is empty.
     pub fn findings_remain(findings: Vec<Finding>) -> Result<Self, VerdictError> {
-        if findings.is_empty() {
-            return Err(VerdictError::EmptyFindings);
-        }
-        Ok(Self::FindingsRemain(findings))
+        Ok(Self::FindingsRemain(NonEmptyFindings::new(findings)?))
     }
 }
 
@@ -210,7 +293,7 @@ impl Verdict {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FastVerdict {
     ZeroFindings,
-    FindingsRemain(Vec<Finding>),
+    FindingsRemain(NonEmptyFindings),
 }
 
 impl FastVerdict {
@@ -219,10 +302,7 @@ impl FastVerdict {
     /// # Errors
     /// Returns `VerdictError::EmptyFindings` if `findings` is empty.
     pub fn findings_remain(findings: Vec<Finding>) -> Result<Self, VerdictError> {
-        if findings.is_empty() {
-            return Err(VerdictError::EmptyFindings);
-        }
-        Ok(Self::FindingsRemain(findings))
+        Ok(Self::FindingsRemain(NonEmptyFindings::new(findings)?))
     }
 }
 

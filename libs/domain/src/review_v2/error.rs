@@ -24,3 +24,10 @@ pub enum FindingError {
     #[error("finding message must not be empty or whitespace-only")]
     EmptyMessage,
 }
+
+/// Errors from `ReviewHashValue::new` construction.
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum ReviewHashError {
+    #[error("review hash must start with 'rvw1:sha256:' and contain hex digits: {0}")]
+    InvalidFormat(String),
+}
