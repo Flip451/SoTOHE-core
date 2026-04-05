@@ -59,18 +59,23 @@ impl ReviewJsonV2 {
 #[derive(Debug)]
 enum PersistenceError {
     Io { operation: &'static str, path: PathBuf, source: std::io::Error },
-    Codec { operation: &'static str, detail: String },
+    Symlink { path: PathBuf },
+    Codec { operation: &'static str, path: Option<PathBuf>, detail: String },
     FutureSchema { version: u64 },
 }
 
 impl PersistenceError {
     fn into_writer_error(self) -> ReviewWriterError {
         match self {
-            Self::Io { operation, path, source } => {
-                ReviewWriterError::Io(format!("{operation} {}: {source}", path.display()))
+            Self::Io { operation, path, source } => ReviewWriterError::Io {
+                path: path.display().to_string(),
+                detail: format!("{operation}: {source}"),
+            },
+            Self::Symlink { path } => {
+                ReviewWriterError::SymlinkDetected { path: path.display().to_string() }
             }
-            Self::Codec { operation, detail } => {
-                ReviewWriterError::Codec(format!("{operation}: {detail}"))
+            Self::Codec { operation, detail, .. } => {
+                ReviewWriterError::Codec { detail: format!("{operation}: {detail}") }
             }
             Self::FutureSchema { version } => ReviewWriterError::IncompatibleSchema { version },
         }
@@ -78,12 +83,17 @@ impl PersistenceError {
 
     fn into_reader_error(self) -> ReviewReaderError {
         match self {
-            Self::Io { operation, path, source } => {
-                ReviewReaderError::Io(format!("{operation} {}: {source}", path.display()))
+            Self::Io { operation, path, source } => ReviewReaderError::Io {
+                path: path.display().to_string(),
+                detail: format!("{operation}: {source}"),
+            },
+            Self::Symlink { path } => {
+                ReviewReaderError::SymlinkDetected { path: path.display().to_string() }
             }
-            Self::Codec { operation, detail } => {
-                ReviewReaderError::Codec(format!("{operation}: {detail}"))
-            }
+            Self::Codec { operation, path, detail } => ReviewReaderError::Codec {
+                path: path.map_or_else(String::new, |p| p.display().to_string()),
+                detail: format!("{operation}: {detail}"),
+            },
             Self::FutureSchema { version } => ReviewReaderError::InvalidData(format!(
                 "review.json has schema_version {version} (unknown future version)"
             )),
@@ -103,10 +113,12 @@ impl WriteGuard {
     /// Validates the path for symlinks below `trusted_root`, ensures the parent
     /// directory exists, and acquires an exclusive lock on `<path>.json.lock`.
     fn acquire(path: &Path, trusted_root: &Path) -> Result<Self, PersistenceError> {
-        reject_symlinks_below(path, trusted_root).map_err(|source| PersistenceError::Io {
-            operation: "symlink check",
-            path: path.to_owned(),
-            source,
+        reject_symlinks_below(path, trusted_root).map_err(|source| {
+            if source.kind() == std::io::ErrorKind::InvalidInput {
+                PersistenceError::Symlink { path: path.to_owned() }
+            } else {
+                PersistenceError::Io { operation: "symlink check", path: path.to_owned(), source }
+            }
         })?;
 
         if let Some(parent) = path.parent() {
@@ -142,8 +154,11 @@ impl WriteGuard {
 /// Serializes `doc` to pretty JSON and writes it atomically (tmp + fsync + rename).
 /// Must be called while a `WriteGuard` is held.
 fn write_atomic(path: &Path, doc: &ReviewJsonV2) -> Result<(), PersistenceError> {
-    let json = serde_json::to_string_pretty(doc)
-        .map_err(|e| PersistenceError::Codec { operation: "serialize", detail: e.to_string() })?;
+    let json = serde_json::to_string_pretty(doc).map_err(|e| PersistenceError::Codec {
+        operation: "serialize",
+        path: None,
+        detail: e.to_string(),
+    })?;
     atomic_write_file(path, json.as_bytes()).map_err(|source| PersistenceError::Io {
         operation: "atomic write",
         path: path.to_owned(),
@@ -183,7 +198,11 @@ impl FsReviewStore {
         // Reject symlinks on the read path to prevent review state injection
         // (e.g., a symlinked review.json pointing to an external zero_findings file).
         reject_symlinks_below(&self.path, &self.trusted_root).map_err(|source| {
-            PersistenceError::Io { operation: "symlink check", path: self.path.clone(), source }
+            if source.kind() == std::io::ErrorKind::InvalidInput {
+                PersistenceError::Symlink { path: self.path.clone() }
+            } else {
+                PersistenceError::Io { operation: "symlink check", path: self.path.clone(), source }
+            }
         })?;
 
         let content = match std::fs::read_to_string(&self.path) {
@@ -210,7 +229,8 @@ impl FsReviewStore {
         let envelope: serde_json::Value =
             serde_json::from_str(&content).map_err(|e| PersistenceError::Codec {
                 operation: "parse",
-                detail: format!("{}: {e}", self.path.display()),
+                path: Some(self.path.clone()),
+                detail: e.to_string(),
             })?;
 
         // Distinguish explicit schema_version from missing/malformed.
@@ -225,10 +245,8 @@ impl FsReviewStore {
                 if reject_future {
                     return Err(PersistenceError::Codec {
                         operation: "validate schema_version",
-                        detail: format!(
-                            "{}: missing or non-numeric schema_version",
-                            self.path.display()
-                        ),
+                        path: Some(self.path.clone()),
+                        detail: "missing or non-numeric schema_version".to_owned(),
                     });
                 }
                 return Ok(ReviewJsonV2::empty());
@@ -237,11 +255,8 @@ impl FsReviewStore {
                 // schema_version present but not a valid u64 (e.g., string, float, null)
                 return Err(PersistenceError::Codec {
                     operation: "validate schema_version",
-                    detail: format!(
-                        "{}: schema_version is not a valid integer: {:?}",
-                        self.path.display(),
-                        version_field
-                    ),
+                    path: Some(self.path.clone()),
+                    detail: format!("schema_version is not a valid integer: {:?}", version_field),
                 });
             }
         };
@@ -250,7 +265,8 @@ impl FsReviewStore {
             let doc: ReviewJsonV2 =
                 serde_json::from_value(envelope).map_err(|e| PersistenceError::Codec {
                     operation: "parse v2",
-                    detail: format!("{}: {e}", self.path.display()),
+                    path: Some(self.path.clone()),
+                    detail: e.to_string(),
                 })?;
             return Ok(doc);
         }
@@ -385,12 +401,9 @@ impl ReviewWriter for FsReviewStore {
             let archive_name = format!("review-{now}-{pid}.json");
             if let Some(parent) = self.path.parent() {
                 let archive_path = parent.join(archive_name);
-                std::fs::rename(&self.path, &archive_path).map_err(|e| {
-                    ReviewWriterError::Io(format!(
-                        "archive {} → {}: {e}",
-                        self.path.display(),
-                        archive_path.display()
-                    ))
+                std::fs::rename(&self.path, &archive_path).map_err(|e| ReviewWriterError::Io {
+                    path: self.path.display().to_string(),
+                    detail: format!("archive → {}: {e}", archive_path.display()),
                 })?;
             }
         }
@@ -415,10 +428,17 @@ impl FsCommitHashStore {
         Self { path: commit_hash_path, trusted_root }
     }
 
-    /// Rejects symlinks on the path below trusted_root, mapping to `CommitHashError::Io`.
+    /// Rejects symlinks on the path below trusted_root.
     fn reject_symlinks(&self) -> Result<(), CommitHashError> {
+        let path_str = self.path.display().to_string();
         reject_symlinks_below(&self.path, &self.trusted_root)
-            .map_err(|e| CommitHashError::Io(format!("symlink check {}: {e}", self.path.display())))
+            .map_err(|e| {
+                if e.kind() == std::io::ErrorKind::InvalidInput {
+                    CommitHashError::SymlinkDetected { path: path_str.clone() }
+                } else {
+                    CommitHashError::Io { path: path_str.clone(), detail: e.to_string() }
+                }
+            })
             .map(|_| ())
     }
 }
@@ -431,7 +451,10 @@ impl CommitHashReader for FsCommitHashStore {
             Ok(c) => c,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
             Err(e) => {
-                return Err(CommitHashError::Io(format!("read {}: {e}", self.path.display())));
+                return Err(CommitHashError::Io {
+                    path: self.path.display().to_string(),
+                    detail: format!("read: {e}"),
+                });
             }
         };
 
@@ -459,12 +482,15 @@ impl CommitHashWriter for FsCommitHashStore {
         self.reject_symlinks()?;
 
         if let Some(parent) = self.path.parent() {
-            std::fs::create_dir_all(parent).map_err(|e| {
-                CommitHashError::Io(format!("create dir {}: {e}", parent.display()))
+            std::fs::create_dir_all(parent).map_err(|e| CommitHashError::Io {
+                path: parent.display().to_string(),
+                detail: format!("create dir: {e}"),
             })?;
         }
-        atomic_write_file(&self.path, hash.as_ref().as_bytes())
-            .map_err(|e| CommitHashError::Io(format!("atomic write {}: {e}", self.path.display())))
+        atomic_write_file(&self.path, hash.as_ref().as_bytes()).map_err(|e| CommitHashError::Io {
+            path: self.path.display().to_string(),
+            detail: format!("atomic write: {e}"),
+        })
     }
 
     fn clear(&self) -> Result<(), CommitHashError> {
@@ -473,7 +499,10 @@ impl CommitHashWriter for FsCommitHashStore {
         match std::fs::remove_file(&self.path) {
             Ok(()) => Ok(()),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
-            Err(e) => Err(CommitHashError::Io(format!("remove {}: {e}", self.path.display()))),
+            Err(e) => Err(CommitHashError::Io {
+                path: self.path.display().to_string(),
+                detail: format!("remove: {e}"),
+            }),
         }
     }
 }

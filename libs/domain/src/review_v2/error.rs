@@ -47,11 +47,14 @@ pub enum ReviewHashError {
 #[derive(Debug, Error)]
 pub enum ReviewReaderError {
     /// File system I/O failure.
-    #[error("review reader I/O error: {0}")]
-    Io(String),
+    #[error("review reader I/O error: {path}: {detail}")]
+    Io { path: String, detail: String },
+    /// Symlink detected on the review file path (security rejection).
+    #[error("review reader symlink detected: {path}")]
+    SymlinkDetected { path: String },
     /// JSON parsing failure (file is not valid JSON).
-    #[error("review reader codec error: {0}")]
-    Codec(String),
+    #[error("review reader codec error: {path}: {detail}")]
+    Codec { path: String, detail: String },
     /// Valid JSON but contains domain-invalid data (bad scope, hash, verdict, finding).
     #[error("review reader invalid data: {0}")]
     InvalidData(String),
@@ -61,11 +64,14 @@ pub enum ReviewReaderError {
 #[derive(Debug, Error)]
 pub enum ReviewWriterError {
     /// File system I/O failure.
-    #[error("review writer I/O error: {0}")]
-    Io(String),
+    #[error("review writer I/O error: {path}: {detail}")]
+    Io { path: String, detail: String },
+    /// Symlink detected on the review file path (security rejection).
+    #[error("review writer symlink detected: {path}")]
+    SymlinkDetected { path: String },
     /// JSON serialization failure.
-    #[error("review writer codec error: {0}")]
-    Codec(String),
+    #[error("review writer codec error: {detail}")]
+    Codec { detail: String },
     /// Refusing to overwrite a `review.json` with a newer schema version.
     #[error(
         "review.json has schema_version {version} (unknown future version); \
@@ -77,8 +83,13 @@ pub enum ReviewWriterError {
 /// Errors from `CommitHashReader` / `CommitHashWriter` port operations.
 #[derive(Debug, Error)]
 pub enum CommitHashError {
-    #[error("commit hash I/O error: {0}")]
-    Io(String),
+    /// File system I/O failure.
+    #[error("commit hash I/O error: {path}: {detail}")]
+    Io { path: String, detail: String },
+    /// Symlink detected on the commit hash file path (security rejection).
+    #[error("commit hash symlink detected: {path}")]
+    SymlinkDetected { path: String },
+    /// Invalid commit hash format.
     #[error("commit hash format error: {0}")]
     Format(String),
 }
