@@ -242,10 +242,34 @@ impl ReviewWriter for FsReviewStore {
     }
 
     fn reset(&self) -> Result<(), ReviewWriterError> {
+        use fs4::fs_std::FileExt;
+
+        reject_symlink_chain(&self.path)?;
+
+        if let Some(parent) = self.path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| {
+                ReviewWriterError::Io(format!("create dir {}: {e}", parent.display()))
+            })?;
+        }
+
+        // Use the same .lock file as append_round to serialize
+        let lock_path = self.path.with_extension("json.lock");
+        let lock_file = std::fs::OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(false)
+            .open(&lock_path)
+            .map_err(|e| {
+                ReviewWriterError::Io(format!("open lock {}: {e}", lock_path.display()))
+            })?;
+        lock_file
+            .lock_exclusive()
+            .map_err(|e| ReviewWriterError::Io(format!("lock {}: {e}", lock_path.display())))?;
+
         // Archive existing file if present
         if self.path.exists() {
             let now = chrono::Utc::now().format("%Y%m%dT%H%M%SZ").to_string();
-            let archive_name = format!("review-{now}.json",);
+            let archive_name = format!("review-{now}.json");
             if let Some(parent) = self.path.parent() {
                 let archive_path = parent.join(archive_name);
                 std::fs::rename(&self.path, &archive_path).map_err(|e| {
@@ -257,8 +281,14 @@ impl ReviewWriter for FsReviewStore {
                 })?;
             }
         }
+
         // Create fresh review.json (does NOT clear .commit_hash per ADR)
-        self.write_doc(&ReviewJsonV2::empty())
+        let json = serde_json::to_string_pretty(&ReviewJsonV2::empty())
+            .map_err(|e| ReviewWriterError::Codec(format!("serialize: {e}")))?;
+        atomic_write(&self.path, &json)?;
+
+        drop(lock_file);
+        Ok(())
     }
 }
 
