@@ -94,9 +94,20 @@ fn test_file_path_with_absolute_path_returns_error() {
 }
 
 #[test]
+fn test_file_path_with_windows_absolute_returns_error() {
+    assert!(matches!(FilePath::new("C:/tmp/a.rs"), Err(FilePathError::Absolute(_))));
+    assert!(matches!(FilePath::new("C:\\tmp\\a.rs"), Err(FilePathError::Absolute(_))));
+}
+
+#[test]
 fn test_file_path_with_traversal_returns_error() {
     assert!(matches!(FilePath::new("../secrets.txt"), Err(FilePathError::Traversal(_))));
     assert!(matches!(FilePath::new("libs/../../etc/passwd"), Err(FilePathError::Traversal(_))));
+}
+
+#[test]
+fn test_file_path_with_windows_traversal_returns_error() {
+    assert!(matches!(FilePath::new("..\\secrets.txt"), Err(FilePathError::Traversal(_))));
 }
 
 #[test]

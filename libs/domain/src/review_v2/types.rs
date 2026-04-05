@@ -15,17 +15,20 @@ impl FilePath {
     ///
     /// # Errors
     /// - `FilePathError::Empty` if empty
-    /// - `FilePathError::Absolute` if the path starts with `/`
-    /// - `FilePathError::Traversal` if the path contains `..` components
+    /// - `FilePathError::Absolute` if the path starts with `/` or contains a Windows drive prefix
+    /// - `FilePathError::Traversal` if the path contains `..` components (Unix or Windows separators)
     pub fn new(s: impl Into<String>) -> Result<Self, FilePathError> {
         let s = s.into();
         if s.is_empty() {
             return Err(FilePathError::Empty);
         }
-        if s.starts_with('/') {
+        // Reject Unix absolute and Windows drive prefix (e.g. C:/ or C:\)
+        if s.starts_with('/') || s.get(1..3).is_some_and(|prefix| prefix == ":\\" || prefix == ":/")
+        {
             return Err(FilePathError::Absolute(s));
         }
-        if s.split('/').any(|seg| seg == "..") {
+        // Check for '..' traversal using both Unix and Windows separators
+        if s.split(&['/', '\\'][..]).any(|seg| seg == "..") {
             return Err(FilePathError::Traversal(s));
         }
         Ok(Self(s))
