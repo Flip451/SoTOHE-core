@@ -342,15 +342,19 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
         return Ok(());
     }
 
-    // If ALL required scopes are NotStarted (no review.json or fresh state),
+    // If review.json does not exist AND all required scopes are NotStarted,
     // allow commit without review. This enables PR-based review workflows
     // where local review is skipped intentionally.
+    // When review.json exists but is corrupt/unreadable, the store returns
+    // empty state (all NotStarted) as fail-closed — we must NOT bypass in
+    // that case, so we require the file to be absent.
+    let review_json = args.items_dir.join(&args.track_id).join("review.json");
     let all_not_started = required.iter().all(|(_, state)| {
         matches!(state, ReviewState::Required(domain::review_v2::RequiredReason::NotStarted))
     });
-    if all_not_started {
+    if all_not_started && !review_json.exists() {
         eprintln!(
-            "[WARN] No review recorded for {} scope(s). Allowing commit for PR-based review.",
+            "[WARN] No review.json found. Allowing commit for PR-based review ({} scope(s)).",
             required.len()
         );
         return Ok(());
