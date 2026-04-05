@@ -121,7 +121,7 @@
     {
       "description": "Infrastructure: FsReviewReader/Writer (review.json v2 codec, fs4 locking) + FsCommitHashReader/Writer (.commit_hash, ancestry validation: fail → None fail-closed, atomic write, clear) + .commit_hash を .gitignore に追加",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "CLI integration: check-approved/review-status/record-round commands + composition root (CodexReviewer adapter construction + CommitHash fallback: None → git rev-parse main) + review-scope.json pattern updates (planning_only 廃止, normalize 廃止, harness-policy 拡張: DEVELOPER_AI_WORKFLOW.md, README.md, track/review-scope.json を追加) + .commit_hash write in commit flow",
@@ -140,5 +140,5 @@
     }
   ],
   "title": "Review System v2: frozen scope 廃止とスコープ独立型レビュー",
-  "updated_at": "2026-04-05T04:18:53Z"
+  "updated_at": "2026-04-05T04:21:26Z"
 }

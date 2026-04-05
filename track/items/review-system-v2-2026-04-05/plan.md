@@ -43,7 +43,7 @@ FsCommitHashReader（.commit_hash 読み込み + infra 内で ancestry 検証）
 FsCommitHashWriter（atomic write + clear）。
 .commit_hash を .gitignore に追加（ローカル状態のみ、ブランチ切替時はフォールバック）。
 
-- [ ] Infrastructure: FsReviewReader/Writer (review.json v2 codec, fs4 locking) + FsCommitHashReader/Writer (.commit_hash, ancestry validation: fail → None fail-closed, atomic write, clear) + .commit_hash を .gitignore に追加
+- [x] Infrastructure: FsReviewReader/Writer (review.json v2 codec, fs4 locking) + FsCommitHashReader/Writer (.commit_hash, ancestry validation: fail → None fail-closed, atomic write, clear) + .commit_hash を .gitignore に追加
 
 ## CLI 統合
 
