@@ -92,6 +92,8 @@ pub enum MakeTask {
     TrackSetCommitHash,
     /// Stage all worktree changes.
     AddAll,
+    /// Unstage paths (remove from index without discarding worktree changes).
+    Unstage,
 
     // Phase 4: Exec
     /// Run a cargo make task via tools-daemon exec with WORKER_ID isolation.
@@ -156,6 +158,7 @@ fn run(args: MakeArgs) -> Result<ExitCode, CliError> {
         MakeTask::TrackBranchSwitch => dispatch_track_branch_switch(&args.raw_args),
         MakeTask::TrackActivate => dispatch_track_activate(&args.raw_args),
         MakeTask::AddAll => dispatch_add_all(),
+        MakeTask::Unstage => dispatch_unstage(&args.raw_args),
         MakeTask::TrackAddPaths => dispatch_track_add_paths(),
         MakeTask::TrackNote => dispatch_track_note(),
         MakeTask::TrackSwitchMain => dispatch_track_switch_main(),
@@ -234,6 +237,15 @@ fn dispatch_track_plan_branch(raw_args: &[String]) -> Result<ExitCode, CliError>
 
 fn dispatch_add_all() -> Result<ExitCode, CliError> {
     run_sotp(&["git", "add-all"])
+}
+
+fn dispatch_unstage(raw_args: &[String]) -> Result<ExitCode, CliError> {
+    if raw_args.is_empty() {
+        return Err(CliError::Message("error: at least one path required".to_owned()));
+    }
+    let mut sotp_args = vec!["git", "unstage", "--"];
+    sotp_args.extend(raw_args.iter().map(String::as_str));
+    run_sotp(&sotp_args)
 }
 
 fn dispatch_track_add_paths() -> Result<ExitCode, CliError> {

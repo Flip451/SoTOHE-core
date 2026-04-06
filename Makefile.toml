@@ -775,6 +775,11 @@ description = "[wrapper] Stage all worktree changes except transient automation 
 command = "bin/sotp"
 args = ["make", "add-all"]
 
+[tasks.unstage]
+description = "[wrapper] Unstage paths (remove from index without discarding worktree changes)"
+command = "bin/sotp"
+args = ["make", "unstage", "${@}"]
+
 [tasks.track-branch-create]
 description = "[wrapper] Materialize branch metadata, create a track branch from main, and switch to it (usage: cargo make track-branch-create '<track-id>')"
 command = "bin/sotp"
