@@ -201,7 +201,7 @@ the following channels to succeed. Partial success on any single channel is not 
 | Channel | What constitutes success | Failure mode |
 |---------|------------------------|--------------|
 | stdout | Valid JSON verdict as the last line | Missing, malformed, or semantically inconsistent JSON |
-| exit code | 0 (zero_findings) or 2/105 (findings_remain) | 1 (error), 3 (escalation), timeout |
+| exit code | 0 (zero_findings) or 2 (findings_remain) | 1 (error), 3 (escalation), timeout |
 | review.json | Verdict persisted by auto-record | Write failure, missing file, stale hash |
 
 Controlling stdout alone while leaving stderr as an uncontrolled fallback is a known bypass
