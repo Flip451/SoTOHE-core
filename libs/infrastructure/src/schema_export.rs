@@ -61,11 +61,15 @@ fn run_rustdoc(workspace_root: &Path, crate_name: &str) -> Result<PathBuf, Schem
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
+        if stderr.contains("package(s) `") && stderr.contains("not found in workspace") {
+            return Err(SchemaExportError::CrateNotFound(crate_name.to_owned()));
+        }
         return Err(SchemaExportError::RustdocFailed(stderr.into_owned()));
     }
 
+    let target_dir = resolve_target_dir(workspace_root)?;
     let artifact_name = crate_name.replace('-', "_");
-    let json_path = workspace_root.join("target").join("doc").join(format!("{artifact_name}.json"));
+    let json_path = target_dir.join("doc").join(format!("{artifact_name}.json"));
 
     if !json_path.is_file() {
         return Err(SchemaExportError::RustdocFailed(format!(
@@ -75,6 +79,36 @@ fn run_rustdoc(workspace_root: &Path, crate_name: &str) -> Result<PathBuf, Schem
     }
 
     Ok(json_path)
+}
+
+/// Resolves the Cargo target directory, respecting `CARGO_TARGET_DIR` and workspace config.
+fn resolve_target_dir(workspace_root: &Path) -> Result<PathBuf, SchemaExportError> {
+    // Check environment variable first
+    if let Ok(dir) = std::env::var("CARGO_TARGET_DIR") {
+        return Ok(PathBuf::from(dir));
+    }
+    // Fall back to `cargo metadata` for reliable resolution
+    let output = Command::new("cargo")
+        .args(["metadata", "--format-version", "1", "--no-deps"])
+        .current_dir(workspace_root)
+        .output()
+        .map_err(|e| SchemaExportError::RustdocFailed(format!("cargo metadata failed: {e}")))?;
+
+    if !output.status.success() {
+        // Default fallback
+        return Ok(workspace_root.join("target"));
+    }
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    // Extract target_directory from JSON without pulling in a full JSON parser dependency
+    // (serde_json is already available via rustdoc_types)
+    if let Ok(meta) = serde_json::from_str::<serde_json::Value>(&stdout) {
+        if let Some(dir) = meta.get("target_directory").and_then(|v| v.as_str()) {
+            return Ok(PathBuf::from(dir));
+        }
+    }
+
+    Ok(workspace_root.join("target"))
 }
 
 fn parse_rustdoc_json(path: &Path) -> Result<rustdoc_types::Crate, SchemaExportError> {
