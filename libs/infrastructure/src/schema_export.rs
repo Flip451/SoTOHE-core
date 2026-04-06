@@ -6,7 +6,11 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use domain::schema::{SchemaExport, SchemaExportError, SchemaExporter};
+use domain::schema::{
+    FunctionInfo, ImplInfo, SchemaExport, SchemaExportError, SchemaExporter, TraitInfo, TypeInfo,
+    TypeKind,
+};
+use rustdoc_types::{ItemEnum, Visibility};
 
 /// Adapter implementing `SchemaExporter` via rustdoc JSON.
 pub struct RustdocSchemaExporter {
@@ -124,7 +128,124 @@ fn parse_rustdoc_json(path: &Path) -> Result<rustdoc_types::Crate, SchemaExportE
         .map_err(|e| SchemaExportError::ParseFailed(format!("JSON parse error: {e}")))
 }
 
-fn build_schema_export(crate_name: &str, _krate: &rustdoc_types::Crate) -> SchemaExport {
-    // Step 1: skeleton — returns empty export. Type extraction in next commit.
-    SchemaExport::new(crate_name.to_owned(), Vec::new(), Vec::new(), Vec::new(), Vec::new())
+fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> SchemaExport {
+    let mut types = Vec::new();
+    let mut functions = Vec::new();
+    let mut traits = Vec::new();
+    let mut impls = Vec::new();
+
+    for item in krate.index.values() {
+        if !matches!(item.visibility, Visibility::Public) {
+            continue;
+        }
+        let name = match &item.name {
+            Some(n) => n.clone(),
+            None => continue,
+        };
+
+        match &item.inner {
+            ItemEnum::Struct(s) => {
+                let members = extract_struct_fields(s, krate);
+                types.push(TypeInfo::new(name, TypeKind::Struct, item.docs.clone(), members));
+            }
+            ItemEnum::Enum(e) => {
+                let variants = extract_enum_variants(e, krate);
+                types.push(TypeInfo::new(name, TypeKind::Enum, item.docs.clone(), variants));
+            }
+            ItemEnum::TypeAlias(_) => {
+                types.push(TypeInfo::new(name, TypeKind::TypeAlias, item.docs.clone(), Vec::new()));
+            }
+            ItemEnum::Function(f) => {
+                let sig = format_sig(&name, &f.sig);
+                functions.push(FunctionInfo::new(name, sig, item.docs.clone()));
+            }
+            ItemEnum::Trait(t) => {
+                let methods = extract_methods(&t.items, krate);
+                traits.push(TraitInfo::new(name, item.docs.clone(), methods));
+            }
+            ItemEnum::Impl(i) => {
+                if i.is_synthetic || i.blanket_impl.is_some() {
+                    continue;
+                }
+                let target = type_name(&i.for_);
+                let trait_name = i.trait_.as_ref().map(|p| p.path.clone());
+                let methods = extract_methods(&i.items, krate);
+                if !methods.is_empty() || trait_name.is_some() {
+                    impls.push(ImplInfo::new(target, trait_name, methods));
+                }
+            }
+            _ => {}
+        }
+    }
+
+    SchemaExport::new(crate_name.to_owned(), types, functions, traits, impls)
+}
+
+/// Extract public field names from a struct.
+fn extract_struct_fields(s: &rustdoc_types::Struct, krate: &rustdoc_types::Crate) -> Vec<String> {
+    match &s.kind {
+        rustdoc_types::StructKind::Plain { fields, .. } => fields
+            .iter()
+            .filter_map(|id| krate.index.get(id))
+            .filter(|item| matches!(item.visibility, Visibility::Public))
+            .filter_map(|item| item.name.clone())
+            .collect(),
+        rustdoc_types::StructKind::Tuple(fields) => fields
+            .iter()
+            .enumerate()
+            .filter_map(|(i, opt)| opt.as_ref().map(|_| i.to_string()))
+            .collect(),
+        rustdoc_types::StructKind::Unit => Vec::new(),
+    }
+}
+
+/// Extract variant names from an enum.
+fn extract_enum_variants(e: &rustdoc_types::Enum, krate: &rustdoc_types::Crate) -> Vec<String> {
+    e.variants
+        .iter()
+        .filter_map(|id| krate.index.get(id))
+        .filter_map(|item| item.name.clone())
+        .collect()
+}
+
+/// Extract public method FunctionInfos from a list of item Ids.
+fn extract_methods(ids: &[rustdoc_types::Id], krate: &rustdoc_types::Crate) -> Vec<FunctionInfo> {
+    ids.iter()
+        .filter_map(|id| krate.index.get(id))
+        .filter(|item| matches!(item.visibility, Visibility::Public))
+        .filter_map(|item| {
+            let name = item.name.as_ref()?;
+            if let ItemEnum::Function(f) = &item.inner {
+                Some(FunctionInfo::new(name.clone(), format_sig(name, &f.sig), item.docs.clone()))
+            } else {
+                None
+            }
+        })
+        .collect()
+}
+
+/// Build a human-readable signature from FunctionSignature.
+/// Keeps it simple: only param names and top-level type names. No recursive Type formatting.
+fn format_sig(name: &str, sig: &rustdoc_types::FunctionSignature) -> String {
+    let params: Vec<String> = sig
+        .inputs
+        .iter()
+        .map(|(param_name, ty)| format!("{param_name}: {}", type_name(ty)))
+        .collect();
+    let ret = sig.output.as_ref().map(|ty| format!(" -> {}", type_name(ty)));
+    format!("fn {name}({}){}", params.join(", "), ret.unwrap_or_default())
+}
+
+/// Extract a short type name. Only resolves the outermost type — no recursive expansion.
+fn type_name(ty: &rustdoc_types::Type) -> String {
+    match ty {
+        rustdoc_types::Type::ResolvedPath(p) => p.path.clone(),
+        rustdoc_types::Type::Primitive(p) => p.clone(),
+        rustdoc_types::Type::BorrowedRef { type_: inner, .. } => {
+            format!("&{}", type_name(inner))
+        }
+        rustdoc_types::Type::Slice(inner) => format!("[{}]", type_name(inner)),
+        rustdoc_types::Type::Tuple(types) if types.is_empty() => "()".to_owned(),
+        _ => "_".to_owned(),
+    }
 }
