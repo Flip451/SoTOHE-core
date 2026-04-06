@@ -25,6 +25,11 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum CliCommand {
+    /// Domain analysis tools (export-schema, etc.).
+    Domain {
+        #[command(subcommand)]
+        cmd: commands::domain::DomainCommand,
+    },
     /// Shell command guard for git operation blocking.
     Guard {
         #[command(subcommand)]
@@ -85,6 +90,7 @@ fn main() -> ExitCode {
     let cli = Cli::parse();
 
     match cli.command {
+        Some(CliCommand::Domain { cmd }) => commands::domain::execute(cmd),
         Some(CliCommand::Guard { cmd }) => commands::guard::execute(cmd),
         Some(CliCommand::Hook { cmd }) => commands::hook::execute(cmd),
         Some(CliCommand::Track { cmd }) => commands::track::execute(cmd),

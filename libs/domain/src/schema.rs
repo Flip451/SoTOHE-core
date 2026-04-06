@@ -1,11 +1,12 @@
 //! Domain types for the `export-schema` feature (BRIDGE-01).
 //!
 //! These types represent the public API surface of a Rust crate as extracted
-//! from rustdoc JSON. They are pure value types with no I/O or serialization
-//! dependencies — JSON output is handled by infrastructure DTOs.
+//! from rustdoc JSON. `Serialize` is derived for JSON output.
+
+use serde::Serialize;
 
 /// Top-level export result containing all public API elements of a crate.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct SchemaExport {
     crate_name: String,
     types: Vec<TypeInfo>,
@@ -53,7 +54,7 @@ impl SchemaExport {
 }
 
 /// Kind of a public type.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum TypeKind {
     /// A struct (with named fields, tuple fields, or unit).
     Struct,
@@ -64,7 +65,7 @@ pub enum TypeKind {
 }
 
 /// Information about a public type (struct, enum, or type alias).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct TypeInfo {
     name: String,
     kind: TypeKind,
@@ -101,7 +102,7 @@ impl TypeInfo {
 }
 
 /// Information about a public function or method.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct FunctionInfo {
     name: String,
     /// Human-readable signature string (e.g., `fn foo(x: u32) -> bool`).
@@ -132,7 +133,7 @@ impl FunctionInfo {
 }
 
 /// Information about a public trait definition.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct TraitInfo {
     name: String,
     docs: Option<String>,
@@ -163,7 +164,7 @@ impl TraitInfo {
 }
 
 /// Information about an impl block.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct ImplInfo {
     /// The type being implemented for (e.g., `TrackStatus`).
     target_type: String,

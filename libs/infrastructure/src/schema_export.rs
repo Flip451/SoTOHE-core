@@ -146,6 +146,11 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
     }
 
     for item in krate.index.values() {
+        // Skip items from external crates (crate_id 0 = local crate).
+        if item.crate_id != 0 {
+            continue;
+        }
+
         // Impl blocks have name=None and non-Public visibility; handle them separately.
         if let ItemEnum::Impl(i) = &item.inner {
             if i.is_synthetic || i.blanket_impl.is_some() {
@@ -191,6 +196,12 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
             _ => {}
         }
     }
+
+    // Sort for deterministic output (HashMap iteration order is non-deterministic).
+    types.sort_by(|a, b| a.name().cmp(b.name()));
+    functions.sort_by(|a, b| a.name().cmp(b.name()));
+    traits.sort_by(|a, b| a.name().cmp(b.name()));
+    impls.sort_by(|a, b| a.target_type().cmp(b.target_type()));
 
     SchemaExport::new(crate_name.to_owned(), types, functions, traits, impls)
 }

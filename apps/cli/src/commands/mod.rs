@@ -1,5 +1,6 @@
 //! CLI subcommand definitions.
 
+pub mod domain;
 pub mod file;
 pub mod git;
 pub mod guard;
