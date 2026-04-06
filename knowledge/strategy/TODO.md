@@ -427,7 +427,7 @@
 - [ ] **WF-34-phase2** (MEDIUM): Planner hexagonal architecture + 統一 config resolver
   - **課題**: provider/model 解決が Rust (`agent_profiles.rs`), Python (`_agent_profiles.py`), raw JSON (`pr_review.rs`) の 3 箇所に分散しており、解決ルールが不整合になるリスクがある
   - **提案**: domain 層に `AgentProfiles` / `Capability` / `ProviderName` 型を定義し、usecase に `Planner` port trait、infrastructure に `CodexPlanner` / `ClaudePlanner` adapter を配置。`sotp plan auto` で config ベース auto-dispatch
-  - **設計資料**: `knowledge/research/2026-04-07-planner-claude-migration-design.md`（Canonical Blocks 含む）
+  - **設計資料**: `knowledge/research/2026-04-07-1040-planner-claude-migration-design.md`（Canonical Blocks 含む）
   - **出典**: Codex planner design review (2026-04-06)
   - **実装**: `agent-profiles.json` に新 profile（例: `claude-planner`）を追加し A/B 比較で効果測定
   - **トレードオフ**: Claude 集中でコンテキスト切替コスト削減・レイテンシ改善が見込める一方、多様な視点が減る
