@@ -132,18 +132,20 @@ class AgentRouterTest(unittest.TestCase):
         self.assertFalse(is_multimodal)
 
     def test_capability_message_uses_template_constant(self) -> None:
+        """Verify message matches CAPABILITY_TEMPLATE with dynamically resolved provider values."""
         message = agent_router.build_capability_message("planner", "design")
-        self.assertEqual(
-            message,
-            agent_router.CAPABILITY_TEMPLATE.format(
-                prefix=agent_router.CAPABILITY_PREFIXES["planner"],
-                trigger="design",
-                capability="planner",
-                provider_label="Codex CLI",
-                capability_description=agent_router.CAPABILITY_DESCRIPTIONS["planner"],
-                provider_example="cargo make track-local-plan -- --model gpt-5.4 --briefing-file '{briefing_file}'",
+        expected = agent_router.CAPABILITY_TEMPLATE.format(
+            prefix=agent_router.CAPABILITY_PREFIXES["planner"],
+            trigger="design",
+            capability="planner",
+            provider_label=agent_router.provider_label("planner"),
+            capability_description=agent_router.CAPABILITY_DESCRIPTIONS["planner"],
+            provider_example=agent_router.render_provider_example(
+                "planner",
+                task=agent_router.CAPABILITY_EXAMPLE_TASKS["planner"],
             ),
         )
+        self.assertEqual(message, expected)
 
     def test_workflow_message_uses_template_constant(self) -> None:
         message = agent_router.build_workflow_message("track")

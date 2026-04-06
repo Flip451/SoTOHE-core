@@ -4,6 +4,7 @@
   "providers": {
     "claude": {
       "label": "Claude Code",
+      "default_model": "claude-opus-4-6",
       "supported_capabilities": [
         "orchestrator",
         "planner",
@@ -63,7 +64,7 @@
   "profiles": {
     "default": {
       "orchestrator": "claude",
-      "planner": "codex",
+      "planner": "claude",
       "researcher": "gemini",
       "implementer": "claude",
       "reviewer": "codex",

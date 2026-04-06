@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "0.1.0",
+  "title": "Planner capability の Claude 移行 (Phase 1)",
+  "goal": [
+    "default profile の planner capability を Codex CLI (gpt-5.4) から Claude Code (Opus subagent) に移行し、",
+    "Claude のメインコンテキスト内で設計レビューを実行可能にする。",
+    "Phase 2 の hexagonal 統一 resolver 実装に向けた設計資料を保存する。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "agent-profiles.json default profile の planner provider 変更 (codex → claude)",
+        "sources": [
+          "feedback — ユーザー承認 (2026-04-06 planning session)"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "providers.claude に default_model フィールド追加",
+        "sources": [
+          "knowledge/research/2026-04-06-1257-claude-code-reviewer-capability.md"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "SKILL.md Phase 1.5/2 の planner 呼び出しパターンを Claude subagent 経路に更新",
+        "sources": [
+          ".claude/skills/track-plan/SKILL.md §Phase 1.5, §Phase 2"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "rules/02, 08, 11 および track/workflow.md, knowledge/DESIGN.md の planner 参照更新",
+        "sources": [
+          ".claude/rules/08-orchestration.md §Delegation Rules"
+        ],
+        "task_refs": [
+          "T003",
+          "T004",
+          "T005",
+          "T006",
+          "T007"
+        ]
+      },
+      {
+        "text": "Codex planner 設計レビュー出力の保存と Phase 2 TODO 追記",
+        "sources": [
+          "feedback — ユーザー承認 (2026-04-06 planning session)"
+        ],
+        "task_refs": [
+          "T008",
+          "T009"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "Rust コード変更（domain型、usecase port、infrastructure adapter）",
+        "sources": [
+          "feedback — Phase 2 で別 track として実施 (2026-04-06)"
+        ]
+      },
+      {
+        "text": "agent-profiles.json の config/ 配下への移動",
+        "sources": [
+          "feedback — Phase 2 で統一 resolver と合わせて実施"
+        ]
+      },
+      {
+        "text": "codex-heavy / claude-heavy profile の変更",
+        "sources": [
+          "feedback — ユーザー確認: そのまま維持"
+        ]
+      },
+      {
+        "text": "track-local-plan Rust CLI ラッパーの変更",
+        "sources": [
+          "feedback — codex-heavy profile で引き続き使用"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "codex-heavy profile は Codex planner を維持すること",
+      "sources": [
+        "feedback — ユーザー確認 (2026-04-06)"
+      ]
+    },
+    {
+      "text": "Rust コード変更なし（doc/config のみ）",
+      "sources": [
+        "feedback — Phase 1 scope (2026-04-06)"
+      ]
+    },
+    {
+      "text": "既存の cargo make ci が通ること",
+      "sources": [
+        "track/workflow.md §Quality Gates"
+      ]
+    }
+  ],
+  "domain_states": [],
+  "acceptance_criteria": [
+    {
+      "text": "agent-profiles.json default profile の planner が claude になっている",
+      "sources": [
+        "feedback — ユーザー承認"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "SKILL.md Phase 1.5 の planner 呼び出しが Claude subagent 経路を示している",
+      "sources": [
+        ".claude/skills/track-plan/SKILL.md §Phase 1.5"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "rules/02, 08 の default specialist profile 記述が Claude planner を反映している",
+      "sources": [
+        ".claude/rules/08-orchestration.md"
+      ],
+      "task_refs": [
+        "T003",
+        "T004"
+      ]
+    },
+    {
+      "text": "cargo make ci が通る",
+      "sources": [
+        "track/workflow.md §Quality Gates"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T005",
+        "T006",
+        "T007"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "knowledge/conventions/source-attribution.md"
+  ],
+  "signals": {
+    "blue": 16,
+    "yellow": 0,
+    "red": 0
+  }
+}

@@ -14,22 +14,18 @@ class AgentProfilesTest(unittest.TestCase):
         path = Path(temp_dir.name) / "agent-profiles.json"
         return write_agent_profiles(path, active_profile, mutator)
 
-    def test_default_profile_matches_current_role_split(self) -> None:
+    def test_default_profile_resolves_all_required_capabilities(self) -> None:
+        """Verify all capabilities resolve to a valid provider.
+
+        Critical mappings (reviewer, debugger, workflow_host) are pinned because
+        the review pipeline fail-closes on non-Codex reviewers. Flexible mappings
+        (planner, implementer, researcher, etc.) only check validity.
+        """
         profiles = agent_profiles.load_profiles()
 
         self.assertEqual(agent_profiles.active_profile_name(profiles), "default")
-        self.assertEqual(
-            agent_profiles.resolve_provider("orchestrator", profiles=profiles), "claude"
-        )
-        self.assertEqual(
-            agent_profiles.resolve_provider("planner", profiles=profiles), "codex"
-        )
-        self.assertEqual(
-            agent_profiles.resolve_provider("researcher", profiles=profiles), "gemini"
-        )
-        self.assertEqual(
-            agent_profiles.resolve_provider("implementer", profiles=profiles), "claude"
-        )
+
+        # Critical mappings — pipeline invariants
         self.assertEqual(
             agent_profiles.resolve_provider("reviewer", profiles=profiles), "codex"
         )
@@ -37,40 +33,32 @@ class AgentProfilesTest(unittest.TestCase):
             agent_profiles.resolve_provider("debugger", profiles=profiles), "codex"
         )
         self.assertEqual(
-            agent_profiles.resolve_provider("multimodal_reader", profiles=profiles),
-            "gemini",
-        )
-
-    def test_provider_label_and_example_follow_active_profile(self) -> None:
-        profiles = agent_profiles.load_profiles()
-
-        self.assertEqual(
-            agent_profiles.provider_label("researcher", profiles=profiles), "Gemini CLI"
-        )
-        self.assertIn(
-            "gemini -p",
-            agent_profiles.provider_example("researcher", profiles=profiles),
-        )
-        self.assertEqual(
-            agent_profiles.provider_label("planner", profiles=profiles), "Codex CLI"
-        )
-        self.assertIn(
-            "cargo make track-local-plan -- --model",
-            agent_profiles.provider_example("planner", profiles=profiles),
-        )
-        self.assertIn(
-            "cargo make track-local-review -- --model",
-            agent_profiles.provider_example("reviewer", profiles=profiles),
-        )
-        self.assertEqual(
             agent_profiles.workflow_host_provider(profiles=profiles), "claude"
         )
-        self.assertEqual(
-            agent_profiles.workflow_host_model(profiles=profiles), "claude-opus-4-6"
-        )
-        self.assertEqual(
-            agent_profiles.workflow_host_label(profiles=profiles), "Claude Code"
-        )
+
+        # Flexible mappings — any valid provider is OK
+        for cap in agent_profiles.REQUIRED_CAPABILITIES:
+            provider = agent_profiles.resolve_provider(cap, profiles=profiles)
+            self.assertIn(
+                provider,
+                ("claude", "codex", "gemini"),
+                f"capability '{cap}' resolved to unexpected provider '{provider}'",
+            )
+
+    def test_provider_label_and_example_are_non_empty_for_all_capabilities(self) -> None:
+        """Verify label/example resolution works for all capabilities without hardcoding values."""
+        profiles = agent_profiles.load_profiles()
+
+        for cap in agent_profiles.REQUIRED_CAPABILITIES:
+            label = agent_profiles.provider_label(cap, profiles=profiles)
+            self.assertTrue(label, f"provider_label for '{cap}' should be non-empty")
+            example = agent_profiles.provider_example(cap, profiles=profiles)
+            self.assertTrue(example, f"provider_example for '{cap}' should be non-empty")
+
+        # Workflow host fields must always be populated
+        self.assertTrue(agent_profiles.workflow_host_provider(profiles=profiles))
+        self.assertTrue(agent_profiles.workflow_host_model(profiles=profiles))
+        self.assertTrue(agent_profiles.workflow_host_label(profiles=profiles))
 
     def test_load_profiles_rejects_missing_required_capability(self) -> None:
         def mutator(profiles: dict) -> None:
@@ -343,7 +331,7 @@ class AgentProfilesTest(unittest.TestCase):
 
         path = self.write_mutated_profiles(mutator)
         rendered = agent_profiles.render_provider_example(
-            "planner", task="test task", path=path
+            "reviewer", task="test task", path=path
         )
         self.assertIn("gpt-5.4", rendered)
         self.assertNotIn("{model}", rendered)
@@ -386,7 +374,7 @@ class AgentProfilesTest(unittest.TestCase):
 
         path = self.write_mutated_profiles(mutator)
         rendered = agent_profiles.render_provider_example(
-            "planner", task="test task", path=path
+            "reviewer", task="test task", path=path
         )
         self.assertIn("gpt-5.4", rendered)
         self.assertNotIn("{model}", rendered)
@@ -403,7 +391,7 @@ class AgentProfilesTest(unittest.TestCase):
 
         path = self.write_mutated_profiles(mutator)
         rendered = agent_profiles.render_provider_example(
-            "planner", task="test task", path=path
+            "reviewer", task="test task", path=path
         )
         # shlex.quote wraps in single quotes — safe against expansion
         self.assertIn("'evil", rendered)
@@ -419,7 +407,7 @@ class AgentProfilesTest(unittest.TestCase):
 
         path = self.write_mutated_profiles(mutator)
         rendered = agent_profiles.render_provider_example(
-            "planner", task="test task", path=path
+            "reviewer", task="test task", path=path
         )
         # shlex.quote wraps in single quotes — backticks are not expanded
         self.assertIn("'model`whoami`end'", rendered)

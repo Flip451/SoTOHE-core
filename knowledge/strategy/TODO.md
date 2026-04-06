@@ -372,6 +372,11 @@
   - **根本解決**: git index の3-way merge（snapshot と real の差分を統合）。ただし実装コストが高く、単一オペレーターワークフローでは不要。
   - **出典**: Codex Cloud PR review rounds 14-24 (2026-03-18〜19)
 
+- [ ] **WF-80** (MEDIUM): PR review finding parser が Codex Cloud ボイラープレートを P1 finding として誤検出
+  - **課題**: `sotp pr review-cycle` の finding parser が、Codex Cloud の初回レビュー時に付与される使い方説明（「Open a pull request」「Mark a draft as ready」「Comment @codex review」）を `[P1] general:` finding としてパースする。これにより orchestrator が不要な Accepted Deviations を PR body に追加してしまう
+  - **提案**: `apps/cli/src/commands/pr.rs` の finding 抽出ロジックで Codex Cloud ボイラープレートパターンをフィルタするか、body セクション境界で「レビュー結果」と「使い方説明」を分離する
+  - **出典**: PR #80 planner-claude-migration-2026-04-07 (2026-04-06)
+
 ### G-3a2. ローカルレビュー整合性
 
 - [ ] **WF-61** (MEDIUM): `record-round` に渡す verdict の虚偽申告を検出できない
@@ -415,13 +420,15 @@
   - **課題**: エージェント間の引き継ぎがファイルベースのみ → 暗黙の意図が喪失
   - **提案**: セッション間コンテキスト共有メカニズム（JSON ペイロード）
 
-- [ ] **WF-34** (MEDIUM): Claude/Codex capability 配置の最適化
-  - **課題**: 現在の default profile は `planner` / `debugger` を Codex に委譲しているが、Claude の 1M context 内に既にあるコードベース情報を活用できず、Codex への再送オーバーヘッドが大きい。特に planner はコンテキスト密度が高い作業であり、外部委譲の効率が悪い。debugger も同様にセッション内のエラー出力・直前の変更が既にある。
-  - **提案**:
-    - `planner`: Claude (Opus) をメインに変更。Codex は「設計の検証・セカンドオピニオン」に限定
-    - `debugger`: 通常デバッグは Claude が直接対応。所有権/ライフタイムの複雑な問題のみ Codex に escalate
-    - `reviewer`: Codex のまま維持（self-review バイアス回避のため外部 reviewer は必須）
-    - `researcher`: コードベース分析は Claude (Explore subagent)、外部リサーチは Gemini に使い分け
+- [x] ~~**WF-34** (MEDIUM): Claude/Codex capability 配置の最適化~~ ✅ Phase 1 完了 (planner-claude-migration-2026-04-07)
+  - **Phase 1 対応**: default profile の `planner` を Claude (Opus, `--bare -p`) に移行。config + doc 変更のみ
+  - **Phase 2 残**: hexagonal 統一 resolver + domain 型定義（下記 WF-34-phase2 参照）
+
+- [ ] **WF-34-phase2** (MEDIUM): Planner hexagonal architecture + 統一 config resolver
+  - **課題**: provider/model 解決が Rust (`agent_profiles.rs`), Python (`_agent_profiles.py`), raw JSON (`pr_review.rs`) の 3 箇所に分散しており、解決ルールが不整合になるリスクがある
+  - **提案**: domain 層に `AgentProfiles` / `Capability` / `ProviderName` 型を定義し、usecase に `Planner` port trait、infrastructure に `CodexPlanner` / `ClaudePlanner` adapter を配置。`sotp plan auto` で config ベース auto-dispatch
+  - **設計資料**: `knowledge/research/2026-04-07-1040-planner-claude-migration-design.md`（Canonical Blocks 含む）
+  - **出典**: Codex planner design review (2026-04-06)
   - **実装**: `agent-profiles.json` に新 profile（例: `claude-planner`）を追加し A/B 比較で効果測定
   - **トレードオフ**: Claude 集中でコンテキスト切替コスト削減・レイテンシ改善が見込める一方、多様な視点が減る
 

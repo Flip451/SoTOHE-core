@@ -317,10 +317,8 @@ const MODEL_RESOLUTION_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     (
         ".claude/skills/track-plan/SKILL.md",
-        "track-plan override-first resolution",
-        &[
-            "Resolve `{model}` from `profiles.<active_profile>.provider_model_overrides.codex` first, then `providers.codex.default_model`",
-        ],
+        "track-plan provider-specific invocation",
+        &["Agent tool", "cargo make track-local-plan"],
         &["codex exec --model gpt-5.3-codex --sandbox read-only --full-auto \""],
     ),
     (

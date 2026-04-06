@@ -6,9 +6,9 @@ Claude Code is the orchestrator.
 - Context management: `track/`
 - Capability routing: `.claude/agent-profiles.json`
 - Default specialist profile:
-  - `planner` / `reviewer` / `debugger`: Codex CLI
+  - `planner` / `implementer`: Claude Code
+  - `reviewer` / `debugger`: Codex CLI
   - `researcher` / `multimodal_reader`: Gemini CLI
-  - `implementer`: Claude Code
 - Parallel execution: Agent Teams
 
 Host orchestration stays in Claude Code.
@@ -72,9 +72,9 @@ Use the minimum capable capability first, then resolve it via `.claude/agent-pro
   - `debugger`: compile-error diagnosis, failing test analysis
   - `multimodal_reader`: PDF / image / audio / video understanding
 - provider resolution:
-  - default profile maps `planner` / `reviewer` / `debugger` to Codex CLI
+  - default profile maps `planner` / `implementer` to Claude Code
+  - default profile maps `reviewer` / `debugger` to Codex CLI
   - default profile maps `researcher` / `multimodal_reader` to Gemini CLI
-  - default profile maps `implementer` to Claude Code
 - Agent Teams:
   - `/track:implement`
   - `/track:review`
