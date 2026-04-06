@@ -18,8 +18,10 @@
 
 ## Result / Open Issues
 
-- (実装後に記入)
+- CI 全通過 (1628 tests pass, all verify checks pass)
+- Python hook テストのエージェント割り当て固定化テストを廃止し、provider-agnostic な形に書き換え
+- orchestra guardrail の SKILL.md チェックを Codex 固有から provider-agnostic に更新
 
 ## verified_at
 
-- (検証後に記入)
+- 2026-04-06

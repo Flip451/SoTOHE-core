@@ -19,7 +19,7 @@
 
 ## Task Workflow
 
-Specialist capability の実体は `.claude/agent-profiles.json` で決まる。既定 profile では `planner` / `reviewer` / `debugger` が Codex、`researcher` / `multimodal_reader` が Gemini、`implementer` が Claude Code に割り当てられる。
+Specialist capability の実体は `.claude/agent-profiles.json` で決まる。既定 profile では `planner` / `implementer` が Claude Code、`reviewer` / `debugger` が Codex、`researcher` / `multimodal_reader` が Gemini に割り当てられる。
 
 ### Standard Task Process
 

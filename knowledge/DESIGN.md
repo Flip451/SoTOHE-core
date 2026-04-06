@@ -36,11 +36,13 @@ flowchart TD
 
 ## Agent Roles
 
-| Agent / Capability | Role |
-|-------|------|
-| Claude Code (main) | Overall orchestration, user interaction |
-| `planner` / `reviewer` / `debugger` | Rust design, review, debugging |
-| `researcher` / `multimodal_reader` | Crate research, codebase analysis, external document reading |
+| Agent / Capability | Default Provider | Role |
+|-------|-------|------|
+| `orchestrator` | Claude Code | Overall orchestration, user interaction |
+| `planner` | Claude Code (Opus) | Architecture design, implementation planning |
+| `implementer` | Claude Code | Rust implementation |
+| `reviewer` / `debugger` | Codex CLI | Code review, debugging |
+| `researcher` / `multimodal_reader` | Gemini CLI | Crate research, codebase analysis, external document reading |
 
 Note: See `.claude/agent-profiles.json` for which provider handles each capability.
 

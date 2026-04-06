@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "title": "Planner capability の Claude 移行 (Phase 1)",
   "goal": [
-    "default profile の planner capability を Codex CLI (gpt-5.4) から Claude (--bare -p, Opus) に移行し、",
-    "Claude による設計レビューを即座に利用可能にする。",
+    "default profile の planner capability を Codex CLI (gpt-5.4) から Claude Code (Opus subagent) に移行し、",
+    "Claude のメインコンテキスト内で設計レビューを実行可能にする。",
     "Phase 2 の hexagonal 統一 resolver 実装に向けた設計資料を保存する。"
   ],
   "scope": {
@@ -29,7 +29,7 @@
         ]
       },
       {
-        "text": "SKILL.md Phase 1.5/2 の planner 呼び出しパターンを Claude 経路に更新",
+        "text": "SKILL.md Phase 1.5/2 の planner 呼び出しパターンを Claude subagent 経路に更新",
         "sources": [
           ".claude/skills/track-plan/SKILL.md §Phase 1.5, §Phase 2"
         ],
@@ -120,7 +120,7 @@
       ]
     },
     {
-      "text": "SKILL.md Phase 1.5 の planner 呼び出しが Claude 経路を示している",
+      "text": "SKILL.md Phase 1.5 の planner 呼び出しが Claude subagent 経路を示している",
       "sources": [
         ".claude/skills/track-plan/SKILL.md §Phase 1.5"
       ],

@@ -4,12 +4,12 @@
 
 ## 既定 profile での主担当 capability
 
-### 1. `planner` / `reviewer`
+### 1. `reviewer`
 
-- アーキテクチャ設計、モジュール構成
-- 実装計画の策定（ステップ分解、依存関係整理）
-- トレードオフ評価、技術選定
 - コードレビュー（品質・正確性分析）
+
+> **Note**: `planner` は既定 profile では Claude に割り当てられている。
+> `codex-heavy` profile では引き続き Codex が `planner` を担当する。
 
 ### 2. `debugger` / `implementer`
 
