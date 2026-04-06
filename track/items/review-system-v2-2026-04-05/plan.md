@@ -53,7 +53,7 @@ CommitHash フォールバック: CommitHashReader が None → git rev-parse ma
 review-scope.json パターン拡張（harness-policy に DEVELOPER_AI_WORKFLOW.md, README.md, track/review-scope.json を追加、planning_only 廃止、normalize 廃止）。
 track-commit-message フローに .commit_hash 書き込みを追加。
 
-- [ ] CLI integration: check-approved/review-status/record-round commands + composition root (CodexReviewer adapter construction + CommitHash fallback: None → git rev-parse main) + review-scope.json pattern updates (planning_only 廃止, normalize 廃止, harness-policy 拡張: DEVELOPER_AI_WORKFLOW.md, README.md, track/review-scope.json を追加) + .commit_hash write in commit flow
+- [x] CLI integration: check-approved/review-status/record-round commands + composition root (CodexReviewer adapter construction + CommitHash fallback: None → git rev-parse main) + review-scope.json pattern updates (planning_only 廃止, normalize 廃止, harness-policy 拡張: DEVELOPER_AI_WORKFLOW.md, README.md, track/review-scope.json を追加) + .commit_hash write in commit flow
 
 ## v1 クリーンアップ
 
@@ -63,4 +63,4 @@ infrastructure 旧 review.json codec, effective_diff_base 削除。
 既存テストを v2 API に更新。
 v1→v2 マイグレーション: v1 review.json (schema_version:1) は無視（デコーダが空として扱う）。既存トラックは init + clear で移行。v1 approved_head → .commit_hash に置換。
 
-- [ ] v1 cleanup: remove domain ReviewCycle/CycleGroupState/frozen scope/ReviewPartitionSnapshot/GroupPartition/DiffScope, usecase RecordRoundProtocol/has_scope_drift/staleness/reclassified_paths_outside_cycle_groups, infra old codec/effective_diff_base, update tests + v1→v2 migration (v1 review.json schema_version:1 は無視, init+clear で移行, v1 approved_head → .commit_hash に置換)
+- [~] v1 cleanup: remove domain ReviewCycle/CycleGroupState/frozen scope/ReviewPartitionSnapshot/GroupPartition/DiffScope, usecase RecordRoundProtocol/has_scope_drift/staleness/reclassified_paths_outside_cycle_groups, infra old codec/effective_diff_base, update tests + v1→v2 migration (v1 review.json schema_version:1 は無視, init+clear で移行, v1 approved_head → .commit_hash に置換)

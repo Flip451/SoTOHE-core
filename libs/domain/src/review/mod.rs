@@ -1,7 +1,7 @@
-//! Review state management for track-level review workflows.
+//! Review state management for track-level review workflows (v1).
 //!
-//! Tracks review progress through a state machine:
-//! `NotStarted` → `FastPassed` → `Approved`, with `Invalidated` on code changes.
+//! Types required by metadata.json codec and review.json codec.
+//! New review workflow logic uses `review_v2` instead.
 
 pub mod concern;
 pub mod cycle;
@@ -9,9 +9,6 @@ pub mod error;
 pub mod escalation;
 pub mod state;
 pub mod types;
-
-#[cfg(test)]
-mod tests;
 
 pub use concern::{ReviewConcern, ReviewConcernStreak, ReviewCycleSummary, file_path_to_concern};
 pub use cycle::{

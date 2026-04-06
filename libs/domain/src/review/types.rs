@@ -34,13 +34,6 @@ impl Verdict {
 }
 
 /// A validated git commit SHA (40-character hexadecimal string).
-///
-/// Used to record the HEAD SHA of the last approved commit, enabling
-/// incremental review scope computation on track branches.
-///
-/// # Errors
-/// Returns `ReviewError::InvalidConcern` if the string is not exactly
-/// 40 lowercase hexadecimal characters.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ApprovedHead(String);
 
@@ -73,16 +66,12 @@ impl std::fmt::Display for ApprovedHead {
 }
 
 /// Code hash state for review freshness tracking.
-///
-/// Three-state ADT replacing `Option<CodeHash>`:
-/// - `NotRecorded`: no review round has been recorded yet (initial state).
-/// - `Pending`: a round was recorded but the final hash hasn't been written back yet.
-/// - `Computed`: holds the actual hash (validated non-empty).
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum CodeHash {
-    /// No review round has been recorded yet (replaces former `None`).
+    /// No review round has been recorded yet.
+    #[default]
     NotRecorded,
-    /// Hash computation is pending (two-phase protocol intermediate state).
+    /// Hash computation is pending.
     Pending,
     /// A computed, non-empty hash string.
     Computed(String),
@@ -109,8 +98,6 @@ impl CodeHash {
     }
 
     /// Returns the hash string if this is a `Computed` variant.
-    ///
-    /// Returns `None` for `NotRecorded` and `Pending` variants.
     #[must_use]
     pub fn as_str(&self) -> Option<&str> {
         match self {
@@ -210,10 +197,6 @@ impl ReviewRoundResult {
 }
 
 /// Progress state of a named review group as an ADT.
-///
-/// Replaces the former `{ fast: Option, final_round: Option }` struct,
-/// making illegal states (e.g., having a final round without a fast round
-/// in normal flow) explicit via variants.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub enum ReviewGroupState {
     /// No rounds recorded yet.
@@ -281,9 +264,6 @@ impl ReviewGroupState {
 }
 
 /// Per-model behavioral profile for reviewer full-auto resolution.
-///
-/// The `full_auto` field controls whether `--full-auto` is passed to the reviewer.
-/// This is a pure domain type without serde; deserialization lives in the usecase layer.
 pub struct ModelProfile {
     /// Whether `--full-auto` should be passed to `codex exec`.
     pub full_auto: bool,
@@ -298,14 +278,6 @@ impl ModelProfile {
 }
 
 /// Resolves whether `--full-auto` should be enabled for the given model.
-///
-/// Looks up `model` in the provided `model_profiles` map.
-/// Falls back to `true` (fail-closed) when the model is not found
-/// or when `model_profiles` is `None`.
-///
-/// # Errors
-///
-/// This function does not return errors — unknown models default to `true`.
 #[must_use]
 pub fn resolve_full_auto(
     model: &str,
@@ -317,13 +289,7 @@ pub fn resolve_full_auto(
     }
 }
 
-/// Scans text content for a JSON verdict block. Pure function (no file I/O).
-///
-/// Handles both single-line compact JSON and pretty-printed multi-line JSON.
-/// Scans backward for JSON objects containing `"verdict"` and `"findings"` keys.
-///
-/// Scans content bottom-up for single-line compact JSON candidates
-/// containing `"verdict"` and `"findings"` keys.
+/// Scans content bottom-up for single-line compact JSON candidates.
 #[must_use]
 pub fn extract_verdict_json_candidates_compact(content: &str) -> Vec<String> {
     let mut candidates = Vec::new();
@@ -339,8 +305,7 @@ pub fn extract_verdict_json_candidates_compact(content: &str) -> Vec<String> {
     candidates
 }
 
-/// Scans content bottom-up for multi-line pretty-printed JSON candidates
-/// containing `"verdict"` and `"findings"` keys.
+/// Scans content bottom-up for multi-line pretty-printed JSON candidates.
 #[must_use]
 pub fn extract_verdict_json_candidates_multiline(content: &str) -> Vec<String> {
     let mut candidates = Vec::new();
@@ -372,58 +337,4 @@ pub fn extract_verdict_json_candidates_multiline(content: &str) -> Vec<String> {
         end = close;
     }
     candidates
-}
-
-#[cfg(test)]
-#[allow(clippy::unwrap_used)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_approved_head_valid_lowercase() {
-        let sha = "abcdef0123456789abcdef0123456789abcdef01";
-        let head = ApprovedHead::try_new(sha).unwrap();
-        assert_eq!(head.as_str(), sha);
-    }
-
-    #[test]
-    fn test_approved_head_valid_uppercase_normalizes() {
-        let sha = "ABCDEF0123456789ABCDEF0123456789ABCDEF01";
-        let head = ApprovedHead::try_new(sha).unwrap();
-        assert_eq!(head.as_str(), sha.to_ascii_lowercase());
-    }
-
-    #[test]
-    fn test_approved_head_too_short_returns_error() {
-        let result = ApprovedHead::try_new("abcdef");
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn test_approved_head_too_long_returns_error() {
-        let sha = "abcdef0123456789abcdef0123456789abcdef010";
-        assert_eq!(sha.len(), 41);
-        let result = ApprovedHead::try_new(sha);
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn test_approved_head_non_hex_returns_error() {
-        let sha = "ghijkl0123456789abcdef0123456789abcdef01";
-        let result = ApprovedHead::try_new(sha);
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn test_approved_head_empty_returns_error() {
-        let result = ApprovedHead::try_new("");
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn test_approved_head_display() {
-        let sha = "abcdef0123456789abcdef0123456789abcdef01";
-        let head = ApprovedHead::try_new(sha).unwrap();
-        assert_eq!(format!("{head}"), sha);
-    }
 }

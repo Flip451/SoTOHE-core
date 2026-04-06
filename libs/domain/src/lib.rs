@@ -34,7 +34,7 @@ pub use review::{
     ReviewCycle, ReviewCycleSummary, ReviewError, ReviewEscalationBlock, ReviewEscalationDecision,
     ReviewEscalationResolution, ReviewEscalationState, ReviewGroupState, ReviewJson,
     ReviewRoundResult, ReviewStalenessReason, ReviewState, ReviewStatus, RoundType, StoredFinding,
-    Verdict,
+    Verdict, file_path_to_concern,
 };
 pub use signal::{
     ConfidenceSignal, SignalBasis, SignalCounts, classify_source_tag, evaluate_source_tag,

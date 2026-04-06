@@ -203,7 +203,6 @@ pub fn record_round(
 ) -> Result<(), RecordRoundError> {
     use crate::review_workflow::{
         ReviewFinalMessageState, ReviewPayloadVerdict, parse_review_final_message,
-        review_findings_to_stored,
     };
 
     let round_type = match input.round_type.as_str() {
@@ -252,7 +251,20 @@ pub fn record_round(
                 ReviewPayloadVerdict::ZeroFindings => Verdict::ZeroFindings,
                 ReviewPayloadVerdict::FindingsRemain => Verdict::FindingsRemain,
             };
-            (verdict, review_findings_to_stored(&payload.findings))
+            let findings: Vec<domain::StoredFinding> = payload
+                .findings
+                .iter()
+                .map(|f| {
+                    domain::StoredFinding::new(
+                        f.message.clone(),
+                        f.severity.clone(),
+                        f.file.clone(),
+                        f.line,
+                    )
+                    .with_category(f.category.clone())
+                })
+                .collect();
+            (verdict, findings)
         }
         ReviewFinalMessageState::Missing => {
             return Err(RecordRoundError::Other("--verdict is required".to_owned()));
@@ -443,116 +455,9 @@ pub fn resolve_escalation(
 }
 
 // ---------------------------------------------------------------------------
-// check-approved: usecase orchestration via domain ports
-// ---------------------------------------------------------------------------
-
-pub struct CheckApprovedInput {
-    pub items_dir: PathBuf,
-    pub track_id: String,
-    /// When `true`, the staged diff contains only planning-only files (track docs,
-    /// config, etc.). The NotStarted+empty-groups fast-path is only allowed in this
-    /// case. When `false`, code files are staged and a completed review is required.
-    pub planning_only: bool,
-    /// Current partition snapshot (policy hashes + group partition) for staleness
-    /// detection. When `Some`, `check_cycle_approved` performs full staleness +
-    /// partition drift + per-group hash verification. When `None`, falls back to
-    /// per-group hash check only (no staleness detection).
-    pub current_snapshot: Option<crate::review_workflow::groups::ReviewPartitionSnapshot>,
-}
-
-/// Orchestrates check-approved: read review.json → check cycle approval.
-///
-/// When review.json does not exist (no review cycle started), planning-only
-/// commits are allowed but code commits are blocked.
-///
-/// # Errors
-///
-/// Returns a human-readable error string when the review is not approved.
-pub fn check_approved(
-    input: CheckApprovedInput,
-    reader: &impl TrackReader,
-    _writer: &impl TrackWriter,
-    hasher: &impl GitHasher,
-    review_reader: &impl domain::ReviewJsonReader,
-) -> Result<(), String> {
-    let track_id =
-        TrackId::try_new(&input.track_id).map_err(|e| format!("invalid track id: {e}"))?;
-
-    // Verify track exists and check legacy escalation gate.
-    let track = reader
-        .find(&track_id)
-        .map_err(|e| format!("failed to read track: {e}"))?
-        .ok_or_else(|| format!("track '{}' not found", track_id.as_ref()))?;
-
-    // Fail-closed: if metadata.json has an active escalation block, reject.
-    // Escalation state has not yet been migrated to review.json (T005/T006).
-    if let Some(review_state) = track.review() {
-        if let domain::EscalationPhase::Blocked(block) = review_state.escalation().phase() {
-            let concerns: Vec<_> = block.concerns().iter().map(|c| c.as_ref().to_owned()).collect();
-            return Err(format!(
-                "[BLOCKED] Review escalation active for concerns: {concerns:?}. \
-                 Run `sotp review resolve-escalation` first."
-            ));
-        }
-    }
-
-    // Read review.json (the new cycle-based review state).
-    let review_json = review_reader
-        .find_review(&track_id)
-        .map_err(|e| format!("failed to read review.json: {e}"))?;
-
-    // No review.json → review never started. Allow commit (WF-66: user may
-    // choose PR-based review instead of local review).
-    let Some(review) = review_json else {
-        return Ok(());
-    };
-
-    // No current cycle → same as not started.
-    let Some(cycle) = review.current_cycle() else {
-        return Ok(());
-    };
-
-    // Delegate to check_cycle_approved which performs full verification:
-    // staleness (policy + partition + hash) + per-group fast/final check.
-    if let Some(ref snapshot) = input.current_snapshot {
-        // Compute hashes from CURRENT partition (not frozen cycle scope) so that
-        // files added to a group after cycle start are reflected in the hash,
-        // causing a mismatch with the reviewed round hash.
-        let mut current_group_hashes = std::collections::BTreeMap::new();
-        for (group_name, paths) in snapshot.partition().groups() {
-            let scope: Vec<String> = paths.iter().map(|p| p.as_str().to_owned()).collect();
-            let group_hash = hasher.group_scope_hash(&scope).map_err(|e| {
-                format!("group scope hash error for '{}': {e}", group_name.as_ref())
-            })?;
-            current_group_hashes.insert(group_name.clone(), group_hash);
-        }
-
-        match crate::review_workflow::cycle::check_cycle_approved(
-            &review,
-            snapshot,
-            &current_group_hashes,
-        ) {
-            crate::review_workflow::cycle::CheckCycleApprovedResult::Approved => Ok(()),
-            crate::review_workflow::cycle::CheckCycleApprovedResult::NotApproved(reason) => {
-                Err(format!("[BLOCKED] {reason:?}"))
-            }
-        }
-    } else {
-        // Fallback when no snapshot provided: compute hashes from cycle's frozen scope.
-        let mut current_group_hashes = std::collections::BTreeMap::new();
-        for (group_name, group_state) in cycle.groups() {
-            let group_hash = hasher.group_scope_hash(group_state.scope()).map_err(|e| {
-                format!("group scope hash error for '{}': {e}", group_name.as_ref())
-            })?;
-            current_group_hashes.insert(group_name.clone(), group_hash);
-        }
-        if review.current_cycle().is_some_and(|c| c.all_groups_approved(&current_group_hashes)) {
-            Ok(())
-        } else {
-            Err("[BLOCKED] Review cycle not fully approved (missing fast+final zero_findings for all groups)".to_string())
-        }
-    }
-}
+// check-approved: removed (superseded by v2 CLI implementation)
+// The CLI layer (apps/cli/src/commands/review/mod.rs) implements check-approved
+// directly using the v2 ReviewCycle. This usecase function is no longer needed.
 
 #[cfg(test)]
 mod tests {
@@ -560,249 +465,9 @@ mod tests {
     #![allow(clippy::panic)]
     #![allow(clippy::expect_used)]
 
-    use std::collections::HashMap;
     use std::path::PathBuf;
-    use std::sync::Mutex;
 
     use super::*;
-
-    // --- Mock GitHasher ---
-
-    struct FixedHasher(String);
-
-    impl FixedHasher {
-        fn new(hash: &str) -> Self {
-            Self(hash.to_owned())
-        }
-    }
-
-    impl GitHasher for FixedHasher {
-        fn group_scope_hash(&self, _scope: &[String]) -> Result<String, String> {
-            Ok(self.0.clone())
-        }
-    }
-
-    // --- Minimal in-memory TrackReader + TrackWriter ---
-
-    #[derive(Default)]
-    struct MemStore {
-        tracks: Mutex<HashMap<String, domain::TrackMetadata>>,
-    }
-
-    impl TrackReader for MemStore {
-        fn find(&self, id: &TrackId) -> Result<Option<domain::TrackMetadata>, TrackReadError> {
-            Ok(self.tracks.lock().unwrap().get(id.as_ref()).cloned())
-        }
-    }
-
-    impl TrackWriter for MemStore {
-        fn save(&self, track: &domain::TrackMetadata) -> Result<(), TrackWriteError> {
-            self.tracks.lock().unwrap().insert(track.id().as_ref().to_owned(), track.clone());
-            Ok(())
-        }
-
-        fn update<F>(
-            &self,
-            id: &TrackId,
-            mutate: F,
-        ) -> Result<domain::TrackMetadata, TrackWriteError>
-        where
-            F: FnOnce(&mut domain::TrackMetadata) -> Result<(), DomainError>,
-        {
-            let mut tracks = self.tracks.lock().unwrap();
-            let track = tracks.get_mut(id.as_ref()).ok_or_else(|| {
-                TrackWriteError::from(domain::RepositoryError::TrackNotFound(
-                    id.as_ref().to_owned(),
-                ))
-            })?;
-            mutate(track)?;
-            Ok(track.clone())
-        }
-    }
-
-    // --- Mock ReviewJsonReader ---
-
-    #[derive(Default)]
-    struct MemReviewStore {
-        reviews: Mutex<HashMap<String, domain::ReviewJson>>,
-    }
-
-    impl domain::ReviewJsonReader for MemReviewStore {
-        fn find_review(&self, id: &TrackId) -> Result<Option<domain::ReviewJson>, TrackReadError> {
-            Ok(self.reviews.lock().unwrap().get(id.as_ref()).cloned())
-        }
-    }
-
-    impl MemReviewStore {
-        fn save_review(&self, id: &TrackId, review: domain::ReviewJson) {
-            self.reviews.lock().unwrap().insert(id.as_ref().to_owned(), review);
-        }
-    }
-
-    // --- Helper: build a minimal track (no review in metadata) ---
-
-    fn make_track(track_id: &str) -> domain::TrackMetadata {
-        let tid = TrackId::try_new(track_id).unwrap();
-        let task_id = domain::TaskId::try_new("T1").unwrap();
-        let task = domain::TrackTask::new(task_id.clone(), "task").unwrap();
-        let section = domain::PlanSection::new("S1", "section", vec![], vec![task_id]).unwrap();
-        let plan = domain::PlanView::new(vec!["summary".to_string()], vec![section]);
-        domain::TrackMetadata::new(tid, "test track", vec![task], plan, None).unwrap()
-    }
-
-    fn make_review_with_approved_cycle(code_hash: &str) -> domain::ReviewJson {
-        use std::collections::BTreeMap;
-        let grn = domain::ReviewGroupName::try_new("other").unwrap();
-        let ts = domain::Timestamp::new("2026-03-30T08:00:00Z").unwrap();
-        let mut groups = BTreeMap::new();
-        let mut gs = domain::CycleGroupState::new(vec![]);
-        let fast = domain::GroupRound::success(
-            domain::RoundType::Fast,
-            ts.clone(),
-            code_hash,
-            domain::GroupRoundVerdict::ZeroFindings,
-        )
-        .unwrap();
-        gs.record_round(fast);
-        let fin = domain::GroupRound::success(
-            domain::RoundType::Final,
-            ts.clone(),
-            code_hash,
-            domain::GroupRoundVerdict::ZeroFindings,
-        )
-        .unwrap();
-        gs.record_round(fin);
-        groups.insert(grn, gs);
-        let mut rj = domain::ReviewJson::new();
-        rj.start_cycle("c1", ts, "main", "sha256:none", "sha256:none", groups).unwrap();
-        rj
-    }
-
-    #[test]
-    fn check_approved_planning_only_true_with_no_review_json_passes() {
-        let store = MemStore::default();
-        let track = make_track("test-track");
-        store.save(&track).unwrap();
-        let review_store = MemReviewStore::default();
-
-        let hasher = FixedHasher::new("abc123");
-        let input = CheckApprovedInput {
-            items_dir: PathBuf::from("track/items"),
-            track_id: "test-track".to_string(),
-            planning_only: true,
-            current_snapshot: None,
-        };
-
-        let result = check_approved(input, &store, &store, &hasher, &review_store);
-        assert!(result.is_ok(), "planning_only=true + no review.json should pass: {result:?}");
-    }
-
-    #[test]
-    fn check_approved_no_review_json_allows_commit() {
-        // WF-66: review never started (NotStarted) should allow commit.
-        // User may choose PR-based review instead of local review.
-        let store = MemStore::default();
-        let track = make_track("test-track");
-        store.save(&track).unwrap();
-        let review_store = MemReviewStore::default();
-
-        let hasher = FixedHasher::new("abc123");
-        let input = CheckApprovedInput {
-            items_dir: PathBuf::from("track/items"),
-            track_id: "test-track".to_string(),
-            planning_only: false,
-            current_snapshot: None,
-        };
-
-        let result = check_approved(input, &store, &store, &hasher, &review_store);
-        assert!(result.is_ok(), "no review.json (NotStarted) should allow commit: {result:?}");
-    }
-
-    #[test]
-    fn check_approved_with_approved_cycle_passes() {
-        let code_hash = "rvw1:sha256:abc123";
-        let store = MemStore::default();
-        let track = make_track("test-track");
-        store.save(&track).unwrap();
-        let review_store = MemReviewStore::default();
-        let track_id = TrackId::try_new("test-track").unwrap();
-        review_store.save_review(&track_id, make_review_with_approved_cycle(code_hash));
-
-        let hasher = FixedHasher::new(code_hash);
-        let input = CheckApprovedInput {
-            items_dir: PathBuf::from("track/items"),
-            track_id: "test-track".to_string(),
-            planning_only: false,
-            current_snapshot: None,
-        };
-
-        let result = check_approved(input, &store, &store, &hasher, &review_store);
-        assert!(result.is_ok(), "approved cycle should pass: {result:?}");
-    }
-
-    #[test]
-    fn check_approved_stale_hash_is_blocked() {
-        let store = MemStore::default();
-        let track = make_track("test-track");
-        store.save(&track).unwrap();
-        let review_store = MemReviewStore::default();
-        let track_id = TrackId::try_new("test-track").unwrap();
-        review_store
-            .save_review(&track_id, make_review_with_approved_cycle("rvw1:sha256:old-hash"));
-
-        let hasher = FixedHasher::new("rvw1:sha256:new-hash");
-        let input = CheckApprovedInput {
-            items_dir: PathBuf::from("track/items"),
-            track_id: "test-track".to_string(),
-            planning_only: false,
-            current_snapshot: None,
-        };
-
-        let result = check_approved(input, &store, &store, &hasher, &review_store);
-        assert!(result.is_err(), "stale hash should block");
-        assert!(result.unwrap_err().contains("[BLOCKED]"));
-    }
-
-    #[test]
-    fn check_approved_fast_only_without_final_is_blocked() {
-        use std::collections::BTreeMap;
-        let code_hash = "rvw1:sha256:abc";
-        let store = MemStore::default();
-        let track = make_track("test-track");
-        store.save(&track).unwrap();
-
-        let grn = domain::ReviewGroupName::try_new("other").unwrap();
-        let ts = domain::Timestamp::new("2026-03-30T08:00:00Z").unwrap();
-        let mut groups = BTreeMap::new();
-        let mut gs = domain::CycleGroupState::new(vec![]);
-        let fast = domain::GroupRound::success(
-            domain::RoundType::Fast,
-            ts.clone(),
-            code_hash,
-            domain::GroupRoundVerdict::ZeroFindings,
-        )
-        .unwrap();
-        gs.record_round(fast);
-        groups.insert(grn, gs);
-        let mut rj = domain::ReviewJson::new();
-        rj.start_cycle("c1", ts, "main", "sha256:none", "sha256:none", groups).unwrap();
-
-        let review_store = MemReviewStore::default();
-        let track_id = TrackId::try_new("test-track").unwrap();
-        review_store.save_review(&track_id, rj);
-
-        let hasher = FixedHasher::new(code_hash);
-        let input = CheckApprovedInput {
-            items_dir: PathBuf::from("track/items"),
-            track_id: "test-track".to_string(),
-            planning_only: false,
-            current_snapshot: None,
-        };
-
-        let result = check_approved(input, &store, &store, &hasher, &review_store);
-        assert!(result.is_err(), "fast-only should block");
-        assert!(result.unwrap_err().contains("[BLOCKED]"));
-    }
 
     // ---------------------------------------------------------------------------
     // Stub for RecordRoundProtocol

@@ -203,6 +203,12 @@ struct FindingDocument {
 /// or domain validation failure.
 pub fn decode(json: &str) -> Result<ReviewJson, ReviewJsonCodecError> {
     let doc: ReviewJsonDocument = serde_json::from_str(json)?;
+    if doc.schema_version != 1 {
+        return Err(ReviewJsonCodecError::InvalidField {
+            field: "schema_version".into(),
+            reason: format!("unsupported schema version: {}", doc.schema_version),
+        });
+    }
     let cycles = doc.cycles.into_iter().map(cycle_from_document).collect::<Result<Vec<_>, _>>()?;
     // Validate append-only cycle ordering (non-decreasing started_at)
     validate_cycle_order(&cycles)?;

@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fmt;
 
 use super::error::{FilePathError, FindingError, ReviewHashError, ScopeNameError, VerdictError};
@@ -411,4 +412,99 @@ impl fmt::Display for ReviewState {
             ReviewState::NotRequired(NotRequiredReason::ZeroFindings) => f.write_str("approved"),
         }
     }
+}
+
+// ── ModelProfile / resolve_full_auto ─────────────────────────────────────────
+
+/// Per-model behavioral profile for reviewer full-auto resolution.
+///
+/// The `full_auto` field controls whether `--full-auto` is passed to the reviewer.
+/// This is a pure domain type without serde; deserialization lives in the infrastructure layer.
+pub struct ModelProfile {
+    /// Whether `--full-auto` should be passed to `codex exec`.
+    pub full_auto: bool,
+}
+
+impl ModelProfile {
+    /// Creates a new `ModelProfile`.
+    #[must_use]
+    pub fn new(full_auto: bool) -> Self {
+        Self { full_auto }
+    }
+}
+
+/// Resolves whether `--full-auto` should be enabled for the given model.
+///
+/// Looks up `model` in the provided `model_profiles` map.
+/// Falls back to `true` (fail-closed) when the model is not found
+/// or when `model_profiles` is `None`.
+///
+/// # Errors
+///
+/// This function does not return errors — unknown models default to `true`.
+#[must_use]
+pub fn resolve_full_auto(
+    model: &str,
+    model_profiles: Option<&HashMap<String, ModelProfile>>,
+) -> bool {
+    match model_profiles {
+        Some(profiles) => profiles.get(model).is_none_or(|profile| profile.full_auto),
+        None => true,
+    }
+}
+
+// ── Verdict JSON extraction ───────────────────────────────────────────────────
+
+/// Scans text content for a JSON verdict block. Pure function (no file I/O).
+///
+/// Scans content bottom-up for single-line compact JSON candidates
+/// containing `"verdict"` and `"findings"` keys.
+#[must_use]
+pub fn extract_verdict_json_candidates_compact(content: &str) -> Vec<String> {
+    let mut candidates = Vec::new();
+    for line in content.lines().rev() {
+        let trimmed = line.trim();
+        if trimmed.starts_with('{')
+            && trimmed.contains("\"verdict\"")
+            && trimmed.contains("\"findings\"")
+        {
+            candidates.push(trimmed.to_owned());
+        }
+    }
+    candidates
+}
+
+/// Scans content bottom-up for multi-line pretty-printed JSON candidates
+/// containing `"verdict"` and `"findings"` keys.
+#[must_use]
+pub fn extract_verdict_json_candidates_multiline(content: &str) -> Vec<String> {
+    let mut candidates = Vec::new();
+    let bytes = content.as_bytes();
+    let mut end = bytes.len();
+    while let Some(close) = content.get(..end).and_then(|s| s.rfind('}')) {
+        let mut depth = 0i32;
+        let mut start = None;
+        for (i, &b) in bytes.get(..=close).iter().flat_map(|s| s.iter().enumerate().rev()) {
+            match b {
+                b'}' => depth += 1,
+                b'{' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        start = Some(i);
+                        break;
+                    }
+                }
+                _ => {}
+            }
+        }
+        if let Some(start) = start {
+            if let Some(block) = content.get(start..=close) {
+                if block.contains("\"verdict\"") && block.contains("\"findings\"") {
+                    candidates.push(block.to_owned());
+                }
+            }
+        }
+        end = close;
+    }
+    candidates
 }

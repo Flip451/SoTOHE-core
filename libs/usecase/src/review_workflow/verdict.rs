@@ -5,8 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 use thiserror::Error;
 
-use domain::StoredFinding;
-pub use domain::review::{ModelProfile, resolve_full_auto};
+pub use domain::review_v2::{ModelProfile, resolve_full_auto};
 
 /// Errors returned by review workflow functions.
 #[derive(Debug, Error)]
@@ -112,22 +111,6 @@ pub struct ReviewFinding {
     pub line: Option<u64>,
     #[serde(default)]
     pub category: Option<String>,
-}
-
-#[must_use]
-pub fn review_findings_to_stored(findings: &[ReviewFinding]) -> Vec<StoredFinding> {
-    findings
-        .iter()
-        .map(|finding| {
-            StoredFinding::new(
-                finding.message.clone(),
-                finding.severity.clone(),
-                finding.file.clone(),
-                finding.line,
-            )
-            .with_category(finding.category.clone())
-        })
-        .collect()
 }
 
 #[must_use]
