@@ -31,6 +31,7 @@ cargo make workspace-tree-full  # crate + 非 crate ディレクトリを含む 
 cargo make add <files>            # 手動の低レベル staging（terminal 直実行用）
 cargo make add-all                # worktree 全体を stage（transient scratch file は除外）
 cargo make track-add-paths        # tmp/track-commit/add-paths.txt から選択的に stage
+cargo make unstage <paths>        # index から除去（worktree 変更は保持）
 cargo make commit                 # 手動の低レベル commit（terminal 直実行用）
 cargo make track-commit-message   # tmp/track-commit/commit-message.txt から commit
 cargo make track-note             # tmp/track-commit/note.md から note を適用して削除
