@@ -110,12 +110,12 @@
     {
       "description": "domain 層: SchemaExport / TypeInfo / FunctionInfo / TraitInfo / ImplInfo 型定義",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "domain 層: SchemaExportPort trait + SchemaExportError",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "infrastructure 層: RustdocSchemaExporter (rustdoc JSON 生成 + パース + 変換)",
@@ -139,5 +139,5 @@
     }
   ],
   "title": "BRIDGE-01: sotp domain export-schema (rustdoc JSON)",
-  "updated_at": "2026-04-06T13:39:23Z"
+  "updated_at": "2026-04-06T13:42:19Z"
 }

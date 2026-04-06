@@ -26,8 +26,8 @@ SchemaExportPort: rustdoc JSON パースの port trait。export(&self, crate_nam
 SchemaExportError: NightlyNotFound, RustdocFailed, ParseFailed, CrateNotFound。
 全型は Serialize を derive（JSON 出力用）。
 
-- [ ] domain 層: SchemaExport / TypeInfo / FunctionInfo / TraitInfo / ImplInfo 型定義
-- [ ] domain 層: SchemaExportPort trait + SchemaExportError
+- [x] domain 層: SchemaExport / TypeInfo / FunctionInfo / TraitInfo / ImplInfo 型定義
+- [x] domain 層: SchemaExportPort trait + SchemaExportError
 
 ## Infrastructure: rustdoc JSON 生成 + パース
 

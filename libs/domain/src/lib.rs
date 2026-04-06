@@ -11,6 +11,7 @@ mod plan;
 mod repository;
 pub mod review;
 pub mod review_v2;
+pub mod schema;
 mod signal;
 pub mod spec;
 mod timestamp;
