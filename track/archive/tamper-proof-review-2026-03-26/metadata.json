@@ -1,5 +1,5 @@
 {
-  "branch": null,
+  "branch": "track/tamper-proof-review-2026-03-26",
   "created_at": "2026-03-26T12:00:00Z",
   "id": "tamper-proof-review-2026-03-26",
   "plan": {
@@ -84,84 +84,84 @@
     ]
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "archived",
   "tasks": [
     {
       "description": "Domain: VerdictProvenance ADT + Sha256Hex + ReviewInvocationId + ProtectedArtifactRef + SessionDigest/PayloadDigest/AttestationDigest newtypes",
       "id": "T001",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "Domain: ReviewRoundResult に provenance フィールド追加 + コンストラクタ統一",
       "id": "T002",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "Domain: ReviewError に provenance 関連バリアント追加 (InvalidProvenance, MissingEvidence, EvidenceDigestMismatch 等)",
       "id": "T003",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "Infrastructure: review.json schema_version 2 — ReviewRoundDocument に Optional<provenance> + ReviewRoundProvenanceDocument + ReviewArtifactRefDocument serde 型",
       "id": "T004",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "Infrastructure: ReviewAttestationDocument serde 型 + review-artifacts/ ディレクトリ管理 (persist/load)",
       "id": "T005",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "Usecase: AttestedReviewRound 型 + RecordRoundProtocol::execute_attested() ポート + record_attested_round() usecase 関数",
       "id": "T006",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "Infrastructure: RecordRoundProtocolImpl::execute_attested() — アーティファクト永続化 + review.json + git add をアトミック実行",
       "id": "T007",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "CLI: codex-local --auto-record に provenance 生成統合 — session log hash + payload hash + attestation 生成 → AttestedReviewRound 構築",
       "id": "T008",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "CLI: RecordRound サブコマンド削除 — ReviewCommand enum から除去",
       "id": "T009",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "Usecase: ReviewEvidenceVerifier ポート + check_approved に require_provenance ゲート追加",
       "id": "T010",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "Infrastructure: FsReviewEvidenceVerifier — アーティファクトファイル読込 + SHA-256 検証 + attestation 整合性チェック",
       "id": "T011",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "Domain/Hook: BlockProtectedReviewStateWrite hook handler — Write/Edit で review.json + review-artifacts/ をブロック",
       "id": "T012",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "CLI/Settings: settings.json に Write|Edit matcher hook 追加 + verify-orchestra で hook 存在を検証",
       "id": "T013",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "CI: check-approved に --require-provenance フラグ追加 + cargo make ci での soft enforcement",
       "id": "T014",
-      "status": "todo"
+      "status": "skipped"
     },
     {
       "description": "CI: --require-provenance を cargo make ci のデフォルトに昇格（hard enforcement — LegacyUnverified ラウンドを拒否）",
       "id": "T015",
-      "status": "todo"
+      "status": "skipped"
     }
   ],
   "title": "レビュー verdict 改ざん防止 — provenance + write-guard + CLI 封鎖",
-  "updated_at": "2026-03-26T12:14:13Z"
+  "updated_at": "2026-04-06T12:20:52Z"
 }
