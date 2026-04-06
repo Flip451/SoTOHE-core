@@ -134,6 +134,17 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
     let mut traits = Vec::new();
     let mut impls = Vec::new();
 
+    // Collect Ids that belong to impl/trait blocks so we can exclude them from free functions.
+    let mut method_ids: std::collections::HashSet<&rustdoc_types::Id> =
+        std::collections::HashSet::new();
+    for item in krate.index.values() {
+        match &item.inner {
+            ItemEnum::Impl(i) => method_ids.extend(&i.items),
+            ItemEnum::Trait(t) => method_ids.extend(&t.items),
+            _ => {}
+        }
+    }
+
     for item in krate.index.values() {
         // Impl blocks have name=None and non-Public visibility; handle them separately.
         if let ItemEnum::Impl(i) = &item.inner {
@@ -169,7 +180,7 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
             ItemEnum::TypeAlias(_) => {
                 types.push(TypeInfo::new(name, TypeKind::TypeAlias, item.docs.clone(), Vec::new()));
             }
-            ItemEnum::Function(f) => {
+            ItemEnum::Function(f) if !method_ids.contains(&item.id) => {
                 let sig = format_sig(&name, &f.sig);
                 functions.push(FunctionInfo::new(name, sig, item.docs.clone()));
             }
