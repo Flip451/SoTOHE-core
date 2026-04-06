@@ -1,0 +1,143 @@
+{
+  "branch": "track/bridge01-export-schema-2026-04-06",
+  "created_at": "2026-04-06T13:05:34Z",
+  "id": "bridge01-export-schema-2026-04-06",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "tech-stack.md にnightly toolchain を dev-tool として追加（crate 自体は stable のまま）。",
+          "rustdoc-types crate を infrastructure の依存に追加。",
+          "knowledge/conventions/ に nightly-dev-tool convention を新規作成（適用範囲・CI 方針を明記）。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Foundation: tech-stack 更新 + 依存追加"
+      },
+      {
+        "description": [
+          "domain 層に schema モジュールを新設。",
+          "SchemaExport: crate_name + types + functions + traits + impls を保持するトップレベル型。",
+          "TypeInfo: name, kind (Struct/Enum/TypeAlias), visibility, fields/variants, docs。",
+          "FunctionInfo: name, signature (文字列), docs, receiver (self/&self/none)。",
+          "TraitInfo: name, methods (Vec<FunctionInfo>), docs。",
+          "ImplInfo: target_type, trait_name (Option), methods (Vec<FunctionInfo>)。",
+          "SchemaExportPort: rustdoc JSON パースの port trait。export(&self, crate_name: &str) -> Result<SchemaExport, SchemaExportError>。",
+          "SchemaExportError: NightlyNotFound, RustdocFailed, ParseFailed, CrateNotFound。",
+          "全型は Serialize を derive（JSON 出力用）。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002",
+          "T003"
+        ],
+        "title": "Domain: スキーマ型定義 + port trait"
+      },
+      {
+        "description": [
+          "infrastructure 層に schema_export モジュールを新設。",
+          "RustdocSchemaExporter: SchemaExportPort の実装。",
+          "Step 1: cargo +nightly rustdoc -p <crate> -- -Z unstable-options --output-format json を subprocess で実行。",
+          "Step 2: target/doc/<crate>.json を読み込み、rustdoc_types::Crate にデシリアライズ。",
+          "Step 3: Crate.index を走査し、pub な Struct/Enum/Function/Trait/Impl を domain 型に変換。",
+          "型変換は rustdoc_types::ItemEnum の match で行う。シグネチャ文字列は rustdoc_types の情報から再構築。",
+          "nightly 不在時は SchemaExportError::NightlyNotFound を返す（fail-closed）。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "Infrastructure: rustdoc JSON 生成 + パース"
+      },
+      {
+        "description": [
+          "apps/cli に domain サブコマンドグループを新設。",
+          "sotp domain export-schema --crate <name> [--format json|pretty] [--output <path>]。",
+          "--crate: workspace 内の crate 名（必須）。",
+          "--format: json (default, compact) or pretty (indented)。",
+          "--output: ファイルパス（省略時は stdout）。",
+          "composition root で RustdocSchemaExporter を組み立て、port 経由で実行。"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T005"
+        ],
+        "title": "CLI: sotp domain export-schema コマンド"
+      },
+      {
+        "description": [
+          "Makefile.toml に export-schema タスクを追加。",
+          "Docker コンテナ内で nightly を利用可能にする Dockerfile 更新。",
+          "cargo make export-schema -- --crate domain で実行可能にする。"
+        ],
+        "id": "S5",
+        "task_ids": [
+          "T006"
+        ],
+        "title": "Build: cargo make タスク + Docker nightly 対応"
+      },
+      {
+        "description": [
+          "SoTOHE-core 自身の domain crate に対して export-schema を実行。",
+          "出力 JSON に TrackStatus, TaskStatus, TrackId 等の既知の pub 型が含まれることを検証。",
+          "出力 JSON が valid な SchemaExport 構造であることを serde roundtrip で検証。",
+          "nightly 不在時に NightlyNotFound エラーが返ることを検証。"
+        ],
+        "id": "S6",
+        "task_ids": [
+          "T007"
+        ],
+        "title": "Integration Test: 自己検証"
+      }
+    ],
+    "summary": [
+      "BRIDGE-01: rustdoc JSON ベースのドメインスキーマ抽出コマンド sotp domain export-schema を実装する。",
+      "syn ベースの前回実装はコンパイラ再発明によりレビュー収束しなかった教訓を踏まえ、rustdoc JSON（コンパイラ解決済み情報）を採用。",
+      "nightly toolchain を dev-tool として導入し、crate 自体は stable のまま維持する。",
+      "Phase 3 テスト生成パイプラインの起点となる型コンテキスト提供基盤。"
+    ]
+  },
+  "schema_version": 3,
+  "status": "planned",
+  "tasks": [
+    {
+      "description": "tech-stack.md 更新 + rustdoc-types 依存追加 + nightly dev-tool convention",
+      "id": "T001",
+      "status": "todo"
+    },
+    {
+      "description": "domain 層: SchemaExport / TypeInfo / FunctionInfo / TraitInfo / ImplInfo 型定義",
+      "id": "T002",
+      "status": "todo"
+    },
+    {
+      "description": "domain 層: SchemaExportPort trait + SchemaExportError",
+      "id": "T003",
+      "status": "todo"
+    },
+    {
+      "description": "infrastructure 層: RustdocSchemaExporter (rustdoc JSON 生成 + パース + 変換)",
+      "id": "T004",
+      "status": "todo"
+    },
+    {
+      "description": "CLI 層: sotp domain export-schema コマンド",
+      "id": "T005",
+      "status": "todo"
+    },
+    {
+      "description": "cargo make タスク + Docker nightly 対応",
+      "id": "T006",
+      "status": "todo"
+    },
+    {
+      "description": "統合テスト: SoTOHE-core 自身の domain crate で export-schema 実行・出力検証",
+      "id": "T007",
+      "status": "todo"
+    }
+  ],
+  "title": "BRIDGE-01: sotp domain export-schema (rustdoc JSON)",
+  "updated_at": "2026-04-06T13:05:34Z"
+}

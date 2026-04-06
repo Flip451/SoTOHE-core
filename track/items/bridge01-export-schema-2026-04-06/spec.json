@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0.0",
+  "title": "BRIDGE-01: sotp domain export-schema (rustdoc JSON)",
+  "goal": [
+    "生成プロジェクトの domain crate から公開型・関数シグネチャを rustdoc JSON 経由で抽出し、テスト生成 AI の型コンテキストとして JSON 出力する。",
+    "syn ベースではなく rustdoc JSON を採用することで、コンパイラの型解決済み情報を利用し、パース精度への指摘が構造的に発生しない設計とする。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "sotp domain export-schema CLI コマンドの実装",
+        "sources": [
+          "knowledge/strategy/TODO-PLAN.md §Phase 3 item 3-1"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "rustdoc JSON の生成（nightly toolchain 経由）とパース",
+        "sources": [
+          "discussion"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "pub types / functions / traits / impls の抽出と domain 型への変換",
+        "sources": [
+          "knowledge/strategy/TODO-PLAN.md §Phase 3 item 3-1"
+        ],
+        "task_refs": [
+          "T002",
+          "T003",
+          "T004"
+        ]
+      },
+      {
+        "text": "JSON 出力フォーマット（AI テスト生成の入力用）",
+        "sources": [
+          "knowledge/strategy/vision.md §1"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "nightly toolchain の dev-tool 導入と tech-stack 更新",
+        "sources": [
+          "discussion"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "cargo make タスク + Docker nightly 対応",
+        "sources": [
+          "discussion"
+        ],
+        "task_refs": [
+          "T006"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "テスト生成（Phase 3 items 3-2, 3-3, 3-4）",
+        "sources": [
+          "knowledge/strategy/TODO-PLAN.md §Phase 3"
+        ]
+      },
+      {
+        "text": "spec ↔ code 整合性チェック（Phase 3 item 3-12）",
+        "sources": [
+          "knowledge/strategy/TODO-PLAN.md §Phase 3"
+        ]
+      },
+      {
+        "text": "既存 domain_scanner.rs (syn ベース) の置換",
+        "sources": [
+          "discussion"
+        ]
+      },
+      {
+        "text": "proptest / usecase テストテンプレート",
+        "sources": [
+          "knowledge/strategy/TODO-PLAN.md §Phase 3"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "crate 自体は stable Rust のまま維持。nightly は rustdoc JSON 生成のみに使用する dev-tool",
+      "sources": [
+        "discussion"
+      ]
+    },
+    {
+      "text": "rustdoc-types crate の format version に依存するため、対応 nightly バージョンを固定する",
+      "sources": [
+        "inference — rustdoc JSON format は nightly 間で破壊的変更あり"
+      ]
+    },
+    {
+      "text": "hexagonal architecture に従い、rustdoc JSON パース (I/O) は infrastructure 層、出力型定義は domain 層に配置",
+      "sources": [
+        "knowledge/conventions/hexagonal-architecture.md"
+      ]
+    },
+    {
+      "text": "nightly 不在時は fail-closed (SchemaExportError::NightlyNotFound)",
+      "sources": [
+        "convention — knowledge/conventions/security.md"
+      ]
+    }
+  ],
+  "domain_states": [
+    {
+      "name": "SchemaExport",
+      "description": "export-schema の出力トップレベル型。crate_name + types + functions + traits + impls を保持",
+      "transitions_to": []
+    },
+    {
+      "name": "TypeInfo",
+      "description": "公開型の情報。name / kind (Struct/Enum/TypeAlias) / fields or variants / docs",
+      "transitions_to": []
+    },
+    {
+      "name": "FunctionInfo",
+      "description": "公開関数の情報。name / signature / docs / receiver type",
+      "transitions_to": []
+    },
+    {
+      "name": "TraitInfo",
+      "description": "公開 trait の情報。name / required methods / docs",
+      "transitions_to": []
+    },
+    {
+      "name": "ImplInfo",
+      "description": "impl ブロックの情報。target_type / trait_name (Option) / methods",
+      "transitions_to": []
+    },
+    {
+      "name": "SchemaExportError",
+      "description": "export-schema のエラー型。NightlyNotFound / RustdocFailed / ParseFailed / CrateNotFound",
+      "transitions_to": []
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "sotp domain export-schema --crate domain が SoTOHE-core の domain crate に対して JSON を出力する",
+      "sources": [
+        "knowledge/strategy/TODO-PLAN.md §Phase 3 item 3-1"
+      ],
+      "task_refs": [
+        "T005",
+        "T007"
+      ]
+    },
+    {
+      "text": "出力 JSON に TrackStatus, TaskStatus, TrackId 等の既知の pub 型が含まれる",
+      "sources": [
+        "discussion"
+      ],
+      "task_refs": [
+        "T007"
+      ]
+    },
+    {
+      "text": "出力 JSON が SchemaExport 型として serde roundtrip 可能",
+      "sources": [
+        "discussion"
+      ],
+      "task_refs": [
+        "T002",
+        "T007"
+      ]
+    },
+    {
+      "text": "nightly 不在時に NightlyNotFound エラーで fail-closed する",
+      "sources": [
+        "convention — knowledge/conventions/security.md"
+      ],
+      "task_refs": [
+        "T004",
+        "T007"
+      ]
+    },
+    {
+      "text": "cargo make export-schema -- --crate domain で Docker 経由実行可能",
+      "sources": [
+        "discussion"
+      ],
+      "task_refs": [
+        "T006"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "knowledge/conventions/hexagonal-architecture.md",
+    "knowledge/conventions/typed-deserialization.md",
+    "knowledge/conventions/source-attribution.md"
+  ],
+  "signals": {
+    "blue": 10,
+    "yellow": 9,
+    "red": 0
+  }
+}
