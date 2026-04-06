@@ -28,7 +28,7 @@ Run exactly ONE `cargo make track-local-review` command and report the verdict.
 ## Report Format
 
 After the command completes, report:
-1. Exit code (0 = zero_findings, 2/105 = findings_remain, 1 = error, 3 = escalation blocked)
+1. Exit code (0 = zero_findings, 2 = findings_remain, 1 = error, 3 = escalation blocked)
 2. The verdict JSON from the last line of stdout
 3. Any errors
 

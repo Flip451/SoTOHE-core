@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Review v2 運用文書アップデート + review skill 更新",
+  "goal": [
+    "review-system-v2 マージ後に特定された運用文書の穴（RV2-10..15）を埋め、",
+    "review.md skill の v2 cleanup（RV2-04）と自律 fix+review ループ（RV2-02）を実装する。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "review.md の v2 cleanup: 散在する RV2-04 制限ノートを集約、provider-support サブセクション化",
+        "sources": [
+          "knowledge/strategy/TODO.md §L RV2-04"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "review.md にチャネル単位 fail-closed 契約を明記",
+        "sources": [
+          "knowledge/strategy/TODO.md §L RV2-12"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "review.md + workflow.md に check-approved NotStarted bypass 仕様を文書化",
+        "sources": [
+          "knowledge/strategy/TODO.md §L RV2-13"
+        ],
+        "task_refs": [
+          "T002",
+          "T004"
+        ]
+      },
+      {
+        "text": "pr-review.md に同一コミット再レビュー不可の注記追加",
+        "sources": [
+          "knowledge/strategy/TODO.md §L RV2-10"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "pr-review.md に手動ポーリング禁止を明記",
+        "sources": [
+          "knowledge/strategy/TODO.md §L RV2-11"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "workflow.md の v1 残存参照監査（RV2-15）",
+        "sources": [
+          "knowledge/strategy/TODO.md §L RV2-15"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "create_dir_all ガード無効化パターン convention 新規作成",
+        "sources": [
+          "knowledge/strategy/TODO.md §L RV2-14"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "review-fix-lead エージェント定義 + review.md 自律ループ化",
+        "sources": [
+          "knowledge/strategy/TODO.md §L RV2-02",
+          "feedback — feedback_subagent_review_loop.md"
+        ],
+        "task_refs": [
+          "T006"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "RV2-05..09（Rust コード修正が必要な穴）は別 track",
+        "sources": [
+          "knowledge/strategy/TODO.md §L"
+        ]
+      },
+      {
+        "text": "RV2-06 v2 escalation 再設計は別 track",
+        "sources": [
+          "knowledge/strategy/TODO.md §L RV2-06"
+        ]
+      },
+      {
+        "text": "claude-heavy profile の auto-record 実装",
+        "sources": [
+          "inference — planner recommendation"
+        ]
+      },
+      {
+        "text": "RV2-03 ReviewState::Running variant 追加",
+        "sources": [
+          "knowledge/strategy/TODO.md §L RV2-03"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "Rust コード変更なし — skill / agent 定義 / convention / workflow 文書のみ",
+      "sources": [
+        "inference — scope definition"
+      ]
+    },
+    {
+      "text": "claude-heavy 制限は事実として残す（auto-record 未実装）",
+      "sources": [
+        "inference — planner risk assessment"
+      ]
+    },
+    {
+      "text": "NotStarted bypass は実装通り狭く記述: 全 scope NotStarted + review.json 不在",
+      "sources": [
+        "apps/cli/src/commands/review/mod.rs L346"
+      ]
+    },
+    {
+      "text": "RV2-02 は target behavior として明記（escalation 未実装のため）",
+      "sources": [
+        "knowledge/strategy/TODO.md §L RV2-06"
+      ]
+    },
+    {
+      "text": "review-fix-lead の無限ループ防止は Agent timeout（60 分/scope）で制御",
+      "sources": [
+        "discussion"
+      ]
+    }
+  ],
+  "domain_states": [
+    {
+      "name": "TODO.md uncommitted",
+      "description": "RV2-05..15 が main 上で未コミット"
+    },
+    {
+      "name": "docs updated",
+      "description": "review.md / pr-review.md / workflow.md の穴が埋まった状態"
+    },
+    {
+      "name": "convention added",
+      "description": "create_dir_all convention が knowledge/conventions/ に追加済み"
+    },
+    {
+      "name": "agent defined",
+      "description": "review-fix-lead agent が定義され review.md が自律ループ化された状態"
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "review.md に RV2-04 制限ノートが 1 箇所のみ（Step 1 近辺）に存在する",
+      "sources": [
+        "knowledge/strategy/TODO.md §L RV2-04"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "review.md にチャネル単位 fail-closed 契約セクションが存在する",
+      "sources": [
+        "knowledge/strategy/TODO.md §L RV2-12"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "review.md + workflow.md に NotStarted bypass 仕様が記載されている",
+      "sources": [
+        "knowledge/strategy/TODO.md §L RV2-13"
+      ],
+      "task_refs": [
+        "T002",
+        "T004"
+      ]
+    },
+    {
+      "text": "pr-review.md に同一コミット再レビュー不可 + 手動ポーリング禁止が記載されている",
+      "sources": [
+        "knowledge/strategy/TODO.md §L RV2-10, RV2-11"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "knowledge/conventions/ に create_dir_all convention ファイルが存在する",
+      "sources": [
+        "knowledge/strategy/TODO.md §L RV2-14"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": ".claude/agents/review-fix-lead.md が存在し、scope 所有 / 自律ループ / timeout / cross-scope fail-closed の契約が定義されている",
+      "sources": [
+        "knowledge/strategy/TODO.md §L RV2-02"
+      ],
+      "task_refs": [
+        "T006"
+      ]
+    },
+    {
+      "text": "review.md Step 2c/Step 3 が review-fix-lead エージェントを使用する形に更新されている",
+      "sources": [
+        "knowledge/strategy/TODO.md §L RV2-02"
+      ],
+      "task_refs": [
+        "T006"
+      ]
+    },
+    {
+      "text": "cargo make ci が通る",
+      "sources": [
+        "convention — .claude/rules/07-dev-environment.md"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T005",
+        "T006"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "knowledge/conventions/source-attribution.md",
+    "knowledge/conventions/impl-delegation-arch-guard.md",
+    "knowledge/conventions/task-completion-flow.md"
+  ],
+  "signals": {
+    "blue": 21,
+    "yellow": 4,
+    "red": 0
+  }
+}
