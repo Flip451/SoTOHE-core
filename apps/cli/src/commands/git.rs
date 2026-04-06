@@ -149,7 +149,12 @@ fn unstage(paths: &[PathBuf]) -> Result<ExitCode, CliError> {
     let mut args = vec!["restore", "--staged", "--"];
     let path_strs: Vec<String> = paths.iter().map(|p| p.display().to_string()).collect();
     args.extend(path_strs.iter().map(String::as_str));
-    repo.status(&args)?;
+    let code = repo.status(&args)?;
+    if code != 0 {
+        return Err(CliError::Message(format!(
+            "git restore --staged failed with exit code {code}"
+        )));
+    }
     Ok(ExitCode::SUCCESS)
 }
 
