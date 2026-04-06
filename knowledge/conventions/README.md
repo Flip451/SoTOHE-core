@@ -57,6 +57,7 @@
 <!-- convention-docs:start -->
 - `adr.md`: Convention: Architecture Decision Records (ADR)
 - `bash-write-guard.md`: Bash File-Write Guard (CON-07)
+- `filesystem-persistence-guard.md`: Filesystem Persistence Guard Convention
 - `hexagonal-architecture.md`: Hexagonal Architecture Convention
 - `impl-delegation-arch-guard.md`: Implementation Delegation Architecture Guard
 - `prefer-type-safe-abstractions.md`: Prefer Type-Safe Abstractions Convention

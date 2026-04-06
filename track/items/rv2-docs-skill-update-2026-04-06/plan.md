@@ -42,7 +42,7 @@ RV2-14: create_dir_all(parent) が暗黙の状態遷移であり、
 ディレクトリ存在がガード条件の場合は先に検証すべきパターンを convention 化。
 動機コードパス: libs/infrastructure/src/review_v2/persistence/commit_hash_store.rs
 
-- [ ] knowledge/conventions/ に create_dir_all ガード無効化パターン convention を新規作成（RV2-14）
+- [x] knowledge/conventions/ に create_dir_all ガード無効化パターン convention を新規作成（RV2-14）
 
 ## review-fix-lead エージェント + 自律ループ設計
 

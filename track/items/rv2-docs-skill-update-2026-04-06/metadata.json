@@ -112,7 +112,7 @@
     {
       "description": "knowledge/conventions/ に create_dir_all ガード無効化パターン convention を新規作成（RV2-14）",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "review-fix-lead エージェント定義を .claude/agents/ に新規作成 + review.md Step 3 を自律ループ化（RV2-02）— timeout で無限ループ防止、cross-scope は blocked_cross_scope で fail-closed",
@@ -121,5 +121,5 @@
     }
   ],
   "title": "Review v2 運用文書アップデート + review skill 更新",
-  "updated_at": "2026-04-06T04:14:28Z"
+  "updated_at": "2026-04-06T04:25:33Z"
 }
