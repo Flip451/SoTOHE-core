@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use domain::review::{ModelProfile, resolve_full_auto};
+use domain::review_v2::{ModelProfile, resolve_full_auto};
 use serde::Deserialize;
 
 const AGENT_PROFILES_PATH: &str = ".claude/agent-profiles.json";

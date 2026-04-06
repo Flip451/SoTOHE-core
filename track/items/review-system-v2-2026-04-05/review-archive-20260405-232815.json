@@ -1,0 +1,1955 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This fallback hardcodes `main` as the only recovery base. If the repo's review base is `master` or another branch, `review status`/`check-approved`/auto-record will either fail or compute against the wrong diff because the old `--diff-base` override is gone.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/compose_v2.rs",
+              "line": 111,
+              "category": "correctness"
+            },
+            {
+              "message": "Auto-record accepts any syntactically valid scope name and silently falls back to an empty target when that scope is absent from `track/review-scope.json`. A typo or renamed group will therefore record a review entry that `get_review_states()` never considers, so the command reports success while approval state is unchanged.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 184,
+              "category": "correctness"
+            },
+            {
+              "message": "`track-set-commit-hash` writes `.commit_hash` without the branch/track guard that `set-approved-head` uses. Running it from the wrong branch or with a mistyped track ID can stamp another track's diff base with the current HEAD and corrupt future scope calculations.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "line": 574,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a67c2b4d87ec08ffe3d1161ed1216e467cde7132fad22443ba84921a31771eeb",
+          "at": "2026-04-05T08:46:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_scope_diff` only combines `git diff <base> HEAD` and `git diff HEAD`; it never includes untracked files (`git ls-files --others --exclude-standard`) the way `GitDiffGetter` does. A newly added file in the selected scope can therefore be omitted from the reviewer prompt and later recorded as if it had been reviewed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 560,
+              "category": "correctness"
+            },
+            {
+              "message": "The v2 auto-record path persists `payload.findings` directly into `ReviewWriter` without the old diff-scope filter. If Codex mentions an out-of-scope file, that finding is now stored under the requested scope and can keep the scope in `FindingsRemain`, which corrupts review state.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 224,
+              "category": "correctness"
+            },
+            {
+              "message": "When scope diff computation fails, or when the requested scope has no files, `build_prompt` logs a warning and falls back to the base prompt instead of aborting. That lets `codex-local` run on an unscoped prompt and only fail later during auto-recording, which defeats the safety boundary for invalid scopes and git errors.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 510,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:1e084bbb72a7575614618503781562b932eab079703257c62b45e9e868d9a214",
+          "at": "2026-04-05T08:54:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Empty review scopes now fail after Codex runs. `build_scope_file_list()` already returns `Ok(None)` for a scope with no files, but `render_auto_record_v2()` treats that case as a hard error instead of skipping or recording an empty verdict. That makes `sotp review codex-local` exit 1 on legitimate empty scopes.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 184,
+              "category": "correctness"
+            },
+            {
+              "message": "Review findings are persisted verbatim for the selected scope with no scope filtering. Any out-of-scope finding in the model output is written into the current scope's `review.json`, which can pollute review history and make later approval checks inaccurate. The previous flow filtered findings before recording them.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 229,
+              "category": "correctness"
+            },
+            {
+              "message": "`is_planning_only_path()` no longer treats `.claude/commands/...` or `.claude/rules/...` as planning-only. Staged docs under those directories will now be classified as code and block `check-approved`, even though the updated tests still expect them to bypass review.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 419,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:22d086e93aba8a7eed2bd694a5e787ad859ffc4a1f5726f11303bacf00543aa7",
+          "at": "2026-04-05T08:59:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Unknown or removed review scopes are treated as an empty target here instead of being rejected. That means a typo in `--group` can silently record `zero_findings` and create an orphan `review.json` entry instead of failing the command.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 184,
+              "category": "correctness"
+            },
+            {
+              "message": "The v2 auto-record path persists the reviewer payload verbatim for the chosen scope without applying the previous scope filter. Findings for files outside the requested scope can now be stored under that scope, which can misattribute the review history or incorrectly keep approval blocked.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 212,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:56e9d83671fe992d046291cf4d1e117f772b7e26590b3b1e17e4276421846ff2",
+          "at": "2026-04-05T09:11:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Auto-record now resolves the review scope and computes the diff hash only after Codex exits, with no before/after snapshot comparison. If files change during the review run, the verdict is written against the later diff instead of the one the reviewer actually saw.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 146,
+              "category": "correctness"
+            },
+            {
+              "message": "Missing scope entries are treated as an empty scope here, so a typoed or unconfigured `--group` silently degrades to `zero_findings` instead of failing. The prompt builder has the same behavior, so invalid scope names are accepted without any explicit error.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 535,
+              "category": "correctness"
+            },
+            {
+              "message": "The new auto-record path writes the reviewer payload verbatim into `review.json`; it no longer filters findings to the requested scope before persistence. Findings about files outside the current scope can therefore contaminate that scope's verdict.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 212,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:56e9d83671fe992d046291cf4d1e117f772b7e26590b3b1e17e4276421846ff2",
+          "at": "2026-04-05T09:15:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_auto_record_v2()` treats a missing scope target as a successful `zero_findings` run, and `validate_auto_record_args()` only checks for a non-empty `ReviewGroupName`. That means a typo or unknown `--group` can run Codex, emit a green exit code, and persist nothing instead of failing fast.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 184,
+              "category": "correctness"
+            },
+            {
+              "message": "The `#[cfg(all(not(unix), not(windows)))]` branch still calls `emit_non_unix_fallback_command_result()`, but that helper was removed. Any non-Unix/non-Windows build will now fail to compile.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 321,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:56e9d83671fe992d046291cf4d1e117f772b7e26590b3b1e17e4276421846ff2",
+          "at": "2026-04-05T09:22:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "A missing or typoed review group is treated as an empty scope here, so `codex-local` emits `zero_findings` and exits 0 even though nothing was recorded. That makes an invalid `--group` look like a successful review instead of a hard error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 184,
+              "category": "correctness"
+            },
+            {
+              "message": "The branch guard fails open: if `git rev-parse --abbrev-ref HEAD` errors, the code skips the `track/{track_id}` check and still writes `.commit_hash`. That defeats the corruption guard in the cases where git state is already unreliable.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "line": 585,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:ae3f2c3cdef4c6604bc36bf58f9c596b2817580d70ea4b618552220cc25bc73b",
+          "at": "2026-04-05T09:25:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Treating a missing `targets.get(&scope)` as `zero_findings` silently succeeds even when the requested scope is not present in `review-scope.json`. A typoed `--group` or scope/config drift will therefore skip persistence and report a successful review instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 184,
+              "category": "correctness"
+            },
+            {
+              "message": "If `git rev-parse --abbrev-ref HEAD` returns a non-success status, the branch guard is skipped and `.commit_hash` is still written. That defeats the corruption check exactly when git state is already unreliable; this should fail closed instead of proceeding.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "line": 585,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:ae3f2c3cdef4c6604bc36bf58f9c596b2817580d70ea4b618552220cc25bc73b",
+          "at": "2026-04-05T09:31:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `targets.get(&scope)` fallback treats both an unknown group and a genuinely empty scope as success with `zero_findings`. If `--group` is mistyped or `review-scope.json` does not define that scope, the command exits 0, emits a synthetic zero-findings payload, and never writes review state, silently dropping the review instead of surfacing a configuration error.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 184,
+              "category": "correctness"
+            },
+            {
+              "message": "The status summary increments `approved_count` for every `NotRequired` scope, but `NotRequired` also includes `Empty`. Per-scope output distinguishes empty scopes, yet the summary reports them as approved, so the aggregate count is wrong whenever the diff contains configured-but-empty scopes.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 548,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ae3f2c3cdef4c6604bc36bf58f9c596b2817580d70ea4b618552220cc25bc73b",
+          "at": "2026-04-05T09:35:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If `git rev-parse --abbrev-ref HEAD` returns a non-success status, this code skips the branch check and still writes `.commit_hash`. That fails open on the repo states where the guard is supposed to prevent cross-track writes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "line": 585,
+              "category": "correctness"
+            },
+            {
+              "message": "`unwrap_or_default()` swallows `get_review_states()` failures. If `review.json` is corrupt or unreadable, an empty configured scope can be treated as a harmless skip and the command exits 0 instead of surfacing the storage error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 186,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7f3fe613524d6bf4e740380b7355226a32eccf12b18b920cec84ffc7c669940a",
+          "at": "2026-04-05T09:46:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`persist_commit_hash_v2()` only enforces the `track/{track_id}` branch guard when `git rev-parse --abbrev-ref HEAD` succeeds. If that command returns a non-success status, the guard is skipped and `.commit_hash` is still written, which fails open on the exact repo states where the corruption guard matters most.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "line": 585,
+              "category": "error-handling"
+            },
+            {
+              "message": "The prompt-scoping path is still fail-open: `build_scope_file_list()` collapses both unknown scopes and scope/config lookup failures into `Ok(None)`, and `build_prompt()` falls back to the base prompt instead of aborting. A typoed `--group` or broken review-scope state can therefore launch Codex on an unscoped prompt and only fail later.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 523,
+              "category": "correctness"
+            },
+            {
+              "message": "`render_auto_record_v2()` uses `unwrap_or_default()` on `get_review_states()` when deciding whether a scope is empty or unknown. Any diff/hash/review-store failure is therefore downgraded to an empty configured-scope set, which can misreport the real infrastructure error as an `Unknown scope` failure.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 186,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:7f3fe613524d6bf4e740380b7355226a32eccf12b18b920cec84ffc7c669940a",
+          "at": "2026-04-05T09:49:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_auto_record_args()` only checks that `--group` is a syntactically valid `ReviewGroupName`; it never verifies that the scope actually exists in `review-scope.json`. A typo like `--group clii` therefore still launches Codex, and because prompt construction falls back to the unscoped base prompt when no target files are found, the reviewer can spend a full run on the wrong scope before `render_auto_record_v2()` finally rejects it as unknown.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/mod.rs",
+              "line": 113,
+              "category": "validation"
+            },
+            {
+              "message": "Empty scopes are only recognized after the reviewer finishes. `build_prompt()` treats `build_scope_file_list(...)=None` as \"just use the base prompt\", so a scope with no diff files still spawns Codex instead of short-circuiting to the existing zero-findings skip path. That means an empty-scope review can now fail on spawn/timeout/process errors even though there was nothing to review.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 531,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:af43dfec5d257ebe906c7177c79d2ac6c49762ffb2dc903cc38014901f26ec62",
+          "at": "2026-04-05T09:55:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_scope_file_list()` currently returns `Ok(None)` for both 'configured scope with no files' and 'unknown scope', and `execute_codex_local()` still spawns Codex when that happens. That creates two regressions: a mistyped `--group` runs an unscoped review before failing later in `render_auto_record_v2()`, and an actually empty scope can still fail with timeout/process errors instead of being skipped as `zero_findings`, because the empty-scope check only happens after a successful reviewer result.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 563,
+              "category": "cli.review"
+            },
+            {
+              "message": "Several tests still assume `run_codex_local()` / `execute_status()` work from a fresh temp directory with no git repo, but the v2 path now calls `build_review_v2()` (git discovery + `track/review-scope.json`) before those assertions run. Tests such as `run_codex_local_never_passes_full_auto_even_for_full_model` and the tempdir-based status cases will now fail before exercising the behavior they claim to cover.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/tests.rs",
+              "line": 531,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:af43dfec5d257ebe906c7177c79d2ac6c49762ffb2dc903cc38014901f26ec62",
+          "at": "2026-04-05T10:02:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This v2 auto-record path writes and re-emits `payload.findings` unchanged. The old implementation filtered findings to the active scope before recording; without that check, a reviewer can report unrelated files and pollute `review.json`, causing the wrong scope to appear `findings_remain`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 241,
+              "category": "correctness"
+            },
+            {
+              "message": "`build_review_v2` trusts the caller-supplied `items_dir` verbatim when constructing `review.json` and `.commit_hash`. The repo-root symlink guard does not enforce containment, so `--items-dir /tmp/...` (or a path with `..`) will make the v2 commands read/write review state outside the repository. Validate that the path stays under the repo's `track/items` tree before using it.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/compose_v2.rs",
+              "line": 78,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:35c9274e9257f5428b887c9c128055383349be4935726dd51bfd901a3ce3ed6a",
+          "at": "2026-04-05T10:19:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new path check still trusts an unresolved `items_dir` when `canonicalize()` fails, so a non-existent path containing `..` can pass the `starts_with()` test and later create/read review state outside the repo root. This leaves a traversal bypass in the guard.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/review/compose_v2.rs",
+              "line": 84,
+              "category": "security"
+            },
+            {
+              "message": "`filter_findings_to_scope()` only does exact string membership against the scope file list. `ReviewFinding.file` is not normalized here, so valid in-scope paths with harmless formatting differences such as surrounding whitespace or `./` prefixes will be dropped and a real `findings_remain` can be downgraded to `zero_findings`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 351,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3ba702ae4a9c114b1d7e97cd9352490f982293aca649da3aabf580829c308af3",
+          "at": "2026-04-05T10:28:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee099b8e8e7e7b369aa1525dd5f8b39480b8497fa7886dc3346df9f629458633",
+          "at": "2026-04-05T10:34:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When all findings are filtered out and the code downgrades the stored verdict to `ZeroFindings`, the emitted command result still uses `payload.verdict` for both `stdout` and `exit_code` (`findings_remain`/2). That means out-of-scope findings still make `codex-local` fail and surface the original JSON, so the scope filter is not reflected in the CLI result.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 313,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:88c2e5061e7b57c29b63e367ed51ac349e4cabe6d7f20a255e8ba7d528909f5d",
+          "at": "2026-04-05T10:39:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: The fallback at `items_dir_resolved.canonicalize().unwrap_or_else(...)` lets a non-existent path with an existing symlinked parent pass the containment check. For example, `--items-dir /repo/link/new-track` where `link` points outside the repo will be accepted if `new-track` does not exist yet, and the later `review.json` / `.commit_hash` writes will escape the repository root.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/compose_v2.rs",
+              "line": 103,
+              "category": "security"
+            },
+            {
+              "message": "P1: The reverse suffix rule `scope_path.ends_with(\"/<finding_path>\")` is too permissive. A short reported path like `mod.rs` or `lib.rs` will match any scoped file with that basename, so an out-of-scope finding can still be retained if the scope contains a different file with the same suffix.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 375,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:614faab396507ee56baa774a1afb50a62879c5cce170dabd6e82406137e2c6a5",
+          "at": "2026-04-05T10:43:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`finding_file_matches_scope()` only trims `./` and whitespace; it does not normalize `\\` separators or reject Windows drive prefixes. On Windows, in-scope findings like `apps\\cli\\src\\commands\\review\\mod.rs` or `C:\\repo\\...` will be dropped as out-of-scope, which can downgrade real findings to `zero_findings`. Reuse the existing `RepoRelativePath::normalize()` logic instead of this ad hoc matcher.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 346,
+              "category": "correctness"
+            },
+            {
+              "message": "The new traversal tests never exercise the symlink-parent bypass described in the briefing; they only cover `/tmp` and `..` inputs. That leaves the ancestor-walk guard unverified against the actual escape vector it is meant to block, so a regression in the symlink logic could ship undetected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/tests.rs",
+              "line": 1209,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:7f3efc949ace6507eb0696087f4b43fd0d4c6d55e33e773f5ed72fdb82198264",
+          "at": "2026-04-05T10:49:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When auto-record downgrades an out-of-scope `findings_remain` payload to `zero_findings`, `stdout_lines` still serializes the original `payload`. That makes the emitted JSON disagree with the stored verdict and exit code, so downstream consumers can see `findings_remain` even though the CLI recorded `zero_findings`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 317,
+              "category": "correctness"
+            },
+            {
+              "message": "The absolute-path fallback accepts any path ending in `/<scope_path>`. For scope entries that are bare filenames, such as `Cargo.toml`, an unrelated absolute path like `/tmp/Cargo.toml` will be treated as in-scope and survive filtering. That lets out-of-scope findings slip into review.json.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 371,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b7be8b275fa0ee318ffed9272918b5e01f22950d769583b31d23e566c21f53f3",
+          "at": "2026-04-05T10:54:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When all findings are filtered out, this downgrades the stored verdict to `zero_findings` but still serializes the original `payload`, so stdout can emit `findings_remain` JSON while the exit code is 0. Callers that consume stdout as the machine-readable result will see a verdict/state mismatch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 317,
+              "category": "correctness"
+            },
+            {
+              "message": "`finding_file_matches_scope` only does exact equality after normalization, so valid but decorated file paths like `src/lib.rs:42` or `src/lib.rs (line 42)` are treated as out-of-scope and filtered out. The rest of the review workflow treats these as indeterminate and keeps them, so this can silently drop real findings and turn `findings_remain` into `zero_findings`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 367,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b7be8b275fa0ee318ffed9272918b5e01f22950d769583b31d23e566c21f53f3",
+          "at": "2026-04-05T10:59:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`items_dir` is rejected whenever the resolved path still contains `..`, even if that path would canonicalize inside the repo. That makes valid repo-local invocations like `../track/items` unusable from nested working directories, so the traversal guard is stricter than the containment check it is meant to enforce.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/compose_v2.rs",
+              "line": 97,
+              "category": "correctness"
+            },
+            {
+              "message": "The absolute-path fallback never re-trims the input, so it loses the whitespace tolerance that `RepoRelativePath::normalize` provides. A finding like `\"  /workspace/apps/cli/src/commands/review/mod.rs  \"` will be dropped even though it is in scope, which can silently discard real findings.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 377,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7f320856f762b99e929abdd8a3c961459d53e1766c6a1f56fc7027767efba669",
+          "at": "2026-04-05T11:04:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Normalizing `..` before the first canonicalization makes the containment check unsound when `items_dir` crosses a symlink. A path such as `items/link/../track` can be collapsed into an in-repo path before the symlink is resolved, so review state can still be written outside the repository root.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/review/compose_v2.rs",
+              "line": 181,
+              "category": "security"
+            },
+            {
+              "message": "The absolute-path fallback only matches paths that end in `/<scope>`, so Windows drive-letter paths (`C:/...`) never match. The comment says drive letters are supported, but on Windows every absolute finding path is filtered out, which can incorrectly downgrade auto-recorded reviews to `zero_findings`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 383,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4b6fbcfc67f39718765f914d5f7e74fefd9173b7248831017bec26b8f391458d",
+          "at": "2026-04-05T11:11:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`finding_file_matches_scope` treats any successfully normalized bare filename as definitively out of scope unless it exactly equals the full scope path. That drops ambiguous reviewer outputs like `codex_local.rs` for a nested file such as `apps/cli/src/commands/review/codex_local.rs`, even though the workflow layer intentionally treats bare filenames as fail-closed/keep. If this is the only finding, the wrapper can incorrectly downgrade the recorded verdict to `zero_findings`.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 379,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:78d787f8ece77e74861f68e90c5dd0dda0da98cfcb18d2e464bb020e7c9bee77",
+          "at": "2026-04-05T11:17:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`strip_line_decoration` removes any trailing `:digits` suffix, which corrupts valid repo-relative filenames that legitimately end in `:NNN`. The shared `RepoRelativePath::normalize` logic explicitly preserves decorated paths instead of stripping them, so a finding like `docs/rfc:2026:12` can be truncated to `docs/rfc` and then dropped or recorded under the wrong file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 419,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:42f92b0a5ab65ebfc49cc2498ef02782dbca843c147990126057e46fdc887f75",
+          "at": "2026-04-05T11:23:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_auto_record_v2` still serializes the original `payload` to stdout when only part of a `findings_remain` result is filtered out. The persisted verdict is filtered, but stdout JSON still includes the dropped findings, so downstream consumers see a different result than what was recorded. Build the stdout JSON from the filtered findings too, not just the stored verdict.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 319,
+              "category": "correctness"
+            },
+            {
+              "message": "`build_review_v2` validates `items_dir` relative to `cwd`, but then opens `review.json` and `.commit_hash` from the original raw path. From any nested working directory, the guard can pass while the review state is silently read/written under that subdirectory's `track/items` tree instead of the repo root. Use the resolved repo-root path for persistence; the same cwd-relative assumption also needs fixing in `persist_commit_hash_v2`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/compose_v2.rs",
+              "line": 139,
+              "category": "correctness"
+            },
+            {
+              "message": "`persist_commit_hash_v2` hardcodes `track/items` relative to the process cwd, so `track-set-commit-hash` and the post-commit hook can write `.commit_hash` to the wrong location when invoked from a subdirectory. Resolve the path from the discovered repo root or accept the validated items dir instead.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "line": 605,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4ad13e6cb7221b0c44b8d3531a0aeb312310fd24f0bb3c9f043c199026154525",
+          "at": "2026-04-05T11:29:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Relative `items_dir` is resolved against the current working directory, not the discovered repo root. When the CLI is invoked from a subdirectory, the default `track/items` path becomes `<cwd>/track/items`, so review state can be read/written in the wrong directory even though the containment check passes because the path is still inside the repo. Anchor this resolution to `root` (or reject non-root-relative inputs) before constructing `review_json_path` and `commit_hash_path`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/compose_v2.rs",
+              "line": 90,
+              "category": "correctness"
+            },
+            {
+              "message": "This test is not serialized with `env_lock()`, but `build_review_v2()` depends on the process cwd via `SystemGitRepo::discover()`. It can race with the other tests in this module that temporarily change cwd and become flaky under parallel test execution. Acquire the same lock here or remove the cwd dependency from the test.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/tests.rs",
+              "line": 987,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:7869137e7fd83cff40e3c0830618c4bc263e1a7741469e1f57ce449c2faba759",
+          "at": "2026-04-05T12:04:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_review_v2` validates `items_dir_abs` against the repo root, but the persistence adapters are still created from the original `items_dir` (`review_json_path`/`commit_hash_path` here). When the CLI is invoked from a subdirectory, the guard checks one location while `review.json` and `.commit_hash` are read/written in another, so `codex-local` can record into a different review tree than `status`/`check-approved` later inspect.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/compose_v2.rs",
+              "line": 139,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:177ef5b0d668d2f39945638b6d96099b112c1959fadecbe7ebd61f91bc4879c3",
+          "at": "2026-04-05T12:10:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b26f5843609c81ba2f5553ea0b0516c2c88eaac1ce9bc00e3b617bb87d541bd2",
+          "at": "2026-04-05T12:14:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: `render_auto_record_v2()` now computes the scope hash only after Codex exits and then writes that hash straight to `review.json`. If any file in the reviewed scope changes while the reviewer is running, the verdict for the old contents is recorded against the new hash, so `review check-approved` can pass unreviewed code. The v2 usecase layer already has a before/after hash guard for this, but the CLI path bypasses it here.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 222,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: empty scopes are still sent to Codex. `build_scope_file_list()` can already tell when a scope has no files, but `execute_codex_local()` launches the subprocess unconditionally and the skip happens only after a successful outcome. That means a timeout/spawn failure on an empty scope turns a case that should be skipped into a hard review failure.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 39,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b26f5843609c81ba2f5553ea0b0516c2c88eaac1ce9bc00e3b617bb87d541bd2",
+          "at": "2026-04-05T12:20:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_track_id_from_branch()` returns the raw suffix after `track/` without validating it as a `TrackId`, and `persist_commit_hash_v2()` uses that string directly in `track/items/<track-id>/.commit_hash`. A branch such as `track/foo/bar` will therefore write the diff base under `track/items/foo/bar/.commit_hash` instead of the intended track directory, while the branch guard still passes because it compares the same unvalidated string. Reuse the existing validated branch parser or validate before joining the path.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 660,
+              "category": "correctness"
+            },
+            {
+              "message": "`.commit_hash` persistence failures are only logged and converted to `COMMIT_HASH_FAILED`, but `dispatch_track_commit_message()` still returns success. That leaves the commit flow reporting success while silently falling back to `main` for future v2 review state, with no non-zero exit code or recovery path for automation to detect.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 538,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:3f645bba37d83c73653d696b5c3b4746003e1658360321bd10454873eb28a39c",
+          "at": "2026-04-05T13:08:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`persist_commit_hash_v2` builds `track/items/<id>/.commit_hash` as a relative path, so `track-set-commit-hash` and the post-commit hook will write to the caller's current directory instead of the discovered repo root when invoked from a subdirectory. That can stamp the wrong track or miss the intended `.commit_hash` entirely.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 605,
+              "category": "correctness"
+            },
+            {
+              "message": "A failed `.commit_hash` write is downgraded to stdout warnings and `dispatch_track_commit_message()` still exits successfully. Any automation that only checks the exit status will miss the failure, leaving the v2 diff base unset and causing later review/status commands to silently fall back to `main`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 538,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:3f645bba37d83c73653d696b5c3b4746003e1658360321bd10454873eb28a39c",
+          "at": "2026-04-05T13:13:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`persist_commit_hash_v2()` hardcodes `track/items` as a process-relative path before creating `FsCommitHashStore`. If `track-set-commit-hash` or the post-commit hook runs from a subdirectory, `.commit_hash` will be written under the wrong tree instead of the discovered repo root, so the v2 diff base can be corrupted or missed entirely.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "line": 605,
+              "category": "correctness"
+            },
+            {
+              "message": "The post-commit path logs `COMMIT_HASH_FAILED` when `.commit_hash` persistence fails, but `dispatch_track_commit_message()` still returns `ExitCode::SUCCESS`. That makes the new v2 diff-base write look successful to automation even though later review/status commands will silently fall back to `main`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "line": 538,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:3f645bba37d83c73653d696b5c3b4746003e1658360321bd10454873eb28a39c",
+          "at": "2026-04-05T13:17:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_v2_shared` now derives `review.json` and `.commit_hash` paths from any slug-valid `track_id` without first verifying that `track/items/<track_id>` is a real track. Because `codex-local` writes through these stores unconditionally, a typo like `--track-id teest` will silently create orphan review state under `track/items/teest/`, and later `status` / `check-approved` calls will treat that orphan state as authoritative instead of failing fast.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/compose_v2.rs",
+              "line": 171,
+              "category": "correctness"
+            },
+            {
+              "message": "`run_check_approved` no longer loads the track record before approving a commit; it only inspects v2 scope hashes. That drops the existing escalation gate carried in track metadata, so `cargo make track-commit-message` can now pass even when the track still has an active review escalation block.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 310,
+              "category": "correctness"
+            },
+            {
+              "message": "After `git commit` has already succeeded, `dispatch_track_commit_message` returns `ExitCode::FAILURE` whenever `.commit_hash` persistence fails. That makes the wrapper report the same non-zero outcome as a real commit failure, so automation that aborts or retries on failure can mis-handle an already-created commit and skip follow-up steps.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 559,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b20b6116959cf81eb3030ee0f71a308332d9fc18c1cb284f9bcba57ce43b54c3",
+          "at": "2026-04-05T13:34:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dispatch_track_commit_message()` now claims post-commit failures are surfaced after both persistence steps run, but `post_commit_failed` is only set for `.commit_hash`. If `persist_approved_head()` fails, the command still exits 0 with no machine-readable signal, so the legacy incremental base stays stale silently despite the recovery path still being advertised.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 550,
+              "category": null
+            },
+            {
+              "message": "`execute_codex_local()` writes the reviewer verdict straight into `review.json` without any scope-side validation/filtering. Because the Codex subprocess still has read-only access to the whole repo, an out-of-scope finding can now be recorded under the selected scope and keep that scope blocked until someone reruns it; the old diff-scope filter was the only hard guard against this class of false positives.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 50,
+              "category": null
+            },
+            {
+              "message": "The new `track_dir.is_dir()` guard sits inside the shared v2 builder used by `review status`, so read-only status checks now fail for fresh/nonexistent tracks instead of showing the fail-closed scope state. That regresses the documented/tested behavior in `status_succeeds_with_v2_scope_states` and turns a harmless inspection command into a hard error on typo/new-track inputs.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/compose_v2.rs",
+              "line": 167,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:2af8c3c3226b9efa55047f5118575ef639f1a4bb34f8eb4cd1e93b6cf0f41b2b",
+          "at": "2026-04-05T13:49:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`persist_commit_hash_v2()` writes `.commit_hash` without first verifying that `track/items/<track-id>` already exists. On a stray or deleted `track/<id>` branch, `track-commit-message` / `track-set-commit-hash` will silently create a new `track/items/<id>/` directory containing only `.commit_hash`; after that, the new `build_review_v2()` fail-fast no longer trips and `review status` / `check-approved` start treating the orphan directory as real review state.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 623,
+              "category": "correctness"
+            },
+            {
+              "message": "The new path-traversal guard is still bypassable via `symlink/..` segments. `normalize_path_components()` collapses `track/link/../items` to `track/items` before any symlink resolution, so if `track/link` points outside the repo the `starts_with(canonical_root)` check can pass even though the original path resolves outside the repository. That leaves the security-critical containment check incomplete.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/compose_v2.rs",
+              "line": 140,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:e05c18bf2250e1efbe6d05881c01ee1c040204f8cfec2c0a000db705587db608",
+          "at": "2026-04-05T14:04:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new v2 `codex-local` path maps `--group` to a `ScopeName`, but then calls `ReviewCycle::review()/fast_review()` without ever forwarding the actual scope label into the prompt builder. In this flow Codex only sees the generic injected label `scope`, so named scopes like `cli` / `domain` / `other` are no longer conveyed to the reviewer. That is a behavior regression for per-scope review, because scope-specific briefing text and accepted deviations can now be contradicted by the wrapper-generated prompt.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 45,
+              "category": "behavior"
+            },
+            {
+              "message": "The test suite no longer exercises the real `codex-local` execution path. `tests.rs` imports and tests `codex_local::run_codex_local`, which is now only a `#[cfg(test)]` compatibility shim; there is no coverage for `execute_codex_local` / `run_execute_codex_local`, the new path that builds the v2 composition and records to `review.json`. That leaves the always-on auto-record flow unguarded against regressions in scope mapping, skip handling, and record-failure behavior.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/tests.rs",
+              "line": 5,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:85d6eed60e9bc6bd1b8d2db991aaea4babfc218d650c335d5f54879530ca8702",
+          "at": "2026-04-05T14:14:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_codex_local()` now records rounds by calling `FsReviewStore::write_verdict()` / `write_fast_verdict()` directly, but that path never derives concerns or updates the metadata escalation state. `check-approved` still only enforces escalation by reading `metadata.json`, so new v2 review rounds can no longer trigger the exit-3/`resolve-escalation` workflow; a track can accumulate repeated findings, rerun until `zero_findings`, and commit without ever resolving the intended escalation block.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 52,
+              "category": "logic"
+            },
+            {
+              "message": "`build_v2_shared()` still accepts arbitrary `--items-dir`, but it always loads the fixed `track/review-scope.json` config whose operational and `other_track` patterns are hard-wired to `track/items/...`. When callers use a non-default items dir, the new v2 flow reads/writes review state under that alternate directory while classification still assumes `track/items`, so `review.json` and sibling-track files stop being excluded from hashing/status checks. That breaks `status`/`check-approved`/`codex-local` for any supported non-default `--items-dir` invocation.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/compose_v2.rs",
+              "line": 180,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3bfb3518947c1a9a4de06b77983afc1e2de079e4f5e87b562ea6c49eb2f90a6b",
+          "at": "2026-04-05T14:26:47Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`harness-policy` now includes docs like `DEVELOPER_AI_WORKFLOW.md`, `README.md`, `CLAUDE.md`, and `AGENTS.md`, but `check-approved` still short-circuits on `detect_planning_only()` before it inspects any review state. Because `is_planning_only_path()` still treats those same files as planning-only, a commit that only touches harness-policy docs will bypass approval entirely instead of requiring the new `harness-policy` scope to be reviewed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/review-scope.json",
+              "line": 16,
+              "category": "correctness"
+            },
+            {
+              "message": "`extract_string_array()` fails open: any malformed `review_operational` or `other_track` field that is not an array, or contains non-string entries, is silently converted to `[]`. That means a policy typo can quietly disable the operational exclusion and reintroduce `review.json` or other-track paths into the diff scope, which is a regression from the old fail-closed loader.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 77,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:36b9a4ed453526d83fe1a4dbef88bebf0378aae835878036d11420f502d00af8",
+          "at": "2026-04-05T08:46:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `track/review-scope.json` to `harness-policy` does not make it review-gated: `apps/cli/src/commands/review/mod.rs:418-435` still treats any `track/*.json` as planning-only, so `check-approved` will short-circuit and bypass review for edits to the policy file itself. That leaves the new policy surface unprotected.",
+              "severity": "P1",
+              "file": "track/review-scope.json",
+              "line": 24,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:36b9a4ed453526d83fe1a4dbef88bebf0378aae835878036d11420f502d00af8",
+          "at": "2026-04-05T08:54:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `cargo make track-record-round` from the allowlist breaks the existing manual fallback path. `.claude/commands/track/review.md` still tells users to run `cargo make track-record-round` when `--auto-record` is unavailable, so this change will now produce a permission denial or unknown-task failure for that documented flow unless you keep a compatibility alias or update the fallback docs in the same patch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/permission-extensions.json",
+              "line": 4,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c324d8bc431688d5d52818fa293cbac1c1ff8fd719d723c8a8d597d44cac32b5",
+          "at": "2026-04-05T08:58:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/settings.json` still tells the permission hook to route `bin/sotp review record-round` to `cargo make track-record-round`, but that wrapper has been removed from the allowlists and no longer exists in `Makefile.toml`. Any request that hits this branch will now be redirected to a dead command instead of the supported v2 flow.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/settings.json",
+              "line": 136,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:23080f8e3f8540afe75b410432dd97c74a2a58bfa9b84576b4f6d312788264d3",
+          "at": "2026-04-05T09:11:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23080f8e3f8540afe75b410432dd97c74a2a58bfa9b84576b4f6d312788264d3",
+          "at": "2026-04-05T09:15:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 still tells reviewers to run `bin/sotp review check-approved`, but the Bash permission hook now explicitly denies that direct command and redirects to `cargo make track-check-approved`. Because this guard is mandatory before declaring readiness, following the documented flow in Claude Code now fails at the last step instead of running the approval check.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 312,
+              "category": "workflow"
+            },
+            {
+              "message": "This policy now declares `.claude/commands/**` and `.claude/rules/**` as `harness-policy`, but the commit guard still treats those prefixes as planning-only (`apps/cli/src/commands/review/mod.rs:is_planning_only_path`). As a result, edits to files such as `.claude/commands/track/review.md` can still bypass `check-approved` entirely even though `track/review-scope.json` says they require harness-policy review.",
+              "severity": "P1",
+              "file": "track/review-scope.json",
+              "line": 18,
+              "category": "logic_error"
+            }
+          ],
+          "hash": "rvw1:sha256:396b64a5265abd81ed9c0a739d6bdb7632d1f673c26de80c38a66ec6680ed3f5",
+          "at": "2026-04-05T09:22:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3fef002bc4cc6c714d68e1e05fd203f5f266ad95db30f9366d6614b9f4194a67",
+          "at": "2026-04-05T09:31:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: This patch edits `.claude/commands/track/review.md`, but `check-approved` still short-circuits all `.claude/commands/**` changes as planning-only (`apps/cli/src/commands/review/mod.rs:325-329,418-440`, and the tests still assert `.claude/commands/track/review.md` is planning-only at `apps/cli/src/commands/review/tests.rs:650`). A commit that only changes this file will therefore pass the mandatory review guard without any `harness-policy` review, so the policy is not actually enforced for one of the files in this scope.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 1,
+              "category": "logic_error"
+            }
+          ],
+          "hash": "rvw1:sha256:3fef002bc4cc6c714d68e1e05fd203f5f266ad95db30f9366d6614b9f4194a67",
+          "at": "2026-04-05T09:36:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/track/review.md` still supports a `claude` reviewer path in Step 1/2c, but Step 2e now says auto-record is always on and manual recording is gone. That is only true for the Codex wrapper path. Under a `claude-heavy` review run, verdicts would not be persisted to `review.json`, so the later `track-check-approved` gate can never succeed.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 208,
+              "category": "workflow"
+            },
+            {
+              "message": "The updated error-handling section dropped the explicit exit-code-3 escalation branch even though the same section still says auto-record can return 3 for `EscalationActive`. A reviewer following this doc now has no required stop/report path for an active escalation and is likely to retry or continue, leaving approval permanently blocked.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 211,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:3fef002bc4cc6c714d68e1e05fd203f5f266ad95db30f9366d6614b9f4194a67",
+          "at": "2026-04-05T09:46:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated `/track:review` command examples still tell reviewers to run `cargo make track-local-review` with `--auto-record`, `--expected-groups`, and `--diff-base`, but `CodexLocalArgs` no longer defines any of those options (`apps/cli/src/commands/review/mod.rs:56-92`). Following the documented command now exits in Clap argument parsing before any review runs, so this workflow is blocked.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 152,
+              "category": "workflow_breakage"
+            },
+            {
+              "message": "This change removes the manual `record-round` fallback and says auto-record is always on, but the same file still supports a `claude` reviewer path that only collects JSON from subagents and never invokes the Codex wrapper that writes `review.json`. Under the existing `claude-heavy` profile (`.claude/agent-profiles.json:75-85`), review can report `zero_findings` yet the mandatory `cargo make track-check-approved` step can never pass because nothing was persisted.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 208,
+              "category": "state_persistence"
+            }
+          ],
+          "hash": "rvw1:sha256:3fef002bc4cc6c714d68e1e05fd203f5f266ad95db30f9366d6614b9f4194a67",
+          "at": "2026-04-05T09:52:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated `/track:review` instructions still tell agents to invoke `cargo make track-local-review` with removed flags (`--auto-record`, `--expected-groups`, `--diff-base`) and describe auto-record as an internal `record-round` call. The current `review codex-local` CLI accepts none of those flags and writes `review.json` directly, so following these examples now fails with unknown-argument errors before the review starts.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 152,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3fef002bc4cc6c714d68e1e05fd203f5f266ad95db30f9366d6614b9f4194a67",
+          "at": "2026-04-05T09:58:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The v2 flow still advertises a `claude` reviewer path in Step 1/2c, but Step 2e only explains auto-recording for the Codex wrapper path. There is no persistence step for Claude subagent verdicts, so a `claude-heavy` run can report `zero_findings` and still leave `review.json` unset, making the mandatory `track-check-approved` step impossible to satisfy.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 203,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:f4a7547629a1d86d333a8615736183ae5834ef8f715db67335aac6b5e6180a99",
+          "at": "2026-04-05T10:19:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b18721d664a7297c36106b96652aea62553f77c2293d34ef970dd9906c18b87",
+          "at": "2026-04-05T10:30:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Codex reviewer examples no longer pass the generated per-group briefing files from Step 2b; they only send a one-line `--prompt`. That drops the design-intent, checklist, and accepted-deviation context the workflow just built, so the review loop no longer follows its own briefing contract and can produce inconsistent findings.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 152,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2b18721d664a7297c36106b96652aea62553f77c2293d34ef970dd9906c18b87",
+          "at": "2026-04-05T10:37:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9db24004392e6c6611489358c43ba76698c1c9f8e450376887f0ee63cb33aac8",
+          "at": "2026-04-05T10:42:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9db24004392e6c6611489358c43ba76698c1c9f8e450376887f0ee63cb33aac8",
+          "at": "2026-04-05T10:46:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:review` still builds only the old 3-part briefing template. The new `knowledge/conventions/impl-delegation-arch-guard.md` requires an `## Architecture Verification Checklist`, but this command never injects it, so delegated implementation reviews will not actually check the new architecture guardrail.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 102,
+              "category": "architecture"
+            },
+            {
+              "message": "The Bash permission prompt no longer maps the still-exposed `bin/sotp review set-approved-head` recovery command to `cargo make track-set-commit-hash`, so a direct state-mutating call can fall through to the generic ask path instead of being redirected to the wrapper. That leaves the new commit-hash recovery path under-enforced.",
+              "severity": "P1",
+              "file": ".claude/settings.json",
+              "line": 136,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:670f0ba1a8a5435554bd5d07d1bb32f34ada42a73aa1bd947e4631998e1a8f4d",
+          "at": "2026-04-05T13:14:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `knowledge/conventions/**` to `harness-policy` does not actually make those files review-gated: the current planning-only bypass still treats all `knowledge/` paths as planning-only except `knowledge/DESIGN.md`, so `knowledge/conventions/README.md` and `knowledge/conventions/impl-delegation-arch-guard.md` will continue to skip review. This policy change needs the bypass guard updated in the same patch.",
+              "severity": "P1",
+              "file": "track/review-scope.json",
+              "line": 21,
+              "category": "workflow"
+            },
+            {
+              "message": "The Bash permission prompt is stale: it still redirects `bin/sotp review record-round` to `cargo make track-record-round`, but that task was removed, and it does not redirect the new `bin/sotp review set-approved-head` call to `cargo make track-set-commit-hash`. As written, the recovery/mutation path can fall through to the generic ask branch instead of the intended wrapper.",
+              "severity": "P1",
+              "file": ".claude/settings.json",
+              "line": 136,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:670f0ba1a8a5435554bd5d07d1bb32f34ada42a73aa1bd947e4631998e1a8f4d",
+          "at": "2026-04-05T13:19:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Bash permission prompt is out of sync with the v2 review workflow: it still maps `bin/sotp review record-round` to the removed `cargo make track-record-round`, and it never advertises the new `bin/sotp review set-approved-head` -> `cargo make track-set-commit-hash` path. That leaves the permission gate inconsistent with the actual allowed wrappers.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/settings.json",
+              "line": 136,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:670f0ba1a8a5435554bd5d07d1bb32f34ada42a73aa1bd947e4631998e1a8f4d",
+          "at": "2026-04-05T13:30:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:review`'s Step 2b briefing template still emits only `Design Intent`, `Changed Files`, and a generic `Review Checklist`. The new `knowledge/conventions/impl-delegation-arch-guard.md` added in this patch declares `## Architecture Verification Checklist` a mandatory review-briefing section, so this change never actually injects the new guardrail into reviewer prompts. Reviewers therefore still will not be asked to verify ADR-mandated type placement, CLI composition-root boundaries, or `NullXxx` bypasses that this convention is meant to catch.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 100,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:670f0ba1a8a5435554bd5d07d1bb32f34ada42a73aa1bd947e4631998e1a8f4d",
+          "at": "2026-04-05T13:49:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `Architecture Verification Checklist` block is mojibake: lines 123-126 contain replacement characters (`�`) instead of the text from `knowledge/conventions/impl-delegation-arch-guard.md`. Since `/track:review` copies this template into reviewer briefings, the architecture checks are now partially unreadable, so the Round 1 fix is not actually complete.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 123,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:13aca3ace6a772c3b1282222bb809adc33620066c69696fb3a41f7b9ec6469b1",
+          "at": "2026-04-05T14:01:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Layer 2` currently bans any `NullReviewer`/`NullXxx` use in the CLI, but this same convention's review checklist explicitly allows the `status`/`check-approved` exception, and the current v2 composition uses `NullReviewer` for exactly that case. As written, the post-implementation verification step will produce false positives against the intended composition-root pattern.",
+              "severity": "P1",
+              "file": "knowledge/conventions/impl-delegation-arch-guard.md",
+              "line": 70,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:7734f0a4e606c2c41ac52212e3732474ebcb9639d79437438cce192930af6844",
+          "at": "2026-04-05T14:11:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8005e0a1c4a82b3474aafbe48e0bcfec799a13654bf3b04db3538caea44e342c",
+          "at": "2026-04-05T14:18:40Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review_operational` and `other_track` entries are silently filtered with `filter_map`, so malformed values like `null` or numbers are treated as if they were never configured. That can disable file exclusions without surfacing a config error and send the wrong files through review.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 77,
+              "category": "correctness"
+            },
+            {
+              "message": "The new payload schema marks `category` as required, but the custom `ReviewFinding` shape validator still does not enforce its presence. Payloads that violate the advertised schema are therefore accepted and deserialized as `category: None`, which makes the parser contract inconsistent with the schema string.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_workflow/verdict.rs",
+              "line": 394,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f14a65c0d90e1829265b72c3151bace0c9288b8e505ed4edfb3ce6d577511cca",
+          "at": "2026-04-05T08:45:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_string_array()` returns `Ok(Vec::new())` when `review_operational` or `other_track` is present but not an array. That silently ignores malformed config instead of failing closed, so a typo like `\"review_operational\": { ... }` will disable the operational exclusion logic and can reintroduce review.json into scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 87,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:58657dff94b13090d302906999b96b3f59ec735e7758ec8ff8dfe5760b972453",
+          "at": "2026-04-05T08:53:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_v2_scope_config()` reads `track/review-scope.json` directly with `std::fs::read_to_string` and never rejects symlinks. In an untrusted repo, that lets `track/review-scope.json` point to an arbitrary local file outside the repository, so the review scope loader can consume attacker-controlled external content and break the repo trust boundary.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 48,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:d912a143d5ccb618b35ab58081c31674356086d22bc5cc718c002678c14ab78f",
+          "at": "2026-04-05T08:58:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_v2_scope_config()` only rejects a symlink at the leaf path. It then calls `read_to_string()` on the original path, so any symlink in an ancestor directory is still followed. In an untrusted worktree, that lets `track/review-scope.json` resolve to arbitrary content outside the repo and bypass the intended trust boundary.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 48,
+              "category": "security"
+            },
+            {
+              "message": "`review_operational` and `other_track` are treated as empty when the fields are missing (`extract_string_array()` returns `Ok(Vec::new())`). For a review-policy loader this is fail-open: a typo or truncated config silently drops the operational exclusion and/or other-track filtering instead of rejecting the file, which can reintroduce `review.json` into scope or misclassify changes.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 77,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:6fa1b8d3fd68abedc0024dc10e98625fa777691a63b51495467b4de43403696c",
+          "at": "2026-04-05T09:10:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_v2_scope_config()` never checks the top-level `version` field, so a stale v1 `track/review-scope.json` is accepted and interpreted with v2 rules. Because `planning_only` and `normalize` are intentionally ignored, that can silently broaden the review scope instead of failing fast on an out-of-date policy file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 70,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f86ddeba254a4d567c87e98491c4ab47972095e4781e3b18d8665d9d0ed9401c",
+          "at": "2026-04-05T09:15:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The version gate is open-ended (`>= 2`), so a future `review-scope.json` revision will be silently loaded with v2 semantics even if its `groups` or exclusion rules are no longer compatible. Since backward compatibility with v1 is not required, this should be an exact version check or an explicit allow-list to avoid misclassifying files on schema bumps.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 77,
+              "category": "correctness"
+            },
+            {
+              "message": "This test is incorrect and will fail: `version: 1` is rejected before the loader ever checks for a missing `groups` field, so the assertion cannot pass. If the intent is to cover the missing-groups path, the fixture needs `version: 2` (or the test should assert the version error instead).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 216,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:a89e670b1c1e3a6afb8698e758f23a316312e59dc256e84416fb51899a960fd0",
+          "at": "2026-04-05T09:21:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Do not fall back to `.` when `git rev-parse --show-toplevel` fails. That makes the symlink guard best-effort instead of fail-closed, so this loader can still read `review-scope.json` from an untrusted working directory instead of rejecting the call.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 52,
+              "category": "security"
+            },
+            {
+              "message": "The manual `serde_json::Value` parsing accepts any unexpected top-level key silently. A typo in `review_operational` or `other_track` will therefore load as an empty exclusion list and can pull `review.json` back into the review diff. This should be schema-validated or use `deny_unknown_fields`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 94,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c3c63f6d06a83fe005bc954a244d29025780ecda3da4908c026075984450b020",
+          "at": "2026-04-05T09:24:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_v2_scope_config()` only checks for symlinks; it never verifies that `review_scope_path` is actually under `trusted_root`. A caller can pass an absolute path or `../` traversal outside the repo and it will still be read if the path has no symlinks, which defeats the intended repo-boundary guard.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 70,
+              "category": "security"
+            },
+            {
+              "message": "The symlink guard is non-atomic: the code validates the path and then opens it again with `std::fs::read_to_string()`. A concurrent swap of `review-scope.json` or one of its parents can replace the checked path after validation, so the loader can still read attacker-controlled content. This needs an atomic open/`O_NOFOLLOW`-style flow.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 82,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:109381820b520759d6c87d248fe57f092a9796e2c775ef5f7175a4953fb2add6",
+          "at": "2026-04-05T09:30:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:109381820b520759d6c87d248fe57f092a9796e2c775ef5f7175a4953fb2add6",
+          "at": "2026-04-05T09:38:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_v2_scope_config` now depends on `SystemGitRepo::discover()`, which resolves the repo root from the process current working directory instead of from `review_scope_path`. That makes this loader fail with `InvalidField(\"cannot determine repo root...\")` whenever a valid config file is loaded from a caller whose CWD is outside the repo, even though the path argument itself is sufficient. The rest of the infrastructure loaders derive trust from their input paths; this one should do the same or accept the trusted root from the caller.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 64,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:109381820b520759d6c87d248fe57f092a9796e2c775ef5f7175a4953fb2add6",
+          "at": "2026-04-05T09:41:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: `trusted_root` is not actually enforced as the path boundary. In [scope_config_loader.rs:61](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/scope_config_loader.rs#L61) the code only asks `reject_symlinks_below()` to inspect the caller-supplied path, then [scope_config_loader.rs:75](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/scope_config_loader.rs#L75) reads that same path directly. Relative inputs are still resolved against the process CWD, and absolute or `..`-escaping paths outside `trusted_root` are still accepted as long as they are not symlinks. That means the new API does not deliver the intended \"trusted_root, not CWD\" behavior and can read arbitrary config files outside the trusted tree.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 61,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:eb35b7116f088b60bf01b9268aa49246b57bfee6b0177a4f15cb2650136c748d",
+          "at": "2026-04-05T09:50:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_v2_scope_config` deserializes straight into `ReviewScopeJsonV2`, so `ScopeConfigLoadError::NotObject` and `ScopeConfigLoadError::MissingGroups` are unreachable. Inputs like `[]` or `{ \"version\": 2 }` come back as a generic `Parse` error instead of the structured variants this API advertises, which breaks callers that want to handle those validation failures distinctly.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 79,
+              "category": "error_handling"
+            },
+            {
+              "message": "`GroupEntry` is missing `#[serde(deny_unknown_fields)]`, so unknown keys inside a group are silently accepted even though the loader comment says typos are rejected. A config that accidentally tucks a field such as `other_track` or any misspelled per-group key alongside `patterns` will load successfully and change scope classification instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 42,
+              "category": "config_validation"
+            }
+          ],
+          "hash": "rvw1:sha256:eb35b7116f088b60bf01b9268aa49246b57bfee6b0177a4f15cb2650136c748d",
+          "at": "2026-04-05T09:54:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`trusted_root` is not enforced as a path boundary here. The call to `reject_symlinks_below(review_scope_path, trusted_root)` only checks for symlink components, and `read_to_string(review_scope_path)` then opens the original caller-supplied path unchanged. That means an absolute path or a `..`-escaping relative path outside the trusted tree is still accepted as long as it contains no symlink, so this exported loader can read config from outside the intended repo root.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 60,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:850c59f186fb12ce670b20d8c0f8dfef2776dc5917e3f11c1021489e79e5c1b2",
+          "at": "2026-04-05T09:58:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new security-critical branches in `load_v2_scope_config()` are still untested. This patch adds trusted-root enforcement and symlink rejection at lines 58-84, but the test module only covers happy-path parsing plus generic parse/I/O failures. Because this is a public infrastructure loader, please add regression tests for a `../` or absolute-path escape outside `trusted_root` and for leaf/ancestor symlink rejection; otherwise those guarantees can regress without detection.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 58,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1f8f2c6d42e46028a5efd3d29b610449f61d0ab84634fc3cb98d57fa0778e5ed",
+          "at": "2026-04-05T10:03:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new trusted-root and symlink rejection branches in `load_v2_scope_config()` are still untested. This file adds the boundary/symlink guards at lines 58-84, but the test module only covers happy-path parsing plus generic parse/I/O failures, so a regression in `canonicalize() + starts_with()` enforcement or in leaf/ancestor symlink rejection would ship unnoticed. Given the review policy requires error-case coverage for public APIs, please add explicit tests for an escape outside `trusted_root` and for symlinked path components.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 58,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1f8f2c6d42e46028a5efd3d29b610449f61d0ab84634fc3cb98d57fa0778e5ed",
+          "at": "2026-04-05T10:05:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Add regression tests for the new boundary and schema-validation branches in `load_v2_scope_config()`. The current tests only cover happy-path loads plus generic parse/I/O failures, so the `trusted_root` escape check, symlink rejection, and `version != 2` `InvalidField` path can regress without detection.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 51,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:be972c3a69caaceea35adf48028d28150ea3741c4b953ba6877c34187b5be80b",
+          "at": "2026-04-05T10:17:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be972c3a69caaceea35adf48028d28150ea3741c4b953ba6877c34187b5be80b",
+          "at": "2026-04-05T10:31:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `trusted_root` / symlink / version gates in `load_v2_scope_config` are not exercised by tests. The suite only covers happy-path loading plus generic parse/I/O failures, so regressions in the repo-boundary checks or the `version != 2` rejection can slip through. Add explicit tests for escape, symlinked paths, and version mismatch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 73,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:be972c3a69caaceea35adf48028d28150ea3741c4b953ba6877c34187b5be80b",
+          "at": "2026-04-05T10:35:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5bd1cf0c6f5026b835541db1d14da7e04464d0a11852695938440402114568a",
+          "at": "2026-04-05T10:40:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5bd1cf0c6f5026b835541db1d14da7e04464d0a11852695938440402114568a",
+          "at": "2026-04-05T10:44:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Timeout cleanup only calls `child.kill()` on the direct Codex process. If Codex spawns descendants, they can survive the timeout and keep the stderr pipe open, so `tee_handle.join()` can hang and the reviewer lifecycle is not actually fail-closed for the whole process tree.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+              "line": 427,
+              "category": "correctness"
+            },
+            {
+              "message": "This verifier snippet no longer checks for the mandatory `--track-id` flag in the `track-local-review` command. A regression that drops `--track-id` would still pass `verify_orchestra`, even though the documented invocation would no longer be able to target the correct track for recording results.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 354,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:9cce2b9bf6b1cc3c193679917f9bd1876acaa23162e391574714f51f8218a7b5",
+          "at": "2026-04-05T13:12:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Runtime artifact names are derived only from PID plus `as_nanos()`, so concurrent reviewer runs in the same process can collide and truncate each other's `output-last-message`, schema, or session log files. Use a truly unique name source to avoid cross-talk between parallel scope reviews.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+              "line": 214,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `Reviewer` impl has no tests for the actual `review()` / `fast_review()` paths. Only helper behavior is covered, so regressions in subprocess spawning, timeout handling, and verdict parsing can slip through.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+              "line": 115,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:eb3a06ebfd87d9c0139ef11fb9738d224a0551c2679bd05820ff4b17cc37fd59",
+          "at": "2026-04-05T13:22:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:468dd1d40f5bf7f7c2559477758f906c658ae1fbbea03ed7b2106057415b1ccc",
+          "at": "2026-04-05T13:29:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_v2_scope_config()` only reads the base `track/review-scope.json` and immediately builds `ReviewScopeConfig` from those groups, with no way to load or apply the optional `track/items/<track-id>/review-groups.json` override that the review workflow expects. Any track that defines an override will therefore be partitioned with the wrong scope set, which in turn misroutes per-scope reviews and stores hashes/verdicts under the wrong groups.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 51,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `--track-id` guard is ineffective because `verify_reviewer_wrapper_guidance()` checks each required snippet independently with `content.contains()`. Requiring a bare `\"--track-id\"` substring will still pass as long as that flag appears anywhere else in `.claude/commands/track/review.md`, even if the actual `cargo make track-local-review ... --group ...` example drops it. This creates a false-negative in the orchestra verifier instead of actually pinning the flag to the reviewer wrapper command.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 923,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:468dd1d40f5bf7f7c2559477758f906c658ae1fbbea03ed7b2106057415b1ccc",
+          "at": "2026-04-05T13:33:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spawn_codex()` forwards the Codex child's stdout directly to the parent process. That means a reviewer payload can be printed before `write_verdict()` succeeds; if persistence later fails, `track-local-review` exits with an error but still leaves a stale verdict on stdout, breaking the documented fail-closed contract for unrecorded rounds. The child stdout should be captured/suppressed so the wrapper is the only code path that emits verdict JSON.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+              "line": 330,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:468dd1d40f5bf7f7c2559477758f906c658ae1fbbea03ed7b2106057415b1ccc",
+          "at": "2026-04-05T13:49:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`tee_stderr_to_file()` still forwards every reviewer stderr line to the parent, while `run_codex_child()` later accepts that same stderr log as a fallback verdict source. Any run recovered via the session-log fallback will therefore leak its JSON verdict before `review.json` is written, so the fail-closed contract from the previous round is still broken for stderr-emitted payloads.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+              "line": 380,
+              "category": null
+            },
+            {
+              "message": "`load_v2_scope_config()` is documented to ignore legacy `planning_only`/`normalize` fields, but `ReviewScopeJsonV2` uses `deny_unknown_fields`, so any v2 `review-scope.json` that still carries those deprecated keys now hard-fails to load. That turns a backward-compatible migration into a runtime parse failure for all v2 review commands.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 27,
+              "category": null
+            },
+            {
+              "message": "At the timeout boundary, the child can exit in the window after `try_wait()` returns `None` but before `terminate_reviewer_child()` runs. In that case `child.kill()` returns an error and the whole review becomes `Unexpected(...)` instead of cleanly timing out or returning the real verdict, which makes near-deadline runs flaky.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+              "line": 411,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:e05c4bd216895b10ad1f5914b26b1399651d0c862bda92e1da3fc07ec1eab8f0",
+          "at": "2026-04-05T14:01:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The timeout path is still not fail-safe: after killing the direct reviewer child, `run_codex_child()` unconditionally joins the stdout/stderr drain threads. Any descendant process that inherited those pipe FDs will keep the readers blocked, so the call can hang long past the configured timeout instead of returning `ReviewerError::Timeout`. The old CLI tests already model this exact background-child case, so this is a real regression in the v2 adapter.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+              "line": 424,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:3f3e2d0e39fb7ea1dce5d94de9c119412e2fdad635f13e540d49546265ac91c1",
+          "at": "2026-04-05T14:12:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_codex_child()` no longer fails closed when `--output-last-message` is missing. If the Codex subprocess exits 0 but writes any verdict-shaped JSON to stderr, the fallback at `session_log_path` will parse that diagnostic stream and return `ZeroFindings`/`FindingsRemain` instead of `LastMessageMissing`. Because `spawn_codex()` only persists stderr to the session log, this turns a non-authoritative channel into an approval source and can mark an unrecorded round as successful.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+              "line": 455,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:855726343e931fbc95de1ff88e7a60bfaf7eb3885369bd3802be7ac3271e375f",
+          "at": "2026-04-05T14:26:06Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `category` requirement is only present in `REVIEW_OUTPUT_SCHEMA_JSON`; the parser still accepts findings without `category` because `ReviewFinding` defaults the field to `None`, `validate_review_payload` only checks blank values when present, and the custom shape visitor does not require the key. As written, a payload without `category` still parses as valid.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_workflow/verdict.rs",
+              "line": 103,
+              "category": "correctness"
+            },
+            {
+              "message": "Both `record_round` and `record_round_typed` collapse `RecordRoundProtocolError::StaleHash` into `RecordRoundError::Other`, so callers cannot distinguish code-drift retries from unrelated failures. The protocol already exposes `StaleHash` as a distinct condition, and this mapping throws that information away at the usecase boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_workflow/usecases.rs",
+              "line": 281,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ceaad8e8465c1748c2d7fbd51f5065ce2cc6a33ccb446ce8a3e0db8b6a2473d8",
+          "at": "2026-04-05T08:46:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`category` is now advertised as required in `REVIEW_OUTPUT_SCHEMA_JSON`, but the usecase parser still accepts findings that omit the key: `ReviewFinding` keeps `category: Option<String>`, and the custom shape/validation path does not reject a missing field. That leaves the published contract and the actual acceptance logic out of sync, so payloads without `category` will still be treated as valid internally even though the schema says they are invalid.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_workflow/verdict.rs",
+              "line": 53,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:50a6cca1f80401de7345c4726e3585512b3b33e49f28de44c7a5e3be28fa7325",
+          "at": "2026-04-05T08:52:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`REVIEW_OUTPUT_SCHEMA_JSON` now requires `category`, but the actual parser/validator in this file still accepts findings without it (`ReviewFindingShapeVisitor` does not mark `category` as required, and `parse_review_final_message` will return `Parsed` with `category: None`). That makes the published contract stricter than runtime behavior, so payloads the usecase layer currently accepts can now be rejected by anything following the schema.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_workflow/verdict.rs",
+              "line": 53,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:50a6cca1f80401de7345c4726e3585512b3b33e49f28de44c7a5e3be28fa7325",
+          "at": "2026-04-05T08:57:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Requiring `category` here is a backward-incompatible parser change: `parse_review_final_message` will now reject existing `findings_remain` payloads that omit the field, even though `ReviewFinding` still models `category` as `Option<String>` and the rest of the workflow still treats `None` as valid. That turns previously parseable reviewer output into `Invalid`/`ProcessFailed` instead of round-tripping as `None`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_workflow/verdict.rs",
+              "line": 422,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:2ad4932fe38c06d0b4f16b2cd212d99171c9f1d61b5cf24ee3728339499c11a3",
+          "at": "2026-04-05T09:09:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ad4932fe38c06d0b4f16b2cd212d99171c9f1d61b5cf24ee3728339499c11a3",
+          "at": "2026-04-05T09:13:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Requiring `category` on every finding now makes the usecase parser reject payloads that omit it, but the repository still contains active reviewer guidance/examples that emit findings without `category` (for example `.claude/commands/track/review.md`, `.claude/skills/codex-system/SKILL.md`, `.claude/rules/02-codex-delegation.md`, and the verifier snippets in `libs/infrastructure/src/verify/orchestra.rs`). A reviewer following the current prompts will now be classified as invalid/process_failed and auto-record will fail. This change needs the prompt/example updates in the same patch, or the parser must continue treating an absent field as `None`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/review_workflow/verdict.rs",
+              "line": 53,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:2ad4932fe38c06d0b4f16b2cd212d99171c9f1d61b5cf24ee3728339499c11a3",
+          "at": "2026-04-05T09:21:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`REVIEW_OUTPUT_SCHEMA_JSON` now marks `category` as required, but `parse_review_final_message` still accepts findings that omit it because `ReviewFindingShapeVisitor` never checks `seen_category`. Those payloads will be parsed as valid and stored with `category: None`, so malformed v2 output is not rejected.",
+              "severity": "P1",
+              "file": "libs/usecase/src/review_workflow/verdict.rs",
+              "line": 423,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d134b4cf431cae16be89fdc6a508ecad6f7ba5885dbb918b57fabdef661e976c",
+          "at": "2026-04-05T09:29:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:355e203ff08898846274b667110d5bb26e232a454a74ad0b8ee0c334d5c5b2ff",
+          "at": "2026-04-05T09:33:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:355e203ff08898846274b667110d5bb26e232a454a74ad0b8ee0c334d5c5b2ff",
+          "at": "2026-04-05T09:34:37Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--group` is only syntax-checked here; the auto-record path later writes any valid name straight into `review.json`. A typoed scope creates an orphan entry that `status` and `check-approved` ignore, so the command can report success without updating the intended review scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/mod.rs",
+              "line": 113,
+              "category": "correctness"
+            },
+            {
+              "message": "The auto-record path recomputes `get_review_targets()` and the scope hash after Codex exits, using the live worktree at record time instead of the diff the reviewer actually saw. If files change during the review window, the verdict is persisted against the wrong hash.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/codex_local.rs",
+              "line": 174,
+              "category": "correctness"
+            },
+            {
+              "message": "`extract_string_array()` silently drops malformed `review_operational` and `other_track` entries instead of failing closed. Because `review_operational` is what keeps `review.json` out of its own scope, a bad config value can remove that exclusion and make the scope hash/self-review logic incorrect.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "line": 77,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:71f5dee265c40f9d2a07b2c5ef51937e7474eea64edce351d033fc8ea0785f92",
+          "at": "2026-04-05T08:46:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing the `track-record-round` cargo-make task here breaks existing callers. The manual fallback in `.claude/commands/track/review.md` still tells users to run `cargo make track-record-round`, and the Claude permission allowlists in `.claude/settings.json` and `.claude/permission-extensions.json` still permit that exact command. After this change those flows will fail with an unknown task unless you keep a compatibility alias or update the surrounding docs and allowlists in the same change.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 843,
+              "category": "correctness"
+            },
+            {
+              "message": "The rewritten onboarding test only checks that `START_HERE_HUMAN.md` is gone. It no longer verifies that `LOCAL_DEVELOPMENT.md` and `track/workflow.md` are wired to `DEVELOPER_AI_WORKFLOW.md`, so a future regression in the entry-point docs would pass CI unnoticed. This removes the only automated guard on that doc linkage.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/scripts/test_verify_scripts.py",
+              "line": 193,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:71f5dee265c40f9d2a07b2c5ef51937e7474eea64edce351d033fc8ea0785f92",
+          "at": "2026-04-05T08:53:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing the `track-record-round` task without a compatibility alias breaks the existing manual fallback in `.claude/commands/track/review.md`, which still instructs users to run `cargo make track-record-round`. That path will now fail with an unknown task.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 843,
+              "category": "correctness"
+            },
+            {
+              "message": "This change deletes the original onboarding wiring test and replaces it with a deletion check, so CI no longer verifies that `LOCAL_DEVELOPMENT.md` and `track/workflow.md` actually point at `DEVELOPER_AI_WORKFLOW.md`. A future regression in the entry-point docs would now pass unnoticed.",
+              "severity": "P1",
+              "file": "scripts/test_verify_scripts.py",
+              "line": 196,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:9d903d6106053ec784517aac40af587bfe4c8e7253a4968680902ac100cf597e",
+          "at": "2026-04-05T08:57:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d903d6106053ec784517aac40af587bfe4c8e7253a4968680902ac100cf597e",
+          "at": "2026-04-05T09:09:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting this file drops the only live onboarding sections that spell out the mandatory approval checkpoints (`/track:plan`, post-review/CI, pre-commit) and the human-editable-path allowlist / denylist. I could not find equivalent guidance elsewhere in the current tree, so after this patch a newcomer no longer has any explicit guardrail telling them when human approval is required or which paths must not be hand-edited.",
+              "severity": "P1",
+              "file": "START_HERE_HUMAN.md",
+              "line": 23,
+              "category": "correctness"
+            },
+            {
+              "message": "The replacement selftest only proves that `START_HERE_HUMAN.md` was deleted and that two docs mention `DEVELOPER_AI_WORKFLOW.md`; it no longer checks that the deleted safety-critical onboarding content was migrated anywhere. That means the documentation regression above will pass CI unnoticed.",
+              "severity": "P1",
+              "file": "scripts/test_verify_scripts.py",
+              "line": 196,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:9d903d6106053ec784517aac40af587bfe4c8e7253a4968680902ac100cf597e",
+          "at": "2026-04-05T09:14:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fe13b21f76990772438d1e462bcb87634c3272dc26239b853cd1e1538fa82e1",
+          "at": "2026-04-05T09:20:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fe13b21f76990772438d1e462bcb87634c3272dc26239b853cd1e1538fa82e1",
+          "at": "2026-04-05T09:23:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These new public wrapper tasks are not covered by the wrapper smoke tests, so a typo in the task name or argument forwarding here would bypass CI. Please add assertions for `track-set-commit-hash` and `track-review-status` in `scripts/test_make_wrappers.py`.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 843,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:0fe13b21f76990772438d1e462bcb87634c3272dc26239b853cd1e1538fa82e1",
+          "at": "2026-04-05T09:30:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new public wrappers added here are not covered by the wrapper smoke tests, so a typo in the task name or an argument-forwarding regression would not be caught by CI. Please add assertions for `track-set-commit-hash` and `track-review-status` in the wrapper test suite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 843,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:0fe13b21f76990772438d1e462bcb87634c3272dc26239b853cd1e1538fa82e1",
+          "at": "2026-04-05T09:33:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The two new public wrappers added here (`track-set-commit-hash` and `track-review-status`) are not covered by the wrapper smoke tests, so a typo in the task names or a regression in their arg forwarding would bypass CI.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 843,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:0fe13b21f76990772438d1e462bcb87634c3272dc26239b853cd1e1538fa82e1",
+          "at": "2026-04-05T09:34:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c0cde37370ddb96463af6e6b426c5f79d5952869342b8997f7f22649b0f360f",
+          "at": "2026-04-05T09:36:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c0cde37370ddb96463af6e6b426c5f79d5952869342b8997f7f22649b0f360f",
+          "at": "2026-04-05T09:40:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b20ff4983b58194b9765e8aa11c6dc5fc6c0beea48802eba6f08081acd3b7130",
+          "at": "2026-04-05T09:49:57Z"
+        }
+      ]
+    }
+  }
+}

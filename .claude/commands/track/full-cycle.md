@@ -16,6 +16,7 @@ Execution:
 - Read the current track's `spec.md`, `plan.md`, `metadata.json`, and `verification.md` before implementation.
 - If the resolved track is branchless planning-only (`status=planned`, `branch=null`), stop and return `/track:activate <track-id>` as the next command. Do not use this command to bypass activation.
 - Read every convention file listed in the `## Related Conventions (Required Reading)` section of `plan.md` before writing code.
+- **ADR pre-check**: If `spec.md` or `plan.md` references an ADR (`knowledge/adr/*.md`), read the ADR and verify that the target task's description is consistent with the ADR's design (layer placement, error types, behavioral contracts). If discrepancies are found, fix the plan (`metadata.json` + `track-sync-views`) before writing code. ADR is the SSoT for design decisions.
 - Map `$ARGUMENTS` to one or more approved tasks in `metadata.json`.
 - Use `cargo make track-transition <track_dir> <task_id> in_progress` to mark selected tasks as `in_progress` and auto-render `plan.md` + `registry.md`. Do NOT edit `plan.md` directly.
 - Execute the implementation autonomously inside Claude Code using Agent Teams, focused tests, and repo-local commands. Prefer Rust CLI / `cargo make` wrappers over ad-hoc workflow scripts.

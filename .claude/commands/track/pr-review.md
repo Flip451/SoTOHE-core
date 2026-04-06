@@ -80,9 +80,23 @@ If the poll times out:
 ## Accepted findings
 
 When a reviewer finding is valid but intentionally deferred (e.g., edge case not applicable
-to the current workflow), record it in the **PR body** under an `## Accepted Findings` section
-with a table: `| Finding | Reason |`. This makes the acceptance visible to the reviewer on
-subsequent rounds and serves as a documented decision.
+to the current workflow), record it in the **PR body** under an `## Accepted Deviations` section
+using numbered list format (reference: PR #72):
+
+```markdown
+## Accepted Deviations (IMPORTANT: do not re-report these as findings)
+
+### Category Name
+1. **Short title** — Why this is accepted
+2. **Short title** — Why this is accepted
+
+### Other
+N. **General findings** ("specific example") — NOT CODE FINDINGS
+```
+
+This makes the acceptance visible to the reviewer on subsequent rounds and serves as a
+documented decision. Do NOT use table format — the numbered list format is more reliably
+parsed by automated reviewers.
 
 ## Behavior
 

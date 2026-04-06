@@ -64,8 +64,8 @@ pub enum MakeTask {
     TrackLocalPlan,
     /// Run the local Codex reviewer.
     TrackLocalReview,
-    /// Record a review round result into metadata.json.
-    TrackRecordRound,
+    /// Show per-scope review status.
+    TrackReviewStatus,
     /// Check that the review state is approved and code hash is current.
     TrackCheckApproved,
     /// Approve a spec (set status=approved + content hash).
@@ -88,6 +88,8 @@ pub enum MakeTask {
     TrackSyncViews,
     /// Attach git note from tmp/track-commit/note.md.
     TrackNote,
+    /// Write current HEAD SHA to .commit_hash (set v2 diff base).
+    TrackSetCommitHash,
     /// Stage all worktree changes.
     AddAll,
 
@@ -172,13 +174,14 @@ fn run(args: MakeArgs) -> Result<ExitCode, CliError> {
         MakeTask::TrackSetOverride => dispatch_track_set_override(&args.raw_args),
         MakeTask::TrackLocalPlan => dispatch_track_local_plan(&args.raw_args),
         MakeTask::TrackLocalReview => dispatch_track_local_review(&args.raw_args),
-        MakeTask::TrackRecordRound => dispatch_track_record_round(&args.raw_args),
+        MakeTask::TrackReviewStatus => dispatch_track_review_status(&args.raw_args),
         MakeTask::TrackCheckApproved => dispatch_track_check_approved(&args.raw_args),
         MakeTask::SpecApprove => dispatch_spec_approve(&args.raw_args),
         MakeTask::TrackPlanBranch => dispatch_track_plan_branch(&args.raw_args),
         MakeTask::Commit => dispatch_commit(&args.raw_args),
         MakeTask::Note => dispatch_note(&args.raw_args),
         MakeTask::TrackCommitMessage => dispatch_track_commit_message(),
+        MakeTask::TrackSetCommitHash => dispatch_set_commit_hash(&args.raw_args),
         MakeTask::Exec => dispatch_exec(&args.raw_args),
     }
 }
@@ -433,8 +436,8 @@ fn build_forwarded_args(prefix: &[&str], raw_args: &[String]) -> Vec<String> {
     args
 }
 
-fn dispatch_track_record_round(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let args = build_forwarded_args(&["review", "record-round"], raw_args);
+fn dispatch_track_review_status(raw_args: &[String]) -> Result<ExitCode, CliError> {
+    let args = build_forwarded_args(&["review", "status"], raw_args);
     let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
     run_sotp(&refs)
 }
@@ -529,23 +532,102 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
         return Ok(commit_result);
     }
 
-    // Post-commit: persist HEAD SHA as approved_head in review.json for incremental scope.
+    // Post-commit: persist HEAD SHA for incremental review scope.
+    // Both steps run regardless of individual failures so that neither blocks the other.
+    // We propagate a failure exit code only after both have been attempted.
+    let mut post_commit_failed = false;
     if let Some(ref track_id) = resolve_track_id_from_branch() {
-        if let Err(msg) = persist_approved_head(track_id) {
-            eprintln!("[track-commit-message] WARNING: approved_head persistence failed: {msg}");
-            // Machine-readable status on stdout for callers to detect and auto-recover.
-            println!("[track-commit-message] COMMIT_OK");
-            println!("[track-commit-message] APPROVED_HEAD_FAILED");
+        // v2: write HEAD SHA to .commit_hash
+        if let Err(msg) = persist_commit_hash_v2(track_id) {
+            eprintln!("[track-commit-message] WARNING: .commit_hash persistence failed: {msg}");
             eprintln!(
-                "[track-commit-message] Recovery: run `bin/sotp review set-approved-head \
-                 --track-id {track_id} --items-dir track/items`"
+                "[track-commit-message] Recovery: run `bin/sotp make track-set-commit-hash \
+                 {track_id}` to set the v2 diff base manually."
             );
-            // Return success — commit already succeeded. Caller should check
-            // stdout for APPROVED_HEAD_FAILED and run recovery if needed.
+            post_commit_failed = true;
+        }
+        // v1: write approved_head to review.json (kept for backwards compat, T007 cleanup).
+        // Soft failure only — v1 codec cannot read v2 review.json, so this will
+        // fail on v2 tracks. Do NOT set post_commit_failed for v1 legacy errors.
+        if let Err(msg) = persist_approved_head(track_id) {
+            eprintln!("[track-commit-message] NOTE: v1 approved_head skipped: {msg}");
         }
     }
 
+    if post_commit_failed {
+        // Exit code 3 distinguishes "commit succeeded but post-commit step failed" from
+        // a real commit failure (exit 1). Automation must not retry the commit on exit 3.
+        eprintln!("[track-commit-message] COMMIT_OK but post-commit steps failed (see above)");
+        return Ok(ExitCode::from(3));
+    }
     Ok(ExitCode::SUCCESS)
+}
+
+fn dispatch_set_commit_hash(raw_args: &[String]) -> Result<ExitCode, CliError> {
+    let track_id = raw_args_to_single(raw_args)
+        .map_err(|_| CliError::Message("usage: track-set-commit-hash <track-id>".to_owned()))?;
+    match persist_commit_hash_v2(&track_id) {
+        Ok(()) => Ok(ExitCode::SUCCESS),
+        Err(msg) => {
+            eprintln!("{msg}");
+            Ok(ExitCode::FAILURE)
+        }
+    }
+}
+
+/// Persists the current HEAD SHA to `.commit_hash` (v2 incremental diff base).
+///
+/// # Errors
+/// Returns a human-readable error string on failure.
+fn persist_commit_hash_v2(track_id: &str) -> Result<(), String> {
+    use domain::review_v2::CommitHashWriter;
+    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+
+    // Validate track_id as a proper slug before using it as a path segment.
+    let validated_id =
+        domain::TrackId::try_new(track_id).map_err(|e| format!("invalid track id: {e}"))?;
+
+    let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
+    let root = git.root().to_path_buf();
+
+    // Branch guard: prevent cross-track corruption.
+    let branch_output = git
+        .output(&["rev-parse", "--abbrev-ref", "HEAD"])
+        .map_err(|e| format!("git rev-parse --abbrev-ref HEAD: {e}"))?;
+    if !branch_output.status.success() {
+        return Err("git rev-parse --abbrev-ref HEAD failed (cannot verify branch)".to_owned());
+    }
+    let branch = String::from_utf8_lossy(&branch_output.stdout).trim().to_owned();
+    let expected = format!("track/{validated_id}");
+    if branch != expected {
+        return Err(format!(
+            "current branch '{branch}' does not match track branch '{expected}'. \
+             Run from the correct track branch to prevent cross-track corruption."
+        ));
+    }
+
+    let head_output =
+        git.output(&["rev-parse", "HEAD"]).map_err(|e| format!("git rev-parse HEAD: {e}"))?;
+    if !head_output.status.success() {
+        return Err("git rev-parse HEAD failed".to_owned());
+    }
+    let head_sha = String::from_utf8_lossy(&head_output.stdout).trim().to_owned();
+    let commit_hash = domain::CommitHash::try_new(&head_sha).map_err(|e| format!("{e}"))?;
+
+    let track_dir = root.join("track/items").join(validated_id.as_ref());
+    if !track_dir.is_dir() {
+        return Err(format!(
+            "track directory '{}' does not exist. \
+             Cannot write .commit_hash for non-existent track '{validated_id}'.",
+            track_dir.display(),
+        ));
+    }
+    let commit_hash_path = track_dir.join(".commit_hash");
+    let store = infrastructure::review_v2::FsCommitHashStore::new(commit_hash_path, root);
+    store.write(&commit_hash).map_err(|e| format!("{e}"))?;
+
+    eprintln!("[track-commit-message] Recorded .commit_hash: {head_sha}");
+    Ok(())
 }
 
 /// Persists the current HEAD SHA as `approved_head` in the track's review.json.

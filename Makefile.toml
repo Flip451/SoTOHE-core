@@ -840,10 +840,15 @@ description = "[wrapper] Run the local Codex reviewer through the repo-owned Rus
 script_runner = "@shell"
 script = ['bin/sotp make track-local-review "$@"']
 
-[tasks.track-record-round]
-description = "[wrapper] Record a review round result into metadata.json"
+[tasks.track-set-commit-hash]
+description = "[wrapper] Write current HEAD SHA to .commit_hash (set v2 diff base)"
 script_runner = "@shell"
-script = ['bin/sotp make track-record-round "$@"']
+script = ['bin/sotp make track-set-commit-hash "$@"']
+
+[tasks.track-review-status]
+description = "[wrapper] Show per-scope review status for a track"
+script_runner = "@shell"
+script = ['bin/sotp make track-review-status "$@"']
 
 [tasks.track-check-approved]
 description = "[wrapper] Check that the review state is approved and code hash is current"

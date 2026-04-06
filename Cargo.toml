@@ -15,6 +15,7 @@ rust-version = "1.85"
 publish = false
 
 [workspace.dependencies]
+globset = "0.4"
 regex = "1"
 rstest = "0.26.1"
 chrono = { version = "0.4", default-features = false, features = ["std"] }

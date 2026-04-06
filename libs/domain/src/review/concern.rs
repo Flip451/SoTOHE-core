@@ -1,91 +1,45 @@
-//! Review concern types: ReviewConcern, ReviewCycleSummary, ReviewConcernStreak,
-//! and pure concern-slug helpers.
+//! Review concern types: slugified concern names and streak tracking.
+
+use std::fmt;
 
 use super::error::ReviewError;
 use super::types::RoundType;
-use crate::{ReviewGroupName, Timestamp};
+use crate::Timestamp;
 
-fn validate_review_concern(value: &str) -> Result<(), ReviewError> {
-    if value.is_empty() {
-        Err(ReviewError::InvalidConcern("concern must not be empty or whitespace-only".to_owned()))
-    } else {
-        Ok(())
-    }
-}
-
-/// A normalized, non-empty concern identifier used for review escalation tracking.
+/// A validated concern slug used for escalation tracking.
 ///
-/// Concerns are lowercase-trimmed strings that enable consistent dedup and sort.
-///
-/// # Errors
-///
-/// Returns `ReviewError::InvalidConcern` if the value is empty after trimming.
-#[nutype::nutype(
-    sanitize(with = |s: String| s.trim().to_lowercase()),
-    validate(with = validate_review_concern, error = ReviewError),
-    derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, AsRef)
-)]
+/// Concern slugs are lowercase, trimmed, non-empty strings.
+/// The reserved value "other" is allowed (it is the fallback concern).
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ReviewConcern(String);
 
-/// Summary of a closed review cycle for escalation tracking.
-///
-/// A cycle closes when all `expected_groups` have recorded the same `round`
-/// for the given `round_type`. Stored in `ReviewEscalationState::recent_cycles`
-/// (FIFO trim at 10 entries).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ReviewCycleSummary {
-    round_type: RoundType,
-    round: u32,
-    timestamp: Timestamp,
-    concerns: Vec<ReviewConcern>,
-    groups: Vec<ReviewGroupName>,
-}
-
-impl ReviewCycleSummary {
-    /// Creates a new `ReviewCycleSummary`.
-    #[must_use]
-    pub fn new(
-        round_type: RoundType,
-        round: u32,
-        timestamp: Timestamp,
-        concerns: Vec<ReviewConcern>,
-        groups: Vec<ReviewGroupName>,
-    ) -> Self {
-        Self { round_type, round, timestamp, concerns, groups }
-    }
-
-    /// Returns the round type for this cycle.
-    #[must_use]
-    pub fn round_type(&self) -> RoundType {
-        self.round_type
-    }
-
-    /// Returns the round number for this cycle.
-    #[must_use]
-    pub fn round(&self) -> u32 {
-        self.round
-    }
-
-    /// Returns the timestamp string for this cycle.
-    #[must_use]
-    pub fn timestamp(&self) -> &str {
-        self.timestamp.as_str()
-    }
-
-    /// Returns the concerns raised in this cycle.
-    #[must_use]
-    pub fn concerns(&self) -> &[ReviewConcern] {
-        &self.concerns
-    }
-
-    /// Returns the groups that participated in this cycle.
-    #[must_use]
-    pub fn groups(&self) -> &[ReviewGroupName] {
-        &self.groups
+impl ReviewConcern {
+    /// Creates a new validated `ReviewConcern`.
+    ///
+    /// # Errors
+    /// Returns `ReviewError::InvalidConcern` if `s` is empty after trimming.
+    pub fn try_new(s: impl AsRef<str>) -> Result<Self, ReviewError> {
+        let s = s.as_ref().trim().to_lowercase();
+        if s.is_empty() {
+            return Err(ReviewError::InvalidConcern("concern slug must not be empty".to_owned()));
+        }
+        Ok(Self(s))
     }
 }
 
-/// Tracks consecutive rounds a concern has appeared.
+impl AsRef<str> for ReviewConcern {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
+impl fmt::Display for ReviewConcern {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.0)
+    }
+}
+
+/// Escalation streak for a single concern across review rounds.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReviewConcernStreak {
     consecutive_rounds: u8,
@@ -95,7 +49,7 @@ pub struct ReviewConcernStreak {
 }
 
 impl ReviewConcernStreak {
-    /// Creates a new `ReviewConcernStreak`.
+    /// Creates a new streak with the given values.
     #[must_use]
     pub fn new(
         consecutive_rounds: u8,
@@ -112,49 +66,108 @@ impl ReviewConcernStreak {
         self.consecutive_rounds
     }
 
-    /// Returns the round type for the last occurrence.
+    /// Returns the round type of the last round this concern appeared.
     #[must_use]
     pub fn last_round_type(&self) -> RoundType {
         self.last_round_type
     }
 
-    /// Returns the round number for the last occurrence.
+    /// Returns the round number of the last round this concern appeared.
     #[must_use]
     pub fn last_round(&self) -> u32 {
         self.last_round
     }
 
-    /// Returns the timestamp string of the last occurrence.
+    /// Returns the timestamp of the last round this concern appeared.
     #[must_use]
     pub fn last_seen_at(&self) -> &str {
         self.last_seen_at.as_str()
     }
 }
 
+/// Summary of a review cycle for escalation tracking.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewCycleSummary {
+    round_type: RoundType,
+    round: u32,
+    timestamp: Timestamp,
+    concerns: Vec<ReviewConcern>,
+    groups: Vec<crate::ReviewGroupName>,
+}
+
+impl ReviewCycleSummary {
+    /// Creates a new cycle summary.
+    #[must_use]
+    pub fn new(
+        round_type: RoundType,
+        round: u32,
+        timestamp: Timestamp,
+        concerns: Vec<ReviewConcern>,
+        groups: Vec<crate::ReviewGroupName>,
+    ) -> Self {
+        Self { round_type, round, timestamp, concerns, groups }
+    }
+
+    /// Returns the round type.
+    #[must_use]
+    pub fn round_type(&self) -> RoundType {
+        self.round_type
+    }
+
+    /// Returns the round number.
+    #[must_use]
+    pub fn round(&self) -> u32 {
+        self.round
+    }
+
+    /// Returns the timestamp string.
+    #[must_use]
+    pub fn timestamp(&self) -> &str {
+        self.timestamp.as_str()
+    }
+
+    /// Returns the concerns for this cycle.
+    #[must_use]
+    pub fn concerns(&self) -> &[ReviewConcern] {
+        &self.concerns
+    }
+
+    /// Returns the groups for this cycle.
+    #[must_use]
+    pub fn groups(&self) -> &[crate::ReviewGroupName] {
+        &self.groups
+    }
+}
+
 /// Converts a file path to a concern slug.
 ///
-/// # Examples
-///
-/// ```
-/// // "libs/domain/src/guard/parser.rs" → "domain.guard.parser"
-/// // "apps/cli/src/commands/review.rs" → "cli.commands.review"
-/// ```
+/// Takes the path components after removing `libs/`, `apps/`, etc. prefixes
+/// and joins them with dots.
 #[must_use]
 pub fn file_path_to_concern(path: &str) -> String {
-    // Handle absolute paths: find "libs/" or "apps/" anywhere in the path
-    let path = if let Some(idx) = path.find("libs/") {
-        &path[idx..]
-    } else if let Some(idx) = path.find("apps/") {
-        &path[idx..]
+    let path = path.trim();
+    if path.is_empty() {
+        return String::new();
+    }
+
+    // Strip common prefixes
+    let stripped = if let Some(rest) = path.strip_prefix("libs/") {
+        rest
+    } else if let Some(rest) = path.strip_prefix("apps/") {
+        rest
     } else {
         path
     };
-    // Strip known workspace prefixes
-    let path = path.trim_start_matches("libs/").trim_start_matches("apps/");
-    // Strip .rs extension
-    let path = path.trim_end_matches(".rs");
-    // Replace "/src/" segments with "."
-    let path = path.replace("/src/", ".");
-    // Replace remaining "/" with "."
-    path.replace('/', ".")
+
+    // Collect all meaningful path components (skip "src", lowercase, strip .rs extension).
+    let parts: Vec<String> = stripped
+        .split('/')
+        .map(|s| {
+            let s = if let Some(stem) = s.strip_suffix(".rs") { stem } else { s };
+            s.to_lowercase()
+        })
+        .filter(|s| s != "src" && !s.is_empty())
+        .collect();
+
+    parts.join(".")
 }

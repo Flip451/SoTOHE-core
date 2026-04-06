@@ -56,6 +56,10 @@ rust_out
 # --- Generated views (rendered from metadata.json, not version-controlled) ---
 track/registry.md
 
+# --- Review v2: per-track commit hash (local diff base state, not version-controlled) ---
+track/items/**/.commit_hash
+track/items/**/.commit_hash.tmp
+
 # --- Temp / local scratch ---
 tmp/
 .track-template-dev

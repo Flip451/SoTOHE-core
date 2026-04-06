@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Superseded by 2026-04-04-1456-review-system-v2-redesign.md
 
 ## Context
 

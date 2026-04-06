@@ -351,7 +351,9 @@ const REVIEW_WRAPPER_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
         ".claude/commands/track/review.md",
         "track review wrapper path",
         &[
-            "cargo make track-local-review -- --model {fast_model} --briefing-file tmp/reviewer-runtime/briefing-",
+            "cargo make track-local-review -- --model {fast_model} --round-type {fast|final} --group",
+            "--track-id",
+            "--briefing-file tmp/reviewer-runtime/briefing-",
             "{\"verdict\":\"zero_findings\",\"findings\":[]}",
             "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"describe the bug\",\"severity\":\"P1\",\"file\":\"path/to/file.rs\",\"line\":123}]}",
             "Every object field is required by the output schema.",

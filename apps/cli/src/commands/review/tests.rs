@@ -1,8 +1,7 @@
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
 use super::{
-    CODEX_BIN_ENV, CodexLocalArgs, ReviewRunResult, codex_local::build_codex_invocation,
-    codex_local::build_prompt, codex_local::render_codex_local_result,
+    CODEX_BIN_ENV, CodexLocalArgs, codex_local::build_codex_invocation, codex_local::build_prompt,
     codex_local::run_codex_local,
 };
 use std::env;
@@ -20,14 +19,6 @@ use std::os::unix::fs::PermissionsExt;
 fn env_lock() -> &'static Mutex<()> {
     static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
     LOCK.get_or_init(|| Mutex::new(()))
-}
-
-fn grn(raw: &str) -> domain::ReviewGroupName {
-    domain::ReviewGroupName::try_new(raw).unwrap()
-}
-
-fn repo_path(raw: &str) -> usecase::review_workflow::scope::RepoRelativePath {
-    usecase::review_workflow::scope::RepoRelativePath::normalize(raw).unwrap()
 }
 
 struct EnvVarGuard {
@@ -71,14 +62,10 @@ fn fake_args(
         briefing_file,
         prompt,
         output_last_message: Some(output_last_message),
-        // auto-record fields default to disabled
-        auto_record: false,
-        track_id: None,
-        round_type: None,
-        group: None,
-        expected_groups: Vec::new(),
+        track_id: "test-track".to_owned(),
+        round_type: super::CodexRoundTypeArg::Final,
+        group: "other".to_owned(),
         items_dir: PathBuf::from("track/items"),
-        diff_base: "main".to_owned(),
     }
 }
 
@@ -98,6 +85,31 @@ impl Drop for CurrentDirGuard {
     fn drop(&mut self) {
         env::set_current_dir(&self.original).unwrap();
     }
+}
+
+/// Sets up a minimal git repo with v2 review-scope.json in the given directory.
+///
+/// Required for tests that change cwd to a tempdir and call `run_codex_local`,
+/// because `build_scope_file_list` calls `build_review_v2` which needs git discovery.
+fn setup_test_git_repo(root: &Path) {
+    use std::process::Command;
+
+    Command::new("git").args(["init", "-b", "main"]).current_dir(root).output().unwrap();
+    Command::new("git")
+        .args(["config", "user.email", "test@test.com"])
+        .current_dir(root)
+        .output()
+        .unwrap();
+    Command::new("git").args(["config", "user.name", "Test"]).current_dir(root).output().unwrap();
+
+    // Minimal v2 review-scope.json (empty groups — only Other scope exists)
+    let track_dir = root.join("track");
+    fs::create_dir_all(&track_dir).unwrap();
+    fs::write(track_dir.join("review-scope.json"), r#"{"version": 2, "groups": {}}"#).unwrap();
+    fs::create_dir_all(root.join("track/items")).unwrap();
+
+    Command::new("git").args(["add", "."]).current_dir(root).output().unwrap();
+    Command::new("git").args(["commit", "-m", "init"]).current_dir(root).output().unwrap();
 }
 
 #[cfg(unix)]
@@ -168,9 +180,11 @@ fn build_prompt_uses_briefing_file_reference() {
 
     let prompt = build_prompt(&args).unwrap();
 
-    assert_eq!(
-        prompt,
-        format!("Read {} and perform the task described there.", briefing.display())
+    let expected_prefix =
+        format!("Read {} and perform the task described there.", briefing.display());
+    assert!(
+        prompt.starts_with(&expected_prefix),
+        "prompt must start with briefing reference: {prompt}"
     );
 }
 
@@ -215,139 +229,7 @@ fn build_codex_invocation_never_includes_full_auto_even_for_full_model() {
     assert!(rendered.windows(2).any(|pair| pair == ["--model", "gpt-5.4"]));
 }
 
-#[test]
-fn render_codex_local_result_emits_zero_findings_json_to_stdout() {
-    let rendered = render_codex_local_result(
-        &fake_args(
-            Some("Review this implementation.".to_owned()),
-            None,
-            PathBuf::from("tmp/reviewer-runtime/out.txt"),
-            1,
-        ),
-        Ok(ReviewRunResult {
-            verdict: ReviewVerdict::ZeroFindings,
-            final_message: Some("{\"verdict\":\"zero_findings\",\"findings\":[]}".to_owned()),
-            output_last_message: PathBuf::from("tmp/reviewer-runtime/out.txt"),
-            output_last_message_auto_managed: false,
-            verdict_detail: None,
-        }),
-    );
-
-    assert_eq!(rendered.exit_code, 0);
-    assert_eq!(
-        rendered.stdout_lines,
-        vec!["{\"verdict\":\"zero_findings\",\"findings\":[]}".to_owned()]
-    );
-    assert!(rendered.stderr_lines.is_empty());
-}
-
-#[test]
-fn render_codex_local_result_emits_findings_json_to_stdout() {
-    let rendered = render_codex_local_result(
-        &fake_args(
-            Some("Review this implementation.".to_owned()),
-            None,
-            PathBuf::from("tmp/reviewer-runtime/out.txt"),
-            1,
-        ),
-        Ok(ReviewRunResult {
-            verdict: ReviewVerdict::FindingsRemain,
-            final_message: Some(
-                "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: finding\",\"severity\":\"P1\",\"file\":null,\"line\":null}]}".to_owned(),
-            ),
-            output_last_message: PathBuf::from("tmp/reviewer-runtime/out.txt"),
-            output_last_message_auto_managed: false,
-            verdict_detail: None,
-        }),
-    );
-
-    assert_eq!(rendered.exit_code, 2);
-    assert_eq!(
-        rendered.stdout_lines,
-        vec![
-            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: finding\",\"severity\":\"P1\",\"file\":null,\"line\":null}]}"
-                .to_owned(),
-        ]
-    );
-    assert!(rendered.stderr_lines.is_empty());
-}
-
-#[test]
-fn filter_partition_to_cycle_groups_preserves_remapped_paths_alongside_other_group() {
-    use std::collections::{BTreeMap, BTreeSet};
-
-    let mut groups = BTreeMap::new();
-    groups.insert(grn("cli"), vec![repo_path("apps/cli/src/commands/review/tests.rs")]);
-    groups.insert(grn("harness-policy"), vec![repo_path(".claude/commands/track/commit.md")]);
-    groups.insert(grn("other"), vec![repo_path("Cargo.lock")]);
-    let full_partition = usecase::review_workflow::groups::GroupPartition::try_new(groups).unwrap();
-
-    let cycle_groups: BTreeSet<_> = [grn("cli"), grn("other")].into_iter().collect();
-    let filtered = super::filter_partition_to_cycle_groups(&full_partition, &cycle_groups);
-
-    assert!(filtered.is_ok(), "partition filter should succeed: {filtered:?}");
-    let filtered = match filtered {
-        Ok(filtered) => filtered,
-        Err(err) => panic!("partition filter should succeed: {err}"),
-    };
-    let other_paths: Vec<_> =
-        filtered.groups()[&grn("other")].iter().map(|path| path.as_str()).collect();
-    assert!(
-        other_paths.contains(&".claude/commands/track/commit.md"),
-        "remapped harness-policy path must be preserved in other: {other_paths:?}"
-    );
-    assert!(other_paths.contains(&"Cargo.lock"), "native other path must be preserved");
-}
-
-#[test]
-fn render_codex_local_result_hides_auto_managed_path_for_timeout() {
-    let rendered = render_codex_local_result(
-        &fake_args(
-            Some("Review this implementation.".to_owned()),
-            None,
-            PathBuf::from("tmp/reviewer-runtime/out.txt"),
-            1,
-        ),
-        Ok(ReviewRunResult {
-            verdict: ReviewVerdict::Timeout,
-            final_message: None,
-            output_last_message: PathBuf::from("tmp/reviewer-runtime/out.txt"),
-            output_last_message_auto_managed: true,
-            verdict_detail: None,
-        }),
-    );
-
-    assert_eq!(rendered.exit_code, 1);
-    assert_eq!(rendered.stderr_lines, vec!["[TIMEOUT] Local reviewer exceeded 1s".to_owned()]);
-}
-
-#[test]
-fn render_codex_local_result_keeps_explicit_path_for_missing_message() {
-    let rendered = render_codex_local_result(
-        &fake_args(
-            Some("Review this implementation.".to_owned()),
-            None,
-            PathBuf::from("tmp/reviewer-runtime/out.txt"),
-            1,
-        ),
-        Ok(ReviewRunResult {
-            verdict: ReviewVerdict::LastMessageMissing,
-            final_message: None,
-            output_last_message: PathBuf::from("tmp/reviewer-runtime/out.txt"),
-            output_last_message_auto_managed: false,
-            verdict_detail: None,
-        }),
-    );
-
-    assert_eq!(rendered.exit_code, 1);
-    assert_eq!(
-        rendered.stderr_lines,
-        vec![
-            "[ERROR] Local reviewer finished without a final message: tmp/reviewer-runtime/out.txt"
-                .to_owned()
-        ]
-    );
-}
+// v1 render_codex_local_result tests removed (auto-record is now always-on)
 
 #[test]
 fn run_codex_local_reports_zero_findings() {
@@ -487,6 +369,7 @@ fn run_codex_local_clears_stale_explicit_output_file_before_invocation() {
 fn run_codex_local_cleans_auto_managed_artifacts_when_spawn_fails() {
     let _lock = env_lock().lock().unwrap();
     let dir = tempfile::tempdir().unwrap();
+    setup_test_git_repo(dir.path());
     let _cwd = CurrentDirGuard::change_to(dir.path());
     let _bin = EnvVarGuard::set(CODEX_BIN_ENV, std::ffi::OsStr::new("definitely-missing-codex"));
 
@@ -496,13 +379,10 @@ fn run_codex_local_cleans_auto_managed_artifacts_when_spawn_fails() {
         briefing_file: None,
         prompt: Some("Review this implementation.".to_owned()),
         output_last_message: None,
-        auto_record: false,
-        track_id: None,
-        round_type: None,
-        group: None,
-        expected_groups: Vec::new(),
+        track_id: "test-track".to_owned(),
+        round_type: super::CodexRoundTypeArg::Final,
+        group: "other".to_owned(),
         items_dir: PathBuf::from("track/items"),
-        diff_base: "main".to_owned(),
     };
 
     let err = run_codex_local(&args).unwrap_err();
@@ -677,6 +557,7 @@ fn write_agent_profiles(root: &Path, model_profiles_json: &str) {
 fn run_codex_local_never_passes_full_auto_even_for_full_model() {
     let _lock = env_lock().lock().unwrap();
     let dir = tempfile::tempdir().unwrap();
+    setup_test_git_repo(dir.path());
     let _cwd = CurrentDirGuard::change_to(dir.path());
     let script = write_fake_codex_script(dir.path());
     let output = dir.path().join("last.txt");
@@ -713,6 +594,7 @@ fn run_codex_local_never_passes_full_auto_even_for_full_model() {
 fn run_codex_local_omits_full_auto_for_spark_model() {
     let _lock = env_lock().lock().unwrap();
     let dir = tempfile::tempdir().unwrap();
+    setup_test_git_repo(dir.path());
     let _cwd = CurrentDirGuard::change_to(dir.path());
     let script = write_fake_codex_script(dir.path());
     let output = dir.path().join("last.txt");
@@ -745,6 +627,7 @@ fn run_codex_local_omits_full_auto_for_spark_model() {
 fn run_codex_local_never_passes_full_auto_even_when_profiles_missing() {
     let _lock = env_lock().lock().unwrap();
     let dir = tempfile::tempdir().unwrap();
+    setup_test_git_repo(dir.path());
     let _cwd = CurrentDirGuard::change_to(dir.path());
     // No agent-profiles.json written — reviewer must still not use --full-auto
     let script = write_fake_codex_script(dir.path());
@@ -774,174 +657,9 @@ fn run_codex_local_never_passes_full_auto_even_when_profiles_missing() {
     );
 }
 
-// ---------------------------------------------------------------------------
-// is_planning_only_path unit tests
-// ---------------------------------------------------------------------------
-
-#[test]
-fn planning_only_path_accepts_track_files() {
-    use super::is_planning_only_path;
-
-    assert!(is_planning_only_path("track/items/my-track/metadata.json"));
-    assert!(is_planning_only_path("track/registry.md"));
-    assert!(is_planning_only_path("track/tech-stack.md"));
-    assert!(is_planning_only_path("track/workflow.md"));
-}
-
-#[test]
-fn planning_only_path_accepts_doc_and_config_files() {
-    use super::is_planning_only_path;
-
-    assert!(is_planning_only_path("knowledge/DESIGN.md"));
-    assert!(is_planning_only_path(".claude/commands/track/review.md"));
-    assert!(is_planning_only_path(".claude/rules/04-coding-principles.md"));
-    assert!(is_planning_only_path(".claude/agent-profiles.json"));
-    assert!(is_planning_only_path(".claude/settings.json"));
-    assert!(is_planning_only_path("knowledge/conventions/hexagonal-architecture.md"));
-    assert!(is_planning_only_path("architecture-rules.json"));
-    assert!(is_planning_only_path("knowledge/adr/2026-03-11-0000-foo.md"));
-    // New knowledge/ subdirectories (post-consolidation paths)
-    assert!(is_planning_only_path("knowledge/conventions/hexagonal-architecture.md"));
-    assert!(is_planning_only_path("knowledge/external/POLICY.md"));
-    assert!(is_planning_only_path("knowledge/external/guides.json"));
-    assert!(is_planning_only_path("knowledge/research/version-baseline-2026-03-11.md"));
-    assert!(is_planning_only_path("knowledge/designs/auto-mode-design.md"));
-    assert!(is_planning_only_path("knowledge/schemas/auto-state-schema.md"));
-    assert!(is_planning_only_path("knowledge/WORKFLOW.md"));
-    assert!(is_planning_only_path("knowledge/architecture.md"));
-    // Root-level architecture-rules.json (moved from docs/)
-    assert!(is_planning_only_path("architecture-rules.json"));
-    assert!(is_planning_only_path("CLAUDE.md"));
-    assert!(is_planning_only_path("DEVELOPER_AI_WORKFLOW.md"));
-    assert!(is_planning_only_path("TRACK_TRACEABILITY.md"));
-    assert!(is_planning_only_path("README.md"));
-    // Root-level .md files are planning-only
-    assert!(is_planning_only_path("AGENTS.md"));
-    assert!(is_planning_only_path("CHANGELOG.md"));
-}
-
-#[test]
-fn planning_only_path_rejects_code_files() {
-    use super::is_planning_only_path;
-
-    assert!(!is_planning_only_path("libs/domain/src/review/state.rs"));
-    assert!(!is_planning_only_path("libs/usecase/src/review_workflow/usecases.rs"));
-    assert!(!is_planning_only_path("libs/infrastructure/src/review_adapters.rs"));
-    assert!(!is_planning_only_path("apps/cli/src/commands/review/mod.rs"));
-    assert!(!is_planning_only_path("Cargo.toml"));
-    assert!(!is_planning_only_path("Cargo.lock"));
-    // Executable code under .claude/ and tmp/ must NOT be planning-only
-    assert!(!is_planning_only_path(".claude/hooks/check-codex-before-write.py"));
-    assert!(!is_planning_only_path(".claude/skills/track-plan/SKILL.md"));
-    assert!(!is_planning_only_path("tmp/reviewer-runtime/briefing.md"));
-    assert!(!is_planning_only_path("tmp/some-script.sh"));
-    assert!(!is_planning_only_path("Makefile.toml"));
-    assert!(!is_planning_only_path("Dockerfile"));
-    assert!(!is_planning_only_path("deny.toml"));
-    assert!(!is_planning_only_path("rustfmt.toml"));
-    assert!(!is_planning_only_path("scripts/check_layers.py"));
-    assert!(!is_planning_only_path("vendor/conch-parser/src/lib.rs"));
-    // Code/unknown extensions in planning-only directories are rejected (fail-closed)
-    assert!(!is_planning_only_path("docs/exploit.rs"));
-    assert!(!is_planning_only_path("track/items/my-track/helper.py"));
-    assert!(!is_planning_only_path("knowledge/script.sh"));
-    assert!(!is_planning_only_path("docs/exploit.js"));
-    assert!(!is_planning_only_path("docs/tool.rb"));
-    assert!(!is_planning_only_path("track/items/my-track/Dockerfile"));
-}
-
-// ---------------------------------------------------------------------------
-// is_planning_only_path: boundary cases and composition tests
-// ---------------------------------------------------------------------------
-
-#[test]
-fn planning_only_path_empty_staged_is_planning_only() {
-    // When no files are staged, all(is_planning_only) returns true (vacuous truth).
-    use super::is_planning_only_path;
-
-    let staged: [&str; 0] = [];
-    assert!(staged.iter().all(|f| is_planning_only_path(f)));
-}
-
-#[test]
-fn planning_only_path_mixed_staged_is_not_planning_only() {
-    // When a mix of planning-only and code files are staged, result is false.
-    use super::is_planning_only_path;
-
-    let staged = ["track/items/my-track/metadata.json", "libs/domain/src/review/state.rs"];
-    assert!(!staged.iter().all(|f| is_planning_only_path(f)));
-}
-
-#[test]
-fn planning_only_path_all_planning_staged_is_planning_only() {
-    use super::is_planning_only_path;
-
-    let staged = [
-        "track/items/my-track/metadata.json",
-        "track/registry.md",
-        "knowledge/DESIGN.md",
-        "CLAUDE.md",
-    ];
-    assert!(staged.iter().all(|f| is_planning_only_path(f)));
-}
-
-#[test]
-fn planning_only_path_all_code_staged_is_not_planning_only() {
-    use super::is_planning_only_path;
-
-    let staged =
-        ["libs/usecase/src/review_workflow/usecases.rs", "apps/cli/src/commands/review/mod.rs"];
-    assert!(!staged.iter().all(|f| is_planning_only_path(f)));
-}
-
-// ---------------------------------------------------------------------------
-// extract_paths_from_name_status unit tests
-// ---------------------------------------------------------------------------
-
-#[test]
-fn extract_paths_handles_normal_status_lines() {
-    use super::extract_paths_from_name_status;
-
-    let output = "A\tlibs/domain/src/new.rs\nM\tapps/cli/src/main.rs\n";
-    let paths = extract_paths_from_name_status(output);
-    assert_eq!(paths, ["libs/domain/src/new.rs", "apps/cli/src/main.rs"]);
-}
-
-#[test]
-fn extract_paths_includes_both_sides_of_rename() {
-    use super::extract_paths_from_name_status;
-
-    let output = "R100\tlibs/domain/src/old.rs\tdocs/old.rs\n";
-    let paths = extract_paths_from_name_status(output);
-    assert_eq!(paths, ["libs/domain/src/old.rs", "docs/old.rs"]);
-}
-
-#[test]
-fn extract_paths_mixed_add_and_rename() {
-    use super::extract_paths_from_name_status;
-
-    let output = "A\ttrack/registry.md\nR095\tsrc/lib.rs\ttrack/lib.rs\nM\tCLAUDE.md\n";
-    let paths = extract_paths_from_name_status(output);
-    assert_eq!(paths, ["track/registry.md", "src/lib.rs", "track/lib.rs", "CLAUDE.md"]);
-}
-
-#[test]
-fn extract_paths_rename_code_into_planning_dir_is_not_planning_only() {
-    use super::{extract_paths_from_name_status, is_planning_only_path};
-
-    // A code file renamed into docs/ — source path is still code
-    let output = "R100\tlibs/domain/src/review.rs\tdocs/review.rs\n";
-    let paths = extract_paths_from_name_status(output);
-    assert!(!paths.iter().all(|p| is_planning_only_path(p)));
-}
-
-#[test]
-fn extract_paths_empty_output() {
-    use super::extract_paths_from_name_status;
-
-    let paths = extract_paths_from_name_status("");
-    assert!(paths.is_empty());
-}
+// planning_only / extract_paths_from_name_status tests removed —
+// v2 abolished the planning_only concept (ADR §planning_only の見直し).
+// Commit gate now uses get_review_states() exclusively.
 
 // ---------------------------------------------------------------------------
 // review status: integration tests via execute_status
@@ -949,9 +667,13 @@ fn extract_paths_empty_output() {
 
 #[test]
 fn status_succeeds_with_valid_track() {
+    let _lock = env_lock().lock().unwrap();
     use super::{StatusArgs, execute_status};
 
     let dir = tempfile::tempdir().unwrap();
+    setup_test_git_repo(dir.path());
+    let _cwd = CurrentDirGuard::change_to(dir.path());
+
     let items_dir = dir.path().join("items");
     let track_dir = items_dir.join("test-track");
     fs::create_dir_all(&track_dir).unwrap();
@@ -977,60 +699,26 @@ fn status_succeeds_with_valid_track() {
 }
 
 #[test]
-fn status_fails_for_missing_track() {
+fn status_fails_for_nonexistent_track() {
+    // v2 composition validates the track directory exists before proceeding.
     use super::{StatusArgs, execute_status};
 
-    let dir = tempfile::tempdir().unwrap();
-    let items_dir = dir.path().join("items");
-    fs::create_dir_all(&items_dir).unwrap();
-
-    let args = StatusArgs { items_dir, track_id: "nonexistent".to_string() };
+    let args =
+        StatusArgs { items_dir: PathBuf::from("track/items"), track_id: "nonexistent".to_string() };
     let exit = execute_status(&args);
-    assert_ne!(exit, std::process::ExitCode::SUCCESS);
-}
-
-#[test]
-fn status_succeeds_without_review_section() {
-    use super::{StatusArgs, execute_status};
-
-    let dir = tempfile::tempdir().unwrap();
-    let items_dir = dir.path().join("items");
-    let track_dir = items_dir.join("test-track");
-    fs::create_dir_all(&track_dir).unwrap();
-
-    // metadata.json without review section (older track format)
-    let metadata = r#"{
-  "schema_version": 3,
-  "id": "test-track",
-  "branch": "track/test-track",
-  "title": "Test track",
-  "status": "planned",
-  "created_at": "2026-03-24T00:00:00Z",
-  "updated_at": "2026-03-24T00:00:00Z",
-  "tasks": [{"id": "T1", "description": "task", "status": "todo", "commit_hash": null}],
-  "plan": {"summary": ["s"], "sections": [{"id": "S1", "title": "sec", "description": [], "task_ids": ["T1"]}]}
-}"#;
-    fs::write(track_dir.join("metadata.json"), metadata).unwrap();
-
-    let args = StatusArgs { items_dir, track_id: "test-track".to_string() };
-    let exit = execute_status(&args);
-    assert_eq!(exit, std::process::ExitCode::SUCCESS);
+    assert_eq!(exit, std::process::ExitCode::FAILURE);
 }
 
 // ---------------------------------------------------------------------------
-// validate_auto_record_args tests (T004)
+// validate_auto_record_args tests (v2: always-on auto-record)
 // ---------------------------------------------------------------------------
 
 use super::{CodexRoundTypeArg, validate_auto_record_args};
 
-/// Build a minimal `CodexLocalArgs` for testing validate_auto_record_args.
-/// `auto_record = false` by default; override fields as needed.
 fn make_codex_local_args_for_validation(
-    auto_record: bool,
-    track_id: Option<&str>,
-    round_type: Option<CodexRoundTypeArg>,
-    group: Option<&str>,
-    expected_groups: Vec<&str>,
+    track_id: &str,
+    round_type: CodexRoundTypeArg,
+    group: &str,
 ) -> CodexLocalArgs {
     CodexLocalArgs {
         model: "gpt-5.4".to_owned(),
@@ -1038,110 +726,28 @@ fn make_codex_local_args_for_validation(
         briefing_file: None,
         prompt: Some("dummy".to_owned()),
         output_last_message: None,
-        auto_record,
-        track_id: track_id.map(str::to_owned),
+        track_id: track_id.to_owned(),
         round_type,
-        group: group.map(str::to_owned),
-        expected_groups: expected_groups.into_iter().map(str::to_owned).collect(),
+        group: group.to_owned(),
         items_dir: PathBuf::from("track/items"),
-        diff_base: "main".to_owned(),
     }
 }
 
 #[test]
-fn test_validate_auto_record_args_disabled_returns_none() {
-    let args = make_codex_local_args_for_validation(false, None, None, None, vec![]);
-    let result = validate_auto_record_args(&args);
-    assert!(matches!(result, Ok(None)));
-}
-
-#[test]
-fn test_validate_auto_record_args_valid_returns_some() {
-    let args = make_codex_local_args_for_validation(
-        true,
-        Some("my-track"),
-        Some(CodexRoundTypeArg::Fast),
-        Some("infra-domain"),
-        vec!["infra-domain", "usecase"],
-    );
+fn test_validate_auto_record_args_valid() {
+    let args = make_codex_local_args_for_validation("my-track", CodexRoundTypeArg::Fast, "domain");
     let result = validate_auto_record_args(&args);
     assert!(result.is_ok());
-    let validated = result.unwrap();
-    assert!(validated.is_some());
-    let v = validated.unwrap();
+    let v = result.unwrap();
     assert_eq!(v.track_id.as_ref(), "my-track");
     assert_eq!(v.round_type, domain::RoundType::Fast);
-    assert_eq!(v.group_name.as_ref(), "infra-domain");
-    assert_eq!(v.expected_groups.len(), 2);
-    assert_eq!(v.diff_base, "main");
-}
-
-#[test]
-fn test_validate_auto_record_args_missing_track_id_returns_error() {
-    let args = make_codex_local_args_for_validation(
-        true,
-        None,
-        Some(CodexRoundTypeArg::Final),
-        Some("cli"),
-        vec!["cli"],
-    );
-    let result = validate_auto_record_args(&args);
-    assert!(result.is_err());
-    assert!(result.unwrap_err().contains("--track-id"));
-}
-
-#[test]
-fn test_validate_auto_record_args_missing_round_type_returns_error() {
-    let args = make_codex_local_args_for_validation(
-        true,
-        Some("my-track"),
-        None,
-        Some("cli"),
-        vec!["cli"],
-    );
-    let result = validate_auto_record_args(&args);
-    assert!(result.is_err());
-    assert!(result.unwrap_err().contains("--round-type"));
-}
-
-#[test]
-fn test_validate_auto_record_args_missing_group_returns_error() {
-    let args = make_codex_local_args_for_validation(
-        true,
-        Some("my-track"),
-        Some(CodexRoundTypeArg::Fast),
-        None,
-        vec!["cli"],
-    );
-    let result = validate_auto_record_args(&args);
-    assert!(result.is_err());
-    assert!(result.unwrap_err().contains("--group"));
-}
-
-#[test]
-fn test_validate_auto_record_args_empty_expected_groups_returns_error() {
-    let args = make_codex_local_args_for_validation(
-        true,
-        Some("my-track"),
-        Some(CodexRoundTypeArg::Fast),
-        Some("cli"),
-        vec![],
-    );
-    let result = validate_auto_record_args(&args);
-    assert!(result.is_err());
-    assert!(result.unwrap_err().contains("--expected-groups"));
+    assert_eq!(v.group_name.as_ref(), "domain");
 }
 
 #[test]
 fn test_validate_auto_record_args_invalid_track_id_returns_error() {
-    // Track IDs must be lowercase slugs; uppercase letters are invalid.
-    let args = make_codex_local_args_for_validation(
-        true,
-        Some("Not A Valid ID"),
-        Some(CodexRoundTypeArg::Fast),
-        Some("cli"),
-        vec!["cli"],
-    );
+    let args =
+        make_codex_local_args_for_validation("Not A Valid ID", CodexRoundTypeArg::Fast, "cli");
     let result = validate_auto_record_args(&args);
     assert!(result.is_err());
     assert!(result.unwrap_err().contains("--track-id"));
@@ -1149,9 +755,13 @@ fn test_validate_auto_record_args_invalid_track_id_returns_error() {
 
 #[test]
 fn status_displays_per_group_fast_final_state() {
+    let _lock = env_lock().lock().unwrap();
     use super::{StatusArgs, execute_status};
 
     let dir = tempfile::tempdir().unwrap();
+    setup_test_git_repo(dir.path());
+    let _cwd = CurrentDirGuard::change_to(dir.path());
+
     let items_dir = dir.path().join("items");
     let track_dir = items_dir.join("test-track");
     fs::create_dir_all(&track_dir).unwrap();
@@ -1188,589 +798,56 @@ fn status_displays_per_group_fast_final_state() {
 }
 
 // ---------------------------------------------------------------------------
-// T005: auto-record execution flow tests
+// v1 auto-record execution flow tests removed (T006: auto-record is now always-on,
+// uses v2 ReviewWriter instead of v1 RecordRoundProtocol).
+// v2 auto-record is tested via integration tests against the real review.json.
 // ---------------------------------------------------------------------------
 
-/// Build a `CodexLocalArgs` with `auto_record = true` and all required fields set.
-#[allow(dead_code)]
-fn make_auto_record_args(dir: &std::path::Path, output_last_message: PathBuf) -> CodexLocalArgs {
-    CodexLocalArgs {
-        model: "gpt-5.4".to_owned(),
-        timeout_seconds: 10,
-        briefing_file: None,
-        prompt: Some("Review this.".to_owned()),
-        output_last_message: Some(output_last_message),
-        auto_record: true,
-        track_id: Some("my-track".to_owned()),
-        round_type: Some(super::CodexRoundTypeArg::Fast),
-        group: Some("codex".to_owned()),
-        expected_groups: vec!["codex".to_owned()],
-        items_dir: dir.join("items"),
-        diff_base: "main".to_owned(),
-    }
+// v1 auto-record stubs and tests removed (T006: auto-record always-on via v2 ReviewWriter)
+
+// ---------------------------------------------------------------------------
+// filter_findings_to_scope tests removed — scope filtering was removed in favor
+// of relying on prompt-injected file lists. Cross-scope leaks are handled by
+// re-review rather than client-side filtering.
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// build_review_v2 items_dir path traversal guard tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn build_review_v2_rejects_items_dir_outside_repo_root() {
+    // Serialize with env_lock because build_review_v2 uses SystemGitRepo::discover()
+    // which depends on cwd — other tests may change cwd concurrently.
+    let _lock = env_lock().lock().unwrap();
+    // Use /tmp as items_dir — this should always be outside the repo root.
+    let track_id = domain::TrackId::try_new("test-track").unwrap();
+    let result = super::compose_v2::build_review_v2(&track_id, std::path::Path::new("/tmp"));
+    assert!(result.is_err(), "build_review_v2 should reject items_dir outside repo root");
+    let err = result.err().expect("checked is_err above");
+    assert!(
+        err.contains("outside the repository root") || err.contains("git discover"),
+        "error should mention path traversal guard: {err}"
+    );
 }
 
-// Test 1: validate_auto_record_args failure causes execute_codex_local to exit 1
-// before spawning Codex (no SOTP_CODEX_BIN set, but validation should fail first).
 #[test]
-fn test_auto_record_validation_failure_exits_1() {
-    use super::codex_local::execute_codex_local;
-
-    // auto_record=true but track_id is missing → validation must fail
+fn build_review_v2_rejects_traversal_items_dir_outside_repo_root() {
+    // A relative path with ".." that resolves outside the repo root should be
+    // rejected by the canonicalize + starts_with containment check.
+    let _lock = env_lock().lock().unwrap();
     let dir = tempfile::tempdir().unwrap();
-    let output = dir.path().join("last.txt");
-    let args = CodexLocalArgs {
-        model: "gpt-5.4".to_owned(),
-        timeout_seconds: 10,
-        briefing_file: None,
-        prompt: Some("Review this.".to_owned()),
-        output_last_message: Some(output),
-        auto_record: true,
-        track_id: None, // missing — triggers validation error
-        round_type: Some(super::CodexRoundTypeArg::Fast),
-        group: Some("codex".to_owned()),
-        expected_groups: vec!["codex".to_owned()],
-        items_dir: dir.path().join("items"),
-        diff_base: "main".to_owned(),
-    };
+    setup_test_git_repo(dir.path());
+    let _cwd = CurrentDirGuard::change_to(dir.path());
 
-    let exit = execute_codex_local(&args);
-    assert_eq!(exit, std::process::ExitCode::from(1), "validation failure must exit 1");
-}
-
-struct AutoRecordEmptyScope;
-
-impl usecase::review_workflow::scope::DiffScopeProvider for AutoRecordEmptyScope {
-    fn changed_files(
-        &self,
-        _base_ref: &str,
-    ) -> Result<
-        usecase::review_workflow::scope::DiffScope,
-        usecase::review_workflow::scope::DiffScopeProviderError,
-    > {
-        Ok(usecase::review_workflow::scope::DiffScope::new(std::iter::empty()))
-    }
-}
-
-struct AutoRecordCliOnlyScope;
-
-impl usecase::review_workflow::scope::DiffScopeProvider for AutoRecordCliOnlyScope {
-    fn changed_files(
-        &self,
-        _base_ref: &str,
-    ) -> Result<
-        usecase::review_workflow::scope::DiffScope,
-        usecase::review_workflow::scope::DiffScopeProviderError,
-    > {
-        Ok(usecase::review_workflow::scope::DiffScope::new([
-            usecase::review_workflow::scope::RepoRelativePath::normalize(
-                "apps/cli/src/commands/review/codex_local.rs",
-            )
-            .unwrap(),
-        ]))
-    }
-}
-
-struct CapturingFindingsProtocol {
-    concerns_received: std::cell::RefCell<Vec<usecase::review_workflow::usecases::ReviewConcern>>,
-    findings_received: std::cell::RefCell<Vec<domain::StoredFinding>>,
-}
-
-impl CapturingFindingsProtocol {
-    fn new() -> Self {
-        Self {
-            concerns_received: std::cell::RefCell::new(Vec::new()),
-            findings_received: std::cell::RefCell::new(Vec::new()),
-        }
-    }
-}
-
-impl usecase::review_workflow::usecases::RecordRoundProtocol for CapturingFindingsProtocol {
-    fn execute(
-        &self,
-        _track_id: &usecase::review_workflow::usecases::TrackId,
-        _round_type: usecase::review_workflow::usecases::RoundType,
-        _group_name: usecase::review_workflow::usecases::ReviewGroupName,
-        _verdict: usecase::review_workflow::usecases::Verdict,
-        concerns: Vec<usecase::review_workflow::usecases::ReviewConcern>,
-        findings: Vec<domain::StoredFinding>,
-        _expected_groups: Vec<usecase::review_workflow::usecases::ReviewGroupName>,
-        _timestamp: usecase::review_workflow::usecases::Timestamp,
-    ) -> Result<(), usecase::review_workflow::usecases::RecordRoundProtocolError> {
-        *self.concerns_received.borrow_mut() = concerns;
-        *self.findings_received.borrow_mut() = findings;
-        Ok(())
-    }
-}
-
-struct CapturingVerdictProtocol {
-    called: std::cell::RefCell<bool>,
-    verdict_received: std::cell::RefCell<Option<usecase::review_workflow::usecases::Verdict>>,
-    concerns_received: std::cell::RefCell<Vec<usecase::review_workflow::usecases::ReviewConcern>>,
-    findings_received: std::cell::RefCell<Vec<domain::StoredFinding>>,
-}
-
-impl CapturingVerdictProtocol {
-    fn new() -> Self {
-        Self {
-            called: std::cell::RefCell::new(false),
-            verdict_received: std::cell::RefCell::new(None),
-            concerns_received: std::cell::RefCell::new(Vec::new()),
-            findings_received: std::cell::RefCell::new(Vec::new()),
-        }
-    }
-}
-
-impl usecase::review_workflow::usecases::RecordRoundProtocol for CapturingVerdictProtocol {
-    fn execute(
-        &self,
-        _track_id: &usecase::review_workflow::usecases::TrackId,
-        _round_type: usecase::review_workflow::usecases::RoundType,
-        _group_name: usecase::review_workflow::usecases::ReviewGroupName,
-        verdict: usecase::review_workflow::usecases::Verdict,
-        concerns: Vec<usecase::review_workflow::usecases::ReviewConcern>,
-        findings: Vec<domain::StoredFinding>,
-        _expected_groups: Vec<usecase::review_workflow::usecases::ReviewGroupName>,
-        _timestamp: usecase::review_workflow::usecases::Timestamp,
-    ) -> Result<(), usecase::review_workflow::usecases::RecordRoundProtocolError> {
-        *self.called.borrow_mut() = true;
-        *self.verdict_received.borrow_mut() = Some(verdict);
-        *self.concerns_received.borrow_mut() = concerns;
-        *self.findings_received.borrow_mut() = findings;
-        Ok(())
-    }
-}
-
-#[derive(Clone)]
-struct SharedBufferWriter(std::rc::Rc<std::cell::RefCell<Vec<u8>>>);
-
-impl SharedBufferWriter {
-    fn new(buffer: std::rc::Rc<std::cell::RefCell<Vec<u8>>>) -> Self {
-        Self(buffer)
-    }
-}
-
-impl std::io::Write for SharedBufferWriter {
-    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        self.0.borrow_mut().extend_from_slice(buf);
-        Ok(buf.len())
-    }
-
-    fn flush(&mut self) -> std::io::Result<()> {
-        Ok(())
-    }
-}
-
-struct RejectingProtocol {
-    error: usecase::review_workflow::usecases::RecordRoundProtocolError,
-}
-
-impl RejectingProtocol {
-    fn other(message: &str) -> Self {
-        Self {
-            error: usecase::review_workflow::usecases::RecordRoundProtocolError::Other(
-                message.to_owned(),
-            ),
-        }
-    }
-}
-
-impl usecase::review_workflow::usecases::RecordRoundProtocol for RejectingProtocol {
-    fn execute(
-        &self,
-        _track_id: &usecase::review_workflow::usecases::TrackId,
-        _round_type: usecase::review_workflow::usecases::RoundType,
-        _group_name: usecase::review_workflow::usecases::ReviewGroupName,
-        _verdict: usecase::review_workflow::usecases::Verdict,
-        _concerns: Vec<usecase::review_workflow::usecases::ReviewConcern>,
-        _findings: Vec<domain::StoredFinding>,
-        _expected_groups: Vec<usecase::review_workflow::usecases::ReviewGroupName>,
-        _timestamp: usecase::review_workflow::usecases::Timestamp,
-    ) -> Result<(), usecase::review_workflow::usecases::RecordRoundProtocolError> {
-        Err(match &self.error {
-            usecase::review_workflow::usecases::RecordRoundProtocolError::EscalationBlocked(
-                blocked,
-            ) => usecase::review_workflow::usecases::RecordRoundProtocolError::EscalationBlocked(
-                blocked.clone(),
-            ),
-            usecase::review_workflow::usecases::RecordRoundProtocolError::StaleHash(msg) => {
-                usecase::review_workflow::usecases::RecordRoundProtocolError::StaleHash(msg.clone())
-            }
-            usecase::review_workflow::usecases::RecordRoundProtocolError::Other(msg) => {
-                usecase::review_workflow::usecases::RecordRoundProtocolError::Other(msg.clone())
-            }
-        })
-    }
-}
-
-fn auto_record_validated_args(items_dir: PathBuf) -> super::ValidatedAutoRecordArgs {
-    super::ValidatedAutoRecordArgs {
-        track_id: usecase::review_workflow::usecases::TrackId::try_new("my-track").unwrap(),
-        round_type: usecase::review_workflow::usecases::RoundType::Fast,
-        group_name: usecase::review_workflow::usecases::ReviewGroupName::try_new("codex").unwrap(),
-        expected_groups: vec![
-            usecase::review_workflow::usecases::ReviewGroupName::try_new("codex").unwrap(),
-        ],
-        items_dir,
-        diff_base: "main".to_owned(),
-    }
-}
-
-fn review_run_result_with_payload(
-    verdict: ReviewVerdict,
-    payload: &str,
-) -> Result<ReviewRunResult, String> {
-    Ok(ReviewRunResult {
-        verdict,
-        final_message: Some(payload.to_owned()),
-        output_last_message: PathBuf::from("tmp/out.txt"),
-        output_last_message_auto_managed: false,
-        verdict_detail: None,
-    })
-}
-
-// Test 2: execute_with_auto_record with zero_findings verdict calls record_round and exits 0.
-// Uses stub DiffScopeProvider and RecordRoundProtocol — no git or filesystem required.
-#[test]
-fn test_auto_record_zero_findings_calls_record_round() {
-    use super::codex_local::execute_with_auto_record;
-
-    let dir = tempfile::tempdir().unwrap();
-    let items_dir = dir.path().join("items");
-    fs::create_dir_all(&items_dir).unwrap();
-
-    let validated = auto_record_validated_args(items_dir.clone());
-    let outcome = review_run_result_with_payload(
-        ReviewVerdict::ZeroFindings,
-        "{\"verdict\":\"zero_findings\",\"findings\":[]}",
-    );
-    let scope_provider = AutoRecordEmptyScope;
-    let protocol = CapturingVerdictProtocol::new();
-
-    let exit = execute_with_auto_record(outcome, validated, 60, &scope_provider, &protocol);
-
-    assert_eq!(exit, std::process::ExitCode::from(0), "zero_findings must exit 0");
-    assert!(*protocol.called.borrow(), "record_round must have been called");
-    assert_eq!(
-        *protocol.verdict_received.borrow(),
-        Some(usecase::review_workflow::usecases::Verdict::ZeroFindings),
-        "verdict must be ZeroFindings"
-    );
+    // "items/../../../tmp" — resolves outside repo root
+    let track_id = domain::TrackId::try_new("test-track").unwrap();
+    let traversal_path = PathBuf::from("items/../../../tmp");
+    let result = super::compose_v2::build_review_v2(&track_id, &traversal_path);
+    assert!(result.is_err(), "items_dir outside repo should be rejected");
+    let err = result.err().expect("checked is_err above");
     assert!(
-        protocol.findings_received.borrow().is_empty(),
-        "zero_findings must pass an empty findings list"
+        err.contains("outside the repository root"),
+        "error should mention containment violation: {err}"
     );
-}
-
-#[test]
-fn test_auto_record_findings_remain_preserves_in_scope_findings_metadata() {
-    use super::codex_local::{
-        emit_rendered_command_result_with_writers, render_execute_with_auto_record,
-    };
-
-    let dir = tempfile::tempdir().unwrap();
-    let items_dir = dir.path().join("items");
-    fs::create_dir_all(&items_dir).unwrap();
-
-    let validated = auto_record_validated_args(items_dir);
-    let outcome = review_run_result_with_payload(
-        ReviewVerdict::FindingsRemain,
-        r#"{
-                "verdict":"findings_remain",
-                "findings":[
-                    {
-                        "message":"P1: keep metadata",
-                        "severity":"P1",
-                        "file":"apps/cli/src/commands/review/codex_local.rs",
-                        "line":77,
-                        "category":"cli.review"
-                    },
-                    {
-                        "message":"P1: drop me as out of scope",
-                        "severity":"P1",
-                        "file":"libs/usecase/src/review_workflow/usecases.rs",
-                        "line":99,
-                        "category":"domain.review"
-                    }
-                ]
-            }"#,
-    );
-    let scope_provider = AutoRecordCliOnlyScope;
-    let protocol = CapturingFindingsProtocol::new();
-
-    let rendered =
-        render_execute_with_auto_record(outcome, validated, 60, &scope_provider, &protocol);
-    let mut stdout = Vec::new();
-    let mut stderr = Vec::new();
-    emit_rendered_command_result_with_writers(&rendered, &mut stdout, &mut stderr).unwrap();
-    let merged = std::rc::Rc::new(std::cell::RefCell::new(Vec::new()));
-    let mut merged_stdout = SharedBufferWriter::new(merged.clone());
-    let mut merged_stderr = SharedBufferWriter::new(merged.clone());
-    emit_rendered_command_result_with_writers(&rendered, &mut merged_stdout, &mut merged_stderr)
-        .unwrap();
-
-    assert_eq!(rendered.exit_code, 2, "findings_remain must exit 2");
-    assert_eq!(
-        protocol.concerns_received.borrow().as_slice(),
-        &[usecase::review_workflow::usecases::ReviewConcern::try_new("cli.review").unwrap()],
-        "recorded concerns must come from the scope-filtered payload"
-    );
-    assert_eq!(
-        String::from_utf8(stdout).unwrap().lines().collect::<Vec<_>>(),
-        vec![
-            r#"{"verdict":"findings_remain","findings":[{"message":"P1: keep metadata","severity":"P1","file":"apps/cli/src/commands/review/codex_local.rs","line":77,"category":"cli.review"}]}"#
-        ],
-        "production output writer must emit the scope-filtered in-scope payload to stdout"
-    );
-    assert!(
-        String::from_utf8(stderr).unwrap().contains("[auto-record] Recorded"),
-        "production output writer must route auto-record status to stderr"
-    );
-    assert_eq!(
-        String::from_utf8(merged.borrow().clone()).unwrap().lines().last(),
-        Some(
-            r#"{"verdict":"findings_remain","findings":[{"message":"P1: keep metadata","severity":"P1","file":"apps/cli/src/commands/review/codex_local.rs","line":77,"category":"cli.review"}]}"#
-        ),
-        "merged output must keep the machine-readable verdict JSON as the final line"
-    );
-    let findings = protocol.findings_received.borrow();
-    assert_eq!(findings.len(), 1, "out-of-scope findings must be removed before recording");
-    assert_eq!(
-        findings.as_slice(),
-        &[domain::StoredFinding::new(
-            "P1: keep metadata",
-            Some("P1".to_owned()),
-            Some("apps/cli/src/commands/review/codex_local.rs".to_owned()),
-            Some(77),
-        )
-        .with_category(Some("cli.review".to_owned()))]
-    );
-    assert!(
-        findings.iter().all(|finding| finding.message() != "P1: drop me as out of scope"),
-        "recorded findings must come from the scope-filtered payload"
-    );
-}
-
-#[test]
-fn test_auto_record_all_out_of_scope_findings_downgrades_to_zero_findings() {
-    use super::codex_local::{
-        emit_rendered_command_result_with_writers, render_execute_with_auto_record,
-    };
-
-    let dir = tempfile::tempdir().unwrap();
-    let items_dir = dir.path().join("items");
-    fs::create_dir_all(&items_dir).unwrap();
-
-    let validated = auto_record_validated_args(items_dir);
-    let outcome = review_run_result_with_payload(
-        ReviewVerdict::FindingsRemain,
-        r#"{
-                "verdict":"findings_remain",
-                "findings":[
-                    {
-                        "message":"P1: out of scope finding",
-                        "severity":"P1",
-                        "file":"libs/usecase/src/review_workflow/usecases.rs",
-                        "line":99,
-                        "category":"domain.review"
-                    }
-                ]
-            }"#,
-    );
-    let scope_provider = AutoRecordEmptyScope;
-    let protocol = CapturingVerdictProtocol::new();
-
-    let rendered =
-        render_execute_with_auto_record(outcome, validated, 60, &scope_provider, &protocol);
-    let mut stdout = Vec::new();
-    let mut stderr = Vec::new();
-    emit_rendered_command_result_with_writers(&rendered, &mut stdout, &mut stderr).unwrap();
-    let merged = std::rc::Rc::new(std::cell::RefCell::new(Vec::new()));
-    let mut merged_stdout = SharedBufferWriter::new(merged.clone());
-    let mut merged_stderr = SharedBufferWriter::new(merged.clone());
-    emit_rendered_command_result_with_writers(&rendered, &mut merged_stdout, &mut merged_stderr)
-        .unwrap();
-
-    assert_eq!(rendered.exit_code, 0, "all out-of-scope findings must downgrade to zero_findings");
-    assert_eq!(
-        *protocol.verdict_received.borrow(),
-        Some(usecase::review_workflow::usecases::Verdict::ZeroFindings),
-        "protocol must receive the downgraded zero_findings verdict"
-    );
-    assert!(
-        protocol.concerns_received.borrow().is_empty(),
-        "downgraded zero_findings must record an empty concerns list"
-    );
-    assert_eq!(
-        String::from_utf8(stdout).unwrap().lines().collect::<Vec<_>>(),
-        vec!["{\"verdict\":\"zero_findings\",\"findings\":[]}"],
-        "production output writer must emit the filtered downgraded payload to stdout"
-    );
-    let stderr = String::from_utf8(stderr).unwrap();
-    assert!(
-        stderr.contains("[scope-filter] 1 of 1 findings out of scope, 0 unknown paths"),
-        "production output writer must emit scope-filter diagnostics to stderr"
-    );
-    assert!(
-        stderr.contains("[auto-record] Recorded"),
-        "production output writer must route auto-record status to stderr"
-    );
-    assert_eq!(
-        String::from_utf8(merged.borrow().clone()).unwrap().lines().collect::<Vec<_>>(),
-        vec![
-            "[scope-filter] 1 of 1 findings out of scope, 0 unknown paths",
-            "[auto-record] Recorded fast round for group 'codex' (verdict: zero_findings)",
-            "{\"verdict\":\"zero_findings\",\"findings\":[]}",
-        ],
-        "merged output must preserve diagnostics before the final machine-readable verdict"
-    );
-    assert!(
-        protocol.findings_received.borrow().is_empty(),
-        "downgraded zero_findings must record an empty findings list"
-    );
-}
-
-#[test]
-fn test_auto_record_record_failure_preserves_scope_filter_diagnostics() {
-    use super::codex_local::{
-        emit_rendered_command_result_with_writers, render_execute_with_auto_record,
-    };
-
-    let dir = tempfile::tempdir().unwrap();
-    let items_dir = dir.path().join("items");
-    fs::create_dir_all(&items_dir).unwrap();
-
-    let validated = auto_record_validated_args(items_dir);
-    let outcome = review_run_result_with_payload(
-        ReviewVerdict::FindingsRemain,
-        r#"{
-                "verdict":"findings_remain",
-                "findings":[
-                    {
-                        "message":"P1: out of scope finding",
-                        "severity":"P1",
-                        "file":"libs/usecase/src/review_workflow/usecases.rs",
-                        "line":99,
-                        "category":"domain.review"
-                    }
-                ]
-            }"#,
-    );
-    let scope_provider = AutoRecordEmptyScope;
-    let protocol = RejectingProtocol::other("boom");
-
-    let rendered =
-        render_execute_with_auto_record(outcome, validated, 60, &scope_provider, &protocol);
-    let mut stdout = Vec::new();
-    let mut stderr = Vec::new();
-    emit_rendered_command_result_with_writers(&rendered, &mut stdout, &mut stderr).unwrap();
-
-    assert_eq!(rendered.exit_code, 1, "record failure must exit 1");
-    assert!(stdout.is_empty(), "record failure must not emit verdict JSON");
-    assert_eq!(
-        String::from_utf8(stderr).unwrap().lines().collect::<Vec<_>>(),
-        vec![
-            "[scope-filter] 1 of 1 findings out of scope, 0 unknown paths",
-            "[auto-record] Record failed: boom",
-        ],
-        "record failure must retain prior scope-filter diagnostics"
-    );
-}
-
-#[test]
-fn test_auto_record_parse_failure_suppresses_untrusted_verdict_json() {
-    use super::codex_local::{
-        emit_rendered_command_result_with_writers, render_execute_with_auto_record,
-    };
-
-    let dir = tempfile::tempdir().unwrap();
-    let items_dir = dir.path().join("items");
-    fs::create_dir_all(&items_dir).unwrap();
-
-    let validated = auto_record_validated_args(items_dir);
-    let outcome = review_run_result_with_payload(
-        ReviewVerdict::FindingsRemain,
-        r#"{"verdict":"findings_remain","findings":[]}"#,
-    );
-    let scope_provider = AutoRecordEmptyScope;
-    let protocol = CapturingVerdictProtocol::new();
-
-    let rendered =
-        render_execute_with_auto_record(outcome, validated, 60, &scope_provider, &protocol);
-    let mut stdout = Vec::new();
-    let mut stderr = Vec::new();
-    emit_rendered_command_result_with_writers(&rendered, &mut stdout, &mut stderr).unwrap();
-
-    assert_eq!(rendered.exit_code, 1, "parse failure must exit 1");
-    assert!(stdout.is_empty(), "parse failure must not emit untrusted verdict JSON");
-    assert_eq!(
-        String::from_utf8(stderr).unwrap().lines().collect::<Vec<_>>(),
-        vec!["[ERROR] auto-record: could not parse verdict payload"],
-        "parse failure must report the payload error on stderr only"
-    );
-    assert!(
-        protocol.verdict_received.borrow().is_none(),
-        "parse failure must not invoke record_round"
-    );
-}
-
-#[test]
-fn test_non_unix_fallback_command_result_keeps_stdout_json_only() {
-    use super::codex_local::emit_non_unix_fallback_command_result;
-
-    let rendered = super::RenderedCommandResult {
-        exit_code: 2,
-        stdout_lines: vec!["{\"verdict\":\"findings_remain\",\"findings\":[]}".to_owned()],
-        stderr_lines: vec![
-            "[scope-filter] 1 of 1 findings out of scope, 0 unknown paths".to_owned(),
-            "[auto-record] Recorded final round for group 'cli' (verdict: findings_remain)"
-                .to_owned(),
-        ],
-    };
-    let mut stdout = Vec::new();
-    let mut stderr = Vec::new();
-
-    emit_non_unix_fallback_command_result(&rendered, &mut stdout, &mut stderr).unwrap();
-
-    assert_eq!(
-        String::from_utf8(stdout).unwrap().lines().collect::<Vec<_>>(),
-        vec!["{\"verdict\":\"findings_remain\",\"findings\":[]}"],
-        "fallback writer must preserve stdout as JSON-only"
-    );
-    assert_eq!(
-        String::from_utf8(stderr).unwrap().lines().collect::<Vec<_>>(),
-        vec![
-            "[scope-filter] 1 of 1 findings out of scope, 0 unknown paths",
-            "[auto-record] Recorded final round for group 'cli' (verdict: findings_remain)",
-        ],
-        "fallback writer must keep diagnostics on stderr"
-    );
-}
-
-// Test 3: auto_record=false uses the normal rendering flow (exit codes unchanged).
-#[test]
-fn test_auto_record_disabled_uses_normal_flow() {
-    let rendered = render_codex_local_result(
-        &fake_args(
-            Some("Review this.".to_owned()),
-            None,
-            PathBuf::from("tmp/reviewer-runtime/out.txt"),
-            1,
-        ),
-        Ok(super::ReviewRunResult {
-            verdict: usecase::review_workflow::ReviewVerdict::FindingsRemain,
-            final_message: Some(
-                "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"P1: bug\",\"severity\":\"P1\",\"file\":null,\"line\":null}]}"
-                    .to_owned(),
-            ),
-            output_last_message: PathBuf::from("tmp/reviewer-runtime/out.txt"),
-            output_last_message_auto_managed: false,
-            verdict_detail: None,
-        }),
-    );
-
-    // Normal flow: findings_remain → exit 2
-    assert_eq!(rendered.exit_code, 2);
-    assert!(!rendered.stdout_lines.is_empty());
-    assert!(rendered.stderr_lines.is_empty());
 }

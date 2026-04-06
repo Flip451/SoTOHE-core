@@ -10,6 +10,7 @@ workspace = true
 
 [dependencies]
 chrono = { workspace = true }
+globset = { workspace = true }
 nutype = { workspace = true }
 strum = { workspace = true }
 thiserror = { workspace = true }
