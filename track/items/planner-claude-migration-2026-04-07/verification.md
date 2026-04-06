@@ -2,12 +2,12 @@
 
 ## Scope Verified
 
-- [x] agent-profiles.json default profile planner = "claude"
-- [x] SKILL.md Phase 1.5/2 が Claude 経路を参照
-- [x] rules/02, 08, 11 が更新済み
-- [x] track/workflow.md, knowledge/DESIGN.md が更新済み
-- [x] planner 設計レビュー出力が保存済み
-- [x] Phase 2 TODO が追記済み
+- [ ] agent-profiles.json default profile planner = "claude"
+- [ ] SKILL.md Phase 1.5/2 が Claude 経路を参照
+- [ ] rules/02, 08, 11 が更新済み
+- [ ] track/workflow.md, knowledge/DESIGN.md が更新済み
+- [ ] planner 設計レビュー出力が保存済み
+- [ ] Phase 2 TODO が追記済み
 
 ## Manual Verification Steps
 
