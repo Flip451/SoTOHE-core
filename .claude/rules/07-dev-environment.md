@@ -51,6 +51,7 @@ cargo make track-branch-switch    # 既存トラックブランチに切替
 cargo make scripts-selftest       # verify / helper スクリプトの回帰テスト
 cargo make hooks-selftest         # Claude hook Python セルフテスト
 cargo make help                   # カテゴリ付きタスク一覧表示
+cargo make export-schema -- --crate-name domain --pretty  # domain crate の pub API を JSON 出力（要 nightly）
 cargo make shell                  # tools コンテナ内でシェルを開く
 cargo make check                  # cargo check（docker compose 経由）
 cargo make test-doc               # ドキュメントテスト

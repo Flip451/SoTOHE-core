@@ -780,6 +780,16 @@ description = "[wrapper] Unstage paths (remove from index without discarding wor
 script_runner = "@shell"
 script = ['bin/sotp make unstage "$@"']
 
+[tasks.export-schema]
+description = "[host] Export domain crate public API schema as JSON (requires nightly toolchain)"
+script_runner = "@shell"
+script = ['bin/sotp domain export-schema "$@"']
+
+[tasks.test-nightly]
+description = "[host] Run ignored tests that require nightly toolchain"
+command = "cargo"
+args = ["nextest", "run", "--run-ignored", "ignored-only", "-E", "package(infrastructure)"]
+
 [tasks.track-branch-create]
 description = "[wrapper] Materialize branch metadata, create a track branch from main, and switch to it (usage: cargo make track-branch-create '<track-id>')"
 command = "bin/sotp"

@@ -100,7 +100,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "description": "tech-stack.md 更新 + rustdoc-types 依存追加 + nightly dev-tool convention",
@@ -130,14 +130,14 @@
     {
       "description": "cargo make タスク + Docker nightly 対応",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "統合テスト: SoTOHE-core 自身の domain crate で export-schema 実行・出力検証",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "BRIDGE-01: sotp domain export-schema (rustdoc JSON)",
-  "updated_at": "2026-04-06T16:35:58Z"
+  "updated_at": "2026-04-06T16:41:11Z"
 }

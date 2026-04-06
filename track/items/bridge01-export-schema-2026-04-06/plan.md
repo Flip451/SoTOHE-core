@@ -58,7 +58,7 @@ Makefile.toml に export-schema タスクを追加。
 Docker コンテナ内で nightly を利用可能にする Dockerfile 更新。
 cargo make export-schema -- --crate domain で実行可能にする。
 
-- [ ] cargo make タスク + Docker nightly 対応
+- [x] cargo make タスク + Docker nightly 対応
 
 ## Integration Test: 自己検証
 
@@ -67,4 +67,4 @@ SoTOHE-core 自身の domain crate に対して export-schema を実行。
 出力 JSON が valid な SchemaExport 構造であることを serde roundtrip で検証。
 nightly 不在時に NightlyNotFound エラーが返ることを検証。
 
-- [ ] 統合テスト: SoTOHE-core 自身の domain crate で export-schema 実行・出力検証
+- [x] 統合テスト: SoTOHE-core 自身の domain crate で export-schema 実行・出力検証
