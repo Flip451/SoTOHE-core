@@ -19,7 +19,7 @@ pub enum DomainCommand {
 #[derive(Debug, Args)]
 pub struct ExportSchemaArgs {
     /// Crate name within the workspace.
-    #[arg(long, value_name = "NAME")]
+    #[arg(long = "crate", value_name = "NAME")]
     pub crate_name: String,
 
     /// Use indented JSON output.

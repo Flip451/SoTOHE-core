@@ -201,7 +201,9 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
     types.sort_by(|a, b| a.name().cmp(b.name()));
     functions.sort_by(|a, b| a.name().cmp(b.name()));
     traits.sort_by(|a, b| a.name().cmp(b.name()));
-    impls.sort_by(|a, b| a.target_type().cmp(b.target_type()));
+    impls.sort_by(|a, b| {
+        a.target_type().cmp(b.target_type()).then_with(|| a.trait_name().cmp(&b.trait_name()))
+    });
 
     SchemaExport::new(crate_name.to_owned(), types, functions, traits, impls)
 }
