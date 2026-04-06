@@ -59,4 +59,4 @@ index_tree_hash_normalizing を production path から除去。
 - [x] テスト: review_hash contract テスト — 未ステージ成功、review.json 変更で hash 不変、無関係ファイル変更で hash 不変、実装ファイル変更で hash 変化
 - [x] テスト: legacy / non-rvw1 hash が stale code hash として拒否されることを検証
 - [x] Legacy 経路整理: index_tree_hash_normalizing + record_round_with_pending を production review path から除去
-- [~] review cycle の収束: metadata.json.review hash 除外の仕様変更（parallel auto-record 安全化）+ cross-group round alignment 制約撤廃 + verification.md / metadata 整合の最終更新。2026-03-29 に superseded by new review-state architecture として凍結し、残課題は後継トラックへ移管
+- [-] review cycle の収束: metadata.json.review hash 除外の仕様変更（parallel auto-record 安全化）+ cross-group round alignment 制約撤廃 + verification.md / metadata 整合の最終更新。2026-03-29 に superseded by new review-state architecture として凍結し、残課題は後継トラックへ移管

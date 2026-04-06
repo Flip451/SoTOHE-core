@@ -108,11 +108,8 @@
     "status": "invalidated"
   },
   "schema_version": 3,
-  "status": "blocked",
-  "status_override": {
-    "reason": "superseded by upcoming review.json / per-group review-state architecture track; this track is frozen and will not pursue further review-cycle convergence",
-    "status": "blocked"
-  },
+  "status": "archived",
+  "status_override": null,
   "tasks": [
     {
       "description": "track/review-scope.json スキーマ定義 + 初期設定ファイル作成（review_operational, planning_only, other_track, normalize セクション）",
@@ -187,7 +184,7 @@
     {
       "description": "review cycle の収束: metadata.json.review hash 除外の仕様変更（parallel auto-record 安全化）+ cross-group round alignment 制約撤廃 + verification.md / metadata 整合の最終更新。2026-03-29 に superseded by new review-state architecture として凍結し、残課題は後継トラックへ移管",
       "id": "T019",
-      "status": "in_progress"
+      "status": "skipped"
     },
     {
       "description": "check_approved review-scope 整合: base_ref configurable, lazy hash, stale code hash invalidation 永続化",
@@ -211,5 +208,5 @@
     }
   ],
   "title": "review hash スコープ再設計 — review-scope manifest hash + 設定ファイル駆動ポリシー",
-  "updated_at": "2026-03-29T07:12:23Z"
+  "updated_at": "2026-04-06T12:30:00Z"
 }
