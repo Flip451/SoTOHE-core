@@ -261,6 +261,8 @@ re-review. Each agent owns one scope and loops until fast-model `zero_findings` 
 Launch one `review-fix-lead` agent per scope with findings, using the Agent tool with
 `run_in_background: true` and a **timeout of 60 minutes per scope**:
 
+**When the provider has a CLI tool** (Codex — default profile):
+
 ```
 Agent prompt for each scope:
   You are a review-fix-lead for the {scope} scope of track {track-id}.
@@ -274,6 +276,13 @@ Agent prompt for each scope:
 
   Report your final status: completed / blocked_cross_scope / failed.
 ```
+
+**When the provider is `claude`** (`claude-heavy` profile):
+
+Use the same `review-fix-lead` agent contract, but instead of `cargo make track-local-review`,
+the agent invokes a Claude Code subagent with `subagent_type: "Explore"` to perform the
+re-review using the same briefing file and JSON verdict format. See Step 2c for the Claude
+invocation pattern. Note: auto-record is not available — see Step 1 **Provider support matrix**.
 
 **Orchestrator responsibilities** during autonomous fix phase:
 1. Wait for all agents to complete (or timeout).
