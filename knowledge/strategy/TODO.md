@@ -870,7 +870,27 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 > **出典**: review-system-v2-2026-04-05 セッション 3 のレビューサイクルで特定
 > **追加日**: 2026-04-05
 
-- [ ] **RV2-01** (HIGH): `is_planning_only_path` のハードコーディング廃止 — review-scope.json の groups を参照して「いずれかのスコープに属するファイルは planning-only ではない」と動的に判定する。現在は PREFIXES/EXACT_FILES/REVIEW_REQUIRED_FILES を手動管理しており review-scope.json と二重管理になっている
+- [x] ~~**RV2-01** (HIGH): `is_planning_only_path` のハードコーディング廃止~~ ✅ planning_only 概念を完全廃止（Session 4 で削除）。v2 は全ファイルを review-scope.json で分類
 - [ ] **RV2-02** (MEDIUM): サブエージェントによる修正+レビューの自律ループ — `/track:review` で各スコープに Agent を spawn し、修正→リビルド→再レビュー→zero_findings まで自律的に回す。orchestrator はステータス監視と full model 昇格のみ担当
 - [ ] **RV2-03** (LOW): `ReviewState::Running` の追加 — 並列レビュー時に「レビュー実行中」を区別し、重複起動防止と進捗可視化を可能にする。`ReviewState::Running { started_at: Timestamp }` を enum variant として追加
 - [ ] **RV2-04** (HIGH): `/track:review` SKILL の v2 対応 — v1 の group-based ワークフロー（cycle 作成→record-round→check-approved）を v2 の scope-based ワークフロー（status→codex-local per scope→check-approved）に更新
+
+> **出典**: review-system-v2-2026-04-05 セッション 5 のレビューサイクルで特定
+> **追加日**: 2026-04-06
+
+### 未修復の穴（Accepted Deviations として残存）
+
+- [ ] **RV2-05** (HIGH): プロセスグループ kill 不可 — `codex_reviewer.rs` の `terminate_reviewer_child` は `child.kill()` のみ。`killpg` は `#[forbid(unsafe_code)]` で使えない。timeout 後に孫プロセスが残留し、繰り返すとホストリソース消費。CLI 層での process group kill wrapper を実装する
+- [ ] **RV2-06** (HIGH): v2 escalation 完全切断 — `codex_local.rs` の `write_verdict` は `record_round` / concern 追跡 / metadata.json escalation state を一切更新しない。同じ finding が無限ループ可能。v2 terms で escalation を再設計する
+- [ ] **RV2-07** (MEDIUM): v1 domain コード残存 — `track/codec.rs` が v1 review 型（`ReviewCycle`, `CycleGroupState`, `ReviewState` v1, escalation）に依存し削除不可。track codec のリファクタリングが必要
+- [ ] **RV2-08** (MEDIUM): v2 CLI パスのテスト不在 — `execute_codex_local` → `ReviewCycle` → `write_verdict` のフルパスが未テスト。サブコンポーネントは独立テスト済みだが integration test がない
+- [ ] **RV2-09** (LOW): `main` ハードコード — `compose_v2.rs` の `resolve_diff_base` が `.commit_hash` 不在時に `git rev-parse main` にフォールバック。default branch が `main` でないリポジトリで動作しない
+
+### 運用文書の穴
+
+- [ ] **RV2-10** (MEDIUM): pr-review.md — Codex Cloud が同一コミットを再レビューしないことが未記載。accepted deviation 追加後に新コミットが必要な場合がある
+- [ ] **RV2-11** (MEDIUM): pr-review.md — `cargo make track-pr-review` がポーリングを内包していることの強調不足。オーケストレーターが手動 sleep + gh api で代替しやすい。Step 2 に「手動ポーリング禁止」を明記する
+- [ ] **RV2-12** (MEDIUM): review.md — fail-closed 契約がチャネル単位（stdout / stderr / file）であることが未明記。stdout を制御しても stderr fallback が抜け穴になるパターンの再発防止
+- [ ] **RV2-13** (MEDIUM): review.md / track/workflow.md — `check-approved` の NotStarted bypass（PR-based workflow 用）の仕様が未記載
+- [ ] **RV2-14** (LOW): knowledge/conventions/ — `create_dir_all` が存在チェックガードを無効化するパターンが convention 化されていない（`persist_commit_hash_v2` で発生）
+- [ ] **RV2-15** (LOW): track/workflow.md — v2 レビューシステムへの切り替え後の運用手順が未更新（v1 `record-round` への参照が残存する可能性）
