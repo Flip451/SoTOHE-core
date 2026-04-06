@@ -102,7 +102,7 @@
     {
       "description": "pr-review.md: 同一コミット再レビュー不可の注記（RV2-10）+ 手動ポーリング禁止（RV2-11）",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "workflow.md: NotStarted bypass 追加（RV2-13）+ v1 残存監査（RV2-15、結果 clean を確認記載）",
@@ -121,5 +121,5 @@
     }
   ],
   "title": "Review v2 運用文書アップデート + review skill 更新",
-  "updated_at": "2026-04-06T03:42:24Z"
+  "updated_at": "2026-04-06T03:59:01Z"
 }
