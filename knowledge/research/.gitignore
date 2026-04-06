@@ -4,6 +4,10 @@
 # Allow these files
 !.gitignore
 !README.md
+
+# YYYY-MM-DD-HHmm-<topic>.md naming convention
+!????-??-??-????-*.md
+
+# Legacy filenames (kept for backward compatibility)
 !version-baseline-*.md
 !tsumiki-hearing-deep-dive-2026-04-01.md
-!2026-04-01-1546-planner-hearing-ux.md
