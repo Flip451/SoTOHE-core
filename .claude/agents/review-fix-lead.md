@@ -47,7 +47,7 @@ Report one of the following statuses:
 3. **Fix phase**:
    - Verify each finding's factual claims via `Grep` / `Read` before acting.
    - P3 findings from pre-existing unchanged code: note but do not fix.
-   - P1/P2: implement the fix within scope boundaries.
+   - P0/P1/P2: implement the fix within scope boundaries.
    - If a fix requires out-of-scope files: return `blocked_cross_scope`.
    - Run `cargo make ci-rust` to verify fixes compile.
 4. **Re-review**: Run the reviewer again with updated briefing (include previous findings
