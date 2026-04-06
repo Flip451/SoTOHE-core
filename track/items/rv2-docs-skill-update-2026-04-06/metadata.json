@@ -1,68 +1,21 @@
 {
-  "schema_version": 3,
-  "id": "rv2-docs-skill-update-2026-04-06",
   "branch": "track/rv2-docs-skill-update-2026-04-06",
-  "title": "Review v2 運用文書アップデート + review skill 更新",
-  "status": "planned",
   "created_at": "2026-04-06T03:11:43Z",
-  "updated_at": "2026-04-06T03:11:43Z",
-  "tasks": [
-    {
-      "id": "T001",
-      "description": "TODO.md の未コミット変更（RV2-05..15）をコミット",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T002",
-      "description": "review.md: v2 cleanup — 散在する RV2-04 制限ノートを Step 1 近辺の provider-support サブセクションに集約、チャネル単位 fail-closed 契約（RV2-12）追加、NotStarted bypass 仕様（RV2-13）追加",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T003",
-      "description": "pr-review.md: 同一コミット再レビュー不可の注記（RV2-10）+ 手動ポーリング禁止（RV2-11）",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T004",
-      "description": "workflow.md: NotStarted bypass 追加（RV2-13）+ v1 残存監査（RV2-15、結果 clean を確認記載）",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T005",
-      "description": "knowledge/conventions/ に create_dir_all ガード無効化パターン convention を新規作成（RV2-14）",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T006",
-      "description": "review-fix-lead エージェント定義を .claude/agents/ に新規作成 + review.md Step 3 を自律ループ化（RV2-02）— timeout で無限ループ防止、cross-scope は blocked_cross_scope で fail-closed",
-      "status": "todo",
-      "commit_hash": null
-    }
-  ],
+  "id": "rv2-docs-skill-update-2026-04-06",
   "plan": {
-    "summary": [
-      "review-system-v2 マージ後に特定された運用文書の穴（RV2-10..15）を埋め、",
-      "review.md skill の v2 cleanup（RV2-04）と自律 fix+review ループ（RV2-02）を実装する。",
-      "Rust コード変更なし。skill / agent 定義 / convention / workflow 文書のみ。"
-    ],
     "sections": [
       {
-        "id": "S1",
-        "title": "TODO.md コミット",
         "description": [
           "main 上に未コミットの RV2-05..15 エントリをコミットする。",
           "track ブランチ作成後の最初のタスクとして実行。"
         ],
-        "task_ids": ["T001"]
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "TODO.md コミット"
       },
       {
-        "id": "S2",
-        "title": "review.md v2 cleanup + 運用保証追加",
         "description": [
           "review.md の散在する RV2-04 制限ノート（lines 47, 170-172, 214）を削除し、",
           "Step 1 近辺に provider-support サブセクションとして 1 箇所に集約する。",
@@ -70,39 +23,47 @@
           "チャネル単位 fail-closed 契約（RV2-12）: stdout verdict + exit code + review.json persistence の 3 チャネル全てが必要。",
           "NotStarted bypass（RV2-13）: 全 scope NotStarted + review.json 不在の場合のみ bypass 許可。"
         ],
-        "task_ids": ["T002"]
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "review.md v2 cleanup + 運用保証追加"
       },
       {
-        "id": "S3",
-        "title": "pr-review.md 運用注記追加",
         "description": [
           "RV2-10: Codex Cloud は同一 HEAD を再レビューしない。accepted deviation 更新後は新コミットが必要。",
           "RV2-11: cargo make track-pr-review が polling を内包。手動 sleep + gh api 禁止を明記。"
         ],
-        "task_ids": ["T003"]
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "pr-review.md 運用注記追加"
       },
       {
-        "id": "S4",
-        "title": "workflow.md 更新 + v1 残存監査",
         "description": [
           "RV2-13: NotStarted bypass 仕様を review セクションに追加。",
           "RV2-15: v1 record-round 等の残存参照を監査。結果 clean であることを確認記載。"
         ],
-        "task_ids": ["T004"]
+        "id": "S4",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "workflow.md 更新 + v1 残存監査"
       },
       {
-        "id": "S5",
-        "title": "create_dir_all convention 新規作成",
         "description": [
           "RV2-14: create_dir_all(parent) が暗黙の状態遷移であり、",
           "ディレクトリ存在がガード条件の場合は先に検証すべきパターンを convention 化。",
           "動機コードパス: libs/infrastructure/src/review_v2/persistence/commit_hash_store.rs"
         ],
-        "task_ids": ["T005"]
+        "id": "S5",
+        "task_ids": [
+          "T005"
+        ],
+        "title": "create_dir_all convention 新規作成"
       },
       {
-        "id": "S6",
-        "title": "review-fix-lead エージェント + 自律ループ設計",
         "description": [
           "RV2-02: 新エージェント型 review-fix-lead を定義。",
           "契約: 1 review scope を所有、fix → verify → re-review → zero_findings まで自律。",
@@ -112,8 +73,53 @@
           "review.md Step 3 を更新: orchestrator は spawn + timeout 監視 + full model 昇格のみ担当。",
           "target behavior として明記（RV2-06 escalation 再設計は別 track）。"
         ],
-        "task_ids": ["T006"]
+        "id": "S6",
+        "task_ids": [
+          "T006"
+        ],
+        "title": "review-fix-lead エージェント + 自律ループ設計"
       }
+    ],
+    "summary": [
+      "review-system-v2 マージ後に特定された運用文書の穴（RV2-10..15）を埋め、",
+      "review.md skill の v2 cleanup（RV2-04）と自律 fix+review ループ（RV2-02）を実装する。",
+      "Rust コード変更なし。skill / agent 定義 / convention / workflow 文書のみ。"
     ]
-  }
+  },
+  "schema_version": 3,
+  "status": "in_progress",
+  "tasks": [
+    {
+      "description": "TODO.md の未コミット変更（RV2-05..15）をコミット",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "review.md: v2 cleanup — 散在する RV2-04 制限ノートを Step 1 近辺の provider-support サブセクションに集約、チャネル単位 fail-closed 契約（RV2-12）追加、NotStarted bypass 仕様（RV2-13）追加",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "pr-review.md: 同一コミット再レビュー不可の注記（RV2-10）+ 手動ポーリング禁止（RV2-11）",
+      "id": "T003",
+      "status": "todo"
+    },
+    {
+      "description": "workflow.md: NotStarted bypass 追加（RV2-13）+ v1 残存監査（RV2-15、結果 clean を確認記載）",
+      "id": "T004",
+      "status": "todo"
+    },
+    {
+      "description": "knowledge/conventions/ に create_dir_all ガード無効化パターン convention を新規作成（RV2-14）",
+      "id": "T005",
+      "status": "todo"
+    },
+    {
+      "description": "review-fix-lead エージェント定義を .claude/agents/ に新規作成 + review.md Step 3 を自律ループ化（RV2-02）— timeout で無限ループ防止、cross-scope は blocked_cross_scope で fail-closed",
+      "id": "T006",
+      "status": "todo"
+    }
+  ],
+  "title": "Review v2 運用文書アップデート + review skill 更新",
+  "updated_at": "2026-04-06T03:42:24Z"
 }

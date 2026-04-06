@@ -10,7 +10,7 @@ Rust コード変更なし。skill / agent 定義 / convention / workflow 文書
 main 上に未コミットの RV2-05..15 エントリをコミットする。
 track ブランチ作成後の最初のタスクとして実行。
 
-- [ ] TODO.md の未コミット変更（RV2-05..15）をコミット
+- [x] TODO.md の未コミット変更（RV2-05..15）をコミット
 
 ## review.md v2 cleanup + 運用保証追加
 
@@ -20,7 +20,7 @@ claude-heavy 制限は事実として残す（auto-record 未実装）。
 チャネル単位 fail-closed 契約（RV2-12）: stdout verdict + exit code + review.json persistence の 3 チャネル全てが必要。
 NotStarted bypass（RV2-13）: 全 scope NotStarted + review.json 不在の場合のみ bypass 許可。
 
-- [ ] review.md: v2 cleanup — 散在する RV2-04 制限ノートを Step 1 近辺の provider-support サブセクションに集約、チャネル単位 fail-closed 契約（RV2-12）追加、NotStarted bypass 仕様（RV2-13）追加
+- [x] review.md: v2 cleanup — 散在する RV2-04 制限ノートを Step 1 近辺の provider-support サブセクションに集約、チャネル単位 fail-closed 契約（RV2-12）追加、NotStarted bypass 仕様（RV2-13）追加
 
 ## pr-review.md 運用注記追加
 

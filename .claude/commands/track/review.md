@@ -44,7 +44,16 @@ Arguments:
   3. If neither is set (e.g., `claude` provider has no `default_model`), `{model}` is not needed — skip the `--model` flag.
 - When the resolved provider has a CLI tool (e.g., Codex CLI), invoke via `cargo make track-local-review` (external subprocess).
 - When the resolved provider is `claude` (e.g., `claude-heavy` profile), invoke via Claude Code subagent with `subagent_type: "Explore"` using the same briefing files and JSON verdict format. No `--model` flag is needed. Do not perform inline review in the main conversation context.
-  > **Note (RV2-04)**: v2 auto-record is Codex-only (built into `bin/sotp review codex-local`). Claude subagent verdict persistence is **not yet implemented** in v2 (tracked as RV2-04 in `knowledge/strategy/TODO-PLAN.md`). Until RV2-04 is implemented, `track-check-approved` (Step 4) **cannot be satisfied** with the `claude-heavy` profile. Use the default Codex profile instead.
+
+### Provider support matrix
+
+| Provider | Auto-record to review.json | `check-approved` satisfiable | Notes |
+|----------|---------------------------|------------------------------|-------|
+| `codex` (default) | Yes (built into `bin/sotp review codex-local`) | Yes | Recommended for all tracks |
+| `claude` (`claude-heavy`) | **No** — verdicts are not persisted | **No** | Use default Codex profile until claude auto-record is implemented |
+
+Until the `claude` provider gains auto-record support, `track-check-approved` (Step 4) **cannot
+be satisfied** with the `claude-heavy` profile. Use the default Codex profile instead.
 
 ## Step 2: Prepare review briefings (parallel observation split)
 
@@ -167,9 +176,7 @@ For the **final confirmation round**, replace `{fast_model}` with `{model}`.
 
 **When the provider is `claude`** (e.g., `claude-heavy` profile):
 
-> **Limitation (RV2-04)**: v2 auto-record is Codex-only. Claude subagent verdicts are
-> **not persisted** to `review.json`. `track-check-approved` cannot be satisfied with the
-> `claude-heavy` profile until RV2-04 is implemented. Use the default Codex profile instead.
+> See Step 1 **Provider support matrix** — claude auto-record is not yet implemented.
 
 Launch one Claude Code subagent per group with `subagent_type: "Explore"`.
 Each subagent reads its briefing file and returns a JSON verdict in the same format.
@@ -185,6 +192,18 @@ Collect the JSON verdict from each reviewer agent. Apply fail-closed aggregation
 - If **any** reviewer fails (timeout / process_failed / last_message_missing): report the
   failure and treat overall verdict as `findings_remain` (fail-closed).
 - Only if **all** reviewers report `zero_findings`: overall verdict is `zero_findings`.
+
+**Channel-scoped fail-closed contract**: A trusted `zero_findings` verdict requires ALL of
+the following channels to succeed. Partial success on any single channel is not sufficient:
+
+| Channel | What constitutes success | Failure mode |
+|---------|------------------------|--------------|
+| stdout | Valid JSON verdict as the last line | Missing, malformed, or semantically inconsistent JSON |
+| exit code | 0 (zero_findings) or 2/105 (findings_remain) | 1 (error), 3 (escalation), timeout |
+| review.json | Verdict persisted by auto-record | Write failure, missing file, stale hash |
+
+Controlling stdout alone while leaving stderr as an uncontrolled fallback is a known bypass
+class. Do not treat stderr output as a verdict source.
 
 The wrapper passes a machine-readable `--output-schema` automatically. The final reviewer
 message must be a single JSON object, and the wrapper additionally rejects semantically
@@ -211,7 +230,7 @@ one finding. The wrapper prints that final JSON payload as the last stdout line.
 `bin/sotp review codex-local` wrapper. Verdicts are written to `review.json` after each
 Codex invocation. Manual `record-round` has been removed to prevent verdict falsification.
 
-> Claude subagent verdicts are **not auto-recorded** in v2 (RV2-04). See Step 1 and Step 2c.
+> Claude subagent verdicts are **not auto-recorded**. See Step 1 **Provider support matrix**.
 
 **Error handling**:
 - If auto-record fails (exit 1, verdict not printed): the round must be retried.
@@ -320,6 +339,13 @@ After the reviewer reports zero findings:
    - If `check-approved` returns exit code 0: review is complete. Proceed to "Ready".
    - If `check-approved` returns non-zero: review is NOT complete. Diagnose the cause
      (stale code hash, auto-record failure) and resolve before declaring readiness.
+
+**NotStarted bypass** (PR-based workflow): When `review.json` does not exist AND all required
+scopes are in `NotStarted` state, `check-approved` treats this as a valid bypass and returns
+exit code 0. This allows commits when only the PR-based review path (`/track:pr-review`) is
+used without a preceding local review. Once any local review round has been recorded (i.e.,
+`review.json` exists or any scope has progressed beyond `NotStarted`), the bypass is no longer
+available and full approval is required.
 
 ## Behavior
 
