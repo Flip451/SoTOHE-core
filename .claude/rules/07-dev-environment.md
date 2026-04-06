@@ -31,6 +31,7 @@ cargo make workspace-tree-full  # crate + 非 crate ディレクトリを含む 
 cargo make add <files>            # 手動の低レベル staging（terminal 直実行用）
 cargo make add-all                # worktree 全体を stage（transient scratch file は除外）
 cargo make track-add-paths        # tmp/track-commit/add-paths.txt から選択的に stage
+cargo make unstage <paths>        # index から除去（worktree 変更は保持）
 cargo make commit                 # 手動の低レベル commit（terminal 直実行用）
 cargo make track-commit-message   # tmp/track-commit/commit-message.txt から commit
 cargo make track-note             # tmp/track-commit/note.md から note を適用して削除
@@ -50,6 +51,7 @@ cargo make track-branch-switch    # 既存トラックブランチに切替
 cargo make scripts-selftest       # verify / helper スクリプトの回帰テスト
 cargo make hooks-selftest         # Claude hook Python セルフテスト
 cargo make help                   # カテゴリ付きタスク一覧表示
+cargo make export-schema -- --crate domain --pretty  # domain crate の pub API を JSON 出力（要 nightly）
 cargo make shell                  # tools コンテナ内でシェルを開く
 cargo make check                  # cargo check（docker compose 経由）
 cargo make test-doc               # ドキュメントテスト

@@ -7,6 +7,9 @@ pub mod git_cli;
 pub mod review_json_codec;
 pub mod review_json_store;
 pub mod review_v2;
+pub mod schema_export;
+#[cfg(test)]
+mod schema_export_tests;
 pub mod shell;
 pub mod spec;
 pub mod track;

@@ -78,6 +78,15 @@ apps/cli             # CLI エントリーポイント + composition root（usec
 - **パスワードハッシュ**: なし
 - **トークン**: なし
 
+## Dev-only Tooling (nightly)
+
+- **rustdoc JSON**: `cargo +nightly rustdoc -- -Z unstable-options --output-format json`
+  - 用途: `sotp domain export-schema` — domain crate の pub API を JSON 抽出（BRIDGE-01）
+  - crate 自体は stable のまま。nightly は rustdoc JSON 生成のみに使用
+  - `rustdoc-types` 0.57: rustdoc JSON の公式 Rust 型定義（infrastructure 依存）
+  - nightly 不在時は `SchemaExportError::NightlyNotFound` で fail-closed
+  - CI: nightly が必要なテストは `#[ignore]` + `cargo make test-nightly` で分離（将来）
+
 ## Version Baseline
 
 - **最新調査日**: 2026-03-11
@@ -92,3 +101,4 @@ apps/cli             # CLI エントリーポイント + composition root（usec
 | 2026-03-11 | 技術選定完了（同期CLI, clap, reqwest, config, mockall） | SoTOHE-core プロジェクト開始 |
 | 2026-03-11 | conch-parser 0.1.1 追加（vendored, patched） | domain 層シェル AST パース（ガードポリシー用） |
 | 2026-03-23 | conch-parser を domain → infrastructure に移動（INF-20） | ShellParser port trait + ConchShellParser adapter |
+| 2026-04-06 | nightly dev-tool + rustdoc-types 0.57 追加（BRIDGE-01） | rustdoc JSON ベースの domain schema 抽出 |

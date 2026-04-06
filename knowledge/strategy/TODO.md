@@ -2,7 +2,7 @@
 
 > **出典**: `tmp/review-2026-03-10.md`（Gemini による包括的レビュー）
 > **作成日**: 2026-03-11
-> **最終更新**: 2026-03-31
+> **最終更新**: 2026-04-06
 > **アーカイブ**: 解決済み項目は `tmp/TODO-archived-2026-03-16.md` に移動済み
 > **全体計画**: [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md)（v3: ハーネス vs テンプレート出力の区別）
 > **全体計画 (旧版)**: `tmp/archive-2026-03-20/`
@@ -176,9 +176,8 @@
   - **課題**: コマンド文字列に `"cargo test"` が含まれるかで判定
   - **提案**: 終了コードや構造化出力ベースのトリガー判定
 
-- [ ] **ERR-08** (MEDIUM): `/track:pr-review` の同期ポーリングが中断耐性を持たない
-  - **根拠**: `scripts/pr_review.py` の `poll-review` はメモリ上の `trigger_time` に依存して最大10分同期ポーリングするが、途中中断後に再開用 state を保存しない。
-  - **提案**: PR 番号・trigger comment id・trigger timestamp を永続化し、resume / reconcile サブコマンドを追加する。
+- [x] ~~**ERR-08** (MEDIUM): `/track:pr-review` の同期ポーリングが中断耐性を持たない~~ ✅ done (`pr-review-flow-fix-2026-03-31`)
+  - **対応**: trigger state (PR番号, comment ID, trigger_timestamp, head_hash) を `tmp/pr-review-state/<track-id>.json` に永続化。`--resume` フラグで既存 state からポーリング再開可能に
 
 ---
 
@@ -468,10 +467,8 @@
 - [x] ~~**WF-59** (HIGH): review hash の index 全体依存による auto-record 不安定性~~ ✅ done (`autorecord-stabilization-2026-03-26` で review-scope manifest hash を実装、後続トラックで運用)
   - **対応**: ADR-2026-03-26-0000 に基づき review-scope manifest hash に移行。`track/review-scope.json` による scope-aware 分類、worktree 直接読み取り、volatile field 正規化、`rvw1:sha256:<hex>` 形式を実装。`review-json-per-group-review-2026-03-29` + `autorecord-reviewjson-wiring-2026-03-30` で per-group scope hash として運用
 
-- [ ] **WF-66** (MEDIUM): `track-pr-push` のタスク完了ガードが中間 push をブロックする
-  - **課題**: `apps/cli/src/commands/pr.rs` の push ガードが全タスク完了を要求するため、中間コミットの push + PR review ができない。レビュー中に追加タスクを切ると push 不可になる
-  - **提案**: タスク完了ガードを `track-pr-push` から `track-pr-merge` に移動。push は常に許可し、merge 時にタスク完了を強制する
-  - **根拠**: autorecord-reviewjson-wiring T007-T009 追加後に PR review の push がブロックされた（2026-03-31）
+- [x] ~~**WF-66** (MEDIUM): `track-pr-push` のタスク完了ガードが中間 push をブロックする~~ ✅ done (`pr-review-flow-fix-2026-03-31`)
+  - **対応**: タスク完了ガードを push/review_cycle から wait_and_merge_with (merge 前) に移動。中間 push と PR review が未完了タスクでもブロックされなくなった
 
 - [ ] **WF-60** (HIGH): 設計⇆実装の自動遷移 — reviewer finding が spec スコープ外を指摘した場合に、自動で planner に設計相談を escalation し、ADR/spec 更新後に実装に戻るフロー。autorecord-stabilization トラックでは spec 外の修正が大量に蓄積し事後的に spec を更新する事態になった。`/track:review` スキル内に scope guard + auto-escalation to planner を組み込み、(1) finding が spec の in_scope/out_of_scope に該当するか自動判定、(2) scope 外 → planner に設計相談を自動起動、(3) planner が spec 更新 or 別トラック化を判断、(4) spec 更新後に実装に復帰。手動介入なしに設計と実装のスコープ整合性を維持する仕組み
 
@@ -609,7 +606,7 @@
 
 > 詳細は [`tmp/refactoring-plan-2026-03-19.md`](./refactoring-plan-2026-03-19.md) §7 を参照
 
-- [ ] **ERR-09b** (MEDIUM): `activate.rs` (1000行超) のモジュール分割 → `branch.rs` / `preflight.rs` / `resume.rs`
+- [ ] **ERR-09b** (MEDIUM): `track/activate.rs` (1890行) のモジュール分割 → `branch.rs` / `preflight.rs` / `resume.rs`（旧 `commands/activate.rs` → `commands/track/activate.rs` に移動済み）
 - [ ] **ERR-11** (LOW): `tracing` クレート導入（前提: `tech-stack.md` 更新）
 - [ ] **ERR-13** (LOW): コンテナ内 `-local` タスクの `cargo run` → `bin/sotp` 置換
 - [ ] **ERR-14** (LOW): `_agent_profiles.py` に `fast_model` バリデーション追加
@@ -708,12 +705,12 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [x] ~~**TSUMIKI-02** (MEDIUM): ソース帰属~~ ✅ Phase 1 完了
 - [x] ~~**TSUMIKI-03** (MEDIUM): 差分ヒアリング~~ ✅ done (`diff-hearing-2026-03-27`)
 - [ ] **TSUMIKI-04** (MEDIUM): TDD 完了時の要件網羅率 → Phase 3
-- [ ] **TSUMIKI-05** (MEDIUM): 構造化ヒアリング UX — AskUserQuestion + multiSelect による選択肢型質問。自由記述 Markdown から構造化質問へ移行 → Phase 2b
-  - **出典**: `knowledge/research/tsumiki-hearing-deep-dive-2026-04-01.md` §6 Priority 1
-- [ ] **TSUMIKI-06** (LOW): ヒアリング作業規模選定 — Full/Focused/Quick モードで /track:plan のヒアリング深度を選択 → Phase 2b
-  - **出典**: tsumiki kairo-requirements Stage 2 (Full/Lightweight/Custom)
-- [ ] **TSUMIKI-07** (LOW): ヒアリング記録 — spec.json に hearing_history を追加し、ヒアリングプロセスの信号変化を追跡可能にする → Phase 2b
-  - **出典**: tsumiki interview-record.md パターン
+- [x] ~~**TSUMIKI-05** (MEDIUM): 構造化ヒアリング UX — AskUserQuestion + multiSelect による選択肢型質問~~ ✅ done (`hearing-ux-improvement-2026-04-01`)
+  - **対応**: SKILL.md Phase 1 に構造化質問ステップを追加。🟡/🔴/❌ 項目を選択肢型質問に変換
+- [x] ~~**TSUMIKI-06** (LOW): ヒアリング作業規模選定 — Full/Focused/Quick モード~~ ✅ done (`hearing-ux-improvement-2026-04-01`)
+  - **対応**: Step 0 でモード選択を追加。Focused: researcher/planner スキップ、Quick: Blue サマリー表示のみ
+- [x] ~~**TSUMIKI-07** (LOW): ヒアリング記録 — spec.json に hearing_history 追加~~ ✅ done (`hearing-ux-improvement-2026-04-01`)
+  - **対応**: domain 層に HearingMode/HearingRecord 型追加。spec.json に hearing_history フィールド追加。append-only 設計、content_hash から除外
 - [ ] **TSUMIKI-08** (MEDIUM): シグナル伝播 — spec.json の信号を metadata.json タスクに worst-case 伝播。🔴依存タスクの implementing 遷移をブロック → Phase 3
 
 **CC-SDD フレームワーク**:
@@ -760,7 +757,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 
 - [ ] **RVW-01** (HIGH): 共通 Frontmatter パーサー抽出 → `frontmatter.rs`
 - [ ] **RVW-02** (HIGH): conch-parser AST 直接走査による hand-rolled shell 解析の廃止
-- [ ] **RVW-03** (MEDIUM, IN PROGRESS): typed deserialization convention + canonical_modules serde 移行
+- [ ] **RVW-03** (MEDIUM): typed deserialization convention + canonical_modules serde 移行
 - [ ] **RVW-04** (LOW): `syn` crate による `is_inside_test_module` 置き換え + standalone テストファイル除外
 - [ ] **RVW-05** (LOW): `skip_command_launchers` の per-launcher フラグモデリング（RVW-02 で根本解決）
 - [ ] **RVW-06** (HIGH): metadata.json にレビュー状態統合 + エスカレーション順序強制 + コミットガード
@@ -782,12 +779,15 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [x] ~~**RVW-31** (HIGH): review state を review.json に分離 + 内部 checksum による tamper detection~~ ✅ done (`review-json-per-group-review-2026-03-29` + `autorecord-reviewjson-wiring-2026-03-30`)
   - **対応**: review state を metadata.json から review.json に完全分離。ReviewCycle モデルで per-group 管理。RecordRoundProtocolImpl が FsReviewJsonStore 経由で review.json に書き込み、check-approved が review.json から読み取り。policy_hash + partition 変更検出で staleness 検証
 - [x] ~~**RVW-33** (MEDIUM): review.json cycle の frozen partition scope 接続~~ ✅ 解決: autorecord-reviewjson-wiring T005/T006 で per-group scope hash を実装。`group_scope_hash` が worktree ファイル内容を直接読み SHA-256 manifest hash を構築（git 非依存）。record-round (write) と check_approved (read) の両方が per-group scope hash を使用。policy_hash/partition_changed 検証は cycle.rs の `check_cycle_approved` / `check_cycle_staleness_any` で実装済み。T007-T009 で露呈した後続の運用問題は frozen partition scope そのものの未実装ではなく、別フォローアップ（例: WF-66）として継続管理
-- [ ] **RVW-34** (MEDIUM): StoredFinding lossy conversion — `RecordRoundProtocolImpl` が findings_remain verdict を review.json に記録する際、`findings_to_concerns()` で生成した concern slug を `StoredFinding::new(slug, None, None, None)` に変換するため、元の message/severity/file/line が消失する。修正には `RecordRoundProtocol` trait に `findings: Vec<StoredFinding>` パラメータを追加し、元データを保持する必要がある
-- [ ] **RVW-37** (CRITICAL): review.md グループ名 `infra` vs `infrastructure` 不一致 — `.claude/commands/track/review.md` が `--group infra` を渡すが `track/review-scope.json` は `infrastructure` を定義。`check-approved` のパーティション比較でキー不一致が発生しレビュー承認が通らない。review.md を `infrastructure` に統一する。出典: review-process-audit-2026-03-31
-- [ ] **RVW-38** (HIGH): `FindingDocument` / `StoredFinding` に `category` フィールドなし — reviewer が返す `category` が review.json のラウンドトリップで消失。`findings_to_concerns()` の第 1 段階（reviewer 提供 category）が機能しない。`review_json_codec.rs` の `FindingDocument` と `domain/src/review/cycle/round_types.rs` の `StoredFinding` に `category: Option<String>` を追加。`REVIEW_OUTPUT_SCHEMA_JSON` の `category` required 指定と Rust `#[serde(default)]` の乖離も同時修正。出典: review-process-audit-2026-03-31
+- [x] ~~**RVW-34** (MEDIUM): StoredFinding lossy conversion~~ ✅ done (`review-finding-fidelity-2026-04-02`)
+  - **対応**: `RecordRoundProtocol::execute` に `findings: Vec<StoredFinding>` パラメータを追加。lossy 変換コードを削除し、元の message/severity/file/line を保持。usecase 層に `review_findings_to_stored()` 変換関数を追加
+- [x] ~~**RVW-37** (CRITICAL): review.md グループ名 `infra` vs `infrastructure` 不一致~~ ✅ 修正済み (`rv2-docs-skill-update-2026-04-06`)
+  - **対応**: `.claude/commands/track/review.md` のグループ名を `infrastructure` に統一。`track/review-scope.json` の定義と一致
+- [x] ~~**RVW-38** (HIGH): `FindingDocument` / `StoredFinding` に `category` フィールドなし~~ ✅ done (`review-finding-fidelity-2026-04-02`)
+  - **対応**: `StoredFinding` に `category: Option<String>` フィールドと `with_category()` ビルダーを追加。v2 `Finding` 型にも `category` フィールドあり
 - [ ] **RVW-39** (HIGH): timeout/ProcessFailed 時の review.json stale 放置 — `codex_local.rs` で Timeout/ProcessFailed 時に auto-record がスキップされ review.json が更新されない。次ラウンドでコード変更があると hash mismatch で invalidation cascade。提案: (1) failed/timeout を informational round として review.json に記録、(2) stderr に stale 警告出力。出典: review-process-audit-2026-03-31
 - [ ] **RVW-40** (MEDIUM): `RecordRoundProtocolImpl::execute` の巨大関数分割 — 295 行で `#[allow(clippy::too_many_lines)]`。policy resolution + diff 取得が cycle auto-create と scope hash 計算で 2 回重複。policy resolution 結果をキャッシュして共有すべき。出典: review-process-audit-2026-03-31
-- [ ] **RVW-41** (MEDIUM): `check_approved` の `_writer: &impl TrackWriter` 未使用パラメータ削除 — `usecases.rs` line 352。API の誤解を招く dead parameter。出典: review-process-audit-2026-03-31
+- [x] ~~**RVW-41** (MEDIUM): `check_approved` の `_writer: &impl TrackWriter` 未使用パラメータ削除~~ ✅ 削除済み（`review-system-v2-2026-04-05` で review usecase をリファクタリング時に解消）
 - [ ] **RVW-42** (MEDIUM): corrupted partial output で session log fallback 不発 — `codex_local.rs` の session log fallback が `Missing` 状態でのみ起動し、`Invalid`（部分的に壊れた JSON）では試行されない。`Invalid` でも fallback を試行すべき。出典: review-process-audit-2026-03-31
 - [ ] **RVW-43** (LOW): policy hash の `unwrap_or_default` → `expect` — `review_group_policy.rs` line 273。`serde_json::Value` の serialization は実質失敗不可能だが、将来の変更で全ポリシーが同一 hash になる silent bug の footgun。出典: review-process-audit-2026-03-31
 - [ ] **RVW-35** (LOW): `normalize_track_file_for_hash` の group_scope_hash 統合 — `group_scope_hash` は生ファイル内容を SHA-256 する。metadata.json が scope に含まれる場合、`updated_at` 等の volatile fields が変更されるだけで hash が変わりうる。`tmp/transition-backup/review_scope.rs` の正規化ロジックを移植して volatile fields を除外すべき
@@ -824,7 +824,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 
 > 詳細は [`tmp/refactoring-plan-2026-03-19.md`](./refactoring-plan-2026-03-19.md) §1 を参照
 
-- [ ] **CLI-01** (HIGH): `pr.rs` (1432行) の review polling/parsing を usecase 層に移動 → 目標 ~500行
+- [ ] **CLI-01** (HIGH): `pr.rs` (1964行) の review polling/parsing を usecase 層に移動 → 目標 ~500行
 - [x] ~~**CLI-02** (HIGH): `review.rs` (~2300行) の record-round/check-approved/resolve-escalation を usecase 層に移動 → 目標 ~700行~~ ✅ review-usecase-extraction-2026-03-20 + cli-review-module-split-2026-03-22 で完了。4ファイル分割、port traits を usecase に配置、hexagonal architecture convention 追加
 - [ ] **CLI-03** (LOW): CLI-01/02 完了後のコーディング原則適合チェック
 
@@ -836,13 +836,13 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 > **追加日**: 2026-03-19
 
 - [ ] **WF-44** (LOW): codec の phase/streak 不整合検出 — `phase=clear` だが `concern_streaks` に threshold 以上の streak がある矛盾状態を decode 時に検出・修復する
-- [ ] **WF-45** (MEDIUM): `render_review_payload()` で `category: null` を明示出力 — **DM-01 (Verdict enum 化) で自然消滅予定**
+- [x] ~~**WF-45** (MEDIUM): `render_review_payload()` で `category: null` を明示出力~~ ✅ DM-01 (Verdict enum 化, PR #42) で自然消滅
 - [ ] **WF-46** (LOW): codec の重複正規化後衝突検出の完遂 — collision 検出ロジック自体は done-hash-backfill Phase D で実装済み (codec.rs L392-397) だが、duplicate normalization 後衝突ケースのユニットテスト backfill が未了。回帰テスト追加まで close しない
 - [ ] **WF-47** (MEDIUM): `findings_to_concerns()` を `record-round` CLI に自動配線 — 現在は `--concerns` の手動指定に依存。reviewer verdict JSON から concerns を自動抽出して渡すフローを構築する
 - [ ] **WF-48** (LOW): `ReviewEscalationState::with_fields` の threshold/block バリデーション — threshold=0 や空 concerns の Blocked を domain 層で拒否する（codec 層では検証済みだが domain API 自体は無防備）
 - [ ] **WF-49** (LOW): `update_escalation_after_record` の streak リセット方式 — 現在は absent concern を `retain` で削除。削除と「0 にリセット」は機能的に同等だが、`consecutive_rounds: 0` を保持して「過去に出現したが現在は連続していない」ことを表現可能にする
 - [ ] **WF-50** (LOW): `file_path_to_concern` の中間ディレクトリ保持 — `apps/cli/src/commands/review.rs` → `cli.commands.review` のように中間ディレクトリを含む。設計判断として粒度が細かい方が正確だが、同一ファイルの異なるパス表現で slug が分散するリスクあり
-- [ ] **WF-51** (LOW): `ReviewRoundResult::new`/`new_with_concerns` のバリデーション — **DM-01 (Verdict enum 化) で自然消滅予定**
+- [x] ~~**WF-51** (LOW): `ReviewRoundResult::new`/`new_with_concerns` のバリデーション~~ ✅ DM-01 (Verdict enum 化, PR #42) で自然消滅
 - [ ] **WF-52** (MEDIUM): CLI review コマンドの統合テスト — `record-round --concerns`, exit-code-3 escalation, `resolve-escalation` のパース・エラーメッセージを CLI レベルでテスト
 - [ ] **WF-53** (LOW): `file_path_to_concern` の absolute path 誤マッチ — `/opt/libs/repo/apps/cli/...` のようにチェックアウト外の `libs/` にマッチするケース。rfind で最後の `libs/`/`apps/` を使うか、workspace root 相対パスに正規化してから処理すべき
 - [ ] **WF-55** (HIGH): metadata.json SSoT 一貫化 — 全 track `.md` ファイルを metadata.json からの read-only view に統一。view は git tracked のまま維持し、`sotp verify view-freshness` で metadata.json ↔ view の一貫性を CI で保証する
@@ -878,9 +878,11 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 > **追加日**: 2026-04-05
 
 - [x] ~~**RV2-01** (HIGH): `is_planning_only_path` のハードコーディング廃止~~ ✅ planning_only 概念を完全廃止（Session 4 で削除）。v2 は全ファイルを review-scope.json で分類
-- [ ] **RV2-02** (MEDIUM): サブエージェントによる修正+レビューの自律ループ — `/track:review` で各スコープに Agent を spawn し、修正→リビルド→再レビュー→zero_findings まで自律的に回す。orchestrator はステータス監視と full model 昇格のみ担当
+- [x] ~~**RV2-02** (MEDIUM): サブエージェントによる修正+レビューの自律ループ~~ ✅ done (`rv2-docs-skill-update-2026-04-06` T006)
+  - **対応**: review-fix-lead エージェント定義を新規作成。1 scope 所有で fix→verify→re-review→zero_findings まで自律。cross-scope は blocked_cross_scope で fail-closed
 - [ ] **RV2-03** (LOW): `ReviewState::Running` の追加 — 並列レビュー時に「レビュー実行中」を区別し、重複起動防止と進捗可視化を可能にする。`ReviewState::Running { started_at: Timestamp }` を enum variant として追加
-- [ ] **RV2-04** (HIGH): `/track:review` SKILL の v2 対応 — v1 の group-based ワークフロー（cycle 作成→record-round→check-approved）を v2 の scope-based ワークフロー（status→codex-local per scope→check-approved）に更新
+- [x] ~~**RV2-04** (HIGH): `/track:review` SKILL の v2 対応~~ ✅ done (`rv2-docs-skill-update-2026-04-06` T002)
+  - **対応**: review.md の v1 group-based 手順を v2 scope-based に更新。provider-support サブセクション集約、fail-closed 契約追加、NotStarted bypass 仕様追加
 
 > **出典**: review-system-v2-2026-04-05 セッション 5 のレビューサイクルで特定
 > **追加日**: 2026-04-06
@@ -895,9 +897,15 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 
 ### 運用文書の穴
 
-- [ ] **RV2-10** (MEDIUM): pr-review.md — Codex Cloud が同一コミットを再レビューしないことが未記載。accepted deviation 追加後に新コミットが必要な場合がある
-- [ ] **RV2-11** (MEDIUM): pr-review.md — `cargo make track-pr-review` がポーリングを内包していることの強調不足。オーケストレーターが手動 sleep + gh api で代替しやすい。Step 2 に「手動ポーリング禁止」を明記する
-- [ ] **RV2-12** (MEDIUM): review.md — fail-closed 契約がチャネル単位（stdout / stderr / file）であることが未明記。stdout を制御しても stderr fallback が抜け穴になるパターンの再発防止
-- [ ] **RV2-13** (MEDIUM): review.md / track/workflow.md — `check-approved` の NotStarted bypass（PR-based workflow 用）の仕様が未記載
-- [ ] **RV2-14** (LOW): knowledge/conventions/ — `create_dir_all` が存在チェックガードを無効化するパターンが convention 化されていない（`persist_commit_hash_v2` で発生）
-- [ ] **RV2-15** (LOW): track/workflow.md — v2 レビューシステムへの切り替え後の運用手順が未更新（v1 `record-round` への参照が残存する可能性）
+- [x] ~~**RV2-10** (MEDIUM): pr-review.md — Codex Cloud 同一コミット再レビュー不可の注記~~ ✅ done → **修正** (`bridge01-export-schema-2026-04-06`)
+  - **確認**: 実測で同一 HEAD でも `@codex review` 再ポストで新規レビューされることを確認 (PR #81, 2026-04-06)。pr-review.md を「再レビュー可」に修正済み
+- [x] ~~**RV2-11** (MEDIUM): pr-review.md — 手動ポーリング禁止の明記~~ ✅ done (`rv2-docs-skill-update-2026-04-06` T003)
+  - **確認**: pr-review.md に "No manual polling" セクション追加済み
+- [x] ~~**RV2-12** (MEDIUM): review.md — fail-closed 契約のチャネル単位明記~~ ✅ done (`rv2-docs-skill-update-2026-04-06` T002)
+  - **確認**: review.md Step 2d に Channel-scoped fail-closed contract テーブル追加済み
+- [x] ~~**RV2-13** (MEDIUM): review.md / track/workflow.md — NotStarted bypass 仕様記載~~ ✅ done (`rv2-docs-skill-update-2026-04-06` T002/T004)
+  - **確認**: review.md Step 4 に NotStarted bypass 条件を記載。track/workflow.md に v1 `record-round` 参照は残存なし
+- [x] ~~**RV2-14** (LOW): knowledge/conventions/ — create_dir_all ガード無効化パターン convention 化~~ ✅ done (`rv2-docs-skill-update-2026-04-06` T005)
+  - **確認**: `knowledge/conventions/filesystem-persistence-guard.md` に convention 追加済み
+- [x] ~~**RV2-15** (LOW): track/workflow.md — v2 運用手順更新 + v1 残存監査~~ ✅ done (`rv2-docs-skill-update-2026-04-06` T004)
+  - **確認**: track/workflow.md に v1 `record-round` 参照なし (grep 0 件)

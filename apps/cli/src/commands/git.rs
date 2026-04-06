@@ -29,6 +29,8 @@ pub enum GitCommand {
     NoteFromFile(FileArgs),
     /// Switch to a branch and pull latest changes.
     SwitchAndPull(SwitchAndPullArgs),
+    /// Unstage paths (remove from git index without discarding worktree changes).
+    Unstage(UnstageArgs),
 }
 
 #[derive(Debug, Args)]
@@ -50,6 +52,13 @@ pub struct CommitFromFileArgs {
 #[derive(Debug, Args)]
 pub struct SwitchAndPullArgs {
     pub branch: String,
+}
+
+#[derive(Debug, Args)]
+pub struct UnstageArgs {
+    /// Paths to unstage (repo-relative).
+    #[arg(required = true)]
+    pub paths: Vec<PathBuf>,
 }
 
 pub fn execute(cmd: GitCommand) -> ExitCode {
@@ -91,6 +100,13 @@ pub fn execute(cmd: GitCommand) -> ExitCode {
                 err.exit_code()
             }
         },
+        GitCommand::Unstage(args) => match unstage(&args.paths) {
+            Ok(code) => code,
+            Err(err) => {
+                eprintln!("{err}");
+                err.exit_code()
+            }
+        },
     }
 }
 
@@ -126,6 +142,15 @@ fn load_stage_paths(path: &Path) -> Result<Vec<String>, CliError> {
             CliError::Message(msg)
         }
     })
+}
+
+fn unstage(paths: &[PathBuf]) -> Result<ExitCode, CliError> {
+    let repo = repo()?;
+    let mut args = vec!["restore", "--staged", "--"];
+    let path_strs: Vec<String> = paths.iter().map(|p| p.display().to_string()).collect();
+    args.extend(path_strs.iter().map(String::as_str));
+    let code = repo.status(&args)?;
+    Ok(ExitCode::from(u8::try_from(code).unwrap_or(1)))
 }
 
 fn add_all() -> Result<ExitCode, CliError> {
@@ -371,7 +396,7 @@ fn verify_branch_by_auto_detection(repo: &impl GitRepository) -> Result<(), CliE
 mod tests {
     use super::{
         add_all, add_from_file, commit_from_file, load_optional_track_dir, load_stage_paths,
-        note_from_file, repo, switch_and_pull,
+        note_from_file, repo, switch_and_pull, unstage,
     };
     use infrastructure::git_cli::{GitRepository, resolve_repo_path};
     use std::fs;
@@ -820,6 +845,33 @@ mod tests {
             run_git_output(dir.path(), &["notes", "show", "HEAD"]),
             "note line 1\nnote line 2\n"
         );
+    }
+
+    #[test]
+    fn unstage_removes_paths_from_index_without_discarding_worktree() {
+        let _lock = cwd_lock().lock().unwrap();
+        let dir = init_repo();
+        fs::write(dir.path().join("a.txt"), "base\n").unwrap();
+        fs::write(dir.path().join("b.txt"), "base\n").unwrap();
+        run_git(dir.path(), &["add", "a.txt", "b.txt"]);
+        run_git(dir.path(), &["commit", "-m", "initial"]);
+
+        fs::write(dir.path().join("a.txt"), "changed\n").unwrap();
+        fs::write(dir.path().join("b.txt"), "changed\n").unwrap();
+        run_git(dir.path(), &["add", "a.txt", "b.txt"]);
+
+        let _guard = CurrentDirGuard::change_to(dir.path());
+
+        assert_eq!(unstage(&[PathBuf::from("a.txt")]).unwrap(), ExitCode::SUCCESS);
+
+        // a.txt should be unstaged (not in index diff) but still modified in worktree
+        let staged = run_git_output(dir.path(), &["diff", "--cached", "--name-only"]);
+        assert!(!staged.contains("a.txt"), "a.txt should be unstaged");
+        assert!(staged.contains("b.txt"), "b.txt should remain staged");
+
+        // worktree change preserved
+        let worktree = run_git_output(dir.path(), &["diff", "--name-only"]);
+        assert!(worktree.contains("a.txt"), "a.txt worktree change should be preserved");
     }
 
     #[test]
