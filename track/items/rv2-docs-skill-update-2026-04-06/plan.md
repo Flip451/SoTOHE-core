@@ -54,4 +54,4 @@ cross-scope 変更は fail-closed（blocked_cross_scope で返す）。
 review.md Step 3 を更新: orchestrator は spawn + timeout 監視 + full model 昇格のみ担当。
 target behavior として明記（RV2-06 escalation 再設計は別 track）。
 
-- [ ] review-fix-lead エージェント定義を .claude/agents/ に新規作成 + review.md Step 3 を自律ループ化（RV2-02）— timeout で無限ループ防止、cross-scope は blocked_cross_scope で fail-closed
+- [x] review-fix-lead エージェント定義を .claude/agents/ に新規作成 + review.md Step 3 を自律ループ化（RV2-02）— timeout で無限ループ防止、cross-scope は blocked_cross_scope で fail-closed

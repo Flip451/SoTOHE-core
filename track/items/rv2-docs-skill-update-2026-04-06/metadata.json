@@ -87,7 +87,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "description": "TODO.md の未コミット変更（RV2-05..15）をコミット",
@@ -117,9 +117,9 @@
     {
       "description": "review-fix-lead エージェント定義を .claude/agents/ に新規作成 + review.md Step 3 を自律ループ化（RV2-02）— timeout で無限ループ防止、cross-scope は blocked_cross_scope で fail-closed",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "Review v2 運用文書アップデート + review skill 更新",
-  "updated_at": "2026-04-06T04:25:33Z"
+  "updated_at": "2026-04-06T06:01:12Z"
 }

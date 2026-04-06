@@ -250,47 +250,49 @@ Execute the parallel review as described in Step 2.
 Parse the aggregated verdict:
 - If `zero_findings` and this was a fast-model round: proceed to the final confirmation round (see Model escalation strategy).
 - If `zero_findings` and this was the full-model confirmation round: proceed to Step 4 (done).
-- If `findings_remain`: read the merged findings list and proceed to fix phase.
+- If `findings_remain`: proceed to autonomous fix phase.
 - If any reviewer execution failed: stop and report the failure before continuing.
 
-### Fix phase
+### Autonomous fix phase (review-fix-lead agents)
 
-For each finding:
+When findings exist, launch **review-fix-lead** agents per scope to autonomously fix and
+re-review. Each agent owns one scope and loops until fast-model `zero_findings` or failure.
 
-1. **Verify factual claims before acting.** If the finding asserts a fact about the codebase
-   (e.g., "function X returns Y", "the runtime emits file Z", "this trait requires W"),
-   use `Grep` / `Read` to confirm the claim is true. Reviewer models can hallucinate
-   implementation details. Do NOT revert correct code based on an unverified claim.
-2. Assess severity (P1 / P2 / P3).
-3. P3 findings from pre-existing unchanged code: note but do not fix.
-4. P1 and P2: implement the fix.
-5. If the finding requires a new test, add it.
-6. Run `cargo make ci` (or `cargo make ci-rust` for fast inner loop) to verify fixes compile and pass.
+Launch one `review-fix-lead` agent per scope with findings, using the Agent tool with
+`run_in_background: true` and a **timeout of 60 minutes per scope**:
 
-**Note**: `cargo make add-all` (staging) is NOT required between review rounds.
-The review hash (`rvw1:` prefix) is computed from worktree file contents, not the git index
-(see `review_adapters.rs` / ADR §5). Staging is only needed before `/track:commit`.
+```
+Agent prompt for each scope:
+  You are a review-fix-lead for the {scope} scope of track {track-id}.
+  Briefing: tmp/reviewer-runtime/briefing-{scope}.md
+  Fast model: {fast_model}
+  Scope files: {file list from Step 2a}
+  Previous findings: {findings for this scope from Round 1}
 
-### Round N (fix verification)
+  Run the fix+review loop as defined in .claude/agents/review-fix-lead.md.
+  Use: cargo make track-local-review -- --model {fast_model} --round-type fast --group {scope} --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md
 
-After fixes are applied, invoke the reviewer again using the **same parallel pattern** from
-Step 2, but update each briefing to include:
-
-```markdown
-## Previous Findings (Round N-1)
-{finding summary per group}
-
-## Fixes Applied
-{fix description, test names if any}
-
-Verify the fixes. Report any remaining bugs or new issues.
+  Report your final status: completed / blocked_cross_scope / failed.
 ```
 
-Parse the aggregated output:
-- If `zero_findings` and this was a fast-model round: proceed to the final confirmation round (see Model escalation strategy).
-- If `zero_findings` and this was the full-model confirmation round: proceed to Step 4 (done).
-- If `findings_remain`: use the merged findings, then repeat fix phase → Round N+1.
-- Otherwise, stop and report the reviewer execution failure.
+**Orchestrator responsibilities** during autonomous fix phase:
+1. Wait for all agents to complete (or timeout).
+2. Collect statuses from each agent.
+3. Handle statuses:
+   - `completed` → scope is ready for full model confirmation.
+   - `blocked_cross_scope` → re-partition the affected files or fix cross-scope
+     dependencies in the orchestrator, then relaunch the affected scope agents.
+   - `failed` / timeout → report to the user and stop.
+
+### Full model confirmation round
+
+After ALL scopes report `completed` from the autonomous fix phase (or `zero_findings`
+from the initial review), run one final review round using `{model}` (full model) instead
+of `{fast_model}`. Use the same parallel `codex-reviewer` pattern from Step 2c.
+
+- If the full model reports `zero_findings` for all scopes: proceed to Step 4.
+  **Only this constitutes review completion.**
+- If the full model finds new issues: return to the autonomous fix phase with the new findings.
 
 ### Model escalation strategy
 
@@ -309,29 +311,25 @@ Resolve models from `.claude/agent-profiles.json` using the `reviewer` capabilit
 - `{fast_model}`: `provider_model_overrides` for reviewer, then `providers.<reviewer_provider>.fast_model`, then `default_model`. If none exist, skip `--model`.
 - `{model}`: `provider_model_overrides`, then `providers.<reviewer_provider>.default_model`. If none exist, skip `--model`.
 
-Execution:
-- **Iterative rounds**: Use the `reviewer` capability with `{fast_model}` for rapid feedback. Purpose: catch obvious errors cheaply before consuming full model budget.
-- **Final round (confirmation)**: When the fast model reports `zero_findings`, run one more round with `{model}` for a thorough, comprehensive review. The full model may find any category of issue the fast model missed (logic errors, test gaps, security concerns, etc.) — it is not limited to design-level findings.
-- If the full model also reports `zero_findings`: proceed to Step 4. **Only this constitutes review completion.**
-- If the full model finds new issues: fix and return to the fast model loop.
-
 ### Early-completion pipelining
 
-When groups are reviewed in parallel and some groups complete with `zero_findings` while
+When scopes are reviewed in parallel and some complete with `zero_findings` while
 others have `findings_remain`:
 
-- **Parallel fixes** (v2): start fixes immediately for completed scopes
-  without waiting for others. `group_scope_hash` is computed per-group from that group's
-  scope files only, so modifying files in one group's scope does not affect another
-  group's hash. Launch the next review round per-group as fixes are ready.
-  Avoid modifying files that belong to a still-running group's scope.
+- Scopes that completed early wait for the remaining scopes before the full model round.
+- `group_scope_hash` is computed per-group from that group's scope files only, so
+  modifications in one scope do not affect another scope's hash.
 
 ### Loop guard
 
-- Soft round guideline: if fast reviewer exceeds **5 rounds**, consider whether splitting the remaining work into smaller tasks would be more effective. Continue beyond 5 rounds if each round makes clear progress, but be alert to diminishing returns on large diffs.
-- If the same finding recurs 3 times with no code change addressing it, stop and report to the user.
+- The review-fix-lead agent loops until fast-model `zero_findings`, `blocked_cross_scope`,
+  `failed`, or Agent timeout (60 minutes/scope).
+- If the same finding recurs 3 times with no code change addressing it, the agent should
+  return `failed` with the recurring finding details.
 - The final full-model confirmation round does not count toward the loop guard.
-- Between rounds, always run `cargo make ci-rust` to ensure fixes don't break the build.
+
+> **Note**: v2 escalation (concern tracking, `EscalationActive`) is not yet implemented
+> (RV2-06). The Agent timeout serves as the primary infinite-loop prevention mechanism.
 
 ## Step 4: Final validation
 

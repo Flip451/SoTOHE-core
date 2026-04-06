@@ -7,3 +7,4 @@
 - `orchestrator.md`: 全体進行管理、タスク分解、委譲判断
 - `rust-implementation-lead.md`: Rust実装・検証・品質ゲート実行
 - `codex-reviewer.md`: Codex レビュー単発実行（並列レビューグループ用）
+- `review-fix-lead.md`: スコープ所有型の自律 fix+review ループ実行
