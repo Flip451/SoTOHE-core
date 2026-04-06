@@ -135,6 +135,20 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
     let mut impls = Vec::new();
 
     for item in krate.index.values() {
+        // Impl blocks have name=None and non-Public visibility; handle them separately.
+        if let ItemEnum::Impl(i) = &item.inner {
+            if i.is_synthetic || i.blanket_impl.is_some() {
+                continue;
+            }
+            let target = type_name(&i.for_);
+            let trait_name = i.trait_.as_ref().map(|p| p.path.clone());
+            let methods = extract_methods(&i.items, krate);
+            if !methods.is_empty() || trait_name.is_some() {
+                impls.push(ImplInfo::new(target, trait_name, methods));
+            }
+            continue;
+        }
+
         if !matches!(item.visibility, Visibility::Public) {
             continue;
         }
@@ -162,17 +176,6 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
             ItemEnum::Trait(t) => {
                 let methods = extract_methods(&t.items, krate);
                 traits.push(TraitInfo::new(name, item.docs.clone(), methods));
-            }
-            ItemEnum::Impl(i) => {
-                if i.is_synthetic || i.blanket_impl.is_some() {
-                    continue;
-                }
-                let target = type_name(&i.for_);
-                let trait_name = i.trait_.as_ref().map(|p| p.path.clone());
-                let methods = extract_methods(&i.items, krate);
-                if !methods.is_empty() || trait_name.is_some() {
-                    impls.push(ImplInfo::new(target, trait_name, methods));
-                }
             }
             _ => {}
         }
@@ -208,11 +211,12 @@ fn extract_enum_variants(e: &rustdoc_types::Enum, krate: &rustdoc_types::Crate) 
         .collect()
 }
 
-/// Extract public method FunctionInfos from a list of item Ids.
+/// Extract method FunctionInfos from a list of item Ids.
+/// Accepts both `Public` and `Default` visibility (trait associated items use `Default`).
 fn extract_methods(ids: &[rustdoc_types::Id], krate: &rustdoc_types::Crate) -> Vec<FunctionInfo> {
     ids.iter()
         .filter_map(|id| krate.index.get(id))
-        .filter(|item| matches!(item.visibility, Visibility::Public))
+        .filter(|item| matches!(item.visibility, Visibility::Public | Visibility::Default))
         .filter_map(|item| {
             let name = item.name.as_ref()?;
             if let ItemEnum::Function(f) = &item.inner {
