@@ -61,7 +61,9 @@ fn run_rustdoc(workspace_root: &Path, crate_name: &str) -> Result<PathBuf, Schem
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        if stderr.contains("package(s) `") && stderr.contains("not found in workspace") {
+        if stderr.contains("did not match any packages")
+            || (stderr.contains("package(s) `") && stderr.contains("not found in workspace"))
+        {
             return Err(SchemaExportError::CrateNotFound(crate_name.to_owned()));
         }
         return Err(SchemaExportError::RustdocFailed(stderr.into_owned()));
@@ -85,7 +87,11 @@ fn run_rustdoc(workspace_root: &Path, crate_name: &str) -> Result<PathBuf, Schem
 fn resolve_target_dir(workspace_root: &Path) -> Result<PathBuf, SchemaExportError> {
     // Check environment variable first
     if let Ok(dir) = std::env::var("CARGO_TARGET_DIR") {
-        return Ok(PathBuf::from(dir));
+        let path = PathBuf::from(dir);
+        if path.is_relative() {
+            return Ok(workspace_root.join(path));
+        }
+        return Ok(path);
     }
     // Fall back to `cargo metadata` for reliable resolution
     let output = Command::new("cargo")
