@@ -897,8 +897,8 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 
 ### 運用文書の穴
 
-- [x] ~~**RV2-10** (MEDIUM): pr-review.md — Codex Cloud 同一コミット再レビュー不可の注記~~ ✅ done (`rv2-docs-skill-update-2026-04-06` T003)
-  - **確認**: pr-review.md "Async handling" セクションに same-commit re-review limitation を記載済み
+- [x] ~~**RV2-10** (MEDIUM): pr-review.md — Codex Cloud 同一コミット再レビュー不可の注記~~ ✅ done → **修正** (`bridge01-export-schema-2026-04-06`)
+  - **確認**: 実測で同一 HEAD でも `@codex review` 再ポストで新規レビューされることを確認 (PR #81, 2026-04-06)。pr-review.md を「再レビュー可」に修正済み
 - [x] ~~**RV2-11** (MEDIUM): pr-review.md — 手動ポーリング禁止の明記~~ ✅ done (`rv2-docs-skill-update-2026-04-06` T003)
   - **確認**: pr-review.md に "No manual polling" セクション追加済み
 - [x] ~~**RV2-12** (MEDIUM): review.md — fail-closed 契約のチャネル単位明記~~ ✅ done (`rv2-docs-skill-update-2026-04-06` T002)

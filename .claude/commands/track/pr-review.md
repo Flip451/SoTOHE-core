@@ -77,15 +77,10 @@ If the poll times out:
 - **No bot activity**: Suggests the Codex Cloud GitHub App is not installed.
 - **Bot active but no review**: The review is still in progress. Try again later.
 
-**Same-commit re-review limitation**: Codex Cloud may not post a new review on the same HEAD
-commit. When this happens, the normal polling loop (which requires `submitted_at >=
-trigger_timestamp`) finds no new review. However, the timeout recovery path falls back to a
-`commit_id`-based lookup that returns the **prior review on the same SHA** regardless of
-`submitted_at` (`apps/cli/src/commands/pr.rs`, timeout recovery branch). This means
-re-triggering on the same HEAD may silently return a stale review that does not reflect
-PR body updates (e.g., new accepted deviations). If you need Codex Cloud to genuinely
-re-evaluate the code after updating accepted deviations, push a new commit first to give
-Codex Cloud a new HEAD to review.
+**Same-commit re-review**: Codex Cloud re-reviews the same HEAD commit when
+`@codex review` is posted again. Updating the PR body (e.g., adding Accepted Deviations)
+and re-triggering without a new commit produces a fresh review that reflects the updated
+PR body. A new commit is **not** required to get Codex Cloud to re-evaluate.
 
 **No manual polling**: `cargo make track-pr-review` (which delegates to `sotp pr review-cycle`)
 handles the full trigger → poll → parse → report cycle internally (15s interval, 10min timeout).
