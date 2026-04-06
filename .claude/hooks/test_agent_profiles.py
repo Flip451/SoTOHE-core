@@ -15,10 +15,28 @@ class AgentProfilesTest(unittest.TestCase):
         return write_agent_profiles(path, active_profile, mutator)
 
     def test_default_profile_resolves_all_required_capabilities(self) -> None:
-        """Verify all required capabilities are resolvable, without hardcoding provider assignments."""
+        """Verify all capabilities resolve to a valid provider.
+
+        Critical mappings (reviewer, debugger, workflow_host) are pinned because
+        the review pipeline fail-closes on non-Codex reviewers. Flexible mappings
+        (planner, implementer, researcher, etc.) only check validity.
+        """
         profiles = agent_profiles.load_profiles()
 
         self.assertEqual(agent_profiles.active_profile_name(profiles), "default")
+
+        # Critical mappings — pipeline invariants
+        self.assertEqual(
+            agent_profiles.resolve_provider("reviewer", profiles=profiles), "codex"
+        )
+        self.assertEqual(
+            agent_profiles.resolve_provider("debugger", profiles=profiles), "codex"
+        )
+        self.assertEqual(
+            agent_profiles.workflow_host_provider(profiles=profiles), "claude"
+        )
+
+        # Flexible mappings — any valid provider is OK
         for cap in agent_profiles.REQUIRED_CAPABILITIES:
             provider = agent_profiles.resolve_provider(cap, profiles=profiles)
             self.assertIn(
