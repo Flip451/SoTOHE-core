@@ -63,4 +63,4 @@ infrastructure 旧 review.json codec, effective_diff_base 削除。
 既存テストを v2 API に更新。
 v1→v2 マイグレーション: v1 review.json (schema_version:1) は無視（デコーダが空として扱う）。既存トラックは init + clear で移行。v1 approved_head → .commit_hash に置換。
 
-- [~] v1 cleanup: remove domain ReviewCycle/CycleGroupState/frozen scope/ReviewPartitionSnapshot/GroupPartition/DiffScope, usecase RecordRoundProtocol/has_scope_drift/staleness/reclassified_paths_outside_cycle_groups, infra old codec/effective_diff_base, update tests + v1→v2 migration (v1 review.json schema_version:1 は無視, init+clear で移行, v1 approved_head → .commit_hash に置換)
+- [x] v1 cleanup: remove domain ReviewCycle/CycleGroupState/frozen scope/ReviewPartitionSnapshot/GroupPartition/DiffScope, usecase RecordRoundProtocol/has_scope_drift/staleness/reclassified_paths_outside_cycle_groups, infra old codec/effective_diff_base, update tests + v1→v2 migration (v1 review.json schema_version:1 は無視, init+clear で移行, v1 approved_head → .commit_hash に置換)
