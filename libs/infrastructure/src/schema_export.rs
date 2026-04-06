@@ -269,8 +269,12 @@ fn type_name(ty: &rustdoc_types::Type) -> String {
     match ty {
         rustdoc_types::Type::ResolvedPath(p) => p.path.clone(),
         rustdoc_types::Type::Primitive(p) => p.clone(),
-        rustdoc_types::Type::BorrowedRef { type_: inner, .. } => {
-            format!("&{}", type_name(inner))
+        rustdoc_types::Type::BorrowedRef { is_mutable, type_: inner, .. } => {
+            if *is_mutable {
+                format!("&mut {}", type_name(inner))
+            } else {
+                format!("&{}", type_name(inner))
+            }
         }
         rustdoc_types::Type::Slice(inner) => format!("[{}]", type_name(inner)),
         rustdoc_types::Type::Tuple(types) if types.is_empty() => "()".to_owned(),
