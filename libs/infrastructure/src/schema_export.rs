@@ -60,9 +60,6 @@ fn run_rustdoc(workspace_root: &Path, crate_name: &str) -> Result<PathBuf, Schem
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        if stderr.contains("package(s) `") || stderr.contains("could not find") {
-            return Err(SchemaExportError::CrateNotFound(crate_name.to_owned()));
-        }
         return Err(SchemaExportError::RustdocFailed(stderr.into_owned()));
     }
 
