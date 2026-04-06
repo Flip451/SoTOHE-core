@@ -107,7 +107,7 @@
     {
       "description": "workflow.md: NotStarted bypass 追加（RV2-13）+ v1 残存監査（RV2-15、結果 clean を確認記載）",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "knowledge/conventions/ に create_dir_all ガード無効化パターン convention を新規作成（RV2-14）",
@@ -121,5 +121,5 @@
     }
   ],
   "title": "Review v2 運用文書アップデート + review skill 更新",
-  "updated_at": "2026-04-06T03:59:01Z"
+  "updated_at": "2026-04-06T04:14:28Z"
 }

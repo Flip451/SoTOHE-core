@@ -250,6 +250,15 @@ graph TD
 - `/track:pr-review` は PR ベースの非同期レビュー（GitHub 上でレビュー履歴が残る）
 - 両者は独立しており、用途に応じて使い分ける
 
+**NotStarted bypass（check-approved）:**
+PR ベースレビューのみを使用し、ローカルレビューをスキップした場合、`review.json` は作成されない。
+`cargo make track-check-approved` は以下の条件を**両方**満たすときに bypass（exit 0）を許可する:
+1. `review.json` が存在しない（`review.json` が存在するが読取不能な場合は bypass しない — fail-closed）
+2. 全 required scope が `NotStarted` 状態
+
+一度でもローカルレビューが実行され `review.json` が作成されると、bypass は無効になり、
+全スコープの approval が必要になる。
+
 ### ガードポリシー
 
 直接の `git merge` / `git rebase` / `git cherry-pick` / `git reset` / `git switch` はフックでブロックされる。

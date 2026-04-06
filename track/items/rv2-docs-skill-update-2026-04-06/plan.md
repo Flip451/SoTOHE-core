@@ -34,7 +34,7 @@ RV2-11: cargo make track-pr-review が polling を内包。手動 sleep + gh api
 RV2-13: NotStarted bypass 仕様を review セクションに追加。
 RV2-15: v1 record-round 等の残存参照を監査。結果 clean であることを確認記載。
 
-- [ ] workflow.md: NotStarted bypass 追加（RV2-13）+ v1 残存監査（RV2-15、結果 clean を確認記載）
+- [x] workflow.md: NotStarted bypass 追加（RV2-13）+ v1 残存監査（RV2-15、結果 clean を確認記載）
 
 ## create_dir_all convention 新規作成
 
