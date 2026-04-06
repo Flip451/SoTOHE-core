@@ -195,14 +195,17 @@ Collect the JSON verdict from each reviewer agent. Apply fail-closed aggregation
   failure and treat overall verdict as `findings_remain` (fail-closed).
 - Only if **all** reviewers report `zero_findings`: overall verdict is `zero_findings`.
 
-**Channel-scoped fail-closed contract**: A trusted `zero_findings` verdict requires ALL of
-the following channels to succeed. Partial success on any single channel is not sufficient:
+**Channel-scoped fail-closed contract**: A trusted `zero_findings` verdict requires ALL
+applicable channels to succeed. Partial success on any single channel is not sufficient:
 
-| Channel | What constitutes success | Failure mode |
-|---------|------------------------|--------------|
-| stdout | Valid JSON verdict as the last line | Missing, malformed, or semantically inconsistent JSON |
-| exit code | 0 (zero_findings) or 2 (findings_remain) | 1 (error), 3 (escalation), timeout |
-| review.json | Verdict persisted by auto-record | Write failure, missing file, stale hash |
+| Channel | Applies to | What constitutes success | Failure mode |
+|---------|-----------|------------------------|--------------|
+| stdout | All providers | Valid JSON verdict as the last line | Missing, malformed, or semantically inconsistent JSON |
+| exit code | All providers | 0 (zero_findings) or 2 (findings_remain) | 1 (error), 3 (escalation), timeout |
+| review.json | Auto-recording providers only (Codex) | Verdict persisted by auto-record | Write failure, missing file, stale hash |
+
+For providers without auto-record (claude), only stdout and exit code channels are evaluated.
+See Step 1 **Provider support matrix** for which providers support auto-record.
 
 Controlling stdout alone while leaving stderr as an uncontrolled fallback is a known bypass
 class. Do not treat stderr output as a verdict source.
