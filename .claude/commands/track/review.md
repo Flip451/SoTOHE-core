@@ -47,13 +47,15 @@ Arguments:
 
 ### Provider support matrix
 
-| Provider | Auto-record to review.json | `check-approved` satisfiable | Notes |
-|----------|---------------------------|------------------------------|-------|
-| `codex` (default) | Yes (built into `bin/sotp review codex-local`) | Yes | Recommended for all tracks |
-| `claude` (`claude-heavy`) | **No** — verdicts are not persisted | **No** | Use default Codex profile until claude auto-record is implemented |
+| Provider | Auto-record to review.json | `check-approved` | Notes |
+|----------|---------------------------|-------------------|-------|
+| `codex` (default) | Yes (built into `bin/sotp review codex-local`) | Satisfied via recorded verdicts | Recommended for all tracks |
+| `claude` (`claude-heavy`) | **No** — verdicts are not persisted | Passes only via NotStarted bypass (review.json absent + all scopes NotStarted) | Review evidence exists only in conversation context, not in review.json |
 
-Until the `claude` provider gains auto-record support, `track-check-approved` (Step 4) **cannot
-be satisfied** with the `claude-heavy` profile. Use the default Codex profile instead.
+**Limitation**: With `claude-heavy`, `check-approved` passes via the NotStarted bypass because
+verdicts are never written to `review.json`. This means Step 4 does not verify actual review
+coverage — it only confirms that no local review was started. For auditable review evidence,
+use the default Codex profile.
 
 ## Step 2: Prepare review briefings (parallel observation split)
 
