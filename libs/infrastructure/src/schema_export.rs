@@ -48,6 +48,7 @@ fn run_rustdoc(workspace_root: &Path, crate_name: &str) -> Result<PathBuf, Schem
             "rustdoc",
             "-p",
             crate_name,
+            "--lib",
             "--",
             "-Z",
             "unstable-options",
@@ -63,7 +64,8 @@ fn run_rustdoc(workspace_root: &Path, crate_name: &str) -> Result<PathBuf, Schem
         return Err(SchemaExportError::RustdocFailed(stderr.into_owned()));
     }
 
-    let json_path = workspace_root.join("target").join("doc").join(format!("{crate_name}.json"));
+    let artifact_name = crate_name.replace('-', "_");
+    let json_path = workspace_root.join("target").join("doc").join(format!("{artifact_name}.json"));
 
     if !json_path.is_file() {
         return Err(SchemaExportError::RustdocFailed(format!(
