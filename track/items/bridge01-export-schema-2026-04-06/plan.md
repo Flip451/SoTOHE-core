@@ -39,7 +39,7 @@ Step 3: Crate.index を走査し、pub な Struct/Enum/Function/Trait/Impl を d
 型変換は rustdoc_types::ItemEnum の match で行う。シグネチャ文字列は rustdoc_types の情報から再構築。
 nightly 不在時は SchemaExportError::NightlyNotFound を返す（fail-closed）。
 
-- [ ] infrastructure 層: RustdocSchemaExporter (rustdoc JSON 生成 + パース + 変換)
+- [~] infrastructure 層: RustdocSchemaExporter (rustdoc JSON 生成 + パース + 変換)
 
 ## CLI: sotp domain export-schema コマンド
 
