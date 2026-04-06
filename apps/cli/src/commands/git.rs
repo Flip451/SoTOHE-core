@@ -150,12 +150,7 @@ fn unstage(paths: &[PathBuf]) -> Result<ExitCode, CliError> {
     let path_strs: Vec<String> = paths.iter().map(|p| p.display().to_string()).collect();
     args.extend(path_strs.iter().map(String::as_str));
     let code = repo.status(&args)?;
-    if code != 0 {
-        return Err(CliError::Message(format!(
-            "git restore --staged failed with exit code {code}"
-        )));
-    }
-    Ok(ExitCode::SUCCESS)
+    Ok(ExitCode::from(u8::try_from(code).unwrap_or(1)))
 }
 
 fn add_all() -> Result<ExitCode, CliError> {
