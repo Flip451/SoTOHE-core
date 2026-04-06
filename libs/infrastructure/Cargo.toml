@@ -21,6 +21,7 @@ syn = { version = "2", features = ["full", "visit"] }
 regex.workspace = true
 thiserror.workspace = true
 toml.workspace = true
+rustdoc-types = "0.57"
 sha2 = "0.10.9"
 fs4 = "0.13.1"
 globset = { workspace = true }

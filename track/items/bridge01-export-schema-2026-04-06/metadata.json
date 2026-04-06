@@ -100,12 +100,12 @@
     ]
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
   "tasks": [
     {
       "description": "tech-stack.md 更新 + rustdoc-types 依存追加 + nightly dev-tool convention",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "domain 層: SchemaExport / TypeInfo / FunctionInfo / TraitInfo / ImplInfo 型定義",
@@ -139,5 +139,5 @@
     }
   ],
   "title": "BRIDGE-01: sotp domain export-schema (rustdoc JSON)",
-  "updated_at": "2026-04-06T13:05:34Z"
+  "updated_at": "2026-04-06T13:39:23Z"
 }

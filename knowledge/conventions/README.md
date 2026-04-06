@@ -60,6 +60,7 @@
 - `filesystem-persistence-guard.md`: Filesystem Persistence Guard Convention
 - `hexagonal-architecture.md`: Hexagonal Architecture Convention
 - `impl-delegation-arch-guard.md`: Implementation Delegation Architecture Guard
+- `nightly-dev-tool.md`: Nightly Toolchain Dev-Tool Convention
 - `prefer-type-safe-abstractions.md`: Prefer Type-Safe Abstractions Convention
 - `security.md`: Security Convention
 - `shell-parsing.md`: Shell Parsing Convention
