@@ -388,15 +388,13 @@ findings?      → forge fixes → re-review (loop)
 # sotp-review: Run Codex review cycle enforced by sotp
 
 1. Stage changes: cargo make add-all
-2. Run Codex reviewer:
-   cargo make track-local-review -- --prompt "Review staged changes"
-3. Parse verdict from reviewer output
-4. Record round: sotp review record-round --track-id {id} --verdict {verdict} --concerns {concerns}
-5. If verdict=findings_remain:
+2. Run Codex reviewer (auto-records verdict to review.json):
+   cargo make track-local-review -- --model gpt-5.4-mini --round-type fast --group {scope} --track-id {id} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md
+3. If verdict=findings_remain:
    - Fix findings
    - Go to step 1 (max 3 rounds per concern before escalation)
-6. If verdict=zero_findings:
-   - Verify: sotp review check --track-id {id}
+4. If verdict=zero_findings:
+   - Verify: cargo make track-check-approved -- --track-id {id}
    - Proceed to commit
 ```
 
