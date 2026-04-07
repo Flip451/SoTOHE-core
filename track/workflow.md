@@ -228,7 +228,6 @@ graph TD
 3. `cargo make track-pr-ensure '<track-id>'` で PR を作成する
 4. PR をレビュー・マージする
 5. `/track:activate <track-id>` で実装ブランチを作成する
-6. `/track:archive <id>` でトラックをアーカイブする
 
 ### PR ベースレビュー（Codex Cloud）
 
