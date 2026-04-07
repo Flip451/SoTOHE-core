@@ -142,126 +142,28 @@ For each non-empty group, build a briefing file at `tmp/reviewer-runtime/briefin
 Report findings as JSON:
 {"verdict":"zero_findings","findings":[]}
 or
-{"verdict":"findings_remain","findings":[{"message":"...","severity":"P1","file":"path","line":123}]}
+{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}
+Every object field is required by the output schema. When a finding does not have a concrete
+severity, file, or line, use `null` for that field instead of omitting it.
 DO NOT report findings about test code using unwrap/expect — that is allowed.
 DO NOT report findings about unchanged pre-existing code.
 ```
 
-### 2c. Invoke reviewers in parallel
+### 2c. Invoke review-fix-lead agents in parallel
 
-Launch one reviewer per non-empty group, **in parallel** using Agent Teams
-(the Agent tool with `run_in_background: true` and `subagent_type: "codex-reviewer"`).
+Launch one `review-fix-lead` agent per non-empty group, **in parallel** using Agent Teams
+(the Agent tool with `run_in_background: true` and `subagent_type: "review-fix-lead"`).
 
-The `codex-reviewer` agent type restricts available tools to Bash + Read + Grep + Glob,
-and its system prompt enforces: run the command exactly as given, no `$?`/`2>&1`/shell
-expansion, no build commands, use Read (not Bash) for reading files.
+Each `review-fix-lead` agent autonomously handles the full review → fix → re-review loop
+for its scope. This eliminates the intermediate `codex-reviewer` → orchestrator aggregation
+→ `review-fix-lead` handoff. The agent loops until fast-model `zero_findings`, then reports
+`completed` back to the orchestrator.
 
 **When the provider has a CLI tool** (e.g., Codex CLI — the default profile):
 
-Use `{fast_model}` for iterative rounds and `{model}` for the final confirmation round (see Model escalation strategy).
-
-Auto-record is always on (v2). Verdicts are written directly to `review.json` after each
-Codex run. The scope file list is automatically injected into the prompt so each reviewer
-focuses on the correct files. Parallel per-scope reviews are safe: each scope's hash is
-computed from its own files only.
-
-```
-Agent 1: cargo make track-local-review -- --model {fast_model} --round-type {fast|final} --group domain --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-domain.md
-Agent 2: cargo make track-local-review -- --model {fast_model} --round-type {fast|final} --group infrastructure --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-infrastructure.md
-Agent 3: cargo make track-local-review -- --model {fast_model} --round-type {fast|final} --group usecase --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-usecase.md
-Agent 4: cargo make track-local-review -- --model {fast_model} --round-type {fast|final} --group cli --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-cli.md
-Agent 5: cargo make track-local-review -- --model {fast_model} --round-type {fast|final} --group harness-policy --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-harness-policy.md
-Agent 6: cargo make track-local-review -- --model {fast_model} --round-type {fast|final} --group other --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-other.md
-```
-
-For the **final confirmation round**, replace `{fast_model}` with `{model}`.
-
-**When the provider is `claude`** (e.g., `claude-heavy` profile):
-
-> See Step 1 **Provider support matrix** — claude auto-record is not yet implemented.
-
-Launch one Claude Code subagent per group with `subagent_type: "Explore"`.
-Each subagent reads its briefing file and returns a JSON verdict in the same format.
-
-Wait for all agents to complete.
-
-### 2d. Aggregate verdicts
-
-Collect the JSON verdict from each reviewer agent. Apply fail-closed aggregation:
-
-- If **any** reviewer reports `findings_remain`: overall verdict is `findings_remain`.
-  Merge all findings arrays into a single list.
-- If **any** reviewer fails (timeout / process_failed / last_message_missing): report the
-  failure and treat overall verdict as `findings_remain` (fail-closed).
-- Only if **all** reviewers report `zero_findings`: overall verdict is `zero_findings`.
-
-**Channel-scoped fail-closed contract**: A trusted `zero_findings` verdict requires ALL
-applicable channels to succeed. Partial success on any single channel is not sufficient:
-
-| Channel | Applies to | What constitutes success | Failure mode |
-|---------|-----------|------------------------|--------------|
-| stdout | All providers | Valid JSON verdict as the last line | Missing, malformed, or semantically inconsistent JSON |
-| exit code | All providers | 0 (zero_findings) or 2 (findings_remain) | 1 (error), 3 (escalation), timeout |
-| review.json | Auto-recording providers only (Codex) | Verdict persisted by auto-record | Write failure, missing file, stale hash |
-
-For providers without auto-record (claude), only stdout and exit code channels are evaluated.
-See Step 1 **Provider support matrix** for which providers support auto-record.
-
-Controlling stdout alone while leaving stderr as an uncontrolled fallback is a known bypass
-class. Do not treat stderr output as a verdict source.
-
-The wrapper passes a machine-readable `--output-schema` automatically. The final reviewer
-message must be a single JSON object, and the wrapper additionally rejects semantically
-inconsistent payloads fail-closed:
-
-```json
-{"verdict":"zero_findings","findings":[]}
-```
-
-or
-
-```json
-{"verdict":"findings_remain","findings":[{"message":"describe the bug","severity":"P1","file":"path/to/file.rs","line":123}]}
-```
-
-Every object field is required by the output schema. When a finding does not have a concrete
-severity, file, or line, use `null` for that field instead of omitting it.
-`zero_findings` must use an empty `findings` array, and `findings_remain` must include at least
-one finding. The wrapper prints that final JSON payload as the last stdout line.
-
-### 2e. Record round results
-
-**Auto-record (v2, Codex-only, always on)**: Step 2e is handled automatically by the
-`bin/sotp review codex-local` wrapper. Verdicts are written to `review.json` after each
-Codex invocation. Manual `record-round` has been removed to prevent verdict falsification.
-
-> Claude subagent verdicts are **not auto-recorded**. See Step 1 **Provider support matrix**.
-
-**Error handling**:
-- If auto-record fails (exit 1, verdict not printed): the round must be retried.
-  Unrecorded verdicts are not trusted.
-
-## Step 3: Review → Fix → Review loop
-
-### Round 1 (initial review)
-
-Execute the parallel review as described in Step 2.
-
-Parse the aggregated verdict:
-- If `zero_findings` and this was a fast-model round: proceed to the final confirmation round (see Model escalation strategy).
-- If `zero_findings` and this was the full-model confirmation round: proceed to Step 4 (done).
-- If `findings_remain`: proceed to autonomous fix phase.
-- If any reviewer execution failed: stop and report the failure before continuing.
-
-### Autonomous fix phase (review-fix-lead agents)
-
-When findings exist, launch **review-fix-lead** agents per scope to autonomously fix and
-re-review. Each agent owns one scope and loops until fast-model `zero_findings` or failure.
-
-Launch one `review-fix-lead` agent per scope with findings, using the Agent tool with
-`run_in_background: true` and a **timeout of 60 minutes per scope**:
-
-**When the provider has a CLI tool** (Codex — default profile):
+Use `{fast_model}` for iterative rounds. Auto-record is always on (v2). Verdicts are
+written directly to `review.json` after each Codex run. Parallel per-scope reviews are
+safe: each scope's hash is computed from its own files only.
 
 ```
 Agent prompt for each scope:
@@ -269,7 +171,6 @@ Agent prompt for each scope:
   Briefing: tmp/reviewer-runtime/briefing-{scope}.md
   Fast model: {fast_model}
   Scope files: {file list from Step 2a}
-  Previous findings: {findings for this scope from Round 1}
 
   Run the fix+review loop as defined in .claude/agents/review-fix-lead.md.
   Use: cargo make track-local-review -- --model {fast_model} --round-type fast --group {scope} --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md
@@ -277,70 +178,76 @@ Agent prompt for each scope:
   Report your final status: completed / blocked_cross_scope / failed.
 ```
 
-**When the provider is `claude`** (`claude-heavy` profile):
+**When the provider is `claude`** (e.g., `claude-heavy` profile):
+
+> See Step 1 **Provider support matrix** — claude auto-record is not yet implemented.
 
 Use the same `review-fix-lead` agent contract, but instead of `cargo make track-local-review`,
-the agent invokes a Claude Code subagent with `subagent_type: "Explore"` to perform the
-re-review using the same briefing file and JSON verdict format. See Step 2c for the Claude
-invocation pattern. Note: auto-record is not available — see Step 1 **Provider support matrix**.
+the agent invokes a Claude Code subagent with `subagent_type: "Explore"` to perform reviews
+using the same briefing file and JSON verdict format.
 
-**Orchestrator responsibilities** during autonomous fix phase:
-1. Wait for all agents to complete (or timeout).
-2. Collect statuses from each agent.
-3. Handle statuses:
-   - `completed` → scope is ready for full model confirmation.
-   - `blocked_cross_scope` → re-partition the affected files or fix cross-scope
-     dependencies in the orchestrator, then relaunch the affected scope agents.
-   - `failed` / timeout → report to the user and stop.
+Wait for all agents to complete (or timeout).
 
-### Full model confirmation round
+### 2d. Collect agent statuses
 
-After ALL scopes report `completed` from the autonomous fix phase (or `zero_findings`
-from the initial review), run one final review round using `{model}` (full model) instead
-of `{fast_model}`. Use the same parallel `codex-reviewer` pattern from Step 2c.
+Each review-fix-lead agent reports one of:
+- `completed` — fast model `zero_findings` achieved
+- `blocked_cross_scope` — fix requires changes in another scope
+- `failed` — timeout, recurring findings, or execution error
 
-- If the full model reports `zero_findings` for all scopes: proceed to Step 4.
-  **Only this constitutes review completion.**
-- If the full model finds new issues: return to the autonomous fix phase with the new findings.
+**Fail-closed**: if an agent fails or times out, treat as `findings_remain`.
+
+**Verdict JSON and auto-record** are handled internally by the review-fix-lead agent
+and the `bin/sotp review codex-local` wrapper. The orchestrator does not parse verdict
+JSON directly — it only acts on the agent's status report.
+
+### 2e. Orchestrator actions per status
+
+- `completed` → immediately launch full model confirmation for that scope (Step 2f)
+- `blocked_cross_scope` → fix cross-scope dependencies in the orchestrator, then relaunch
+- `failed` / timeout → immediately relaunch or report to user depending on cause
+
+### 2f. Full model confirmation (per-scope, immediate)
+
+When a scope's review-fix-lead reports `completed` (fast model `zero_findings`),
+**immediately** launch a full model confirmation for that scope. Do not wait for other scopes.
+
+Launch a `review-fix-lead` agent for that scope with `{model}` (full model) and
+`--round-type final`. If the full model reports `zero_findings`: that scope is done.
+If the full model finds new issues: the orchestrator updates the briefing for that scope
+to include the full-model findings and previously applied fixes, then relaunches
+review-fix-lead for that scope, choosing `{fast_model}` or `{model}` based on its
+assessment of the findings.
+
+A scope's review is complete only when **full model `zero_findings`** is recorded for it.
+Step 3 begins when all scopes have achieved full model `zero_findings`.
 
 ### Model escalation strategy
 
-Use the reviewer provider's `fast_model` for iterative fix-verify rounds and escalate to `default_model` for final confirmation.
-
 **CRITICAL: fast model の zero_findings はレビュー完了の根拠にならない。**
-
-fast model レビューの役割は **安価に高速に明白な間違いを検出すること** であり、実装品質や設計品質の保証ではない。
-たとえ fast model が何度連続で zero_findings を返しても、それはレビュー完了を意味しない。
 レビュー完了は **full model の zero_findings** によってのみ確認される。
-
-fast model の zero_findings を根拠にレビュー終了を提案してはならない。
-fast model の zero_findings を根拠に「実質完了」「レビューは十分」と判断してはならない。
 
 Resolve models from `.claude/agent-profiles.json` using the `reviewer` capability:
 - `{fast_model}`: `provider_model_overrides` for reviewer, then `providers.<reviewer_provider>.fast_model`, then `default_model`. If none exist, skip `--model`.
 - `{model}`: `provider_model_overrides`, then `providers.<reviewer_provider>.default_model`. If none exist, skip `--model`.
 
-### Early-completion pipelining
+### Per-scope independence (throughput-first)
 
-When scopes are reviewed in parallel and some complete with `zero_findings` while
-others have `findings_remain`:
-
-- Scopes that completed early wait for the remaining scopes before the full model round.
-- `group_scope_hash` is computed per-group from that group's scope files only, so
-  modifications in one scope do not affect another scope's hash.
+Each scope's review lifecycle is fully independent. Scopes do not wait for each other.
+`group_scope_hash` is computed per-group from that group's scope files only, so
+modifications in one scope do not affect another scope's hash.
 
 ### Loop guard
 
-- The review-fix-lead agent loops until fast-model `zero_findings`, `blocked_cross_scope`,
+- The review-fix-lead agent loops until `zero_findings`, `blocked_cross_scope`,
   `failed`, or Agent timeout (60 minutes/scope).
 - If the same finding recurs 3 times with no code change addressing it, the agent should
   return `failed` with the recurring finding details.
-- The final full-model confirmation round does not count toward the loop guard.
 
 > **Note**: v2 escalation (concern tracking, `EscalationActive`) is not yet implemented
 > (RV2-06). The Agent timeout serves as the primary infinite-loop prevention mechanism.
 
-## Step 4: Final validation
+## Step 3: Final validation
 
 After the reviewer reports zero findings:
 1. Run `cargo make ci` (full CI, not just ci-rust) to confirm all checks pass.

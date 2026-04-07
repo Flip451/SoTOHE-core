@@ -11,6 +11,8 @@ Override guidance:
 
 When documentation or prompts mention a subagent model, prefer describing the default plus override criteria rather than hardcoding Opus as the default.
 
+**Planner model tier rule**: Use the highest available Claude model tier (currently `claude-opus-4-6`) for planning tasks that involve architecture decisions, complex trade-offs, or new crate boundaries. Use the default subagent model (`claude-sonnet-4-6`) only for narrowly scoped, low-risk prompt-only changes. Cheap planning produces expensive review loops downstream.
+
 ## Codex Model Tiers
 
 | Tier | Model | 用途 |

@@ -49,6 +49,12 @@ Operational split:
 - `architecture-rules.json`: machine-readable layer dependency source of truth for `deny.toml` and `scripts/check_layers.py`
 - `.claude/agent-profiles.json`: capability-to-provider mapping source of truth
 
+## Planner Gate (Mandatory)
+
+Always invoke the `planner` capability before implementation, regardless of task difficulty.
+Even S-difficulty prompt-only changes require planner review. Skipping design causes
+expensive downstream review loops (historical lesson: 15+ review rounds from skipped design).
+
 ## Planner Briefing Requirements (Provider-Agnostic)
 
 All planner briefings (regardless of provider — Codex, Claude, or future providers) must

@@ -1,0 +1,334 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/rules/08-orchestration.md` now requires planner review before implementation for every task, but `.claude/skills/track-plan/SKILL.md` still explicitly skips Phase 1.5 in Focused/Quick mode. That leaves the repo with mutually exclusive instructions for existing-spec updates, so users cannot tell whether planner review is required.",
+              "severity": "P1",
+              "file": ".claude/rules/08-orchestration.md",
+              "line": 54,
+              "category": "workflow"
+            },
+            {
+              "message": "`.claude/rules/10-guardrails.md` bans `2>/dev/null`, but the existing planner/research examples in `.claude/skills/track-plan/SKILL.md` still use that redirect. As written, the new guardrail makes documented commands non-compliant and will cause avoidable retries unless those examples are updated in the same change.",
+              "severity": "P1",
+              "file": ".claude/rules/10-guardrails.md",
+              "line": 42,
+              "category": "workflow"
+            },
+            {
+              "message": "`.claude/rules/11-subagent-model.md` introduces `M+ difficulty` and `premium/deep-think` without defining either term or mapping them to a concrete model. The planner override rule is therefore not actionable: readers cannot tell when it applies or which model to choose.",
+              "severity": "P1",
+              "file": ".claude/rules/11-subagent-model.md",
+              "line": 14,
+              "category": "clarity"
+            }
+          ],
+          "hash": "rvw1:sha256:800171e5bd0769eff6b227684e2af78b869e7c061541950ae2626d129a3166e4",
+          "at": "2026-04-07T15:05:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2c switches reviewer agents to the new `review-fix-lead` status contract, but Step 2d still says to collect per-agent JSON verdicts and merge findings arrays. That leaves `/track:review` with incompatible output shapes, so the orchestrator cannot reliably aggregate results or tell when a scope is actually complete.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 191,
+              "category": "logic"
+            },
+            {
+              "message": "This redirect rule is broader than the underlying bash-write-guard behavior: it bans \"other stderr redirects\" outright, which reads as forbidding `2>&1`/FD duplication even though the existing guard convention explicitly allows that pattern. As written, the rule conflicts with current command guidance and will block common stderr-capture usage.",
+              "severity": "P1",
+              "file": ".claude/rules/10-guardrails.md",
+              "line": 42,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d5a85dd8ee11c49122cb33db7a3fd295f5cc13e404132055400db4ce4f900a60",
+          "at": "2026-04-07T15:21:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This planner gate conflicts with the existing Focused/Quick exception in `.claude/skills/track-plan/SKILL.md`, which still skips Phase 1.5 for existing-spec updates. As written, the repo gives contradictory instructions on whether planner review is required for prompt-only/quick edits.",
+              "severity": "P1",
+              "file": ".claude/rules/08-orchestration.md",
+              "line": 54,
+              "category": "workflow"
+            },
+            {
+              "message": "Banning `2>/dev/null` here makes several still-shipping command examples in `.claude/skills/track-plan/SKILL.md` and other guidance non-compliant. The new rule will force avoidable retries unless those examples are updated in the same change or the ban is narrowed to the actual hook failure mode.",
+              "severity": "P1",
+              "file": ".claude/rules/10-guardrails.md",
+              "line": 42,
+              "category": "workflow"
+            },
+            {
+              "message": "`M+ difficulty` and `premium/deep-think` are not defined anywhere in the repo, so the planner tier rule is not actionable. Readers cannot tell when it applies or which concrete model tier to choose.",
+              "severity": "P1",
+              "file": ".claude/rules/11-subagent-model.md",
+              "line": 14,
+              "category": "clarity"
+            },
+            {
+              "message": "The claude-provider path still says to wait for all agents to complete before collecting statuses, but the new flow says full-model confirmation should launch immediately when a scope reports `completed`. That leaves two incompatible execution orders in the same command and breaks the stated per-scope pipelining for `claude-heavy`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 187,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:baabc7edab2a653b560e62d014245b2369f48e6d52788c8ce131910bc44e9401",
+          "at": "2026-04-07T15:35:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`M+ difficulty` and `premium/deep-think` are not defined anywhere in this policy set, so the planner model-tier rule is not actionable: readers cannot tell when it applies or which concrete model to pick.",
+              "severity": "P1",
+              "file": ".claude/rules/11-subagent-model.md",
+              "line": 14,
+              "category": "workflow"
+            },
+            {
+              "message": "When a full-model confirmation finds new issues, the relaunch path does not pass the prior findings/fixes into the next `review-fix-lead` run. That drops the structured context needed to fix the regression that triggered the rerun and can send the agent back into a fresh review loop over the same scope.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 215,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:baabc7edab2a653b560e62d014245b2369f48e6d52788c8ce131910bc44e9401",
+          "at": "2026-04-07T15:38:03Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ForgeCode integration example is wrong: ForgeCode’s MCP docs configure servers through `.mcp.json` / `forge mcp import`, not a `forge.yaml` `mcp_servers` block. As written, readers will copy a config shape ForgeCode does not document or support. Source: https://forgecode.dev/docs/mcp-integration/",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 154,
+              "category": "documentation"
+            },
+            {
+              "message": "The cost comparison is misleading. ForgeCode’s pricing page has Free/Pro/Max subscription tiers with included prompts and unlimited requests, so the report’s \"service fee + per-token API\" framing and the derived 5-10x cost estimate are unsupported unless this is explicitly scoped to a self-managed API-only setup. Source: https://forgecode.dev/pricing/",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 471,
+              "category": "factual_accuracy"
+            }
+          ],
+          "hash": "rvw1:sha256:460318ac31a7572cdbcf0c6c3d96d0ed358b8d1fb10470e421d38b46fbc649f2",
+          "at": "2026-04-07T15:05:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The MCP example points readers at a `forge.yaml` `mcp_servers` block, but ForgeCode’s MCP docs use `.mcp.json` and `forge mcp import` instead. This config snippet would mislead anyone trying to wire the integration. Source: https://forgecode.dev/docs/mcp-integration/",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 154,
+              "category": "documentation"
+            },
+            {
+              "message": "The cost section treats ForgeCode as a per-token/API-only tool and says Claude Pro/Max subscriptions are unusable, but ForgeCode’s pricing page lists Free/Pro/Max plans and the Max plan includes unlimited requests. Unless the analysis is explicitly scoped to a self-managed API-only setup, the 5-10x estimate is unsupported. Source: https://forgecode.dev/pricing/",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 471,
+              "category": "factual_accuracy"
+            }
+          ],
+          "hash": "rvw1:sha256:460318ac31a7572cdbcf0c6c3d96d0ed358b8d1fb10470e421d38b46fbc649f2",
+          "at": "2026-04-07T15:07:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The cost section misstates ForgeCode's pricing model: the official pricing page shows Free/Pro/Max plans with included model access, and Pro/Max do not require separate API keys. Framing ForgeCode as a per-token/API-only tool and deriving the 5-10x cost comparison from that is only valid for a self-managed API-key setup, not ForgeCode in general. Source: https://forgecode.dev/pricing/",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 475,
+              "category": "factual_accuracy"
+            }
+          ],
+          "hash": "rvw1:sha256:96a08b8bb8b3db6e23df4ca5799918526a5fe8ce5ecc260a66535502312a3496",
+          "at": "2026-04-07T15:19:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ForgeCode pricing/cost section is stale and internally inconsistent with the current official pricing page (https://forgecode.dev/pricing/). That page lists Free ($0), Pro ($20/month), and Max ($200/month, currently $0 for a limited time), and says Pro/Max include premium model access without requiring separate API keys. This report instead says Max is $100/month, claims ForgeCode requires a separate `ANTHROPIC_API_KEY` for Claude models, and concludes there is no subscription-plan support. Please correct this before using the report for an adoption decision.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 475,
+              "category": "factual_accuracy"
+            }
+          ],
+          "hash": "rvw1:sha256:96a08b8bb8b3db6e23df4ca5799918526a5fe8ce5ecc260a66535502312a3496",
+          "at": "2026-04-07T15:20:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ForgeCode skills and agents are described here as YAML files, but ForgeCode’s current docs say both are Markdown files with YAML frontmatter (`.forge/skills/<skill>/SKILL.md` and `.forge/agents/*.md`). This will mislead readers about the required file layout and extension.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 72,
+              "category": "factual_accuracy"
+            },
+            {
+              "message": "The MCP example says `forge mcp import .mcp.json`, but ForgeCode documents `forge mcp import` as taking a JSON string; `.mcp.json` is edited directly and then reloaded with `forge mcp reload`. The example should be corrected so users do not follow a broken setup step.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 164,
+              "category": "factual_accuracy"
+            }
+          ],
+          "hash": "rvw1:sha256:96a08b8bb8b3db6e23df4ca5799918526a5fe8ce5ecc260a66535502312a3496",
+          "at": "2026-04-07T15:22:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ForgeCode pricing is still mischaracterized here. The current official pricing page lists Free ($0), Pro ($20/mo with 500 prompts/month), and Max ($200/mo, currently free unlimited) and says Pro/Max include premium AI models without requiring separate API keys. This block instead describes per-token API-key billing and daily request caps, which would mislead readers making an adoption decision. Source: https://forgecode.dev/pricing/",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 475,
+              "category": "factual_accuracy"
+            }
+          ],
+          "hash": "rvw1:sha256:61fb63e1cf16c6c0fa8b502a585bcd0b517c5129458b23a6c0ff5921113c491d",
+          "at": "2026-04-07T15:27:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41b0fe54e89235ba9c941db27a9f7a729e2d8310d8a8d618f942a93dfd7e3ef7",
+          "at": "2026-04-07T15:31:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The TermBench section states ForgeCode is '#1 at 81.8%,' but the public Terminal-Bench 2.0 leaderboard currently shows Forge Code/Gemini 3.1 Pro at 78.4% in rank 1 and Claude Code/Opus 4.6 at 58.0% in rank 33. If this is a model-specific filtered result, it needs to say so explicitly; otherwise the rank/score are wrong.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 444,
+              "category": "factual_accuracy"
+            },
+            {
+              "message": "The final verdict says ForgeCode has 'No subscription plan support,' but the cost section immediately above lists Free/Pro/Max subscription tiers and pricing. This contradiction makes the cost-based recommendation unreliable.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 517,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:41b0fe54e89235ba9c941db27a9f7a729e2d8310d8a8d618f942a93dfd7e3ef7",
+          "at": "2026-04-07T15:35:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan/` branch workflow ends with `/track:archive <id>` immediately after `/track:activate`, but the archive command only accepts tracks already in `done` state. Following this new sequence would tell users to archive an active track before implementation even starts.",
+              "severity": "P1",
+              "file": "track/workflow.md",
+              "line": 231,
+              "category": "workflow_consistency"
+            },
+            {
+              "message": "The agent comparison table marks ForgeCode's `muse` agent as non-editing, but ForgeCode's current docs list `muse` as `read + write`. That makes the comparison materially inaccurate for readers deciding how ForgeCode's agent model differs from SoTOHE's.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 34,
+              "category": "factual_accuracy"
+            },
+            {
+              "message": "The `forge-guarded` agent example is not a valid ForgeCode agent definition: current ForgeCode docs require YAML frontmatter delimited by `---` and a unique `id`, but this snippet is just bare fields inside a markdown block. Anyone copying it will get an agent file that ForgeCode cannot load.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 167,
+              "category": "integration_correctness"
+            },
+            {
+              "message": "The recommended CLI+Skill path says the existing `sotp` CLI already has the needed state-management commands, but the concrete examples use subcommands that do not exist in this repo (`sotp review check`, `sotp verify spec-signals`, `sotp track transition --id ... --task ... --to ...`). As written, the proposed 'zero-cost' integration path is not executable.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 196,
+              "category": "factual_accuracy"
+            },
+            {
+              "message": "The final assessment still says ForgeCode has 'No subscription plan support' and relies on per-token API billing, which directly contradicts both the pricing section earlier in this same document and ForgeCode's current pricing page showing Free/Pro/Max subscription tiers. This leaves the report with a stale cost conclusion after the earlier pricing fix.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 517,
+              "category": "factual_accuracy"
+            }
+          ],
+          "hash": "rvw1:sha256:41b0fe54e89235ba9c941db27a9f7a729e2d8310d8a8d618f942a93dfd7e3ef7",
+          "at": "2026-04-07T15:36:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The agent comparison table is wrong for `muse`: ForgeCode docs describe Muse as `read + write` for planning and analysis, not read-only/no file modification. This misstates the default access level and role.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 34,
+              "category": "factual_accuracy"
+            },
+            {
+              "message": "The skills row misstates ForgeCode skills format. ForgeCode's skills docs describe `.forge/skills/<skill>/SKILL.md` as a plain markdown file; YAML frontmatter applies to agents, not skills.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "line": 72,
+              "category": "factual_accuracy"
+            }
+          ],
+          "hash": "rvw1:sha256:41b0fe54e89235ba9c941db27a9f7a729e2d8310d8a8d618f942a93dfd7e3ef7",
+          "at": "2026-04-07T15:37:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e11c820666c37f46b3b017bd43f3e82925f0e0437856db5ad48988ef3332c562",
+          "at": "2026-04-07T15:40:21Z"
+        }
+      ]
+    }
+  }
+}

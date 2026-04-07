@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "運用ルールのドキュメント移行 + メモリ棚卸し",
+  "goal": [
+    "Claude Code memory に蓄積された運用ルール（61件）を git 管理ドキュメントに移行し、全 SoTOHE 利用者が恩恵を受けられるようにする。"
+  ],
+  "scope": {
+    "in_scope": [
+      {"text": "review-protocol.md 新規作成", "sources": ["memory feedback files"], "task_refs": ["T001"]},
+      {"text": "language-policy.md 新規作成", "sources": ["memory feedback files"], "task_refs": ["T002"]},
+      {"text": "track/workflow.md 追記", "sources": ["memory feedback files"], "task_refs": ["T003"]},
+      {"text": ".claude/rules/ 追記", "sources": ["memory feedback files"], "task_refs": ["T004"]},
+      {"text": "ForgeCode 比較レポート", "sources": ["ForgeCode GitHub README, TermBench 2.0"], "task_refs": ["T005"]}
+    ],
+    "out_of_scope": [
+      {"text": "Rust コード変更", "sources": ["track scope decision"]}
+    ]
+  },
+  "constraints": [],
+  "domain_states": [],
+  "acceptance_criteria": [
+    {"text": "memory 件数が 30 件以下に削減されていること", "sources": ["session goal"], "task_refs": ["T001", "T002", "T003", "T004"]},
+    {"text": "新規 convention ファイルが conventions README に登録されていること", "sources": ["conventions workflow"], "task_refs": ["T001", "T002"]}
+  ],
+  "additional_sections": [],
+  "related_conventions": [],
+  "signals": null
+}
