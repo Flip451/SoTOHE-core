@@ -373,7 +373,7 @@ findings?      → forge fixes → re-review (loop)
    independence — the reviewer has no shared context or incentive alignment with
    the implementer.
 
-2. **sotp enforces the cycle**: The review loop is not optional. `sotp review check`
+2. **sotp enforces the cycle**: The review loop is not optional. `sotp review check-approved`
    must return `approved=true` before commit is possible. This is enforced via
    git pre-commit hook (host-independent) + ForgeCode skill instructions.
 
