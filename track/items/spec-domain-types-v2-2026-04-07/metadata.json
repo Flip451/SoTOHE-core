@@ -1,0 +1,137 @@
+{
+  "schema_version": 3,
+  "id": "spec-domain-types-v2-2026-04-07",
+  "branch": "track/spec-domain-types-v2-2026-04-07",
+  "title": "domain-types.json — typed domain type registry (spec.json から分離)",
+  "status": "planned",
+  "created_at": "2026-04-07T00:39:16Z",
+  "updated_at": "2026-04-07T00:45:29Z",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Domain: DomainTypeKind enum + DomainTypeEntry + DomainTypeSignal 型定義。DomainStateEntry/DomainStateSignal を削除し置換",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Domain: DomainTypesDocument 型定義 (domain-types.json の domain 表現)。schema_version + entries + signals を保持",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "Domain: evaluate_domain_type_signals() — kind ごとの Blue/Red 2値評価ロジック。CodeScanResult + Optional SchemaExport",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "Domain: SpecDocument から domain_states / domain_state_signals フィールドを削除。関連アクセサ削除",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T005",
+      "description": "Infrastructure: domain-types.json 用 codec 新設 (encode/decode)。DomainTypeKindDto (serde tag = kind)。schema_version 1。transitions_to 参照整合性チェックは Typestate kind のみ",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T006",
+      "description": "Infrastructure: domain-types.md renderer 新設。Domain Types テーブル + kind ごとの Details 列 (遷移/variant/メソッド) + 信号表示",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "Infrastructure: spec.json codec から domain_states / domain_state_signals を削除。spec.json content hash から domain_states を除去",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T008",
+      "description": "Infrastructure: render_spec() から Domain States テーブル表示を削除",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T009",
+      "description": "Infrastructure: verify spec_states.rs を domain-types.json 読み込みに切替。Blue/Red 2値ゲート",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T010",
+      "description": "CLI: domain-type-signals コマンド新設 (domain-types.json を読み書き)。旧 domain-state-signals 廃止",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T011",
+      "description": "CLI: sotp track views sync に domain-types.md 生成を追加。track-sync-views で自動レンダリング",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T012",
+      "description": "既存 track の spec.json から domain_states を抽出し domain-types.json を生成。spec.json から domain_states/domain_state_signals を削除",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T013",
+      "description": "DESIGN.md + ADR 更新: domain-types.json 分離 + DomainTypeKind の設計決定を記録",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "spec.json から domain_states を切り出し、独立ファイル domain-types.json として新設する。",
+      "DomainTypeKind enum で型カテゴリ (typestate/enum/value_object/error_type/trait_port) を表現。",
+      "各カテゴリは固有の検証データを持ち、信号評価は Blue/Red 2値。",
+      "spec は「何を作るか」(要件)、domaintypes は「何が実装されているか」(型宣言) — ライフサイクルが異なるため分離。",
+      "SchemaExport (BRIDGE-01) を optional 入力として受け取り、enum variant / trait メソッドの検証を可能にする。"
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Domain 層: 新型定義 + 評価ロジック",
+        "description": [
+          "DomainTypeKind enum: Typestate{transitions_to}, Enum{expected_variants}, ValueObject, ErrorType{expected_variants}, TraitPort{expected_methods}",
+          "DomainTypeEntry: name + description + kind",
+          "DomainTypeSignal: type_name + kind_tag + signal (Blue/Red) + found_type + found_items + missing_items + extra_items",
+          "DomainTypesDocument: schema_version + entries + signals (domain-types.json の domain 表現)",
+          "evaluate_domain_type_signals(): kind ごとの Blue/Red 2値判定。CodeScanResult + Optional SchemaExport",
+          "SpecDocument から domain_states / domain_state_signals を削除",
+          "信号ルール — Blue: spec と code が完全一致。Red: それ以外全て"
+        ],
+        "task_ids": ["T001", "T002", "T003", "T004"]
+      },
+      {
+        "id": "S2",
+        "title": "Infrastructure 層: 新 codec/renderer + 既存削除",
+        "description": [
+          "domain-types.json 用 codec 新設: DomainTypeKindDto (serde tag = kind), schema_version 1",
+          "domain-types.md renderer 新設: Domain Types テーブル + kind ごとの Details 列",
+          "spec.json codec から domain_states / domain_state_signals を削除",
+          "render_spec() から Domain States テーブルを削除",
+          "verify: domain-types.json 読み込み + Blue/Red ゲート"
+        ],
+        "task_ids": ["T005", "T006", "T007", "T008", "T009"]
+      },
+      {
+        "id": "S3",
+        "title": "CLI + マイグレーション + ドキュメント",
+        "description": [
+          "CLI: domain-type-signals コマンド新設 (domain-types.json 読み書き)",
+          "CLI: sotp track views sync に domain-types.md 生成を追加",
+          "既存 spec.json から domain_states を抽出し domain-types.json を生成",
+          "DESIGN.md + ADR 更新"
+        ],
+        "task_ids": ["T010", "T011", "T012", "T013"]
+      }
+    ]
+  }
+}

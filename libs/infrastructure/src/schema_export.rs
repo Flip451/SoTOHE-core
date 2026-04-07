@@ -187,7 +187,15 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
             }
             ItemEnum::Function(f) if !method_ids.contains(&item.id) => {
                 let sig = format_sig(&name, &f.sig);
-                functions.push(FunctionInfo::new(name, sig, item.docs.clone()));
+                let return_type_names = extract_return_type_names(&f.sig);
+                // Free functions never have a self receiver.
+                functions.push(FunctionInfo::new(
+                    name,
+                    sig,
+                    item.docs.clone(),
+                    return_type_names,
+                    false,
+                ));
             }
             ItemEnum::Trait(t) => {
                 let methods = extract_methods(&t.items, krate);
@@ -235,6 +243,12 @@ fn extract_enum_variants(e: &rustdoc_types::Enum, krate: &rustdoc_types::Crate) 
         .collect()
 }
 
+/// Returns `true` if the function signature's first parameter is a self receiver
+/// (`self`, `&self`, or `&mut self`).
+fn has_self_param(sig: &rustdoc_types::FunctionSignature) -> bool {
+    sig.inputs.first().map(|(name, _)| name == "self").unwrap_or(false)
+}
+
 /// Extract method FunctionInfos from a list of item Ids.
 /// Accepts both `Public` and `Default` visibility (trait associated items use `Default`).
 fn extract_methods(ids: &[rustdoc_types::Id], krate: &rustdoc_types::Crate) -> Vec<FunctionInfo> {
@@ -244,12 +258,62 @@ fn extract_methods(ids: &[rustdoc_types::Id], krate: &rustdoc_types::Crate) -> V
         .filter_map(|item| {
             let name = item.name.as_ref()?;
             if let ItemEnum::Function(f) = &item.inner {
-                Some(FunctionInfo::new(name.clone(), format_sig(name, &f.sig), item.docs.clone()))
+                let return_type_names = extract_return_type_names(&f.sig);
+                let has_self = has_self_param(&f.sig);
+                Some(FunctionInfo::new(
+                    name.clone(),
+                    format_sig(name, &f.sig),
+                    item.docs.clone(),
+                    return_type_names,
+                    has_self,
+                ))
             } else {
                 None
             }
         })
         .collect()
+}
+
+/// Extract the list of type names from the return type of a function signature.
+fn extract_return_type_names(sig: &rustdoc_types::FunctionSignature) -> Vec<String> {
+    sig.output.as_ref().map_or_else(Vec::new, |ty| {
+        let mut names = Vec::new();
+        collect_type_names(ty, &mut names);
+        names
+    })
+}
+
+/// Recursively collect all type names from a rustdoc `Type`.
+///
+/// Extracts the last path segment for resolved paths (e.g. `"Published"` from
+/// `"crate::Published"`) and recurses into generic arguments, borrowed refs, and
+/// tuple elements.
+fn collect_type_names(ty: &rustdoc_types::Type, out: &mut Vec<String>) {
+    match ty {
+        rustdoc_types::Type::ResolvedPath(p) => {
+            if let Some(name) = p.path.rsplit("::").next() {
+                out.push(name.to_string());
+            }
+            if let Some(args) = &p.args {
+                if let rustdoc_types::GenericArgs::AngleBracketed { args, .. } = args.as_ref() {
+                    for arg in args {
+                        if let rustdoc_types::GenericArg::Type(inner) = arg {
+                            collect_type_names(inner, out);
+                        }
+                    }
+                }
+            }
+        }
+        rustdoc_types::Type::BorrowedRef { type_: inner, .. } => {
+            collect_type_names(inner, out);
+        }
+        rustdoc_types::Type::Tuple(types) => {
+            for t in types {
+                collect_type_names(t, out);
+            }
+        }
+        _ => {}
+    }
 }
 
 /// Build a human-readable signature from FunctionSignature.

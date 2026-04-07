@@ -1,4 +1,4 @@
-//! Rendering and sync of track read-only views (`plan.md`, `registry.md`, `spec.md`) from metadata.json / spec.json.
+//! Rendering and sync of track read-only views (`plan.md`, `registry.md`, `spec.md`, `domain-types.md`) from metadata.json / spec.json / domain-types.json.
 
 use std::path::{Path, PathBuf};
 
@@ -6,6 +6,8 @@ use domain::{TaskStatus, TrackMetadata};
 
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
+use crate::domain_types_codec;
+use crate::domain_types_render;
 use crate::spec;
 
 const TRACK_ITEMS_DIR: &str = "track/items";
@@ -537,6 +539,43 @@ pub fn sync_rendered_views(
                     // so callers (CI, verify-arch-docs) detect spec.json corruption.
                     return Err(RenderError::Io(std::io::Error::other(format!(
                         "spec.json error at {}: {e}",
+                        track_dir.display()
+                    ))));
+                }
+            }
+        }
+
+        // Render domain-types.md from domain-types.json if present.
+        let domain_types_json_path = track_dir.join("domain-types.json");
+        if domain_types_json_path.is_file() {
+            let domain_types_content = std::fs::read_to_string(&domain_types_json_path)?;
+            match domain_types_codec::decode(&domain_types_content) {
+                Ok(doc) => {
+                    let rendered = domain_types_render::render_domain_types(&doc);
+                    let domain_types_md_path = track_dir.join("domain-types.md");
+                    let old_md = match std::fs::read_to_string(&domain_types_md_path) {
+                        Ok(content) => Some(content),
+                        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+                        Err(e) => return Err(RenderError::Io(e)),
+                    };
+                    if old_md
+                        .as_deref()
+                        .is_none_or(|existing| !rendered_matches(existing, &rendered))
+                    {
+                        atomic_write_file(&domain_types_md_path, rendered.as_bytes())?;
+                        changed.push(domain_types_md_path);
+                    }
+                }
+                Err(domain_types_codec::DomainTypesCodecError::Json(_)) => {
+                    // Warn and continue only on JSON parse errors — file may be mid-edit.
+                    eprintln!(
+                        "warning: skipping domain-types.md render for {} (malformed JSON)",
+                        track_dir.display()
+                    );
+                }
+                Err(e) => {
+                    return Err(RenderError::Io(std::io::Error::other(format!(
+                        "domain-types.json error at {}: {e}",
                         track_dir.display()
                     ))));
                 }
@@ -1382,5 +1421,129 @@ mod tests {
 
         let result = sync_rendered_views(dir.path(), None);
         assert!(result.is_err(), "unsupported spec.json schema version must return an error");
+    }
+
+    // ---------------------------------------------------------------------------
+    // T011: domain-types.md rendering
+    // ---------------------------------------------------------------------------
+
+    const DOMAIN_TYPES_JSON_MINIMAL: &str = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
+  ]
+}"#;
+
+    #[test]
+    fn sync_rendered_views_generates_domain_types_md_from_domain_types_json() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+
+        let changed = sync_rendered_views(dir.path(), None).unwrap();
+
+        assert!(
+            changed.iter().any(|p| p.ends_with("domain-types.md")),
+            "domain-types.md should be reported as changed"
+        );
+
+        let md = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
+        assert!(md.contains("<!-- Generated from domain-types.json"), "must have generated header");
+        assert!(md.contains("TrackId"), "must include declared type name");
+    }
+
+    #[test]
+    fn sync_rendered_views_skips_domain_types_md_when_domain_types_json_absent() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        // No domain-types.json
+
+        let changed = sync_rendered_views(dir.path(), None).unwrap();
+
+        assert!(
+            !changed.iter().any(|p| p.ends_with("domain-types.md")),
+            "domain-types.md must not be generated when domain-types.json is absent"
+        );
+        assert!(!track_dir.join("domain-types.md").exists());
+    }
+
+    #[test]
+    fn sync_rendered_views_does_not_overwrite_domain_types_md_when_already_up_to_date() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+
+        // First sync — generates domain-types.md.
+        sync_rendered_views(dir.path(), None).unwrap();
+
+        // Second sync — domain-types.md is already up to date, should not appear in changed.
+        let changed = sync_rendered_views(dir.path(), None).unwrap();
+        assert!(
+            !changed.iter().any(|p| p.ends_with("domain-types.md")),
+            "second sync must not report domain-types.md as changed when already up to date"
+        );
+    }
+
+    #[test]
+    fn sync_rendered_views_continues_on_malformed_domain_types_json() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        // Write malformed domain-types.json (JSON parse error).
+        std::fs::write(track_dir.join("domain-types.json"), "{ not valid json }").unwrap();
+
+        let result = sync_rendered_views(dir.path(), None);
+        assert!(result.is_ok(), "malformed domain-types.json must not abort sync");
+
+        let changed = result.unwrap();
+        assert!(changed.iter().any(|p| p.ends_with("plan.md")));
+        assert!(!changed.iter().any(|p| p.ends_with("domain-types.md")));
     }
 }

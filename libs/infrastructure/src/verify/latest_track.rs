@@ -696,10 +696,6 @@ fn validate_spec_json_file(path: &Path, root: &Path) -> Vec<Finding> {
             all_texts.push(src.as_str());
         }
     }
-    for state in doc.domain_states() {
-        all_texts.push(state.name());
-        all_texts.push(state.description());
-    }
     for section in doc.additional_sections() {
         all_texts.push(section.title());
         for line in section.content() {

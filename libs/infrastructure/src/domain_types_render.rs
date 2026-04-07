@@ -1,0 +1,287 @@
+//! Renderer for domain-types.md (read-only view of `DomainTypesDocument`).
+//!
+//! Produces a markdown file with:
+//! - A generated-view header comment
+//! - A `## Domain Types` section with a table: Name | Kind | Details | Signal
+//!
+//! The Details column summarises kind-specific payload:
+//! - Typestate: `→ A, → B` (declared transitions)
+//! - Enum / ErrorType: `A | B | C` (expected variants)
+//! - TraitPort: `fn a, fn b` (expected methods)
+//! - ValueObject: `—`
+//!
+//! The Signal column shows `🔵` / `🔴` / `—` (no signal yet).
+
+use domain::{
+    ConfidenceSignal, DomainTypeEntry, DomainTypeKind, DomainTypesDocument, TypestateTransitions,
+};
+
+/// Renders the full `domain-types.md` document for a `DomainTypesDocument`.
+///
+/// Returns a markdown string suitable for writing to `domain-types.md`.
+#[must_use]
+pub fn render_domain_types(doc: &DomainTypesDocument) -> String {
+    let mut out = String::new();
+
+    out.push_str("<!-- Generated from domain-types.json — DO NOT EDIT DIRECTLY -->\n");
+
+    out.push_str("\n## Domain Types\n\n");
+
+    out.push_str("| Name | Kind | Details | Signal |\n");
+    out.push_str("|------|------|---------|--------|\n");
+
+    for entry in doc.entries() {
+        let signal_col = signal_for_entry(doc, entry.name(), entry.kind().kind_tag());
+        let details_col = render_details(entry);
+        out.push_str(&format!(
+            "| {} | {} | {} | {} |\n",
+            entry.name(),
+            entry.kind().kind_tag(),
+            details_col,
+            signal_col,
+        ));
+    }
+
+    out.push('\n');
+    out
+}
+
+/// Returns the signal emoji string for a named entry, or `"—"` if not evaluated.
+fn signal_for_entry(doc: &DomainTypesDocument, name: &str, kind_tag: &str) -> String {
+    doc.signals()
+        .and_then(|sigs| sigs.iter().find(|s| s.type_name() == name && s.kind_tag() == kind_tag))
+        .map(|sig| match sig.signal() {
+            ConfidenceSignal::Blue => "\u{1f535}".to_owned(),
+            ConfidenceSignal::Yellow => "\u{1f7e1}".to_owned(),
+            ConfidenceSignal::Red => "\u{1f534}".to_owned(),
+            _ => "?".to_owned(),
+        })
+        .unwrap_or_else(|| "\u{2014}".to_owned()) // —
+}
+
+/// Renders the Details column for a single entry based on its kind.
+fn render_details(entry: &DomainTypeEntry) -> String {
+    match entry.kind() {
+        DomainTypeKind::Typestate { transitions } => match transitions {
+            TypestateTransitions::Terminal => "\u{2205} (terminal)".to_owned(), // ∅ (terminal)
+            TypestateTransitions::To(targets) => {
+                targets.iter().map(|t| format!("\u{2192} {t}")).collect::<Vec<_>>().join(", ")
+            }
+        },
+        DomainTypeKind::Enum { expected_variants }
+        | DomainTypeKind::ErrorType { expected_variants } => {
+            if expected_variants.is_empty() {
+                "\u{2014}".to_owned()
+            } else {
+                expected_variants.join(", ")
+            }
+        }
+        DomainTypeKind::TraitPort { expected_methods } => {
+            if expected_methods.is_empty() {
+                "\u{2014}".to_owned()
+            } else {
+                expected_methods.iter().map(|m| format!("fn {m}")).collect::<Vec<_>>().join(", ")
+            }
+        }
+        DomainTypeKind::ValueObject => "\u{2014}".to_owned(),
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
+mod tests {
+    use domain::{
+        ConfidenceSignal, DomainTypeEntry, DomainTypeKind, DomainTypeSignal, DomainTypesDocument,
+    };
+
+    use super::*;
+
+    fn make_entry(name: &str, kind: DomainTypeKind) -> DomainTypeEntry {
+        DomainTypeEntry::new(name, "description", kind, true).unwrap()
+    }
+
+    fn make_doc(entries: Vec<DomainTypeEntry>) -> DomainTypesDocument {
+        DomainTypesDocument::new(1, entries)
+    }
+
+    // ---------------------------------------------------------------------------
+    // render_domain_types: header
+    // ---------------------------------------------------------------------------
+
+    #[test]
+    fn test_render_domain_types_includes_generated_header() {
+        let doc = make_doc(vec![]);
+        let output = render_domain_types(&doc);
+        assert!(
+            output.contains("<!-- Generated from domain-types.json"),
+            "missing generated header"
+        );
+    }
+
+    #[test]
+    fn test_render_domain_types_includes_section_heading() {
+        let doc = make_doc(vec![]);
+        let output = render_domain_types(&doc);
+        assert!(output.contains("## Domain Types\n"), "missing section heading");
+    }
+
+    #[test]
+    fn test_render_domain_types_includes_table_header() {
+        let doc = make_doc(vec![]);
+        let output = render_domain_types(&doc);
+        assert!(output.contains("| Name | Kind | Details | Signal |"), "missing table header");
+        assert!(output.contains("|------|------|---------|--------|"), "missing table separator");
+    }
+
+    // ---------------------------------------------------------------------------
+    // render_domain_types: entry rows
+    // ---------------------------------------------------------------------------
+
+    #[test]
+    fn test_render_typestate_entry_row() {
+        let entry = make_entry(
+            "Draft",
+            DomainTypeKind::Typestate {
+                transitions: TypestateTransitions::To(vec!["Published".into()]),
+            },
+        );
+        let doc = make_doc(vec![entry]);
+        let output = render_domain_types(&doc);
+        assert!(output.contains("| Draft | typestate |"), "missing typestate row");
+        assert!(output.contains("\u{2192} Published"), "missing transition arrow");
+    }
+
+    #[test]
+    fn test_render_typestate_terminal_shows_empty_set() {
+        let entry = make_entry(
+            "Final",
+            DomainTypeKind::Typestate { transitions: TypestateTransitions::Terminal },
+        );
+        let doc = make_doc(vec![entry]);
+        let output = render_domain_types(&doc);
+        assert!(output.contains("\u{2205} (terminal)"), "missing terminal marker");
+    }
+
+    #[test]
+    fn test_render_enum_entry_row() {
+        let entry = make_entry(
+            "TrackStatus",
+            DomainTypeKind::Enum { expected_variants: vec!["Planned".into(), "Done".into()] },
+        );
+        let doc = make_doc(vec![entry]);
+        let output = render_domain_types(&doc);
+        assert!(output.contains("| TrackStatus | enum |"), "missing enum row");
+        assert!(output.contains("Planned, Done"), "missing enum variants");
+    }
+
+    #[test]
+    fn test_render_value_object_entry_row() {
+        let entry = make_entry("TrackId", DomainTypeKind::ValueObject);
+        let doc = make_doc(vec![entry]);
+        let output = render_domain_types(&doc);
+        assert!(output.contains("| TrackId | value_object |"), "missing value_object row");
+    }
+
+    #[test]
+    fn test_render_error_type_entry_row() {
+        let entry = make_entry(
+            "SchemaExportError",
+            DomainTypeKind::ErrorType { expected_variants: vec!["NightlyNotFound".into()] },
+        );
+        let doc = make_doc(vec![entry]);
+        let output = render_domain_types(&doc);
+        assert!(output.contains("| SchemaExportError | error_type |"), "missing error_type row");
+        assert!(output.contains("NightlyNotFound"), "missing error variant");
+    }
+
+    #[test]
+    fn test_render_trait_port_entry_row() {
+        let entry = make_entry(
+            "SchemaExporter",
+            DomainTypeKind::TraitPort { expected_methods: vec!["export".into()] },
+        );
+        let doc = make_doc(vec![entry]);
+        let output = render_domain_types(&doc);
+        assert!(output.contains("| SchemaExporter | trait_port |"), "missing trait_port row");
+        assert!(output.contains("fn export"), "missing method");
+    }
+
+    // ---------------------------------------------------------------------------
+    // render_domain_types: Signal column
+    // ---------------------------------------------------------------------------
+
+    #[test]
+    fn test_render_signal_column_shows_dash_when_no_signals() {
+        let entry = make_entry("Draft", DomainTypeKind::ValueObject);
+        let doc = make_doc(vec![entry]);
+        let output = render_domain_types(&doc);
+        assert!(output.contains("\u{2014}"), "missing em-dash for unevaluated signal");
+    }
+
+    #[test]
+    fn test_render_signal_column_shows_blue_when_signal_blue() {
+        let entry = make_entry("Draft", DomainTypeKind::ValueObject);
+        let mut doc = make_doc(vec![entry]);
+        doc.set_signals(vec![DomainTypeSignal::new(
+            "Draft",
+            "value_object",
+            ConfidenceSignal::Blue,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        )]);
+        let output = render_domain_types(&doc);
+        assert!(output.contains("\u{1f535}"), "missing blue circle for Blue signal");
+    }
+
+    #[test]
+    fn test_render_signal_column_shows_red_when_signal_red() {
+        let entry = make_entry("Ghost", DomainTypeKind::ValueObject);
+        let mut doc = make_doc(vec![entry]);
+        doc.set_signals(vec![DomainTypeSignal::new(
+            "Ghost",
+            "value_object",
+            ConfidenceSignal::Red,
+            false,
+            vec![],
+            vec![],
+            vec![],
+        )]);
+        let output = render_domain_types(&doc);
+        assert!(output.contains("\u{1f534}"), "missing red circle for Red signal");
+    }
+
+    #[test]
+    fn test_render_multiple_entries_all_present() {
+        let entries = vec![
+            make_entry(
+                "Draft",
+                DomainTypeKind::Typestate {
+                    transitions: TypestateTransitions::To(vec!["Published".into()]),
+                },
+            ),
+            make_entry(
+                "TrackStatus",
+                DomainTypeKind::Enum { expected_variants: vec!["Planned".into()] },
+            ),
+            make_entry("TrackId", DomainTypeKind::ValueObject),
+        ];
+        let doc = make_doc(entries);
+        let output = render_domain_types(&doc);
+        assert!(output.contains("Draft"), "missing Draft");
+        assert!(output.contains("TrackStatus"), "missing TrackStatus");
+        assert!(output.contains("TrackId"), "missing TrackId");
+    }
+
+    #[test]
+    fn test_render_output_ends_with_newline() {
+        let doc = make_doc(vec![]);
+        let output = render_domain_types(&doc);
+        assert!(output.ends_with('\n'), "output must end with trailing newline");
+    }
+}

@@ -2,6 +2,9 @@
 //! Infrastructure layer for the SoTOHE-core track state machine.
 
 pub mod agent_profiles;
+pub mod code_profile_builder;
+pub mod domain_types_codec;
+pub mod domain_types_render;
 pub mod gh_cli;
 pub mod git_cli;
 pub mod review_json_codec;

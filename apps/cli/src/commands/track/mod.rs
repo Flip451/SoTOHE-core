@@ -171,8 +171,8 @@ pub enum TrackCommand {
         track_id: String,
     },
 
-    /// Evaluate domain state signals by scanning domain code and store results in spec.json.
-    DomainStateSignals {
+    /// Evaluate domain type signals via rustdoc schema export and store results in domain-types.json.
+    DomainTypeSignals {
         /// Path to the track items root directory (e.g., `track/items`).
         #[arg(long, default_value = "track/items")]
         items_dir: PathBuf,
@@ -180,9 +180,9 @@ pub enum TrackCommand {
         /// Track ID (directory name under items_dir).
         track_id: String,
 
-        /// Path to the domain source directory to scan (relative to cwd).
-        #[arg(long, default_value = "libs/domain/src")]
-        domain_dir: PathBuf,
+        /// Workspace root directory (must contain `Cargo.toml`). Defaults to current directory.
+        #[arg(long, default_value = ".")]
+        workspace_root: PathBuf,
     },
 }
 
@@ -306,8 +306,8 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         TrackCommand::Signals { items_dir, track_id } => {
             signals::execute_signals(items_dir, track_id)
         }
-        TrackCommand::DomainStateSignals { items_dir, track_id, domain_dir } => {
-            domain_state_signals::execute_domain_state_signals(items_dir, track_id, domain_dir)
+        TrackCommand::DomainTypeSignals { items_dir, track_id, workspace_root } => {
+            domain_state_signals::execute_domain_type_signals(items_dir, track_id, workspace_root)
         }
     };
     match result {
