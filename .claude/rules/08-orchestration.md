@@ -51,9 +51,10 @@ Operational split:
 
 ## Planner Gate (Mandatory)
 
-Always invoke the `planner` capability before implementation, regardless of task difficulty.
-Even S-difficulty prompt-only changes require planner review. Skipping design causes
-expensive downstream review loops (historical lesson: 15+ review rounds from skipped design).
+Always invoke `/track:plan` before implementation, regardless of task difficulty.
+`/track:plan` supports Quick/Focused/Full modes — smaller tasks use reduced scope, but
+the planning step itself is never skipped. Skipping design entirely causes expensive
+downstream review loops (historical lesson: 15+ review rounds from skipped design).
 
 ## Planner Briefing Requirements (Provider-Agnostic)
 
