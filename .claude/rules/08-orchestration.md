@@ -49,6 +49,13 @@ Operational split:
 - `architecture-rules.json`: machine-readable layer dependency source of truth for `deny.toml` and `scripts/check_layers.py`
 - `.claude/agent-profiles.json`: capability-to-provider mapping source of truth
 
+## Planner Gate (Mandatory)
+
+Always invoke `/track:plan` before implementation, regardless of task difficulty.
+`/track:plan` supports Quick/Focused/Full modes — smaller tasks use reduced scope, but
+the planning step itself is never skipped. Skipping design entirely causes expensive
+downstream review loops (historical lesson: 15+ review rounds from skipped design).
+
 ## Planner Briefing Requirements (Provider-Agnostic)
 
 All planner briefings (regardless of provider — Codex, Claude, or future providers) must

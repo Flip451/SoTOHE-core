@@ -37,6 +37,12 @@ In particular, when reading output files or extracting results (e.g. reviewer ve
 use the `Read` tool — not `Bash(grep ...)`, `Bash(cat ...)`, or `Bash(head ...)`.
 These commands are in the `FORBIDDEN_ALLOW` list and trigger permission prompts every time.
 
+## Bash Output Redirect Constraint
+
+Do not use `2>/dev/null` in Claude Code Bash tool calls.
+The file-write guard (`bash-write-guard`) scans for `>` patterns and treats
+`2>` as an output redirect, blocking the command. `2>&1` (FD duplication) is not affected.
+
 ## Hook Constraint
 
 The `sotp hook dispatch block-direct-git-ops` guard scans the entire Bash command string for protected git-operation keywords.
