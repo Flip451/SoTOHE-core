@@ -93,7 +93,7 @@ pub fn execute_domain_type_signals(
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::expect_used)]
 mod tests {
     use super::*;
 
@@ -138,5 +138,39 @@ mod tests {
 
         let result = execute_domain_type_signals(items_dir, track_id, workspace_root);
         assert!(result.is_err(), "malformed domain-types.json must return error");
+    }
+
+    /// Success-path integration test.  Requires nightly toolchain for `cargo +nightly rustdoc`.
+    /// Run with: `cargo test --package cli -- --ignored`
+    #[test]
+    #[ignore]
+    fn test_execute_domain_type_signals_success_path_writes_signals() {
+        let dir = tempfile::tempdir().unwrap();
+        let domain_types_json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
+  ]
+}"#;
+        let (items_dir, track_id) = setup_track(dir.path(), domain_types_json);
+        // workspace_root must point to the real workspace so rustdoc can find the domain crate.
+        let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(|p| p.parent())
+            .expect("workspace root")
+            .to_path_buf();
+
+        let result =
+            execute_domain_type_signals(items_dir.clone(), track_id.clone(), workspace_root);
+        assert!(result.is_ok(), "success path must return Ok: {result:?}");
+
+        // Verify signals were written back
+        let updated =
+            std::fs::read_to_string(items_dir.join(&track_id).join("domain-types.json")).unwrap();
+        assert!(updated.contains("\"signals\""), "signals must be written to domain-types.json");
+
+        // Verify domain-types.md was generated
+        let md_path = items_dir.join(&track_id).join("domain-types.md");
+        assert!(md_path.exists(), "domain-types.md must be generated");
     }
 }
