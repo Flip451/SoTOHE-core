@@ -3,6 +3,7 @@
 
 pub mod auto_phase;
 mod decision;
+pub mod domain_types;
 mod error;
 pub mod guard;
 pub mod hook;
@@ -20,6 +21,10 @@ pub mod track_phase;
 pub mod verify;
 
 pub use decision::Decision;
+pub use domain_types::{
+    DomainTypeEntry, DomainTypeKind, DomainTypeSignal, DomainTypesDocument, TypestateTransitions,
+    evaluate_domain_type_signals,
+};
 pub use error::{
     DomainError, RepositoryError, TrackReadError, TrackWriteError, TransitionError,
     ValidationError, WorktreeError,
@@ -37,13 +42,13 @@ pub use review::{
     ReviewRoundResult, ReviewStalenessReason, ReviewState, ReviewStatus, RoundType, StoredFinding,
     Verdict, file_path_to_concern,
 };
+pub use schema::{CodeProfile, CodeTrait, CodeType};
 pub use signal::{
     ConfidenceSignal, SignalBasis, SignalCounts, classify_source_tag, evaluate_source_tag,
 };
 pub use spec::{
-    CodeScanResult, CoverageResult, DomainStateEntry, DomainStateSignal, HearingMode,
-    HearingRecord, HearingSignalDelta, HearingSignalSnapshot, SpecDocument, SpecRequirement,
-    SpecScope, SpecSection, SpecStatus, SpecValidationError, evaluate_domain_state_signals,
+    CoverageResult, HearingMode, HearingRecord, HearingSignalDelta, HearingSignalSnapshot,
+    SpecDocument, SpecRequirement, SpecScope, SpecSection, SpecStatus, SpecValidationError,
     evaluate_requirement_signal,
 };
 pub use timestamp::Timestamp;

@@ -1671,3 +1671,41 @@ pub enum HookName {
     BlockProtectedReviewStateWrite,
 }
 ```
+
+## Domain Types Registry (domain-types.json)
+
+Domain type declarations are stored in a separate `domain-types.json` file per track,
+independent from `spec.json`. This separation reflects different lifecycles: specs are
+frozen after approval while type declarations evolve with implementation.
+
+See ADR: `knowledge/adr/2026-04-07-0045-domain-types-separation.md`
+
+### DomainTypeKind Categories
+
+| Kind | Verification | Data |
+|------|-------------|------|
+| `typestate` | transition functions exist | `TypestateTransitions::Terminal` or `To(targets)` |
+| `enum` | variant names match exactly | `expected_variants: Vec<String>` |
+| `value_object` | type exists | (none) |
+| `error_type` | expected variants covered | `expected_variants: Vec<String>` |
+| `trait_port` | methods present | `expected_methods: Vec<String>` |
+
+### CodeProfile (Pre-indexed Evaluation Interface)
+
+`CodeProfile` is the domain-layer query interface for type evaluation.
+Infrastructure builds it from `SchemaExport` via `build_code_profile()`.
+
+| Type | Layer | Purpose |
+|------|-------|---------|
+| `CodeProfile` | domain | HashMap-indexed view: types + traits |
+| `CodeType` | domain | kind + members + method_return_types (HashSet) |
+| `CodeTrait` | domain | method_names |
+| `build_code_profile()` | infrastructure | Transforms SchemaExport → CodeProfile |
+
+The evaluation function `evaluate_domain_type_signals(entries, profile)` takes
+`&CodeProfile` — no raw string parsing in the domain layer.
+
+### Signal Rules (Blue/Red Binary)
+
+Blue = spec and code fully match. Red = everything else.
+Yellow is not used in domain type evaluation (Stage 2).

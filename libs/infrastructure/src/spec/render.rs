@@ -4,9 +4,7 @@
 //! The first line of the rendered output is a machine-readable comment that marks
 //! the file as generated, preventing accidental direct edits.
 
-use domain::{
-    ConfidenceSignal, DomainStateEntry, DomainStateSignal, SpecDocument, SpecRequirement,
-};
+use domain::{SpecDocument, SpecRequirement};
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -131,30 +129,6 @@ pub fn render_spec(doc: &SpecDocument) -> String {
         out.push('\n');
     }
 
-    // Domain States
-    let domain_states = doc.domain_states();
-    if !domain_states.is_empty() {
-        out.push_str("## Domain States\n");
-        out.push('\n');
-        if let Some(signals) = doc.domain_state_signals() {
-            // 4-column table when signals are present
-            out.push_str("| State | Description | Signal | Transitions |\n");
-            out.push_str("|-------|-------------|--------|-------------|\n");
-            for entry in domain_states {
-                let signal = signals.iter().find(|s| s.state_name() == entry.name());
-                out.push_str(&render_domain_state_with_signal(entry, signal));
-            }
-        } else {
-            // 2-column table (fallback)
-            out.push_str("| State | Description |\n");
-            out.push_str("|-------|-------------|\n");
-            for entry in domain_states {
-                out.push_str(&render_domain_state(entry));
-            }
-        }
-        out.push('\n');
-    }
-
     // Acceptance Criteria
     let ac = doc.acceptance_criteria();
     if !ac.is_empty() {
@@ -257,80 +231,17 @@ fn append_task_refs_tag(line: &mut String, req: &SpecRequirement) {
     }
 }
 
-/// Renders a domain state as a 2-column markdown table row (no signal data).
-fn render_domain_state(entry: &DomainStateEntry) -> String {
-    format!("| {} | {} |\n", entry.name(), entry.description())
-}
-
-/// Renders a domain state as a 4-column markdown table row with signal and transitions.
-///
-/// Signal column: emoji for the confidence level (🔵 / 🟡 / 🔴), or "?" if no signal found.
-///
-/// Transitions column:
-/// - Type not found (Red signal): "—"
-/// - Undeclared (transitions_to = None): "—"
-/// - Terminal (transitions_to = Some([])): "∅ (terminal)"
-/// - Has transitions: found ones plain ("→ X"), missing ones with suffix ("→ Y (missing)")
-fn render_domain_state_with_signal(
-    entry: &DomainStateEntry,
-    signal: Option<&DomainStateSignal>,
-) -> String {
-    let (signal_emoji, transitions_col) = match signal {
-        None => ("?".to_string(), "—".to_string()),
-        Some(sig) => {
-            let emoji = match sig.signal() {
-                ConfidenceSignal::Blue => "🔵",
-                ConfidenceSignal::Yellow => "🟡",
-                ConfidenceSignal::Red => "🔴",
-                // ConfidenceSignal is #[non_exhaustive]; future variants fall back to "?".
-                _ => "?",
-            };
-
-            let transitions_col = if !sig.found_type() {
-                // Red: type not found
-                "—".to_string()
-            } else {
-                match entry.transitions_to() {
-                    None => "—".to_string(),
-                    Some([]) => "∅ (terminal)".to_string(),
-                    Some(_) => {
-                        let mut parts: Vec<String> =
-                            sig.found_transitions().iter().map(|t| format!("→ {t}")).collect();
-                        parts.extend(
-                            sig.missing_transitions().iter().map(|t| format!("→ {t} (missing)")),
-                        );
-                        if parts.is_empty() { "—".to_string() } else { parts.join(", ") }
-                    }
-                }
-            };
-
-            (emoji.to_string(), transitions_col)
-        }
-    };
-
-    format!(
-        "| {} | {} | {} | {} |\n",
-        entry.name(),
-        entry.description(),
-        signal_emoji,
-        transitions_col
-    )
-}
-
 /// Renders the Signal Summary section for a spec document.
 ///
-/// Produces a `## Signal Summary` markdown section containing sub-sections for
-/// whichever signal stages are present:
+/// Produces a `## Signal Summary` markdown section with:
 /// - `### Stage 1: Spec Signals` — when `doc.signals()` is `Some`
-/// - `### Stage 2: Domain State Signals` — when `doc.domain_state_signals()` is `Some`
 ///
-/// Returns an empty string when neither stage has been evaluated yet.
+/// Returns an empty string when no signals have been evaluated yet.
 #[must_use]
 pub fn render_signal_summary(doc: &SpecDocument) -> String {
     let stage1 = doc.signals();
-    let stage2 = doc.domain_state_signal_counts();
 
-    if stage1.is_none() && stage2.is_none() {
+    if stage1.is_none() {
         return String::new();
     }
 
@@ -340,17 +251,6 @@ pub fn render_signal_summary(doc: &SpecDocument) -> String {
 
     if let Some(counts) = stage1 {
         out.push_str("### Stage 1: Spec Signals\n");
-        out.push_str(&format!(
-            "\u{1f535} {}  \u{1f7e1} {}  \u{1f534} {}\n",
-            counts.blue(),
-            counts.yellow(),
-            counts.red()
-        ));
-        out.push('\n');
-    }
-
-    if let Some(counts) = stage2 {
-        out.push_str("### Stage 2: Domain State Signals\n");
         out.push_str(&format!(
             "\u{1f535} {}  \u{1f7e1} {}  \u{1f534} {}\n",
             counts.blue(),
@@ -370,10 +270,7 @@ pub fn render_signal_summary(doc: &SpecDocument) -> String {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use domain::{
-        ConfidenceSignal, DomainStateEntry, DomainStateSignal, SignalCounts, SpecDocument,
-        SpecRequirement, SpecScope, SpecSection,
-    };
+    use domain::{SignalCounts, SpecDocument, SpecRequirement, SpecScope, SpecSection};
 
     use super::*;
 
@@ -396,8 +293,6 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            vec![],
-            None,
             None,
             None,
             None,
@@ -416,14 +311,12 @@ mod tests {
                 vec![req("Excluded item", &["inference — not needed"])],
             ),
             vec![req("Constraint 1", &["convention — hex.md"])],
-            vec![DomainStateEntry::new("Draft", "Initial state", None).unwrap()],
             vec![req("AC text", &["PRD §4.1"])],
             vec![
                 SpecSection::new("Custom Section Title", vec!["Free-form line 1".into()]).unwrap(),
             ],
             vec!["knowledge/conventions/source-attribution.md".into()],
             Some(SignalCounts::new(15, 0, 0)),
-            None,
             None,
             None,
         )
@@ -516,8 +409,6 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            vec![],
-            None,
             None,
             None,
             None,
@@ -573,8 +464,6 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            vec![],
-            None,
             None,
             None,
             None,
@@ -597,8 +486,6 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            vec![],
-            None,
             None,
             None,
             None,
@@ -628,54 +515,6 @@ mod tests {
     }
 
     // ---------------------------------------------------------------------------
-    // render_spec: domain states
-    // ---------------------------------------------------------------------------
-
-    #[test]
-    fn test_render_spec_domain_states_table_rendered_when_present() {
-        let doc = make_full_doc();
-        let output = render_spec(&doc);
-        assert!(output.contains("## Domain States\n"));
-        assert!(output.contains("| State | Description |\n"));
-        assert!(output.contains("|-------|-------------|\n"));
-        assert!(output.contains("| Draft | Initial state |\n"));
-    }
-
-    #[test]
-    fn test_render_spec_domain_states_omitted_when_empty() {
-        let doc = make_minimal_doc();
-        let output = render_spec(&doc);
-        assert!(!output.contains("## Domain States\n"));
-    }
-
-    #[test]
-    fn test_render_spec_domain_states_multiple_rows() {
-        let doc = SpecDocument::new(
-            "F",
-            domain::SpecStatus::Draft,
-            "1.0",
-            vec![],
-            SpecScope::new(vec![], vec![]),
-            vec![],
-            vec![
-                DomainStateEntry::new("Draft", "Initial", None).unwrap(),
-                DomainStateEntry::new("Active", "In use", None).unwrap(),
-            ],
-            vec![],
-            vec![],
-            vec![],
-            None,
-            None,
-            None,
-            None,
-        )
-        .unwrap();
-        let output = render_spec(&doc);
-        assert!(output.contains("| Draft | Initial |\n"));
-        assert!(output.contains("| Active | In use |\n"));
-    }
-
-    // ---------------------------------------------------------------------------
     // render_spec: acceptance criteria
     // ---------------------------------------------------------------------------
 
@@ -696,11 +535,9 @@ mod tests {
             vec![],
             SpecScope::new(vec![], vec![]),
             vec![],
-            vec![],
             vec![req("plain AC", &[])],
             vec![],
             vec![],
-            None,
             None,
             None,
             None,
@@ -750,13 +587,11 @@ mod tests {
             SpecScope::new(vec![], vec![]),
             vec![],
             vec![],
-            vec![],
             vec![
                 SpecSection::new("Alpha", vec!["line alpha".into()]).unwrap(),
                 SpecSection::new("Beta", vec!["line beta".into()]).unwrap(),
             ],
             vec![],
-            None,
             None,
             None,
             None,
@@ -830,12 +665,6 @@ Goal paragraph line 1
 ## Constraints
 - Constraint 1 [source: convention — hex.md]
 
-## Domain States
-
-| State | Description |
-|-------|-------------|
-| Draft | Initial state |
-
 ## Acceptance Criteria
 - [ ] AC text [source: PRD §4.1]
 
@@ -902,7 +731,6 @@ version: \"1.0\"
             "### In Scope",
             "### Out of Scope",
             "## Constraints",
-            "## Domain States",
             "## Acceptance Criteria",
             "## Custom Section Title",
             "## Related Conventions",
@@ -920,229 +748,11 @@ version: \"1.0\"
     }
 
     // ---------------------------------------------------------------------------
-    // render_spec: domain states with signals (4-column table)
-    // ---------------------------------------------------------------------------
-
-    fn make_doc_with_signals(
-        entries: Vec<DomainStateEntry>,
-        signals: Vec<DomainStateSignal>,
-    ) -> SpecDocument {
-        let mut doc = SpecDocument::new(
-            "Feature S",
-            domain::SpecStatus::Draft,
-            "1.0",
-            vec![],
-            SpecScope::new(vec![], vec![]),
-            vec![],
-            entries,
-            vec![],
-            vec![],
-            vec![],
-            None,
-            None,
-            None,
-            None,
-        )
-        .unwrap();
-        doc.set_domain_state_signals(signals);
-        doc
-    }
-
-    #[test]
-    fn test_render_spec_domain_states_without_signals_uses_2col_header() {
-        // When domain_state_signals is None, keep 2-column table
-        let doc = SpecDocument::new(
-            "F",
-            domain::SpecStatus::Draft,
-            "1.0",
-            vec![],
-            SpecScope::new(vec![], vec![]),
-            vec![],
-            vec![DomainStateEntry::new("Draft", "Initial state", None).unwrap()],
-            vec![],
-            vec![],
-            vec![],
-            None,
-            None,
-            None,
-            None,
-        )
-        .unwrap();
-        let output = render_spec(&doc);
-        assert!(output.contains("| State | Description |\n"));
-        assert!(output.contains("|-------|-------------|\n"));
-        assert!(output.contains("| Draft | Initial state |\n"));
-        assert!(!output.contains("Signal"));
-        assert!(!output.contains("Transitions"));
-    }
-
-    #[test]
-    fn test_render_spec_domain_states_with_signals_uses_4col_header() {
-        let entries = vec![DomainStateEntry::new("Draft", "Initial state", None).unwrap()];
-        let signals =
-            vec![DomainStateSignal::new("Draft", ConfidenceSignal::Yellow, true, vec![], vec![])];
-        let doc = make_doc_with_signals(entries, signals);
-        let output = render_spec(&doc);
-        assert!(output.contains("| State | Description | Signal | Transitions |\n"));
-        assert!(output.contains("|-------|-------------|--------|-------------|\n"));
-    }
-
-    #[test]
-    fn test_render_spec_domain_states_blue_signal_rendered() {
-        let entries = vec![DomainStateEntry::new("Draft", "Initial state", Some(vec![])).unwrap()];
-        let signals =
-            vec![DomainStateSignal::new("Draft", ConfidenceSignal::Blue, true, vec![], vec![])];
-        let doc = make_doc_with_signals(entries, signals);
-        let output = render_spec(&doc);
-        assert!(output.contains("🔵"));
-    }
-
-    #[test]
-    fn test_render_spec_domain_states_yellow_signal_rendered() {
-        let entries = vec![DomainStateEntry::new("Draft", "Initial state", None).unwrap()];
-        let signals =
-            vec![DomainStateSignal::new("Draft", ConfidenceSignal::Yellow, true, vec![], vec![])];
-        let doc = make_doc_with_signals(entries, signals);
-        let output = render_spec(&doc);
-        assert!(output.contains("🟡"));
-    }
-
-    #[test]
-    fn test_render_spec_domain_states_red_signal_rendered() {
-        let entries = vec![DomainStateEntry::new("Ghost", "Missing type", None).unwrap()];
-        let signals =
-            vec![DomainStateSignal::new("Ghost", ConfidenceSignal::Red, false, vec![], vec![])];
-        let doc = make_doc_with_signals(entries, signals);
-        let output = render_spec(&doc);
-        assert!(output.contains("🔴"));
-    }
-
-    #[test]
-    fn test_render_spec_domain_states_terminal_state_transitions_column() {
-        // terminal state (transitions_to = Some([])) → "∅ (terminal)"
-        let entries = vec![DomainStateEntry::new("Final", "Terminal state", Some(vec![])).unwrap()];
-        let signals =
-            vec![DomainStateSignal::new("Final", ConfidenceSignal::Blue, true, vec![], vec![])];
-        let doc = make_doc_with_signals(entries, signals);
-        let output = render_spec(&doc);
-        assert!(output.contains("∅ (terminal)"));
-    }
-
-    #[test]
-    fn test_render_spec_domain_states_undeclared_transitions_column() {
-        // undeclared (transitions_to = None) → "—"
-        let entries = vec![DomainStateEntry::new("Draft", "Initial state", None).unwrap()];
-        let signals =
-            vec![DomainStateSignal::new("Draft", ConfidenceSignal::Yellow, true, vec![], vec![])];
-        let doc = make_doc_with_signals(entries, signals);
-        let output = render_spec(&doc);
-        // "—" appears in transitions column (after signal column)
-        assert!(output.contains("| Draft | Initial state | 🟡 | — |\n"));
-    }
-
-    #[test]
-    fn test_render_spec_domain_states_red_type_not_found_transitions_column() {
-        // Red signal (type not found) → transitions "—"
-        let entries = vec![DomainStateEntry::new("Ghost", "Missing type", None).unwrap()];
-        let signals =
-            vec![DomainStateSignal::new("Ghost", ConfidenceSignal::Red, false, vec![], vec![])];
-        let doc = make_doc_with_signals(entries, signals);
-        let output = render_spec(&doc);
-        assert!(output.contains("| Ghost | Missing type | 🔴 | — |\n"));
-    }
-
-    #[test]
-    fn test_render_spec_domain_states_found_transitions_rendered_plain() {
-        // found transition → "→ Published"
-        let entries = vec![
-            DomainStateEntry::new("Draft", "Initial state", Some(vec!["Published".into()]))
-                .unwrap(),
-        ];
-        let signals = vec![DomainStateSignal::new(
-            "Draft",
-            ConfidenceSignal::Blue,
-            true,
-            vec!["Published".into()],
-            vec![],
-        )];
-        let doc = make_doc_with_signals(entries, signals);
-        let output = render_spec(&doc);
-        assert!(output.contains("| Draft | Initial state | 🔵 | → Published |\n"));
-    }
-
-    #[test]
-    fn test_render_spec_domain_states_missing_transitions_rendered_with_suffix() {
-        // missing transition → "→ Archived (missing)"
-        let entries =
-            vec![DomainStateEntry::new("Active", "In use", Some(vec!["Archived".into()])).unwrap()];
-        let signals = vec![DomainStateSignal::new(
-            "Active",
-            ConfidenceSignal::Yellow,
-            true,
-            vec![],
-            vec!["Archived".into()],
-        )];
-        let doc = make_doc_with_signals(entries, signals);
-        let output = render_spec(&doc);
-        assert!(output.contains("| Active | In use | 🟡 | → Archived (missing) |\n"));
-    }
-
-    #[test]
-    fn test_render_spec_domain_states_mixed_found_and_missing_transitions() {
-        // found + missing → "→ Published, → Archived (missing)"
-        let entries = vec![
-            DomainStateEntry::new(
-                "Draft",
-                "Initial state",
-                Some(vec!["Published".into(), "Archived".into()]),
-            )
-            .unwrap(),
-        ];
-        let signals = vec![DomainStateSignal::new(
-            "Draft",
-            ConfidenceSignal::Yellow,
-            true,
-            vec!["Published".into()],
-            vec!["Archived".into()],
-        )];
-        let doc = make_doc_with_signals(entries, signals);
-        let output = render_spec(&doc);
-        assert!(
-            output.contains("| Draft | Initial state | 🟡 | → Published, → Archived (missing) |\n")
-        );
-    }
-
-    #[test]
-    fn test_render_spec_domain_states_4col_multiple_rows() {
-        let entries = vec![
-            DomainStateEntry::new("Draft", "Initial state", None).unwrap(),
-            DomainStateEntry::new("Ghost", "Missing type", None).unwrap(),
-            DomainStateEntry::new("Active", "In use", Some(vec!["Archived".into()])).unwrap(),
-        ];
-        let signals = vec![
-            DomainStateSignal::new("Draft", ConfidenceSignal::Yellow, true, vec![], vec![]),
-            DomainStateSignal::new("Ghost", ConfidenceSignal::Red, false, vec![], vec![]),
-            DomainStateSignal::new(
-                "Active",
-                ConfidenceSignal::Yellow,
-                true,
-                vec![],
-                vec!["Archived".into()],
-            ),
-        ];
-        let doc = make_doc_with_signals(entries, signals);
-        let output = render_spec(&doc);
-        assert!(output.contains("| Draft | Initial state | 🟡 | — |\n"));
-        assert!(output.contains("| Ghost | Missing type | 🔴 | — |\n"));
-        assert!(output.contains("| Active | In use | 🟡 | → Archived (missing) |\n"));
-    }
-
-    // ---------------------------------------------------------------------------
     // render_signal_summary tests
     // ---------------------------------------------------------------------------
 
-    fn make_doc_no_signals() -> SpecDocument {
-        SpecDocument::new(
+    fn make_doc_stage1_only() -> SpecDocument {
+        let mut doc = SpecDocument::new(
             "Feature X",
             domain::SpecStatus::Draft,
             "1.0",
@@ -1152,54 +762,32 @@ version: \"1.0\"
             vec![],
             vec![],
             vec![],
-            vec![],
-            None,
             None,
             None,
             None,
         )
-        .unwrap()
-    }
-
-    fn make_doc_stage1_only() -> SpecDocument {
-        let mut doc = make_doc_no_signals();
+        .unwrap();
         doc.set_signals(SignalCounts::new(12, 1, 0));
-        doc
-    }
-
-    fn make_doc_stage2_only() -> SpecDocument {
-        let mut doc = make_doc_no_signals();
-        let signals = vec![
-            DomainStateSignal::new("Draft", ConfidenceSignal::Blue, true, vec![], vec![]),
-            DomainStateSignal::new("Active", ConfidenceSignal::Blue, true, vec![], vec![]),
-            DomainStateSignal::new("Archived", ConfidenceSignal::Blue, true, vec![], vec![]),
-            DomainStateSignal::new(
-                "Pending",
-                ConfidenceSignal::Yellow,
-                true,
-                vec![],
-                vec!["Next".into()],
-            ),
-        ];
-        doc.set_domain_state_signals(signals);
-        doc
-    }
-
-    fn make_doc_both_stages() -> SpecDocument {
-        let mut doc = make_doc_no_signals();
-        doc.set_signals(SignalCounts::new(12, 1, 0));
-        let signals = vec![
-            DomainStateSignal::new("Draft", ConfidenceSignal::Blue, true, vec![], vec![]),
-            DomainStateSignal::new("Active", ConfidenceSignal::Yellow, true, vec![], vec![]),
-            DomainStateSignal::new("Ghost", ConfidenceSignal::Red, false, vec![], vec![]),
-        ];
-        doc.set_domain_state_signals(signals);
         doc
     }
 
     #[test]
     fn test_render_signal_summary_empty_when_no_signals() {
-        let doc = make_doc_no_signals();
+        let doc = SpecDocument::new(
+            "Feature X",
+            domain::SpecStatus::Draft,
+            "1.0",
+            vec![],
+            SpecScope::new(vec![], vec![]),
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            None,
+            None,
+        )
+        .unwrap();
         let output = render_signal_summary(&doc);
         assert_eq!(output, "");
     }
@@ -1217,33 +805,8 @@ version: \"1.0\"
     }
 
     #[test]
-    fn test_render_signal_summary_stage2_only() {
-        let doc = make_doc_stage2_only();
-        let output = render_signal_summary(&doc);
-        assert!(output.contains("## Signal Summary\n"), "missing header");
-        assert!(output.contains("### Stage 2: Domain State Signals\n"), "missing stage2 header");
-        assert!(output.contains("\u{1f535} 3"), "missing blue count");
-        assert!(output.contains("\u{1f7e1} 1"), "missing yellow count");
-        assert!(output.contains("\u{1f534} 0"), "missing red count");
-        assert!(!output.contains("Stage 1"), "stage1 should be absent");
-    }
-
-    #[test]
-    fn test_render_signal_summary_both_stages() {
-        let doc = make_doc_both_stages();
-        let output = render_signal_summary(&doc);
-        assert!(output.contains("## Signal Summary\n"), "missing header");
-        assert!(output.contains("### Stage 1: Spec Signals\n"), "missing stage1 header");
-        assert!(output.contains("### Stage 2: Domain State Signals\n"), "missing stage2 header");
-        // Stage 1 must come before Stage 2
-        let stage1_pos = output.find("Stage 1").unwrap();
-        let stage2_pos = output.find("Stage 2").unwrap();
-        assert!(stage1_pos < stage2_pos, "stage1 must come before stage2");
-    }
-
-    #[test]
     fn test_render_signal_summary_output_ends_with_trailing_newline() {
-        let doc = make_doc_both_stages();
+        let doc = make_doc_stage1_only();
         let output = render_signal_summary(&doc);
         assert!(output.ends_with('\n'), "output must end with trailing newline");
     }

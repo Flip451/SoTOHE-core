@@ -3,6 +3,8 @@
 //! These types represent the public API surface of a Rust crate as extracted
 //! from rustdoc JSON. `Serialize` is derived for JSON output.
 
+use std::collections::{HashMap, HashSet};
+
 use serde::Serialize;
 
 /// Top-level export result containing all public API elements of a crate.
@@ -108,12 +110,22 @@ pub struct FunctionInfo {
     /// Human-readable signature string (e.g., `fn foo(x: u32) -> bool`).
     signature: String,
     docs: Option<String>,
+    /// Type names extracted from the return type (e.g., `["Published"]` for `-> Published`).
+    return_type_names: Vec<String>,
+    /// `true` if the first parameter is `self`, `&self`, or `&mut self`.
+    has_self_receiver: bool,
 }
 
 impl FunctionInfo {
     /// Creates a new function info.
-    pub fn new(name: String, signature: String, docs: Option<String>) -> Self {
-        Self { name, signature, docs }
+    pub fn new(
+        name: String,
+        signature: String,
+        docs: Option<String>,
+        return_type_names: Vec<String>,
+        has_self_receiver: bool,
+    ) -> Self {
+        Self { name, signature, docs, return_type_names, has_self_receiver }
     }
 
     /// Returns the function name.
@@ -129,6 +141,16 @@ impl FunctionInfo {
     /// Returns the documentation string.
     pub fn docs(&self) -> Option<&str> {
         self.docs.as_deref()
+    }
+
+    /// Returns the type names extracted from the return type.
+    pub fn return_type_names(&self) -> &[String] {
+        &self.return_type_names
+    }
+
+    /// Returns `true` if the first parameter is `self`, `&self`, or `&mut self`.
+    pub fn has_self_receiver(&self) -> bool {
+        self.has_self_receiver
     }
 }
 
@@ -228,10 +250,130 @@ pub trait SchemaExporter {
     fn export(&self, crate_name: &str) -> Result<SchemaExport, SchemaExportError>;
 }
 
+// ---------------------------------------------------------------------------
+// CodeProfile — pre-indexed query interface for domain type evaluation
+// ---------------------------------------------------------------------------
+
+/// Pre-indexed view of a crate's public API for domain type evaluation.
+///
+/// Constructed from `SchemaExport` by infrastructure. The domain evaluation
+/// layer uses only this type — no raw string parsing needed.
+#[derive(Debug, Clone)]
+pub struct CodeProfile {
+    types: HashMap<String, CodeType>,
+    traits: HashMap<String, CodeTrait>,
+}
+
+impl CodeProfile {
+    /// Creates a new `CodeProfile`.
+    #[must_use]
+    pub fn new(types: HashMap<String, CodeType>, traits: HashMap<String, CodeTrait>) -> Self {
+        Self { types, traits }
+    }
+
+    /// Returns `true` if a type with the given name exists in the profile.
+    #[must_use]
+    pub fn has_type(&self, name: &str) -> bool {
+        self.types.contains_key(name)
+    }
+
+    /// Returns the `CodeType` for the given name, if present.
+    #[must_use]
+    pub fn get_type(&self, name: &str) -> Option<&CodeType> {
+        self.types.get(name)
+    }
+
+    /// Returns the `CodeTrait` for the given name, if present.
+    #[must_use]
+    pub fn get_trait(&self, name: &str) -> Option<&CodeTrait> {
+        self.traits.get(name)
+    }
+}
+
+/// A public type in the crate.
+#[derive(Debug, Clone)]
+pub struct CodeType {
+    kind: TypeKind,
+    /// Variant names (for enums) or field names (for structs).
+    members: Vec<String>,
+    /// Type names returned by inherent (non-trait) impl methods.
+    ///
+    /// `Result<T, E>` and `Option<T>` are unwrapped to extract `T`.
+    /// Only the last path segment is stored (e.g., `"Published"` not `"crate::Published"`).
+    method_return_types: HashSet<String>,
+}
+
+impl CodeType {
+    /// Creates a new `CodeType`.
+    #[must_use]
+    pub fn new(kind: TypeKind, members: Vec<String>, method_return_types: HashSet<String>) -> Self {
+        Self { kind, members, method_return_types }
+    }
+
+    /// Returns the kind of this type.
+    #[must_use]
+    pub fn kind(&self) -> &TypeKind {
+        &self.kind
+    }
+
+    /// Returns variant names (enums) or field names (structs).
+    #[must_use]
+    pub fn members(&self) -> &[String] {
+        &self.members
+    }
+
+    /// Returns type names returned by inherent impl methods.
+    #[must_use]
+    pub fn method_return_types(&self) -> &HashSet<String> {
+        &self.method_return_types
+    }
+}
+
+/// A public trait in the crate.
+#[derive(Debug, Clone)]
+pub struct CodeTrait {
+    method_names: Vec<String>,
+}
+
+impl CodeTrait {
+    /// Creates a new `CodeTrait`.
+    #[must_use]
+    pub fn new(method_names: Vec<String>) -> Self {
+        Self { method_names }
+    }
+
+    /// Returns the method names of this trait.
+    #[must_use]
+    pub fn method_names(&self) -> &[String] {
+        &self.method_names
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn function_info_has_self_receiver_reflects_constructor_value() {
+        let method = FunctionInfo::new(
+            "consume".to_string(),
+            "fn consume(self) -> Done".to_string(),
+            None,
+            vec!["Done".to_string()],
+            true,
+        );
+        assert!(method.has_self_receiver());
+
+        let assoc_fn = FunctionInfo::new(
+            "from_db".to_string(),
+            "fn from_db() -> Published".to_string(),
+            None,
+            vec!["Published".to_string()],
+            false,
+        );
+        assert!(!assoc_fn.has_self_receiver());
+    }
 
     #[test]
     fn schema_export_accessors_return_correct_values() {
