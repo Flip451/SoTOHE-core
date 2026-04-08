@@ -209,7 +209,8 @@ pub fn trigger_matches(text: &str, trigger: &str) -> bool {
             if before_ok && after_ok {
                 return true;
             }
-            start = pos + 1;
+            // Advance past the current match start on a char boundary
+            start = text_lower.ceil_char_boundary(pos + 1);
         }
         false
     } else {
@@ -348,6 +349,19 @@ mod tests {
     fn test_trigger_matches_word_boundary() {
         assert!(trigger_matches("use harness pattern", "harness"));
         assert!(!trigger_matches("use harnessing pattern", "harness"));
+    }
+
+    #[test]
+    fn test_trigger_matches_second_occurrence() {
+        // First "harness" is embedded in "xharness", second is standalone
+        assert!(trigger_matches("xharness then harness", "harness"));
+    }
+
+    #[test]
+    fn test_trigger_matches_multibyte_text() {
+        // Ensure no panic on multi-byte UTF-8 text
+        assert!(trigger_matches("日本語 harness パターン", "harness"));
+        assert!(!trigger_matches("日本語テスト", "harness"));
     }
 
     #[test]
