@@ -243,16 +243,29 @@ pub fn find_matching_guides(prompt: &str, guides: &[GuideEntry], limit: usize) -
 }
 
 /// Performs a full skill compliance check: detect command + match guides.
+///
+/// `track_context` is optional additional text (e.g. from spec.md/plan.md of the
+/// active track) that is concatenated with the prompt for guide trigger matching.
+/// This mirrors the Python `find_relevant_guides_for_track_workflow()` behavior.
 #[must_use]
 pub fn check_compliance(
     prompt: &str,
+    track_context: Option<&str>,
     guides: &[GuideEntry],
     guide_limit: usize,
 ) -> ComplianceContext {
-    ComplianceContext {
-        skill_match: detect_skill_command(prompt),
-        guide_matches: find_matching_guides(prompt, guides, guide_limit),
-    }
+    let skill_match = detect_skill_command(prompt);
+    // Only match guides when a /track:* command is detected.
+    let guide_matches = if skill_match.is_some() {
+        let combined = match track_context {
+            Some(ctx) if !ctx.is_empty() => format!("{prompt}\n{ctx}"),
+            _ => prompt.to_owned(),
+        };
+        find_matching_guides(&combined, guides, guide_limit)
+    } else {
+        Vec::new()
+    };
+    ComplianceContext { skill_match, guide_matches }
 }
 
 // ---------------------------------------------------------------------------
@@ -413,7 +426,7 @@ mod tests {
     #[test]
     fn test_check_compliance_with_track_plan_and_guide() {
         let guides = sample_guides();
-        let ctx = check_compliance("/track:plan harness-feature", &guides, 3);
+        let ctx = check_compliance("/track:plan harness-feature", None, &guides, 3);
         assert!(ctx.skill_match.is_some());
         assert_eq!(ctx.guide_matches.len(), 1);
         assert!(!ctx.is_empty());
@@ -421,7 +434,7 @@ mod tests {
 
     #[test]
     fn test_check_compliance_empty_prompt() {
-        let ctx = check_compliance("hello", &[], 3);
+        let ctx = check_compliance("hello", None, &[], 3);
         assert!(ctx.is_empty());
         assert!(ctx.render().is_none());
     }

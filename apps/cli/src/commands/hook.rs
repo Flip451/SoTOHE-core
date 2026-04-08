@@ -296,11 +296,13 @@ fn execute_user_prompt_submit(_hook: CliHookName) -> ExitCode {
         return ExitCode::SUCCESS;
     }
 
-    // Load guides from project dir
+    // Load guides and track context from project dir
     let guides = load_guides_from_project();
+    let track_context = load_latest_track_context();
 
     // Run compliance check
-    let ctx = domain::skill_compliance::check_compliance(&prompt, &guides, 3);
+    let ctx =
+        domain::skill_compliance::check_compliance(&prompt, track_context.as_deref(), &guides, 3);
 
     if let Some(additional_context) = ctx.render() {
         let output = serde_json::json!({
@@ -324,4 +326,33 @@ fn load_guides_from_project() -> Vec<domain::skill_compliance::GuideEntry> {
     };
     let guides_path = project_dir.join("knowledge/external/guides.json");
     infrastructure::guides_codec::load_guides(&guides_path).unwrap_or_default()
+}
+
+/// Loads context from the latest active track's spec.md and plan.md.
+/// Returns `None` on any failure (advisory hook — never block).
+fn load_latest_track_context() -> Option<String> {
+    let project_dir = PathBuf::from(std::env::var("CLAUDE_PROJECT_DIR").ok()?);
+    let items_dir = project_dir.join("track/items");
+    let entries = std::fs::read_dir(&items_dir).ok()?;
+
+    // Find the latest track directory by modified time
+    let latest = entries
+        .filter_map(|e| e.ok())
+        .filter(|e| e.file_type().ok().is_some_and(|ft| ft.is_dir()))
+        .filter_map(|e| {
+            let metadata_path = e.path().join("metadata.json");
+            let modified = std::fs::metadata(&metadata_path).ok()?.modified().ok()?;
+            Some((e.path(), modified))
+        })
+        .max_by_key(|(_, modified)| *modified)?;
+
+    let track_dir = latest.0;
+    let mut parts = Vec::new();
+    for filename in ["spec.md", "plan.md"] {
+        if let Ok(content) = std::fs::read_to_string(track_dir.join(filename)) {
+            parts.push(content);
+        }
+    }
+
+    if parts.is_empty() { None } else { Some(parts.join("\n")) }
 }
