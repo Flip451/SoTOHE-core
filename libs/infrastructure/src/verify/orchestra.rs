@@ -64,6 +64,7 @@ const EXPECTED_HOOK_COMMANDS: &[(&str, &[&str])] = &[
         &[
             "SOTP_CLI_BINARY:-",
             "$CLAUDE_PROJECT_DIR/bin/sotp",
+            "cargo run --quiet -p cli --",
             "hook dispatch block-direct-git-ops",
             "|| exit 2",
         ],
