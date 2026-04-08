@@ -14,6 +14,7 @@ pub mod review;
 pub mod review_v2;
 pub mod schema;
 mod signal;
+pub mod skill_compliance;
 pub mod spec;
 mod timestamp;
 mod track;
