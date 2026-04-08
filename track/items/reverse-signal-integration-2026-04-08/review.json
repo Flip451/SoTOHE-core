@@ -1,0 +1,265 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7da79d5a7124c0742bf9eb98f015c10998174ddb3ed104e8e10ed2fc5379e52",
+          "at": "2026-04-08T13:58:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision.2’s CLI summary format omits the Yellow count (`blue=N red=K (undeclared=U)`), but the track spec and task metadata require `blue=N yellow=M red=K (undeclared=U)`. That leaves the ADR and implementation spec inconsistent on the required output.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 50,
+              "category": "consistency"
+            },
+            {
+              "message": "`Reassess When` still reintroduces `auto-add` language (`auto-add を「提案モード」...`) even though this track explicitly rejects auto-add / Yellow-as-approved paths. Keeping that wording in the active ADR conflicts with the stated no-auto-add policy and can be misread as an approved future behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 125,
+              "category": "policy"
+            }
+          ],
+          "hash": "rvw1:sha256:dec3ef50b964dadaf3ceed1f28b1f8953455343bcd012d0427472099f0bec0d2",
+          "at": "2026-04-08T14:08:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision 2 specifies the command summary as `blue=N red=K (undeclared=U)`, but the track spec and verification files require `blue=N yellow=M red=K (undeclared=U)`. That leaves the observable contract for `domain-type-signals` inconsistent and risks implementing the wrong output format.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 50,
+              "category": "spec"
+            }
+          ],
+          "hash": "rvw1:sha256:dec3ef50b964dadaf3ceed1f28b1f8953455343bcd012d0427472099f0bec0d2",
+          "at": "2026-04-08T14:10:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Reassess When` still reopens `auto-add` as a future option. That reintroduces the rejected Yellow/auto-add path the ADR otherwise bans, so the document is internally inconsistent with the stated TDDD policy.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 125,
+              "category": "consistency"
+            },
+            {
+              "message": "T07’s scope includes updating `registry.md`, but the acceptance criteria and verification steps only cover the `/track:plan` message plus the two workflow docs. The registry index update can be missed without any failing check, so the workflow redirect remains unverified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/reverse-signal-integration-2026-04-08/spec.json",
+              "line": 69,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:8f67a5cd6f0bd4255a47647ea3a88889c42378aa1060de2f3dedde1c23a6ec8b",
+          "at": "2026-04-08T14:11:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeGraph` still keys types by bare name and only emits a warning on same-name collisions, so a public type in one module can overwrite another with the same name. That means the reverse check can silently miss undeclared code or mix signals across modules instead of disambiguating them.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-0045-spec-code-consistency-check-design.md",
+              "line": 125,
+              "category": "correctness"
+            },
+            {
+              "message": "The new Red gate is underspecified for reverse-only signals: undeclared types/traits are emitted as extra Red `DomainTypeSignal`s with no matching spec entry, but the spec only says \"Red なし → pass\". If `verify spec-states` keeps its current name+kind matching, those extra Red signals will be ignored and TDDD violations will still pass CI.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/spec.json",
+              "line": 42,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:883e055af1c20b59a47d573c126d674f54a28f5b494ad1b3c63f6e885042f53e",
+          "at": "2026-04-08T14:15:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30ed62696702fc7f4f0845fb15115d78cb824ea5e481bac806416d9e6ed08080",
+          "at": "2026-04-08T14:16:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` still describes the gate as \"Yellow is allowed, only Red blocks\", which contradicts ADR 1800/spec.json's two-stage rule that merge requires all Blue. If implementers follow the track metadata/plan, they can relax the final approval gate and allow unfinished Yellow states to merge.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 55,
+              "category": "correctness"
+            },
+            {
+              "message": "T04's verification checklist covers Red/Yellow outcomes, but it never checks that CI actually runs `domain-type-signals` before `verify spec-states`. Since reverse undeclared Reds are produced by the first step, leaving this sequence unverified can let undeclared types bypass the gate even when all listed checks pass.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/verification.md",
+              "line": 15,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:30ed62696702fc7f4f0845fb15115d78cb824ea5e481bac806416d9e6ed08080",
+          "at": "2026-04-08T14:18:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T04 still under-specifies the accepted two-stage gate. `metadata.json` only says `verify spec-states` should pass when there is no Red, but it omits the merge-time requirement that leftover Yellow must also block until all signals are Blue. Because `plan.md` is generated from this file, the implementation task can be completed without ever adding the merge-stage enforcement required by ADR 1800 §Decision.4 and `spec.json`.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 27,
+              "category": "consistency"
+            },
+            {
+              "message": "ADR 0045 now says the reverse-signal integration was completed while 'not relaxing the gate' and 'keeping all Blue required', but ADR 1800 accepted a two-stage gate where Yellow is allowed during intermediate commits and only blocked at merge. This leaves the ADR set internally inconsistent about the actual `verify spec-states` contract.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-0045-spec-code-consistency-check-design.md",
+              "line": 218,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:e5a8a315f208745a7a540be84b305d6211765990c327d49001ada2d154668b7f",
+          "at": "2026-04-08T14:21:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T07's acceptance criteria omit the `registry.md` Next-column update that the task description and ADR Decision.6 both require. As written, this spec can be marked complete even if `/track:design` never appears in `registry.md`, leaving part of the workflow change unimplemented and unverified.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/spec.json",
+              "line": 238,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:a682f4ca72dbd9916ee1b3f8df0e7d6da267774dc847983e28eaf9a7844fb7fe",
+          "at": "2026-04-08T14:24:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR’s TDDD introduction still says `forward Red` is the normal work-in-progress state, but Decision.3 and the 3-state table below redefine `defined + not yet implemented` as Yellow. Leaving the old Red/Yellow semantics in the same accepted ADR makes the design internally contradictory and can send later spec updates back toward the rejected gate behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 25,
+              "category": "correctness"
+            },
+            {
+              "message": "Section S2 still summarizes `verify spec-states` as a one-stage gate (`Red なし → pass。Yellow は許容。Red → fail`) and omits the merge-time `all Blue required` rule that T04 introduces everywhere else. Because `plan.md` is generated from this metadata, readers following the section summary can implement or review against the wrong gate contract and leave Yellow unblocked at track completion.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 75,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:819d29979452eb7fa892b87ee42da5e80bd77cbd11b5c9b17ce1c94409342755",
+          "at": "2026-04-08T14:27:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c23e8746f2d8cf41db4c0afdce0c4fec24699ad88e3fc78945d5b05d8e879e0",
+          "at": "2026-04-08T14:30:55Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `provider_model_overrides` from the reviewer model-resolution instructions leaves this file out of sync with the repo's existing `verify_orchestra` guardrail, which still requires the override-first snippet for `.claude/commands/track/review.md`. The same regression appears again in the model escalation section, so this change will fail verification unless the checker is updated in the same patch.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 41,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T13:59:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T13:59:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `provider_model_overrides` from the reviewer model-resolution guidance leaves this file out of sync with the current `verify orchestra` guardrail, which still requires the canonical override-first snippets for `.claude/commands/track/review.md`. Since `cargo make ci` includes `verify-orchestra-local`, this change will fail the workflow gate until the verifier is updated in the same patch; the same regression is repeated in the model-escalation section later in this file.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 42,
+              "category": "ci"
+            }
+          ],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T14:01:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T14:07:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T14:08:41Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
+          "at": "2026-04-08T14:11:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
+          "at": "2026-04-08T14:11:48Z"
+        }
+      ]
+    }
+  }
+}

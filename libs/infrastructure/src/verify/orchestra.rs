@@ -333,9 +333,8 @@ const MODEL_RESOLUTION_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
     ),
     (
         ".claude/commands/track/review.md",
-        "track review override-first resolution",
+        "track review model resolution",
         &[
-            "provider_model_overrides",
             "providers.<reviewer_provider>.fast_model",
             "providers.<reviewer_provider>.default_model",
         ],

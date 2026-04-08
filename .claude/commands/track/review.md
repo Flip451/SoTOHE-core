@@ -39,9 +39,8 @@ Arguments:
 - Read `.claude/agent-profiles.json`.
 - Look up `profiles.<active_profile>.reviewer` to determine the provider (e.g., `codex`).
 - Resolve `{model}`:
-  1. Check `profiles.<active_profile>.provider_model_overrides.<provider>`.
-  2. Fall back to `providers.<provider>.default_model`.
-  3. If neither is set (e.g., `claude` provider has no `default_model`), `{model}` is not needed — skip the `--model` flag.
+  1. Look up `providers.<provider>.default_model`.
+  2. If not set, `{model}` is not needed — skip the `--model` flag.
 - When the resolved provider has a CLI tool (e.g., Codex CLI), invoke via `cargo make track-local-review` (external subprocess).
 - When the resolved provider is `claude` (e.g., `claude-heavy` profile), invoke via Claude Code subagent with `subagent_type: "Explore"` using the same briefing files and JSON verdict format. No `--model` flag is needed. Do not perform inline review in the main conversation context.
 
@@ -93,18 +92,6 @@ from `review-scope.json`, the JSON file wins.
 | **other** | Track artifacts, scripts, config, docs not covered above | Everything else (`track/**`, `scripts/**`, `Cargo.*`, etc.) |
 
 If a group has zero changed files, skip it (do not invoke a reviewer for empty scope).
-
-If the total changed files are small (≤ 5 files) AND all belong to **a single group**,
-collapse into a single reviewer invocation instead of splitting — parallel overhead is
-not worthwhile. Use the actual group name from the partition (e.g., `other` for planning
-artifacts). Do NOT use a synthetic group name like `all` — `record-round` only recognizes
-group names produced by `partition()`: named groups from the active policy
-(base `track/review-scope.json` or per-track `review-groups.json` override)
-plus the implicit `other` fallback group.
-
-If files span **multiple groups**, use the normal parallel pattern even for ≤ 5 files.
-Auto-record records exactly one scope per invocation, so multi-scope collapsed reviews
-would leave some groups unrecorded.
 
 ### 2b. Build per-group briefing
 
@@ -228,8 +215,8 @@ Step 3 begins when all scopes have achieved full model `zero_findings`.
 レビュー完了は **full model の zero_findings** によってのみ確認される。
 
 Resolve models from `.claude/agent-profiles.json` using the `reviewer` capability:
-- `{fast_model}`: `provider_model_overrides` for reviewer, then `providers.<reviewer_provider>.fast_model`, then `default_model`. If none exist, skip `--model`.
-- `{model}`: `provider_model_overrides`, then `providers.<reviewer_provider>.default_model`. If none exist, skip `--model`.
+- `{fast_model}`: `providers.<reviewer_provider>.fast_model`, then `default_model`. If neither exists, skip `--model`.
+- `{model}`: `providers.<reviewer_provider>.default_model`. If not set, skip `--model`.
 
 ### Per-scope independence (throughput-first)
 
