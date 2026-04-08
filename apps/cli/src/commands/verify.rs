@@ -265,44 +265,35 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
     if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
 }
 
-/// Serialize a `ConsistencyReport` as a JSON line to stdout.
+/// Serialize a `ConsistencyReport` as a JSON line to stdout via serde_json.
 fn print_consistency_report_json(report: &domain::ConsistencyReport) {
-    let items_to_json =
-        |items: &[String]| items.iter().map(|i| format!("\"{i}\"")).collect::<Vec<_>>().join(",");
     let signal_str = |s: domain::ConfidenceSignal| match s {
         domain::ConfidenceSignal::Blue => "blue",
         domain::ConfidenceSignal::Yellow => "yellow",
         domain::ConfidenceSignal::Red => "red",
         _ => "unknown",
     };
-    let forward_json: Vec<String> = report
+    let forward: Vec<serde_json::Value> = report
         .forward_signals()
         .iter()
         .map(|s| {
-            format!(
-                "{{\"type_name\":\"{}\",\"kind_tag\":\"{}\",\"signal\":\"{}\",\
-                 \"found_type\":{},\"found_items\":[{}],\
-                 \"missing_items\":[{}],\"extra_items\":[{}]}}",
-                s.type_name(),
-                s.kind_tag(),
-                signal_str(s.signal()),
-                s.found_type(),
-                items_to_json(s.found_items()),
-                items_to_json(s.missing_items()),
-                items_to_json(s.extra_items()),
-            )
+            serde_json::json!({
+                "type_name": s.type_name(),
+                "kind_tag": s.kind_tag(),
+                "signal": signal_str(s.signal()),
+                "found_type": s.found_type(),
+                "found_items": s.found_items(),
+                "missing_items": s.missing_items(),
+                "extra_items": s.extra_items(),
+            })
         })
         .collect();
-    let undeclared_types_json: Vec<String> =
-        report.undeclared_types().iter().map(|s| format!("\"{s}\"")).collect();
-    let undeclared_traits_json: Vec<String> =
-        report.undeclared_traits().iter().map(|s| format!("\"{s}\"")).collect();
-    println!(
-        "{{\"forward_signals\":[{}],\"undeclared_types\":[{}],\"undeclared_traits\":[{}]}}",
-        forward_json.join(","),
-        undeclared_types_json.join(","),
-        undeclared_traits_json.join(","),
-    );
+    let output = serde_json::json!({
+        "forward_signals": forward,
+        "undeclared_types": report.undeclared_types(),
+        "undeclared_traits": report.undeclared_traits(),
+    });
+    println!("{output}");
 }
 
 /// Combine architecture_rules + doc_patterns + convention_docs checks.
