@@ -8,7 +8,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use domain::schema::{SchemaExportError, SchemaExporter};
-use infrastructure::code_profile_builder::build_code_profile;
+use infrastructure::code_profile_builder::build_type_graph;
 use infrastructure::domain_types_codec;
 use infrastructure::schema_export::RustdocSchemaExporter;
 use infrastructure::track::atomic_write::atomic_write_file;
@@ -59,8 +59,16 @@ pub fn execute_domain_type_signals(
         CliError::Message(format!("failed to export schema: {e}{hint}"))
     })?;
 
-    // Build a pre-indexed CodeProfile from the flat schema export.
-    let profile = build_code_profile(&schema);
+    // Collect typestate names for outgoing transition filtering in build_type_graph.
+    let typestate_names: std::collections::HashSet<String> = doc
+        .entries()
+        .iter()
+        .filter(|e| matches!(e.kind(), domain::domain_types::DomainTypeKind::Typestate { .. }))
+        .map(|e| e.name().to_string())
+        .collect();
+
+    // Build a pre-indexed TypeGraph from the flat schema export.
+    let profile = build_type_graph(&schema, &typestate_names);
 
     // Evaluate signals.
     let signals = domain::evaluate_domain_type_signals(doc.entries(), &profile);

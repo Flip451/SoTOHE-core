@@ -93,7 +93,7 @@
     {
       "description": "CodeProfile → TypeGraph リネーム + outgoing フィールド追加 — typestate フィルタを構築時に移動",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "module_path 追加 — TypeInfo/TypeNode に module_path を追加し同名型衝突の warning を出す",
@@ -112,5 +112,5 @@
     }
   ],
   "title": "3-12 spec ↔ code 整合性チェック — TypeGraph + 逆方向検出",
-  "updated_at": "2026-04-08T08:02:18Z"
+  "updated_at": "2026-04-08T08:15:31Z"
 }

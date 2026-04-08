@@ -251,7 +251,7 @@ pub trait SchemaExporter {
 }
 
 // ---------------------------------------------------------------------------
-// CodeProfile — pre-indexed query interface for domain type evaluation
+// TypeGraph — pre-indexed query interface for domain type evaluation
 // ---------------------------------------------------------------------------
 
 /// Pre-indexed view of a crate's public API for domain type evaluation.
@@ -259,15 +259,15 @@ pub trait SchemaExporter {
 /// Constructed from `SchemaExport` by infrastructure. The domain evaluation
 /// layer uses only this type — no raw string parsing needed.
 #[derive(Debug, Clone)]
-pub struct CodeProfile {
-    types: HashMap<String, CodeType>,
-    traits: HashMap<String, CodeTrait>,
+pub struct TypeGraph {
+    types: HashMap<String, TypeNode>,
+    traits: HashMap<String, TraitNode>,
 }
 
-impl CodeProfile {
-    /// Creates a new `CodeProfile`.
+impl TypeGraph {
+    /// Creates a new `TypeGraph`.
     #[must_use]
-    pub fn new(types: HashMap<String, CodeType>, traits: HashMap<String, CodeTrait>) -> Self {
+    pub fn new(types: HashMap<String, TypeNode>, traits: HashMap<String, TraitNode>) -> Self {
         Self { types, traits }
     }
 
@@ -277,22 +277,22 @@ impl CodeProfile {
         self.types.contains_key(name)
     }
 
-    /// Returns the `CodeType` for the given name, if present.
+    /// Returns the `TypeNode` for the given name, if present.
     #[must_use]
-    pub fn get_type(&self, name: &str) -> Option<&CodeType> {
+    pub fn get_type(&self, name: &str) -> Option<&TypeNode> {
         self.types.get(name)
     }
 
-    /// Returns the `CodeTrait` for the given name, if present.
+    /// Returns the `TraitNode` for the given name, if present.
     #[must_use]
-    pub fn get_trait(&self, name: &str) -> Option<&CodeTrait> {
+    pub fn get_trait(&self, name: &str) -> Option<&TraitNode> {
         self.traits.get(name)
     }
 }
 
 /// A public type in the crate.
 #[derive(Debug, Clone)]
-pub struct CodeType {
+pub struct TypeNode {
     kind: TypeKind,
     /// Variant names (for enums) or field names (for structs).
     members: Vec<String>,
@@ -301,13 +301,26 @@ pub struct CodeType {
     /// `Result<T, E>` and `Option<T>` are unwrapped to extract `T`.
     /// Only the last path segment is stored (e.g., `"Published"` not `"crate::Published"`).
     method_return_types: HashSet<String>,
+    /// Outgoing typestate transitions: subset of `method_return_types` filtered to
+    /// only those types declared as typestate in the domain-types catalogue.
+    /// Set by `build_type_graph` in the infrastructure layer.
+    outgoing: HashSet<String>,
 }
 
-impl CodeType {
-    /// Creates a new `CodeType`.
+impl TypeNode {
+    /// Creates a new `TypeNode`.
+    ///
+    /// `outgoing` is intersected with `method_return_types` to enforce the invariant
+    /// that outgoing transitions are always a subset of the actual method return types.
     #[must_use]
-    pub fn new(kind: TypeKind, members: Vec<String>, method_return_types: HashSet<String>) -> Self {
-        Self { kind, members, method_return_types }
+    pub fn new(
+        kind: TypeKind,
+        members: Vec<String>,
+        method_return_types: HashSet<String>,
+        outgoing: HashSet<String>,
+    ) -> Self {
+        let outgoing = outgoing.intersection(&method_return_types).cloned().collect();
+        Self { kind, members, method_return_types, outgoing }
     }
 
     /// Returns the kind of this type.
@@ -327,16 +340,22 @@ impl CodeType {
     pub fn method_return_types(&self) -> &HashSet<String> {
         &self.method_return_types
     }
+
+    /// Returns outgoing typestate transitions (filtered subset of `method_return_types`).
+    #[must_use]
+    pub fn outgoing(&self) -> &HashSet<String> {
+        &self.outgoing
+    }
 }
 
 /// A public trait in the crate.
 #[derive(Debug, Clone)]
-pub struct CodeTrait {
+pub struct TraitNode {
     method_names: Vec<String>,
 }
 
-impl CodeTrait {
-    /// Creates a new `CodeTrait`.
+impl TraitNode {
+    /// Creates a new `TraitNode`.
     #[must_use]
     pub fn new(method_names: Vec<String>) -> Self {
         Self { method_names }

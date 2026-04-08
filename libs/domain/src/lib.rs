@@ -43,7 +43,7 @@ pub use review::{
     ReviewRoundResult, ReviewStalenessReason, ReviewState, ReviewStatus, RoundType, StoredFinding,
     Verdict, file_path_to_concern,
 };
-pub use schema::{CodeProfile, CodeTrait, CodeType};
+pub use schema::{TraitNode, TypeGraph, TypeNode};
 pub use signal::{
     ConfidenceSignal, SignalBasis, SignalCounts, classify_source_tag, evaluate_source_tag,
 };

@@ -260,9 +260,9 @@ impl DomainTypesDocument {
 
 use std::collections::HashSet;
 
-use crate::schema::{CodeProfile, TypeKind};
+use crate::schema::{TypeGraph, TypeKind};
 
-/// Evaluates domain type signals by comparing spec entries against a pre-indexed `CodeProfile`.
+/// Evaluates domain type signals by comparing spec entries against a pre-indexed `TypeGraph`.
 ///
 /// Only types declared as `Typestate` in entries are considered valid transition targets.
 ///
@@ -270,7 +270,7 @@ use crate::schema::{CodeProfile, TypeKind};
 #[must_use]
 pub fn evaluate_domain_type_signals(
     entries: &[DomainTypeEntry],
-    profile: &CodeProfile,
+    profile: &TypeGraph,
 ) -> Vec<DomainTypeSignal> {
     // Collect names of typestate-declared types — only these count as valid transition targets.
     let typestate_names: HashSet<&str> = entries
@@ -283,7 +283,7 @@ pub fn evaluate_domain_type_signals(
 
 fn evaluate_single(
     entry: &DomainTypeEntry,
-    profile: &CodeProfile,
+    profile: &TypeGraph,
     typestate_names: &HashSet<&str>,
 ) -> DomainTypeSignal {
     let name = entry.name();
@@ -318,20 +318,17 @@ fn evaluate_typestate(
     name: &str,
     kind_tag: &str,
     transitions: &TypestateTransitions,
-    profile: &CodeProfile,
-    typestate_names: &HashSet<&str>,
+    profile: &TypeGraph,
+    _typestate_names: &HashSet<&str>,
 ) -> DomainTypeSignal {
     let Some(code_type) = profile.get_type(name) else {
         return red(name, kind_tag, false);
     };
 
-    // Filter method_return_types to only typestate types, excluding self.
-    let code_transitions: HashSet<&str> = code_type
-        .method_return_types()
-        .iter()
-        .filter(|rtn| rtn.as_str() != name && typestate_names.contains(rtn.as_str()))
-        .map(|s| s.as_str())
-        .collect();
+    // Use pre-filtered outgoing transitions from TypeGraph (set by build_type_graph).
+    // Self-transitions are excluded during construction.
+    let code_transitions: HashSet<&str> =
+        code_type.outgoing().iter().filter(|t| t.as_str() != name).map(|s| s.as_str()).collect();
 
     match transitions {
         TypestateTransitions::Terminal => {
@@ -387,7 +384,7 @@ fn evaluate_enum(
     name: &str,
     kind_tag: &str,
     expected_variants: &[String],
-    profile: &CodeProfile,
+    profile: &TypeGraph,
 ) -> DomainTypeSignal {
     let Some(code_type) = profile.get_type(name) else {
         return DomainTypeSignal::new(
@@ -434,7 +431,7 @@ fn evaluate_enum(
     DomainTypeSignal::new(name, kind_tag, signal, true, found, missing, extra)
 }
 
-fn evaluate_value_object(name: &str, kind_tag: &str, profile: &CodeProfile) -> DomainTypeSignal {
+fn evaluate_value_object(name: &str, kind_tag: &str, profile: &TypeGraph) -> DomainTypeSignal {
     let Some(code_type) = profile.get_type(name) else {
         return red(name, kind_tag, false);
     };
@@ -450,7 +447,7 @@ fn evaluate_error_type(
     name: &str,
     kind_tag: &str,
     expected_variants: &[String],
-    profile: &CodeProfile,
+    profile: &TypeGraph,
 ) -> DomainTypeSignal {
     let Some(code_type) = profile.get_type(name) else {
         return DomainTypeSignal::new(
@@ -500,7 +497,7 @@ fn evaluate_trait_port(
     name: &str,
     kind_tag: &str,
     expected_methods: &[String],
-    profile: &CodeProfile,
+    profile: &TypeGraph,
 ) -> DomainTypeSignal {
     let Some(code_trait) = profile.get_trait(name) else {
         return DomainTypeSignal::new(
@@ -687,49 +684,57 @@ mod tests {
 
     use std::collections::{HashMap, HashSet};
 
-    use crate::schema::{CodeProfile, CodeTrait, CodeType, TypeKind};
+    use crate::schema::{TraitNode, TypeGraph, TypeKind, TypeNode};
 
-    /// Build a `CodeProfile` with struct-kinded types only (no members, no return types).
-    fn make_profile(type_names: &[&str]) -> CodeProfile {
+    /// Build a `TypeGraph` with struct-kinded types only (no members, no return types).
+    fn make_profile(type_names: &[&str]) -> TypeGraph {
         let mut types = HashMap::new();
         for name in type_names {
-            types.insert(name.to_string(), CodeType::new(TypeKind::Struct, vec![], HashSet::new()));
+            types.insert(
+                name.to_string(),
+                TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
+            );
         }
-        CodeProfile::new(types, HashMap::new())
+        TypeGraph::new(types, HashMap::new())
     }
 
-    /// Build a `CodeProfile` with a single enum type and given variants.
-    fn make_profile_with_enum(name: &str, variants: &[&str]) -> CodeProfile {
+    /// Build a `TypeGraph` with a single enum type and given variants.
+    fn make_profile_with_enum(name: &str, variants: &[&str]) -> TypeGraph {
         let mut types = HashMap::new();
         types.insert(
             name.to_string(),
-            CodeType::new(
+            TypeNode::new(
                 TypeKind::Enum,
                 variants.iter().map(|v| v.to_string()).collect(),
                 HashSet::new(),
+                HashSet::new(),
             ),
         );
-        CodeProfile::new(types, HashMap::new())
+        TypeGraph::new(types, HashMap::new())
     }
 
-    /// Build a `CodeProfile` where `from_type` has a method returning `to_type`.
-    fn make_profile_with_transition(from_type: &str, to_type: &str) -> CodeProfile {
+    /// Build a `TypeGraph` where `from_type` has a method returning `to_type`.
+    fn make_profile_with_transition(from_type: &str, to_type: &str) -> TypeGraph {
         let mut types = HashMap::new();
-        let mut return_types = HashSet::new();
-        return_types.insert(to_type.to_string());
-        types.insert(from_type.to_string(), CodeType::new(TypeKind::Struct, vec![], return_types));
-        types.insert(to_type.to_string(), CodeType::new(TypeKind::Struct, vec![], HashSet::new()));
-        CodeProfile::new(types, HashMap::new())
+        let return_types: HashSet<String> = [to_type.to_string()].into();
+        let outgoing: HashSet<String> = [to_type.to_string()].into();
+        let from_node = TypeNode::new(TypeKind::Struct, vec![], return_types, outgoing);
+        types.insert(from_type.to_string(), from_node);
+        types.insert(
+            to_type.to_string(),
+            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
+        );
+        TypeGraph::new(types, HashMap::new())
     }
 
-    /// Build a `CodeProfile` with a trait and given method names.
-    fn make_profile_with_trait(trait_name: &str, methods: &[&str]) -> CodeProfile {
+    /// Build a `TypeGraph` with a trait and given method names.
+    fn make_profile_with_trait(trait_name: &str, methods: &[&str]) -> TypeGraph {
         let mut traits = HashMap::new();
         traits.insert(
             trait_name.to_string(),
-            CodeTrait::new(methods.iter().map(|m| m.to_string()).collect()),
+            TraitNode::new(methods.iter().map(|m| m.to_string()).collect()),
         );
-        CodeProfile::new(HashMap::new(), traits)
+        TypeGraph::new(HashMap::new(), traits)
     }
 
     #[test]
@@ -876,5 +881,54 @@ mod tests {
         let profile = make_profile(&["Final"]);
         let results = evaluate_domain_type_signals(&[entry], &profile);
         assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_evaluate_typestate_uses_outgoing_not_method_return_types() {
+        // "Draft" has method_return_types = {"Published", "NonTypestate"},
+        // but outgoing = {"Published"} only (NonTypestate was filtered out by build_type_graph).
+        // Evaluation must use outgoing — not method_return_types — so "NonTypestate" must not
+        // appear in extra_items even though it is in method_return_types.
+        let draft_entry = DomainTypeEntry::new(
+            "Draft",
+            "desc",
+            DomainTypeKind::Typestate {
+                transitions: TypestateTransitions::To(vec!["Published".into()]),
+            },
+            true,
+        )
+        .unwrap();
+        let published_entry = DomainTypeEntry::new(
+            "Published",
+            "desc",
+            DomainTypeKind::Typestate { transitions: TypestateTransitions::Terminal },
+            true,
+        )
+        .unwrap();
+
+        // Construct a TypeGraph where method_return_types has a non-typestate extra entry.
+        let mut types = HashMap::new();
+        let method_return_types: HashSet<String> =
+            ["Published".to_string(), "NonTypestate".to_string()].into();
+        // outgoing only contains the typestate target — NonTypestate is intentionally absent.
+        let outgoing: HashSet<String> = ["Published".to_string()].into();
+        let from_node = TypeNode::new(TypeKind::Struct, vec![], method_return_types, outgoing);
+        types.insert("Draft".to_string(), from_node);
+        types.insert(
+            "Published".to_string(),
+            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
+        );
+        let profile = TypeGraph::new(types, HashMap::new());
+
+        let results = evaluate_domain_type_signals(&[draft_entry, published_entry], &profile);
+        let draft_signal = results.first().unwrap();
+        // Blue: outgoing matches the declared transition exactly.
+        assert_eq!(draft_signal.signal(), ConfidenceSignal::Blue);
+        // NonTypestate must not appear in extra_items — evaluation must not read method_return_types.
+        assert!(
+            draft_signal.extra_items().is_empty(),
+            "expected no extra_items, got {:?}",
+            draft_signal.extra_items()
+        );
     }
 }
