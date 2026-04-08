@@ -163,19 +163,31 @@ const SKILL_COMMANDS: &[(&str, &[&str])] = &[
     ),
 ];
 
-/// Detects `/track:*` commands in the prompt and returns the first match.
+/// Detects `/track:*` commands in the prompt and returns the one that
+/// appears earliest in the prompt. When multiple commands start at the
+/// same position, the longest match wins (e.g. `/track:plan-only` over
+/// `/track:plan`).
 #[must_use]
 pub fn detect_skill_command(prompt: &str) -> Option<SkillMatch> {
     let prompt_lower = prompt.to_lowercase();
+    let mut best: Option<(usize, &str, &[&str])> = None;
     for (command, reminders) in SKILL_COMMANDS {
-        if prompt_lower.contains(command) {
-            return Some(SkillMatch {
-                command: (*command).to_owned(),
-                reminders: reminders.iter().map(|r| (*r).to_owned()).collect(),
-            });
+        if let Some(pos) = prompt_lower.find(command) {
+            let is_better = match &best {
+                None => true,
+                Some((best_pos, best_cmd, _)) => {
+                    pos < *best_pos || (pos == *best_pos && command.len() > best_cmd.len())
+                }
+            };
+            if is_better {
+                best = Some((pos, command, reminders));
+            }
         }
     }
-    None
+    best.map(|(_, command, reminders)| SkillMatch {
+        command: (*command).to_owned(),
+        reminders: reminders.iter().map(|r| (*r).to_owned()).collect(),
+    })
 }
 
 // ---------------------------------------------------------------------------
@@ -337,6 +349,22 @@ mod tests {
         let result = detect_skill_command("/track:full-cycle T01");
         assert!(result.is_some());
         assert_eq!(result.unwrap().command, "/track:full-cycle");
+    }
+
+    #[test]
+    fn test_detect_skill_command_earliest_in_prompt_wins() {
+        // /track:review appears before /track:implement
+        let result = detect_skill_command("do /track:review then /track:implement");
+        assert!(result.is_some());
+        assert_eq!(result.unwrap().command, "/track:review");
+    }
+
+    #[test]
+    fn test_detect_skill_command_longest_match_at_same_position() {
+        // /track:plan-only and /track:plan both start at same position
+        let result = detect_skill_command("/track:plan-only my-feature");
+        assert!(result.is_some());
+        assert_eq!(result.unwrap().command, "/track:plan-only");
     }
 
     #[test]
