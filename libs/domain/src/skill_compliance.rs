@@ -173,6 +173,15 @@ pub fn detect_skill_command(prompt: &str) -> Option<SkillMatch> {
     let mut best: Option<(usize, &str, &[&str])> = None;
     for (command, reminders) in SKILL_COMMANDS {
         if let Some(pos) = prompt_lower.find(command) {
+            // Token boundary: the char after the command must not be alphanumeric
+            // or hyphen, to avoid /track:plan matching /track:planner.
+            let after_pos = pos + command.len();
+            let after_char = prompt_lower.as_bytes().get(after_pos).copied();
+            let at_boundary =
+                after_char.is_none_or(|b| !b.is_ascii_alphanumeric() && b != b'-' && b != b'_');
+            if !at_boundary {
+                continue;
+            }
             let is_better = match &best {
                 None => true,
                 Some((best_pos, best_cmd, _)) => {
@@ -372,6 +381,27 @@ mod tests {
         let result = detect_skill_command("/track:commit fix things");
         assert!(result.is_some());
         assert_eq!(result.unwrap().command, "/track:commit");
+    }
+
+    #[test]
+    fn test_detect_skill_command_rejects_unknown_suffix() {
+        // /track:planner should NOT match /track:plan
+        let result = detect_skill_command("/track:planner something");
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_detect_skill_command_accepts_space_after_command() {
+        let result = detect_skill_command("/track:plan my-feature");
+        assert!(result.is_some());
+        assert_eq!(result.unwrap().command, "/track:plan");
+    }
+
+    #[test]
+    fn test_detect_skill_command_accepts_end_of_string() {
+        let result = detect_skill_command("/track:plan");
+        assert!(result.is_some());
+        assert_eq!(result.unwrap().command, "/track:plan");
     }
 
     // -- trigger_matches --

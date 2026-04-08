@@ -128,13 +128,15 @@ pub enum CliHookName {
 }
 
 impl CliHookName {
-    /// Converts to domain `HookName`.
+    /// Converts to domain `HookName` for guard hooks.
+    /// Returns `None` for advisory hooks (e.g. `SkillCompliance`) that have
+    /// no corresponding domain guard.
     #[allow(dead_code)]
-    fn to_domain(self) -> HookName {
+    fn to_domain(self) -> Option<HookName> {
         match self {
-            Self::BlockDirectGitOps => HookName::BlockDirectGitOps,
-            Self::BlockTestFileDeletion => HookName::BlockTestFileDeletion,
-            Self::SkillCompliance => HookName::BlockDirectGitOps, // unused for advisory
+            Self::BlockDirectGitOps => Some(HookName::BlockDirectGitOps),
+            Self::BlockTestFileDeletion => Some(HookName::BlockTestFileDeletion),
+            Self::SkillCompliance => None,
         }
     }
 
