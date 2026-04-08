@@ -1,0 +1,412 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The reverse-direction check is underspecified: the ADR/metadata require `ConsistencyReport` to track `undeclared_traits`, but the spec only requires detecting undeclared types. That lets an implementation ignore missing trait declarations and still pass review, which weakens the CI guardrail the track is adding.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 51,
+              "category": "spec completeness"
+            },
+            {
+              "message": "T001's verification only checks a single `done` track's `spec.md`. It does not exercise an archived track or the other rendered views (`plan.md` / `domain-types.md`), so the manual verification plan cannot catch the regression this task is meant to prevent.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 11,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:ea10676eb30a4fc9e2bfa5ff3cb88b6a860f174013de6a57e8d23830d68b582a",
+          "at": "2026-04-08T04:50:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 only verifies that undeclared types are detected, but the ADR's reverse-check contract also requires undeclared traits to be reported in `ConsistencyReport`. As written, the spec can pass while trait drift remains untested.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 163,
+              "category": "coverage"
+            },
+            {
+              "message": "The combined `T005-T006` verification step checks only undeclared-type detection. It never validates that `sotp verify spec-code-consistency` emits the `ConsistencyReport` output required by T006, so the CLI contract can regress without this checklist catching it.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 15,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:ea10676eb30a4fc9e2bfa5ff3cb88b6a860f174013de6a57e8d23830d68b582a",
+          "at": "2026-04-08T04:53:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94413265f6b66873ca6aec768df1f858620ee3ea89c1c53d756d97710bbe00df",
+          "at": "2026-04-08T04:55:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's acceptance criteria only assert that `track-sync-views` leaves done/archived track views untouched. The ADR and metadata make `registry.md` regeneration part of the same fix, but there is no success criterion for that behavior, so an implementation that stops updating `registry.md` would still satisfy the current spec.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 118,
+              "category": "acceptance_criteria"
+            },
+            {
+              "message": "T004 requires both capturing `module_path` and warning on same-name type collisions, but the acceptance criteria only cover `module_path` extraction. A change that stores module paths yet never emits the collision warning would still pass the track's stated success conditions.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 154,
+              "category": "acceptance_criteria"
+            }
+          ],
+          "hash": "rvw1:sha256:94413265f6b66873ca6aec768df1f858620ee3ea89c1c53d756d97710bbe00df",
+          "at": "2026-04-08T04:58:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004's only acceptance criterion covers `module_path` extraction, but the task/ADR also require emitting a warning on same-name collisions. As written, an implementation could skip the `tracing::warn` path entirely and still satisfy the spec's done criteria.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 154,
+              "category": "requirements"
+            },
+            {
+              "message": "The T005/T006 acceptance criteria verify reverse detection and report emission, but they never require `forward_signals` to be populated correctly from the existing spec->code evaluation. That leaves a reverse-only implementation able to pass this track even though the goal and ADR both call for bidirectional consistency checking.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 163,
+              "category": "requirements"
+            },
+            {
+              "message": "`cargo make ci` is an acceptance criterion for every task, but the verification checklist never asks the implementer to run it. Someone can complete every listed verification step without exercising the actual repository gate.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 11,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:94413265f6b66873ca6aec768df1f858620ee3ea89c1c53d756d97710bbe00df",
+          "at": "2026-04-08T05:03:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is underspecified in the success criteria. The ADR and metadata make this fix responsible for still regenerating `registry.md` while skipping done/archived track views, but the only acceptance criterion checks the non-overwrite side. An implementation that stops updating `registry.md` entirely would still satisfy the current spec.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 118,
+              "category": "acceptance_criteria"
+            },
+            {
+              "message": "T002's contract says `collect_type_names` must keep unwrapping both `Result<T, E>` and `Option<T>`, but the acceptance criteria only exercise the `Vec<T>` negative case and the `Result` positive case. A change that accidentally stops unwrapping `Option<T>` would still pass this track as written.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 127,
+              "category": "acceptance_criteria"
+            },
+            {
+              "message": "The T003 verification step asks for `grep -r CodeProfile` over the whole codebase, but this repository intentionally contains historical docs and ADRs that must continue to mention `CodeProfile`. Even after the implementation is correct, this checklist item will still fail on unrelated documentation, so it cannot reliably verify the rename.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 13,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:0d6741e36788f0c855e728af19c67230d5da2cb18b2867d40d53766189efa8c3",
+          "at": "2026-04-08T05:06:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T004`'s written acceptance contract dropped the `TypeInfo.module_path` requirement even though both the task scope and ADR require adding `module_path` to `TypeInfo` and `TypeNode`. As written, an implementation that only populates `TypeNode.module_path` would satisfy the track while still violating the planned rustdoc-to-domain data flow.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 172,
+              "category": null
+            },
+            {
+              "message": "`verification.md` never checks the main behavioral change for `T003`: that `TypeGraph.outgoing` is filtered down to typestate transitions only. The only `T003` manual step is a `CodeProfile` grep, so this track can be marked verified without exercising the new transition-filtering behavior called out in the ADR and acceptance criteria.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 13,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:c495f5fc23fdc6f7e61dd139fe0c683c0b52cffec68f01af340b37d6ee9b4ffc",
+          "at": "2026-04-08T05:09:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` checks that done/archived track views stay untouched after `cargo make track-sync-views`, but it never verifies the paired T001 acceptance criterion that `registry.md` is still regenerated. A regression that skips registry updates entirely would still satisfy this checklist.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 11,
+              "category": "testing"
+            },
+            {
+              "message": "The T004 verification only asks for a same-name-type warning, while `spec.json` also requires proving that `TypeInfo.module_path` is extracted from rustdoc JSON and propagated into `TypeNode.module_path`. As written, the checklist would miss an implementation that emits a warning without actually wiring the `module_path` data flow correctly.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 15,
+              "category": "testing"
+            },
+            {
+              "message": "The T006 step only checks that the CLI output contains `forward_signals`, `undeclared_types`, and `undeclared_traits`; it does not verify that `forward_signals` is actually the correct result of `evaluate_domain_type_signals` as required by the acceptance criteria. A broken forward-direction consistency report could therefore pass this verification plan.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 17,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6ef6e692338c47727e1078ee30609b4dc3045af2d10086a27172e836d415e102",
+          "at": "2026-04-08T05:13:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` is the only task referenced for the reverse-direction check, but its description only covers undeclared `TypeGraph` nodes and never mentions trait reporting. Since `spec.json` assigns `undeclared_traits` to `T005`, the plan can be marked complete without implementing half of ADR Decision 4.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/metadata.json",
+              "line": 36,
+              "category": "traceability"
+            },
+            {
+              "message": "The T002 checklist only verifies the negative case (`Vec<T>` must not expose `T` in `return_type_names`). It never checks the required positive unwrap behavior for `Option<T>`/`Result<T, E>`, so a regression in the new selective-unwrapping logic would still pass verification.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 13,
+              "category": "testing"
+            },
+            {
+              "message": "This verification step compares `ConsistencyReport.forward_signals` against `sotp track signals`, but that command evaluates spec source-tag signals, not domain-type signals. As written, the checklist cannot validate whether the new forward consistency output matches `evaluate_domain_type_signals`.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 20,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c001658c41d277960c5aff6a64d038002cb2c7b0881d1ae45ad8bcb8fedab7df",
+          "at": "2026-04-08T05:16:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The track introduces a new public CLI surface (`sotp verify spec-code-consistency`), but the acceptance contract only covers the happy path of emitting a `ConsistencyReport`. AGENTS.md requires happy-path and error-case tests for public APIs, and there is no requirement here to verify fail-closed behavior for invalid track IDs, unreadable `domain-types.json`, or schema/export failures. As written, incomplete error propagation could ship while still satisfying the track.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 208,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:8bf90d6837d1d4162231e3a7e3cb0c069de16db9f95a7e90eeb496365ed15fcf",
+          "at": "2026-04-08T05:19:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec7bb7353e9aff80fe379ed2629a0b84b01f30663756e23f8647aa3567f9da9a",
+          "at": "2026-04-08T05:21:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005's manual verification invokes `sotp verify spec-code-consistency` without the `--track-id` and `--crate` arguments that the spec requires for this CLI, so the checklist does not actually exercise the documented command contract.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 19,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:a9fca60f8aac86b24d1d01e6c6b65677521e8b00fbcad97ae2129ee687395d1d",
+          "at": "2026-04-08T05:38:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002's verification only checks `Vec<T>` non-expansion and `Option<T>` expansion; it never exercises the `Result<T, E>` path that the spec explicitly relies on. If `collect_type_names()` regresses on `Result`, this checklist would still pass.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 13,
+              "category": "testing"
+            },
+            {
+              "message": "T006 is missing any error-path verification for invalid `track-id` or unreadable `domain-types.json`, even though the spec requires a non-zero exit code and clear error message for those cases. That leaves the CLI's failure handling untested.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 19,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:ed97f270772c111f380deb6688c723030241bab7da4c4871225a8524b6df9011",
+          "at": "2026-04-08T05:40:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is underspecified: the ADR’s Decision 1 requires `collect_type_names` to keep unwrapping `BorrowedRef` and to stop recursing into tuples, but this spec/verification only assert the Vec/Result/Option cases. An implementation could satisfy the current checklist and still violate the intended `collect_type_names` behavior for borrowed references or tuples.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 24,
+              "category": "spec"
+            }
+          ],
+          "hash": "rvw1:sha256:1461359d3b93bbd7111ae384a9fabc3f4d6cbaa91ea6bbf63495094035a70ec3",
+          "at": "2026-04-08T05:41:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is under-tested as written: the checklist only exercises `Vec<T>` for the non-expanding generic-wrapper case, but the task description explicitly also forbids recursion into other wrappers like `HashMap` and `Box`. A regression that still unwraps those wrappers could pass this verification plan.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 13,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:64bd87ff42417c1b84c1218fefe193acc03deca635f0e13f0e5d339184ae0f13",
+          "at": "2026-04-08T05:48:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b870cfc9f7c64540a5d5d268cdcda5da070cc820b2b517b42166085a2914bac0",
+          "at": "2026-04-08T05:49:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is underspecified: the acceptance criteria only require preserving done/archived views and still regenerating `registry.md`, but never assert that active track views continue to be regenerated. An implementation that stops rendering all per-track views and only updates `registry.md` would still satisfy the current spec while breaking `track-sync-views` for planned/in-progress tracks.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 118,
+              "category": "requirements"
+            }
+          ],
+          "hash": "rvw1:sha256:b870cfc9f7c64540a5d5d268cdcda5da070cc820b2b517b42166085a2914bac0",
+          "at": "2026-04-08T05:55:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003's in-scope requirement drops the ADR's requirement that typestate filtering move into TypeGraph construction (`build_type_graph`). With only the rename and `outgoing` field called out here, an implementation could keep filtering in `evaluate_domain_type_signals` and still satisfy the written spec, which misses the planned architecture change.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 33,
+              "category": "requirements"
+            },
+            {
+              "message": "T002's acceptance criteria cover `Vec<T>` and `Option<T>` only, even though the in-scope requirement also mandates preserving `BorrowedRef` unwrapping and removing tuple expansion. A regression in `&T` or tuple handling would still satisfy every listed acceptance criterion.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 145,
+              "category": "acceptance_criteria"
+            }
+          ],
+          "hash": "rvw1:sha256:1bb5c613dec9d24cdab48f34299d8cbb12deed2a4ade82266ac722d670e7bafa",
+          "at": "2026-04-08T06:58:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`S1` says the fix may be implemented by filtering `collect_track_snapshots()` by status, but `sync_rendered_views()` uses that same snapshot list to render `registry.md`. Taking this option would drop `done`/`archived` tracks from the registry entirely, even though the intended change is only to stop rewriting their per-track views.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/metadata.json",
+              "line": 60,
+              "category": "correctness"
+            },
+            {
+              "message": "`T005` promises that reverse checking will detect every undeclared type/trait, but the spec still keeps `domain-types.json` keyed by bare name and `T004` only warns on same-name collisions. In the motivating `review::Error` vs `guard::Error` case, a single declared `Error` entry would mask the other code type, so this design can still produce false negatives.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 208,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:994c43ff369884aa3b0fc69cfe28c60b069878eac07ef33f6fbb97c111657100",
+          "at": "2026-04-08T07:11:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002's acceptance contract only exercises `Vec<Published>` for the 'do not recurse into generic wrappers' rule, even though the task explicitly forbids unwrapping other wrappers such as `HashMap`, `Box`, and `Arc`. An implementation that still expands those wrappers would satisfy every written acceptance criterion here.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 151,
+              "category": "requirements"
+            },
+            {
+              "message": "This T006 verification step cannot prove `forward_signals` is correct: `sotp track domain-type-signals` only emits a blue/red summary and writes signals back to `domain-types.json`, so comparing against the command's 'output' does not validate the per-entry `evaluate_domain_type_signals` result. A broken `ConsistencyReport.forward_signals` could still pass as long as aggregate counts match.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 24,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:56b4dd3f560624ab66d4b21946cf1d48143b6dca36fc9a0531d0d9c0909ab307",
+          "at": "2026-04-08T07:19:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 only defines success around the bulk `cargo make track-sync-views` path, but the same overwrite bug can still occur through `sync_rendered_views(..., Some(track_id))`, which is what `track transition`/state operations call after a track becomes `done`. As written, the plan can pass its acceptance checks while still regenerating a just-completed legacy track's views on status transition.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/spec.json",
+              "line": 124,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:66b4d3a3a3e366200c33701b342a0159e8c3bbd703801de4714a941893098d17",
+          "at": "2026-04-08T07:26:33Z"
+        }
+      ]
+    }
+  }
+}
