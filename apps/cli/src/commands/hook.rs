@@ -12,7 +12,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 use std::sync::Arc;
 
-use domain::hook::{HookContext, HookName};
+use domain::hook::HookContext;
 use infrastructure::shell::ConchShellParser;
 
 /// CLI-layer serde type for Claude Code hook JSON envelope.
@@ -123,16 +123,14 @@ pub enum CliHookName {
     BlockDirectGitOps,
     /// Guard: block `rm` commands targeting test files (PreToolUse).
     BlockTestFileDeletion,
+    /// Advisory: skill compliance check for UserPromptSubmit.
+    SkillCompliance,
 }
 
 impl CliHookName {
-    /// Converts to domain `HookName`.
-    #[allow(dead_code)]
-    fn to_domain(self) -> HookName {
-        match self {
-            Self::BlockDirectGitOps => HookName::BlockDirectGitOps,
-            Self::BlockTestFileDeletion => HookName::BlockTestFileDeletion,
-        }
+    /// Returns `true` if this is a UserPromptSubmit hook (advisory, never blocks).
+    fn is_user_prompt_submit(self) -> bool {
+        matches!(self, Self::SkillCompliance)
     }
 
     /// Returns `true` if this is a PostToolUse hook (cannot block).
@@ -163,6 +161,11 @@ pub fn execute(cmd: HookCommand) -> ExitCode {
 }
 
 fn execute_dispatch(hook: CliHookName) -> ExitCode {
+    // UserPromptSubmit hooks use a separate flow (advisory, not guard).
+    if hook.is_user_prompt_submit() {
+        return execute_user_prompt_submit(hook);
+    }
+
     let is_post = hook.is_post_tool_use();
 
     // Read stdin JSON
@@ -205,6 +208,7 @@ fn execute_dispatch(hook: CliHookName) -> ExitCode {
                 usecase::hook::TestFileDeletionGuardHandler { parser: Arc::clone(&parser) };
             handler_handle(&handler, &ctx, &input)
         }
+        CliHookName::SkillCompliance => return ExitCode::SUCCESS,
     };
 
     match result {
@@ -250,4 +254,107 @@ fn handle_error(is_post_tool_use: bool, message: &str) -> ExitCode {
 /// Returns an `ExitCode` for the given value.
 fn exit_code(code: u8) -> ExitCode {
     ExitCode::from(code)
+}
+
+// ---------------------------------------------------------------------------
+// UserPromptSubmit: skill compliance hook
+// ---------------------------------------------------------------------------
+
+/// Serde type for UserPromptSubmit hook JSON envelope.
+#[derive(Debug, serde::Deserialize)]
+struct PromptEnvelope {
+    #[serde(default)]
+    prompt: String,
+}
+
+/// Executes a UserPromptSubmit advisory hook.
+/// Reads prompt from stdin JSON, checks skill compliance, and emits
+/// `additionalContext` via stdout JSON. Always exits 0.
+fn execute_user_prompt_submit(_hook: CliHookName) -> ExitCode {
+    // Read stdin
+    let mut stdin_buf = String::new();
+    if std::io::stdin().read_to_string(&mut stdin_buf).is_err() {
+        return ExitCode::SUCCESS; // advisory — never block
+    }
+
+    let prompt = match serde_json::from_str::<PromptEnvelope>(stdin_buf.trim()) {
+        Ok(env) => env.prompt,
+        Err(e) => {
+            eprintln!("warning: skill-compliance: failed to parse prompt JSON: {e}");
+            return ExitCode::SUCCESS;
+        }
+    };
+
+    if prompt.is_empty() {
+        return ExitCode::SUCCESS;
+    }
+
+    // Early exit: skip filesystem I/O when no /track: command is present
+    let has_track_command = prompt.to_lowercase().contains("/track:");
+    let skill_match = domain::skill_compliance::detect_skill_command(&prompt);
+    if !has_track_command && skill_match.is_none() {
+        return ExitCode::SUCCESS;
+    }
+
+    // Load guides and track context only when /track: is detected
+    let guides = load_guides_from_project();
+    let track_context = load_latest_track_context();
+
+    // Run compliance check
+    let ctx =
+        domain::skill_compliance::check_compliance(&prompt, track_context.as_deref(), &guides, 3);
+
+    if let Some(additional_context) = ctx.render() {
+        let output = serde_json::json!({
+            "hookSpecificOutput": {
+                "hookEventName": "UserPromptSubmit",
+                "additionalContext": additional_context,
+            }
+        });
+        println!("{}", output);
+    }
+
+    ExitCode::SUCCESS
+}
+
+/// Loads guide entries from `knowledge/external/guides.json` relative to
+/// `$CLAUDE_PROJECT_DIR`. Returns empty vec on any failure (advisory hook).
+fn load_guides_from_project() -> Vec<domain::skill_compliance::GuideEntry> {
+    let project_dir = match std::env::var("CLAUDE_PROJECT_DIR") {
+        Ok(dir) => PathBuf::from(dir),
+        Err(_) => return Vec::new(),
+    };
+    let guides_path = project_dir.join("knowledge/external/guides.json");
+    infrastructure::guides_codec::load_guides(&guides_path).unwrap_or_default()
+}
+
+/// Loads context from the current track's spec.md and plan.md.
+/// Resolves the track from the current git branch (`track/<id>`).
+/// Returns `None` if not on a track branch or on any failure (advisory — never block).
+fn load_latest_track_context() -> Option<String> {
+    let project_dir = PathBuf::from(std::env::var("CLAUDE_PROJECT_DIR").ok()?);
+
+    // Resolve current track from git branch name
+    let output = std::process::Command::new("git")
+        .args(["branch", "--show-current"])
+        .current_dir(&project_dir)
+        .output()
+        .ok()?;
+    let branch = String::from_utf8(output.stdout).ok()?;
+    let branch = branch.trim();
+    let track_id = branch.strip_prefix("track/")?;
+
+    let track_dir = project_dir.join("track/items").join(track_id);
+    if !track_dir.is_dir() {
+        return None;
+    }
+
+    let mut parts = Vec::new();
+    for filename in ["spec.md", "plan.md"] {
+        if let Ok(content) = std::fs::read_to_string(track_dir.join(filename)) {
+            parts.push(content);
+        }
+    }
+
+    if parts.is_empty() { None } else { Some(parts.join("\n")) }
 }

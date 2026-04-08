@@ -43,7 +43,6 @@ static HARDCODED_CODEX_MODEL_RE: LazyLock<Option<Regex>> =
 // ---------------------------------------------------------------------------
 
 const EXPECTED_HOOK_PATHS: &[(&str, &str)] = &[
-    (".claude/hooks/agent-router.py", "agent-router hook"),
     (".claude/hooks/check-codex-before-write.py", "codex-before-write hook"),
     (".claude/hooks/suggest-gemini-research.py", "gemini-research hook"),
     (".claude/hooks/error-to-codex.py", "error-to-codex hook"),
@@ -59,16 +58,27 @@ const EXPECTED_HOOK_PATHS: &[(&str, &str)] = &[
 // Constants: expected hook commands (label -> required fragments)
 // ---------------------------------------------------------------------------
 
-const EXPECTED_HOOK_COMMANDS: &[(&str, &[&str])] = &[(
-    "direct git ops block hook",
-    &[
-        "SOTP_CLI_BINARY:-",
-        "$CLAUDE_PROJECT_DIR/bin/sotp",
-        "cargo run --quiet -p cli --",
-        "hook dispatch block-direct-git-ops",
-        "|| exit 2",
-    ],
-)];
+const EXPECTED_HOOK_COMMANDS: &[(&str, &[&str])] = &[
+    (
+        "direct git ops block hook",
+        &[
+            "SOTP_CLI_BINARY:-",
+            "$CLAUDE_PROJECT_DIR/bin/sotp",
+            "cargo run --quiet -p cli --",
+            "hook dispatch block-direct-git-ops",
+            "|| exit 2",
+        ],
+    ),
+    (
+        "skill compliance hook",
+        &[
+            "SOTP_CLI_BINARY:-",
+            "$CLAUDE_PROJECT_DIR/bin/sotp",
+            "hook dispatch skill-compliance",
+            "|| exit 0",
+        ],
+    ),
+];
 
 // ---------------------------------------------------------------------------
 // Constants: expected allow (entry -> label)

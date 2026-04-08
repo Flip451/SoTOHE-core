@@ -1,0 +1,135 @@
+{
+  "branch": "track/skill-compliance-hook-2026-04-08",
+  "created_at": "2026-04-08T00:44:27Z",
+  "id": "skill-compliance-hook-2026-04-08",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "agent-router.py と test_agent_router.py を削除し、settings.json / orchestra.rs / DESIGN.md から参照を除去する。",
+          "test_agent_router.py は agent-router.py と同時に削除しないと pytest collection が失敗するため、原子的に削除する。",
+          "settings.json の UserPromptSubmit キーは一旦削除し、新フック実装後に再登録する。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T01",
+          "T02",
+          "T03",
+          "T04"
+        ],
+        "title": "agent-router 廃止（クリーンアップ）"
+      },
+      {
+        "description": [
+          "/track:* コマンドパターン検出と SKILL.md フェーズ要件リマインド生成を domain 層に配置する。",
+          "external guide マッチングロジック（guides.json keyword match）も domain 層に移植する。",
+          "TDD で Red → Green → Refactor サイクルを遵守する。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T05",
+          "T06",
+          "T07"
+        ],
+        "title": "skill 遵守フック — domain 層"
+      },
+      {
+        "description": [
+          "guides.json の serde codec を infrastructure 層に配置する。",
+          "sotp hook dispatch skill-compliance サブコマンドを CLI 層に実装する。",
+          "settings.json と orchestra.rs に新フックを登録する。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T08",
+          "T09",
+          "T11"
+        ],
+        "title": "skill 遵守フック — infrastructure + CLI 層"
+      },
+      {
+        "description": [
+          "domain/infrastructure/CLI 各層のユニットテストを作成する。",
+          "cargo make ci 全チェックを通過させる。"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T10",
+          "T12"
+        ],
+        "title": "テスト + CI 検証"
+      }
+    ],
+    "summary": [
+      "agent-router.py（intent 検出 + ルーティングヒント注入の Python フック ~850行）を廃止する。",
+      "代わりに sotp hook dispatch skill-compliance を Rust で新設し、/track:* コマンド検出時の SKILL.md フェーズ遵守リマインドと external guide injection を担う。",
+      "intent 検出・ルーティングヒントは rules + agent-profiles.json に委譲し、フックでは行わない。"
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "settings.json — UserPromptSubmit の agent-router エントリを sotp hook dispatch skill-compliance に置換",
+      "id": "T01",
+      "status": "done"
+    },
+    {
+      "description": "agent-router.py + test_agent_router.py の削除（同時削除必須 — pytest collection 失敗を防ぐ）",
+      "id": "T02",
+      "status": "done"
+    },
+    {
+      "description": "orchestra.rs — EXPECTED_HOOK_PATHS から agent-router を除去",
+      "id": "T03",
+      "status": "done"
+    },
+    {
+      "description": "DESIGN.md — Python advisory hooks テーブルから agent-router を除去",
+      "id": "T04",
+      "status": "done"
+    },
+    {
+      "description": "domain 層 — /track:* コマンドパターン検出ロジック（SkillComplianceCheck）の定義",
+      "id": "T05",
+      "status": "done"
+    },
+    {
+      "description": "domain 層 — SKILL.md フェーズ要件のリマインドメッセージ生成",
+      "id": "T06",
+      "status": "done"
+    },
+    {
+      "description": "domain 層 — external guide マッチングロジック（guides.json keyword match）の移植",
+      "id": "T07",
+      "status": "done"
+    },
+    {
+      "description": "infrastructure 層 — guides.json codec（serde deserialize + keyword matcher 実装）",
+      "id": "T08",
+      "status": "done"
+    },
+    {
+      "description": "CLI 層 — sotp hook dispatch skill-compliance サブコマンド実装",
+      "id": "T09",
+      "status": "done"
+    },
+    {
+      "description": "テスト — domain/infrastructure/CLI 各層のユニットテスト（TDD: Red → Green → Refactor）",
+      "id": "T10",
+      "status": "done"
+    },
+    {
+      "description": "settings.json + orchestra.rs に新フック skill-compliance を登録",
+      "id": "T11",
+      "status": "done"
+    },
+    {
+      "description": "cargo make ci 全チェック通過確認",
+      "id": "T12",
+      "status": "done"
+    }
+  ],
+  "title": "WF-67: agent-router 廃止 + skill 遵守フック導入（Rust）",
+  "updated_at": "2026-04-08T04:17:38Z"
+}

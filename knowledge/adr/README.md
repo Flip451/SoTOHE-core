@@ -101,3 +101,9 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Review Hash スコープ再設計](2026-03-26-0000-review-hash-scope-redesign.md) | Superseded | 2026-03-26 |
 | [review.json 分離 + グループ独立レビュー状態](2026-03-29-0947-review-json-per-group-review-state.md) | Superseded | 2026-03-29 |
 | [Review System v2: frozen scope 廃止とスコープ独立型レビュー](2026-04-04-1456-review-system-v2-redesign.md) | Accepted | 2026-04-04 |
+
+### オーケストレーション・エージェント管理
+
+| ADR | Status | Date |
+|-----|--------|------|
+| [agent-router フックを skill 遵守フックに置換](2026-04-08-1200-remove-agent-router-hook.md) | Accepted | 2026-04-08 |
