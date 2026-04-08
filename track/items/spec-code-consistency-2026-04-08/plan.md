@@ -20,7 +20,7 @@ Result と Option のみ first generic arg を展開。他の ResolvedPath は b
 BorrowedRef は引き続き inner を展開。Tuple 展開は削除。
 影響: Vec<Published> → [Vec] (Published は展開されない), Result<Published, Error> → [Published]
 
-- [ ] collect_type_names を Result/Option のみに制限 — 他の generic wrapper (Vec, HashMap, Box 等) は展開しない
+- [x] collect_type_names を Result/Option のみに制限 — 他の generic wrapper (Vec, HashMap, Box 等) は展開しない
 
 ## CodeProfile → TypeGraph リネーム + outgoing フィールド
 

@@ -88,7 +88,7 @@
     {
       "description": "collect_type_names を Result/Option のみに制限 — 他の generic wrapper (Vec, HashMap, Box 等) は展開しない",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "CodeProfile → TypeGraph リネーム + outgoing フィールド追加 — typestate フィルタを構築時に移動",
@@ -112,5 +112,5 @@
     }
   ],
   "title": "3-12 spec ↔ code 整合性チェック — TypeGraph + 逆方向検出",
-  "updated_at": "2026-04-08T07:40:10Z"
+  "updated_at": "2026-04-08T08:02:18Z"
 }

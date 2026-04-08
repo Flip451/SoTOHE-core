@@ -283,34 +283,38 @@ fn extract_return_type_names(sig: &rustdoc_types::FunctionSignature) -> Vec<Stri
     })
 }
 
-/// Recursively collect all type names from a rustdoc `Type`.
+/// Collect type names from a rustdoc `Type`, selectively unwrapping only
+/// `Result<T, E>` and `Option<T>` (extracting the first generic argument).
 ///
-/// Extracts the last path segment for resolved paths (e.g. `"Published"` from
-/// `"crate::Published"`) and recurses into generic arguments, borrowed refs, and
-/// tuple elements.
+/// Other generic wrappers (`Vec<T>`, `HashMap<K,V>`, `Box<T>`, `Arc<T>`, etc.)
+/// are added as bare names without recursing into their type arguments.
+/// `BorrowedRef` (`&T`) is unwrapped to extract the inner type.
+/// `Tuple` elements are NOT expanded (tuples are not transition targets).
 fn collect_type_names(ty: &rustdoc_types::Type, out: &mut Vec<String>) {
     match ty {
         rustdoc_types::Type::ResolvedPath(p) => {
-            if let Some(name) = p.path.rsplit("::").next() {
-                out.push(name.to_string());
-            }
-            if let Some(args) = &p.args {
-                if let rustdoc_types::GenericArgs::AngleBracketed { args, .. } = args.as_ref() {
-                    for arg in args {
-                        if let rustdoc_types::GenericArg::Type(inner) = arg {
-                            collect_type_names(inner, out);
+            let name = p.path.rsplit("::").next().unwrap_or(&p.path);
+            match name {
+                "Result" | "Option" => {
+                    // Unwrap first generic argument only.
+                    if let Some(args) = &p.args {
+                        if let rustdoc_types::GenericArgs::AngleBracketed { args, .. } =
+                            args.as_ref()
+                        {
+                            if let Some(rustdoc_types::GenericArg::Type(inner)) = args.first() {
+                                collect_type_names(inner, out);
+                            }
                         }
                     }
+                }
+                _ => {
+                    // Non-wrapper type — add bare name, do NOT recurse into generics.
+                    out.push(name.to_string());
                 }
             }
         }
         rustdoc_types::Type::BorrowedRef { type_: inner, .. } => {
             collect_type_names(inner, out);
-        }
-        rustdoc_types::Type::Tuple(types) => {
-            for t in types {
-                collect_type_names(t, out);
-            }
         }
         _ => {}
     }
@@ -343,5 +347,117 @@ fn type_name(ty: &rustdoc_types::Type) -> String {
         rustdoc_types::Type::Slice(inner) => format!("[{}]", type_name(inner)),
         rustdoc_types::Type::Tuple(types) if types.is_empty() => "()".to_owned(),
         _ => "_".to_owned(),
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+
+    /// Helper: build a `ResolvedPath` type with optional generic args.
+    fn resolved(name: &str, args: Option<Vec<rustdoc_types::GenericArg>>) -> rustdoc_types::Type {
+        rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: name.to_string(),
+            id: rustdoc_types::Id(0),
+            args: args.map(|a| {
+                Box::new(rustdoc_types::GenericArgs::AngleBracketed {
+                    args: a,
+                    constraints: vec![],
+                })
+            }),
+        })
+    }
+
+    fn type_arg(ty: rustdoc_types::Type) -> rustdoc_types::GenericArg {
+        rustdoc_types::GenericArg::Type(ty)
+    }
+
+    fn simple(name: &str) -> rustdoc_types::Type {
+        resolved(name, None)
+    }
+
+    #[test]
+    fn test_collect_type_names_result_unwraps_first_arg() {
+        let ty = resolved(
+            "Result",
+            Some(vec![type_arg(simple("Published")), type_arg(simple("Error"))]),
+        );
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["Published"]);
+    }
+
+    #[test]
+    fn test_collect_type_names_option_unwraps_first_arg() {
+        let ty = resolved("Option", Some(vec![type_arg(simple("Published"))]));
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["Published"]);
+    }
+
+    #[test]
+    fn test_collect_type_names_vec_does_not_unwrap() {
+        let ty = resolved("Vec", Some(vec![type_arg(simple("Published"))]));
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["Vec"]);
+    }
+
+    #[test]
+    fn test_collect_type_names_hashmap_does_not_unwrap() {
+        let ty = resolved(
+            "HashMap",
+            Some(vec![type_arg(simple("String")), type_arg(simple("Published"))]),
+        );
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["HashMap"]);
+    }
+
+    #[test]
+    fn test_collect_type_names_box_does_not_unwrap() {
+        let ty = resolved("Box", Some(vec![type_arg(simple("Published"))]));
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["Box"]);
+    }
+
+    #[test]
+    fn test_collect_type_names_borrowed_ref_unwraps_inner() {
+        let ty = rustdoc_types::Type::BorrowedRef {
+            lifetime: None,
+            is_mutable: false,
+            type_: Box::new(simple("Draft")),
+        };
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["Draft"]);
+    }
+
+    #[test]
+    fn test_collect_type_names_tuple_does_not_expand() {
+        let ty = rustdoc_types::Type::Tuple(vec![simple("A"), simple("B")]);
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert!(out.is_empty());
+    }
+
+    #[test]
+    fn test_collect_type_names_simple_type_returns_bare_name() {
+        let ty = simple("Published");
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["Published"]);
+    }
+
+    #[test]
+    fn test_collect_type_names_result_with_nested_option() {
+        // Result<Option<Published>, Error> → unwrap Result → unwrap Option → Published
+        let inner = resolved("Option", Some(vec![type_arg(simple("Published"))]));
+        let ty = resolved("Result", Some(vec![type_arg(inner), type_arg(simple("Error"))]));
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["Published"]);
     }
 }

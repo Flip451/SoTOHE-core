@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
-          "at": "2026-04-08T07:55:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
-          "at": "2026-04-08T07:59:34Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -466,6 +448,67 @@
           "findings": [],
           "hash": "rvw1:sha256:abdd2e6811af53a84da781e040289018c331614ad6ed4aac99aee5e924d121c1",
           "at": "2026-04-08T07:58:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d24132d090dd59bae610b1ea2db8f4395e92c8980b63f6e6541e1f071ad0de3",
+          "at": "2026-04-08T08:03:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The change marks `T002` as `done`, but the review brief and changed-file description both state this update was supposed to complete `T001`. As written, the source-of-truth metadata advances the wrong task and leaves the intended task-state update unreviewed.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/metadata.json",
+              "line": 91,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0d24132d090dd59bae610b1ea2db8f4395e92c8980b63f6e6541e1f071ad0de3",
+          "at": "2026-04-08T08:06:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d24132d090dd59bae610b1ea2db8f4395e92c8980b63f6e6541e1f071ad0de3",
+          "at": "2026-04-08T08:07:47Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
+          "at": "2026-04-08T07:55:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
+          "at": "2026-04-08T07:59:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e02e0e33ed6add32f0f7796985b0ac4fe4e3253444bbc22867fd449f0e10155b",
+          "at": "2026-04-08T08:04:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e02e0e33ed6add32f0f7796985b0ac4fe4e3253444bbc22867fd449f0e10155b",
+          "at": "2026-04-08T08:07:57Z"
         }
       ]
     }
