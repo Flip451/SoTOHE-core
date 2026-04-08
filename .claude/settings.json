@@ -1,5 +1,17 @@
 {
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"${SOTP_CLI_BINARY:-}\" ]; then \"$SOTP_CLI_BINARY\" hook dispatch skill-compliance || exit 0; elif [ -x \"$CLAUDE_PROJECT_DIR/bin/sotp\" ]; then \"$CLAUDE_PROJECT_DIR/bin/sotp\" hook dispatch skill-compliance || exit 0; elif command -v sotp >/dev/null 2>&1; then sotp hook dispatch skill-compliance || exit 0; else exit 0; fi",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Edit|Write",
