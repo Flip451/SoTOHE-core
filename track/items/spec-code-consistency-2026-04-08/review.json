@@ -1,118 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
-          "at": "2026-04-08T07:55:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
-          "at": "2026-04-08T07:59:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e02e0e33ed6add32f0f7796985b0ac4fe4e3253444bbc22867fd449f0e10155b",
-          "at": "2026-04-08T08:04:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e02e0e33ed6add32f0f7796985b0ac4fe4e3253444bbc22867fd449f0e10155b",
-          "at": "2026-04-08T08:07:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `typestate_names`-driven outgoing computation is not covered by any test in this file: every updated test still passes `HashSet::new()`, so a regression in the intersection logic or `set_outgoing()` path would slip through. This public API now has an untested behavior branch.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/code_profile_builder.rs",
-              "line": 38,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:220393607eb2677b938bcc5a096014df25e9f1cb449aa61bec0920ca139e98a0",
-          "at": "2026-04-08T08:17:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "No test covers the new `typestate_names` filtering path. Every existing test still calls `build_type_graph(..., &HashSet::new())`, so the outgoing-transition logic at this point can regress without any assertion failure. Please add a case that supplies typestate names and verifies `TypeNode::outgoing()` only includes the filtered typestate targets.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/code_profile_builder.rs",
-              "line": 38,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:220393607eb2677b938bcc5a096014df25e9f1cb449aa61bec0920ca139e98a0",
-          "at": "2026-04-08T08:18:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:458b87b3633322ad77fcca3e4f0caef7c2bbd2ef9df3c2c512650fecc91c1a86",
-          "at": "2026-04-08T08:19:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:458b87b3633322ad77fcca3e4f0caef7c2bbd2ef9df3c2c512650fecc91c1a86",
-          "at": "2026-04-08T08:21:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:06884a4f254b6f98b86135e5ad79d53501dad5d023358fa45f95d36a164d6fce",
-          "at": "2026-04-08T08:52:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
-          "at": "2026-04-08T09:09:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_type_graph` still resolves collisions by plain type name and keeps the last entry it sees. Because `SchemaExport` only sorts by `name`, equal-name types retain the original `krate.index` hash iteration order, so the winner is nondeterministic. This repo already has two public `Verdict` enums (`review::Verdict` and `review_v2::Verdict`), which means the new collision path can flip between runs and produce unstable `TypeGraph` contents/module paths.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/code_profile_builder.rs",
-              "line": 66,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
-          "at": "2026-04-08T09:13:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
-          "at": "2026-04-08T09:19:55Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -684,6 +572,20 @@
           "findings": [],
           "hash": "rvw1:sha256:1ace372cdf2c4e5c5015b439a95c650bdbc1a2a414aa7ae03f60c73d3694e3ab",
           "at": "2026-04-08T09:54:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ad97850a05c103542cea6b4c3b1c23cca7c0a5b8ff518a2b0a910e4e86a6194",
+          "at": "2026-04-08T10:41:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ad97850a05c103542cea6b4c3b1c23cca7c0a5b8ff518a2b0a910e4e86a6194",
+          "at": "2026-04-08T10:42:51Z"
         }
       ]
     },
@@ -886,6 +788,118 @@
           "findings": [],
           "hash": "rvw1:sha256:6de82f76cf8bf6b476df2d74eb964672af0d7df325b481d774a57dfc6be24398",
           "at": "2026-04-08T09:55:25Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
+          "at": "2026-04-08T07:55:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
+          "at": "2026-04-08T07:59:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e02e0e33ed6add32f0f7796985b0ac4fe4e3253444bbc22867fd449f0e10155b",
+          "at": "2026-04-08T08:04:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e02e0e33ed6add32f0f7796985b0ac4fe4e3253444bbc22867fd449f0e10155b",
+          "at": "2026-04-08T08:07:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `typestate_names`-driven outgoing computation is not covered by any test in this file: every updated test still passes `HashSet::new()`, so a regression in the intersection logic or `set_outgoing()` path would slip through. This public API now has an untested behavior branch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/code_profile_builder.rs",
+              "line": 38,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:220393607eb2677b938bcc5a096014df25e9f1cb449aa61bec0920ca139e98a0",
+          "at": "2026-04-08T08:17:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "No test covers the new `typestate_names` filtering path. Every existing test still calls `build_type_graph(..., &HashSet::new())`, so the outgoing-transition logic at this point can regress without any assertion failure. Please add a case that supplies typestate names and verifies `TypeNode::outgoing()` only includes the filtered typestate targets.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/code_profile_builder.rs",
+              "line": 38,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:220393607eb2677b938bcc5a096014df25e9f1cb449aa61bec0920ca139e98a0",
+          "at": "2026-04-08T08:18:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:458b87b3633322ad77fcca3e4f0caef7c2bbd2ef9df3c2c512650fecc91c1a86",
+          "at": "2026-04-08T08:19:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:458b87b3633322ad77fcca3e4f0caef7c2bbd2ef9df3c2c512650fecc91c1a86",
+          "at": "2026-04-08T08:21:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:06884a4f254b6f98b86135e5ad79d53501dad5d023358fa45f95d36a164d6fce",
+          "at": "2026-04-08T08:52:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
+          "at": "2026-04-08T09:09:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_type_graph` still resolves collisions by plain type name and keeps the last entry it sees. Because `SchemaExport` only sorts by `name`, equal-name types retain the original `krate.index` hash iteration order, so the winner is nondeterministic. This repo already has two public `Verdict` enums (`review::Verdict` and `review_v2::Verdict`), which means the new collision path can flip between runs and produce unstable `TypeGraph` contents/module paths.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/code_profile_builder.rs",
+              "line": 66,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
+          "at": "2026-04-08T09:13:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
+          "at": "2026-04-08T09:19:55Z"
         }
       ]
     },
@@ -1109,6 +1123,20 @@
           "findings": [],
           "hash": "rvw1:sha256:a74d07e735a5f4ca0f850e6270e56c319d8354f697d8a28fbfdfcd5a2ef8c51a",
           "at": "2026-04-08T10:13:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dba068e88ea6d79ecc78d75df6d7da63fdbb230f1cba353ea6278d5704c8772d",
+          "at": "2026-04-08T10:41:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dba068e88ea6d79ecc78d75df6d7da63fdbb230f1cba353ea6278d5704c8772d",
+          "at": "2026-04-08T10:43:30Z"
         }
       ]
     }

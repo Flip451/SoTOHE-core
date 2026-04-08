@@ -248,15 +248,15 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
         }
     }
 
-    // Reverse: undeclared types/traits become warnings.
+    // Reverse: undeclared types/traits are errors — forces domain-types.json update.
     for name in report.undeclared_types() {
-        findings.push(domain::verify::Finding::warning(format!(
-            "undeclared type in code: `{name}` (not in domain-types.json)"
+        findings.push(domain::verify::Finding::error(format!(
+            "undeclared type in code: `{name}` — add to domain-types.json"
         )));
     }
     for name in report.undeclared_traits() {
-        findings.push(domain::verify::Finding::warning(format!(
-            "undeclared trait in code: `{name}` (not in domain-types.json)"
+        findings.push(domain::verify::Finding::error(format!(
+            "undeclared trait in code: `{name}` — add to domain-types.json"
         )));
     }
 
