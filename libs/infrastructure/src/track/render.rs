@@ -488,6 +488,13 @@ pub fn sync_rendered_views(
                 schema_version: parsed.schema_version,
             });
         }
+
+        // Skip per-track view regeneration for done/archived tracks to prevent
+        // overwriting legacy views with newer renderers that may drop data.
+        if matches!(parsed.status.as_str(), "done" | "archived") {
+            continue;
+        }
+
         let (track, _) = codec::decode(&json).map_err(|source| RenderError::InvalidMetadata {
             path: metadata_path.clone(),
             source,
@@ -1545,5 +1552,115 @@ mod tests {
         let changed = result.unwrap();
         assert!(changed.iter().any(|p| p.ends_with("plan.md")));
         assert!(!changed.iter().any(|p| p.ends_with("domain-types.md")));
+    }
+
+    #[test]
+    fn sync_rendered_views_skips_done_track_views_but_includes_in_registry() {
+        let dir = tempfile::tempdir().unwrap();
+
+        // Active track — views should be generated.
+        let active_dir = dir.path().join("track/items/track-active");
+        std::fs::create_dir_all(&active_dir).unwrap();
+        std::fs::write(
+            active_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-active",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+
+        // Done track — views should NOT be generated.
+        let done_dir = dir.path().join("track/items/track-done");
+        std::fs::create_dir_all(&done_dir).unwrap();
+        std::fs::write(
+            done_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-done",
+                "done",
+                "2026-03-10T00:00:00Z",
+                r#"[{"id":"T001","description":"Done task","status":"done","commit_hash":"abc1234567890abc1234567890abc1234567890a"}]"#,
+            ),
+        )
+        .unwrap();
+        // Write a sentinel plan.md to verify it is NOT overwritten.
+        std::fs::write(done_dir.join("plan.md"), "SENTINEL_DONE").unwrap();
+
+        let changed = sync_rendered_views(dir.path(), None).unwrap();
+
+        // Active track plan.md should be generated.
+        assert!(active_dir.join("plan.md").is_file());
+        assert!(changed.iter().any(|p| p.ends_with("track-active/plan.md")));
+
+        // Done track plan.md should remain untouched (sentinel preserved).
+        let done_plan = std::fs::read_to_string(done_dir.join("plan.md")).unwrap();
+        assert_eq!(done_plan, "SENTINEL_DONE");
+        assert!(!changed.iter().any(|p| p.ends_with("track-done/plan.md")));
+
+        // Registry should include both tracks.
+        let registry = std::fs::read_to_string(dir.path().join("track/registry.md")).unwrap();
+        assert!(registry.contains("track-done"));
+        assert!(registry.contains("track-active"));
+    }
+
+    #[test]
+    fn sync_rendered_views_skips_archived_track_views() {
+        let dir = tempfile::tempdir().unwrap();
+
+        // Archived track in archive directory.
+        let archived_dir = dir.path().join("track/archive/track-archived");
+        std::fs::create_dir_all(&archived_dir).unwrap();
+        std::fs::write(
+            archived_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-archived",
+                "archived",
+                "2026-03-10T00:00:00Z",
+                r#"[{"id":"T001","description":"Archived task","status":"done","commit_hash":"def4567890def4567890def4567890def4567890"}]"#,
+            ),
+        )
+        .unwrap();
+        // Write a sentinel plan.md.
+        std::fs::write(archived_dir.join("plan.md"), "SENTINEL_ARCHIVED").unwrap();
+
+        let changed = sync_rendered_views(dir.path(), None).unwrap();
+
+        // Archived plan.md should remain untouched.
+        let archived_plan = std::fs::read_to_string(archived_dir.join("plan.md")).unwrap();
+        assert_eq!(archived_plan, "SENTINEL_ARCHIVED");
+        assert!(!changed.iter().any(|p| p.ends_with("track-archived/plan.md")));
+
+        // Registry should include the archived track.
+        let registry = std::fs::read_to_string(dir.path().join("track/registry.md")).unwrap();
+        assert!(registry.contains("track-archived"));
+    }
+
+    #[test]
+    fn sync_rendered_views_single_track_skips_done_track() {
+        let dir = tempfile::tempdir().unwrap();
+
+        let done_dir = dir.path().join("track/items/track-done");
+        std::fs::create_dir_all(&done_dir).unwrap();
+        std::fs::write(
+            done_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-done",
+                "done",
+                "2026-03-10T00:00:00Z",
+                r#"[{"id":"T001","description":"Done task","status":"done","commit_hash":"abc1234567890abc1234567890abc1234567890a"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(done_dir.join("plan.md"), "SENTINEL_SINGLE").unwrap();
+
+        // Single-track path with track_id=Some.
+        let changed = sync_rendered_views(dir.path(), Some("track-done")).unwrap();
+
+        // plan.md should remain untouched.
+        let plan = std::fs::read_to_string(done_dir.join("plan.md")).unwrap();
+        assert_eq!(plan, "SENTINEL_SINGLE");
+        assert!(!changed.iter().any(|p| p.ends_with("plan.md")));
     }
 }

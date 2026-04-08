@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
+          "at": "2026-04-08T07:55:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
+          "at": "2026-04-08T07:59:34Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -405,6 +423,49 @@
           ],
           "hash": "rvw1:sha256:66b4d3a3a3e366200c33701b342a0159e8c3bbd703801de4714a941893098d17",
           "at": "2026-04-08T07:26:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Scope Verified` requires every ADR decision section to be covered by this track, but ADR 2026-04-08-0045 Decision 5 explicitly defers Yellow reintroduction to a future track. As written, the checklist is impossible to satisfy without scope creep or a false sign-off.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 5,
+              "category": null
+            },
+            {
+              "message": "The T001 single-track verification only checks a `done` track. The ADR and acceptance criteria require both `done` and `archived` tracks to be skipped, so an `archived`-only regression in the `track_id=Some(...)` path would pass this checklist.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/verification.md",
+              "line": 12,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:ee11ac82df8a6d0c967fa7a43afaf6b6bd00282f1295069d936ee747a263be6b",
+          "at": "2026-04-08T07:31:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7e18e3f03022fff3f89c152b84102e659bd508609e429e611d79bc02cff0f36",
+          "at": "2026-04-08T07:35:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abdd2e6811af53a84da781e040289018c331614ad6ed4aac99aee5e924d121c1",
+          "at": "2026-04-08T07:53:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abdd2e6811af53a84da781e040289018c331614ad6ed4aac99aee5e924d121c1",
+          "at": "2026-04-08T07:58:10Z"
         }
       ]
     }

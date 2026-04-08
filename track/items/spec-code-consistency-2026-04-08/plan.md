@@ -11,7 +11,7 @@ sync_rendered_views() が全トラック (done/archived 含む) の views を再
 metadata.json の status が done または archived のトラックはスキップ。registry.md は常に再生成。
 sync_rendered_views() 内で per-track view 再生成をスキップする (collect_track_snapshots は registry 生成に全 track が必要なためフィルタしない)。
 
-- [ ] track-sync-views をアクティブトラック + registry.md に制限 — done/archived トラックの views 再生成をスキップ
+- [x] track-sync-views をアクティブトラック + registry.md に制限 — done/archived トラックの views 再生成をスキップ
 
 ## collect_type_names 修正 (Result/Option のみ展開)
 
