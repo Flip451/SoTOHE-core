@@ -173,17 +173,53 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
             None => continue,
         };
 
+        // Extract module path from the rustdoc paths table for type items.
+        let module_path = extract_module_path(&item.id, krate);
+
         match &item.inner {
             ItemEnum::Struct(s) => {
                 let members = extract_struct_fields(s, krate);
-                types.push(TypeInfo::new(name, TypeKind::Struct, item.docs.clone(), members));
+                let ti = if let Some(mp) = module_path {
+                    TypeInfo::with_module_path(
+                        name,
+                        TypeKind::Struct,
+                        item.docs.clone(),
+                        members,
+                        mp,
+                    )
+                } else {
+                    TypeInfo::new(name, TypeKind::Struct, item.docs.clone(), members)
+                };
+                types.push(ti);
             }
             ItemEnum::Enum(e) => {
                 let variants = extract_enum_variants(e, krate);
-                types.push(TypeInfo::new(name, TypeKind::Enum, item.docs.clone(), variants));
+                let ti = if let Some(mp) = module_path {
+                    TypeInfo::with_module_path(
+                        name,
+                        TypeKind::Enum,
+                        item.docs.clone(),
+                        variants,
+                        mp,
+                    )
+                } else {
+                    TypeInfo::new(name, TypeKind::Enum, item.docs.clone(), variants)
+                };
+                types.push(ti);
             }
             ItemEnum::TypeAlias(_) => {
-                types.push(TypeInfo::new(name, TypeKind::TypeAlias, item.docs.clone(), Vec::new()));
+                let ti = if let Some(mp) = module_path {
+                    TypeInfo::with_module_path(
+                        name,
+                        TypeKind::TypeAlias,
+                        item.docs.clone(),
+                        Vec::new(),
+                        mp,
+                    )
+                } else {
+                    TypeInfo::new(name, TypeKind::TypeAlias, item.docs.clone(), Vec::new())
+                };
+                types.push(ti);
             }
             ItemEnum::Function(f) if !method_ids.contains(&item.id) => {
                 let sig = format_sig(&name, &f.sig);
@@ -243,6 +279,20 @@ fn extract_enum_variants(e: &rustdoc_types::Enum, krate: &rustdoc_types::Crate) 
         .collect()
 }
 
+/// Extract the module path for a type from the rustdoc `paths` table.
+///
+/// Returns the parent module path (e.g., `"review"` for `crate::review::Error`),
+/// or `None` if the item is not found in the paths table.
+fn extract_module_path(id: &rustdoc_types::Id, krate: &rustdoc_types::Crate) -> Option<String> {
+    let summary = krate.paths.get(id)?;
+    // path is e.g. ["crate_name", "module", "TypeName"] — take all but last as module path.
+    summary
+        .path
+        .get(..summary.path.len().saturating_sub(1))
+        .filter(|parent| !parent.is_empty())
+        .map(|parent| parent.join("::"))
+}
+
 /// Returns `true` if the function signature's first parameter is a self receiver
 /// (`self`, `&self`, or `&mut self`).
 fn has_self_param(sig: &rustdoc_types::FunctionSignature) -> bool {
@@ -283,34 +333,38 @@ fn extract_return_type_names(sig: &rustdoc_types::FunctionSignature) -> Vec<Stri
     })
 }
 
-/// Recursively collect all type names from a rustdoc `Type`.
+/// Collect type names from a rustdoc `Type`, selectively unwrapping only
+/// `Result<T, E>` and `Option<T>` (extracting the first generic argument).
 ///
-/// Extracts the last path segment for resolved paths (e.g. `"Published"` from
-/// `"crate::Published"`) and recurses into generic arguments, borrowed refs, and
-/// tuple elements.
+/// Other generic wrappers (`Vec<T>`, `HashMap<K,V>`, `Box<T>`, `Arc<T>`, etc.)
+/// are added as bare names without recursing into their type arguments.
+/// `BorrowedRef` (`&T`) is unwrapped to extract the inner type.
+/// `Tuple` elements are NOT expanded (tuples are not transition targets).
 fn collect_type_names(ty: &rustdoc_types::Type, out: &mut Vec<String>) {
     match ty {
         rustdoc_types::Type::ResolvedPath(p) => {
-            if let Some(name) = p.path.rsplit("::").next() {
-                out.push(name.to_string());
-            }
-            if let Some(args) = &p.args {
-                if let rustdoc_types::GenericArgs::AngleBracketed { args, .. } = args.as_ref() {
-                    for arg in args {
-                        if let rustdoc_types::GenericArg::Type(inner) = arg {
-                            collect_type_names(inner, out);
+            let name = p.path.rsplit("::").next().unwrap_or(&p.path);
+            match name {
+                "Result" | "Option" => {
+                    // Unwrap first generic argument only.
+                    if let Some(args) = &p.args {
+                        if let rustdoc_types::GenericArgs::AngleBracketed { args, .. } =
+                            args.as_ref()
+                        {
+                            if let Some(rustdoc_types::GenericArg::Type(inner)) = args.first() {
+                                collect_type_names(inner, out);
+                            }
                         }
                     }
+                }
+                _ => {
+                    // Non-wrapper type — add bare name, do NOT recurse into generics.
+                    out.push(name.to_string());
                 }
             }
         }
         rustdoc_types::Type::BorrowedRef { type_: inner, .. } => {
             collect_type_names(inner, out);
-        }
-        rustdoc_types::Type::Tuple(types) => {
-            for t in types {
-                collect_type_names(t, out);
-            }
         }
         _ => {}
     }
@@ -343,5 +397,117 @@ fn type_name(ty: &rustdoc_types::Type) -> String {
         rustdoc_types::Type::Slice(inner) => format!("[{}]", type_name(inner)),
         rustdoc_types::Type::Tuple(types) if types.is_empty() => "()".to_owned(),
         _ => "_".to_owned(),
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+
+    /// Helper: build a `ResolvedPath` type with optional generic args.
+    fn resolved(name: &str, args: Option<Vec<rustdoc_types::GenericArg>>) -> rustdoc_types::Type {
+        rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: name.to_string(),
+            id: rustdoc_types::Id(0),
+            args: args.map(|a| {
+                Box::new(rustdoc_types::GenericArgs::AngleBracketed {
+                    args: a,
+                    constraints: vec![],
+                })
+            }),
+        })
+    }
+
+    fn type_arg(ty: rustdoc_types::Type) -> rustdoc_types::GenericArg {
+        rustdoc_types::GenericArg::Type(ty)
+    }
+
+    fn simple(name: &str) -> rustdoc_types::Type {
+        resolved(name, None)
+    }
+
+    #[test]
+    fn test_collect_type_names_result_unwraps_first_arg() {
+        let ty = resolved(
+            "Result",
+            Some(vec![type_arg(simple("Published")), type_arg(simple("Error"))]),
+        );
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["Published"]);
+    }
+
+    #[test]
+    fn test_collect_type_names_option_unwraps_first_arg() {
+        let ty = resolved("Option", Some(vec![type_arg(simple("Published"))]));
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["Published"]);
+    }
+
+    #[test]
+    fn test_collect_type_names_vec_does_not_unwrap() {
+        let ty = resolved("Vec", Some(vec![type_arg(simple("Published"))]));
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["Vec"]);
+    }
+
+    #[test]
+    fn test_collect_type_names_hashmap_does_not_unwrap() {
+        let ty = resolved(
+            "HashMap",
+            Some(vec![type_arg(simple("String")), type_arg(simple("Published"))]),
+        );
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["HashMap"]);
+    }
+
+    #[test]
+    fn test_collect_type_names_box_does_not_unwrap() {
+        let ty = resolved("Box", Some(vec![type_arg(simple("Published"))]));
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["Box"]);
+    }
+
+    #[test]
+    fn test_collect_type_names_borrowed_ref_unwraps_inner() {
+        let ty = rustdoc_types::Type::BorrowedRef {
+            lifetime: None,
+            is_mutable: false,
+            type_: Box::new(simple("Draft")),
+        };
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["Draft"]);
+    }
+
+    #[test]
+    fn test_collect_type_names_tuple_does_not_expand() {
+        let ty = rustdoc_types::Type::Tuple(vec![simple("A"), simple("B")]);
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert!(out.is_empty());
+    }
+
+    #[test]
+    fn test_collect_type_names_simple_type_returns_bare_name() {
+        let ty = simple("Published");
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["Published"]);
+    }
+
+    #[test]
+    fn test_collect_type_names_result_with_nested_option() {
+        // Result<Option<Published>, Error> → unwrap Result → unwrap Option → Published
+        let inner = resolved("Option", Some(vec![type_arg(simple("Published"))]));
+        let ty = resolved("Result", Some(vec![type_arg(inner), type_arg(simple("Error"))]));
+        let mut out = Vec::new();
+        collect_type_names(&ty, &mut out);
+        assert_eq!(out, vec!["Published"]);
     }
 }

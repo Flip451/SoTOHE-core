@@ -74,12 +74,25 @@ pub struct TypeInfo {
     docs: Option<String>,
     /// For enums: variant names. For structs: field names. Empty for type aliases.
     members: Vec<String>,
+    /// Module path for disambiguation (e.g., `"domain::review"`). `None` if unknown.
+    module_path: Option<String>,
 }
 
 impl TypeInfo {
     /// Creates a new type info.
     pub fn new(name: String, kind: TypeKind, docs: Option<String>, members: Vec<String>) -> Self {
-        Self { name, kind, docs, members }
+        Self { name, kind, docs, members, module_path: None }
+    }
+
+    /// Creates a new type info with a module path.
+    pub fn with_module_path(
+        name: String,
+        kind: TypeKind,
+        docs: Option<String>,
+        members: Vec<String>,
+        module_path: String,
+    ) -> Self {
+        Self { name, kind, docs, members, module_path: Some(module_path) }
     }
 
     /// Returns the type name.
@@ -100,6 +113,11 @@ impl TypeInfo {
     /// Returns variant names (enums) or field names (structs).
     pub fn members(&self) -> &[String] {
         &self.members
+    }
+
+    /// Returns the module path, if known.
+    pub fn module_path(&self) -> Option<&str> {
+        self.module_path.as_deref()
     }
 }
 
@@ -251,7 +269,7 @@ pub trait SchemaExporter {
 }
 
 // ---------------------------------------------------------------------------
-// CodeProfile — pre-indexed query interface for domain type evaluation
+// TypeGraph — pre-indexed query interface for domain type evaluation
 // ---------------------------------------------------------------------------
 
 /// Pre-indexed view of a crate's public API for domain type evaluation.
@@ -259,15 +277,15 @@ pub trait SchemaExporter {
 /// Constructed from `SchemaExport` by infrastructure. The domain evaluation
 /// layer uses only this type — no raw string parsing needed.
 #[derive(Debug, Clone)]
-pub struct CodeProfile {
-    types: HashMap<String, CodeType>,
-    traits: HashMap<String, CodeTrait>,
+pub struct TypeGraph {
+    types: HashMap<String, TypeNode>,
+    traits: HashMap<String, TraitNode>,
 }
 
-impl CodeProfile {
-    /// Creates a new `CodeProfile`.
+impl TypeGraph {
+    /// Creates a new `TypeGraph`.
     #[must_use]
-    pub fn new(types: HashMap<String, CodeType>, traits: HashMap<String, CodeTrait>) -> Self {
+    pub fn new(types: HashMap<String, TypeNode>, traits: HashMap<String, TraitNode>) -> Self {
         Self { types, traits }
     }
 
@@ -277,37 +295,62 @@ impl CodeProfile {
         self.types.contains_key(name)
     }
 
-    /// Returns the `CodeType` for the given name, if present.
+    /// Returns the `TypeNode` for the given name, if present.
     #[must_use]
-    pub fn get_type(&self, name: &str) -> Option<&CodeType> {
+    pub fn get_type(&self, name: &str) -> Option<&TypeNode> {
         self.types.get(name)
     }
 
-    /// Returns the `CodeTrait` for the given name, if present.
+    /// Returns the `TraitNode` for the given name, if present.
     #[must_use]
-    pub fn get_trait(&self, name: &str) -> Option<&CodeTrait> {
+    pub fn get_trait(&self, name: &str) -> Option<&TraitNode> {
         self.traits.get(name)
+    }
+
+    /// Returns an iterator over all type names in this graph.
+    pub fn type_names(&self) -> impl Iterator<Item = &String> {
+        self.types.keys()
+    }
+
+    /// Returns an iterator over all trait names in this graph.
+    pub fn trait_names(&self) -> impl Iterator<Item = &String> {
+        self.traits.keys()
     }
 }
 
 /// A public type in the crate.
 #[derive(Debug, Clone)]
-pub struct CodeType {
+pub struct TypeNode {
     kind: TypeKind,
     /// Variant names (for enums) or field names (for structs).
     members: Vec<String>,
     /// Type names returned by inherent (non-trait) impl methods.
-    ///
-    /// `Result<T, E>` and `Option<T>` are unwrapped to extract `T`.
-    /// Only the last path segment is stored (e.g., `"Published"` not `"crate::Published"`).
     method_return_types: HashSet<String>,
+    /// Outgoing typestate transitions: subset of `method_return_types`.
+    outgoing: HashSet<String>,
+    /// Module path for disambiguation (e.g., `"domain::review"`). `None` if unknown.
+    module_path: Option<String>,
 }
 
-impl CodeType {
-    /// Creates a new `CodeType`.
+impl TypeNode {
+    /// Creates a new `TypeNode`.
+    ///
+    /// `outgoing` is intersected with `method_return_types` to enforce the invariant
+    /// that outgoing transitions are always a subset of the actual method return types.
     #[must_use]
-    pub fn new(kind: TypeKind, members: Vec<String>, method_return_types: HashSet<String>) -> Self {
-        Self { kind, members, method_return_types }
+    pub fn new(
+        kind: TypeKind,
+        members: Vec<String>,
+        method_return_types: HashSet<String>,
+        outgoing: HashSet<String>,
+    ) -> Self {
+        let outgoing = outgoing.intersection(&method_return_types).cloned().collect();
+        Self { kind, members, method_return_types, outgoing, module_path: None }
+    }
+
+    /// Sets the module path for disambiguation.
+    pub fn set_module_path(&mut self, path: String) {
+        self.module_path = Some(path);
     }
 
     /// Returns the kind of this type.
@@ -322,21 +365,33 @@ impl CodeType {
         &self.members
     }
 
+    /// Returns the module path, if known.
+    #[must_use]
+    pub fn module_path(&self) -> Option<&str> {
+        self.module_path.as_deref()
+    }
+
     /// Returns type names returned by inherent impl methods.
     #[must_use]
     pub fn method_return_types(&self) -> &HashSet<String> {
         &self.method_return_types
     }
+
+    /// Returns outgoing typestate transitions (filtered subset of `method_return_types`).
+    #[must_use]
+    pub fn outgoing(&self) -> &HashSet<String> {
+        &self.outgoing
+    }
 }
 
 /// A public trait in the crate.
 #[derive(Debug, Clone)]
-pub struct CodeTrait {
+pub struct TraitNode {
     method_names: Vec<String>,
 }
 
-impl CodeTrait {
-    /// Creates a new `CodeTrait`.
+impl TraitNode {
+    /// Creates a new `TraitNode`.
     #[must_use]
     pub fn new(method_names: Vec<String>) -> Self {
         Self { method_names }
@@ -395,5 +450,36 @@ mod tests {
         assert_eq!(export.types().first().unwrap().name(), "TrackStatus");
         assert_eq!(export.types().first().unwrap().kind(), &TypeKind::Enum);
         assert_eq!(export.types().first().unwrap().members(), &["Planned", "InProgress"]);
+    }
+
+    #[test]
+    fn type_info_module_path_none_by_default() {
+        let ti = TypeInfo::new("Foo".to_string(), TypeKind::Struct, None, vec![]);
+        assert!(ti.module_path().is_none());
+    }
+
+    #[test]
+    fn type_info_with_module_path_stores_path() {
+        let ti = TypeInfo::with_module_path(
+            "Error".to_string(),
+            TypeKind::Enum,
+            None,
+            vec![],
+            "domain::review".to_string(),
+        );
+        assert_eq!(ti.module_path(), Some("domain::review"));
+    }
+
+    #[test]
+    fn type_node_module_path_none_by_default() {
+        let node = TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new());
+        assert!(node.module_path().is_none());
+    }
+
+    #[test]
+    fn type_node_set_module_path_stores_value() {
+        let mut node = TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new());
+        node.set_module_path("domain::guard".to_string());
+        assert_eq!(node.module_path(), Some("domain::guard"));
     }
 }

@@ -23,8 +23,8 @@ pub mod verify;
 
 pub use decision::Decision;
 pub use domain_types::{
-    DomainTypeEntry, DomainTypeKind, DomainTypeSignal, DomainTypesDocument, TypestateTransitions,
-    evaluate_domain_type_signals,
+    ConsistencyReport, DomainTypeEntry, DomainTypeKind, DomainTypeSignal, DomainTypesDocument,
+    TypestateTransitions, check_consistency, evaluate_domain_type_signals,
 };
 pub use error::{
     DomainError, RepositoryError, TrackReadError, TrackWriteError, TransitionError,
@@ -43,7 +43,7 @@ pub use review::{
     ReviewRoundResult, ReviewStalenessReason, ReviewState, ReviewStatus, RoundType, StoredFinding,
     Verdict, file_path_to_concern,
 };
-pub use schema::{CodeProfile, CodeTrait, CodeType};
+pub use schema::{TraitNode, TypeGraph, TypeNode};
 pub use signal::{
     ConfidenceSignal, SignalBasis, SignalCounts, classify_source_tag, evaluate_source_tag,
 };

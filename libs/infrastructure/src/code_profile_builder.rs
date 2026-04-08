@@ -1,22 +1,27 @@
-//! Builds a [`CodeProfile`] from a [`SchemaExport`].
+//! Builds a [`TypeGraph`] from a [`SchemaExport`].
 //!
 //! This module is intentionally in the infrastructure layer because it depends on
-//! both [`SchemaExport`] (domain) and [`CodeProfile`] (domain), and bridges the
+//! both [`SchemaExport`] (domain) and [`TypeGraph`] (domain), and bridges the
 //! flat serializable export into the pre-indexed query structure used by domain
 //! evaluation logic.
 
 use std::collections::{HashMap, HashSet};
 
-use domain::schema::{CodeProfile, CodeTrait, CodeType, SchemaExport};
+use domain::schema::{SchemaExport, TraitNode, TypeGraph, TypeNode};
 
-/// Builds a [`CodeProfile`] from a [`SchemaExport`].
+/// Builds a [`TypeGraph`] from a [`SchemaExport`].
 ///
 /// For each type in the schema, collects return type names from all inherent
 /// (non-trait) impl methods targeting that type.  Trait impls are excluded so
 /// that transition detection focuses on the type's own behaviour.
+///
+/// `typestate_names` is the set of type names declared as typestate in the
+/// domain-types catalogue.  After building the graph, each node's `outgoing`
+/// field is populated with the subset of `method_return_types` that are in
+/// `typestate_names`.
 #[must_use]
-pub fn build_code_profile(schema: &SchemaExport) -> CodeProfile {
-    let mut types = HashMap::new();
+pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>) -> TypeGraph {
+    let mut types: HashMap<String, TypeNode> = HashMap::new();
 
     for type_info in schema.types() {
         let method_return_types: HashSet<String> = schema
@@ -30,25 +35,46 @@ pub fn build_code_profile(schema: &SchemaExport) -> CodeProfile {
             .flat_map(|m| m.return_type_names().iter().cloned())
             .collect();
 
-        types.insert(
-            type_info.name().to_string(),
-            CodeType::new(
-                type_info.kind().clone(),
-                type_info.members().to_vec(),
-                method_return_types,
-            ),
+        let outgoing: HashSet<String> = method_return_types
+            .iter()
+            .filter(|rtn| typestate_names.contains(rtn.as_str()))
+            .cloned()
+            .collect();
+
+        let name_key = type_info.name().to_string();
+
+        // Warn on same-name type collision (different module paths).
+        if let Some(existing) = types.get(&name_key) {
+            eprintln!(
+                "warning: same-name type collision for `{}`: existing={:?}, new={:?} — later entry overwrites earlier",
+                name_key,
+                existing.module_path(),
+                type_info.module_path(),
+            );
+        }
+
+        let mut node = TypeNode::new(
+            type_info.kind().clone(),
+            type_info.members().to_vec(),
+            method_return_types,
+            outgoing,
         );
+        if let Some(mp) = type_info.module_path() {
+            node.set_module_path(mp.to_string());
+        }
+
+        types.insert(name_key, node);
     }
 
     let mut traits = HashMap::new();
     for trait_info in schema.traits() {
         traits.insert(
             trait_info.name().to_string(),
-            CodeTrait::new(trait_info.methods().iter().map(|m| m.name().to_string()).collect()),
+            TraitNode::new(trait_info.methods().iter().map(|m| m.name().to_string()).collect()),
         );
     }
 
-    CodeProfile::new(types, traits)
+    TypeGraph::new(types, traits)
 }
 
 /// Extracts the last `::` segment from a path (e.g., `crate::Foo` → `Foo`).
@@ -87,7 +113,7 @@ mod tests {
     }
 
     #[test]
-    fn test_build_code_profile_with_struct_type_creates_type_entry() {
+    fn test_build_type_graph_with_struct_type_creates_type_entry() {
         let schema = SchemaExport::new(
             "test".to_string(),
             vec![TypeInfo::new("MyType".to_string(), TypeKind::Struct, None, vec![])],
@@ -95,13 +121,13 @@ mod tests {
             vec![],
             vec![],
         );
-        let profile = build_code_profile(&schema);
+        let profile = build_type_graph(&schema, &HashSet::new());
         assert!(profile.has_type("MyType"));
         assert!(!profile.has_type("Missing"));
     }
 
     #[test]
-    fn test_build_code_profile_with_enum_type_preserves_members() {
+    fn test_build_type_graph_with_enum_type_preserves_members() {
         let schema = SchemaExport::new(
             "test".to_string(),
             vec![TypeInfo::new(
@@ -114,22 +140,22 @@ mod tests {
             vec![],
             vec![],
         );
-        let profile = build_code_profile(&schema);
+        let profile = build_type_graph(&schema, &HashSet::new());
         let code_type = profile.get_type("Status").unwrap();
         assert_eq!(code_type.kind(), &TypeKind::Enum);
         assert_eq!(code_type.members(), &["Active", "Done"]);
     }
 
     #[test]
-    fn test_build_code_profile_with_inherent_impl_collects_return_types() {
+    fn test_build_type_graph_with_inherent_impl_collects_return_types() {
         let schema = make_schema_with_impl("Draft", "Published", "Published");
-        let profile = build_code_profile(&schema);
+        let profile = build_type_graph(&schema, &HashSet::new());
         let draft = profile.get_type("Draft").unwrap();
         assert!(draft.method_return_types().contains("Published"));
     }
 
     #[test]
-    fn test_build_code_profile_associated_fn_without_self_excluded_from_transitions() {
+    fn test_build_type_graph_associated_fn_without_self_excluded_from_transitions() {
         // An associated function (no self receiver) like `fn from_db() -> Published`
         // must NOT appear in method_return_types — it is not a state transition.
         let types = vec![
@@ -148,7 +174,7 @@ mod tests {
             )],
         )];
         let schema = SchemaExport::new("test".to_string(), types, vec![], vec![], impls);
-        let profile = build_code_profile(&schema);
+        let profile = build_type_graph(&schema, &HashSet::new());
         let draft = profile.get_type("Draft").unwrap();
         assert!(
             !draft.method_return_types().contains("Published"),
@@ -157,7 +183,7 @@ mod tests {
     }
 
     #[test]
-    fn test_build_code_profile_with_trait_impl_excludes_return_types() {
+    fn test_build_type_graph_with_trait_impl_excludes_return_types() {
         let types = vec![TypeInfo::new("Foo".to_string(), TypeKind::Struct, None, vec![])];
         let impls = vec![ImplInfo::new(
             "Foo".to_string(),
@@ -171,14 +197,14 @@ mod tests {
             )],
         )];
         let schema = SchemaExport::new("test".to_string(), types, vec![], vec![], impls);
-        let profile = build_code_profile(&schema);
+        let profile = build_type_graph(&schema, &HashSet::new());
         let foo = profile.get_type("Foo").unwrap();
         // trait impls must be excluded — no return types collected
         assert!(foo.method_return_types().is_empty());
     }
 
     #[test]
-    fn test_build_code_profile_with_trait_creates_trait_entry() {
+    fn test_build_type_graph_with_trait_creates_trait_entry() {
         let trait_info = TraitInfo::new(
             "Repo".to_string(),
             None,
@@ -201,15 +227,64 @@ mod tests {
         );
         let schema =
             SchemaExport::new("test".to_string(), vec![], vec![], vec![trait_info], vec![]);
-        let profile = build_code_profile(&schema);
+        let profile = build_type_graph(&schema, &HashSet::new());
         let code_trait = profile.get_trait("Repo").unwrap();
         assert_eq!(code_trait.method_names(), &["save", "find"]);
     }
 
     #[test]
-    fn test_build_code_profile_missing_trait_returns_none() {
+    fn test_build_type_graph_missing_trait_returns_none() {
         let schema = SchemaExport::new("test".to_string(), vec![], vec![], vec![], vec![]);
-        let profile = build_code_profile(&schema);
+        let profile = build_type_graph(&schema, &HashSet::new());
         assert!(profile.get_trait("NonExistent").is_none());
+    }
+
+    #[test]
+    fn test_build_type_graph_outgoing_contains_only_typestate_targets() {
+        // "Draft" has methods returning both "Published" (a typestate) and "Archived" (not a typestate).
+        // Only "Published" should appear in outgoing.
+        let types = vec![
+            TypeInfo::new("Draft".to_string(), TypeKind::Struct, None, vec![]),
+            TypeInfo::new("Published".to_string(), TypeKind::Struct, None, vec![]),
+            TypeInfo::new("Archived".to_string(), TypeKind::Struct, None, vec![]),
+        ];
+        let impls = vec![ImplInfo::new(
+            "Draft".to_string(),
+            None,
+            vec![
+                FunctionInfo::new(
+                    "publish".to_string(),
+                    "fn publish(self) -> Published".to_string(),
+                    None,
+                    vec!["Published".to_string()],
+                    true,
+                ),
+                FunctionInfo::new(
+                    "archive".to_string(),
+                    "fn archive(self) -> Archived".to_string(),
+                    None,
+                    vec!["Archived".to_string()],
+                    true,
+                ),
+            ],
+        )];
+        let schema = SchemaExport::new("test".to_string(), types, vec![], vec![], impls);
+
+        let mut typestate_names = HashSet::new();
+        typestate_names.insert("Published".to_string());
+
+        let profile = build_type_graph(&schema, &typestate_names);
+        let draft = profile.get_type("Draft").unwrap();
+
+        // method_return_types includes both "Published" and "Archived"
+        assert!(draft.method_return_types().contains("Published"));
+        assert!(draft.method_return_types().contains("Archived"));
+
+        // outgoing only includes the typestate target "Published"
+        assert!(draft.outgoing().contains("Published"), "Published must be in outgoing");
+        assert!(
+            !draft.outgoing().contains("Archived"),
+            "Archived must not be in outgoing (not a typestate)"
+        );
     }
 }

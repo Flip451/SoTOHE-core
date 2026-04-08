@@ -1,0 +1,116 @@
+{
+  "branch": "track/spec-code-consistency-2026-04-08",
+  "created_at": "2026-04-08T14:00:00Z",
+  "id": "spec-code-consistency-2026-04-08",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "sync_rendered_views() が全トラック (done/archived 含む) の views を再生成する設計バグを修正。",
+          "metadata.json の status が done または archived のトラックはスキップ。registry.md は常に再生成。",
+          "sync_rendered_views() 内で per-track view 再生成をスキップする (collect_track_snapshots は registry 生成に全 track が必要なためフィルタしない)。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "最優先バグ修正: track-sync-views スコープ制限"
+      },
+      {
+        "description": [
+          "schema_export.rs の collect_type_names() を修正。",
+          "Result と Option のみ first generic arg を展開。他の ResolvedPath は bare name のみ追加し generics に再帰しない。",
+          "BorrowedRef は引き続き inner を展開。Tuple 展開は削除。",
+          "影響: Vec<Published> → [Vec] (Published は展開されない), Result<Published, Error> → [Published]"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "collect_type_names 修正 (Result/Option のみ展開)"
+      },
+      {
+        "description": [
+          "domain: CodeProfile → TypeGraph, CodeType → TypeNode, CodeTrait → TraitNode にリネーム。",
+          "TypeNode に outgoing: HashSet<String> を追加 — method_return_types のうち typestate 型のみに絞り込み。",
+          "infra: build_code_profile → build_type_graph に改名。typestate_names を受け取り構築時にフィルタ。",
+          "domain_types.rs: evaluate_domain_type_signals が TypeGraph を使用。typestate_names の内部計算を削除。",
+          "CLI: domain_state_signals.rs が TypeGraph を使用。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "CodeProfile → TypeGraph リネーム + outgoing フィールド"
+      },
+      {
+        "description": [
+          "domain: SchemaExport の TypeInfo に module_path: Option<String> を追加。",
+          "domain: TypeNode に module_path: Option<String> を追加。",
+          "infra: schema_export.rs で rustdoc JSON の path 情報から module_path を抽出。",
+          "infra: build_type_graph で module_path を設定。同名衝突時に tracing::warn で警告。"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "module_path による同名型の区別"
+      },
+      {
+        "description": [
+          "domain: ConsistencyReport 型を新設 — forward_signals: Vec<DomainTypeSignal> + undeclared_types: Vec<String> + undeclared_traits: Vec<String>。",
+          "domain: check_consistency() 関数 — entries と TypeGraph を受け取り前方向 + 逆方向を統合。",
+          "CLI: sotp verify spec-code-consistency --track-id <id> --crate <name> サブコマンド新設。",
+          "domain-types.json 読み込み → SchemaExport → TypeGraph 構築 → check_consistency() → レポート出力。"
+        ],
+        "id": "S5",
+        "task_ids": [
+          "T005",
+          "T006"
+        ],
+        "title": "逆方向チェック + ConsistencyReport + CLI"
+      }
+    ],
+    "summary": [
+      "Phase 3-12: spec と code の双方向整合性チェックを実装する。",
+      "CodeProfile を TypeGraph に拡張し、collect_type_names の false positive を修正し、逆方向チェック (code → spec) を新設する。",
+      "最優先で track-sync-views の done/archived トラック views 消失バグを修正する。"
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "description": "track-sync-views をアクティブトラック + registry.md に制限 — done/archived トラックの views 再生成をスキップ",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "collect_type_names を Result/Option のみに制限 — 他の generic wrapper (Vec, HashMap, Box 等) は展開しない",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "description": "CodeProfile → TypeGraph リネーム + outgoing フィールド追加 — typestate フィルタを構築時に移動",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "module_path 追加 — TypeInfo/TypeNode に module_path を追加し同名型衝突の warning を出す",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "逆方向チェック (code → spec) — TypeGraph の全ノード (型および trait) のうち domain-types.json に宣言がないものを検出し undeclared_types と undeclared_traits として分類する",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "description": "ConsistencyReport + sotp verify spec-code-consistency CLI コマンド新設",
+      "id": "T006",
+      "status": "done"
+    }
+  ],
+  "title": "3-12 spec ↔ code 整合性チェック — TypeGraph + 逆方向検出",
+  "updated_at": "2026-04-08T09:28:50Z"
+}
