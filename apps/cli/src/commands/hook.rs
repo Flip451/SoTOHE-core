@@ -12,7 +12,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 use std::sync::Arc;
 
-use domain::hook::{HookContext, HookName};
+use domain::hook::HookContext;
 use infrastructure::shell::ConchShellParser;
 
 /// CLI-layer serde type for Claude Code hook JSON envelope.
@@ -128,18 +128,6 @@ pub enum CliHookName {
 }
 
 impl CliHookName {
-    /// Converts to domain `HookName` for guard hooks.
-    /// Returns `None` for advisory hooks (e.g. `SkillCompliance`) that have
-    /// no corresponding domain guard.
-    #[allow(dead_code)]
-    fn to_domain(self) -> Option<HookName> {
-        match self {
-            Self::BlockDirectGitOps => Some(HookName::BlockDirectGitOps),
-            Self::BlockTestFileDeletion => Some(HookName::BlockTestFileDeletion),
-            Self::SkillCompliance => None,
-        }
-    }
-
     /// Returns `true` if this is a UserPromptSubmit hook (advisory, never blocks).
     fn is_user_prompt_submit(self) -> bool {
         matches!(self, Self::SkillCompliance)
