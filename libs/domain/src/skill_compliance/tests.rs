@@ -96,6 +96,14 @@ fn test_detect_skill_command_accepts_end_of_string() {
     assert_eq!(result.unwrap().command, "/track:plan");
 }
 
+#[test]
+fn test_detect_skill_command_skips_invalid_prefix_then_finds_valid() {
+    // /track:planner fails boundary check, but /track:plan later is valid
+    let result = detect_skill_command("/track:planner then /track:plan feature");
+    assert!(result.is_some());
+    assert_eq!(result.unwrap().command, "/track:plan");
+}
+
 // -- trigger_matches --
 
 #[test]

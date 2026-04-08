@@ -187,25 +187,38 @@ pub fn detect_skill_command(prompt: &str) -> Option<SkillMatch> {
     let prompt_lower = prompt.to_lowercase();
     let mut best: Option<(usize, &str, &[&str])> = None;
     for (command, reminders) in SKILL_COMMANDS {
-        if let Some(pos) = prompt_lower.find(command) {
-            // Token boundary: the char after the command must not be alphanumeric
-            // or hyphen, to avoid /track:plan matching /track:planner.
+        // Scan all occurrences — the first match may fail boundary check
+        // (e.g. "/track:planner then /track:plan").
+        let mut search_start = 0;
+        let found_pos = loop {
+            let Some(rel) = prompt_lower[search_start..].find(command) else {
+                break None;
+            };
+            let pos = search_start + rel;
             let after_pos = pos + command.len();
             let after_char = prompt_lower.as_bytes().get(after_pos).copied();
             let at_boundary =
                 after_char.is_none_or(|b| !b.is_ascii_alphanumeric() && b != b'-' && b != b'_');
-            if !at_boundary {
-                continue;
+            if at_boundary {
+                break Some(pos);
             }
-            let is_better = match &best {
-                None => true,
-                Some((best_pos, best_cmd, _)) => {
-                    pos < *best_pos || (pos == *best_pos && command.len() > best_cmd.len())
-                }
-            };
-            if is_better {
-                best = Some((pos, command, reminders));
+            search_start = pos + 1;
+            while search_start < prompt_lower.len() && !prompt_lower.is_char_boundary(search_start)
+            {
+                search_start += 1;
             }
+        };
+        let Some(pos) = found_pos else {
+            continue;
+        };
+        let is_better = match &best {
+            None => true,
+            Some((best_pos, best_cmd, _)) => {
+                pos < *best_pos || (pos == *best_pos && command.len() > best_cmd.len())
+            }
+        };
+        if is_better {
+            best = Some((pos, command, reminders));
         }
     }
     best.map(|(_, command, reminders)| SkillMatch {
