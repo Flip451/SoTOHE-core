@@ -335,34 +335,27 @@ fn load_guides_from_project() -> Vec<domain::skill_compliance::GuideEntry> {
     infrastructure::guides_codec::load_guides(&guides_path).unwrap_or_default()
 }
 
-/// Loads context from the latest active track's spec.md and plan.md.
-/// Selects the track with the most recent `updated_at` from metadata.json,
-/// filtering to tracks that are not "done" or "archived".
-/// Returns `None` on any failure (advisory hook — never block).
+/// Loads context from the current track's spec.md and plan.md.
+/// Resolves the track from the current git branch (`track/<id>`).
+/// Returns `None` if not on a track branch or on any failure (advisory — never block).
 fn load_latest_track_context() -> Option<String> {
     let project_dir = PathBuf::from(std::env::var("CLAUDE_PROJECT_DIR").ok()?);
-    let items_dir = project_dir.join("track/items");
-    let entries = std::fs::read_dir(&items_dir).ok()?;
 
-    // Find the latest active track by updated_at in metadata.json
-    let latest = entries
-        .filter_map(|e| e.ok())
-        .filter(|e| e.file_type().ok().is_some_and(|ft| ft.is_dir()))
-        .filter_map(|e| {
-            let metadata_path = e.path().join("metadata.json");
-            let content = std::fs::read_to_string(&metadata_path).ok()?;
-            let json: serde_json::Value = serde_json::from_str(&content).ok()?;
-            let status = json.get("status")?.as_str()?;
-            // Skip done/archived tracks
-            if status == "done" || status == "archived" {
-                return None;
-            }
-            let updated_at = json.get("updated_at")?.as_str()?.to_owned();
-            Some((e.path(), updated_at))
-        })
-        .max_by(|(_, a), (_, b)| a.cmp(b))?;
+    // Resolve current track from git branch name
+    let output = std::process::Command::new("git")
+        .args(["branch", "--show-current"])
+        .current_dir(&project_dir)
+        .output()
+        .ok()?;
+    let branch = String::from_utf8(output.stdout).ok()?;
+    let branch = branch.trim();
+    let track_id = branch.strip_prefix("track/")?;
 
-    let track_dir = latest.0;
+    let track_dir = project_dir.join("track/items").join(track_id);
+    if !track_dir.is_dir() {
+        return None;
+    }
+
     let mut parts = Vec::new();
     for filename in ["spec.md", "plan.md"] {
         if let Ok(content) = std::fs::read_to_string(track_dir.join(filename)) {
