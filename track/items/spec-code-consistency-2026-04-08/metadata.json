@@ -78,7 +78,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "description": "track-sync-views をアクティブトラック + registry.md に制限 — done/archived トラックの views 再生成をスキップ",
@@ -103,14 +103,14 @@
     {
       "description": "逆方向チェック (code → spec) — TypeGraph の全ノード (型および trait) のうち domain-types.json に宣言がないものを検出し undeclared_types と undeclared_traits として分類する",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "ConsistencyReport + sotp verify spec-code-consistency CLI コマンド新設",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "3-12 spec ↔ code 整合性チェック — TypeGraph + 逆方向検出",
-  "updated_at": "2026-04-08T09:02:37Z"
+  "updated_at": "2026-04-08T09:28:50Z"
 }

@@ -53,6 +53,8 @@ pub enum VerifyCommand {
     SpecStates(SpecVerifyArgs),
     /// Check requirement-to-task coverage for a track (resolved from branch or --track-dir).
     SpecCoverage(SpecCoverageArgs),
+    /// Check bidirectional spec ↔ code consistency (domain-types.json vs rustdoc TypeGraph).
+    SpecCodeConsistency(SpecCodeConsistencyArgs),
 }
 
 /// Arguments for spec-coverage verify subcommand.
@@ -62,6 +64,20 @@ pub struct SpecCoverageArgs {
     /// If not provided, the command is a no-op (pass).
     #[arg(long)]
     track_dir: Option<PathBuf>,
+}
+
+/// Arguments for spec-code-consistency verify subcommand.
+#[derive(Args)]
+pub struct SpecCodeConsistencyArgs {
+    /// Track ID (e.g., `spec-code-consistency-2026-04-08`).
+    #[arg(long)]
+    track_id: String,
+    /// Crate name to export schema from (e.g., `domain`).
+    #[arg(long = "crate", default_value = "domain")]
+    crate_name: String,
+    /// Project root directory.
+    #[arg(long, default_value = ".")]
+    project_root: PathBuf,
 }
 
 /// Common arguments for all verify subcommands.
@@ -142,9 +158,151 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
             };
             ("verify spec coverage", outcome)
         }
+        VerifyCommand::SpecCodeConsistency(args) => {
+            ("verify spec-code consistency", execute_spec_code_consistency(args))
+        }
     };
 
     print_outcome(label, &outcome)
+}
+
+/// Execute bidirectional spec ↔ code consistency check.
+fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome {
+    use domain::schema::{SchemaExportError, SchemaExporter};
+
+    // Validate track ID.
+    let track_id = match domain::TrackId::try_new(&args.track_id) {
+        Ok(id) => id,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
+                "invalid track ID: {e}"
+            ))]);
+        }
+    };
+
+    let track_dir = args.project_root.join("track/items").join(track_id.as_ref());
+    let domain_types_path = track_dir.join("domain-types.json");
+
+    // Read and decode domain-types.json.
+    let json = match std::fs::read_to_string(&domain_types_path) {
+        Ok(s) => s,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
+                "cannot read {}: {e}",
+                domain_types_path.display()
+            ))]);
+        }
+    };
+
+    let doc = match infrastructure::domain_types_codec::decode(&json) {
+        Ok(d) => d,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
+                "domain-types.json decode error: {e}"
+            ))]);
+        }
+    };
+
+    // Export schema via rustdoc JSON.
+    let exporter =
+        infrastructure::schema_export::RustdocSchemaExporter::new(args.project_root.clone());
+    let schema = match exporter.export(&args.crate_name) {
+        Ok(s) => s,
+        Err(e) => {
+            let hint = if matches!(e, SchemaExportError::NightlyNotFound) {
+                " (install with: rustup toolchain install nightly)"
+            } else {
+                ""
+            };
+            return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
+                "schema export failed: {e}{hint}"
+            ))]);
+        }
+    };
+
+    // Collect typestate names and build TypeGraph.
+    let typestate_names: std::collections::HashSet<String> = doc
+        .entries()
+        .iter()
+        .filter(|e| matches!(e.kind(), domain::domain_types::DomainTypeKind::Typestate { .. }))
+        .map(|e| e.name().to_string())
+        .collect();
+    let graph = infrastructure::code_profile_builder::build_type_graph(&schema, &typestate_names);
+
+    // Run bidirectional consistency check.
+    let report = domain::check_consistency(doc.entries(), &graph);
+
+    // Convert to VerifyOutcome.
+    let mut findings = Vec::new();
+
+    // Forward: red signals become errors.
+    for sig in report.forward_signals() {
+        if sig.signal() == domain::ConfidenceSignal::Red {
+            findings.push(domain::verify::Finding::error(format!(
+                "{} ({}): Red — missing={:?}, extra={:?}",
+                sig.type_name(),
+                sig.kind_tag(),
+                sig.missing_items(),
+                sig.extra_items(),
+            )));
+        }
+    }
+
+    // Reverse: undeclared types/traits become warnings.
+    for name in report.undeclared_types() {
+        findings.push(domain::verify::Finding::warning(format!(
+            "undeclared type in code: `{name}` (not in domain-types.json)"
+        )));
+    }
+    for name in report.undeclared_traits() {
+        findings.push(domain::verify::Finding::warning(format!(
+            "undeclared trait in code: `{name}` (not in domain-types.json)"
+        )));
+    }
+
+    print_consistency_report_json(&report);
+
+    if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
+}
+
+/// Serialize a `ConsistencyReport` as a JSON line to stdout.
+fn print_consistency_report_json(report: &domain::ConsistencyReport) {
+    let items_to_json =
+        |items: &[String]| items.iter().map(|i| format!("\"{i}\"")).collect::<Vec<_>>().join(",");
+    let signal_str = |s: domain::ConfidenceSignal| match s {
+        domain::ConfidenceSignal::Blue => "blue",
+        domain::ConfidenceSignal::Yellow => "yellow",
+        domain::ConfidenceSignal::Red => "red",
+        _ => "unknown",
+    };
+    let forward_json: Vec<String> = report
+        .forward_signals()
+        .iter()
+        .map(|s| {
+            format!(
+                "{{\"type_name\":\"{}\",\"kind_tag\":\"{}\",\"signal\":\"{}\",\
+                 \"found_type\":{},\"found_items\":[{}],\
+                 \"missing_items\":[{}],\"extra_items\":[{}]}}",
+                s.type_name(),
+                s.kind_tag(),
+                signal_str(s.signal()),
+                s.found_type(),
+                items_to_json(s.found_items()),
+                items_to_json(s.missing_items()),
+                items_to_json(s.extra_items()),
+            )
+        })
+        .collect();
+    let undeclared_types_json: Vec<String> =
+        report.undeclared_types().iter().map(|s| format!("\"{s}\"")).collect();
+    let undeclared_traits_json: Vec<String> =
+        report.undeclared_traits().iter().map(|s| format!("\"{s}\"")).collect();
+    println!(
+        "{{\"forward_signals\":[{}],\"undeclared_types\":[{}],\"undeclared_traits\":[{}]}}",
+        forward_json.join(","),
+        undeclared_types_json.join(","),
+        undeclared_traits_json.join(","),
+    );
 }
 
 /// Combine architecture_rules + doc_patterns + convention_docs checks.

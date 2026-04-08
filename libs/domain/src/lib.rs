@@ -23,8 +23,8 @@ pub mod verify;
 
 pub use decision::Decision;
 pub use domain_types::{
-    DomainTypeEntry, DomainTypeKind, DomainTypeSignal, DomainTypesDocument, TypestateTransitions,
-    evaluate_domain_type_signals,
+    ConsistencyReport, DomainTypeEntry, DomainTypeKind, DomainTypeSignal, DomainTypesDocument,
+    TypestateTransitions, check_consistency, evaluate_domain_type_signals,
 };
 pub use error::{
     DomainError, RepositoryError, TrackReadError, TrackWriteError, TransitionError,

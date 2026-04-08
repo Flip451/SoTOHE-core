@@ -529,6 +529,79 @@ fn evaluate_trait_port(
 }
 
 // ---------------------------------------------------------------------------
+// ConsistencyReport — bidirectional spec ↔ code check
+// ---------------------------------------------------------------------------
+
+/// Result of a bidirectional consistency check between domain-types.json (spec)
+/// and the crate's public API (code).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ConsistencyReport {
+    /// Forward signals: spec → code evaluation results.
+    forward_signals: Vec<DomainTypeSignal>,
+    /// Types found in code but not declared in domain-types.json.
+    undeclared_types: Vec<String>,
+    /// Traits found in code but not declared in domain-types.json.
+    undeclared_traits: Vec<String>,
+}
+
+impl ConsistencyReport {
+    /// Returns the forward (spec → code) signals.
+    #[must_use]
+    pub fn forward_signals(&self) -> &[DomainTypeSignal] {
+        &self.forward_signals
+    }
+
+    /// Returns type names found in code but not declared in the spec.
+    #[must_use]
+    pub fn undeclared_types(&self) -> &[String] {
+        &self.undeclared_types
+    }
+
+    /// Returns trait names found in code but not declared in the spec.
+    #[must_use]
+    pub fn undeclared_traits(&self) -> &[String] {
+        &self.undeclared_traits
+    }
+}
+
+/// Performs a bidirectional consistency check between domain-types entries and a TypeGraph.
+///
+/// - Forward: evaluates each entry against the TypeGraph (existing `evaluate_domain_type_signals`).
+/// - Reverse: finds types and traits in the TypeGraph not declared in entries.
+#[must_use]
+pub fn check_consistency(entries: &[DomainTypeEntry], graph: &TypeGraph) -> ConsistencyReport {
+    let forward_signals = evaluate_domain_type_signals(entries, graph);
+
+    let declared_type_names: HashSet<&str> = entries
+        .iter()
+        .filter(|e| !matches!(e.kind(), DomainTypeKind::TraitPort { .. }))
+        .map(|e| e.name())
+        .collect();
+
+    let declared_trait_names: HashSet<&str> = entries
+        .iter()
+        .filter(|e| matches!(e.kind(), DomainTypeKind::TraitPort { .. }))
+        .map(|e| e.name())
+        .collect();
+
+    let mut undeclared_types: Vec<String> = graph
+        .type_names()
+        .filter(|name| !declared_type_names.contains(name.as_str()))
+        .cloned()
+        .collect();
+    undeclared_types.sort();
+
+    let mut undeclared_traits: Vec<String> = graph
+        .trait_names()
+        .filter(|name| !declared_trait_names.contains(name.as_str()))
+        .cloned()
+        .collect();
+    undeclared_traits.sort();
+
+    ConsistencyReport { forward_signals, undeclared_types, undeclared_traits }
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -930,5 +1003,64 @@ mod tests {
             "expected no extra_items, got {:?}",
             draft_signal.extra_items()
         );
+    }
+
+    // --- check_consistency tests ---
+
+    #[test]
+    fn test_check_consistency_reports_undeclared_types_and_traits() {
+        // Entries declare only "TrackId" (value_object).
+        let entry =
+            DomainTypeEntry::new("TrackId", "desc", DomainTypeKind::ValueObject, true).unwrap();
+
+        // TypeGraph has "TrackId" + "UndeclaredStruct", and trait "UndeclaredTrait".
+        let mut types = HashMap::new();
+        types.insert(
+            "TrackId".to_string(),
+            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
+        );
+        types.insert(
+            "UndeclaredStruct".to_string(),
+            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
+        );
+        let mut traits = HashMap::new();
+        traits.insert("UndeclaredTrait".to_string(), TraitNode::new(vec!["method".into()]));
+        let graph = TypeGraph::new(types, traits);
+
+        let report = check_consistency(&[entry], &graph);
+
+        // Forward: TrackId should be Blue.
+        assert_eq!(report.forward_signals().len(), 1);
+        assert_eq!(report.forward_signals().first().unwrap().signal(), ConfidenceSignal::Blue);
+
+        // Reverse: UndeclaredStruct in types, UndeclaredTrait in traits.
+        assert_eq!(report.undeclared_types(), &["UndeclaredStruct"]);
+        assert_eq!(report.undeclared_traits(), &["UndeclaredTrait"]);
+    }
+
+    #[test]
+    fn test_check_consistency_empty_undeclared_when_fully_covered() {
+        let entry =
+            DomainTypeEntry::new("TrackId", "desc", DomainTypeKind::ValueObject, true).unwrap();
+        let trait_entry = DomainTypeEntry::new(
+            "Repo",
+            "desc",
+            DomainTypeKind::TraitPort { expected_methods: vec!["save".into()] },
+            true,
+        )
+        .unwrap();
+
+        let mut types = HashMap::new();
+        types.insert(
+            "TrackId".to_string(),
+            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
+        );
+        let mut traits = HashMap::new();
+        traits.insert("Repo".to_string(), TraitNode::new(vec!["save".into()]));
+        let graph = TypeGraph::new(types, traits);
+
+        let report = check_consistency(&[entry, trait_entry], &graph);
+        assert!(report.undeclared_types().is_empty());
+        assert!(report.undeclared_traits().is_empty());
     }
 }

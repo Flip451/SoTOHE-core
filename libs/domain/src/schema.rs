@@ -306,6 +306,16 @@ impl TypeGraph {
     pub fn get_trait(&self, name: &str) -> Option<&TraitNode> {
         self.traits.get(name)
     }
+
+    /// Returns an iterator over all type names in this graph.
+    pub fn type_names(&self) -> impl Iterator<Item = &String> {
+        self.types.keys()
+    }
+
+    /// Returns an iterator over all trait names in this graph.
+    pub fn trait_names(&self) -> impl Iterator<Item = &String> {
+        self.traits.keys()
+    }
 }
 
 /// A public type in the crate.

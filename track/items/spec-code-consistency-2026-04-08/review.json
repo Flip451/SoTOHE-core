@@ -1,6 +1,118 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
+          "at": "2026-04-08T07:55:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
+          "at": "2026-04-08T07:59:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e02e0e33ed6add32f0f7796985b0ac4fe4e3253444bbc22867fd449f0e10155b",
+          "at": "2026-04-08T08:04:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e02e0e33ed6add32f0f7796985b0ac4fe4e3253444bbc22867fd449f0e10155b",
+          "at": "2026-04-08T08:07:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `typestate_names`-driven outgoing computation is not covered by any test in this file: every updated test still passes `HashSet::new()`, so a regression in the intersection logic or `set_outgoing()` path would slip through. This public API now has an untested behavior branch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/code_profile_builder.rs",
+              "line": 38,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:220393607eb2677b938bcc5a096014df25e9f1cb449aa61bec0920ca139e98a0",
+          "at": "2026-04-08T08:17:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "No test covers the new `typestate_names` filtering path. Every existing test still calls `build_type_graph(..., &HashSet::new())`, so the outgoing-transition logic at this point can regress without any assertion failure. Please add a case that supplies typestate names and verifies `TypeNode::outgoing()` only includes the filtered typestate targets.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/code_profile_builder.rs",
+              "line": 38,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:220393607eb2677b938bcc5a096014df25e9f1cb449aa61bec0920ca139e98a0",
+          "at": "2026-04-08T08:18:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:458b87b3633322ad77fcca3e4f0caef7c2bbd2ef9df3c2c512650fecc91c1a86",
+          "at": "2026-04-08T08:19:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:458b87b3633322ad77fcca3e4f0caef7c2bbd2ef9df3c2c512650fecc91c1a86",
+          "at": "2026-04-08T08:21:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:06884a4f254b6f98b86135e5ad79d53501dad5d023358fa45f95d36a164d6fce",
+          "at": "2026-04-08T08:52:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
+          "at": "2026-04-08T09:09:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_type_graph` still resolves collisions by plain type name and keeps the last entry it sees. Because `SchemaExport` only sorts by `name`, equal-name types retain the original `krate.index` hash iteration order, so the winner is nondeterministic. This repo already has two public `Verdict` enums (`review::Verdict` and `review_v2::Verdict`), which means the new collision path can flip between runs and produce unstable `TypeGraph` contents/module paths.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/code_profile_builder.rs",
+              "line": 66,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
+          "at": "2026-04-08T09:13:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
+          "at": "2026-04-08T09:19:55Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -528,6 +640,50 @@
           "findings": [],
           "hash": "rvw1:sha256:c7eb342bb7be29f84b7dda38c6107e77d45d0b0781774140ef748e29ff4df0f1",
           "at": "2026-04-08T09:24:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` still marks T006 as in progress (`[~]`) even though `metadata.json` marks the same task `done`. Because `plan.md` is the generated view, this leaves the rendered track out of sync with the source of truth and makes the track look unfinished.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/plan.md",
+              "line": 52,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5ecfa6f04db40635ef6c810d18e2d76e4ea7f01477e6160111088b6c7567b6e2",
+          "at": "2026-04-08T09:51:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` still renders T006 as in-progress (`[~]`) even though `metadata.json` marks the same task as `done`. Since this file is declared as a generated view from `metadata.json`, the two files are now self-contradictory and the rendered plan will misrepresent the track's completion state.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/plan.md",
+              "line": 52,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5ecfa6f04db40635ef6c810d18e2d76e4ea7f01477e6160111088b6c7567b6e2",
+          "at": "2026-04-08T09:52:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ace372cdf2c4e5c5015b439a95c650bdbc1a2a414aa7ae03f60c73d3694e3ab",
+          "at": "2026-04-08T09:54:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ace372cdf2c4e5c5015b439a95c650bdbc1a2a414aa7ae03f60c73d3694e3ab",
+          "at": "2026-04-08T09:54:33Z"
         }
       ]
     },
@@ -687,118 +843,49 @@
           "findings": [],
           "hash": "rvw1:sha256:3b1ba9031d4684c68d6f7da745aa2002f8762b6ecd193ae0d3b461ebe69a8b92",
           "at": "2026-04-08T09:07:18Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
-          "at": "2026-04-08T07:55:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
-          "at": "2026-04-08T07:59:34Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e02e0e33ed6add32f0f7796985b0ac4fe4e3253444bbc22867fd449f0e10155b",
-          "at": "2026-04-08T08:04:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e02e0e33ed6add32f0f7796985b0ac4fe4e3253444bbc22867fd449f0e10155b",
-          "at": "2026-04-08T08:07:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `typestate_names`-driven outgoing computation is not covered by any test in this file: every updated test still passes `HashSet::new()`, so a regression in the intersection logic or `set_outgoing()` path would slip through. This public API now has an untested behavior branch.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/code_profile_builder.rs",
-              "line": 38,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:220393607eb2677b938bcc5a096014df25e9f1cb449aa61bec0920ca139e98a0",
-          "at": "2026-04-08T08:17:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "No test covers the new `typestate_names` filtering path. Every existing test still calls `build_type_graph(..., &HashSet::new())`, so the outgoing-transition logic at this point can regress without any assertion failure. Please add a case that supplies typestate names and verifies `TypeNode::outgoing()` only includes the filtered typestate targets.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/code_profile_builder.rs",
-              "line": 38,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:220393607eb2677b938bcc5a096014df25e9f1cb449aa61bec0920ca139e98a0",
-          "at": "2026-04-08T08:18:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:458b87b3633322ad77fcca3e4f0caef7c2bbd2ef9df3c2c512650fecc91c1a86",
-          "at": "2026-04-08T08:19:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:458b87b3633322ad77fcca3e4f0caef7c2bbd2ef9df3c2c512650fecc91c1a86",
-          "at": "2026-04-08T08:21:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:06884a4f254b6f98b86135e5ad79d53501dad5d023358fa45f95d36a164d6fce",
-          "at": "2026-04-08T08:52:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
-          "at": "2026-04-08T09:09:07Z"
+          "hash": "rvw1:sha256:6de82f76cf8bf6b476df2d74eb964672af0d7df325b481d774a57dfc6be24398",
+          "at": "2026-04-08T09:30:42Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`build_type_graph` still resolves collisions by plain type name and keeps the last entry it sees. Because `SchemaExport` only sorts by `name`, equal-name types retain the original `krate.index` hash iteration order, so the winner is nondeterministic. This repo already has two public `Verdict` enums (`review::Verdict` and `review_v2::Verdict`), which means the new collision path can flip between runs and produce unstable `TypeGraph` contents/module paths.",
+              "message": "The new `check_consistency` tests use `HashMap::new()` without importing `HashMap`, so this module's test build will fail before the added coverage can run. Bring `std::collections::HashMap` into scope in the test module.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/code_profile_builder.rs",
-              "line": 66,
-              "category": "correctness"
+              "file": "libs/domain/src/domain_types.rs",
+              "line": 1017,
+              "category": "tests"
             }
           ],
-          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
-          "at": "2026-04-08T09:13:23Z"
+          "hash": "rvw1:sha256:6de82f76cf8bf6b476df2d74eb964672af0d7df325b481d774a57dfc6be24398",
+          "at": "2026-04-08T09:33:30Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
-          "at": "2026-04-08T09:19:55Z"
+          "hash": "rvw1:sha256:6de82f76cf8bf6b476df2d74eb964672af0d7df325b481d774a57dfc6be24398",
+          "at": "2026-04-08T09:36:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6de82f76cf8bf6b476df2d74eb964672af0d7df325b481d774a57dfc6be24398",
+          "at": "2026-04-08T09:52:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6de82f76cf8bf6b476df2d74eb964672af0d7df325b481d774a57dfc6be24398",
+          "at": "2026-04-08T09:55:25Z"
         }
       ]
     },
@@ -832,6 +919,196 @@
           "findings": [],
           "hash": "rvw1:sha256:d7b9054064f465f4d4f9aa36d9b687678d29f750f39f7e0a3399554f8ea7c7b6",
           "at": "2026-04-08T08:49:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecCodeConsistencyArgs` will parse `--crate-name` by default, but the documented CLI contract here and in the ADR is `--crate <name>`. As written, the expected flag is rejected and the new subcommand cannot be invoked as specified.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 76,
+              "category": "correctness"
+            },
+            {
+              "message": "The stdout payload is not a `ConsistencyReport` JSON object. It emits `forward_signals_count` plus debug-formatted slices, so the required `forward_signals` field is missing and the output is not guaranteed to be valid JSON for arbitrary identifiers. That breaks the documented contract for this subcommand.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 263,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:39b332eee5cc0e019c70a5de09b3e8855c3d6c375469170e3595e5c59072f31b",
+          "at": "2026-04-08T09:38:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The stdout JSON omits `found_items`, `missing_items`, and `extra_items` from each `forward_signals` entry, so this command does not emit the full `ConsistencyReport` shape required by T006 and callers cannot verify per-entry signal details.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 264,
+              "category": "correctness"
+            },
+            {
+              "message": "There are no tests for the new `SpecCodeConsistency` path, so the invalid-track-id, unreadable `domain-types.json`, and schema-export failure branches are unguarded despite this being a new public CLI surface.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 170,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:51d28e98e8e9cf0a38281ecf44494ef4477aaefae71d311fa674a73aac144e4b",
+          "at": "2026-04-08T09:52:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new report payload is hand-built with `format!`/`println!`, so any quote, backslash, or newline in a type or trait name will emit invalid JSON. `DomainTypeEntry::new` only rejects empty names, so this path is reachable with valid input. Serialize a struct with `serde_json` instead of concatenating strings.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 268,
+              "category": "correctness"
+            },
+            {
+              "message": "`execute()` always calls `print_outcome(label, &outcome)` after printing the JSON blob, so stdout is no longer a pure `ConsistencyReport` stream. That breaks the new command’s machine-readable contract and makes downstream parsing fragile. Either suppress the human summary for `spec-code-consistency` or send it to stderr.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 166,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:51d28e98e8e9cf0a38281ecf44494ef4477aaefae71d311fa674a73aac144e4b",
+          "at": "2026-04-08T09:55:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new subcommand prints the JSON report and then `print_outcome()` appends the normal human-readable verify footer, so stdout is not a standalone `ConsistencyReport` payload. The acceptance criteria say this command should emit the report itself.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 285,
+              "category": "correctness"
+            },
+            {
+              "message": "The emitted JSON is not a full `ConsistencyReport`: each `forward_signals` entry is reduced to `{type_name, kind_tag, signal}` and drops `found_type`, `found_items`, `missing_items`, and `extra_items`. Callers cannot reconstruct the per-entry mismatch details the report is supposed to carry.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 264,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:51d28e98e8e9cf0a38281ecf44494ef4477aaefae71d311fa674a73aac144e4b",
+          "at": "2026-04-08T09:56:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec-code-consistency` no longer emits a machine-readable `ConsistencyReport`: the `forward_signals` JSON here only includes `type_name`, `kind_tag`, and `signal`, dropping `found_type`, `found_items`, `missing_items`, and `extra_items`, and `execute()` still passes the result through `print_outcome`, which appends human banners after the JSON blob. That breaks the stdout contract expected by T006 and any downstream parser.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 269,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:51d28e98e8e9cf0a38281ecf44494ef4477aaefae71d311fa674a73aac144e4b",
+          "at": "2026-04-08T09:57:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`matches!(e, SchemaExportError::NightlyNotFound)` moves `e`, so the later `format!(\"schema export failed: {e}{hint}\")` is a use-after-move and this arm will not compile. Borrow the error in the predicate instead.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 212,
+              "category": "correctness"
+            },
+            {
+              "message": "`spec-code-consistency` is supposed to emit a standalone `ConsistencyReport`, but this path prints a hand-built JSON fragment and then `execute()` still calls `print_outcome()`, so stdout is no longer machine-readable. The JSON also drops `found_type`, `found_items`, `missing_items`, and `extra_items` from each `forward_signals` entry.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 166,
+              "category": "correctness"
+            },
+            {
+              "message": "This new public CLI subcommand has no happy-path or error-path tests in the module, so regressions in track-id validation, schema export failures, or the stdout contract can ship unnoticed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 170,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:51d28e98e8e9cf0a38281ecf44494ef4477aaefae71d311fa674a73aac144e4b",
+          "at": "2026-04-08T10:00:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`matches!(e, SchemaExportError::NightlyNotFound)` moves `e`, so the later `format!(\"schema export failed: {e}{hint}\")` uses a moved value and this branch will not compile. Borrow the error in the predicate (`matches!(&e, ...)`) or match on `&e` instead.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 212,
+              "category": "correctness"
+            },
+            {
+              "message": "The JSON line is assembled with manual `format!(\"\\\"{s}\\\"\")` interpolation and similar string concatenation, but none of the values are escaped. Because `DomainTypeEntry::name()` accepts arbitrary non-empty strings, a quote, backslash, or newline in a type/item name will emit invalid JSON. Use a real serializer such as `serde_json::json!`/`to_string` or escape the strings before printing.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 270,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a74d07e735a5f4ca0f850e6270e56c319d8354f697d8a28fbfdfcd5a2ef8c51a",
+          "at": "2026-04-08T10:04:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute()` still calls `print_outcome()` after emitting the JSON report, so stdout is a JSON blob plus human banners/findings. That violates the new command’s `ConsistencyReport` stdout contract and will break any parser expecting pure JSON.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 166,
+              "category": "correctness"
+            },
+            {
+              "message": "There are no tests covering the new `SpecCodeConsistency` path. The new happy path plus invalid-track-ID, unreadable `domain-types.json`, and schema-export failure branches can regress without detection.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 170,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:a74d07e735a5f4ca0f850e6270e56c319d8354f697d8a28fbfdfcd5a2ef8c51a",
+          "at": "2026-04-08T10:07:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a74d07e735a5f4ca0f850e6270e56c319d8354f697d8a28fbfdfcd5a2ef8c51a",
+          "at": "2026-04-08T10:09:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a74d07e735a5f4ca0f850e6270e56c319d8354f697d8a28fbfdfcd5a2ef8c51a",
+          "at": "2026-04-08T10:13:46Z"
         }
       ]
     }
