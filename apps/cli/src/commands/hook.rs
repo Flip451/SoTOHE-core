@@ -329,22 +329,31 @@ fn load_guides_from_project() -> Vec<domain::skill_compliance::GuideEntry> {
 }
 
 /// Loads context from the latest active track's spec.md and plan.md.
+/// Selects the track with the most recent `updated_at` from metadata.json,
+/// filtering to tracks that are not "done" or "archived".
 /// Returns `None` on any failure (advisory hook — never block).
 fn load_latest_track_context() -> Option<String> {
     let project_dir = PathBuf::from(std::env::var("CLAUDE_PROJECT_DIR").ok()?);
     let items_dir = project_dir.join("track/items");
     let entries = std::fs::read_dir(&items_dir).ok()?;
 
-    // Find the latest track directory by modified time
+    // Find the latest active track by updated_at in metadata.json
     let latest = entries
         .filter_map(|e| e.ok())
         .filter(|e| e.file_type().ok().is_some_and(|ft| ft.is_dir()))
         .filter_map(|e| {
             let metadata_path = e.path().join("metadata.json");
-            let modified = std::fs::metadata(&metadata_path).ok()?.modified().ok()?;
-            Some((e.path(), modified))
+            let content = std::fs::read_to_string(&metadata_path).ok()?;
+            let json: serde_json::Value = serde_json::from_str(&content).ok()?;
+            let status = json.get("status")?.as_str()?;
+            // Skip done/archived tracks
+            if status == "done" || status == "archived" {
+                return None;
+            }
+            let updated_at = json.get("updated_at")?.as_str()?.to_owned();
+            Some((e.path(), updated_at))
         })
-        .max_by_key(|(_, modified)| *modified)?;
+        .max_by(|(_, a), (_, b)| a.cmp(b))?;
 
     let track_dir = latest.0;
     let mut parts = Vec::new();

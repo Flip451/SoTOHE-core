@@ -191,8 +191,10 @@ pub fn trigger_matches(text: &str, trigger: &str) -> bool {
     let text_lower = text.to_lowercase();
     let trigger_lower = trigger.to_lowercase();
     if trigger_lower.chars().any(|c| c.is_ascii_alphanumeric()) {
-        // Word-boundary aware match
-        if let Some(pos) = text_lower.find(&trigger_lower) {
+        // Word-boundary aware match — scan all occurrences
+        let mut start = 0;
+        while let Some(rel) = text_lower[start..].find(&trigger_lower) {
+            let pos = start + rel;
             let before_ok = pos == 0
                 || text_lower
                     .as_bytes()
@@ -204,10 +206,12 @@ pub fn trigger_matches(text: &str, trigger: &str) -> bool {
                     .as_bytes()
                     .get(after_pos)
                     .is_none_or(|&b| !b.is_ascii_alphanumeric() && b != b'_');
-            before_ok && after_ok
-        } else {
-            false
+            if before_ok && after_ok {
+                return true;
+            }
+            start = pos + 1;
         }
+        false
     } else {
         text_lower.contains(&trigger_lower)
     }
@@ -255,8 +259,9 @@ pub fn check_compliance(
     guide_limit: usize,
 ) -> ComplianceContext {
     let skill_match = detect_skill_command(prompt);
-    // Only match guides when a /track:* command is detected.
-    let guide_matches = if skill_match.is_some() {
+    // Match guides when any /track: command is detected (not just SKILL_COMMANDS).
+    let has_track_command = prompt.to_lowercase().contains("/track:");
+    let guide_matches = if has_track_command {
         let combined = match track_context {
             Some(ctx) if !ctx.is_empty() => format!("{prompt}\n{ctx}"),
             _ => prompt.to_owned(),
