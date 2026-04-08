@@ -296,7 +296,14 @@ fn execute_user_prompt_submit(_hook: CliHookName) -> ExitCode {
         return ExitCode::SUCCESS;
     }
 
-    // Load guides and track context from project dir
+    // Early exit: skip filesystem I/O when no /track: command is present
+    let has_track_command = prompt.to_lowercase().contains("/track:");
+    let skill_match = domain::skill_compliance::detect_skill_command(&prompt);
+    if !has_track_command && skill_match.is_none() {
+        return ExitCode::SUCCESS;
+    }
+
+    // Load guides and track context only when /track: is detected
     let guides = load_guides_from_project();
     let track_context = load_latest_track_context();
 
