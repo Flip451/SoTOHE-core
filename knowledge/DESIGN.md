@@ -437,7 +437,7 @@ launcher files have been removed (STRAT-03 Phase 1).
 
 | Layer | Rust (fail-closed by design) | Python (advisory, keep as-is) |
 |-------|------------------------------|-------------------------------|
-| Security hooks | `sotp hook dispatch` (direct shell invocation) | `suggest-*`, `lint-on-save`, `agent-router`, etc. |
+| Security hooks | `sotp hook dispatch` (direct shell invocation) | `suggest-*`, `lint-on-save`, etc. |
 | Track state I/O | `metadata.json` read-modify-write | `plan.md` / `registry.md` rendering |
 | File writes | Atomic write for critical data | Log append (JSONL) |
 

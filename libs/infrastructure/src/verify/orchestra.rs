@@ -43,7 +43,6 @@ static HARDCODED_CODEX_MODEL_RE: LazyLock<Option<Regex>> =
 // ---------------------------------------------------------------------------
 
 const EXPECTED_HOOK_PATHS: &[(&str, &str)] = &[
-    (".claude/hooks/agent-router.py", "agent-router hook"),
     (".claude/hooks/check-codex-before-write.py", "codex-before-write hook"),
     (".claude/hooks/suggest-gemini-research.py", "gemini-research hook"),
     (".claude/hooks/error-to-codex.py", "error-to-codex hook"),
