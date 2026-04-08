@@ -173,17 +173,53 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
             None => continue,
         };
 
+        // Extract module path from the rustdoc paths table for type items.
+        let module_path = extract_module_path(&item.id, krate);
+
         match &item.inner {
             ItemEnum::Struct(s) => {
                 let members = extract_struct_fields(s, krate);
-                types.push(TypeInfo::new(name, TypeKind::Struct, item.docs.clone(), members));
+                let ti = if let Some(mp) = module_path {
+                    TypeInfo::with_module_path(
+                        name,
+                        TypeKind::Struct,
+                        item.docs.clone(),
+                        members,
+                        mp,
+                    )
+                } else {
+                    TypeInfo::new(name, TypeKind::Struct, item.docs.clone(), members)
+                };
+                types.push(ti);
             }
             ItemEnum::Enum(e) => {
                 let variants = extract_enum_variants(e, krate);
-                types.push(TypeInfo::new(name, TypeKind::Enum, item.docs.clone(), variants));
+                let ti = if let Some(mp) = module_path {
+                    TypeInfo::with_module_path(
+                        name,
+                        TypeKind::Enum,
+                        item.docs.clone(),
+                        variants,
+                        mp,
+                    )
+                } else {
+                    TypeInfo::new(name, TypeKind::Enum, item.docs.clone(), variants)
+                };
+                types.push(ti);
             }
             ItemEnum::TypeAlias(_) => {
-                types.push(TypeInfo::new(name, TypeKind::TypeAlias, item.docs.clone(), Vec::new()));
+                let ti = if let Some(mp) = module_path {
+                    TypeInfo::with_module_path(
+                        name,
+                        TypeKind::TypeAlias,
+                        item.docs.clone(),
+                        Vec::new(),
+                        mp,
+                    )
+                } else {
+                    TypeInfo::new(name, TypeKind::TypeAlias, item.docs.clone(), Vec::new())
+                };
+                types.push(ti);
             }
             ItemEnum::Function(f) if !method_ids.contains(&item.id) => {
                 let sig = format_sig(&name, &f.sig);
@@ -241,6 +277,20 @@ fn extract_enum_variants(e: &rustdoc_types::Enum, krate: &rustdoc_types::Crate) 
         .filter_map(|id| krate.index.get(id))
         .filter_map(|item| item.name.clone())
         .collect()
+}
+
+/// Extract the module path for a type from the rustdoc `paths` table.
+///
+/// Returns the parent module path (e.g., `"review"` for `crate::review::Error`),
+/// or `None` if the item is not found in the paths table.
+fn extract_module_path(id: &rustdoc_types::Id, krate: &rustdoc_types::Crate) -> Option<String> {
+    let summary = krate.paths.get(id)?;
+    // path is e.g. ["crate_name", "module", "TypeName"] — take all but last as module path.
+    summary
+        .path
+        .get(..summary.path.len().saturating_sub(1))
+        .filter(|parent| !parent.is_empty())
+        .map(|parent| parent.join("::"))
 }
 
 /// Returns `true` if the function signature's first parameter is a self receiver

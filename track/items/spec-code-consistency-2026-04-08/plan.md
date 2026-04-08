@@ -39,7 +39,7 @@ domain: TypeNode に module_path: Option<String> を追加。
 infra: schema_export.rs で rustdoc JSON の path 情報から module_path を抽出。
 infra: build_type_graph で module_path を設定。同名衝突時に tracing::warn で警告。
 
-- [ ] module_path 追加 — TypeInfo/TypeNode に module_path を追加し同名型衝突の warning を出す
+- [x] module_path 追加 — TypeInfo/TypeNode に module_path を追加し同名型衝突の warning を出す
 
 ## 逆方向チェック + ConsistencyReport + CLI
 

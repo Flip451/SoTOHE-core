@@ -1,219 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:926c7df78a9c6c5e9d5a8801bdf3598bae551cdab705371fd67779a5ef364645",
-          "at": "2026-04-08T08:18:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeNode::new` now creates nodes with `outgoing` always empty, while `evaluate_typestate` reads only `outgoing()` and ignores `method_return_types`. Any caller that constructs a `TypeGraph` directly and forgets the extra `set_outgoing()` step will get false missing-transition reds, so the new public API no longer makes this invariant self-consistent or hard to misuse.",
-              "severity": "P1",
-              "file": "libs/domain/src/schema.rs",
-              "line": 313,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:926c7df78a9c6c5e9d5a8801bdf3598bae551cdab705371fd67779a5ef364645",
-          "at": "2026-04-08T08:23:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeNode::new()` now always initializes `outgoing` as empty, while `evaluate_typestate()` consumes only `outgoing()` and no longer falls back to `method_return_types()`. Because `TypeGraph`/`TypeNode` are still public and re-exported, any caller that constructs a graph directly through this API will silently get false-red typestate evaluations unless they know to call `set_outgoing()` themselves. That hidden invariant was not present before this rename and is not enforced by the type system.",
-              "severity": "P1",
-              "file": "libs/domain/src/schema.rs",
-              "line": 313,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:926c7df78a9c6c5e9d5a8801bdf3598bae551cdab705371fd67779a5ef364645",
-          "at": "2026-04-08T08:26:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeNode::new()` now always builds a node with `outgoing` empty, while typestate evaluation reads only `outgoing()` and no longer falls back to `method_return_types()`. Because `TypeNode`/`TypeGraph` are still public and re-exported, any caller that constructs a graph directly with `TypeNode::new` will silently get false-red missing-transition results unless they remember a separate `set_outgoing()` call. This introduces a new hidden invariant into the domain API instead of making the invalid state unrepresentable.",
-              "severity": "P1",
-              "file": "libs/domain/src/schema.rs",
-              "line": 323,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:fea712612541f09e3e01dcb48aee8101531273617d78d478aef0812c5545762b",
-          "at": "2026-04-08T08:29:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeNode::new()` now always initializes `outgoing` as empty, while typestate evaluation reads only `outgoing()` and no longer falls back to `method_return_types()`. Because `TypeNode`/`TypeGraph` remain public (and are re-exported), any caller that constructs a graph with `TypeNode::new()` will silently get false-red missing-transition results unless they know to make a separate `set_outgoing()` call. That introduces a new hidden invariant into the library API.",
-              "severity": "P0",
-              "file": "libs/domain/src/schema.rs",
-              "line": 323,
-              "category": "correctness"
-            },
-            {
-              "message": "The updated typestate tests still do not exercise the new `outgoing` behavior. `make_profile_with_transition()` sets `method_return_types` and `outgoing` to the same value, so this suite cannot catch regressions where evaluation accidentally consults `method_return_types()` again or where non-typestate return types leak into `outgoing`. Add a case where the two sets differ and assert that only `outgoing` drives the result.",
-              "severity": "P1",
-              "file": "libs/domain/src/domain_types.rs",
-              "line": 717,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:6804ab472947eddbc11dab135f3ab8432c5a48b2b6af7a9282c00d2ea64d14da",
-          "at": "2026-04-08T08:32:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeNode::new()` now always initializes `outgoing` as empty, while typestate evaluation consumes only `outgoing()` and no longer falls back to `method_return_types()`. Because `TypeNode`/`TypeGraph` are public and re-exported, any caller that constructs a graph directly with `TypeNode::new()` will silently get false-red missing-transition results unless they remember a separate `set_outgoing()` call. This introduces a new hidden invalid state into the public domain API instead of making the invariant self-enforcing.",
-              "severity": "P1",
-              "file": "libs/domain/src/schema.rs",
-              "line": 323,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:15048ce94143e29fc9a65ae2c0c9852e0ce0f3a8fee0e1923a059035f9b72ffe",
-          "at": "2026-04-08T08:34:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeNode::new` now takes `outgoing` as an unconstrained public input, while `evaluate_typestate` consumes only `outgoing()` as the source of typestate transitions. That means any direct `TypeGraph` construction can omit or invent transitions and silently produce false red/blue results, because the required `outgoing ⊆ method_return_types` invariant is no longer enforced by the domain API.",
-              "severity": "P1",
-              "file": "libs/domain/src/schema.rs",
-              "line": 316,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1b395be64323684dc23a01a56039049eedd07a1567b957e2db93167cea59ff35",
-          "at": "2026-04-08T08:39:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeNode::new` still accepts an arbitrary `outgoing` subset even though `evaluate_typestate` now ignores `method_return_types()` and trusts only `outgoing()`. Because `TypeNode`/`TypeGraph` remain public and are re-exported, any direct construction with `method_return_types = {\"Published\"}` and `outgoing = {}` will silently produce a false-red missing-transition result. This introduces a new hidden invariant into the public domain API instead of making the typestate edge set derivable or validated.",
-              "severity": "P1",
-              "file": "libs/domain/src/schema.rs",
-              "line": 316,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:bdc1700cf976ddd51f36a80432562f821c6535520376721124406acd3325e275",
-          "at": "2026-04-08T08:42:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bdc1700cf976ddd51f36a80432562f821c6535520376721124406acd3325e275",
-          "at": "2026-04-08T08:45:39Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
-          "at": "2026-04-08T07:55:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
-          "at": "2026-04-08T07:59:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e02e0e33ed6add32f0f7796985b0ac4fe4e3253444bbc22867fd449f0e10155b",
-          "at": "2026-04-08T08:04:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e02e0e33ed6add32f0f7796985b0ac4fe4e3253444bbc22867fd449f0e10155b",
-          "at": "2026-04-08T08:07:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `typestate_names`-driven outgoing computation is not covered by any test in this file: every updated test still passes `HashSet::new()`, so a regression in the intersection logic or `set_outgoing()` path would slip through. This public API now has an untested behavior branch.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/code_profile_builder.rs",
-              "line": 38,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:220393607eb2677b938bcc5a096014df25e9f1cb449aa61bec0920ca139e98a0",
-          "at": "2026-04-08T08:17:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "No test covers the new `typestate_names` filtering path. Every existing test still calls `build_type_graph(..., &HashSet::new())`, so the outgoing-transition logic at this point can regress without any assertion failure. Please add a case that supplies typestate names and verifies `TypeNode::outgoing()` only includes the filtered typestate targets.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/code_profile_builder.rs",
-              "line": 38,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:220393607eb2677b938bcc5a096014df25e9f1cb449aa61bec0920ca139e98a0",
-          "at": "2026-04-08T08:18:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:458b87b3633322ad77fcca3e4f0caef7c2bbd2ef9df3c2c512650fecc91c1a86",
-          "at": "2026-04-08T08:19:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:458b87b3633322ad77fcca3e4f0caef7c2bbd2ef9df3c2c512650fecc91c1a86",
-          "at": "2026-04-08T08:21:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:06884a4f254b6f98b86135e5ad79d53501dad5d023358fa45f95d36a164d6fce",
-          "at": "2026-04-08T08:52:11Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -712,6 +499,306 @@
           "findings": [],
           "hash": "rvw1:sha256:ab908bd7506df0edd16c1424657f68a467d990b09ed497bf3676d370db801335",
           "at": "2026-04-08T08:53:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7eb342bb7be29f84b7dda38c6107e77d45d0b0781774140ef748e29ff4df0f1",
+          "at": "2026-04-08T09:22:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` is still earlier than `created_at` (`2026-04-08T09:02:37Z` vs `2026-04-08T14:00:00Z`), so this metadata now records an impossible timeline and can misorder or invalidate consumers that rely on timestamp monotonicity.",
+              "severity": "P1",
+              "file": "track/items/spec-code-consistency-2026-04-08/metadata.json",
+              "line": 115,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:c7eb342bb7be29f84b7dda38c6107e77d45d0b0781774140ef748e29ff4df0f1",
+          "at": "2026-04-08T09:23:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7eb342bb7be29f84b7dda38c6107e77d45d0b0781774140ef748e29ff4df0f1",
+          "at": "2026-04-08T09:24:11Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:926c7df78a9c6c5e9d5a8801bdf3598bae551cdab705371fd67779a5ef364645",
+          "at": "2026-04-08T08:18:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeNode::new` now creates nodes with `outgoing` always empty, while `evaluate_typestate` reads only `outgoing()` and ignores `method_return_types`. Any caller that constructs a `TypeGraph` directly and forgets the extra `set_outgoing()` step will get false missing-transition reds, so the new public API no longer makes this invariant self-consistent or hard to misuse.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 313,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:926c7df78a9c6c5e9d5a8801bdf3598bae551cdab705371fd67779a5ef364645",
+          "at": "2026-04-08T08:23:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeNode::new()` now always initializes `outgoing` as empty, while `evaluate_typestate()` consumes only `outgoing()` and no longer falls back to `method_return_types()`. Because `TypeGraph`/`TypeNode` are still public and re-exported, any caller that constructs a graph directly through this API will silently get false-red typestate evaluations unless they know to call `set_outgoing()` themselves. That hidden invariant was not present before this rename and is not enforced by the type system.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 313,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:926c7df78a9c6c5e9d5a8801bdf3598bae551cdab705371fd67779a5ef364645",
+          "at": "2026-04-08T08:26:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeNode::new()` now always builds a node with `outgoing` empty, while typestate evaluation reads only `outgoing()` and no longer falls back to `method_return_types()`. Because `TypeNode`/`TypeGraph` are still public and re-exported, any caller that constructs a graph directly with `TypeNode::new` will silently get false-red missing-transition results unless they remember a separate `set_outgoing()` call. This introduces a new hidden invariant into the domain API instead of making the invalid state unrepresentable.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 323,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fea712612541f09e3e01dcb48aee8101531273617d78d478aef0812c5545762b",
+          "at": "2026-04-08T08:29:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeNode::new()` now always initializes `outgoing` as empty, while typestate evaluation reads only `outgoing()` and no longer falls back to `method_return_types()`. Because `TypeNode`/`TypeGraph` remain public (and are re-exported), any caller that constructs a graph with `TypeNode::new()` will silently get false-red missing-transition results unless they know to make a separate `set_outgoing()` call. That introduces a new hidden invariant into the library API.",
+              "severity": "P0",
+              "file": "libs/domain/src/schema.rs",
+              "line": 323,
+              "category": "correctness"
+            },
+            {
+              "message": "The updated typestate tests still do not exercise the new `outgoing` behavior. `make_profile_with_transition()` sets `method_return_types` and `outgoing` to the same value, so this suite cannot catch regressions where evaluation accidentally consults `method_return_types()` again or where non-typestate return types leak into `outgoing`. Add a case where the two sets differ and assert that only `outgoing` drives the result.",
+              "severity": "P1",
+              "file": "libs/domain/src/domain_types.rs",
+              "line": 717,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:6804ab472947eddbc11dab135f3ab8432c5a48b2b6af7a9282c00d2ea64d14da",
+          "at": "2026-04-08T08:32:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeNode::new()` now always initializes `outgoing` as empty, while typestate evaluation consumes only `outgoing()` and no longer falls back to `method_return_types()`. Because `TypeNode`/`TypeGraph` are public and re-exported, any caller that constructs a graph directly with `TypeNode::new()` will silently get false-red missing-transition results unless they remember a separate `set_outgoing()` call. This introduces a new hidden invalid state into the public domain API instead of making the invariant self-enforcing.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 323,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:15048ce94143e29fc9a65ae2c0c9852e0ce0f3a8fee0e1923a059035f9b72ffe",
+          "at": "2026-04-08T08:34:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeNode::new` now takes `outgoing` as an unconstrained public input, while `evaluate_typestate` consumes only `outgoing()` as the source of typestate transitions. That means any direct `TypeGraph` construction can omit or invent transitions and silently produce false red/blue results, because the required `outgoing ⊆ method_return_types` invariant is no longer enforced by the domain API.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 316,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1b395be64323684dc23a01a56039049eedd07a1567b957e2db93167cea59ff35",
+          "at": "2026-04-08T08:39:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeNode::new` still accepts an arbitrary `outgoing` subset even though `evaluate_typestate` now ignores `method_return_types()` and trusts only `outgoing()`. Because `TypeNode`/`TypeGraph` remain public and are re-exported, any direct construction with `method_return_types = {\"Published\"}` and `outgoing = {}` will silently produce a false-red missing-transition result. This introduces a new hidden invariant into the public domain API instead of making the typestate edge set derivable or validated.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 316,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:bdc1700cf976ddd51f36a80432562f821c6535520376721124406acd3325e275",
+          "at": "2026-04-08T08:42:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdc1700cf976ddd51f36a80432562f821c6535520376721124406acd3325e275",
+          "at": "2026-04-08T08:45:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d6dba8f8b38d50480a6132bb72e45137dacf3e7150ee18645dcbda43831cd8c",
+          "at": "2026-04-08T09:03:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "New public module-path APIs were added here (`TypeInfo::with_module_path`/`module_path` and `TypeNode::set_module_path`/`module_path`), but this file's tests still cover only the pre-existing constructors/accessors. That leaves the new `Some(...)` path and mutation path unverified, which is a P1 gap under this repo's testing policy for public APIs.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 88,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:9d6dba8f8b38d50480a6132bb72e45137dacf3e7150ee18645dcbda43831cd8c",
+          "at": "2026-04-08T09:05:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b1ba9031d4684c68d6f7da745aa2002f8762b6ecd193ae0d3b461ebe69a8b92",
+          "at": "2026-04-08T09:07:18Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
+          "at": "2026-04-08T07:55:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e852c7f9d1254b0e25fc840a31c9ad6bf02a3135e3b998c859292ec0c3dc5f80",
+          "at": "2026-04-08T07:59:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e02e0e33ed6add32f0f7796985b0ac4fe4e3253444bbc22867fd449f0e10155b",
+          "at": "2026-04-08T08:04:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e02e0e33ed6add32f0f7796985b0ac4fe4e3253444bbc22867fd449f0e10155b",
+          "at": "2026-04-08T08:07:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `typestate_names`-driven outgoing computation is not covered by any test in this file: every updated test still passes `HashSet::new()`, so a regression in the intersection logic or `set_outgoing()` path would slip through. This public API now has an untested behavior branch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/code_profile_builder.rs",
+              "line": 38,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:220393607eb2677b938bcc5a096014df25e9f1cb449aa61bec0920ca139e98a0",
+          "at": "2026-04-08T08:17:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "No test covers the new `typestate_names` filtering path. Every existing test still calls `build_type_graph(..., &HashSet::new())`, so the outgoing-transition logic at this point can regress without any assertion failure. Please add a case that supplies typestate names and verifies `TypeNode::outgoing()` only includes the filtered typestate targets.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/code_profile_builder.rs",
+              "line": 38,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:220393607eb2677b938bcc5a096014df25e9f1cb449aa61bec0920ca139e98a0",
+          "at": "2026-04-08T08:18:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:458b87b3633322ad77fcca3e4f0caef7c2bbd2ef9df3c2c512650fecc91c1a86",
+          "at": "2026-04-08T08:19:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:458b87b3633322ad77fcca3e4f0caef7c2bbd2ef9df3c2c512650fecc91c1a86",
+          "at": "2026-04-08T08:21:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:06884a4f254b6f98b86135e5ad79d53501dad5d023358fa45f95d36a164d6fce",
+          "at": "2026-04-08T08:52:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
+          "at": "2026-04-08T09:09:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_type_graph` still resolves collisions by plain type name and keeps the last entry it sees. Because `SchemaExport` only sorts by `name`, equal-name types retain the original `krate.index` hash iteration order, so the winner is nondeterministic. This repo already has two public `Verdict` enums (`review::Verdict` and `review_v2::Verdict`), which means the new collision path can flip between runs and produce unstable `TypeGraph` contents/module paths.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/code_profile_builder.rs",
+              "line": 66,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
+          "at": "2026-04-08T09:13:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5254b8ca7cbb5fb683ee457b683e5b4b2edba1e73cbbe780e1812f4f827663f7",
+          "at": "2026-04-08T09:19:55Z"
         }
       ]
     },

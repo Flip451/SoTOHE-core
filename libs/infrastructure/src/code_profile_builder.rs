@@ -21,7 +21,7 @@ use domain::schema::{SchemaExport, TraitNode, TypeGraph, TypeNode};
 /// `typestate_names`.
 #[must_use]
 pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>) -> TypeGraph {
-    let mut types = HashMap::new();
+    let mut types: HashMap<String, TypeNode> = HashMap::new();
 
     for type_info in schema.types() {
         let method_return_types: HashSet<String> = schema
@@ -41,15 +41,29 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
             .cloned()
             .collect();
 
-        types.insert(
-            type_info.name().to_string(),
-            TypeNode::new(
-                type_info.kind().clone(),
-                type_info.members().to_vec(),
-                method_return_types,
-                outgoing,
-            ),
+        let name_key = type_info.name().to_string();
+
+        // Warn on same-name type collision (different module paths).
+        if let Some(existing) = types.get(&name_key) {
+            eprintln!(
+                "warning: same-name type collision for `{}`: existing={:?}, new={:?} — later entry overwrites earlier",
+                name_key,
+                existing.module_path(),
+                type_info.module_path(),
+            );
+        }
+
+        let mut node = TypeNode::new(
+            type_info.kind().clone(),
+            type_info.members().to_vec(),
+            method_return_types,
+            outgoing,
         );
+        if let Some(mp) = type_info.module_path() {
+            node.set_module_path(mp.to_string());
+        }
+
+        types.insert(name_key, node);
     }
 
     let mut traits = HashMap::new();

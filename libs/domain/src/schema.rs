@@ -74,12 +74,25 @@ pub struct TypeInfo {
     docs: Option<String>,
     /// For enums: variant names. For structs: field names. Empty for type aliases.
     members: Vec<String>,
+    /// Module path for disambiguation (e.g., `"domain::review"`). `None` if unknown.
+    module_path: Option<String>,
 }
 
 impl TypeInfo {
     /// Creates a new type info.
     pub fn new(name: String, kind: TypeKind, docs: Option<String>, members: Vec<String>) -> Self {
-        Self { name, kind, docs, members }
+        Self { name, kind, docs, members, module_path: None }
+    }
+
+    /// Creates a new type info with a module path.
+    pub fn with_module_path(
+        name: String,
+        kind: TypeKind,
+        docs: Option<String>,
+        members: Vec<String>,
+        module_path: String,
+    ) -> Self {
+        Self { name, kind, docs, members, module_path: Some(module_path) }
     }
 
     /// Returns the type name.
@@ -100,6 +113,11 @@ impl TypeInfo {
     /// Returns variant names (enums) or field names (structs).
     pub fn members(&self) -> &[String] {
         &self.members
+    }
+
+    /// Returns the module path, if known.
+    pub fn module_path(&self) -> Option<&str> {
+        self.module_path.as_deref()
     }
 }
 
@@ -297,14 +315,11 @@ pub struct TypeNode {
     /// Variant names (for enums) or field names (for structs).
     members: Vec<String>,
     /// Type names returned by inherent (non-trait) impl methods.
-    ///
-    /// `Result<T, E>` and `Option<T>` are unwrapped to extract `T`.
-    /// Only the last path segment is stored (e.g., `"Published"` not `"crate::Published"`).
     method_return_types: HashSet<String>,
-    /// Outgoing typestate transitions: subset of `method_return_types` filtered to
-    /// only those types declared as typestate in the domain-types catalogue.
-    /// Set by `build_type_graph` in the infrastructure layer.
+    /// Outgoing typestate transitions: subset of `method_return_types`.
     outgoing: HashSet<String>,
+    /// Module path for disambiguation (e.g., `"domain::review"`). `None` if unknown.
+    module_path: Option<String>,
 }
 
 impl TypeNode {
@@ -320,7 +335,12 @@ impl TypeNode {
         outgoing: HashSet<String>,
     ) -> Self {
         let outgoing = outgoing.intersection(&method_return_types).cloned().collect();
-        Self { kind, members, method_return_types, outgoing }
+        Self { kind, members, method_return_types, outgoing, module_path: None }
+    }
+
+    /// Sets the module path for disambiguation.
+    pub fn set_module_path(&mut self, path: String) {
+        self.module_path = Some(path);
     }
 
     /// Returns the kind of this type.
@@ -333,6 +353,12 @@ impl TypeNode {
     #[must_use]
     pub fn members(&self) -> &[String] {
         &self.members
+    }
+
+    /// Returns the module path, if known.
+    #[must_use]
+    pub fn module_path(&self) -> Option<&str> {
+        self.module_path.as_deref()
     }
 
     /// Returns type names returned by inherent impl methods.
@@ -414,5 +440,36 @@ mod tests {
         assert_eq!(export.types().first().unwrap().name(), "TrackStatus");
         assert_eq!(export.types().first().unwrap().kind(), &TypeKind::Enum);
         assert_eq!(export.types().first().unwrap().members(), &["Planned", "InProgress"]);
+    }
+
+    #[test]
+    fn type_info_module_path_none_by_default() {
+        let ti = TypeInfo::new("Foo".to_string(), TypeKind::Struct, None, vec![]);
+        assert!(ti.module_path().is_none());
+    }
+
+    #[test]
+    fn type_info_with_module_path_stores_path() {
+        let ti = TypeInfo::with_module_path(
+            "Error".to_string(),
+            TypeKind::Enum,
+            None,
+            vec![],
+            "domain::review".to_string(),
+        );
+        assert_eq!(ti.module_path(), Some("domain::review"));
+    }
+
+    #[test]
+    fn type_node_module_path_none_by_default() {
+        let node = TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new());
+        assert!(node.module_path().is_none());
+    }
+
+    #[test]
+    fn type_node_set_module_path_stores_value() {
+        let mut node = TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new());
+        node.set_module_path("domain::guard".to_string());
+        assert_eq!(node.module_path(), Some("domain::guard"));
     }
 }

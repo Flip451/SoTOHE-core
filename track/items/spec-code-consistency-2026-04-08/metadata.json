@@ -98,7 +98,7 @@
     {
       "description": "module_path 追加 — TypeInfo/TypeNode に module_path を追加し同名型衝突の warning を出す",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "逆方向チェック (code → spec) — TypeGraph の全ノード (型および trait) のうち domain-types.json に宣言がないものを検出し undeclared_types と undeclared_traits として分類する",
@@ -112,5 +112,5 @@
     }
   ],
   "title": "3-12 spec ↔ code 整合性チェック — TypeGraph + 逆方向検出",
-  "updated_at": "2026-04-08T08:15:31Z"
+  "updated_at": "2026-04-08T09:02:37Z"
 }
