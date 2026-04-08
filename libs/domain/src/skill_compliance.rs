@@ -209,8 +209,11 @@ pub fn trigger_matches(text: &str, trigger: &str) -> bool {
             if before_ok && after_ok {
                 return true;
             }
-            // Advance past the current match start on a char boundary
-            start = text_lower.ceil_char_boundary(pos + 1);
+            // Advance past the current match start on a valid char boundary.
+            start = pos + 1;
+            while start < text_lower.len() && !text_lower.is_char_boundary(start) {
+                start += 1;
+            }
         }
         false
     } else {
