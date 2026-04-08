@@ -289,7 +289,10 @@ fn execute_user_prompt_submit(_hook: CliHookName) -> ExitCode {
 
     let prompt = match serde_json::from_str::<PromptEnvelope>(stdin_buf.trim()) {
         Ok(env) => env.prompt,
-        Err(_) => return ExitCode::SUCCESS,
+        Err(e) => {
+            eprintln!("warning: skill-compliance: failed to parse prompt JSON: {e}");
+            return ExitCode::SUCCESS;
+        }
     };
 
     if prompt.is_empty() {
