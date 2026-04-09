@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
+          "at": "2026-04-08T14:11:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
+          "at": "2026-04-08T14:11:48Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -661,42 +679,6 @@
         }
       ]
     },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
-          "at": "2026-04-08T14:11:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
-          "at": "2026-04-08T14:11:48Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
-          "at": "2026-04-08T14:52:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
-          "at": "2026-04-08T14:53:39Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -939,6 +921,104 @@
           "findings": [],
           "hash": "rvw1:sha256:249b776035b92142187e8db7d218b46b51b2d776225eaa8fe0cab9ac5a585dc7",
           "at": "2026-04-08T15:50:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f32b135b5cecb16dbdaf71fb5d75760f792af8452224cea12f8c75d583d82067",
+          "at": "2026-04-09T00:38:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f32b135b5cecb16dbdaf71fb5d75760f792af8452224cea12f8c75d583d82067",
+          "at": "2026-04-09T00:39:43Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
+          "at": "2026-04-08T14:52:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
+          "at": "2026-04-08T14:53:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Missing regression coverage for the new `DomainTypeKind::ErrorType` missing-type branch. `evaluate_domain_type_signals` now returns `Yellow` here, but no test exercises this public path, so a future regression would go undetected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/domain_types.rs",
+              "line": 442,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:40:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:41:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Changing the missing-type branches to return `ConfidenceSignal::Yellow` is incomplete on its own: callers still treat every non-Blue domain signal as a failure, so a spec-declared but unimplemented type remains blocking instead of becoming the intended WIP state. As merged, this patch mostly relabels that case without delivering the new behavior.",
+              "severity": "P1",
+              "file": "libs/domain/src/domain_types.rs",
+              "line": 313,
+              "category": "logic"
+            },
+            {
+              "message": "The new missing-type path for `ErrorType` has no regression test. This patch updates all five evaluators, but only four missing-type cases were re-covered in `#[cfg(test)]`, so `evaluate_error_type(...missing...) -> Yellow + found_type=false` can regress unnoticed.",
+              "severity": "P1",
+              "file": "libs/domain/src/domain_types.rs",
+              "line": 448,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:43:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_error_type` now classifies a missing declared error type as `Yellow`, but this changed branch has no regression test while the other updated evaluators do. That leaves the public `ErrorType` WIP path (`signal = Yellow`, `found_type = false`) able to regress unnoticed.",
+              "severity": "P1",
+              "file": "libs/domain/src/domain_types.rs",
+              "line": 448,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:46:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7432e38c13e7b9ee26ad083d4c2195e4ef79a17724689b784c1b63320c6f14d7",
+          "at": "2026-04-09T00:49:20Z"
         }
       ]
     }

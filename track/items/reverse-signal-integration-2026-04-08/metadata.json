@@ -68,14 +68,15 @@
   "status": "in_progress",
   "tasks": [
     {
+      "commit_hash": "45d7023",
       "description": "undeclared types/traits を Red の DomainTypeSignal (kind_tag: undeclared_type / undeclared_trait) に変換する関数を domain 層に追加",
       "id": "T01",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "定義済みだが未実装の型に Yellow シグナルを返すよう evaluate_domain_type_signals を拡張 (型が TypeGraph に見つからない場合 → Yellow)",
       "id": "T02",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "domain-type-signals コマンドを拡張: 逆方向チェック → undeclared Red + 未実装 Yellow を domain-types.json に保存。不在時はエラー終了し /track:design を促す。domain-types.md レンダリング。サマリ出力 blue=N yellow=M red=K (undeclared=U)",
@@ -109,5 +110,5 @@
     }
   ],
   "title": "TDDD: 逆方向チェック信号機統合 + designer capability + /track:design",
-  "updated_at": "2026-04-08T18:01:00Z"
+  "updated_at": "2026-04-09T00:37:03Z"
 }

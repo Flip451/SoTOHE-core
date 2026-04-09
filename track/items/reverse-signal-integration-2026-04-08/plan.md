@@ -12,8 +12,8 @@ undeclared types/traits を Red の DomainTypeSignal (kind_tag: undeclared_type 
 定義済みだが TypeGraph に見つからない型に Yellow シグナルを返すよう evaluate_domain_type_signals を拡張。
 Blue = 定義+実装+構造一致、Yellow = 定義+未実装 (WIP)、Red = 未定義+実装済み (TDDD 違反)。
 
-- [~] undeclared types/traits を Red の DomainTypeSignal (kind_tag: undeclared_type / undeclared_trait) に変換する関数を domain 層に追加
-- [ ] 定義済みだが未実装の型に Yellow シグナルを返すよう evaluate_domain_type_signals を拡張 (型が TypeGraph に見つからない場合 → Yellow)
+- [x] undeclared types/traits を Red の DomainTypeSignal (kind_tag: undeclared_type / undeclared_trait) に変換する関数を domain 層に追加 45d7023
+- [~] 定義済みだが未実装の型に Yellow シグナルを返すよう evaluate_domain_type_signals を拡張 (型が TypeGraph に見つからない場合 → Yellow)
 
 ## domain-type-signals コマンド拡張 + verify spec-states ゲート
 
