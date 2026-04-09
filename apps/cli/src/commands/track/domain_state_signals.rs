@@ -41,8 +41,16 @@ pub fn execute_domain_type_signals(
     let domain_types_path = track_dir.join("domain-types.json");
 
     // Read and decode domain-types.json.
+    // If not found, instruct the user to run /track:design first (TDDD requirement).
     let json = std::fs::read_to_string(&domain_types_path).map_err(|e| {
-        CliError::Message(format!("cannot read {}: {e}", domain_types_path.display()))
+        if e.kind() == std::io::ErrorKind::NotFound {
+            CliError::Message(format!(
+                "domain-types.json not found for track '{track_id}'. \
+                 Run /track:design first to create it (TDDD: type definitions must be written before implementation)."
+            ))
+        } else {
+            CliError::Message(format!("cannot read {}: {e}", domain_types_path.display()))
+        }
     })?;
 
     let mut doc = domain_types_codec::decode(&json)
@@ -70,14 +78,18 @@ pub fn execute_domain_type_signals(
     // Build a pre-indexed TypeGraph from the flat schema export.
     let profile = build_type_graph(&schema, &typestate_names);
 
-    // Evaluate signals.
-    let signals = domain::evaluate_domain_type_signals(doc.entries(), &profile);
+    // Bidirectional consistency check: forward (spec → code) + reverse (code → spec).
+    let report = domain::check_consistency(doc.entries(), &profile);
 
-    // Count by signal level for the summary.
-    let blue = signals.iter().filter(|s| s.signal() == domain::ConfidenceSignal::Blue).count();
-    let red = signals.iter().filter(|s| s.signal() == domain::ConfidenceSignal::Red).count();
+    // Convert undeclared types/traits to Red signals and merge with forward signals.
+    let reverse_signals =
+        domain::undeclared_to_signals(report.undeclared_types(), report.undeclared_traits());
+    let undeclared_count = reverse_signals.len();
 
-    doc.set_signals(signals);
+    let mut all_signals: Vec<_> = report.forward_signals().to_vec();
+    all_signals.extend(reverse_signals);
+
+    doc.set_signals(all_signals.clone());
 
     // Encode and write back.
     let encoded = domain_types_codec::encode(&doc)
@@ -94,10 +106,40 @@ pub fn execute_domain_type_signals(
         CliError::Message(format!("cannot write {}: {e}", domain_types_md_path.display()))
     })?;
 
-    let total = doc.entries().len();
-    println!("[OK] domain-type-signals: blue={blue} red={red} (total={total})",);
+    print_signal_summary(&all_signals, undeclared_count);
 
     Ok(ExitCode::SUCCESS)
+}
+
+/// Format the signal summary line and, when applicable, the undeclared-types warning.
+///
+/// Returns a `String` containing the full output (newline-terminated lines) so the
+/// formatting logic is testable without requiring the nightly toolchain that the full
+/// `execute_domain_type_signals` path needs.
+///
+/// `total` equals `signals.len()` — it counts every emitted signal (forward + reverse),
+/// not just the entries in `domain-types.json`, to keep `blue + yellow + red == total`.
+fn format_signal_summary(signals: &[domain::DomainTypeSignal], undeclared_count: usize) -> String {
+    let blue = signals.iter().filter(|s| s.signal() == domain::ConfidenceSignal::Blue).count();
+    let yellow = signals.iter().filter(|s| s.signal() == domain::ConfidenceSignal::Yellow).count();
+    let red = signals.iter().filter(|s| s.signal() == domain::ConfidenceSignal::Red).count();
+    let total = signals.len();
+    let mut out = format!(
+        "[OK] domain-type-signals: blue={blue} yellow={yellow} red={red} (total={total}, undeclared={undeclared_count})\n",
+    );
+
+    if undeclared_count > 0 {
+        out.push_str(&format!(
+            "[WARN] {undeclared_count} undeclared type(s)/trait(s) found. Run /track:design to update domain-types.json.\n"
+        ));
+    }
+
+    out
+}
+
+/// Print the signal summary produced by [`format_signal_summary`].
+fn print_signal_summary(signals: &[domain::DomainTypeSignal], undeclared_count: usize) {
+    print!("{}", format_signal_summary(signals, undeclared_count));
 }
 
 #[cfg(test)]
@@ -135,7 +177,9 @@ mod tests {
 
         let result =
             execute_domain_type_signals(items_dir, "test-track".to_owned(), workspace_root);
-        assert!(result.is_err(), "missing domain-types.json must return error");
+        let err = result.unwrap_err();
+        let msg = format!("{err}");
+        assert!(msg.contains("/track:design"), "error must suggest /track:design, got: {msg}");
     }
 
     #[test]
@@ -146,6 +190,69 @@ mod tests {
 
         let result = execute_domain_type_signals(items_dir, track_id, workspace_root);
         assert!(result.is_err(), "malformed domain-types.json must return error");
+    }
+
+    // --- format_signal_summary tests (pure, no nightly needed) ---
+
+    fn make_signal(signal: domain::ConfidenceSignal) -> domain::DomainTypeSignal {
+        domain::DomainTypeSignal::new("Foo", "value_object", signal, true, vec![], vec![], vec![])
+    }
+
+    #[test]
+    fn test_format_signal_summary_with_no_signals_prints_zero_counts() {
+        let out = format_signal_summary(&[], 0);
+        assert!(
+            out.contains("blue=0 yellow=0 red=0 (total=0, undeclared=0)"),
+            "unexpected summary: {out}"
+        );
+        assert!(!out.contains("[WARN]"), "no WARN expected when undeclared=0");
+    }
+
+    #[test]
+    fn test_format_signal_summary_with_mixed_signals_counts_correctly() {
+        let signals = vec![
+            make_signal(domain::ConfidenceSignal::Blue),
+            make_signal(domain::ConfidenceSignal::Blue),
+            make_signal(domain::ConfidenceSignal::Yellow),
+            make_signal(domain::ConfidenceSignal::Red),
+        ];
+        let out = format_signal_summary(&signals, 0);
+        assert!(
+            out.contains("blue=2 yellow=1 red=1 (total=4, undeclared=0)"),
+            "unexpected summary: {out}"
+        );
+        assert!(!out.contains("[WARN]"), "no WARN expected when undeclared=0");
+    }
+
+    #[test]
+    fn test_format_signal_summary_with_undeclared_shows_warn_and_track_design() {
+        let signals = vec![
+            make_signal(domain::ConfidenceSignal::Blue),
+            make_signal(domain::ConfidenceSignal::Red),
+            make_signal(domain::ConfidenceSignal::Red),
+        ];
+        // 2 undeclared signals are represented in the red count above; undeclared_count is passed
+        // separately to distinguish reverse-Red from forward-Red in the WARN line.
+        let out = format_signal_summary(&signals, 2);
+        assert!(
+            out.contains("blue=1 yellow=0 red=2 (total=3, undeclared=2)"),
+            "unexpected summary: {out}"
+        );
+        assert!(out.contains("[WARN]"), "WARN line expected when undeclared>0");
+        assert!(out.contains("/track:design"), "WARN must mention /track:design, got: {out}");
+    }
+
+    #[test]
+    fn test_format_signal_summary_blue_plus_yellow_plus_red_equals_total() {
+        let signals = vec![
+            make_signal(domain::ConfidenceSignal::Blue),
+            make_signal(domain::ConfidenceSignal::Yellow),
+            make_signal(domain::ConfidenceSignal::Yellow),
+            make_signal(domain::ConfidenceSignal::Red),
+        ];
+        let out = format_signal_summary(&signals, 1);
+        // invariant: blue + yellow + red == total
+        assert!(out.contains("blue=1 yellow=2 red=1 (total=4,"), "totals must sum: {out}");
     }
 
     /// Success-path integration test.  Requires nightly toolchain for `cargo +nightly rustdoc`.

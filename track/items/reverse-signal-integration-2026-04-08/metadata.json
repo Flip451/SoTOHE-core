@@ -74,14 +74,15 @@
       "status": "done"
     },
     {
+      "commit_hash": "2c3748a",
       "description": "定義済みだが未実装の型に Yellow シグナルを返すよう evaluate_domain_type_signals を拡張 (型が TypeGraph に見つからない場合 → Yellow)",
       "id": "T02",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "domain-type-signals コマンドを拡張: 逆方向チェック → undeclared Red + 未実装 Yellow を domain-types.json に保存。不在時はエラー終了し /track:design を促す。domain-types.md レンダリング。サマリ出力 blue=N yellow=M red=K (undeclared=U)",
       "id": "T03",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "verify spec-states ゲートを 2 段階判定に変更: 途中コミット時は Red なし → pass (Yellow 許容、Red ブロック + /track:design 案内)。merge 時は全 Blue 必須 (Yellow もブロック)",
@@ -110,5 +111,5 @@
     }
   ],
   "title": "TDDD: 逆方向チェック信号機統合 + designer capability + /track:design",
-  "updated_at": "2026-04-09T00:37:03Z"
+  "updated_at": "2026-04-09T00:55:02Z"
 }
