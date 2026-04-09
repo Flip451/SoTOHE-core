@@ -135,9 +135,9 @@ args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "
 
 [tasks.python-lint-local]
 private = true
-description = "[internal] Run ruff lint on Python scripts and hooks"
+description = "[internal] Run ruff lint on Python helper scripts under scripts/"
 script_runner = "@shell"
-script = ['ruff check scripts/ .claude/hooks/']
+script = ['ruff check scripts/']
 
 [tasks.bootstrap]
 description = "[gate] Set up host Python venv, build Docker images, and run CI"
@@ -740,7 +740,7 @@ args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "
 [tasks.python-lint]
 description = "[optional] Run ruff lint on Python scripts and hooks (host, no docker)"
 script_runner = "@shell"
-script = ['RUFF="${RUFF_BIN:-.venv/bin/ruff}"; if [ -x "$RUFF" ] || command -v ruff >/dev/null 2>&1; then RUFF="${RUFF_BIN:-$(command -v ruff 2>/dev/null || echo .venv/bin/ruff)}"; "$RUFF" check scripts/ .claude/hooks/; else echo "[python-lint] ruff not found, skipping (install: uv tool install ruff)"; fi']
+script = ['RUFF="${RUFF_BIN:-.venv/bin/ruff}"; if [ -x "$RUFF" ] || command -v ruff >/dev/null 2>&1; then RUFF="${RUFF_BIN:-$(command -v ruff 2>/dev/null || echo .venv/bin/ruff)}"; "$RUFF" check scripts/; else echo "[python-lint] ruff not found, skipping (install: uv tool install ruff)"; fi']
 
 [tasks.ci]
 description = "[gate] Run CI checks (docker compose + host python-lint)"

@@ -8,7 +8,7 @@
 - [x] Rust hook (`skill-compliance` / `block-direct-git-ops` / `block-test-file-deletion`) は `.claude/settings.json` に維持されている (T03 で確認)
 - [x] `libs/infrastructure/src/verify/orchestra.rs` の `EXPECTED_HOOK_PATHS` から削除対象 9 hook が除去されている (T01)
 - [x] `Makefile.toml` から `[tasks.hooks-selftest]` と `[tasks.hooks-selftest-local]` が削除されている (T04)
-- [ ] `Makefile.toml` の `python-lint-local` / `python-lint` ruff 対象が `scripts/` のみになっている
+- [x] `Makefile.toml` の `python-lint-local` / `python-lint` ruff 対象が `scripts/` のみになっている (T05)
 - [ ] CLAUDE.md / .claude/rules/09-maintainer-checklist.md / DEVELOPER_AI_WORKFLOW.md / knowledge/WORKFLOW.md / LOCAL_DEVELOPMENT.md / START_HERE_HUMAN.md / knowledge/DESIGN.md / track/workflow.md から Python hook 言及が整理されている
 - [ ] knowledge/adr/2026-04-09-{2047,2235,2323}*.md と knowledge/strategy/TODO.md がトラック計画 commit に含まれている
 - [ ] cargo make ci 全チェック通過
@@ -54,6 +54,15 @@
 - `scripts/test_make_wrappers.py`:
   - `test_selftest_wrappers_smoke` の selftest task ループから `hooks-selftest-local` を削除
   - `test_docker_wrappers_smoke` の compose wrapper expectation から `hooks-selftest` エントリ全体を削除
+- 検証: `cargo make ci` 全 PASS
+
+### T05 (2026-04-10) — 実装順序を T02 と入れ替え
+
+- 順序入れ替えの理由: T04 と同じ。T02 (Python hook ファイル削除) を先にやると `python-lint-local` の `ruff check scripts/ .claude/hooks/` が削除済みディレクトリを参照して E902 で失敗する。T05 を先にすることで CI を一貫した状態で維持
+- `Makefile.toml`:
+  - `[tasks.python-lint-local]` の script を `'ruff check scripts/'` に変更し、description を "Run ruff lint on Python helper scripts under scripts/" に更新
+  - `[tasks.python-lint]` (host wrapper) の script から `.claude/hooks/` を削除
+  - `python-lint` task 自体は `scripts/` 配下の Python ヘルパー (architecture_rules.py, atomic_write.py, convention_docs.py, external_guides.py, track_*.py 等) の lint 用に維持
 - 検証: `cargo make ci` 全 PASS
 
 ## Open Issues

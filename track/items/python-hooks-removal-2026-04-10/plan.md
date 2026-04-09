@@ -38,8 +38,8 @@ permissions.allow から Bash(cargo make hooks-selftest) を削除する。
 python-lint-local / python-lint の ruff 対象から .claude/hooks/ を除外し、scripts/ のみに絞り込む。
 python-lint task 自体は scripts/ Python のために維持する。
 
-- [~] Makefile.toml から [tasks.hooks-selftest] と [tasks.hooks-selftest-local] を削除する。compose ラッパーと local task の両方を同時に削除し、ci task からの参照があれば併せて除去する。
-- [ ] Makefile.toml の python-lint-local (現状 'ruff check scripts/ .claude/hooks/') と python-lint ホストタスクの ruff 対象から .claude/hooks/ を削除し、scripts/ のみに変更する。task 自体は scripts/ Python のために維持する (本トラックでは scripts/ 削除は scope 外)。
+- [x] Makefile.toml から [tasks.hooks-selftest] と [tasks.hooks-selftest-local] を削除する。compose ラッパーと local task の両方を同時に削除し、ci task からの参照があれば併せて除去する。 fd06b109bc457f6f6daaffbd2b9fe7b36f0cacf3
+- [~] Makefile.toml の python-lint-local (現状 'ruff check scripts/ .claude/hooks/') と python-lint ホストタスクの ruff 対象から .claude/hooks/ を削除し、scripts/ のみに変更する。task 自体は scripts/ Python のために維持する (本トラックでは scripts/ 削除は scope 外)。
 
 ## ドキュメント更新
 
