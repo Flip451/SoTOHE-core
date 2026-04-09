@@ -7,7 +7,7 @@
 - [x] `.claude/settings.json` permissions.allow から `Bash(cargo make hooks-selftest)` が削除されている (T01 ペア変更で実施)
 - [x] Rust hook (`skill-compliance` / `block-direct-git-ops` / `block-test-file-deletion`) は `.claude/settings.json` に維持されている (T03 で確認)
 - [x] `libs/infrastructure/src/verify/orchestra.rs` の `EXPECTED_HOOK_PATHS` から削除対象 9 hook が除去されている (T01)
-- [ ] `Makefile.toml` から `[tasks.hooks-selftest]` と `[tasks.hooks-selftest-local]` が削除されている
+- [x] `Makefile.toml` から `[tasks.hooks-selftest]` と `[tasks.hooks-selftest-local]` が削除されている (T04)
 - [ ] `Makefile.toml` の `python-lint-local` / `python-lint` ruff 対象が `scripts/` のみになっている
 - [ ] CLAUDE.md / .claude/rules/09-maintainer-checklist.md / DEVELOPER_AI_WORKFLOW.md / knowledge/WORKFLOW.md / LOCAL_DEVELOPMENT.md / START_HERE_HUMAN.md / knowledge/DESIGN.md / track/workflow.md から Python hook 言及が整理されている
 - [ ] knowledge/adr/2026-04-09-{2047,2235,2323}*.md と knowledge/strategy/TODO.md がトラック計画 commit に含まれている
@@ -42,6 +42,19 @@
   - PostToolUse: `check-codex-after-plan` (Task matcher), `error-to-codex` / `post-test-analysis` / `log-cli-tools` (Bash matcher), `lint-on-save` / `python-lint-on-save` / `post-implementation-review` (Edit|Write matcher) — 全 3 matchers を含む `PostToolUse` セクション全体を削除
   - Rust hook (`block-direct-git-ops`, `block-test-file-deletion`, `skill-compliance`) は維持
 - 検証: `cargo make ci` 全 PASS、`cargo make verify-orchestra` PASS
+
+### T04 (2026-04-10) — 実装順序を T02 と入れ替え
+
+- 順序入れ替えの理由: T02 (Python hook ファイル削除) を先に実施すると、Makefile.toml の `hooks-selftest-local` task が `pytest .claude/hooks` を実行しようとして CI が失敗する。T04 を先にすることで `cargo make ci` を一貫した状態で通過させられる
+- `Makefile.toml`:
+  - `[tasks.hooks-selftest-local]` (private pytest task) を削除
+  - `[tasks.hooks-selftest]` (compose wrapper) を削除
+  - `ci-local` の dependencies から `hooks-selftest-local` を削除
+  - `ci-container` の dependencies からも `hooks-selftest-local` を削除
+- `scripts/test_make_wrappers.py`:
+  - `test_selftest_wrappers_smoke` の selftest task ループから `hooks-selftest-local` を削除
+  - `test_docker_wrappers_smoke` の compose wrapper expectation から `hooks-selftest` エントリ全体を削除
+- 検証: `cargo make ci` 全 PASS
 
 ## Open Issues
 

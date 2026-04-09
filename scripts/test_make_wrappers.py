@@ -514,7 +514,6 @@ class MakeWrappersTest(unittest.TestCase):
             for task in (
                 "guides-selftest-local",
                 "scripts-selftest-local",
-                "hooks-selftest-local",
             ):
                 result = self.run_make(root, task, allow_private=True)
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -657,20 +656,6 @@ class MakeWrappersTest(unittest.TestCase):
                         "make",
                         "--allow-private",
                         "scripts-selftest-local",
-                    ],
-                ),
-                (
-                    "hooks-selftest",
-                    (),
-                    [
-                        "compose",
-                        "run",
-                        "--rm",
-                        "tools",
-                        "cargo",
-                        "make",
-                        "--allow-private",
-                        "hooks-selftest-local",
                     ],
                 ),
                 ("build-tools", (), ["compose", "build", "tools"]),

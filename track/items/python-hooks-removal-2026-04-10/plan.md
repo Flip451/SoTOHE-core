@@ -30,7 +30,7 @@ Rust hook が依存している bin/sotp は本ステップで影響を受けな
 permissions.allow から Bash(cargo make hooks-selftest) を削除する。
 既存の Rust hook (sotp hook dispatch ...) エントリは維持する。
 
-- [~] .claude/settings.json から Python hook entry を全削除する。PreToolUse: check-codex-before-write (Edit|Write), suggest-gemini-research (WebSearch|WebFetch); PostToolUse: check-codex-after-plan (Task), error-to-codex (Bash), post-test-analysis (Bash), log-cli-tools (Bash), lint-on-save (Edit|Write), python-lint-on-save (Edit|Write), post-implementation-review (Edit|Write) の計 9 entries。さらに permissions.allow から Bash(cargo make hooks-selftest) を削除する。Rust hook (skill-compliance / block-direct-git-ops / block-test-file-deletion) のエントリは維持する。
+- [x] .claude/settings.json から Python hook entry を全削除する。PreToolUse: check-codex-before-write (Edit|Write), suggest-gemini-research (WebSearch|WebFetch); PostToolUse: check-codex-after-plan (Task), error-to-codex (Bash), post-test-analysis (Bash), log-cli-tools (Bash), lint-on-save (Edit|Write), python-lint-on-save (Edit|Write), post-implementation-review (Edit|Write) の計 9 entries。さらに permissions.allow から Bash(cargo make hooks-selftest) を削除する。Rust hook (skill-compliance / block-direct-git-ops / block-test-file-deletion) のエントリは維持する。 c927ea73e3400c97212b6d41f2061cd9a84fe6ad
 
 ## Makefile.toml task の整理
 
@@ -38,7 +38,7 @@ permissions.allow から Bash(cargo make hooks-selftest) を削除する。
 python-lint-local / python-lint の ruff 対象から .claude/hooks/ を除外し、scripts/ のみに絞り込む。
 python-lint task 自体は scripts/ Python のために維持する。
 
-- [ ] Makefile.toml から [tasks.hooks-selftest] と [tasks.hooks-selftest-local] を削除する。compose ラッパーと local task の両方を同時に削除し、ci task からの参照があれば併せて除去する。
+- [~] Makefile.toml から [tasks.hooks-selftest] と [tasks.hooks-selftest-local] を削除する。compose ラッパーと local task の両方を同時に削除し、ci task からの参照があれば併せて除去する。
 - [ ] Makefile.toml の python-lint-local (現状 'ruff check scripts/ .claude/hooks/') と python-lint ホストタスクの ruff 対象から .claude/hooks/ を削除し、scripts/ のみに変更する。task 自体は scripts/ Python のために維持する (本トラックでは scripts/ 削除は scope 外)。
 
 ## ドキュメント更新
