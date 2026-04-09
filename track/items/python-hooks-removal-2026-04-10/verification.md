@@ -12,8 +12,8 @@
 - [x] CLAUDE.md / .claude/rules/09-maintainer-checklist.md / DEVELOPER_AI_WORKFLOW.md / knowledge/WORKFLOW.md / LOCAL_DEVELOPMENT.md / START_HERE_HUMAN.md / knowledge/DESIGN.md / track/workflow.md から Python hook 言及が整理されている (T06)
 - [x] TRACK_TRACEABILITY.md の enforcement task list から `hooks-selftest-local` が削除されている (T06)
 - [x] `libs/infrastructure/src/verify/doc_patterns.rs` から hooks-selftest 関連の `RequireLine` 3 entries が削除されている (T06)
-- [ ] knowledge/adr/2026-04-09-{2047,2235,2323}*.md と knowledge/strategy/TODO.md がトラック計画 commit に含まれている
-- [ ] cargo make ci 全チェック通過
+- [x] knowledge/adr/2026-04-09-{2047,2235,2323}*.md と knowledge/strategy/TODO.md がトラック計画 commit に含まれている (T07, 計画 commit e2854af)
+- [x] cargo make ci 全チェック通過 (T08, 2026-04-10)
 
 ## Manual Verification Steps
 
@@ -96,6 +96,17 @@
 - `libs/infrastructure/src/verify/doc_patterns.rs`: docs 整合性チェックの 3 entries (track/workflow.md hooks selftest gate / TRACK_TRACEABILITY.md hooks selftest gate / DEVELOPER_AI_WORKFLOW.md hooks selftest gate) を削除
 - 検証: `cargo make ci` 全 PASS
 
+### T08 (2026-04-10) — 最終 CI 確認
+
+- 全タスク実装 (T01-T06) 完了後の最終 CI ゲート確認として `cargo make ci` を実行
+- 通過したチェック: `fmt-check` / `clippy` / `test` / `test-doc` / `deny` / `python-lint` (scripts/ のみ) / `scripts-selftest` / `check-layers` / `verify-arch-docs` / `verify-doc-links` / `verify-plan-progress` / `verify-track-metadata` / `verify-track-registry` / `verify-tech-stack` / `verify-orchestra` / `verify-canonical-modules` / `verify-latest-track` / `verify-module-size` / `verify-domain-strings` / `verify-domain-purity` / `verify-usecase-purity` / `verify-view-freshness` / `verify-spec-coverage`
+- 結果: 全チェック PASS、Build Done in ~12s
+- 注: `verify-orchestra` が `EXPECTED_HOOK_PATHS = &[]` の状態と settings.json の Rust hook entries (skill-compliance / block-direct-git-ops / block-test-file-deletion) を整合的に検証していることを確認
+
+## Verified At
+
+2026-04-10 (T01-T06, T08 全タスク完了; T07 は計画 commit (e2854af) で実質完了済み、admin transition は本コミット直後に実施)
+
 ## Open Issues
 
 （実装中に発見された問題を記録）
@@ -108,6 +119,3 @@
 - docker compose 設定から Python 関連ボリュームマウント / 環境変数の整理 (ADR §5 言及) → compose.yml / compose.dev.yml に Python 関連エントリが存在しないため変更不要 (no-op)
 - .claude/rules/02-codex-delegation.md の debugger capability 言及削除 → Phase 2 (agent-profiles redesign) トラックで対応
 
-## Verified At
-
-（検証完了日時を記入）
