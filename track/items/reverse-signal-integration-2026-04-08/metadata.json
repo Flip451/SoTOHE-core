@@ -65,7 +65,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "commit_hash": "45d7023",
@@ -110,11 +110,12 @@
       "status": "done"
     },
     {
+      "commit_hash": "dc02efd",
       "description": "ADR 2026-04-08-1800 を最終化し、ADR README 索引のタイトルを実ファイルと一致させる",
       "id": "T08",
-      "status": "in_progress"
+      "status": "done"
     }
   ],
   "title": "TDDD: 逆方向チェック信号機統合 + designer capability + /track:design",
-  "updated_at": "2026-04-09T06:09:21Z"
+  "updated_at": "2026-04-09T06:13:50Z"
 }
