@@ -201,7 +201,6 @@
       "Bash(cargo make verify-latest-track)",
       "Bash(cargo make verify-track-registry)",
       "Bash(cargo make scripts-selftest)",
-      "Bash(cargo make hooks-selftest)",
       "Bash(cargo make guides-selftest)",
       "Bash(cargo make ci-rust)",
       "Bash(cargo make ci)",

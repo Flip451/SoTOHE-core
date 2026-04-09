@@ -4,9 +4,9 @@
 
 - [ ] `.claude/hooks/` ディレクトリが完全削除されている
 - [ ] `.claude/settings.json` から Python hook entry (PreToolUse 2 + PostToolUse 7 = 9 entries) が全削除されている
-- [ ] `.claude/settings.json` permissions.allow から `Bash(cargo make hooks-selftest)` が削除されている
+- [x] `.claude/settings.json` permissions.allow から `Bash(cargo make hooks-selftest)` が削除されている (T01 ペア変更で実施)
 - [ ] Rust hook (`skill-compliance` / `block-direct-git-ops` / `block-test-file-deletion`) は `.claude/settings.json` に維持されている
-- [ ] `libs/infrastructure/src/verify/orchestra.rs` の `EXPECTED_HOOK_PATHS` から削除対象 9 hook が除去されている
+- [x] `libs/infrastructure/src/verify/orchestra.rs` の `EXPECTED_HOOK_PATHS` から削除対象 9 hook が除去されている (T01)
 - [ ] `Makefile.toml` から `[tasks.hooks-selftest]` と `[tasks.hooks-selftest-local]` が削除されている
 - [ ] `Makefile.toml` の `python-lint-local` / `python-lint` ruff 対象が `scripts/` のみになっている
 - [ ] CLAUDE.md / .claude/rules/09-maintainer-checklist.md / DEVELOPER_AI_WORKFLOW.md / knowledge/WORKFLOW.md / LOCAL_DEVELOPMENT.md / START_HERE_HUMAN.md / knowledge/DESIGN.md / track/workflow.md から Python hook 言及が整理されている
@@ -24,7 +24,15 @@
 
 ## Result
 
-（実装完了後に記入）
+### T01 (2026-04-10)
+
+- `libs/infrastructure/src/verify/orchestra.rs`:
+  - `EXPECTED_HOOK_PATHS` を `&[]` (empty slice) に変更し、後続の Python hook 削除作業に備えた
+  - `Bash(cargo make hooks-selftest)` を `EXPECTED_CARGO_MAKE_ALLOW` から削除
+  - `test_verify_hook_paths_passes_when_all_fragments_present` を簡略化 (Python hook iteration を削除)
+  - 新規テスト `test_verify_hook_paths_does_not_require_any_python_hook_scripts` を追加し、post-RV2-17 の不変条件を明示
+- `.claude/settings.json`: orphan permission entry `Bash(cargo make hooks-selftest)` を削除 (T01 と T03 の中間状態で `verify-orchestra` が壊れるのを防ぐペア変更)
+- 検証: `cargo make ci` 全 PASS、`cargo make verify-orchestra` PASS、`cargo make test-one-exec test_verify_hook_paths` 3 tests PASS
 
 ## Open Issues
 

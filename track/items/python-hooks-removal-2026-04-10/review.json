@@ -183,6 +183,100 @@
           "findings": [],
           "hash": "rvw1:sha256:619181e694232bf90e2c9be26ad8698d447d9fd3faa3f0311dec22d0bd74461a",
           "at": "2026-04-09T15:48:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4e1613c47018347a8a6d7c8d04b9a9379254cae7d8299d9d46ac46628969c40",
+          "at": "2026-04-09T16:06:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4e1613c47018347a8a6d7c8d04b9a9379254cae7d8299d9d46ac46628969c40",
+          "at": "2026-04-09T16:09:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` records T01 as already completed (`[x]` entries and a `T01` result block claiming CI/verify success), but `metadata.json` still leaves task `T01` in `in_progress`. That makes the track state internally inconsistent and the verification record premature for a status-flip commit.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-hooks-removal-2026-04-10/verification.md",
+              "line": 27,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4aa38d3b0b662011630fa19ace2a35358213aef5cde374af7851efef8f00148f",
+          "at": "2026-04-09T16:12:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4aa38d3b0b662011630fa19ace2a35358213aef5cde374af7851efef8f00148f",
+          "at": "2026-04-09T16:12:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` records T01 as already completed (`[x]` checklist items plus a `T01` result block claiming CI/review success), but the same change set leaves `metadata.json`/`plan.md` with T01 only `in_progress`. That makes the track artifacts internally inconsistent and turns the verification record into a premature source of truth for this status-flip commit.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/verification.md",
+              "line": 27,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4aa38d3b0b662011630fa19ace2a35358213aef5cde374af7851efef8f00148f",
+          "at": "2026-04-09T16:14:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f94c18c6d204d8728069759d275c6af1642697624f5d072f94b7164e07abeb3",
+          "at": "2026-04-09T16:16:08Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
+          "at": "2026-04-09T16:07:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
+          "at": "2026-04-09T16:10:18Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56d9f816340b69eccdcf9c870594cfb2a75161a72f8546411a11537ebe62f183",
+          "at": "2026-04-09T16:06:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56d9f816340b69eccdcf9c870594cfb2a75161a72f8546411a11537ebe62f183",
+          "at": "2026-04-09T16:08:22Z"
         }
       ]
     }

@@ -42,17 +42,12 @@ static HARDCODED_CODEX_MODEL_RE: LazyLock<Option<Regex>> =
 // Constants: expected hook paths (path -> label)
 // ---------------------------------------------------------------------------
 
-const EXPECTED_HOOK_PATHS: &[(&str, &str)] = &[
-    (".claude/hooks/check-codex-before-write.py", "codex-before-write hook"),
-    (".claude/hooks/suggest-gemini-research.py", "gemini-research hook"),
-    (".claude/hooks/error-to-codex.py", "error-to-codex hook"),
-    (".claude/hooks/post-test-analysis.py", "post-test-analysis hook"),
-    (".claude/hooks/check-codex-after-plan.py", "codex-after-plan hook"),
-    (".claude/hooks/log-cli-tools.py", "log-cli-tools hook"),
-    (".claude/hooks/lint-on-save.py", "lint-on-save hook"),
-    (".claude/hooks/python-lint-on-save.py", "python-lint-on-save hook"),
-    (".claude/hooks/post-implementation-review.py", "post-implementation-review hook"),
-];
+// All Python hooks were removed by RV2-17 (ADR 2026-04-09-2323).
+// Only Rust hooks (block-direct-git-ops, skill-compliance, block-test-file-deletion)
+// remain, and they are validated via EXPECTED_HOOK_COMMANDS by command-fragment match.
+// EXPECTED_HOOK_PATHS is intentionally empty: there is no on-disk script file to verify
+// because Rust hooks dispatch through the `sotp hook dispatch ...` binary entry point.
+const EXPECTED_HOOK_PATHS: &[(&str, &str)] = &[];
 
 // ---------------------------------------------------------------------------
 // Constants: expected hook commands (label -> required fragments)
@@ -162,7 +157,6 @@ const EXPECTED_CARGO_MAKE_ALLOW: &[(&str, &str)] = &[
     ("Bash(cargo make verify-latest-track)", "cargo make verify-latest-track permission"),
     ("Bash(cargo make verify-track-registry)", "cargo make verify-track-registry permission"),
     ("Bash(cargo make scripts-selftest)", "cargo make scripts-selftest permission"),
-    ("Bash(cargo make hooks-selftest)", "cargo make hooks-selftest permission"),
     ("Bash(cargo make guides-selftest)", "cargo make guides-selftest permission"),
     ("Bash(cargo make add-all)", "cargo make add-all permission"),
     ("Bash(cargo make track-add-paths)", "cargo make track-add-paths permission"),
@@ -1408,24 +1402,11 @@ mod tests {
     #[test]
     fn test_verify_hook_paths_passes_when_all_fragments_present() {
         let tmp = TempDir::new().unwrap();
-        // Write all hook files to disk so file-exists check passes
-        let hooks_dir = tmp.path().join(".claude").join("hooks");
-        std::fs::create_dir_all(&hooks_dir).unwrap();
-        for (hook_path, _) in EXPECTED_HOOK_PATHS {
-            let full = tmp.path().join(hook_path);
-            if let Some(p) = full.parent() {
-                std::fs::create_dir_all(p).unwrap();
-            }
-            std::fs::write(&full, "#!/usr/bin/env python3\n").unwrap();
-        }
 
-        // Build a single giant command that contains all needed path fragments and fragments
+        // Build a single command that contains every required hook command fragment.
+        // After RV2-17 there are no Python hook script paths to inject — only the
+        // Rust hook command-fragment expectations remain.
         let mut big_cmd = String::new();
-        for (hook_path, _) in EXPECTED_HOOK_PATHS {
-            big_cmd.push_str(hook_path);
-            big_cmd.push(' ');
-        }
-        // Add all EXPECTED_HOOK_COMMANDS fragments
         for (_, fragments) in EXPECTED_HOOK_COMMANDS {
             for f in *fragments {
                 big_cmd.push_str(f);
@@ -1437,6 +1418,40 @@ mod tests {
         let mut outcome = VerifyOutcome::pass();
         verify_hook_paths(&commands, tmp.path(), &mut outcome);
         assert!(outcome.is_ok(), "errors: {:?}", outcome.findings());
+    }
+
+    #[test]
+    fn test_verify_hook_paths_does_not_require_any_python_hook_scripts() {
+        // Post RV2-17: EXPECTED_HOOK_PATHS must be empty so that no .claude/hooks/*.py
+        // files are required to exist on disk. Verifying with an absent .claude/hooks/
+        // directory and a command list containing only the required Rust hook fragments
+        // should produce zero findings.
+        assert!(
+            EXPECTED_HOOK_PATHS.is_empty(),
+            "EXPECTED_HOOK_PATHS must be empty after Python hooks removal (RV2-17); \
+             found {} entries",
+            EXPECTED_HOOK_PATHS.len()
+        );
+
+        let tmp = TempDir::new().unwrap();
+        // Intentionally do NOT create .claude/hooks/ — verify it is no longer required.
+        assert!(!tmp.path().join(".claude").join("hooks").exists());
+
+        let mut big_cmd = String::new();
+        for (_, fragments) in EXPECTED_HOOK_COMMANDS {
+            for f in *fragments {
+                big_cmd.push_str(f);
+                big_cmd.push(' ');
+            }
+        }
+        let commands = vec![big_cmd];
+        let mut outcome = VerifyOutcome::pass();
+        verify_hook_paths(&commands, tmp.path(), &mut outcome);
+        assert!(
+            outcome.is_ok(),
+            "verify_hook_paths must not require any Python hook scripts; errors: {:?}",
+            outcome.findings()
+        );
     }
 
     // -----------------------------------------------------------------------
