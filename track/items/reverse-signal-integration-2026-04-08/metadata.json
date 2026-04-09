@@ -80,14 +80,15 @@
       "status": "done"
     },
     {
+      "commit_hash": "d143714",
       "description": "domain-type-signals コマンドを拡張: 逆方向チェック → undeclared Red + 未実装 Yellow を domain-types.json に保存。不在時はエラー終了し /track:design を促す。domain-types.md レンダリング。サマリ出力 blue=N yellow=M red=K (undeclared=U)",
       "id": "T03",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "verify spec-states ゲートを 2 段階判定に変更: 途中コミット時は Red なし → pass (Yellow 許容、Red ブロック + /track:design 案内)。merge 時は全 Blue 必須 (Yellow もブロック)",
       "id": "T04",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "agent-profiles.json の全 profile に designer capability を追加 (既定 provider: claude)",
@@ -111,5 +112,5 @@
     }
   ],
   "title": "TDDD: 逆方向チェック信号機統合 + designer capability + /track:design",
-  "updated_at": "2026-04-09T00:55:02Z"
+  "updated_at": "2026-04-09T01:20:56Z"
 }

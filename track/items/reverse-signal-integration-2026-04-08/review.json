@@ -1,142 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`total` is computed from `doc.entries().len()`, but `all_signals` now includes the extra reverse undeclared red signals. On tracks with undeclared code items, the printed total will be lower than the actual number of signals written, so the new summary becomes internally inconsistent on the exact path this change adds.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
-              "line": 115,
-              "category": "correctness"
-            },
-            {
-              "message": "The new reverse-consistency branch (`check_consistency` + `undeclared_to_signals` + warning output) is not covered by any test in this file. The only success test still exercises a forward-only value-object case, so a regression in the undeclared type/trait path would not be caught.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
-              "line": 183,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:44427e357cc2a64e2c890360bacb86fb4c6f3143692a904472cfd419b1663bcd",
-          "at": "2026-04-09T01:00:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:44427e357cc2a64e2c890360bacb86fb4c6f3143692a904472cfd419b1663bcd",
-          "at": "2026-04-09T01:02:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`red` is counted from `all_signals`, which now includes reverse undeclared signals, but `total` still comes from `doc.entries().len()`. As soon as any undeclared type/trait is present, the printed summary becomes internally inconsistent (`blue + yellow + red > total`) on the exact reverse-check path this change adds.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
-              "line": 115,
-              "category": "correctness"
-            },
-            {
-              "message": "The new reverse-consistency path (`check_consistency` + `undeclared_to_signals` + warning output) is not covered by a test in this file. The only success-path test remains `#[ignore]` and exercises a forward-only value-object case, so regressions in the undeclared type/trait handling would ship without any automated coverage.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
-              "line": 183,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:44427e357cc2a64e2c890360bacb86fb4c6f3143692a904472cfd419b1663bcd",
-          "at": "2026-04-09T01:04:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`red` is counted from `all_signals`, which now includes the extra reverse undeclared signals, but `total` still comes from `doc.entries().len()`. As soon as any undeclared type or trait is present, the printed summary becomes internally inconsistent because `blue + yellow + red` can exceed `total` on the exact path this change adds.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
-              "line": 115,
-              "category": "correctness"
-            },
-            {
-              "message": "The new reverse-consistency path (`check_consistency` + `undeclared_to_signals` + warning output) still has no runnable automated coverage in this file. The only success-path test remains `#[ignore]` and exercises a forward-only value-object case, so regressions in undeclared type/trait handling would ship without test protection.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
-              "line": 183,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:44427e357cc2a64e2c890360bacb86fb4c6f3143692a904472cfd419b1663bcd",
-          "at": "2026-04-09T01:06:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new reverse-consistency path (`check_consistency` + `undeclared_to_signals` + the undeclared warning/summary formatting) has no runnable coverage in this file. The only success-path test is still `#[ignore]` and uses a forward-only fixture, so regressions in undeclared type/trait handling or the new output format would not be caught.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
-              "line": 81,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:82668d1c848d9171ea3f454592859461f0256bdfbbd99041e6109f148909d9b1",
-          "at": "2026-04-09T01:09:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82668d1c848d9171ea3f454592859461f0256bdfbbd99041e6109f148909d9b1",
-          "at": "2026-04-09T01:10:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new reverse-consistency path (`check_consistency` + `undeclared_to_signals` + `print_signal_summary`) still has no runnable automated coverage. The only success-path test remains `#[ignore]` and uses a forward-only fixture, so regressions in undeclared type/trait handling or the new `undeclared=` summary/warning output would ship unnoticed.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
-              "line": 81,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:82668d1c848d9171ea3f454592859461f0256bdfbbd99041e6109f148909d9b1",
-          "at": "2026-04-09T01:12:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Merging `undeclared_to_signals(...)` into `doc.signals()` here does not actually enforce the new reverse-Red gate. These records are saved with synthetic kind tags like `undeclared_type` / `undeclared_trait`, but downstream `verify spec-states` only considers signals whose `(type_name, kind_tag)` matches a declared entry, so undeclared code can still pass CI after `sotp track domain-type-signals` runs.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
-              "line": 92,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:17db52e194bd057351de2d58404f21e4c50870cb74d67882e01b4e7939de36e1",
-          "at": "2026-04-09T01:15:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:17db52e194bd057351de2d58404f21e4c50870cb74d67882e01b4e7939de36e1",
-          "at": "2026-04-09T01:19:21Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -152,6 +16,50 @@
           "findings": [],
           "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
           "at": "2026-04-08T14:11:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11895e6cbf3bd279e62ba91cc20856da0638e85d0e1cd039dd672c9fea280a37",
+          "at": "2026-04-09T01:26:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `strict=true`, this implementation only rejects Yellow signals from `domain-types.json`. A `spec.json` with top-level signal counts like `yellow>0, red=0` still passes as long as the domain-type signals are all Blue, which violates the stated strict-mode contract that all signals must be Blue for merge. Add the strict Yellow check to the Stage 1 `spec_doc.signals()` prerequisite and cover that case with a regression test.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 156,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:11895e6cbf3bd279e62ba91cc20856da0638e85d0e1cd039dd672c9fea280a37",
+          "at": "2026-04-09T01:28:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `strict=true`, Stage 1 still only rejects `spec.json` signal counts with `red>0`. A `spec.json` whose top-level signals are `yellow>0, red=0` will pass as long as the domain-type signals are Blue, which violates the documented merge-gate rule that strict mode requires all signals to be Blue. Add the strict Yellow check to the `spec_doc.signals()` prerequisite and cover it with a regression test.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 53,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:11895e6cbf3bd279e62ba91cc20856da0638e85d0e1cd039dd672c9fea280a37",
+          "at": "2026-04-09T01:31:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2b44cb831974852ee24e7548d46fcbbc3ffd74e29bf531bfb1ca747a42016ee",
+          "at": "2026-04-09T01:34:17Z"
         }
       ]
     },
@@ -425,6 +333,20 @@
           "findings": [],
           "hash": "rvw1:sha256:cca2a285b8dcc1dd8d02ad870328277b835422198868e2a0e7febfa127fb690a",
           "at": "2026-04-09T01:00:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:482d9e4d6ef53f78b143afc1e6ae587a122d77a879337ac8e3c4d6f1e48b7983",
+          "at": "2026-04-09T01:24:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:482d9e4d6ef53f78b143afc1e6ae587a122d77a879337ac8e3c4d6f1e48b7983",
+          "at": "2026-04-09T01:25:50Z"
         }
       ]
     },
@@ -1169,6 +1091,223 @@
           "findings": [],
           "hash": "rvw1:sha256:7432e38c13e7b9ee26ad083d4c2195e4ef79a17724689b784c1b63320c6f14d7",
           "at": "2026-04-09T00:49:20Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`total` is computed from `doc.entries().len()`, but `all_signals` now includes the extra reverse undeclared red signals. On tracks with undeclared code items, the printed total will be lower than the actual number of signals written, so the new summary becomes internally inconsistent on the exact path this change adds.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 115,
+              "category": "correctness"
+            },
+            {
+              "message": "The new reverse-consistency branch (`check_consistency` + `undeclared_to_signals` + warning output) is not covered by any test in this file. The only success test still exercises a forward-only value-object case, so a regression in the undeclared type/trait path would not be caught.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 183,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:44427e357cc2a64e2c890360bacb86fb4c6f3143692a904472cfd419b1663bcd",
+          "at": "2026-04-09T01:00:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44427e357cc2a64e2c890360bacb86fb4c6f3143692a904472cfd419b1663bcd",
+          "at": "2026-04-09T01:02:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`red` is counted from `all_signals`, which now includes reverse undeclared signals, but `total` still comes from `doc.entries().len()`. As soon as any undeclared type/trait is present, the printed summary becomes internally inconsistent (`blue + yellow + red > total`) on the exact reverse-check path this change adds.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 115,
+              "category": "correctness"
+            },
+            {
+              "message": "The new reverse-consistency path (`check_consistency` + `undeclared_to_signals` + warning output) is not covered by a test in this file. The only success-path test remains `#[ignore]` and exercises a forward-only value-object case, so regressions in the undeclared type/trait handling would ship without any automated coverage.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 183,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:44427e357cc2a64e2c890360bacb86fb4c6f3143692a904472cfd419b1663bcd",
+          "at": "2026-04-09T01:04:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`red` is counted from `all_signals`, which now includes the extra reverse undeclared signals, but `total` still comes from `doc.entries().len()`. As soon as any undeclared type or trait is present, the printed summary becomes internally inconsistent because `blue + yellow + red` can exceed `total` on the exact path this change adds.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 115,
+              "category": "correctness"
+            },
+            {
+              "message": "The new reverse-consistency path (`check_consistency` + `undeclared_to_signals` + warning output) still has no runnable automated coverage in this file. The only success-path test remains `#[ignore]` and exercises a forward-only value-object case, so regressions in undeclared type/trait handling would ship without test protection.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 183,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:44427e357cc2a64e2c890360bacb86fb4c6f3143692a904472cfd419b1663bcd",
+          "at": "2026-04-09T01:06:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new reverse-consistency path (`check_consistency` + `undeclared_to_signals` + the undeclared warning/summary formatting) has no runnable coverage in this file. The only success-path test is still `#[ignore]` and uses a forward-only fixture, so regressions in undeclared type/trait handling or the new output format would not be caught.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 81,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:82668d1c848d9171ea3f454592859461f0256bdfbbd99041e6109f148909d9b1",
+          "at": "2026-04-09T01:09:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82668d1c848d9171ea3f454592859461f0256bdfbbd99041e6109f148909d9b1",
+          "at": "2026-04-09T01:10:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new reverse-consistency path (`check_consistency` + `undeclared_to_signals` + `print_signal_summary`) still has no runnable automated coverage. The only success-path test remains `#[ignore]` and uses a forward-only fixture, so regressions in undeclared type/trait handling or the new `undeclared=` summary/warning output would ship unnoticed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 81,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:82668d1c848d9171ea3f454592859461f0256bdfbbd99041e6109f148909d9b1",
+          "at": "2026-04-09T01:12:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Merging `undeclared_to_signals(...)` into `doc.signals()` here does not actually enforce the new reverse-Red gate. These records are saved with synthetic kind tags like `undeclared_type` / `undeclared_trait`, but downstream `verify spec-states` only considers signals whose `(type_name, kind_tag)` matches a declared entry, so undeclared code can still pass CI after `sotp track domain-type-signals` runs.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 92,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:17db52e194bd057351de2d58404f21e4c50870cb74d67882e01b4e7939de36e1",
+          "at": "2026-04-09T01:15:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17db52e194bd057351de2d58404f21e4c50870cb74d67882e01b4e7939de36e1",
+          "at": "2026-04-09T01:19:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `--strict` wiring for `SpecStates` is not exercised anywhere in this file. All updated spec-state tests still pass `strict: false`, so a regression in the new merge-gate path or the `args.strict` handoff to `infrastructure::verify::spec_states::verify` would slip through CI.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
+              "line": 151,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:f3e1d6aa610a2882125fe068781724d575653891df634d68543234afa24fd696",
+          "at": "2026-04-09T01:25:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `SpecStates` strict-gate path is not exercised by any CLI test. All updated spec-state tests still pass `strict: false`, so a regression in the `args.strict` handoff to `infrastructure::verify::spec_states::verify` or in the merge-gate behavior would slip through CI. Add at least one `strict: true` test that covers a yellow-state spec and asserts failure.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 151,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:f3e1d6aa610a2882125fe068781724d575653891df634d68543234afa24fd696",
+          "at": "2026-04-09T01:26:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f44f3954a676ab42c53a4136abb7c1f25948d48d62ba1423e576993aa3c0fd3b",
+          "at": "2026-04-09T01:27:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecVerifyArgs` is reused by `spec-attribution`, `spec-frontmatter`, `spec-signals`, and `spec-states`, so introducing `strict: bool` here exposes `--strict` on all four subcommands. Only `spec-states` consumes it; the other three now accept and silently ignore the flag, which violates the intended CLI wiring and can mask invalid invocations instead of rejecting them.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 14,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f44f3954a676ab42c53a4136abb7c1f25948d48d62ba1423e576993aa3c0fd3b",
+          "at": "2026-04-09T01:28:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Add parser-level coverage for the new `--strict` flag. The current tests only construct `VerifyCommand::SpecStates` directly, so a broken `#[arg(long)]` mapping or a future subcommand-layout regression would still pass these tests and leave the public CLI flag unusable.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 25,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:6ac2ac932625f4894e69d44f04eae7b5150eb65c5ad4aecb3a2c2b35c3477814",
+          "at": "2026-04-09T01:31:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19feb44c42c12aa48c3e48e725efe775062bae44501c996d6a7b985f4a2a362d",
+          "at": "2026-04-09T01:34:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19feb44c42c12aa48c3e48e725efe775062bae44501c996d6a7b985f4a2a362d",
+          "at": "2026-04-09T01:36:17Z"
         }
       ]
     }

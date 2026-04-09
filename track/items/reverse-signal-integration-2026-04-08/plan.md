@@ -21,8 +21,8 @@ domain-type-signals: forward 評価 (Blue/Yellow) + 逆方向チェック (Red) 
 domain-types.json 不在時はエラー終了し /track:design を促す (TDDD: 初回作成は designer の責務)。
 verify spec-states 2 段階ゲート: 途中コミット時は Red なし → pass (Yellow 許容、Red → fail + /track:design 案内)。merge 時は全 Blue 必須 (Yellow もブロック)。
 
-- [~] domain-type-signals コマンドを拡張: 逆方向チェック → undeclared Red + 未実装 Yellow を domain-types.json に保存。不在時はエラー終了し /track:design を促す。domain-types.md レンダリング。サマリ出力 blue=N yellow=M red=K (undeclared=U)
-- [ ] verify spec-states ゲートを 2 段階判定に変更: 途中コミット時は Red なし → pass (Yellow 許容、Red ブロック + /track:design 案内)。merge 時は全 Blue 必須 (Yellow もブロック)
+- [x] domain-type-signals コマンドを拡張: 逆方向チェック → undeclared Red + 未実装 Yellow を domain-types.json に保存。不在時はエラー終了し /track:design を促す。domain-types.md レンダリング。サマリ出力 blue=N yellow=M red=K (undeclared=U) d143714
+- [~] verify spec-states ゲートを 2 段階判定に変更: 途中コミット時は Red なし → pass (Yellow 許容、Red ブロック + /track:design 案内)。merge 時は全 Blue 必須 (Yellow もブロック)
 
 ## designer capability + /track:design コマンド
 

@@ -28,7 +28,7 @@ use super::frontmatter::parse_yaml_frontmatter;
 /// - The file cannot be read or decoded.
 /// - The entries list is empty.
 /// - Any signal is Red.
-pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
+pub fn verify_from_spec_json(spec_json_path: &Path, strict: bool) -> VerifyOutcome {
     // Validate spec.json itself is readable and parseable
     let spec_json = match std::fs::read_to_string(spec_json_path) {
         Ok(s) => s,
@@ -49,7 +49,9 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
         }
     };
 
-    // Stage 1 prerequisite: spec signals must exist and have red == 0
+    // Stage 1 prerequisite: spec signals must exist and satisfy the mode gate.
+    // - Default: red == 0 (Yellow WIP allowed)
+    // - Strict:  red == 0 AND yellow == 0 (all Blue required for merge)
     match spec_doc.signals() {
         None => {
             return VerifyOutcome::from_findings(vec![Finding::error(format!(
@@ -62,6 +64,13 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
                 "{}: Stage 1 prerequisite not met: spec signals have red={} (must be 0)",
                 spec_json_path.display(),
                 counts.red()
+            ))]);
+        }
+        Some(counts) if strict && counts.yellow() > 0 => {
+            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "{}: Stage 1 prerequisite not met in strict mode: spec signals have yellow={} (all must be Blue for merge — run /track:design)",
+                spec_json_path.display(),
+                counts.yellow()
             ))]);
         }
         _ => {}
@@ -132,22 +141,42 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
         ))]);
     }
 
-    // Fail-closed: any non-Blue signal for a current entry (matched by name+kind) is a failure
+    // Two-stage gate (TDDD):
+    // - Default (interim commit): Red → fail, Yellow → pass (WIP allowed)
+    // - Strict (merge gate): any non-Blue → fail (Yellow also blocked)
     let entry_keys: std::collections::HashSet<(&str, &str)> =
         doc.entries().iter().map(|e| (e.name(), e.kind().kind_tag())).collect();
-    let non_blue: Vec<&str> = signals
+
+    let red_entries: Vec<&str> = signals
         .iter()
         .filter(|s| entry_keys.contains(&(s.type_name(), s.kind_tag())))
-        .filter(|s| s.signal() != ConfidenceSignal::Blue)
+        .filter(|s| s.signal() == ConfidenceSignal::Red)
         .map(|s| s.type_name())
         .collect();
-    if !non_blue.is_empty() {
+    if !red_entries.is_empty() {
         return VerifyOutcome::from_findings(vec![Finding::error(format!(
-            "{}: {} domain type(s) are not Blue (spec does not match code): {}",
+            "{}: {} domain type(s) have Red signal (TDDD violation — run /track:design): {}",
             domain_types_path.display(),
-            non_blue.len(),
-            non_blue.join(", ")
+            red_entries.len(),
+            red_entries.join(", ")
         ))]);
+    }
+
+    if strict {
+        let yellow_entries: Vec<&str> = signals
+            .iter()
+            .filter(|s| entry_keys.contains(&(s.type_name(), s.kind_tag())))
+            .filter(|s| s.signal() == ConfidenceSignal::Yellow)
+            .map(|s| s.type_name())
+            .collect();
+        if !yellow_entries.is_empty() {
+            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "{}: {} domain type(s) have Yellow signal (not yet implemented — all must be Blue for merge): {}",
+                domain_types_path.display(),
+                yellow_entries.len(),
+                yellow_entries.join(", ")
+            ))]);
+        }
     }
 
     VerifyOutcome::pass()
@@ -166,11 +195,11 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
 /// - The `## Domain States` heading is absent from the body.
 /// - The section exists but contains no markdown table.
 /// - The table has no data rows (header + separator only).
-pub fn verify(spec_path: &Path) -> VerifyOutcome {
+pub fn verify(spec_path: &Path, strict: bool) -> VerifyOutcome {
     // Delegate to spec.json path when a sibling spec.json exists.
     if let Some(spec_json_path) = sibling_spec_json(spec_path) {
         if spec_json_path.is_file() {
-            return verify_from_spec_json(&spec_json_path);
+            return verify_from_spec_json(&spec_json_path, strict);
         }
     }
 
@@ -355,7 +384,7 @@ mod tests {
     fn test_spec_states_with_no_domain_states_section_returns_error() {
         let (_dir, path) =
             make_spec("---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n\nSome content.\n");
-        let outcome = verify(&path);
+        let outcome = verify(&path, false);
         assert!(outcome.has_errors(), "missing ## Domain States must be an error");
     }
 
@@ -369,7 +398,7 @@ mod tests {
              |-------|-------------|\n\
              | Draft | Initial state |\n",
         );
-        let outcome = verify(&path);
+        let outcome = verify(&path, false);
         assert!(!outcome.has_errors(), "valid table must pass");
     }
 
@@ -383,7 +412,7 @@ mod tests {
              | Active | Active state |\n\
              | Done | Terminal state |\n",
         );
-        let outcome = verify(&path);
+        let outcome = verify(&path, false);
         assert!(!outcome.has_errors(), "table with multiple data rows must pass");
     }
 
@@ -395,7 +424,7 @@ mod tests {
             "## Domain States\n\n\
              | State | Description |\n",
         );
-        let outcome = verify(&path);
+        let outcome = verify(&path, false);
         assert!(outcome.has_errors(), "header-only table (no separator) must be an error");
     }
 
@@ -408,7 +437,7 @@ mod tests {
              | State | Description |\n\
              |-------|-------------|\n",
         );
-        let outcome = verify(&path);
+        let outcome = verify(&path, false);
         assert!(outcome.has_errors(), "header + separator with no data rows must be an error");
     }
 
@@ -417,7 +446,7 @@ mod tests {
     #[test]
     fn test_spec_states_with_empty_section_body_returns_error() {
         let (_dir, path) = make_spec("## Domain States\n");
-        let outcome = verify(&path);
+        let outcome = verify(&path, false);
         assert!(outcome.has_errors(), "empty section body must be an error");
     }
 
@@ -429,7 +458,7 @@ mod tests {
             "## Domain States\n\n\
              This section describes domain states but has no table.\n",
         );
-        let outcome = verify(&path);
+        let outcome = verify(&path, false);
         assert!(outcome.has_errors(), "section with non-table content must be an error");
     }
 
@@ -443,7 +472,7 @@ mod tests {
              |-------|-------------|\n\
              | Draft | Initial state |\n",
         );
-        let outcome = verify(&path);
+        let outcome = verify(&path, false);
         assert!(
             outcome.has_errors(),
             "### Domain States must not satisfy the ## Domain States requirement"
@@ -458,7 +487,7 @@ mod tests {
              |-------|-------------|\n\
              | Draft | Initial state |\n",
         );
-        let outcome = verify(&path);
+        let outcome = verify(&path, false);
         assert!(
             outcome.has_errors(),
             "# Domain States must not satisfy the ## Domain States requirement"
@@ -471,7 +500,7 @@ mod tests {
     fn test_spec_states_with_nonexistent_file_returns_error() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("nonexistent.md");
-        let outcome = verify(&path);
+        let outcome = verify(&path, false);
         assert!(outcome.has_errors(), "unreadable file must return an error");
     }
 
@@ -487,7 +516,7 @@ mod tests {
              |-------|------|\n\
              | Ready | ok   |\n",
         );
-        let outcome = verify(&path);
+        let outcome = verify(&path, false);
         assert!(!outcome.has_errors(), "spec without frontmatter but valid section must pass");
     }
 
@@ -501,7 +530,7 @@ mod tests {
              |-------|------|\n\
              | Ready | ok   |\n",
         );
-        let outcome = verify(&path);
+        let outcome = verify(&path, false);
         assert!(!outcome.has_errors(), "spec with frontmatter and valid section must pass");
     }
 
@@ -515,7 +544,7 @@ mod tests {
              | Ready | ok   |\n\n\
              ## Other Section\n\nMore text.\n",
         );
-        let outcome = verify(&path);
+        let outcome = verify(&path, false);
         assert!(
             !outcome.has_errors(),
             "## Domain States after other sections with valid table must pass"
@@ -531,6 +560,15 @@ mod tests {
   "title": "Feature",
   "scope": { "in_scope": [], "out_of_scope": [] },
   "signals": { "blue": 1, "yellow": 0, "red": 0 }
+}"#;
+
+    const SPEC_JSON_WITH_YELLOW_SIGNALS: &str = r#"{
+  "schema_version": 1,
+  "status": "draft",
+  "version": "1.0",
+  "title": "Feature",
+  "scope": { "in_scope": [], "out_of_scope": [] },
+  "signals": { "blue": 0, "yellow": 1, "red": 0 }
 }"#;
 
     const DOMAIN_TYPES_WITH_ONE_ENTRY: &str = r#"{
@@ -572,7 +610,7 @@ mod tests {
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
             .unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path);
+        let outcome = verify_from_spec_json(&spec_json_path, false);
         assert!(
             !outcome.has_errors(),
             "domain-types.json with blue signals should pass: {outcome:?}"
@@ -585,7 +623,7 @@ mod tests {
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ONE_ENTRY).unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path);
+        let outcome = verify_from_spec_json(&spec_json_path, false);
         assert!(outcome.has_errors(), "missing signals must be an error: {outcome:?}");
     }
 
@@ -595,7 +633,7 @@ mod tests {
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         // No domain-types.json
-        let outcome = verify_from_spec_json(&spec_json_path);
+        let outcome = verify_from_spec_json(&spec_json_path, false);
         assert!(outcome.has_errors(), "missing domain-types.json should be an error: {outcome:?}");
     }
 
@@ -605,7 +643,7 @@ mod tests {
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_EMPTY_ENTRIES).unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path);
+        let outcome = verify_from_spec_json(&spec_json_path, false);
         assert!(outcome.has_errors(), "empty entries must be an error: {outcome:?}");
     }
 
@@ -616,8 +654,76 @@ mod tests {
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
             .unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path);
+        let outcome = verify_from_spec_json(&spec_json_path, false);
         assert!(!outcome.has_errors(), "all-blue signals should pass: {outcome:?}");
+    }
+
+    const DOMAIN_TYPES_WITH_YELLOW_SIGNAL: &str = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
+  ],
+  "signals": [
+    { "type_name": "TrackId", "kind_tag": "value_object", "signal": "yellow", "found_type": false }
+  ]
+}"#;
+
+    #[test]
+    fn test_verify_from_spec_json_with_yellow_signal_passes_in_default_mode() {
+        let dir = tempfile::tempdir().unwrap();
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_YELLOW_SIGNAL)
+            .unwrap();
+        let outcome = verify_from_spec_json(&spec_json_path, false);
+        assert!(
+            !outcome.has_errors(),
+            "yellow signal must pass in default (interim) mode: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_yellow_signal_fails_in_strict_mode() {
+        let dir = tempfile::tempdir().unwrap();
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_YELLOW_SIGNAL)
+            .unwrap();
+        let outcome = verify_from_spec_json(&spec_json_path, true);
+        assert!(
+            outcome.has_errors(),
+            "yellow signal must fail in strict (merge) mode: {outcome:?}"
+        );
+    }
+
+    // --- Stage 1 strict gate: spec.json yellow signals ---
+
+    #[test]
+    fn test_verify_from_spec_json_with_spec_yellow_signals_passes_in_default_mode() {
+        let dir = tempfile::tempdir().unwrap();
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_WITH_YELLOW_SIGNALS).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+        let outcome = verify_from_spec_json(&spec_json_path, false);
+        assert!(
+            !outcome.has_errors(),
+            "spec.json with yellow signals must pass Stage 1 in default (interim) mode: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_spec_yellow_signals_fails_in_strict_mode() {
+        let dir = tempfile::tempdir().unwrap();
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_WITH_YELLOW_SIGNALS).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+        let outcome = verify_from_spec_json(&spec_json_path, true);
+        assert!(
+            outcome.has_errors(),
+            "spec.json with yellow signals must fail Stage 1 in strict (merge) mode: {outcome:?}"
+        );
     }
 
     #[test]
@@ -626,7 +732,7 @@ mod tests {
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_RED_SIGNAL).unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path);
+        let outcome = verify_from_spec_json(&spec_json_path, false);
         assert!(outcome.has_errors(), "red signal must be an error: {outcome:?}");
     }
 
@@ -636,7 +742,7 @@ mod tests {
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), "not valid json").unwrap();
-        let outcome = verify_from_spec_json(&spec_json_path);
+        let outcome = verify_from_spec_json(&spec_json_path, false);
         assert!(outcome.has_errors(), "invalid JSON must be an error: {outcome:?}");
     }
 
@@ -655,7 +761,7 @@ mod tests {
             "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n\nNo domain states here.\n",
         )
         .unwrap();
-        let outcome = verify(&dir.path().join("spec.md"));
+        let outcome = verify(&dir.path().join("spec.md"), false);
         assert!(
             !outcome.has_errors(),
             "spec.json delegation with valid domain-types.json should pass: {outcome:?}"
@@ -671,7 +777,7 @@ mod tests {
             "## Domain States\n\n| State | Desc |\n|-------|------|\n| Ready | ok |\n",
         )
         .unwrap();
-        let outcome = verify(&dir.path().join("spec.md"));
+        let outcome = verify(&dir.path().join("spec.md"), false);
         assert!(
             !outcome.has_errors(),
             "legacy markdown path with valid table must pass: {outcome:?}"
