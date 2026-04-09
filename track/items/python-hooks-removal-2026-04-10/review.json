@@ -1,0 +1,190 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The track consistently states that `.claude/settings.json` contains `PreToolUse 2 + PostToolUse 6 = 8` Python hook entries, but the current file actually has 2 Python `PreToolUse` hooks and 7 Python `PostToolUse` hooks, for 9 total. As written, the spec/plan/verification artifacts would under-scope the removal and leave `post-implementation-review.py` behind.",
+              "severity": "P0",
+              "file": "track/items/python-hooks-removal-2026-04-10/spec.json",
+              "line": 23,
+              "category": "factual contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f9438cca390b645b9dde753b56178ab5990f0d17094d96ebd5c0537efe722cfe",
+          "at": "2026-04-09T15:10:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR §5 still calls for `docker compose` cleanup, but the track spec never assigns that work to a task or explicitly marks it out of scope, so part of the decision is unowned.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/spec.json",
+              "line": 87,
+              "category": "scope"
+            }
+          ],
+          "hash": "rvw1:sha256:f9438cca390b645b9dde753b56178ab5990f0d17094d96ebd5c0537efe722cfe",
+          "at": "2026-04-09T15:13:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5f34beaf1ea2015cbfa50fc01d6e34d2389a0b3d51feb240674935476e2202c",
+          "at": "2026-04-09T15:19:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan-review.json` is defined earlier in this ADR as `review.json` v2 plus a required `necessity` field, but the 5-gate section now requires `view_files_hash` and `must_count` fields. Those fields are not defined anywhere else in the design, so the gate contract is internally inconsistent and an implementer cannot tell whether they should be stored fields or derived from the latest round.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md",
+              "line": 195,
+              "category": "consistency"
+            },
+            {
+              "message": "This ADR introduces `planning-artifacts.json` under `track/`, but the prerequisite Phase 2 ADR says files such as `planning-artifacts.json` will be migrated under `.harness/config/`. Because Phase 3 depends on Phase 2, the current ADR chain no longer defines a single canonical location for this config.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md",
+              "line": 88,
+              "category": "consistency"
+            },
+            {
+              "message": "The consequence here claims Phase 1 removes the project's Python runtime dependency entirely, but §Decision/5 and the track spec explicitly leave `scripts/` Python, `requirements-python.txt`, and Dockerfile Python packages in place. That false premise also leaks into the Phase 2 ADR's prerequisite section, so the phase boundary is not factually sound.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2323-python-hooks-removal.md",
+              "line": 208,
+              "category": "factual_accuracy"
+            },
+            {
+              "message": "Section S3 still says the plan removes '全 8 個' Python hook entries, even though the same task text and `.claude/settings.json` enumerate 9 commands (2 PreToolUse + 7 PostToolUse). Because `plan.md` is rendered from this metadata, the current planning artifacts already disagree on the required deletion count.",
+              "severity": "P0",
+              "file": "track/items/python-hooks-removal-2026-04-10/metadata.json",
+              "line": 93,
+              "category": "factual_accuracy"
+            },
+            {
+              "message": "The out-of-scope rationale still says `scripts/` contains 26 Python files, but the repository currently has 25 (`rg --files scripts -g '*.py'`). `spec.md` and `verification.md` repeat the same number, so the planning artifacts are carrying a stale factual count.",
+              "severity": "P0",
+              "file": "track/items/python-hooks-removal-2026-04-10/spec.json",
+              "line": 109,
+              "category": "factual_accuracy"
+            }
+          ],
+          "hash": "rvw1:sha256:1ac8a1c28874b2437de61a1f02e4093397d46f2f8abf681fccc102b0a8ee0b82",
+          "at": "2026-04-09T15:23:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 2's prerequisite state is overstated here: after RV2-17 completes, Python hooks are gone, but project-level Python dependencies are not. `scripts/*.py`, `requirements-python.txt`, and `cargo make python-lint` remain explicitly in scope/out-of-scope elsewhere, so saying \"Python 依存そのものがプロジェクトから消滅している\" makes the ADR chain internally inconsistent.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2235-agent-profiles-redesign.md",
+              "line": 18,
+              "category": "correctness"
+            },
+            {
+              "message": "This consequence claims RV2-17 alone eliminates the project's Python runtime dependency, but the same planning set keeps `scripts/` Python, `requirements-python.txt`, and Docker Python packages out of scope for a later track. That leaves the ADR contradicting the track spec about what Phase 1 actually achieves.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2323-python-hooks-removal.md",
+              "line": 208,
+              "category": "correctness"
+            },
+            {
+              "message": "The plan is still internally inconsistent about how many `.claude/settings.json` Python hook entries must be removed: T03 and the summary were corrected to 9, but section S3 still says \"全8個\". Because `plan.md` is rendered from this file, reviewers and implementers will get conflicting instructions from the same source of truth.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/metadata.json",
+              "line": 93,
+              "category": "correctness"
+            },
+            {
+              "message": "The acceptance criteria do not cover two in-scope deliverables from T03/T06: removing `permissions.allow` for `Bash(cargo make hooks-selftest)` and updating the listed documentation files. As written, the track can satisfy every AC while still leaving Decision §2/§6 partially undone.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/spec.json",
+              "line": 190,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:1ac8a1c28874b2437de61a1f02e4093397d46f2f8abf681fccc102b0a8ee0b82",
+          "at": "2026-04-09T15:26:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`planning-artifacts.json` has two conflicting homes in the prerequisite ADR chain. Phase 2 says this harness config should move under `.harness/config/` (`knowledge/adr/2026-04-09-2235-agent-profiles-redesign.md:92`), but this ADR still defines and loads it as `track/planning-artifacts.json`. That leaves Phase 3's source of truth ambiguous and will force either a follow-up rename or duplicate path handling.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md",
+              "line": 88,
+              "category": "correctness"
+            },
+            {
+              "message": "The planning artifacts under-specify the documentation cleanup for Phase 1. T06/its derived acceptance criteria only cover eight docs here, but the current repo still has hook/Python-runtime references in files like `.claude/commands/track/setup.md:8` and `.claude/rules/10-guardrails.md:148`. With the current task list, the track can satisfy its own spec while still shipping docs that point to deleted `.claude/hooks/` behavior.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/spec.json",
+              "line": 60,
+              "category": "correctness"
+            },
+            {
+              "message": "Section 5 says `plan-review.json` keeps the existing review round shape and stores the review hash in each round's `hash` field, but the commit gate later checks nonexistent top-level fields `view_files_hash` and `must_count`. That contradiction leaves the Phase 3 gate impossible to implement exactly as written.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md",
+              "line": 195,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:72c9055ab659e30e3128306aae066aadc5205f135be600824c7c2cb87203850a",
+          "at": "2026-04-09T15:32:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 2323 now contradicts the track plan on `python-lint`: this consequence says Phase 1 deletes both `hooks-selftest` and `python-lint`, but T05 in the track artifacts explicitly keeps `python-lint` and only narrows it to `scripts/`. That leaves the ADR mis-stating what this track is supposed to deliver.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2323-python-hooks-removal.md",
+              "line": 211,
+              "category": "correctness"
+            },
+            {
+              "message": "The out-of-scope inventory says `scripts/` still has 26 Python files, but the repository currently tracks 25 (`git ls-files 'scripts/*.py'`). Because this count is used as the concrete rationale for leaving the `scripts/` cleanup out of scope, the planning artifacts are carrying a factual error.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/spec.json",
+              "line": 109,
+              "category": "correctness"
+            },
+            {
+              "message": "The rationale for keeping `requirements-python.txt` is factually wrong: it says the file is the SSoT for `scripts/ pytest と ruff`, but `requirements-python.txt` currently pins `PyYAML` and `ruff` only, while `pytest` is provided separately by the environment/Docker layer. The out-of-scope decision may still be correct, but the stated basis is not.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/spec.json",
+              "line": 105,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b214fab146bdc2af7cc0ad828744ba36d35254f5a9269b4cd64a2ddd74567a7c",
+          "at": "2026-04-09T15:39:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:619181e694232bf90e2c9be26ad8698d447d9fd3faa3f0311dec22d0bd74461a",
+          "at": "2026-04-09T15:48:04Z"
+        }
+      ]
+    }
+  }
+}
