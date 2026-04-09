@@ -268,6 +268,11 @@
 
 - [x] ~~**INF-21** (HIGH): TODO ID 自動採番~~ ✅ `/todo-add` スキルとして実装（`.claude/commands/todo/add.md`）。既存最大 ID を grep で自動取得し次番号を付与。CI ゲートは費用対効果から見送り（発生頻度低、影響小）。2026-03-28
 
+- [ ] **INF-22** (LOW): `agent-profiles.json` を config ディレクトリに移動
+  - **課題**: `.claude/agent-profiles.json` は `.claude/` 配下にあるが、本来は設定ファイルとして config/ 等の専用ディレクトリに配置すべき
+  - **提案**: `config/agent-profiles.json` に移動し、参照箇所（`_agent_profiles.py`, `CLAUDE.md`, `.claude/rules/` 等）を一括更新
+  - **追加日**: 2026-04-09
+
 ---
 
 ## G. ワークフロー・TDD (WF)

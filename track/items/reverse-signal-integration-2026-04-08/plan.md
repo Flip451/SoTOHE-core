@@ -22,7 +22,7 @@ domain-types.json 不在時はエラー終了し /track:design を促す (TDDD: 
 verify spec-states 2 段階ゲート: 途中コミット時は Red なし → pass (Yellow 許容、Red → fail + /track:design 案内)。merge 時は全 Blue 必須 (Yellow もブロック)。
 
 - [x] domain-type-signals コマンドを拡張: 逆方向チェック → undeclared Red + 未実装 Yellow を domain-types.json に保存。不在時はエラー終了し /track:design を促す。domain-types.md レンダリング。サマリ出力 blue=N yellow=M red=K (undeclared=U) d143714
-- [~] verify spec-states ゲートを 2 段階判定に変更: 途中コミット時は Red なし → pass (Yellow 許容、Red ブロック + /track:design 案内)。merge 時は全 Blue 必須 (Yellow もブロック)
+- [x] verify spec-states ゲートを 2 段階判定に変更: 途中コミット時は Red なし → pass (Yellow 許容、Red ブロック + /track:design 案内)。merge 時は全 Blue 必須 (Yellow もブロック) 0ba172e
 
 ## designer capability + /track:design コマンド
 
@@ -30,7 +30,7 @@ agent-profiles.json の全 profile に designer capability を追加 (既定 pro
 /track:design コマンドを .claude/commands/track/design.md に作成。
 ワークフロー: (1) 対象トラックの plan.md を読み込み, (2) 既存 domain-types.json があれば読み込み (増分更新), (3) 既存コードがあれば TypeGraph も参照, (4) designer capability を呼び出し DomainTypeKind / members / transitions を設計, (5) domain-types.json を生成・更新。
 
-- [ ] agent-profiles.json の全 profile に designer capability を追加 (既定 provider: claude)
+- [~] agent-profiles.json の全 profile に designer capability を追加 (既定 provider: claude)
 - [ ] /track:design コマンドを作成: 対象トラックの plan.md + 既存 domain-types.json (あれば) を入力に designer capability を呼び出し domain-types.json を生成・更新
 
 ## ワークフロー導線整備 + ADR 最終化

@@ -86,14 +86,15 @@
       "status": "done"
     },
     {
+      "commit_hash": "0ba172e",
       "description": "verify spec-states ゲートを 2 段階判定に変更: 途中コミット時は Red なし → pass (Yellow 許容、Red ブロック + /track:design 案内)。merge 時は全 Blue 必須 (Yellow もブロック)",
       "id": "T04",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "agent-profiles.json の全 profile に designer capability を追加 (既定 provider: claude)",
       "id": "T05",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "/track:design コマンドを作成: 対象トラックの plan.md + 既存 domain-types.json (あれば) を入力に designer capability を呼び出し domain-types.json を生成・更新",
@@ -112,5 +113,5 @@
     }
   ],
   "title": "TDDD: 逆方向チェック信号機統合 + designer capability + /track:design",
-  "updated_at": "2026-04-09T01:20:56Z"
+  "updated_at": "2026-04-09T01:37:53Z"
 }
