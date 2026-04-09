@@ -1,409 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d7da79d5a7124c0742bf9eb98f015c10998174ddb3ed104e8e10ed2fc5379e52",
-          "at": "2026-04-08T13:58:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Decision.2’s CLI summary format omits the Yellow count (`blue=N red=K (undeclared=U)`), but the track spec and task metadata require `blue=N yellow=M red=K (undeclared=U)`. That leaves the ADR and implementation spec inconsistent on the required output.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
-              "line": 50,
-              "category": "consistency"
-            },
-            {
-              "message": "`Reassess When` still reintroduces `auto-add` language (`auto-add を「提案モード」...`) even though this track explicitly rejects auto-add / Yellow-as-approved paths. Keeping that wording in the active ADR conflicts with the stated no-auto-add policy and can be misread as an approved future behavior.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
-              "line": 125,
-              "category": "policy"
-            }
-          ],
-          "hash": "rvw1:sha256:dec3ef50b964dadaf3ceed1f28b1f8953455343bcd012d0427472099f0bec0d2",
-          "at": "2026-04-08T14:08:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Decision 2 specifies the command summary as `blue=N red=K (undeclared=U)`, but the track spec and verification files require `blue=N yellow=M red=K (undeclared=U)`. That leaves the observable contract for `domain-type-signals` inconsistent and risks implementing the wrong output format.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
-              "line": 50,
-              "category": "spec"
-            }
-          ],
-          "hash": "rvw1:sha256:dec3ef50b964dadaf3ceed1f28b1f8953455343bcd012d0427472099f0bec0d2",
-          "at": "2026-04-08T14:10:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Reassess When` still reopens `auto-add` as a future option. That reintroduces the rejected Yellow/auto-add path the ADR otherwise bans, so the document is internally inconsistent with the stated TDDD policy.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
-              "line": 125,
-              "category": "consistency"
-            },
-            {
-              "message": "T07’s scope includes updating `registry.md`, but the acceptance criteria and verification steps only cover the `/track:plan` message plus the two workflow docs. The registry index update can be missed without any failing check, so the workflow redirect remains unverified.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/reverse-signal-integration-2026-04-08/spec.json",
-              "line": 69,
-              "category": "coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:8f67a5cd6f0bd4255a47647ea3a88889c42378aa1060de2f3dedde1c23a6ec8b",
-          "at": "2026-04-08T14:11:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeGraph` still keys types by bare name and only emits a warning on same-name collisions, so a public type in one module can overwrite another with the same name. That means the reverse check can silently miss undeclared code or mix signals across modules instead of disambiguating them.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-08-0045-spec-code-consistency-check-design.md",
-              "line": 125,
-              "category": "correctness"
-            },
-            {
-              "message": "The new Red gate is underspecified for reverse-only signals: undeclared types/traits are emitted as extra Red `DomainTypeSignal`s with no matching spec entry, but the spec only says \"Red なし → pass\". If `verify spec-states` keeps its current name+kind matching, those extra Red signals will be ignored and TDDD violations will still pass CI.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/spec.json",
-              "line": 42,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:883e055af1c20b59a47d573c126d674f54a28f5b494ad1b3c63f6e885042f53e",
-          "at": "2026-04-08T14:15:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30ed62696702fc7f4f0845fb15115d78cb824ea5e481bac806416d9e6ed08080",
-          "at": "2026-04-08T14:16:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`metadata.json` still describes the gate as \"Yellow is allowed, only Red blocks\", which contradicts ADR 1800/spec.json's two-stage rule that merge requires all Blue. If implementers follow the track metadata/plan, they can relax the final approval gate and allow unfinished Yellow states to merge.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
-              "line": 55,
-              "category": "correctness"
-            },
-            {
-              "message": "T04's verification checklist covers Red/Yellow outcomes, but it never checks that CI actually runs `domain-type-signals` before `verify spec-states`. Since reverse undeclared Reds are produced by the first step, leaving this sequence unverified can let undeclared types bypass the gate even when all listed checks pass.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/verification.md",
-              "line": 15,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:30ed62696702fc7f4f0845fb15115d78cb824ea5e481bac806416d9e6ed08080",
-          "at": "2026-04-08T14:18:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T04 still under-specifies the accepted two-stage gate. `metadata.json` only says `verify spec-states` should pass when there is no Red, but it omits the merge-time requirement that leftover Yellow must also block until all signals are Blue. Because `plan.md` is generated from this file, the implementation task can be completed without ever adding the merge-stage enforcement required by ADR 1800 §Decision.4 and `spec.json`.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
-              "line": 27,
-              "category": "consistency"
-            },
-            {
-              "message": "ADR 0045 now says the reverse-signal integration was completed while 'not relaxing the gate' and 'keeping all Blue required', but ADR 1800 accepted a two-stage gate where Yellow is allowed during intermediate commits and only blocked at merge. This leaves the ADR set internally inconsistent about the actual `verify spec-states` contract.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-08-0045-spec-code-consistency-check-design.md",
-              "line": 218,
-              "category": "consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:e5a8a315f208745a7a540be84b305d6211765990c327d49001ada2d154668b7f",
-          "at": "2026-04-08T14:21:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T07's acceptance criteria omit the `registry.md` Next-column update that the task description and ADR Decision.6 both require. As written, this spec can be marked complete even if `/track:design` never appears in `registry.md`, leaving part of the workflow change unimplemented and unverified.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/spec.json",
-              "line": 238,
-              "category": "consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:a682f4ca72dbd9916ee1b3f8df0e7d6da267774dc847983e28eaf9a7844fb7fe",
-          "at": "2026-04-08T14:24:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The ADR’s TDDD introduction still says `forward Red` is the normal work-in-progress state, but Decision.3 and the 3-state table below redefine `defined + not yet implemented` as Yellow. Leaving the old Red/Yellow semantics in the same accepted ADR makes the design internally contradictory and can send later spec updates back toward the rejected gate behavior.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
-              "line": 25,
-              "category": "correctness"
-            },
-            {
-              "message": "Section S2 still summarizes `verify spec-states` as a one-stage gate (`Red なし → pass。Yellow は許容。Red → fail`) and omits the merge-time `all Blue required` rule that T04 introduces everywhere else. Because `plan.md` is generated from this metadata, readers following the section summary can implement or review against the wrong gate contract and leave Yellow unblocked at track completion.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
-              "line": 75,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:819d29979452eb7fa892b87ee42da5e80bd77cbd11b5c9b17ce1c94409342755",
-          "at": "2026-04-08T14:27:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c23e8746f2d8cf41db4c0afdce0c4fec24699ad88e3fc78945d5b05d8e879e0",
-          "at": "2026-04-08T14:30:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
-          "at": "2026-04-08T14:54:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`updated_at` moved backwards to `2026-04-08T14:50:43Z`, which is earlier than this item's `created_at` (`2026-04-08T18:00:00Z`). A status transition should not produce metadata where the update timestamp predates creation; any tooling that relies on monotonic timestamps will now see this item as modified before it existed.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
-              "line": 112,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
-          "at": "2026-04-08T14:55:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
-          "at": "2026-04-08T14:56:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`updated_at` is earlier than `created_at` (`2026-04-08T14:50:43Z` vs `2026-04-08T18:00:00Z`), which violates the track timestamp invariant and can misorder or invalidate consumers that rely on `updated_at` for latest-track selection.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
-              "line": 112,
-              "category": "data-integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:0491e44cb108d6e0370f0dfc17891f974a5d107dca03715fce132e3e8fb747ba",
-          "at": "2026-04-08T15:44:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:249b776035b92142187e8db7d218b46b51b2d776225eaa8fe0cab9ac5a585dc7",
-          "at": "2026-04-08T15:47:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:249b776035b92142187e8db7d218b46b51b2d776225eaa8fe0cab9ac5a585dc7",
-          "at": "2026-04-08T15:50:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f32b135b5cecb16dbdaf71fb5d75760f792af8452224cea12f8c75d583d82067",
-          "at": "2026-04-09T00:38:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f32b135b5cecb16dbdaf71fb5d75760f792af8452224cea12f8c75d583d82067",
-          "at": "2026-04-09T00:39:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cca2a285b8dcc1dd8d02ad870328277b835422198868e2a0e7febfa127fb690a",
-          "at": "2026-04-09T00:59:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cca2a285b8dcc1dd8d02ad870328277b835422198868e2a0e7febfa127fb690a",
-          "at": "2026-04-09T01:00:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:482d9e4d6ef53f78b143afc1e6ae587a122d77a879337ac8e3c4d6f1e48b7983",
-          "at": "2026-04-09T01:24:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:482d9e4d6ef53f78b143afc1e6ae587a122d77a879337ac8e3c4d6f1e48b7983",
-          "at": "2026-04-09T01:25:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:15:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes it a mandatory field for every `version: 1` profile, so any existing config loaded through `CLAUDE_AGENT_PROFILES_PATH` that has not been migrated yet will now fail `validate_profiles()` with \"missing required capabilities\". Because this patch does not bump the schema version or provide a compatibility fallback, rolling out the new hook before every external profile file is updated becomes a hard runtime break.",
-              "severity": "P1",
-              "file": ".claude/hooks/_agent_profiles.py",
-              "line": 20,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:17:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes every v1 profile require the new capability immediately. Because `CLAUDE_AGENT_PROFILES_PATH` still allows older/custom configs and `PROFILE_VERSION` stays at 1, those configs will now fail validation with a breaking runtime error instead of loading with the previous schema. This needs a version bump or compatibility fallback.",
-              "severity": "P1",
-              "file": ".claude/hooks/_agent_profiles.py",
-              "line": 17,
-              "category": "compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:18:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes it mandatory for every v1 profile immediately. Any existing or custom config loaded via `CLAUDE_AGENT_PROFILES_PATH` that has not been migrated will now fail `validate_profiles()` with a missing-capabilities error, even though `PROFILE_VERSION` is still 1. This is a breaking schema change without a version bump or backward-compatibility fallback.",
-              "severity": "P1",
-              "file": ".claude/hooks/_agent_profiles.py",
-              "line": 20,
-              "category": "compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:20:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:20:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T05 is still recorded as `in_progress`, but the companion config change already adds `designer` to every profile in `.claude/agent-profiles.json`. Because `metadata.json` is the source of truth and workflow tooling returns the first `in_progress` task before any `todo`, leaving T05 open will keep this track pinned on a completed task and delay T06 from becoming the next actionable item.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
-              "line": 97,
-              "category": "other"
-            }
-          ],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:22:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:23:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:23:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5bb066475db5ed877a81c8e2dbca5cd7e7aff4d5ddcb1eb19f84edd766b24b3b",
-          "at": "2026-04-09T02:40:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5bb066475db5ed877a81c8e2dbca5cd7e7aff4d5ddcb1eb19f84edd766b24b3b",
-          "at": "2026-04-09T02:41:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:63faab1418d7c94651c63df127745a81cd8ce79f94eec23f257745cdae072595",
-          "at": "2026-04-09T03:34:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:63faab1418d7c94651c63df127745a81cd8ce79f94eec23f257745cdae072595",
-          "at": "2026-04-09T03:35:49Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -1551,6 +1148,591 @@
           "findings": [],
           "hash": "rvw1:sha256:5d7fb2da9a35d015e2e07428216cc912af111c4eda97c0cd695ded4b7d85e3d0",
           "at": "2026-04-09T04:16:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b463f5658bff73e936cd116a0989c0972069bddfbc6cac3ce11461b098eba77",
+          "at": "2026-04-09T04:22:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/track/plan.md` now presents `/track:full-cycle <task>` as an alternative to the new `/track:design -> /track:implement -> /track:review -> /track:commit` lane. That bypasses the TDDD gate the change is trying to introduce, because `/track:full-cycle` still goes straight into implementation and never creates `domain-types.json`. Users following this prompt can start coding without running `/track:design` at all.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow"
+            },
+            {
+              "message": "`DEVELOPER_AI_WORKFLOW.md` adds the TDDD sequence only in the 3.2 daily-loop example, but the same document's primary flowchart, command table, and example path still send users from planning directly to `/track:implement` or `/track:full-cycle`. That leaves two contradictory 'official' workflows in one file, so readers following the top-level guide will still skip `/track:design`.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 220,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:6b463f5658bff73e936cd116a0989c0972069bddfbc6cac3ce11461b098eba77",
+          "at": "2026-04-09T04:23:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new next-step guidance still presents `/track:full-cycle <task>` as an alternative to the TDDD lane. That command goes straight into implementation and does not create `domain-types.json`, so users following this prompt can bypass `/track:design` entirely and only discover the missing type declarations later when `verify spec-states` fails.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow"
+            },
+            {
+              "message": "These added TDDD lines introduce `/track:plan -> /track:design -> /track:implement` as the expected flow, but the same document's primary flowchart and command table still send users directly from planning to `/track:implement` or `/track:full-cycle` and still describe `/track:plan` as including design. That leaves two contradictory 'official' workflows in one guide, so readers following the top-level path will still skip the required design step.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 220,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:6b463f5658bff73e936cd116a0989c0972069bddfbc6cac3ce11461b098eba77",
+          "at": "2026-04-09T04:25:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This changes the optional asdf baseline to `python 3.13.8`, but the repository’s `.tool-versions` and the same document’s later note both still point to `python 3.12.8`. The setup guidance is now self-contradictory and will send users to the wrong interpreter version.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 16,
+              "category": "correctness"
+            },
+            {
+              "message": "The plan-only handoff still says to follow the standard flow from `5. 実装`, but after inserting `/track:design` the implementation step is now `6. 実装`. That stale cross-reference will misroute users after `/track:activate` and skip the new design step numbering.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 184,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e10bbe60077b3820107aa7470c92c61a10c619a7aa69895384354bd5554da775",
+          "at": "2026-04-09T04:34:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan-only activation handoff still tells readers to continue from standard flow step `6. 実装`, which skips the newly inserted `/track:design` step. Following this path after `/track:activate` lets a user enter implementation without declaring `domain-types.json` first.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 184,
+              "category": "workflow"
+            },
+            {
+              "message": "The `/track:plan <feature>` entry still says it performs `調査・設計・plan 作成・トラック成果物作成`, and section 3.1 repeats the same wording. That conflicts with the new separate `/track:design` command and can mislead readers into keeping domain-type design inside planning, bypassing the new TDDD step.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 94,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:01e61a44983eb4dc15e6786947530672ddb2a07f7c035abf46bfc1d7c9a08650",
+          "at": "2026-04-09T04:35:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03f5c61a94c3ef1e0ed9a7838a9d7a40039fab10b60305ecb60aa25522410984",
+          "at": "2026-04-09T04:37:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new plan-complete guidance still advertises `/track:full-cycle <task>` as a peer next step. `full-cycle` goes straight into implementation and does not create `domain-types.json`, so this prompt still gives users an official path that skips the new `/track:design` gate the change is supposed to introduce.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 85,
+              "category": "workflow"
+            },
+            {
+              "message": "This guide now contradicts itself about the TDDD lane: the command table says `/track:design` is required, but the same patch's flowchart (`skip design`) and standard flow (`型宣言が不要な場合はスキップ可`) say it can be bypassed. With both 'required' and 'optional' instructions in one document, readers still do not have a single authoritative `plan -> design -> implement` workflow.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 95,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:03f5c61a94c3ef1e0ed9a7838a9d7a40039fab10b60305ecb60aa25522410984",
+          "at": "2026-04-09T04:40:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:plan` still describes phase 2 as `Research & design`, so the planning command continues to own the design step that this patch is trying to separate into `/track:design`. That means a user can complete planning without ever creating `domain-types.json`, which defeats the new TDDD gate.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 14,
+              "category": "workflow"
+            },
+            {
+              "message": "The top-level workflow still exposes `/track:full-cycle <task>` as a direct alternative from the post-plan decision point, and the same document labels that branch as `design stepなし`. Because this flowchart is presented as the basic path for every run, it preserves an official implementation route that bypasses `/track:design` entirely.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 70,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:6426d54816566d1b2b878a0f185da4b49e8514d7d5f4a7a7f2b66d7ced3145ca",
+          "at": "2026-04-09T04:44:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7959e07af43d5598662a6c04d44fa4014c59bf07123ed1742b7e68b0aec71c28",
+          "at": "2026-04-09T04:46:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated command table still documents `/track:full-cycle <task>` as a sanctioned \"design stepなし\" lane. That contradicts this task's stated TDDD flow (`plan -> design -> implement -> review -> commit`) and preserves an official path that skips `/track:design`/`domain-types.json`, so readers can still bypass the new gate and only discover it later when verification fails.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 94,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7959e07af43d5598662a6c04d44fa4014c59bf07123ed1742b7e68b0aec71c28",
+          "at": "2026-04-09T04:47:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The daily loop still tells Claude Code to choose the next command from `track/registry.md`, `spec.md`, `plan.md`, and `verification.md` only. With `/track:design` added, the phase gate now also depends on `metadata.json` and `track/items/<id>/domain-types.json`, so this loop can miss an unfinished design phase and recommend `/track:implement` too early.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 218,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:e589498c3aff16b3dea0e3c6efad5c8ada11fc339836aab75fd1d7a227014e3e",
+          "at": "2026-04-09T04:49:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated workflow now makes `/track:design` the required post-plan step, but this example still sends users from `/track:plan` approval straight to `/track:full-cycle`. That leaves two incompatible paths in the same guide and can bypass domain-type declaration entirely.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 110,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:05d7443932383952961c85f9bd4120a45074e0db9de548d6fd90b7b1209c99e5",
+          "at": "2026-04-09T04:51:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0419ea9883dd32ccce0f5a571407a829b0e217943a690377faf44d3f62d2b25d",
+          "at": "2026-04-09T04:52:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new daily-loop guidance says `/track:status` reads `domain-types.json` and will recommend the TDDD lane (`/track:design` before `/track:implement`), but the actual `status` command still only reads `metadata.json`/`spec.md`/`plan.md`/`verification.md` and recommends `/track:implement` for materialized planned tracks. As written, this guide promises a gate the command does not enforce, so users can still be sent straight into implementation without declaring domain types first.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 218,
+              "category": null
+            },
+            {
+              "message": "The plan-only activation handoff now tells readers to continue from `/track:design`, but `/track:activate` itself still ends by recommending `/track:implement` or `/track:full-cycle`. That leaves two conflicting official next-step instructions immediately after activation, and the command-driven path still bypasses the new TDDD design phase.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 182,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:0419ea9883dd32ccce0f5a571407a829b0e217943a690377faf44d3f62d2b25d",
+          "at": "2026-04-09T04:54:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fd39043a4896d572d364556d75f4d3eddc5095949e42d9b72d2fa46f5bfd694",
+          "at": "2026-04-09T04:56:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/track/plan.md` now tells the planner that domain type declarations happen in `/track:design`, but the same command still instructs `/track:plan` to create `spec.json.domain_states` and never creates `domain-types.json`. That leaves new tracks with two conflicting sources of truth for type design, so the new handoff is internally inconsistent until the artifact schema in this prompt is updated as well.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 14,
+              "category": "correctness"
+            },
+            {
+              "message": "`DEVELOPER_AI_WORKFLOW.md` makes `/track:design` an unconditional step in the standard flow, but the current verifier errors when `domain-types.json` is missing or empty. For tracks that legitimately have no domain types to declare, following this documented flow becomes a dead end or pushes authors to invent bogus declarations. This needs a conditional path or an explicit zero-type workflow.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 188,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:2fd39043a4896d572d364556d75f4d3eddc5095949e42d9b72d2fa46f5bfd694",
+          "at": "2026-04-09T04:58:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/track/plan.md` still describes phase 2 of `/track:plan` as `Research & design`, but the new handoff at lines 82-84 moves design to `/track:design`. That leaves two conflicting sources of truth in the same prompt, so users can either do domain-type design twice or never reach the new command.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow"
+            },
+            {
+              "message": "`DEVELOPER_AI_WORKFLOW.md` adds a TDDD next-step flow in section 3.2, but the status loop still only reads `spec.md`, `plan.md`, and `verification.md` and never mentions `domain-types.json`. With no source of truth for whether design has happened, the workflow can still recommend `/track:implement` before `/track:design` is complete.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 219,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:aebc719646c711af44c30772a121c271db075ff26e91e179c17aaf6a426b9093",
+          "at": "2026-04-09T05:01:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33e7a0280cfb801c482ef76759d49ee3cc3c82b471aa6874491898eb0eee358a",
+          "at": "2026-04-09T05:03:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new handoff says domain type declarations now happen in `/track:design`, but this same prompt still tells `/track:plan` to create `spec.json.domain_states`. That leaves two conflicting sources of truth for type design in one command, so authors can keep doing the type-definition work during planning and bypass the new `domain-types.json` step.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 83,
+              "category": "workflow"
+            },
+            {
+              "message": "This workflow now documents a `型なし` lane that skips `/track:design` and goes straight to `/track:implement`, but `verify spec-states` currently fails when `domain-types.json` is missing or empty. Following the documented path will send users into implementation with no design file and then block them at verification.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 69,
+              "category": "workflow"
+            },
+            {
+              "message": "Section 3.2 now promises that `/track:status` checks `domain-types.json` to decide whether the design phase is complete, but the actual `status` command still only reads `metadata.json`/`spec.md`/`plan.md`/`verification.md` and recommends `/track:implement` for planned tracks. As written, the guide advertises a TDDD gate that the command does not enforce.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 219,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:33e7a0280cfb801c482ef76759d49ee3cc3c82b471aa6874491898eb0eee358a",
+          "at": "2026-04-09T05:06:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:status`'s daily-loop guidance still says the next command is chosen from `track/registry.md`, `spec.md`, `plan.md`, and `verification.md` only. That omits `domain-types.json`, so the new TDDD gate is invisible to the status router and it can still recommend `/track:implement` before design has happened.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 218,
+              "category": "workflow"
+            },
+            {
+              "message": "The external-guide auto-injection rule still covers `/track:plan`, `/track:implement`, and `/track:full-cycle`, but not the newly added `/track:design`. As a result, the new design phase can miss the same trigger-keyword context that planning and implementation receive, which leaves the TDDD workflow inconsistent.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 342,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:5efe589b4f7f17b85fe01c37d7684f88a6495c0cf1219a2c7f45bceb47e227ac",
+          "at": "2026-04-09T05:10:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb13bc8784f49a9020c565f0e6d0402ac3ba60f11d1d3963f64e6f3078ff1c0b",
+          "at": "2026-04-09T05:12:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:status` is documented here as a TDDD-aware router that can recommend `/track:design`, but the actual status surfaces still cannot emit that command: `.claude/commands/track/status.md` routes materialized planned tracks to `/track:implement`, and `libs/domain/src/track_phase.rs` has no `/track:design` next-command variant. As written, users following `/track:status` will still be sent past the new design phase.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 218,
+              "category": "correctness"
+            },
+            {
+              "message": "The plan-only handoff now says activation continues with `/track:design`, but `/track:activate` itself still ends by recommending `/track:implement` or `/track:full-cycle <task>`. That leaves two conflicting official next steps immediately after activation, and the command-driven path still bypasses the TDDD design phase this doc is trying to introduce.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 182,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fb13bc8784f49a9020c565f0e6d0402ac3ba60f11d1d3963f64e6f3078ff1c0b",
+          "at": "2026-04-09T05:14:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf8072df9d438d7fcd26def8d28b42439fa35845060028a39c2160acd3e3af7a",
+          "at": "2026-04-09T05:16:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Section 3.1 now tells readers to continue from `/track:design` after `/track:activate`, but the actual activate command still ends by recommending `/track:implement` or `/track:full-cycle <task>` (`.claude/commands/track/activate.md:27`). That leaves two official next-step instructions in conflict, and the command-driven path still bypasses the new TDDD design gate.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 182,
+              "category": "correctness"
+            },
+            {
+              "message": "The new daily-loop bullet documents `/track:status` as if it will enforce the TDDD route (`/track:plan` → `/track:design` → `/track:implement`), but the current status flow still only reads `metadata.json`/`spec.md`/`plan.md`/`verification.md` and recommends `/track:implement` for materialized planned tracks (`.claude/commands/track/status.md:34-37`, `libs/domain/src/track_phase.rs:46-58,93-97`). Users following `/track:status` can still be sent straight into implementation without ever running `/track:design`.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bf8072df9d438d7fcd26def8d28b42439fa35845060028a39c2160acd3e3af7a",
+          "at": "2026-04-09T05:19:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This note reintroduces optionality for `/track:design` by saying the developer decides whether the design phase is needed. That conflicts with §3.1, which now inserts `/track:design` as the required step before `/track:implement`, and it lets `/track:status` still recommend implementation without the TDDD type-design gate.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 221,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:92fec8bca489a07a3a7bbcf886772f7554709c0502a8344243612648d9e308f5",
+          "at": "2026-04-09T05:22:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:92fec8bca489a07a3a7bbcf886772f7554709c0502a8344243612648d9e308f5",
+          "at": "2026-04-09T05:23:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Section 3.1 now tells readers that activation should continue at step 5 (`/track:design`), but the actual `/track:activate` command still ends by recommending `/track:implement` or `/track:full-cycle <task>` (`.claude/commands/track/activate.md:21-27`). That leaves the plan-only lane with two conflicting official next steps, and the command-driven path still bypasses the new TDDD design gate.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 182,
+              "category": "workflow"
+            },
+            {
+              "message": "The new daily-loop note says the developer decides whether the design phase is needed, but `/track:status` still unconditionally recommends `/track:implement` for materialized planned tracks (`.claude/commands/track/status.md:34-37`, `libs/domain/src/track_phase.rs:93-97`). In practice this means the status-driven workflow can still skip `/track:design`, despite the rest of the document making it the required handoff after planning.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 221,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:92fec8bca489a07a3a7bbcf886772f7554709c0502a8344243612648d9e308f5",
+          "at": "2026-04-09T05:25:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f8c919dddc5714ec6afa586f1c0a44d9e5f40a89ade172ab2d67699e08db484",
+          "at": "2026-04-09T05:29:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The post-plan guidance still makes `/track:implement` the default next command and relegates `/track:design` to an optional note. For tracks that need new or changed domain types, this still steers users past the new TDDD phase and into implementation before `domain-types.json` has been declared.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow"
+            },
+            {
+              "message": "The top-level workflow diagram still routes both the normal and plan-only lanes directly into `/track:implement` (`R1C/PC/ACT --> F`), while `/track:design` is only a side note. That leaves the main 'basic flow' inconsistent with the intended TDDD sequence (`plan -> design -> implement`), so readers following the diagram can still skip the design phase entirely.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 63,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:3f8c919dddc5714ec6afa586f1c0a44d9e5f40a89ade172ab2d67699e08db484",
+          "at": "2026-04-09T05:31:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The post-plan handoff still makes `/track:implement` the default next step and relegates `/track:design` to an optional note. That contradicts the intended TDDD sequence (`plan -> design -> implement`) and leaves an official path that skips `domain-types.json` declaration entirely.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow"
+            },
+            {
+              "message": "The primary workflow guide still routes both the normal lane and the activated plan-only lane directly into `/track:implement`, while `/track:design` is only shown as optional. Because this is the top-level 'basic flow', readers following it can still bypass the new TDDD design phase despite the intended `plan -> design -> implement` sequence.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 63,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:3f8c919dddc5714ec6afa586f1c0a44d9e5f40a89ade172ab2d67699e08db484",
+          "at": "2026-04-09T05:33:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:plan` still presents `/track:implement` as the primary next command and relegates `/track:design` to an optional sub-bullet. The accepted TDDD workflow for this feature is `plan -> design -> implement`, so users following the command output can skip the required type-declaration step and only discover the problem later when `domain-types.json`-based checks fail.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow"
+            },
+            {
+              "message": "The updated workflow diagram still routes both the standard lane and the `plan-only` activation lane directly into `/track:implement`, while `/track:design` is shown as a disconnected optional node with no inbound edge. That leaves the rendered flow as effectively `plan -> implement` instead of the intended `plan -> design -> implement`, so the main visual guidance does not actually teach when the new command must be run.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 63,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:3f8c919dddc5714ec6afa586f1c0a44d9e5f40a89ade172ab2d67699e08db484",
+          "at": "2026-04-09T05:40:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:plan` no longer advertises `/track:full-cycle <task>` as a valid post-planning implementation path. That creates conflicting guidance with the still-live `/track:full-cycle` command and `/track:activate`, so users who follow the planning command output will be told the only implementation lane is `/track:implement` even though the autonomous lane is still supported.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow drift"
+            },
+            {
+              "message": "This change documents `/track:full-cycle` as only for tasks that do not modify `domain-types.json`, but the TDDD design only makes `/track:design` an optional pre-step before implementation; it does not ban the autonomous lane afterward. Combined with the flowchart and step-list changes that remove `/track:full-cycle` from the implementation phase, this misstates the supported workflow and will steer TDDD tracks away from a still-valid command path.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 93,
+              "category": "workflow drift"
+            }
+          ],
+          "hash": "rvw1:sha256:3f8c919dddc5714ec6afa586f1c0a44d9e5f40a89ade172ab2d67699e08db484",
+          "at": "2026-04-09T05:43:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The post-plan next-step guidance still offers `/track:full-cycle <task>` as a peer alternative, but the new TDDD note only tells users to run `/track:design` before `/track:implement`. On TDDD tracks this documents a straight `/track:plan` -> `/track:full-cycle` path even though `domain-types.json` must be created via `/track:design` before either implementation lane, so users following this advice will reach the new Red/error gate only after starting implementation.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:fce1b661b9b50cee239355d7a7af21ab5e00a21e486ddf5e668a6d2baac87a47",
+          "at": "2026-04-09T05:53:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DEVELOPER_AI_WORKFLOW.md` now makes `/track:implement` the only documented post-planning implementation path in both the main flowchart and the numbered standard flow, even though the same document still lists `/track:full-cycle <task>` as a supported implementation command. That inconsistency changes the advertised workflow instead of just adding optional `/track:design`, and will steer users away from the autonomous lane that the repo still supports.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 63,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:77239f60e7b5b25288cc248ef10aff929d4d4f5e14c22c2a7c2911ac5ec42ca0",
+          "at": "2026-04-09T05:55:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DEVELOPER_AI_WORKFLOW.md` now narrows the post-plan/post-activate path to `/track:implement` only (`activate 後は標準フローの 5（/track:implement）以降` and step 5 itself), but the same patch still documents `/track:full-cycle <task>` as a supported implementation choice in the flowchart and command table. That contradiction will misroute users who rely on the autonomous lane after `/track:activate`, and it also makes the new TDDD note read as if `/track:design` only feeds `/track:implement`. Keep `/track:full-cycle <task>` visible as an alternative in the numbered standard flow.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 184,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:b8a7d34dfb51f960b8a78fb758b6d05ac5f5709b3078f843eeae75d11becb7ca",
+          "at": "2026-04-09T05:57:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3273ba34a8fc3be9643556123639dafa98d7eeacfa0085da5c9c5d7e42ef2fa0",
+          "at": "2026-04-09T06:00:35Z"
         }
       ]
     },
@@ -1627,6 +1809,559 @@
           "findings": [],
           "hash": "rvw1:sha256:5dcf02daca7c23ebc83335194ddcf1d78852bbc92d983e79f70da8cc0cabf9d2",
           "at": "2026-04-09T04:10:01Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
+          "at": "2026-04-08T14:52:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
+          "at": "2026-04-08T14:53:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Missing regression coverage for the new `DomainTypeKind::ErrorType` missing-type branch. `evaluate_domain_type_signals` now returns `Yellow` here, but no test exercises this public path, so a future regression would go undetected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/domain_types.rs",
+              "line": 442,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:40:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:41:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Changing the missing-type branches to return `ConfidenceSignal::Yellow` is incomplete on its own: callers still treat every non-Blue domain signal as a failure, so a spec-declared but unimplemented type remains blocking instead of becoming the intended WIP state. As merged, this patch mostly relabels that case without delivering the new behavior.",
+              "severity": "P1",
+              "file": "libs/domain/src/domain_types.rs",
+              "line": 313,
+              "category": "logic"
+            },
+            {
+              "message": "The new missing-type path for `ErrorType` has no regression test. This patch updates all five evaluators, but only four missing-type cases were re-covered in `#[cfg(test)]`, so `evaluate_error_type(...missing...) -> Yellow + found_type=false` can regress unnoticed.",
+              "severity": "P1",
+              "file": "libs/domain/src/domain_types.rs",
+              "line": 448,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:43:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_error_type` now classifies a missing declared error type as `Yellow`, but this changed branch has no regression test while the other updated evaluators do. That leaves the public `ErrorType` WIP path (`signal = Yellow`, `found_type = false`) able to regress unnoticed.",
+              "severity": "P1",
+              "file": "libs/domain/src/domain_types.rs",
+              "line": 448,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:46:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7432e38c13e7b9ee26ad083d4c2195e4ef79a17724689b784c1b63320c6f14d7",
+          "at": "2026-04-09T00:49:20Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7da79d5a7124c0742bf9eb98f015c10998174ddb3ed104e8e10ed2fc5379e52",
+          "at": "2026-04-08T13:58:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision.2’s CLI summary format omits the Yellow count (`blue=N red=K (undeclared=U)`), but the track spec and task metadata require `blue=N yellow=M red=K (undeclared=U)`. That leaves the ADR and implementation spec inconsistent on the required output.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 50,
+              "category": "consistency"
+            },
+            {
+              "message": "`Reassess When` still reintroduces `auto-add` language (`auto-add を「提案モード」...`) even though this track explicitly rejects auto-add / Yellow-as-approved paths. Keeping that wording in the active ADR conflicts with the stated no-auto-add policy and can be misread as an approved future behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 125,
+              "category": "policy"
+            }
+          ],
+          "hash": "rvw1:sha256:dec3ef50b964dadaf3ceed1f28b1f8953455343bcd012d0427472099f0bec0d2",
+          "at": "2026-04-08T14:08:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision 2 specifies the command summary as `blue=N red=K (undeclared=U)`, but the track spec and verification files require `blue=N yellow=M red=K (undeclared=U)`. That leaves the observable contract for `domain-type-signals` inconsistent and risks implementing the wrong output format.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 50,
+              "category": "spec"
+            }
+          ],
+          "hash": "rvw1:sha256:dec3ef50b964dadaf3ceed1f28b1f8953455343bcd012d0427472099f0bec0d2",
+          "at": "2026-04-08T14:10:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Reassess When` still reopens `auto-add` as a future option. That reintroduces the rejected Yellow/auto-add path the ADR otherwise bans, so the document is internally inconsistent with the stated TDDD policy.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 125,
+              "category": "consistency"
+            },
+            {
+              "message": "T07’s scope includes updating `registry.md`, but the acceptance criteria and verification steps only cover the `/track:plan` message plus the two workflow docs. The registry index update can be missed without any failing check, so the workflow redirect remains unverified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/reverse-signal-integration-2026-04-08/spec.json",
+              "line": 69,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:8f67a5cd6f0bd4255a47647ea3a88889c42378aa1060de2f3dedde1c23a6ec8b",
+          "at": "2026-04-08T14:11:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeGraph` still keys types by bare name and only emits a warning on same-name collisions, so a public type in one module can overwrite another with the same name. That means the reverse check can silently miss undeclared code or mix signals across modules instead of disambiguating them.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-0045-spec-code-consistency-check-design.md",
+              "line": 125,
+              "category": "correctness"
+            },
+            {
+              "message": "The new Red gate is underspecified for reverse-only signals: undeclared types/traits are emitted as extra Red `DomainTypeSignal`s with no matching spec entry, but the spec only says \"Red なし → pass\". If `verify spec-states` keeps its current name+kind matching, those extra Red signals will be ignored and TDDD violations will still pass CI.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/spec.json",
+              "line": 42,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:883e055af1c20b59a47d573c126d674f54a28f5b494ad1b3c63f6e885042f53e",
+          "at": "2026-04-08T14:15:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30ed62696702fc7f4f0845fb15115d78cb824ea5e481bac806416d9e6ed08080",
+          "at": "2026-04-08T14:16:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` still describes the gate as \"Yellow is allowed, only Red blocks\", which contradicts ADR 1800/spec.json's two-stage rule that merge requires all Blue. If implementers follow the track metadata/plan, they can relax the final approval gate and allow unfinished Yellow states to merge.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 55,
+              "category": "correctness"
+            },
+            {
+              "message": "T04's verification checklist covers Red/Yellow outcomes, but it never checks that CI actually runs `domain-type-signals` before `verify spec-states`. Since reverse undeclared Reds are produced by the first step, leaving this sequence unverified can let undeclared types bypass the gate even when all listed checks pass.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/verification.md",
+              "line": 15,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:30ed62696702fc7f4f0845fb15115d78cb824ea5e481bac806416d9e6ed08080",
+          "at": "2026-04-08T14:18:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T04 still under-specifies the accepted two-stage gate. `metadata.json` only says `verify spec-states` should pass when there is no Red, but it omits the merge-time requirement that leftover Yellow must also block until all signals are Blue. Because `plan.md` is generated from this file, the implementation task can be completed without ever adding the merge-stage enforcement required by ADR 1800 §Decision.4 and `spec.json`.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 27,
+              "category": "consistency"
+            },
+            {
+              "message": "ADR 0045 now says the reverse-signal integration was completed while 'not relaxing the gate' and 'keeping all Blue required', but ADR 1800 accepted a two-stage gate where Yellow is allowed during intermediate commits and only blocked at merge. This leaves the ADR set internally inconsistent about the actual `verify spec-states` contract.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-0045-spec-code-consistency-check-design.md",
+              "line": 218,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:e5a8a315f208745a7a540be84b305d6211765990c327d49001ada2d154668b7f",
+          "at": "2026-04-08T14:21:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T07's acceptance criteria omit the `registry.md` Next-column update that the task description and ADR Decision.6 both require. As written, this spec can be marked complete even if `/track:design` never appears in `registry.md`, leaving part of the workflow change unimplemented and unverified.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/spec.json",
+              "line": 238,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:a682f4ca72dbd9916ee1b3f8df0e7d6da267774dc847983e28eaf9a7844fb7fe",
+          "at": "2026-04-08T14:24:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR’s TDDD introduction still says `forward Red` is the normal work-in-progress state, but Decision.3 and the 3-state table below redefine `defined + not yet implemented` as Yellow. Leaving the old Red/Yellow semantics in the same accepted ADR makes the design internally contradictory and can send later spec updates back toward the rejected gate behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 25,
+              "category": "correctness"
+            },
+            {
+              "message": "Section S2 still summarizes `verify spec-states` as a one-stage gate (`Red なし → pass。Yellow は許容。Red → fail`) and omits the merge-time `all Blue required` rule that T04 introduces everywhere else. Because `plan.md` is generated from this metadata, readers following the section summary can implement or review against the wrong gate contract and leave Yellow unblocked at track completion.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 75,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:819d29979452eb7fa892b87ee42da5e80bd77cbd11b5c9b17ce1c94409342755",
+          "at": "2026-04-08T14:27:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c23e8746f2d8cf41db4c0afdce0c4fec24699ad88e3fc78945d5b05d8e879e0",
+          "at": "2026-04-08T14:30:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
+          "at": "2026-04-08T14:54:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` moved backwards to `2026-04-08T14:50:43Z`, which is earlier than this item's `created_at` (`2026-04-08T18:00:00Z`). A status transition should not produce metadata where the update timestamp predates creation; any tooling that relies on monotonic timestamps will now see this item as modified before it existed.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 112,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
+          "at": "2026-04-08T14:55:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
+          "at": "2026-04-08T14:56:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` is earlier than `created_at` (`2026-04-08T14:50:43Z` vs `2026-04-08T18:00:00Z`), which violates the track timestamp invariant and can misorder or invalidate consumers that rely on `updated_at` for latest-track selection.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 112,
+              "category": "data-integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:0491e44cb108d6e0370f0dfc17891f974a5d107dca03715fce132e3e8fb747ba",
+          "at": "2026-04-08T15:44:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:249b776035b92142187e8db7d218b46b51b2d776225eaa8fe0cab9ac5a585dc7",
+          "at": "2026-04-08T15:47:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:249b776035b92142187e8db7d218b46b51b2d776225eaa8fe0cab9ac5a585dc7",
+          "at": "2026-04-08T15:50:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f32b135b5cecb16dbdaf71fb5d75760f792af8452224cea12f8c75d583d82067",
+          "at": "2026-04-09T00:38:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f32b135b5cecb16dbdaf71fb5d75760f792af8452224cea12f8c75d583d82067",
+          "at": "2026-04-09T00:39:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cca2a285b8dcc1dd8d02ad870328277b835422198868e2a0e7febfa127fb690a",
+          "at": "2026-04-09T00:59:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cca2a285b8dcc1dd8d02ad870328277b835422198868e2a0e7febfa127fb690a",
+          "at": "2026-04-09T01:00:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:482d9e4d6ef53f78b143afc1e6ae587a122d77a879337ac8e3c4d6f1e48b7983",
+          "at": "2026-04-09T01:24:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:482d9e4d6ef53f78b143afc1e6ae587a122d77a879337ac8e3c4d6f1e48b7983",
+          "at": "2026-04-09T01:25:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:15:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes it a mandatory field for every `version: 1` profile, so any existing config loaded through `CLAUDE_AGENT_PROFILES_PATH` that has not been migrated yet will now fail `validate_profiles()` with \"missing required capabilities\". Because this patch does not bump the schema version or provide a compatibility fallback, rolling out the new hook before every external profile file is updated becomes a hard runtime break.",
+              "severity": "P1",
+              "file": ".claude/hooks/_agent_profiles.py",
+              "line": 20,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:17:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes every v1 profile require the new capability immediately. Because `CLAUDE_AGENT_PROFILES_PATH` still allows older/custom configs and `PROFILE_VERSION` stays at 1, those configs will now fail validation with a breaking runtime error instead of loading with the previous schema. This needs a version bump or compatibility fallback.",
+              "severity": "P1",
+              "file": ".claude/hooks/_agent_profiles.py",
+              "line": 17,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:18:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes it mandatory for every v1 profile immediately. Any existing or custom config loaded via `CLAUDE_AGENT_PROFILES_PATH` that has not been migrated will now fail `validate_profiles()` with a missing-capabilities error, even though `PROFILE_VERSION` is still 1. This is a breaking schema change without a version bump or backward-compatibility fallback.",
+              "severity": "P1",
+              "file": ".claude/hooks/_agent_profiles.py",
+              "line": 20,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:20:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:20:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T05 is still recorded as `in_progress`, but the companion config change already adds `designer` to every profile in `.claude/agent-profiles.json`. Because `metadata.json` is the source of truth and workflow tooling returns the first `in_progress` task before any `todo`, leaving T05 open will keep this track pinned on a completed task and delay T06 from becoming the next actionable item.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 97,
+              "category": "other"
+            }
+          ],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:22:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:23:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:23:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5bb066475db5ed877a81c8e2dbca5cd7e7aff4d5ddcb1eb19f84edd766b24b3b",
+          "at": "2026-04-09T02:40:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5bb066475db5ed877a81c8e2dbca5cd7e7aff4d5ddcb1eb19f84edd766b24b3b",
+          "at": "2026-04-09T02:41:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63faab1418d7c94651c63df127745a81cd8ce79f94eec23f257745cdae072595",
+          "at": "2026-04-09T03:34:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63faab1418d7c94651c63df127745a81cd8ce79f94eec23f257745cdae072595",
+          "at": "2026-04-09T03:35:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:353064bc72a3d8eb3f7d5bba78bf44243ab41003e33a5cfde75503caee8b6d22",
+          "at": "2026-04-09T04:22:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `/track:design` here leaves the same command table still describing `/track:plan` as `Research, design, plan, and create track artifacts after approval`, so `knowledge/WORKFLOW.md` now gives two conflicting answers about where the TDDD design step happens. Because `domain-types.json` creation is now supposed to happen in `/track:design`, this can misroute users into skipping the required step and hitting `verify spec-states` failures.",
+              "severity": "P1",
+              "file": "knowledge/WORKFLOW.md",
+              "line": 150,
+              "category": "workflow-docs"
+            }
+          ],
+          "hash": "rvw1:sha256:353064bc72a3d8eb3f7d5bba78bf44243ab41003e33a5cfde75503caee8b6d22",
+          "at": "2026-04-09T04:23:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:353064bc72a3d8eb3f7d5bba78bf44243ab41003e33a5cfde75503caee8b6d22",
+          "at": "2026-04-09T06:01:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new TDDD step is only documented on the standard `/track:plan` lane. In the alternative `plan-only` flow, the sequence still jumps from `/track:activate <track-id>` straight to implementation, so users following this file can miss `/track:design` before coding and immediately hit the Red `verify spec-states` gate. The `plan-only` path needs the same `plan -> design -> implement` guidance that was added elsewhere.",
+              "severity": "P1",
+              "file": "knowledge/WORKFLOW.md",
+              "line": 23,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:353064bc72a3d8eb3f7d5bba78bf44243ab41003e33a5cfde75503caee8b6d22",
+          "at": "2026-04-09T06:03:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:design` is introduced here as the separate TDDD step, but the command reference still says `/track:plan` does \"Research, design, plan...\". That leaves the primary workflow doc telling users planning already covers design, so they can reasonably skip `/track:design` and then run into the documented `domain-types.json` / `verify spec-states` gate later. Update the `/track:plan` description so the standard workflow no longer implies that design already happened.",
+              "severity": "P1",
+              "file": "knowledge/WORKFLOW.md",
+              "line": 149,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:3ac6ac729067b9963a63fbdaa24f6cd3bd665a771f4e1fcc6ad2dd03bd17bc24",
+          "at": "2026-04-09T06:05:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f67a25b52a8c9774563fcace7a09533820ec3b87f8f2919931dd4a7d143690e5",
+          "at": "2026-04-09T06:08:19Z"
         }
       ]
     },
@@ -1844,90 +2579,6 @@
           "findings": [],
           "hash": "rvw1:sha256:19feb44c42c12aa48c3e48e725efe775062bae44501c996d6a7b985f4a2a362d",
           "at": "2026-04-09T01:36:17Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
-          "at": "2026-04-08T14:52:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
-          "at": "2026-04-08T14:53:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Missing regression coverage for the new `DomainTypeKind::ErrorType` missing-type branch. `evaluate_domain_type_signals` now returns `Yellow` here, but no test exercises this public path, so a future regression would go undetected.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/domain_types.rs",
-              "line": 442,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
-          "at": "2026-04-09T00:40:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
-          "at": "2026-04-09T00:41:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Changing the missing-type branches to return `ConfidenceSignal::Yellow` is incomplete on its own: callers still treat every non-Blue domain signal as a failure, so a spec-declared but unimplemented type remains blocking instead of becoming the intended WIP state. As merged, this patch mostly relabels that case without delivering the new behavior.",
-              "severity": "P1",
-              "file": "libs/domain/src/domain_types.rs",
-              "line": 313,
-              "category": "logic"
-            },
-            {
-              "message": "The new missing-type path for `ErrorType` has no regression test. This patch updates all five evaluators, but only four missing-type cases were re-covered in `#[cfg(test)]`, so `evaluate_error_type(...missing...) -> Yellow + found_type=false` can regress unnoticed.",
-              "severity": "P1",
-              "file": "libs/domain/src/domain_types.rs",
-              "line": 448,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
-          "at": "2026-04-09T00:43:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`evaluate_error_type` now classifies a missing declared error type as `Yellow`, but this changed branch has no regression test while the other updated evaluators do. That leaves the public `ErrorType` WIP path (`signal = Yellow`, `found_type = false`) able to regress unnoticed.",
-              "severity": "P1",
-              "file": "libs/domain/src/domain_types.rs",
-              "line": 448,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
-          "at": "2026-04-09T00:46:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7432e38c13e7b9ee26ad083d4c2195e4ef79a17724689b784c1b63320c6f14d7",
-          "at": "2026-04-09T00:49:20Z"
         }
       ]
     }

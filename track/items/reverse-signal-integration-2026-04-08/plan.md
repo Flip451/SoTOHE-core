@@ -31,7 +31,7 @@ agent-profiles.json の全 profile に designer capability を追加 (既定 pro
 ワークフロー: (1) 対象トラックの plan.md を読み込み, (2) 既存 domain-types.json があれば読み込み (増分更新), (3) 既存コードがあれば TypeGraph も参照, (4) designer capability を呼び出し DomainTypeKind / members / transitions を設計, (5) domain-types.json を生成・更新。
 
 - [x] agent-profiles.json の全 profile に designer capability を追加 (既定 provider: claude) 784346b
-- [~] /track:design コマンドを作成: 対象トラックの plan.md + 既存 domain-types.json (あれば) を入力に designer capability を呼び出し domain-types.json を生成・更新
+- [x] /track:design コマンドを作成: 対象トラックの plan.md + 既存 domain-types.json (あれば) を入力に designer capability を呼び出し domain-types.json を生成・更新 5047c95
 
 ## ワークフロー導線整備 + ADR 最終化
 
@@ -39,5 +39,5 @@ agent-profiles.json の全 profile に designer capability を追加 (既定 pro
 DEVELOPER_AI_WORKFLOW.md と knowledge/WORKFLOW.md に TDDD フロー (plan → design → implement) を追記。
 ADR 2026-04-08-1800 の内容を最終確認。ADR README 索引のタイトルを実ファイルと一致させる。
 
-- [ ] /track:plan 完了メッセージ・registry.md・DEVELOPER_AI_WORKFLOW.md・knowledge/WORKFLOW.md に /track:design を次ステップとして案内する導線を追加
+- [~] /track:plan 完了メッセージ・registry.md・DEVELOPER_AI_WORKFLOW.md・knowledge/WORKFLOW.md に /track:design を次ステップとして案内する導線を追加
 - [ ] ADR 2026-04-08-1800 を最終化し、ADR README 索引のタイトルを実ファイルと一致させる

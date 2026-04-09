@@ -98,14 +98,15 @@
       "status": "done"
     },
     {
+      "commit_hash": "5047c95",
       "description": "/track:design コマンドを作成: 対象トラックの plan.md + 既存 domain-types.json (あれば) を入力に designer capability を呼び出し domain-types.json を生成・更新",
       "id": "T06",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "/track:plan 完了メッセージ・registry.md・DEVELOPER_AI_WORKFLOW.md・knowledge/WORKFLOW.md に /track:design を次ステップとして案内する導線を追加",
       "id": "T07",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "ADR 2026-04-08-1800 を最終化し、ADR README 索引のタイトルを実ファイルと一致させる",
@@ -114,5 +115,5 @@
     }
   ],
   "title": "TDDD: 逆方向チェック信号機統合 + designer capability + /track:design",
-  "updated_at": "2026-04-09T02:24:53Z"
+  "updated_at": "2026-04-09T04:17:48Z"
 }
