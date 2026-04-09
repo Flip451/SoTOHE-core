@@ -9,7 +9,9 @@
 - [x] `libs/infrastructure/src/verify/orchestra.rs` の `EXPECTED_HOOK_PATHS` から削除対象 9 hook が除去されている (T01)
 - [x] `Makefile.toml` から `[tasks.hooks-selftest]` と `[tasks.hooks-selftest-local]` が削除されている (T04)
 - [x] `Makefile.toml` の `python-lint-local` / `python-lint` ruff 対象が `scripts/` のみになっている (T05)
-- [ ] CLAUDE.md / .claude/rules/09-maintainer-checklist.md / DEVELOPER_AI_WORKFLOW.md / knowledge/WORKFLOW.md / LOCAL_DEVELOPMENT.md / START_HERE_HUMAN.md / knowledge/DESIGN.md / track/workflow.md から Python hook 言及が整理されている
+- [x] CLAUDE.md / .claude/rules/09-maintainer-checklist.md / DEVELOPER_AI_WORKFLOW.md / knowledge/WORKFLOW.md / LOCAL_DEVELOPMENT.md / START_HERE_HUMAN.md / knowledge/DESIGN.md / track/workflow.md から Python hook 言及が整理されている (T06)
+- [x] TRACK_TRACEABILITY.md の enforcement task list から `hooks-selftest-local` が削除されている (T06)
+- [x] `libs/infrastructure/src/verify/doc_patterns.rs` から hooks-selftest 関連の `RequireLine` 3 entries が削除されている (T06)
 - [ ] knowledge/adr/2026-04-09-{2047,2235,2323}*.md と knowledge/strategy/TODO.md がトラック計画 commit に含まれている
 - [ ] cargo make ci 全チェック通過
 
@@ -73,6 +75,26 @@
   - tests (5): `test_agent_profiles.py`, `test_helpers.py`, `test_post_tool_hooks.py`, `test_pre_tool_hooks.py`, `test_shared_hook_utils.py`
 - 安全な削除のための前提条件 (T03 settings.json hook entry 削除、T04 hooks-selftest task 削除、T05 python-lint scripts/ 限定) は全て先行完了済み
 - 検証: `cargo make ci` 全 PASS、`cargo make verify-orchestra` PASS、`.claude/hooks/` ディレクトリが filesystem 上に存在しないことを確認
+
+### T06 (2026-04-10) — ドキュメント更新
+
+- `.claude/rules/09-maintainer-checklist.md`:
+  - "Host prerequisite" の Python 言及を更新 ("python3 is optional on host" → "required inside Docker for scripts/ helpers")
+  - "enforcement" 列から `.claude/hooks/` を削除し、Rust hook entries (skill-compliance / block-direct-git-ops / block-test-file-deletion) を `.claude/settings.json` の項目に併記
+- `DEVELOPER_AI_WORKFLOW.md`:
+  - Python test 説明から `hooks-selftest` を削除
+  - `cargo make hooks-selftest` のコマンド行を削除
+  - `cargo make ci` の補足リストから `hooks-selftest` を除外
+- `LOCAL_DEVELOPMENT.md`:
+  - Python test 説明から `cargo make hooks-selftest` を削除
+  - "Claude hooks in `.claude/hooks/` run via `python3`..." の行を Rust hook (`bin/sotp hook dispatch`) 説明に置換
+  - "lint-on-save を有効にする" 節を "tools-daemon コンテナを使う" 節に書き換え (lint-on-save hook 自体が削除されたため)
+- `START_HERE_HUMAN.md`: 編集対象リストから `.claude/hooks/**` を削除
+- `track/workflow.md`: Definition of Done のチェックリストから `cargo make hooks-selftest` 行を削除
+- `knowledge/DESIGN.md`: "Security Hardening: Rust Migration" 節を更新し、Python advisory hooks 表を Rust-only 表に書き換え。RV2-17 への参照を追記
+- `TRACK_TRACEABILITY.md`: enforcement task list から `hooks-selftest-local` を削除し、`python-lint-local` の説明を `scripts/` のみに修正
+- `libs/infrastructure/src/verify/doc_patterns.rs`: docs 整合性チェックの 3 entries (track/workflow.md hooks selftest gate / TRACK_TRACEABILITY.md hooks selftest gate / DEVELOPER_AI_WORKFLOW.md hooks selftest gate) を削除
+- 検証: `cargo make ci` 全 PASS
 
 ## Open Issues
 

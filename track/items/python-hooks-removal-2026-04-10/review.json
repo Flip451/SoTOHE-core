@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
-          "at": "2026-04-09T16:07:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
-          "at": "2026-04-09T16:10:18Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -330,6 +312,139 @@
           "findings": [],
           "hash": "rvw1:sha256:fe1f54a8149b58ce19e182abd77bee3d61daaf40d16a0bd678aace9170075e1d",
           "at": "2026-04-09T16:42:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LOCAL_DEVELOPMENT.md:9` still claims that advisory hooks gracefully skip when `python3` is absent. That behavior no longer exists after the Python hook removal, so this is a stale reference to the deleted hook layer and conflicts with the new Rust-only hook description later in the file.",
+              "severity": "P1",
+              "file": "LOCAL_DEVELOPMENT.md",
+              "line": 9,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:499b653327bf575ba385a04a6700f45882ca59e9d974f08aaced6e6d71dfa5be",
+          "at": "2026-04-09T16:49:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`python3` is still described as being needed for advisory hooks to \"gracefully skip\" when absent, but this cleanup removes the advisory hook layer entirely. That leaves a stale and conflicting prerequisite claim in the host requirements section, since the new Rust-only hook description below is now the source of truth.",
+              "severity": "P1",
+              "file": "LOCAL_DEVELOPMENT.md",
+              "line": 9,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:499b653327bf575ba385a04a6700f45882ca59e9d974f08aaced6e6d71dfa5be",
+          "at": "2026-04-09T16:51:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c98d7ede3c75e1974c977a6a5f88f4c5c5310dad0e36980fee0db487c8325558",
+          "at": "2026-04-09T16:52:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/DESIGN.md` now documents `skill-compliance` as a security-critical hook in the same fail-closed bucket as `block-direct-git-ops` and `block-test-file-deletion`, but `.claude/settings.json` still wires `skill-compliance` as a `UserPromptSubmit` hook with `|| exit 0` fail-open behavior. That makes the new architecture section inaccurate about the current hook contract and could mislead later maintenance around which hooks are actually blocking guards.",
+              "severity": "P1",
+              "file": "knowledge/DESIGN.md",
+              "line": 434,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c98d7ede3c75e1974c977a6a5f88f4c5c5310dad0e36980fee0db487c8325558",
+          "at": "2026-04-09T16:55:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LOCAL_DEVELOPMENT.md` now says \"Claude Code hooks are dispatched via `bin/sotp hook dispatch ...`\" and lists only three active hooks, but `.claude/settings.json` still contains active `TeammateIdle`, `PreCompact`, and `PermissionRequest` hooks that are not Rust-dispatched. This makes the local workflow documentation inaccurate and can mislead future maintenance of the remaining hook surface.",
+              "severity": "P1",
+              "file": "LOCAL_DEVELOPMENT.md",
+              "line": 17,
+              "category": "correctness"
+            },
+            {
+              "message": "The new \"Rust for All Hooks\" section is overstated: `.claude/settings.json` still defines non-Rust hooks (`TeammateIdle`, `PreCompact`, `PermissionRequest`), so claiming that all Claude Code hooks are now dispatched via `sotp hook dispatch` is false. The design doc should narrow this to the former Python tool-hook layer, otherwise it documents the architecture incorrectly.",
+              "severity": "P1",
+              "file": "knowledge/DESIGN.md",
+              "line": 432,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c98d7ede3c75e1974c977a6a5f88f4c5c5310dad0e36980fee0db487c8325558",
+          "at": "2026-04-09T16:56:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rewritten hook table now claims the combined \"Security & advisory hooks\" layer is \"fail-closed by design\", but the advisory `skill-compliance` hook is still configured with `|| exit 0` in `.claude/settings.json`, so it is explicitly fail-open. This overstates the enforcement guarantee of the remaining advisory hook and makes the architecture doc inaccurate; split security vs advisory behavior or remove the fail-closed claim from this row.",
+              "severity": "P1",
+              "file": "knowledge/DESIGN.md",
+              "line": 444,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:764e23352dec1ba8e9060b41ea4c1ca90bc285968249827cb5eed3cecf766cec",
+          "at": "2026-04-09T16:58:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T06's scope description still enumerates only the original doc set and omits both `TRACK_TRACEABILITY.md` and the paired `libs/infrastructure/src/verify/doc_patterns.rs` cleanup that this change set performs. Because `metadata.json` is the SSoT for track scope, marking T06 complete from this state would leave the plan/verification trail understating what the task actually covered, which weakens the repo's traceability guarantees.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/metadata.json",
+              "line": 133,
+              "category": "traceability"
+            }
+          ],
+          "hash": "rvw1:sha256:f4b1c3a6bf739be4ca4ff6e7eec18cab4091362e0f01755d5422e5b0cd9ae578",
+          "at": "2026-04-09T17:02:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T06 is still recorded as `in_progress` here (and `[~]` in `plan.md`) even though the diff already contains the full T06 doc cleanup and `verification.md` marks T06 complete. Leaving the task open will keep track tooling treating T06 as the active task instead of advancing to T07, so the track artifacts are now internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/metadata.json",
+              "line": 135,
+              "category": "tracking correctness"
+            },
+            {
+              "message": "The top `Scope Verified` checklist was not expanded when T06 scope grew to include `TRACK_TRACEABILITY.md` and `libs/infrastructure/src/verify/doc_patterns.rs`. As written, the main verification checklist can be checked off without verifying those two new T06 deliverables, which leaves a real coverage gap in the track’s verification artifact.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/verification.md",
+              "line": 12,
+              "category": "verification coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:cad93e1aad09f980d6fbf631b7cc8d6edeade9bb6c0ba0d682968691c2ce1989",
+          "at": "2026-04-09T17:05:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b047e4e231f3572941f2e2f8dab97ac199354cc13d1e1f1c21488a49910e13f5",
+          "at": "2026-04-09T17:08:07Z"
         }
       ]
     },
@@ -362,6 +477,52 @@
           "findings": [],
           "hash": "rvw1:sha256:2c866cf8421cc5d3df1788bd0888a20ba5b169494f83a59e1a12616daa6d8b6a",
           "at": "2026-04-09T16:21:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:969b4e061b12bde36b8f6d2a2e8cdbcf5e938af612ab1da0562b40f96480c9eb",
+          "at": "2026-04-09T16:48:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:969b4e061b12bde36b8f6d2a2e8cdbcf5e938af612ab1da0562b40f96480c9eb",
+          "at": "2026-04-09T16:50:25Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
+          "at": "2026-04-09T16:07:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
+          "at": "2026-04-09T16:10:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9da6ce7c5ea07616b59c7d8ccd0b5aa8dedb495ecd4aeba0b20bf54d31cd3acf",
+          "at": "2026-04-09T16:48:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9da6ce7c5ea07616b59c7d8ccd0b5aa8dedb495ecd4aeba0b20bf54d31cd3acf",
+          "at": "2026-04-09T16:49:23Z"
         }
       ]
     }

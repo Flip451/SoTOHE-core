@@ -106,9 +106,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "d0a1abe28abf6ceaefe58241b1cb1e73597db39d",
       "description": ".claude/hooks/*.py 全 16 ファイル (advisory 9 + library 2 + tests 5) を削除し、__pycache__ / .pytest_cache を含めて .claude/hooks/ ディレクトリ自体を削除する。Rust hook の参照先である bin/sotp は影響を受けない。",
       "id": "T02",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "commit_hash": "c927ea73e3400c97212b6d41f2061cd9a84fe6ad",
@@ -129,9 +130,9 @@
       "status": "done"
     },
     {
-      "description": "ドキュメントから Python hook 言及を削除/更新する。対象: CLAUDE.md (python3 optional 記述), .claude/rules/09-maintainer-checklist.md (python3 advisory 言及), DEVELOPER_AI_WORKFLOW.md, knowledge/WORKFLOW.md, LOCAL_DEVELOPMENT.md, START_HERE_HUMAN.md, knowledge/DESIGN.md (Python advisory hooks 表), track/workflow.md。.claude/rules/02-codex-delegation.md の debugger capability 言及は Phase 2 (agent-profiles redesign) のスコープのため本トラックでは触らない。",
+      "description": "ドキュメントから Python hook 言及を削除/更新する。対象: CLAUDE.md (python3 optional 記述), .claude/rules/09-maintainer-checklist.md (python3 advisory 言及), DEVELOPER_AI_WORKFLOW.md, knowledge/WORKFLOW.md, LOCAL_DEVELOPMENT.md, START_HERE_HUMAN.md, knowledge/DESIGN.md (Python advisory hooks 表), track/workflow.md, TRACK_TRACEABILITY.md (hooks-selftest-local 除去), libs/infrastructure/src/verify/doc_patterns.rs (hooks-selftest RequireLine 3 件削除)。.claude/rules/02-codex-delegation.md の debugger capability 言及は Phase 2 (agent-profiles redesign) のスコープのため本トラックでは触らない。",
       "id": "T06",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Phase 1-3 の設計 ADR 3 本 (knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md, knowledge/adr/2026-04-09-2235-agent-profiles-redesign.md, knowledge/adr/2026-04-09-2323-python-hooks-removal.md) と knowledge/strategy/TODO.md (RV2-16/RV2-17 エントリ) を本トラックの計画 commit に取り込む。spec.md には ADR 2 本 (Phase 2/3) は本トラックの prerequisite 設計として同時導入されることを明記する。",
@@ -145,5 +146,5 @@
     }
   ],
   "title": "RV2-17: Python hooks 全廃止 (Phase 1)",
-  "updated_at": "2026-04-09T16:37:57Z"
+  "updated_at": "2026-04-09T16:44:05Z"
 }

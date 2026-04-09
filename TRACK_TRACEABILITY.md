@@ -40,9 +40,8 @@ For day-to-day workflow and quality gate overview, see `track/workflow.md`.
   - `test-local` — nextest test execution
   - `test-doc-local` — doctest execution
   - `deny-local` — forbidden dependency / license verification
-  - `python-lint-local` — Python scripts / hooks ruff lint
+  - `python-lint-local` — Python helper scripts (`scripts/`) ruff lint
   - `scripts-selftest-local` — verify script regression tests
-  - `hooks-selftest-local` — Claude hook regression tests
   - `check-layers-local` — layer dependency rule verification (including transitive)
   - `verify-arch-docs-local` — architecture document sync verification
   - `verify-plan-progress-local` — plan.md and metadata.json sync verification
