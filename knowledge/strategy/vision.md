@@ -54,10 +54,11 @@ impl InProgress {
 // 無効遷移: 関数が存在しない = 遷移表の - の部分
 // NotStarted に pass_fast は存在しない → コンパイルエラー
 
-// 永続化用 enum（serde 互換）
-pub enum ReviewStatus { NotStarted, InProgress, FastPassed, Approved, Invalidated }
-impl ReviewStatus {
-    pub fn as_in_progress(self) -> Option<InProgress> { ... }
+// infrastructure 層: 永続化用 enum DTO（serde 互換、domain typestate から From 変換）
+pub enum ReviewStatusDto { NotStarted, InProgress, FastPassed, Approved, Invalidated }
+impl From<Review<InProgress>> for ReviewStatusDto { ... }
+impl ReviewStatusDto {
+    pub fn into_domain(self) -> Result</* appropriate typestate */, ConversionError> { ... }
 }
 ```
 

@@ -30,8 +30,8 @@ agent-profiles.json の全 profile に designer capability を追加 (既定 pro
 /track:design コマンドを .claude/commands/track/design.md に作成。
 ワークフロー: (1) 対象トラックの plan.md を読み込み, (2) 既存 domain-types.json があれば読み込み (増分更新), (3) 既存コードがあれば TypeGraph も参照, (4) designer capability を呼び出し DomainTypeKind / members / transitions を設計, (5) domain-types.json を生成・更新。
 
-- [~] agent-profiles.json の全 profile に designer capability を追加 (既定 provider: claude)
-- [ ] /track:design コマンドを作成: 対象トラックの plan.md + 既存 domain-types.json (あれば) を入力に designer capability を呼び出し domain-types.json を生成・更新
+- [x] agent-profiles.json の全 profile に designer capability を追加 (既定 provider: claude) 784346b
+- [~] /track:design コマンドを作成: 対象トラックの plan.md + 既存 domain-types.json (あれば) を入力に designer capability を呼び出し domain-types.json を生成・更新
 
 ## ワークフロー導線整備 + ADR 最終化
 

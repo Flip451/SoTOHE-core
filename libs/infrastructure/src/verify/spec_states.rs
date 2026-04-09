@@ -144,23 +144,24 @@ pub fn verify_from_spec_json(spec_json_path: &Path, strict: bool) -> VerifyOutco
     // Two-stage gate (TDDD):
     // - Default (interim commit): Red → fail, Yellow → pass (WIP allowed)
     // - Strict (merge gate): any non-Blue → fail (Yellow also blocked)
-    let entry_keys: std::collections::HashSet<(&str, &str)> =
-        doc.entries().iter().map(|e| (e.name(), e.kind().kind_tag())).collect();
-
-    let red_entries: Vec<&str> = signals
+    // Red check: ALL signals (forward + reverse undeclared) — single gate per ADR §Decision.4
+    let all_red: Vec<&str> = signals
         .iter()
-        .filter(|s| entry_keys.contains(&(s.type_name(), s.kind_tag())))
         .filter(|s| s.signal() == ConfidenceSignal::Red)
         .map(|s| s.type_name())
         .collect();
-    if !red_entries.is_empty() {
+    if !all_red.is_empty() {
         return VerifyOutcome::from_findings(vec![Finding::error(format!(
-            "{}: {} domain type(s) have Red signal (TDDD violation — run /track:design): {}",
+            "{}: {} type(s) have Red signal (TDDD violation — run /track:design): {}",
             domain_types_path.display(),
-            red_entries.len(),
-            red_entries.join(", ")
+            all_red.len(),
+            all_red.join(", ")
         ))]);
     }
+
+    // Yellow check (strict only): declared entries only (undeclared signals are never Yellow)
+    let entry_keys: std::collections::HashSet<(&str, &str)> =
+        doc.entries().iter().map(|e| (e.name(), e.kind().kind_tag())).collect();
 
     if strict {
         let yellow_entries: Vec<&str> = signals
@@ -723,6 +724,34 @@ mod tests {
         assert!(
             outcome.has_errors(),
             "spec.json with yellow signals must fail Stage 1 in strict (merge) mode: {outcome:?}"
+        );
+    }
+
+    const DOMAIN_TYPES_WITH_UNDECLARED_RED_SIGNAL: &str = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
+  ],
+  "signals": [
+    { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true },
+    { "type_name": "SomeUndeclared", "kind_tag": "undeclared_type", "signal": "red", "found_type": true }
+  ]
+}"#;
+
+    #[test]
+    fn test_verify_from_spec_json_with_undeclared_red_signal_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        std::fs::write(
+            dir.path().join("domain-types.json"),
+            DOMAIN_TYPES_WITH_UNDECLARED_RED_SIGNAL,
+        )
+        .unwrap();
+        let outcome = verify_from_spec_json(&spec_json_path, false);
+        assert!(
+            outcome.has_errors(),
+            "undeclared reverse Red signal must block spec-states (single gate per ADR): {outcome:?}"
         );
     }
 

@@ -1,87 +1,406 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
-          "at": "2026-04-08T14:52:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
-          "at": "2026-04-08T14:53:39Z"
+          "hash": "rvw1:sha256:d7da79d5a7124c0742bf9eb98f015c10998174ddb3ed104e8e10ed2fc5379e52",
+          "at": "2026-04-08T13:58:32Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Missing regression coverage for the new `DomainTypeKind::ErrorType` missing-type branch. `evaluate_domain_type_signals` now returns `Yellow` here, but no test exercises this public path, so a future regression would go undetected.",
+              "message": "Decision.2’s CLI summary format omits the Yellow count (`blue=N red=K (undeclared=U)`), but the track spec and task metadata require `blue=N yellow=M red=K (undeclared=U)`. That leaves the ADR and implementation spec inconsistent on the required output.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/domain_types.rs",
-              "line": 442,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
-          "at": "2026-04-09T00:40:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
-          "at": "2026-04-09T00:41:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Changing the missing-type branches to return `ConfidenceSignal::Yellow` is incomplete on its own: callers still treat every non-Blue domain signal as a failure, so a spec-declared but unimplemented type remains blocking instead of becoming the intended WIP state. As merged, this patch mostly relabels that case without delivering the new behavior.",
-              "severity": "P1",
-              "file": "libs/domain/src/domain_types.rs",
-              "line": 313,
-              "category": "logic"
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 50,
+              "category": "consistency"
             },
             {
-              "message": "The new missing-type path for `ErrorType` has no regression test. This patch updates all five evaluators, but only four missing-type cases were re-covered in `#[cfg(test)]`, so `evaluate_error_type(...missing...) -> Yellow + found_type=false` can regress unnoticed.",
+              "message": "`Reassess When` still reintroduces `auto-add` language (`auto-add を「提案モード」...`) even though this track explicitly rejects auto-add / Yellow-as-approved paths. Keeping that wording in the active ADR conflicts with the stated no-auto-add policy and can be misread as an approved future behavior.",
               "severity": "P1",
-              "file": "libs/domain/src/domain_types.rs",
-              "line": 448,
-              "category": "tests"
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 125,
+              "category": "policy"
             }
           ],
-          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
-          "at": "2026-04-09T00:43:56Z"
+          "hash": "rvw1:sha256:dec3ef50b964dadaf3ceed1f28b1f8953455343bcd012d0427472099f0bec0d2",
+          "at": "2026-04-08T14:08:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision 2 specifies the command summary as `blue=N red=K (undeclared=U)`, but the track spec and verification files require `blue=N yellow=M red=K (undeclared=U)`. That leaves the observable contract for `domain-type-signals` inconsistent and risks implementing the wrong output format.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 50,
+              "category": "spec"
+            }
+          ],
+          "hash": "rvw1:sha256:dec3ef50b964dadaf3ceed1f28b1f8953455343bcd012d0427472099f0bec0d2",
+          "at": "2026-04-08T14:10:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Reassess When` still reopens `auto-add` as a future option. That reintroduces the rejected Yellow/auto-add path the ADR otherwise bans, so the document is internally inconsistent with the stated TDDD policy.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 125,
+              "category": "consistency"
+            },
+            {
+              "message": "T07’s scope includes updating `registry.md`, but the acceptance criteria and verification steps only cover the `/track:plan` message plus the two workflow docs. The registry index update can be missed without any failing check, so the workflow redirect remains unverified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/reverse-signal-integration-2026-04-08/spec.json",
+              "line": 69,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:8f67a5cd6f0bd4255a47647ea3a88889c42378aa1060de2f3dedde1c23a6ec8b",
+          "at": "2026-04-08T14:11:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeGraph` still keys types by bare name and only emits a warning on same-name collisions, so a public type in one module can overwrite another with the same name. That means the reverse check can silently miss undeclared code or mix signals across modules instead of disambiguating them.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-0045-spec-code-consistency-check-design.md",
+              "line": 125,
+              "category": "correctness"
+            },
+            {
+              "message": "The new Red gate is underspecified for reverse-only signals: undeclared types/traits are emitted as extra Red `DomainTypeSignal`s with no matching spec entry, but the spec only says \"Red なし → pass\". If `verify spec-states` keeps its current name+kind matching, those extra Red signals will be ignored and TDDD violations will still pass CI.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/spec.json",
+              "line": 42,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:883e055af1c20b59a47d573c126d674f54a28f5b494ad1b3c63f6e885042f53e",
+          "at": "2026-04-08T14:15:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30ed62696702fc7f4f0845fb15115d78cb824ea5e481bac806416d9e6ed08080",
+          "at": "2026-04-08T14:16:55Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`evaluate_error_type` now classifies a missing declared error type as `Yellow`, but this changed branch has no regression test while the other updated evaluators do. That leaves the public `ErrorType` WIP path (`signal = Yellow`, `found_type = false`) able to regress unnoticed.",
+              "message": "`metadata.json` still describes the gate as \"Yellow is allowed, only Red blocks\", which contradicts ADR 1800/spec.json's two-stage rule that merge requires all Blue. If implementers follow the track metadata/plan, they can relax the final approval gate and allow unfinished Yellow states to merge.",
               "severity": "P1",
-              "file": "libs/domain/src/domain_types.rs",
-              "line": 448,
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 55,
+              "category": "correctness"
+            },
+            {
+              "message": "T04's verification checklist covers Red/Yellow outcomes, but it never checks that CI actually runs `domain-type-signals` before `verify spec-states`. Since reverse undeclared Reds are produced by the first step, leaving this sequence unverified can let undeclared types bypass the gate even when all listed checks pass.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/verification.md",
+              "line": 15,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:30ed62696702fc7f4f0845fb15115d78cb824ea5e481bac806416d9e6ed08080",
+          "at": "2026-04-08T14:18:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T04 still under-specifies the accepted two-stage gate. `metadata.json` only says `verify spec-states` should pass when there is no Red, but it omits the merge-time requirement that leftover Yellow must also block until all signals are Blue. Because `plan.md` is generated from this file, the implementation task can be completed without ever adding the merge-stage enforcement required by ADR 1800 §Decision.4 and `spec.json`.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 27,
+              "category": "consistency"
+            },
+            {
+              "message": "ADR 0045 now says the reverse-signal integration was completed while 'not relaxing the gate' and 'keeping all Blue required', but ADR 1800 accepted a two-stage gate where Yellow is allowed during intermediate commits and only blocked at merge. This leaves the ADR set internally inconsistent about the actual `verify spec-states` contract.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-0045-spec-code-consistency-check-design.md",
+              "line": 218,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:e5a8a315f208745a7a540be84b305d6211765990c327d49001ada2d154668b7f",
+          "at": "2026-04-08T14:21:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T07's acceptance criteria omit the `registry.md` Next-column update that the task description and ADR Decision.6 both require. As written, this spec can be marked complete even if `/track:design` never appears in `registry.md`, leaving part of the workflow change unimplemented and unverified.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/spec.json",
+              "line": 238,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:a682f4ca72dbd9916ee1b3f8df0e7d6da267774dc847983e28eaf9a7844fb7fe",
+          "at": "2026-04-08T14:24:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR’s TDDD introduction still says `forward Red` is the normal work-in-progress state, but Decision.3 and the 3-state table below redefine `defined + not yet implemented` as Yellow. Leaving the old Red/Yellow semantics in the same accepted ADR makes the design internally contradictory and can send later spec updates back toward the rejected gate behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 25,
+              "category": "correctness"
+            },
+            {
+              "message": "Section S2 still summarizes `verify spec-states` as a one-stage gate (`Red なし → pass。Yellow は許容。Red → fail`) and omits the merge-time `all Blue required` rule that T04 introduces everywhere else. Because `plan.md` is generated from this metadata, readers following the section summary can implement or review against the wrong gate contract and leave Yellow unblocked at track completion.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 75,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:819d29979452eb7fa892b87ee42da5e80bd77cbd11b5c9b17ce1c94409342755",
+          "at": "2026-04-08T14:27:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c23e8746f2d8cf41db4c0afdce0c4fec24699ad88e3fc78945d5b05d8e879e0",
+          "at": "2026-04-08T14:30:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
+          "at": "2026-04-08T14:54:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` moved backwards to `2026-04-08T14:50:43Z`, which is earlier than this item's `created_at` (`2026-04-08T18:00:00Z`). A status transition should not produce metadata where the update timestamp predates creation; any tooling that relies on monotonic timestamps will now see this item as modified before it existed.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 112,
               "category": null
             }
           ],
-          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
-          "at": "2026-04-09T00:46:35Z"
+          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
+          "at": "2026-04-08T14:55:29Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7432e38c13e7b9ee26ad083d4c2195e4ef79a17724689b784c1b63320c6f14d7",
-          "at": "2026-04-09T00:49:20Z"
+          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
+          "at": "2026-04-08T14:56:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` is earlier than `created_at` (`2026-04-08T14:50:43Z` vs `2026-04-08T18:00:00Z`), which violates the track timestamp invariant and can misorder or invalidate consumers that rely on `updated_at` for latest-track selection.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 112,
+              "category": "data-integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:0491e44cb108d6e0370f0dfc17891f974a5d107dca03715fce132e3e8fb747ba",
+          "at": "2026-04-08T15:44:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:249b776035b92142187e8db7d218b46b51b2d776225eaa8fe0cab9ac5a585dc7",
+          "at": "2026-04-08T15:47:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:249b776035b92142187e8db7d218b46b51b2d776225eaa8fe0cab9ac5a585dc7",
+          "at": "2026-04-08T15:50:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f32b135b5cecb16dbdaf71fb5d75760f792af8452224cea12f8c75d583d82067",
+          "at": "2026-04-09T00:38:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f32b135b5cecb16dbdaf71fb5d75760f792af8452224cea12f8c75d583d82067",
+          "at": "2026-04-09T00:39:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cca2a285b8dcc1dd8d02ad870328277b835422198868e2a0e7febfa127fb690a",
+          "at": "2026-04-09T00:59:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cca2a285b8dcc1dd8d02ad870328277b835422198868e2a0e7febfa127fb690a",
+          "at": "2026-04-09T01:00:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:482d9e4d6ef53f78b143afc1e6ae587a122d77a879337ac8e3c4d6f1e48b7983",
+          "at": "2026-04-09T01:24:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:482d9e4d6ef53f78b143afc1e6ae587a122d77a879337ac8e3c4d6f1e48b7983",
+          "at": "2026-04-09T01:25:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:15:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes it a mandatory field for every `version: 1` profile, so any existing config loaded through `CLAUDE_AGENT_PROFILES_PATH` that has not been migrated yet will now fail `validate_profiles()` with \"missing required capabilities\". Because this patch does not bump the schema version or provide a compatibility fallback, rolling out the new hook before every external profile file is updated becomes a hard runtime break.",
+              "severity": "P1",
+              "file": ".claude/hooks/_agent_profiles.py",
+              "line": 20,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:17:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes every v1 profile require the new capability immediately. Because `CLAUDE_AGENT_PROFILES_PATH` still allows older/custom configs and `PROFILE_VERSION` stays at 1, those configs will now fail validation with a breaking runtime error instead of loading with the previous schema. This needs a version bump or compatibility fallback.",
+              "severity": "P1",
+              "file": ".claude/hooks/_agent_profiles.py",
+              "line": 17,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:18:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes it mandatory for every v1 profile immediately. Any existing or custom config loaded via `CLAUDE_AGENT_PROFILES_PATH` that has not been migrated will now fail `validate_profiles()` with a missing-capabilities error, even though `PROFILE_VERSION` is still 1. This is a breaking schema change without a version bump or backward-compatibility fallback.",
+              "severity": "P1",
+              "file": ".claude/hooks/_agent_profiles.py",
+              "line": 20,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:20:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:20:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T05 is still recorded as `in_progress`, but the companion config change already adds `designer` to every profile in `.claude/agent-profiles.json`. Because `metadata.json` is the source of truth and workflow tooling returns the first `in_progress` task before any `todo`, leaving T05 open will keep this track pinned on a completed task and delay T06 from becoming the next actionable item.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 97,
+              "category": "other"
+            }
+          ],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:22:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:23:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:23:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5bb066475db5ed877a81c8e2dbca5cd7e7aff4d5ddcb1eb19f84edd766b24b3b",
+          "at": "2026-04-09T02:40:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5bb066475db5ed877a81c8e2dbca5cd7e7aff4d5ddcb1eb19f84edd766b24b3b",
+          "at": "2026-04-09T02:41:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63faab1418d7c94651c63df127745a81cd8ce79f94eec23f257745cdae072595",
+          "at": "2026-04-09T03:34:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63faab1418d7c94651c63df127745a81cd8ce79f94eec23f257745cdae072595",
+          "at": "2026-04-09T03:35:49Z"
         }
       ]
     },
@@ -756,6 +1075,558 @@
           "findings": [],
           "hash": "rvw1:sha256:b0c8149fbd5338328396eada4d353669151bf5af129677f6c645cebfc0ad9115",
           "at": "2026-04-09T02:15:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 merges/removes `domain_types` entries but never says to clear or rebuild the derived `signals` array. If `/track:design` is rerun after a prior evaluation, removed or renamed types can keep stale signal rows in `domain-types.json`, so later verification reads a document whose declarations and signals disagree. The command should explicitly drop signals on design writes or regenerate them.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 71,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0f67f725af0a910ac820b7e512b7af830f5a3f02dbec0b494780adce5d4d0bfd",
+          "at": "2026-04-09T02:42:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Typestate entries are described as carrying `transitions`, but `domain-types.json` actually serializes typestate as `transitions_to` in the codec. Following this prompt verbatim will emit the wrong key and produce JSON that cannot be decoded for typestate types.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 36,
+              "category": "correctness"
+            },
+            {
+              "message": "The incremental-update rule only preserves or removes existing entries; it never reconciles changed kind-specific fields, and the write example omits the top-level `signals` field. Re-running `/track:design` after a plan edit or after signal evaluation can therefore leave stale type declarations in place or erase recorded signal state.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 71,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0f67f725af0a910ac820b7e512b7af830f5a3f02dbec0b494780adce5d4d0bfd",
+          "at": "2026-04-09T02:43:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The kind-specific field for typestate is written as `transitions` here, but the domain-types codec serializes/deserializes `transitions_to` for `kind=typestate`. Following this prompt literally will produce JSON that the existing decoder rejects.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 51,
+              "category": "schema"
+            },
+            {
+              "message": "Step 3 preserves any existing `signals` array, but the command never generates one on a fresh `domain-types.json` write. Since `verify spec-states` requires signal data before CI can pass, a first-time `/track:design` run cannot satisfy Step 4 as written.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 76,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:49befefd8466300fc79683d57a816e005c3a5bd7345253805c564c341fc24d48",
+          "at": "2026-04-09T02:51:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 names the typestate payload as `transitions`, but the codec and canonical schema use `transitions_to`. Following this prompt literally will produce JSON that `domain_types_codec` rejects for typestate entries.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 51,
+              "category": "schema"
+            },
+            {
+              "message": "The incremental update rules only preserve existing entries/signals; they never say to refresh changed fields or drop stale signals when a type is renamed, re-kinded, or removed. Re-running `/track:design` after a plan edit can leave `domain-types.json` out of sync with the current plan and later verification will read stale declarations.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 71,
+              "category": "incremental-update"
+            }
+          ],
+          "hash": "rvw1:sha256:49befefd8466300fc79683d57a816e005c3a5bd7345253805c564c341fc24d48",
+          "at": "2026-04-09T02:53:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The incremental merge rules never say to drop obsolete kind-specific fields when a type changes kind. Reusing an existing entry that moves from `enum`/`typestate` to `value_object` can leave stale `expected_variants`/`transitions_to` data behind and produce a JSON object the codec rejects.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 71,
+              "category": "correctness"
+            },
+            {
+              "message": "Step 3 writes `domain-types.json`, but Step 4 only runs `cargo make ci`; it never regenerates the paired `domain-types.md` view or re-evaluates domain type signals. That leaves the rendered docs and cached signals stale after a successful design update, so the next steps guidance can point at out-of-date state.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 81,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:848e4bb72538a36aa38ba279fc2e8b7a1d6102386495bbc1e387cab4c030b456",
+          "at": "2026-04-09T03:00:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 asks this command to run `cargo make ci`, but the workflow never regenerates domain-type signals after writing a fresh `domain-types.json`. `verify spec-states` fails closed when `signals` is absent, so the first `/track:design` run cannot satisfy its own validation step.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 81,
+              "category": "correctness"
+            },
+            {
+              "message": "The next-steps guidance says `verify spec-states` will pass as long as no Red signals exist, but that is only true for the default/interim gate. In strict merge mode, Yellow also fails, so this can incorrectly imply a Yellow-only design is merge-ready.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 94,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:848e4bb72538a36aa38ba279fc2e8b7a1d6102386495bbc1e387cab4c030b456",
+          "at": "2026-04-09T03:02:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0/1 stops at `spec.md`, `metadata.json`, `.claude/rules/04-coding-principles.md`, and `knowledge/DESIGN.md`, but it never reads the track's `## Related Conventions (Required Reading)` section from the spec. That means `/track:design` can ignore feature-specific mandatory conventions and produce a type design that is already non-compliant with the track contract.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 17,
+              "category": "correctness"
+            },
+            {
+              "message": "The incremental merge rules update known fields but never say to remove obsolete kind-specific fields when a type changes kind. If a type is reclassified from `enum`/`typestate`/`error_type`/`trait_port` to `value_object`, stale `expected_variants` or `transitions_to` data can remain on disk and drift the registry away from the schema the codec expects.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 71,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:73f540cd2a9bda30f83ce57cee7aba03017997f20c7d2a6a95b831bcae7a760a",
+          "at": "2026-04-09T03:07:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 unconditionally reads `track/items/<id>/spec.md`, but the command also claims to support legacy tracks without `spec.json` by falling back to `plan.md`. On legacy tracks that only have `plan.md`/`metadata.json`, `/track:design` will fail before it reaches the fallback path.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 17,
+              "category": "correctness"
+            },
+            {
+              "message": "The decision table says `Serde/persistence needed? -> enum + runtime validation`, which does not match `.claude/rules/04-coding-principles.md`. The rule says persistence should select `enum`, while runtime validation is only the fallback for large state spaces, so this prompt can steer the designer toward the wrong abstraction.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 45,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:716edb0c81cb87e69b099b353be4ed5a723c0bdc5ab52ed9c418f4c05e33b21e",
+          "at": "2026-04-09T03:11:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 does not say what to do when the current branch is neither `track/<id>` nor `plan/<id>`. In that case the command can proceed without a valid track id and only fail later with a confusing path error. Add an explicit fail-closed stop before any file access.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 15,
+              "category": "correctness"
+            },
+            {
+              "message": "The decision-table summary here conflicts with `.claude/rules/04-coding-principles.md`: persistence/serde should map to `enum`, while `enum + runtime validation` is only the fallback for oversized state spaces. As written, `/track:design` can steer the designer toward runtime validation for persisted types even when the coding principles say to model them as enums.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 45,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:716edb0c81cb87e69b099b353be4ed5a723c0bdc5ab52ed9c418f4c05e33b21e",
+          "at": "2026-04-09T03:13:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:design` only resolves `track/<id>` or `plan/<id>` branches and otherwise aborts. That is stricter than the established track-command resolver used elsewhere in the workflow, so invoking this command from a normal `main`/non-track checkout will fail even when a current track exists.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 15,
+              "category": "workflow"
+            },
+            {
+              "message": "The next-step guidance unconditionally tells the user to run `/track:implement`, but planning-only tracks must be activated first. On a `plan/<id>` branch this will send users into a command that immediately stops on the activation guard instead of giving the required `/track:activate <track-id>` step.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 94,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:669a9189c39a41c11de6c9c493110d907e50f4025797beef012fea2aacac379e",
+          "at": "2026-04-09T03:16:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 tells users to run `sotp track domain-type-signals` without the required `<track-id>` argument. The CLI entrypoint for this command takes an explicit track ID, so the instruction as written will fail or target the wrong track and leaves the just-written `domain-types.json` unevaluated.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 83,
+              "category": "correctness"
+            },
+            {
+              "message": "Step 1 only loads `knowledge/DESIGN.md` for architecture context and never cross-checks the accepted ADRs that actually define the domain-types workflow. That leaves `/track:design` free to follow the summary doc even when the track is governed by `2026-04-07-0045` / `2026-04-08-1800`, which can produce a design that disagrees with the authoritative decisions.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 28,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:669a9189c39a41c11de6c9c493110d907e50f4025797beef012fea2aacac379e",
+          "at": "2026-04-09T03:19:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00e2a5383a65e71584d6af271abb52c2ce33a6f91793808702535e52bedfbd6d",
+          "at": "2026-04-09T03:22:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 tells the operator to run `sotp track domain-type-signals --track-id <id>`, but this CLI takes `track_id` as a positional argument and does not define a `--track-id` flag. Following the prompt will fail before signals are refreshed and `domain-types.md` is regenerated.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 84,
+              "category": null
+            },
+            {
+              "message": "The next-step guidance always says to run `/track:implement`, but this command explicitly supports `plan/<id>` branches in Step 0. Those tracks are still planning-only, and `/track:implement` rejects them until `/track:activate <track-id>` runs, so the prompt sends a supported workflow to the wrong next command.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 95,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:00e2a5383a65e71584d6af271abb52c2ce33a6f91793808702535e52bedfbd6d",
+          "at": "2026-04-09T03:25:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:design` only resolves the track from `track/<id>`, `plan/<id>`, or an explicit argument, then aborts otherwise. That breaks the repo's established current-track resolver for non-track checkouts, so running this from `main` after planning artifacts land on a branchless track will fail even though a current track exists.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 15,
+              "category": "workflow"
+            },
+            {
+              "message": "Step 5 always tells the user to run `/track:implement`, but planning-only tracks must go through `/track:activate <track-id>` before any code-bearing implementation. In the `plan/<id>` / branchless workflow this guidance sends the user to a command that immediately refuses to run.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 95,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:00e2a5383a65e71584d6af271abb52c2ce33a6f91793808702535e52bedfbd6d",
+          "at": "2026-04-09T03:29:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 instructs users to run `sotp track domain-type-signals --track-id <id>`, but the actual CLI takes the track ID positionally and does not define a `--track-id` flag. Following this instruction will fail before the new `domain-types.json` is re-evaluated and `domain-types.md` is regenerated.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 84,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7650ccc7304308827706280b777e84971a2de958c521117f985d401b7da4b1ff",
+          "at": "2026-04-09T03:34:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 tells the operator to run `sotp track domain-type-signals --track-id <id>`, but this CLI takes the track ID positionally and does not define a `--track-id` flag. Following the prompt as written will fail before signals are refreshed and `domain-types.md` is regenerated.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 84,
+              "category": "workflow"
+            },
+            {
+              "message": "Step 3 preserves the existing `signals` array while mutating the entry set. That leaves `domain-types.json` inconsistent whenever a type is added, removed, or re-kinded, and `verify spec-states` does not reject extra stale signal rows. The write step should clear or rebuild signals instead of carrying them forward.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 80,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7650ccc7304308827706280b777e84971a2de958c521117f985d401b7da4b1ff",
+          "at": "2026-04-09T03:35:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8131bb253f1893c1b09d4562920f1f03820bd97491003e7d28c7ae971ab3b610",
+          "at": "2026-04-09T03:42:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new persistence rule only specifies a one-way `From` conversion to the serde DTO, even though this section is about states being restored from persistence. Following it literally leaves no validated DTO -> domain path for rebuilding typestate and encourages ad-hoc reconstruction instead of a fallible `TryFrom`/constructor flow that returns `Result`.",
+              "severity": "P1",
+              "file": ".claude/rules/04-coding-principles.md",
+              "line": 121,
+              "category": null
+            },
+            {
+              "message": "Step 5 says default `verify spec-states` passes as long as no Red signals exist, but the current gate only counts signals whose `(type_name, kind_tag)` matches a declared entry. Reverse undeclared Reds (`undeclared_type` / `undeclared_trait`) are ignored there, so this guidance overstates what the command actually verifies and can tell users CI is clean when undeclared code still exists.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 97,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:8131bb253f1893c1b09d4562920f1f03820bd97491003e7d28c7ae971ab3b610",
+          "at": "2026-04-09T03:46:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new persistence rule says to keep typestate in the domain layer and convert to a serde DTO with `From`, but this section is specifically about states being restored from persistence. Following it literally leaves no validated DTO -> domain path for rebuilding typestate and encourages ad-hoc reconstruction instead of a fallible `TryFrom`/constructor flow that returns `Result`.",
+              "severity": "P1",
+              "file": ".claude/rules/04-coding-principles.md",
+              "line": 121,
+              "category": "correctness"
+            },
+            {
+              "message": "Step 5 says default `verify spec-states` passes as long as no Red signals exist, but the current verifier only checks signals whose `(type_name, kind_tag)` matches a declared entry and ignores reverse undeclared Reds (`undeclared_type` / `undeclared_trait`). This guidance can therefore tell users CI is clean even when undeclared code still exists.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 97,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8131bb253f1893c1b09d4562920f1f03820bd97491003e7d28c7ae971ab3b610",
+          "at": "2026-04-09T03:49:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This guidance says reverse undeclared Red signals do not block `verify spec-states` and are handled separately by `verify spec-code-consistency`, but the reverse-signal design makes `domain-type-signals -> verify spec-states` a single gate and expects reverse Reds to be part of that gate. As written, the workflow can tell users a track is clean while undeclared code is still present.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 97,
+              "category": "correctness"
+            },
+            {
+              "message": "The persistence example is not implementable as written: `TryFrom<ReviewStatusDto> for Review<State>` cannot be a blanket conversion over an arbitrary typestate parameter. Persisted typestates need a concrete erased-state wrapper or per-state constructor; otherwise this guidance points implementers at an impossible API.",
+              "severity": "P1",
+              "file": ".claude/rules/04-coding-principles.md",
+              "line": 128,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:9048dc02226fe9a2e9c5d9762494de7b01621e394f2f39f8871c5790bd32fbec",
+          "at": "2026-04-09T03:54:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 unconditionally reads `track/items/<id>/spec.md` before the documented legacy fallback. On tracks that only have `plan.md`/`metadata.json`, `/track:design` will fail before it can use the `plan.md` path the command claims to support.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 16,
+              "category": "correctness"
+            },
+            {
+              "message": "Step 5 tells users that reverse undeclared Red signals are only warnings from `domain-type-signals` and are handled by `verify spec-code-consistency` instead of `verify spec-states`. That contradicts the TDDD gate flow, where reverse Reds are part of the same `domain-type-signals -> verify spec-states` check, so this guidance can leave undeclared code appearing non-blocking.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 97,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9048dc02226fe9a2e9c5d9762494de7b01621e394f2f39f8871c5790bd32fbec",
+          "at": "2026-04-09T03:56:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:design` should analyze the approved `plan.md`, but this step now prefers `spec.md` whenever it exists. `spec.md` is a rendered artifact, so using it as the primary input can make the command design against stale or generated content instead of the source plan.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 16,
+              "category": "architecture"
+            },
+            {
+              "message": "The new persistence rule is too absolute: it says any serde-backed state should be modeled as domain typestate plus an infrastructure DTO. That conflicts with the repo's existing enum-based persisted state machines and will cause valid finite-state enums to be treated as non-conforming, pushing unnecessary typestate refactors.",
+              "severity": "P1",
+              "file": ".claude/rules/04-coding-principles.md",
+              "line": 116,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a8adc8c6987eaef052e500f7757274d013e290a73f34cb4347a9fb56d821bbfb",
+          "at": "2026-04-09T04:04:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 never runs `verify spec-states` after refreshing `domain-types.json`. `sotp track domain-type-signals <id>` returns success even when it writes Red signals, and `cargo make ci` does not invoke the track-specific `spec-states` gate, so `/track:design` can claim validation passed while the new design still violates the TDDD gate. This should explicitly run `sotp verify spec-states ...` after `domain-type-signals`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 82,
+              "category": "correctness"
+            },
+            {
+              "message": "For legacy tracks without `spec.json`, this tells the command to read required conventions from `plan.md`, but the workflow treats `spec.md` as the authoritative human-authored spec and legacy tracks can still have `spec.md` present. That means `/track:design` can pull conventions from a rendered view instead of the source spec and miss the real required-reading set. The fallback to `plan.md` should only happen when `spec.md` is absent.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 21,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:c1a57a71df7f022472a072d2a426c7fd8fe2d1b9b05da0f148a7cd38e04f89d5",
+          "at": "2026-04-09T04:10:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d7fb2da9a35d015e2e07428216cc912af111c4eda97c0cd695ded4b7d85e3d0",
+          "at": "2026-04-09T04:15:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d7fb2da9a35d015e2e07428216cc912af111c4eda97c0cd695ded4b7d85e3d0",
+          "at": "2026-04-09T04:16:10Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
+          "at": "2026-04-08T14:11:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
+          "at": "2026-04-08T14:11:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11895e6cbf3bd279e62ba91cc20856da0638e85d0e1cd039dd672c9fea280a37",
+          "at": "2026-04-09T01:26:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `strict=true`, this implementation only rejects Yellow signals from `domain-types.json`. A `spec.json` with top-level signal counts like `yellow>0, red=0` still passes as long as the domain-type signals are all Blue, which violates the stated strict-mode contract that all signals must be Blue for merge. Add the strict Yellow check to the Stage 1 `spec_doc.signals()` prerequisite and cover that case with a regression test.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 156,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:11895e6cbf3bd279e62ba91cc20856da0638e85d0e1cd039dd672c9fea280a37",
+          "at": "2026-04-09T01:28:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `strict=true`, Stage 1 still only rejects `spec.json` signal counts with `red>0`. A `spec.json` whose top-level signals are `yellow>0, red=0` will pass as long as the domain-type signals are Blue, which violates the documented merge-gate rule that strict mode requires all signals to be Blue. Add the strict Yellow check to the `spec_doc.signals()` prerequisite and cover it with a regression test.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 53,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:11895e6cbf3bd279e62ba91cc20856da0638e85d0e1cd039dd672c9fea280a37",
+          "at": "2026-04-09T01:31:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2b44cb831974852ee24e7548d46fcbbc3ffd74e29bf531bfb1ca747a42016ee",
+          "at": "2026-04-09T01:34:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5dcf02daca7c23ebc83335194ddcf1d78852bbc92d983e79f70da8cc0cabf9d2",
+          "at": "2026-04-09T04:09:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5dcf02daca7c23ebc83335194ddcf1d78852bbc92d983e79f70da8cc0cabf9d2",
+          "at": "2026-04-09T04:10:01Z"
         }
       ]
     },
@@ -976,440 +1847,87 @@
         }
       ]
     },
-    "infrastructure": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
-          "at": "2026-04-08T14:11:04Z"
+          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
+          "at": "2026-04-08T14:52:26Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
-          "at": "2026-04-08T14:11:48Z"
+          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
+          "at": "2026-04-08T14:53:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Missing regression coverage for the new `DomainTypeKind::ErrorType` missing-type branch. `evaluate_domain_type_signals` now returns `Yellow` here, but no test exercises this public path, so a future regression would go undetected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/domain_types.rs",
+              "line": 442,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:40:21Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:11895e6cbf3bd279e62ba91cc20856da0638e85d0e1cd039dd672c9fea280a37",
-          "at": "2026-04-09T01:26:10Z"
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:41:16Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "When `strict=true`, this implementation only rejects Yellow signals from `domain-types.json`. A `spec.json` with top-level signal counts like `yellow>0, red=0` still passes as long as the domain-type signals are all Blue, which violates the stated strict-mode contract that all signals must be Blue for merge. Add the strict Yellow check to the Stage 1 `spec_doc.signals()` prerequisite and cover that case with a regression test.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/verify/spec_states.rs",
-              "line": 156,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:11895e6cbf3bd279e62ba91cc20856da0638e85d0e1cd039dd672c9fea280a37",
-          "at": "2026-04-09T01:28:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "When `strict=true`, Stage 1 still only rejects `spec.json` signal counts with `red>0`. A `spec.json` whose top-level signals are `yellow>0, red=0` will pass as long as the domain-type signals are Blue, which violates the documented merge-gate rule that strict mode requires all signals to be Blue. Add the strict Yellow check to the `spec_doc.signals()` prerequisite and cover it with a regression test.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/verify/spec_states.rs",
-              "line": 53,
+              "message": "Changing the missing-type branches to return `ConfidenceSignal::Yellow` is incomplete on its own: callers still treat every non-Blue domain signal as a failure, so a spec-declared but unimplemented type remains blocking instead of becoming the intended WIP state. As merged, this patch mostly relabels that case without delivering the new behavior.",
+              "severity": "P1",
+              "file": "libs/domain/src/domain_types.rs",
+              "line": 313,
               "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:11895e6cbf3bd279e62ba91cc20856da0638e85d0e1cd039dd672c9fea280a37",
-          "at": "2026-04-09T01:31:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2b44cb831974852ee24e7548d46fcbbc3ffd74e29bf531bfb1ca747a42016ee",
-          "at": "2026-04-09T01:34:17Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d7da79d5a7124c0742bf9eb98f015c10998174ddb3ed104e8e10ed2fc5379e52",
-          "at": "2026-04-08T13:58:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Decision.2’s CLI summary format omits the Yellow count (`blue=N red=K (undeclared=U)`), but the track spec and task metadata require `blue=N yellow=M red=K (undeclared=U)`. That leaves the ADR and implementation spec inconsistent on the required output.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
-              "line": 50,
-              "category": "consistency"
             },
             {
-              "message": "`Reassess When` still reintroduces `auto-add` language (`auto-add を「提案モード」...`) even though this track explicitly rejects auto-add / Yellow-as-approved paths. Keeping that wording in the active ADR conflicts with the stated no-auto-add policy and can be misread as an approved future behavior.",
+              "message": "The new missing-type path for `ErrorType` has no regression test. This patch updates all five evaluators, but only four missing-type cases were re-covered in `#[cfg(test)]`, so `evaluate_error_type(...missing...) -> Yellow + found_type=false` can regress unnoticed.",
               "severity": "P1",
-              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
-              "line": 125,
-              "category": "policy"
+              "file": "libs/domain/src/domain_types.rs",
+              "line": 448,
+              "category": "tests"
             }
           ],
-          "hash": "rvw1:sha256:dec3ef50b964dadaf3ceed1f28b1f8953455343bcd012d0427472099f0bec0d2",
-          "at": "2026-04-08T14:08:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Decision 2 specifies the command summary as `blue=N red=K (undeclared=U)`, but the track spec and verification files require `blue=N yellow=M red=K (undeclared=U)`. That leaves the observable contract for `domain-type-signals` inconsistent and risks implementing the wrong output format.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
-              "line": 50,
-              "category": "spec"
-            }
-          ],
-          "hash": "rvw1:sha256:dec3ef50b964dadaf3ceed1f28b1f8953455343bcd012d0427472099f0bec0d2",
-          "at": "2026-04-08T14:10:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Reassess When` still reopens `auto-add` as a future option. That reintroduces the rejected Yellow/auto-add path the ADR otherwise bans, so the document is internally inconsistent with the stated TDDD policy.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
-              "line": 125,
-              "category": "consistency"
-            },
-            {
-              "message": "T07’s scope includes updating `registry.md`, but the acceptance criteria and verification steps only cover the `/track:plan` message plus the two workflow docs. The registry index update can be missed without any failing check, so the workflow redirect remains unverified.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/reverse-signal-integration-2026-04-08/spec.json",
-              "line": 69,
-              "category": "coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:8f67a5cd6f0bd4255a47647ea3a88889c42378aa1060de2f3dedde1c23a6ec8b",
-          "at": "2026-04-08T14:11:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeGraph` still keys types by bare name and only emits a warning on same-name collisions, so a public type in one module can overwrite another with the same name. That means the reverse check can silently miss undeclared code or mix signals across modules instead of disambiguating them.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-08-0045-spec-code-consistency-check-design.md",
-              "line": 125,
-              "category": "correctness"
-            },
-            {
-              "message": "The new Red gate is underspecified for reverse-only signals: undeclared types/traits are emitted as extra Red `DomainTypeSignal`s with no matching spec entry, but the spec only says \"Red なし → pass\". If `verify spec-states` keeps its current name+kind matching, those extra Red signals will be ignored and TDDD violations will still pass CI.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/spec.json",
-              "line": 42,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:883e055af1c20b59a47d573c126d674f54a28f5b494ad1b3c63f6e885042f53e",
-          "at": "2026-04-08T14:15:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30ed62696702fc7f4f0845fb15115d78cb824ea5e481bac806416d9e6ed08080",
-          "at": "2026-04-08T14:16:55Z"
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:43:56Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`metadata.json` still describes the gate as \"Yellow is allowed, only Red blocks\", which contradicts ADR 1800/spec.json's two-stage rule that merge requires all Blue. If implementers follow the track metadata/plan, they can relax the final approval gate and allow unfinished Yellow states to merge.",
+              "message": "`evaluate_error_type` now classifies a missing declared error type as `Yellow`, but this changed branch has no regression test while the other updated evaluators do. That leaves the public `ErrorType` WIP path (`signal = Yellow`, `found_type = false`) able to regress unnoticed.",
               "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
-              "line": 55,
-              "category": "correctness"
-            },
-            {
-              "message": "T04's verification checklist covers Red/Yellow outcomes, but it never checks that CI actually runs `domain-type-signals` before `verify spec-states`. Since reverse undeclared Reds are produced by the first step, leaving this sequence unverified can let undeclared types bypass the gate even when all listed checks pass.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/verification.md",
-              "line": 15,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:30ed62696702fc7f4f0845fb15115d78cb824ea5e481bac806416d9e6ed08080",
-          "at": "2026-04-08T14:18:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T04 still under-specifies the accepted two-stage gate. `metadata.json` only says `verify spec-states` should pass when there is no Red, but it omits the merge-time requirement that leftover Yellow must also block until all signals are Blue. Because `plan.md` is generated from this file, the implementation task can be completed without ever adding the merge-stage enforcement required by ADR 1800 §Decision.4 and `spec.json`.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
-              "line": 27,
-              "category": "consistency"
-            },
-            {
-              "message": "ADR 0045 now says the reverse-signal integration was completed while 'not relaxing the gate' and 'keeping all Blue required', but ADR 1800 accepted a two-stage gate where Yellow is allowed during intermediate commits and only blocked at merge. This leaves the ADR set internally inconsistent about the actual `verify spec-states` contract.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-08-0045-spec-code-consistency-check-design.md",
-              "line": 218,
-              "category": "consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:e5a8a315f208745a7a540be84b305d6211765990c327d49001ada2d154668b7f",
-          "at": "2026-04-08T14:21:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T07's acceptance criteria omit the `registry.md` Next-column update that the task description and ADR Decision.6 both require. As written, this spec can be marked complete even if `/track:design` never appears in `registry.md`, leaving part of the workflow change unimplemented and unverified.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/spec.json",
-              "line": 238,
-              "category": "consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:a682f4ca72dbd9916ee1b3f8df0e7d6da267774dc847983e28eaf9a7844fb7fe",
-          "at": "2026-04-08T14:24:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The ADR’s TDDD introduction still says `forward Red` is the normal work-in-progress state, but Decision.3 and the 3-state table below redefine `defined + not yet implemented` as Yellow. Leaving the old Red/Yellow semantics in the same accepted ADR makes the design internally contradictory and can send later spec updates back toward the rejected gate behavior.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
-              "line": 25,
-              "category": "correctness"
-            },
-            {
-              "message": "Section S2 still summarizes `verify spec-states` as a one-stage gate (`Red なし → pass。Yellow は許容。Red → fail`) and omits the merge-time `all Blue required` rule that T04 introduces everywhere else. Because `plan.md` is generated from this metadata, readers following the section summary can implement or review against the wrong gate contract and leave Yellow unblocked at track completion.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
-              "line": 75,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:819d29979452eb7fa892b87ee42da5e80bd77cbd11b5c9b17ce1c94409342755",
-          "at": "2026-04-08T14:27:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c23e8746f2d8cf41db4c0afdce0c4fec24699ad88e3fc78945d5b05d8e879e0",
-          "at": "2026-04-08T14:30:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
-          "at": "2026-04-08T14:54:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`updated_at` moved backwards to `2026-04-08T14:50:43Z`, which is earlier than this item's `created_at` (`2026-04-08T18:00:00Z`). A status transition should not produce metadata where the update timestamp predates creation; any tooling that relies on monotonic timestamps will now see this item as modified before it existed.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
-              "line": 112,
+              "file": "libs/domain/src/domain_types.rs",
+              "line": 448,
               "category": null
             }
           ],
-          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
-          "at": "2026-04-08T14:55:29Z"
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:46:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
-          "at": "2026-04-08T14:56:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`updated_at` is earlier than `created_at` (`2026-04-08T14:50:43Z` vs `2026-04-08T18:00:00Z`), which violates the track timestamp invariant and can misorder or invalidate consumers that rely on `updated_at` for latest-track selection.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
-              "line": 112,
-              "category": "data-integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:0491e44cb108d6e0370f0dfc17891f974a5d107dca03715fce132e3e8fb747ba",
-          "at": "2026-04-08T15:44:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:249b776035b92142187e8db7d218b46b51b2d776225eaa8fe0cab9ac5a585dc7",
-          "at": "2026-04-08T15:47:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:249b776035b92142187e8db7d218b46b51b2d776225eaa8fe0cab9ac5a585dc7",
-          "at": "2026-04-08T15:50:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f32b135b5cecb16dbdaf71fb5d75760f792af8452224cea12f8c75d583d82067",
-          "at": "2026-04-09T00:38:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f32b135b5cecb16dbdaf71fb5d75760f792af8452224cea12f8c75d583d82067",
-          "at": "2026-04-09T00:39:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cca2a285b8dcc1dd8d02ad870328277b835422198868e2a0e7febfa127fb690a",
-          "at": "2026-04-09T00:59:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cca2a285b8dcc1dd8d02ad870328277b835422198868e2a0e7febfa127fb690a",
-          "at": "2026-04-09T01:00:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:482d9e4d6ef53f78b143afc1e6ae587a122d77a879337ac8e3c4d6f1e48b7983",
-          "at": "2026-04-09T01:24:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:482d9e4d6ef53f78b143afc1e6ae587a122d77a879337ac8e3c4d6f1e48b7983",
-          "at": "2026-04-09T01:25:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:15:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes it a mandatory field for every `version: 1` profile, so any existing config loaded through `CLAUDE_AGENT_PROFILES_PATH` that has not been migrated yet will now fail `validate_profiles()` with \"missing required capabilities\". Because this patch does not bump the schema version or provide a compatibility fallback, rolling out the new hook before every external profile file is updated becomes a hard runtime break.",
-              "severity": "P1",
-              "file": ".claude/hooks/_agent_profiles.py",
-              "line": 20,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:17:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes every v1 profile require the new capability immediately. Because `CLAUDE_AGENT_PROFILES_PATH` still allows older/custom configs and `PROFILE_VERSION` stays at 1, those configs will now fail validation with a breaking runtime error instead of loading with the previous schema. This needs a version bump or compatibility fallback.",
-              "severity": "P1",
-              "file": ".claude/hooks/_agent_profiles.py",
-              "line": 17,
-              "category": "compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:18:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes it mandatory for every v1 profile immediately. Any existing or custom config loaded via `CLAUDE_AGENT_PROFILES_PATH` that has not been migrated will now fail `validate_profiles()` with a missing-capabilities error, even though `PROFILE_VERSION` is still 1. This is a breaking schema change without a version bump or backward-compatibility fallback.",
-              "severity": "P1",
-              "file": ".claude/hooks/_agent_profiles.py",
-              "line": 20,
-              "category": "compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:20:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:20:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T05 is still recorded as `in_progress`, but the companion config change already adds `designer` to every profile in `.claude/agent-profiles.json`. Because `metadata.json` is the source of truth and workflow tooling returns the first `in_progress` task before any `todo`, leaving T05 open will keep this track pinned on a completed task and delay T06 from becoming the next actionable item.",
-              "severity": "P1",
-              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
-              "line": 97,
-              "category": "other"
-            }
-          ],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:22:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:23:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
-          "at": "2026-04-09T02:23:50Z"
+          "hash": "rvw1:sha256:7432e38c13e7b9ee26ad083d4c2195e4ef79a17724689b784c1b63320c6f14d7",
+          "at": "2026-04-09T00:49:20Z"
         }
       ]
     }
