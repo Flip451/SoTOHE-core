@@ -25,6 +25,7 @@ Detailed development workflow for this project.
            → Push plan/<id> branch + PR     # Review planning artifacts via PR
            → PR merge to main               # Planning artifacts land on main
            → /track:activate <track-id>     # Create track/<id> implementation branch from main
+           → (optional) /track:design       # TDDD: declare domain types before implementation
 
 Architecture-focused changes:
    └── /architecture-customizer             # crate map, dependency direction, enforcement rules
@@ -34,6 +35,12 @@ Version Baseline (Phase 1) required steps:
 - Review `Cargo.toml` `rust-version`
 - Review `Dockerfile` `RUST_VERSION` and tool version ARGs
 - Update `track/tech-stack.md` MSRV and changelog
+
+2.5. Design phase (TDDD — Type-Definition-Driven Development)
+   └── /track:design                          # Declare domain types in domain-types.json
+       - Types start as Yellow (defined but not yet implemented)
+       - Implementation turns Yellow → Blue
+       - Undeclared types in code = Red (TDDD violation, blocked by verify spec-states)
 
 3. Implementation phase (choose one)
    ├── /track:full-cycle <task>              # Autonomous full cycle inside Claude Code
@@ -139,8 +146,9 @@ cargo make machete             # Unused dependency audit
 
 ```bash
 /track:setup                  # Project initialization
-/track:plan <feature>         # Research, design, plan, and create track artifacts after approval
+/track:plan <feature>         # Research, plan, and create track artifacts after approval
 /track:plan-only <feature>   # Create plan/<id> branch for planning artifacts; PR to main, then activate
+/track:design                 # Declare domain types in domain-types.json (TDDD)
 /track:activate <track-id>   # Materialize a planning-only track: create branch and switch
 /track:full-cycle <task>      # Autonomous full-cycle implementation in Claude Code
 /track:implement              # Parallel implementation (interactive)

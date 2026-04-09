@@ -101,22 +101,33 @@ impl Review<FastPassed> {
 // Review<NotStarted> に record_final() は存在しない → コンパイルエラー
 ```
 
-**使い分け：enum-first vs typestate**
+**使い分け：enum vs typestate（基本原則）**
+
+- **状態遷移がない**（有限の値の集合）→ **enum**
+- **状態遷移がある**（少しでも）→ **typestate + 遷移関数を優先**
+- typestate は「遷移の有無」で判断する。遷移が少しでもあれば typestate を第一候補にする。
 
 | 要件 | 推奨パターン |
 |---|---|
-| 状態ごとにデータが違う（表現の問題） | → **enum-first** |
-| 状態遷移に制約がある（遷移の問題） | → **typestate** |
-| 両方 | → **typestate + 状態型を enum-first で設計** |
-| 状態が永続化から復元される（serde 必要） | → enum（typestate は永続化と相性が悪い） |
-| 状態数が多く組み合わせ爆発する | → enum + runtime validation（typestate の型爆発を避ける） |
+| 有限の値の集合（遷移なし） | → **enum-first** |
+| 状態ごとにデータが違う（遷移なし） | → **enum-first**（variant にデータを持たせる） |
+| 状態遷移がある（少しでも） | → **typestate** + 遷移関数 |
+| 状態ごとにデータが違う + 遷移あり | → **typestate + 状態型を enum-first で設計** |
+| 状態が永続化から復元される（serde 必要） | → domain 層は **typestate**、infrastructure 層で serde 対応 enum DTO に変換（ヘキサゴナル分離） |
+| 状態数が多く組み合わせ爆発する | → enum + runtime validation（typestate の型爆発を避けるエスケープハッチ） |
 
-**typestate が適さないケース：**
-- 状態を JSON/DB から復元する必要がある（serde との統合が複雑）
+**typestate が適さないケース（エスケープハッチ）：**
 - 状態数が多い（型の数が爆発する）
 - 状態遷移がデータ駆動（外部入力で遷移先が決まる）
 
 これらの場合は enum + runtime validation が現実的。ただし「typestate で表現できないか」を最初に検討すること。
+
+**永続化が必要な場合：**
+domain 層では typestate を維持し、infrastructure 層で serde 対応 enum DTO と相互変換する。
+- domain → DTO: `From<Review<State>> for ReviewStatusDto`
+- DTO → domain: `TryFrom<ReviewStatusDto> for Review<State>`（fallible — 不正な状態復元は `Result` で報告）
+
+domain 層の型安全性を永続化の都合で妥協しない（ヘキサゴナルアーキテクチャの原則）。
 
 ## Error Handling: Result and ? Operator
 

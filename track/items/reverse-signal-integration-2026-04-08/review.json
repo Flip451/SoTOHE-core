@@ -1,0 +1,2600 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7da79d5a7124c0742bf9eb98f015c10998174ddb3ed104e8e10ed2fc5379e52",
+          "at": "2026-04-08T13:58:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision.2’s CLI summary format omits the Yellow count (`blue=N red=K (undeclared=U)`), but the track spec and task metadata require `blue=N yellow=M red=K (undeclared=U)`. That leaves the ADR and implementation spec inconsistent on the required output.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 50,
+              "category": "consistency"
+            },
+            {
+              "message": "`Reassess When` still reintroduces `auto-add` language (`auto-add を「提案モード」...`) even though this track explicitly rejects auto-add / Yellow-as-approved paths. Keeping that wording in the active ADR conflicts with the stated no-auto-add policy and can be misread as an approved future behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 125,
+              "category": "policy"
+            }
+          ],
+          "hash": "rvw1:sha256:dec3ef50b964dadaf3ceed1f28b1f8953455343bcd012d0427472099f0bec0d2",
+          "at": "2026-04-08T14:08:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision 2 specifies the command summary as `blue=N red=K (undeclared=U)`, but the track spec and verification files require `blue=N yellow=M red=K (undeclared=U)`. That leaves the observable contract for `domain-type-signals` inconsistent and risks implementing the wrong output format.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 50,
+              "category": "spec"
+            }
+          ],
+          "hash": "rvw1:sha256:dec3ef50b964dadaf3ceed1f28b1f8953455343bcd012d0427472099f0bec0d2",
+          "at": "2026-04-08T14:10:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Reassess When` still reopens `auto-add` as a future option. That reintroduces the rejected Yellow/auto-add path the ADR otherwise bans, so the document is internally inconsistent with the stated TDDD policy.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 125,
+              "category": "consistency"
+            },
+            {
+              "message": "T07’s scope includes updating `registry.md`, but the acceptance criteria and verification steps only cover the `/track:plan` message plus the two workflow docs. The registry index update can be missed without any failing check, so the workflow redirect remains unverified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/reverse-signal-integration-2026-04-08/spec.json",
+              "line": 69,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:8f67a5cd6f0bd4255a47647ea3a88889c42378aa1060de2f3dedde1c23a6ec8b",
+          "at": "2026-04-08T14:11:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeGraph` still keys types by bare name and only emits a warning on same-name collisions, so a public type in one module can overwrite another with the same name. That means the reverse check can silently miss undeclared code or mix signals across modules instead of disambiguating them.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-0045-spec-code-consistency-check-design.md",
+              "line": 125,
+              "category": "correctness"
+            },
+            {
+              "message": "The new Red gate is underspecified for reverse-only signals: undeclared types/traits are emitted as extra Red `DomainTypeSignal`s with no matching spec entry, but the spec only says \"Red なし → pass\". If `verify spec-states` keeps its current name+kind matching, those extra Red signals will be ignored and TDDD violations will still pass CI.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/spec.json",
+              "line": 42,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:883e055af1c20b59a47d573c126d674f54a28f5b494ad1b3c63f6e885042f53e",
+          "at": "2026-04-08T14:15:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30ed62696702fc7f4f0845fb15115d78cb824ea5e481bac806416d9e6ed08080",
+          "at": "2026-04-08T14:16:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` still describes the gate as \"Yellow is allowed, only Red blocks\", which contradicts ADR 1800/spec.json's two-stage rule that merge requires all Blue. If implementers follow the track metadata/plan, they can relax the final approval gate and allow unfinished Yellow states to merge.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 55,
+              "category": "correctness"
+            },
+            {
+              "message": "T04's verification checklist covers Red/Yellow outcomes, but it never checks that CI actually runs `domain-type-signals` before `verify spec-states`. Since reverse undeclared Reds are produced by the first step, leaving this sequence unverified can let undeclared types bypass the gate even when all listed checks pass.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/verification.md",
+              "line": 15,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:30ed62696702fc7f4f0845fb15115d78cb824ea5e481bac806416d9e6ed08080",
+          "at": "2026-04-08T14:18:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T04 still under-specifies the accepted two-stage gate. `metadata.json` only says `verify spec-states` should pass when there is no Red, but it omits the merge-time requirement that leftover Yellow must also block until all signals are Blue. Because `plan.md` is generated from this file, the implementation task can be completed without ever adding the merge-stage enforcement required by ADR 1800 §Decision.4 and `spec.json`.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 27,
+              "category": "consistency"
+            },
+            {
+              "message": "ADR 0045 now says the reverse-signal integration was completed while 'not relaxing the gate' and 'keeping all Blue required', but ADR 1800 accepted a two-stage gate where Yellow is allowed during intermediate commits and only blocked at merge. This leaves the ADR set internally inconsistent about the actual `verify spec-states` contract.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-0045-spec-code-consistency-check-design.md",
+              "line": 218,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:e5a8a315f208745a7a540be84b305d6211765990c327d49001ada2d154668b7f",
+          "at": "2026-04-08T14:21:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T07's acceptance criteria omit the `registry.md` Next-column update that the task description and ADR Decision.6 both require. As written, this spec can be marked complete even if `/track:design` never appears in `registry.md`, leaving part of the workflow change unimplemented and unverified.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/spec.json",
+              "line": 238,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:a682f4ca72dbd9916ee1b3f8df0e7d6da267774dc847983e28eaf9a7844fb7fe",
+          "at": "2026-04-08T14:24:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR’s TDDD introduction still says `forward Red` is the normal work-in-progress state, but Decision.3 and the 3-state table below redefine `defined + not yet implemented` as Yellow. Leaving the old Red/Yellow semantics in the same accepted ADR makes the design internally contradictory and can send later spec updates back toward the rejected gate behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "line": 25,
+              "category": "correctness"
+            },
+            {
+              "message": "Section S2 still summarizes `verify spec-states` as a one-stage gate (`Red なし → pass。Yellow は許容。Red → fail`) and omits the merge-time `all Blue required` rule that T04 introduces everywhere else. Because `plan.md` is generated from this metadata, readers following the section summary can implement or review against the wrong gate contract and leave Yellow unblocked at track completion.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 75,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:819d29979452eb7fa892b87ee42da5e80bd77cbd11b5c9b17ce1c94409342755",
+          "at": "2026-04-08T14:27:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c23e8746f2d8cf41db4c0afdce0c4fec24699ad88e3fc78945d5b05d8e879e0",
+          "at": "2026-04-08T14:30:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
+          "at": "2026-04-08T14:54:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` moved backwards to `2026-04-08T14:50:43Z`, which is earlier than this item's `created_at` (`2026-04-08T18:00:00Z`). A status transition should not produce metadata where the update timestamp predates creation; any tooling that relies on monotonic timestamps will now see this item as modified before it existed.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 112,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
+          "at": "2026-04-08T14:55:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
+          "at": "2026-04-08T14:56:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` is earlier than `created_at` (`2026-04-08T14:50:43Z` vs `2026-04-08T18:00:00Z`), which violates the track timestamp invariant and can misorder or invalidate consumers that rely on `updated_at` for latest-track selection.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 112,
+              "category": "data-integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:0491e44cb108d6e0370f0dfc17891f974a5d107dca03715fce132e3e8fb747ba",
+          "at": "2026-04-08T15:44:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:249b776035b92142187e8db7d218b46b51b2d776225eaa8fe0cab9ac5a585dc7",
+          "at": "2026-04-08T15:47:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:249b776035b92142187e8db7d218b46b51b2d776225eaa8fe0cab9ac5a585dc7",
+          "at": "2026-04-08T15:50:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f32b135b5cecb16dbdaf71fb5d75760f792af8452224cea12f8c75d583d82067",
+          "at": "2026-04-09T00:38:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f32b135b5cecb16dbdaf71fb5d75760f792af8452224cea12f8c75d583d82067",
+          "at": "2026-04-09T00:39:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cca2a285b8dcc1dd8d02ad870328277b835422198868e2a0e7febfa127fb690a",
+          "at": "2026-04-09T00:59:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cca2a285b8dcc1dd8d02ad870328277b835422198868e2a0e7febfa127fb690a",
+          "at": "2026-04-09T01:00:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:482d9e4d6ef53f78b143afc1e6ae587a122d77a879337ac8e3c4d6f1e48b7983",
+          "at": "2026-04-09T01:24:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:482d9e4d6ef53f78b143afc1e6ae587a122d77a879337ac8e3c4d6f1e48b7983",
+          "at": "2026-04-09T01:25:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:15:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes it a mandatory field for every `version: 1` profile, so any existing config loaded through `CLAUDE_AGENT_PROFILES_PATH` that has not been migrated yet will now fail `validate_profiles()` with \"missing required capabilities\". Because this patch does not bump the schema version or provide a compatibility fallback, rolling out the new hook before every external profile file is updated becomes a hard runtime break.",
+              "severity": "P1",
+              "file": ".claude/hooks/_agent_profiles.py",
+              "line": 20,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:17:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes every v1 profile require the new capability immediately. Because `CLAUDE_AGENT_PROFILES_PATH` still allows older/custom configs and `PROFILE_VERSION` stays at 1, those configs will now fail validation with a breaking runtime error instead of loading with the previous schema. This needs a version bump or compatibility fallback.",
+              "severity": "P1",
+              "file": ".claude/hooks/_agent_profiles.py",
+              "line": 17,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:18:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `designer` to `REQUIRED_CAPABILITIES` makes it mandatory for every v1 profile immediately. Any existing or custom config loaded via `CLAUDE_AGENT_PROFILES_PATH` that has not been migrated will now fail `validate_profiles()` with a missing-capabilities error, even though `PROFILE_VERSION` is still 1. This is a breaking schema change without a version bump or backward-compatibility fallback.",
+              "severity": "P1",
+              "file": ".claude/hooks/_agent_profiles.py",
+              "line": 20,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:20:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:20:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T05 is still recorded as `in_progress`, but the companion config change already adds `designer` to every profile in `.claude/agent-profiles.json`. Because `metadata.json` is the source of truth and workflow tooling returns the first `in_progress` task before any `todo`, leaving T05 open will keep this track pinned on a completed task and delay T06 from becoming the next actionable item.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 97,
+              "category": "other"
+            }
+          ],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:22:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:23:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:209830589791b11d01b1ed06f0ea755377bc2b0cae6e9320b5b2f27b19515d2f",
+          "at": "2026-04-09T02:23:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5bb066475db5ed877a81c8e2dbca5cd7e7aff4d5ddcb1eb19f84edd766b24b3b",
+          "at": "2026-04-09T02:40:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5bb066475db5ed877a81c8e2dbca5cd7e7aff4d5ddcb1eb19f84edd766b24b3b",
+          "at": "2026-04-09T02:41:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63faab1418d7c94651c63df127745a81cd8ce79f94eec23f257745cdae072595",
+          "at": "2026-04-09T03:34:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63faab1418d7c94651c63df127745a81cd8ce79f94eec23f257745cdae072595",
+          "at": "2026-04-09T03:35:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:353064bc72a3d8eb3f7d5bba78bf44243ab41003e33a5cfde75503caee8b6d22",
+          "at": "2026-04-09T04:22:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `/track:design` here leaves the same command table still describing `/track:plan` as `Research, design, plan, and create track artifacts after approval`, so `knowledge/WORKFLOW.md` now gives two conflicting answers about where the TDDD design step happens. Because `domain-types.json` creation is now supposed to happen in `/track:design`, this can misroute users into skipping the required step and hitting `verify spec-states` failures.",
+              "severity": "P1",
+              "file": "knowledge/WORKFLOW.md",
+              "line": 150,
+              "category": "workflow-docs"
+            }
+          ],
+          "hash": "rvw1:sha256:353064bc72a3d8eb3f7d5bba78bf44243ab41003e33a5cfde75503caee8b6d22",
+          "at": "2026-04-09T04:23:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:353064bc72a3d8eb3f7d5bba78bf44243ab41003e33a5cfde75503caee8b6d22",
+          "at": "2026-04-09T06:01:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new TDDD step is only documented on the standard `/track:plan` lane. In the alternative `plan-only` flow, the sequence still jumps from `/track:activate <track-id>` straight to implementation, so users following this file can miss `/track:design` before coding and immediately hit the Red `verify spec-states` gate. The `plan-only` path needs the same `plan -> design -> implement` guidance that was added elsewhere.",
+              "severity": "P1",
+              "file": "knowledge/WORKFLOW.md",
+              "line": 23,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:353064bc72a3d8eb3f7d5bba78bf44243ab41003e33a5cfde75503caee8b6d22",
+          "at": "2026-04-09T06:03:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:design` is introduced here as the separate TDDD step, but the command reference still says `/track:plan` does \"Research, design, plan...\". That leaves the primary workflow doc telling users planning already covers design, so they can reasonably skip `/track:design` and then run into the documented `domain-types.json` / `verify spec-states` gate later. Update the `/track:plan` description so the standard workflow no longer implies that design already happened.",
+              "severity": "P1",
+              "file": "knowledge/WORKFLOW.md",
+              "line": 149,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:3ac6ac729067b9963a63fbdaa24f6cd3bd665a771f4e1fcc6ad2dd03bd17bc24",
+          "at": "2026-04-09T06:05:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f67a25b52a8c9774563fcace7a09533820ec3b87f8f2919931dd4a7d143690e5",
+          "at": "2026-04-09T06:08:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47cfe2a708f2b0f954e98ccbfb79ef3e10472d18ebe93055f31b89eb86486e46",
+          "at": "2026-04-09T06:10:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47cfe2a708f2b0f954e98ccbfb79ef3e10472d18ebe93055f31b89eb86486e46",
+          "at": "2026-04-09T06:12:59Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
+          "at": "2026-04-08T14:52:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
+          "at": "2026-04-08T14:53:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Missing regression coverage for the new `DomainTypeKind::ErrorType` missing-type branch. `evaluate_domain_type_signals` now returns `Yellow` here, but no test exercises this public path, so a future regression would go undetected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/domain_types.rs",
+              "line": 442,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:40:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:41:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Changing the missing-type branches to return `ConfidenceSignal::Yellow` is incomplete on its own: callers still treat every non-Blue domain signal as a failure, so a spec-declared but unimplemented type remains blocking instead of becoming the intended WIP state. As merged, this patch mostly relabels that case without delivering the new behavior.",
+              "severity": "P1",
+              "file": "libs/domain/src/domain_types.rs",
+              "line": 313,
+              "category": "logic"
+            },
+            {
+              "message": "The new missing-type path for `ErrorType` has no regression test. This patch updates all five evaluators, but only four missing-type cases were re-covered in `#[cfg(test)]`, so `evaluate_error_type(...missing...) -> Yellow + found_type=false` can regress unnoticed.",
+              "severity": "P1",
+              "file": "libs/domain/src/domain_types.rs",
+              "line": 448,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:43:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_error_type` now classifies a missing declared error type as `Yellow`, but this changed branch has no regression test while the other updated evaluators do. That leaves the public `ErrorType` WIP path (`signal = Yellow`, `found_type = false`) able to regress unnoticed.",
+              "severity": "P1",
+              "file": "libs/domain/src/domain_types.rs",
+              "line": 448,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:f02252e1f1851185ea8d879208c9f50cd66ac20a21fb3b2500cd2ec0963000d3",
+          "at": "2026-04-09T00:46:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7432e38c13e7b9ee26ad083d4c2195e4ef79a17724689b784c1b63320c6f14d7",
+          "at": "2026-04-09T00:49:20Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `provider_model_overrides` from the reviewer model-resolution instructions leaves this file out of sync with the repo's existing `verify_orchestra` guardrail, which still requires the override-first snippet for `.claude/commands/track/review.md`. The same regression appears again in the model escalation section, so this change will fail verification unless the checker is updated in the same patch.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 41,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T13:59:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T13:59:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `provider_model_overrides` from the reviewer model-resolution guidance leaves this file out of sync with the current `verify orchestra` guardrail, which still requires the canonical override-first snippets for `.claude/commands/track/review.md`. Since `cargo make ci` includes `verify-orchestra-local`, this change will fail the workflow gate until the verifier is updated in the same patch; the same regression is repeated in the model-escalation section later in this file.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 42,
+              "category": "ci"
+            }
+          ],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T14:01:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T14:07:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T14:08:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2a says to invoke reviewers only for groups that report `required`, but Step 2b/2c still say to build briefings and launch `review-fix-lead` for every non-empty group. Approved-but-non-empty scopes will still get reviewer runs, so the new `track-review-status` gate is not actually enforced.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 95,
+              "category": "workflow"
+            },
+            {
+              "message": "The rewrite removes the manual file-classification instructions, but it never adds a source for the `{file list for this group}` needed in the briefing template and the `{file list from Step 2a}` prompt. `track-review-status` only reports per-scope state, so this document no longer tells the orchestrator how to populate per-group file lists.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 66,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:0435446374e96052622aff0a1da3708bd5ceb37711159f006940ad55529af356",
+          "at": "2026-04-08T14:59:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2a says to invoke reviewers only for groups that report `required`, but Step 2c still launches `review-fix-lead` per non-empty group. Approved-but-non-empty scopes will still get reviewer runs, so the new `track-review-status` gate is not actually enforced.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 138,
+              "category": "workflow"
+            },
+            {
+              "message": "The rewrite removes the manual file-classification recipe, but Step 2b/2c still need a per-group file list (`{file list for this group}` / `{file list from Step 2a}`). `track-review-status` only reports per-scope state, so this document no longer tells the orchestrator where those file lists come from.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 157,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:0435446374e96052622aff0a1da3708bd5ceb37711159f006940ad55529af356",
+          "at": "2026-04-08T15:00:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2b still references `{base}` in the changed-file diff, but Step 2a removed the only definition of that variable. The orchestrator no longer has an unambiguous diff base to use when building briefings, so file lists can diverge from the status command's scope hash.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 96,
+              "category": "correctness"
+            },
+            {
+              "message": "The new file-list recipe only filters by per-group glob patterns from `track/review-scope.json`, but `other` is a complement scope and `review_operational` / `other_track` exclusions have to be applied first. As written, `other` briefings cannot be derived correctly and may include operational files.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 96,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b1c9621edb7989b7ba3c86b69f67b4eaafc434f73e4356c65e6fe513a07a1b45",
+          "at": "2026-04-08T15:09:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2b still uses `{base}` in the committed-diff command, but the rewrite removed the only place that defined the diff base. The briefing file list can now be computed against an undefined or incorrect merge base, so the per-group scope can diverge from `track-review-status`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 96,
+              "category": "workflow"
+            },
+            {
+              "message": "The new file-list recipe only filters by named-group globs from `track/review-scope.json`; it never explains how to build the implicit `other` scope or apply `review_operational` / `other_track` exclusions. As written, `other` briefings can be wrong or include operational files.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 96,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:b1c9621edb7989b7ba3c86b69f67b4eaafc434f73e4356c65e6fe513a07a1b45",
+          "at": "2026-04-08T15:10:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `review-fix-lead` contract still needs an explicit scope file list, but this prompt replaces it with a note that `track-local-review` will auto-inject files. That only applies to the reviewer subprocess, so the higher-level agent loses its modification allowlist, and the `claude` branch has no alternate source for the list.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 158,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:c8cce9759e55c50aa7caaafc18bfeed55c3d45f9846dc874baf722d3af2d7a0e",
+          "at": "2026-04-08T15:18:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2a omits the `required (findings remain)` state from the list of scopes that need reviewer invocation, even though `track-review-status` can emit it. A scope with unresolved findings would be treated as skippable and could never be re-reviewed.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 84,
+              "category": null
+            },
+            {
+              "message": "Step 2b claims the per-group file list is auto-injected by `track-local-review`, then reuses the same briefing for the `claude`/`Explore` path in Step 2c. That path does not invoke `track-local-review`, so the reviewer contract loses the required scope file list and can review the wrong or incomplete set of files.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 96,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:c8cce9759e55c50aa7caaafc18bfeed55c3d45f9846dc874baf722d3af2d7a0e",
+          "at": "2026-04-08T15:19:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2b tells the `claude` path to populate `## Changed Files`, but the rewrite removed the only instruction for deriving those per-group file lists. `track-review-status` only reports scope state, so this policy no longer says how to build the briefing for `claude`/`Explore` runs or any manual fallback.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 98,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:7fe7ab5aab2e91c2013f466daebc029fa113cb889e7e92dbade5d2b91d9bb6fd",
+          "at": "2026-04-08T15:23:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2b now requires a per-group `## Changed Files` section for the `claude` path, but Step 2a no longer provides any recipe for deriving that list. `track-review-status` only reports scope state, so the briefing for `claude`/`Explore` runs is underspecified and cannot be built deterministically.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 98,
+              "category": "correctness"
+            },
+            {
+              "message": "The `review-fix-lead` agent prompt no longer passes an explicit scope file allowlist; `Scope files: (auto-injected by track-local-review)` refers to the reviewer subprocess, not the agent that must enforce scope boundaries and return `blocked_cross_scope`. This breaks the contract in `.claude/agents/review-fix-lead.md` and leaves the `claude` path without a modification allowlist.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 160,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7fe7ab5aab2e91c2013f466daebc029fa113cb889e7e92dbade5d2b91d9bb6fd",
+          "at": "2026-04-08T15:24:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Hard-coding Codex here removes the existing `claude-heavy` reviewer path even though `.claude/agent-profiles.json` and the guardrails still define it. That makes `/track:review` unusable for a supported profile and contradicts the profile-driven reviewer selection model.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 43,
+              "category": "correctness"
+            },
+            {
+              "message": "`Scope files` is part of the `review-fix-lead` input contract, but this prompt replaces it with an auto-injected note that only applies to the reviewer subprocess. The agent no longer has an explicit modification allowlist, so it cannot reliably detect or report cross-scope fixes.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ceede06ff4d5a7151b62d4f133f9d91f7eacb17035fe39a0710c658ffa05df6d",
+          "at": "2026-04-08T15:36:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Hard-coding the reviewer model resolution to Codex and marking the `claude` path unsupported makes `/track:review` unusable for the existing `claude-heavy` profile, which still maps `reviewer` to `claude` in `.claude/agent-profiles.json`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 43,
+              "category": "workflow"
+            },
+            {
+              "message": "Replacing the explicit `Scope files` allowlist with `'(auto-injected by track-local-review)'` breaks the `review-fix-lead` contract: the agent no longer receives the file list it is allowed to modify, so it cannot reliably detect or report cross-scope fixes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 145,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:ceede06ff4d5a7151b62d4f133f9d91f7eacb17035fe39a0710c658ffa05df6d",
+          "at": "2026-04-08T15:38:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 still resolves `{fast_model}`/`{model}` from `providers.<reviewer_provider>`, but Step 1 removed provider resolution and hardcodes codex-only lookup. The command is internally inconsistent about which provider drives model selection.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 195,
+              "category": "correctness"
+            },
+            {
+              "message": "Step 2a removes manual partitioning, but the prescribed `cargo make track-review-status` command only reports scope states; it does not provide the per-group file lists that Step 2c still requires for the `review-fix-lead` prompt. As written, the orchestrator has no documented source for the `Scope files` input.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 52,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:44be30cfad58931ca1989b27c05b1c97b6895437613dca6e21e413f74a264291",
+          "at": "2026-04-08T15:42:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2c asks the orchestrator to pass '{changed files in this group, from track-review-status partition}' into each review-fix-lead agent, but `cargo make track-review-status` only prints per-scope state and does not expose the per-group file list. As written, the scope-owned file set cannot be populated, so the agent cannot safely enforce its edit boundary.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:44be30cfad58931ca1989b27c05b1c97b6895437613dca6e21e413f74a264291",
+          "at": "2026-04-08T15:45:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2b/2c removed the documented source for the per-group file list, but `track-review-status` only reports scope state and never emits changed-file lists. The orchestrator still needs an explicit allowlist to populate the briefing and `review-fix-lead` prompt, so this workflow is no longer deterministic.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 82,
+              "category": null
+            },
+            {
+              "message": "The new `Scope files` derivation only mentions files matching a group's glob patterns, but `other` is a complement scope and `review_operational` / `other_track` exclusions must be applied first. As written, the `other` agent can receive the wrong file set, which breaks the scope boundary the review-fix-lead contract relies on.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 145,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:aaa43f12219aed39663ffb76349c7a5304ee07bbd7666d7badd0ef040d6e0734",
+          "at": "2026-04-08T15:50:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The per-scope agent prompt now grants modification rights to every file matching the scope glob, instead of the concrete changed-file set for this review. That broadens the write set beyond the current review target and can let a fixer mutate unrelated files in the same layer, which risks unintended edits and stale review/hash state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aaa43f12219aed39663ffb76349c7a5304ee07bbd7666d7badd0ef040d6e0734",
+          "at": "2026-04-08T15:51:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `review-fix-lead` allowlist recipe is incomplete for the `other` scope. `track/review-scope.json` has no `other` glob patterns, and this prompt never says to derive `other` as the complement of the named groups or to exclude `review_operational` / `other_track`, so the agent cannot get a correct modification allowlist for `other` and may either miss files or touch operational ones.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 145,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:aaa43f12219aed39663ffb76349c7a5304ee07bbd7666d7badd0ef040d6e0734",
+          "at": "2026-04-08T15:55:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aaa43f12219aed39663ffb76349c7a5304ee07bbd7666d7badd0ef040d6e0734",
+          "at": "2026-04-08T15:57:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new review-fix-lead prompt says to fill `Scope files` from `track/review-scope.json`, but that file has no entry for the implicit `other` scope. `track-review-status` can still require `other`, so for those runs the orchestrator no longer has any way to give the agent a correct in-scope allowlist, which breaks the cross-scope guard for `other`-only changes.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 146,
+              "category": null
+            },
+            {
+              "message": "Step 2 now forbids manual per-file classification and relies on `track-review-status`, but the briefing template still requires `## Changed Files (this group only)`. Because `track-review-status` only reports state and `CodexReviewer::build_full_prompt` injects file lists only inside `track-local-review`, the orchestrator no longer has a documented way to populate that section, so the briefing generation flow is internally inconsistent for every required scope.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 82,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:aaa43f12219aed39663ffb76349c7a5304ee07bbd7666d7badd0ef040d6e0734",
+          "at": "2026-04-08T16:00:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a805ff074d0f6197c24d5bc8189d4d87febc4748aa09b7c1de6eba2a38a79327",
+          "at": "2026-04-08T16:07:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1 now hard-codes `providers.codex.{default_model,fast_model}` and removes the `providers.<reviewer_provider>.{default_model,fast_model}` guidance that `verify-orchestra` still enforces for this file. In the current repo state, that makes `.claude/commands/track/review.md` fail the orchestration verifier before the review workflow can be considered valid.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 40,
+              "category": null
+            },
+            {
+              "message": "Step 2a says not to classify files manually and to rely on `track-review-status`, but the agent prompt still requires an explicit file list for the `other` scope. Because `other` is implicit in `track/review-scope.json` and `track-review-status` does not expose per-scope membership, the orchestrator no longer has any documented way to populate that list when `other` is required.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 145,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:a805ff074d0f6197c24d5bc8189d4d87febc4748aa09b7c1de6eba2a38a79327",
+          "at": "2026-04-08T16:11:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Lines 40-41 hard-code model lookup to `providers.codex.*`, but the repo verifier still requires this command spec to describe provider-relative resolution via `providers.<reviewer_provider>.*` (`libs/infrastructure/src/verify/orchestra.rs` lines 335-340). As written, the updated policy fails orchestration verification before the review workflow can be accepted.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 40,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `other`-scope allowlist is underspecified. Step 2c says to pass the actual changed files for `other`, but Step 2a now forbids manual partitioning and `track-review-status` only reports scope state, not membership. Since `track/review-scope.json` has no `other` glob patterns, the orchestrator has no documented way to build that allowlist when `other` is required, so the review-fix-lead cannot enforce its scope boundary.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a805ff074d0f6197c24d5bc8189d4d87febc4748aa09b7c1de6eba2a38a79327",
+          "at": "2026-04-08T16:13:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ceb4a4bcdcd6e3fa6a852b8ea3e4c7d4cf580806ef2093a6eb931f81a2e7937",
+          "at": "2026-04-08T16:20:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `other`-scope allowlist recipe is semantically wrong. `ReviewScopeConfig::classify()` excludes `review_operational` and `other_track` paths before assigning unmatched files to `Other`, but this step now says to derive `other` by subtracting named-group matches from the raw full diff. On a worktree that also changes `track/items/<track-id>/review.json`, archived tracks, or another track's files, the orchestrator will incorrectly hand those excluded paths to the `review-fix-lead` as in-scope files.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 149,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6ceb4a4bcdcd6e3fa6a852b8ea3e4c7d4cf580806ef2093a6eb931f81a2e7937",
+          "at": "2026-04-08T16:22:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new per-scope allowlist recipe is underspecified: it says to derive files from the 'full diff' but no longer spells out the same 4-source union that the reviewer actually uses (committed diff, staged, unstaged, and untracked files). In this repo, `GitDiffGetter` includes all four sources, so an implementation that follows this doc literally can miss staged or untracked edits and leave them out of review/fix coverage.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 147,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9ffb6b2407f0297eaf093038178e0b1037f665358e2521873f38b774b8cb39bf",
+          "at": "2026-04-08T23:04:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `other`-scope allowlist recipe is too aggressive: `ReviewScopeConfig::classify()` keeps files under `track/items/<track-id>/` even when they match `track/items/<other-track>/**`, but Step 2c says to subtract every `other_track` match from the full diff. That would drop current-track planning artifacts from `other` and leave them unreviewed.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 148,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9ffb6b2407f0297eaf093038178e0b1037f665358e2521873f38b774b8cb39bf",
+          "at": "2026-04-08T23:06:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Step 2 flow never consumes the optional `$ARGUMENTS` scope note, so a scoped invocation still runs every `required` group from `track-review-status`. That silently violates the documented contract to limit review to the requested files/modules/concerns.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 29,
+              "category": "workflow_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:bd9a37e4990eb680b9b88667a57b1af0b3794a549aa4310ecff97a2b5cbda272",
+          "at": "2026-04-08T23:23:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f6c3ed6c990ea250265ad8da585546d7e179faebd26533cd235db65a2a498dbc",
+          "at": "2026-04-08T23:30:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Filtering Step 2 down to only the user-requested groups breaks scoped reviews. `track-check-approved` still validates every required scope in the track, so a run like `/track:review libs/domain/` will now stop after reviewing only `domain` and then fail the final approval gate as soon as any other scope (for example `cli`) is still `required`. Before this change the command reviewed all required groups, so the new scope filter introduces a path where a legitimate partial review request can never complete successfully.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 81,
+              "category": "workflow_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f6c3ed6c990ea250265ad8da585546d7e179faebd26533cd235db65a2a498dbc",
+          "at": "2026-04-08T23:34:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2c still requires an `other`-scope allowlist computed from the \"full diff\", but Step 2a removed the only recipe for reconstructing that diff (base ref plus staged/unstaged/untracked files) and replaced it with `track-review-status`, which only prints scope states. In `other`-only reviews the orchestrator no longer has a deterministic way to build the agent's edit boundary, so files can be omitted from or over-included in the scope.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 153,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:f6c3ed6c990ea250265ad8da585546d7e179faebd26533cd235db65a2a498dbc",
+          "at": "2026-04-08T23:38:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ee3b70a186cb9cb4103d0e9c91bd6b52f26d88144ceb62475bb1005a930e6d1",
+          "at": "2026-04-08T23:43:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2b says the per-group briefing no longer needs a scope file list because `track-local-review` injects it automatically, but the template immediately below still requires `## Changed Files (this group only)`. An orchestrator following the new prose will either leave that section blank or need undocumented extra work, so the briefing-generation contract is internally inconsistent for every required scope.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 89,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:2ee3b70a186cb9cb4103d0e9c91bd6b52f26d88144ceb62475bb1005a930e6d1",
+          "at": "2026-04-08T23:46:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Filtering Step 2 down to only the user-requested groups breaks scoped `/track:review` runs. Step 3 still requires `cargo make track-check-approved`, and that gate blocks whenever any other scope in the track remains `required`, so a run scoped to `libs/domain/` cannot reach completion unless all other required scopes are reviewed anyway.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 81,
+              "category": "workflow_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2ee3b70a186cb9cb4103d0e9c91bd6b52f26d88144ceb62475bb1005a930e6d1",
+          "at": "2026-04-08T23:48:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This says `$ARGUMENTS` is not used, but Step 0 still reads it to override track selection when it starts with a track id. That makes `/track:review <track-id>` silently switch targets even though the command contract says arguments are ignored, which can send the review to the wrong track.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 13,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a8340261effcabc11272514fee9742db94770587bcbc998ec6b8e491ec3dda94",
+          "at": "2026-04-09T00:02:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`$ARGUMENTS` is documented as unused, but Step 0 still uses it to select the track and otherwise falls back to the latest active track. On a `plan/<id>` or other non-track checkout this can silently review the wrong track instead of the explicit planning-only track the user intended, so the non-track review flow is no longer deterministic.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 13,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a8340261effcabc11272514fee9742db94770587bcbc998ec6b8e491ec3dda94",
+          "at": "2026-04-09T00:04:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Requiring the current branch to be `track/<id>` breaks the documented `/track:review` flow for `plan/<id>` review branches and branchless planning-only tracks. Those workflows still need explicit track-id selection before activation, but this precondition makes them impossible to review.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 16,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3754ef8f68737e43b011b1c1bdc73d9afc6d56cb6cfdc4d7c101418d2f202e18",
+          "at": "2026-04-09T00:12:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing the explicit `track-id` selector path means `/track:review` now rejects every non-`track/<id>`/`plan/<id>` branch. That breaks the documented planning-only review lane on non-track branches, so planning-only tracks are no longer reviewable before activation unless the user is on the `plan/<id>` checkout.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 12,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:a2346f325bcb5cfbba5de796990438d9e14d38b69b1b0b632e2978b97b90f8fe",
+          "at": "2026-04-09T00:19:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Claiming `plan/<id>` branches are valid review targets is incorrect: the shared track resolver rejects `plan/*` as `NotTrackBranch`, so `/track:review` will abort on the `plan/<track-id>` branch created by `/track:plan-only`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 16,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:a2346f325bcb5cfbba5de796990438d9e14d38b69b1b0b632e2978b97b90f8fe",
+          "at": "2026-04-09T00:21:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2346f325bcb5cfbba5de796990438d9e14d38b69b1b0b632e2978b97b90f8fe",
+          "at": "2026-04-09T00:24:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2346f325bcb5cfbba5de796990438d9e14d38b69b1b0b632e2978b97b90f8fe",
+          "at": "2026-04-09T00:28:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0c8149fbd5338328396eada4d353669151bf5af129677f6c645cebfc0ad9115",
+          "at": "2026-04-09T02:14:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0c8149fbd5338328396eada4d353669151bf5af129677f6c645cebfc0ad9115",
+          "at": "2026-04-09T02:15:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 merges/removes `domain_types` entries but never says to clear or rebuild the derived `signals` array. If `/track:design` is rerun after a prior evaluation, removed or renamed types can keep stale signal rows in `domain-types.json`, so later verification reads a document whose declarations and signals disagree. The command should explicitly drop signals on design writes or regenerate them.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 71,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0f67f725af0a910ac820b7e512b7af830f5a3f02dbec0b494780adce5d4d0bfd",
+          "at": "2026-04-09T02:42:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Typestate entries are described as carrying `transitions`, but `domain-types.json` actually serializes typestate as `transitions_to` in the codec. Following this prompt verbatim will emit the wrong key and produce JSON that cannot be decoded for typestate types.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 36,
+              "category": "correctness"
+            },
+            {
+              "message": "The incremental-update rule only preserves or removes existing entries; it never reconciles changed kind-specific fields, and the write example omits the top-level `signals` field. Re-running `/track:design` after a plan edit or after signal evaluation can therefore leave stale type declarations in place or erase recorded signal state.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 71,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0f67f725af0a910ac820b7e512b7af830f5a3f02dbec0b494780adce5d4d0bfd",
+          "at": "2026-04-09T02:43:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The kind-specific field for typestate is written as `transitions` here, but the domain-types codec serializes/deserializes `transitions_to` for `kind=typestate`. Following this prompt literally will produce JSON that the existing decoder rejects.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 51,
+              "category": "schema"
+            },
+            {
+              "message": "Step 3 preserves any existing `signals` array, but the command never generates one on a fresh `domain-types.json` write. Since `verify spec-states` requires signal data before CI can pass, a first-time `/track:design` run cannot satisfy Step 4 as written.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 76,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:49befefd8466300fc79683d57a816e005c3a5bd7345253805c564c341fc24d48",
+          "at": "2026-04-09T02:51:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 names the typestate payload as `transitions`, but the codec and canonical schema use `transitions_to`. Following this prompt literally will produce JSON that `domain_types_codec` rejects for typestate entries.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 51,
+              "category": "schema"
+            },
+            {
+              "message": "The incremental update rules only preserve existing entries/signals; they never say to refresh changed fields or drop stale signals when a type is renamed, re-kinded, or removed. Re-running `/track:design` after a plan edit can leave `domain-types.json` out of sync with the current plan and later verification will read stale declarations.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 71,
+              "category": "incremental-update"
+            }
+          ],
+          "hash": "rvw1:sha256:49befefd8466300fc79683d57a816e005c3a5bd7345253805c564c341fc24d48",
+          "at": "2026-04-09T02:53:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The incremental merge rules never say to drop obsolete kind-specific fields when a type changes kind. Reusing an existing entry that moves from `enum`/`typestate` to `value_object` can leave stale `expected_variants`/`transitions_to` data behind and produce a JSON object the codec rejects.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 71,
+              "category": "correctness"
+            },
+            {
+              "message": "Step 3 writes `domain-types.json`, but Step 4 only runs `cargo make ci`; it never regenerates the paired `domain-types.md` view or re-evaluates domain type signals. That leaves the rendered docs and cached signals stale after a successful design update, so the next steps guidance can point at out-of-date state.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 81,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:848e4bb72538a36aa38ba279fc2e8b7a1d6102386495bbc1e387cab4c030b456",
+          "at": "2026-04-09T03:00:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 asks this command to run `cargo make ci`, but the workflow never regenerates domain-type signals after writing a fresh `domain-types.json`. `verify spec-states` fails closed when `signals` is absent, so the first `/track:design` run cannot satisfy its own validation step.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 81,
+              "category": "correctness"
+            },
+            {
+              "message": "The next-steps guidance says `verify spec-states` will pass as long as no Red signals exist, but that is only true for the default/interim gate. In strict merge mode, Yellow also fails, so this can incorrectly imply a Yellow-only design is merge-ready.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 94,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:848e4bb72538a36aa38ba279fc2e8b7a1d6102386495bbc1e387cab4c030b456",
+          "at": "2026-04-09T03:02:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0/1 stops at `spec.md`, `metadata.json`, `.claude/rules/04-coding-principles.md`, and `knowledge/DESIGN.md`, but it never reads the track's `## Related Conventions (Required Reading)` section from the spec. That means `/track:design` can ignore feature-specific mandatory conventions and produce a type design that is already non-compliant with the track contract.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 17,
+              "category": "correctness"
+            },
+            {
+              "message": "The incremental merge rules update known fields but never say to remove obsolete kind-specific fields when a type changes kind. If a type is reclassified from `enum`/`typestate`/`error_type`/`trait_port` to `value_object`, stale `expected_variants` or `transitions_to` data can remain on disk and drift the registry away from the schema the codec expects.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 71,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:73f540cd2a9bda30f83ce57cee7aba03017997f20c7d2a6a95b831bcae7a760a",
+          "at": "2026-04-09T03:07:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 unconditionally reads `track/items/<id>/spec.md`, but the command also claims to support legacy tracks without `spec.json` by falling back to `plan.md`. On legacy tracks that only have `plan.md`/`metadata.json`, `/track:design` will fail before it reaches the fallback path.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 17,
+              "category": "correctness"
+            },
+            {
+              "message": "The decision table says `Serde/persistence needed? -> enum + runtime validation`, which does not match `.claude/rules/04-coding-principles.md`. The rule says persistence should select `enum`, while runtime validation is only the fallback for large state spaces, so this prompt can steer the designer toward the wrong abstraction.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 45,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:716edb0c81cb87e69b099b353be4ed5a723c0bdc5ab52ed9c418f4c05e33b21e",
+          "at": "2026-04-09T03:11:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 does not say what to do when the current branch is neither `track/<id>` nor `plan/<id>`. In that case the command can proceed without a valid track id and only fail later with a confusing path error. Add an explicit fail-closed stop before any file access.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 15,
+              "category": "correctness"
+            },
+            {
+              "message": "The decision-table summary here conflicts with `.claude/rules/04-coding-principles.md`: persistence/serde should map to `enum`, while `enum + runtime validation` is only the fallback for oversized state spaces. As written, `/track:design` can steer the designer toward runtime validation for persisted types even when the coding principles say to model them as enums.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 45,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:716edb0c81cb87e69b099b353be4ed5a723c0bdc5ab52ed9c418f4c05e33b21e",
+          "at": "2026-04-09T03:13:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:design` only resolves `track/<id>` or `plan/<id>` branches and otherwise aborts. That is stricter than the established track-command resolver used elsewhere in the workflow, so invoking this command from a normal `main`/non-track checkout will fail even when a current track exists.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 15,
+              "category": "workflow"
+            },
+            {
+              "message": "The next-step guidance unconditionally tells the user to run `/track:implement`, but planning-only tracks must be activated first. On a `plan/<id>` branch this will send users into a command that immediately stops on the activation guard instead of giving the required `/track:activate <track-id>` step.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 94,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:669a9189c39a41c11de6c9c493110d907e50f4025797beef012fea2aacac379e",
+          "at": "2026-04-09T03:16:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 tells users to run `sotp track domain-type-signals` without the required `<track-id>` argument. The CLI entrypoint for this command takes an explicit track ID, so the instruction as written will fail or target the wrong track and leaves the just-written `domain-types.json` unevaluated.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 83,
+              "category": "correctness"
+            },
+            {
+              "message": "Step 1 only loads `knowledge/DESIGN.md` for architecture context and never cross-checks the accepted ADRs that actually define the domain-types workflow. That leaves `/track:design` free to follow the summary doc even when the track is governed by `2026-04-07-0045` / `2026-04-08-1800`, which can produce a design that disagrees with the authoritative decisions.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 28,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:669a9189c39a41c11de6c9c493110d907e50f4025797beef012fea2aacac379e",
+          "at": "2026-04-09T03:19:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00e2a5383a65e71584d6af271abb52c2ce33a6f91793808702535e52bedfbd6d",
+          "at": "2026-04-09T03:22:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 tells the operator to run `sotp track domain-type-signals --track-id <id>`, but this CLI takes `track_id` as a positional argument and does not define a `--track-id` flag. Following the prompt will fail before signals are refreshed and `domain-types.md` is regenerated.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 84,
+              "category": null
+            },
+            {
+              "message": "The next-step guidance always says to run `/track:implement`, but this command explicitly supports `plan/<id>` branches in Step 0. Those tracks are still planning-only, and `/track:implement` rejects them until `/track:activate <track-id>` runs, so the prompt sends a supported workflow to the wrong next command.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 95,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:00e2a5383a65e71584d6af271abb52c2ce33a6f91793808702535e52bedfbd6d",
+          "at": "2026-04-09T03:25:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:design` only resolves the track from `track/<id>`, `plan/<id>`, or an explicit argument, then aborts otherwise. That breaks the repo's established current-track resolver for non-track checkouts, so running this from `main` after planning artifacts land on a branchless track will fail even though a current track exists.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 15,
+              "category": "workflow"
+            },
+            {
+              "message": "Step 5 always tells the user to run `/track:implement`, but planning-only tracks must go through `/track:activate <track-id>` before any code-bearing implementation. In the `plan/<id>` / branchless workflow this guidance sends the user to a command that immediately refuses to run.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 95,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:00e2a5383a65e71584d6af271abb52c2ce33a6f91793808702535e52bedfbd6d",
+          "at": "2026-04-09T03:29:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 instructs users to run `sotp track domain-type-signals --track-id <id>`, but the actual CLI takes the track ID positionally and does not define a `--track-id` flag. Following this instruction will fail before the new `domain-types.json` is re-evaluated and `domain-types.md` is regenerated.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 84,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7650ccc7304308827706280b777e84971a2de958c521117f985d401b7da4b1ff",
+          "at": "2026-04-09T03:34:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 tells the operator to run `sotp track domain-type-signals --track-id <id>`, but this CLI takes the track ID positionally and does not define a `--track-id` flag. Following the prompt as written will fail before signals are refreshed and `domain-types.md` is regenerated.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 84,
+              "category": "workflow"
+            },
+            {
+              "message": "Step 3 preserves the existing `signals` array while mutating the entry set. That leaves `domain-types.json` inconsistent whenever a type is added, removed, or re-kinded, and `verify spec-states` does not reject extra stale signal rows. The write step should clear or rebuild signals instead of carrying them forward.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 80,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7650ccc7304308827706280b777e84971a2de958c521117f985d401b7da4b1ff",
+          "at": "2026-04-09T03:35:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8131bb253f1893c1b09d4562920f1f03820bd97491003e7d28c7ae971ab3b610",
+          "at": "2026-04-09T03:42:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new persistence rule only specifies a one-way `From` conversion to the serde DTO, even though this section is about states being restored from persistence. Following it literally leaves no validated DTO -> domain path for rebuilding typestate and encourages ad-hoc reconstruction instead of a fallible `TryFrom`/constructor flow that returns `Result`.",
+              "severity": "P1",
+              "file": ".claude/rules/04-coding-principles.md",
+              "line": 121,
+              "category": null
+            },
+            {
+              "message": "Step 5 says default `verify spec-states` passes as long as no Red signals exist, but the current gate only counts signals whose `(type_name, kind_tag)` matches a declared entry. Reverse undeclared Reds (`undeclared_type` / `undeclared_trait`) are ignored there, so this guidance overstates what the command actually verifies and can tell users CI is clean when undeclared code still exists.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 97,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:8131bb253f1893c1b09d4562920f1f03820bd97491003e7d28c7ae971ab3b610",
+          "at": "2026-04-09T03:46:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new persistence rule says to keep typestate in the domain layer and convert to a serde DTO with `From`, but this section is specifically about states being restored from persistence. Following it literally leaves no validated DTO -> domain path for rebuilding typestate and encourages ad-hoc reconstruction instead of a fallible `TryFrom`/constructor flow that returns `Result`.",
+              "severity": "P1",
+              "file": ".claude/rules/04-coding-principles.md",
+              "line": 121,
+              "category": "correctness"
+            },
+            {
+              "message": "Step 5 says default `verify spec-states` passes as long as no Red signals exist, but the current verifier only checks signals whose `(type_name, kind_tag)` matches a declared entry and ignores reverse undeclared Reds (`undeclared_type` / `undeclared_trait`). This guidance can therefore tell users CI is clean even when undeclared code still exists.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 97,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8131bb253f1893c1b09d4562920f1f03820bd97491003e7d28c7ae971ab3b610",
+          "at": "2026-04-09T03:49:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This guidance says reverse undeclared Red signals do not block `verify spec-states` and are handled separately by `verify spec-code-consistency`, but the reverse-signal design makes `domain-type-signals -> verify spec-states` a single gate and expects reverse Reds to be part of that gate. As written, the workflow can tell users a track is clean while undeclared code is still present.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 97,
+              "category": "correctness"
+            },
+            {
+              "message": "The persistence example is not implementable as written: `TryFrom<ReviewStatusDto> for Review<State>` cannot be a blanket conversion over an arbitrary typestate parameter. Persisted typestates need a concrete erased-state wrapper or per-state constructor; otherwise this guidance points implementers at an impossible API.",
+              "severity": "P1",
+              "file": ".claude/rules/04-coding-principles.md",
+              "line": 128,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:9048dc02226fe9a2e9c5d9762494de7b01621e394f2f39f8871c5790bd32fbec",
+          "at": "2026-04-09T03:54:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 unconditionally reads `track/items/<id>/spec.md` before the documented legacy fallback. On tracks that only have `plan.md`/`metadata.json`, `/track:design` will fail before it can use the `plan.md` path the command claims to support.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 16,
+              "category": "correctness"
+            },
+            {
+              "message": "Step 5 tells users that reverse undeclared Red signals are only warnings from `domain-type-signals` and are handled by `verify spec-code-consistency` instead of `verify spec-states`. That contradicts the TDDD gate flow, where reverse Reds are part of the same `domain-type-signals -> verify spec-states` check, so this guidance can leave undeclared code appearing non-blocking.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 97,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9048dc02226fe9a2e9c5d9762494de7b01621e394f2f39f8871c5790bd32fbec",
+          "at": "2026-04-09T03:56:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:design` should analyze the approved `plan.md`, but this step now prefers `spec.md` whenever it exists. `spec.md` is a rendered artifact, so using it as the primary input can make the command design against stale or generated content instead of the source plan.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 16,
+              "category": "architecture"
+            },
+            {
+              "message": "The new persistence rule is too absolute: it says any serde-backed state should be modeled as domain typestate plus an infrastructure DTO. That conflicts with the repo's existing enum-based persisted state machines and will cause valid finite-state enums to be treated as non-conforming, pushing unnecessary typestate refactors.",
+              "severity": "P1",
+              "file": ".claude/rules/04-coding-principles.md",
+              "line": 116,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a8adc8c6987eaef052e500f7757274d013e290a73f34cb4347a9fb56d821bbfb",
+          "at": "2026-04-09T04:04:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 never runs `verify spec-states` after refreshing `domain-types.json`. `sotp track domain-type-signals <id>` returns success even when it writes Red signals, and `cargo make ci` does not invoke the track-specific `spec-states` gate, so `/track:design` can claim validation passed while the new design still violates the TDDD gate. This should explicitly run `sotp verify spec-states ...` after `domain-type-signals`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 82,
+              "category": "correctness"
+            },
+            {
+              "message": "For legacy tracks without `spec.json`, this tells the command to read required conventions from `plan.md`, but the workflow treats `spec.md` as the authoritative human-authored spec and legacy tracks can still have `spec.md` present. That means `/track:design` can pull conventions from a rendered view instead of the source spec and miss the real required-reading set. The fallback to `plan.md` should only happen when `spec.md` is absent.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 21,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:c1a57a71df7f022472a072d2a426c7fd8fe2d1b9b05da0f148a7cd38e04f89d5",
+          "at": "2026-04-09T04:10:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d7fb2da9a35d015e2e07428216cc912af111c4eda97c0cd695ded4b7d85e3d0",
+          "at": "2026-04-09T04:15:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d7fb2da9a35d015e2e07428216cc912af111c4eda97c0cd695ded4b7d85e3d0",
+          "at": "2026-04-09T04:16:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b463f5658bff73e936cd116a0989c0972069bddfbc6cac3ce11461b098eba77",
+          "at": "2026-04-09T04:22:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/track/plan.md` now presents `/track:full-cycle <task>` as an alternative to the new `/track:design -> /track:implement -> /track:review -> /track:commit` lane. That bypasses the TDDD gate the change is trying to introduce, because `/track:full-cycle` still goes straight into implementation and never creates `domain-types.json`. Users following this prompt can start coding without running `/track:design` at all.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow"
+            },
+            {
+              "message": "`DEVELOPER_AI_WORKFLOW.md` adds the TDDD sequence only in the 3.2 daily-loop example, but the same document's primary flowchart, command table, and example path still send users from planning directly to `/track:implement` or `/track:full-cycle`. That leaves two contradictory 'official' workflows in one file, so readers following the top-level guide will still skip `/track:design`.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 220,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:6b463f5658bff73e936cd116a0989c0972069bddfbc6cac3ce11461b098eba77",
+          "at": "2026-04-09T04:23:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new next-step guidance still presents `/track:full-cycle <task>` as an alternative to the TDDD lane. That command goes straight into implementation and does not create `domain-types.json`, so users following this prompt can bypass `/track:design` entirely and only discover the missing type declarations later when `verify spec-states` fails.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow"
+            },
+            {
+              "message": "These added TDDD lines introduce `/track:plan -> /track:design -> /track:implement` as the expected flow, but the same document's primary flowchart and command table still send users directly from planning to `/track:implement` or `/track:full-cycle` and still describe `/track:plan` as including design. That leaves two contradictory 'official' workflows in one guide, so readers following the top-level path will still skip the required design step.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 220,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:6b463f5658bff73e936cd116a0989c0972069bddfbc6cac3ce11461b098eba77",
+          "at": "2026-04-09T04:25:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This changes the optional asdf baseline to `python 3.13.8`, but the repository’s `.tool-versions` and the same document’s later note both still point to `python 3.12.8`. The setup guidance is now self-contradictory and will send users to the wrong interpreter version.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 16,
+              "category": "correctness"
+            },
+            {
+              "message": "The plan-only handoff still says to follow the standard flow from `5. 実装`, but after inserting `/track:design` the implementation step is now `6. 実装`. That stale cross-reference will misroute users after `/track:activate` and skip the new design step numbering.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 184,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e10bbe60077b3820107aa7470c92c61a10c619a7aa69895384354bd5554da775",
+          "at": "2026-04-09T04:34:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan-only activation handoff still tells readers to continue from standard flow step `6. 実装`, which skips the newly inserted `/track:design` step. Following this path after `/track:activate` lets a user enter implementation without declaring `domain-types.json` first.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 184,
+              "category": "workflow"
+            },
+            {
+              "message": "The `/track:plan <feature>` entry still says it performs `調査・設計・plan 作成・トラック成果物作成`, and section 3.1 repeats the same wording. That conflicts with the new separate `/track:design` command and can mislead readers into keeping domain-type design inside planning, bypassing the new TDDD step.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 94,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:01e61a44983eb4dc15e6786947530672ddb2a07f7c035abf46bfc1d7c9a08650",
+          "at": "2026-04-09T04:35:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03f5c61a94c3ef1e0ed9a7838a9d7a40039fab10b60305ecb60aa25522410984",
+          "at": "2026-04-09T04:37:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new plan-complete guidance still advertises `/track:full-cycle <task>` as a peer next step. `full-cycle` goes straight into implementation and does not create `domain-types.json`, so this prompt still gives users an official path that skips the new `/track:design` gate the change is supposed to introduce.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 85,
+              "category": "workflow"
+            },
+            {
+              "message": "This guide now contradicts itself about the TDDD lane: the command table says `/track:design` is required, but the same patch's flowchart (`skip design`) and standard flow (`型宣言が不要な場合はスキップ可`) say it can be bypassed. With both 'required' and 'optional' instructions in one document, readers still do not have a single authoritative `plan -> design -> implement` workflow.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 95,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:03f5c61a94c3ef1e0ed9a7838a9d7a40039fab10b60305ecb60aa25522410984",
+          "at": "2026-04-09T04:40:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:plan` still describes phase 2 as `Research & design`, so the planning command continues to own the design step that this patch is trying to separate into `/track:design`. That means a user can complete planning without ever creating `domain-types.json`, which defeats the new TDDD gate.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 14,
+              "category": "workflow"
+            },
+            {
+              "message": "The top-level workflow still exposes `/track:full-cycle <task>` as a direct alternative from the post-plan decision point, and the same document labels that branch as `design stepなし`. Because this flowchart is presented as the basic path for every run, it preserves an official implementation route that bypasses `/track:design` entirely.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 70,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:6426d54816566d1b2b878a0f185da4b49e8514d7d5f4a7a7f2b66d7ced3145ca",
+          "at": "2026-04-09T04:44:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7959e07af43d5598662a6c04d44fa4014c59bf07123ed1742b7e68b0aec71c28",
+          "at": "2026-04-09T04:46:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated command table still documents `/track:full-cycle <task>` as a sanctioned \"design stepなし\" lane. That contradicts this task's stated TDDD flow (`plan -> design -> implement -> review -> commit`) and preserves an official path that skips `/track:design`/`domain-types.json`, so readers can still bypass the new gate and only discover it later when verification fails.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 94,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7959e07af43d5598662a6c04d44fa4014c59bf07123ed1742b7e68b0aec71c28",
+          "at": "2026-04-09T04:47:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The daily loop still tells Claude Code to choose the next command from `track/registry.md`, `spec.md`, `plan.md`, and `verification.md` only. With `/track:design` added, the phase gate now also depends on `metadata.json` and `track/items/<id>/domain-types.json`, so this loop can miss an unfinished design phase and recommend `/track:implement` too early.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 218,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:e589498c3aff16b3dea0e3c6efad5c8ada11fc339836aab75fd1d7a227014e3e",
+          "at": "2026-04-09T04:49:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated workflow now makes `/track:design` the required post-plan step, but this example still sends users from `/track:plan` approval straight to `/track:full-cycle`. That leaves two incompatible paths in the same guide and can bypass domain-type declaration entirely.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 110,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:05d7443932383952961c85f9bd4120a45074e0db9de548d6fd90b7b1209c99e5",
+          "at": "2026-04-09T04:51:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0419ea9883dd32ccce0f5a571407a829b0e217943a690377faf44d3f62d2b25d",
+          "at": "2026-04-09T04:52:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new daily-loop guidance says `/track:status` reads `domain-types.json` and will recommend the TDDD lane (`/track:design` before `/track:implement`), but the actual `status` command still only reads `metadata.json`/`spec.md`/`plan.md`/`verification.md` and recommends `/track:implement` for materialized planned tracks. As written, this guide promises a gate the command does not enforce, so users can still be sent straight into implementation without declaring domain types first.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 218,
+              "category": null
+            },
+            {
+              "message": "The plan-only activation handoff now tells readers to continue from `/track:design`, but `/track:activate` itself still ends by recommending `/track:implement` or `/track:full-cycle`. That leaves two conflicting official next-step instructions immediately after activation, and the command-driven path still bypasses the new TDDD design phase.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 182,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:0419ea9883dd32ccce0f5a571407a829b0e217943a690377faf44d3f62d2b25d",
+          "at": "2026-04-09T04:54:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fd39043a4896d572d364556d75f4d3eddc5095949e42d9b72d2fa46f5bfd694",
+          "at": "2026-04-09T04:56:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/track/plan.md` now tells the planner that domain type declarations happen in `/track:design`, but the same command still instructs `/track:plan` to create `spec.json.domain_states` and never creates `domain-types.json`. That leaves new tracks with two conflicting sources of truth for type design, so the new handoff is internally inconsistent until the artifact schema in this prompt is updated as well.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 14,
+              "category": "correctness"
+            },
+            {
+              "message": "`DEVELOPER_AI_WORKFLOW.md` makes `/track:design` an unconditional step in the standard flow, but the current verifier errors when `domain-types.json` is missing or empty. For tracks that legitimately have no domain types to declare, following this documented flow becomes a dead end or pushes authors to invent bogus declarations. This needs a conditional path or an explicit zero-type workflow.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 188,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:2fd39043a4896d572d364556d75f4d3eddc5095949e42d9b72d2fa46f5bfd694",
+          "at": "2026-04-09T04:58:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/track/plan.md` still describes phase 2 of `/track:plan` as `Research & design`, but the new handoff at lines 82-84 moves design to `/track:design`. That leaves two conflicting sources of truth in the same prompt, so users can either do domain-type design twice or never reach the new command.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow"
+            },
+            {
+              "message": "`DEVELOPER_AI_WORKFLOW.md` adds a TDDD next-step flow in section 3.2, but the status loop still only reads `spec.md`, `plan.md`, and `verification.md` and never mentions `domain-types.json`. With no source of truth for whether design has happened, the workflow can still recommend `/track:implement` before `/track:design` is complete.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 219,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:aebc719646c711af44c30772a121c271db075ff26e91e179c17aaf6a426b9093",
+          "at": "2026-04-09T05:01:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33e7a0280cfb801c482ef76759d49ee3cc3c82b471aa6874491898eb0eee358a",
+          "at": "2026-04-09T05:03:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new handoff says domain type declarations now happen in `/track:design`, but this same prompt still tells `/track:plan` to create `spec.json.domain_states`. That leaves two conflicting sources of truth for type design in one command, so authors can keep doing the type-definition work during planning and bypass the new `domain-types.json` step.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 83,
+              "category": "workflow"
+            },
+            {
+              "message": "This workflow now documents a `型なし` lane that skips `/track:design` and goes straight to `/track:implement`, but `verify spec-states` currently fails when `domain-types.json` is missing or empty. Following the documented path will send users into implementation with no design file and then block them at verification.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 69,
+              "category": "workflow"
+            },
+            {
+              "message": "Section 3.2 now promises that `/track:status` checks `domain-types.json` to decide whether the design phase is complete, but the actual `status` command still only reads `metadata.json`/`spec.md`/`plan.md`/`verification.md` and recommends `/track:implement` for planned tracks. As written, the guide advertises a TDDD gate that the command does not enforce.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 219,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:33e7a0280cfb801c482ef76759d49ee3cc3c82b471aa6874491898eb0eee358a",
+          "at": "2026-04-09T05:06:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:status`'s daily-loop guidance still says the next command is chosen from `track/registry.md`, `spec.md`, `plan.md`, and `verification.md` only. That omits `domain-types.json`, so the new TDDD gate is invisible to the status router and it can still recommend `/track:implement` before design has happened.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 218,
+              "category": "workflow"
+            },
+            {
+              "message": "The external-guide auto-injection rule still covers `/track:plan`, `/track:implement`, and `/track:full-cycle`, but not the newly added `/track:design`. As a result, the new design phase can miss the same trigger-keyword context that planning and implementation receive, which leaves the TDDD workflow inconsistent.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 342,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:5efe589b4f7f17b85fe01c37d7684f88a6495c0cf1219a2c7f45bceb47e227ac",
+          "at": "2026-04-09T05:10:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb13bc8784f49a9020c565f0e6d0402ac3ba60f11d1d3963f64e6f3078ff1c0b",
+          "at": "2026-04-09T05:12:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:status` is documented here as a TDDD-aware router that can recommend `/track:design`, but the actual status surfaces still cannot emit that command: `.claude/commands/track/status.md` routes materialized planned tracks to `/track:implement`, and `libs/domain/src/track_phase.rs` has no `/track:design` next-command variant. As written, users following `/track:status` will still be sent past the new design phase.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 218,
+              "category": "correctness"
+            },
+            {
+              "message": "The plan-only handoff now says activation continues with `/track:design`, but `/track:activate` itself still ends by recommending `/track:implement` or `/track:full-cycle <task>`. That leaves two conflicting official next steps immediately after activation, and the command-driven path still bypasses the TDDD design phase this doc is trying to introduce.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 182,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fb13bc8784f49a9020c565f0e6d0402ac3ba60f11d1d3963f64e6f3078ff1c0b",
+          "at": "2026-04-09T05:14:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf8072df9d438d7fcd26def8d28b42439fa35845060028a39c2160acd3e3af7a",
+          "at": "2026-04-09T05:16:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Section 3.1 now tells readers to continue from `/track:design` after `/track:activate`, but the actual activate command still ends by recommending `/track:implement` or `/track:full-cycle <task>` (`.claude/commands/track/activate.md:27`). That leaves two official next-step instructions in conflict, and the command-driven path still bypasses the new TDDD design gate.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 182,
+              "category": "correctness"
+            },
+            {
+              "message": "The new daily-loop bullet documents `/track:status` as if it will enforce the TDDD route (`/track:plan` → `/track:design` → `/track:implement`), but the current status flow still only reads `metadata.json`/`spec.md`/`plan.md`/`verification.md` and recommends `/track:implement` for materialized planned tracks (`.claude/commands/track/status.md:34-37`, `libs/domain/src/track_phase.rs:46-58,93-97`). Users following `/track:status` can still be sent straight into implementation without ever running `/track:design`.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bf8072df9d438d7fcd26def8d28b42439fa35845060028a39c2160acd3e3af7a",
+          "at": "2026-04-09T05:19:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This note reintroduces optionality for `/track:design` by saying the developer decides whether the design phase is needed. That conflicts with §3.1, which now inserts `/track:design` as the required step before `/track:implement`, and it lets `/track:status` still recommend implementation without the TDDD type-design gate.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 221,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:92fec8bca489a07a3a7bbcf886772f7554709c0502a8344243612648d9e308f5",
+          "at": "2026-04-09T05:22:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:92fec8bca489a07a3a7bbcf886772f7554709c0502a8344243612648d9e308f5",
+          "at": "2026-04-09T05:23:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Section 3.1 now tells readers that activation should continue at step 5 (`/track:design`), but the actual `/track:activate` command still ends by recommending `/track:implement` or `/track:full-cycle <task>` (`.claude/commands/track/activate.md:21-27`). That leaves the plan-only lane with two conflicting official next steps, and the command-driven path still bypasses the new TDDD design gate.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 182,
+              "category": "workflow"
+            },
+            {
+              "message": "The new daily-loop note says the developer decides whether the design phase is needed, but `/track:status` still unconditionally recommends `/track:implement` for materialized planned tracks (`.claude/commands/track/status.md:34-37`, `libs/domain/src/track_phase.rs:93-97`). In practice this means the status-driven workflow can still skip `/track:design`, despite the rest of the document making it the required handoff after planning.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 221,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:92fec8bca489a07a3a7bbcf886772f7554709c0502a8344243612648d9e308f5",
+          "at": "2026-04-09T05:25:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f8c919dddc5714ec6afa586f1c0a44d9e5f40a89ade172ab2d67699e08db484",
+          "at": "2026-04-09T05:29:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The post-plan guidance still makes `/track:implement` the default next command and relegates `/track:design` to an optional note. For tracks that need new or changed domain types, this still steers users past the new TDDD phase and into implementation before `domain-types.json` has been declared.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow"
+            },
+            {
+              "message": "The top-level workflow diagram still routes both the normal and plan-only lanes directly into `/track:implement` (`R1C/PC/ACT --> F`), while `/track:design` is only a side note. That leaves the main 'basic flow' inconsistent with the intended TDDD sequence (`plan -> design -> implement`), so readers following the diagram can still skip the design phase entirely.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 63,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:3f8c919dddc5714ec6afa586f1c0a44d9e5f40a89ade172ab2d67699e08db484",
+          "at": "2026-04-09T05:31:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The post-plan handoff still makes `/track:implement` the default next step and relegates `/track:design` to an optional note. That contradicts the intended TDDD sequence (`plan -> design -> implement`) and leaves an official path that skips `domain-types.json` declaration entirely.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow"
+            },
+            {
+              "message": "The primary workflow guide still routes both the normal lane and the activated plan-only lane directly into `/track:implement`, while `/track:design` is only shown as optional. Because this is the top-level 'basic flow', readers following it can still bypass the new TDDD design phase despite the intended `plan -> design -> implement` sequence.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 63,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:3f8c919dddc5714ec6afa586f1c0a44d9e5f40a89ade172ab2d67699e08db484",
+          "at": "2026-04-09T05:33:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:plan` still presents `/track:implement` as the primary next command and relegates `/track:design` to an optional sub-bullet. The accepted TDDD workflow for this feature is `plan -> design -> implement`, so users following the command output can skip the required type-declaration step and only discover the problem later when `domain-types.json`-based checks fail.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow"
+            },
+            {
+              "message": "The updated workflow diagram still routes both the standard lane and the `plan-only` activation lane directly into `/track:implement`, while `/track:design` is shown as a disconnected optional node with no inbound edge. That leaves the rendered flow as effectively `plan -> implement` instead of the intended `plan -> design -> implement`, so the main visual guidance does not actually teach when the new command must be run.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 63,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:3f8c919dddc5714ec6afa586f1c0a44d9e5f40a89ade172ab2d67699e08db484",
+          "at": "2026-04-09T05:40:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:plan` no longer advertises `/track:full-cycle <task>` as a valid post-planning implementation path. That creates conflicting guidance with the still-live `/track:full-cycle` command and `/track:activate`, so users who follow the planning command output will be told the only implementation lane is `/track:implement` even though the autonomous lane is still supported.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow drift"
+            },
+            {
+              "message": "This change documents `/track:full-cycle` as only for tasks that do not modify `domain-types.json`, but the TDDD design only makes `/track:design` an optional pre-step before implementation; it does not ban the autonomous lane afterward. Combined with the flowchart and step-list changes that remove `/track:full-cycle` from the implementation phase, this misstates the supported workflow and will steer TDDD tracks away from a still-valid command path.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 93,
+              "category": "workflow drift"
+            }
+          ],
+          "hash": "rvw1:sha256:3f8c919dddc5714ec6afa586f1c0a44d9e5f40a89ade172ab2d67699e08db484",
+          "at": "2026-04-09T05:43:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The post-plan next-step guidance still offers `/track:full-cycle <task>` as a peer alternative, but the new TDDD note only tells users to run `/track:design` before `/track:implement`. On TDDD tracks this documents a straight `/track:plan` -> `/track:full-cycle` path even though `domain-types.json` must be created via `/track:design` before either implementation lane, so users following this advice will reach the new Red/error gate only after starting implementation.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 82,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:fce1b661b9b50cee239355d7a7af21ab5e00a21e486ddf5e668a6d2baac87a47",
+          "at": "2026-04-09T05:53:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DEVELOPER_AI_WORKFLOW.md` now makes `/track:implement` the only documented post-planning implementation path in both the main flowchart and the numbered standard flow, even though the same document still lists `/track:full-cycle <task>` as a supported implementation command. That inconsistency changes the advertised workflow instead of just adding optional `/track:design`, and will steer users away from the autonomous lane that the repo still supports.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 63,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:77239f60e7b5b25288cc248ef10aff929d4d4f5e14c22c2a7c2911ac5ec42ca0",
+          "at": "2026-04-09T05:55:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DEVELOPER_AI_WORKFLOW.md` now narrows the post-plan/post-activate path to `/track:implement` only (`activate 後は標準フローの 5（/track:implement）以降` and step 5 itself), but the same patch still documents `/track:full-cycle <task>` as a supported implementation choice in the flowchart and command table. That contradiction will misroute users who rely on the autonomous lane after `/track:activate`, and it also makes the new TDDD note read as if `/track:design` only feeds `/track:implement`. Keep `/track:full-cycle <task>` visible as an alternative in the numbered standard flow.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 184,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:b8a7d34dfb51f960b8a78fb758b6d05ac5f5709b3078f843eeae75d11becb7ca",
+          "at": "2026-04-09T05:57:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3273ba34a8fc3be9643556123639dafa98d7eeacfa0085da5c9c5d7e42ef2fa0",
+          "at": "2026-04-09T06:00:35Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
+          "at": "2026-04-08T14:11:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
+          "at": "2026-04-08T14:11:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11895e6cbf3bd279e62ba91cc20856da0638e85d0e1cd039dd672c9fea280a37",
+          "at": "2026-04-09T01:26:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `strict=true`, this implementation only rejects Yellow signals from `domain-types.json`. A `spec.json` with top-level signal counts like `yellow>0, red=0` still passes as long as the domain-type signals are all Blue, which violates the stated strict-mode contract that all signals must be Blue for merge. Add the strict Yellow check to the Stage 1 `spec_doc.signals()` prerequisite and cover that case with a regression test.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 156,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:11895e6cbf3bd279e62ba91cc20856da0638e85d0e1cd039dd672c9fea280a37",
+          "at": "2026-04-09T01:28:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `strict=true`, Stage 1 still only rejects `spec.json` signal counts with `red>0`. A `spec.json` whose top-level signals are `yellow>0, red=0` will pass as long as the domain-type signals are Blue, which violates the documented merge-gate rule that strict mode requires all signals to be Blue. Add the strict Yellow check to the `spec_doc.signals()` prerequisite and cover it with a regression test.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 53,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:11895e6cbf3bd279e62ba91cc20856da0638e85d0e1cd039dd672c9fea280a37",
+          "at": "2026-04-09T01:31:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2b44cb831974852ee24e7548d46fcbbc3ffd74e29bf531bfb1ca747a42016ee",
+          "at": "2026-04-09T01:34:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5dcf02daca7c23ebc83335194ddcf1d78852bbc92d983e79f70da8cc0cabf9d2",
+          "at": "2026-04-09T04:09:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5dcf02daca7c23ebc83335194ddcf1d78852bbc92d983e79f70da8cc0cabf9d2",
+          "at": "2026-04-09T04:10:01Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`total` is computed from `doc.entries().len()`, but `all_signals` now includes the extra reverse undeclared red signals. On tracks with undeclared code items, the printed total will be lower than the actual number of signals written, so the new summary becomes internally inconsistent on the exact path this change adds.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 115,
+              "category": "correctness"
+            },
+            {
+              "message": "The new reverse-consistency branch (`check_consistency` + `undeclared_to_signals` + warning output) is not covered by any test in this file. The only success test still exercises a forward-only value-object case, so a regression in the undeclared type/trait path would not be caught.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 183,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:44427e357cc2a64e2c890360bacb86fb4c6f3143692a904472cfd419b1663bcd",
+          "at": "2026-04-09T01:00:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44427e357cc2a64e2c890360bacb86fb4c6f3143692a904472cfd419b1663bcd",
+          "at": "2026-04-09T01:02:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`red` is counted from `all_signals`, which now includes reverse undeclared signals, but `total` still comes from `doc.entries().len()`. As soon as any undeclared type/trait is present, the printed summary becomes internally inconsistent (`blue + yellow + red > total`) on the exact reverse-check path this change adds.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 115,
+              "category": "correctness"
+            },
+            {
+              "message": "The new reverse-consistency path (`check_consistency` + `undeclared_to_signals` + warning output) is not covered by a test in this file. The only success-path test remains `#[ignore]` and exercises a forward-only value-object case, so regressions in the undeclared type/trait handling would ship without any automated coverage.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 183,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:44427e357cc2a64e2c890360bacb86fb4c6f3143692a904472cfd419b1663bcd",
+          "at": "2026-04-09T01:04:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`red` is counted from `all_signals`, which now includes the extra reverse undeclared signals, but `total` still comes from `doc.entries().len()`. As soon as any undeclared type or trait is present, the printed summary becomes internally inconsistent because `blue + yellow + red` can exceed `total` on the exact path this change adds.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 115,
+              "category": "correctness"
+            },
+            {
+              "message": "The new reverse-consistency path (`check_consistency` + `undeclared_to_signals` + warning output) still has no runnable automated coverage in this file. The only success-path test remains `#[ignore]` and exercises a forward-only value-object case, so regressions in undeclared type/trait handling would ship without test protection.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 183,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:44427e357cc2a64e2c890360bacb86fb4c6f3143692a904472cfd419b1663bcd",
+          "at": "2026-04-09T01:06:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new reverse-consistency path (`check_consistency` + `undeclared_to_signals` + the undeclared warning/summary formatting) has no runnable coverage in this file. The only success-path test is still `#[ignore]` and uses a forward-only fixture, so regressions in undeclared type/trait handling or the new output format would not be caught.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 81,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:82668d1c848d9171ea3f454592859461f0256bdfbbd99041e6109f148909d9b1",
+          "at": "2026-04-09T01:09:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82668d1c848d9171ea3f454592859461f0256bdfbbd99041e6109f148909d9b1",
+          "at": "2026-04-09T01:10:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new reverse-consistency path (`check_consistency` + `undeclared_to_signals` + `print_signal_summary`) still has no runnable automated coverage. The only success-path test remains `#[ignore]` and uses a forward-only fixture, so regressions in undeclared type/trait handling or the new `undeclared=` summary/warning output would ship unnoticed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 81,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:82668d1c848d9171ea3f454592859461f0256bdfbbd99041e6109f148909d9b1",
+          "at": "2026-04-09T01:12:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Merging `undeclared_to_signals(...)` into `doc.signals()` here does not actually enforce the new reverse-Red gate. These records are saved with synthetic kind tags like `undeclared_type` / `undeclared_trait`, but downstream `verify spec-states` only considers signals whose `(type_name, kind_tag)` matches a declared entry, so undeclared code can still pass CI after `sotp track domain-type-signals` runs.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/domain_state_signals.rs",
+              "line": 92,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:17db52e194bd057351de2d58404f21e4c50870cb74d67882e01b4e7939de36e1",
+          "at": "2026-04-09T01:15:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17db52e194bd057351de2d58404f21e4c50870cb74d67882e01b4e7939de36e1",
+          "at": "2026-04-09T01:19:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `--strict` wiring for `SpecStates` is not exercised anywhere in this file. All updated spec-state tests still pass `strict: false`, so a regression in the new merge-gate path or the `args.strict` handoff to `infrastructure::verify::spec_states::verify` would slip through CI.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
+              "line": 151,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:f3e1d6aa610a2882125fe068781724d575653891df634d68543234afa24fd696",
+          "at": "2026-04-09T01:25:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `SpecStates` strict-gate path is not exercised by any CLI test. All updated spec-state tests still pass `strict: false`, so a regression in the `args.strict` handoff to `infrastructure::verify::spec_states::verify` or in the merge-gate behavior would slip through CI. Add at least one `strict: true` test that covers a yellow-state spec and asserts failure.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 151,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:f3e1d6aa610a2882125fe068781724d575653891df634d68543234afa24fd696",
+          "at": "2026-04-09T01:26:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f44f3954a676ab42c53a4136abb7c1f25948d48d62ba1423e576993aa3c0fd3b",
+          "at": "2026-04-09T01:27:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecVerifyArgs` is reused by `spec-attribution`, `spec-frontmatter`, `spec-signals`, and `spec-states`, so introducing `strict: bool` here exposes `--strict` on all four subcommands. Only `spec-states` consumes it; the other three now accept and silently ignore the flag, which violates the intended CLI wiring and can mask invalid invocations instead of rejecting them.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 14,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f44f3954a676ab42c53a4136abb7c1f25948d48d62ba1423e576993aa3c0fd3b",
+          "at": "2026-04-09T01:28:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Add parser-level coverage for the new `--strict` flag. The current tests only construct `VerifyCommand::SpecStates` directly, so a broken `#[arg(long)]` mapping or a future subcommand-layout regression would still pass these tests and leave the public CLI flag unusable.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 25,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:6ac2ac932625f4894e69d44f04eae7b5150eb65c5ad4aecb3a2c2b35c3477814",
+          "at": "2026-04-09T01:31:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19feb44c42c12aa48c3e48e725efe775062bae44501c996d6a7b985f4a2a362d",
+          "at": "2026-04-09T01:34:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19feb44c42c12aa48c3e48e725efe775062bae44501c996d6a7b985f4a2a362d",
+          "at": "2026-04-09T01:36:17Z"
+        }
+      ]
+    }
+  }
+}

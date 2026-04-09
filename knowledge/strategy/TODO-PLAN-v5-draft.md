@@ -370,7 +370,7 @@ Phase 2c 完了により、Phase 3 の以下の項目の前提が整う:
 | 状態遷移 | typestate（関数の存在 = 有効遷移） | いいえ |
 | usecase DI | `impl Fn`（モック = クロージャ） | いいえ（trait 維持） |
 | ファイル分割 | DDD 概念 + pub 可視性フィルタ | はい（CLI-02 で実施済み） |
-| 永続化 | typestate enum + serde 変換 | いいえ |
+| 永続化 | domain: typestate 維持、infra: serde enum DTO に変換 | いいえ |
 
 ---
 

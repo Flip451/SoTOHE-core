@@ -11,7 +11,7 @@ Arguments:
 Execution:
 - Perform a 3-phase planning workflow for `$ARGUMENTS`:
   1. Understand: codebase and version baseline
-  2. Research & design: Gemini/Codex collaboration as needed
+  2. Research & architecture: Gemini/Codex collaboration as needed
   3. Plan & approve: produce plan and request user approval
 - If `$ARGUMENTS` matches `knowledge/external/guides.json` `trigger_keywords`, use the injected guide summaries before opening cached raw documents.
 - Keep `knowledge/DESIGN.md` in English for cross-provider compatibility, but keep crate/module names aligned with `plan.md`.
@@ -79,6 +79,7 @@ Behavior:
   1. Plan summary
   2. Created track id/path
   3. Created/updated files
-  4. Suggested next command (`/track:implement` → `/track:review` → `/track:commit`, or `/track:full-cycle <task>`)
+  4. Suggested next command: `/track:implement` → `/track:review` → `/track:commit`, or `/track:full-cycle <task>`
+     - Optional (TDDD): run `/track:design` before implementation (`/track:implement` or `/track:full-cycle`) to declare domain types in `domain-types.json`
      - Optional: run `/track:review` → `/track:commit` first to review planning artifacts before implementation
   5. Alternative: use `/track:plan-only <feature>` to create planning artifacts on a `plan/<id>` review branch, PR to main, then `/track:activate <track-id>` when ready to implement

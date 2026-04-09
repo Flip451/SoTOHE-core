@@ -8,6 +8,7 @@
       "supported_capabilities": [
         "orchestrator",
         "planner",
+        "designer",
         "implementer",
         "reviewer",
         "debugger"
@@ -16,6 +17,7 @@
         "default": "/track:status",
         "orchestrator": "/track:status",
         "planner": "/track:plan <feature>",
+        "designer": "/track:design",
         "implementer": "/track:implement",
         "reviewer": "/track:review",
         "debugger": "Continue in the active Claude Code session with the full error context."
@@ -65,6 +67,7 @@
     "default": {
       "orchestrator": "claude",
       "planner": "claude",
+      "designer": "claude",
       "researcher": "gemini",
       "implementer": "claude",
       "reviewer": "codex",
@@ -76,10 +79,10 @@
     "claude-heavy": {
       "orchestrator": "claude",
       "planner": "claude",
+      "designer": "claude",
       "researcher": "gemini",
       "implementer": "claude",
       "reviewer": "claude",
-
       "debugger": "codex",
       "multimodal_reader": "gemini",
       "workflow_host_provider": "claude",
@@ -88,6 +91,7 @@
     "codex-heavy": {
       "orchestrator": "claude",
       "planner": "codex",
+      "designer": "claude",
       "researcher": "codex",
       "implementer": "codex",
       "reviewer": "codex",

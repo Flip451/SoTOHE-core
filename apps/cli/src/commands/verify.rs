@@ -16,6 +16,16 @@ pub struct SpecVerifyArgs {
     spec_path: PathBuf,
 }
 
+/// Arguments for spec-states verify subcommand (includes strict-mode gate).
+#[derive(Args)]
+pub struct SpecStatesArgs {
+    /// Path to the spec.md file to verify.
+    spec_path: PathBuf,
+    /// Strict mode (merge gate): Yellow signals also fail. Default: only Red fails.
+    #[arg(long)]
+    strict: bool,
+}
+
 /// Verify subcommands for CI validation.
 #[derive(Subcommand)]
 pub enum VerifyCommand {
@@ -50,7 +60,7 @@ pub enum VerifyCommand {
     /// Check spec.md source tag signals match frontmatter and red == 0 gate.
     SpecSignals(SpecVerifyArgs),
     /// Check spec.md contains a ## Domain States section with table data rows.
-    SpecStates(SpecVerifyArgs),
+    SpecStates(SpecStatesArgs),
     /// Check requirement-to-task coverage for a track (resolved from branch or --track-dir).
     SpecCoverage(SpecCoverageArgs),
     /// Check bidirectional spec ↔ code consistency (domain-types.json vs rustdoc TypeGraph).
@@ -145,9 +155,10 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
         VerifyCommand::SpecSignals(args) => {
             ("verify spec signals", infrastructure::verify::spec_signals::verify(&args.spec_path))
         }
-        VerifyCommand::SpecStates(args) => {
-            ("verify spec states", infrastructure::verify::spec_states::verify(&args.spec_path))
-        }
+        VerifyCommand::SpecStates(args) => (
+            "verify spec states",
+            infrastructure::verify::spec_states::verify(&args.spec_path, args.strict),
+        ),
         VerifyCommand::SpecCoverage(args) => {
             let outcome = match &args.track_dir {
                 Some(dir) if dir.is_dir() => infrastructure::verify::spec_coverage::verify(dir),
@@ -325,11 +336,49 @@ fn print_outcome(label: &str, outcome: &VerifyOutcome) -> ExitCode {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use clap::Parser;
     use tempfile::TempDir;
 
     use super::*;
+
+    /// Minimal wrapper so `VerifyCommand` can be exercised through the clap parser.
+    #[derive(Parser)]
+    struct TestCli {
+        #[command(subcommand)]
+        cmd: VerifyCommand,
+    }
+
+    #[test]
+    fn test_spec_states_strict_flag_parsed_by_clap() {
+        let cli = TestCli::try_parse_from(["sotp", "spec-states", "spec.md", "--strict"]).unwrap();
+        match cli.cmd {
+            VerifyCommand::SpecStates(args) => {
+                assert!(args.strict, "--strict must be parsed as true");
+                assert_eq!(args.spec_path.to_str().unwrap(), "spec.md");
+            }
+            _ => panic!("expected SpecStates variant"),
+        }
+    }
+
+    #[test]
+    fn test_spec_states_without_strict_flag_defaults_to_false() {
+        let cli = TestCli::try_parse_from(["sotp", "spec-states", "spec.md"]).unwrap();
+        match cli.cmd {
+            VerifyCommand::SpecStates(args) => {
+                assert!(!args.strict, "strict must default to false when --strict is absent");
+            }
+            _ => panic!("expected SpecStates variant"),
+        }
+    }
+
+    #[test]
+    fn test_spec_attribution_does_not_accept_strict_flag() {
+        // --strict is not a valid flag for spec-attribution; clap must reject it.
+        let result = TestCli::try_parse_from(["sotp", "spec-attribution", "spec.md", "--strict"]);
+        assert!(result.is_err(), "--strict must not be accepted by spec-attribution");
+    }
 
     fn make_args(root: &std::path::Path) -> VerifyArgs {
         VerifyArgs { project_root: root.to_path_buf() }
@@ -600,7 +649,8 @@ mod tests {
              | Draft | Initial state |\n",
         )
         .unwrap();
-        let exit = execute(VerifyCommand::SpecStates(SpecVerifyArgs { spec_path: spec }));
+        let exit =
+            execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: spec, strict: false }));
         assert_eq!(exit, ExitCode::SUCCESS);
     }
 
@@ -614,8 +664,55 @@ mod tests {
             "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n\nNo states here.\n",
         )
         .unwrap();
-        let exit = execute(VerifyCommand::SpecStates(SpecVerifyArgs { spec_path: spec }));
+        let exit =
+            execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: spec, strict: false }));
         assert_eq!(exit, ExitCode::FAILURE);
+    }
+
+    #[test]
+    fn test_spec_states_strict_false_passes_with_yellow_signal() {
+        let tmp = TempDir::new().unwrap();
+        let spec = tmp.path().join("spec.md");
+        // spec.md without ## Domain States (will delegate to spec.json).
+        std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n").unwrap();
+        // spec.json: signals have yellow=1, red=0 (Stage 1 prerequisite satisfied).
+        std::fs::write(
+            tmp.path().join("spec.json"),
+            r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":{"blue":0,"yellow":1,"red":0}}"#,
+        )
+        .unwrap();
+        // domain-types.json: one entry with a yellow signal.
+        std::fs::write(
+            tmp.path().join("domain-types.json"),
+            r#"{"schema_version":1,"domain_types":[{"name":"MyType","kind":"value_object","description":"d","approved":true}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
+        )
+        .unwrap();
+        let exit =
+            execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: spec, strict: false }));
+        assert_eq!(exit, ExitCode::SUCCESS, "yellow signal must pass in default (non-strict) mode");
+    }
+
+    #[test]
+    fn test_spec_states_strict_true_fails_with_yellow_signal() {
+        let tmp = TempDir::new().unwrap();
+        let spec = tmp.path().join("spec.md");
+        // spec.md without ## Domain States (will delegate to spec.json).
+        std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n").unwrap();
+        // spec.json: signals have yellow=1, red=0 (Stage 1 prerequisite satisfied).
+        std::fs::write(
+            tmp.path().join("spec.json"),
+            r#"{"schema_version":1,"status":"draft","version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":{"blue":0,"yellow":1,"red":0}}"#,
+        )
+        .unwrap();
+        // domain-types.json: one entry with a yellow signal.
+        std::fs::write(
+            tmp.path().join("domain-types.json"),
+            r#"{"schema_version":1,"domain_types":[{"name":"MyType","kind":"value_object","description":"d","approved":true}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
+        )
+        .unwrap();
+        let exit =
+            execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: spec, strict: true }));
+        assert_eq!(exit, ExitCode::FAILURE, "yellow signal must fail in strict (merge-gate) mode");
     }
 
     // --- spec-coverage CLI wiring ---

@@ -9,24 +9,16 @@ Implements the review → fix → review cycle mandated by `CLAUDE.md`:
 > (review → fix → review → ... → no findings). Do not commit until the reviewer
 > reports zero findings.
 
-Arguments:
-- Use `$ARGUMENTS` as optional review scope (files/modules/concerns).
-- On a non-track branch, when reviewing a planning-only artifact, require an explicit
-  track-id selector in `$ARGUMENTS` and treat the remaining text as optional scope notes.
-  Do not auto-detect a branchless planning-only track by timestamp alone.
+Arguments: none. The current branch (`track/<id>` or `plan/<id>`) determines the review target.
 
 ## Step 0: Gather context
 
-- Resolve the current track in this order:
-  1. If the current git branch matches `track/<id>`, use that track.
-  2. Otherwise, if `$ARGUMENTS` starts with an explicit existing `<track-id>`, use `track/items/<track-id>`.
-  3. Otherwise, use the latest materialized active track (non-archived, non-done, `branch != null`).
-- Do not auto-select a branchless planning-only track on a non-track branch.
+- Extract the track id from the current git branch (`track/<id>` or `plan/<id>`).
+  If the branch matches neither pattern, stop and instruct the user to switch first.
 - Read the current track's `spec.md`, `plan.md`, and `metadata.json`.
 - Read every convention file listed in the `## Related Conventions (Required Reading)` section of `spec.md` (or `plan.md` for legacy tracks without `spec.json`).
 - For exact type signatures, trait definitions, module trees, and Mermaid diagrams, use `## Canonical Blocks` in `plan.md` and `knowledge/DESIGN.md` as the source of truth when reviewing implementation correctness.
 - Use any auto-injected external guide summaries from `knowledge/external/guides.json` before opening cached raw guide documents.
-- If `$ARGUMENTS` is provided, scope the review to the specified files/modules/concerns.
 - If the selected track is branchless planning-only (`status=planned`, `branch=null`), limit review scope to planning artifacts only. Allowed diff is:
   - `track/items/<id>/`
   - `track/registry.md`
@@ -34,90 +26,60 @@ Arguments:
   - `knowledge/DESIGN.md`
 - If changed files exceed that allowlist, stop and instruct the user to run `/track:activate <track-id>` before code-bearing review.
 
-## Step 1: Resolve reviewer provider
+## Step 1: Resolve reviewer model
 
 - Read `.claude/agent-profiles.json`.
-- Look up `profiles.<active_profile>.reviewer` to determine the provider (e.g., `codex`).
-- Resolve `{model}`:
-  1. Check `profiles.<active_profile>.provider_model_overrides.<provider>`.
-  2. Fall back to `providers.<provider>.default_model`.
-  3. If neither is set (e.g., `claude` provider has no `default_model`), `{model}` is not needed — skip the `--model` flag.
-- When the resolved provider has a CLI tool (e.g., Codex CLI), invoke via `cargo make track-local-review` (external subprocess).
-- When the resolved provider is `claude` (e.g., `claude-heavy` profile), invoke via Claude Code subagent with `subagent_type: "Explore"` using the same briefing files and JSON verdict format. No `--model` flag is needed. Do not perform inline review in the main conversation context.
-
-### Provider support matrix
-
-| Provider | Auto-record to review.json | `check-approved` | Notes |
-|----------|---------------------------|-------------------|-------|
-| `codex` (default) | Yes (built into `bin/sotp review codex-local`) | Satisfied via recorded verdicts | Recommended for all tracks |
-| `claude` (`claude-heavy`) | **No** — verdicts are not persisted | Passes only via NotStarted bypass (review.json absent + all scopes NotStarted) | Review evidence exists only in conversation context, not in review.json |
-
-**Limitation**: With `claude-heavy`, `check-approved` passes via the NotStarted bypass because
-verdicts are never written to `review.json`. This means Step 4 does not verify actual review
-coverage — it only confirms that no local review was started. For auditable review evidence,
-use the default Codex profile.
+- Look up `profiles.<active_profile>.reviewer` → `{reviewer_provider}` (e.g., `codex`).
+- Look up `providers.<reviewer_provider>.default_model` → `{model}` (full model).
+- Look up `providers.<reviewer_provider>.fast_model` → `{fast_model}` (iterative rounds).
+- Invoke via `cargo make track-local-review` with explicit `--model` flag.
+- **Note**: The `claude` provider path (`claude-heavy` profile) is not yet supported.
 
 ## Step 2: Prepare review briefings (parallel observation split)
 
 Partition changed files into **observation groups** by architecture layer. Each group gets its own
 focused briefing and reviewer invocation. All groups run **in parallel** via Agent Teams.
 
-### 2a. Classify changed files into groups
+### 2a. Determine review scope via `track-review-status`
 
-Get the full changed file list including staged, unstaged, and untracked files.
-Use `{base}` as the diff base (default: `.commit_hash` → fallback to `main`):
-- `git diff {base}...HEAD --name-only` for committed changes (merge-base diff)
-- `git diff --cached --name-only` for staged-only changes
-- `git diff --name-only` for unstaged worktree changes
-- `git ls-files --others --exclude-standard` for untracked files (e.g., new track artifacts)
-- Merge all lists and deduplicate.
-- Note: `review_operational` files (e.g., `review.json`) are
-  automatically excluded by the infrastructure before partition. In manual fallback mode,
-  the orchestrator should exclude files matching `review_operational` patterns from
-  `track/review-scope.json` before assigning groups.
-- Assign each remaining file to exactly one observation group:
+Run `cargo make track-review-status -- --track-id {track-id}` to get the authoritative
+per-scope review state. This command computes diff-based scope hashes and reports which
+groups need review:
 
-The authoritative group definitions are in `track/review-scope.json`. Per-track overrides
-can be placed at `track/items/<track-id>/review-groups.json` — when present, its `groups`
-object **replaces** the base groups entirely. Check for a per-track override before using
-the base definitions. The table below is a summary of the base groups — if they diverge
-from `review-scope.json`, the JSON file wins.
+```
+cargo make track-review-status -- --track-id {track-id}
+```
 
-| Group | Scope | Files matching |
-|-------|-------|----------------|
-| **domain** | Type design, invariants, business rules, trait signatures (ports) | `libs/domain/**` |
-| **infrastructure** | I/O correctness, parsing, adapters, external dependencies | `libs/infrastructure/**` |
-| **usecase** | Workflow logic, error propagation, functional correctness | `libs/usecase/**` |
-| **cli** | CLI error handling, exit codes, user-facing messages | `apps/**` |
-| **harness-policy** | Workflow commands, rules, agent profiles, conventions | `.claude/commands/**`, `.claude/rules/**`, `.claude/agents/**`, `.claude/agent-profiles.json`, `.claude/settings*.json`, `.claude/permission-extensions.json`, `knowledge/conventions/**`, `AGENTS.md`, `CLAUDE.md` |
-| **other** | Track artifacts, scripts, config, docs not covered above | Everything else (`track/**`, `scripts/**`, `Cargo.*`, etc.) |
+Output example:
+```
+  [✓] cli: approved
+  [-] domain: required (not started)
+  [.] harness-policy: not required (empty)
+  [-] other: required (stale hash)
+  [.] usecase: not required (empty)
+```
 
-If a group has zero changed files, skip it (do not invoke a reviewer for empty scope).
+Use this output to determine which groups need reviewer invocation:
+- `required (not started)` — needs review (new changes, no review yet)
+- `required (stale hash)` — needs review (files changed since last review)
+- `required (findings remain)` — needs review (previous round had findings; re-review required)
+- `approved` — already reviewed and up-to-date, skip
+- `not required (empty)` — no changed files in this group, skip
 
-If the total changed files are small (≤ 5 files) AND all belong to **a single group**,
-collapse into a single reviewer invocation instead of splitting — parallel overhead is
-not worthwhile. Use the actual group name from the partition (e.g., `other` for planning
-artifacts). Do NOT use a synthetic group name like `all` — `record-round` only recognizes
-group names produced by `partition()`: named groups from the active policy
-(base `track/review-scope.json` or per-track `review-groups.json` override)
-plus the implicit `other` fallback group.
-
-If files span **multiple groups**, use the normal parallel pattern even for ≤ 5 files.
-Auto-record records exactly one scope per invocation, so multi-scope collapsed reviews
-would leave some groups unrecorded.
+**Do NOT manually classify files into groups** — `track-review-status` handles partition,
+hash computation, and approval state tracking. Only invoke reviewers for groups that
+report `required`.
 
 ### 2b. Build per-group briefing
 
-For each non-empty group, build a briefing file at `tmp/reviewer-runtime/briefing-{group}.md`:
+For each group reporting `required` in Step 2a, build a briefing file at `tmp/reviewer-runtime/briefing-{group}.md`.
+The per-group scope file list is automatically injected by `cargo make track-local-review` (via `CodexReviewer::build_full_prompt`) — the briefing only needs design intent and review checklist.
 
 ```markdown
 # Review Briefing: {track-id} — {group} layer
 
 ## Design Intent
 {3-5 bullet points from spec.md / plan.md}
-
-## Changed Files (this group only)
-{file list for this group}
 
 ## Review Checklist
 - Logic errors, edge cases, race conditions
@@ -151,7 +113,7 @@ DO NOT report findings about unchanged pre-existing code.
 
 ### 2c. Invoke review-fix-lead agents in parallel
 
-Launch one `review-fix-lead` agent per non-empty group, **in parallel** using Agent Teams
+Launch one `review-fix-lead` agent per group reporting `required`, **in parallel** using Agent Teams
 (the Agent tool with `run_in_background: true` and `subagent_type: "review-fix-lead"`).
 
 Each `review-fix-lead` agent autonomously handles the full review → fix → re-review loop
@@ -165,26 +127,23 @@ Use `{fast_model}` for iterative rounds. Auto-record is always on (v2). Verdicts
 written directly to `review.json` after each Codex run. Parallel per-scope reviews are
 safe: each scope's hash is computed from its own files only.
 
+To compute per-scope file lists for the agent prompt:
+- **Named groups**: changed files matching the group's glob patterns from `track/review-scope.json`.
+- **`other` group**: full changed file list (`git diff {base}...HEAD --name-only` + staged + unstaged + untracked, where `{base}` = `.commit_hash` or `main`) minus files matched by named-group patterns, `review_operational` patterns, and `other_track` patterns (all from `track/review-scope.json`). Exception: current track artifacts (`track/items/{track-id}/**`) are NOT excluded by `other_track`.
+
 ```
 Agent prompt for each scope:
   You are a review-fix-lead for the {scope} scope of track {track-id}.
   Briefing: tmp/reviewer-runtime/briefing-{scope}.md
   Fast model: {fast_model}
-  Scope files: {file list from Step 2a}
+  Scope files (files this agent is allowed to modify):
+  {per-scope file list computed above}
 
   Run the fix+review loop as defined in .claude/agents/review-fix-lead.md.
   Use: cargo make track-local-review -- --model {fast_model} --round-type fast --group {scope} --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md
 
   Report your final status: completed / blocked_cross_scope / failed.
 ```
-
-**When the provider is `claude`** (e.g., `claude-heavy` profile):
-
-> See Step 1 **Provider support matrix** — claude auto-record is not yet implemented.
-
-Use the same `review-fix-lead` agent contract, but instead of `cargo make track-local-review`,
-the agent invokes a Claude Code subagent with `subagent_type: "Explore"` to perform reviews
-using the same briefing file and JSON verdict format.
 
 Wait for all agents to complete (or timeout).
 
@@ -228,8 +187,8 @@ Step 3 begins when all scopes have achieved full model `zero_findings`.
 レビュー完了は **full model の zero_findings** によってのみ確認される。
 
 Resolve models from `.claude/agent-profiles.json` using the `reviewer` capability:
-- `{fast_model}`: `provider_model_overrides` for reviewer, then `providers.<reviewer_provider>.fast_model`, then `default_model`. If none exist, skip `--model`.
-- `{model}`: `provider_model_overrides`, then `providers.<reviewer_provider>.default_model`. If none exist, skip `--model`.
+- `{fast_model}`: `providers.<reviewer_provider>.fast_model`, then `default_model`. If neither exists, skip `--model`.
+- `{model}`: `providers.<reviewer_provider>.default_model`. If not set, skip `--model`.
 
 ### Per-scope independence (throughput-first)
 

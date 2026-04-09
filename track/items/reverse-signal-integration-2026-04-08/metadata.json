@@ -1,0 +1,121 @@
+{
+  "branch": "track/reverse-signal-integration-2026-04-08",
+  "created_at": "2026-04-08T18:00:00Z",
+  "id": "reverse-signal-integration-2026-04-08",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "undeclared types/traits を Red の DomainTypeSignal (kind_tag: undeclared_type / undeclared_trait) に変換する関数を追加。",
+          "定義済みだが TypeGraph に見つからない型に Yellow シグナルを返すよう evaluate_domain_type_signals を拡張。",
+          "Blue = 定義+実装+構造一致、Yellow = 定義+未実装 (WIP)、Red = 未定義+実装済み (TDDD 違反)。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T01",
+          "T02"
+        ],
+        "title": "逆方向 Red + 未実装 Yellow シグナル (domain 層)"
+      },
+      {
+        "description": [
+          "domain-type-signals: forward 評価 (Blue/Yellow) + 逆方向チェック (Red) → domain-types.json 保存 → domain-types.md レンダリング → サマリ出力。",
+          "domain-types.json 不在時はエラー終了し /track:design を促す (TDDD: 初回作成は designer の責務)。",
+          "verify spec-states 2 段階ゲート: 途中コミット時は Red なし → pass (Yellow 許容、Red → fail + /track:design 案内)。merge 時は全 Blue 必須 (Yellow もブロック)。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T03",
+          "T04"
+        ],
+        "title": "domain-type-signals コマンド拡張 + verify spec-states ゲート"
+      },
+      {
+        "description": [
+          "agent-profiles.json の全 profile に designer capability を追加 (既定 provider: claude)。",
+          "/track:design コマンドを .claude/commands/track/design.md に作成。",
+          "ワークフロー: (1) 対象トラックの plan.md を読み込み, (2) 既存 domain-types.json があれば読み込み (増分更新), (3) 既存コードがあれば TypeGraph も参照, (4) designer capability を呼び出し DomainTypeKind / members / transitions を設計, (5) domain-types.json を生成・更新。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T05",
+          "T06"
+        ],
+        "title": "designer capability + /track:design コマンド"
+      },
+      {
+        "description": [
+          "/track:plan 完了メッセージ・registry.md に /track:design を次ステップとして案内。",
+          "DEVELOPER_AI_WORKFLOW.md と knowledge/WORKFLOW.md に TDDD フロー (plan → design → implement) を追記。",
+          "ADR 2026-04-08-1800 の内容を最終確認。ADR README 索引のタイトルを実ファイルと一致させる。"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T07",
+          "T08"
+        ],
+        "title": "ワークフロー導線整備 + ADR 最終化"
+      }
+    ],
+    "summary": [
+      "TDDD (Type-Definition-Driven Development) ワークフローを確立する。",
+      "逆方向チェックの undeclared types/traits を Red、定義済み未実装を Yellow として信号機に統合する。",
+      "verify spec-states ゲートを 2 段階判定に変更: 途中コミット時は Red なし → pass (Yellow 許容)。merge 時は全 Blue 必須 (Yellow もブロック)。",
+      "designer capability + /track:design コマンドを新設し、domain-types.json の初回作成と更新を体系化する。"
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "commit_hash": "45d7023",
+      "description": "undeclared types/traits を Red の DomainTypeSignal (kind_tag: undeclared_type / undeclared_trait) に変換する関数を domain 層に追加",
+      "id": "T01",
+      "status": "done"
+    },
+    {
+      "commit_hash": "2c3748a",
+      "description": "定義済みだが未実装の型に Yellow シグナルを返すよう evaluate_domain_type_signals を拡張 (型が TypeGraph に見つからない場合 → Yellow)",
+      "id": "T02",
+      "status": "done"
+    },
+    {
+      "commit_hash": "d143714",
+      "description": "domain-type-signals コマンドを拡張: 逆方向チェック → undeclared Red + 未実装 Yellow を domain-types.json に保存。不在時はエラー終了し /track:design を促す。domain-types.md レンダリング。サマリ出力 blue=N yellow=M red=K (undeclared=U)",
+      "id": "T03",
+      "status": "done"
+    },
+    {
+      "commit_hash": "0ba172e",
+      "description": "verify spec-states ゲートを 2 段階判定に変更: 途中コミット時は Red なし → pass (Yellow 許容、Red ブロック + /track:design 案内)。merge 時は全 Blue 必須 (Yellow もブロック)",
+      "id": "T04",
+      "status": "done"
+    },
+    {
+      "commit_hash": "784346b",
+      "description": "agent-profiles.json の全 profile に designer capability を追加 (既定 provider: claude)",
+      "id": "T05",
+      "status": "done"
+    },
+    {
+      "commit_hash": "5047c95",
+      "description": "/track:design コマンドを作成: 対象トラックの plan.md + 既存 domain-types.json (あれば) を入力に designer capability を呼び出し domain-types.json を生成・更新",
+      "id": "T06",
+      "status": "done"
+    },
+    {
+      "commit_hash": "1e65aeb",
+      "description": "/track:plan 完了メッセージ・registry.md・DEVELOPER_AI_WORKFLOW.md・knowledge/WORKFLOW.md に /track:design を次ステップとして案内する導線を追加",
+      "id": "T07",
+      "status": "done"
+    },
+    {
+      "commit_hash": "dc02efd",
+      "description": "ADR 2026-04-08-1800 を最終化し、ADR README 索引のタイトルを実ファイルと一致させる",
+      "id": "T08",
+      "status": "done"
+    }
+  ],
+  "title": "TDDD: 逆方向チェック信号機統合 + designer capability + /track:design",
+  "updated_at": "2026-04-09T06:13:50Z"
+}

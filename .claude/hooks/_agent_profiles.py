@@ -17,6 +17,7 @@ DEFAULT_CONFIG_PATH = Path(__file__).resolve().parent.parent / "agent-profiles.j
 REQUIRED_CAPABILITIES = (
     "orchestrator",
     "planner",
+    "designer",
     "researcher",
     "implementer",
     "reviewer",

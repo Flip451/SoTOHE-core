@@ -60,15 +60,16 @@ flowchart TD
     R1 --> PC{"計画をコミットする?"}
     PR -->|No| PC
     PC -->|Yes| R1C["/track:commit（計画 artifact）"]
-    R1C --> D{実装方法を選ぶ}
-    PC -->|No| D
+    R1C --> IMPL{実装方法を選ぶ}
+    PC -->|No| IMPL
     P2 --> PM["plan/&lt;id&gt; で PR → main にマージ"]
     PM --> ACT["/track:activate &lt;track-id&gt;"]
-    ACT --> D
-    D --> E["/track:full-cycle &lt;task&gt;"]
-    D --> F["/track:implement"]
-    E --> G["実装完了"]
-    F --> G
+    ACT --> IMPL
+    DS["(任意) /track:design"] -.->|"TDDD: 型宣言"| IMPL
+    IMPL -->|"対話型"| F["/track:implement"]
+    IMPL -->|"自律型"| FC["/track:full-cycle &lt;task&gt;"]
+    F --> G["実装完了"]
+    FC --> G
     G --> H{レビュー方法を選ぶ}
     H -->|"ローカル"| I["/track:review"]
     I --> J["/track:ci"]
@@ -90,8 +91,9 @@ flowchart TD
 | ------- | ---- | --------- |
 | `/track:catchup` | 環境構築 + track setup + プロジェクト状態ブリーフィング | 初回セットアップ時・新規参入時 |
 | `/track:setup` | 初期状態を整えて主要ドキュメントを確認・整備する | track ワークフローの論理的な初期化のみ必要な時 |
-| `/track:plan <feature>` | 調査・設計・plan 作成・トラック成果物作成 | 実装前に tech-stack と計画を固め、承認後にトラックを作る時 |
-| `/track:full-cycle <task>` | 自律実装 | 承認後にまとめて進めたい時 |
+| `/track:plan <feature>` | 調査・計画作成・トラック成果物作成（ドメイン型宣言は /track:design） | 実装前に tech-stack と計画を固め、承認後にトラックを作る時 |
+| `/track:design` | TDDD: domain-types.json にドメイン型を宣言 | TDDD フロー（plan → design → implement）での型宣言時 |
+| `/track:full-cycle <task>` | 自律実装（TDDD 使用時は事前に `/track:design` 推奨） | タスクを自律的に進めたい時 |
 | `/track:implement` | 対話型並列実装 | 実装中に途中判断を挟みたい時 |
 | `/track:review` | 計画・実装レビュー（ローカル） | 計画 artifact や実装内容を確認したい時 |
 | `/track:pr-review` | GitHub PR レビュー（Codex Cloud） | PR 上で非同期レビューしたい時（要: Codex Cloud GitHub App） |
@@ -107,7 +109,7 @@ flowchart TD
 | `/track:status` | 進捗確認 | 現在地を知りたい時 |
 | `/conventions:add <name>` | Project Conventions の正式ルールを追加・管理 | プロジェクト固有の実装規約を一次資料として残したい時 |
 
-注: `<feature>` は作りたい機能名・作業名、`<task>` はその機能内で今回実行する具体的な作業のこと。`/track:plan <feature>` で技術方針を固め、承認後にトラック成果物を作成し、実行単位ごとに `<task>` を指定する（例: `/track:plan user-auth` → 承認 → `/track:full-cycle "login endpoint with JWT validation"`）。
+注: `<feature>` は作りたい機能名・作業名、`<task>` はその機能内で今回実行する具体的な作業のこと。`/track:plan <feature>` で技術方針を固め、承認後にトラック成果物を作成し、実行単位ごとに `<task>` を指定する（例: `/track:plan user-auth` → 承認 → `/track:design` → `/track:implement`）。
 
 ### 0.5 守るべきルール
 
@@ -168,7 +170,7 @@ flowchart TD
 1. `[Claude Code]` `/track:catchup`（初回のみ）
    - 環境構築（Python venv、Docker イメージ、CI）+ track setup + プロジェクト状態ブリーフィングをまとめて実行
 2. `[Claude Code]` `/track:plan <feature>`
-   - 仕様を前提に、実装前の調査と計画確定を行う入口。要件整理、技術調査、設計、計画作成、承認確認を行う
+   - 仕様を前提に、実装前の調査と計画確定を行う入口。要件整理、技術調査、計画作成、承認確認を行う（ドメイン型宣言は後続の /track:design で行う）
    - `track/tech-stack.md` の `TODO:` を解消し、version baseline を確定する
    - ユーザー承認後に `track/items/<id>/` にトラック成果物（`metadata.json` / `plan.md` / `spec.md` / `verification.md`）を作成する
    - `cargo make ci` は `verify-track-metadata` と `verify-tech-stack` を通して track 状態と tech-stack の整合を検証する
@@ -179,16 +181,17 @@ flowchart TD
    - `[Terminal/GitHub]` `plan/<id>` ブランチを push して PR を作成、計画をレビュー
    - `[GitHub]` PR マージ → 計画 artifacts が main に合流
    - `[Claude Code]` `/track:activate <track-id>`: `track/<id>` 実装ブランチを作成して実装フェーズへ移行
-   - activate 後は標準フローの「5. 実装」以降と同じ流れで進める
+   - activate 後は標準フローのステップ 4b 以降で進める
 
 3. (任意) `[Claude Code]` `/track:review`
    - 計画 artifact のレビューを実行する
 4. (任意) `[Claude Code]` `/track:commit <message>`
    - 計画 artifact をコミットする（レビュー有無にかかわらず）
-5. 実装
-   - 以下のいずれかを選択して進める
-   - `[Claude Code]` `/track:full-cycle <task>`: 自律的にまとめて進める
-   - `[Claude Code]` `/track:implement`: 対話しながら並列実装する
+4b. (任意・TDDD) `[Claude Code]` `/track:design`
+   - 実装前に `domain-types.json` にドメイン型を宣言・確認する（TDDD フロー推奨）
+5. `[Claude Code]` `/track:implement` または `/track:full-cycle <task>`
+   - `/track:implement`: 対話しながら並列実装
+   - `/track:full-cycle <task>`: 自律実装（TDDD 使用時は事前にステップ 4b 推奨）
 6. `[Claude Code]` `/track:review`
    - 実装レビューを実行する
 7. `[Claude Code]` `/track:ci`
@@ -217,6 +220,9 @@ flowchart TD
 1. `[Claude Code]` `/track:status`
 2. Claude Code が `track/registry.md`, `track/items/<id>/spec.md`, `track/items/<id>/plan.md`, `track/items/<id>/verification.md` を読んで状況を整理し、次に使うべきコマンドを提案する
    - 例: `/track:plan`, `/track:implement`, `/track:review`, `/track:ci`
+
+   > **TDDD 参考**: ドメイン型を新規追加・変更する場合は、実装前に標準フローの任意ステップ 4b（`/track:design`）で `domain-types.json` に型を宣言することを推奨する（Yellow = WIP 宣言 → `/track:implement` で実装 → Blue 確定。未宣言の型がコードに存在すると Red = TDDD 違反）。`/track:status` はトラック状態に基づいてコマンドを提案するため、設計フェーズが必要かどうかは開発者自身が判断して明示的に実行する。
+
 3. 開発者が提案を採用するか、別の進め方を指示する
 4. Claude Code がコマンドを実行し、必要なら active profile に応じて specialist capability / Agent Teams を使う
 5. 実行後に `plan.md` と関連ドキュメントを更新する
@@ -335,7 +341,7 @@ cargo make bacon-test  # テスト寄りの継続チェック
 - `knowledge/external/POLICY.md`
 - `knowledge/external/guides.json`
 
-`/track:plan`, `/track:implement`, `/track:full-cycle` では、プロンプトと最新トラックの
+`/track:plan`, `/track:implement`, `/track:full-cycle`、`/track:design` では、プロンプトと最新トラックの
 `spec.md` / `plan.md` を走査し、`trigger_keywords` に一致すると該当ガイドの要約が
 追加コンテキストとして自動注入される。
 

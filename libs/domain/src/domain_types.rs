@@ -310,6 +310,10 @@ fn red(name: &str, kind_tag: &str, found_type: bool) -> DomainTypeSignal {
     DomainTypeSignal::new(name, kind_tag, ConfidenceSignal::Red, found_type, vec![], vec![], vec![])
 }
 
+fn yellow(name: &str, kind_tag: &str) -> DomainTypeSignal {
+    DomainTypeSignal::new(name, kind_tag, ConfidenceSignal::Yellow, false, vec![], vec![], vec![])
+}
+
 fn blue(name: &str, kind_tag: &str) -> DomainTypeSignal {
     DomainTypeSignal::new(name, kind_tag, ConfidenceSignal::Blue, true, vec![], vec![], vec![])
 }
@@ -322,7 +326,7 @@ fn evaluate_typestate(
     _typestate_names: &HashSet<&str>,
 ) -> DomainTypeSignal {
     let Some(code_type) = profile.get_type(name) else {
-        return red(name, kind_tag, false);
+        return yellow(name, kind_tag);
     };
 
     // Use pre-filtered outgoing transitions from TypeGraph (set by build_type_graph).
@@ -387,15 +391,7 @@ fn evaluate_enum(
     profile: &TypeGraph,
 ) -> DomainTypeSignal {
     let Some(code_type) = profile.get_type(name) else {
-        return DomainTypeSignal::new(
-            name,
-            kind_tag,
-            ConfidenceSignal::Red,
-            false,
-            vec![],
-            expected_variants.to_vec(),
-            vec![],
-        );
+        return yellow(name, kind_tag);
     };
     if *code_type.kind() != TypeKind::Enum {
         return DomainTypeSignal::new(
@@ -433,7 +429,7 @@ fn evaluate_enum(
 
 fn evaluate_value_object(name: &str, kind_tag: &str, profile: &TypeGraph) -> DomainTypeSignal {
     let Some(code_type) = profile.get_type(name) else {
-        return red(name, kind_tag, false);
+        return yellow(name, kind_tag);
     };
     // ValueObject must be a Struct (not Enum or TypeAlias).
     if *code_type.kind() == TypeKind::Struct {
@@ -450,15 +446,7 @@ fn evaluate_error_type(
     profile: &TypeGraph,
 ) -> DomainTypeSignal {
     let Some(code_type) = profile.get_type(name) else {
-        return DomainTypeSignal::new(
-            name,
-            kind_tag,
-            ConfidenceSignal::Red,
-            false,
-            vec![],
-            expected_variants.to_vec(),
-            vec![],
-        );
+        return yellow(name, kind_tag);
     };
     if *code_type.kind() != TypeKind::Enum {
         return DomainTypeSignal::new(
@@ -500,15 +488,7 @@ fn evaluate_trait_port(
     profile: &TypeGraph,
 ) -> DomainTypeSignal {
     let Some(code_trait) = profile.get_trait(name) else {
-        return DomainTypeSignal::new(
-            name,
-            kind_tag,
-            ConfidenceSignal::Red,
-            false,
-            vec![],
-            expected_methods.to_vec(),
-            vec![],
-        );
+        return yellow(name, kind_tag);
     };
 
     let code_methods: HashSet<&str> =
@@ -526,6 +506,54 @@ fn evaluate_trait_port(
 
     let signal = if missing.is_empty() { ConfidenceSignal::Blue } else { ConfidenceSignal::Red };
     DomainTypeSignal::new(name, kind_tag, signal, true, found, missing, vec![])
+}
+
+// ---------------------------------------------------------------------------
+// undeclared_to_signals — reverse check Red signal conversion
+// ---------------------------------------------------------------------------
+
+/// Converts undeclared type and trait names into Red `DomainTypeSignal`s.
+///
+/// - Undeclared types get `kind_tag = "undeclared_type"`
+/// - Undeclared traits get `kind_tag = "undeclared_trait"`
+/// - All signals are `ConfidenceSignal::Red` with `found_type = true`
+///   (they exist in code but not in domain-types.json).
+///
+/// # Errors
+///
+/// This function is infallible.
+#[must_use]
+pub fn undeclared_to_signals(
+    undeclared_types: &[String],
+    undeclared_traits: &[String],
+) -> Vec<DomainTypeSignal> {
+    let mut signals = Vec::with_capacity(undeclared_types.len() + undeclared_traits.len());
+
+    for name in undeclared_types {
+        signals.push(DomainTypeSignal::new(
+            name.clone(),
+            "undeclared_type",
+            ConfidenceSignal::Red,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        ));
+    }
+
+    for name in undeclared_traits {
+        signals.push(DomainTypeSignal::new(
+            name.clone(),
+            "undeclared_trait",
+            ConfidenceSignal::Red,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        ));
+    }
+
+    signals
 }
 
 // ---------------------------------------------------------------------------
@@ -606,7 +634,7 @@ pub fn check_consistency(entries: &[DomainTypeEntry], graph: &TypeGraph) -> Cons
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use super::*;
 
@@ -834,7 +862,7 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_typestate_red_when_type_missing() {
+    fn test_evaluate_typestate_yellow_when_type_not_implemented() {
         let entry = DomainTypeEntry::new(
             "Ghost",
             "desc",
@@ -844,7 +872,7 @@ mod tests {
         .unwrap();
         let profile = make_profile(&[]);
         let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Red);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
         assert!(!results.first().unwrap().found_type());
     }
 
@@ -876,16 +904,17 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_value_object_red_when_missing() {
+    fn test_evaluate_value_object_yellow_when_not_implemented() {
         let entry =
             DomainTypeEntry::new("TrackId", "desc", DomainTypeKind::ValueObject, true).unwrap();
         let profile = make_profile(&[]);
         let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Red);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+        assert!(!results.first().unwrap().found_type());
     }
 
     #[test]
-    fn test_evaluate_enum_red_when_not_found_in_profile() {
+    fn test_evaluate_enum_yellow_when_not_implemented() {
         let entry = DomainTypeEntry::new(
             "Status",
             "desc",
@@ -896,7 +925,24 @@ mod tests {
         // Profile has no "Status" type.
         let profile = make_profile(&[]);
         let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Red);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+        assert!(!results.first().unwrap().found_type());
+    }
+
+    #[test]
+    fn test_evaluate_error_type_yellow_when_not_implemented() {
+        let entry = DomainTypeEntry::new(
+            "DomainError",
+            "desc",
+            DomainTypeKind::ErrorType { expected_variants: vec!["NotFound".into()] },
+            true,
+        )
+        .unwrap();
+        // Profile has no "DomainError" type — declared in spec, not yet implemented.
+        let profile = make_profile(&[]);
+        let results = evaluate_domain_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+        assert!(!results.first().unwrap().found_type());
     }
 
     #[test]
@@ -914,7 +960,7 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_trait_port_red_when_not_in_profile() {
+    fn test_evaluate_trait_port_yellow_when_not_implemented() {
         let entry = DomainTypeEntry::new(
             "Repo",
             "desc",
@@ -924,7 +970,8 @@ mod tests {
         .unwrap();
         let profile = make_profile(&[]);
         let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Red);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+        assert!(!results.first().unwrap().found_type());
     }
 
     #[test]
@@ -1003,6 +1050,55 @@ mod tests {
             "expected no extra_items, got {:?}",
             draft_signal.extra_items()
         );
+    }
+
+    // --- undeclared_to_signals tests ---
+
+    #[test]
+    fn test_undeclared_to_signals_converts_types_to_red() {
+        let undeclared = vec!["Foo".to_string(), "Bar".to_string()];
+        let signals = undeclared_to_signals(&undeclared, &[]);
+
+        assert_eq!(signals.len(), 2);
+        assert_eq!(signals[0].type_name(), "Foo");
+        assert_eq!(signals[0].kind_tag(), "undeclared_type");
+        assert_eq!(signals[0].signal(), ConfidenceSignal::Red);
+        assert!(signals[0].found_type());
+        assert!(signals[0].missing_items().is_empty());
+        assert!(signals[0].extra_items().is_empty());
+
+        assert_eq!(signals[1].type_name(), "Bar");
+        assert_eq!(signals[1].kind_tag(), "undeclared_type");
+        assert_eq!(signals[1].signal(), ConfidenceSignal::Red);
+    }
+
+    #[test]
+    fn test_undeclared_to_signals_converts_traits_to_red() {
+        let undeclared_traits = vec!["MyTrait".to_string()];
+        let signals = undeclared_to_signals(&[], &undeclared_traits);
+
+        assert_eq!(signals.len(), 1);
+        assert_eq!(signals[0].type_name(), "MyTrait");
+        assert_eq!(signals[0].kind_tag(), "undeclared_trait");
+        assert_eq!(signals[0].signal(), ConfidenceSignal::Red);
+        assert!(signals[0].found_type());
+    }
+
+    #[test]
+    fn test_undeclared_to_signals_empty_inputs_returns_empty() {
+        let signals = undeclared_to_signals(&[], &[]);
+        assert!(signals.is_empty());
+    }
+
+    #[test]
+    fn test_undeclared_to_signals_mixed_types_and_traits() {
+        let types = vec!["Foo".to_string()];
+        let traits = vec!["Bar".to_string()];
+        let signals = undeclared_to_signals(&types, &traits);
+
+        assert_eq!(signals.len(), 2);
+        assert_eq!(signals[0].kind_tag(), "undeclared_type");
+        assert_eq!(signals[1].kind_tag(), "undeclared_trait");
     }
 
     // --- check_consistency tests ---

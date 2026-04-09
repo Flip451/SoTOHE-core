@@ -32,4 +32,4 @@ Behavior:
   5. Suggested next steps:
      - Push the planning branch and create a PR for review
      - After PR merge to main, run `/track:activate <track-id>` to create the implementation branch
-     - Note: on the `plan/<id>` branch (non-track branch), `/track:review` and `/track:commit` require explicit `<track-id>` selector (e.g., `/track:commit <track-id> -- <message>`)
+     - Note: on the `plan/<id>` branch, `/track:review` uses the `<id>` from the branch name to resolve the track. `/track:commit` requires explicit `<track-id>` selector (e.g., `/track:commit <track-id> -- <message>`)
