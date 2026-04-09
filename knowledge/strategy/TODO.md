@@ -601,6 +601,7 @@
 - [ ] **Review escalation enforcement の機構化** (HIGH) — `record-round` に `--model-tier fast|full` フラグを追加し、domain 層で「全グループが fast zero_findings → full zero_findings の 2 段階を経たか」を追跡。`check-approved` が full model 確認なしのグループを拒否。現状はプロンプト依存で fast model pass のみでコミットできるすり抜けが発生した (2026-03-24 発見)。関連: WF-36, RVW-06
 - [ ] **track-local-review のモデル自動解決** (MEDIUM) — `review.md` にモデル解決フォールバックルールを散文で記載するのは DRY 違反・CI 検証不能・ドリフト必至。`cargo make track-local-review --track-id <id> --group <scope> --briefing-file <path>` だけで CLI が `agent-profiles.json` を読み `fast_model` / `default_model` / `--round-type` を自動解決すべき。関連: WF-34-phase2
 - [ ] **`designer` capability + `/track:design` コマンド** (HIGH) — track `reverse-signal-integration-2026-04-08` に統合済み (T05-T07)
+- [ ] **`sotp review scope-files --group <name>` コマンド** (MEDIUM) — 指定グループに属する変更ファイルリストを出力する。`partition()` ロジックは既に `bin/sotp` 内にあるのでサブコマンド追加で実現可能。review-fix-lead エージェントへの scope allowlist 受け渡しを自動化する。関連: track-local-review のモデル自動解決
 
 ---
 

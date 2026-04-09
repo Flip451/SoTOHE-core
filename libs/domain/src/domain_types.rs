@@ -529,6 +529,54 @@ fn evaluate_trait_port(
 }
 
 // ---------------------------------------------------------------------------
+// undeclared_to_signals — reverse check Red signal conversion
+// ---------------------------------------------------------------------------
+
+/// Converts undeclared type and trait names into Red `DomainTypeSignal`s.
+///
+/// - Undeclared types get `kind_tag = "undeclared_type"`
+/// - Undeclared traits get `kind_tag = "undeclared_trait"`
+/// - All signals are `ConfidenceSignal::Red` with `found_type = true`
+///   (they exist in code but not in domain-types.json).
+///
+/// # Errors
+///
+/// This function is infallible.
+#[must_use]
+pub fn undeclared_to_signals(
+    undeclared_types: &[String],
+    undeclared_traits: &[String],
+) -> Vec<DomainTypeSignal> {
+    let mut signals = Vec::with_capacity(undeclared_types.len() + undeclared_traits.len());
+
+    for name in undeclared_types {
+        signals.push(DomainTypeSignal::new(
+            name.clone(),
+            "undeclared_type",
+            ConfidenceSignal::Red,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        ));
+    }
+
+    for name in undeclared_traits {
+        signals.push(DomainTypeSignal::new(
+            name.clone(),
+            "undeclared_trait",
+            ConfidenceSignal::Red,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        ));
+    }
+
+    signals
+}
+
+// ---------------------------------------------------------------------------
 // ConsistencyReport — bidirectional spec ↔ code check
 // ---------------------------------------------------------------------------
 
@@ -606,7 +654,7 @@ pub fn check_consistency(entries: &[DomainTypeEntry], graph: &TypeGraph) -> Cons
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use super::*;
 
@@ -1003,6 +1051,55 @@ mod tests {
             "expected no extra_items, got {:?}",
             draft_signal.extra_items()
         );
+    }
+
+    // --- undeclared_to_signals tests ---
+
+    #[test]
+    fn test_undeclared_to_signals_converts_types_to_red() {
+        let undeclared = vec!["Foo".to_string(), "Bar".to_string()];
+        let signals = undeclared_to_signals(&undeclared, &[]);
+
+        assert_eq!(signals.len(), 2);
+        assert_eq!(signals[0].type_name(), "Foo");
+        assert_eq!(signals[0].kind_tag(), "undeclared_type");
+        assert_eq!(signals[0].signal(), ConfidenceSignal::Red);
+        assert!(signals[0].found_type());
+        assert!(signals[0].missing_items().is_empty());
+        assert!(signals[0].extra_items().is_empty());
+
+        assert_eq!(signals[1].type_name(), "Bar");
+        assert_eq!(signals[1].kind_tag(), "undeclared_type");
+        assert_eq!(signals[1].signal(), ConfidenceSignal::Red);
+    }
+
+    #[test]
+    fn test_undeclared_to_signals_converts_traits_to_red() {
+        let undeclared_traits = vec!["MyTrait".to_string()];
+        let signals = undeclared_to_signals(&[], &undeclared_traits);
+
+        assert_eq!(signals.len(), 1);
+        assert_eq!(signals[0].type_name(), "MyTrait");
+        assert_eq!(signals[0].kind_tag(), "undeclared_trait");
+        assert_eq!(signals[0].signal(), ConfidenceSignal::Red);
+        assert!(signals[0].found_type());
+    }
+
+    #[test]
+    fn test_undeclared_to_signals_empty_inputs_returns_empty() {
+        let signals = undeclared_to_signals(&[], &[]);
+        assert!(signals.is_empty());
+    }
+
+    #[test]
+    fn test_undeclared_to_signals_mixed_types_and_traits() {
+        let types = vec!["Foo".to_string()];
+        let traits = vec!["Bar".to_string()];
+        let signals = undeclared_to_signals(&types, &traits);
+
+        assert_eq!(signals.len(), 2);
+        assert_eq!(signals[0].kind_tag(), "undeclared_type");
+        assert_eq!(signals[1].kind_tag(), "undeclared_trait");
     }
 
     // --- check_consistency tests ---

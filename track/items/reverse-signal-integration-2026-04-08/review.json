@@ -1,6 +1,702 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `provider_model_overrides` from the reviewer model-resolution instructions leaves this file out of sync with the repo's existing `verify_orchestra` guardrail, which still requires the override-first snippet for `.claude/commands/track/review.md`. The same regression appears again in the model escalation section, so this change will fail verification unless the checker is updated in the same patch.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 41,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T13:59:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T13:59:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `provider_model_overrides` from the reviewer model-resolution guidance leaves this file out of sync with the current `verify orchestra` guardrail, which still requires the canonical override-first snippets for `.claude/commands/track/review.md`. Since `cargo make ci` includes `verify-orchestra-local`, this change will fail the workflow gate until the verifier is updated in the same patch; the same regression is repeated in the model-escalation section later in this file.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 42,
+              "category": "ci"
+            }
+          ],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T14:01:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T14:07:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
+          "at": "2026-04-08T14:08:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2a says to invoke reviewers only for groups that report `required`, but Step 2b/2c still say to build briefings and launch `review-fix-lead` for every non-empty group. Approved-but-non-empty scopes will still get reviewer runs, so the new `track-review-status` gate is not actually enforced.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 95,
+              "category": "workflow"
+            },
+            {
+              "message": "The rewrite removes the manual file-classification instructions, but it never adds a source for the `{file list for this group}` needed in the briefing template and the `{file list from Step 2a}` prompt. `track-review-status` only reports per-scope state, so this document no longer tells the orchestrator how to populate per-group file lists.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 66,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:0435446374e96052622aff0a1da3708bd5ceb37711159f006940ad55529af356",
+          "at": "2026-04-08T14:59:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2a says to invoke reviewers only for groups that report `required`, but Step 2c still launches `review-fix-lead` per non-empty group. Approved-but-non-empty scopes will still get reviewer runs, so the new `track-review-status` gate is not actually enforced.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 138,
+              "category": "workflow"
+            },
+            {
+              "message": "The rewrite removes the manual file-classification recipe, but Step 2b/2c still need a per-group file list (`{file list for this group}` / `{file list from Step 2a}`). `track-review-status` only reports per-scope state, so this document no longer tells the orchestrator where those file lists come from.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 157,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:0435446374e96052622aff0a1da3708bd5ceb37711159f006940ad55529af356",
+          "at": "2026-04-08T15:00:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2b still references `{base}` in the changed-file diff, but Step 2a removed the only definition of that variable. The orchestrator no longer has an unambiguous diff base to use when building briefings, so file lists can diverge from the status command's scope hash.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 96,
+              "category": "correctness"
+            },
+            {
+              "message": "The new file-list recipe only filters by per-group glob patterns from `track/review-scope.json`, but `other` is a complement scope and `review_operational` / `other_track` exclusions have to be applied first. As written, `other` briefings cannot be derived correctly and may include operational files.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 96,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b1c9621edb7989b7ba3c86b69f67b4eaafc434f73e4356c65e6fe513a07a1b45",
+          "at": "2026-04-08T15:09:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2b still uses `{base}` in the committed-diff command, but the rewrite removed the only place that defined the diff base. The briefing file list can now be computed against an undefined or incorrect merge base, so the per-group scope can diverge from `track-review-status`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 96,
+              "category": "workflow"
+            },
+            {
+              "message": "The new file-list recipe only filters by named-group globs from `track/review-scope.json`; it never explains how to build the implicit `other` scope or apply `review_operational` / `other_track` exclusions. As written, `other` briefings can be wrong or include operational files.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 96,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:b1c9621edb7989b7ba3c86b69f67b4eaafc434f73e4356c65e6fe513a07a1b45",
+          "at": "2026-04-08T15:10:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `review-fix-lead` contract still needs an explicit scope file list, but this prompt replaces it with a note that `track-local-review` will auto-inject files. That only applies to the reviewer subprocess, so the higher-level agent loses its modification allowlist, and the `claude` branch has no alternate source for the list.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 158,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:c8cce9759e55c50aa7caaafc18bfeed55c3d45f9846dc874baf722d3af2d7a0e",
+          "at": "2026-04-08T15:18:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2a omits the `required (findings remain)` state from the list of scopes that need reviewer invocation, even though `track-review-status` can emit it. A scope with unresolved findings would be treated as skippable and could never be re-reviewed.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 84,
+              "category": null
+            },
+            {
+              "message": "Step 2b claims the per-group file list is auto-injected by `track-local-review`, then reuses the same briefing for the `claude`/`Explore` path in Step 2c. That path does not invoke `track-local-review`, so the reviewer contract loses the required scope file list and can review the wrong or incomplete set of files.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 96,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:c8cce9759e55c50aa7caaafc18bfeed55c3d45f9846dc874baf722d3af2d7a0e",
+          "at": "2026-04-08T15:19:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2b tells the `claude` path to populate `## Changed Files`, but the rewrite removed the only instruction for deriving those per-group file lists. `track-review-status` only reports scope state, so this policy no longer says how to build the briefing for `claude`/`Explore` runs or any manual fallback.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 98,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:7fe7ab5aab2e91c2013f466daebc029fa113cb889e7e92dbade5d2b91d9bb6fd",
+          "at": "2026-04-08T15:23:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2b now requires a per-group `## Changed Files` section for the `claude` path, but Step 2a no longer provides any recipe for deriving that list. `track-review-status` only reports scope state, so the briefing for `claude`/`Explore` runs is underspecified and cannot be built deterministically.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 98,
+              "category": "correctness"
+            },
+            {
+              "message": "The `review-fix-lead` agent prompt no longer passes an explicit scope file allowlist; `Scope files: (auto-injected by track-local-review)` refers to the reviewer subprocess, not the agent that must enforce scope boundaries and return `blocked_cross_scope`. This breaks the contract in `.claude/agents/review-fix-lead.md` and leaves the `claude` path without a modification allowlist.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 160,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7fe7ab5aab2e91c2013f466daebc029fa113cb889e7e92dbade5d2b91d9bb6fd",
+          "at": "2026-04-08T15:24:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Hard-coding Codex here removes the existing `claude-heavy` reviewer path even though `.claude/agent-profiles.json` and the guardrails still define it. That makes `/track:review` unusable for a supported profile and contradicts the profile-driven reviewer selection model.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 43,
+              "category": "correctness"
+            },
+            {
+              "message": "`Scope files` is part of the `review-fix-lead` input contract, but this prompt replaces it with an auto-injected note that only applies to the reviewer subprocess. The agent no longer has an explicit modification allowlist, so it cannot reliably detect or report cross-scope fixes.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ceede06ff4d5a7151b62d4f133f9d91f7eacb17035fe39a0710c658ffa05df6d",
+          "at": "2026-04-08T15:36:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Hard-coding the reviewer model resolution to Codex and marking the `claude` path unsupported makes `/track:review` unusable for the existing `claude-heavy` profile, which still maps `reviewer` to `claude` in `.claude/agent-profiles.json`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 43,
+              "category": "workflow"
+            },
+            {
+              "message": "Replacing the explicit `Scope files` allowlist with `'(auto-injected by track-local-review)'` breaks the `review-fix-lead` contract: the agent no longer receives the file list it is allowed to modify, so it cannot reliably detect or report cross-scope fixes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 145,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:ceede06ff4d5a7151b62d4f133f9d91f7eacb17035fe39a0710c658ffa05df6d",
+          "at": "2026-04-08T15:38:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 still resolves `{fast_model}`/`{model}` from `providers.<reviewer_provider>`, but Step 1 removed provider resolution and hardcodes codex-only lookup. The command is internally inconsistent about which provider drives model selection.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 195,
+              "category": "correctness"
+            },
+            {
+              "message": "Step 2a removes manual partitioning, but the prescribed `cargo make track-review-status` command only reports scope states; it does not provide the per-group file lists that Step 2c still requires for the `review-fix-lead` prompt. As written, the orchestrator has no documented source for the `Scope files` input.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 52,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:44be30cfad58931ca1989b27c05b1c97b6895437613dca6e21e413f74a264291",
+          "at": "2026-04-08T15:42:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2c asks the orchestrator to pass '{changed files in this group, from track-review-status partition}' into each review-fix-lead agent, but `cargo make track-review-status` only prints per-scope state and does not expose the per-group file list. As written, the scope-owned file set cannot be populated, so the agent cannot safely enforce its edit boundary.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:44be30cfad58931ca1989b27c05b1c97b6895437613dca6e21e413f74a264291",
+          "at": "2026-04-08T15:45:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2b/2c removed the documented source for the per-group file list, but `track-review-status` only reports scope state and never emits changed-file lists. The orchestrator still needs an explicit allowlist to populate the briefing and `review-fix-lead` prompt, so this workflow is no longer deterministic.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 82,
+              "category": null
+            },
+            {
+              "message": "The new `Scope files` derivation only mentions files matching a group's glob patterns, but `other` is a complement scope and `review_operational` / `other_track` exclusions must be applied first. As written, the `other` agent can receive the wrong file set, which breaks the scope boundary the review-fix-lead contract relies on.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 145,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:aaa43f12219aed39663ffb76349c7a5304ee07bbd7666d7badd0ef040d6e0734",
+          "at": "2026-04-08T15:50:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The per-scope agent prompt now grants modification rights to every file matching the scope glob, instead of the concrete changed-file set for this review. That broadens the write set beyond the current review target and can let a fixer mutate unrelated files in the same layer, which risks unintended edits and stale review/hash state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aaa43f12219aed39663ffb76349c7a5304ee07bbd7666d7badd0ef040d6e0734",
+          "at": "2026-04-08T15:51:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `review-fix-lead` allowlist recipe is incomplete for the `other` scope. `track/review-scope.json` has no `other` glob patterns, and this prompt never says to derive `other` as the complement of the named groups or to exclude `review_operational` / `other_track`, so the agent cannot get a correct modification allowlist for `other` and may either miss files or touch operational ones.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 145,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:aaa43f12219aed39663ffb76349c7a5304ee07bbd7666d7badd0ef040d6e0734",
+          "at": "2026-04-08T15:55:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aaa43f12219aed39663ffb76349c7a5304ee07bbd7666d7badd0ef040d6e0734",
+          "at": "2026-04-08T15:57:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new review-fix-lead prompt says to fill `Scope files` from `track/review-scope.json`, but that file has no entry for the implicit `other` scope. `track-review-status` can still require `other`, so for those runs the orchestrator no longer has any way to give the agent a correct in-scope allowlist, which breaks the cross-scope guard for `other`-only changes.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 146,
+              "category": null
+            },
+            {
+              "message": "Step 2 now forbids manual per-file classification and relies on `track-review-status`, but the briefing template still requires `## Changed Files (this group only)`. Because `track-review-status` only reports state and `CodexReviewer::build_full_prompt` injects file lists only inside `track-local-review`, the orchestrator no longer has a documented way to populate that section, so the briefing generation flow is internally inconsistent for every required scope.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 82,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:aaa43f12219aed39663ffb76349c7a5304ee07bbd7666d7badd0ef040d6e0734",
+          "at": "2026-04-08T16:00:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a805ff074d0f6197c24d5bc8189d4d87febc4748aa09b7c1de6eba2a38a79327",
+          "at": "2026-04-08T16:07:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1 now hard-codes `providers.codex.{default_model,fast_model}` and removes the `providers.<reviewer_provider>.{default_model,fast_model}` guidance that `verify-orchestra` still enforces for this file. In the current repo state, that makes `.claude/commands/track/review.md` fail the orchestration verifier before the review workflow can be considered valid.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 40,
+              "category": null
+            },
+            {
+              "message": "Step 2a says not to classify files manually and to rely on `track-review-status`, but the agent prompt still requires an explicit file list for the `other` scope. Because `other` is implicit in `track/review-scope.json` and `track-review-status` does not expose per-scope membership, the orchestrator no longer has any documented way to populate that list when `other` is required.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 145,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:a805ff074d0f6197c24d5bc8189d4d87febc4748aa09b7c1de6eba2a38a79327",
+          "at": "2026-04-08T16:11:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Lines 40-41 hard-code model lookup to `providers.codex.*`, but the repo verifier still requires this command spec to describe provider-relative resolution via `providers.<reviewer_provider>.*` (`libs/infrastructure/src/verify/orchestra.rs` lines 335-340). As written, the updated policy fails orchestration verification before the review workflow can be accepted.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 40,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `other`-scope allowlist is underspecified. Step 2c says to pass the actual changed files for `other`, but Step 2a now forbids manual partitioning and `track-review-status` only reports scope state, not membership. Since `track/review-scope.json` has no `other` glob patterns, the orchestrator has no documented way to build that allowlist when `other` is required, so the review-fix-lead cannot enforce its scope boundary.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a805ff074d0f6197c24d5bc8189d4d87febc4748aa09b7c1de6eba2a38a79327",
+          "at": "2026-04-08T16:13:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ceb4a4bcdcd6e3fa6a852b8ea3e4c7d4cf580806ef2093a6eb931f81a2e7937",
+          "at": "2026-04-08T16:20:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `other`-scope allowlist recipe is semantically wrong. `ReviewScopeConfig::classify()` excludes `review_operational` and `other_track` paths before assigning unmatched files to `Other`, but this step now says to derive `other` by subtracting named-group matches from the raw full diff. On a worktree that also changes `track/items/<track-id>/review.json`, archived tracks, or another track's files, the orchestrator will incorrectly hand those excluded paths to the `review-fix-lead` as in-scope files.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 149,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6ceb4a4bcdcd6e3fa6a852b8ea3e4c7d4cf580806ef2093a6eb931f81a2e7937",
+          "at": "2026-04-08T16:22:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new per-scope allowlist recipe is underspecified: it says to derive files from the 'full diff' but no longer spells out the same 4-source union that the reviewer actually uses (committed diff, staged, unstaged, and untracked files). In this repo, `GitDiffGetter` includes all four sources, so an implementation that follows this doc literally can miss staged or untracked edits and leave them out of review/fix coverage.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 147,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9ffb6b2407f0297eaf093038178e0b1037f665358e2521873f38b774b8cb39bf",
+          "at": "2026-04-08T23:04:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `other`-scope allowlist recipe is too aggressive: `ReviewScopeConfig::classify()` keeps files under `track/items/<track-id>/` even when they match `track/items/<other-track>/**`, but Step 2c says to subtract every `other_track` match from the full diff. That would drop current-track planning artifacts from `other` and leave them unreviewed.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 148,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9ffb6b2407f0297eaf093038178e0b1037f665358e2521873f38b774b8cb39bf",
+          "at": "2026-04-08T23:06:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Step 2 flow never consumes the optional `$ARGUMENTS` scope note, so a scoped invocation still runs every `required` group from `track-review-status`. That silently violates the documented contract to limit review to the requested files/modules/concerns.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 29,
+              "category": "workflow_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:bd9a37e4990eb680b9b88667a57b1af0b3794a549aa4310ecff97a2b5cbda272",
+          "at": "2026-04-08T23:23:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f6c3ed6c990ea250265ad8da585546d7e179faebd26533cd235db65a2a498dbc",
+          "at": "2026-04-08T23:30:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Filtering Step 2 down to only the user-requested groups breaks scoped reviews. `track-check-approved` still validates every required scope in the track, so a run like `/track:review libs/domain/` will now stop after reviewing only `domain` and then fail the final approval gate as soon as any other scope (for example `cli`) is still `required`. Before this change the command reviewed all required groups, so the new scope filter introduces a path where a legitimate partial review request can never complete successfully.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 81,
+              "category": "workflow_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f6c3ed6c990ea250265ad8da585546d7e179faebd26533cd235db65a2a498dbc",
+          "at": "2026-04-08T23:34:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2c still requires an `other`-scope allowlist computed from the \"full diff\", but Step 2a removed the only recipe for reconstructing that diff (base ref plus staged/unstaged/untracked files) and replaced it with `track-review-status`, which only prints scope states. In `other`-only reviews the orchestrator no longer has a deterministic way to build the agent's edit boundary, so files can be omitted from or over-included in the scope.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 153,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:f6c3ed6c990ea250265ad8da585546d7e179faebd26533cd235db65a2a498dbc",
+          "at": "2026-04-08T23:38:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ee3b70a186cb9cb4103d0e9c91bd6b52f26d88144ceb62475bb1005a930e6d1",
+          "at": "2026-04-08T23:43:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2b says the per-group briefing no longer needs a scope file list because `track-local-review` injects it automatically, but the template immediately below still requires `## Changed Files (this group only)`. An orchestrator following the new prose will either leave that section blank or need undocumented extra work, so the briefing-generation contract is internally inconsistent for every required scope.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 89,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:2ee3b70a186cb9cb4103d0e9c91bd6b52f26d88144ceb62475bb1005a930e6d1",
+          "at": "2026-04-08T23:46:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Filtering Step 2 down to only the user-requested groups breaks scoped `/track:review` runs. Step 3 still requires `cargo make track-check-approved`, and that gate blocks whenever any other scope in the track remains `required`, so a run scoped to `libs/domain/` cannot reach completion unless all other required scopes are reviewed anyway.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 81,
+              "category": "workflow_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2ee3b70a186cb9cb4103d0e9c91bd6b52f26d88144ceb62475bb1005a930e6d1",
+          "at": "2026-04-08T23:48:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This says `$ARGUMENTS` is not used, but Step 0 still reads it to override track selection when it starts with a track id. That makes `/track:review <track-id>` silently switch targets even though the command contract says arguments are ignored, which can send the review to the wrong track.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 13,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a8340261effcabc11272514fee9742db94770587bcbc998ec6b8e491ec3dda94",
+          "at": "2026-04-09T00:02:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`$ARGUMENTS` is documented as unused, but Step 0 still uses it to select the track and otherwise falls back to the latest active track. On a `plan/<id>` or other non-track checkout this can silently review the wrong track instead of the explicit planning-only track the user intended, so the non-track review flow is no longer deterministic.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 13,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a8340261effcabc11272514fee9742db94770587bcbc998ec6b8e491ec3dda94",
+          "at": "2026-04-09T00:04:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Requiring the current branch to be `track/<id>` breaks the documented `/track:review` flow for `plan/<id>` review branches and branchless planning-only tracks. Those workflows still need explicit track-id selection before activation, but this precondition makes them impossible to review.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 16,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3754ef8f68737e43b011b1c1bdc73d9afc6d56cb6cfdc4d7c101418d2f202e18",
+          "at": "2026-04-09T00:12:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing the explicit `track-id` selector path means `/track:review` now rejects every non-`track/<id>`/`plan/<id>` branch. That breaks the documented planning-only review lane on non-track branches, so planning-only tracks are no longer reviewable before activation unless the user is on the `plan/<id>` checkout.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 12,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:a2346f325bcb5cfbba5de796990438d9e14d38b69b1b0b632e2978b97b90f8fe",
+          "at": "2026-04-09T00:19:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Claiming `plan/<id>` branches are valid review targets is incorrect: the shared track resolver rejects `plan/*` as `NotTrackBranch`, so `/track:review` will abort on the `plan/<track-id>` branch created by `/track:plan-only`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 16,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:a2346f325bcb5cfbba5de796990438d9e14d38b69b1b0b632e2978b97b90f8fe",
+          "at": "2026-04-09T00:21:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2346f325bcb5cfbba5de796990438d9e14d38b69b1b0b632e2978b97b90f8fe",
+          "at": "2026-04-09T00:24:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2346f325bcb5cfbba5de796990438d9e14d38b69b1b0b632e2978b97b90f8fe",
+          "at": "2026-04-09T00:28:20Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
+          "at": "2026-04-08T14:11:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
+          "at": "2026-04-08T14:11:48Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
+          "at": "2026-04-08T14:52:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a174909e4c5428051134b854738737fe9a59494eab8512008241d5226096983",
+          "at": "2026-04-08T14:53:39Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -185,79 +881,64 @@
           "findings": [],
           "hash": "rvw1:sha256:4c23e8746f2d8cf41db4c0afdce0c4fec24699ad88e3fc78945d5b05d8e879e0",
           "at": "2026-04-08T14:30:55Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Removing `provider_model_overrides` from the reviewer model-resolution instructions leaves this file out of sync with the repo's existing `verify_orchestra` guardrail, which still requires the override-first snippet for `.claude/commands/track/review.md`. The same regression appears again in the model escalation section, so this change will fail verification unless the checker is updated in the same patch.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 41,
-              "category": "verification"
-            }
-          ],
-          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
-          "at": "2026-04-08T13:59:03Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
-          "at": "2026-04-08T13:59:33Z"
+          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
+          "at": "2026-04-08T14:54:45Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Removing `provider_model_overrides` from the reviewer model-resolution guidance leaves this file out of sync with the current `verify orchestra` guardrail, which still requires the canonical override-first snippets for `.claude/commands/track/review.md`. Since `cargo make ci` includes `verify-orchestra-local`, this change will fail the workflow gate until the verifier is updated in the same patch; the same regression is repeated in the model-escalation section later in this file.",
+              "message": "`updated_at` moved backwards to `2026-04-08T14:50:43Z`, which is earlier than this item's `created_at` (`2026-04-08T18:00:00Z`). A status transition should not produce metadata where the update timestamp predates creation; any tooling that relies on monotonic timestamps will now see this item as modified before it existed.",
               "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 42,
-              "category": "ci"
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 112,
+              "category": null
             }
           ],
-          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
-          "at": "2026-04-08T14:01:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
-          "at": "2026-04-08T14:07:29Z"
+          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
+          "at": "2026-04-08T14:55:29Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7af0a092934af8f2cb4d0d974ae054ed7f3f20587133b8bf96b7e7eaf48205b7",
-          "at": "2026-04-08T14:08:41Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+          "hash": "rvw1:sha256:99b5af49c2be3c0ca2e60adce0865d8ba208c5235d1d34f7fba53c3d4cbda8d1",
+          "at": "2026-04-08T14:56:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` is earlier than `created_at` (`2026-04-08T14:50:43Z` vs `2026-04-08T18:00:00Z`), which violates the track timestamp invariant and can misorder or invalidate consumers that rely on `updated_at` for latest-track selection.",
+              "severity": "P1",
+              "file": "track/items/reverse-signal-integration-2026-04-08/metadata.json",
+              "line": 112,
+              "category": "data-integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:0491e44cb108d6e0370f0dfc17891f974a5d107dca03715fce132e3e8fb747ba",
+          "at": "2026-04-08T15:44:51Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
-          "at": "2026-04-08T14:11:04Z"
+          "hash": "rvw1:sha256:249b776035b92142187e8db7d218b46b51b2d776225eaa8fe0cab9ac5a585dc7",
+          "at": "2026-04-08T15:47:48Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:20acda594fddb05687460666ca2462dcdd2500b89e4e3eb8c38602bac2eff8f0",
-          "at": "2026-04-08T14:11:48Z"
+          "hash": "rvw1:sha256:249b776035b92142187e8db7d218b46b51b2d776225eaa8fe0cab9ac5a585dc7",
+          "at": "2026-04-08T15:50:17Z"
         }
       ]
     }

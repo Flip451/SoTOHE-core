@@ -24,7 +24,7 @@ pub mod verify;
 pub use decision::Decision;
 pub use domain_types::{
     ConsistencyReport, DomainTypeEntry, DomainTypeKind, DomainTypeSignal, DomainTypesDocument,
-    TypestateTransitions, check_consistency, evaluate_domain_type_signals,
+    TypestateTransitions, check_consistency, evaluate_domain_type_signals, undeclared_to_signals,
 };
 pub use error::{
     DomainError, RepositoryError, TrackReadError, TrackWriteError, TransitionError,
