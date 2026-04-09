@@ -39,5 +39,5 @@ agent-profiles.json の全 profile に designer capability を追加 (既定 pro
 DEVELOPER_AI_WORKFLOW.md と knowledge/WORKFLOW.md に TDDD フロー (plan → design → implement) を追記。
 ADR 2026-04-08-1800 の内容を最終確認。ADR README 索引のタイトルを実ファイルと一致させる。
 
-- [~] /track:plan 完了メッセージ・registry.md・DEVELOPER_AI_WORKFLOW.md・knowledge/WORKFLOW.md に /track:design を次ステップとして案内する導線を追加
-- [ ] ADR 2026-04-08-1800 を最終化し、ADR README 索引のタイトルを実ファイルと一致させる
+- [x] /track:plan 完了メッセージ・registry.md・DEVELOPER_AI_WORKFLOW.md・knowledge/WORKFLOW.md に /track:design を次ステップとして案内する導線を追加 1e65aeb
+- [~] ADR 2026-04-08-1800 を最終化し、ADR README 索引のタイトルを実ファイルと一致させる
