@@ -2,7 +2,7 @@
 
 ## Scope Verified
 
-- [ ] `.claude/hooks/` ディレクトリが完全削除されている
+- [x] `.claude/hooks/` ディレクトリが完全削除されている (T02)
 - [x] `.claude/settings.json` から Python hook entry (PreToolUse 2 + PostToolUse 7 = 9 entries) が全削除されている (T03)
 - [x] `.claude/settings.json` permissions.allow から `Bash(cargo make hooks-selftest)` が削除されている (T01 ペア変更で実施)
 - [x] Rust hook (`skill-compliance` / `block-direct-git-ops` / `block-test-file-deletion`) は `.claude/settings.json` に維持されている (T03 で確認)
@@ -64,6 +64,15 @@
   - `[tasks.python-lint]` (host wrapper) の script から `.claude/hooks/` を削除
   - `python-lint` task 自体は `scripts/` 配下の Python ヘルパー (architecture_rules.py, atomic_write.py, convention_docs.py, external_guides.py, track_*.py 等) の lint 用に維持
 - 検証: `cargo make ci` 全 PASS
+
+### T02 (2026-04-10) — Python hook ファイル削除 (実行順序: T03→T04→T05 完了後)
+
+- 全 16 個の `.claude/hooks/*.py` ファイルを `__pycache__` / `.pytest_cache` を含めて削除し、`.claude/hooks/` ディレクトリ自体も削除した:
+  - advisory hooks (9): `check-codex-before-write.py`, `check-codex-after-plan.py`, `error-to-codex.py`, `post-implementation-review.py`, `post-test-analysis.py`, `suggest-gemini-research.py`, `lint-on-save.py`, `python-lint-on-save.py`, `log-cli-tools.py`
+  - libraries (2): `_agent_profiles.py`, `_shared.py`
+  - tests (5): `test_agent_profiles.py`, `test_helpers.py`, `test_post_tool_hooks.py`, `test_pre_tool_hooks.py`, `test_shared_hook_utils.py`
+- 安全な削除のための前提条件 (T03 settings.json hook entry 削除、T04 hooks-selftest task 削除、T05 python-lint scripts/ 限定) は全て先行完了済み
+- 検証: `cargo make ci` 全 PASS、`cargo make verify-orchestra` PASS、`.claude/hooks/` ディレクトリが filesystem 上に存在しないことを確認
 
 ## Open Issues
 

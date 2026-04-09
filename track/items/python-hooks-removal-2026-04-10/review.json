@@ -1,38 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56d9f816340b69eccdcf9c870594cfb2a75161a72f8546411a11537ebe62f183",
-          "at": "2026-04-09T16:06:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56d9f816340b69eccdcf9c870594cfb2a75161a72f8546411a11537ebe62f183",
-          "at": "2026-04-09T16:08:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c866cf8421cc5d3df1788bd0888a20ba5b169494f83a59e1a12616daa6d8b6a",
-          "at": "2026-04-09T16:21:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c866cf8421cc5d3df1788bd0888a20ba5b169494f83a59e1a12616daa6d8b6a",
-          "at": "2026-04-09T16:21:54Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -333,6 +301,67 @@
           "findings": [],
           "hash": "rvw1:sha256:a9f68bbf637c0e6e99338a441585c1baf19761132833d09cc6f1780306490900",
           "at": "2026-04-09T16:36:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe1f54a8149b58ce19e182abd77bee3d61daaf40d16a0bd678aace9170075e1d",
+          "at": "2026-04-09T16:39:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/items/python-hooks-removal-2026-04-10/metadata.json` still leaves T02 as `in_progress`, even though `verification.md` now records T02 as completed and verified. Because `metadata.json` is the SSoT for task state, downstream track tooling will continue to treat this deletion task as unresolved and the rendered `plan.md` remains `[~]` instead of `[x]`.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/metadata.json",
+              "line": 111,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fe1f54a8149b58ce19e182abd77bee3d61daaf40d16a0bd678aace9170075e1d",
+          "at": "2026-04-09T16:41:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe1f54a8149b58ce19e182abd77bee3d61daaf40d16a0bd678aace9170075e1d",
+          "at": "2026-04-09T16:42:55Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56d9f816340b69eccdcf9c870594cfb2a75161a72f8546411a11537ebe62f183",
+          "at": "2026-04-09T16:06:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56d9f816340b69eccdcf9c870594cfb2a75161a72f8546411a11537ebe62f183",
+          "at": "2026-04-09T16:08:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c866cf8421cc5d3df1788bd0888a20ba5b169494f83a59e1a12616daa6d8b6a",
+          "at": "2026-04-09T16:21:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c866cf8421cc5d3df1788bd0888a20ba5b169494f83a59e1a12616daa6d8b6a",
+          "at": "2026-04-09T16:21:54Z"
         }
       ]
     }
