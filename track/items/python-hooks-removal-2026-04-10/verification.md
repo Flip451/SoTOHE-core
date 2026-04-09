@@ -3,9 +3,9 @@
 ## Scope Verified
 
 - [ ] `.claude/hooks/` ディレクトリが完全削除されている
-- [ ] `.claude/settings.json` から Python hook entry (PreToolUse 2 + PostToolUse 7 = 9 entries) が全削除されている
+- [x] `.claude/settings.json` から Python hook entry (PreToolUse 2 + PostToolUse 7 = 9 entries) が全削除されている (T03)
 - [x] `.claude/settings.json` permissions.allow から `Bash(cargo make hooks-selftest)` が削除されている (T01 ペア変更で実施)
-- [ ] Rust hook (`skill-compliance` / `block-direct-git-ops` / `block-test-file-deletion`) は `.claude/settings.json` に維持されている
+- [x] Rust hook (`skill-compliance` / `block-direct-git-ops` / `block-test-file-deletion`) は `.claude/settings.json` に維持されている (T03 で確認)
 - [x] `libs/infrastructure/src/verify/orchestra.rs` の `EXPECTED_HOOK_PATHS` から削除対象 9 hook が除去されている (T01)
 - [ ] `Makefile.toml` から `[tasks.hooks-selftest]` と `[tasks.hooks-selftest-local]` が削除されている
 - [ ] `Makefile.toml` の `python-lint-local` / `python-lint` ruff 対象が `scripts/` のみになっている
@@ -33,6 +33,15 @@
   - 新規テスト `test_verify_hook_paths_does_not_require_any_python_hook_scripts` を追加し、post-RV2-17 の不変条件を明示
 - `.claude/settings.json`: orphan permission entry `Bash(cargo make hooks-selftest)` を削除 (T01 と T03 の中間状態で `verify-orchestra` が壊れるのを防ぐペア変更)
 - 検証: `cargo make ci` 全 PASS、`cargo make verify-orchestra` PASS、`cargo make test-one-exec test_verify_hook_paths` 3 tests PASS
+
+### T03 (2026-04-10) — 実装順序を T02 と入れ替え
+
+- 順序入れ替えの理由: T02 (Python hook 削除) を先に実施すると、settings.json の PreToolUse hook が削除済みファイルを起動しようとして exit 2 (blocking deny) を返し、後続の Edit/Write/Bash ツール呼び出しがブロックされる危険があった。settings.json の Python hook entry を先に削除することでこのリスクを排除
+- `.claude/settings.json` の hooks セクションから Python hook を全削除:
+  - PreToolUse: `check-codex-before-write` (Edit|Write matcher 全体)、`suggest-gemini-research` (WebSearch|WebFetch matcher 全体) を削除
+  - PostToolUse: `check-codex-after-plan` (Task matcher), `error-to-codex` / `post-test-analysis` / `log-cli-tools` (Bash matcher), `lint-on-save` / `python-lint-on-save` / `post-implementation-review` (Edit|Write matcher) — 全 3 matchers を含む `PostToolUse` セクション全体を削除
+  - Rust hook (`block-direct-git-ops`, `block-test-file-deletion`, `skill-compliance`) は維持
+- 検証: `cargo make ci` 全 PASS、`cargo make verify-orchestra` PASS
 
 ## Open Issues
 

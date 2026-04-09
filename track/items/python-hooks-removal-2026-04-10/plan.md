@@ -14,7 +14,7 @@ libs/infrastructure/src/verify/orchestra.rs の EXPECTED_HOOK_PATHS から削除
 permission allowlist 検証から Bash(cargo make hooks-selftest) を除外する。
 影響を受ける unit test を TDD (Red → Green) で更新する。
 
-- [~] libs/infrastructure/src/verify/orchestra.rs の EXPECTED_HOOK_PATHS から削除対象 9 hook entries (check-codex-before-write, suggest-gemini-research, error-to-codex, post-test-analysis, check-codex-after-plan, log-cli-tools, lint-on-save, python-lint-on-save, post-implementation-review) を除去し、Bash(cargo make hooks-selftest) permission entry の expected list からも除外する。影響を受ける unit test を Red → Green で更新する。Rust hook (skill-compliance / block-direct-git-ops / block-test-file-deletion) は維持。
+- [x] libs/infrastructure/src/verify/orchestra.rs の EXPECTED_HOOK_PATHS から削除対象 9 hook entries (check-codex-before-write, suggest-gemini-research, error-to-codex, post-test-analysis, check-codex-after-plan, log-cli-tools, lint-on-save, python-lint-on-save, post-implementation-review) を除去し、Bash(cargo make hooks-selftest) permission entry の expected list からも除外する。影響を受ける unit test を Red → Green で更新する。Rust hook (skill-compliance / block-direct-git-ops / block-test-file-deletion) は維持。 baac3b4e9858e42e249cd791249b5b8f92b58dbf
 
 ## Python hook ファイル削除
 
@@ -30,7 +30,7 @@ Rust hook が依存している bin/sotp は本ステップで影響を受けな
 permissions.allow から Bash(cargo make hooks-selftest) を削除する。
 既存の Rust hook (sotp hook dispatch ...) エントリは維持する。
 
-- [ ] .claude/settings.json から Python hook entry を全削除する。PreToolUse: check-codex-before-write (Edit|Write), suggest-gemini-research (WebSearch|WebFetch); PostToolUse: check-codex-after-plan (Task), error-to-codex (Bash), post-test-analysis (Bash), log-cli-tools (Bash), lint-on-save (Edit|Write), python-lint-on-save (Edit|Write), post-implementation-review (Edit|Write) の計 9 entries。さらに permissions.allow から Bash(cargo make hooks-selftest) を削除する。Rust hook (skill-compliance / block-direct-git-ops / block-test-file-deletion) のエントリは維持する。
+- [~] .claude/settings.json から Python hook entry を全削除する。PreToolUse: check-codex-before-write (Edit|Write), suggest-gemini-research (WebSearch|WebFetch); PostToolUse: check-codex-after-plan (Task), error-to-codex (Bash), post-test-analysis (Bash), log-cli-tools (Bash), lint-on-save (Edit|Write), python-lint-on-save (Edit|Write), post-implementation-review (Edit|Write) の計 9 entries。さらに permissions.allow から Bash(cargo make hooks-selftest) を削除する。Rust hook (skill-compliance / block-direct-git-ops / block-test-file-deletion) のエントリは維持する。
 
 ## Makefile.toml task の整理
 
