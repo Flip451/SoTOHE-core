@@ -813,6 +813,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **RVW-52** (MEDIUM): `/track:done` で approved_head 書き込み後の dirty review.json を処理 — 最後のコミット後に persist_approved_head が review.json を変更するため、worktree が dirty になり track-switch-main が失敗する。review.json を破棄するのではなく、approved_head を保持したまま clean に戻せる同期フロー（例: commit/note への取り込み、または別の永続化ポイント）が必要
 - [ ] **RVW-53** (LOW): `/track:commit` に APPROVED_HEAD_FAILED 自動リカバリを追加 — track-commit-message の stdout に APPROVED_HEAD_FAILED が出たら即座に `bin/sotp review set-approved-head` を実行する指示をスキル定義に追加
 - [ ] **RVW-54** (MEDIUM): CLI 統合テストハーネス構築 — make.rs の persist_approved_head、review/mod.rs の set-approved-head 等、git repo + プロセス実行を伴う CLI パスのテスト基盤が存在しない。infra 層の setup_test_repo パターンを CLI 層にも導入すべき
+- [ ] **RVW-55** (MEDIUM): v1 `persist_approved_head` 残骸の削除 — `apps/cli/src/commands/make.rs` L561-566 に v1 review.json の `approved_head` 書き込みコードが残っている（コメント: "kept for backwards compat, T007 cleanup"）。v2 scope-based review.json (`scopes` フィールド) を v1 codec (`schema_version` + `cycles`) で読もうとして毎回 soft fail する。v2 `persist_commit_hash_v2` が正常動作しており v1 パスは完全にデッドコード。`persist_approved_head` 関数本体と呼び出し元、および関連する RVW-52 / RVW-53 の前提を再評価して削除すべき。発見: 2026-04-10 agent-profiles-redesign planning commit
 
 ---
 
@@ -903,10 +904,10 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **RV2-08** (MEDIUM): v2 CLI パスのテスト不在 — `execute_codex_local` → `ReviewCycle` → `write_verdict` のフルパスが未テスト。サブコンポーネントは独立テスト済みだが integration test がない
 - [ ] **RV2-09** (LOW): `main` ハードコード — `compose_v2.rs` の `resolve_diff_base` が `.commit_hash` 不在時に `git rev-parse main` にフォールバック。default branch が `main` でないリポジトリで動作しない
 
-- [ ] **RV2-16** (HIGH): 計画レビュー専用コマンド + `.harness/config/agent-profiles.json` 再設計 — ADR `knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md` + `knowledge/adr/2026-04-09-2235-agent-profiles-redesign.md` で設計済み
+- [ ] **RV2-16** (HIGH): 計画レビュー専用コマンド — ADR `knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md` で設計済み（agent-profiles 再設計は track `agent-profiles-redesign-2026-04-10` で完了済み）
   - **根本原因**: 計画レビュー時に `metadata.json` / `spec.json` (SoT) と `plan.md` / `spec.md` / `verification.md` (rendered view) の両方をレビューアが読むため、同じ情報の表現齟齬を延々と指摘し続ける無限ループに陥る (v2-escalation-redesign-2026-04-09 の planning review で実測: 30+ ラウンドでも収束せず)
   - **解決策**: (1) 新コマンド `sotp review plan` / `sotp commit plan` を追加し既存 review システムと完全独立 (2) 必要度分類 (Necessity: must/advisory/info) 付き verdict で `must_count == 0` ゲート (3) `track/planning-artifacts.json` に allowlist 集約 (4) `plan-review.json` を新設 (既存 review.json v2 schema 踏襲 + necessity 追加)
-  - **prerequisite**: agent-profiles.json 再設計 (配置を `.harness/config/` に移動、スキーマを capability 中心に整理、`workflow_host` / `debugger` / `multimodal_reader` を削除、fast round で別 provider 指定を許可) — ADR `2026-04-09-2235`
+  - **prerequisite**: ~~agent-profiles.json 再設計~~ ✅ 完了 (track `agent-profiles-redesign-2026-04-10`、ADR `2026-04-09-2235` Accepted)
   - **追加日**: 2026-04-09
 
 - [ ] **RV2-17** (MEDIUM): Python hook 全廃止 — `.claude/hooks/*.py` を全削除し、fail-closed 系は Rust `sotp hook dispatch` に統一、advisory 系は各 track command の skill / コマンドドキュメントに吸収する
@@ -930,3 +931,6 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
   - **確認**: `knowledge/conventions/filesystem-persistence-guard.md` に convention 追加済み
 - [x] ~~**RV2-15** (LOW): track/workflow.md — v2 運用手順更新 + v1 残存監査~~ ✅ done (`rv2-docs-skill-update-2026-04-06` T004)
   - **確認**: track/workflow.md に v1 `record-round` 参照なし (grep 0 件)
+
+- [ ] **RV2-18** (MEDIUM): `sotp review codex-local` の verdict/findings stdout 出力改善 — 現在は Codex CLI の stdout 末尾に verdict JSON が埋もれており、review-fix-lead agent が `tail` で抽出している。`sotp review codex-local` が auto-record 完了後に findings のサマリーを整形して stdout に出力すれば、agent も orchestrator も exit code + stdout だけで判断完結する。review.json の Read が不要になり、レビューループの手間が減る
+  - **追加日**: 2026-04-10

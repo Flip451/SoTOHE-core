@@ -93,7 +93,7 @@ cargo make tools-down
 - Run the PR review helper: `cargo make track-pr-review`
 
 外部長文ガイドの運用ルールは `knowledge/external/POLICY.md` を参照する。
-`.claude/agent-profiles.json` の `workflow_host_provider` / `workflow_host_model` は、残存 migration compatibility surface が消えるまで host-side workflow provider を表す設定である。
+`.harness/config/agent-profiles.json` が capability-to-provider 割り当ての SSoT である。
 
 ## Git Notes (Optional)
 

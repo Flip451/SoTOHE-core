@@ -8,7 +8,7 @@
 2. **型が嘘をつかない**: 実装前に型設計（ドメイン型・エラー型・トレイト）を確定する
 3. **テスト駆動**: 実装前にテストを書く（TDD: Red → Green → Refactor）
 4. **Tech Stack 厳守**: `track/tech-stack.md` の `TODO:` を0件にしてから実装を開始する
-5. **Context 効率**: specialist capability（`planner` / `researcher` / `reviewer` / `debugger` / `multimodal_reader`）を活用して主コンテキストを汚染しない
+5. **Context 効率**: specialist capability（`planner` / `designer` / `researcher` / `implementer` / `reviewer`）を活用して主コンテキストを汚染しない
 6. **CI グリーン**: `cargo make ci`（docker compose内実行）が通らない限りコミットしない
 7. **No Panics in Production**: `unwrap()` は本番コードでは使用しない
 8. **Rust Edition 2024**: 新規コードは Rust Edition 2024 前提で作成する
@@ -19,7 +19,7 @@
 
 ## Task Workflow
 
-Specialist capability の実体は `.claude/agent-profiles.json` で決まる。既定 profile では `planner` / `implementer` が Claude Code、`reviewer` / `debugger` が Codex、`researcher` / `multimodal_reader` が Gemini に割り当てられる。
+Specialist capability の実体は `.harness/config/agent-profiles.json` で決まる。既定では `orchestrator` / `planner` / `designer` / `implementer` が Claude Code、`reviewer` が Codex、`researcher` が Gemini に割り当てられる。
 
 ### Standard Task Process
 
@@ -29,7 +29,7 @@ Specialist capability の実体は `.claude/agent-profiles.json` で決まる。
 4. **テスト作成（Red）**: テストを書き、失敗を確認する
 5. **実装（Green）**: テストを通す最小限のコードを書く
 6. **リファクタリング**: `cargo make fmt` と `cargo make clippy` を適用する
-7. **詰まりの切り分け**: コンパイルエラーや失敗テストが続く場合は active profile の `debugger` / `researcher` capability と外部ガイド要約を使って debug/research を行う
+7. **詰まりの切り分け**: コンパイルエラーや失敗テストが続く場合は `researcher` capability と外部ガイド要約を使って research を行い、対話的に原因を切り分ける
 8. **レビュー**: `reviewer` capability でレビュー。目標 <500 行/レビュー。5 round 超えたらタスク分割を検討する
 9. **品質ゲート**: `cargo make ci` を通す
 10. **コミット**: `/track:commit <message>` を使う

@@ -28,7 +28,7 @@ Arguments: none. The current branch (`track/<id>` or `plan/<id>`) determines the
 
 ## Step 2: Design domain types
 
-Using the designer capability (resolved via `.claude/agent-profiles.json`):
+Using the designer capability (resolved via `.harness/config/agent-profiles.json`):
 
 For each type needed by the plan:
 1. Determine the `DomainTypeKind`:

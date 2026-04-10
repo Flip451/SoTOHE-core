@@ -16,7 +16,7 @@
     "harness-policy": {
       "patterns": [
         ".claude/commands/**", ".claude/rules/**", ".claude/agents/**",
-        ".claude/agent-profiles.json", ".claude/settings*.json",
+        ".harness/config/agent-profiles.json", ".claude/settings*.json",
         ".claude/permission-extensions.json",
         "knowledge/conventions/**",
         "AGENTS.md", "CLAUDE.md",

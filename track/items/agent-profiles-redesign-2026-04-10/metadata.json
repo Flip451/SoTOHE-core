@@ -1,0 +1,181 @@
+{
+  "branch": "track/agent-profiles-redesign-2026-04-10",
+  "created_at": "2026-04-10T03:30:08Z",
+  "id": "agent-profiles-redesign-2026-04-10",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          ".harness/config/ ディレクトリと agent-profiles.json + 3 samples を作成する。",
+          "libs/infrastructure/src/agent_profiles.rs を TDD で完全書き換えし、capability 中心スキーマを読み込む新 API を提供する。",
+          "resolve_execution(capability, RoundType) -> Option<ResolvedExecution> で provider/model を同時解決し、Fast round 時の fast_provider/fast_model fallback を実装する。",
+          "resolve_full_auto_from_profiles / ModelProfile 関連のデッドコードを削除する。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T01",
+          "T02",
+          "T03"
+        ],
+        "title": "Phase A — 新スキーマ基盤 (Rust loader)"
+      },
+      {
+        "description": [
+          "libs/usecase/src/pr_review.rs::resolve_reviewer_provider を新 API に切り替え、active_profile / profiles.<p>.reviewer 参照を削除する。",
+          "apps/cli/src/commands/{pr,review/tests}.rs のパスと fixture を .harness/config/ + 新スキーマに更新する。",
+          "libs/infrastructure/src/verify/orchestra.rs の REVIEW_WRAPPER_TARGETS / MODEL_RESOLUTION_TARGETS を新パス + 新スキーマに更新し、削除対象ファイル (02/03) のエントリを完全除去する。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T04",
+          "T05",
+          "T06",
+          "T07"
+        ],
+        "title": "Phase B — 既存コード移行 (breaking change)"
+      },
+      {
+        "description": [
+          ".claude/rules/02-codex-delegation.md を削除し、Sandbox/Hook Coverage Warning のみを .claude/rules/10-guardrails.md に移設する。",
+          ".claude/rules/03-gemini-delegation.md を削除する (内容は既に他所に重複記載、multimodal_reader は廃止)。",
+          ".claude/rules/{08-orchestration,10-guardrails,11-subagent-model}.md を新 capability 6 個 + .harness/config/ パスに更新する。",
+          ".claude/commands/track/{review,design,pr-review}.md と .claude/skills/{track-plan,codex-system,gemini-system}/SKILL.md の capability 言及とパス参照を更新する。",
+          "top-level docs (CLAUDE.md / DEVELOPER_AI_WORKFLOW.md / knowledge/WORKFLOW.md / knowledge/DESIGN.md / LOCAL_DEVELOPMENT.md / START_HERE_HUMAN.md / track/workflow.md / .codex/instructions.md / .gemini/GEMINI.md) を更新する。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T08",
+          "T09",
+          "T10",
+          "T11",
+          "T12",
+          "T13",
+          "T14"
+        ],
+        "title": "Phase C — ルール / ドキュメントのスリム化"
+      },
+      {
+        "description": [
+          "旧 .claude/agent-profiles.json を削除する (新 SSoT は .harness/config/agent-profiles.json)。",
+          "ADR 2026-04-09-2235-agent-profiles-redesign.md の Status を Proposed → Accepted に、knowledge/strategy/TODO.md の対応エントリを done に更新する。",
+          "cargo make ci で fmt-check / clippy / test / deny / check-layers / verify-arch-docs / verify-orchestra 等の全ゲート通過を確認する。"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T15",
+          "T16",
+          "T17"
+        ],
+        "title": "Phase D — Cleanup + ADR + CI 検証"
+      }
+    ],
+    "summary": [
+      ".claude/agent-profiles.json を .harness/config/agent-profiles.json に移動し、providers 2 層 + profiles 詰め込み構造を capability 中心の単一 profile スキーマに再設計する (schema_version=1)。",
+      "providers セクションは label のみのミニマル構造にし、capabilities に provider/model/fast_provider/fast_model を直接持たせる。reviewer のみ 2-tier (fast+final) 対応。workflow_host/debugger/multimodal_reader capability は廃止。",
+      "libs/infrastructure/src/agent_profiles.rs を完全書き換え、AgentProfiles::resolve_execution(capability, RoundType) -> ResolvedExecution API を提供する。fallback chain: fast_provider ?? provider, fast_model ?? model。",
+      "死にかけた .claude/rules/02-codex-delegation.md (sotp plan/review codex-local CLI 化により空洞化) と .claude/rules/03-gemini-delegation.md (multimodal_reader 廃止 + 内容重複) を削除し、Sandbox/Hook Coverage Warning のみ 10-guardrails.md に移設する。",
+      "resolve_full_auto_from_profiles 関数はデッドコード (呼び出し元 0、reviewer 側は意図的に --full-auto を外している) のため ModelProfile 型と共に削除する。",
+      ".harness/config/agent-profiles.json は git 管理方針で確定 (template 派生プロジェクトの bootstrap 容易性優先、ADR §1 末尾の open question を本トラックで解決)。",
+      "全変更は breaking change (ADR §6)。自動マイグレーションは実装せず、旧 .claude/agent-profiles.json は削除する。",
+      "後続 RV2-16 (Phase 3: planning review phase separation) が resolve_execution API を使用する前提となる。"
+    ]
+  },
+  "schema_version": 3,
+  "status": "done",
+  "tasks": [
+    {
+      "commit_hash": "1d4a2813b3e1efa6f12ed79c317e2e7a3e603f65",
+      "description": ".harness/config/ 新設 + ファイル作成。.harness/config/agent-profiles.json (新スキーマ schema_version=1, 単一 profile, providers は label のみ, capabilities 6 個: orchestrator/planner/designer/implementer/reviewer/researcher) を作成する。.harness/config/samples/agent-profiles.{default,claude-heavy,codex-heavy}.json の 3 サンプルも同時作成。reviewer capability は fast_model を持ち、codex-heavy サンプルのみ planner/implementer も Codex に割り当てる。.gitignore は触らない (agent-profiles.json は git 管理方針で確定)。",
+      "id": "T01",
+      "status": "done"
+    },
+    {
+      "commit_hash": "bd6aaf81141371fb28c47732464928c3b65bb66b",
+      "description": "libs/infrastructure/src/agent_profiles.rs を完全書き換え (TDD Red → Green)。新型: ProviderName, CapabilityName, ModelName (nutype で validation), CapabilityConfig, ResolvedExecution, RoundType (Fast/Final enum), AgentProfilesError (thiserror)。新 API: AgentProfiles::load(path) -> Result, resolve_capability(&self, &str) -> Option<&CapabilityConfig>, resolve_execution(&self, &str, RoundType) -> Option<ResolvedExecution>, shortcut helpers resolve_model / resolve_provider。解決ルール (ADR §4): Final → (provider, model)、Fast → (fast_provider ?? provider, fast_model ?? model)。Unit tests 最低 6 件: (1) schema parse 正常系、(2) Final 解決、(3) Fast 解決 (fast_model のみ指定)、(4) Fast 解決 (fast_provider + fast_model 両方指定, cross-provider)、(5) 不明 capability で None、(6) 不正 JSON / missing file で Err。",
+      "id": "T02",
+      "status": "done"
+    },
+    {
+      "commit_hash": "91320b0e6bfec273e8348882262b6cd9e301fda0",
+      "description": "デッドコード削除。(a) libs/infrastructure/src/agent_profiles.rs から resolve_full_auto_from_profiles 関数 / ModelProfileSerde 型 / ProviderConfig.model_profiles フィールド / 関連テスト 2 件を削除 (新 loader に統合)。(b) libs/domain/src/review_v2/types.rs の ModelProfile 型と resolve_full_auto 関数、および libs/domain/src/review/types.rs の同名 ModelProfile 型と resolve_full_auto 関数 (両モジュールに重複して存在) は reviewer 側で --full-auto を外した (codex_reviewer.rs:316-319 のコメント参照) ため完全に dead code。他からの参照がないことを rg で最終確認した上で削除。(c) libs/usecase/src/review_workflow/{mod,verdict}.rs の re-export 行も削除。(d) libs/domain/src/review/mod.rs / libs/domain/src/review_v2/mod.rs の pub use も削除。理由: .claude/agent-profiles.json の providers.codex.model_profiles エントリは全て full_auto:true (未登録モデル fallback も true) で実質無効化されており、新 ADR の providers は label のみミニマル方針と矛盾。将来モデル別に --full-auto off が必要になれば capability 側の provider_params として再導入する。",
+      "id": "T03",
+      "status": "done"
+    },
+    {
+      "commit_hash": "1778f64504bc130bee9a39d9961d449ad649ffb5",
+      "description": "libs/usecase/src/pr_review.rs::resolve_reviewer_provider を新 API に書き換え。現行は .claude/agent-profiles.json の active_profile + profiles.<p>.reviewer を直読みしているが、新スキーマでは capabilities.reviewer.provider を読む。実装: AgentProfiles::load → resolve_execution(\"reviewer\", RoundType::Final).provider を取得し STRUCTURED_PROVIDERS (= [\"codex\"]) に含まれるか検証。PrReviewError variants は ProfilesParse / UnsupportedProvider / MissingField を維持し、active_profile 関連エラーパスのみ削除。テスト fixture 4 件 (L774, L787, L804, L818 近辺) の JSON を新スキーマに書き換え、active_profile のテストは capability 欠如テストに差し替える。",
+      "id": "T04",
+      "status": "done"
+    },
+    {
+      "commit_hash": "1778f64504bc130bee9a39d9961d449ad649ffb5",
+      "description": "apps/cli/src/commands/pr.rs の .claude/agent-profiles.json パスハードコード 2 箇所 (line 475, line 763) を .harness/config/agent-profiles.json に更新。合わせて apps/cli/src/commands/plan/mod.rs (L36 の doc comment) と apps/cli/src/commands/review/mod.rs (L63 の doc comment) の .claude/agent-profiles.json 言及を .harness/config/agent-profiles.json に更新する。パス文字列は infrastructure 層の constants モジュール (例: libs/infrastructure/src/constants.rs) に AGENT_PROFILES_PATH 定数として一箇所集約し、pr.rs / orchestra.rs などの複数ファイルからその定数を参照する。これにより将来のパス変更が一箇所の修正で済む。",
+      "id": "T05",
+      "status": "done"
+    },
+    {
+      "commit_hash": "0dd0b78a503c246305019d7576d4395da96955ea",
+      "description": "apps/cli/src/commands/review/tests.rs の write_agent_profiles helper (L533) を新パス (.harness/config/) + 新スキーマに更新。テストで作成する JSON を capability 中心スキーマに書き換え、各 fixture (L565, L602, L632 近辺) も新スキーマに対応させる。T03 で model_profiles が削除されるため、full_auto 関連のテストは削除または簡略化。",
+      "id": "T06",
+      "status": "done"
+    },
+    {
+      "commit_hash": "0dd0b78a503c246305019d7576d4395da96955ea",
+      "description": "libs/infrastructure/src/verify/orchestra.rs の guardrail constants を全面更新。(a) REVIEW_WRAPPER_TARGETS[0] の path を .claude/agent-profiles.json → .harness/config/agent-profiles.json、required_snippets を新スキーマの capability エントリ形式に更新。(b) MODEL_RESOLUTION_TARGETS の forbidden_snippet から 旧パスへの参照を削除し、新スキーマ形式 (capabilities.<name>.model / fast_model) に更新。(c) 削除対象ファイル (.claude/rules/02-codex-delegation.md と 03-gemini-delegation.md) のエントリを REVIEW_WRAPPER_TARGETS / MODEL_RESOLUTION_TARGETS から完全除去。(d) 旧 providers.codex.default_model 系の言及を capabilities.reviewer.model に置換。(e) 関連 unit test を Red → Green で更新。",
+      "id": "T07",
+      "status": "done"
+    },
+    {
+      "description": ".claude/rules/02-codex-delegation.md の削除 + Sandbox/Hook Coverage Warning セクションを .claude/rules/10-guardrails.md に移設。削除理由: 文書の大半 (When Codex Is A Good Fit 表、How to Consult 例、direct codex exec 例、debugger/implementer 向け例) は sotp plan codex-local / sotp review codex-local CLI 化によりほぼ空洞化しており、かつ debugger capability は ADR で廃止される。Canonical Block Preservation は .claude/skills/track-plan/SKILL.md に既記載のため重複削除。Sandbox and Hook Coverage Warning の警告内容 (hook は Codex 子プロセスに効かない / --full-auto が --sandbox workspace-write を含意するため --sandbox read-only と併用してはいけない) のみ 10-guardrails.md の既存 guardrails 節に追記する。",
+      "id": "T08",
+      "status": "done"
+    },
+    {
+      "description": ".claude/rules/03-gemini-delegation.md の削除。削除理由: multimodal_reader capability は ADR で廃止される。researcher capability の gemini -p 例は .claude/skills/track-plan/SKILL.md と .claude/skills/gemini-system/SKILL.md に既記載。\"In The Default Profile, Gemini Usually Does Not Own\" の表は現状 (planner=Claude, debugger 廃止) と乖離しておりメンテナンス負荷のみ高い。Language Protocol (English→Japanese) は .claude/rules/01-language.md に既存。全てのセクションが重複または廃止対象のためファイル自体を削除する。",
+      "id": "T09",
+      "status": "done"
+    },
+    {
+      "description": ".claude/rules/08-orchestration.md の更新。(a) capability 一覧を新 6 個 (orchestrator/planner/designer/implementer/reviewer/researcher) に変更し workflow_host/debugger/multimodal_reader 言及を削除。(b) Default specialist profile 表を新スキーマの単一 profile に合わせる (planner/designer/implementer=Claude, reviewer/researcher=Codex or Gemini — default に準拠)。(c) .claude/agent-profiles.json への参照を .harness/config/agent-profiles.json に更新。(d) Delegation Rules 表を単一 SoT に集約し、削除された 02/03 ルールファイルへの参照を除去。(e) Planner Briefing Requirements 節は維持。",
+      "id": "T10",
+      "status": "done"
+    },
+    {
+      "description": ".claude/rules/10-guardrails.md と 11-subagent-model.md の更新。10-guardrails.md: (a) T08 で移設する Sandbox/Hook Coverage Warning を追記、(b) 削除ファイル 02/03 への参照を除去、(c) .claude/agent-profiles.json パス参照を .harness/config/agent-profiles.json に更新、(d) Review Escalation Threshold 節の「providers.codex.escalation_threshold は将来の configurability のため registered」という記述を削除または更新する — 新スキーマでは providers は label のみのため providers.codex.escalation_threshold フィールドが存在しない。代替: escalation_threshold は将来 review 機能側に再配置する旨に書き換える。11-subagent-model.md: (a) provider 名のみ言及するよう更新し、新スキーマの capability 中心構造に合わせる、(b) .claude/agent-profiles.json パス参照を更新、(c) Codex Model Tiers 表は情報として維持するが providers.codex.{default,fast,nano}_model 言及を capabilities.reviewer.{model,fast_model} に修正。",
+      "id": "T11",
+      "status": "done"
+    },
+    {
+      "description": ".claude/commands/track/{review,design,pr-review}.md の更新。(a) capability 言及を新 6 個に整合 (review.md は reviewer を中心に、design.md は designer、pr-review.md は reviewer + PR flow)。(b) .claude/agent-profiles.json への参照を .harness/config/agent-profiles.json に更新。(c) model 解決ルールの記述を providers.<p>.{default,fast}_model から capabilities.<name>.{model,fast_model} に書き換え。(d) 削除対象 02/03 rules への参照を除去。",
+      "id": "T12",
+      "status": "done"
+    },
+    {
+      "description": ".claude/skills/{track-plan,codex-system,gemini-system,repomix-snapshot}/SKILL.md の更新。track-plan SKILL.md: (a) capability 一覧と provider resolution 記述を新スキーマに、(b) Phase 1.5 planner の briefing 例のパス参照を更新。codex-system SKILL.md: (a) providers.codex.default_model → capabilities.<cap>.model 系の model resolution 記述に書き換え、(b) debugger capability 言及削除、(c) .claude/agent-profiles.json パス更新。gemini-system SKILL.md: (a) researcher capability のみを対象とする記述に絞り込み multimodal_reader 削除、(b) パス更新。repomix-snapshot SKILL.md: .claude/agent-profiles.json パス参照を .harness/config/agent-profiles.json に更新。",
+      "id": "T13",
+      "status": "done"
+    },
+    {
+      "description": "top-level docs の更新。対象: CLAUDE.md (削除ファイル 02/03 への参照除去 + .harness/config/agent-profiles.json を参照リストに追加), DEVELOPER_AI_WORKFLOW.md (capability 表を 6 個に、workflow_host/debugger/multimodal_reader 削除), knowledge/WORKFLOW.md (同), knowledge/DESIGN.md (.harness/config/ 新設について簡潔な説明を追加、agent-profiles の SSoT セクション更新), LOCAL_DEVELOPMENT.md (パス更新), START_HERE_HUMAN.md (編集対象パス更新), track/workflow.md (capability + パス), .codex/instructions.md (参照更新), .gemini/GEMINI.md (参照更新)。既存の knowledge/research/ 配下の legacy 文書は修正対象外 (ADR §5 末尾方針)。",
+      "id": "T14",
+      "status": "done"
+    },
+    {
+      "description": "旧 .claude/agent-profiles.json の削除。削除前に (a) rg で残存参照がないことを最終確認、(b) .gitignore は更新不要 (.harness/config/agent-profiles.json は git 管理方針で確定、ユーザー承認済み 2026-04-10)、(c) git rm で index から除去。.harness/config/agent-profiles.json が新 SSoT となる。",
+      "id": "T15",
+      "status": "done"
+    },
+    {
+      "description": "ADR Status + TODO.md の administrative 更新。(a) knowledge/adr/2026-04-09-2235-agent-profiles-redesign.md の ## Status を Proposed → Accepted に更新し、Implemented-by として本トラック ID を記録。(b) ADR §1 末尾 (または §3 末尾) の .gitignore 方針に関する open question 記述 (「.harness/config/agent-profiles.json は .gitignore に追加するかは実装時に検討」) を、git 管理で確定した旨 (ユーザー承認 2026-04-10、template bootstrap 容易性優先) に更新し、open question を解消済みとして記録する。(c) knowledge/strategy/TODO.md の該当エントリ (RV2-Phase2 / agent-profiles redesign) を done 状態に更新し、本トラック ID とマージされた PR 番号 (存在すれば) を参照として追記。",
+      "id": "T16",
+      "status": "done"
+    },
+    {
+      "description": "cargo make ci 全チェック通過確認。通過必須ゲート: fmt-check / clippy / test / test-doc / deny / python-lint (scripts/) / scripts-selftest / check-layers / verify-arch-docs / verify-doc-links / verify-plan-progress / verify-track-metadata / verify-track-registry / verify-tech-stack / verify-orchestra (新パス .harness/config/agent-profiles.json の整合性を最終確認) / verify-canonical-modules / verify-latest-track / verify-module-size / verify-domain-strings / verify-domain-purity / verify-usecase-purity / verify-view-freshness / verify-spec-coverage。verify-orchestra が削除ファイル 02/03 を参照しないことを確認することが本トラックの最終ゲート。",
+      "id": "T17",
+      "status": "done"
+    }
+  ],
+  "title": "RV2-Phase2: agent-profiles redesign (.harness/config 移行 + capability 中心スキーマ)",
+  "updated_at": "2026-04-10T11:09:14Z"
+}

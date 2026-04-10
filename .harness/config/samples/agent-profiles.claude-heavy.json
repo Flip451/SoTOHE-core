@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "providers": {
+    "claude": {
+      "label": "Claude Code"
+    },
+    "codex": {
+      "label": "Codex CLI"
+    },
+    "gemini": {
+      "label": "Gemini CLI"
+    }
+  },
+  "capabilities": {
+    "orchestrator": {
+      "provider": "claude",
+      "model": "claude-opus-4-6"
+    },
+    "planner": {
+      "provider": "claude",
+      "model": "claude-opus-4-6"
+    },
+    "designer": {
+      "provider": "claude",
+      "model": "claude-opus-4-6"
+    },
+    "implementer": {
+      "provider": "claude",
+      "model": "claude-opus-4-6"
+    },
+    "reviewer": {
+      "provider": "claude",
+      "model": "claude-opus-4-6",
+      "fast_model": "claude-sonnet-4-6"
+    },
+    "researcher": {
+      "provider": "gemini"
+    }
+  }
+}

@@ -12,7 +12,7 @@ metadata:
 
 **Pack the repository with repomix and pipe it to the researcher capability (Gemini) for full-codebase analysis.**
 
-Check `.claude/agent-profiles.json` first. Use this skill only when `researcher` capability is assigned to Gemini.
+Check `.harness/config/agent-profiles.json` first. Use this skill only when `researcher` capability is assigned to Gemini.
 
 ## When to Use
 

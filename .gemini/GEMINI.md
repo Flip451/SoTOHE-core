@@ -6,10 +6,9 @@
 
 ```
 Claude Code (Orchestrator — 200K context)
-    ↓ resolves capability via .claude/agent-profiles.json
+    ↓ resolves capability via .harness/config/agent-profiles.json
     └── calls you when Gemini owns:
-        ├── researcher
-        └── multimodal_reader
+        └── researcher
 ```
 
 ## Your Default-Profile Roles
@@ -40,22 +39,12 @@ Use Google Search grounding to research the Rust ecosystem:
 - Comparison with alternatives
 - Include docs.rs and crates.io links
 
-### 3. Multimodal File Reading
-
-| File Type | Extensions |
-|-----------|-----------|
-| PDF | `.pdf` |
-| Video | `.mp4`, `.mov`, `.avi`, `.mkv`, `.webm` |
-| Audio | `.mp3`, `.wav`, `.m4a`, `.flac`, `.ogg` |
-| Image | `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.svg` |
-
 ## Default-Profile Tasks Usually Routed Elsewhere
 
 | Task | Who Does It |
 |------|-------------|
-| `planner` / `reviewer` | **Codex CLI** |
-| `debugger` | **Codex CLI** |
-| `implementer` | **Claude Code / Subagent** |
+| `reviewer` | **Codex CLI** |
+| `orchestrator` / `planner` / `designer` / `implementer` | **Claude Code** |
 
 ## Shared Context
 

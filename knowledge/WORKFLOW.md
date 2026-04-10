@@ -165,8 +165,8 @@ cargo make machete             # Unused dependency audit
 
 ## Context Management
 
-Specialist capability providers are defined in `.claude/agent-profiles.json`.
-Default profile: `planner` / `reviewer` / `debugger` = Codex, `researcher` / `multimodal_reader` = Gemini.
+Specialist capability providers are defined in `.harness/config/agent-profiles.json`.
+Default: `orchestrator` / `planner` / `designer` / `implementer` = Claude Code, `reviewer` = Codex, `researcher` = Gemini.
 
 | Context Size | Recommended Approach |
 |-------------|---------------------|

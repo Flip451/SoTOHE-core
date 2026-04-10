@@ -91,7 +91,7 @@ cargo make bootstrap    # 初回セットアップ
 | code_reviewer | Codex CLI | コード品質レビュー |
 | researcher | Gemini CLI | 外部調査、crate サーベイ |
 
-設定: `.claude/agent-profiles.json`
+設定: `.harness/config/agent-profiles.json`
 
 ## ロードマップ
 

@@ -10,7 +10,7 @@ Core guardrails:
 - Keep `cargo make ci`, `cargo make deny`, and `cargo make verify-*` as reproducible final gates (`run --rm`)
 - Before committing code changes, run the `reviewer` capability review cycle
   (review -> fix -> review -> ... -> no findings). Do not commit until the reviewer
-  reports zero findings. The reviewer provider is resolved via `.claude/agent-profiles.json`.
+  reports zero findings. The reviewer provider is resolved via `.harness/config/agent-profiles.json`.
 - **Small task commits**: Prefer small, focused task commits (<500 lines). Review cost
   grows super-linearly with diff size. Split large tasks into sub-tasks during planning.
 
@@ -60,6 +60,38 @@ To avoid unnecessary retries:
   - These wrappers convert the briefing file path to `"Read {path} and perform the task"` internally, keeping git keywords out of the Bash command string.
   - Note: `track-local-*` は Docker 内部用の `*-local` タスク（`fmt-local` 等）とは異なり、ホスト上で Codex を呼ぶラッパー。ガードレール「`*-local` を直接実行するな」の対象外。
 
+## Sandbox and Hook Coverage Warning (External Subprocesses)
+
+Claude Code hooks (e.g. `sotp hook dispatch block-direct-git-ops`) only intercept
+**Claude Code's own tool calls**. They do NOT apply to operations performed inside
+an external subprocess (e.g. Codex CLI with `--sandbox workspace-write`).
+
+| Sandbox | File writes | Git operations | Hook coverage |
+|---------|-------------|----------------|---------------|
+| `read-only` | Blocked by sandbox | Blocked by sandbox | N/A |
+| `workspace-write` | Allowed | **Allowed — hooks do NOT fire** | None |
+
+**`--full-auto` implies `--sandbox workspace-write`**: Codex CLI's `--full-auto` flag
+forces `--sandbox workspace-write`, overriding any subsequent `--sandbox read-only`.
+Do not use `--full-auto` for `reviewer` or `researcher` — use `--sandbox read-only` only.
+
+**Consequences when using `workspace-write`:**
+
+- The external subprocess can run `git add` / `git commit` / `git push` directly,
+  bypassing the `sotp` guard hook (`block-direct-git-ops`).
+- The external subprocess can write any file without hook-based validation.
+
+**Rules for `workspace-write` usage:**
+
+1. Prefer `read-only` for `planner` / `reviewer` / `researcher` — they should never need to write files.
+2. When `implementer` is routed to an external provider with `workspace-write`, instruct it explicitly:
+   - Do not run `git add` or `git commit` directly.
+   - Do not run `git push` under any circumstance.
+   - For selective staging, write repo-relative paths to `tmp/track-commit/add-paths.txt` and run `cargo make track-add-paths`.
+   - For guarded commits, use `/track:commit` or the exact wrappers `cargo make track-commit-message` / `cargo make track-note`.
+3. Hook protections apply to all operations performed during autonomous task execution.
+   Do not bypass hook coverage by routing through external subprocesses.
+
 ## Review Escalation Threshold (Enforced by `sotp review record-round`)
 
 When the **same concern category appears in 3 consecutive closed review cycles**,
@@ -69,8 +101,8 @@ When the **same concern category appears in 3 consecutive closed review cycles**
 This is **enforced by the domain layer** (`ReviewState::record_round` /
 `record_round_with_pending` / `check_commit_ready`), not by prompt instructions.
 
-The threshold defaults to 3. `agent-profiles.json` → `providers.codex.escalation_threshold` is
-registered for future configurability but is not yet read by the runtime (hardcoded in domain layer).
+The threshold defaults to 3 (hardcoded in domain layer).
+Future configurability may be added to the review feature directly.
 
 ### When Escalation Triggers
 
@@ -131,7 +163,7 @@ Reference: `knowledge/conventions/shell-parsing.md`
 
 ## Reviewer Capability Constraint
 
-The `reviewer` capability delegates to an external provider defined in `.claude/agent-profiles.json`.
+The `reviewer` capability delegates to an external provider defined in `.harness/config/agent-profiles.json`.
 Inline review within Claude Code's main context (self-review) is not a substitute for the reviewer capability.
 
 - If the external reviewer (e.g., Codex CLI) fails to return a verdict → **retry** (up to 2 times)

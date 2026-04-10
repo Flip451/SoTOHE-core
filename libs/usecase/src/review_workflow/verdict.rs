@@ -5,8 +5,6 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 use thiserror::Error;
 
-pub use domain::review_v2::{ModelProfile, resolve_full_auto};
-
 /// Errors returned by review workflow functions.
 #[derive(Debug, Error)]
 pub enum ReviewWorkflowError {

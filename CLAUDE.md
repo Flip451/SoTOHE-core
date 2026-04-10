@@ -14,7 +14,7 @@
 - `knowledge/WORKFLOW.md`
 - `knowledge/adr/README.md`
 - `knowledge/strategy/TODO-PLAN.md`
-- `.claude/agent-profiles.json`
+- `.harness/config/agent-profiles.json`
 - `.claude/rules/`
 - `knowledge/conventions/README.md`
 - `knowledge/conventions/`
@@ -38,9 +38,7 @@
 - maintainer checklist: `.claude/rules/09-maintainer-checklist.md`
 - guardrails: `.claude/rules/10-guardrails.md`
 - `knowledge/DESIGN.md`
-- `.claude/agent-profiles.json`
-- `.claude/rules/02-codex-delegation.md`
-- `.claude/rules/03-gemini-delegation.md`
+- `.harness/config/agent-profiles.json`
 - `.claude/rules/07-dev-environment.md`
 - `.claude/skills/track-plan/SKILL.md`
 - `.claude/skills/codex-system/SKILL.md`           # Codex delegation skill

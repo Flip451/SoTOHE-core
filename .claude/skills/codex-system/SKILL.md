@@ -7,8 +7,8 @@ description: |
   clone vs borrow), trait design or review ("トレイト設計", Repository pattern, method signatures,
   return types), Rust architecture planning (domain layer, usecase layer, hexagonal/DDD,
   Command/Query patterns), and implementation planning for Rust features ("実装計画", "設計したい").
-  Also trigger when the active profile assigns planner/reviewer/debugger/implementer roles
-  to Codex. Do NOT trigger for simple Cargo.toml edits, cargo fmt/clippy fixes, test assertion
+  Also trigger when a capability (planner/reviewer/implementer) is assigned to Codex
+  in `.harness/config/agent-profiles.json`. Do NOT trigger for simple Cargo.toml edits, cargo fmt/clippy fixes, test assertion
   updates, dependency version lookups, or non-Rust tasks.
 metadata:
   short-description: Consult Codex for Rust design & complex tasks
@@ -18,15 +18,15 @@ metadata:
 
 Skill for using Codex CLI as a specialist provider.
 
-Check `.claude/agent-profiles.json` first. Use this skill only when the target capability is assigned to Codex.
+Check `.harness/config/agent-profiles.json` first. Use this skill only when the target capability is assigned to Codex.
 
 ## Configuration
 
-Before invoking Codex, read `.claude/agent-profiles.json` to resolve the model:
+Before invoking Codex, read `.harness/config/agent-profiles.json` to resolve the model:
 
 ```
-profiles.<active_profile>.provider_model_overrides.codex  →  {model}
-fallback: providers.codex.default_model  →  {model}
+capabilities.<capability>.model  →  {model}
+(only for capabilities where provider = "codex")
 ```
 
 All templates below use `{model}` as a placeholder. Replace it with the actual value from `agent-profiles.json`.
@@ -49,7 +49,7 @@ Values: `low`, `medium`, `high`. Default varies by model. Use `high` for complex
 - Compiler error diagnosis (E-codes)
 - Implementation planning (TDD-friendly)
 - Complex Rust code review
-- When `planner` / `reviewer` / `debugger` / `implementer` capability is assigned to Codex
+- When `planner` / `reviewer` / `implementer` capability is assigned to Codex
 
 ## Usage Patterns
 
@@ -301,7 +301,7 @@ Verify the fix in {file}:{line range}. Any remaining bugs?
 
 ## Execution Tips
 
-- **Model flag**: resolve `profiles.<active_profile>.provider_model_overrides.codex` first, then fall back to `providers.codex.default_model`, and pass the result as `--model {model}`
+- **Model flag**: resolve `capabilities.<capability>.model` from `.harness/config/agent-profiles.json` and pass the result as `--model {model}`
 - **Foreground preferred**: `2>&1` captures both stdout and stderr reliably; `2>/dev/null` may hide useful diagnostics
 - **Long prompts**: always use the file-based briefing pattern — inline prompts over ~1KB risk shell escaping issues
 - **Short prompts**: inline is fine for 1–2 paragraph queries

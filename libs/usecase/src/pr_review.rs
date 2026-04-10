@@ -6,7 +6,7 @@
 //! - `classify_severity`: keyword-based severity classification
 //! - `parse_body_findings`: extract findings from review body text
 //! - `parse_paginated_json`: handle concatenated JSON arrays from `gh api --paginate`
-//! - `resolve_reviewer_provider`: read `agent-profiles.json` and validate provider
+//! - `resolve_reviewer_provider`: read capability-centric agent-profiles and validate provider
 
 use std::sync::LazyLock;
 
@@ -51,22 +51,14 @@ const STRUCTURED_PROVIDERS: &[&str] = &["codex"];
 // Error type
 // ---------------------------------------------------------------------------
 
-/// Errors returned by [`resolve_reviewer_provider`].
+/// Errors returned by [`validate_reviewer_provider`].
 #[derive(Debug, Error)]
 pub enum PrReviewError {
-    /// The `agent-profiles.json` content could not be parsed as JSON.
-    #[error("failed to parse agent-profiles.json: {0}")]
-    ProfilesParse(#[from] serde_json::Error),
-
     /// The resolved reviewer provider does not support structured output.
     #[error(
         "reviewer provider '{provider}' does not support structured output; requires one of: {allowed}"
     )]
     UnsupportedProvider { provider: String, allowed: String },
-
-    /// A required field is missing in `agent-profiles.json`.
-    #[error("missing required field in agent-profiles.json: {0}")]
-    MissingField(String),
 }
 
 // ---------------------------------------------------------------------------
@@ -347,41 +339,24 @@ pub fn parse_paginated_json(text: &str) -> Result<Vec<serde_json::Value>, serde_
     }
 }
 
-/// Read `agent-profiles.json` at `profiles_path`, resolve the active reviewer
-/// provider, and validate that it supports structured output.
+/// Validates that the given reviewer provider supports structured output.
+///
+/// The caller is responsible for resolving the provider from the agent-profiles
+/// configuration (via `AgentProfiles::resolve_execution` in the infrastructure layer).
+/// This function only validates the provider against `STRUCTURED_PROVIDERS`.
 ///
 /// # Errors
 ///
-/// Returns [`PrReviewError::ProfilesNotFound`] if the file does not exist,
-/// [`PrReviewError::ProfilesParse`] if it is not valid JSON,
-/// [`PrReviewError::MissingField`] if the active profile or its `reviewer`
-/// field is absent, and [`PrReviewError::UnsupportedProvider`] if the resolved
-/// provider is not in `STRUCTURED_PROVIDERS`.
-pub fn resolve_reviewer_provider(profiles_content: &str) -> Result<String, PrReviewError> {
-    let data: serde_json::Value = serde_json::from_str(profiles_content)?;
-
-    // active_profile defaults to "default" when absent — this is safe because
-    // agent-profiles.json always has a "default" profile.
-    let active_profile = data.get("active_profile").and_then(|v| v.as_str()).unwrap_or("default");
-
-    let profile = data
-        .get("profiles")
-        .and_then(|p| p.get(active_profile))
-        .ok_or_else(|| PrReviewError::MissingField(format!("profiles.{active_profile}")))?;
-
-    let provider = profile
-        .get("reviewer")
-        .and_then(|v| v.as_str())
-        .ok_or_else(|| PrReviewError::MissingField(format!("profiles.{active_profile}.reviewer")))?
-        .to_owned();
-
-    if !STRUCTURED_PROVIDERS.contains(&provider.as_str()) {
+/// Returns [`PrReviewError::UnsupportedProvider`] if the provider is not in
+/// `STRUCTURED_PROVIDERS`.
+pub fn validate_reviewer_provider(provider: &str) -> Result<(), PrReviewError> {
+    if !STRUCTURED_PROVIDERS.contains(&provider) {
         return Err(PrReviewError::UnsupportedProvider {
-            provider,
+            provider: provider.to_owned(),
             allowed: STRUCTURED_PROVIDERS.join(", "),
         });
     }
-    Ok(provider)
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------
@@ -408,8 +383,8 @@ fn strip_numbered_prefix(s: &str) -> Option<&str> {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use super::{
-        classify_severity, parse_body_findings, parse_paginated_json, resolve_reviewer_provider,
-        sanitize_text,
+        classify_severity, parse_body_findings, parse_paginated_json, sanitize_text,
+        validate_reviewer_provider,
     };
 
     // -----------------------------------------------------------------------
@@ -764,31 +739,17 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
-    // resolve_reviewer_provider — tests
+    // validate_reviewer_provider — tests
     // -----------------------------------------------------------------------
 
     #[test]
-    fn test_resolve_reviewer_provider_codex_succeeds() {
-        let profiles = serde_json::json!({
-            "version": 1,
-            "active_profile": "default",
-            "providers": {},
-            "profiles": { "default": { "reviewer": "codex" } }
-        });
-        let result = resolve_reviewer_provider(&serde_json::to_string(&profiles).unwrap());
-        assert!(result.is_ok(), "expected Ok, got: {result:?}");
-        assert_eq!(result.unwrap(), "codex");
+    fn test_validate_reviewer_provider_codex_succeeds() {
+        assert!(validate_reviewer_provider("codex").is_ok());
     }
 
     #[test]
-    fn test_resolve_reviewer_provider_claude_fails_closed() {
-        let profiles = serde_json::json!({
-            "version": 1,
-            "active_profile": "default",
-            "providers": {},
-            "profiles": { "default": { "reviewer": "claude" } }
-        });
-        let result = resolve_reviewer_provider(&serde_json::to_string(&profiles).unwrap());
+    fn test_validate_reviewer_provider_claude_fails_closed() {
+        let result = validate_reviewer_provider("claude");
         assert!(result.is_err(), "expected Err for unsupported provider");
         let msg = result.unwrap_err().to_string();
         assert!(
@@ -798,36 +759,8 @@ mod tests {
     }
 
     #[test]
-    fn test_resolve_reviewer_provider_missing_profile_fails() {
-        let profiles = serde_json::json!({
-            "version": 1,
-            "active_profile": "nonexistent",
-            "providers": {},
-            "profiles": {}
-        });
-        let result = resolve_reviewer_provider(&serde_json::to_string(&profiles).unwrap());
-        assert!(result.is_err(), "expected Err for missing profile");
-        let msg = result.unwrap_err().to_string();
-        assert!(msg.contains("profiles.nonexistent"), "unexpected error message: {msg}");
-    }
-
-    #[test]
-    fn test_resolve_reviewer_provider_missing_reviewer_field_fails() {
-        let profiles = serde_json::json!({
-            "version": 1,
-            "active_profile": "default",
-            "providers": {},
-            "profiles": { "default": { "planner": "codex" } }
-        });
-        let result = resolve_reviewer_provider(&serde_json::to_string(&profiles).unwrap());
-        assert!(result.is_err(), "expected Err for missing reviewer field");
-        let msg = result.unwrap_err().to_string();
-        assert!(msg.contains("profiles.default.reviewer"), "unexpected error message: {msg}");
-    }
-
-    #[test]
-    fn test_resolve_reviewer_provider_invalid_json_fails() {
-        let result = resolve_reviewer_provider("not valid json");
-        assert!(result.is_err(), "expected Err for invalid JSON");
+    fn test_validate_reviewer_provider_gemini_fails() {
+        let result = validate_reviewer_provider("gemini");
+        assert!(result.is_err(), "expected Err for unsupported provider");
     }
 }

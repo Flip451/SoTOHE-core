@@ -469,19 +469,6 @@ class VerifyScriptsTest(unittest.TestCase):
         re.IGNORECASE,
     )
 
-    def test_gemini_delegation_uses_path_in_prompt(self) -> None:
-        """03-gemini-delegation.md multimodal example should use path-in-prompt, not stdin redirect."""
-        content = (
-            PROJECT_ROOT / ".claude" / "rules" / "03-gemini-delegation.md"
-        ).read_text(encoding="utf-8")
-        # No stdin redirect for multimodal files
-        hits = self._MULTIMODAL_REDIRECT_RE.findall(content)
-        self.assertEqual(hits, [], "stdin redirect found for multimodal files")
-        # Should reference agent-profiles.json as source of truth
-        self.assertIn("agent-profiles.json", content)
-        # Should use path-in-prompt format
-        self.assertIn("path-in-prompt", content)
-
     def test_gemini_skill_uses_path_in_prompt(self) -> None:
         """gemini-system SKILL.md multimodal examples should use path-in-prompt."""
         content = (
@@ -493,6 +480,42 @@ class VerifyScriptsTest(unittest.TestCase):
         # File-Based Briefing Pattern should still exist (text-based stdin is OK)
         self.assertIn("File-Based Briefing Pattern", content)
         self.assertIn("tmp/gemini-briefing.md", content)
+
+    # --- Sandbox/Hook Coverage Warning migration (T08) ---
+
+    def test_sandbox_warning_migrated_to_guardrails(self) -> None:
+        """Sandbox/Hook Coverage Warning must exist in 10-guardrails.md after 02-codex-delegation.md deletion."""
+        content = (
+            PROJECT_ROOT / ".claude" / "rules" / "10-guardrails.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("Sandbox and Hook Coverage Warning", content)
+        self.assertIn("workspace-write", content)
+        self.assertIn("block-direct-git-ops", content)
+        # Consequences section: guard-bypass warning must be preserved
+        self.assertIn("bypassing the `sotp` guard hook", content)
+        self.assertIn("Consequences when using", content)
+        # --full-auto implies --sandbox workspace-write warning
+        self.assertIn("--full-auto", content)
+        self.assertIn("--sandbox workspace-write", content)
+
+    def test_deleted_rule_files_do_not_exist(self) -> None:
+        """02-codex-delegation.md and 03-gemini-delegation.md must not exist."""
+        self.assertFalse(
+            (PROJECT_ROOT / ".claude" / "rules" / "02-codex-delegation.md").exists(),
+            "02-codex-delegation.md should have been deleted",
+        )
+        self.assertFalse(
+            (PROJECT_ROOT / ".claude" / "rules" / "03-gemini-delegation.md").exists(),
+            "03-gemini-delegation.md should have been deleted",
+        )
+
+    def test_security_convention_references_guardrails(self) -> None:
+        """security.md must reference 10-guardrails.md, not deleted 02-codex-delegation.md."""
+        content = (
+            PROJECT_ROOT / "knowledge" / "conventions" / "security.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("10-guardrails.md", content)
+        self.assertNotIn("02-codex-delegation.md", content)
 
     # Tests for the old `.claude/hooks/lint-on-save.py` Python hook have been
     # deleted along with the hook itself in track python-hooks-removal-2026-04-10.

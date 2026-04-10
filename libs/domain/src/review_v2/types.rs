@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::fmt;
 
 use super::error::{FilePathError, FindingError, ReviewHashError, ScopeNameError, VerdictError};
@@ -411,45 +410,6 @@ impl fmt::Display for ReviewState {
             }
             ReviewState::NotRequired(NotRequiredReason::ZeroFindings) => f.write_str("approved"),
         }
-    }
-}
-
-// ── ModelProfile / resolve_full_auto ─────────────────────────────────────────
-
-/// Per-model behavioral profile for reviewer full-auto resolution.
-///
-/// The `full_auto` field controls whether `--full-auto` is passed to the reviewer.
-/// This is a pure domain type without serde; deserialization lives in the infrastructure layer.
-pub struct ModelProfile {
-    /// Whether `--full-auto` should be passed to `codex exec`.
-    pub full_auto: bool,
-}
-
-impl ModelProfile {
-    /// Creates a new `ModelProfile`.
-    #[must_use]
-    pub fn new(full_auto: bool) -> Self {
-        Self { full_auto }
-    }
-}
-
-/// Resolves whether `--full-auto` should be enabled for the given model.
-///
-/// Looks up `model` in the provided `model_profiles` map.
-/// Falls back to `true` (fail-closed) when the model is not found
-/// or when `model_profiles` is `None`.
-///
-/// # Errors
-///
-/// This function does not return errors — unknown models default to `true`.
-#[must_use]
-pub fn resolve_full_auto(
-    model: &str,
-    model_profiles: Option<&HashMap<String, ModelProfile>>,
-) -> bool {
-    match model_profiles {
-        Some(profiles) => profiles.get(model).is_none_or(|profile| profile.full_auto),
-        None => true,
     }
 }
 
