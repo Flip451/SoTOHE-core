@@ -60,7 +60,7 @@ pub enum CodexRoundTypeArg {
         .args(["briefing_file", "prompt"])
 ))]
 pub struct CodexLocalArgs {
-    /// Model name resolved from `.claude/agent-profiles.json`.
+    /// Model name resolved from `.harness/config/agent-profiles.json`.
     #[arg(long)]
     pub(super) model: String,
 

@@ -102,14 +102,16 @@
       "status": "done"
     },
     {
+      "commit_hash": "1778f64504bc130bee9a39d9961d449ad649ffb5",
       "description": "libs/usecase/src/pr_review.rs::resolve_reviewer_provider を新 API に書き換え。現行は .claude/agent-profiles.json の active_profile + profiles.<p>.reviewer を直読みしているが、新スキーマでは capabilities.reviewer.provider を読む。実装: AgentProfiles::load → resolve_execution(\"reviewer\", RoundType::Final).provider を取得し STRUCTURED_PROVIDERS (= [\"codex\"]) に含まれるか検証。PrReviewError variants は ProfilesParse / UnsupportedProvider / MissingField を維持し、active_profile 関連エラーパスのみ削除。テスト fixture 4 件 (L774, L787, L804, L818 近辺) の JSON を新スキーマに書き換え、active_profile のテストは capability 欠如テストに差し替える。",
       "id": "T04",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "1778f64504bc130bee9a39d9961d449ad649ffb5",
       "description": "apps/cli/src/commands/pr.rs の .claude/agent-profiles.json パスハードコード 2 箇所 (line 475, line 763) を .harness/config/agent-profiles.json に更新。合わせて apps/cli/src/commands/plan/mod.rs (L36 の doc comment) と apps/cli/src/commands/review/mod.rs (L63 の doc comment) の .claude/agent-profiles.json 言及を .harness/config/agent-profiles.json に更新する。パス文字列は infrastructure 層の constants モジュール (例: libs/infrastructure/src/constants.rs) に AGENT_PROFILES_PATH 定数として一箇所集約し、pr.rs / orchestra.rs などの複数ファイルからその定数を参照する。これにより将来のパス変更が一箇所の修正で済む。",
       "id": "T05",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "apps/cli/src/commands/review/tests.rs の write_agent_profiles helper (L533) を新パス (.harness/config/) + 新スキーマに更新。テストで作成する JSON を capability 中心スキーマに書き換え、各 fixture (L565, L602, L632 近辺) も新スキーマに対応させる。T03 で model_profiles が削除されるため、full_auto 関連のテストは削除または簡略化。",
@@ -173,5 +175,5 @@
     }
   ],
   "title": "RV2-Phase2: agent-profiles redesign (.harness/config 移行 + capability 中心スキーマ)",
-  "updated_at": "2026-04-10T06:42:41Z"
+  "updated_at": "2026-04-10T07:16:07Z"
 }

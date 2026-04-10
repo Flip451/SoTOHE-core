@@ -334,6 +334,8 @@ const MODEL_RESOLUTION_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
         ],
         &["Read the provider's `default_model` to get `{model}`."],
     ),
+    // Note: MODEL_RESOLUTION_TARGETS will be updated to capability-centric patterns
+    // when the target files are migrated in T12/T13.
 ];
 
 // ---------------------------------------------------------------------------
@@ -343,9 +345,9 @@ const MODEL_RESOLUTION_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
 
 const REVIEW_WRAPPER_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
     (
-        ".claude/agent-profiles.json",
-        "agent profile reviewer wrapper path",
-        &["cargo make track-local-review -- --model {model} --prompt \\\"{task}\\\""],
+        crate::agent_profiles::AGENT_PROFILES_PATH,
+        "agent profile reviewer capability",
+        &["\"capabilities\"", "\"reviewer\"", "\"provider\""],
         &["codex exec review --uncommitted --json --model {model} --full-auto"],
     ),
     (
@@ -382,21 +384,7 @@ const REVIEW_WRAPPER_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
             "codex exec review --uncommitted --json --model {model} --full-auto",
         ],
     ),
-    (
-        ".claude/rules/02-codex-delegation.md",
-        "codex delegation reviewer wrapper path",
-        &[
-            "cargo make track-local-review -- --model {model} --prompt \\",
-            "{\"verdict\":\"zero_findings\",\"findings\":[]}",
-            "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"describe the bug\",\"severity\":\"P1\",\"file\":\"path/to/file.rs\",\"line\":123}]}",
-            "field \u{81ea}\u{4f53}\u{306f}\u{7701}\u{7565}\u{305b}\u{305a} `null` \u{3092}\u{4f7f}\u{3046}\u{3002}",
-        ],
-        &[
-            "timeout 180 codex exec --model {model} --sandbox read-only --full-auto \\\n  \"Review this Rust implementation: {description}\"",
-            "timeout 600 codex exec --model {model} --sandbox read-only --full-auto \\\n  \"Review this Rust implementation: {description}\"",
-            "codex exec review --uncommitted --json --model {model} --full-auto",
-        ],
-    ),
+    // .claude/rules/02-codex-delegation.md entry removed — file deleted in T08
 ];
 
 // ---------------------------------------------------------------------------

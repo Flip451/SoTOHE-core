@@ -530,25 +530,20 @@ sleep "${SOTP_FAKE_CODEX_SLEEP_SECONDS:-30}"
     assert!(child_gone, "expected timed-out reviewer descendant {child_pid} to be gone or zombie");
 }
 
-fn write_agent_profiles(root: &Path, model_profiles_json: &str) {
-    let claude_dir = root.join(".claude");
-    fs::create_dir_all(&claude_dir).unwrap();
+fn write_agent_profiles(root: &Path) {
+    let config_dir = root.join(".harness").join("config");
+    fs::create_dir_all(&config_dir).unwrap();
     fs::write(
-        claude_dir.join("agent-profiles.json"),
-        format!(
-            r#"{{
-  "version": 1,
-  "providers": {{
-    "codex": {{
-      "default_model": "gpt-5.4",
-      "model_profiles": {model_profiles_json}
-    }}
-  }},
-  "profiles": {{
-    "default": {{ "reviewer": "codex" }}
-  }}
-}}"#
-        ),
+        config_dir.join("agent-profiles.json"),
+        r#"{
+  "schema_version": 1,
+  "providers": {
+    "codex": { "label": "Codex CLI" }
+  },
+  "capabilities": {
+    "reviewer": { "provider": "codex", "model": "gpt-5.4", "fast_model": "gpt-5.4-mini" }
+  }
+}"#,
     )
     .unwrap();
 }
@@ -562,10 +557,7 @@ fn run_codex_local_never_passes_full_auto_even_for_full_model() {
     let script = write_fake_codex_script(dir.path());
     let output = dir.path().join("last.txt");
     let args_file = dir.path().join("codex-args.txt");
-    write_agent_profiles(
-        dir.path(),
-        r#"{"gpt-5.4": {"full_auto": true}, "gpt-5.3-codex-spark": {"full_auto": false}}"#,
-    );
+    write_agent_profiles(dir.path());
     let _bin = EnvVarGuard::set(CODEX_BIN_ENV, script.as_os_str());
     let _args_env = EnvVarGuard::set("SOTP_FAKE_CODEX_ARGS_FILE", args_file.as_os_str());
     let _message = EnvVarGuard::set(
@@ -599,10 +591,7 @@ fn run_codex_local_omits_full_auto_for_spark_model() {
     let script = write_fake_codex_script(dir.path());
     let output = dir.path().join("last.txt");
     let args_file = dir.path().join("codex-args.txt");
-    write_agent_profiles(
-        dir.path(),
-        r#"{"gpt-5.4": {"full_auto": true}, "gpt-5.3-codex-spark": {"full_auto": false}}"#,
-    );
+    write_agent_profiles(dir.path());
     let _bin = EnvVarGuard::set(CODEX_BIN_ENV, script.as_os_str());
     let _args_env = EnvVarGuard::set("SOTP_FAKE_CODEX_ARGS_FILE", args_file.as_os_str());
     let _message = EnvVarGuard::set(
