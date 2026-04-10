@@ -904,10 +904,10 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **RV2-08** (MEDIUM): v2 CLI パスのテスト不在 — `execute_codex_local` → `ReviewCycle` → `write_verdict` のフルパスが未テスト。サブコンポーネントは独立テスト済みだが integration test がない
 - [ ] **RV2-09** (LOW): `main` ハードコード — `compose_v2.rs` の `resolve_diff_base` が `.commit_hash` 不在時に `git rev-parse main` にフォールバック。default branch が `main` でないリポジトリで動作しない
 
-- [ ] **RV2-16** (HIGH): 計画レビュー専用コマンド + `.harness/config/agent-profiles.json` 再設計 — ADR `knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md` + `knowledge/adr/2026-04-09-2235-agent-profiles-redesign.md` で設計済み
+- [ ] **RV2-16** (HIGH): 計画レビュー専用コマンド — ADR `knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md` で設計済み（agent-profiles 再設計は track `agent-profiles-redesign-2026-04-10` で完了済み）
   - **根本原因**: 計画レビュー時に `metadata.json` / `spec.json` (SoT) と `plan.md` / `spec.md` / `verification.md` (rendered view) の両方をレビューアが読むため、同じ情報の表現齟齬を延々と指摘し続ける無限ループに陥る (v2-escalation-redesign-2026-04-09 の planning review で実測: 30+ ラウンドでも収束せず)
   - **解決策**: (1) 新コマンド `sotp review plan` / `sotp commit plan` を追加し既存 review システムと完全独立 (2) 必要度分類 (Necessity: must/advisory/info) 付き verdict で `must_count == 0` ゲート (3) `track/planning-artifacts.json` に allowlist 集約 (4) `plan-review.json` を新設 (既存 review.json v2 schema 踏襲 + necessity 追加)
-  - **prerequisite**: agent-profiles.json 再設計 (配置を `.harness/config/` に移動、スキーマを capability 中心に整理、`workflow_host` / `debugger` / `multimodal_reader` を削除、fast round で別 provider 指定を許可) — ADR `2026-04-09-2235`
+  - **prerequisite**: ~~agent-profiles.json 再設計~~ ✅ 完了 (track `agent-profiles-redesign-2026-04-10`、ADR `2026-04-09-2235` Accepted)
   - **追加日**: 2026-04-09
 
 - [ ] **RV2-17** (MEDIUM): Python hook 全廃止 — `.claude/hooks/*.py` を全削除し、fail-closed 系は Rust `sotp hook dispatch` に統一、advisory 系は各 track command の skill / コマンドドキュメントに吸収する

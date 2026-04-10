@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed
+Accepted — Implemented by track `agent-profiles-redesign-2026-04-10`
 
 ## Context
 
@@ -254,7 +254,7 @@ track workflow で実際に使用されているものに絞る (6 個):
 
 `active_profile` フィールドは廃止。ファイル自体が active 設定である。
 
-`.harness/config/samples/` は git 管理し、新しいサンプルの追加や既存サンプルの更新は PR で行う。`.harness/config/agent-profiles.json` は `.gitignore` に追加し、ユーザーごとのカスタマイズをローカルに留める (ただし初期 bootstrap 用に `.harness/config/agent-profiles.json.example` を別途 git 管理するかは実装時に検討)。
+`.harness/config/samples/` は git 管理し、新しいサンプルの追加や既存サンプルの更新は PR で行う。**解決済み (2026-04-10)**: `.harness/config/agent-profiles.json` は git 管理で確定。template 派生プロジェクトの bootstrap 容易性を優先し、`.gitignore` には追加しない。
 
 ### 4. 読み込み API の刷新
 
@@ -408,7 +408,7 @@ impl AgentProfiles {
 
 - **全参照箇所の手動更新が必要**: `.claude/agent-profiles.json` を参照している箇所が広範囲 (Python hooks、Rust コード、ドキュメント) に及ぶ
 - **一時的な混乱**: 移行期間中はドキュメントと実装の整合性に注意が必要
-- **`.gitignore` 戦略の判断**: `.harness/config/agent-profiles.json` を git 管理するか否か、してしない場合は bootstrap 用 `.example` ファイルをどう提供するかの判断が必要
+- **`.gitignore` 戦略**: 解決済み — `.harness/config/agent-profiles.json` は git 管理で確定 (2026-04-10)
 - **CI の影響**: `verify-orchestra-guardrails` などの既存ガードチェックが新パスを参照するよう更新が必要
 
 ## Reassess When

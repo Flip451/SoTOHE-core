@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f389101e4cc11afe655ce1c49f2ebeeb9a7e16cf00be223775aa469b85b3941e",
+          "at": "2026-04-10T06:38:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f389101e4cc11afe655ce1c49f2ebeeb9a7e16cf00be223775aa469b85b3941e",
+          "at": "2026-04-10T06:40:03Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -117,6 +135,102 @@
           "findings": [],
           "hash": "rvw1:sha256:cbd3a09ca9375dcaf58678f5d8fada01f5e4cd777572ec6c1b30c270dbc2ee87",
           "at": "2026-04-10T10:59:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe2c8e39f88164cf4c97b978aeaa51124b4a280edf8d5d7d0247740fe59d4eef",
+          "at": "2026-04-10T11:10:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe2c8e39f88164cf4c97b978aeaa51124b4a280edf8d5d7d0247740fe59d4eef",
+          "at": "2026-04-10T11:10:47Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:325a2ea354496de3c74ef00c810132b269969fc818d5ed77b7e059691cac66aa",
+          "at": "2026-04-10T07:03:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:325a2ea354496de3c74ef00c810132b269969fc818d5ed77b7e059691cac66aa",
+          "at": "2026-04-10T07:06:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e2606116501836b405228e4438120bdea384621e6a9c7c775dfe10abf22c6df5",
+          "at": "2026-04-10T07:12:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e2606116501836b405228e4438120bdea384621e6a9c7c775dfe10abf22c6df5",
+          "at": "2026-04-10T07:15:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:baf2cbc3f2adb75b7c665e4cc5cd815ea36515557aaa38dbb4e8bdcd09e92127",
+          "at": "2026-04-10T07:23:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:baf2cbc3f2adb75b7c665e4cc5cd815ea36515557aaa38dbb4e8bdcd09e92127",
+          "at": "2026-04-10T07:29:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
+          "at": "2026-04-10T07:38:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`write_agent_profiles()` was updated to the new `.harness/config/agent-profiles.json` schema, but the surrounding tests still execute `run_codex_local()`, whose test shim never reads agent profiles at all. As a result, this CLI-scope change adds no regression coverage for the actual `pr.rs` migration to `AgentProfiles::load`/`validate_reviewer_provider`; a bad path, missing `reviewer` capability, or unsupported provider would still pass here. Add a test that exercises the PR review entrypoints (or the helper they use) against the new config contract.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/tests.rs",
+              "line": 533,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
+          "at": "2026-04-10T07:41:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
+          "at": "2026-04-10T07:47:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
+          "at": "2026-04-10T07:49:12Z"
         }
       ]
     },
@@ -1282,24 +1396,49 @@
           "findings": [],
           "hash": "rvw1:sha256:dffbd153a27ea4baaa7586f1a22fcd9eb093ad14e8d18e99f72d2ce968e4a8e5",
           "at": "2026-04-10T11:06:29Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f389101e4cc11afe655ce1c49f2ebeeb9a7e16cf00be223775aa469b85b3941e",
-          "at": "2026-04-10T06:38:18Z"
+          "hash": "rvw1:sha256:56d14a420ccd2451e09fd46b9bc983e0288f9a35e7f40351e6111cb0126242ee",
+          "at": "2026-04-10T11:10:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Resolving the open question here to say `.harness/config/agent-profiles.json` is committed now leaves the Accepted ADR internally contradictory: the workflow just above still says the active file is initially absent and must be copied from `samples/`. Because this ADR is now the canonical design record, readers will get two incompatible bootstrap behaviors from the same document.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-09-2235-agent-profiles-redesign.md",
+              "line": 257,
+              "category": "docs"
+            },
+            {
+              "message": "This update says the agent-profiles redesign is already complete, but `INF-22` earlier in the same backlog still tracks the same migration as unfinished and even points to the old `config/agent-profiles.json` target. Leaving both entries in `TODO.md` creates conflicting backlog state and can send follow-on planning back toward already-finished work.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 907,
+              "category": "tracking"
+            }
+          ],
+          "hash": "rvw1:sha256:56d14a420ccd2451e09fd46b9bc983e0288f9a35e7f40351e6111cb0126242ee",
+          "at": "2026-04-10T11:12:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56d14a420ccd2451e09fd46b9bc983e0288f9a35e7f40351e6111cb0126242ee",
+          "at": "2026-04-10T11:14:15Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f389101e4cc11afe655ce1c49f2ebeeb9a7e16cf00be223775aa469b85b3941e",
-          "at": "2026-04-10T06:40:03Z"
+          "hash": "rvw1:sha256:56d14a420ccd2451e09fd46b9bc983e0288f9a35e7f40351e6111cb0126242ee",
+          "at": "2026-04-10T11:15:26Z"
         }
       ]
     },
@@ -1362,88 +1501,6 @@
           "findings": [],
           "hash": "rvw1:sha256:150826b14f06fe314221201bd0c457ad0dcd6e04697fa22d27a4da449a318fd5",
           "at": "2026-04-10T07:10:21Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:325a2ea354496de3c74ef00c810132b269969fc818d5ed77b7e059691cac66aa",
-          "at": "2026-04-10T07:03:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:325a2ea354496de3c74ef00c810132b269969fc818d5ed77b7e059691cac66aa",
-          "at": "2026-04-10T07:06:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e2606116501836b405228e4438120bdea384621e6a9c7c775dfe10abf22c6df5",
-          "at": "2026-04-10T07:12:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e2606116501836b405228e4438120bdea384621e6a9c7c775dfe10abf22c6df5",
-          "at": "2026-04-10T07:15:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:baf2cbc3f2adb75b7c665e4cc5cd815ea36515557aaa38dbb4e8bdcd09e92127",
-          "at": "2026-04-10T07:23:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:baf2cbc3f2adb75b7c665e4cc5cd815ea36515557aaa38dbb4e8bdcd09e92127",
-          "at": "2026-04-10T07:29:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
-          "at": "2026-04-10T07:38:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`write_agent_profiles()` was updated to the new `.harness/config/agent-profiles.json` schema, but the surrounding tests still execute `run_codex_local()`, whose test shim never reads agent profiles at all. As a result, this CLI-scope change adds no regression coverage for the actual `pr.rs` migration to `AgentProfiles::load`/`validate_reviewer_provider`; a bad path, missing `reviewer` capability, or unsupported provider would still pass here. Add a test that exercises the PR review entrypoints (or the helper they use) against the new config contract.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/tests.rs",
-              "line": 533,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
-          "at": "2026-04-10T07:41:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
-          "at": "2026-04-10T07:47:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
-          "at": "2026-04-10T07:49:12Z"
         }
       ]
     }
