@@ -452,23 +452,22 @@ pub fn sync_rendered_views(
     let snapshots = collect_track_snapshots(root)?;
     let rendered_registry = render_registry(&snapshots);
     let registry_path = root.join("track/registry.md");
-    let track_dirs: Vec<PathBuf> = if let Some(track_id) = track_id {
-        vec![root.join(TRACK_ITEMS_DIR).join(track_id)]
-    } else {
-        let mut dirs = Vec::new();
-        for base in [root.join(TRACK_ITEMS_DIR), root.join(TRACK_ARCHIVE_DIR)] {
-            if !base.is_dir() {
-                continue;
-            }
-            for entry in std::fs::read_dir(base)? {
-                let entry = entry?;
-                if entry.path().is_dir() {
-                    dirs.push(entry.path());
-                }
-            }
-        }
-        dirs.sort();
-        dirs
+
+    // Per-track view rendering: only when a specific `track_id` is requested.
+    // Passing `None` means "refresh registry.md only" (useful after archiving
+    // or when the caller has no active track context).
+    //
+    // The previous bulk mode ("render every track under items/ and archive/")
+    // has been removed in favour of this scoped design. If a caller wants to
+    // refresh multiple tracks, it must iterate and call this function once per
+    // explicit track_id. This guarantees that single-track callers (e.g., the
+    // final `in_progress → done` transition of an active track) always render
+    // the requested track unconditionally, and that archived tracks under
+    // `track/archive/` are naturally protected because they are never
+    // referenced through `track/items/<id>`.
+    let track_dirs: Vec<PathBuf> = match track_id {
+        Some(id) => vec![root.join(TRACK_ITEMS_DIR).join(id)],
+        None => Vec::new(),
     };
 
     for track_dir in track_dirs {
@@ -489,11 +488,11 @@ pub fn sync_rendered_views(
             });
         }
 
-        // Skip per-track view regeneration for done/archived tracks to prevent
-        // overwriting legacy views with newer renderers that may drop data.
-        if matches!(parsed.status.as_str(), "done" | "archived") {
-            continue;
-        }
+        // No done/archived skip here: the caller explicitly asked to render
+        // this track via `track_id = Some(...)`. If protection for legacy
+        // archived views is needed, the caller must simply not pass archived
+        // track ids (which live under `track/archive/` and are unreachable
+        // through the `track/items/<id>` path used above).
 
         let (track, _) = codec::decode(&json).map_err(|source| RenderError::InvalidMetadata {
             path: metadata_path.clone(),
@@ -939,7 +938,7 @@ mod tests {
         )
         .unwrap();
 
-        let changed = sync_rendered_views(dir.path(), None).unwrap();
+        let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
         assert!(changed.iter().any(|path| path.ends_with("plan.md")));
         assert!(changed.iter().any(|path| path.ends_with("registry.md")));
@@ -1295,7 +1294,7 @@ mod tests {
         )
         .unwrap();
 
-        let changed = sync_rendered_views(dir.path(), None).unwrap();
+        let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
         // spec.md must be in the changed list
         assert!(
@@ -1327,7 +1326,7 @@ mod tests {
         .unwrap();
 
         // No spec.json written — legacy mode
-        let changed = sync_rendered_views(dir.path(), None).unwrap();
+        let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
         assert!(
             !changed.iter().any(|p| p.ends_with("spec.md")),
@@ -1363,10 +1362,10 @@ mod tests {
         std::fs::write(track_dir.join("spec.json"), spec_json).unwrap();
 
         // First sync — generates spec.md
-        sync_rendered_views(dir.path(), None).unwrap();
+        sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
         // Second sync — spec.md is already up-to-date, must NOT be in changed list
-        let changed = sync_rendered_views(dir.path(), None).unwrap();
+        let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
         assert!(
             !changed.iter().any(|p| p.ends_with("spec.md")),
             "spec.md must NOT be in changed list when already up-to-date"
@@ -1394,7 +1393,7 @@ mod tests {
         std::fs::write(track_dir.join("spec.json"), "{not valid json}").unwrap();
 
         // Must succeed (only warn) — plan.md and registry.md are still generated
-        let result = sync_rendered_views(dir.path(), None);
+        let result = sync_rendered_views(dir.path(), Some("track-a"));
         assert!(result.is_ok(), "JSON-parse-error spec.json must not abort sync");
 
         let changed = result.unwrap();
@@ -1426,7 +1425,7 @@ mod tests {
         )
         .unwrap();
 
-        let result = sync_rendered_views(dir.path(), None);
+        let result = sync_rendered_views(dir.path(), Some("track-a"));
         assert!(result.is_err(), "unsupported spec.json schema version must return an error");
     }
 
@@ -1459,7 +1458,7 @@ mod tests {
         .unwrap();
         std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
 
-        let changed = sync_rendered_views(dir.path(), None).unwrap();
+        let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
         assert!(
             changed.iter().any(|p| p.ends_with("domain-types.md")),
@@ -1489,7 +1488,7 @@ mod tests {
         .unwrap();
         // No domain-types.json
 
-        let changed = sync_rendered_views(dir.path(), None).unwrap();
+        let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
         assert!(
             !changed.iter().any(|p| p.ends_with("domain-types.md")),
@@ -1517,10 +1516,10 @@ mod tests {
         std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
 
         // First sync — generates domain-types.md.
-        sync_rendered_views(dir.path(), None).unwrap();
+        sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
         // Second sync — domain-types.md is already up to date, should not appear in changed.
-        let changed = sync_rendered_views(dir.path(), None).unwrap();
+        let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
         assert!(
             !changed.iter().any(|p| p.ends_with("domain-types.md")),
             "second sync must not report domain-types.md as changed when already up to date"
@@ -1546,7 +1545,7 @@ mod tests {
         // Write malformed domain-types.json (JSON parse error).
         std::fs::write(track_dir.join("domain-types.json"), "{ not valid json }").unwrap();
 
-        let result = sync_rendered_views(dir.path(), None);
+        let result = sync_rendered_views(dir.path(), Some("track-a"));
         assert!(result.is_ok(), "malformed domain-types.json must not abort sync");
 
         let changed = result.unwrap();
@@ -1555,10 +1554,16 @@ mod tests {
     }
 
     #[test]
-    fn sync_rendered_views_skips_done_track_views_but_includes_in_registry() {
+    fn sync_rendered_views_with_none_refreshes_registry_only() {
+        // With `track_id = None` the function now operates in "registry only"
+        // mode: it rebuilds track/registry.md from all collected snapshots but
+        // does NOT iterate per-track views. Existing plan.md sentinels on
+        // other tracks must therefore stay intact, and the bulk mode
+        // "render every track under items/ and archive/" is gone.
         let dir = tempfile::tempdir().unwrap();
 
-        // Active track — views should be generated.
+        // Active track — even with a valid metadata.json, its plan.md must
+        // not be generated when `track_id = None` (registry-only mode).
         let active_dir = dir.path().join("track/items/track-active");
         std::fs::create_dir_all(&active_dir).unwrap();
         std::fs::write(
@@ -1572,7 +1577,7 @@ mod tests {
         )
         .unwrap();
 
-        // Done track — views should NOT be generated.
+        // Done track in items/ — its sentinel plan.md must stay intact.
         let done_dir = dir.path().join("track/items/track-done");
         std::fs::create_dir_all(&done_dir).unwrap();
         std::fs::write(
@@ -1585,31 +1590,10 @@ mod tests {
             ),
         )
         .unwrap();
-        // Write a sentinel plan.md to verify it is NOT overwritten.
         std::fs::write(done_dir.join("plan.md"), "SENTINEL_DONE").unwrap();
 
-        let changed = sync_rendered_views(dir.path(), None).unwrap();
-
-        // Active track plan.md should be generated.
-        assert!(active_dir.join("plan.md").is_file());
-        assert!(changed.iter().any(|p| p.ends_with("track-active/plan.md")));
-
-        // Done track plan.md should remain untouched (sentinel preserved).
-        let done_plan = std::fs::read_to_string(done_dir.join("plan.md")).unwrap();
-        assert_eq!(done_plan, "SENTINEL_DONE");
-        assert!(!changed.iter().any(|p| p.ends_with("track-done/plan.md")));
-
-        // Registry should include both tracks.
-        let registry = std::fs::read_to_string(dir.path().join("track/registry.md")).unwrap();
-        assert!(registry.contains("track-done"));
-        assert!(registry.contains("track-active"));
-    }
-
-    #[test]
-    fn sync_rendered_views_skips_archived_track_views() {
-        let dir = tempfile::tempdir().unwrap();
-
-        // Archived track in archive directory.
+        // Archived track in archive/ — registry must still list it, but its
+        // plan.md must stay intact.
         let archived_dir = dir.path().join("track/archive/track-archived");
         std::fs::create_dir_all(&archived_dir).unwrap();
         std::fs::write(
@@ -1622,23 +1606,38 @@ mod tests {
             ),
         )
         .unwrap();
-        // Write a sentinel plan.md.
         std::fs::write(archived_dir.join("plan.md"), "SENTINEL_ARCHIVED").unwrap();
 
         let changed = sync_rendered_views(dir.path(), None).unwrap();
 
-        // Archived plan.md should remain untouched.
-        let archived_plan = std::fs::read_to_string(archived_dir.join("plan.md")).unwrap();
-        assert_eq!(archived_plan, "SENTINEL_ARCHIVED");
+        // No per-track views should be generated or touched.
+        assert!(!active_dir.join("plan.md").exists());
+        assert!(!changed.iter().any(|p| p.ends_with("track-active/plan.md")));
+        assert_eq!(std::fs::read_to_string(done_dir.join("plan.md")).unwrap(), "SENTINEL_DONE");
+        assert!(!changed.iter().any(|p| p.ends_with("track-done/plan.md")));
+        assert_eq!(
+            std::fs::read_to_string(archived_dir.join("plan.md")).unwrap(),
+            "SENTINEL_ARCHIVED"
+        );
         assert!(!changed.iter().any(|p| p.ends_with("track-archived/plan.md")));
 
-        // Registry should include the archived track.
+        // Registry MUST reflect all three tracks (snapshots are collected
+        // across items/ and archive/ regardless of rendering mode).
+        assert!(changed.iter().any(|p| p.ends_with("registry.md")));
         let registry = std::fs::read_to_string(dir.path().join("track/registry.md")).unwrap();
+        assert!(registry.contains("track-active"));
+        assert!(registry.contains("track-done"));
         assert!(registry.contains("track-archived"));
     }
 
     #[test]
-    fn sync_rendered_views_single_track_skips_done_track() {
+    fn sync_rendered_views_single_track_renders_done_track() {
+        // Regression: when `track_id=Some(id)` is passed, the caller has
+        // explicitly asked to render that track. The done/archived skip is a
+        // bulk-sync-only protection and must NOT apply to single-track sync,
+        // otherwise the final `in_progress → done` transition of an active
+        // track freezes plan.md in its pre-done state (task checkboxes do not
+        // flip to `[x]`).
         let dir = tempfile::tempdir().unwrap();
 
         let done_dir = dir.path().join("track/items/track-done");
@@ -1653,14 +1652,16 @@ mod tests {
             ),
         )
         .unwrap();
-        std::fs::write(done_dir.join("plan.md"), "SENTINEL_SINGLE").unwrap();
+        // Sentinel content that must be overwritten by the single-track render.
+        std::fs::write(done_dir.join("plan.md"), "STALE_SENTINEL_MUST_BE_OVERWRITTEN").unwrap();
 
         // Single-track path with track_id=Some.
         let changed = sync_rendered_views(dir.path(), Some("track-done")).unwrap();
 
-        // plan.md should remain untouched.
+        // plan.md must be freshly rendered (sentinel overwritten).
         let plan = std::fs::read_to_string(done_dir.join("plan.md")).unwrap();
-        assert_eq!(plan, "SENTINEL_SINGLE");
-        assert!(!changed.iter().any(|p| p.ends_with("plan.md")));
+        assert_ne!(plan, "STALE_SENTINEL_MUST_BE_OVERWRITTEN");
+        assert!(plan.contains("Done task"));
+        assert!(changed.iter().any(|p| p.ends_with("track-done/plan.md")));
     }
 }

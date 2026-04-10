@@ -53,11 +53,11 @@ CLAUDE.md / .claude/rules/09-maintainer-checklist.md / DEVELOPER_AI_WORKFLOW.md 
 Phase 1-3 の設計 ADR 3 本と knowledge/strategy/TODO.md (RV2-16/RV2-17 エントリ) を本トラックの計画 commit に含める。
 ADR 2026-04-09-2235 (Phase 2) と 2026-04-09-2047 (Phase 3) は本トラックの後続トラックの prerequisite 設計としてここで導入する。
 
-- [ ] Phase 1-3 の設計 ADR 3 本 (knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md, knowledge/adr/2026-04-09-2235-agent-profiles-redesign.md, knowledge/adr/2026-04-09-2323-python-hooks-removal.md) と knowledge/strategy/TODO.md (RV2-16/RV2-17 エントリ) を本トラックの計画 commit に取り込む。spec.md には ADR 2 本 (Phase 2/3) は本トラックの prerequisite 設計として同時導入されることを明記する。
+- [x] Phase 1-3 の設計 ADR 3 本 (knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md, knowledge/adr/2026-04-09-2235-agent-profiles-redesign.md, knowledge/adr/2026-04-09-2323-python-hooks-removal.md) と knowledge/strategy/TODO.md (RV2-16/RV2-17 エントリ) を本トラックの計画 commit に取り込む。spec.md には ADR 2 本 (Phase 2/3) は本トラックの prerequisite 設計として同時導入されることを明記する。 e2854af1239a92a173a36220061ec5f99201c054
 
 ## CI 全チェック通過確認
 
 cargo make ci で fmt-check / clippy / test / deny / check-layers / verify-arch-docs / verify-orchestra 等の全ゲートを通過させる。
 verify-orchestra は hook path 整合性の最終チェックポイントとして機能する。
 
-- [~] cargo make ci 全チェック通過確認 (fmt-check + clippy + test + deny + check-layers + verify-arch-docs + verify-orchestra 等)。verify-orchestra で hook path 整合性が確認されることが本トラックの最終ゲート。
+- [x] cargo make ci 全チェック通過確認 (fmt-check + clippy + test + deny + check-layers + verify-arch-docs + verify-orchestra 等)。verify-orchestra で hook path 整合性が確認されることが本トラックの最終ゲート。 6d6ac2a9f11e680d3e7b925299b7cf3f7bdf5406

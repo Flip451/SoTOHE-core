@@ -96,6 +96,30 @@
 - `libs/infrastructure/src/verify/doc_patterns.rs`: docs 整合性チェックの 3 entries (track/workflow.md hooks selftest gate / TRACK_TRACEABILITY.md hooks selftest gate / DEVELOPER_AI_WORKFLOW.md hooks selftest gate) を削除
 - 検証: `cargo make ci` 全 PASS
 
+### sotp render bug fix (T08 進行中に発見、本トラック内で修正)
+
+T08 finalize 中に `sync_rendered_views` のバグを発見した。`bin/sotp track transition T0X done` でトラック状態が `in_progress → done` に flip する瞬間、`plan.md` の再 render が完全にスキップされ、`[~]` (in_progress) のチェックボックスが永久に保存される現象。原因は commit `795b45f` (2026-04-08) で追加された "skip done/archived track views" 保護ロジックで、bulk sync (`track_id = None`) と single-track sync (`track_id = Some(...)`) 両方のパスが保護対象とされた。この設計は legacy archived track の view を上書きしないという目的には合致していたが、`track transition done` で状態が切り替わる瞬間に single-track sync を呼ぶユースケースを見落としており、完了直後の再 render もスキップしてしまう過剰な保護となっていた。
+
+修正内容:
+
+- `libs/infrastructure/src/track/render.rs`:
+  - `sync_rendered_views` の bulk iteration ロジックを廃止
+  - `track_id = Some(id)` → 指定トラックを無条件で render (done/archived skip なし)
+  - `track_id = None` → registry.md のみ render (per-track view は触らない)
+  - 既存テストを新セマンティクスに合わせて更新
+  - 新規テスト 2 件追加: `sync_rendered_views_with_none_refreshes_registry_only` (None モード) と `sync_rendered_views_single_track_renders_done_track` (regression guard)
+- `scripts/test_track_registry.py` / `scripts/test_track_state_machine.py`:
+  - Python smoke test を新セマンティクスに合わせて `track_id="demo"` / `--track-id demo` を渡すように更新
+- `bin/sotp` を `cargo make build-sotp` で再ビルド
+
+検証:
+
+- `cargo make test-one-exec sync_rendered_views`: 13/13 PASS
+- `cargo make ci`: 全チェック PASS
+- 実環境テスト: T08 を `in_progress → done` に再遷移 → `[OK] Rendered: track/items/.../plan.md` が出力されること、`plan.md` line 63 の T08 が `[x]` に変わること、`commit_hash` が末尾に付くこと、を確認
+
+この修正により本トラックの T07/T08 は正しく `[x] + commit_hash` を render できるようになった。
+
 ### T08 (2026-04-10) — 最終 CI 確認
 
 - 全タスク実装 (T01-T06) 完了後の最終 CI ゲート確認として `cargo make ci` を実行
@@ -105,7 +129,7 @@
 
 ## Verified At
 
-2026-04-10 (T01-T06, T08 全タスク完了; T07 は計画 commit (e2854af) で実質完了済み、admin transition は本コミット直後に実施)
+2026-04-10 (全タスク T01-T08 完了; T07 commit_hash = e2854af (計画 commit)、T08 commit_hash = 6d6ac2a9 (T08 verification commit)、track status = done — 本コミットで admin transition 実施済み)
 
 ## Open Issues
 

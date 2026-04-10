@@ -417,7 +417,7 @@ class TestSyncRenderedViewsRegistry(unittest.TestCase):
                     }
                 ],
             )
-            changed = sync_rendered_views(root)
+            changed = sync_rendered_views(root, track_id="feat-001")
             paths = [p.name for p in changed]
             self.assertIn("plan.md", paths)
             self.assertIn("registry.md", paths)
@@ -443,9 +443,9 @@ class TestSyncRenderedViewsRegistry(unittest.TestCase):
                 ],
             )
             # First sync writes registry
-            sync_rendered_views(root)
+            sync_rendered_views(root, track_id="feat-001")
             # Second sync should not include registry.md in changed (content unchanged)
-            changed = sync_rendered_views(root)
+            changed = sync_rendered_views(root, track_id="feat-001")
             registry_paths = [p for p in changed if p.name == "registry.md"]
             self.assertEqual(len(registry_paths), 0)
 
