@@ -9,17 +9,17 @@ If on any other branch, stop and suggest switching to the track branch.
 
 ## Execution
 
-For each task in `metadata.json` `tasks` array (in order) where `status` is `todo` or `in_progress`,
-or `done` with `commit_hash` null (skip `done` with non-null `commit_hash` and `skipped` tasks):
+For each task in `metadata.json` `tasks` array (in order), skip `done` with non-null `commit_hash` and `skipped` tasks:
 
-1. **Implement**: execute `/track:implement` scoped to this single task.
-   `/track:implement` handles implementation, CI, and verification update.
-   Note: `/track:implement` normally marks the task `done` and suggests `/track:commit`,
-   but within the full-cycle loop the orchestrator proceeds to review before committing.
-2. **Review**: execute `/track:review`. Reviews the implementation including all changes.
-   Must reach full model `zero_findings`.
-3. **Commit**: execute `/track:commit` with a commit message generated from the task description.
-   After commit, record the hash: `cargo make track-transition <track_dir> <task_id> done --commit-hash <hash>`.
+- **`todo` or `in_progress` tasks** — full cycle:
+  1. **Implement**: execute `/track:implement` scoped to this single task.
+  2. **Review**: execute `/track:review`. Must reach full model `zero_findings`.
+  3. **Commit**: execute `/track:commit` with a commit message generated from the task description.
+     After commit, record the hash: `cargo make track-transition <track_dir> <task_id> done --commit-hash <hash>`.
+
+- **`done` with `commit_hash` null** — hash backfill only:
+  The task was implemented and committed but the hash was not recorded. Find the commit via `git log` and run:
+  `cargo make track-transition <track_dir> <task_id> done --commit-hash <hash>`.
 
 If any step fails, stop the loop and report the failure.
 Rerun `/track:full-cycle` resumes correctly because only tasks with a committed hash are skipped.
