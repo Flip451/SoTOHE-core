@@ -18,7 +18,7 @@ Arguments:
 
 - Resolve the current track: the current git branch must match `track/<id>`.
 - Read the track's `metadata.json` to confirm track status.
-- Read `.claude/agent-profiles.json` to verify the reviewer provider supports structured output.
+- Read `.harness/config/agent-profiles.json` to verify the reviewer provider supports structured output.
 - If the provider is not in the structured provider set (currently: `codex`), fail with a clear error message directing the user to use `/track:review` instead.
 
 ## Step 1: Push and ensure PR

@@ -1,197 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:325a2ea354496de3c74ef00c810132b269969fc818d5ed77b7e059691cac66aa",
-          "at": "2026-04-10T07:03:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:325a2ea354496de3c74ef00c810132b269969fc818d5ed77b7e059691cac66aa",
-          "at": "2026-04-10T07:06:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e2606116501836b405228e4438120bdea384621e6a9c7c775dfe10abf22c6df5",
-          "at": "2026-04-10T07:12:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e2606116501836b405228e4438120bdea384621e6a9c7c775dfe10abf22c6df5",
-          "at": "2026-04-10T07:15:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:baf2cbc3f2adb75b7c665e4cc5cd815ea36515557aaa38dbb4e8bdcd09e92127",
-          "at": "2026-04-10T07:23:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:baf2cbc3f2adb75b7c665e4cc5cd815ea36515557aaa38dbb4e8bdcd09e92127",
-          "at": "2026-04-10T07:29:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
-          "at": "2026-04-10T07:38:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`write_agent_profiles()` was updated to the new `.harness/config/agent-profiles.json` schema, but the surrounding tests still execute `run_codex_local()`, whose test shim never reads agent profiles at all. As a result, this CLI-scope change adds no regression coverage for the actual `pr.rs` migration to `AgentProfiles::load`/`validate_reviewer_provider`; a bad path, missing `reviewer` capability, or unsupported provider would still pass here. Add a test that exercises the PR review entrypoints (or the helper they use) against the new config contract.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/tests.rs",
-              "line": 533,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
-          "at": "2026-04-10T07:41:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
-          "at": "2026-04-10T07:47:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
-          "at": "2026-04-10T07:49:12Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f389101e4cc11afe655ce1c49f2ebeeb9a7e16cf00be223775aa469b85b3941e",
-          "at": "2026-04-10T06:38:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f389101e4cc11afe655ce1c49f2ebeeb9a7e16cf00be223775aa469b85b3941e",
-          "at": "2026-04-10T06:40:03Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13c68c81b3fdc9dce610008f2d401a08c893d808d8effbe2bd3926a53e25a605",
-          "at": "2026-04-10T09:59:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The migrated Sandbox/Hook warning is not lossless: rule 1 now says to prefer `read-only` only for `reviewer` / `researcher`, but the deleted source also covered `planner`. That omission matters because the shipped `agent-profiles.codex-heavy.json` still routes `planner` to Codex, so a planner launched with `workspace-write` would bypass `block-direct-git-ops` without this guardrail telling operators to keep it read-only.",
-              "severity": "P1",
-              "file": ".claude/rules/10-guardrails.md",
-              "line": 82,
-              "category": "safety"
-            }
-          ],
-          "hash": "rvw1:sha256:13c68c81b3fdc9dce610008f2d401a08c893d808d8effbe2bd3926a53e25a605",
-          "at": "2026-04-10T10:02:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The migrated sandbox warning drops `planner` from the read-only / no-`--full-auto` guidance. That is not lossless: planners in this repo still run through Codex and are expected to stay on `--sandbox read-only`, so the safety warning no longer covers a capability that can still spawn a write-capable subprocess.",
-              "severity": "P1",
-              "file": ".claude/rules/10-guardrails.md",
-              "line": 86,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:9a3517d59b83e031b005e34a75e47a537f948e90d067c4be2d6c6bd1ef804c46",
-          "at": "2026-04-10T10:12:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9a3517d59b83e031b005e34a75e47a537f948e90d067c4be2d6c6bd1ef804c46",
-          "at": "2026-04-10T10:13:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The migrated Sandbox/Hook warning is not lossless: it drops `planner` from the capabilities that must stay read-only / must not use `--full-auto`. This weakens the only safety-critical content being preserved, because planner can still route to an external provider in non-default profiles, and a `workspace-write` planner run would bypass the same git/file-write hooks this section is warning about.",
-              "severity": "P1",
-              "file": ".claude/rules/10-guardrails.md",
-              "line": 76,
-              "category": "safety"
-            }
-          ],
-          "hash": "rvw1:sha256:9a3517d59b83e031b005e34a75e47a537f948e90d067c4be2d6c6bd1ef804c46",
-          "at": "2026-04-10T10:15:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d2c0db60052369dd267c555f17e43f840997e38a672d19831cd8e59f68fbeef9",
-          "at": "2026-04-10T10:20:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d2c0db60052369dd267c555f17e43f840997e38a672d19831cd8e59f68fbeef9",
-          "at": "2026-04-10T10:21:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7088f89b26321b4f6eaed335fbd9e696bbd30d712fce74b0cb61a1ac1ff3f92f",
-          "at": "2026-04-10T10:26:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7088f89b26321b4f6eaed335fbd9e696bbd30d712fce74b0cb61a1ac1ff3f92f",
-          "at": "2026-04-10T10:27:31Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -838,6 +647,353 @@
           "findings": [],
           "hash": "rvw1:sha256:b38b071002a5283dfe8e742ddb3c154e7aa0cfef9ae151014c2ede199e4852c9",
           "at": "2026-04-10T10:27:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This still references the removed `debugger` capability in the `When to Use` list. The redesign switched to the six-capability schema, so leaving debugger here makes the skill instructions inconsistent with the new agent profile model.",
+              "severity": "P1",
+              "file": ".claude/skills/codex-system/SKILL.md",
+              "line": 52,
+              "category": "consistency"
+            },
+            {
+              "message": "This still points readers to `.claude/agent-profiles.json`, which is the legacy location. The rest of the update moved model resolution to `.harness/config/agent-profiles.json`, so this line now sends agents to the wrong source of truth.",
+              "severity": "P1",
+              "file": ".claude/skills/gemini-system/SKILL.md",
+              "line": 18,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:73369496f85b0fb9b767b40a3ea20a7957cc202ebd18528b07049d67c528d426",
+          "at": "2026-04-10T10:38:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:73369496f85b0fb9b767b40a3ea20a7957cc202ebd18528b07049d67c528d426",
+          "at": "2026-04-10T10:39:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/skills/gemini-system/SKILL.md` still tells readers to consult `.claude/agent-profiles.json`, but that file is still present with the old profile-based schema and differs from `.harness/config/agent-profiles.json`. Following this instruction will resolve the researcher provider from stale data, so the T13 path migration is incomplete.",
+              "severity": "P1",
+              "file": ".claude/skills/gemini-system/SKILL.md",
+              "line": 18,
+              "category": "correctness"
+            },
+            {
+              "message": "The Codex skill still lists `debugger` as a Codex-assigned capability even though the new `.harness/config/agent-profiles.json` schema no longer defines `debugger`. That leaves the skill inconsistent with the new capability set and can send users looking for a nonexistent assignment.",
+              "severity": "P1",
+              "file": ".claude/skills/codex-system/SKILL.md",
+              "line": 52,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:73369496f85b0fb9b767b40a3ea20a7957cc202ebd18528b07049d67c528d426",
+          "at": "2026-04-10T10:41:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e140ee037d770d9dbf54b3e23269a5b73854348bb127cd52bcc1730295c80f2b",
+          "at": "2026-04-10T10:44:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The capability-gated trigger list now omits `designer`, even though this skill still covers trait and architecture design. Under the new capability-centric routing, any profile that assigns `designer` to Codex would be told not to use `codex-system`, which misroutes design work to the wrong provider.",
+              "severity": "P1",
+              "file": ".claude/skills/codex-system/SKILL.md",
+              "line": 10,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:e140ee037d770d9dbf54b3e23269a5b73854348bb127cd52bcc1730295c80f2b",
+          "at": "2026-04-10T10:46:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e140ee037d770d9dbf54b3e23269a5b73854348bb127cd52bcc1730295c80f2b",
+          "at": "2026-04-10T10:46:57Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f725200361bc9cc85fc10489f68017b21eea4d34e9ca95a623467098251ce5c",
+          "at": "2026-04-10T06:38:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f725200361bc9cc85fc10489f68017b21eea4d34e9ca95a623467098251ce5c",
+          "at": "2026-04-10T06:41:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_reviewer_provider` now parses raw JSON and never checks `schema_version`, so any unsupported/future agent-profiles shape that still contains `capabilities.reviewer.provider = \"codex\"` will pass this guard and let `@codex review` proceed. This loses the fail-closed validation that the canonical loader enforces.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/pr_review.rs",
+              "line": 359,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:b495a0d4c52bf67cf918cebb63330cd6b65936acceb781f5bd77e0e1b5fe9b9d",
+          "at": "2026-04-10T06:56:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_reviewer_provider` still hand-parses `serde_json::Value` instead of delegating to `AgentProfiles::load(...).resolve_execution(\"reviewer\", RoundType::Final)` as the redesign specifies. That keeps a second copy of the agent-profiles schema in `usecase`, so validation can drift from the canonical loader and the new `schema_version` gate here has no loader-backed regression coverage.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/pr_review.rs",
+              "line": 359,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:6f458b177ef714e55d43445b3d093016d31a830ae23d4c975f14fa7b84aa2c99",
+          "at": "2026-04-10T06:58:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:150826b14f06fe314221201bd0c457ad0dcd6e04697fa22d27a4da449a318fd5",
+          "at": "2026-04-10T07:04:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:150826b14f06fe314221201bd0c457ad0dcd6e04697fa22d27a4da449a318fd5",
+          "at": "2026-04-10T07:10:21Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:325a2ea354496de3c74ef00c810132b269969fc818d5ed77b7e059691cac66aa",
+          "at": "2026-04-10T07:03:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:325a2ea354496de3c74ef00c810132b269969fc818d5ed77b7e059691cac66aa",
+          "at": "2026-04-10T07:06:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e2606116501836b405228e4438120bdea384621e6a9c7c775dfe10abf22c6df5",
+          "at": "2026-04-10T07:12:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e2606116501836b405228e4438120bdea384621e6a9c7c775dfe10abf22c6df5",
+          "at": "2026-04-10T07:15:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:baf2cbc3f2adb75b7c665e4cc5cd815ea36515557aaa38dbb4e8bdcd09e92127",
+          "at": "2026-04-10T07:23:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:baf2cbc3f2adb75b7c665e4cc5cd815ea36515557aaa38dbb4e8bdcd09e92127",
+          "at": "2026-04-10T07:29:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
+          "at": "2026-04-10T07:38:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`write_agent_profiles()` was updated to the new `.harness/config/agent-profiles.json` schema, but the surrounding tests still execute `run_codex_local()`, whose test shim never reads agent profiles at all. As a result, this CLI-scope change adds no regression coverage for the actual `pr.rs` migration to `AgentProfiles::load`/`validate_reviewer_provider`; a bad path, missing `reviewer` capability, or unsupported provider would still pass here. Add a test that exercises the PR review entrypoints (or the helper they use) against the new config contract.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/tests.rs",
+              "line": 533,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
+          "at": "2026-04-10T07:41:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
+          "at": "2026-04-10T07:47:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
+          "at": "2026-04-10T07:49:12Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13c68c81b3fdc9dce610008f2d401a08c893d808d8effbe2bd3926a53e25a605",
+          "at": "2026-04-10T09:59:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The migrated Sandbox/Hook warning is not lossless: rule 1 now says to prefer `read-only` only for `reviewer` / `researcher`, but the deleted source also covered `planner`. That omission matters because the shipped `agent-profiles.codex-heavy.json` still routes `planner` to Codex, so a planner launched with `workspace-write` would bypass `block-direct-git-ops` without this guardrail telling operators to keep it read-only.",
+              "severity": "P1",
+              "file": ".claude/rules/10-guardrails.md",
+              "line": 82,
+              "category": "safety"
+            }
+          ],
+          "hash": "rvw1:sha256:13c68c81b3fdc9dce610008f2d401a08c893d808d8effbe2bd3926a53e25a605",
+          "at": "2026-04-10T10:02:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The migrated sandbox warning drops `planner` from the read-only / no-`--full-auto` guidance. That is not lossless: planners in this repo still run through Codex and are expected to stay on `--sandbox read-only`, so the safety warning no longer covers a capability that can still spawn a write-capable subprocess.",
+              "severity": "P1",
+              "file": ".claude/rules/10-guardrails.md",
+              "line": 86,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:9a3517d59b83e031b005e34a75e47a537f948e90d067c4be2d6c6bd1ef804c46",
+          "at": "2026-04-10T10:12:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a3517d59b83e031b005e34a75e47a537f948e90d067c4be2d6c6bd1ef804c46",
+          "at": "2026-04-10T10:13:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The migrated Sandbox/Hook warning is not lossless: it drops `planner` from the capabilities that must stay read-only / must not use `--full-auto`. This weakens the only safety-critical content being preserved, because planner can still route to an external provider in non-default profiles, and a `workspace-write` planner run would bypass the same git/file-write hooks this section is warning about.",
+              "severity": "P1",
+              "file": ".claude/rules/10-guardrails.md",
+              "line": 76,
+              "category": "safety"
+            }
+          ],
+          "hash": "rvw1:sha256:9a3517d59b83e031b005e34a75e47a537f948e90d067c4be2d6c6bd1ef804c46",
+          "at": "2026-04-10T10:15:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2c0db60052369dd267c555f17e43f840997e38a672d19831cd8e59f68fbeef9",
+          "at": "2026-04-10T10:20:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2c0db60052369dd267c555f17e43f840997e38a672d19831cd8e59f68fbeef9",
+          "at": "2026-04-10T10:21:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7088f89b26321b4f6eaed335fbd9e696bbd30d712fce74b0cb61a1ac1ff3f92f",
+          "at": "2026-04-10T10:26:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7088f89b26321b4f6eaed335fbd9e696bbd30d712fce74b0cb61a1ac1ff3f92f",
+          "at": "2026-04-10T10:27:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3fd3627b4f12a0d96cde5fd5a3ff4b5a2abbc08ed0e684a2d8027bbac2bf8e5d",
+          "at": "2026-04-10T10:39:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3fd3627b4f12a0d96cde5fd5a3ff4b5a2abbc08ed0e684a2d8027bbac2bf8e5d",
+          "at": "2026-04-10T10:41:11Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f389101e4cc11afe655ce1c49f2ebeeb9a7e16cf00be223775aa469b85b3941e",
+          "at": "2026-04-10T06:38:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f389101e4cc11afe655ce1c49f2ebeeb9a7e16cf00be223775aa469b85b3941e",
+          "at": "2026-04-10T06:40:03Z"
         }
       ]
     },
@@ -1179,68 +1335,6 @@
           "findings": [],
           "hash": "rvw1:sha256:2dd614abe2aefa53fac766665509cf204373a8c0a9c73d8c8140afe951338680",
           "at": "2026-04-10T08:03:07Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8f725200361bc9cc85fc10489f68017b21eea4d34e9ca95a623467098251ce5c",
-          "at": "2026-04-10T06:38:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8f725200361bc9cc85fc10489f68017b21eea4d34e9ca95a623467098251ce5c",
-          "at": "2026-04-10T06:41:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_reviewer_provider` now parses raw JSON and never checks `schema_version`, so any unsupported/future agent-profiles shape that still contains `capabilities.reviewer.provider = \"codex\"` will pass this guard and let `@codex review` proceed. This loses the fail-closed validation that the canonical loader enforces.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/pr_review.rs",
-              "line": 359,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:b495a0d4c52bf67cf918cebb63330cd6b65936acceb781f5bd77e0e1b5fe9b9d",
-          "at": "2026-04-10T06:56:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_reviewer_provider` still hand-parses `serde_json::Value` instead of delegating to `AgentProfiles::load(...).resolve_execution(\"reviewer\", RoundType::Final)` as the redesign specifies. That keeps a second copy of the agent-profiles schema in `usecase`, so validation can drift from the canonical loader and the new `schema_version` gate here has no loader-backed regression coverage.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/pr_review.rs",
-              "line": 359,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:6f458b177ef714e55d43445b3d093016d31a830ae23d4c975f14fa7b84aa2c99",
-          "at": "2026-04-10T06:58:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:150826b14f06fe314221201bd0c457ad0dcd6e04697fa22d27a4da449a318fd5",
-          "at": "2026-04-10T07:04:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:150826b14f06fe314221201bd0c457ad0dcd6e04697fa22d27a4da449a318fd5",
-          "at": "2026-04-10T07:10:21Z"
         }
       ]
     }

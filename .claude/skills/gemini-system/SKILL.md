@@ -1,12 +1,12 @@
 ---
 name: gemini-system
 description: |
-  Use Gemini CLI when the active profile assigns researcher/multimodal_reader
-  capabilities to Gemini. Invoke this skill whenever the task involves crate research,
-  codebase-wide analysis, dependency auditing, Rust ecosystem surveys, or reading
-  multimodal files (PDF, image, video, audio) — even if the user doesn't explicitly
-  mention Gemini. Gemini's 1M context window and Google Search grounding make it
-  the right choice for tasks that require broad context or up-to-date external information.
+  Use Gemini CLI when the researcher capability is assigned to Gemini
+  in `.harness/config/agent-profiles.json`. Invoke this skill whenever the task involves
+  crate research, codebase-wide analysis, dependency auditing, Rust ecosystem surveys,
+  or reading multimodal files (PDF, image, video, audio) — even if the user doesn't
+  explicitly mention Gemini. Gemini's 1M context window and Google Search grounding make
+  it the right choice for tasks that require broad context or up-to-date external information.
 metadata:
   short-description: Use Gemini for Rust research & codebase analysis
 ---
@@ -15,7 +15,7 @@ metadata:
 
 Skill for using Gemini CLI as a specialist provider for research and multimodal tasks.
 
-Check `.claude/agent-profiles.json` first. Use this skill only when the target capability is assigned to Gemini.
+Check `.harness/config/agent-profiles.json` first. Use this skill only when the `researcher` capability is assigned to Gemini.
 
 ## When to Use
 
@@ -24,7 +24,7 @@ Check `.claude/agent-profiles.json` first. Use this skill only when the target c
 - Multimodal file reading (PDF, video, audio, image)
 - Large-scale dependency analysis
 - Rust ecosystem surveys
-- When `researcher` / `multimodal_reader` capability is assigned to Gemini
+- When `researcher` capability is assigned to Gemini in `.harness/config/agent-profiles.json`
 
 ## Usage Patterns
 

@@ -28,10 +28,10 @@ Arguments: none. The current branch (`track/<id>` or `plan/<id>`) determines the
 
 ## Step 1: Resolve reviewer model
 
-- Read `.claude/agent-profiles.json`.
-- Look up `profiles.<active_profile>.reviewer` → `{reviewer_provider}` (e.g., `codex`).
-- Look up `providers.<reviewer_provider>.default_model` → `{model}` (full model).
-- Look up `providers.<reviewer_provider>.fast_model` → `{fast_model}` (iterative rounds).
+- Read `.harness/config/agent-profiles.json`.
+- Look up `capabilities.reviewer.provider` → `{reviewer_provider}` (e.g., `codex`).
+- Look up `capabilities.reviewer.model` → `{model}` (full model).
+- Look up `capabilities.reviewer.fast_model` → `{fast_model}` (iterative rounds; falls back to `model` if absent).
 - Invoke via `cargo make track-local-review` with explicit `--model` flag.
 - **Note**: The `claude` provider path (`claude-heavy` profile) is not yet supported.
 
@@ -186,9 +186,9 @@ Step 3 begins when all scopes have achieved full model `zero_findings`.
 **CRITICAL: fast model の zero_findings はレビュー完了の根拠にならない。**
 レビュー完了は **full model の zero_findings** によってのみ確認される。
 
-Resolve models from `.claude/agent-profiles.json` using the `reviewer` capability:
-- `{fast_model}`: `providers.<reviewer_provider>.fast_model`, then `default_model`. If neither exists, skip `--model`.
-- `{model}`: `providers.<reviewer_provider>.default_model`. If not set, skip `--model`.
+Resolve models from `.harness/config/agent-profiles.json` using the `reviewer` capability:
+- `{fast_model}`: `capabilities.reviewer.fast_model`, then `capabilities.reviewer.model`. If neither exists, skip `--model`.
+- `{model}`: `capabilities.reviewer.model`. If not set, skip `--model`.
 
 ### Per-scope independence (throughput-first)
 

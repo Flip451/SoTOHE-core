@@ -148,12 +148,12 @@
     {
       "description": ".claude/commands/track/{review,design,pr-review}.md の更新。(a) capability 言及を新 6 個に整合 (review.md は reviewer を中心に、design.md は designer、pr-review.md は reviewer + PR flow)。(b) .claude/agent-profiles.json への参照を .harness/config/agent-profiles.json に更新。(c) model 解決ルールの記述を providers.<p>.{default,fast}_model から capabilities.<name>.{model,fast_model} に書き換え。(d) 削除対象 02/03 rules への参照を除去。",
       "id": "T12",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": ".claude/skills/{track-plan,codex-system,gemini-system,repomix-snapshot}/SKILL.md の更新。track-plan SKILL.md: (a) capability 一覧と provider resolution 記述を新スキーマに、(b) Phase 1.5 planner の briefing 例のパス参照を更新。codex-system SKILL.md: (a) providers.codex.default_model → capabilities.<cap>.model 系の model resolution 記述に書き換え、(b) debugger capability 言及削除、(c) .claude/agent-profiles.json パス更新。gemini-system SKILL.md: (a) researcher capability のみを対象とする記述に絞り込み multimodal_reader 削除、(b) パス更新。repomix-snapshot SKILL.md: .claude/agent-profiles.json パス参照を .harness/config/agent-profiles.json に更新。",
       "id": "T13",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "top-level docs の更新。対象: CLAUDE.md (削除ファイル 02/03 への参照除去 + .harness/config/agent-profiles.json を参照リストに追加), DEVELOPER_AI_WORKFLOW.md (capability 表を 6 個に、workflow_host/debugger/multimodal_reader 削除), knowledge/WORKFLOW.md (同), knowledge/DESIGN.md (.harness/config/ 新設について簡潔な説明を追加、agent-profiles の SSoT セクション更新), LOCAL_DEVELOPMENT.md (パス更新), START_HERE_HUMAN.md (編集対象パス更新), track/workflow.md (capability + パス), .codex/instructions.md (参照更新), .gemini/GEMINI.md (参照更新)。既存の knowledge/research/ 配下の legacy 文書は修正対象外 (ADR §5 末尾方針)。",
@@ -177,5 +177,5 @@
     }
   ],
   "title": "RV2-Phase2: agent-profiles redesign (.harness/config 移行 + capability 中心スキーマ)",
-  "updated_at": "2026-04-10T10:24:30Z"
+  "updated_at": "2026-04-10T10:36:49Z"
 }

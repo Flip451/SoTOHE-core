@@ -310,13 +310,11 @@ const ALLOWED_EXTRA_GIT_SUBCOMMANDS: &[&str] =
 const MODEL_RESOLUTION_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
     (
         ".claude/skills/codex-system/SKILL.md",
-        "codex-system override-first resolution",
+        "codex-system capability-centric model resolution",
+        &["capabilities.<capability>.model", ".harness/config/agent-profiles.json"],
         &[
-            "profiles.<active_profile>.provider_model_overrides.codex  \u{2192}  {model}",
-            "fallback: providers.codex.default_model  \u{2192}  {model}",
-        ],
-        &[
-            "read `providers.codex.default_model` from `.claude/agent-profiles.json` and pass as `--model {model}`",
+            "profiles.<active_profile>.provider_model_overrides.codex",
+            "providers.codex.default_model",
         ],
     ),
     (
@@ -328,14 +326,12 @@ const MODEL_RESOLUTION_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
     (
         ".claude/commands/track/review.md",
         "track review model resolution",
+        &["capabilities.reviewer.model", "capabilities.reviewer.fast_model"],
         &[
             "providers.<reviewer_provider>.fast_model",
             "providers.<reviewer_provider>.default_model",
         ],
-        &["Read the provider's `default_model` to get `{model}`."],
     ),
-    // Note: MODEL_RESOLUTION_TARGETS will be updated to capability-centric patterns
-    // when the target files are migrated in T12/T13.
 ];
 
 // ---------------------------------------------------------------------------

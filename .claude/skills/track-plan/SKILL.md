@@ -14,8 +14,8 @@ metadata:
 
 **specialist capability と Agent Teams を活用した Rust 機能計画スキル。**
 
-実際にどの provider を使うかは `.claude/agent-profiles.json` を正本とする。
-以下の CLI 例は既定 profile を前提にしており、`researcher` / `multimodal_reader` = Gemini、`planner` = Codex を想定している。
+実際にどの provider を使うかは `.harness/config/agent-profiles.json` を正本とする。
+以下の CLI 例は既定 profile を前提にしており、`researcher` = Gemini、`planner` = Claude を想定している。
 
 ## Overview
 
