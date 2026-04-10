@@ -272,6 +272,7 @@ class MakeWrappersTest(unittest.TestCase):
         for task_header, task_name in (
             ("[tasks.track-add-task]", "track-add-task"),
             ("[tasks.track-set-override]", "track-set-override"),
+            ("[tasks.spec-approve]", "spec-approve"),
         ):
             with self.subTest(task=task_header):
                 task_start = makefile.index(task_header)
@@ -281,6 +282,20 @@ class MakeWrappersTest(unittest.TestCase):
                 )
                 self.assertIn('script_runner = "@shell"', task_body, f"{task_header} missing script_runner")
                 self.assertIn(f'bin/sotp make {task_name}', task_body, f"{task_header} missing sotp make call")
+                self.assertIn('"$@"', task_body, f"{task_header} missing shell $@ forwarding")
+
+        # Direct bin/sotp subcommand wrappers (not via sotp make)
+        for task_header, expected_call in (
+            ("[tasks.track-signals]", "bin/sotp track signals"),
+        ):
+            with self.subTest(task=task_header):
+                task_start = makefile.index(task_header)
+                next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+                task_body = (
+                    makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
+                )
+                self.assertIn('script_runner = "@shell"', task_body, f"{task_header} missing script_runner")
+                self.assertIn(expected_call, task_body, f"{task_header} missing {expected_call}")
                 self.assertIn('"$@"', task_body, f"{task_header} missing shell $@ forwarding")
 
     def test_track_branch_ops_delegate_to_sotp_make(self) -> None:

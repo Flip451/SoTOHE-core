@@ -175,6 +175,7 @@
       "Bash(cargo make track-set-commit-hash:*)",
       "Bash(cargo make track-check-approved:*)",
       "Bash(cargo make spec-approve:*)",
+      "Bash(cargo make track-signals:*)",
       "Bash(cargo make track-switch-main)",
       "Bash(true)",
       "Bash(head :*)",
