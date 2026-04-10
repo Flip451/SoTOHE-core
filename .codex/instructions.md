@@ -6,12 +6,10 @@
 
 ```
 Claude Code (Orchestrator)
-    ↓ resolves capability via .claude/agent-profiles.json
+    ↓ resolves capability via .harness/config/agent-profiles.json
     └── calls you when Codex owns:
-        ├── planner
         ├── reviewer
-        ├── debugger
-        └── implementer
+        └── (planner/designer/implementer/researcher when overridden to Codex)
 ```
 
 ## Your Strengths (Use These)
@@ -28,8 +26,7 @@ Claude Code (Orchestrator)
 | Task | Who Does It |
 |------|-------------|
 | `researcher` | **Gemini CLI** (Google Search grounding / 1M context) |
-| `multimodal_reader` | **Gemini CLI** |
-| small workflow-preserving edits | **Claude Code** |
+| `orchestrator` / `planner` / `designer` / `implementer` | **Claude Code** |
 
 ## Shared Context Access
 

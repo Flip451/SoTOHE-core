@@ -158,7 +158,7 @@
     {
       "description": "top-level docs の更新。対象: CLAUDE.md (削除ファイル 02/03 への参照除去 + .harness/config/agent-profiles.json を参照リストに追加), DEVELOPER_AI_WORKFLOW.md (capability 表を 6 個に、workflow_host/debugger/multimodal_reader 削除), knowledge/WORKFLOW.md (同), knowledge/DESIGN.md (.harness/config/ 新設について簡潔な説明を追加、agent-profiles の SSoT セクション更新), LOCAL_DEVELOPMENT.md (パス更新), START_HERE_HUMAN.md (編集対象パス更新), track/workflow.md (capability + パス), .codex/instructions.md (参照更新), .gemini/GEMINI.md (参照更新)。既存の knowledge/research/ 配下の legacy 文書は修正対象外 (ADR §5 末尾方針)。",
       "id": "T14",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "旧 .claude/agent-profiles.json の削除。削除前に (a) rg で残存参照がないことを最終確認、(b) .gitignore は更新不要 (.harness/config/agent-profiles.json は git 管理方針で確定、ユーザー承認済み 2026-04-10)、(c) git rm で index から除去。.harness/config/agent-profiles.json が新 SSoT となる。",
@@ -177,5 +177,5 @@
     }
   ],
   "title": "RV2-Phase2: agent-profiles redesign (.harness/config 移行 + capability 中心スキーマ)",
-  "updated_at": "2026-04-10T10:36:49Z"
+  "updated_at": "2026-04-10T10:56:14Z"
 }

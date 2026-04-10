@@ -40,11 +40,12 @@ flowchart TD
 |-------|-------|------|
 | `orchestrator` | Claude Code | Overall orchestration, user interaction |
 | `planner` | Claude Code (Opus) | Architecture design, implementation planning |
+| `designer` | Claude Code | Domain type design (TDDD workflow) |
 | `implementer` | Claude Code | Rust implementation |
-| `reviewer` / `debugger` | Codex CLI | Code review, debugging |
-| `researcher` / `multimodal_reader` | Gemini CLI | Crate research, codebase analysis, external document reading |
+| `reviewer` | Codex CLI | Code review, correctness analysis |
+| `researcher` | Gemini CLI | Crate research, codebase analysis, external research |
 
-Note: See `.claude/agent-profiles.json` for which provider handles each capability.
+Note: See `.harness/config/agent-profiles.json` for which provider handles each capability.
 
 ## Key Design Decisions
 
