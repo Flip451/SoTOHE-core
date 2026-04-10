@@ -1,21 +1,148 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3a25cfc18ae6250c03ca391522c5a3219f4daf03c8c3b9b574fc4a4cde94537a",
-          "at": "2026-04-10T00:53:03Z"
+          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
+          "at": "2026-04-09T16:07:26Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3a25cfc18ae6250c03ca391522c5a3219f4daf03c8c3b9b574fc4a4cde94537a",
-          "at": "2026-04-10T00:54:35Z"
+          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
+          "at": "2026-04-09T16:10:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9da6ce7c5ea07616b59c7d8ccd0b5aa8dedb495ecd4aeba0b20bf54d31cd3acf",
+          "at": "2026-04-09T16:48:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9da6ce7c5ea07616b59c7d8ccd0b5aa8dedb495ecd4aeba0b20bf54d31cd3acf",
+          "at": "2026-04-09T16:49:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
+          "at": "2026-04-10T00:14:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new regression test does not assert the done marker that motivated this fix. `sync_rendered_views_single_track_renders_done_track` only checks that `plan.md` changed and still contains `Done task`, so a renderer that kept writing `- [~] Done task` would still pass while reintroducing the reported bug.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 1664,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
+          "at": "2026-04-10T00:19:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
+          "at": "2026-04-10T00:21:24Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`detect_track_id_from_branch` ignores the `project_root` passed from `execute_views` and always discovers the repo from the process CWD. That means `track views sync --project-root <repo>` can silently inspect the wrong git checkout or fall back to registry-only mode when invoked outside the repo root, so the new auto-detect is not reliable for non-default project roots.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/views.rs",
+              "line": 49,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d5cab3ead917cac89db6c44c1b44ff5b2768cfe1ce3a2b39625468d2cec38db8",
+          "at": "2026-04-10T00:53:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`detect_track_id_from_branch` ignores the `project_root` it is passed and always calls `SystemGitRepo::discover()` from the process CWD. That makes auto-detection fail or pick the wrong repository when `track views sync` is run with `--project-root` from outside the repo root, and the code silently falls back to registry-only mode instead of syncing the active track.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/views.rs",
+              "line": 49,
+              "category": "logic"
+            },
+            {
+              "message": "`current_branch_track_id_strict()` collapses every resolver error into `None` via `.ok()`, including malformed `track/<id>` branches. That means an invalid track branch bypasses both the review-approval guard and the post-commit hash persistence entirely, which is a fail-open regression for a path that is supposed to be strict.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 709,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:d5cab3ead917cac89db6c44c1b44ff5b2768cfe1ce3a2b39625468d2cec38db8",
+          "at": "2026-04-10T00:54:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df46b2c767619d188fad3835c02ae68635a4573317e8ddce5eb818aea1d819bd",
+          "at": "2026-04-10T01:00:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The restored auto-detect path in `track views sync` still has no regression coverage for the user-visible cases this patch is fixing: no-arg sync on `track/<id>` / `plan/<id>` branches, fallback on `main` / detached HEAD, and `--track-id` overriding branch inference. Because the previous bug was a silent no-op in this exact command path, leaving these branches untested means CI still will not catch a relapse of `cargo make track-sync-views` silently skipping per-track rendering.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/views.rs",
+              "line": 15,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:df46b2c767619d188fad3835c02ae68635a4573317e8ddce5eb818aea1d819bd",
+          "at": "2026-04-10T01:04:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df46b2c767619d188fad3835c02ae68635a4573317e8ddce5eb818aea1d819bd",
+          "at": "2026-04-10T01:07:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c047d6944a5f5da1541317a21fc818988aa8b053f3c21fcaa5e9172ccc44d6ce",
+          "at": "2026-04-10T01:59:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c047d6944a5f5da1541317a21fc818988aa8b053f3c21fcaa5e9172ccc44d6ce",
+          "at": "2026-04-10T02:01:01Z"
         }
       ]
     },
@@ -62,6 +189,24 @@
           "findings": [],
           "hash": "rvw1:sha256:969b4e061b12bde36b8f6d2a2e8cdbcf5e938af612ab1da0562b40f96480c9eb",
           "at": "2026-04-09T16:50:25Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a25cfc18ae6250c03ca391522c5a3219f4daf03c8c3b9b574fc4a4cde94537a",
+          "at": "2026-04-10T00:53:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a25cfc18ae6250c03ca391522c5a3219f4daf03c8c3b9b574fc4a4cde94537a",
+          "at": "2026-04-10T00:54:35Z"
         }
       ]
     },
@@ -647,137 +792,6 @@
           "findings": [],
           "hash": "rvw1:sha256:d25997a89baf084310891efd3fa3ba31de8d73ce56dbddc45316f1de7722a45d",
           "at": "2026-04-10T01:45:48Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`detect_track_id_from_branch` ignores the `project_root` passed from `execute_views` and always discovers the repo from the process CWD. That means `track views sync --project-root <repo>` can silently inspect the wrong git checkout or fall back to registry-only mode when invoked outside the repo root, so the new auto-detect is not reliable for non-default project roots.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/views.rs",
-              "line": 49,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d5cab3ead917cac89db6c44c1b44ff5b2768cfe1ce3a2b39625468d2cec38db8",
-          "at": "2026-04-10T00:53:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`detect_track_id_from_branch` ignores the `project_root` it is passed and always calls `SystemGitRepo::discover()` from the process CWD. That makes auto-detection fail or pick the wrong repository when `track views sync` is run with `--project-root` from outside the repo root, and the code silently falls back to registry-only mode instead of syncing the active track.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/views.rs",
-              "line": 49,
-              "category": "logic"
-            },
-            {
-              "message": "`current_branch_track_id_strict()` collapses every resolver error into `None` via `.ok()`, including malformed `track/<id>` branches. That means an invalid track branch bypasses both the review-approval guard and the post-commit hash persistence entirely, which is a fail-open regression for a path that is supposed to be strict.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/make.rs",
-              "line": 709,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:d5cab3ead917cac89db6c44c1b44ff5b2768cfe1ce3a2b39625468d2cec38db8",
-          "at": "2026-04-10T00:54:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:df46b2c767619d188fad3835c02ae68635a4573317e8ddce5eb818aea1d819bd",
-          "at": "2026-04-10T01:00:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The restored auto-detect path in `track views sync` still has no regression coverage for the user-visible cases this patch is fixing: no-arg sync on `track/<id>` / `plan/<id>` branches, fallback on `main` / detached HEAD, and `--track-id` overriding branch inference. Because the previous bug was a silent no-op in this exact command path, leaving these branches untested means CI still will not catch a relapse of `cargo make track-sync-views` silently skipping per-track rendering.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/views.rs",
-              "line": 15,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:df46b2c767619d188fad3835c02ae68635a4573317e8ddce5eb818aea1d819bd",
-          "at": "2026-04-10T01:04:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:df46b2c767619d188fad3835c02ae68635a4573317e8ddce5eb818aea1d819bd",
-          "at": "2026-04-10T01:07:16Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
-          "at": "2026-04-09T16:07:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
-          "at": "2026-04-09T16:10:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9da6ce7c5ea07616b59c7d8ccd0b5aa8dedb495ecd4aeba0b20bf54d31cd3acf",
-          "at": "2026-04-09T16:48:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9da6ce7c5ea07616b59c7d8ccd0b5aa8dedb495ecd4aeba0b20bf54d31cd3acf",
-          "at": "2026-04-09T16:49:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
-          "at": "2026-04-10T00:14:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new regression test does not assert the done marker that motivated this fix. `sync_rendered_views_single_track_renders_done_track` only checks that `plan.md` changed and still contains `Done task`, so a renderer that kept writing `- [~] Done task` would still pass while reintroducing the reported bug.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/render.rs",
-              "line": 1664,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
-          "at": "2026-04-10T00:19:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
-          "at": "2026-04-10T00:21:24Z"
         }
       ]
     }
