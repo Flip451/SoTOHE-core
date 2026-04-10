@@ -9,7 +9,7 @@ If on any other branch, stop and suggest switching to the track branch.
 
 ## Execution
 
-For each task in `metadata.json` `tasks` array (in order) where `status` is `todo`, `in_progress`, or `done` with `commit_hash` null (implemented but not yet committed):
+For each task in `metadata.json` `tasks` array (in order) where `status` is `todo` or `in_progress`:
 
 1. **Implement**: execute `/track:implement` scoped to this single task.
    `/track:implement` handles implementation, CI, and verification update.
@@ -20,14 +20,12 @@ For each task in `metadata.json` `tasks` array (in order) where `status` is `tod
 3. **Commit**: execute `/track:commit` with a commit message generated from the task description.
 
 If any step fails, stop the loop and report the failure.
-Rerun `/track:full-cycle` resumes from the first eligible task (the loop condition above catches done tasks with null commit_hash).
+Rerun `/track:full-cycle` resumes from the first `todo` or `in_progress` task.
 
 ## Post-loop
 
-After all tasks complete:
-1. Update `verification.md` with overall results and `verified_at`.
-2. Run `cargo make track-sync-views`.
-3. Commit post-loop changes via `/track:commit "chore: update verification and sync views"`.
+After all tasks complete, update `verification.md` with overall results and `verified_at`.
+Post-loop changes are included in the next `/track:commit` or `/track:pr` — no separate commit is needed here.
 
 ## Behavior
 
