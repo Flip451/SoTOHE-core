@@ -4,11 +4,11 @@ Claude Code is the orchestrator.
 
 - User-facing interface: `/track:*`
 - Context management: `track/`
-- Capability routing: `.claude/agent-profiles.json`
-- Default specialist profile:
-  - `planner` / `implementer`: Claude Code
-  - `reviewer` / `debugger`: Codex CLI
-  - `researcher` / `multimodal_reader`: Gemini CLI
+- Capability routing: `.harness/config/agent-profiles.json`
+- Default capability assignment:
+  - `orchestrator` / `planner` / `designer` / `implementer`: Claude Code
+  - `reviewer`: Codex CLI
+  - `researcher`: Gemini CLI
 - Parallel execution: Agent Teams
 
 Host orchestration stays in Claude Code.
@@ -47,7 +47,7 @@ Operational split:
 - `knowledge/external/guides.json`: registry for long-form external guides cached outside git
 - `knowledge/external/POLICY.md`: operating policy for external long-form guides
 - `architecture-rules.json`: machine-readable layer dependency source of truth for `deny.toml` and `scripts/check_layers.py`
-- `.claude/agent-profiles.json`: capability-to-provider mapping source of truth
+- `.harness/config/agent-profiles.json`: capability-to-provider mapping source of truth
 
 ## Planner Gate (Mandatory)
 
@@ -64,24 +64,24 @@ The enum-first / typestate / hybrid decision table in that file is the source of
 
 ## Delegation Rules
 
-Use the minimum capable capability first, then resolve it via `.claude/agent-profiles.json`.
+Use the minimum capable capability first, then resolve it via `.harness/config/agent-profiles.json`.
 
 - Claude Code (`orchestrator` host):
   - normal edits
   - workflow control
   - file synchronization
   - user interaction
-- specialist capabilities:
+- specialist capabilities (6):
+  - `orchestrator`: overall coordination (always Claude Code)
   - `planner`: architecture design, trait/module planning, trade-off evaluation
-  - `researcher`: crate research, codebase-wide analysis, external research
+  - `designer`: domain type design (TDDD workflow)
   - `implementer`: difficult Rust implementation, refactoring, performance-oriented edits
   - `reviewer`: code review, correctness analysis, idiomatic Rust checks
-  - `debugger`: compile-error diagnosis, failing test analysis
-  - `multimodal_reader`: PDF / image / audio / video understanding
-- provider resolution:
-  - default profile maps `planner` / `implementer` to Claude Code
-  - default profile maps `reviewer` / `debugger` to Codex CLI
-  - default profile maps `researcher` / `multimodal_reader` to Gemini CLI
+  - `researcher`: crate research, codebase-wide analysis, external research
+- provider resolution (from `.harness/config/agent-profiles.json`):
+  - `orchestrator` / `planner` / `designer` / `implementer` → Claude Code
+  - `reviewer` → Codex CLI
+  - `researcher` → Gemini CLI
 - Agent Teams:
   - `/track:implement`
   - `/track:review`
@@ -89,6 +89,6 @@ Use the minimum capable capability first, then resolve it via `.claude/agent-pro
 If unsure:
 
 1. Workflow control or user interaction -> Claude Code
-2. Research or multimodal need -> `researcher` / `multimodal_reader`
-3. Design, review, or debugging need -> `planner` / `reviewer` / `debugger`
+2. Research need -> `researcher`
+3. Design, review need -> `planner` / `designer` / `reviewer`
 4. Implementation work -> `implementer`

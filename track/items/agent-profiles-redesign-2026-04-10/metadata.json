@@ -138,12 +138,12 @@
     {
       "description": ".claude/rules/08-orchestration.md の更新。(a) capability 一覧を新 6 個 (orchestrator/planner/designer/implementer/reviewer/researcher) に変更し workflow_host/debugger/multimodal_reader 言及を削除。(b) Default specialist profile 表を新スキーマの単一 profile に合わせる (planner/designer/implementer=Claude, reviewer/researcher=Codex or Gemini — default に準拠)。(c) .claude/agent-profiles.json への参照を .harness/config/agent-profiles.json に更新。(d) Delegation Rules 表を単一 SoT に集約し、削除された 02/03 ルールファイルへの参照を除去。(e) Planner Briefing Requirements 節は維持。",
       "id": "T10",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": ".claude/rules/10-guardrails.md と 11-subagent-model.md の更新。10-guardrails.md: (a) T08 で移設する Sandbox/Hook Coverage Warning を追記、(b) 削除ファイル 02/03 への参照を除去、(c) .claude/agent-profiles.json パス参照を .harness/config/agent-profiles.json に更新、(d) Review Escalation Threshold 節の「providers.codex.escalation_threshold は将来の configurability のため registered」という記述を削除または更新する — 新スキーマでは providers は label のみのため providers.codex.escalation_threshold フィールドが存在しない。代替: escalation_threshold は将来 review 機能側に再配置する旨に書き換える。11-subagent-model.md: (a) provider 名のみ言及するよう更新し、新スキーマの capability 中心構造に合わせる、(b) .claude/agent-profiles.json パス参照を更新、(c) Codex Model Tiers 表は情報として維持するが providers.codex.{default,fast,nano}_model 言及を capabilities.reviewer.{model,fast_model} に修正。",
       "id": "T11",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": ".claude/commands/track/{review,design,pr-review}.md の更新。(a) capability 言及を新 6 個に整合 (review.md は reviewer を中心に、design.md は designer、pr-review.md は reviewer + PR flow)。(b) .claude/agent-profiles.json への参照を .harness/config/agent-profiles.json に更新。(c) model 解決ルールの記述を providers.<p>.{default,fast}_model から capabilities.<name>.{model,fast_model} に書き換え。(d) 削除対象 02/03 rules への参照を除去。",
@@ -177,5 +177,5 @@
     }
   ],
   "title": "RV2-Phase2: agent-profiles redesign (.harness/config 移行 + capability 中心スキーマ)",
-  "updated_at": "2026-04-10T09:12:28Z"
+  "updated_at": "2026-04-10T10:24:30Z"
 }

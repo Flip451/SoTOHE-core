@@ -931,3 +931,6 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
   - **確認**: `knowledge/conventions/filesystem-persistence-guard.md` に convention 追加済み
 - [x] ~~**RV2-15** (LOW): track/workflow.md — v2 運用手順更新 + v1 残存監査~~ ✅ done (`rv2-docs-skill-update-2026-04-06` T004)
   - **確認**: track/workflow.md に v1 `record-round` 参照なし (grep 0 件)
+
+- [ ] **RV2-18** (MEDIUM): `sotp review codex-local` の verdict/findings stdout 出力改善 — 現在は Codex CLI の stdout 末尾に verdict JSON が埋もれており、review-fix-lead agent が `tail` で抽出している。`sotp review codex-local` が auto-record 完了後に findings のサマリーを整形して stdout に出力すれば、agent も orchestrator も exit code + stdout だけで判断完結する。review.json の Read が不要になり、レビューループの手間が減る
+  - **追加日**: 2026-04-10
