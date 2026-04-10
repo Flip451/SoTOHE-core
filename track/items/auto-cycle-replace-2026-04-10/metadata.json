@@ -55,29 +55,33 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
+      "commit_hash": "00f7207",
       "description": "full-cycle.md の内容をタスクループ方式に書き換え（transitional compatibility 表記を削除し正式コマンド化）",
       "id": "T001",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "00f7207",
       "description": "SKILL.md の full-cycle 説明を更新",
       "id": "T002",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "00f7207",
       "description": "cargo make track-signals ラッパー追加 + track:plan コマンドに track-signals → spec-approve の手順を明記",
       "id": "T003",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "00f7207",
       "description": "CI 通過確認",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "full-cycle をタスクごとの implement → review → commit ループに書き換え",
-  "updated_at": "2026-04-10T13:05:20Z"
+  "updated_at": "2026-04-10T23:05:42Z"
 }
