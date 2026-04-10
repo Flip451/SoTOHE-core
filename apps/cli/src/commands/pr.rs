@@ -8,6 +8,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use clap::{Args, Subcommand};
+use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
 use infrastructure::gh_cli::{GhClient, PrCheckRecord, SystemGhClient};
 use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 use usecase::pr_review::{self, PrReviewFinding, PrReviewResult, sanitize_text};
@@ -472,11 +473,13 @@ fn is_codex_bot(login: &str) -> bool {
 fn trigger_review<C: GhClient>(pr: &str, client: &C) -> Result<ExitCode, CliError> {
     // Fail-closed: validate reviewer provider (resolve from repo root)
     let git_repo = SystemGitRepo::discover()?;
-    let profiles_path = git_repo.root().join(".claude/agent-profiles.json");
-    let profiles_content = std::fs::read_to_string(&profiles_path).map_err(|e| {
-        CliError::Message(format!("failed to read {}: {e}", profiles_path.display()))
+    let profiles_path = git_repo.root().join(AGENT_PROFILES_PATH);
+    let profiles =
+        AgentProfiles::load(&profiles_path).map_err(|e| CliError::Message(format!("{e}")))?;
+    let resolved = profiles.resolve_execution("reviewer", RoundType::Final).ok_or_else(|| {
+        CliError::Message("reviewer capability not defined in agent-profiles.json".to_owned())
     })?;
-    pr_review::resolve_reviewer_provider(&profiles_content)?;
+    pr_review::validate_reviewer_provider(&resolved.provider)?;
 
     let repo = client.repo_nwo()?;
     let response = client.post_issue_comment(&repo, pr, "@codex review")?;
@@ -760,11 +763,13 @@ fn trigger_new_review(
 fn review_cycle(explicit_track_id: Option<&str>, resume: bool) -> Result<ExitCode, CliError> {
     let repo = SystemGitRepo::discover()?;
 
-    let profiles_path = repo.root().join(".claude/agent-profiles.json");
-    let profiles_content = std::fs::read_to_string(&profiles_path).map_err(|e| {
-        CliError::Message(format!("failed to read {}: {e}", profiles_path.display()))
+    let profiles_path = repo.root().join(AGENT_PROFILES_PATH);
+    let profiles =
+        AgentProfiles::load(&profiles_path).map_err(|e| CliError::Message(format!("{e}")))?;
+    let resolved = profiles.resolve_execution("reviewer", RoundType::Final).ok_or_else(|| {
+        CliError::Message("reviewer capability not defined in agent-profiles.json".to_owned())
     })?;
-    pr_review::resolve_reviewer_provider(&profiles_content)?;
+    pr_review::validate_reviewer_provider(&resolved.provider)?;
     let branch = repo
         .current_branch()?
         .ok_or_else(|| CliError::Message("could not determine current branch".to_owned()))?;

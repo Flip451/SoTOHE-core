@@ -1,6 +1,42 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f389101e4cc11afe655ce1c49f2ebeeb9a7e16cf00be223775aa469b85b3941e",
+          "at": "2026-04-10T06:38:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f389101e4cc11afe655ce1c49f2ebeeb9a7e16cf00be223775aa469b85b3941e",
+          "at": "2026-04-10T06:40:03Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:325a2ea354496de3c74ef00c810132b269969fc818d5ed77b7e059691cac66aa",
+          "at": "2026-04-10T07:03:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:325a2ea354496de3c74ef00c810132b269969fc818d5ed77b7e059691cac66aa",
+          "at": "2026-04-10T07:06:56Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -164,6 +200,68 @@
           "findings": [],
           "hash": "rvw1:sha256:41b789421ea694cb4de3560617c77bce89c7efe76032ffce2c1da84c0e296436",
           "at": "2026-04-10T06:33:52Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f725200361bc9cc85fc10489f68017b21eea4d34e9ca95a623467098251ce5c",
+          "at": "2026-04-10T06:38:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f725200361bc9cc85fc10489f68017b21eea4d34e9ca95a623467098251ce5c",
+          "at": "2026-04-10T06:41:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_reviewer_provider` now parses raw JSON and never checks `schema_version`, so any unsupported/future agent-profiles shape that still contains `capabilities.reviewer.provider = \"codex\"` will pass this guard and let `@codex review` proceed. This loses the fail-closed validation that the canonical loader enforces.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/pr_review.rs",
+              "line": 359,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:b495a0d4c52bf67cf918cebb63330cd6b65936acceb781f5bd77e0e1b5fe9b9d",
+          "at": "2026-04-10T06:56:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_reviewer_provider` still hand-parses `serde_json::Value` instead of delegating to `AgentProfiles::load(...).resolve_execution(\"reviewer\", RoundType::Final)` as the redesign specifies. That keeps a second copy of the agent-profiles schema in `usecase`, so validation can drift from the canonical loader and the new `schema_version` gate here has no loader-backed regression coverage.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/pr_review.rs",
+              "line": 359,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:6f458b177ef714e55d43445b3d093016d31a830ae23d4c975f14fa7b84aa2c99",
+          "at": "2026-04-10T06:58:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:150826b14f06fe314221201bd0c457ad0dcd6e04697fa22d27a4da449a318fd5",
+          "at": "2026-04-10T07:04:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:150826b14f06fe314221201bd0c457ad0dcd6e04697fa22d27a4da449a318fd5",
+          "at": "2026-04-10T07:10:21Z"
         }
       ]
     },
@@ -626,6 +724,34 @@
           "findings": [],
           "hash": "rvw1:sha256:c0234ac513ac40629e79e9d3fdabcd2a251440bf732b0bd75ab9924c27e5b2e1",
           "at": "2026-04-10T06:27:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1935db36ec688e3df2decf4ad2966420d1e8547e193f3f75e5f909abef762db6",
+          "at": "2026-04-10T06:39:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1935db36ec688e3df2decf4ad2966420d1e8547e193f3f75e5f909abef762db6",
+          "at": "2026-04-10T06:41:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6f38a182da910e757976311be0a909f35e7ebfe70a0bc76f15a05f72ba5d239",
+          "at": "2026-04-10T07:04:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6f38a182da910e757976311be0a909f35e7ebfe70a0bc76f15a05f72ba5d239",
+          "at": "2026-04-10T07:08:01Z"
         }
       ]
     }
