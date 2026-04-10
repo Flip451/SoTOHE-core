@@ -79,7 +79,6 @@ Specialist capability の実体は `.claude/agent-profiles.json` で決まる。
 - [ ] `cargo make deny` passes
 - [ ] `cargo make python-lint` passes
 - [ ] `cargo make scripts-selftest` passes
-- [ ] `cargo make hooks-selftest` passes
 - [ ] `cargo make check-layers` passes
 - [ ] `cargo make verify-arch-docs` passes
 - [ ] `cargo make verify-plan-progress` passes

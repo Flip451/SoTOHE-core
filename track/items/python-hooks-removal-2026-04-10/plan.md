@@ -1,0 +1,63 @@
+<!-- Generated from metadata.json — DO NOT EDIT DIRECTLY -->
+# RV2-17: Python hooks 全廃止 (Phase 1)
+
+.claude/hooks/ 配下の Python hook (advisory 9 + library 2 + tests 5 = 16 ファイル) を全削除し、.claude/hooks/ ディレクトリ自体を削除する。
+.claude/settings.json の Python hook entry (PreToolUse 2 + PostToolUse 7 = 9 entries) と permissions.allow の Bash(cargo make hooks-selftest) を削除する。Rust hook (skill-compliance / block-direct-git-ops / block-test-file-deletion) は維持。
+libs/infrastructure/src/verify/orchestra.rs の EXPECTED_HOOK_PATHS 9 entries を除去し、Makefile.toml から hooks-selftest task を削除、python-lint task は scripts/ のみ対象に絞り込む (本トラックでは scripts/ Python 削除は scope 外)。
+ドキュメント (CLAUDE.md, .claude/rules/09-maintainer-checklist.md, DEVELOPER_AI_WORKFLOW.md, knowledge/WORKFLOW.md, LOCAL_DEVELOPMENT.md, START_HERE_HUMAN.md, knowledge/DESIGN.md, track/workflow.md) から Python hook 言及を削除/更新する。debugger capability 関連は Phase 2 トラックの責務。
+Phase 1-3 設計 ADR 3 本と TODO.md 変更を本トラックの計画 commit に取り込む。Phase 2 (agent-profiles redesign) と Phase 3 (planning review separation) は別トラックで段階的に実装する。
+Dockerfile からの python3 削除と requirements-python.txt 削除は scripts/ Python 残存により本トラックでは不可 — ADR §5 末尾の段階的除去方針を採用し、別トラックで対応。
+
+## Rust 側参照の更新 (verify/orchestra)
+
+libs/infrastructure/src/verify/orchestra.rs の EXPECTED_HOOK_PATHS から削除対象 9 hook を除去する。
+permission allowlist 検証から Bash(cargo make hooks-selftest) を除外する。
+影響を受ける unit test を TDD (Red → Green) で更新する。
+
+- [x] libs/infrastructure/src/verify/orchestra.rs の EXPECTED_HOOK_PATHS から削除対象 9 hook entries (check-codex-before-write, suggest-gemini-research, error-to-codex, post-test-analysis, check-codex-after-plan, log-cli-tools, lint-on-save, python-lint-on-save, post-implementation-review) を除去し、Bash(cargo make hooks-selftest) permission entry の expected list からも除外する。影響を受ける unit test を Red → Green で更新する。Rust hook (skill-compliance / block-direct-git-ops / block-test-file-deletion) は維持。 baac3b4e9858e42e249cd791249b5b8f92b58dbf
+
+## Python hook ファイル削除
+
+.claude/hooks/*.py 全 16 ファイルを削除する (advisory 9 + library 2 + tests 5)。
+__pycache__ / .pytest_cache をクリーンアップした上で .claude/hooks/ ディレクトリ自体を削除する。
+Rust hook が依存している bin/sotp は本ステップで影響を受けない。
+
+- [x] .claude/hooks/*.py 全 16 ファイル (advisory 9 + library 2 + tests 5) を削除し、__pycache__ / .pytest_cache を含めて .claude/hooks/ ディレクトリ自体を削除する。Rust hook の参照先である bin/sotp は影響を受けない。 d0a1abe28abf6ceaefe58241b1cb1e73597db39d
+
+## settings.json の hook entry 整理
+
+.claude/settings.json の PreToolUse / PostToolUse から Python hook 起動エントリを全 9 個削除する (PreToolUse 2 + PostToolUse 7)。
+permissions.allow から Bash(cargo make hooks-selftest) を削除する。
+既存の Rust hook (sotp hook dispatch ...) エントリは維持する。
+
+- [x] .claude/settings.json から Python hook entry を全削除する。PreToolUse: check-codex-before-write (Edit|Write), suggest-gemini-research (WebSearch|WebFetch); PostToolUse: check-codex-after-plan (Task), error-to-codex (Bash), post-test-analysis (Bash), log-cli-tools (Bash), lint-on-save (Edit|Write), python-lint-on-save (Edit|Write), post-implementation-review (Edit|Write) の計 9 entries。さらに permissions.allow から Bash(cargo make hooks-selftest) を削除する。Rust hook (skill-compliance / block-direct-git-ops / block-test-file-deletion) のエントリは維持する。 c927ea73e3400c97212b6d41f2061cd9a84fe6ad
+
+## Makefile.toml task の整理
+
+[tasks.hooks-selftest] と [tasks.hooks-selftest-local] を削除する。
+python-lint-local / python-lint の ruff 対象から .claude/hooks/ を除外し、scripts/ のみに絞り込む。
+python-lint task 自体は scripts/ Python のために維持する。
+
+- [x] Makefile.toml から [tasks.hooks-selftest] と [tasks.hooks-selftest-local] を削除する。compose ラッパーと local task の両方を同時に削除し、ci task からの参照があれば併せて除去する。 fd06b109bc457f6f6daaffbd2b9fe7b36f0cacf3
+- [x] Makefile.toml の python-lint-local (現状 'ruff check scripts/ .claude/hooks/') と python-lint ホストタスクの ruff 対象から .claude/hooks/ を削除し、scripts/ のみに変更する。task 自体は scripts/ Python のために維持する (本トラックでは scripts/ 削除は scope 外)。 7eed41d653abb57221172593dff64179504a2bd2
+
+## ドキュメント更新
+
+CLAUDE.md / .claude/rules/09-maintainer-checklist.md / DEVELOPER_AI_WORKFLOW.md / knowledge/WORKFLOW.md / LOCAL_DEVELOPMENT.md / START_HERE_HUMAN.md / knowledge/DESIGN.md / track/workflow.md から Python hook (check-codex-*, error-to-codex, post-implementation-review 等) の言及を整理する。
+.claude/rules/02-codex-delegation.md の debugger capability 言及は Phase 2 トラックで扱うため本トラックでは触らない。
+
+- [x] ドキュメントから Python hook 言及を削除/更新する。対象: CLAUDE.md (python3 optional 記述), .claude/rules/09-maintainer-checklist.md (python3 advisory 言及), DEVELOPER_AI_WORKFLOW.md, knowledge/WORKFLOW.md, LOCAL_DEVELOPMENT.md, START_HERE_HUMAN.md, knowledge/DESIGN.md (Python advisory hooks 表), track/workflow.md, TRACK_TRACEABILITY.md (hooks-selftest-local 除去), libs/infrastructure/src/verify/doc_patterns.rs (hooks-selftest RequireLine 3 件削除)。.claude/rules/02-codex-delegation.md の debugger capability 言及は Phase 2 (agent-profiles redesign) のスコープのため本トラックでは触らない。 287666d4bd027eca05bd71f24f696a60a8300d3a
+
+## ADR と TODO.md の取り込み
+
+Phase 1-3 の設計 ADR 3 本と knowledge/strategy/TODO.md (RV2-16/RV2-17 エントリ) を本トラックの計画 commit に含める。
+ADR 2026-04-09-2235 (Phase 2) と 2026-04-09-2047 (Phase 3) は本トラックの後続トラックの prerequisite 設計としてここで導入する。
+
+- [x] Phase 1-3 の設計 ADR 3 本 (knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md, knowledge/adr/2026-04-09-2235-agent-profiles-redesign.md, knowledge/adr/2026-04-09-2323-python-hooks-removal.md) と knowledge/strategy/TODO.md (RV2-16/RV2-17 エントリ) を本トラックの計画 commit に取り込む。spec.md には ADR 2 本 (Phase 2/3) は本トラックの prerequisite 設計として同時導入されることを明記する。 e2854af1239a92a173a36220061ec5f99201c054
+
+## CI 全チェック通過確認
+
+cargo make ci で fmt-check / clippy / test / deny / check-layers / verify-arch-docs / verify-orchestra 等の全ゲートを通過させる。
+verify-orchestra は hook path 整合性の最終チェックポイントとして機能する。
+
+- [x] cargo make ci 全チェック通過確認 (fmt-check + clippy + test + deny + check-layers + verify-arch-docs + verify-orchestra 等)。verify-orchestra で hook path 整合性が確認されることが本トラックの最終ゲート。 6d6ac2a9f11e680d3e7b925299b7cf3f7bdf5406

@@ -429,17 +429,25 @@ flowchart TD
 
 ## Security Hardening: Rust Migration
 
-### Strategy: Rust for Critical Paths, Python for Advisory
+### Strategy: Rust for Security and Advisory Hooks (Python hook files fully removed by RV2-17)
 
-Security-critical hooks (`block-direct-git-ops`, `block-test-file-deletion`) are now dispatched
-directly via `sotp hook dispatch` shell commands in `.claude/settings.json`. The deprecated Python
-launcher files have been removed (STRAT-03 Phase 1).
+Security hooks (`block-direct-git-ops`, `block-test-file-deletion`) and the advisory hook
+(`skill-compliance`) are dispatched directly via `sotp hook dispatch` shell commands in
+`.claude/settings.json`. Security hooks are fail-closed (exit 2 on error); the advisory hook
+is fail-open (exit 0 on error, so a missing sotp binary never blocks the user). The deprecated
+Python launcher files were removed in two phases: STRAT-03 Phase 1 (security launchers) and
+RV2-17 (all remaining advisory hooks). There are no Python hook files under `.claude/hooks/`
+anymore — the directory itself is gone. Other hooks (`TeammateIdle`, `PreCompact`,
+`PermissionRequest`) use inline shell commands or prompt strings defined directly in
+`.claude/settings.json` and are not Rust-dispatched.
 
-| Layer | Rust (fail-closed by design) | Python (advisory, keep as-is) |
-|-------|------------------------------|-------------------------------|
-| Security hooks | `sotp hook dispatch` (direct shell invocation) | `suggest-*`, `lint-on-save`, etc. |
-| Track state I/O | `metadata.json` read-modify-write | `plan.md` / `registry.md` rendering |
-| File writes | Atomic write for critical data | Log append (JSONL) |
+| Layer | Implementation |
+|-------|----------------|
+| Security hooks (`block-direct-git-ops`, `block-test-file-deletion`) | `sotp hook dispatch` (Rust, fail-closed: exit 2 on error) |
+| Advisory hook (`skill-compliance`) | `sotp hook dispatch` (Rust, fail-open: exit 0 on error) |
+| Orchestration hooks (`TeammateIdle`, `PreCompact`, `PermissionRequest`) | Inline shell/prompt in `.claude/settings.json` |
+| Track state I/O | `metadata.json` read-modify-write |
+| File writes | Atomic write for critical data |
 
 ### SOLID Design Principles Applied
 

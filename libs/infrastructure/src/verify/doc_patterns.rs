@@ -129,11 +129,6 @@ static REQUIRED_LINES: &[RequireLine] = &[
     },
     RequireLine {
         rel_path: "track/workflow.md",
-        pattern: "`cargo make hooks-selftest` passes",
-        label: "workflow hooks selftest gate",
-    },
-    RequireLine {
-        rel_path: "track/workflow.md",
         pattern: "`cargo make verify-orchestra` passes",
         label: "workflow orchestra gate",
     },
@@ -162,11 +157,6 @@ static REQUIRED_LINES: &[RequireLine] = &[
         rel_path: "TRACK_TRACEABILITY.md",
         pattern: "scripts-selftest-local",
         label: "traceability scripts selftest gate",
-    },
-    RequireLine {
-        rel_path: "TRACK_TRACEABILITY.md",
-        pattern: "hooks-selftest-local",
-        label: "traceability hooks selftest gate",
     },
     RequireLine {
         rel_path: "TRACK_TRACEABILITY.md",
@@ -208,11 +198,6 @@ static REQUIRED_LINES: &[RequireLine] = &[
         rel_path: "DEVELOPER_AI_WORKFLOW.md",
         pattern: "cargo make scripts-selftest",
         label: "developer workflow scripts selftest gate",
-    },
-    RequireLine {
-        rel_path: "DEVELOPER_AI_WORKFLOW.md",
-        pattern: "cargo make hooks-selftest",
-        label: "developer workflow hooks selftest gate",
     },
 ];
 

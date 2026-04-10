@@ -31,7 +31,12 @@ pub enum TrackResolutionError {
     ReadError(#[from] TrackReadError),
 }
 
-/// Resolves a track ID from the current git branch name.
+/// Resolves a track ID from the current git branch name (strict mode).
+///
+/// Accepts only `track/<id>` branches. `plan/<id>` branches return
+/// [`TrackResolutionError::NotTrackBranch`]. Use this for callers that must
+/// fail closed on non-implementation branches (e.g., commit-time review
+/// guard, post-commit hash persistence).
 ///
 /// # Errors
 /// Returns an error if the branch is not a `track/` branch,
@@ -47,6 +52,39 @@ pub fn resolve_track_id_from_branch(branch: Option<&str>) -> Result<String, Trac
             None if b == "HEAD" => Err(TrackResolutionError::DetachedHead),
             None => Err(TrackResolutionError::NotTrackBranch(b.to_owned())),
         },
+        None => Err(TrackResolutionError::NoBranch),
+    }
+}
+
+/// Resolves a track ID from the current git branch name (lenient mode).
+///
+/// Accepts both `track/<id>` and `plan/<id>` branches and returns the bare
+/// track id in either case. Use this for callers where plan-phase branches
+/// should also be auto-detected (e.g., view sync, where rendering plan.md
+/// from a `plan/<id>` checkout is meaningful even before activation).
+///
+/// The id segment is validated through [`TrackId::try_new`] so an invalid
+/// slug returns [`TrackResolutionError::InvalidTrackId`] for both prefixes.
+///
+/// # Errors
+/// Returns an error if the branch is neither a `track/` nor a `plan/`
+/// branch, is detached HEAD, or is `None`.
+pub fn resolve_track_or_plan_id_from_branch(
+    branch: Option<&str>,
+) -> Result<String, TrackResolutionError> {
+    match branch {
+        Some(b) => {
+            let stripped = b.strip_prefix("track/").or_else(|| b.strip_prefix("plan/"));
+            match stripped {
+                Some(slug) => {
+                    TrackId::try_new(slug)
+                        .map_err(|e| TrackResolutionError::InvalidTrackId(slug.to_owned(), e))?;
+                    Ok(slug.to_owned())
+                }
+                None if b == "HEAD" => Err(TrackResolutionError::DetachedHead),
+                None => Err(TrackResolutionError::NotTrackBranch(b.to_owned())),
+            }
+        }
         None => Err(TrackResolutionError::NoBranch),
     }
 }
@@ -163,6 +201,53 @@ mod tests {
     fn test_resolve_track_id_from_branch_with_none_returns_error() {
         let result = resolve_track_id_from_branch(None);
         assert!(matches!(result.unwrap_err(), TrackResolutionError::NoBranch));
+    }
+
+    // --- resolve_track_or_plan_id_from_branch (lenient) ---
+
+    #[test]
+    fn test_resolve_track_or_plan_id_accepts_track_branch() {
+        let result = resolve_track_or_plan_id_from_branch(Some("track/my-feature"));
+        assert_eq!(result.unwrap(), "my-feature");
+    }
+
+    #[test]
+    fn test_resolve_track_or_plan_id_accepts_plan_branch() {
+        // Lenient mode: plan/<id> resolves to the same bare id as track/<id>.
+        let result = resolve_track_or_plan_id_from_branch(Some("plan/my-feature"));
+        assert_eq!(result.unwrap(), "my-feature");
+    }
+
+    #[test]
+    fn test_resolve_track_or_plan_id_rejects_main_branch() {
+        let result = resolve_track_or_plan_id_from_branch(Some("main"));
+        assert!(matches!(result.unwrap_err(), TrackResolutionError::NotTrackBranch(_)));
+    }
+
+    #[test]
+    fn test_resolve_track_or_plan_id_rejects_detached_head() {
+        let result = resolve_track_or_plan_id_from_branch(Some("HEAD"));
+        assert!(matches!(result.unwrap_err(), TrackResolutionError::DetachedHead));
+    }
+
+    #[test]
+    fn test_resolve_track_or_plan_id_rejects_none() {
+        let result = resolve_track_or_plan_id_from_branch(None);
+        assert!(matches!(result.unwrap_err(), TrackResolutionError::NoBranch));
+    }
+
+    #[test]
+    fn test_resolve_track_or_plan_id_validates_slug_for_plan_branch() {
+        // The id segment after `plan/` must still pass TrackId validation —
+        // the lenient mode only relaxes the prefix, not the slug rules.
+        let result = resolve_track_or_plan_id_from_branch(Some("plan/Not Valid"));
+        assert!(matches!(result.unwrap_err(), TrackResolutionError::InvalidTrackId(_, _)));
+    }
+
+    #[test]
+    fn test_resolve_track_or_plan_id_rejects_empty_plan_suffix() {
+        let result = resolve_track_or_plan_id_from_branch(Some("plan/"));
+        assert!(matches!(result.unwrap_err(), TrackResolutionError::InvalidTrackId(_, _)));
     }
 
     // --- resolve_transition ---

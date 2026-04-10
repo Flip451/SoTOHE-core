@@ -1,0 +1,835 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`detect_track_id_from_branch` ignores the `project_root` passed from `execute_views` and always discovers the repo from the process CWD. That means `track views sync --project-root <repo>` can silently inspect the wrong git checkout or fall back to registry-only mode when invoked outside the repo root, so the new auto-detect is not reliable for non-default project roots.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/views.rs",
+              "line": 49,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d5cab3ead917cac89db6c44c1b44ff5b2768cfe1ce3a2b39625468d2cec38db8",
+          "at": "2026-04-10T00:53:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`detect_track_id_from_branch` ignores the `project_root` it is passed and always calls `SystemGitRepo::discover()` from the process CWD. That makes auto-detection fail or pick the wrong repository when `track views sync` is run with `--project-root` from outside the repo root, and the code silently falls back to registry-only mode instead of syncing the active track.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/views.rs",
+              "line": 49,
+              "category": "logic"
+            },
+            {
+              "message": "`current_branch_track_id_strict()` collapses every resolver error into `None` via `.ok()`, including malformed `track/<id>` branches. That means an invalid track branch bypasses both the review-approval guard and the post-commit hash persistence entirely, which is a fail-open regression for a path that is supposed to be strict.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 709,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:d5cab3ead917cac89db6c44c1b44ff5b2768cfe1ce3a2b39625468d2cec38db8",
+          "at": "2026-04-10T00:54:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df46b2c767619d188fad3835c02ae68635a4573317e8ddce5eb818aea1d819bd",
+          "at": "2026-04-10T01:00:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The restored auto-detect path in `track views sync` still has no regression coverage for the user-visible cases this patch is fixing: no-arg sync on `track/<id>` / `plan/<id>` branches, fallback on `main` / detached HEAD, and `--track-id` overriding branch inference. Because the previous bug was a silent no-op in this exact command path, leaving these branches untested means CI still will not catch a relapse of `cargo make track-sync-views` silently skipping per-track rendering.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/views.rs",
+              "line": 15,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:df46b2c767619d188fad3835c02ae68635a4573317e8ddce5eb818aea1d819bd",
+          "at": "2026-04-10T01:04:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df46b2c767619d188fad3835c02ae68635a4573317e8ddce5eb818aea1d819bd",
+          "at": "2026-04-10T01:07:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c047d6944a5f5da1541317a21fc818988aa8b053f3c21fcaa5e9172ccc44d6ce",
+          "at": "2026-04-10T01:59:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c047d6944a5f5da1541317a21fc818988aa8b053f3c21fcaa5e9172ccc44d6ce",
+          "at": "2026-04-10T02:01:01Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
+          "at": "2026-04-09T16:07:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
+          "at": "2026-04-09T16:10:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9da6ce7c5ea07616b59c7d8ccd0b5aa8dedb495ecd4aeba0b20bf54d31cd3acf",
+          "at": "2026-04-09T16:48:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9da6ce7c5ea07616b59c7d8ccd0b5aa8dedb495ecd4aeba0b20bf54d31cd3acf",
+          "at": "2026-04-09T16:49:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
+          "at": "2026-04-10T00:14:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new regression test does not assert the done marker that motivated this fix. `sync_rendered_views_single_track_renders_done_track` only checks that `plan.md` changed and still contains `Done task`, so a renderer that kept writing `- [~] Done task` would still pass while reintroducing the reported bug.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 1664,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
+          "at": "2026-04-10T00:19:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
+          "at": "2026-04-10T00:21:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:09ef3983d0ef68db3801fd80cc6029a06e7d27508897761a4cedad9f243b669c",
+          "at": "2026-04-10T02:13:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sync_rendered_views(Some(id))` now skips `spec.json` entirely once a track is `done`/`archived`, which means malformed or unsupported spec documents no longer trigger the existing warning/error paths during the final transition. That silently weakens corruption detection for the source-of-truth JSON; the markdown rewrite should be skipped, but the decode/validation step should still run.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 525,
+              "category": "error_handling"
+            },
+            {
+              "message": "The same short-circuit was added for `domain-types.json`: done/archived tracks now bypass decoding altogether, so invalid domain-types documents are no longer surfaced when rendering a specific completed track. This hides source corruption instead of merely preserving the legacy `domain-types.md` output.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 569,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:09ef3983d0ef68db3801fd80cc6029a06e7d27508897761a4cedad9f243b669c",
+          "at": "2026-04-10T02:16:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:09ef3983d0ef68db3801fd80cc6029a06e7d27508897761a4cedad9f243b669c",
+          "at": "2026-04-10T02:17:12Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a25cfc18ae6250c03ca391522c5a3219f4daf03c8c3b9b574fc4a4cde94537a",
+          "at": "2026-04-10T00:53:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a25cfc18ae6250c03ca391522c5a3219f4daf03c8c3b9b574fc4a4cde94537a",
+          "at": "2026-04-10T00:54:35Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56d9f816340b69eccdcf9c870594cfb2a75161a72f8546411a11537ebe62f183",
+          "at": "2026-04-09T16:06:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56d9f816340b69eccdcf9c870594cfb2a75161a72f8546411a11537ebe62f183",
+          "at": "2026-04-09T16:08:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c866cf8421cc5d3df1788bd0888a20ba5b169494f83a59e1a12616daa6d8b6a",
+          "at": "2026-04-09T16:21:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c866cf8421cc5d3df1788bd0888a20ba5b169494f83a59e1a12616daa6d8b6a",
+          "at": "2026-04-09T16:21:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:969b4e061b12bde36b8f6d2a2e8cdbcf5e938af612ab1da0562b40f96480c9eb",
+          "at": "2026-04-09T16:48:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:969b4e061b12bde36b8f6d2a2e8cdbcf5e938af612ab1da0562b40f96480c9eb",
+          "at": "2026-04-09T16:50:25Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The track consistently states that `.claude/settings.json` contains `PreToolUse 2 + PostToolUse 6 = 8` Python hook entries, but the current file actually has 2 Python `PreToolUse` hooks and 7 Python `PostToolUse` hooks, for 9 total. As written, the spec/plan/verification artifacts would under-scope the removal and leave `post-implementation-review.py` behind.",
+              "severity": "P0",
+              "file": "track/items/python-hooks-removal-2026-04-10/spec.json",
+              "line": 23,
+              "category": "factual contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f9438cca390b645b9dde753b56178ab5990f0d17094d96ebd5c0537efe722cfe",
+          "at": "2026-04-09T15:10:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR §5 still calls for `docker compose` cleanup, but the track spec never assigns that work to a task or explicitly marks it out of scope, so part of the decision is unowned.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/spec.json",
+              "line": 87,
+              "category": "scope"
+            }
+          ],
+          "hash": "rvw1:sha256:f9438cca390b645b9dde753b56178ab5990f0d17094d96ebd5c0537efe722cfe",
+          "at": "2026-04-09T15:13:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5f34beaf1ea2015cbfa50fc01d6e34d2389a0b3d51feb240674935476e2202c",
+          "at": "2026-04-09T15:19:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan-review.json` is defined earlier in this ADR as `review.json` v2 plus a required `necessity` field, but the 5-gate section now requires `view_files_hash` and `must_count` fields. Those fields are not defined anywhere else in the design, so the gate contract is internally inconsistent and an implementer cannot tell whether they should be stored fields or derived from the latest round.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md",
+              "line": 195,
+              "category": "consistency"
+            },
+            {
+              "message": "This ADR introduces `planning-artifacts.json` under `track/`, but the prerequisite Phase 2 ADR says files such as `planning-artifacts.json` will be migrated under `.harness/config/`. Because Phase 3 depends on Phase 2, the current ADR chain no longer defines a single canonical location for this config.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md",
+              "line": 88,
+              "category": "consistency"
+            },
+            {
+              "message": "The consequence here claims Phase 1 removes the project's Python runtime dependency entirely, but §Decision/5 and the track spec explicitly leave `scripts/` Python, `requirements-python.txt`, and Dockerfile Python packages in place. That false premise also leaks into the Phase 2 ADR's prerequisite section, so the phase boundary is not factually sound.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2323-python-hooks-removal.md",
+              "line": 208,
+              "category": "factual_accuracy"
+            },
+            {
+              "message": "Section S3 still says the plan removes '全 8 個' Python hook entries, even though the same task text and `.claude/settings.json` enumerate 9 commands (2 PreToolUse + 7 PostToolUse). Because `plan.md` is rendered from this metadata, the current planning artifacts already disagree on the required deletion count.",
+              "severity": "P0",
+              "file": "track/items/python-hooks-removal-2026-04-10/metadata.json",
+              "line": 93,
+              "category": "factual_accuracy"
+            },
+            {
+              "message": "The out-of-scope rationale still says `scripts/` contains 26 Python files, but the repository currently has 25 (`rg --files scripts -g '*.py'`). `spec.md` and `verification.md` repeat the same number, so the planning artifacts are carrying a stale factual count.",
+              "severity": "P0",
+              "file": "track/items/python-hooks-removal-2026-04-10/spec.json",
+              "line": 109,
+              "category": "factual_accuracy"
+            }
+          ],
+          "hash": "rvw1:sha256:1ac8a1c28874b2437de61a1f02e4093397d46f2f8abf681fccc102b0a8ee0b82",
+          "at": "2026-04-09T15:23:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 2's prerequisite state is overstated here: after RV2-17 completes, Python hooks are gone, but project-level Python dependencies are not. `scripts/*.py`, `requirements-python.txt`, and `cargo make python-lint` remain explicitly in scope/out-of-scope elsewhere, so saying \"Python 依存そのものがプロジェクトから消滅している\" makes the ADR chain internally inconsistent.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2235-agent-profiles-redesign.md",
+              "line": 18,
+              "category": "correctness"
+            },
+            {
+              "message": "This consequence claims RV2-17 alone eliminates the project's Python runtime dependency, but the same planning set keeps `scripts/` Python, `requirements-python.txt`, and Docker Python packages out of scope for a later track. That leaves the ADR contradicting the track spec about what Phase 1 actually achieves.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2323-python-hooks-removal.md",
+              "line": 208,
+              "category": "correctness"
+            },
+            {
+              "message": "The plan is still internally inconsistent about how many `.claude/settings.json` Python hook entries must be removed: T03 and the summary were corrected to 9, but section S3 still says \"全8個\". Because `plan.md` is rendered from this file, reviewers and implementers will get conflicting instructions from the same source of truth.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/metadata.json",
+              "line": 93,
+              "category": "correctness"
+            },
+            {
+              "message": "The acceptance criteria do not cover two in-scope deliverables from T03/T06: removing `permissions.allow` for `Bash(cargo make hooks-selftest)` and updating the listed documentation files. As written, the track can satisfy every AC while still leaving Decision §2/§6 partially undone.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/spec.json",
+              "line": 190,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:1ac8a1c28874b2437de61a1f02e4093397d46f2f8abf681fccc102b0a8ee0b82",
+          "at": "2026-04-09T15:26:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`planning-artifacts.json` has two conflicting homes in the prerequisite ADR chain. Phase 2 says this harness config should move under `.harness/config/` (`knowledge/adr/2026-04-09-2235-agent-profiles-redesign.md:92`), but this ADR still defines and loads it as `track/planning-artifacts.json`. That leaves Phase 3's source of truth ambiguous and will force either a follow-up rename or duplicate path handling.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md",
+              "line": 88,
+              "category": "correctness"
+            },
+            {
+              "message": "The planning artifacts under-specify the documentation cleanup for Phase 1. T06/its derived acceptance criteria only cover eight docs here, but the current repo still has hook/Python-runtime references in files like `.claude/commands/track/setup.md:8` and `.claude/rules/10-guardrails.md:148`. With the current task list, the track can satisfy its own spec while still shipping docs that point to deleted `.claude/hooks/` behavior.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/spec.json",
+              "line": 60,
+              "category": "correctness"
+            },
+            {
+              "message": "Section 5 says `plan-review.json` keeps the existing review round shape and stores the review hash in each round's `hash` field, but the commit gate later checks nonexistent top-level fields `view_files_hash` and `must_count`. That contradiction leaves the Phase 3 gate impossible to implement exactly as written.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2047-planning-review-phase-separation.md",
+              "line": 195,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:72c9055ab659e30e3128306aae066aadc5205f135be600824c7c2cb87203850a",
+          "at": "2026-04-09T15:32:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 2323 now contradicts the track plan on `python-lint`: this consequence says Phase 1 deletes both `hooks-selftest` and `python-lint`, but T05 in the track artifacts explicitly keeps `python-lint` and only narrows it to `scripts/`. That leaves the ADR mis-stating what this track is supposed to deliver.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-04-09-2323-python-hooks-removal.md",
+              "line": 211,
+              "category": "correctness"
+            },
+            {
+              "message": "The out-of-scope inventory says `scripts/` still has 26 Python files, but the repository currently tracks 25 (`git ls-files 'scripts/*.py'`). Because this count is used as the concrete rationale for leaving the `scripts/` cleanup out of scope, the planning artifacts are carrying a factual error.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/spec.json",
+              "line": 109,
+              "category": "correctness"
+            },
+            {
+              "message": "The rationale for keeping `requirements-python.txt` is factually wrong: it says the file is the SSoT for `scripts/ pytest と ruff`, but `requirements-python.txt` currently pins `PyYAML` and `ruff` only, while `pytest` is provided separately by the environment/Docker layer. The out-of-scope decision may still be correct, but the stated basis is not.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/spec.json",
+              "line": 105,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b214fab146bdc2af7cc0ad828744ba36d35254f5a9269b4cd64a2ddd74567a7c",
+          "at": "2026-04-09T15:39:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:619181e694232bf90e2c9be26ad8698d447d9fd3faa3f0311dec22d0bd74461a",
+          "at": "2026-04-09T15:48:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4e1613c47018347a8a6d7c8d04b9a9379254cae7d8299d9d46ac46628969c40",
+          "at": "2026-04-09T16:06:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4e1613c47018347a8a6d7c8d04b9a9379254cae7d8299d9d46ac46628969c40",
+          "at": "2026-04-09T16:09:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` records T01 as already completed (`[x]` entries and a `T01` result block claiming CI/verify success), but `metadata.json` still leaves task `T01` in `in_progress`. That makes the track state internally inconsistent and the verification record premature for a status-flip commit.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-hooks-removal-2026-04-10/verification.md",
+              "line": 27,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4aa38d3b0b662011630fa19ace2a35358213aef5cde374af7851efef8f00148f",
+          "at": "2026-04-09T16:12:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4aa38d3b0b662011630fa19ace2a35358213aef5cde374af7851efef8f00148f",
+          "at": "2026-04-09T16:12:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` records T01 as already completed (`[x]` checklist items plus a `T01` result block claiming CI/review success), but the same change set leaves `metadata.json`/`plan.md` with T01 only `in_progress`. That makes the track artifacts internally inconsistent and turns the verification record into a premature source of truth for this status-flip commit.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/verification.md",
+              "line": 27,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4aa38d3b0b662011630fa19ace2a35358213aef5cde374af7851efef8f00148f",
+          "at": "2026-04-09T16:14:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f94c18c6d204d8728069759d275c6af1642697624f5d072f94b7164e07abeb3",
+          "at": "2026-04-09T16:16:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00e013159a1b12703216844699578a9812f6aee7143228ae1118d7f9c6909e6",
+          "at": "2026-04-09T16:21:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00e013159a1b12703216844699578a9812f6aee7143228ae1118d7f9c6909e6",
+          "at": "2026-04-09T16:23:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70832c78fc6c9ba218494313258b470d868a01e4e1df500b6733ca0518ec43bc",
+          "at": "2026-04-09T16:30:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70832c78fc6c9ba218494313258b470d868a01e4e1df500b6733ca0518ec43bc",
+          "at": "2026-04-09T16:32:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9f68bbf637c0e6e99338a441585c1baf19761132833d09cc6f1780306490900",
+          "at": "2026-04-09T16:35:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9f68bbf637c0e6e99338a441585c1baf19761132833d09cc6f1780306490900",
+          "at": "2026-04-09T16:36:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe1f54a8149b58ce19e182abd77bee3d61daaf40d16a0bd678aace9170075e1d",
+          "at": "2026-04-09T16:39:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/items/python-hooks-removal-2026-04-10/metadata.json` still leaves T02 as `in_progress`, even though `verification.md` now records T02 as completed and verified. Because `metadata.json` is the SSoT for task state, downstream track tooling will continue to treat this deletion task as unresolved and the rendered `plan.md` remains `[~]` instead of `[x]`.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/metadata.json",
+              "line": 111,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fe1f54a8149b58ce19e182abd77bee3d61daaf40d16a0bd678aace9170075e1d",
+          "at": "2026-04-09T16:41:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe1f54a8149b58ce19e182abd77bee3d61daaf40d16a0bd678aace9170075e1d",
+          "at": "2026-04-09T16:42:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LOCAL_DEVELOPMENT.md:9` still claims that advisory hooks gracefully skip when `python3` is absent. That behavior no longer exists after the Python hook removal, so this is a stale reference to the deleted hook layer and conflicts with the new Rust-only hook description later in the file.",
+              "severity": "P1",
+              "file": "LOCAL_DEVELOPMENT.md",
+              "line": 9,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:499b653327bf575ba385a04a6700f45882ca59e9d974f08aaced6e6d71dfa5be",
+          "at": "2026-04-09T16:49:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`python3` is still described as being needed for advisory hooks to \"gracefully skip\" when absent, but this cleanup removes the advisory hook layer entirely. That leaves a stale and conflicting prerequisite claim in the host requirements section, since the new Rust-only hook description below is now the source of truth.",
+              "severity": "P1",
+              "file": "LOCAL_DEVELOPMENT.md",
+              "line": 9,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:499b653327bf575ba385a04a6700f45882ca59e9d974f08aaced6e6d71dfa5be",
+          "at": "2026-04-09T16:51:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c98d7ede3c75e1974c977a6a5f88f4c5c5310dad0e36980fee0db487c8325558",
+          "at": "2026-04-09T16:52:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/DESIGN.md` now documents `skill-compliance` as a security-critical hook in the same fail-closed bucket as `block-direct-git-ops` and `block-test-file-deletion`, but `.claude/settings.json` still wires `skill-compliance` as a `UserPromptSubmit` hook with `|| exit 0` fail-open behavior. That makes the new architecture section inaccurate about the current hook contract and could mislead later maintenance around which hooks are actually blocking guards.",
+              "severity": "P1",
+              "file": "knowledge/DESIGN.md",
+              "line": 434,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c98d7ede3c75e1974c977a6a5f88f4c5c5310dad0e36980fee0db487c8325558",
+          "at": "2026-04-09T16:55:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LOCAL_DEVELOPMENT.md` now says \"Claude Code hooks are dispatched via `bin/sotp hook dispatch ...`\" and lists only three active hooks, but `.claude/settings.json` still contains active `TeammateIdle`, `PreCompact`, and `PermissionRequest` hooks that are not Rust-dispatched. This makes the local workflow documentation inaccurate and can mislead future maintenance of the remaining hook surface.",
+              "severity": "P1",
+              "file": "LOCAL_DEVELOPMENT.md",
+              "line": 17,
+              "category": "correctness"
+            },
+            {
+              "message": "The new \"Rust for All Hooks\" section is overstated: `.claude/settings.json` still defines non-Rust hooks (`TeammateIdle`, `PreCompact`, `PermissionRequest`), so claiming that all Claude Code hooks are now dispatched via `sotp hook dispatch` is false. The design doc should narrow this to the former Python tool-hook layer, otherwise it documents the architecture incorrectly.",
+              "severity": "P1",
+              "file": "knowledge/DESIGN.md",
+              "line": 432,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c98d7ede3c75e1974c977a6a5f88f4c5c5310dad0e36980fee0db487c8325558",
+          "at": "2026-04-09T16:56:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rewritten hook table now claims the combined \"Security & advisory hooks\" layer is \"fail-closed by design\", but the advisory `skill-compliance` hook is still configured with `|| exit 0` in `.claude/settings.json`, so it is explicitly fail-open. This overstates the enforcement guarantee of the remaining advisory hook and makes the architecture doc inaccurate; split security vs advisory behavior or remove the fail-closed claim from this row.",
+              "severity": "P1",
+              "file": "knowledge/DESIGN.md",
+              "line": 444,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:764e23352dec1ba8e9060b41ea4c1ca90bc285968249827cb5eed3cecf766cec",
+          "at": "2026-04-09T16:58:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T06's scope description still enumerates only the original doc set and omits both `TRACK_TRACEABILITY.md` and the paired `libs/infrastructure/src/verify/doc_patterns.rs` cleanup that this change set performs. Because `metadata.json` is the SSoT for track scope, marking T06 complete from this state would leave the plan/verification trail understating what the task actually covered, which weakens the repo's traceability guarantees.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/metadata.json",
+              "line": 133,
+              "category": "traceability"
+            }
+          ],
+          "hash": "rvw1:sha256:f4b1c3a6bf739be4ca4ff6e7eec18cab4091362e0f01755d5422e5b0cd9ae578",
+          "at": "2026-04-09T17:02:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T06 is still recorded as `in_progress` here (and `[~]` in `plan.md`) even though the diff already contains the full T06 doc cleanup and `verification.md` marks T06 complete. Leaving the task open will keep track tooling treating T06 as the active task instead of advancing to T07, so the track artifacts are now internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/metadata.json",
+              "line": 135,
+              "category": "tracking correctness"
+            },
+            {
+              "message": "The top `Scope Verified` checklist was not expanded when T06 scope grew to include `TRACK_TRACEABILITY.md` and `libs/infrastructure/src/verify/doc_patterns.rs`. As written, the main verification checklist can be checked off without verifying those two new T06 deliverables, which leaves a real coverage gap in the track’s verification artifact.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/verification.md",
+              "line": 12,
+              "category": "verification coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:cad93e1aad09f980d6fbf631b7cc8d6edeade9bb6c0ba0d682968691c2ce1989",
+          "at": "2026-04-09T17:05:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b047e4e231f3572941f2e2f8dab97ac199354cc13d1e1f1c21488a49910e13f5",
+          "at": "2026-04-09T17:08:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` still has a second `## Verified At` section at the end with the template placeholder left in place, so the final verification timestamp is duplicated and ambiguous instead of being a single completed record.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/verification.md",
+              "line": 122,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:93b48d3ff01b2b71c2f06bddbf2a14f48acccefbfe988a7e8f0a7a2454d971a7",
+          "at": "2026-04-09T17:11:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The verification record is still not fully closed out: `Scope Verified` leaves the ADR/TODO inclusion item unchecked at line 15, and the file still retains the template's empty `## Verified At` block at the end. If T08 is meant to finish the track, this needs to be marked verified or removed so the completion state is unambiguous.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/verification.md",
+              "line": 15,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:93b48d3ff01b2b71c2f06bddbf2a14f48acccefbfe988a7e8f0a7a2454d971a7",
+          "at": "2026-04-09T17:13:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a35d1455776b2e406b20fc3e8dc38443958a2c62875b096b40fab9f8842ba286",
+          "at": "2026-04-09T17:13:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a35d1455776b2e406b20fc3e8dc38443958a2c62875b096b40fab9f8842ba286",
+          "at": "2026-04-09T17:15:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d3ae8017a85303f78afb4efa7554e7fd1f27fbf0cc593d4426c3d62f2f71f5f",
+          "at": "2026-04-09T23:15:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:125a5768f341fed54509992bcfa39e6f70c3d903a7d4670efea0624df787b534",
+          "at": "2026-04-10T00:14:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Verified At` still says T07's admin transition will happen \"right after this commit,\" but this change already flips T07/T08 and the track itself to `done` in `metadata.json`/`plan.md`. That leaves the final verification artifact with a stale status narrative, which undermines the audit trail for the finalized track.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/verification.md",
+              "line": 132,
+              "category": "accuracy"
+            }
+          ],
+          "hash": "rvw1:sha256:125a5768f341fed54509992bcfa39e6f70c3d903a7d4670efea0624df787b534",
+          "at": "2026-04-10T00:17:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` still describes the pre-transition state: it says T07 was only 'effectively complete' and that the admin transition would happen 'right after this commit', but this same change already marks both T07 and T08 as `done` in `metadata.json`/`plan.md`. That leaves the verification artifact factually out of sync with the finalized track state.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/verification.md",
+              "line": 132,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:125a5768f341fed54509992bcfa39e6f70c3d903a7d4670efea0624df787b534",
+          "at": "2026-04-10T00:20:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` misstates the origin of the render bug. The new narrative says commit `795b45f` was only supposed to protect bulk sync (`track_id = None`) and accidentally applied the skip to single-track sync, but the 2026-04-08 track artifacts for that change explicitly required both bulk and single-track paths to skip done/archived views. Recording this as a bulk-only intent/implementation gap makes the finalized verification history factually inaccurate.",
+              "severity": "P1",
+              "file": "track/items/python-hooks-removal-2026-04-10/verification.md",
+              "line": 101,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2bc848718923b49ab9948f22f32fb8345c2e64bbc377df34077eef3019f175ad",
+          "at": "2026-04-10T00:21:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dfd330f5180a2877750185dc5c652ab91bd69831cc98ebdef75f0b7c5b54404c",
+          "at": "2026-04-10T00:24:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e829f8dad2a342b9ff952f8212146712a45701b1e46802ce6057358d0f768ff2",
+          "at": "2026-04-10T00:53:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e829f8dad2a342b9ff952f8212146712a45701b1e46802ce6057358d0f768ff2",
+          "at": "2026-04-10T00:54:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d25997a89baf084310891efd3fa3ba31de8d73ce56dbddc45316f1de7722a45d",
+          "at": "2026-04-10T01:44:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d25997a89baf084310891efd3fa3ba31de8d73ce56dbddc45316f1de7722a45d",
+          "at": "2026-04-10T01:45:48Z"
+        }
+      ]
+    }
+  }
+}

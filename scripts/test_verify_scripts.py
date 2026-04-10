@@ -494,19 +494,11 @@ class VerifyScriptsTest(unittest.TestCase):
         self.assertIn("File-Based Briefing Pattern", content)
         self.assertIn("tmp/gemini-briefing.md", content)
 
-    def test_lint_on_save_delegates_edition_to_rustfmt_toml(self) -> None:
-        """lint-on-save.py should not hardcode --edition; rustfmt.toml is the source of truth."""
-        content = (PROJECT_ROOT / ".claude" / "hooks" / "lint-on-save.py").read_text(
-            encoding="utf-8"
-        )
-        self.assertNotIn("--edition", content)
-
-    def test_lint_on_save_clippy_uses_all_targets(self) -> None:
-        """lint-on-save.py clippy should use --all-targets to match CI scope."""
-        content = (PROJECT_ROOT / ".claude" / "hooks" / "lint-on-save.py").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn("--all-targets", content)
+    # Tests for the old `.claude/hooks/lint-on-save.py` Python hook have been
+    # deleted along with the hook itself in track python-hooks-removal-2026-04-10.
+    # There is no replacement target to assert against — the lint-on-save
+    # watcher is no longer part of the workflow. If a new lint-on-save-style
+    # hook is reintroduced in the future, add fresh tests for that hook here.
 
 
 if __name__ == "__main__":

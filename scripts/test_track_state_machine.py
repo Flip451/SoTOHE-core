@@ -1066,7 +1066,7 @@ class TestCLI(unittest.TestCase):
             original = os.getcwd()
             try:
                 os.chdir(root)
-                rc = main(["sync-views"])
+                rc = main(["sync-views", "--track-id", "demo"])
             finally:
                 os.chdir(original)
 

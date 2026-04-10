@@ -135,20 +135,9 @@ args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "
 
 [tasks.python-lint-local]
 private = true
-description = "[internal] Run ruff lint on Python scripts and hooks"
+description = "[internal] Run ruff lint on Python helper scripts under scripts/"
 script_runner = "@shell"
-script = ['ruff check scripts/ .claude/hooks/']
-
-[tasks.hooks-selftest-local]
-private = true
-description = "[internal] Run Claude hook Python self-tests"
-command = "pytest"
-args = [
-  "-q",
-  "-o",
-  "cache_dir=.cache/pytest",
-  ".claude/hooks",
-]
+script = ['ruff check scripts/']
 
 [tasks.bootstrap]
 description = "[gate] Set up host Python venv, build Docker images, and run CI"
@@ -570,12 +559,6 @@ case "$BRANCH" in
 esac
 ''']
 
-[tasks.hooks-selftest]
-description = "[wrapper] Run Claude hook Python self-tests (docker compose)"
-dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "hooks-selftest-local"]
-
 [tasks.ci-rust-local]
 private = true
 description = "[internal] Run Rust-only CI checks (fmt + clippy + test + deny + check-layers + canonical-modules)"
@@ -584,7 +567,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local CI checks"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-spec-coverage-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-spec-coverage-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
@@ -592,7 +575,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "hooks-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-spec-coverage-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-spec-coverage-local"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -757,7 +740,7 @@ args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "
 [tasks.python-lint]
 description = "[optional] Run ruff lint on Python scripts and hooks (host, no docker)"
 script_runner = "@shell"
-script = ['RUFF="${RUFF_BIN:-.venv/bin/ruff}"; if [ -x "$RUFF" ] || command -v ruff >/dev/null 2>&1; then RUFF="${RUFF_BIN:-$(command -v ruff 2>/dev/null || echo .venv/bin/ruff)}"; "$RUFF" check scripts/ .claude/hooks/; else echo "[python-lint] ruff not found, skipping (install: uv tool install ruff)"; fi']
+script = ['RUFF="${RUFF_BIN:-.venv/bin/ruff}"; if [ -x "$RUFF" ] || command -v ruff >/dev/null 2>&1; then RUFF="${RUFF_BIN:-$(command -v ruff 2>/dev/null || echo .venv/bin/ruff)}"; "$RUFF" check scripts/; else echo "[python-lint] ruff not found, skipping (install: uv tool install ruff)"; fi']
 
 [tasks.ci]
 description = "[gate] Run CI checks (docker compose + host python-lint)"

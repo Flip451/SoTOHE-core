@@ -6,15 +6,15 @@ Read `START_HERE_HUMAN.md` first if you are new to this repository.
 
 ## Host Requirements
 
-- Python 3.11+ is optional on the host machine. Advisory hooks gracefully skip when `python3` is absent.
+- Python 3.11+ is optional on the host machine (required only for `scripts/` Python helpers; not needed for hooks).
 - host-side Python package management should use `uv` (when Python is installed).
 - `.tool-versions` は `python 3.12.8` を pin しており、asdf 利用時は `python3` 解決に使われる。
 - Docker compose 実行は `HOST_UID` / `HOST_GID` を使ってホスト user に寄せる。Linux で uid/gid が `1000:1000` 以外なら `export HOST_UID=$(id -u) HOST_GID=$(id -g)` を shell profile に入れる。
 - `guides-*` / `conventions-*` / `architecture-rules-*` などの Python helper はホスト上で `python3` を直接実行する。これらのタスクは `python3` がインストールされている環境でのみ動作する。
 - ホスト側の検証は `cargo make verify-*` タスク（`sotp verify` サブコマンド、Rust CLI）で実行される。Python 検証スクリプトは Phase 5/6 で Rust へ移行済み。
-- Python test は Docker 経由で実行する（`cargo make guides-selftest`, `cargo make scripts-selftest`, `cargo make hooks-selftest`）。
+- Python test は Docker 経由で実行する（`cargo make guides-selftest`, `cargo make scripts-selftest`）。
 - `*-local` タスクは内部専用（private）で、直接実行しない。
-- Claude hooks in `.claude/hooks/` run via `python3` (skipped gracefully when `python3` is unavailable).
+- Security and advisory Claude Code hooks (`skill-compliance`, `block-direct-git-ops`, `block-test-file-deletion`) are dispatched via `bin/sotp hook dispatch ...` (Rust). Other hooks (`TeammateIdle`, `PreCompact`, `PermissionRequest`) use inline shell commands or prompts defined directly in `.claude/settings.json`.
 
 1. Build tool image:
 
@@ -53,10 +53,11 @@ not a long-running HTTP server.
 The runtime image built from `Dockerfile` starts the minimal `apps/server` HTTP server, while the compose.dev `app` service remains a watcher-only container.
 Cargo cache / `target` / pytest cache は repo bind mount 側を使う。`target_cache` named volume は使わないため、ホストの `rust-analyzer` と compose 実行で成果物を共有できる。
 
-### lint-on-save を有効にする（オプション）
+### tools-daemon コンテナを使う（オプション、反復作業の高速化）
 
-`lint-on-save` フックは Rust ファイル編集後に rustfmt + clippy を自動実行する。
-このフックは **`tools-daemon` コンテナが起動中の場合のみ動作**し、停止中は無音でスキップされる。
+`tools-daemon` コンテナを起動しておくと、`*-exec` 系タスク (`test-exec`, `clippy-exec`,
+`fmt-exec`, `check-exec`, `llvm-cov-exec`, `test-one-exec`) を `docker compose exec`
+経由で実行でき、毎回 `run --rm` でコンテナを起動するオーバーヘッドを回避できる。
 
 ```bash
 # 開発開始時に tools-daemon を起動（バックグラウンド）

@@ -14,26 +14,6 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "command -v python3 >/dev/null 2>&1 || exit 0; python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-codex-before-write.py\"",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "WebSearch|WebFetch",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "command -v python3 >/dev/null 2>&1 || exit 0; python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/suggest-gemini-research.py\"",
-            "timeout": 10
-          }
-        ]
-      },
-      {
         "matcher": "Bash",
         "hooks": [
           {
@@ -49,58 +29,6 @@
           {
             "type": "command",
             "command": "if [ -n \"${SOTP_CLI_BINARY:-}\" ]; then \"$SOTP_CLI_BINARY\" hook dispatch block-test-file-deletion || exit 2; elif [ -x \"$CLAUDE_PROJECT_DIR/bin/sotp\" ]; then \"$CLAUDE_PROJECT_DIR/bin/sotp\" hook dispatch block-test-file-deletion || exit 2; elif command -v sotp >/dev/null 2>&1; then sotp hook dispatch block-test-file-deletion || exit 2; else cargo run --quiet -p cli -- hook dispatch block-test-file-deletion || exit 2; fi",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Task",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "command -v python3 >/dev/null 2>&1 || exit 0; python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-codex-after-plan.py\"",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "command -v python3 >/dev/null 2>&1 || exit 0; python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/error-to-codex.py\"",
-            "timeout": 10
-          },
-          {
-            "type": "command",
-            "command": "command -v python3 >/dev/null 2>&1 || exit 0; python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-test-analysis.py\"",
-            "timeout": 10
-          },
-          {
-            "type": "command",
-            "command": "command -v python3 >/dev/null 2>&1 || exit 0; python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/log-cli-tools.py\"",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "command -v python3 >/dev/null 2>&1 || exit 0; python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/lint-on-save.py\"",
-            "timeout": 30
-          },
-          {
-            "type": "command",
-            "command": "command -v python3 >/dev/null 2>&1 || exit 0; python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/python-lint-on-save.py\"",
-            "timeout": 10
-          },
-          {
-            "type": "command",
-            "command": "command -v python3 >/dev/null 2>&1 || exit 0; python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-implementation-review.py\"",
             "timeout": 10
           }
         ]
@@ -201,7 +129,6 @@
       "Bash(cargo make verify-latest-track)",
       "Bash(cargo make verify-track-registry)",
       "Bash(cargo make scripts-selftest)",
-      "Bash(cargo make hooks-selftest)",
       "Bash(cargo make guides-selftest)",
       "Bash(cargo make ci-rust)",
       "Bash(cargo make ci)",
