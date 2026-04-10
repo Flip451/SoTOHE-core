@@ -1,0 +1,439 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` is missing the required top-level `domain_states` and `additional_sections` keys, so it does not satisfy the declared spec schema and downstream validators that expect those sections will fail.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 1,
+              "category": "spec.schema"
+            }
+          ],
+          "hash": "rvw1:sha256:4a4b16a7990b1e0b14e4baaed30c4987f05e8bb1371ce5a35fab239ca64b2661",
+          "at": "2026-04-10T03:44:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `resolve_full_auto*` zero-reference gate is too broad as written. The track explicitly leaves `knowledge/research/` out of scope, and the repo still contains historical references to these symbols in knowledge docs, so `rg 0` across the whole workspace will not be satisfiable unless you narrow the grep to the implementation files or add cleanup tasks for the remaining docs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 364,
+              "category": "spec.consistency"
+            },
+            {
+              "message": "The repo-wide grep acceptance criteria for `.claude/agent-profiles.json` and the deprecated capability names are still over-scoped. `knowledge/adr/2026-04-09-2235-agent-profiles-redesign.md` and `knowledge/strategy/TODO.md` are still in `knowledge/` and still reference these strings, but this track does not schedule a full rewrite of those documents. Either exclude those files from the checks or add explicit cleanup tasks; otherwise the gates at lines 501 and 516 will never pass.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 501,
+              "category": "spec.consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:4a4b16a7990b1e0b14e4baaed30c4987f05e8bb1371ce5a35fab239ca64b2661",
+          "at": "2026-04-10T03:47:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` is missing the required top-level `domain_states` and `additional_sections` fields. The review brief marks both as mandatory schema elements, so this planning artifact is not a complete spec SSoT yet.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 1,
+              "category": "spec.schema"
+            }
+          ],
+          "hash": "rvw1:sha256:5232a308e4e0c325e1f9b23280b2e19bafb143ee791d3111c21c1ad5d0168f73",
+          "at": "2026-04-10T03:49:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5232a308e4e0c325e1f9b23280b2e19bafb143ee791d3111c21c1ad5d0168f73",
+          "at": "2026-04-10T03:55:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Task T11 explicitly requires updating `.claude/rules/11-subagent-model.md`, but the only acceptance criterion mapped to `T11` checks `10-guardrails.md`. As written, the track can be marked complete while `11-subagent-model.md` still describes the old provider-level model schema.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 427,
+              "category": "spec.coverage"
+            },
+            {
+              "message": "The acceptance gate for `T12`/`T13` only checks that command and skill docs point at `.harness/config/agent-profiles.json`; it does not verify the required schema-text migration away from `providers.<p>.{default,fast,nano}_model` wording. That leaves a path for the track to pass with command/skill docs still teaching the deprecated routing model.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 446,
+              "category": "spec.coverage"
+            },
+            {
+              "message": "The final grep-based cleanup criterion only searches for `workflow_host|multimodal_reader`, even though `debugger` is also a deprecated capability called out in T10/T13/T14. With the current gate, stale `debugger` references outside `08-orchestration.md` can survive and still satisfy the spec.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 516,
+              "category": "spec.coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:5232a308e4e0c325e1f9b23280b2e19bafb143ee791d3111c21c1ad5d0168f73",
+          "at": "2026-04-10T03:58:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T02 acceptance block under-specifies the new loader: it only requires `load`/`resolve_execution`/`resolve_model`/`resolve_provider` plus tests through invalid JSON, even though the scoped API also includes `resolve_capability` and the task text explicitly requires a missing-file error path. As written, an implementation can satisfy the track while still diverging from ADR §4 and the T02 task definition.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 346,
+              "category": "spec.acceptance_criteria"
+            },
+            {
+              "message": "The deprecated-capability cleanup is not actually verifiable for T13/T14. The only global grep checks `workflow_host|multimodal_reader` under `apps/ libs/ .claude/`, so `debugger` can survive anywhere outside `.claude/rules/08-orchestration.md`, and stale capability tables in top-level/knowledge docs are excluded entirely. That lets the implementation pass while still contradicting ADR §Decision/5's six-capability cleanup.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 516,
+              "category": "spec.acceptance_criteria"
+            },
+            {
+              "message": "T01/ADR §3 rely on the three sample profiles being meaningfully different, but the formal acceptance only checks that the files exist. Three identical or incomplete samples would still pass, so the plan never verifies the promised migration aid (`default`/`claude-heavy`/`codex-heavy`, reviewer fast model, codex-heavy planner/implementer routing).",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 337,
+              "category": "spec.acceptance_criteria"
+            }
+          ],
+          "hash": "rvw1:sha256:5232a308e4e0c325e1f9b23280b2e19bafb143ee791d3111c21c1ad5d0168f73",
+          "at": "2026-04-10T04:02:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T03 only names `libs/domain/src/review_v2/types.rs`, but the same `ModelProfile` / `resolve_full_auto` dead code also exists in `libs/domain/src/review/types.rs`. As written, the cleanup plan can leave one copy behind, so the workspace-wide deletion criterion in `spec.json` is not fully covered.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/metadata.json",
+              "line": 24,
+              "category": "plan.completeness"
+            },
+            {
+              "message": "T11 updates `10-guardrails.md`, but it does not call out the existing `providers.codex.escalation_threshold` reference in that file. After this redesign the field no longer exists, so leaving that sentence unchanged would keep a stale provider-level config reference in the updated guardrails doc.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/metadata.json",
+              "line": 72,
+              "category": "doc.consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:f2b07873b836efffcff8fdb3fa8749080aa456468dafb106f549a2962303c36b",
+          "at": "2026-04-10T04:05:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af3c39c73c60da877d51cf5564827c1f92d9b7e0ca7e1032c702077de7f83348",
+          "at": "2026-04-10T04:08:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The final acceptance criterion is internally inconsistent: it requires `rg -l 'workflow_host|multimodal_reader|debugger'` over `apps/ libs/ .claude/` to return zero, but the same sentence explicitly allows `debugger` to remain in `.claude/rules/10-guardrails.md`, and `verification.md` step 5 drops `debugger` from the manual check entirely. That leaves T11/T17 with conflicting completion conditions and makes the criterion non-verifiable as written.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 516,
+              "category": "spec.consistency"
+            },
+            {
+              "message": "The T16 provenance uses `convention — ADR lifecycle` as a source, but `knowledge/conventions/source-attribution.md` defines convention sources as `convention — <file>`. Without a concrete file or document reference, this requirement is not traceable and does not follow the stated source-tag format. The same problem appears again in the matching acceptance criterion.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 179,
+              "category": "spec.attribution"
+            }
+          ],
+          "hash": "rvw1:sha256:af3c39c73c60da877d51cf5564827c1f92d9b7e0ca7e1032c702077de7f83348",
+          "at": "2026-04-10T04:10:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a67eedf4ce6d414404a2cceefb3d504e7b360a4ccde74e9b3626ca0d56c9d277",
+          "at": "2026-04-10T04:13:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` says the three sample profiles must have \"meaningful differences\", but the only concrete requirement for `claude-heavy` is `planner/implementer = claude`. That leaves `default` and `claude-heavy` able to satisfy the spec while being identical, so T01 does not actually guarantee three distinct sample files.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 337,
+              "category": "spec.consistency"
+            },
+            {
+              "message": "T11 requires updating both `.claude/rules/10-guardrails.md` and `11-subagent-model.md`, including the path/model-reference cleanup, but the acceptance section only checks that the warning text was moved and that removed capability names disappear. As written, the track can pass with `11-subagent-model.md` still pointing at `.claude/agent-profiles.json` or old `providers.codex.*_model` fields, so ADR §5 is not fully covered by verifiable criteria.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 427,
+              "category": "spec.coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:a67eedf4ce6d414404a2cceefb3d504e7b360a4ccde74e9b3626ca0d56c9d277",
+          "at": "2026-04-10T04:17:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Acceptance coverage for deprecated capability cleanup is incomplete. The only global grep is limited to `apps/ libs/ .claude/`, so it does not check the T13/T14 docs under `track/` or the top-level docs, and the extra `debugger` check is only for `08-orchestration.md`. That still allows stale `debugger`/`workflow_host`/`multimodal_reader` mentions to survive in files like `track/workflow.md` or `.claude/skills/codex-system/SKILL.md` while the plan passes.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 525,
+              "category": "spec.coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:07651bd9be5727d40b9737bc695e969884f675f1cf184063d0f5f18727bf52c3",
+          "at": "2026-04-10T04:19:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Acceptance criterion 2 is internally inconsistent: it says the three sample files should have mutually different `planner.provider` values, but the same criterion explicitly sets `planner=claude` for both `default` and `claude-heavy`. As written, this cannot be satisfied or mechanically verified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 337,
+              "category": "spec.consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:58c35f3cd23abddb66338eaf700e906e9a848615db825c5dfe1f9fa5c5c38260",
+          "at": "2026-04-10T04:22:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbecefc4d7f5b6295d92e1122b91083176f6ce6e457c4d41d34121042f8eb9a7",
+          "at": "2026-04-10T04:24:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The spec makes path deduplication a hard constraint (`.harness/config/agent-profiles.json` must be centralized in one infrastructure constants module), but T05 only says to do that if the path is constantized. With no matching acceptance criterion or verification step, this track can pass while leaving the new path hardcoded in multiple files, which violates the stated SSoT constraint.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/metadata.json",
+              "line": 36,
+              "category": "plan.consistency"
+            },
+            {
+              "message": "T11 says `10-guardrails.md` must remove references to deleted `02/03` rule files and drop the stale `providers.codex.escalation_threshold` guidance, but the acceptance criteria only check that the warning section was migrated and that `11-subagent-model.md` was updated. Because those `10-guardrails.md` requirements are not covered here, the implementation could ship with broken/stale guardrail docs without failing the track.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 427,
+              "category": "spec.coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:cbecefc4d7f5b6295d92e1122b91083176f6ce6e457c4d41d34121042f8eb9a7",
+          "at": "2026-04-10T04:26:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:685c726e7efb8239da1a845051bf1ff1c5249e2d99cdfc16db6dd2a15d92d798",
+          "at": "2026-04-10T04:29:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The deprecated-capability cleanup criterion only greps for `workflow_host|multimodal_reader` and then spot-checks `debugger` in `.claude/rules/08-orchestration.md`. Tasks T10, T13, and T14 require `debugger` cleanup in other docs and skills too, so stale `debugger` references outside that single file would still satisfy the spec.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 535,
+              "category": "spec.consistency"
+            },
+            {
+              "message": "The manual verification grep for old-path/deprecated-capability cleanup only checks `apps/ libs/ .claude/ knowledge/conventions/`. That misses required T14 locations such as `CLAUDE.md`, `DEVELOPER_AI_WORKFLOW.md`, `track/workflow.md`, `.codex/instructions.md`, and `.gemini/GEMINI.md`, so the documented verification can pass with stale references still present in files this track is supposed to update.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/verification.md",
+              "line": 31,
+              "category": "verification.coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:685c726e7efb8239da1a845051bf1ff1c5249e2d99cdfc16db6dd2a15d92d798",
+          "at": "2026-04-10T04:31:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d03934fb76b59bd0b2a667141ed0abf410f83d87f2cb31f561b0fe4118401b3e",
+          "at": "2026-04-10T04:34:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The manual old-path check is narrower than the spec it is supposed to verify: step 4 greps many locations for `.claude/agent-profiles.json`, but it omits `knowledge/WORKFLOW.md` and `knowledge/DESIGN.md` even though T14 explicitly requires those docs to migrate off the old path. As written, verification can pass while those two scoped docs still reference the retired file.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/verification.md",
+              "line": 31,
+              "category": "verification.coverage"
+            },
+            {
+              "message": "The deprecated-capability verification is incomplete. The spec requires confirming that `debugger` is gone from the updated capability docs, but step 5 only greps for `workflow_host|multimodal_reader`; stale `debugger` references in the T10/T12/T13/T14 files would not be caught by this checklist.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/verification.md",
+              "line": 32,
+              "category": "verification.coverage"
+            },
+            {
+              "message": "T03's acceptance criterion requires all three dead-code symbols (`resolve_full_auto_from_profiles`, `ModelProfile`, and `resolve_full_auto`) to be gone, but the manual verification only greps for `resolve_full_auto_from_profiles`. That leaves two of the required removals unverified, so the track could be signed off with dead code still present.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/verification.md",
+              "line": 33,
+              "category": "verification.coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:d03934fb76b59bd0b2a667141ed0abf410f83d87f2cb31f561b0fe4118401b3e",
+          "at": "2026-04-10T04:38:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1de8abc3b9405122f67577dfd88f2f6a282f14045dd03919c1f099392d3c9a2b",
+          "at": "2026-04-10T04:39:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The repo-wide old-path acceptance gate requires `.claude/agent-profiles.json` to disappear from `apps/`, `libs/`, and `.claude/`, but the plan does not assign work for every existing hit in that scope. `apps/cli/src/commands/plan/mod.rs:36`, `apps/cli/src/commands/review/mod.rs:63`, and `.claude/skills/repomix-snapshot/SKILL.md:15` still contain the old path, yet T05/T06/T13 only cover `pr.rs`, `review/tests.rs`, and three named skills. As written, the track can fail its own grep-based acceptance check with no task telling the implementer to touch those files.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 520,
+              "category": "spec.coverage"
+            },
+            {
+              "message": "Manual verification steps 4 and 5 grep the entire `track/` tree for retired path/capability strings and expect zero matches, but that tree intentionally contains historical track artifacts and the current planning docs that still mention `.claude/agent-profiles.json`, `workflow_host`, and `multimodal_reader`. Even a correct implementation will keep finding matches in `track/`, so these checks are impossible to satisfy unless the scope is narrowed to the same locations excluded by the spec.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/verification.md",
+              "line": 31,
+              "category": "verification.consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:1de8abc3b9405122f67577dfd88f2f6a282f14045dd03919c1f099392d3c9a2b",
+          "at": "2026-04-10T04:43:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6374a392191da6f8d0c94686c76001e8dd8291245dd19c7f62cdf4ee9f780115",
+          "at": "2026-04-10T04:46:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The last acceptance criterion is not actually satisfiable as written: it requires `rg -l 'workflow_host|multimodal_reader'` over the entire `track/` tree to return zero, but `track/` intentionally contains historical artifacts that preserve those retired names (for example `track/items/*` and the current planning docs themselves). A correct implementation can still never pass T17 unless this path set is narrowed the same way `verification.md` already narrows it.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 535,
+              "category": "spec.acceptance"
+            },
+            {
+              "message": "The plan resolves the `.gitignore` question in favor of git-managing `.harness/config/agent-profiles.json`, but T16 only asks to flip the ADR status to Accepted and add `Implemented-by`. The ADR body still says the active file should be gitignored, so this track can finish with an Accepted ADR that contradicts the implemented design unless the task/spec explicitly require updating those ADR paragraphs too.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/metadata.json",
+              "line": 102,
+              "category": "metadata.consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:6374a392191da6f8d0c94686c76001e8dd8291245dd19c7f62cdf4ee9f780115",
+          "at": "2026-04-10T04:50:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T05 is under-specified: the only verifiable requirement around the agent-profiles path migration checks `pr.rs` and `review/tests.rs`, but the task also requires updating `apps/cli/src/commands/plan/mod.rs` and `apps/cli/src/commands/review/mod.rs` doc comments. Those edits are not covered anywhere in the spec/verification artifacts, so they can be missed without failing this track.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 382,
+              "category": "spec.coverage"
+            },
+            {
+              "message": "T12/T13 are under-specified: acceptance criterion 16 only checks that the command/skill files point at `.harness/config/agent-profiles.json`, but the tasks also require rewriting their capability and model-resolution content. The plan currently provides no verifiable criterion for those substantive text changes.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 465,
+              "category": "spec.coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:1a906cf2c505877e760fc4203ec6dc4e0bc9ba031e13e1fa90fdd46aee11d7aa",
+          "at": "2026-04-10T04:53:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The SKILL.md update scope omits `repomix-snapshot`, but this same track's task text and acceptance criteria both require updating `.claude/skills/{track-plan,codex-system,gemini-system,repomix-snapshot}/SKILL.md`. As written, the spec understates T13 and can let the implementation miss a required file.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "line": 139,
+              "category": "spec.consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:6c1efe8b40f74bb5a66101f7d5862b84474b7090a5950ced3be1965d3544048d",
+          "at": "2026-04-10T04:55:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87c488c1caa5d81a49f1e97705d353bb6e013b03f6aaa24a424a497814daa6a5",
+          "at": "2026-04-10T04:57:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87c488c1caa5d81a49f1e97705d353bb6e013b03f6aaa24a424a497814daa6a5",
+          "at": "2026-04-10T05:00:53Z"
+        }
+      ]
+    }
+  }
+}
