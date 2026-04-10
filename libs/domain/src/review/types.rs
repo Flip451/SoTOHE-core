@@ -1,8 +1,6 @@
 //! Core review type definitions: Verdict, CodeHash, ReviewStatus, RoundType,
 //! ReviewRoundResult, ReviewGroupState, and pure logic helpers.
 
-use std::collections::HashMap;
-
 use super::error::ReviewError;
 
 /// Review round verdict.
@@ -260,32 +258,6 @@ impl ReviewGroupState {
             }
             Self::NoRounds | Self::FinalOnly(_) => Self::FinalOnly(result),
         };
-    }
-}
-
-/// Per-model behavioral profile for reviewer full-auto resolution.
-pub struct ModelProfile {
-    /// Whether `--full-auto` should be passed to `codex exec`.
-    pub full_auto: bool,
-}
-
-impl ModelProfile {
-    /// Creates a new `ModelProfile`.
-    #[must_use]
-    pub fn new(full_auto: bool) -> Self {
-        Self { full_auto }
-    }
-}
-
-/// Resolves whether `--full-auto` should be enabled for the given model.
-#[must_use]
-pub fn resolve_full_auto(
-    model: &str,
-    model_profiles: Option<&HashMap<String, ModelProfile>>,
-) -> bool {
-    match model_profiles {
-        Some(profiles) => profiles.get(model).is_none_or(|profile| profile.full_auto),
-        None => true,
     }
 }
 
