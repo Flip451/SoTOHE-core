@@ -12,8 +12,8 @@ If on any other branch, stop and suggest switching to the track branch.
 For each task in `metadata.json` `tasks` array (in order),
 skip `done` with non-null `commit_hash` and `skipped` tasks:
 
-- **`todo` tasks**: run all three steps (implement → review → commit).
-- **`in_progress` or `done` with null `commit_hash`**: implementation is already done.
+- **`todo` or `in_progress`**: run all three steps (implement → review → commit).
+- **`done` with null `commit_hash`**: implementation is complete but not yet committed.
   Skip step 1 and run steps 2-3 only (review → commit).
 
 Steps:
