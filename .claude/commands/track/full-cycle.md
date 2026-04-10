@@ -9,7 +9,7 @@ If on any other branch, stop and suggest switching to the track branch.
 
 ## Execution
 
-For each task in `metadata.json` `tasks` array (in order) where `status` is `todo` or `in_progress`:
+For each task in `metadata.json` `tasks` array (in order) where `status` is not `done` with a non-null `commit_hash`:
 
 1. **Implement**: execute `/track:implement` scoped to this single task.
    `/track:implement` handles implementation, CI, and verification update.
@@ -18,14 +18,15 @@ For each task in `metadata.json` `tasks` array (in order) where `status` is `tod
 2. **Review**: execute `/track:review`. Reviews the implementation including all changes.
    Must reach full model `zero_findings`.
 3. **Commit**: execute `/track:commit` with a commit message generated from the task description.
+   After commit, record the hash: `cargo make track-transition <track_dir> <task_id> done --commit-hash <hash>`.
 
 If any step fails, stop the loop and report the failure.
-Rerun `/track:full-cycle` resumes from the first `todo` or `in_progress` task.
+Rerun `/track:full-cycle` resumes correctly because only tasks with a committed hash are skipped.
 
 ## Post-loop
 
-After all tasks complete, update `verification.md` with overall results and `verified_at`.
-Post-loop changes are included in the next `/track:commit` or `/track:pr` — no separate commit is needed here.
+After all tasks are committed, update `verification.md` with overall results and `verified_at`,
+then commit these bookkeeping changes via `/track:commit "chore: update verification"`.
 
 ## Behavior
 
