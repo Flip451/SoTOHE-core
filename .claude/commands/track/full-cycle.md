@@ -9,7 +9,8 @@ If on any other branch, stop and suggest switching to the track branch.
 
 ## Execution
 
-For each task in `metadata.json` `tasks` array (in order) where `status` is not `done` with a non-null `commit_hash`:
+For each task in `metadata.json` `tasks` array (in order) where `status` is `todo` or `in_progress`,
+or `done` with `commit_hash` null (skip `done` with non-null `commit_hash` and `skipped` tasks):
 
 1. **Implement**: execute `/track:implement` scoped to this single task.
    `/track:implement` handles implementation, CI, and verification update.
@@ -25,8 +26,9 @@ Rerun `/track:full-cycle` resumes correctly because only tasks with a committed 
 
 ## Post-loop
 
-After all tasks are committed, update `verification.md` with overall results and `verified_at`,
-then commit these bookkeeping changes via `/track:commit "chore: update verification"`.
+After all tasks are committed, update `verification.md` with overall results and `verified_at`.
+These bookkeeping changes are uncommitted and will be included in the next review+commit cycle
+or picked up by `/track:pr`.
 
 ## Behavior
 
