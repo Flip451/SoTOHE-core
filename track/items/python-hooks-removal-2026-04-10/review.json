@@ -1,67 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
-          "at": "2026-04-09T16:07:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
-          "at": "2026-04-09T16:10:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9da6ce7c5ea07616b59c7d8ccd0b5aa8dedb495ecd4aeba0b20bf54d31cd3acf",
-          "at": "2026-04-09T16:48:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9da6ce7c5ea07616b59c7d8ccd0b5aa8dedb495ecd4aeba0b20bf54d31cd3acf",
-          "at": "2026-04-09T16:49:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
-          "at": "2026-04-10T00:14:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new regression test does not assert the done marker that motivated this fix. `sync_rendered_views_single_track_renders_done_track` only checks that `plan.md` changed and still contains `Done task`, so a renderer that kept writing `- [~] Done task` would still pass while reintroducing the reported bug.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/render.rs",
-              "line": 1664,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
-          "at": "2026-04-10T00:19:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
-          "at": "2026-04-10T00:21:24Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -146,6 +85,121 @@
         }
       ]
     },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
+          "at": "2026-04-09T16:07:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:433ea7a1da006c57570378cbf9d88a84ebbfeeeac8c0a316fdebd5c595ad1e87",
+          "at": "2026-04-09T16:10:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9da6ce7c5ea07616b59c7d8ccd0b5aa8dedb495ecd4aeba0b20bf54d31cd3acf",
+          "at": "2026-04-09T16:48:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9da6ce7c5ea07616b59c7d8ccd0b5aa8dedb495ecd4aeba0b20bf54d31cd3acf",
+          "at": "2026-04-09T16:49:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
+          "at": "2026-04-10T00:14:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new regression test does not assert the done marker that motivated this fix. `sync_rendered_views_single_track_renders_done_track` only checks that `plan.md` changed and still contains `Done task`, so a renderer that kept writing `- [~] Done task` would still pass while reintroducing the reported bug.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 1664,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
+          "at": "2026-04-10T00:19:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7128d35832b0ed37f9e2804c83ac7726680b4f2d258bdd6bd8bbfd59c5bb8fd",
+          "at": "2026-04-10T00:21:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:09ef3983d0ef68db3801fd80cc6029a06e7d27508897761a4cedad9f243b669c",
+          "at": "2026-04-10T02:13:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sync_rendered_views(Some(id))` now skips `spec.json` entirely once a track is `done`/`archived`, which means malformed or unsupported spec documents no longer trigger the existing warning/error paths during the final transition. That silently weakens corruption detection for the source-of-truth JSON; the markdown rewrite should be skipped, but the decode/validation step should still run.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 525,
+              "category": "error_handling"
+            },
+            {
+              "message": "The same short-circuit was added for `domain-types.json`: done/archived tracks now bypass decoding altogether, so invalid domain-types documents are no longer surfaced when rendering a specific completed track. This hides source corruption instead of merely preserving the legacy `domain-types.md` output.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 569,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:09ef3983d0ef68db3801fd80cc6029a06e7d27508897761a4cedad9f243b669c",
+          "at": "2026-04-10T02:16:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:09ef3983d0ef68db3801fd80cc6029a06e7d27508897761a4cedad9f243b669c",
+          "at": "2026-04-10T02:17:12Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a25cfc18ae6250c03ca391522c5a3219f4daf03c8c3b9b574fc4a4cde94537a",
+          "at": "2026-04-10T00:53:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a25cfc18ae6250c03ca391522c5a3219f4daf03c8c3b9b574fc4a4cde94537a",
+          "at": "2026-04-10T00:54:35Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -189,24 +243,6 @@
           "findings": [],
           "hash": "rvw1:sha256:969b4e061b12bde36b8f6d2a2e8cdbcf5e938af612ab1da0562b40f96480c9eb",
           "at": "2026-04-09T16:50:25Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a25cfc18ae6250c03ca391522c5a3219f4daf03c8c3b9b574fc4a4cde94537a",
-          "at": "2026-04-10T00:53:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a25cfc18ae6250c03ca391522c5a3219f4daf03c8c3b9b574fc4a4cde94537a",
-          "at": "2026-04-10T00:54:35Z"
         }
       ]
     },

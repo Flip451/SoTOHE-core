@@ -488,11 +488,17 @@ pub fn sync_rendered_views(
             });
         }
 
-        // No done/archived skip here: the caller explicitly asked to render
-        // this track via `track_id = Some(...)`. If protection for legacy
-        // archived views is needed, the caller must simply not pass archived
-        // track ids (which live under `track/archive/` and are unreachable
-        // through the `track/items/<id>` path used above).
+        // `plan.md` must be re-rendered unconditionally on the single-track
+        // path because `execute_transition` relies on it to reflect the
+        // post-transition task state (including the `in_progress → done`
+        // flip that caused the earlier bug). The legacy-protection guard
+        // only applies to `spec.md` / `domain-types.md` below, not plan.md.
+        //
+        // Archived tracks under `track/archive/<id>` are still naturally
+        // protected because this function only looks at
+        // `track/items/<track_id>` — passing an archived id resolves to a
+        // missing metadata file and is silently skipped.
+        let is_done_or_archived = matches!(parsed.status.as_str(), "done" | "archived");
 
         let (track, _) = codec::decode(&json).map_err(|source| RenderError::InvalidMetadata {
             path: metadata_path.clone(),
@@ -510,9 +516,13 @@ pub fn sync_rendered_views(
             changed.push(plan_path);
         }
 
-        // Render spec.md from spec.json if present
+        // Render spec.md from spec.json if present. Skipped for done/archived
+        // tracks to avoid silently overwriting legacy rendered content with a
+        // newer renderer that may drop fields an older format preserved —
+        // transitions into `done` do NOT touch spec.json, so re-rendering
+        // here would only surface renderer-version drift, not new data.
         let spec_json_path = track_dir.join("spec.json");
-        if spec_json_path.is_file() {
+        if !is_done_or_archived && spec_json_path.is_file() {
             let spec_json_content = std::fs::read_to_string(&spec_json_path)?;
             match spec::codec::decode(&spec_json_content) {
                 Ok(spec_doc) => {
@@ -551,9 +561,12 @@ pub fn sync_rendered_views(
             }
         }
 
-        // Render domain-types.md from domain-types.json if present.
+        // Render domain-types.md from domain-types.json if present. Same
+        // legacy-protection rationale as spec.md above: transitions into
+        // `done` do not modify domain-types.json, so re-rendering here would
+        // only surface renderer-version drift. Skip for done/archived.
         let domain_types_json_path = track_dir.join("domain-types.json");
-        if domain_types_json_path.is_file() {
+        if !is_done_or_archived && domain_types_json_path.is_file() {
             let domain_types_content = std::fs::read_to_string(&domain_types_json_path)?;
             match domain_types_codec::decode(&domain_types_content) {
                 Ok(doc) => {
@@ -1663,5 +1676,76 @@ mod tests {
         assert_ne!(plan, "STALE_SENTINEL_MUST_BE_OVERWRITTEN");
         assert!(plan.contains("Done task"));
         assert!(changed.iter().any(|p| p.ends_with("track-done/plan.md")));
+    }
+
+    #[test]
+    fn sync_rendered_views_single_track_skips_spec_md_for_done_track() {
+        // Regression: single-track rendering must still preserve legacy
+        // spec.md content on done/archived tracks to avoid silently
+        // overwriting a field an older renderer preserved. Only plan.md is
+        // re-rendered unconditionally because it mirrors task state that
+        // actually changes during transitions; spec.md reflects spec.json
+        // which does NOT change on a task transition.
+        let dir = tempfile::tempdir().unwrap();
+        let done_dir = dir.path().join("track/items/track-done-spec");
+        std::fs::create_dir_all(&done_dir).unwrap();
+        std::fs::write(
+            done_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-done-spec",
+                "done",
+                "2026-03-10T00:00:00Z",
+                r#"[{"id":"T001","description":"Done task","status":"done","commit_hash":"abc1234567890abc1234567890abc1234567890a"}]"#,
+            ),
+        )
+        .unwrap();
+        // Minimal spec.json so the render code path is reachable.
+        std::fs::write(
+            done_dir.join("spec.json"),
+            r#"{"schema_version":1,"status":"draft","version":"1.0","title":"Done Feature","scope":{"in_scope":[],"out_of_scope":[]}}"#,
+        )
+        .unwrap();
+        // Sentinel spec.md that must stay intact.
+        std::fs::write(done_dir.join("spec.md"), "LEGACY_SPEC_SENTINEL_PRESERVED").unwrap();
+
+        let changed = sync_rendered_views(dir.path(), Some("track-done-spec")).unwrap();
+
+        // spec.md must NOT be re-rendered for a done track.
+        let spec = std::fs::read_to_string(done_dir.join("spec.md")).unwrap();
+        assert_eq!(spec, "LEGACY_SPEC_SENTINEL_PRESERVED");
+        assert!(!changed.iter().any(|p| p.ends_with("spec.md")));
+
+        // plan.md, on the other hand, MUST still have been rendered so
+        // the post-transition state is captured.
+        assert!(changed.iter().any(|p| p.ends_with("track-done-spec/plan.md")));
+    }
+
+    #[test]
+    fn sync_rendered_views_single_track_skips_domain_types_md_for_done_track() {
+        // Same legacy-protection rationale as the spec.md case above, but
+        // for `domain-types.md`.
+        let dir = tempfile::tempdir().unwrap();
+        let done_dir = dir.path().join("track/items/track-done-domain");
+        std::fs::create_dir_all(&done_dir).unwrap();
+        std::fs::write(
+            done_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-done-domain",
+                "done",
+                "2026-03-10T00:00:00Z",
+                r#"[{"id":"T001","description":"Done task","status":"done","commit_hash":"abc1234567890abc1234567890abc1234567890a"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(done_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+        std::fs::write(done_dir.join("domain-types.md"), "LEGACY_DOMAIN_TYPES_SENTINEL_PRESERVED")
+            .unwrap();
+
+        let changed = sync_rendered_views(dir.path(), Some("track-done-domain")).unwrap();
+
+        let domain_types = std::fs::read_to_string(done_dir.join("domain-types.md")).unwrap();
+        assert_eq!(domain_types, "LEGACY_DOMAIN_TYPES_SENTINEL_PRESERVED");
+        assert!(!changed.iter().any(|p| p.ends_with("domain-types.md")));
+        assert!(changed.iter().any(|p| p.ends_with("track-done-domain/plan.md")));
     }
 }
