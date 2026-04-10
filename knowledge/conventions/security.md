@@ -8,7 +8,7 @@ not be committed to version control and must not be read by Claude Code.
 > **Scope of enforcement**: The `Read` / `Grep` deny rules in `.claude/settings.json` apply only
 > to Claude Code's own tool calls. They do **not** apply inside a Codex subprocess
 > (`workspace-write` sandbox) or when Gemini CLI accesses the filesystem directly — see
-> `.claude/rules/02-codex-delegation.md` for details. When using Codex with `workspace-write`,
+> `.claude/rules/10-guardrails.md` §Sandbox and Hook Coverage Warning for details. When using Codex with `workspace-write`,
 > instruct it explicitly not to read files under `private/` or `config/secrets/`.
 >
 > **Container-level enforcement**: Docker Compose services enforce these rules at OS level:

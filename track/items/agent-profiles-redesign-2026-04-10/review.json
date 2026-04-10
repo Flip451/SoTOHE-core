@@ -1,6 +1,429 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:325a2ea354496de3c74ef00c810132b269969fc818d5ed77b7e059691cac66aa",
+          "at": "2026-04-10T07:03:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:325a2ea354496de3c74ef00c810132b269969fc818d5ed77b7e059691cac66aa",
+          "at": "2026-04-10T07:06:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e2606116501836b405228e4438120bdea384621e6a9c7c775dfe10abf22c6df5",
+          "at": "2026-04-10T07:12:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e2606116501836b405228e4438120bdea384621e6a9c7c775dfe10abf22c6df5",
+          "at": "2026-04-10T07:15:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:baf2cbc3f2adb75b7c665e4cc5cd815ea36515557aaa38dbb4e8bdcd09e92127",
+          "at": "2026-04-10T07:23:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:baf2cbc3f2adb75b7c665e4cc5cd815ea36515557aaa38dbb4e8bdcd09e92127",
+          "at": "2026-04-10T07:29:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
+          "at": "2026-04-10T07:38:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`write_agent_profiles()` was updated to the new `.harness/config/agent-profiles.json` schema, but the surrounding tests still execute `run_codex_local()`, whose test shim never reads agent profiles at all. As a result, this CLI-scope change adds no regression coverage for the actual `pr.rs` migration to `AgentProfiles::load`/`validate_reviewer_provider`; a bad path, missing `reviewer` capability, or unsupported provider would still pass here. Add a test that exercises the PR review entrypoints (or the helper they use) against the new config contract.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/tests.rs",
+              "line": 533,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
+          "at": "2026-04-10T07:41:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
+          "at": "2026-04-10T07:47:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
+          "at": "2026-04-10T07:49:12Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AgentProfilesDto` will happily deserialize a config that is missing `capabilities`/`providers`, and `load()` never verifies `schema_version == 1`. That means a legacy or truncated JSON file can load successfully as an empty routing table, so every capability lookup returns `None` instead of surfacing a config error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 67,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dc5cba03a3dddb92c9f341fc383c808a7f1623b8de722b04edb64ff17c4efe23",
+          "at": "2026-04-10T05:54:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_version` is deserialized but never validated, so any syntactically valid file with a legacy or future layout will still load and be treated as this schema. For a routing config, that can silently misresolve every capability instead of failing fast; `load()` should reject `schema_version != 1`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 111,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:dc5cba03a3dddb92c9f341fc383c808a7f1623b8de722b04edb64ff17c4efe23",
+          "at": "2026-04-10T05:55:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af3bf5fae5575dbafc5c3c7cd352cb0adb9d04a5c461448f04085911bdaadebe",
+          "at": "2026-04-10T05:59:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`providers` and `capabilities` are deserialized with `#[serde(default)]`, so a config that omits or misspells one of those top-level sections still makes `AgentProfiles::load()` return `Ok(...)` with empty maps. That silently converts a malformed/truncated profile into `resolve_execution(...)=None`, which callers will interpret as a missing capability instead of surfacing a configuration error. These sections are required for the new schema and should fail load-time validation instead of defaulting.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 70,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:af3bf5fae5575dbafc5c3c7cd352cb0adb9d04a5c461448f04085911bdaadebe",
+          "at": "2026-04-10T06:03:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `AgentProfiles::load` deserializes `provider`, `model`, `fast_provider`, and `fast_model` as raw `String`s and returns them without validation, so malformed config like `{\"provider\":\"\"}` or `{\"fast_provider\":\"\"}` is accepted and `resolve_execution` later hands back an empty provider name instead of failing fast. That violates the repo rule to validate external input via domain types and turns a config error into a downstream runtime failure when the caller tries to dispatch on the provider.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 109,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:080337c4cb5f9860a1e69618ebd433d848cd33158a98d35af23a77d0f83d4870",
+          "at": "2026-04-10T06:07:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AgentProfiles::load()` only rejects blank `provider`/`fast_provider`, so malformed configs like `{\"provider\":\"codex\",\"model\":\"\"}` or `{\"fast_model\":\"\"}` still load successfully. `resolve_execution()` then propagates that bad input as `Some(\"\")` for `Final` and coerces the same empty string to `None` for `Fast`, which can turn a config typo into an invalid `--model` invocation or inconsistent routing instead of a load-time error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 129,
+              "category": "validation"
+            },
+            {
+              "message": "The DTOs accept unknown JSON keys because neither `AgentProfilesDto` nor `CapabilityConfigDto` uses `#[serde(deny_unknown_fields)]`. A user typo like `fast_modle`/`fast_provier` will therefore parse as if the override were absent, silently changing the resolved provider/model instead of surfacing a configuration error in this routing file.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 75,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:b3ce2f0b9e4637b9a32556b261561e0daf00ef6161a91dba3c56dc8a94295184",
+          "at": "2026-04-10T06:11:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AgentProfiles::load()` silently normalizes blank `model` / `fast_model` strings to `None` instead of rejecting them. A malformed config like `{ \"provider\": \"codex\", \"model\": \" \" }` therefore loads successfully, and `resolve_execution(..., RoundType::Final)` returns `model=None` as if the field were intentionally omitted. That turns invalid external input into altered routing behavior rather than surfacing an `InvalidCapability` error at load time.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 149,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:f82585363cfc4c53e7a602801491ce249103e8e446117c85c970dab5c364e1cc",
+          "at": "2026-04-10T06:15:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AgentProfiles::load()` only checks that `provider` / `fast_provider` are non-empty, but it never verifies that those names exist in the top-level `providers` map. A typo like `\"provider\": \"codxe\"` or `\"fast_provider\": \"gemni\"` will load successfully and then flow into `resolve_execution()` as an unusable provider string, so the bad config is discovered only later when a caller tries to dispatch on that provider instead of being rejected as `InvalidCapability` at load time.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 131,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:d18a09cd9e0d7b0219d346b8d36c0136b3b43ca51591fd015554f7b9e3791545",
+          "at": "2026-04-10T06:18:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`UnsupportedSchemaVersion` is only reachable after `serde_json::from_str` succeeds, but this DTO is `deny_unknown_fields`. Any future schema bump that introduces new fields will fail during deserialization and surface as `Parse` instead of the advertised version-specific error, so callers cannot reliably distinguish an unsupported config version from malformed JSON. Parse a minimal envelope containing `schema_version` first, then deserialize the versioned payload.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 124,
+              "category": "correctness"
+            },
+            {
+              "message": "`load()` now has explicit error branches for blank `model` and blank `fast_model`, but the test module does not cover either branch. The briefing requires path coverage, and without negative tests here these new validation guarantees can regress silently while the suite still passes.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 150,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:d18a09cd9e0d7b0219d346b8d36c0136b3b43ca51591fd015554f7b9e3791545",
+          "at": "2026-04-10T06:22:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b64f5fdf28e13f03872ffd70c5ae368a5521c63730b81f3892226b65b6a6bbbb",
+          "at": "2026-04-10T06:26:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41b789421ea694cb4de3560617c77bce89c7efe76032ffce2c1da84c0e296436",
+          "at": "2026-04-10T06:30:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41b789421ea694cb4de3560617c77bce89c7efe76032ffce2c1da84c0e296436",
+          "at": "2026-04-10T06:33:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The codex-system target stopped checking the plain `providers.codex.default_model` fallback that still appears in `SKILL.md`; only the longer old sentence and `profiles.<active_profile>.provider_model_overrides.codex` are forbidden now, so the fallback guidance can remain undetected.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 310,
+              "category": "coverage"
+            },
+            {
+              "message": "The `track review` target no longer asserts the config-path migration. It requires only `capabilities` and forbids the old model fields, so the stale `.claude/agent-profiles.json` reference in `review.md` can still pass this guardrail.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 327,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e9509a8b29a6cb628faba10ea5a4cf7f5d8323513bed3131b36abce2665d2692",
+          "at": "2026-04-10T07:25:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9509a8b29a6cb628faba10ea5a4cf7f5d8323513bed3131b36abce2665d2692",
+          "at": "2026-04-10T07:27:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MODEL_RESOLUTION_TARGETS` now requires `.claude/skills/codex-system/SKILL.md` to contain `capabilities` and forbids `profiles.<active_profile>.provider_model_overrides.codex`, but that file still contains the old override/default_model guidance today. Because `verify_override_first_model_resolution` checks the current repository state directly, this change will make `verify-orchestra` fail until T13 lands.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 312,
+              "category": "correctness"
+            },
+            {
+              "message": "`MODEL_RESOLUTION_TARGETS` also tightens `.claude/commands/track/review.md` immediately by requiring `capabilities` and forbidding the existing `providers.<reviewer_provider>.fast_model` / `default_model` strings. The current doc still contains those lines, so this staged change introduces a deterministic guardrail failure before the review.md migration is applied.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 327,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e9509a8b29a6cb628faba10ea5a4cf7f5d8323513bed3131b36abce2665d2692",
+          "at": "2026-04-10T07:31:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9509a8b29a6cb628faba10ea5a4cf7f5d8323513bed3131b36abce2665d2692",
+          "at": "2026-04-10T07:35:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MODEL_RESOLUTION_TARGETS` now requires the literal `capabilities` in `.claude/skills/codex-system/SKILL.md`, but that file still only contains the old `provider_model_overrides/default_model` wording and no `capabilities` token. As staged, `verify_override_first_model_resolution` will start failing `cargo make verify-orchestra` before the T13 doc update lands.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 314,
+              "category": "correctness"
+            },
+            {
+              "message": "The same regression exists for `.claude/commands/track/review.md`: adding `capabilities` as a required snippet will fail verification immediately, because the current document still says to read `.claude/agent-profiles.json` and contains no `capabilities` string. That makes this guardrail change fail-closed before the later doc migration it depends on.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 329,
+              "category": "correctness"
+            },
+            {
+              "message": "The `.claude/rules/02-codex-delegation.md` target was removed even though that file is still tracked in this repo and still contains the legacy reviewer wrapper prompt. Dropping the entry here weakens the guardrail and lets stale guidance in that rule file persist without `verify-orchestra` catching it.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 384,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e9509a8b29a6cb628faba10ea5a4cf7f5d8323513bed3131b36abce2665d2692",
+          "at": "2026-04-10T07:38:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ac35f2baf73a4949a238e9791cb14a734bc2186b5b628db8ef36e7709f868be",
+          "at": "2026-04-10T07:45:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new guardrail for `.harness/config/agent-profiles.json` only requires the bare substring `reviewer`. Because `verify_reviewer_wrapper_guidance` does a simple `contains()` check, this will pass even if the capability-centric schema regresses and the file no longer has a `capabilities.reviewer` entry, as long as `reviewer` appears anywhere else in the JSON. That weakens the verification substantially and does not actually enforce the intended migration to capability-based guidance.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 350,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3ac35f2baf73a4949a238e9791cb14a734bc2186b5b628db8ef36e7709f868be",
+          "at": "2026-04-10T07:47:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Dropping the `.claude/rules/02-codex-delegation.md` target removes coverage for an existing stale guidance file that is still present in the tree and still references the old `.claude/agent-profiles.json` contract. `verify_reviewer_wrapper_guidance()` will no longer fail if that file regresses again, so the guardrail becomes incomplete until the file is actually removed or migrated.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 387,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:d59047ff5033a7ea364dba08259316d9935bc34a44e3e5342a0e754a0127d928",
+          "at": "2026-04-10T07:52:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new reviewer-capability guard is too weak to catch a broken `capabilities.reviewer` entry. `verify_reviewer_wrapper_guidance()` only checks each required snippet with independent `contains()` calls, so `\"provider\"` can be satisfied by any other capability's provider field. Since `.harness/config/agent-profiles.json` contains several unrelated `\"provider\"` keys, CI will still pass even if the reviewer capability loses its own provider mapping.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 350,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d59047ff5033a7ea364dba08259316d9935bc34a44e3e5342a0e754a0127d928",
+          "at": "2026-04-10T07:53:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d59047ff5033a7ea364dba08259316d9935bc34a44e3e5342a0e754a0127d928",
+          "at": "2026-04-10T07:55:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`REVIEW_WRAPPER_TARGETS` hardcodes `.harness/config/agent-profiles.json` instead of reusing `agent_profiles::AGENT_PROFILES_PATH`. That path is already centralized for runtime consumers, so this duplicate literal can drift on the next migration and leave `verify-orchestra` checking the wrong file or failing spuriously.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 348,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:d59047ff5033a7ea364dba08259316d9935bc34a44e3e5342a0e754a0127d928",
+          "at": "2026-04-10T07:59:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dd614abe2aefa53fac766665509cf204373a8c0a9c73d8c8140afe951338680",
+          "at": "2026-04-10T08:01:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dd614abe2aefa53fac766665509cf204373a8c0a9c73d8c8140afe951338680",
+          "at": "2026-04-10T08:03:07Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -60,6 +483,87 @@
           "findings": [],
           "hash": "rvw1:sha256:150826b14f06fe314221201bd0c457ad0dcd6e04697fa22d27a4da449a318fd5",
           "at": "2026-04-10T07:10:21Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13c68c81b3fdc9dce610008f2d401a08c893d808d8effbe2bd3926a53e25a605",
+          "at": "2026-04-10T09:59:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The migrated Sandbox/Hook warning is not lossless: rule 1 now says to prefer `read-only` only for `reviewer` / `researcher`, but the deleted source also covered `planner`. That omission matters because the shipped `agent-profiles.codex-heavy.json` still routes `planner` to Codex, so a planner launched with `workspace-write` would bypass `block-direct-git-ops` without this guardrail telling operators to keep it read-only.",
+              "severity": "P1",
+              "file": ".claude/rules/10-guardrails.md",
+              "line": 82,
+              "category": "safety"
+            }
+          ],
+          "hash": "rvw1:sha256:13c68c81b3fdc9dce610008f2d401a08c893d808d8effbe2bd3926a53e25a605",
+          "at": "2026-04-10T10:02:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The migrated sandbox warning drops `planner` from the read-only / no-`--full-auto` guidance. That is not lossless: planners in this repo still run through Codex and are expected to stay on `--sandbox read-only`, so the safety warning no longer covers a capability that can still spawn a write-capable subprocess.",
+              "severity": "P1",
+              "file": ".claude/rules/10-guardrails.md",
+              "line": 86,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:9a3517d59b83e031b005e34a75e47a537f948e90d067c4be2d6c6bd1ef804c46",
+          "at": "2026-04-10T10:12:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a3517d59b83e031b005e34a75e47a537f948e90d067c4be2d6c6bd1ef804c46",
+          "at": "2026-04-10T10:13:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The migrated Sandbox/Hook warning is not lossless: it drops `planner` from the capabilities that must stay read-only / must not use `--full-auto`. This weakens the only safety-critical content being preserved, because planner can still route to an external provider in non-default profiles, and a `workspace-write` planner run would bypass the same git/file-write hooks this section is warning about.",
+              "severity": "P1",
+              "file": ".claude/rules/10-guardrails.md",
+              "line": 76,
+              "category": "safety"
+            }
+          ],
+          "hash": "rvw1:sha256:9a3517d59b83e031b005e34a75e47a537f948e90d067c4be2d6c6bd1ef804c46",
+          "at": "2026-04-10T10:15:41Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f389101e4cc11afe655ce1c49f2ebeeb9a7e16cf00be223775aa469b85b3941e",
+          "at": "2026-04-10T06:38:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f389101e4cc11afe655ce1c49f2ebeeb9a7e16cf00be223775aa469b85b3941e",
+          "at": "2026-04-10T06:40:03Z"
         }
       ]
     },
@@ -600,433 +1104,101 @@
           "findings": [],
           "hash": "rvw1:sha256:6926f3924bd4cca7b5af118a2de85364fd4463a4092521204dca8ce70c80c45b",
           "at": "2026-04-10T07:50:28Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:325a2ea354496de3c74ef00c810132b269969fc818d5ed77b7e059691cac66aa",
-          "at": "2026-04-10T07:03:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:325a2ea354496de3c74ef00c810132b269969fc818d5ed77b7e059691cac66aa",
-          "at": "2026-04-10T07:06:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e2606116501836b405228e4438120bdea384621e6a9c7c775dfe10abf22c6df5",
-          "at": "2026-04-10T07:12:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e2606116501836b405228e4438120bdea384621e6a9c7c775dfe10abf22c6df5",
-          "at": "2026-04-10T07:15:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:baf2cbc3f2adb75b7c665e4cc5cd815ea36515557aaa38dbb4e8bdcd09e92127",
-          "at": "2026-04-10T07:23:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:baf2cbc3f2adb75b7c665e4cc5cd815ea36515557aaa38dbb4e8bdcd09e92127",
-          "at": "2026-04-10T07:29:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
-          "at": "2026-04-10T07:38:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`write_agent_profiles()` was updated to the new `.harness/config/agent-profiles.json` schema, but the surrounding tests still execute `run_codex_local()`, whose test shim never reads agent profiles at all. As a result, this CLI-scope change adds no regression coverage for the actual `pr.rs` migration to `AgentProfiles::load`/`validate_reviewer_provider`; a bad path, missing `reviewer` capability, or unsupported provider would still pass here. Add a test that exercises the PR review entrypoints (or the helper they use) against the new config contract.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/tests.rs",
-              "line": 533,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
-          "at": "2026-04-10T07:41:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
-          "at": "2026-04-10T07:47:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ac0e2d01a527cdf3878f61265ab594368a60c23b614bc721663bed2c663698e",
-          "at": "2026-04-10T07:49:12Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f389101e4cc11afe655ce1c49f2ebeeb9a7e16cf00be223775aa469b85b3941e",
-          "at": "2026-04-10T06:38:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f389101e4cc11afe655ce1c49f2ebeeb9a7e16cf00be223775aa469b85b3941e",
-          "at": "2026-04-10T06:40:03Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AgentProfilesDto` will happily deserialize a config that is missing `capabilities`/`providers`, and `load()` never verifies `schema_version == 1`. That means a legacy or truncated JSON file can load successfully as an empty routing table, so every capability lookup returns `None` instead of surfacing a config error.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 67,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:dc5cba03a3dddb92c9f341fc383c808a7f1623b8de722b04edb64ff17c4efe23",
-          "at": "2026-04-10T05:54:28Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`schema_version` is deserialized but never validated, so any syntactically valid file with a legacy or future layout will still load and be treated as this schema. For a routing config, that can silently misresolve every capability instead of failing fast; `load()` should reject `schema_version != 1`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 111,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:dc5cba03a3dddb92c9f341fc383c808a7f1623b8de722b04edb64ff17c4efe23",
-          "at": "2026-04-10T05:55:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af3bf5fae5575dbafc5c3c7cd352cb0adb9d04a5c461448f04085911bdaadebe",
-          "at": "2026-04-10T05:59:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
+              "message": "Removing `test_gemini_delegation_uses_path_in_prompt` drops the only automated check that the multimodal guidance stays in `path-in-prompt` form. There is no replacement assertion against the migrated canonical location, so the T08/T09 doc move is now unguarded by tests.",
+              "severity": "medium",
+              "file": "scripts/test_verify_scripts.py",
+              "line": 464,
+              "category": "test coverage"
+            },
             {
-              "message": "`providers` and `capabilities` are deserialized with `#[serde(default)]`, so a config that omits or misspells one of those top-level sections still makes `AgentProfiles::load()` return `Ok(...)` with empty maps. That silently converts a malformed/truncated profile into `resolve_execution(...)=None`, which callers will interpret as a missing capability instead of surfacing a configuration error. These sections are required for the new schema and should fail load-time validation instead of defaulting.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 70,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:af3bf5fae5575dbafc5c3c7cd352cb0adb9d04a5c461448f04085911bdaadebe",
-          "at": "2026-04-10T06:03:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `AgentProfiles::load` deserializes `provider`, `model`, `fast_provider`, and `fast_model` as raw `String`s and returns them without validation, so malformed config like `{\"provider\":\"\"}` or `{\"fast_provider\":\"\"}` is accepted and `resolve_execution` later hands back an empty provider name instead of failing fast. That violates the repo rule to validate external input via domain types and turns a config error into a downstream runtime failure when the caller tries to dispatch on the provider.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 109,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:080337c4cb5f9860a1e69618ebd433d848cd33158a98d35af23a77d0f83d4870",
-          "at": "2026-04-10T06:07:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AgentProfiles::load()` only rejects blank `provider`/`fast_provider`, so malformed configs like `{\"provider\":\"codex\",\"model\":\"\"}` or `{\"fast_model\":\"\"}` still load successfully. `resolve_execution()` then propagates that bad input as `Some(\"\")` for `Final` and coerces the same empty string to `None` for `Fast`, which can turn a config typo into an invalid `--model` invocation or inconsistent routing instead of a load-time error.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "message": "The tracker marks T08/T09 done, but the completed Phase C descriptions still contain literal references to the deleted rules, and the same phase leaves the `providers.codex.escalation_threshold` rewrite as a later TODO. That creates stale/dangling references in the authoritative progress docs and makes the migration look more complete than it is.",
+              "severity": "medium",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/metadata.json",
               "line": 129,
-              "category": "validation"
+              "category": "documentation consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:42995024f29aa20ab47a48face657de4d98c8af6754529fa9fc2b4d15936dfaf",
+          "at": "2026-04-10T09:15:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T08 is checked off here, but the migrated warning in `.claude/rules/10-guardrails.md` is not lossless: the old section explicitly warned that `workspace-write` bypasses `check-codex-before-write.py`, and this task text also says the migration must preserve the `--full-auto` => `workspace-write` / `read-only` incompatibility. Neither point is present in the new guardrails section, so marking T08 complete here (and in the mirrored metadata entry) records an incomplete safety-doc migration as finished.",
+              "severity": "P1",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/plan.md",
+              "line": 43,
+              "category": "tracking"
             },
             {
-              "message": "The DTOs accept unknown JSON keys because neither `AgentProfilesDto` nor `CapabilityConfigDto` uses `#[serde(deny_unknown_fields)]`. A user typo like `fast_modle`/`fast_provier` will therefore parse as if the override were absent, silently changing the resolved provider/model instead of surfacing a configuration error in this routing file.",
+              "message": "After deleting the file-specific Gemini test, this suite no longer has any regression check for the content that was supposed to survive the rule-file cleanup: there is no assertion that `.claude/rules/10-guardrails.md` still contains the migrated Sandbox/Hook warning, and no assertion that `knowledge/conventions/security.md` points at that live section. Because this file already exists to catch doc drift, removing coverage without a replacement leaves the safety-critical migration effectively untested.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 75,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:b3ce2f0b9e4637b9a32556b261561e0daf00ef6161a91dba3c56dc8a94295184",
-          "at": "2026-04-10T06:11:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AgentProfiles::load()` silently normalizes blank `model` / `fast_model` strings to `None` instead of rejecting them. A malformed config like `{ \"provider\": \"codex\", \"model\": \" \" }` therefore loads successfully, and `resolve_execution(..., RoundType::Final)` returns `model=None` as if the field were intentionally omitted. That turns invalid external input into altered routing behavior rather than surfacing an `InvalidCapability` error at load time.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 149,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:f82585363cfc4c53e7a602801491ce249103e8e446117c85c970dab5c364e1cc",
-          "at": "2026-04-10T06:15:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AgentProfiles::load()` only checks that `provider` / `fast_provider` are non-empty, but it never verifies that those names exist in the top-level `providers` map. A typo like `\"provider\": \"codxe\"` or `\"fast_provider\": \"gemni\"` will load successfully and then flow into `resolve_execution()` as an unusable provider string, so the bad config is discovered only later when a caller tries to dispatch on that provider instead of being rejected as `InvalidCapability` at load time.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 131,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:d18a09cd9e0d7b0219d346b8d36c0136b3b43ca51591fd015554f7b9e3791545",
-          "at": "2026-04-10T06:18:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`UnsupportedSchemaVersion` is only reachable after `serde_json::from_str` succeeds, but this DTO is `deny_unknown_fields`. Any future schema bump that introduces new fields will fail during deserialization and surface as `Parse` instead of the advertised version-specific error, so callers cannot reliably distinguish an unsupported config version from malformed JSON. Parse a minimal envelope containing `schema_version` first, then deserialize the versioned payload.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 124,
-              "category": "correctness"
-            },
-            {
-              "message": "`load()` now has explicit error branches for blank `model` and blank `fast_model`, but the test module does not cover either branch. The briefing requires path coverage, and without negative tests here these new validation guarantees can regress silently while the suite still passes.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 150,
+              "file": "scripts/test_verify_scripts.py",
+              "line": 472,
               "category": "testing"
             }
           ],
-          "hash": "rvw1:sha256:d18a09cd9e0d7b0219d346b8d36c0136b3b43ca51591fd015554f7b9e3791545",
-          "at": "2026-04-10T06:22:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b64f5fdf28e13f03872ffd70c5ae368a5521c63730b81f3892226b65b6a6bbbb",
-          "at": "2026-04-10T06:26:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:41b789421ea694cb4de3560617c77bce89c7efe76032ffce2c1da84c0e296436",
-          "at": "2026-04-10T06:30:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:41b789421ea694cb4de3560617c77bce89c7efe76032ffce2c1da84c0e296436",
-          "at": "2026-04-10T06:33:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The codex-system target stopped checking the plain `providers.codex.default_model` fallback that still appears in `SKILL.md`; only the longer old sentence and `profiles.<active_profile>.provider_model_overrides.codex` are forbidden now, so the fallback guidance can remain undetected.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 310,
-              "category": "coverage"
-            },
-            {
-              "message": "The `track review` target no longer asserts the config-path migration. It requires only `capabilities` and forbids the old model fields, so the stale `.claude/agent-profiles.json` reference in `review.md` can still pass this guardrail.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 327,
-              "category": "coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:e9509a8b29a6cb628faba10ea5a4cf7f5d8323513bed3131b36abce2665d2692",
-          "at": "2026-04-10T07:25:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e9509a8b29a6cb628faba10ea5a4cf7f5d8323513bed3131b36abce2665d2692",
-          "at": "2026-04-10T07:27:53Z"
+          "hash": "rvw1:sha256:42995024f29aa20ab47a48face657de4d98c8af6754529fa9fc2b4d15936dfaf",
+          "at": "2026-04-10T09:18:49Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`MODEL_RESOLUTION_TARGETS` now requires `.claude/skills/codex-system/SKILL.md` to contain `capabilities` and forbids `profiles.<active_profile>.provider_model_overrides.codex`, but that file still contains the old override/default_model guidance today. Because `verify_override_first_model_resolution` checks the current repository state directly, this change will make `verify-orchestra` fail until T13 lands.",
+              "message": "`test_sandbox_warning_migrated_to_guardrails` does not actually lock in the restored T08 content. It only checks for the section title plus `workspace-write` and `block-direct-git-ops`, so the specific `Consequences`/guard-bypass warning that previously got lost could be removed again without this test failing. The regression test should assert the migrated consequence text or an equivalent bypass-specific invariant.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 312,
-              "category": "correctness"
-            },
-            {
-              "message": "`MODEL_RESOLUTION_TARGETS` also tightens `.claude/commands/track/review.md` immediately by requiring `capabilities` and forbidding the existing `providers.<reviewer_provider>.fast_model` / `default_model` strings. The current doc still contains those lines, so this staged change introduces a deterministic guardrail failure before the review.md migration is applied.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 327,
-              "category": "correctness"
+              "file": "scripts/test_verify_scripts.py",
+              "line": 486,
+              "category": "testing"
             }
           ],
-          "hash": "rvw1:sha256:e9509a8b29a6cb628faba10ea5a4cf7f5d8323513bed3131b36abce2665d2692",
-          "at": "2026-04-10T07:31:30Z"
+          "hash": "rvw1:sha256:0e2d6b9cb2e1cbbe9ef5aa4e84a1f9d4d900658a575a7cbd2750f3c6ecc7fa8f",
+          "at": "2026-04-10T09:55:37Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e9509a8b29a6cb628faba10ea5a4cf7f5d8323513bed3131b36abce2665d2692",
-          "at": "2026-04-10T07:35:26Z"
+          "hash": "rvw1:sha256:6346276577fc8674e6e4c7196e4ed3ee4678b555d87f1ec8ace0c1150a270b7a",
+          "at": "2026-04-10T10:00:24Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`MODEL_RESOLUTION_TARGETS` now requires the literal `capabilities` in `.claude/skills/codex-system/SKILL.md`, but that file still only contains the old `provider_model_overrides/default_model` wording and no `capabilities` token. As staged, `verify_override_first_model_resolution` will start failing `cargo make verify-orchestra` before the T13 doc update lands.",
+              "message": "`test_sandbox_warning_migrated_to_guardrails` only checks for generic `workspace-write`/hook strings and never asserts the second warning called out in T08: that `--full-auto` implies `--sandbox workspace-write` and must not be paired with `--sandbox read-only`. Because of that, the regression suite still passes when that migrated guidance disappears from `10-guardrails.md`, so the durability check for the move is incomplete.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 314,
-              "category": "correctness"
-            },
-            {
-              "message": "The same regression exists for `.claude/commands/track/review.md`: adding `capabilities` as a required snippet will fail verification immediately, because the current document still says to read `.claude/agent-profiles.json` and contains no `capabilities` string. That makes this guardrail change fail-closed before the later doc migration it depends on.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 329,
-              "category": "correctness"
-            },
-            {
-              "message": "The `.claude/rules/02-codex-delegation.md` target was removed even though that file is still tracked in this repo and still contains the legacy reviewer wrapper prompt. Dropping the entry here weakens the guardrail and lets stale guidance in that rule file persist without `verify-orchestra` catching it.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 384,
-              "category": "correctness"
+              "file": "scripts/test_verify_scripts.py",
+              "line": 486,
+              "category": null
             }
           ],
-          "hash": "rvw1:sha256:e9509a8b29a6cb628faba10ea5a4cf7f5d8323513bed3131b36abce2665d2692",
-          "at": "2026-04-10T07:38:15Z"
+          "hash": "rvw1:sha256:6346276577fc8674e6e4c7196e4ed3ee4678b555d87f1ec8ace0c1150a270b7a",
+          "at": "2026-04-10T10:01:48Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3ac35f2baf73a4949a238e9791cb14a734bc2186b5b628db8ef36e7709f868be",
-          "at": "2026-04-10T07:45:20Z"
+          "hash": "rvw1:sha256:2c163859f345ef7ba0a555a3312ac98082ee357786288c7ee786706b07dde46e",
+          "at": "2026-04-10T10:12:52Z"
         },
         {
           "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new guardrail for `.harness/config/agent-profiles.json` only requires the bare substring `reviewer`. Because `verify_reviewer_wrapper_guidance` does a simple `contains()` check, this will pass even if the capability-centric schema regresses and the file no longer has a `capabilities.reviewer` entry, as long as `reviewer` appears anywhere else in the JSON. That weakens the verification substantially and does not actually enforce the intended migration to capability-based guidance.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 350,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3ac35f2baf73a4949a238e9791cb14a734bc2186b5b628db8ef36e7709f868be",
-          "at": "2026-04-10T07:47:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Dropping the `.claude/rules/02-codex-delegation.md` target removes coverage for an existing stale guidance file that is still present in the tree and still references the old `.claude/agent-profiles.json` contract. `verify_reviewer_wrapper_guidance()` will no longer fail if that file regresses again, so the guardrail becomes incomplete until the file is actually removed or migrated.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 387,
-              "category": "coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:d59047ff5033a7ea364dba08259316d9935bc34a44e3e5342a0e754a0127d928",
-          "at": "2026-04-10T07:52:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new reviewer-capability guard is too weak to catch a broken `capabilities.reviewer` entry. `verify_reviewer_wrapper_guidance()` only checks each required snippet with independent `contains()` calls, so `\"provider\"` can be satisfied by any other capability's provider field. Since `.harness/config/agent-profiles.json` contains several unrelated `\"provider\"` keys, CI will still pass even if the reviewer capability loses its own provider mapping.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 350,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d59047ff5033a7ea364dba08259316d9935bc34a44e3e5342a0e754a0127d928",
-          "at": "2026-04-10T07:53:59Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d59047ff5033a7ea364dba08259316d9935bc34a44e3e5342a0e754a0127d928",
-          "at": "2026-04-10T07:55:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`REVIEW_WRAPPER_TARGETS` hardcodes `.harness/config/agent-profiles.json` instead of reusing `agent_profiles::AGENT_PROFILES_PATH`. That path is already centralized for runtime consumers, so this duplicate literal can drift on the next migration and leave `verify-orchestra` checking the wrong file or failing spuriously.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 348,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:d59047ff5033a7ea364dba08259316d9935bc34a44e3e5342a0e754a0127d928",
-          "at": "2026-04-10T07:59:37Z"
+          "hash": "rvw1:sha256:2c163859f345ef7ba0a555a3312ac98082ee357786288c7ee786706b07dde46e",
+          "at": "2026-04-10T10:13:57Z"
         }
       ]
     }

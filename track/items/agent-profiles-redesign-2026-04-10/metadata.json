@@ -114,24 +114,26 @@
       "status": "done"
     },
     {
+      "commit_hash": "0dd0b78a503c246305019d7576d4395da96955ea",
       "description": "apps/cli/src/commands/review/tests.rs の write_agent_profiles helper (L533) を新パス (.harness/config/) + 新スキーマに更新。テストで作成する JSON を capability 中心スキーマに書き換え、各 fixture (L565, L602, L632 近辺) も新スキーマに対応させる。T03 で model_profiles が削除されるため、full_auto 関連のテストは削除または簡略化。",
       "id": "T06",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "0dd0b78a503c246305019d7576d4395da96955ea",
       "description": "libs/infrastructure/src/verify/orchestra.rs の guardrail constants を全面更新。(a) REVIEW_WRAPPER_TARGETS[0] の path を .claude/agent-profiles.json → .harness/config/agent-profiles.json、required_snippets を新スキーマの capability エントリ形式に更新。(b) MODEL_RESOLUTION_TARGETS の forbidden_snippet から 旧パスへの参照を削除し、新スキーマ形式 (capabilities.<name>.model / fast_model) に更新。(c) 削除対象ファイル (.claude/rules/02-codex-delegation.md と 03-gemini-delegation.md) のエントリを REVIEW_WRAPPER_TARGETS / MODEL_RESOLUTION_TARGETS から完全除去。(d) 旧 providers.codex.default_model 系の言及を capabilities.reviewer.model に置換。(e) 関連 unit test を Red → Green で更新。",
       "id": "T07",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": ".claude/rules/02-codex-delegation.md の削除 + Sandbox/Hook Coverage Warning セクションを .claude/rules/10-guardrails.md に移設。削除理由: 文書の大半 (When Codex Is A Good Fit 表、How to Consult 例、direct codex exec 例、debugger/implementer 向け例) は sotp plan codex-local / sotp review codex-local CLI 化によりほぼ空洞化しており、かつ debugger capability は ADR で廃止される。Canonical Block Preservation は .claude/skills/track-plan/SKILL.md に既記載のため重複削除。Sandbox and Hook Coverage Warning の警告内容 (hook は Codex 子プロセスに効かない / --full-auto が --sandbox workspace-write を含意するため --sandbox read-only と併用してはいけない) のみ 10-guardrails.md の既存 guardrails 節に追記する。",
       "id": "T08",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": ".claude/rules/03-gemini-delegation.md の削除。削除理由: multimodal_reader capability は ADR で廃止される。researcher capability の gemini -p 例は .claude/skills/track-plan/SKILL.md と .claude/skills/gemini-system/SKILL.md に既記載。\"In The Default Profile, Gemini Usually Does Not Own\" の表は現状 (planner=Claude, debugger 廃止) と乖離しておりメンテナンス負荷のみ高い。Language Protocol (English→Japanese) は .claude/rules/01-language.md に既存。全てのセクションが重複または廃止対象のためファイル自体を削除する。",
       "id": "T09",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": ".claude/rules/08-orchestration.md の更新。(a) capability 一覧を新 6 個 (orchestrator/planner/designer/implementer/reviewer/researcher) に変更し workflow_host/debugger/multimodal_reader 言及を削除。(b) Default specialist profile 表を新スキーマの単一 profile に合わせる (planner/designer/implementer=Claude, reviewer/researcher=Codex or Gemini — default に準拠)。(c) .claude/agent-profiles.json への参照を .harness/config/agent-profiles.json に更新。(d) Delegation Rules 表を単一 SoT に集約し、削除された 02/03 ルールファイルへの参照を除去。(e) Planner Briefing Requirements 節は維持。",
@@ -175,5 +177,5 @@
     }
   ],
   "title": "RV2-Phase2: agent-profiles redesign (.harness/config 移行 + capability 中心スキーマ)",
-  "updated_at": "2026-04-10T07:16:07Z"
+  "updated_at": "2026-04-10T09:12:28Z"
 }
