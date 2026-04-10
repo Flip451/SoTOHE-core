@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "providers": {
+    "claude": {
+      "label": "Claude Code"
+    },
+    "codex": {
+      "label": "Codex CLI"
+    },
+    "gemini": {
+      "label": "Gemini CLI"
+    }
+  },
+  "capabilities": {
+    "orchestrator": {
+      "provider": "claude",
+      "model": "claude-opus-4-6"
+    },
+    "planner": {
+      "provider": "codex",
+      "model": "gpt-5.4"
+    },
+    "designer": {
+      "provider": "claude",
+      "model": "claude-opus-4-6"
+    },
+    "implementer": {
+      "provider": "codex",
+      "model": "gpt-5.4"
+    },
+    "reviewer": {
+      "provider": "codex",
+      "model": "gpt-5.4",
+      "fast_model": "gpt-5.4-mini"
+    },
+    "researcher": {
+      "provider": "codex",
+      "model": "gpt-5.4-mini"
+    }
+  }
+}
