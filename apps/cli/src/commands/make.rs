@@ -521,7 +521,7 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
 
     // Review guard: check review.status == approved with current code hash.
     // Resolve track ID from current branch (track/<id>).
-    if let Some(track_id) = resolve_track_id_from_branch() {
+    if let Some(track_id) = current_branch_track_id_strict()? {
         eprintln!("[track-commit-message] Checking review approval for track '{track_id}'...");
         let guard_result = run_sotp(&[
             "review",
@@ -548,7 +548,7 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
     // Both steps run regardless of individual failures so that neither blocks the other.
     // We propagate a failure exit code only after both have been attempted.
     let mut post_commit_failed = false;
-    if let Some(ref track_id) = resolve_track_id_from_branch() {
+    if let Some(ref track_id) = current_branch_track_id_strict()? {
         // v2: write HEAD SHA to .commit_hash
         if let Err(msg) = persist_commit_hash_v2(track_id) {
             eprintln!("[track-commit-message] WARNING: .commit_hash persistence failed: {msg}");
@@ -686,19 +686,40 @@ fn persist_approved_head(track_id: &str) -> Result<(), String> {
     Ok(())
 }
 
-/// Resolves the track ID from the current git branch.
+/// Resolves the track ID from the current git branch (strict mode).
 ///
-/// Returns `Some(id)` if the branch matches `track/<id>`, otherwise `None`.
-fn resolve_track_id_from_branch() -> Option<String> {
-    let output = std::process::Command::new("git")
-        .args(["rev-parse", "--abbrev-ref", "HEAD"])
-        .output()
-        .ok()?;
+/// Returns `Ok(Some(id))` only when the branch matches `track/<id>` and the
+/// id passes [`TrackId`] validation. Plan-phase branches (`plan/<id>`)
+/// intentionally resolve to `Ok(None)` because the make-task callers
+/// (review check-approved, post-commit hash persistence) only apply once a
+/// track has progressed past the planning phase. Non-track branches (e.g.
+/// `main`) and git failures also resolve to `Ok(None)`.
+///
+/// Returns `Err` when the branch matches `track/<id>` but the `<id>` fails
+/// validation: in that case the callers must not silently skip the review
+/// guard (fail-closed).
+///
+/// Internally delegates parsing to
+/// [`usecase::track_resolution::resolve_track_id_from_branch`] so the
+/// branch-name semantics stay consistent with the rest of the workflow.
+fn current_branch_track_id_strict() -> Result<Option<String>, CliError> {
+    let output =
+        std::process::Command::new("git").args(["rev-parse", "--abbrev-ref", "HEAD"]).output().ok();
+    let Some(output) = output else { return Ok(None) };
     if !output.status.success() {
-        return None;
+        return Ok(None);
     }
     let branch = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-    branch.strip_prefix("track/").map(|id| id.to_owned())
+    match usecase::track_resolution::resolve_track_id_from_branch(Some(&branch)) {
+        Ok(id) => Ok(Some(id)),
+        Err(usecase::track_resolution::TrackResolutionError::InvalidTrackId(slug, _)) => {
+            Err(CliError::Message(format!(
+                "current branch 'track/{slug}' has an invalid track id; \
+                 rename the branch or switch to a valid track branch before committing"
+            )))
+        }
+        Err(_) => Ok(None),
+    }
 }
 
 // --- Phase 4: Exec dispatcher ---

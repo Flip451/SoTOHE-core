@@ -96,6 +96,34 @@
 - `libs/infrastructure/src/verify/doc_patterns.rs`: docs 整合性チェックの 3 entries (track/workflow.md hooks selftest gate / TRACK_TRACEABILITY.md hooks selftest gate / DEVELOPER_AI_WORKFLOW.md hooks selftest gate) を削除
 - 検証: `cargo make ci` 全 PASS
 
+### sotp `cargo make track-sync-views` auto-detect (PR #87 review feedback)
+
+PR #87 のレビューで「`track_id=None` (引数なしの `cargo make track-sync-views`) で per-track view を完全に touch しなくなり、metadata/spec を編集後に sync で全更新されると期待しているユーザーが silent に困る」と指摘された。指摘自体は妥当で、bulk mode 廃止に伴う UX 後退を補うための auto-detect 機能を本トラック内で追加する。
+
+実装:
+
+- `libs/usecase/src/track_resolution.rs`:
+  - 既存 `resolve_track_id_from_branch` (strict, `track/` 専用) はそのまま残す
+  - 新規 `resolve_track_or_plan_id_from_branch` (lenient, `track/` + `plan/` 両対応) を追加。slug は両プレフィックスとも `TrackId::try_new` で validation
+  - 新規 unit test 7 件追加 (track/plan/main/HEAD/None/invalid slug/empty suffix)
+- `apps/cli/src/commands/track/views.rs`:
+  - Sync ハンドラに `detect_track_id_from_branch` を追加
+  - `--track-id` 未指定時、current branch を `SystemGitRepo::discover()` で取得し、lenient resolver で track_id を抽出
+  - `track/<id>` または `plan/<id>` チェックアウト中なら自動的にそのトラックの per-track view を render
+  - main 等の非 track/plan ブランチでは引き続き registry-only モードへ fall back
+- `apps/cli/src/commands/make.rs`:
+  - 重複していた private `resolve_track_id_from_branch()` (`Option<String>`、`track/` のみ、独自実装) を削除
+  - `current_branch_track_id_strict()` に rename し、本体を library 版 (strict) を呼ぶ薄いラッパーに置き換え
+  - 呼び出し元 2 箇所 (review check-approved, post-commit hash persist) を rename された関数名に更新
+  - strict のままにした理由: review check-approved や commit_hash persist は plan ブランチ上では無意味なので fail-closed が正しく、lenient 化はしない
+
+検証:
+
+- `cargo make ci`: 全チェック PASS
+- track 抽出ロジックの test 計 13 件 (既存 6 + 新規 7) PASS
+
+この変更により PR #87 の P1 finding (bulk view rendering の喪失) は解消される: ユーザーが track ブランチ上で `cargo make track-sync-views` を引数なしで実行すれば、当該トラックの plan.md / spec.md / domain-types.md が render されるようになる。
+
 ### sotp render bug fix (T08 進行中に発見、本トラック内で修正)
 
 T08 finalize 中に `sync_rendered_views` のバグを発見した。`bin/sotp track transition T0X done` でトラック状態が `in_progress → done` に flip する瞬間、`plan.md` の再 render が完全にスキップされ、`[~]` (in_progress) のチェックボックスが永久に保存される現象。原因は commit `795b45f` (2026-04-08) で追加された "skip done/archived track views" 保護ロジックで、bulk sync (`track_id = None`) と single-track sync (`track_id = Some(...)`) 両方のパスが保護対象とされた。この設計は legacy archived track の view を上書きしないという目的には合致していたが、`track transition done` で状態が切り替わる瞬間に single-track sync を呼ぶユースケースを見落としており、完了直後の再 render もスキップしてしまう過剰な保護となっていた。
