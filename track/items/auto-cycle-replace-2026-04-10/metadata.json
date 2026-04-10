@@ -1,79 +1,83 @@
 {
-  "schema_version": 3,
-  "id": "auto-cycle-replace-2026-04-10",
   "branch": "track/auto-cycle-replace-2026-04-10",
-  "title": "full-cycle をタスクごとの implement → review → commit ループに書き換え",
-  "status": "planned",
   "created_at": "2026-04-10T12:00:00+09:00",
-  "updated_at": "2026-04-10T23:59:00+09:00",
-  "tasks": [
-    {
-      "id": "T001",
-      "description": "full-cycle.md の内容をタスクループ方式に書き換え（transitional compatibility 表記を削除し正式コマンド化）",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T002",
-      "description": "SKILL.md の full-cycle 説明を更新",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T003",
-      "description": "cargo make track-signals ラッパー追加 + track:plan コマンドに spec-approve / track-signals ステップを明記",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T004",
-      "description": "CI 通過確認",
-      "status": "todo",
-      "commit_hash": null
-    }
-  ],
+  "id": "auto-cycle-replace-2026-04-10",
   "plan": {
-    "summary": [
-      "/track:full-cycle の動作を「全タスク一括実装 + まとめてレビュー」から「タスクごとの implement → review → commit ループ」に書き換える。",
-      "コマンド名は変更せず、中身のセマンティクスのみ変更。Rust コード変更なし。"
-    ],
     "sections": [
       {
-        "id": "S1",
-        "title": "full-cycle.md 書き換え",
         "description": [
           "現在の一括実装ロジックを、metadata.json のタスク配列順にループする方式に変更。",
           "各タスクで implement → review (zero_findings) → cargo make ci → commit を完結させる。",
           "デフォルトはコミットメッセージ確認あり、--auto でタスク説明から自動生成。",
           "失敗時はそのタスクで停止してステータス報告。"
         ],
-        "task_ids": ["T001"]
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "full-cycle.md 書き換え"
       },
       {
-        "id": "S2",
-        "title": "SKILL.md 参照更新",
         "description": [
           "track-plan SKILL.md 内の full-cycle 説明を新しいセマンティクスに合わせる。"
         ],
-        "task_ids": ["T002"]
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "SKILL.md 参照更新"
       },
       {
-        "id": "S3",
-        "title": "track-signals ラッパー + track:plan 手順修正",
         "description": [
           "Makefile.toml に cargo make track-signals ラッパーを追加。",
-          "track:plan コマンド (plan.md) に spec-approve → track-signals の正しい手順を明記。"
+          "track:plan コマンド (plan.md) に track-signals → spec-approve の正しい手順を明記。"
         ],
-        "task_ids": ["T003"]
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "track-signals ラッパー + track:plan 手順修正"
       },
       {
-        "id": "S4",
-        "title": "CI 検証",
         "description": [
           "cargo make ci で全チェック通過を確認。"
         ],
-        "task_ids": ["T004"]
+        "id": "S4",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "CI 検証"
       }
+    ],
+    "summary": [
+      "/track:full-cycle の動作を「全タスク一括実装 + まとめてレビュー」から「タスクごとの implement → review → commit ループ」に書き換える。",
+      "コマンド名は変更せず、中身のセマンティクスのみ変更。Rust コード変更なし。"
     ]
-  }
+  },
+  "schema_version": 3,
+  "status": "in_progress",
+  "tasks": [
+    {
+      "description": "full-cycle.md の内容をタスクループ方式に書き換え（transitional compatibility 表記を削除し正式コマンド化）",
+      "id": "T001",
+      "status": "in_progress"
+    },
+    {
+      "description": "SKILL.md の full-cycle 説明を更新",
+      "id": "T002",
+      "status": "in_progress"
+    },
+    {
+      "description": "cargo make track-signals ラッパー追加 + track:plan コマンドに track-signals → spec-approve の手順を明記",
+      "id": "T003",
+      "status": "in_progress"
+    },
+    {
+      "description": "CI 通過確認",
+      "id": "T004",
+      "status": "todo"
+    }
+  ],
+  "title": "full-cycle をタスクごとの implement → review → commit ループに書き換え",
+  "updated_at": "2026-04-10T13:05:20Z"
 }

@@ -30,7 +30,7 @@ Execution:
   - Record which manual verification steps were performed and their results.
   - Note any open issues or areas requiring further review.
   - Set `verified_at` to the current date.
-- Use `cargo make track-transition <track_dir> <task_id> done --commit-hash <hash>` to mark completed tasks as `done` (auto-renders `plan.md` + `registry.md`). If work remains blocked, keep tasks in `in_progress` and report why.
+- Use `cargo make track-transition <track_dir> <task_id> done` to mark completed tasks as `done` (auto-renders `plan.md` + `registry.md`). The `--commit-hash <hash>` is recorded later after `/track:commit` creates the actual commit. If work remains blocked, keep tasks in `in_progress` and report why.
 
 Behavior:
 - This command is the canonical replacement for legacy team-implement style flow.

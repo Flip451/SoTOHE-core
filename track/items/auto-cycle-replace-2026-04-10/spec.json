@@ -28,7 +28,7 @@
         ]
       },
       {
-        "text": "Makefile.toml に cargo make track-signals ラッパーを追加し、track:plan コマンドに spec-approve / track-signals ステップを明記",
+        "text": "Makefile.toml に cargo make track-signals ラッパーを追加し、track:plan コマンドに track-signals → spec-approve の手順を明記",
         "sources": [
           "discussion — planning session 2026-04-10"
         ],
@@ -74,7 +74,7 @@
   ],
   "acceptance_criteria": [
     {
-      "text": "full-cycle.md がタスクごとの implement → review (zero_findings) → cargo make ci → commit ループを定義しており、デフォルトのコミットメッセージ確認・--auto による自動生成・失敗時のタスク停止とステータス報告を含み、transitional compatibility の位置づけが削除され正式コマンドとして記述されている",
+      "text": "full-cycle.md がタスクごとの implement（CI・done transition 含む）→ review (zero_findings) → commit ループを定義しており、コミットメッセージはタスク説明から自動生成され、失敗時はループを停止して報告し、transitional compatibility の位置づけが削除され正式コマンドとして記述されている",
       "sources": [
         "feedback — user request 2026-04-08"
       ],
@@ -92,7 +92,7 @@
       ]
     },
     {
-      "text": "Makefile.toml に cargo make track-signals ラッパーが追加され、track:plan コマンドに spec-approve / track-signals ステップが明記されている",
+      "text": "Makefile.toml に cargo make track-signals ラッパーが追加され、track:plan コマンドに track-signals → spec-approve の手順が明記されている",
       "sources": [
         "discussion — planning session 2026-04-10"
       ],
@@ -110,6 +110,6 @@
       ]
     }
   ],
-  "approved_at": "2026-04-10T12:58:18Z",
-  "content_hash": "sha256:d285571bfa9fe98678e5abd5d2724185ecb6eee7a106688b34ab005971e846d9"
+  "approved_at": "2026-04-10T14:17:24Z",
+  "content_hash": "sha256:929c6a6bfc44ec6a945285cab7f039b7078c864da02fdf7d02584095c094dae4"
 }

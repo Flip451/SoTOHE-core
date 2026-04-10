@@ -858,6 +858,11 @@ description = "[wrapper] Approve a spec (set status=approved + content hash)"
 script_runner = "@shell"
 script = ['bin/sotp make spec-approve "$@"']
 
+[tasks.track-signals]
+description = "[wrapper] Evaluate confidence signals for a track's spec.json"
+script_runner = "@shell"
+script = ['bin/sotp track signals "$@"']
+
 [tasks.track-switch-main]
 description = "[wrapper] Switch to main branch and pull latest"
 command = "bin/sotp"

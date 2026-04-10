@@ -1,35 +1,38 @@
 ---
-description: Run the autonomous implementation full-cycle for a track task.
+description: Run per-task implement → review → commit loop for the current track.
 ---
 
-Autonomous implementation wrapper using Claude Code orchestration.
+Canonical command for autonomous per-task implementation in the track workflow.
 
-Arguments:
-- Use `$ARGUMENTS` as the task summary.
-- If empty, ask for a short task summary and stop.
+Requires being on a `track/<id>` branch. If on `plan/<id>`, stop and suggest `/track:activate <id>`.
+If on any other branch, stop and suggest switching to the track branch.
 
-Execution:
-- Resolve the current track in this order:
-  1. If the current git branch matches `track/<id>`, use that track.
-  2. Otherwise, use the latest materialized active track (non-archived, non-done, `branch != null`).
-  3. If no materialized active track exists, fall back to the latest branchless planning-only track (`status=planned`, `branch=null`).
-- Read the current track's `spec.md`, `plan.md`, `metadata.json`, and `verification.md` before implementation.
-- If the resolved track is branchless planning-only (`status=planned`, `branch=null`), stop and return `/track:activate <track-id>` as the next command. Do not use this command to bypass activation.
-- Read every convention file listed in the `## Related Conventions (Required Reading)` section of `plan.md` before writing code.
-- **ADR pre-check**: If `spec.md` or `plan.md` references an ADR (`knowledge/adr/*.md`), read the ADR and verify that the target task's description is consistent with the ADR's design (layer placement, error types, behavioral contracts). If discrepancies are found, fix the plan (`metadata.json` + `track-sync-views`) before writing code. ADR is the SSoT for design decisions.
-- Map `$ARGUMENTS` to one or more approved tasks in `metadata.json`.
-- Use `cargo make track-transition <track_dir> <task_id> in_progress` to mark selected tasks as `in_progress` and auto-render `plan.md` + `registry.md`. Do NOT edit `plan.md` directly.
-- Execute the implementation autonomously inside Claude Code using Agent Teams, focused tests, and repo-local commands. Prefer Rust CLI / `cargo make` wrappers over ad-hoc workflow scripts.
-- If `$ARGUMENTS` matches `knowledge/external/guides.json` `trigger_keywords`, rely on the injected guide summaries before opening cached raw documents.
-- Before completion, run the equivalent of `/track:review` until findings reach zero, then run `cargo make ci`.
-- Update `verification.md` with the work performed, focused/manual verification results, open issues, and `verified_at`.
-- Use `cargo make track-transition <track_dir> <task_id> done --commit-hash <hash>` to mark completed tasks as `done`. If work remains blocked, keep tasks in `in_progress` and report the blocker.
+## Execution
 
-Behavior:
-- This command is transitional compatibility only. Prefer `/track:implement` for the primary implementation lane.
-- It must not add new workflow behavior beyond parity with the current track guardrails.
-- While this command remains in the repo, it must obey the same activation guard as `/track:implement`.
-- After execution, summarize:
-  1. Result (success/failure)
-  2. Key outputs or blockers
-  3. Next recommended action
+For each task in `metadata.json` `tasks` array (in order) where `status` is `todo`, `in_progress`, or `done` with `commit_hash` null (implemented but not yet committed):
+
+1. **Implement**: execute `/track:implement` scoped to this single task.
+   `/track:implement` handles implementation, CI, and verification update.
+   Note: `/track:implement` normally marks the task `done` and suggests `/track:commit`,
+   but within the full-cycle loop the orchestrator proceeds to review before committing.
+2. **Review**: execute `/track:review`. Reviews the implementation including all changes.
+   Must reach full model `zero_findings`.
+3. **Commit**: execute `/track:commit` with a commit message generated from the task description.
+
+If any step fails, stop the loop and report the failure.
+Rerun `/track:full-cycle` resumes from the first eligible task (the loop condition above catches done tasks with null commit_hash).
+
+## Post-loop
+
+After all tasks complete:
+1. Update `verification.md` with overall results and `verified_at`.
+2. Run `cargo make track-sync-views`.
+3. Commit post-loop changes via `/track:commit "chore: update verification and sync views"`.
+
+## Behavior
+
+After execution, summarize:
+1. Tasks completed (count and IDs)
+2. Tasks remaining (if stopped early)
+3. Failure details (if any)
+4. Recommended next command: `/track:pr` (all done) or targeted fix (stopped)

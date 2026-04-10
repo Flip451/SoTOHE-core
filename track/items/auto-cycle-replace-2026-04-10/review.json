@@ -324,6 +324,516 @@
           "findings": [],
           "hash": "rvw1:sha256:2c65cdf3ce810453424cb01f3524b8cb8f8e2a2091cfa87fc00c8a75ddea6153",
           "at": "2026-04-10T13:00:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:362be706c8558b7c9eca0adc08ab471e2df308912d9fe5d7b43ec5d4d1f2d19d",
+          "at": "2026-04-10T13:09:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated `/track:plan` next-step template still tells users to run only `cargo make spec-approve <track-dir>` before starting implementation. T003 and the new `track-signals` wrapper make `spec-approve -> track-signals` the intended post-approval flow, so this changed guidance is still incomplete and will leave users skipping signal evaluation/persistence.",
+              "severity": "P1",
+              "file": ".claude/skills/track-plan/SKILL.md",
+              "line": 490,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:362be706c8558b7c9eca0adc08ab471e2df308912d9fe5d7b43ec5d4d1f2d19d",
+          "at": "2026-04-10T13:11:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated `/track:plan` next-step templates still instruct users to run only `cargo make spec-approve <track-dir>` after approval. T003 adds `track-signals` as part of the required post-approval flow, and this same skill already documents `bin/sotp track signals <track-id>` elsewhere, so users following these templates will skip signal evaluation and leave the spec/views stale.",
+              "severity": "P1",
+              "file": ".claude/skills/track-plan/SKILL.md",
+              "line": 490,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:362be706c8558b7c9eca0adc08ab471e2df308912d9fe5d7b43ec5d4d1f2d19d",
+          "at": "2026-04-10T13:13:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` still encodes T003's plan text with the old `spec-approve -> track-signals` order, while the task description, spec, verification checklist, and updated SKILL now require `track-signals -> spec-approve`. Because `metadata.json` is the SSoT for the rendered plan, this stale section will keep regenerating contradictory instructions and leaves the track artifacts out of sync about the canonical approval flow.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/metadata.json",
+              "line": 33,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ae6dbb6a3167e5f35e52802cbf01aa6692b451d4bf447e97486b3f14816d244b",
+          "at": "2026-04-10T14:00:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Makefile.toml` adds a new public `cargo make track-signals` wrapper, but the wrapper regression suite is not updated to cover it. That leaves the new dispatch/arg-forwarding path unverified, so a typo or later refactor of `bin/sotp track signals \"$@\"` can break the command without CI catching it.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 861,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c117a21de0b8de6ca7240b8a542ea54d9636eb3b9afcc1dac7185dabd2f3f980",
+          "at": "2026-04-10T14:04:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:574b3f149a6e76e029c017f582903b9d929124c4b7ea3a82d796a231d832cfa1",
+          "at": "2026-04-10T14:08:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3724e3f5d7e5348ac8336676659eb34329873a3ee67e35026f9301155d661755",
+          "at": "2026-04-10T14:34:31Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The commit phase is incomplete: `cargo make track-commit-message` needs `tmp/track-commit/commit-message.txt`, and `cargo make track-note` needs `tmp/track-commit/note.md`, but Step 1e never tells the command to write either scratch file. As written, the autonomous loop cannot reliably commit and may fail or reuse stale note/message content.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 60,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:a0c356d62ac137fa4dab0f3e346c7c9ecbffceca44330e34517b980e3f55f802",
+          "at": "2026-04-10T13:09:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This resolution order never handles `plan/<id>` checkouts. If `/track:full-cycle` is run from a planning-only branch, it will fall through to some other active track instead of stopping with `/track:activate`, so the command can operate on the wrong track.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 18,
+              "category": "workflow"
+            },
+            {
+              "message": "The loop only processes tasks with `status == \"todo\"`, but failure handling leaves the failing task `in_progress` and tells the user to rerun `/track:full-cycle`. On rerun, that task will be skipped, so the command cannot resume the blocked task it just stopped on.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 31,
+              "category": "workflow"
+            },
+            {
+              "message": "Approving `spec.json` before `track-signals` mutates it makes the recorded `content_hash` stale as soon as signals are written. Since approval validity depends on the current file contents, this workflow should evaluate signals first or re-run approval after the signals update.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 57,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8ff511d8aecb7e5c80dcd7bc2d57d4679a3f2fb9ecfc875d38c19b24c57b74f2",
+          "at": "2026-04-10T13:14:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The failure-handling block does not cover the `cargo make track-transition <track_dir> <task_id> done --commit-hash <hash>` step. If the done transition fails after the task has already been committed, the loop has no instruction to stop or recover, so the task can stay `in_progress` while the implementation proceeds as if it were finished.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 74,
+              "category": null
+            },
+            {
+              "message": "The post-loop `verification.md` update and `cargo make track-sync-views` run are never followed by a staging or commit step. A successful full-cycle therefore leaves the branch dirty, and the final verification / regenerated view changes will be missing from the PR.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 83,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:8bd92bf0f6444091567fdab89275e6edcbb19f980077dbf2f14649896b7f927c",
+          "at": "2026-04-10T13:19:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:full-cycle` still falls back to the latest active track when you are not on a `track/<id>` branch, but the new loop now performs guarded commits. That means invoking it from `main` or another non-track branch can commit against the wrong track and skip `track-commit-message`'s branch/hash bookkeeping, because that wrapper only enforces those checks on `track/<id>` branches. Require the implementation branch before entering the commit loop or switch to it first.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 21,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ce075753e80a87d3ba3f8af8a1214bfe00a851bd2a258810c8a5344a98f7c013",
+          "at": "2026-04-10T13:23:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The failure handler treats a `cargo make track-transition ... done` error the same as a pre-commit failure and tells the operator to rerun `/track:full-cycle`. If the commit already succeeded, that rerun will re-enter implement/review/CI for the same task and can create a duplicate commit instead of just retrying the missing `done` transition.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 74,
+              "category": "workflow"
+            },
+            {
+              "message": "The `track:plan` handoff inverts the requested `spec-approve -> track-signals` sequence: the success path says to run `track-signals` before `spec-approve`, and the fallback path approves first and only then retries signals. That leaves the canonical planning guide with an approval step that can still be followed by a later `spec.json` mutation without a matching re-approval pass.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 57,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:11aa0f17b35d3a3669e91af82bcae414d7b93beb0f54f4122e1f98e963b26f5d",
+          "at": "2026-04-10T13:29:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `/track:plan` handoff is still inverted relative to the track definition: this doc runs `track-signals` before approval, even though the task spec says the canonical sequence should be `spec-approve → track-signals`. That leaves the planner instruction out of sync with the accepted workflow, and the failure branch can approve a spec before the signal step is actually resolved.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 57,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:6e4cde1b755f0af3f06a18bb66f76c0d5d5419faec2a918fe28de26456d48c3b",
+          "at": "2026-04-10T13:33:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `/track:plan` handoff is still inverted relative to the requested canonical sequence: the normal path runs `track-signals` before `spec-approve`, and the fallback path approves first and only then retries signals. That leaves the planning guide out of sync with the intended `spec-approve -> track-signals` flow.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 57,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:6e4cde1b755f0af3f06a18bb66f76c0d5d5419faec2a918fe28de26456d48c3b",
+          "at": "2026-04-10T13:36:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Post-commit failures are not recoverable in this loop. `cargo make track-commit-message` can already have created the commit and still return a non-zero post-commit status, and `cargo make track-note` can fail after that, but the failure handling only distinguishes pre-commit and done-transition errors. If `/track:full-cycle` is rerun, the task remains `in_progress` and the command will re-enter implementation, risking duplicate edits or commits. Add an explicit recovery path for commit/note attachment failures that skips re-implementation.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 63,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:6e4cde1b755f0af3f06a18bb66f76c0d5d5419faec2a918fe28de26456d48c3b",
+          "at": "2026-04-10T13:38:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing the `signals: null` fallback makes planning block when `track-signals` cannot succeed for a legitimate reason such as a track that still has no source tags. The previous flow could still approve the spec and defer signals; this version retries signals after approval but never documents a path to finish without them.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 57,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:47f954b54808039a79ec26cdeef12765aac2a049fbf6b7930d1b9a581e8b00c7",
+          "at": "2026-04-10T13:42:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Allowing `cargo make add-all` here is unsafe in the autonomous loop: Step 2 runs `track-sync-views` first, and that command can regenerate files outside the current track. In the post-loop commit, `add-all` can therefore stage unrelated regenerated views from other tracks and commit them with this task's changes. Require explicit path staging instead.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 62,
+              "category": "workflow"
+            },
+            {
+              "message": "The fallback path for a failed `track-signals` run says to proceed and that signals can be re-evaluated later, but the workflow never requires a fresh `spec-approve` after any later signal mutation. Because `spec-approve` records `content_hash` from the current file contents, a later successful signal update will silently make the approved hash stale.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 60,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:28c2b095980b588b76f5120891f4eb36151b6343674a0a376bcbe413b62c4f51",
+          "at": "2026-04-10T13:46:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo make track-commit-message` can return a non-zero exit after the commit already exists (the wrapper uses exit 3 for post-commit persistence failures). The current failure matrix treats that like a pre-commit failure and tells the operator to rerun `/track:full-cycle`, which would repeat the task loop and can create a duplicate commit. Add an explicit recovery path for the partial-success case before recommending a full rerun.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 63,
+              "category": "workflow"
+            },
+            {
+              "message": "The `track-signals` recovery note assumes a failure leaves `signals: null`, but the implementation writes `spec.json` before it writes `spec.md`. If the second write fails, `spec.json` already contains the new signals, so the instruction is factually wrong and sends the operator down the wrong recovery path. The step needs to acknowledge partial application or require a resync/verification before approval.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 60,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:9f2dd1ffe153981dfdae403ff73e9abef9c21ffd94e0f3b532cdd1f833e1f3e6",
+          "at": "2026-04-10T13:52:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a1ce87b3d491976763e5e272642887e1d4dd5ff3b8c7eb962b16cb1e0697c70",
+          "at": "2026-04-10T13:55:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On a `plan/<id>` branch this tells the operator to run `/track:activate` without the required track id. `.claude/commands/track/activate.md` stops when `$ARGUMENTS` is empty, so the suggested recovery path is not actually executable from this failure case; it needs to say `/track:activate <track-id>`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 7,
+              "category": "workflow"
+            },
+            {
+              "message": "The `--auto` behavior only covers the per-task commit in Step 3. The mandatory post-loop commit still invokes `/track:commit` with no message source, and that command stops to ask for commit-message candidates when arguments are empty. In practice an `--auto` run will still stall at the final bookkeeping commit instead of completing autonomously.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 30,
+              "category": "workflow"
+            },
+            {
+              "message": "The failure/retry guidance treats every stopped run as safe to rerun, but `cargo make track-commit-message` can return a non-zero status after the commit already exists (post-commit bookkeeping failure, exit 3). Recommending `fix and rerun /track:full-cycle` here will re-enter implementation/review for an already-committed task and can create duplicate commits. This command needs an explicit recovery path for commit-partial-success failures.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 38,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:f7b50f4b3a9eb574066423c7b0f0967c6f540398201f9d24c39c9ce9e75a1c30",
+          "at": "2026-04-10T14:01:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The per-task loop now goes straight from `/track:review` to `/track:commit` and never runs `cargo make ci` before each task commit. The approved track plan and `track/workflow.md` both require `implement -> review (zero_findings) -> cargo make ci -> commit`, so this command would allow commits before the mandatory quality gate passes.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 14,
+              "category": "workflow correctness"
+            },
+            {
+              "message": "This rewrite drops the required commit-message behavior for `full-cycle`. T001's plan/spec require default commit-message confirmation plus a `--auto` mode that generates the message from the task description, but the command only says to execute `/track:commit` with a generated message and never defines any arguments or `--auto` handling. As written, the documented command can satisfy this file while omitting the promised confirmation/automation semantics.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 16,
+              "category": "requirements coverage"
+            },
+            {
+              "message": "Step 1 is not executable against the current `/track:implement` contract. That command still says it performs `cargo make ci`, updates `verification.md`, and marks the task `done` via `track-transition ... --commit-hash <hash>` before returning, but this new loop does not create the commit until step 3. Without documenting a different implement mode or moving the `done` transition after commit, `/track:full-cycle` cannot actually complete a task in the order this file prescribes.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 14,
+              "category": "command integration"
+            }
+          ],
+          "hash": "rvw1:sha256:92ca6881e56ce051f3c0ce68a8f853db59ef605ee42bd833b60e11a6cb9bbca7",
+          "at": "2026-04-10T14:07:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1 is not executable against the current `/track:implement` contract. This file says the per-task implement step already includes the `done` transition, but `/track:implement` still marks a task done with `cargo make track-transition <track_dir> <task_id> done --commit-hash <hash>`. Because the commit is not created until step 3 here, the loop cannot actually complete a task in the documented order.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 14,
+              "category": "workflow"
+            },
+            {
+              "message": "The post-loop sequence mutates `verification.md` and runs `cargo make track-sync-views`, then immediately calls `/track:commit` without another `/track:review`. On track branches, `track-commit-message` re-runs `review check-approved` against the current code hash before committing, so these unreviewed bookkeeping changes will leave the approval hash stale and block the final commit.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 26,
+              "category": "workflow"
+            },
+            {
+              "message": "The rewritten command still does not define the required commit-message UX for `full-cycle`. The accepted scope requires default commit-message confirmation plus a `--auto` mode, but this text only says to commit with a message generated from the task description. As written, it drops the default confirmation path and never specifies how `--auto` is requested.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 18,
+              "category": "requirements"
+            }
+          ],
+          "hash": "rvw1:sha256:d5d6b67879e0903959ba8cd849b7702d3988f45a065d3eb13f07cdd50a7dc9c6",
+          "at": "2026-04-10T14:16:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:implement` still owns the task `done` transition and requires `track-transition ... done --commit-hash <hash>` before it returns, but this loop postpones the first commit until step 3. As written, step 1 cannot actually complete a task without inventing a different implement mode, and if the task is marked `done` anyway, the resume rule on line 21 will skip an unreviewed/uncommitted task.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 14,
+              "category": "command_integration"
+            },
+            {
+              "message": "This rewrite removes the `$ARGUMENTS` task selector and now always iterates every `todo`/`in_progress` task. The rest of the track workflow still documents `/track:full-cycle <task>`, so following those existing entry points will unexpectedly execute the whole remaining track instead of the requested task.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 12,
+              "category": "workflow_compatibility"
+            },
+            {
+              "message": "Step 3 hard-codes commit-message generation from the task description and never defines the promised default confirmation path or an explicit `--auto` switch. That leaves no documented way to choose between interactive confirmation and autonomous generation, which was part of the approved `full-cycle` behavior.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 18,
+              "category": "requirements_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:d5d6b67879e0903959ba8cd849b7702d3988f45a065d3eb13f07cdd50a7dc9c6",
+          "at": "2026-04-10T14:20:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1 still delegates to `/track:implement`, but that command’s current contract completes the task via `track-transition ... done --commit-hash <hash>` before returning. Because this loop does not create the commit until step 3 and then resumes from the first non-done task, a failed review/commit can leave the task marked done and skipped on rerun even though its changes were never review-approved or committed.",
+              "severity": "P0",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 14,
+              "category": "workflow"
+            },
+            {
+              "message": "The post-loop block edits `verification.md` and regenerates views, then immediately calls `/track:commit` without any fresh approval path. The guarded commit flow re-checks `review check-approved` against the current tree hash, so after any local `/track:review` these bookkeeping edits make the approval stale and the final post-loop commit is blocked.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 28,
+              "category": "workflow"
+            },
+            {
+              "message": "The new fallback says to proceed to `spec-approve` even when `cargo make track-signals` fails and `signals` stays `null`. `sotp track signals` only fails on real read/decode/write/render errors, so this instruction blesses a spec without a successful Stage 1 signal evaluation and can leave an approved spec that later fails the signal prerequisite checks.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 58,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:ff775d04ba2e7ead8f36ffe3faf854334a7e8a8820b6d90be962ca13eef14fec",
+          "at": "2026-04-10T14:25:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:implement` now documents that it marks a task `done` before `/track:commit` exists, but this file still says a rerun resumes from the first non-`done` task. If review or commit fails for a task, rerunning `/track:full-cycle` will skip that already-`done` task and continue with later work, leaving the failed task unreviewed or uncommitted.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 23,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:7d4fa59742aed2cad7d7b38eb9300e67c7ad65e420dd000ba9657ed962c83744",
+          "at": "2026-04-10T14:34:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:full-cycle` now says reruns resume by checking each done task's `commit_hash`, but the loop still only processes `todo`/`in_progress` tasks. If `/track:implement` marks a task `done` and review or commit then fails, rerunning can skip that still-uncommitted task because it is already `done` and has no recorded hash yet.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 23,
+              "category": "correctness"
+            },
+            {
+              "message": "The updated `/track:implement` flow says the task's `commit_hash` is recorded later by `/track:commit`, but the current commit flow only persists `.commit_hash` for review diff base and does not backfill `metadata.json.tasks[*].commit_hash`. Following this instruction leaves completed tasks as `done` with `commit_hash: null`, which breaks per-task traceability and the new full-cycle rerun rule.",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 33,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c3a677756796b81591f6a2c72d70d5f2f0b34ee906b7217bb9531f3b1573d35c",
+          "at": "2026-04-10T14:36:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new resume rule is internally inconsistent with the loop predicate. `/track:implement` now leaves a reviewed-but-uncommitted task in `done` without a metadata `commit_hash`, but this command still iterates only `todo`/`in_progress` tasks. If the loop stops after implement or review, rerunning `/track:full-cycle` will skip that unfinished `done` task instead of resuming it, which breaks the per-task review/commit gate the change is introducing.",
+              "severity": "P0",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 23,
+              "category": null
+            },
+            {
+              "message": "This new sentence says the task `commit_hash` is recorded later by `/track:commit`, but the actual commit flow only writes `.commit_hash`; metadata backfill still requires a separate `track-transition ... done --commit-hash <hash>` step. Following this instruction leaves tasks in `DonePending`, so any workflow that relies on metadata `commit_hash` presence to detect committed tasks cannot work as documented.",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 33,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:c3a677756796b81591f6a2c72d70d5f2f0b34ee906b7217bb9531f3b1573d35c",
+          "at": "2026-04-10T14:38:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8e5b78aee70a3ca67a46444b2af5874a18e7cbe0b605892103f0efef2d4309f",
+          "at": "2026-04-10T14:41:25Z"
         }
       ]
     }

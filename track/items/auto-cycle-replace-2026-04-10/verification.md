@@ -9,14 +9,13 @@
 
 ## Manual Verification Steps
 
-- [ ] full-cycle.md がタスクごとの implement → review (zero_findings) → cargo make ci → commit ループ構造を定義していることを確認 (T001)
-- [ ] full-cycle.md がデフォルトのコミットメッセージ確認動作を定義していることを確認 (T001)
-- [ ] full-cycle.md が --auto フラグによるコミットメッセージ自動生成を定義していることを確認 (T001)
-- [ ] full-cycle.md がタスク失敗時の停止とステータス報告を定義していることを確認 (T001)
+- [ ] full-cycle.md がタスクごとの implement（CI・done transition 含む）→ review (zero_findings) → commit ループ構造を定義していることを確認 (T001)
+- [ ] full-cycle.md がコミットメッセージをタスク説明から自動生成することを定義していることを確認 (T001)
+- [ ] full-cycle.md がタスク失敗時の停止と報告を定義していることを確認 (T001)
 - [ ] full-cycle.md から transitional compatibility の記述が削除され正式コマンドとして記述されていることを確認 (T001)
 - [ ] SKILL.md の説明が新セマンティクスと整合していることを確認 (T002)
 - [ ] cargo make track-signals が Makefile.toml に追加されていることを確認 (T003)
-- [ ] track:plan コマンドに spec-approve / track-signals ステップが明記されていることを確認 (T003)
+- [ ] track:plan コマンドに track-signals → spec-approve の手順が明記されていることを確認 (T003)
 - [ ] cargo make ci 通過 (T004)
 
 ## Result / Open Issues
