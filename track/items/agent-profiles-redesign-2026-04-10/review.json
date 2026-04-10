@@ -446,6 +446,172 @@
           "findings": [],
           "hash": "rvw1:sha256:083d03ac4ce54bcc6d2ced86b13d54ddfd9df50c9f98454ba1c737095a4bfb6c",
           "at": "2026-04-10T05:48:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0234ac513ac40629e79e9d3fdabcd2a251440bf732b0bd75ab9924c27e5b2e1",
+          "at": "2026-04-10T05:53:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0234ac513ac40629e79e9d3fdabcd2a251440bf732b0bd75ab9924c27e5b2e1",
+          "at": "2026-04-10T06:27:41Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AgentProfilesDto` will happily deserialize a config that is missing `capabilities`/`providers`, and `load()` never verifies `schema_version == 1`. That means a legacy or truncated JSON file can load successfully as an empty routing table, so every capability lookup returns `None` instead of surfacing a config error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 67,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dc5cba03a3dddb92c9f341fc383c808a7f1623b8de722b04edb64ff17c4efe23",
+          "at": "2026-04-10T05:54:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_version` is deserialized but never validated, so any syntactically valid file with a legacy or future layout will still load and be treated as this schema. For a routing config, that can silently misresolve every capability instead of failing fast; `load()` should reject `schema_version != 1`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 111,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:dc5cba03a3dddb92c9f341fc383c808a7f1623b8de722b04edb64ff17c4efe23",
+          "at": "2026-04-10T05:55:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af3bf5fae5575dbafc5c3c7cd352cb0adb9d04a5c461448f04085911bdaadebe",
+          "at": "2026-04-10T05:59:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`providers` and `capabilities` are deserialized with `#[serde(default)]`, so a config that omits or misspells one of those top-level sections still makes `AgentProfiles::load()` return `Ok(...)` with empty maps. That silently converts a malformed/truncated profile into `resolve_execution(...)=None`, which callers will interpret as a missing capability instead of surfacing a configuration error. These sections are required for the new schema and should fail load-time validation instead of defaulting.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 70,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:af3bf5fae5575dbafc5c3c7cd352cb0adb9d04a5c461448f04085911bdaadebe",
+          "at": "2026-04-10T06:03:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `AgentProfiles::load` deserializes `provider`, `model`, `fast_provider`, and `fast_model` as raw `String`s and returns them without validation, so malformed config like `{\"provider\":\"\"}` or `{\"fast_provider\":\"\"}` is accepted and `resolve_execution` later hands back an empty provider name instead of failing fast. That violates the repo rule to validate external input via domain types and turns a config error into a downstream runtime failure when the caller tries to dispatch on the provider.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 109,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:080337c4cb5f9860a1e69618ebd433d848cd33158a98d35af23a77d0f83d4870",
+          "at": "2026-04-10T06:07:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AgentProfiles::load()` only rejects blank `provider`/`fast_provider`, so malformed configs like `{\"provider\":\"codex\",\"model\":\"\"}` or `{\"fast_model\":\"\"}` still load successfully. `resolve_execution()` then propagates that bad input as `Some(\"\")` for `Final` and coerces the same empty string to `None` for `Fast`, which can turn a config typo into an invalid `--model` invocation or inconsistent routing instead of a load-time error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 129,
+              "category": "validation"
+            },
+            {
+              "message": "The DTOs accept unknown JSON keys because neither `AgentProfilesDto` nor `CapabilityConfigDto` uses `#[serde(deny_unknown_fields)]`. A user typo like `fast_modle`/`fast_provier` will therefore parse as if the override were absent, silently changing the resolved provider/model instead of surfacing a configuration error in this routing file.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 75,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:b3ce2f0b9e4637b9a32556b261561e0daf00ef6161a91dba3c56dc8a94295184",
+          "at": "2026-04-10T06:11:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AgentProfiles::load()` silently normalizes blank `model` / `fast_model` strings to `None` instead of rejecting them. A malformed config like `{ \"provider\": \"codex\", \"model\": \" \" }` therefore loads successfully, and `resolve_execution(..., RoundType::Final)` returns `model=None` as if the field were intentionally omitted. That turns invalid external input into altered routing behavior rather than surfacing an `InvalidCapability` error at load time.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 149,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:f82585363cfc4c53e7a602801491ce249103e8e446117c85c970dab5c364e1cc",
+          "at": "2026-04-10T06:15:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AgentProfiles::load()` only checks that `provider` / `fast_provider` are non-empty, but it never verifies that those names exist in the top-level `providers` map. A typo like `\"provider\": \"codxe\"` or `\"fast_provider\": \"gemni\"` will load successfully and then flow into `resolve_execution()` as an unusable provider string, so the bad config is discovered only later when a caller tries to dispatch on that provider instead of being rejected as `InvalidCapability` at load time.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 131,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:d18a09cd9e0d7b0219d346b8d36c0136b3b43ca51591fd015554f7b9e3791545",
+          "at": "2026-04-10T06:18:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`UnsupportedSchemaVersion` is only reachable after `serde_json::from_str` succeeds, but this DTO is `deny_unknown_fields`. Any future schema bump that introduces new fields will fail during deserialization and surface as `Parse` instead of the advertised version-specific error, so callers cannot reliably distinguish an unsupported config version from malformed JSON. Parse a minimal envelope containing `schema_version` first, then deserialize the versioned payload.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 124,
+              "category": "correctness"
+            },
+            {
+              "message": "`load()` now has explicit error branches for blank `model` and blank `fast_model`, but the test module does not cover either branch. The briefing requires path coverage, and without negative tests here these new validation guarantees can regress silently while the suite still passes.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 150,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:d18a09cd9e0d7b0219d346b8d36c0136b3b43ca51591fd015554f7b9e3791545",
+          "at": "2026-04-10T06:22:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b64f5fdf28e13f03872ffd70c5ae368a5521c63730b81f3892226b65b6a6bbbb",
+          "at": "2026-04-10T06:26:31Z"
         }
       ]
     }
