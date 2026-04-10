@@ -1,0 +1,331 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` does not cover the full planned track. `metadata.json`/`plan.md` add `T003` (`track-signals` wrapper + `track:plan` procedure update) and `T004` (CI verification), but `scope.in_scope` only lists `T001`/`T002`, and the CI acceptance criterion is tagged `T003` instead of `T004`. As written, the approved spec can be satisfied without ever reviewing the wrapper/procedure change, and the real CI task is left untraced.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 11,
+              "category": "traceability"
+            }
+          ],
+          "hash": "rvw1:sha256:e3cafd9eb6f93db19f4ed82f0c71c236f8a3d3ea2be664125d47838ee4c70b5a",
+          "at": "2026-04-10T12:04:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo make ci` is incorrectly tagged as `T003`, but `T003` in `metadata.json` is the track-signals / `track:plan` update task and `T004` is the CI check. `T003` is also missing from `in_scope`, so the spec leaves the planned wrapper/command work under-scoped and misassigns the CI acceptance criterion.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 85,
+              "category": "spec alignment"
+            }
+          ],
+          "hash": "rvw1:sha256:e3cafd9eb6f93db19f4ed82f0c71c236f8a3d3ea2be664125d47838ee4c70b5a",
+          "at": "2026-04-10T12:05:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:06a4792798b65bdec544b261f28ef9814cc481023b079144bc6ec9e006315274",
+          "at": "2026-04-10T12:07:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` never turns task `T003` into an acceptance criterion. The plan and metadata make the `track-signals` wrapper plus the `track:plan` step update part of the intended deliverable, but the acceptance section only covers `T001`, `T002`, and CI. As written, this track could be accepted without implementing the entire `T003` scope.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 75,
+              "category": "correctness"
+            },
+            {
+              "message": "The `T002` requirement/criterion cites `knowledge/conventions/source-attribution.md` as its provenance, but that document only describes how source tags should be recorded and explicitly warns against fabricating references; it does not justify changing the `full-cycle` semantics in `SKILL.md`. This leaves the item with unsupported provenance, which breaks the traceability this spec is supposed to provide.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 22,
+              "category": "traceability"
+            },
+            {
+              "message": "`verification.md` already marks the first two scope items as verified even though every manual verification step is still unchecked and the result section says `_未実施_`. That gives a false positive audit trail for pre-implementation work and can mislead downstream reviewers about what has actually been validated.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/verification.md",
+              "line": 5,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:06a4792798b65bdec544b261f28ef9814cc481023b079144bc6ec9e006315274",
+          "at": "2026-04-10T12:09:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` still has no acceptance criterion for T003 (`cargo make track-signals` wrapper plus the `track:plan` spec-approve/track-signals step update). That means the track can satisfy all listed acceptance criteria without ever checking one of its scoped deliverables, so this workflow change could be omitted and still look complete.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 75,
+              "category": "spec coverage"
+            },
+            {
+              "message": "`verification.md` marks the `full-cycle.md` rewrite and `SKILL.md` update as already verified, but this track is still at the planning-artifact stage and the same file says verification is `_未実施_`. Those false-positive `[x]` entries can mislead reviewers into treating T001/T002 as completed without any actual verification evidence.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/verification.md",
+              "line": 5,
+              "category": "verification status"
+            }
+          ],
+          "hash": "rvw1:sha256:06a4792798b65bdec544b261f28ef9814cc481023b079144bc6ec9e006315274",
+          "at": "2026-04-10T12:10:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T002`'s provenance is still unsupported: both the scope item and matching acceptance criterion cite `knowledge/conventions/source-attribution.md`, but that document only defines how sources must be recorded and explicitly says not to fabricate references. It does not justify changing the `full-cycle` semantics in `SKILL.md`, so this requirement is not traceable to an actual design/input source.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 24,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6ce707b329ed6d3a36f8f4f60859a2510a9a369e449e7d610570c16cf30d86b3",
+          "at": "2026-04-10T12:12:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f19bd2fe89a8d8eec08252b6f07275cd503232d2eaab1a6f8caa4380c34b35c9",
+          "at": "2026-04-10T12:14:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:990b390b18357753309c0c6060e9e68b531a9336def759038b785d5dd753c16c",
+          "at": "2026-04-10T12:19:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T001` is still under-specified. `metadata.json` says the new `/track:full-cycle` flow must also confirm commit messages by default, support `--auto` message generation, and stop with a status report on failure, but `spec.json`/`verification.md` never make any of those behaviors part of scope or acceptance. As written, this track can be approved after only changing the loop shape while dropping the new commit UX and fail-fast semantics.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/metadata.json",
+              "line": 47,
+              "category": "traceability"
+            },
+            {
+              "message": "The approved spec defines the per-task cycle as `implement -> review -> commit` and leaves `cargo make ci` as a separate `T004` check. That conflicts with `track/workflow.md`, where the required task workflow is `review -> cargo make ci -> commit`. In other words, this plan currently allows `/track:full-cycle` to create task commits before any CI gate has passed.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 77,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:990b390b18357753309c0c6060e9e68b531a9336def759038b785d5dd753c16c",
+          "at": "2026-04-10T12:22:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T001` is still under-specified here. `metadata.json` section `S1` requires not just the per-task implement→review→commit loop, but also default commit-message confirmation, `--auto` commit-message generation, and fail-fast status reporting. `spec.json` only accepts the loop shape, and `verification.md` only checks that loop structure, so this track can be marked complete while dropping the new commit UX and failure semantics promised by the plan.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 77,
+              "category": null
+            },
+            {
+              "message": "This approved spec carries a stale `content_hash`. Recomputing it from the current hashable fields yields `sha256:3c65471ed1e2b16fb66fc464f9527480b1c4bf785d7709ad10c0ebf12f72b475`, not the stored `sha256:21e27c25cafa5ecab6d37c53ebf8c02bec6f44f78b2a756402103b437428e5d4`. Because the approval gate auto-demotes on hash mismatch, any consumer decoding this file will treat it as draft even though `status` still says `approved`.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 114,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:990b390b18357753309c0c6060e9e68b531a9336def759038b785d5dd753c16c",
+          "at": "2026-04-10T12:24:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ef4bdaa87fbd039e47efcbc15d0f349d2807baee77fe35af212b73f1ad2f241",
+          "at": "2026-04-10T12:25:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` still carries a stale approval hash. Recomputing the hash from the current hashable fields yields `sha256:c205a22b042b39a71990f3e055d18781a56cd3e3f6671d1119b9236454c8445d`, not the stored `sha256:f1182363b4a31db75a859a37c54d01fce1223287b4a23e290b844f60db2d835f`. Because spec decoding auto-demotes approved documents on hash mismatch, consumers will treat this spec as unapproved even though `status` remains `approved`.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 114,
+              "category": "approval metadata"
+            }
+          ],
+          "hash": "rvw1:sha256:4ef4bdaa87fbd039e47efcbc15d0f349d2807baee77fe35af212b73f1ad2f241",
+          "at": "2026-04-10T12:29:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a04ee22c7611203c21c9ec2312be0d7a6301619df26e51899c0fd59bfc9d21ee",
+          "at": "2026-04-10T12:31:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` still defines the new `/track:full-cycle` semantics as a per-task `implement → review → commit` loop while leaving `cargo make ci` as a separate `T004` check. That contradicts the repository workflow in `track/workflow.md`, which requires `review → cargo make ci → commit` for each task. As written, this plan would allow task commits before the mandatory CI gate has passed, so the approved behavior can violate the project's own quality-gate policy.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 77,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:a04ee22c7611203c21c9ec2312be0d7a6301619df26e51899c0fd59bfc9d21ee",
+          "at": "2026-04-10T12:33:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bac58c47dec36e1d8f9077ae6ba9eaeb8dcac27b3fdba042b5763758bf0ceb8e",
+          "at": "2026-04-10T12:34:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bac58c47dec36e1d8f9077ae6ba9eaeb8dcac27b3fdba042b5763758bf0ceb8e",
+          "at": "2026-04-10T12:36:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` uses `conversation:*` source strings (for example `conversation:user-request-2026-04-08`), but the source-attribution convention only defines `feedback — ...`, `discussion`, `convention — ...`, `inference — ...`, or real document references. `sotp track signals` will classify these conversation tags as document evidence and score them Blue, overstating confidence for requirements that actually came from discussion/feedback.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 15,
+              "category": "traceability"
+            },
+            {
+              "message": "The spec says `/track:full-cycle` must stop being \"transitional compatibility only\", but T001's metadata plan only tracks the per-task loop/commit behavior. Because that requirement is not traced into the task plan (and therefore not into the generated verification checklist), this track can be marked complete while leaving the existing transitional-only wording in `.claude/commands/track/full-cycle.md` unchanged.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/metadata.json",
+              "line": 45,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:4d66003fbf2d4d136d1ad54be2ba713e125cfd7f67fbb2066db029394a9fb09b",
+          "at": "2026-04-10T12:42:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` was edited in this change, but `updated_at` is still the original `2026-04-10T12:00:00+09:00` even though the track artifacts were updated later (`spec.json` was re-approved at `2026-04-10T12:43:22Z`). Latest-track resolution and `verify-latest-track` both key off `metadata.json.updated_at`, so leaving it stale can cause this track to be skipped or misordered during completeness checks.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/metadata.json",
+              "line": 8,
+              "category": "traceability"
+            },
+            {
+              "message": "T001 now explicitly includes removing the `transitional compatibility` positioning and treating `/track:full-cycle` as the formal command, but the T001 acceptance criterion still only checks the task-loop/CI/commit behavior. Because `verification.md` mirrors that criterion and has no step for the wording/status change, the new requirement can be missed while the track is marked verified.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 77,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:0cd3d997f9b4e0df34a170d03f36d4ea8e232ea592e415e80cd61469cad6773e",
+          "at": "2026-04-10T12:46:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json`/`plan.md` now make T001 responsible for removing the `transitional compatibility` positioning and treating `/track:full-cycle` as the formal command, but the T001 acceptance criterion here still only checks the loop/CI/commit behavior. Because `verification.md` mirrors this criterion and never asks reviewers to confirm the wording/status change, the track can be marked complete while leaving the old transitional-only wording in `.claude/commands/track/full-cycle.md` untouched.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 77,
+              "category": "traceability"
+            }
+          ],
+          "hash": "rvw1:sha256:0cd3d997f9b4e0df34a170d03f36d4ea8e232ea592e415e80cd61469cad6773e",
+          "at": "2026-04-10T12:49:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` still lets T001 pass after merely inserting a review step before CI/commit, because the acceptance criterion no longer requires that review to reach `zero_findings`. `metadata.json` S1 still defines the loop as `review (zero_findings) -> cargo make ci -> commit`, so the current criterion leaves a real loophole where `/track:full-cycle` could proceed past a failing review and still satisfy the spec.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/spec.json",
+              "line": 77,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:5ace1c197ff1012ea383eb2e5f0bba197275ddfc6c070c053b852856de4f6b85",
+          "at": "2026-04-10T12:51:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` no longer verifies the `zero_findings` gate for T001. `metadata.json` section `S1` and `spec.json` both require `implement → review (zero_findings) → cargo make ci → commit`, but the checklist here only asks reviewers to confirm a generic `implement → review → cargo make ci → commit` loop. That means `/track:full-cycle` could still pass this verification plan even if it proceeds to CI/commit after a review that reported findings.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/verification.md",
+              "line": 12,
+              "category": "verification coverage"
+            },
+            {
+              "message": "`metadata.json.updated_at` is still older than the latest change in this track: it was set to `2026-04-10T21:50:00+09:00`, but `spec.json` was re-approved later at `2026-04-10T12:53:41Z` (`2026-04-10T21:53:41+09:00`). Latest-track resolution and completeness checks key off `metadata.json.updated_at`, so leaving it behind the actual latest artifact update can misorder this track or make downstream checks read stale track state.",
+              "severity": "P1",
+              "file": "track/items/auto-cycle-replace-2026-04-10/metadata.json",
+              "line": 8,
+              "category": "traceability"
+            }
+          ],
+          "hash": "rvw1:sha256:1222933e68aae08f12516425941cc528772bce34270932565ddaf8c3700252be",
+          "at": "2026-04-10T12:57:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c65cdf3ce810453424cb01f3524b8cb8f8e2a2091cfa87fc00c8a75ddea6153",
+          "at": "2026-04-10T13:00:43Z"
+        }
+      ]
+    }
+  }
+}
