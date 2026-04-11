@@ -22,14 +22,15 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
+      "commit_hash": "712c00e",
       "description": "wait-and-merge のタスク完了ガード直後に verify spec-states --strict を呼び出す配線追加",
       "id": "T001",
-      "status": "in_progress"
+      "status": "done"
     }
   ],
   "title": "Strict spec signal gate — Yellow blocks merge",
-  "updated_at": "2026-04-11T22:08:56Z"
+  "updated_at": "2026-04-11T22:11:48Z"
 }

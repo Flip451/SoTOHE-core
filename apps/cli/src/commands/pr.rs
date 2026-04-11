@@ -449,8 +449,21 @@ fn check_spec_signals_strict(branch: &str, repo_root: &std::path::Path) -> ExitC
         }
     };
 
-    if let Some(signals) = spec_doc.signals() {
-        if signals.yellow() > 0 {
+    match spec_doc.signals() {
+        None => {
+            eprintln!(
+                "[BLOCKED] spec.json has no signals — run `cargo make track-signals` to evaluate"
+            );
+            return ExitCode::FAILURE;
+        }
+        Some(signals) if signals.red() > 0 => {
+            eprintln!(
+                "[BLOCKED] spec signals have red={} — resolve missing sources before merge",
+                signals.red()
+            );
+            return ExitCode::FAILURE;
+        }
+        Some(signals) if signals.yellow() > 0 => {
             eprintln!(
                 "[BLOCKED] spec signals have yellow={} — all requirements must have \
                  authoritative sources (document/feedback/convention) for merge. \
@@ -459,6 +472,7 @@ fn check_spec_signals_strict(branch: &str, repo_root: &std::path::Path) -> ExitC
             );
             return ExitCode::FAILURE;
         }
+        _ => {}
     }
 
     ExitCode::SUCCESS
