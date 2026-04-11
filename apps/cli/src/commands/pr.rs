@@ -431,9 +431,10 @@ fn check_spec_signals_strict(branch: &str, repo_root: &std::path::Path) -> ExitC
 
     let json = match output {
         Ok(o) if o.status.success() => String::from_utf8_lossy(&o.stdout).into_owned(),
-        Ok(_) => {
-            // No spec.json on remote — skip gate (legacy tracks without spec.json).
-            return ExitCode::SUCCESS;
+        Ok(o) => {
+            let stderr = String::from_utf8_lossy(&o.stderr);
+            eprintln!("[BLOCKED] spec.json not found on origin/{branch}: {stderr}");
+            return ExitCode::FAILURE;
         }
         Err(e) => {
             eprintln!("[BLOCKED] failed to run git show for spec.json: {e}");
