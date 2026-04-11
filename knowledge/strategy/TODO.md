@@ -36,6 +36,8 @@
   - **課題**: `verify_plan_progress.py`, `lint-on-save.py` で文字列判定に依存
   - **提案**: `pathlib.Path.resolve()` + `is_relative_to()` に移行
 
+- [ ] **SEC-10** (MEDIUM): `wait_and_merge` の race condition — ポーリング中に push された新コミットがガードを通過せずマージされる。`gh pr merge --match-head-commit` + ガード再検証で対応。task completion guard と strict spec signal gate の両方に影響
+
 - [ ] **SEC-11** (MEDIUM): guard の `"git"` 部分文字列検出の過剰ブロック
   - **根拠**: `libs/domain/src/guard/policy.rs` は非 git コマンドでも argv/redirect に `"git"` を含むだけで block する設計。
   - **提案**: 部分文字列ではなく、argv 境界・AST 上のコマンド名・`git` 実行意図に限定した判定へ縮退する。
