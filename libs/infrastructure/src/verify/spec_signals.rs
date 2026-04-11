@@ -368,7 +368,9 @@ mod tests {
     fn test_evaluate_tilde_code_blocks_are_skipped() {
         let body = "## Acceptance Criteria\n~~~\n- item inside tilde block\n~~~\n- real item [source: feedback — confirmed]\n";
         let counts = evaluate(body);
-        assert_eq!(counts.blue(), 1);
+        // feedback is Yellow (undocumented) — only document/convention produce Blue
+        assert_eq!(counts.yellow(), 1);
+        assert_eq!(counts.blue(), 0);
         assert_eq!(counts.total(), 1);
     }
 

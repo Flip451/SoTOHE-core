@@ -11,13 +11,15 @@ Every requirement, constraint, and acceptance criterion in `spec.md` must carry 
 
 ## Source Tag Types
 
-| Tag | Meaning | Example |
-|-----|---------|---------|
-| `[source: <document> §<section>]` | Explicit reference to a document, section, or external standard | `[source: PRD §3.2]`, `[source: track/tech-stack.md]` |
-| `[source: feedback — <context>]` | User feedback or correction recorded in memory/history | `[source: feedback — Rust-first policy]` |
-| `[source: convention — <file>]` | Established project convention with specific file reference | `[source: convention — knowledge/conventions/security.md]` |
-| `[source: inference — <reason>]` | Inferred from context, conventions, or common practice; not explicitly stated | `[source: inference — security best practice]` |
-| `[source: discussion]` | Agreed upon in team discussion or user conversation | `[source: discussion]` |
+| Tag | Meaning | Signal | Example |
+|-----|---------|--------|---------|
+| `[source: <document> §<section>]` | Explicit reference to a document, section, or external standard | Blue | `[source: PRD §3.2]`, `[source: track/tech-stack.md]` |
+| `[source: convention — <file>]` | Established project convention with specific file reference | Blue | `[source: convention — knowledge/conventions/security.md]` |
+| `[source: feedback — <context>]` | User feedback or correction (undocumented, not persisted) | Yellow | `[source: feedback — Rust-first policy]` |
+| `[source: inference — <reason>]` | Inferred from context, conventions, or common practice; not explicitly stated | Yellow | `[source: inference — security best practice]` |
+| `[source: discussion]` | Agreed upon in team discussion or user conversation | Yellow | `[source: discussion]` |
+
+**Blue sources** (document, convention) reference persistent files. **Yellow sources** (feedback, inference, discussion) lack persistent documentation and block merge under the strict signal gate. To upgrade Yellow to Blue, record the decision in an ADR (`knowledge/adr/`) or convention (`knowledge/conventions/`).
 
 ## Placement
 

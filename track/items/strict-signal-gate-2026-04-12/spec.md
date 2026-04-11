@@ -1,9 +1,9 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 status: approved
-approved_at: "2026-04-11T22:08:44Z"
+approved_at: "2026-04-11T23:04:31Z"
 version: "1.0.0"
-signals: { blue: 1, yellow: 4, red: 0 }
+signals: { blue: 5, yellow: 0, red: 0 }
 ---
 
 # Strict spec signal gate — Yellow blocks merge
@@ -15,20 +15,20 @@ verify spec-states --strict を track-pr-merge に配線し、spec signals に Y
 ## Scope
 
 ### In Scope
-- wait-and-merge のタスク完了ガード直後に verify spec-states --strict を呼び出す配線追加 [source: discussion] [tasks: T001]
+- wait-and-merge のタスク完了ガード直後に verify spec-states --strict を呼び出す配線追加 [source: knowledge/adr/2026-04-12-2304-strict-spec-signal-gate.md §D1] [tasks: T001]
 
 ### Out of Scope
-- verify spec-states --strict の実装自体 (既に完了済み) [source: inference — libs/infrastructure/src/verify/spec_states.rs に実装済み]
+- verify spec-states --strict の実装自体 (既に完了済み) [source: knowledge/adr/2026-04-12-2304-strict-spec-signal-gate.md §D1]
 
 ## Constraints
-- 既存の --strict 実装をそのまま使い、新規ロジックは追加しない [source: discussion]
+- 既存の --strict 実装をそのまま使い、新規ロジックは追加しない [source: knowledge/adr/2026-04-12-2304-strict-spec-signal-gate.md §D1]
 
 ## Acceptance Criteria
-- [ ] spec signals に Yellow がある状態で track-pr-merge を実行するとマージが阻止されること [source: discussion] [tasks: T001]
+- [ ] spec signals に Yellow がある状態で track-pr-merge を実行するとマージが阻止されること [source: knowledge/adr/2026-04-12-2304-strict-spec-signal-gate.md §D1] [tasks: T001]
 - [ ] cargo make ci が通ること [source: convention — .claude/rules/07-dev-environment.md] [tasks: T001]
 
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 1  🟡 4  🔴 0
+🔵 5  🟡 0  🔴 0
 
