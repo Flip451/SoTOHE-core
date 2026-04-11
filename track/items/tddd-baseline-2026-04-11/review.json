@@ -1,54 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
-          "at": "2026-04-11T07:42:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new requirement that the execution plan be built \"before the first tool call\" is internally inconsistent with the immediately preceding instruction to read `/track:implement`, `/track:review`, and `/track:commit`, because those sub-command definitions normally have to be opened via tool calls. That makes the section ambiguous in practice and can cause agents to either violate the instruction or skip the required pre-read.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 23,
-              "category": "ambiguity"
-            }
-          ],
-          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
-          "at": "2026-04-11T07:43:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new mandate is internally impossible to follow literally: it says to read `/track:implement`, `/track:review`, and `/track:commit` and build the execution plan \"before the first tool call\", but opening those command definitions is itself a tool call. In practice this leaves agents choosing between violating the new requirement or skipping the required sub-command read, which undermines the prompt hardening this change is trying to add.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 24,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
-          "at": "2026-04-11T07:44:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1fc5dc3e97148c19fbb4b2e0f0c9f710428a709f3f06f6c2a36de92f4e2cb72e",
-          "at": "2026-04-11T07:47:09Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -263,6 +215,60 @@
           "findings": [],
           "hash": "rvw1:sha256:e04b877194b8a7c2dce72adbeeab392fcb6fdaa4b1feb84e928d51ab3fe1e9ac",
           "at": "2026-04-11T08:40:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:086e14a362e32ea3ef49f3ff8513999dd812e6bc603287dcbddec9a659b85b4e",
+          "at": "2026-04-11T08:44:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:086e14a362e32ea3ef49f3ff8513999dd812e6bc603287dcbddec9a659b85b4e",
+          "at": "2026-04-11T08:47:26Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a32cf842a0a1de928470e3467fda0d5d48d239dfc7c3d94e72f032c5dde66637",
+          "at": "2026-04-11T07:37:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/mod.rs` now declares `mod tddd;`, but the new `apps/cli/src/commands/track/tddd/mod.rs` and `apps/cli/src/commands/track/tddd/signals.rs` files are still untracked (`git status` shows `??`). As a result, the tracked diff under review deletes `domain_state_signals.rs` without adding the replacement module, so applying the patch as-is produces an unresolved-module build failure.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/mod.rs",
+              "line": 21,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:a32cf842a0a1de928470e3467fda0d5d48d239dfc7c3d94e72f032c5dde66637",
+          "at": "2026-04-11T07:40:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a32cf842a0a1de928470e3467fda0d5d48d239dfc7c3d94e72f032c5dde66637",
+          "at": "2026-04-11T07:42:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1f3ea59212813e34e22ac9efd9a78722aad2d674bd2f055b6a4f14fbe58fb399",
+          "at": "2026-04-11T08:00:01Z"
         }
       ]
     },
@@ -653,46 +659,20 @@
           "findings": [],
           "hash": "rvw1:sha256:33115feb9313550cd3d4ce6ae9b302a3c97f223b5fe89f98cde71eab47cf73c2",
           "at": "2026-04-11T08:23:22Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a32cf842a0a1de928470e3467fda0d5d48d239dfc7c3d94e72f032c5dde66637",
-          "at": "2026-04-11T07:37:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track/mod.rs` now declares `mod tddd;`, but the new `apps/cli/src/commands/track/tddd/mod.rs` and `apps/cli/src/commands/track/tddd/signals.rs` files are still untracked (`git status` shows `??`). As a result, the tracked diff under review deletes `domain_state_signals.rs` without adding the replacement module, so applying the patch as-is produces an unresolved-module build failure.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/mod.rs",
-              "line": 21,
-              "category": "build"
-            }
-          ],
-          "hash": "rvw1:sha256:a32cf842a0a1de928470e3467fda0d5d48d239dfc7c3d94e72f032c5dde66637",
-          "at": "2026-04-11T07:40:46Z"
+          "hash": "rvw1:sha256:bbe43bd68a146b7bbd2f6397f42e59d9cc3dc1cf4b6901bdc4aa4db3e94b8b88",
+          "at": "2026-04-11T08:44:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a32cf842a0a1de928470e3467fda0d5d48d239dfc7c3d94e72f032c5dde66637",
-          "at": "2026-04-11T07:42:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1f3ea59212813e34e22ac9efd9a78722aad2d674bd2f055b6a4f14fbe58fb399",
-          "at": "2026-04-11T08:00:01Z"
+          "hash": "rvw1:sha256:bbe43bd68a146b7bbd2f6397f42e59d9cc3dc1cf4b6901bdc4aa4db3e94b8b88",
+          "at": "2026-04-11T08:45:12Z"
         }
       ]
     },
@@ -851,6 +831,54 @@
           "findings": [],
           "hash": "rvw1:sha256:a92b567a8c4d0a7377153f81855a078452bdd8a1aea5f262f9ff9a9ca088f33d",
           "at": "2026-04-11T08:17:58Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
+          "at": "2026-04-11T07:42:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new requirement that the execution plan be built \"before the first tool call\" is internally inconsistent with the immediately preceding instruction to read `/track:implement`, `/track:review`, and `/track:commit`, because those sub-command definitions normally have to be opened via tool calls. That makes the section ambiguous in practice and can cause agents to either violate the instruction or skip the required pre-read.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 23,
+              "category": "ambiguity"
+            }
+          ],
+          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
+          "at": "2026-04-11T07:43:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new mandate is internally impossible to follow literally: it says to read `/track:implement`, `/track:review`, and `/track:commit` and build the execution plan \"before the first tool call\", but opening those command definitions is itself a tool call. In practice this leaves agents choosing between violating the new requirement or skipping the required sub-command read, which undermines the prompt hardening this change is trying to add.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 24,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
+          "at": "2026-04-11T07:44:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fc5dc3e97148c19fbb4b2e0f0c9f710428a709f3f06f6c2a36de92f4e2cb72e",
+          "at": "2026-04-11T07:47:09Z"
         }
       ]
     }
