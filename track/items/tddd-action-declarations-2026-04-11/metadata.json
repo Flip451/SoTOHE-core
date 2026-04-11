@@ -95,7 +95,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "commit_hash": "bf44c19",
@@ -128,31 +128,36 @@
       "status": "done"
     },
     {
+      "commit_hash": "4fbde52",
       "description": "Infrastructure: Codec DTO 拡張 — TypeActionDto enum + action フィールド (default=add, skip_serializing_if=add) + duplicate name 検証緩和 (同名は delete+add ペアのみ許可、3件以上は常にエラー)",
       "id": "T006",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "4fbde52",
       "description": "Infrastructure: domain_types_render に Action 列追加 (Add='—', 他=action名)",
       "id": "T007",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "4fbde52",
       "description": "CLI: verify.rs に contradictions → Finding::warning + delete_errors → Finding::error + print_consistency_report_json に新フィールド追加",
       "id": "T008",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "4fbde52",
       "description": "CLI: signals.rs に contradictions → [WARN] 出力 + delete_errors → CliError 失敗",
       "id": "T009",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "4fbde52",
       "description": "Command: /track:design の Step 2 に action 選択ガイダンス追加 + Step 3 の JSON スキーマ例に action フィールド追加",
       "id": "T010",
-      "status": "in_progress"
+      "status": "done"
     }
   ],
   "title": "TDDD-03: Type action declarations — add/modify/reference/delete",
-  "updated_at": "2026-04-11T13:25:07Z"
+  "updated_at": "2026-04-11T14:34:34Z"
 }

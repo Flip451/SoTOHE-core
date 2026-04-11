@@ -42,20 +42,20 @@ TypeActionDto enum (serde rename_all snake_case) を定義。action フィール
 duplicate name 検証を緩和: 同名エントリは delete+add ペア (2件) のみ許可、3件以上は常にエラー。
 domain_types_render に Action 列を追加 (Add='—', 他=action名)。
 
-- [~] Infrastructure: Codec DTO 拡張 — TypeActionDto enum + action フィールド (default=add, skip_serializing_if=add) + duplicate name 検証緩和 (同名は delete+add ペアのみ許可、3件以上は常にエラー)
-- [~] Infrastructure: domain_types_render に Action 列追加 (Add='—', 他=action名)
+- [x] Infrastructure: Codec DTO 拡張 — TypeActionDto enum + action フィールド (default=add, skip_serializing_if=add) + duplicate name 検証緩和 (同名は delete+add ペアのみ許可、3件以上は常にエラー) 4fbde52
+- [x] Infrastructure: domain_types_render に Action 列追加 (Add='—', 他=action名) 4fbde52
 
 ## CLI 層: verify + signals
 
 verify.rs: contradictions → Finding::warning, delete_errors → Finding::error, JSON 出力に新フィールド追加。
 signals.rs: contradictions → [WARN] 出力, delete_errors → CliError。
 
-- [~] CLI: verify.rs に contradictions → Finding::warning + delete_errors → Finding::error + print_consistency_report_json に新フィールド追加
-- [~] CLI: signals.rs に contradictions → [WARN] 出力 + delete_errors → CliError 失敗
+- [x] CLI: verify.rs に contradictions → Finding::warning + delete_errors → Finding::error + print_consistency_report_json に新フィールド追加 4fbde52
+- [x] CLI: signals.rs に contradictions → [WARN] 出力 + delete_errors → CliError 失敗 4fbde52
 
 ## /track:design コマンド更新
 
 Step 2 に action 選択ガイダンスを追加する。
 Step 3 の JSON スキーマ例に action フィールドを追加する。
 
-- [~] Command: /track:design の Step 2 に action 選択ガイダンス追加 + Step 3 の JSON スキーマ例に action フィールド追加
+- [x] Command: /track:design の Step 2 に action 選択ガイダンス追加 + Step 3 の JSON スキーマ例に action フィールド追加 4fbde52

@@ -190,9 +190,11 @@ pub fn decode(json: &str) -> Result<DomainTypesDocument, DomainTypesCodecError> 
                     ),
                 });
             }
-            // The two entries must have different kinds.
-            // Same kind would produce two signals with the same (type_name, kind_tag) key,
-            // making one signal unaddressable and leading to ambiguous rendering.
+            // The two entries must have different kinds AND be in different partitions.
+            // Same kind would produce two signals with the same (type_name, kind_tag) key.
+            // Same partition (both trait_port or both non-trait_port) would cause
+            // evaluate_delete to find the new type by name and stay Yellow forever.
+            // Use action:"modify" for same-partition kind changes.
             if let [(_, kind_a), (_, kind_b)] = pairs.as_slice() {
                 if kind_a == kind_b {
                     return Err(DomainTypesCodecError::InvalidEntry {
@@ -200,6 +202,18 @@ pub fn decode(json: &str) -> Result<DomainTypesDocument, DomainTypesCodecError> 
                         reason: format!(
                             "delete+add pair must have different kinds to avoid signal key \
                              collision (both are '{kind_a}')"
+                        ),
+                    });
+                }
+                let is_trait_a = *kind_a == "trait_port";
+                let is_trait_b = *kind_b == "trait_port";
+                if is_trait_a == is_trait_b {
+                    return Err(DomainTypesCodecError::InvalidEntry {
+                        name: (*name).to_owned(),
+                        reason: format!(
+                            "delete+add pair must cross the trait/non-trait partition \
+                             ('{kind_a}' and '{kind_b}' are in the same partition). \
+                             Use action:\"modify\" for same-partition kind changes"
                         ),
                     });
                 }
@@ -796,6 +810,21 @@ mod tests {
   "domain_types": [
     { "name": "Foo", "kind": "value_object", "description": "old", "action": "delete" },
     { "name": "Foo", "kind": "value_object", "description": "new" }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(matches!(err, DomainTypesCodecError::InvalidEntry { .. }));
+    }
+
+    #[test]
+    fn test_decode_delete_add_same_partition_returns_error() {
+        // Same partition (both non-trait) — evaluate_delete would find the new type
+        // by name and stay Yellow forever. Use action:"modify" instead.
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "Foo", "kind": "value_object", "description": "old", "action": "delete" },
+    { "name": "Foo", "kind": "enum", "description": "new", "expected_variants": ["A"] }
   ]
 }"#;
         let err = decode(json).unwrap_err();
