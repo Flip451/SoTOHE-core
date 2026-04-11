@@ -53,4 +53,4 @@ tddd/signals.rs (旧 domain_state_signals.rs) を更新: baseline 読み込み (
 .claude/commands/track/design.md の Step 4 を更新: baseline-capture を呼び出して baseline を生成する旨を記載。
 baseline を design 成果物と一緒にコミットすることを推奨する旨を追記。
 
-- [~] /track:design コマンドを更新: Step 4 で baseline-capture を呼び出す旨を記載、design 成果物と一緒にコミット推奨を追記
+- [x] /track:design コマンドを更新: Step 4 で baseline-capture を呼び出す旨を記載、design 成果物と一緒にコミット推奨を追記 ebdb712
