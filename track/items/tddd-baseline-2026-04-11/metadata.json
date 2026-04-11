@@ -89,14 +89,15 @@
   "status": "in_progress",
   "tasks": [
     {
+      "commit_hash": "ec458b7",
       "description": "tddd/ モジュール構造を domain / infrastructure / cli の 3 層に作成し、既存ファイル (domain_types.rs, domain_types_codec.rs, domain_state_signals.rs) を tddd/ 配下に移動",
       "id": "T001",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "TypeBaseline / TypeBaselineEntry / TraitBaselineEntry 型を domain 層 tddd/baseline.rs に実装 (純粋データ型 + 構造比較関数)",
       "id": "T002",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Baseline codec (encode/decode) を infrastructure 層 tddd/baseline_codec.rs に実装",
@@ -125,5 +126,5 @@
     }
   ],
   "title": "TDDD-02: Baseline reverse signal — 既存型ノイズ排除",
-  "updated_at": "2026-04-11T07:31:40Z"
+  "updated_at": "2026-04-11T08:05:53Z"
 }

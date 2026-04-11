@@ -48,6 +48,7 @@ pub use spec::{
     SpecDocument, SpecRequirement, SpecScope, SpecSection, SpecStatus, SpecValidationError,
     evaluate_requirement_signal,
 };
+pub use tddd::baseline::{TraitBaselineEntry, TypeBaseline, TypeBaselineEntry};
 pub use tddd::catalogue::{
     ConsistencyReport, DomainTypeEntry, DomainTypeKind, DomainTypeSignal, DomainTypesDocument,
     TypestateTransitions, check_consistency, evaluate_domain_type_signals, undeclared_to_signals,
