@@ -40,10 +40,11 @@ pub fn check_spec_doc_signals(
     }
 }
 
-/// Checks domain-types.json signals (Stage 2) for strict mode.
+/// Checks domain-types.json signals (Stage 2).
 ///
 /// Red signals always block. Yellow signals block only in strict mode.
-/// Returns `pass()` if the document has no entries or no signals (TDDD not active).
+/// Returns `pass()` only when the document has no entries (empty TDDD catalogue).
+/// Fail-closed when entries exist but signals have not been evaluated.
 #[must_use]
 pub fn check_domain_types_signals(
     doc: &domain::DomainTypesDocument,
@@ -54,7 +55,10 @@ pub fn check_domain_types_signals(
     }
 
     let Some(signals) = doc.signals() else {
-        return VerifyOutcome::pass();
+        return VerifyOutcome::from_findings(vec![Finding::error(
+            "domain type signals not yet evaluated — run `sotp track domain-type-signals`"
+                .to_owned(),
+        )]);
     };
 
     let red_entries: Vec<&str> = signals

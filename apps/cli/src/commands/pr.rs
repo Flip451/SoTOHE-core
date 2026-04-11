@@ -488,10 +488,19 @@ fn check_spec_signals_strict(branch: &str, repo_root: &std::path::Path) -> ExitC
 enum BlobResult {
     /// Blob found and content returned.
     Found(String),
-    /// Blob not found on the remote ref (git show exited non-zero).
+    /// Blob genuinely does not exist on the remote ref (stderr matches path-not-found).
     NotFound,
-    /// Git command failed to execute (spawn error).
+    /// Git command failed: spawn error, or non-zero exit with non-path-not-found stderr.
     CommandFailed(String),
+}
+
+/// Returns `true` if the stderr output indicates the blob path does not exist.
+///
+/// Git emits `fatal: path '...' does not exist in '...'` or
+/// `fatal: path '...' exists on disk, but not in '...'` when the blob is missing.
+/// Any other stderr (corrupt object DB, bad ref, etc.) must fail closed.
+fn is_path_not_found_stderr(stderr: &str) -> bool {
+    stderr.contains("does not exist in") || stderr.contains("exists on disk, but not in")
 }
 
 /// Read a blob from `origin/{branch}:track/items/{track_id}/{filename}`.
@@ -509,7 +518,18 @@ fn git_show_blob(
         Ok(o) if o.status.success() => {
             BlobResult::Found(String::from_utf8_lossy(&o.stdout).into_owned())
         }
-        Ok(_) => BlobResult::NotFound,
+        Ok(o) => {
+            let stderr = String::from_utf8_lossy(&o.stderr);
+            if is_path_not_found_stderr(&stderr) {
+                BlobResult::NotFound
+            } else {
+                BlobResult::CommandFailed(format!(
+                    "git show failed for {filename} (exit {}): {}",
+                    o.status.code().unwrap_or(-1),
+                    stderr.trim()
+                ))
+            }
+        }
         Err(e) => BlobResult::CommandFailed(format!("failed to run git show for {filename}: {e}")),
     }
 }
