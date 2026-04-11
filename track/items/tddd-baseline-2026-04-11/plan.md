@@ -21,14 +21,14 @@ TraitBaselineEntry は methods (Vec<String>) を保持。
 構造比較関数: TypeBaselineEntry 同士の equality (kind + sorted members + sorted method_return_types)、TraitBaselineEntry 同士の equality (sorted methods)。
 TypeNode の outgoing と module_path は baseline に含めない。outgoing は method_return_types から導出可能で冗長、module_path はモジュール移動は構造変更ではないため。
 
-- [~] TypeBaseline / TypeBaselineEntry / TraitBaselineEntry 型を domain 層 tddd/baseline.rs に実装 (純粋データ型 + 構造比較関数)
+- [x] TypeBaseline / TypeBaselineEntry / TraitBaselineEntry 型を domain 層 tddd/baseline.rs に実装 (純粋データ型 + 構造比較関数) 2f4945a
 
 ## Baseline codec + builder (infrastructure 層)
 
 baseline_codec.rs: TypeBaseline の JSON encode/decode。オブジェクト形式 (型名をキー) で HashMap と 1:1 対応。
 baseline_builder.rs: TypeGraph → TypeBaseline 変換。TypeNode から kind + members + method_return_types を抽出、TraitNode から method_names を抽出。outgoing と module_path は除外。
 
-- [ ] Baseline codec (encode/decode) を infrastructure 層 tddd/baseline_codec.rs に実装
+- [~] Baseline codec (encode/decode) を infrastructure 層 tddd/baseline_codec.rs に実装
 - [ ] TypeGraph → TypeBaseline 変換を infrastructure 層 tddd/baseline_builder.rs に実装
 
 ## 4 グループ評価の実装 (domain 層)

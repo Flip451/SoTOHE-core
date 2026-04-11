@@ -95,14 +95,15 @@
       "status": "done"
     },
     {
+      "commit_hash": "2f4945a",
       "description": "TypeBaseline / TypeBaselineEntry / TraitBaselineEntry 型を domain 層 tddd/baseline.rs に実装 (純粋データ型 + 構造比較関数)",
       "id": "T002",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "Baseline codec (encode/decode) を infrastructure 層 tddd/baseline_codec.rs に実装",
       "id": "T003",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "TypeGraph → TypeBaseline 変換を infrastructure 層 tddd/baseline_builder.rs に実装",
@@ -126,5 +127,5 @@
     }
   ],
   "title": "TDDD-02: Baseline reverse signal — 既存型ノイズ排除",
-  "updated_at": "2026-04-11T08:05:53Z"
+  "updated_at": "2026-04-11T08:19:21Z"
 }
