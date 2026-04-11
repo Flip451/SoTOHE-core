@@ -412,38 +412,68 @@ fn check_tasks_resolved(branch: &str, repo_root: &std::path::Path) -> ExitCode {
     ExitCode::SUCCESS
 }
 
-/// Strict spec signal gate: delegates to the existing `verify spec-states --strict`
-/// verifier which checks spec signals (Stage 1) AND domain type signals for Yellow.
+/// Strict spec signal gate: reads spec.json from the PR head ref (not local worktree)
+/// and blocks merge when signals contain Red or Yellow.
 ///
-/// Uses the local worktree spec.md (which delegates to spec.json when present).
-/// Legacy tracks without spec.json are handled gracefully by the verifier.
+/// Follows the same `git show origin/branch:path → decode → check` pattern as
+/// `check_tasks_resolved` for metadata.json.
 fn check_spec_signals_strict(branch: &str, repo_root: &std::path::Path) -> ExitCode {
     if branch.starts_with("plan/") {
         return ExitCode::SUCCESS;
     }
 
     let track_id_str = branch.strip_prefix("track/").unwrap_or(branch);
-    let spec_path = repo_root.join(format!("track/items/{track_id_str}/spec.md"));
+    let blob_path = format!("track/items/{track_id_str}/spec.json");
+    let git_ref = format!("origin/{branch}:{blob_path}");
 
-    if !spec_path.is_file() {
-        // No spec.md — skip gate (legacy tracks).
-        return ExitCode::SUCCESS;
-    }
+    let output =
+        std::process::Command::new("git").args(["show", &git_ref]).current_dir(repo_root).output();
 
-    let outcome = infrastructure::verify::spec_states::verify(&spec_path, true);
-    if outcome.has_errors() {
-        eprintln!("[BLOCKED] strict spec signal gate failed:");
-        for finding in outcome.findings() {
-            eprintln!("  {}", finding.message());
+    let json = match output {
+        Ok(o) if o.status.success() => String::from_utf8_lossy(&o.stdout).into_owned(),
+        Ok(_) => {
+            // No spec.json on remote — skip gate (legacy tracks without spec.json).
+            return ExitCode::SUCCESS;
         }
-        eprintln!(
-            "Run /track:plan to upgrade inference/discussion sources to ADR/feedback, \
-             or implement remaining Yellow domain types."
-        );
-        return ExitCode::FAILURE;
-    }
+        Err(e) => {
+            eprintln!("[BLOCKED] failed to run git show for spec.json: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
 
-    ExitCode::SUCCESS
+    let spec_doc = match infrastructure::spec::codec::decode(&json) {
+        Ok(doc) => doc,
+        Err(e) => {
+            eprintln!("[BLOCKED] failed to decode spec.json: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    match spec_doc.signals() {
+        None => {
+            eprintln!(
+                "[BLOCKED] spec.json has no signals — run `cargo make track-signals` to evaluate"
+            );
+            ExitCode::FAILURE
+        }
+        Some(signals) if signals.red() > 0 => {
+            eprintln!(
+                "[BLOCKED] spec signals have red={} — resolve missing sources before merge",
+                signals.red()
+            );
+            ExitCode::FAILURE
+        }
+        Some(signals) if signals.yellow() > 0 => {
+            eprintln!(
+                "[BLOCKED] spec signals have yellow={} — all requirements must have \
+                 authoritative sources (document/feedback/convention) for merge. \
+                 Run /track:plan to upgrade inference/discussion sources to ADR/feedback.",
+                signals.yellow()
+            );
+            ExitCode::FAILURE
+        }
+        _ => ExitCode::SUCCESS,
+    }
 }
 
 fn wait_and_merge(pr: &str, interval: u64, timeout: u64, method: &str) -> ExitCode {
