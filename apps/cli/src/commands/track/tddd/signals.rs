@@ -68,12 +68,7 @@ pub fn execute_domain_type_signals(
     })?;
 
     // Collect typestate names for outgoing transition filtering in build_type_graph.
-    let typestate_names: std::collections::HashSet<String> = doc
-        .entries()
-        .iter()
-        .filter(|e| matches!(e.kind(), domain::DomainTypeKind::Typestate { .. }))
-        .map(|e| e.name().to_string())
-        .collect();
+    let typestate_names = doc.typestate_names();
 
     // Build a pre-indexed TypeGraph from the flat schema export.
     let profile = build_type_graph(&schema, &typestate_names);

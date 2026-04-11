@@ -233,12 +233,7 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
     };
 
     // Collect typestate names and build TypeGraph.
-    let typestate_names: std::collections::HashSet<String> = doc
-        .entries()
-        .iter()
-        .filter(|e| matches!(e.kind(), domain::DomainTypeKind::Typestate { .. }))
-        .map(|e| e.name().to_string())
-        .collect();
+    let typestate_names = doc.typestate_names();
     let graph = infrastructure::code_profile_builder::build_type_graph(&schema, &typestate_names);
 
     // Load baseline for 4-group evaluation.

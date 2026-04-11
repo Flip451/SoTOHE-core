@@ -19,6 +19,22 @@ pub mod tddd;
 pub mod track;
 pub mod verify;
 
+/// Returns a `Timestamp` for the current UTC instant, truncated to whole seconds.
+///
+/// Consolidates `chrono::Utc::now()` into a single infrastructure function so that
+/// domain/usecase layers receive timestamps as arguments (hexagonal purity).
+///
+/// # Errors
+///
+/// Returns `domain::ValidationError` if chrono produces an unparsable string (should never happen).
+pub fn timestamp_now() -> Result<domain::Timestamp, domain::ValidationError> {
+    use chrono::Timelike as _;
+    let now = chrono::Utc::now();
+    let dt = now.with_nanosecond(0).unwrap_or(now);
+    let raw = dt.to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
+    domain::Timestamp::new(raw)
+}
+
 use std::collections::HashMap;
 use std::sync::Mutex;
 

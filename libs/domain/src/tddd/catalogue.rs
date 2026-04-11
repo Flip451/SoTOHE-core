@@ -252,6 +252,18 @@ impl DomainTypesDocument {
     pub fn set_signals(&mut self, signals: Vec<DomainTypeSignal>) {
         self.signals = Some(signals);
     }
+
+    /// Returns the names of entries classified as `Typestate`.
+    ///
+    /// Used by `build_type_graph` to filter outgoing transitions.
+    #[must_use]
+    pub fn typestate_names(&self) -> HashSet<String> {
+        self.entries
+            .iter()
+            .filter(|e| matches!(e.kind(), DomainTypeKind::Typestate { .. }))
+            .map(|e| e.name().to_string())
+            .collect()
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -854,6 +866,61 @@ mod tests {
         let stored = doc.signals().unwrap();
         assert_eq!(stored.len(), 1);
         assert_eq!(stored.first().unwrap(), &signal);
+    }
+
+    #[test]
+    fn test_typestate_names_returns_only_typestate_entries() {
+        let typestate = typestate_entry();
+        let value_obj =
+            DomainTypeEntry::new("Email", "Validated email", DomainTypeKind::ValueObject, true)
+                .unwrap();
+        let enum_entry = DomainTypeEntry::new(
+            "Status",
+            "Status enum",
+            DomainTypeKind::Enum { expected_variants: vec!["Active".into()] },
+            true,
+        )
+        .unwrap();
+        let doc = DomainTypesDocument::new(1, vec![typestate, value_obj, enum_entry]);
+        let names = doc.typestate_names();
+        assert_eq!(names.len(), 1);
+        assert!(names.contains("ReviewState"));
+        assert!(!names.contains("Email"));
+        assert!(!names.contains("Status"));
+    }
+
+    #[test]
+    fn test_typestate_names_with_no_typestate_entries_returns_empty_set() {
+        let value_obj =
+            DomainTypeEntry::new("Email", "Validated email", DomainTypeKind::ValueObject, true)
+                .unwrap();
+        let doc = DomainTypesDocument::new(1, vec![value_obj]);
+        assert!(doc.typestate_names().is_empty());
+    }
+
+    #[test]
+    fn test_typestate_names_with_multiple_typestate_entries_returns_all() {
+        let ts1 = DomainTypeEntry::new(
+            "StateA",
+            "First typestate",
+            DomainTypeKind::Typestate { transitions: TypestateTransitions::Terminal },
+            true,
+        )
+        .unwrap();
+        let ts2 = DomainTypeEntry::new(
+            "StateB",
+            "Second typestate",
+            DomainTypeKind::Typestate {
+                transitions: TypestateTransitions::To(vec!["StateA".into()]),
+            },
+            true,
+        )
+        .unwrap();
+        let doc = DomainTypesDocument::new(1, vec![ts1, ts2]);
+        let names = doc.typestate_names();
+        assert_eq!(names.len(), 2);
+        assert!(names.contains("StateA"));
+        assert!(names.contains("StateB"));
     }
 
     #[test]

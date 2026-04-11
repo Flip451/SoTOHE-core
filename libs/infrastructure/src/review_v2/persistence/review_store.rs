@@ -154,7 +154,9 @@ impl FsReviewStore {
         let scope_key = scope.to_string();
         let entry = doc.scopes.entry(scope_key).or_insert_with(|| ScopeEntry { rounds: vec![] });
 
-        let now = chrono::Utc::now().format("%Y-%m-%dT%H:%M:%SZ").to_string();
+        let now = crate::timestamp_now()
+            .map(|ts| ts.as_str().to_owned())
+            .map_err(|e| ReviewWriterError::Codec { detail: format!("timestamp_now: {e}") })?;
         entry.rounds.push(super::RoundEntry {
             round_type: round_type.to_owned(),
             verdict: verdict_str.to_owned(),

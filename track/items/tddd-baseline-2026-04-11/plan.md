@@ -38,7 +38,7 @@ check_consistency のシグネチャを (entries: &[DomainTypeEntry], graph: &Ty
 B\A で C に存在しない場合も Red (未宣言の削除)。TDDD-03 実装まで /track:design と既存型削除は併用不可の制約。
 ConsistencyReport に skipped_count (B\A で構造同一の件数) を追加。
 
-- [~] check_consistency を拡張: &TypeBaseline 引数追加、4 グループ評価 (A\B, A∩B, B\A, ∁(A∪B)∩C)、ConsistencyReport に skipped_count 追加
+- [x] check_consistency を拡張: &TypeBaseline 引数追加、4 グループ評価 (A\B, A∩B, B\A, ∁(A∪B)∩C)、ConsistencyReport に skipped_count 追加 1232554
 
 ## CLI コマンド分離
 
@@ -46,7 +46,7 @@ tddd/baseline.rs に baseline-capture コマンドを実装: rustdoc → TypeGra
 tddd/signals.rs (旧 domain_state_signals.rs) を更新: baseline 読み込み (存在しない場合はエラー) → check_consistency に baseline を渡す。baseline の生成ロジックは含めない。
 サマリ出力に skipped_count を追加。
 
-- [ ] CLI baseline-capture コマンドを tddd/baseline.rs に実装 (生成専用、既存時スキップで冪等、--force で再生成)。tddd/signals.rs (旧 domain_state_signals.rs) を拡張して baseline 読み込み (不在時エラー) + 4 グループ評価呼び出しを追加
+- [~] CLI baseline-capture コマンドを tddd/baseline.rs に実装 (生成専用、既存時スキップで冪等、--force で再生成)。tddd/signals.rs (旧 domain_state_signals.rs) を拡張して baseline 読み込み (不在時エラー) + 4 グループ評価呼び出しを追加
 
 ## /track:design コマンド更新
 
