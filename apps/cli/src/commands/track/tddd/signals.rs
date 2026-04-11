@@ -9,8 +9,8 @@ use std::process::ExitCode;
 
 use domain::schema::{SchemaExportError, SchemaExporter};
 use infrastructure::code_profile_builder::build_type_graph;
-use infrastructure::domain_types_codec;
 use infrastructure::schema_export::RustdocSchemaExporter;
+use infrastructure::tddd::catalogue_codec;
 use infrastructure::track::atomic_write::atomic_write_file;
 
 use crate::CliError;
@@ -53,7 +53,7 @@ pub fn execute_domain_type_signals(
         }
     })?;
 
-    let mut doc = domain_types_codec::decode(&json)
+    let mut doc = catalogue_codec::decode(&json)
         .map_err(|e| CliError::Message(format!("domain-types.json decode error: {e}")))?;
 
     // Export the domain crate's public API via rustdoc JSON.
@@ -71,7 +71,7 @@ pub fn execute_domain_type_signals(
     let typestate_names: std::collections::HashSet<String> = doc
         .entries()
         .iter()
-        .filter(|e| matches!(e.kind(), domain::domain_types::DomainTypeKind::Typestate { .. }))
+        .filter(|e| matches!(e.kind(), domain::DomainTypeKind::Typestate { .. }))
         .map(|e| e.name().to_string())
         .collect();
 
@@ -92,7 +92,7 @@ pub fn execute_domain_type_signals(
     doc.set_signals(all_signals.clone());
 
     // Encode and write back.
-    let encoded = domain_types_codec::encode(&doc)
+    let encoded = catalogue_codec::encode(&doc)
         .map_err(|e| CliError::Message(format!("domain-types.json encode error: {e}")))?;
 
     atomic_write_file(&domain_types_path, format!("{encoded}\n").as_bytes()).map_err(|e| {

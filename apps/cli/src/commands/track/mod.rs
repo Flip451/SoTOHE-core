@@ -15,10 +15,10 @@ use infrastructure::track::render;
 use usecase::track_activation::{ActivateTrackOutcome, ActivateTrackUseCase};
 
 mod activate;
-mod domain_state_signals;
 mod resolve;
 mod signals;
 mod state_ops;
+mod tddd;
 mod transition;
 mod views;
 
@@ -307,7 +307,7 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             signals::execute_signals(items_dir, track_id)
         }
         TrackCommand::DomainTypeSignals { items_dir, track_id, workspace_root } => {
-            domain_state_signals::execute_domain_type_signals(items_dir, track_id, workspace_root)
+            tddd::signals::execute_domain_type_signals(items_dir, track_id, workspace_root)
         }
     };
     match result {

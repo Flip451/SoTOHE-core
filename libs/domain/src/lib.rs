@@ -3,7 +3,6 @@
 
 pub mod auto_phase;
 mod decision;
-pub mod domain_types;
 mod error;
 pub mod guard;
 pub mod hook;
@@ -16,16 +15,13 @@ pub mod schema;
 mod signal;
 pub mod skill_compliance;
 pub mod spec;
+pub mod tddd;
 mod timestamp;
 mod track;
 pub mod track_phase;
 pub mod verify;
 
 pub use decision::Decision;
-pub use domain_types::{
-    ConsistencyReport, DomainTypeEntry, DomainTypeKind, DomainTypeSignal, DomainTypesDocument,
-    TypestateTransitions, check_consistency, evaluate_domain_type_signals, undeclared_to_signals,
-};
 pub use error::{
     DomainError, RepositoryError, TrackReadError, TrackWriteError, TransitionError,
     ValidationError, WorktreeError,
@@ -51,6 +47,10 @@ pub use spec::{
     CoverageResult, HearingMode, HearingRecord, HearingSignalDelta, HearingSignalSnapshot,
     SpecDocument, SpecRequirement, SpecScope, SpecSection, SpecStatus, SpecValidationError,
     evaluate_requirement_signal,
+};
+pub use tddd::catalogue::{
+    ConsistencyReport, DomainTypeEntry, DomainTypeKind, DomainTypeSignal, DomainTypesDocument,
+    TypestateTransitions, check_consistency, evaluate_domain_type_signals, undeclared_to_signals,
 };
 pub use timestamp::Timestamp;
 pub use track::{

@@ -205,7 +205,7 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
         }
     };
 
-    let doc = match infrastructure::domain_types_codec::decode(&json) {
+    let doc = match infrastructure::tddd::catalogue_codec::decode(&json) {
         Ok(d) => d,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
@@ -235,7 +235,7 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
     let typestate_names: std::collections::HashSet<String> = doc
         .entries()
         .iter()
-        .filter(|e| matches!(e.kind(), domain::domain_types::DomainTypeKind::Typestate { .. }))
+        .filter(|e| matches!(e.kind(), domain::DomainTypeKind::Typestate { .. }))
         .map(|e| e.name().to_string())
         .collect();
     let graph = infrastructure::code_profile_builder::build_type_graph(&schema, &typestate_names);

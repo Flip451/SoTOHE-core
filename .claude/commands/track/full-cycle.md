@@ -7,6 +7,23 @@ Canonical command for autonomous per-task implementation in the track workflow.
 Requires being on a `track/<id>` branch. If on `plan/<id>`, stop and suggest `/track:activate <id>`.
 If on any other branch, stop and suggest switching to the track branch.
 
+## Step 0 (required before any execution step): Build an execution plan
+
+Read **every** sub-command definition referenced below (`/track:implement`,
+`/track:review`, `/track:commit`) and extract their decision points into a concrete
+execution plan. Do NOT treat them as informational background — treat them as a state
+machine to execute.
+
+For each sub-command, identify:
+- Trigger conditions ("when X happens → do Y immediately")
+- Parallelism rules ("launch N agents in parallel, escalate each independently")
+- Completion criteria ("full model zero_findings, not just fast model")
+- Error/branch handling ("if step fails → stop and report")
+
+Skim-reading produces missed steps and user corrections. Reading the sub-command
+definitions and building this plan is the first action; no execution step may begin
+until the plan is complete.
+
 ## Execution
 
 For each task in `metadata.json` `tasks` array (in order),

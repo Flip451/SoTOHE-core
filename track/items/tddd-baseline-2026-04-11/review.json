@@ -1,6 +1,161 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
+          "at": "2026-04-11T07:42:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new requirement that the execution plan be built \"before the first tool call\" is internally inconsistent with the immediately preceding instruction to read `/track:implement`, `/track:review`, and `/track:commit`, because those sub-command definitions normally have to be opened via tool calls. That makes the section ambiguous in practice and can cause agents to either violate the instruction or skip the required pre-read.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 23,
+              "category": "ambiguity"
+            }
+          ],
+          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
+          "at": "2026-04-11T07:43:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new mandate is internally impossible to follow literally: it says to read `/track:implement`, `/track:review`, and `/track:commit` and build the execution plan \"before the first tool call\", but opening those command definitions is itself a tool call. In practice this leaves agents choosing between violating the new requirement or skipping the required sub-command read, which undermines the prompt hardening this change is trying to add.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 24,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
+          "at": "2026-04-11T07:44:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fc5dc3e97148c19fbb4b2e0f0c9f710428a709f3f06f6c2a36de92f4e2cb72e",
+          "at": "2026-04-11T07:47:09Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:37:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is not a pure file move/path update as described. Keep the old public path as a re-export (for example `pub use tddd::catalogue_codec as domain_types_codec;`) or treat this as an intentional breaking API change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": "public API break"
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:39:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is not a pure file move/path update as described. Re-export the moved module under the old name or treat this as an intentional breaking API change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:44:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b36d45529aa78b518993aa2b5a508da8436eda538e78951e7f7043220aa095ec",
+          "at": "2026-04-11T07:47:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Replacing the public `domain_types_codec` module with `pub mod tddd;` removes the existing `infrastructure::domain_types_codec::{...}` API surface. Any downstream crate importing the old path will stop compiling, so this is a breaking change rather than the 'pure file move + path update' described in the brief. Keep a compatibility re-export (for example `pub use tddd::catalogue_codec as domain_types_codec;`) or treat this as an intentional breaking API change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:50:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is a breaking API change rather than the pure file move/path update described in the brief. Re-export `tddd::catalogue_codec` under the old name or treat this as an intentional breaking change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:52:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lib.rs` removes the public `domain_types_codec` module and only exposes the moved code under `tddd::catalogue_codec`. That breaks the existing `infrastructure::domain_types_codec::{...}` API surface for any downstream crate, so this is a breaking change rather than the 'pure file move + path update' described in the brief. Add a compatibility re-export such as `pub use tddd::catalogue_codec as domain_types_codec;` or treat this as an intentional API break.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": "api-compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:53:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:56:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c626dd7194e860f7222fade684f1c6f89dd6dc506dec432e05e0eb892f8c9268",
+          "at": "2026-04-11T07:59:53Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -346,6 +501,152 @@
           "findings": [],
           "hash": "rvw1:sha256:d2342798376f3241f689199518aec0a497bfb2779ff9fe51bc8c5815a5a8ccbc",
           "at": "2026-04-11T07:20:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20b51f5d01bd1b8c31f2ac9b7968a25356ec5c003ef819e5f43919dd0a5f89d3",
+          "at": "2026-04-11T07:36:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20b51f5d01bd1b8c31f2ac9b7968a25356ec5c003ef819e5f43919dd0a5f89d3",
+          "at": "2026-04-11T07:38:44Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a32cf842a0a1de928470e3467fda0d5d48d239dfc7c3d94e72f032c5dde66637",
+          "at": "2026-04-11T07:37:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/mod.rs` now declares `mod tddd;`, but the new `apps/cli/src/commands/track/tddd/mod.rs` and `apps/cli/src/commands/track/tddd/signals.rs` files are still untracked (`git status` shows `??`). As a result, the tracked diff under review deletes `domain_state_signals.rs` without adding the replacement module, so applying the patch as-is produces an unresolved-module build failure.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/mod.rs",
+              "line": 21,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:a32cf842a0a1de928470e3467fda0d5d48d239dfc7c3d94e72f032c5dde66637",
+          "at": "2026-04-11T07:40:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a32cf842a0a1de928470e3467fda0d5d48d239dfc7c3d94e72f032c5dde66637",
+          "at": "2026-04-11T07:42:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1f3ea59212813e34e22ac9efd9a78722aad2d674bd2f055b6a4f14fbe58fb399",
+          "at": "2026-04-11T08:00:01Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2191ad54a5716b110f873018080a3e88bfaa04797597531597b67dea8877ac16",
+          "at": "2026-04-11T07:37:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing the public `domain_types` module from the crate root preserves `domain::DomainTypeEntry`, but it breaks existing imports through `domain::domain_types::*`. That is a compile-time public API regression for downstream crates, so this is not a pure move unless a compatibility shim keeps the old module path alive.",
+              "severity": "P1",
+              "file": "libs/domain/src/lib.rs",
+              "line": 18,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2191ad54a5716b110f873018080a3e88bfaa04797597531597b67dea8877ac16",
+          "at": "2026-04-11T07:39:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing the public `domain_types` module is a breaking API change: downstream code that imports `domain::domain_types::{...}` will stop compiling even though the symbols are still re-exported at the crate root. Because this task is scoped as a pure move/path update, `lib.rs` needs a compatibility shim for the old module path (for example re-exporting `tddd::catalogue` as `domain_types`).",
+              "severity": "P1",
+              "file": "libs/domain/src/lib.rs",
+              "line": 18,
+              "category": "public_api"
+            }
+          ],
+          "hash": "rvw1:sha256:2191ad54a5716b110f873018080a3e88bfaa04797597531597b67dea8877ac16",
+          "at": "2026-04-11T07:40:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26ad451e7b1d035359cb08844f5ac25c4bf2a1d64a6fc6db9c198a4edbbd6cb8",
+          "at": "2026-04-11T07:42:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing the public `domain_types` module breaks downstream imports of `domain::domain_types::{...}`. The crate still re-exports the items at the root, but the old module path is gone; add a compatibility re-export such as `pub use tddd::catalogue as domain_types;` to preserve the existing API.",
+              "severity": "P1",
+              "file": "libs/domain/src/lib.rs",
+              "line": 18,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:2191ad54a5716b110f873018080a3e88bfaa04797597531597b67dea8877ac16",
+          "at": "2026-04-11T07:44:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing the public `domain_types` module path is still a breaking API change. `lib.rs` now exposes the moved items only through crate-root re-exports and `tddd::catalogue`, so downstream code importing `domain::domain_types::{...}` will stop compiling unless you add the compatibility shim (`pub use tddd::catalogue as domain_types;`) described in the briefing.",
+              "severity": "P1",
+              "file": "libs/domain/src/lib.rs",
+              "line": 18,
+              "category": "breaking_change"
+            }
+          ],
+          "hash": "rvw1:sha256:2191ad54a5716b110f873018080a3e88bfaa04797597531597b67dea8877ac16",
+          "at": "2026-04-11T07:45:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2191ad54a5716b110f873018080a3e88bfaa04797597531597b67dea8877ac16",
+          "at": "2026-04-11T07:47:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19b31fd3adb7100705cce9fda142fc739077ffc97d2cd3cafefcda9d52a0f320",
+          "at": "2026-04-11T07:59:52Z"
         }
       ]
     }

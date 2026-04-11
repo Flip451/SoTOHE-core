@@ -3,7 +3,6 @@
 
 pub mod agent_profiles;
 pub mod code_profile_builder;
-pub mod domain_types_codec;
 pub mod domain_types_render;
 pub mod gh_cli;
 pub mod git_cli;
@@ -16,6 +15,7 @@ pub mod schema_export;
 mod schema_export_tests;
 pub mod shell;
 pub mod spec;
+pub mod tddd;
 pub mod track;
 pub mod verify;
 

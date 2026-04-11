@@ -9,7 +9,7 @@ use std::path::Path;
 use domain::ConfidenceSignal;
 use domain::verify::{Finding, VerifyOutcome};
 
-use crate::domain_types_codec;
+use crate::tddd::catalogue_codec;
 
 use super::frontmatter::parse_yaml_frontmatter;
 
@@ -99,7 +99,7 @@ pub fn verify_from_spec_json(spec_json_path: &Path, strict: bool) -> VerifyOutco
         }
     };
 
-    let doc = match domain_types_codec::decode(&json) {
+    let doc = match catalogue_codec::decode(&json) {
         Ok(d) => d,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![Finding::error(format!(
