@@ -8,6 +8,51 @@ use crate::ConfidenceSignal;
 use crate::spec::SpecValidationError;
 
 // ---------------------------------------------------------------------------
+// TypeAction enum
+// ---------------------------------------------------------------------------
+
+/// Declares the intended operation for a domain type entry.
+///
+/// Used in `domain-types.json` to record developer intent about how a type
+/// should be evaluated relative to the baseline.
+///
+/// - `Add` (default): type is being newly added
+/// - `Modify`: type is being modified from its baseline structure
+/// - `Reference`: type is declared as-is for documentation purposes
+/// - `Delete`: type is being intentionally deleted (inverts forward check)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum TypeAction {
+    /// Type is being newly added. Default when field is omitted.
+    #[default]
+    Add,
+    /// Type is being modified from its baseline structure.
+    Modify,
+    /// Type is declared as-is for documentation purposes (reference only).
+    Reference,
+    /// Type is being intentionally deleted (inverts forward check).
+    Delete,
+}
+
+impl TypeAction {
+    /// Returns the canonical lowercase string tag for this action.
+    #[must_use]
+    pub fn action_tag(&self) -> &'static str {
+        match self {
+            Self::Add => "add",
+            Self::Modify => "modify",
+            Self::Reference => "reference",
+            Self::Delete => "delete",
+        }
+    }
+
+    /// Returns `true` if this is the default action (`Add`).
+    #[must_use]
+    pub fn is_default(&self) -> bool {
+        matches!(self, Self::Add)
+    }
+}
+
+// ---------------------------------------------------------------------------
 // DomainTypeKind enum
 // ---------------------------------------------------------------------------
 
@@ -66,12 +111,14 @@ impl DomainTypeKind {
 /// A single entry in the domain-types catalogue.
 ///
 /// Each entry records one named domain type together with its expected structure
-/// (`kind`) and whether the entry has been human-approved.
+/// (`kind`), intended operation (`action`), and whether the entry has been
+/// human-approved.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DomainTypeEntry {
     name: String,
     description: String,
     kind: DomainTypeKind,
+    action: TypeAction,
     approved: bool,
 }
 
@@ -86,13 +133,14 @@ impl DomainTypeEntry {
         name: impl Into<String>,
         description: impl Into<String>,
         kind: DomainTypeKind,
+        action: TypeAction,
         approved: bool,
     ) -> Result<Self, SpecValidationError> {
         let name = name.into();
         if name.trim().is_empty() {
             return Err(SpecValidationError::EmptyDomainStateName);
         }
-        Ok(Self { name, description: description.into(), kind, approved })
+        Ok(Self { name, description: description.into(), kind, action, approved })
     }
 
     /// Returns the type name.
@@ -111,6 +159,12 @@ impl DomainTypeEntry {
     #[must_use]
     pub fn kind(&self) -> &DomainTypeKind {
         &self.kind
+    }
+
+    /// Returns the intended operation for this entry.
+    #[must_use]
+    pub fn action(&self) -> TypeAction {
+        self.action
     }
 
     /// Returns `true` if this entry has been explicitly approved by a maintainer.
@@ -301,6 +355,12 @@ fn evaluate_single(
     let name = entry.name();
     let kind_tag = entry.kind().kind_tag().to_string();
 
+    // Delete action inverts the forward check: absent → Blue, present → Yellow.
+    // This is orthogonal to kind, so we branch before the kind dispatch.
+    if entry.action() == TypeAction::Delete {
+        return evaluate_delete(name, &kind_tag, entry.kind(), profile);
+    }
+
     match entry.kind() {
         DomainTypeKind::Typestate { transitions } => {
             evaluate_typestate(name, &kind_tag, transitions, profile, typestate_names)
@@ -315,6 +375,38 @@ fn evaluate_single(
         DomainTypeKind::TraitPort { expected_methods } => {
             evaluate_trait_port(name, &kind_tag, expected_methods, profile)
         }
+    }
+}
+
+/// Evaluates a `Delete`-action entry: absent from code → Blue, still present → Yellow.
+///
+/// TraitPort entries check `graph.get_trait()`; all other kinds check `graph.get_type()`.
+fn evaluate_delete(
+    name: &str,
+    kind_tag: &str,
+    kind: &DomainTypeKind,
+    profile: &TypeGraph,
+) -> DomainTypeSignal {
+    let present = if matches!(kind, DomainTypeKind::TraitPort { .. }) {
+        profile.get_trait(name).is_some()
+    } else {
+        profile.get_type(name).is_some()
+    };
+
+    if present {
+        // Type still exists — not yet deleted.
+        DomainTypeSignal::new(
+            name,
+            kind_tag,
+            ConfidenceSignal::Yellow,
+            true,
+            vec![],
+            vec![],
+            vec![],
+        )
+    } else {
+        // Type is gone — deletion complete.
+        DomainTypeSignal::new(name, kind_tag, ConfidenceSignal::Blue, false, vec![], vec![], vec![])
     }
 }
 
@@ -569,6 +661,57 @@ pub fn undeclared_to_signals(
 }
 
 // ---------------------------------------------------------------------------
+// ActionContradiction — action vs baseline mismatch warnings
+// ---------------------------------------------------------------------------
+
+/// Describes a contradiction between an entry's declared `action` and the baseline state.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ActionContradiction {
+    name: String,
+    action: TypeAction,
+    kind: ActionContradictionKind,
+}
+
+impl ActionContradiction {
+    /// Creates a new `ActionContradiction`.
+    #[must_use]
+    pub fn new(name: impl Into<String>, action: TypeAction, kind: ActionContradictionKind) -> Self {
+        Self { name: name.into(), action, kind }
+    }
+
+    /// Returns the type name.
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// Returns the declared action.
+    #[must_use]
+    pub fn action(&self) -> TypeAction {
+        self.action
+    }
+
+    /// Returns the kind of contradiction.
+    #[must_use]
+    pub fn kind(&self) -> &ActionContradictionKind {
+        &self.kind
+    }
+}
+
+/// Classifies the nature of an action-baseline contradiction.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ActionContradictionKind {
+    /// `action: "add"` but type already exists in baseline.
+    AddButAlreadyInBaseline,
+    /// `action: "modify"` but type not found in baseline.
+    ModifyButNotInBaseline,
+    /// `action: "reference"` but type not found in baseline.
+    ReferenceButNotInBaseline,
+    /// `action: "reference"` but forward check signal is not Blue (implementation differs).
+    ReferenceButNotBlue,
+}
+
+// ---------------------------------------------------------------------------
 // ConsistencyReport — bidirectional spec ↔ code check
 // ---------------------------------------------------------------------------
 
@@ -588,6 +731,10 @@ pub struct ConsistencyReport {
     baseline_red_types: Vec<String>,
     /// Red signals from baseline comparison for traits (group 3).
     baseline_red_traits: Vec<String>,
+    /// Advisory warnings for action-baseline contradictions.
+    contradictions: Vec<ActionContradiction>,
+    /// Hard errors: `delete` action declared for types not in baseline.
+    delete_errors: Vec<String>,
 }
 
 impl ConsistencyReport {
@@ -626,6 +773,18 @@ impl ConsistencyReport {
     pub fn baseline_red_traits(&self) -> &[String] {
         &self.baseline_red_traits
     }
+
+    /// Returns advisory warnings for action-baseline contradictions.
+    #[must_use]
+    pub fn contradictions(&self) -> &[ActionContradiction] {
+        &self.contradictions
+    }
+
+    /// Returns hard errors for `delete` action on types not in baseline.
+    #[must_use]
+    pub fn delete_errors(&self) -> &[String] {
+        &self.delete_errors
+    }
 }
 
 /// Performs a baseline-aware bidirectional consistency check.
@@ -645,12 +804,12 @@ pub fn check_consistency(
     baseline: &crate::TypeBaseline,
 ) -> ConsistencyReport {
     // Forward check (groups 1 + 2): evaluate declared entries against code.
-    let forward_signals = evaluate_domain_type_signals(entries, graph);
+    let mut forward_signals = evaluate_domain_type_signals(entries, graph);
 
     // Kind-specific declared sets: types and traits are partitioned separately
     // so that cross-kind undeclared code is detected by reverse check.
-    // Kind migration (e.g., struct -> trait) produces false Red, but this is
-    // constrained by TDDD-03 until `action: "delete"` is available.
+    // Kind migration (e.g., struct -> trait) is handled via delete+add pairs:
+    // declare the old kind with action:"delete" and the new kind with action:"add".
     let declared_type_names: HashSet<&str> = entries
         .iter()
         .filter(|e| !matches!(e.kind(), DomainTypeKind::TraitPort { .. }))
@@ -730,6 +889,66 @@ pub fn check_consistency(
         .collect();
     undeclared_traits.sort();
 
+    // Action-baseline contradiction detection + delete validation.
+    let mut contradictions = Vec::new();
+    let mut delete_errors = Vec::new();
+
+    for (i, entry) in entries.iter().enumerate() {
+        let name = entry.name();
+        let is_trait = matches!(entry.kind(), DomainTypeKind::TraitPort { .. });
+        let in_baseline = if is_trait { baseline.has_trait(name) } else { baseline.has_type(name) };
+
+        match entry.action() {
+            TypeAction::Add => {
+                if in_baseline {
+                    contradictions.push(ActionContradiction::new(
+                        name,
+                        TypeAction::Add,
+                        ActionContradictionKind::AddButAlreadyInBaseline,
+                    ));
+                }
+            }
+            TypeAction::Modify => {
+                if !in_baseline {
+                    contradictions.push(ActionContradiction::new(
+                        name,
+                        TypeAction::Modify,
+                        ActionContradictionKind::ModifyButNotInBaseline,
+                    ));
+                }
+            }
+            TypeAction::Reference => {
+                if !in_baseline {
+                    contradictions.push(ActionContradiction::new(
+                        name,
+                        TypeAction::Reference,
+                        ActionContradictionKind::ReferenceButNotInBaseline,
+                    ));
+                } else if let Some(signal) = forward_signals.get(i) {
+                    if signal.signal() != ConfidenceSignal::Blue {
+                        contradictions.push(ActionContradiction::new(
+                            name,
+                            TypeAction::Reference,
+                            ActionContradictionKind::ReferenceButNotBlue,
+                        ));
+                    }
+                }
+            }
+            TypeAction::Delete => {
+                if !in_baseline {
+                    delete_errors.push(name.to_string());
+                    // Patch the forward signal to Red so that existing consumers
+                    // that only inspect `forward_signals` see this as an error.
+                    // Without baseline evidence the delete declaration cannot be
+                    // validated, so the entry must not silently resolve to Blue.
+                    if let Some(sig) = forward_signals.get_mut(i) {
+                        *sig = red(name, entry.kind().kind_tag(), false);
+                    }
+                }
+            }
+        }
+    }
+
     ConsistencyReport {
         forward_signals,
         undeclared_types,
@@ -737,6 +956,8 @@ pub fn check_consistency(
         skipped_count,
         baseline_red_types,
         baseline_red_traits,
+        contradictions,
+        delete_errors,
     }
 }
 
@@ -749,6 +970,82 @@ pub fn check_consistency(
 mod tests {
     use super::*;
 
+    // --- TypeAction ---
+
+    #[test]
+    fn test_type_action_default_is_add() {
+        assert_eq!(TypeAction::default(), TypeAction::Add);
+    }
+
+    #[test]
+    fn test_type_action_is_default_returns_true_for_add() {
+        assert!(TypeAction::Add.is_default());
+    }
+
+    #[test]
+    fn test_type_action_is_default_returns_false_for_non_add() {
+        assert!(!TypeAction::Delete.is_default());
+        assert!(!TypeAction::Modify.is_default());
+        assert!(!TypeAction::Reference.is_default());
+    }
+
+    #[test]
+    fn test_type_action_tag_returns_canonical_string() {
+        assert_eq!(TypeAction::Add.action_tag(), "add");
+        assert_eq!(TypeAction::Modify.action_tag(), "modify");
+        assert_eq!(TypeAction::Reference.action_tag(), "reference");
+        assert_eq!(TypeAction::Delete.action_tag(), "delete");
+    }
+
+    #[test]
+    fn test_domain_type_entry_action_defaults_to_add() {
+        let entry =
+            DomainTypeEntry::new("Foo", "desc", DomainTypeKind::ValueObject, TypeAction::Add, true)
+                .unwrap();
+        assert_eq!(entry.action(), TypeAction::Add);
+    }
+
+    #[test]
+    fn test_domain_type_entry_stores_delete_action() {
+        let entry = DomainTypeEntry::new(
+            "OldType",
+            "Intentionally deleted",
+            DomainTypeKind::ValueObject,
+            TypeAction::Delete,
+            true,
+        )
+        .unwrap();
+        assert_eq!(entry.action(), TypeAction::Delete);
+    }
+
+    #[test]
+    fn test_domain_type_entry_stores_modify_action() {
+        let entry = DomainTypeEntry::new(
+            "ChangedType",
+            "Modified existing type",
+            DomainTypeKind::ValueObject,
+            TypeAction::Modify,
+            true,
+        )
+        .unwrap();
+        assert_eq!(entry.action(), TypeAction::Modify);
+    }
+
+    #[test]
+    fn test_domain_type_entry_stores_reference_action() {
+        let entry = DomainTypeEntry::new(
+            "RefType",
+            "Referenced for docs",
+            DomainTypeKind::ValueObject,
+            TypeAction::Reference,
+            true,
+        )
+        .unwrap();
+        assert_eq!(entry.action(), TypeAction::Reference);
+    }
+
+    // --- DomainTypeEntry helpers ---
+
     fn typestate_entry() -> DomainTypeEntry {
         DomainTypeEntry::new(
             "ReviewState",
@@ -756,6 +1053,7 @@ mod tests {
             DomainTypeKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["Approved".into(), "Rejected".into()]),
             },
+            TypeAction::Add,
             true,
         )
         .unwrap()
@@ -772,13 +1070,15 @@ mod tests {
 
     #[test]
     fn test_domain_type_entry_with_empty_name_returns_error() {
-        let result = DomainTypeEntry::new("", "desc", DomainTypeKind::ValueObject, true);
+        let result =
+            DomainTypeEntry::new("", "desc", DomainTypeKind::ValueObject, TypeAction::Add, true);
         assert!(matches!(result, Err(SpecValidationError::EmptyDomainStateName)));
     }
 
     #[test]
     fn test_domain_type_entry_with_whitespace_name_returns_error() {
-        let result = DomainTypeEntry::new("   ", "desc", DomainTypeKind::ValueObject, true);
+        let result =
+            DomainTypeEntry::new("   ", "desc", DomainTypeKind::ValueObject, TypeAction::Add, true);
         assert!(matches!(result, Err(SpecValidationError::EmptyDomainStateName)));
     }
 
@@ -788,6 +1088,7 @@ mod tests {
             "Email",
             "Validated email address",
             DomainTypeKind::ValueObject,
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -799,8 +1100,14 @@ mod tests {
     fn test_domain_type_entry_enum_kind_with_variants() {
         let kind =
             DomainTypeKind::Enum { expected_variants: vec!["Active".into(), "Inactive".into()] };
-        let entry =
-            DomainTypeEntry::new("Status", "Track status enum", kind.clone(), true).unwrap();
+        let entry = DomainTypeEntry::new(
+            "Status",
+            "Track status enum",
+            kind.clone(),
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
         assert_eq!(entry.kind(), &kind);
         assert_eq!(entry.kind().kind_tag(), "enum");
     }
@@ -810,8 +1117,14 @@ mod tests {
         let kind = DomainTypeKind::ErrorType {
             expected_variants: vec!["NotFound".into(), "InvalidInput".into()],
         };
-        let entry =
-            DomainTypeEntry::new("DomainError", "Domain error type", kind.clone(), true).unwrap();
+        let entry = DomainTypeEntry::new(
+            "DomainError",
+            "Domain error type",
+            kind.clone(),
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
         assert_eq!(entry.kind(), &kind);
         assert_eq!(entry.kind().kind_tag(), "error_type");
     }
@@ -821,15 +1134,23 @@ mod tests {
         let kind = DomainTypeKind::TraitPort {
             expected_methods: vec!["find_by_id".into(), "save".into()],
         };
-        let entry =
-            DomainTypeEntry::new("UserRepository", "User repo port", kind.clone(), true).unwrap();
+        let entry = DomainTypeEntry::new(
+            "UserRepository",
+            "User repo port",
+            kind.clone(),
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
         assert_eq!(entry.kind(), &kind);
         assert_eq!(entry.kind().kind_tag(), "trait_port");
     }
 
     #[test]
     fn test_domain_type_entry_approved_default_true() {
-        let entry = DomainTypeEntry::new("Foo", "desc", DomainTypeKind::ValueObject, true).unwrap();
+        let entry =
+            DomainTypeEntry::new("Foo", "desc", DomainTypeKind::ValueObject, TypeAction::Add, true)
+                .unwrap();
         assert!(entry.approved());
     }
 
@@ -839,6 +1160,7 @@ mod tests {
             "AiSuggested",
             "AI-added type",
             DomainTypeKind::ValueObject,
+            TypeAction::Add,
             false,
         )
         .unwrap();
@@ -875,13 +1197,19 @@ mod tests {
     #[test]
     fn test_typestate_names_returns_only_typestate_entries() {
         let typestate = typestate_entry();
-        let value_obj =
-            DomainTypeEntry::new("Email", "Validated email", DomainTypeKind::ValueObject, true)
-                .unwrap();
+        let value_obj = DomainTypeEntry::new(
+            "Email",
+            "Validated email",
+            DomainTypeKind::ValueObject,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
         let enum_entry = DomainTypeEntry::new(
             "Status",
             "Status enum",
             DomainTypeKind::Enum { expected_variants: vec!["Active".into()] },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -895,9 +1223,14 @@ mod tests {
 
     #[test]
     fn test_typestate_names_with_no_typestate_entries_returns_empty_set() {
-        let value_obj =
-            DomainTypeEntry::new("Email", "Validated email", DomainTypeKind::ValueObject, true)
-                .unwrap();
+        let value_obj = DomainTypeEntry::new(
+            "Email",
+            "Validated email",
+            DomainTypeKind::ValueObject,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
         let doc = DomainTypesDocument::new(1, vec![value_obj]);
         assert!(doc.typestate_names().is_empty());
     }
@@ -908,6 +1241,7 @@ mod tests {
             "StateA",
             "First typestate",
             DomainTypeKind::Typestate { transitions: TypestateTransitions::Terminal },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -917,6 +1251,7 @@ mod tests {
             DomainTypeKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["StateA".into()]),
             },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -1012,6 +1347,7 @@ mod tests {
             DomainTypeKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["Published".into()]),
             },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -1019,6 +1355,7 @@ mod tests {
             "Published",
             "desc",
             DomainTypeKind::Typestate { transitions: TypestateTransitions::Terminal },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -1033,6 +1370,7 @@ mod tests {
             "Ghost",
             "desc",
             DomainTypeKind::Typestate { transitions: TypestateTransitions::Terminal },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -1050,6 +1388,7 @@ mod tests {
             DomainTypeKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["Published".into()]),
             },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -1062,8 +1401,14 @@ mod tests {
 
     #[test]
     fn test_evaluate_value_object_blue_when_exists() {
-        let entry =
-            DomainTypeEntry::new("TrackId", "desc", DomainTypeKind::ValueObject, true).unwrap();
+        let entry = DomainTypeEntry::new(
+            "TrackId",
+            "desc",
+            DomainTypeKind::ValueObject,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
         let profile = make_profile(&["TrackId"]);
         let results = evaluate_domain_type_signals(&[entry], &profile);
         assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
@@ -1071,12 +1416,88 @@ mod tests {
 
     #[test]
     fn test_evaluate_value_object_yellow_when_not_implemented() {
-        let entry =
-            DomainTypeEntry::new("TrackId", "desc", DomainTypeKind::ValueObject, true).unwrap();
+        let entry = DomainTypeEntry::new(
+            "TrackId",
+            "desc",
+            DomainTypeKind::ValueObject,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
         let profile = make_profile(&[]);
         let results = evaluate_domain_type_signals(&[entry], &profile);
         assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
         assert!(!results.first().unwrap().found_type());
+    }
+
+    // --- Delete action forward check ---
+
+    #[test]
+    fn test_delete_value_object_blue_when_absent() {
+        let entry = DomainTypeEntry::new(
+            "OldType",
+            "desc",
+            DomainTypeKind::ValueObject,
+            TypeAction::Delete,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&[]); // type absent
+        let results = evaluate_domain_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
+        assert!(!results.first().unwrap().found_type());
+    }
+
+    #[test]
+    fn test_delete_value_object_yellow_when_still_present() {
+        let entry = DomainTypeEntry::new(
+            "OldType",
+            "desc",
+            DomainTypeKind::ValueObject,
+            TypeAction::Delete,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&["OldType"]); // type still present
+        let results = evaluate_domain_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+        assert!(results.first().unwrap().found_type());
+    }
+
+    #[test]
+    fn test_delete_trait_port_blue_when_absent() {
+        let entry = DomainTypeEntry::new(
+            "OldRepo",
+            "desc",
+            DomainTypeKind::TraitPort { expected_methods: vec!["find".into()] },
+            TypeAction::Delete,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&[]); // trait absent
+        let results = evaluate_domain_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_delete_trait_port_yellow_when_still_present() {
+        let entry = DomainTypeEntry::new(
+            "OldRepo",
+            "desc",
+            DomainTypeKind::TraitPort { expected_methods: vec!["find".into()] },
+            TypeAction::Delete,
+            true,
+        )
+        .unwrap();
+        // Build a profile with the trait present
+        let types = std::collections::HashMap::new();
+        let traits = std::collections::HashMap::from([(
+            "OldRepo".to_string(),
+            crate::schema::TraitNode::new(vec!["find".into()]),
+        )]);
+        let profile = TypeGraph::new(types, traits);
+        let results = evaluate_domain_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
     }
 
     #[test]
@@ -1085,6 +1506,7 @@ mod tests {
             "Status",
             "desc",
             DomainTypeKind::Enum { expected_variants: vec!["Active".into()] },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -1101,6 +1523,7 @@ mod tests {
             "DomainError",
             "desc",
             DomainTypeKind::ErrorType { expected_variants: vec!["NotFound".into()] },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -1117,6 +1540,7 @@ mod tests {
             "Status",
             "desc",
             DomainTypeKind::Enum { expected_variants: vec!["Active".into(), "Done".into()] },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -1131,6 +1555,7 @@ mod tests {
             "Repo",
             "desc",
             DomainTypeKind::TraitPort { expected_methods: vec!["save".into()] },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -1146,6 +1571,7 @@ mod tests {
             "Repo",
             "desc",
             DomainTypeKind::TraitPort { expected_methods: vec!["save".into(), "find".into()] },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -1161,6 +1587,7 @@ mod tests {
             "Final",
             "desc",
             DomainTypeKind::Typestate { transitions: TypestateTransitions::Terminal },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -1181,6 +1608,7 @@ mod tests {
             DomainTypeKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["Published".into()]),
             },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -1188,6 +1616,7 @@ mod tests {
             "Published",
             "desc",
             DomainTypeKind::Typestate { transitions: TypestateTransitions::Terminal },
+            TypeAction::Add,
             true,
         )
         .unwrap();
@@ -1380,8 +1809,14 @@ mod tests {
             TypeBaselineEntry::new(TypeKind::Struct, vec!["0".into()], vec![]),
         )]);
 
-        let entry =
-            DomainTypeEntry::new("TrackId", "desc", DomainTypeKind::ValueObject, true).unwrap();
+        let entry = DomainTypeEntry::new(
+            "TrackId",
+            "desc",
+            DomainTypeKind::ValueObject,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
 
         let mut types = HashMap::new();
         types.insert(
@@ -1401,8 +1836,14 @@ mod tests {
     #[test]
     fn test_group1_new_declared_type_uses_forward_check() {
         // Declared but not in baseline → group 1, forward check
-        let entry =
-            DomainTypeEntry::new("NewType", "desc", DomainTypeKind::ValueObject, true).unwrap();
+        let entry = DomainTypeEntry::new(
+            "NewType",
+            "desc",
+            DomainTypeKind::ValueObject,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
 
         let mut types = HashMap::new();
         types.insert(
@@ -1470,9 +1911,22 @@ mod tests {
         ]);
 
         let entries = vec![
-            DomainTypeEntry::new("DeclaredNew", "d", DomainTypeKind::ValueObject, true).unwrap(),
-            DomainTypeEntry::new("DeclaredExisting", "d", DomainTypeKind::ValueObject, true)
-                .unwrap(),
+            DomainTypeEntry::new(
+                "DeclaredNew",
+                "d",
+                DomainTypeKind::ValueObject,
+                TypeAction::Add,
+                true,
+            )
+            .unwrap(),
+            DomainTypeEntry::new(
+                "DeclaredExisting",
+                "d",
+                DomainTypeKind::ValueObject,
+                TypeAction::Add,
+                true,
+            )
+            .unwrap(),
         ];
 
         let mut types = HashMap::new();
@@ -1503,5 +1957,160 @@ mod tests {
         assert_eq!(report.baseline_red_types(), &["ChangedExisting"]);
         // Group 4: BrandNew
         assert_eq!(report.undeclared_types(), &["BrandNew"]);
+    }
+
+    // --- Contradiction detection (T003/T004) ---
+
+    #[test]
+    fn test_contradiction_add_already_in_baseline() {
+        let entry =
+            DomainTypeEntry::new("Foo", "d", DomainTypeKind::ValueObject, TypeAction::Add, true)
+                .unwrap();
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        let baseline = baseline_with_types(vec![(
+            "Foo",
+            TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
+        )]);
+        let report = check_consistency(&[entry], &graph, &baseline);
+        assert_eq!(report.contradictions().len(), 1);
+        assert_eq!(
+            report.contradictions()[0].kind(),
+            &ActionContradictionKind::AddButAlreadyInBaseline
+        );
+    }
+
+    #[test]
+    fn test_no_contradiction_add_not_in_baseline() {
+        let entry =
+            DomainTypeEntry::new("Foo", "d", DomainTypeKind::ValueObject, TypeAction::Add, true)
+                .unwrap();
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        let baseline = empty_baseline();
+        let report = check_consistency(&[entry], &graph, &baseline);
+        assert!(report.contradictions().is_empty());
+    }
+
+    #[test]
+    fn test_contradiction_modify_not_in_baseline() {
+        let entry =
+            DomainTypeEntry::new("Foo", "d", DomainTypeKind::ValueObject, TypeAction::Modify, true)
+                .unwrap();
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        let baseline = empty_baseline();
+        let report = check_consistency(&[entry], &graph, &baseline);
+        assert_eq!(report.contradictions().len(), 1);
+        assert_eq!(
+            report.contradictions()[0].kind(),
+            &ActionContradictionKind::ModifyButNotInBaseline
+        );
+    }
+
+    #[test]
+    fn test_no_contradiction_modify_in_baseline() {
+        let entry =
+            DomainTypeEntry::new("Foo", "d", DomainTypeKind::ValueObject, TypeAction::Modify, true)
+                .unwrap();
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        let baseline = baseline_with_types(vec![(
+            "Foo",
+            TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
+        )]);
+        let report = check_consistency(&[entry], &graph, &baseline);
+        assert!(report.contradictions().is_empty());
+    }
+
+    #[test]
+    fn test_contradiction_reference_not_in_baseline() {
+        let entry = DomainTypeEntry::new(
+            "Foo",
+            "d",
+            DomainTypeKind::ValueObject,
+            TypeAction::Reference,
+            true,
+        )
+        .unwrap();
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        let baseline = empty_baseline();
+        let report = check_consistency(&[entry], &graph, &baseline);
+        assert_eq!(report.contradictions().len(), 1);
+        assert_eq!(
+            report.contradictions()[0].kind(),
+            &ActionContradictionKind::ReferenceButNotInBaseline
+        );
+    }
+
+    #[test]
+    fn test_contradiction_reference_not_blue() {
+        // Reference entry with type in baseline but not in code → forward Yellow → contradiction
+        let entry = DomainTypeEntry::new(
+            "Foo",
+            "d",
+            DomainTypeKind::ValueObject,
+            TypeAction::Reference,
+            true,
+        )
+        .unwrap();
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new()); // type absent → Yellow
+        let baseline = baseline_with_types(vec![(
+            "Foo",
+            TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
+        )]);
+        let report = check_consistency(&[entry], &graph, &baseline);
+        assert_eq!(report.contradictions().len(), 1);
+        assert_eq!(
+            report.contradictions()[0].kind(),
+            &ActionContradictionKind::ReferenceButNotBlue
+        );
+    }
+
+    #[test]
+    fn test_delete_error_not_in_baseline() {
+        let entry = DomainTypeEntry::new(
+            "Ghost",
+            "d",
+            DomainTypeKind::ValueObject,
+            TypeAction::Delete,
+            true,
+        )
+        .unwrap();
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        let baseline = empty_baseline();
+        let report = check_consistency(&[entry], &graph, &baseline);
+        assert_eq!(report.delete_errors(), &["Ghost"]);
+    }
+
+    #[test]
+    fn test_delete_error_not_in_baseline_signal_is_red() {
+        // An invalid delete (no baseline) must produce a Red forward signal so that
+        // consumers who only inspect `forward_signals` see the error without having
+        // to also consult `delete_errors`.
+        let entry = DomainTypeEntry::new(
+            "Ghost",
+            "d",
+            DomainTypeKind::ValueObject,
+            TypeAction::Delete,
+            true,
+        )
+        .unwrap();
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        let baseline = empty_baseline();
+        let report = check_consistency(&[entry], &graph, &baseline);
+        assert_eq!(report.delete_errors(), &["Ghost"]);
+        assert_eq!(report.forward_signals()[0].signal(), ConfidenceSignal::Red);
+        assert!(!report.forward_signals()[0].found_type());
+    }
+
+    #[test]
+    fn test_delete_in_baseline_no_error() {
+        let entry =
+            DomainTypeEntry::new("Foo", "d", DomainTypeKind::ValueObject, TypeAction::Delete, true)
+                .unwrap();
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        let baseline = baseline_with_types(vec![(
+            "Foo",
+            TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
+        )]);
+        let report = check_consistency(&[entry], &graph, &baseline);
+        assert!(report.delete_errors().is_empty());
     }
 }

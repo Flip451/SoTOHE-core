@@ -192,8 +192,14 @@ fn domain_type_entry_from_dto(
     dto: &DomainTypeEntryDto,
 ) -> Result<DomainTypeEntry, DomainTypesCodecError> {
     let kind = domain_type_kind_from_dto(&dto.kind);
-    DomainTypeEntry::new(&dto.name, &dto.description, kind, dto.approved)
-        .map_err(DomainTypesCodecError::Validation)
+    DomainTypeEntry::new(
+        &dto.name,
+        &dto.description,
+        kind,
+        domain::TypeAction::default(),
+        dto.approved,
+    )
+    .map_err(DomainTypesCodecError::Validation)
 }
 
 fn domain_type_kind_from_dto(dto: &DomainTypeKindDto) -> DomainTypeKind {

@@ -101,7 +101,7 @@ mod tests {
     use super::*;
 
     fn make_entry(name: &str, kind: DomainTypeKind) -> DomainTypeEntry {
-        DomainTypeEntry::new(name, "description", kind, true).unwrap()
+        DomainTypeEntry::new(name, "description", kind, domain::TypeAction::Add, true).unwrap()
     }
 
     fn make_doc(entries: Vec<DomainTypeEntry>) -> DomainTypesDocument {

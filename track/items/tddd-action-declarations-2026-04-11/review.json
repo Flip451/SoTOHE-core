@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45335a53e493006c75f9c4876529e8dd8f5ae179291c039bdfeb27483d21f269",
+          "at": "2026-04-11T13:05:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45335a53e493006c75f9c4876529e8dd8f5ae179291c039bdfeb27483d21f269",
+          "at": "2026-04-11T13:06:43Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -118,6 +136,97 @@
           "findings": [],
           "hash": "rvw1:sha256:8ca4bf9fa93a1e2e2626779c9aa440bf412d18ed336cd6519ba93cdeac8e9c02",
           "at": "2026-04-11T12:47:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ba81577c591ee9290098b0ce609fb1e89519e10bd19de9c49b0d33632180f15",
+          "at": "2026-04-11T13:05:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` broadens the approved TDDD-03 scope with `T011` (`catalogue.rs` split into three modules), but neither the ADR, planner review, nor `spec.json` define that refactor as part of this track. Adding unscoped work here means the generated plan now requires an unrelated structural change before the feature is complete, which creates review churn and can delay delivery of the actual action-declaration behavior.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/metadata.json",
+              "line": 152,
+              "category": "scope"
+            }
+          ],
+          "hash": "rvw1:sha256:efc57fd9c884a06ef98505dcb540d5e26a5571385fa4dba748304acac6bbd78e",
+          "at": "2026-04-11T13:12:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_version: 3` track metadata requires each task object to carry `{id, description, status, commit_hash}`, but this edit removes `commit_hash` from every task. That breaks the documented SSoT shape for `metadata.json` and will prevent per-task completion provenance from being recorded once tasks transition to `done`.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/metadata.json",
+              "line": 99,
+              "category": "schema"
+            }
+          ],
+          "hash": "rvw1:sha256:bcb1ba111d44c10d2d220ab1179016faca878b9f19356ec5b68eadbca6d54bd0",
+          "at": "2026-04-11T13:15:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bcb1ba111d44c10d2d220ab1179016faca878b9f19356ec5b68eadbca6d54bd0",
+          "at": "2026-04-11T13:16:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bcb1ba111d44c10d2d220ab1179016faca878b9f19356ec5b68eadbca6d54bd0",
+          "at": "2026-04-11T13:17:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bcb1ba111d44c10d2d220ab1179016faca878b9f19356ec5b68eadbca6d54bd0",
+          "at": "2026-04-11T13:17:36Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db808571f395002d480393689243103a59236e912e409e366b6374c96a6a9446",
+          "at": "2026-04-11T13:07:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeAction::Delete` on a name that is not in the baseline only appends to `delete_errors` here, while the delete entry still suppresses group-4 undeclared detection for that name. That means an invalid `delete` declaration can produce no Red signals at all and will be silently accepted by existing `ConsistencyReport` consumers unless they are updated to consult the new field.",
+              "severity": "P0",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 937,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:db808571f395002d480393689243103a59236e912e409e366b6374c96a6a9446",
+          "at": "2026-04-11T13:10:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e6d852352d25cb96fd8428280a955f7036cde1f999b97ebd4b79ae35156f131d",
+          "at": "2026-04-11T13:14:31Z"
         }
       ]
     }
