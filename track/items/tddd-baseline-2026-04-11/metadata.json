@@ -119,16 +119,17 @@
       "status": "done"
     },
     {
+      "commit_hash": "3212a31",
       "description": "CLI baseline-capture コマンドを tddd/baseline.rs に実装 (生成専用、既存時スキップで冪等、--force で再生成)。tddd/signals.rs (旧 domain_state_signals.rs) を拡張して baseline 読み込み (不在時エラー) + 4 グループ評価呼び出しを追加",
       "id": "T006",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "/track:design コマンドを更新: Step 4 で baseline-capture を呼び出す旨を記載、design 成果物と一緒にコミット推奨を追記",
       "id": "T007",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "title": "TDDD-02: Baseline reverse signal — 既存型ノイズ排除",
-  "updated_at": "2026-04-11T09:32:29Z"
+  "updated_at": "2026-04-11T10:40:42Z"
 }

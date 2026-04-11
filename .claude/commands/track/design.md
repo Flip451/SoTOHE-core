@@ -77,12 +77,16 @@ If the file already exists, merge new types with existing ones:
 - Do not modify `approved` status of existing entries
 - Clear the `signals` field (omit or set to `null`) — Step 4 runs `domain-type-signals` which always does a full rebuild
 
-## Step 4: Validate and summarize
+## Step 4: Capture baseline and validate
 
-1. Run `sotp track domain-type-signals <id>` to evaluate signals for the new/updated types.
-2. Run `sotp verify spec-states <spec-path>` to verify the TDDD gate passes (no Red signals).
-3. Run `cargo make ci` to verify everything passes.
-3. Print a summary:
+1. Run `cargo make track-baseline-capture -- <id>` to snapshot the current TypeGraph as `domain-types-baseline.json`.
+   This baseline enables the reverse signal check to distinguish existing-unchanged types (skip)
+   from structurally-changed or newly-added types (Red). The capture is idempotent — if a baseline
+   already exists it is skipped (use `--force` to regenerate).
+2. Run `sotp track domain-type-signals <id>` to evaluate signals for the new/updated types.
+3. Run `sotp verify spec-states <spec-path>` to verify the TDDD gate passes (no Red signals).
+4. Run `cargo make ci` to verify everything passes.
+5. Print a summary:
    - Total types declared
    - Breakdown by kind (value_object, enum, typestate, error_type, trait_port)
    - New types added (if incremental update)
@@ -91,6 +95,7 @@ If the file already exists, merge new types with existing ones:
 ## Step 5: Next steps guidance
 
 After design completion, inform the user:
+- Commit `domain-types.json` and `domain-types-baseline.json` together as design artifacts.
 - If the track is planning-only (branchless, `status=planned`, `branch=null`), run `/track:activate <track-id>` first.
 - Then run `/track:implement` to start implementing the declared types.
 - Types will start as Yellow (defined but not yet implemented).

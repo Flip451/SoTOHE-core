@@ -863,6 +863,11 @@ description = "[wrapper] Evaluate confidence signals for a track's spec.json"
 script_runner = "@shell"
 script = ['bin/sotp track signals "$@"']
 
+[tasks.track-baseline-capture]
+description = "[wrapper] Capture TypeGraph baseline for TDDD reverse signal filtering. Usage: cargo make track-baseline-capture -- <track-id> [--force]"
+script_runner = "@shell"
+script = ['bin/sotp track baseline-capture "$@"']
+
 [tasks.track-switch-main]
 description = "[wrapper] Switch to main branch and pull latest"
 command = "bin/sotp"

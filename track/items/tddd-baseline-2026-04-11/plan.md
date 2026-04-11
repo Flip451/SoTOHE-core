@@ -46,11 +46,11 @@ tddd/baseline.rs に baseline-capture コマンドを実装: rustdoc → TypeGra
 tddd/signals.rs (旧 domain_state_signals.rs) を更新: baseline 読み込み (存在しない場合はエラー) → check_consistency に baseline を渡す。baseline の生成ロジックは含めない。
 サマリ出力に skipped_count を追加。
 
-- [~] CLI baseline-capture コマンドを tddd/baseline.rs に実装 (生成専用、既存時スキップで冪等、--force で再生成)。tddd/signals.rs (旧 domain_state_signals.rs) を拡張して baseline 読み込み (不在時エラー) + 4 グループ評価呼び出しを追加
+- [x] CLI baseline-capture コマンドを tddd/baseline.rs に実装 (生成専用、既存時スキップで冪等、--force で再生成)。tddd/signals.rs (旧 domain_state_signals.rs) を拡張して baseline 読み込み (不在時エラー) + 4 グループ評価呼び出しを追加 3212a31
 
 ## /track:design コマンド更新
 
 .claude/commands/track/design.md の Step 4 を更新: baseline-capture を呼び出して baseline を生成する旨を記載。
 baseline を design 成果物と一緒にコミットすることを推奨する旨を追記。
 
-- [ ] /track:design コマンドを更新: Step 4 で baseline-capture を呼び出す旨を記載、design 成果物と一緒にコミット推奨を追記
+- [~] /track:design コマンドを更新: Step 4 で baseline-capture を呼び出す旨を記載、design 成果物と一緒にコミット推奨を追記

@@ -1,6 +1,357 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:37:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is not a pure file move/path update as described. Keep the old public path as a re-export (for example `pub use tddd::catalogue_codec as domain_types_codec;`) or treat this as an intentional breaking API change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": "public API break"
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:39:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is not a pure file move/path update as described. Re-export the moved module under the old name or treat this as an intentional breaking API change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:44:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b36d45529aa78b518993aa2b5a508da8436eda538e78951e7f7043220aa095ec",
+          "at": "2026-04-11T07:47:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Replacing the public `domain_types_codec` module with `pub mod tddd;` removes the existing `infrastructure::domain_types_codec::{...}` API surface. Any downstream crate importing the old path will stop compiling, so this is a breaking change rather than the 'pure file move + path update' described in the brief. Keep a compatibility re-export (for example `pub use tddd::catalogue_codec as domain_types_codec;`) or treat this as an intentional breaking API change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:50:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is a breaking API change rather than the pure file move/path update described in the brief. Re-export `tddd::catalogue_codec` under the old name or treat this as an intentional breaking change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:52:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lib.rs` removes the public `domain_types_codec` module and only exposes the moved code under `tddd::catalogue_codec`. That breaks the existing `infrastructure::domain_types_codec::{...}` API surface for any downstream crate, so this is a breaking change rather than the 'pure file move + path update' described in the brief. Add a compatibility re-export such as `pub use tddd::catalogue_codec as domain_types_codec;` or treat this as an intentional API break.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": "api-compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:53:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:56:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c626dd7194e860f7222fade684f1c6f89dd6dc506dec432e05e0eb892f8c9268",
+          "at": "2026-04-11T07:59:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The DTOs are permissive by default: `serde` will ignore unknown fields here, and the `#[serde(default)]` vecs make typos or schema drift decode as empty `members`/`methods` instead of failing. For a source-of-truth baseline codec, this is silent input corruption; reject unknown fields or add equivalent validation at the DTO boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 34,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:c5b65d6d27c72a4431cadabeda703157d3bb54ced675ca2ab554a37488031f06",
+          "at": "2026-04-11T08:23:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The DTOs are permissive here: serde will ignore unknown fields, and the `#[serde(default)]` vectors turn typos or schema drift into empty `members`/`methods` instead of failing fast. For a source-of-truth baseline codec, that means malformed input can deserialize successfully with silently dropped data; reject unknown fields or validate the required arrays explicitly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 34,
+              "category": "correctness"
+            },
+            {
+              "message": "`encode()` builds the `types` and `traits` payloads from `HashMap`s and passes them straight to `serde_json::to_string_pretty`, so key order depends on hash iteration. That makes `baseline-capture` output non-deterministic across runs for the same baseline, which is a poor fit for a committed artifact and will create spurious diffs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 131,
+              "category": "determinism"
+            }
+          ],
+          "hash": "rvw1:sha256:c5b65d6d27c72a4431cadabeda703157d3bb54ced675ca2ab554a37488031f06",
+          "at": "2026-04-11T08:25:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd51f5838494f49f6d4fba8a1cb6015040f598608294d0caafd570337efe6abe",
+          "at": "2026-04-11T08:28:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaselineDto` defaults both top-level maps, so a malformed or partially-written baseline like `{ \"schema_version\": 1, \"captured_at\": \"...\" }` decodes as an empty snapshot instead of failing. Because this file drives reverse-signal suppression, that silently erases the baseline and can misclassify every existing type/trait as new or changed; `types` and `traits` should be required at the DTO boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 41,
+              "category": "correctness"
+            },
+            {
+              "message": "`decode()` deserializes `types`/`traits` directly into `BTreeMap`s, which means duplicate JSON keys are collapsed by `serde_json` before any validation and the last entry wins. A corrupted `domain-types-baseline.json` can therefore drop type or trait definitions silently instead of failing fast, making the baseline unreliable as a source-of-truth artifact.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 75,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cd51f5838494f49f6d4fba8a1cb6015040f598608294d0caafd570337efe6abe",
+          "at": "2026-04-11T08:30:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaselineDto` makes the top-level `types` and `traits` maps optional via `#[serde(default)]`, so a truncated payload like `{ \"schema_version\": 1, \"captured_at\": \"...\" }` is accepted as a valid empty baseline instead of being rejected. That turns a malformed or partially-written baseline artifact into 'no prior types/traits', which will skew downstream comparisons rather than surfacing an input error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 41,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cd51f5838494f49f6d4fba8a1cb6015040f598608294d0caafd570337efe6abe",
+          "at": "2026-04-11T08:32:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaselineDto.types`/`traits` deserialize straight into `BTreeMap`, so a malformed JSON payload with duplicate object keys will silently keep only the last entry instead of failing. That drops baseline data without surfacing an error, which violates the intended strict decode behavior for committed artifacts.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 45,
+              "category": "correctness"
+            },
+            {
+              "message": "`test_decode_unknown_type_kind` no longer exercises the unknown-kind rejection path: the fixture omits the now-required `traits` field, so deserialization fails earlier on the missing top-level map. The custom `unknown type kind` branch is therefore untested after the round-2 schema tightening.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 242,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:57296c415733b2b99af96aca869358f2304e2aae66a4d6ff036e268c41af094f",
+          "at": "2026-04-11T08:36:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e04b877194b8a7c2dce72adbeeab392fcb6fdaa4b1feb84e928d51ab3fe1e9ac",
+          "at": "2026-04-11T08:40:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:086e14a362e32ea3ef49f3ff8513999dd812e6bc603287dcbddec9a659b85b4e",
+          "at": "2026-04-11T08:44:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:086e14a362e32ea3ef49f3ff8513999dd812e6bc603287dcbddec9a659b85b4e",
+          "at": "2026-04-11T08:47:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9d282f49fa9b97e37a05214c2646bc90d8bbac44e4f634c1611884193a7002f",
+          "at": "2026-04-11T10:30:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`append_round` now discards `crate::timestamp_now()` errors and falls back to a fresh raw `chrono::Utc::now()` string. This defeats the new centralized/validated clock path: if `domain::Timestamp` validation is ever tightened, review writes will still persist an unvalidated timestamp instead of failing through `ReviewWriterError`, and this path reintroduces a second direct clock access outside the accepted archive exception.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
+              "line": 157,
+              "category": "error handling"
+            },
+            {
+              "message": "`now_iso8601()` swallows `crate::timestamp_now()` failures and returns a raw `chrono` string anyway, so `save`/`update` will keep writing metadata timestamps even when the validated timestamp constructor rejects that format. This bypasses the intended single validated clock path and should be changed to return a `Result` so `TrackWriteError` propagation is preserved.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/fs_store.rs",
+              "line": 87,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:a9d282f49fa9b97e37a05214c2646bc90d8bbac44e4f634c1611884193a7002f",
+          "at": "2026-04-11T10:32:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsReviewStore::append_round` swallows `timestamp_now()` failures and falls back to a raw `chrono::Utc::now()` string, so a timestamp validation regression would still write an unvalidated `at` value into `review.json` instead of returning `ReviewWriterError` as the new `Result` contract implies.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
+              "line": 157,
+              "category": null
+            },
+            {
+              "message": "`FsTrackStore::now_iso8601` converts `timestamp_now()` back into infallible behavior by ignoring `ValidationError` and returning a raw chrono string. That means `save`/`update` can keep persisting metadata timestamps even after the shared validator rejects them, which is silent error swallowing in a library path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/fs_store.rs",
+              "line": 88,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:a9d282f49fa9b97e37a05214c2646bc90d8bbac44e4f634c1611884193a7002f",
+          "at": "2026-04-11T10:33:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fc29b7a65e78183c39b929943b97b95f09c08b76330d89027cba9315f146d5c",
+          "at": "2026-04-11T10:36:39Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
+          "at": "2026-04-11T07:42:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new requirement that the execution plan be built \"before the first tool call\" is internally inconsistent with the immediately preceding instruction to read `/track:implement`, `/track:review`, and `/track:commit`, because those sub-command definitions normally have to be opened via tool calls. That makes the section ambiguous in practice and can cause agents to either violate the instruction or skip the required pre-read.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 23,
+              "category": "ambiguity"
+            }
+          ],
+          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
+          "at": "2026-04-11T07:43:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new mandate is internally impossible to follow literally: it says to read `/track:implement`, `/track:review`, and `/track:commit` and build the execution plan \"before the first tool call\", but opening those command definitions is itself a tool call. In practice this leaves agents choosing between violating the new requirement or skipping the required sub-command read, which undermines the prompt hardening this change is trying to add.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 24,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
+          "at": "2026-04-11T07:44:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fc5dc3e97148c19fbb4b2e0f0c9f710428a709f3f06f6c2a36de92f4e2cb72e",
+          "at": "2026-04-11T07:47:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17dd1345874a6b8a954cee13dffb1bf40a00a55a8ec4aa557234a9ed1f8dbf6e",
+          "at": "2026-04-11T10:46:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17dd1345874a6b8a954cee13dffb1bf40a00a55a8ec4aa557234a9ed1f8dbf6e",
+          "at": "2026-04-11T10:48:38Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -353,295 +704,6 @@
           "findings": [],
           "hash": "rvw1:sha256:204f88e8459fd7e4601292d3f2402dc46841c8de90c92d06521625d707daa7f1",
           "at": "2026-04-11T10:39:39Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
-          "at": "2026-04-11T07:37:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is not a pure file move/path update as described. Keep the old public path as a re-export (for example `pub use tddd::catalogue_codec as domain_types_codec;`) or treat this as an intentional breaking API change.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/lib.rs",
-              "line": 18,
-              "category": "public API break"
-            }
-          ],
-          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
-          "at": "2026-04-11T07:39:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is not a pure file move/path update as described. Re-export the moved module under the old name or treat this as an intentional breaking API change.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/lib.rs",
-              "line": 18,
-              "category": "compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
-          "at": "2026-04-11T07:44:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b36d45529aa78b518993aa2b5a508da8436eda538e78951e7f7043220aa095ec",
-          "at": "2026-04-11T07:47:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Replacing the public `domain_types_codec` module with `pub mod tddd;` removes the existing `infrastructure::domain_types_codec::{...}` API surface. Any downstream crate importing the old path will stop compiling, so this is a breaking change rather than the 'pure file move + path update' described in the brief. Keep a compatibility re-export (for example `pub use tddd::catalogue_codec as domain_types_codec;`) or treat this as an intentional breaking API change.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/lib.rs",
-              "line": 18,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
-          "at": "2026-04-11T07:50:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is a breaking API change rather than the pure file move/path update described in the brief. Re-export `tddd::catalogue_codec` under the old name or treat this as an intentional breaking change.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/lib.rs",
-              "line": 18,
-              "category": "compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
-          "at": "2026-04-11T07:52:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`lib.rs` removes the public `domain_types_codec` module and only exposes the moved code under `tddd::catalogue_codec`. That breaks the existing `infrastructure::domain_types_codec::{...}` API surface for any downstream crate, so this is a breaking change rather than the 'pure file move + path update' described in the brief. Add a compatibility re-export such as `pub use tddd::catalogue_codec as domain_types_codec;` or treat this as an intentional API break.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/lib.rs",
-              "line": 18,
-              "category": "api-compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
-          "at": "2026-04-11T07:53:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
-          "at": "2026-04-11T07:56:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c626dd7194e860f7222fade684f1c6f89dd6dc506dec432e05e0eb892f8c9268",
-          "at": "2026-04-11T07:59:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The DTOs are permissive by default: `serde` will ignore unknown fields here, and the `#[serde(default)]` vecs make typos or schema drift decode as empty `members`/`methods` instead of failing. For a source-of-truth baseline codec, this is silent input corruption; reject unknown fields or add equivalent validation at the DTO boundary.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 34,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:c5b65d6d27c72a4431cadabeda703157d3bb54ced675ca2ab554a37488031f06",
-          "at": "2026-04-11T08:23:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The DTOs are permissive here: serde will ignore unknown fields, and the `#[serde(default)]` vectors turn typos or schema drift into empty `members`/`methods` instead of failing fast. For a source-of-truth baseline codec, that means malformed input can deserialize successfully with silently dropped data; reject unknown fields or validate the required arrays explicitly.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 34,
-              "category": "correctness"
-            },
-            {
-              "message": "`encode()` builds the `types` and `traits` payloads from `HashMap`s and passes them straight to `serde_json::to_string_pretty`, so key order depends on hash iteration. That makes `baseline-capture` output non-deterministic across runs for the same baseline, which is a poor fit for a committed artifact and will create spurious diffs.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 131,
-              "category": "determinism"
-            }
-          ],
-          "hash": "rvw1:sha256:c5b65d6d27c72a4431cadabeda703157d3bb54ced675ca2ab554a37488031f06",
-          "at": "2026-04-11T08:25:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cd51f5838494f49f6d4fba8a1cb6015040f598608294d0caafd570337efe6abe",
-          "at": "2026-04-11T08:28:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`BaselineDto` defaults both top-level maps, so a malformed or partially-written baseline like `{ \"schema_version\": 1, \"captured_at\": \"...\" }` decodes as an empty snapshot instead of failing. Because this file drives reverse-signal suppression, that silently erases the baseline and can misclassify every existing type/trait as new or changed; `types` and `traits` should be required at the DTO boundary.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 41,
-              "category": "correctness"
-            },
-            {
-              "message": "`decode()` deserializes `types`/`traits` directly into `BTreeMap`s, which means duplicate JSON keys are collapsed by `serde_json` before any validation and the last entry wins. A corrupted `domain-types-baseline.json` can therefore drop type or trait definitions silently instead of failing fast, making the baseline unreliable as a source-of-truth artifact.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 75,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:cd51f5838494f49f6d4fba8a1cb6015040f598608294d0caafd570337efe6abe",
-          "at": "2026-04-11T08:30:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`BaselineDto` makes the top-level `types` and `traits` maps optional via `#[serde(default)]`, so a truncated payload like `{ \"schema_version\": 1, \"captured_at\": \"...\" }` is accepted as a valid empty baseline instead of being rejected. That turns a malformed or partially-written baseline artifact into 'no prior types/traits', which will skew downstream comparisons rather than surfacing an input error.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 41,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:cd51f5838494f49f6d4fba8a1cb6015040f598608294d0caafd570337efe6abe",
-          "at": "2026-04-11T08:32:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`BaselineDto.types`/`traits` deserialize straight into `BTreeMap`, so a malformed JSON payload with duplicate object keys will silently keep only the last entry instead of failing. That drops baseline data without surfacing an error, which violates the intended strict decode behavior for committed artifacts.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 45,
-              "category": "correctness"
-            },
-            {
-              "message": "`test_decode_unknown_type_kind` no longer exercises the unknown-kind rejection path: the fixture omits the now-required `traits` field, so deserialization fails earlier on the missing top-level map. The custom `unknown type kind` branch is therefore untested after the round-2 schema tightening.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 242,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:57296c415733b2b99af96aca869358f2304e2aae66a4d6ff036e268c41af094f",
-          "at": "2026-04-11T08:36:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e04b877194b8a7c2dce72adbeeab392fcb6fdaa4b1feb84e928d51ab3fe1e9ac",
-          "at": "2026-04-11T08:40:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:086e14a362e32ea3ef49f3ff8513999dd812e6bc603287dcbddec9a659b85b4e",
-          "at": "2026-04-11T08:44:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:086e14a362e32ea3ef49f3ff8513999dd812e6bc603287dcbddec9a659b85b4e",
-          "at": "2026-04-11T08:47:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9d282f49fa9b97e37a05214c2646bc90d8bbac44e4f634c1611884193a7002f",
-          "at": "2026-04-11T10:30:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`append_round` now discards `crate::timestamp_now()` errors and falls back to a fresh raw `chrono::Utc::now()` string. This defeats the new centralized/validated clock path: if `domain::Timestamp` validation is ever tightened, review writes will still persist an unvalidated timestamp instead of failing through `ReviewWriterError`, and this path reintroduces a second direct clock access outside the accepted archive exception.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
-              "line": 157,
-              "category": "error handling"
-            },
-            {
-              "message": "`now_iso8601()` swallows `crate::timestamp_now()` failures and returns a raw `chrono` string anyway, so `save`/`update` will keep writing metadata timestamps even when the validated timestamp constructor rejects that format. This bypasses the intended single validated clock path and should be changed to return a `Result` so `TrackWriteError` propagation is preserved.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/fs_store.rs",
-              "line": 87,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:a9d282f49fa9b97e37a05214c2646bc90d8bbac44e4f634c1611884193a7002f",
-          "at": "2026-04-11T10:32:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FsReviewStore::append_round` swallows `timestamp_now()` failures and falls back to a raw `chrono::Utc::now()` string, so a timestamp validation regression would still write an unvalidated `at` value into `review.json` instead of returning `ReviewWriterError` as the new `Result` contract implies.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
-              "line": 157,
-              "category": null
-            },
-            {
-              "message": "`FsTrackStore::now_iso8601` converts `timestamp_now()` back into infallible behavior by ignoring `ValidationError` and returning a raw chrono string. That means `save`/`update` can keep persisting metadata timestamps even after the shared validator rejects them, which is silent error swallowing in a library path.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/fs_store.rs",
-              "line": 88,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:a9d282f49fa9b97e37a05214c2646bc90d8bbac44e4f634c1611884193a7002f",
-          "at": "2026-04-11T10:33:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1fc29b7a65e78183c39b929943b97b95f09c08b76330d89027cba9315f146d5c",
-          "at": "2026-04-11T10:36:39Z"
         }
       ]
     },
@@ -1088,6 +1150,20 @@
           "findings": [],
           "hash": "rvw1:sha256:4ea006611867d359d6915a912b22fe757b2eae204b94453dd73b53353b5df844",
           "at": "2026-04-11T10:32:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9bb9458bac838ce2e02399a3f4737f84904da923e5505074c6b7ee8777586af",
+          "at": "2026-04-11T10:46:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9bb9458bac838ce2e02399a3f4737f84904da923e5505074c6b7ee8777586af",
+          "at": "2026-04-11T10:46:33Z"
         }
       ]
     },
@@ -1399,54 +1475,6 @@
           "findings": [],
           "hash": "rvw1:sha256:7f18a90f501ac7305d167d5c5ddc2d7a7f39b1dc7017f0c543429140fe3d6188",
           "at": "2026-04-11T10:32:22Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
-          "at": "2026-04-11T07:42:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new requirement that the execution plan be built \"before the first tool call\" is internally inconsistent with the immediately preceding instruction to read `/track:implement`, `/track:review`, and `/track:commit`, because those sub-command definitions normally have to be opened via tool calls. That makes the section ambiguous in practice and can cause agents to either violate the instruction or skip the required pre-read.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 23,
-              "category": "ambiguity"
-            }
-          ],
-          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
-          "at": "2026-04-11T07:43:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new mandate is internally impossible to follow literally: it says to read `/track:implement`, `/track:review`, and `/track:commit` and build the execution plan \"before the first tool call\", but opening those command definitions is itself a tool call. In practice this leaves agents choosing between violating the new requirement or skipping the required sub-command read, which undermines the prompt hardening this change is trying to add.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 24,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
-          "at": "2026-04-11T07:44:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1fc5dc3e97148c19fbb4b2e0f0c9f710428a709f3f06f6c2a36de92f4e2cb72e",
-          "at": "2026-04-11T07:47:09Z"
         }
       ]
     }
