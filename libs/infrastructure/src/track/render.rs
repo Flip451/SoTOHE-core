@@ -6,9 +6,9 @@ use domain::{TaskStatus, TrackMetadata};
 
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
-use crate::domain_types_codec;
 use crate::domain_types_render;
 use crate::spec;
+use crate::tddd::catalogue_codec;
 
 const TRACK_ITEMS_DIR: &str = "track/items";
 const TRACK_ARCHIVE_DIR: &str = "track/archive";
@@ -568,7 +568,7 @@ pub fn sync_rendered_views(
         let domain_types_json_path = track_dir.join("domain-types.json");
         if !is_done_or_archived && domain_types_json_path.is_file() {
             let domain_types_content = std::fs::read_to_string(&domain_types_json_path)?;
-            match domain_types_codec::decode(&domain_types_content) {
+            match catalogue_codec::decode(&domain_types_content) {
                 Ok(doc) => {
                     let rendered = domain_types_render::render_domain_types(&doc);
                     let domain_types_md_path = track_dir.join("domain-types.md");
@@ -585,7 +585,7 @@ pub fn sync_rendered_views(
                         changed.push(domain_types_md_path);
                     }
                 }
-                Err(domain_types_codec::DomainTypesCodecError::Json(_)) => {
+                Err(catalogue_codec::DomainTypesCodecError::Json(_)) => {
                     // Warn and continue only on JSON parse errors — file may be mid-edit.
                     eprintln!(
                         "warning: skipping domain-types.md render for {} (malformed JSON)",

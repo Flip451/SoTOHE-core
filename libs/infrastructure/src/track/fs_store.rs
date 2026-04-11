@@ -84,8 +84,13 @@ impl FsTrackStore {
     }
 
     /// Returns the current timestamp as an ISO 8601 string.
-    fn now_iso8601() -> String {
-        chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true)
+    ///
+    /// # Errors
+    /// Returns `RepositoryError` if `timestamp_now()` fails (should never happen in practice).
+    fn now_iso8601() -> Result<String, RepositoryError> {
+        crate::timestamp_now()
+            .map(|ts| ts.as_str().to_owned())
+            .map_err(|e| RepositoryError::Message(format!("timestamp_now: {e}")))
     }
 }
 
@@ -130,13 +135,13 @@ impl TrackWriter for FsTrackStore {
             Some((existing, mut meta)) => {
                 track.validate_descriptions_unchanged(&existing).map_err(DomainError::from)?;
                 track.validate_no_tasks_removed(&existing).map_err(DomainError::from)?;
-                meta.updated_at = Self::now_iso8601();
+                meta.updated_at = Self::now_iso8601().map_err(TrackWriteError::from)?;
                 meta
             }
             None => DocumentMeta {
                 schema_version: 2,
-                created_at: Self::now_iso8601(),
-                updated_at: Self::now_iso8601(),
+                created_at: Self::now_iso8601().map_err(TrackWriteError::from)?,
+                updated_at: Self::now_iso8601().map_err(TrackWriteError::from)?,
                 original_status: None,
                 extra: serde_json::Map::new(),
             },
@@ -176,7 +181,7 @@ impl TrackWriter for FsTrackStore {
         // Update timestamp and clear original_status so encode() recomputes
         // the status from the (possibly mutated) domain model instead of
         // preserving a stale value like "archived".
-        meta.updated_at = Self::now_iso8601();
+        meta.updated_at = Self::now_iso8601().map_err(TrackWriteError::from)?;
         meta.original_status = None;
         self.write_track(&track, &meta).map_err(TrackWriteError::from)?;
 

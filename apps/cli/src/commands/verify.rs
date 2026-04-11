@@ -178,6 +178,7 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
 }
 
 /// Execute bidirectional spec ↔ code consistency check.
+#[allow(clippy::too_many_lines)]
 fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome {
     use domain::schema::{SchemaExportError, SchemaExporter};
 
@@ -205,7 +206,7 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
         }
     };
 
-    let doc = match infrastructure::domain_types_codec::decode(&json) {
+    let doc = match infrastructure::tddd::catalogue_codec::decode(&json) {
         Ok(d) => d,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
@@ -232,16 +233,36 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
     };
 
     // Collect typestate names and build TypeGraph.
-    let typestate_names: std::collections::HashSet<String> = doc
-        .entries()
-        .iter()
-        .filter(|e| matches!(e.kind(), domain::domain_types::DomainTypeKind::Typestate { .. }))
-        .map(|e| e.name().to_string())
-        .collect();
+    let typestate_names = doc.typestate_names();
     let graph = infrastructure::code_profile_builder::build_type_graph(&schema, &typestate_names);
 
-    // Run bidirectional consistency check.
-    let report = domain::check_consistency(doc.entries(), &graph);
+    // Load baseline for 4-group evaluation.
+    let baseline_path = track_dir.join("domain-types-baseline.json");
+    let baseline = match std::fs::read_to_string(&baseline_path) {
+        Ok(bl_json) => match infrastructure::tddd::baseline_codec::decode(&bl_json) {
+            Ok(bl) => bl,
+            Err(e) => {
+                return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(
+                    format!("baseline decode error: {e}"),
+                )]);
+            }
+        },
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
+                "domain-types-baseline.json not found — run `sotp track baseline-capture {}`",
+                args.track_id
+            ))]);
+        }
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
+                "cannot read {}: {e}",
+                baseline_path.display()
+            ))]);
+        }
+    };
+
+    // Run bidirectional consistency check with baseline-aware 4-group evaluation.
+    let report = domain::check_consistency(doc.entries(), &graph, &baseline);
 
     // Convert to VerifyOutcome.
     let mut findings = Vec::new();
@@ -259,15 +280,27 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
         }
     }
 
-    // Reverse: undeclared types/traits are errors — forces domain-types.json update.
+    // Group 4: undeclared types/traits (not in baseline, not declared) → Red.
     for name in report.undeclared_types() {
         findings.push(domain::verify::Finding::error(format!(
-            "undeclared type in code: `{name}` — add to domain-types.json"
+            "undeclared new type in code: `{name}` — add to domain-types.json"
         )));
     }
     for name in report.undeclared_traits() {
         findings.push(domain::verify::Finding::error(format!(
-            "undeclared trait in code: `{name}` — add to domain-types.json"
+            "undeclared new trait in code: `{name}` — add to domain-types.json"
+        )));
+    }
+
+    // Group 3: baseline structural changes or deletions → Red.
+    for name in report.baseline_red_types() {
+        findings.push(domain::verify::Finding::error(format!(
+            "undeclared structural change to baseline type: `{name}` — add to domain-types.json"
+        )));
+    }
+    for name in report.baseline_red_traits() {
+        findings.push(domain::verify::Finding::error(format!(
+            "undeclared structural change to baseline trait: `{name}` — add to domain-types.json"
         )));
     }
 
@@ -303,6 +336,9 @@ fn print_consistency_report_json(report: &domain::ConsistencyReport) {
         "forward_signals": forward,
         "undeclared_types": report.undeclared_types(),
         "undeclared_traits": report.undeclared_traits(),
+        "skipped_count": report.skipped_count(),
+        "baseline_red_types": report.baseline_red_types(),
+        "baseline_red_traits": report.baseline_red_traits(),
     });
     println!("{output}");
 }

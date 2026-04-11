@@ -863,6 +863,11 @@ description = "[wrapper] Evaluate confidence signals for a track's spec.json"
 script_runner = "@shell"
 script = ['bin/sotp track signals "$@"']
 
+[tasks.track-baseline-capture]
+description = "[wrapper] Capture TypeGraph baseline for TDDD reverse signal filtering. Usage: cargo make track-baseline-capture -- <track-id> [--force]"
+script_runner = "@shell"
+script = ['bin/sotp track baseline-capture "$@"']
+
 [tasks.track-switch-main]
 description = "[wrapper] Switch to main branch and pull latest"
 command = "bin/sotp"
@@ -894,7 +899,7 @@ command = "bin/sotp"
 args = ["make", "track-note"]
 
 [tasks.track-transition]
-description = "[wrapper] Transition a task status and sync rendered views"
+description = "[wrapper] Transition a task status and sync rendered views. Usage: cargo make track-transition -- <track_dir> <task_id> <status> [--commit-hash <hash>]. Example: cargo make track-transition -- track/items/my-track T001 done --commit-hash abc1234"
 command = "bin/sotp"
 args = ["make", "track-transition", "${@}"]
 

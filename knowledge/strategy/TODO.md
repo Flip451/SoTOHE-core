@@ -826,6 +826,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [x] ~~**DM-02** (HIGH): `PrReviewResult::state: String` → `GhReviewState` enum~~ ✅ done (PR #42)
 - [x] ~~**DM-03** (MEDIUM): `PrReviewFinding::severity: String` → `Severity` enum~~ ✅ done (PR #42)
 - [x] ~~**DM-04** (MEDIUM): `ReviewRoundResult::timestamp: String` → `chrono::DateTime<Utc>`~~ ✅ done (PR #42)
+- [ ] **DM-05** (MEDIUM): 散在する `chrono::Utc::now()` 直書きを `infrastructure::timestamp_now()` に統一 — `review/mod.rs`, `review_store.rs` (archive), `spec.rs`, `signals.rs` 等に残存。`infrastructure::timestamp_now()` を追加し `fs_store.rs` と `review_store.rs` (record_round) は移行済み（tddd-baseline-2026-04-11 T006）。CLI 層の残存箇所は後続トラックで実施
 
 ---
 

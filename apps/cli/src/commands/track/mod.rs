@@ -15,10 +15,10 @@ use infrastructure::track::render;
 use usecase::track_activation::{ActivateTrackOutcome, ActivateTrackUseCase};
 
 mod activate;
-mod domain_state_signals;
 mod resolve;
 mod signals;
 mod state_ops;
+mod tddd;
 mod transition;
 mod views;
 
@@ -184,6 +184,24 @@ pub enum TrackCommand {
         #[arg(long, default_value = ".")]
         workspace_root: PathBuf,
     },
+
+    /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
+    BaselineCapture {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        track_id: String,
+
+        /// Workspace root directory (must contain `Cargo.toml`). Defaults to current directory.
+        #[arg(long, default_value = ".")]
+        workspace_root: PathBuf,
+
+        /// Force regeneration even if baseline already exists.
+        #[arg(long, default_value_t = false)]
+        force: bool,
+    },
 }
 
 #[derive(Debug, Subcommand)]
@@ -307,7 +325,10 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             signals::execute_signals(items_dir, track_id)
         }
         TrackCommand::DomainTypeSignals { items_dir, track_id, workspace_root } => {
-            domain_state_signals::execute_domain_type_signals(items_dir, track_id, workspace_root)
+            tddd::signals::execute_domain_type_signals(items_dir, track_id, workspace_root)
+        }
+        TrackCommand::BaselineCapture { items_dir, track_id, workspace_root, force } => {
+            tddd::baseline::execute_baseline_capture(items_dir, track_id, workspace_root, force)
         }
     };
     match result {
