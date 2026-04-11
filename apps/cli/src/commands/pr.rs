@@ -426,8 +426,12 @@ fn check_spec_signals_strict(branch: &str, repo_root: &std::path::Path) -> ExitC
 
     // Stage 1: spec.json signals (required, fail-closed).
     let spec_json = match git_show_blob(repo_root, branch, track_id_str, "spec.json") {
-        Ok(json) => json,
-        Err(msg) => {
+        BlobResult::Found(json) => json,
+        BlobResult::NotFound => {
+            eprintln!("[BLOCKED] spec.json not found on origin/{branch}");
+            return ExitCode::FAILURE;
+        }
+        BlobResult::CommandFailed(msg) => {
             eprintln!("[BLOCKED] {msg}");
             return ExitCode::FAILURE;
         }
@@ -449,10 +453,15 @@ fn check_spec_signals_strict(branch: &str, repo_root: &std::path::Path) -> ExitC
     }
 
     // Stage 2: domain-types.json signals (optional — TDDD tracks only).
-    // File not found → skip (TDDD not active). File found but malformed → fail-closed.
+    // NotFound → skip (TDDD not active). Found but malformed → fail-closed.
+    // CommandFailed → fail-closed (cannot verify → block).
     match git_show_blob(repo_root, branch, track_id_str, "domain-types.json") {
-        Err(_) => {} // File not found on remote — TDDD not active, skip.
-        Ok(dt_json) => {
+        BlobResult::NotFound => {} // TDDD not active, skip.
+        BlobResult::CommandFailed(msg) => {
+            eprintln!("[BLOCKED] {msg}");
+            return ExitCode::FAILURE;
+        }
+        BlobResult::Found(dt_json) => {
             let dt_doc = match infrastructure::tddd::catalogue_codec::decode(&dt_json) {
                 Ok(d) => d,
                 Err(e) => {
@@ -475,24 +484,33 @@ fn check_spec_signals_strict(branch: &str, repo_root: &std::path::Path) -> ExitC
     ExitCode::SUCCESS
 }
 
+/// Result of reading a blob from a remote ref via `git show`.
+enum BlobResult {
+    /// Blob found and content returned.
+    Found(String),
+    /// Blob not found on the remote ref (git show exited non-zero).
+    NotFound,
+    /// Git command failed to execute (spawn error).
+    CommandFailed(String),
+}
+
 /// Read a blob from `origin/{branch}:track/items/{track_id}/{filename}`.
 fn git_show_blob(
     repo_root: &std::path::Path,
     branch: &str,
     track_id: &str,
     filename: &str,
-) -> Result<String, String> {
+) -> BlobResult {
     let blob_path = format!("track/items/{track_id}/{filename}");
     let git_ref = format!("origin/{branch}:{blob_path}");
     let output =
         std::process::Command::new("git").args(["show", &git_ref]).current_dir(repo_root).output();
     match output {
-        Ok(o) if o.status.success() => Ok(String::from_utf8_lossy(&o.stdout).into_owned()),
-        Ok(o) => {
-            let stderr = String::from_utf8_lossy(&o.stderr);
-            Err(format!("{filename} not found on origin/{branch}: {stderr}"))
+        Ok(o) if o.status.success() => {
+            BlobResult::Found(String::from_utf8_lossy(&o.stdout).into_owned())
         }
-        Err(e) => Err(format!("failed to run git show for {filename}: {e}")),
+        Ok(_) => BlobResult::NotFound,
+        Err(e) => BlobResult::CommandFailed(format!("failed to run git show for {filename}: {e}")),
     }
 }
 
