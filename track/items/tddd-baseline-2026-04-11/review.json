@@ -1,237 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
-          "at": "2026-04-11T07:37:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is not a pure file move/path update as described. Keep the old public path as a re-export (for example `pub use tddd::catalogue_codec as domain_types_codec;`) or treat this as an intentional breaking API change.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/lib.rs",
-              "line": 18,
-              "category": "public API break"
-            }
-          ],
-          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
-          "at": "2026-04-11T07:39:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is not a pure file move/path update as described. Re-export the moved module under the old name or treat this as an intentional breaking API change.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/lib.rs",
-              "line": 18,
-              "category": "compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
-          "at": "2026-04-11T07:44:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b36d45529aa78b518993aa2b5a508da8436eda538e78951e7f7043220aa095ec",
-          "at": "2026-04-11T07:47:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Replacing the public `domain_types_codec` module with `pub mod tddd;` removes the existing `infrastructure::domain_types_codec::{...}` API surface. Any downstream crate importing the old path will stop compiling, so this is a breaking change rather than the 'pure file move + path update' described in the brief. Keep a compatibility re-export (for example `pub use tddd::catalogue_codec as domain_types_codec;`) or treat this as an intentional breaking API change.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/lib.rs",
-              "line": 18,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
-          "at": "2026-04-11T07:50:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is a breaking API change rather than the pure file move/path update described in the brief. Re-export `tddd::catalogue_codec` under the old name or treat this as an intentional breaking change.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/lib.rs",
-              "line": 18,
-              "category": "compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
-          "at": "2026-04-11T07:52:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`lib.rs` removes the public `domain_types_codec` module and only exposes the moved code under `tddd::catalogue_codec`. That breaks the existing `infrastructure::domain_types_codec::{...}` API surface for any downstream crate, so this is a breaking change rather than the 'pure file move + path update' described in the brief. Add a compatibility re-export such as `pub use tddd::catalogue_codec as domain_types_codec;` or treat this as an intentional API break.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/lib.rs",
-              "line": 18,
-              "category": "api-compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
-          "at": "2026-04-11T07:53:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
-          "at": "2026-04-11T07:56:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c626dd7194e860f7222fade684f1c6f89dd6dc506dec432e05e0eb892f8c9268",
-          "at": "2026-04-11T07:59:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The DTOs are permissive by default: `serde` will ignore unknown fields here, and the `#[serde(default)]` vecs make typos or schema drift decode as empty `members`/`methods` instead of failing. For a source-of-truth baseline codec, this is silent input corruption; reject unknown fields or add equivalent validation at the DTO boundary.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 34,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:c5b65d6d27c72a4431cadabeda703157d3bb54ced675ca2ab554a37488031f06",
-          "at": "2026-04-11T08:23:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The DTOs are permissive here: serde will ignore unknown fields, and the `#[serde(default)]` vectors turn typos or schema drift into empty `members`/`methods` instead of failing fast. For a source-of-truth baseline codec, that means malformed input can deserialize successfully with silently dropped data; reject unknown fields or validate the required arrays explicitly.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 34,
-              "category": "correctness"
-            },
-            {
-              "message": "`encode()` builds the `types` and `traits` payloads from `HashMap`s and passes them straight to `serde_json::to_string_pretty`, so key order depends on hash iteration. That makes `baseline-capture` output non-deterministic across runs for the same baseline, which is a poor fit for a committed artifact and will create spurious diffs.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 131,
-              "category": "determinism"
-            }
-          ],
-          "hash": "rvw1:sha256:c5b65d6d27c72a4431cadabeda703157d3bb54ced675ca2ab554a37488031f06",
-          "at": "2026-04-11T08:25:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cd51f5838494f49f6d4fba8a1cb6015040f598608294d0caafd570337efe6abe",
-          "at": "2026-04-11T08:28:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`BaselineDto` defaults both top-level maps, so a malformed or partially-written baseline like `{ \"schema_version\": 1, \"captured_at\": \"...\" }` decodes as an empty snapshot instead of failing. Because this file drives reverse-signal suppression, that silently erases the baseline and can misclassify every existing type/trait as new or changed; `types` and `traits` should be required at the DTO boundary.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 41,
-              "category": "correctness"
-            },
-            {
-              "message": "`decode()` deserializes `types`/`traits` directly into `BTreeMap`s, which means duplicate JSON keys are collapsed by `serde_json` before any validation and the last entry wins. A corrupted `domain-types-baseline.json` can therefore drop type or trait definitions silently instead of failing fast, making the baseline unreliable as a source-of-truth artifact.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 75,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:cd51f5838494f49f6d4fba8a1cb6015040f598608294d0caafd570337efe6abe",
-          "at": "2026-04-11T08:30:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`BaselineDto` makes the top-level `types` and `traits` maps optional via `#[serde(default)]`, so a truncated payload like `{ \"schema_version\": 1, \"captured_at\": \"...\" }` is accepted as a valid empty baseline instead of being rejected. That turns a malformed or partially-written baseline artifact into 'no prior types/traits', which will skew downstream comparisons rather than surfacing an input error.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 41,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:cd51f5838494f49f6d4fba8a1cb6015040f598608294d0caafd570337efe6abe",
-          "at": "2026-04-11T08:32:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`BaselineDto.types`/`traits` deserialize straight into `BTreeMap`, so a malformed JSON payload with duplicate object keys will silently keep only the last entry instead of failing. That drops baseline data without surfacing an error, which violates the intended strict decode behavior for committed artifacts.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 45,
-              "category": "correctness"
-            },
-            {
-              "message": "`test_decode_unknown_type_kind` no longer exercises the unknown-kind rejection path: the fixture omits the now-required `traits` field, so deserialization fails earlier on the missing top-level map. The custom `unknown type kind` branch is therefore untested after the round-2 schema tightening.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 242,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:57296c415733b2b99af96aca869358f2304e2aae66a4d6ff036e268c41af094f",
-          "at": "2026-04-11T08:36:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e04b877194b8a7c2dce72adbeeab392fcb6fdaa4b1feb84e928d51ab3fe1e9ac",
-          "at": "2026-04-11T08:40:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:086e14a362e32ea3ef49f3ff8513999dd812e6bc603287dcbddec9a659b85b4e",
-          "at": "2026-04-11T08:44:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:086e14a362e32ea3ef49f3ff8513999dd812e6bc603287dcbddec9a659b85b4e",
-          "at": "2026-04-11T08:47:26Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -269,6 +38,164 @@
           "findings": [],
           "hash": "rvw1:sha256:1f3ea59212813e34e22ac9efd9a78722aad2d674bd2f055b6a4f14fbe58fb399",
           "at": "2026-04-11T08:00:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f8d5130caef8ff8d198c9ec4b4dea75eb5ed0ad556b7fa7c28579069a221a4a",
+          "at": "2026-04-11T09:13:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`undeclared_count` is computed from `reverse_signals.len()` after appending `baseline_red_types()`/`baseline_red_traits()`. That means a pure group-3 baseline change or deletion will be reported as `undeclared=N` and will trigger the undeclared warning even when `report.undeclared_types()` and `report.undeclared_traits()` are both empty, so the new summary output is no longer correct.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 125,
+              "category": "correctness"
+            },
+            {
+              "message": "`baseline_red_types()`/`baseline_red_traits()` contain both structural changes and deletions, but the synthesized `DomainTypeSignal`s are always emitted with `found_type = true` and a `baseline_changed_*` tag. For a deleted baseline entry, `domain-types.json` will therefore claim the type/trait still exists in code, which misrepresents the failure and can mislead downstream tooling or reviewers reading the persisted signals.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 104,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6f8d5130caef8ff8d198c9ec4b4dea75eb5ed0ad556b7fa7c28579069a221a4a",
+          "at": "2026-04-11T09:16:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`undeclared_count` is computed after appending group-3 baseline reds to `reverse_signals`, so the summary's `undeclared=` value and WARN line now include baseline structural changes/deletions as if they were true group-4 undeclared additions. A track that only changes an existing baseline type will be told there are undeclared types and to rerun `/track:design`, which is the wrong diagnosis.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 125,
+              "category": "correctness"
+            },
+            {
+              "message": "Using `baseline_path.exists()` here drops I/O errors before the actual read. If `domain-types-baseline.json` is unreadable (for example, permission denied or a broken symlink), this branch reports it as \"not found\" and tells the user to recapture the baseline instead of surfacing the real read failure. `verify.rs` already avoids this by matching directly on `read_to_string`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 83,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:6f8d5130caef8ff8d198c9ec4b4dea75eb5ed0ad556b7fa7c28579069a221a4a",
+          "at": "2026-04-11T09:18:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`undeclared_count` is computed from `reverse_signals.len()` after group-3 baseline reds have been appended. A track that only has a baseline structural change/deletion will therefore be reported as `undeclared=N` and will emit the `/track:design` warning even when `report.undeclared_types()` / `report.undeclared_traits()` are empty, so the new summary output diagnoses the wrong failure class.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 125,
+              "category": "correctness"
+            },
+            {
+              "message": "`report.baseline_red_types()` / `report.baseline_red_traits()` contain deletions as well as structural changes, but the synthesized signals always set `found_type = true`. When a baseline entry was actually deleted from code, the persisted `domain-types.json` signal will incorrectly claim that the type/trait still exists, which corrupts the CLI’s stored signal data.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 103,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6f8d5130caef8ff8d198c9ec4b4dea75eb5ed0ad556b7fa7c28579069a221a4a",
+          "at": "2026-04-11T09:20:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_domain_type_signals` gates baseline loading with `baseline_path.exists()`, which swallows filesystem errors. If `domain-types-baseline.json` is unreadable (for example due to permissions or a broken symlink), this branch reports it as \"not found\" and tells the user to rerun `baseline-capture` instead of surfacing the real read failure. `verify.rs` already handles this correctly by matching directly on `read_to_string`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 83,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:a5d67f9bd07c961ac9af665cbdc70c6ebaec9e660a2a3c3a35773b23743c2014",
+          "at": "2026-04-11T09:24:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_domain_type_signals` now hard-fails unless `domain-types-baseline.json` exists, but this file's only end-to-end success test still uses `setup_track()` to create only `domain-types.json`. As a result, `test_execute_domain_type_signals_success_path_writes_signals` will now return `Err(...)` when run with `cargo test --package cli -- --ignored`, so the CLI's happy-path coverage regresses instead of being updated for the new baseline requirement.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 84,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:76e29ef326700421ce62f0d5761b4831839aa4987993a5f935b04907278a9360",
+          "at": "2026-04-11T09:28:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9131e1014ede2f7538aef9e2bf3eb7fa5ad4ced94895ced1ce835a7a1411423e",
+          "at": "2026-04-11T09:31:09Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
+          "at": "2026-04-11T07:42:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new requirement that the execution plan be built \"before the first tool call\" is internally inconsistent with the immediately preceding instruction to read `/track:implement`, `/track:review`, and `/track:commit`, because those sub-command definitions normally have to be opened via tool calls. That makes the section ambiguous in practice and can cause agents to either violate the instruction or skip the required pre-read.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 23,
+              "category": "ambiguity"
+            }
+          ],
+          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
+          "at": "2026-04-11T07:43:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new mandate is internally impossible to follow literally: it says to read `/track:implement`, `/track:review`, and `/track:commit` and build the execution plan \"before the first tool call\", but opening those command definitions is itself a tool call. In practice this leaves agents choosing between violating the new requirement or skipping the required sub-command read, which undermines the prompt hardening this change is trying to add.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 24,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
+          "at": "2026-04-11T07:44:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fc5dc3e97148c19fbb4b2e0f0c9f710428a709f3f06f6c2a36de92f4e2cb72e",
+          "at": "2026-04-11T07:47:09Z"
         }
       ]
     },
@@ -673,6 +600,251 @@
           "findings": [],
           "hash": "rvw1:sha256:bbe43bd68a146b7bbd2f6397f42e59d9cc3dc1cf4b6901bdc4aa4db3e94b8b88",
           "at": "2026-04-11T08:45:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7338f57d9afb3124781d09fca42914df1f72a659fe4d6d9485908e02e8dbfd2e",
+          "at": "2026-04-11T09:11:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7338f57d9afb3124781d09fca42914df1f72a659fe4d6d9485908e02e8dbfd2e",
+          "at": "2026-04-11T09:12:33Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:37:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is not a pure file move/path update as described. Keep the old public path as a re-export (for example `pub use tddd::catalogue_codec as domain_types_codec;`) or treat this as an intentional breaking API change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": "public API break"
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:39:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is not a pure file move/path update as described. Re-export the moved module under the old name or treat this as an intentional breaking API change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:44:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b36d45529aa78b518993aa2b5a508da8436eda538e78951e7f7043220aa095ec",
+          "at": "2026-04-11T07:47:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Replacing the public `domain_types_codec` module with `pub mod tddd;` removes the existing `infrastructure::domain_types_codec::{...}` API surface. Any downstream crate importing the old path will stop compiling, so this is a breaking change rather than the 'pure file move + path update' described in the brief. Keep a compatibility re-export (for example `pub use tddd::catalogue_codec as domain_types_codec;`) or treat this as an intentional breaking API change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:50:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lib.rs` removes the public `domain_types_codec` module without a compatibility re-export. Any downstream crate importing `infrastructure::domain_types_codec::{decode, DomainTypesCodecError, ...}` will stop compiling, so this is a breaking API change rather than the pure file move/path update described in the brief. Re-export `tddd::catalogue_codec` under the old name or treat this as an intentional breaking change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:52:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lib.rs` removes the public `domain_types_codec` module and only exposes the moved code under `tddd::catalogue_codec`. That breaks the existing `infrastructure::domain_types_codec::{...}` API surface for any downstream crate, so this is a breaking change rather than the 'pure file move + path update' described in the brief. Add a compatibility re-export such as `pub use tddd::catalogue_codec as domain_types_codec;` or treat this as an intentional API break.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 18,
+              "category": "api-compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:53:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d746b6effbfc42f6b20878d7c1afe705a866e7f7e8229d5a8749d6b9ad50ed1",
+          "at": "2026-04-11T07:56:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c626dd7194e860f7222fade684f1c6f89dd6dc506dec432e05e0eb892f8c9268",
+          "at": "2026-04-11T07:59:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The DTOs are permissive by default: `serde` will ignore unknown fields here, and the `#[serde(default)]` vecs make typos or schema drift decode as empty `members`/`methods` instead of failing. For a source-of-truth baseline codec, this is silent input corruption; reject unknown fields or add equivalent validation at the DTO boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 34,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:c5b65d6d27c72a4431cadabeda703157d3bb54ced675ca2ab554a37488031f06",
+          "at": "2026-04-11T08:23:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The DTOs are permissive here: serde will ignore unknown fields, and the `#[serde(default)]` vectors turn typos or schema drift into empty `members`/`methods` instead of failing fast. For a source-of-truth baseline codec, that means malformed input can deserialize successfully with silently dropped data; reject unknown fields or validate the required arrays explicitly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 34,
+              "category": "correctness"
+            },
+            {
+              "message": "`encode()` builds the `types` and `traits` payloads from `HashMap`s and passes them straight to `serde_json::to_string_pretty`, so key order depends on hash iteration. That makes `baseline-capture` output non-deterministic across runs for the same baseline, which is a poor fit for a committed artifact and will create spurious diffs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 131,
+              "category": "determinism"
+            }
+          ],
+          "hash": "rvw1:sha256:c5b65d6d27c72a4431cadabeda703157d3bb54ced675ca2ab554a37488031f06",
+          "at": "2026-04-11T08:25:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd51f5838494f49f6d4fba8a1cb6015040f598608294d0caafd570337efe6abe",
+          "at": "2026-04-11T08:28:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaselineDto` defaults both top-level maps, so a malformed or partially-written baseline like `{ \"schema_version\": 1, \"captured_at\": \"...\" }` decodes as an empty snapshot instead of failing. Because this file drives reverse-signal suppression, that silently erases the baseline and can misclassify every existing type/trait as new or changed; `types` and `traits` should be required at the DTO boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 41,
+              "category": "correctness"
+            },
+            {
+              "message": "`decode()` deserializes `types`/`traits` directly into `BTreeMap`s, which means duplicate JSON keys are collapsed by `serde_json` before any validation and the last entry wins. A corrupted `domain-types-baseline.json` can therefore drop type or trait definitions silently instead of failing fast, making the baseline unreliable as a source-of-truth artifact.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 75,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cd51f5838494f49f6d4fba8a1cb6015040f598608294d0caafd570337efe6abe",
+          "at": "2026-04-11T08:30:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaselineDto` makes the top-level `types` and `traits` maps optional via `#[serde(default)]`, so a truncated payload like `{ \"schema_version\": 1, \"captured_at\": \"...\" }` is accepted as a valid empty baseline instead of being rejected. That turns a malformed or partially-written baseline artifact into 'no prior types/traits', which will skew downstream comparisons rather than surfacing an input error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 41,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cd51f5838494f49f6d4fba8a1cb6015040f598608294d0caafd570337efe6abe",
+          "at": "2026-04-11T08:32:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaselineDto.types`/`traits` deserialize straight into `BTreeMap`, so a malformed JSON payload with duplicate object keys will silently keep only the last entry instead of failing. That drops baseline data without surfacing an error, which violates the intended strict decode behavior for committed artifacts.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 45,
+              "category": "correctness"
+            },
+            {
+              "message": "`test_decode_unknown_type_kind` no longer exercises the unknown-kind rejection path: the fixture omits the now-required `traits` field, so deserialization fails earlier on the missing top-level map. The custom `unknown type kind` branch is therefore untested after the round-2 schema tightening.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 242,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:57296c415733b2b99af96aca869358f2304e2aae66a4d6ff036e268c41af094f",
+          "at": "2026-04-11T08:36:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e04b877194b8a7c2dce72adbeeab392fcb6fdaa4b1feb84e928d51ab3fe1e9ac",
+          "at": "2026-04-11T08:40:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:086e14a362e32ea3ef49f3ff8513999dd812e6bc603287dcbddec9a659b85b4e",
+          "at": "2026-04-11T08:44:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:086e14a362e32ea3ef49f3ff8513999dd812e6bc603287dcbddec9a659b85b4e",
+          "at": "2026-04-11T08:47:26Z"
         }
       ]
     },
@@ -831,54 +1003,42 @@
           "findings": [],
           "hash": "rvw1:sha256:a92b567a8c4d0a7377153f81855a078452bdd8a1aea5f262f9ff9a9ca088f33d",
           "at": "2026-04-11T08:17:58Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
-          "at": "2026-04-11T07:42:20Z"
+          "hash": "rvw1:sha256:6bce1418c945f703b7f89ce8b6471be1cd0db04e12b2ffc0a1920a48cf664c38",
+          "at": "2026-04-11T09:13:32Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new requirement that the execution plan be built \"before the first tool call\" is internally inconsistent with the immediately preceding instruction to read `/track:implement`, `/track:review`, and `/track:commit`, because those sub-command definitions normally have to be opened via tool calls. That makes the section ambiguous in practice and can cause agents to either violate the instruction or skip the required pre-read.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 23,
-              "category": "ambiguity"
-            }
-          ],
-          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
-          "at": "2026-04-11T07:43:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
+              "message": "Group 3 misclassifies declared names when the declaration kind differs from the baseline kind. `baseline.types()` only checks `declared_type_names` (and the traits loop only checks `declared_trait_names`), so a name declared in `domain-types.json` as a `TraitPort` while it still exists in the baseline as a type is treated as `B\\A` and can be skipped or reported as `baseline_red_*`, even though ADR TDDD-02 says any name in `A∩B` must be handled by the forward check only.",
+              "severity": "P0",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 656,
+              "category": null
+            },
             {
-              "message": "The new mandate is internally impossible to follow literally: it says to read `/track:implement`, `/track:review`, and `/track:commit` and build the execution plan \"before the first tool call\", but opening those command definitions is itself a tool call. In practice this leaves agents choosing between violating the new requirement or skipping the required sub-command read, which undermines the prompt hardening this change is trying to add.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 24,
+              "message": "Group 4 uses kind-specific baseline membership (`has_type` / `has_trait`), which double-reports kind changes. If a baseline type becomes a trait (or vice versa), the name is already in `B` and should only yield the group-3 Red, but this filter also emits it as an undeclared new item because it looks only in the matching baseline map.",
+              "severity": "P0",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 705,
               "category": null
             }
           ],
-          "hash": "rvw1:sha256:84492c640832ec917fbe73db62097a52c32650807d90d24e0d8377ba81ed7097",
-          "at": "2026-04-11T07:44:29Z"
+          "hash": "rvw1:sha256:6bce1418c945f703b7f89ce8b6471be1cd0db04e12b2ffc0a1920a48cf664c38",
+          "at": "2026-04-11T09:16:49Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1fc5dc3e97148c19fbb4b2e0f0c9f710428a709f3f06f6c2a36de92f4e2cb72e",
-          "at": "2026-04-11T07:47:09Z"
+          "hash": "rvw1:sha256:6bce1418c945f703b7f89ce8b6471be1cd0db04e12b2ffc0a1920a48cf664c38",
+          "at": "2026-04-11T09:19:53Z"
         }
       ]
     }

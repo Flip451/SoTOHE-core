@@ -78,13 +78,62 @@ pub fn execute_domain_type_signals(
     // Build a pre-indexed TypeGraph from the flat schema export.
     let profile = build_type_graph(&schema, &typestate_names);
 
-    // Bidirectional consistency check: forward (spec → code) + reverse (code → spec).
-    let report = domain::check_consistency(doc.entries(), &profile);
+    // Load baseline for 4-group evaluation.
+    // Match directly on read_to_string so permissions errors and broken symlinks are
+    // surfaced instead of being silently misreported as "file not found".
+    let baseline_path = track_dir.join("domain-types-baseline.json");
+    let baseline = match std::fs::read_to_string(&baseline_path) {
+        Ok(bl_json) => infrastructure::tddd::baseline_codec::decode(&bl_json)
+            .map_err(|e| CliError::Message(format!("baseline decode error: {e}")))?,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            return Err(CliError::Message(format!(
+                "domain-types-baseline.json not found for track '{track_id}'. \
+                 Run `sotp track baseline-capture {track_id}` first."
+            )));
+        }
+        Err(e) => {
+            return Err(CliError::Message(format!("cannot read {}: {e}", baseline_path.display())));
+        }
+    };
 
-    // Convert undeclared types/traits to Red signals and merge with forward signals.
-    let reverse_signals =
+    // Bidirectional consistency check: forward (spec → code) + reverse (code → spec).
+    let report = domain::check_consistency(doc.entries(), &profile, &baseline);
+
+    // Convert undeclared types/traits (group 4) to Red DomainTypeSignals.
+    // Capture the count before appending group-3 baseline reds so the summary
+    // WARN line only fires for truly new undeclared items (not baseline changes/deletions).
+    let undeclared_signals =
         domain::undeclared_to_signals(report.undeclared_types(), report.undeclared_traits());
-    let undeclared_count = reverse_signals.len();
+    let undeclared_count = undeclared_signals.len();
+    let mut reverse_signals = undeclared_signals;
+
+    // Baseline Red: structural changes or deletions (group 3).
+    // `found_type` is true when the name still exists in the code (structural change),
+    // false when the name is absent from the type graph (deletion).
+    for name in report.baseline_red_types() {
+        let found_type = profile.get_type(name).is_some();
+        reverse_signals.push(domain::DomainTypeSignal::new(
+            name.clone(),
+            "baseline_changed_type",
+            domain::ConfidenceSignal::Red,
+            found_type,
+            vec![],
+            vec![],
+            vec![],
+        ));
+    }
+    for name in report.baseline_red_traits() {
+        let found_type = profile.get_trait(name).is_some();
+        reverse_signals.push(domain::DomainTypeSignal::new(
+            name.clone(),
+            "baseline_changed_trait",
+            domain::ConfidenceSignal::Red,
+            found_type,
+            vec![],
+            vec![],
+            vec![],
+        ));
+    }
 
     let mut all_signals: Vec<_> = report.forward_signals().to_vec();
     all_signals.extend(reverse_signals);
@@ -106,12 +155,13 @@ pub fn execute_domain_type_signals(
         CliError::Message(format!("cannot write {}: {e}", domain_types_md_path.display()))
     })?;
 
-    print_signal_summary(&all_signals, undeclared_count);
+    let skipped = report.skipped_count();
+    print_signal_summary(&all_signals, undeclared_count, skipped);
 
     Ok(ExitCode::SUCCESS)
 }
 
-/// Format the signal summary line and, when applicable, the undeclared-types warning.
+/// Format the signal summary line with baseline-aware counts.
 ///
 /// Returns a `String` containing the full output (newline-terminated lines) so the
 /// formatting logic is testable without requiring the nightly toolchain that the full
@@ -119,13 +169,17 @@ pub fn execute_domain_type_signals(
 ///
 /// `total` equals `signals.len()` — it counts every emitted signal (forward + reverse),
 /// not just the entries in `domain-types.json`, to keep `blue + yellow + red == total`.
-fn format_signal_summary(signals: &[domain::DomainTypeSignal], undeclared_count: usize) -> String {
+fn format_signal_summary(
+    signals: &[domain::DomainTypeSignal],
+    undeclared_count: usize,
+    skipped_count: usize,
+) -> String {
     let blue = signals.iter().filter(|s| s.signal() == domain::ConfidenceSignal::Blue).count();
     let yellow = signals.iter().filter(|s| s.signal() == domain::ConfidenceSignal::Yellow).count();
     let red = signals.iter().filter(|s| s.signal() == domain::ConfidenceSignal::Red).count();
     let total = signals.len();
     let mut out = format!(
-        "[OK] domain-type-signals: blue={blue} yellow={yellow} red={red} (total={total}, undeclared={undeclared_count})\n",
+        "[OK] domain-type-signals: blue={blue} yellow={yellow} red={red} (total={total}, undeclared={undeclared_count}, skipped={skipped_count})\n",
     );
 
     if undeclared_count > 0 {
@@ -138,8 +192,12 @@ fn format_signal_summary(signals: &[domain::DomainTypeSignal], undeclared_count:
 }
 
 /// Print the signal summary produced by [`format_signal_summary`].
-fn print_signal_summary(signals: &[domain::DomainTypeSignal], undeclared_count: usize) {
-    print!("{}", format_signal_summary(signals, undeclared_count));
+fn print_signal_summary(
+    signals: &[domain::DomainTypeSignal],
+    undeclared_count: usize,
+    skipped_count: usize,
+) {
+    print!("{}", format_signal_summary(signals, undeclared_count, skipped_count));
 }
 
 #[cfg(test)]
@@ -200,9 +258,9 @@ mod tests {
 
     #[test]
     fn test_format_signal_summary_with_no_signals_prints_zero_counts() {
-        let out = format_signal_summary(&[], 0);
+        let out = format_signal_summary(&[], 0, 0);
         assert!(
-            out.contains("blue=0 yellow=0 red=0 (total=0, undeclared=0)"),
+            out.contains("blue=0 yellow=0 red=0 (total=0, undeclared=0, skipped=0)"),
             "unexpected summary: {out}"
         );
         assert!(!out.contains("[WARN]"), "no WARN expected when undeclared=0");
@@ -216,9 +274,9 @@ mod tests {
             make_signal(domain::ConfidenceSignal::Yellow),
             make_signal(domain::ConfidenceSignal::Red),
         ];
-        let out = format_signal_summary(&signals, 0);
+        let out = format_signal_summary(&signals, 0, 0);
         assert!(
-            out.contains("blue=2 yellow=1 red=1 (total=4, undeclared=0)"),
+            out.contains("blue=2 yellow=1 red=1 (total=4, undeclared=0, skipped=0)"),
             "unexpected summary: {out}"
         );
         assert!(!out.contains("[WARN]"), "no WARN expected when undeclared=0");
@@ -233,9 +291,9 @@ mod tests {
         ];
         // 2 undeclared signals are represented in the red count above; undeclared_count is passed
         // separately to distinguish reverse-Red from forward-Red in the WARN line.
-        let out = format_signal_summary(&signals, 2);
+        let out = format_signal_summary(&signals, 2, 0);
         assert!(
-            out.contains("blue=1 yellow=0 red=2 (total=3, undeclared=2)"),
+            out.contains("blue=1 yellow=0 red=2 (total=3, undeclared=2, skipped=0)"),
             "unexpected summary: {out}"
         );
         assert!(out.contains("[WARN]"), "WARN line expected when undeclared>0");
@@ -250,7 +308,7 @@ mod tests {
             make_signal(domain::ConfidenceSignal::Yellow),
             make_signal(domain::ConfidenceSignal::Red),
         ];
-        let out = format_signal_summary(&signals, 1);
+        let out = format_signal_summary(&signals, 1, 0);
         // invariant: blue + yellow + red == total
         assert!(out.contains("blue=1 yellow=2 red=1 (total=4,"), "totals must sum: {out}");
     }
@@ -268,6 +326,15 @@ mod tests {
   ]
 }"#;
         let (items_dir, track_id) = setup_track(dir.path(), domain_types_json);
+        // Write an empty baseline so the baseline-required code path succeeds.
+        let baseline_json = r#"{
+  "schema_version": 1,
+  "captured_at": "2026-01-01T00:00:00Z",
+  "types": {},
+  "traits": {}
+}"#;
+        std::fs::write(items_dir.join(&track_id).join("domain-types-baseline.json"), baseline_json)
+            .unwrap();
         // workspace_root must point to the real workspace so rustdoc can find the domain crate.
         let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .parent()

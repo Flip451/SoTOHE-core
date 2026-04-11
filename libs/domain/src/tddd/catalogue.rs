@@ -561,15 +561,21 @@ pub fn undeclared_to_signals(
 // ---------------------------------------------------------------------------
 
 /// Result of a bidirectional consistency check between domain-types.json (spec)
-/// and the crate's public API (code).
+/// and the crate's public API (code), with baseline-aware filtering.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ConsistencyReport {
-    /// Forward signals: spec → code evaluation results.
+    /// Forward signals: spec → code evaluation results (groups 1 + 2).
     forward_signals: Vec<DomainTypeSignal>,
-    /// Types found in code but not declared in domain-types.json.
+    /// Types found in code but not in declarations or baseline (group 4).
     undeclared_types: Vec<String>,
-    /// Traits found in code but not declared in domain-types.json.
+    /// Traits found in code but not in declarations or baseline (group 4).
     undeclared_traits: Vec<String>,
+    /// Count of baseline types/traits skipped because structure is unchanged (group 3).
+    skipped_count: usize,
+    /// Red signals from baseline comparison: structural changes or deletions (group 3).
+    baseline_red_types: Vec<String>,
+    /// Red signals from baseline comparison for traits (group 3).
+    baseline_red_traits: Vec<String>,
 }
 
 impl ConsistencyReport {
@@ -579,25 +585,54 @@ impl ConsistencyReport {
         &self.forward_signals
     }
 
-    /// Returns type names found in code but not declared in the spec.
+    /// Returns type names found in code but not in declarations or baseline (group 4).
     #[must_use]
     pub fn undeclared_types(&self) -> &[String] {
         &self.undeclared_types
     }
 
-    /// Returns trait names found in code but not declared in the spec.
+    /// Returns trait names found in code but not in declarations or baseline (group 4).
     #[must_use]
     pub fn undeclared_traits(&self) -> &[String] {
         &self.undeclared_traits
     }
+
+    /// Returns the count of baseline entries skipped (structure unchanged, group 3).
+    #[must_use]
+    pub fn skipped_count(&self) -> usize {
+        self.skipped_count
+    }
+
+    /// Returns type names from baseline with structural changes or deletions (group 3 Red).
+    #[must_use]
+    pub fn baseline_red_types(&self) -> &[String] {
+        &self.baseline_red_types
+    }
+
+    /// Returns trait names from baseline with structural changes or deletions (group 3 Red).
+    #[must_use]
+    pub fn baseline_red_traits(&self) -> &[String] {
+        &self.baseline_red_traits
+    }
 }
 
-/// Performs a bidirectional consistency check between domain-types entries and a TypeGraph.
+/// Performs a baseline-aware bidirectional consistency check.
 ///
-/// - Forward: evaluates each entry against the TypeGraph (existing `evaluate_domain_type_signals`).
-/// - Reverse: finds types and traits in the TypeGraph not declared in entries.
+/// Uses the 4-group evaluation from ADR TDDD-02 §3:
+/// - **Group 1 (A\B)**: declared, not in baseline → forward check
+/// - **Group 2 (A∩B)**: declared and in baseline → forward check
+/// - **Group 3 (B\A)**: baseline, not declared → skip if unchanged, Red if changed/deleted
+/// - **Group 4 (∁(A∪B)∩C)**: not declared, not in baseline, in code → Red
+///
+/// Groups 1+2 are handled by `evaluate_domain_type_signals` (forward check).
+/// Groups 3+4 replace the old undeclared-types reverse check.
 #[must_use]
-pub fn check_consistency(entries: &[DomainTypeEntry], graph: &TypeGraph) -> ConsistencyReport {
+pub fn check_consistency(
+    entries: &[DomainTypeEntry],
+    graph: &TypeGraph,
+    baseline: &crate::TypeBaseline,
+) -> ConsistencyReport {
+    // Forward check (groups 1 + 2): evaluate declared entries against code.
     let forward_signals = evaluate_domain_type_signals(entries, graph);
 
     let declared_type_names: HashSet<&str> = entries
@@ -612,21 +647,81 @@ pub fn check_consistency(entries: &[DomainTypeEntry], graph: &TypeGraph) -> Cons
         .map(|e| e.name())
         .collect();
 
+    let mut skipped_count: usize = 0;
+    let mut baseline_red_types: Vec<String> = Vec::new();
+    let mut baseline_red_traits: Vec<String> = Vec::new();
+
+    // Group 3 — types: B\A (in baseline, not declared)
+    for (name, baseline_entry) in baseline.types() {
+        if declared_type_names.contains(name.as_str()) {
+            continue; // Group 2: declared → handled by forward check
+        }
+        match graph.get_type(name) {
+            Some(code_node) => {
+                // Compare baseline entry against current code structure.
+                let current = crate::TypeBaselineEntry::new(
+                    code_node.kind().clone(),
+                    code_node.members().to_vec(),
+                    code_node.method_return_types().iter().cloned().collect(),
+                );
+                if baseline_entry.structurally_equal(&current) {
+                    skipped_count += 1; // Unchanged → skip
+                } else {
+                    baseline_red_types.push(name.clone()); // Structural change → Red
+                }
+            }
+            None => {
+                baseline_red_types.push(name.clone()); // Deleted → Red
+            }
+        }
+    }
+
+    // Group 3 — traits: B\A (in baseline, not declared)
+    for (name, baseline_entry) in baseline.traits() {
+        if declared_trait_names.contains(name.as_str()) {
+            continue; // Group 2: declared → handled by forward check
+        }
+        match graph.get_trait(name) {
+            Some(code_node) => {
+                let current = crate::TraitBaselineEntry::new(code_node.method_names().to_vec());
+                if baseline_entry.structurally_equal(&current) {
+                    skipped_count += 1;
+                } else {
+                    baseline_red_traits.push(name.clone());
+                }
+            }
+            None => {
+                baseline_red_traits.push(name.clone());
+            }
+        }
+    }
+
+    baseline_red_types.sort();
+    baseline_red_traits.sort();
+
+    // Group 4 — ∁(A∪B)∩C: in code, not declared, not in baseline → Red
     let mut undeclared_types: Vec<String> = graph
         .type_names()
-        .filter(|name| !declared_type_names.contains(name.as_str()))
+        .filter(|name| !declared_type_names.contains(name.as_str()) && !baseline.has_type(name))
         .cloned()
         .collect();
     undeclared_types.sort();
 
     let mut undeclared_traits: Vec<String> = graph
         .trait_names()
-        .filter(|name| !declared_trait_names.contains(name.as_str()))
+        .filter(|name| !declared_trait_names.contains(name.as_str()) && !baseline.has_trait(name))
         .cloned()
         .collect();
     undeclared_traits.sort();
 
-    ConsistencyReport { forward_signals, undeclared_types, undeclared_traits }
+    ConsistencyReport {
+        forward_signals,
+        undeclared_types,
+        undeclared_traits,
+        skipped_count,
+        baseline_red_types,
+        baseline_red_traits,
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -1101,62 +1196,241 @@ mod tests {
         assert_eq!(signals[1].kind_tag(), "undeclared_trait");
     }
 
-    // --- check_consistency tests ---
+    // --- check_consistency tests (4-group baseline-aware) ---
 
-    #[test]
-    fn test_check_consistency_reports_undeclared_types_and_traits() {
-        // Entries declare only "TrackId" (value_object).
-        let entry =
-            DomainTypeEntry::new("TrackId", "desc", DomainTypeKind::ValueObject, true).unwrap();
+    use crate::Timestamp;
+    use crate::tddd::baseline::{TraitBaselineEntry, TypeBaseline, TypeBaselineEntry};
 
-        // TypeGraph has "TrackId" + "UndeclaredStruct", and trait "UndeclaredTrait".
-        let mut types = HashMap::new();
-        types.insert(
-            "TrackId".to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
-        );
-        types.insert(
-            "UndeclaredStruct".to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
-        );
-        let mut traits = HashMap::new();
-        traits.insert("UndeclaredTrait".to_string(), TraitNode::new(vec!["method".into()]));
-        let graph = TypeGraph::new(types, traits);
+    fn empty_baseline() -> TypeBaseline {
+        TypeBaseline::new(
+            1,
+            Timestamp::new("2026-04-11T00:00:00Z").unwrap(),
+            HashMap::new(),
+            HashMap::new(),
+        )
+    }
 
-        let report = check_consistency(&[entry], &graph);
+    fn baseline_with_types(entries: Vec<(&str, TypeBaselineEntry)>) -> TypeBaseline {
+        let types = entries.into_iter().map(|(n, e)| (n.to_string(), e)).collect();
+        TypeBaseline::new(1, Timestamp::new("2026-04-11T00:00:00Z").unwrap(), types, HashMap::new())
+    }
 
-        // Forward: TrackId should be Blue.
-        assert_eq!(report.forward_signals().len(), 1);
-        assert_eq!(report.forward_signals().first().unwrap().signal(), ConfidenceSignal::Blue);
-
-        // Reverse: UndeclaredStruct in types, UndeclaredTrait in traits.
-        assert_eq!(report.undeclared_types(), &["UndeclaredStruct"]);
-        assert_eq!(report.undeclared_traits(), &["UndeclaredTrait"]);
+    fn baseline_with_traits(entries: Vec<(&str, TraitBaselineEntry)>) -> TypeBaseline {
+        let traits = entries.into_iter().map(|(n, e)| (n.to_string(), e)).collect();
+        TypeBaseline::new(
+            1,
+            Timestamp::new("2026-04-11T00:00:00Z").unwrap(),
+            HashMap::new(),
+            traits,
+        )
     }
 
     #[test]
-    fn test_check_consistency_empty_undeclared_when_fully_covered() {
+    fn test_group4_undeclared_new_type_is_red() {
+        // Type in code, not declared, not in baseline → group 4 Red
+        let mut types = HashMap::new();
+        types.insert(
+            "NewType".to_string(),
+            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
+        );
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let report = check_consistency(&[], &graph, &empty_baseline());
+        assert_eq!(report.undeclared_types(), &["NewType"]);
+        assert_eq!(report.skipped_count(), 0);
+    }
+
+    #[test]
+    fn test_group3_baseline_unchanged_type_is_skipped() {
+        // Type in baseline and code, not declared, structure unchanged → skip
+        let bl = baseline_with_types(vec![(
+            "ExistingType",
+            TypeBaselineEntry::new(TypeKind::Struct, vec!["field".into()], vec![]),
+        )]);
+
+        let mut types = HashMap::new();
+        types.insert(
+            "ExistingType".to_string(),
+            TypeNode::new(TypeKind::Struct, vec!["field".into()], HashSet::new(), HashSet::new()),
+        );
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let report = check_consistency(&[], &graph, &bl);
+        assert_eq!(report.skipped_count(), 1);
+        assert!(report.undeclared_types().is_empty());
+        assert!(report.baseline_red_types().is_empty());
+    }
+
+    #[test]
+    fn test_group3_baseline_changed_type_is_red() {
+        // Type in baseline and code, not declared, structure changed → Red
+        let bl = baseline_with_types(vec![(
+            "ChangedType",
+            TypeBaselineEntry::new(TypeKind::Enum, vec!["A".into()], vec![]),
+        )]);
+
+        let mut types = HashMap::new();
+        types.insert(
+            "ChangedType".to_string(),
+            TypeNode::new(
+                TypeKind::Enum,
+                vec!["A".into(), "B".into()], // new variant added
+                HashSet::new(),
+                HashSet::new(),
+            ),
+        );
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let report = check_consistency(&[], &graph, &bl);
+        assert_eq!(report.baseline_red_types(), &["ChangedType"]);
+        assert_eq!(report.skipped_count(), 0);
+    }
+
+    #[test]
+    fn test_group3_baseline_deleted_type_is_red() {
+        // Type in baseline but not in code, not declared → Red (deletion)
+        let bl = baseline_with_types(vec![(
+            "DeletedType",
+            TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
+        )]);
+
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+
+        let report = check_consistency(&[], &graph, &bl);
+        assert_eq!(report.baseline_red_types(), &["DeletedType"]);
+        assert_eq!(report.skipped_count(), 0);
+    }
+
+    #[test]
+    fn test_group2_declared_baseline_type_uses_forward_check() {
+        // Type in both baseline and declarations → forward check (group 2)
+        let bl = baseline_with_types(vec![(
+            "TrackId",
+            TypeBaselineEntry::new(TypeKind::Struct, vec!["0".into()], vec![]),
+        )]);
+
         let entry =
             DomainTypeEntry::new("TrackId", "desc", DomainTypeKind::ValueObject, true).unwrap();
-        let trait_entry = DomainTypeEntry::new(
-            "Repo",
-            "desc",
-            DomainTypeKind::TraitPort { expected_methods: vec!["save".into()] },
-            true,
-        )
-        .unwrap();
 
         let mut types = HashMap::new();
         types.insert(
             "TrackId".to_string(),
+            TypeNode::new(TypeKind::Struct, vec!["0".into()], HashSet::new(), HashSet::new()),
+        );
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let report = check_consistency(&[entry], &graph, &bl);
+        assert_eq!(report.forward_signals().len(), 1);
+        assert_eq!(report.forward_signals()[0].signal(), ConfidenceSignal::Blue);
+        // Not counted as skipped (it's declared → forward check handles it)
+        assert_eq!(report.skipped_count(), 0);
+        assert!(report.baseline_red_types().is_empty());
+    }
+
+    #[test]
+    fn test_group1_new_declared_type_uses_forward_check() {
+        // Declared but not in baseline → group 1, forward check
+        let entry =
+            DomainTypeEntry::new("NewType", "desc", DomainTypeKind::ValueObject, true).unwrap();
+
+        let mut types = HashMap::new();
+        types.insert(
+            "NewType".to_string(),
             TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
         );
-        let mut traits = HashMap::new();
-        traits.insert("Repo".to_string(), TraitNode::new(vec!["save".into()]));
-        let graph = TypeGraph::new(types, traits);
+        let graph = TypeGraph::new(types, HashMap::new());
 
-        let report = check_consistency(&[entry, trait_entry], &graph);
+        let report = check_consistency(&[entry], &graph, &empty_baseline());
+        assert_eq!(report.forward_signals().len(), 1);
+        assert_eq!(report.forward_signals()[0].signal(), ConfidenceSignal::Blue);
         assert!(report.undeclared_types().is_empty());
-        assert!(report.undeclared_traits().is_empty());
+    }
+
+    #[test]
+    fn test_group3_baseline_unchanged_trait_is_skipped() {
+        let bl = baseline_with_traits(vec![(
+            "MyTrait",
+            TraitBaselineEntry::new(vec!["method_a".into()]),
+        )]);
+
+        let mut traits = HashMap::new();
+        traits.insert("MyTrait".to_string(), TraitNode::new(vec!["method_a".into()]));
+        let graph = TypeGraph::new(HashMap::new(), traits);
+
+        let report = check_consistency(&[], &graph, &bl);
+        assert_eq!(report.skipped_count(), 1);
+        assert!(report.baseline_red_traits().is_empty());
+    }
+
+    #[test]
+    fn test_group3_baseline_changed_trait_is_red() {
+        let bl = baseline_with_traits(vec![(
+            "MyTrait",
+            TraitBaselineEntry::new(vec!["method_a".into()]),
+        )]);
+
+        let mut traits = HashMap::new();
+        traits.insert(
+            "MyTrait".to_string(),
+            TraitNode::new(vec!["method_a".into(), "method_b".into()]),
+        );
+        let graph = TypeGraph::new(HashMap::new(), traits);
+
+        let report = check_consistency(&[], &graph, &bl);
+        assert_eq!(report.baseline_red_traits(), &["MyTrait"]);
+        assert_eq!(report.skipped_count(), 0);
+    }
+
+    #[test]
+    fn test_mixed_groups_comprehensive() {
+        // Set up a scenario with all 4 groups:
+        // - "DeclaredNew" (group 1): declared, not in baseline
+        // - "DeclaredExisting" (group 2): declared, in baseline
+        // - "UnchangedExisting" (group 3 skip): in baseline, unchanged
+        // - "ChangedExisting" (group 3 red): in baseline, changed
+        // - "BrandNew" (group 4): not declared, not in baseline
+        let bl = baseline_with_types(vec![
+            ("DeclaredExisting", TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![])),
+            (
+                "UnchangedExisting",
+                TypeBaselineEntry::new(TypeKind::Struct, vec!["x".into()], vec![]),
+            ),
+            ("ChangedExisting", TypeBaselineEntry::new(TypeKind::Enum, vec!["A".into()], vec![])),
+        ]);
+
+        let entries = vec![
+            DomainTypeEntry::new("DeclaredNew", "d", DomainTypeKind::ValueObject, true).unwrap(),
+            DomainTypeEntry::new("DeclaredExisting", "d", DomainTypeKind::ValueObject, true)
+                .unwrap(),
+        ];
+
+        let mut types = HashMap::new();
+        for name in
+            &["DeclaredNew", "DeclaredExisting", "UnchangedExisting", "ChangedExisting", "BrandNew"]
+        {
+            let (kind, members) = if *name == "ChangedExisting" {
+                (TypeKind::Enum, vec!["A".into(), "B".into()]) // changed
+            } else if *name == "UnchangedExisting" {
+                (TypeKind::Struct, vec!["x".into()])
+            } else {
+                (TypeKind::Struct, vec![])
+            };
+            types.insert(
+                name.to_string(),
+                TypeNode::new(kind, members, HashSet::new(), HashSet::new()),
+            );
+        }
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let report = check_consistency(&entries, &graph, &bl);
+
+        // Groups 1+2: 2 forward signals
+        assert_eq!(report.forward_signals().len(), 2);
+        // Group 3 skip: UnchangedExisting
+        assert_eq!(report.skipped_count(), 1);
+        // Group 3 red: ChangedExisting
+        assert_eq!(report.baseline_red_types(), &["ChangedExisting"]);
+        // Group 4: BrandNew
+        assert_eq!(report.undeclared_types(), &["BrandNew"]);
     }
 }
