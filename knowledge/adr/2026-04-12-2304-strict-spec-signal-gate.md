@@ -1,4 +1,4 @@
-# Strict Spec Signal Gate — Yellow blocks merge
+# Strict Spec Signal Gate — Yellow がマージをブロックする
 
 ## Status
 
@@ -6,99 +6,108 @@ Accepted
 
 ## Context
 
-SoTOHE-core uses a 3-level confidence signal system (Blue/Yellow/Red) to evaluate the provenance of spec requirements. Prior to this ADR, the signal gate only blocked Red (missing sources) at CI time, while Yellow (inference, discussion, feedback) was allowed at all stages including merge.
+SoTOHE-core は 3 段階の信頼度シグナル (Blue/Yellow/Red) で仕様要件の根拠を評価する。本 ADR 以前、シグナルゲートは CI で Red (根拠なし) のみをブロックし、Yellow (inference/discussion) はマージを含む全段階で許容されていた。
 
-This meant requirements could reach main with no persistent documentation of their rationale. A developer could write `[source: discussion]` or `[source: feedback — user said so]` and pass all gates.
+### 問題 1: マージ時の Yellow 許容
 
-### Problem: feedback as Blue
+Yellow は「推定」「議論」などの非永続的な根拠を示す。CI は Red のみをブロックするため、Yellow の要件がそのまま main にマージされ、設計判断の根拠がどこにも永続化されない状態が許容されていた。
 
-The `feedback` source type was mapped to Blue (same confidence level as `document` and `convention`), despite having no persistent artifact. This created a trivial bypass: any Yellow item could be upgraded to Blue by rewriting the source tag to `feedback — approved` without creating any documentation.
+### 問題 2: feedback が Blue にマッピングされていた
 
-### Fail-closed principle
+本 ADR の D1 (マージゲート追加) だけでは不十分であった。`feedback` ソースタイプは `document` や `convention` と同じ Blue にマッピングされていたが、永続的なファイル参照を持たない。そのため、Yellow の項目を `feedback — 承認済み` と書き換えるだけで Blue に昇格でき、マージゲートをバイパスできた。
 
-SoTOHE-core follows a fail-closed design philosophy across all gates:
-- Hook errors → block (ADR 2026-03-11-0050)
-- review.json unreadable → bypass denied
-- Baseline absent → signal evaluation error
-- The merge gate should follow the same principle
+### Fail-closed 原則
+
+SoTOHE-core は全ゲートで fail-closed を設計原則とする:
+- Hook エラー → ブロック (ADR 2026-03-11-0050)
+- review.json 読取不能 → bypass 不可
+- Baseline 不在 → signal 評価エラー
+- マージゲートも同原則に従うべき
 
 ## Decision
 
-### D1: Yellow blocks merge
+### D1: Yellow がマージをブロックする
 
-`wait-and-merge` reads `spec.json` from the PR head ref (via `git show origin/branch:path`) and blocks merge when:
-- `signals` is absent → BLOCKED (unevaluated)
-- `signals.red > 0` → BLOCKED (missing sources)
-- `signals.yellow > 0` → BLOCKED (undocumented sources)
+`wait-and-merge` は PR head ref から `spec.json` を `git show` で読み取り、以下の条件でマージをブロックする:
 
-Only `signals.yellow == 0 && signals.red == 0` (all Blue) allows merge.
+- `signals` が存在しない → BLOCKED (未評価)
+- `signals.red > 0` → BLOCKED (根拠なし)
+- `signals.yellow > 0` → BLOCKED (根拠が非永続的)
 
-This creates a structural incentive to record design decisions before merge:
-- `inference` / `discussion` / `feedback` → Yellow → merge blocked
-- Write an ADR or convention document → reference as `document` source → Blue → merge allowed
+`signals.yellow == 0 && signals.red == 0` (全 Blue) のみマージを許可する。
 
-### D2: Downgrade feedback from Blue to Yellow
+これにより、マージ前に設計判断を ADR や convention として記録する構造的インセンティブが生まれる:
+- `inference` / `discussion` / `feedback` → Yellow → マージブロック
+- ADR を書いて `document` ソースとして参照 → Blue → マージ許可
 
-`SignalBasis::Feedback` is remapped from `ConfidenceSignal::Blue` to `ConfidenceSignal::Yellow`.
+### D2: feedback を Yellow に降格
 
-Blue sources must reference persistent files:
-- `document` → references a file (ADR, spec, PRD)
-- `convention` → references a convention file
+`SignalBasis::Feedback` を `ConfidenceSignal::Blue` から `ConfidenceSignal::Yellow` に再マッピングする。
 
-Yellow sources lack persistent documentation:
-- `feedback` → "user said so" (no file)
-- `inference` → "I think because..." (no file)
-- `discussion` → "we agreed" (no file)
+Blue ソースは永続的なファイル参照を持つもののみ:
+- `document` → ファイル参照あり (ADR, spec, PRD)
+- `convention` → convention ファイル参照あり
 
-To upgrade `feedback` to Blue, the developer must persist the decision in an ADR or convention document and reference it as a `document` source.
+Yellow ソースは永続的な記録を持たない:
+- `feedback` → 「ユーザーが言った」(ファイルなし)
+- `inference` → 「推定」(ファイルなし)
+- `discussion` → 「合意した」(ファイルなし)
 
-### D3: spec.json required (fail-closed)
+`feedback` を Blue に戻すには、決定内容を ADR か convention ドキュメントに記録し、`document` ソースとして参照する必要がある。
 
-All new tracks created by `/track:plan` include `spec.json`. Legacy tracks without `spec.json` are already completed and will not be re-merged. When `git show` cannot find `spec.json` on the PR head ref, merge is blocked.
+### D3: spec.json 必須 (fail-closed)
 
-### D4: Pattern follows check_tasks_resolved
+`/track:plan` で作成される全ての新規 track は `spec.json` を含む。`spec.json` が存在しない場合はレガシー track であるが、完了済みで再マージされることはない。`git show` で `spec.json` が見つからない場合、マージをブロックする。
 
-The implementation uses the same `git show origin/branch:path → decode → check` pattern as the existing task completion guard, ensuring the gate validates the remote state rather than stale local files.
+### D4: check_tasks_resolved と同じパターン
+
+実装は既存のタスク完了ガードと同じ `git show origin/branch:path → decode → check` パターンを使用し、ローカルではなくリモートの状態を検証する。
 
 ## Rejected Alternatives
 
-### A. Delegate to verify_from_spec_json via temp file
+### A. verify_from_spec_json を temp ファイル経由で呼び出す
 
-Writing remote `spec.json` to a temp file and calling `verify_from_spec_json(path, strict=true)`. Rejected because:
-- Requires temp file management (creation, cleanup)
-- `verify_from_spec_json` also checks domain-types.json as a sibling file, which isn't available from the remote ref
-- The simple `git show → decode → check signals` pattern is sufficient for the merge gate since CI already runs the full `verify spec-states` (default mode)
+リモートの `spec.json` を temp ファイルに書き出し、`verify_from_spec_json(path, strict=true)` を呼ぶ方式。
 
-### B. Keep feedback as Blue
+却下理由:
+- temp ファイルの管理が必要 (作成・削除)
+- `verify_from_spec_json` は sibling の `domain-types.json` も読むが、リモート ref からは利用不可
+- `git show → decode → signals チェック` のシンプルなパターンで十分
 
-Keep the existing Blue mapping for `feedback` sources. Rejected because:
-- Provides a trivial bypass for the strict gate
-- No persistent artifact is created
-- Undermines the purpose of requiring documented rationale
+### B. feedback を Blue のまま維持
 
-### C. Skip gate for legacy tracks without spec.json
+既存の Blue マッピングを維持する方式。
 
-Return SUCCESS when `spec.json` is not found. Rejected because:
-- Violates fail-closed principle
-- All new tracks have `spec.json`
-- Legacy tracks are completed and won't merge again
+却下理由:
+- strict gate の trivial なバイパスを提供する
+- 永続的なアーティファクトが作成されない
+- 設計根拠の文書化を要求する目的を損なう
+
+### C. spec.json 不在時にゲートをスキップ
+
+`spec.json` が見つからない場合に SUCCESS を返す方式。
+
+却下理由:
+- fail-closed 原則に違反する
+- 全ての新規 track は `spec.json` を含む
+- レガシー track は完了済みで再マージされない
 
 ## Consequences
 
 ### Good
 
-- **ADR creation is structurally incentivized**: The only way to upgrade Yellow to Blue is to write a persistent document. This creates a natural workflow where design decisions are recorded before merge.
-- **Fail-closed**: Missing or unevaluated specs block merge.
-- **Consistent with existing gates**: Same pattern as task completion guard.
+- **ADR 作成が構造的に促進される**: Yellow → Blue の昇格には永続的なドキュメントの作成が必要。設計判断がマージ前に自然に記録される
+- **Fail-closed**: 未評価・根拠不十分な spec はマージをブロックする
+- **既存ゲートと一貫性**: タスク完了ガードと同じパターン
 
 ### Bad
 
-- **Higher friction for small changes**: Even trivial features need spec sources that reference persistent files. This can feel disproportionate for 5-line changes.
-- **Domain-type signals not checked**: The merge gate only checks Stage 1 (spec signals), not Stage 2 (domain-type signals). CI covers Stage 2 in default mode (Red blocked), but Yellow domain-type signals can reach main. This is an accepted limitation — replicating the full verify pipeline from remote refs is complex.
-- **Race condition**: Guards run once before the poll loop, not at merge time. A post-validation push could bypass the gate. Tracked as SEC-10 in TODO.md.
+- **小規模変更の摩擦増加**: trivial な機能でも spec ソースにファイル参照が必要。5 行の変更に ADR を書くのは不釣り合いに感じる場合がある
+- **Domain type signal 未チェック**: マージゲートは Stage 1 (spec signals) のみ。Stage 2 (domain type signals) は CI の default モード (Red ブロック) でカバーされるが、Yellow domain type signal は main に到達しうる
+- **Race condition**: ガードはポーリングループの前に 1 回実行され、マージ時には再検証されない。ポーリング中の push でバイパス可能。SEC-10 として TODO.md に記録済み
 
 ## Reassess When
 
-- A lightweight "micro-track" workflow is introduced that reduces planning overhead for small changes
-- Domain-type signal strict gate is needed at merge time (would require reading domain-types.json from remote refs)
-- `feedback` needs to be re-elevated to Blue (would need a persistent artifact requirement, e.g., feedback must reference a memory file or PR comment)
+- 小規模変更の摩擦を軽減する「micro-track」ワークフローが導入された場合
+- Domain type signal の strict gate がマージ時に必要になった場合
+- `feedback` を Blue に再昇格する必要がある場合 (永続的アーティファクトの要件付き)
