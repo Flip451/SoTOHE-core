@@ -1,0 +1,251 @@
+{
+  "schema_version": 1,
+  "status": "approved",
+  "version": "1.0.0",
+  "title": "TDDD-02: Baseline reverse signal — 既存型ノイズ排除",
+  "goal": [
+    "reverse check で発生する既存型ノイズ (100+ Red) を排除し、TDDD の reverse signal を実用可能にする。",
+    "design 時点の TypeGraph スナップショット (baseline) を保存し、baseline との差分比較で新規型・構造変更のみを検出する。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "TypeBaseline / TypeBaselineEntry / TraitBaselineEntry 型の定義 (domain 層)",
+        "sources": [
+          "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §1, §7"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "Baseline codec (encode/decode) と TypeGraph → TypeBaseline 変換 (infrastructure 層)",
+        "sources": [
+          "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §1, §7"
+        ],
+        "task_refs": [
+          "T003",
+          "T004"
+        ]
+      },
+      {
+        "text": "check_consistency の 4 グループ評価 (A\\B, A∩B, B\\A, ∁(A∪B)∩C)",
+        "sources": [
+          "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §3"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "CLI baseline-capture コマンド (baseline 生成専用) と domain-type-signals の拡張 (baseline 読み込み + 4 グループ評価)",
+        "sources": [
+          "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §4"
+        ],
+        "task_refs": [
+          "T006"
+        ]
+      },
+      {
+        "text": "各層に tddd/ モジュール構造の新設 + 既存ファイル (domain_types.rs, domain_types_codec.rs, domain_state_signals.rs) の tddd/ 配下への移動",
+        "sources": [
+          "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §7"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "/track:design コマンドの baseline 生成・コミット推奨の追記",
+        "sources": [
+          "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §4"
+        ],
+        "task_refs": [
+          "T007"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "MethodDeclaration によるシグネチャ検証 — TDDD-01 の scope",
+        "sources": [
+          "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md D2"
+        ]
+      },
+      {
+        "text": "action フィールド (add/modify/reference/delete) — TDDD-03 の scope",
+        "sources": [
+          "knowledge/adr/2026-04-11-0003-type-action-declarations.md"
+        ]
+      },
+      {
+        "text": "多層化 (architecture-rules.json の tddd ブロック) — TDDD-01 の scope",
+        "sources": [
+          "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md D1"
+        ]
+      },
+      {
+        "text": "--refresh-baseline フラグ — 廃止済み",
+        "sources": [
+          "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §6"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "baseline は domain-types-baseline.json として track ディレクトリに保存。オブジェクト形式 (型名をキー)",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §1"
+      ]
+    },
+    {
+      "text": "baseline に TypeNode の outgoing と module_path は含めない",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §1"
+      ]
+    },
+    {
+      "text": "baseline 生成 (baseline-capture) と signal 評価 (domain-type-signals) は別コマンドに分離する",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §4"
+      ]
+    },
+    {
+      "text": "domain-type-signals は baseline が存在しない場合エラーとする",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §4"
+      ]
+    },
+    {
+      "text": "baseline-capture は既に baseline が存在する場合スキップする (冪等動作、--force で再生成可)",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §4"
+      ]
+    },
+    {
+      "text": "baseline は /track:design 時に baseline-capture で生成し、design 成果物と一緒にコミットを推奨",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §4"
+      ]
+    },
+    {
+      "text": "TDDD-03 実装まで、/track:design を使用する track では既存型の削除を含められない",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §3"
+      ]
+    },
+    {
+      "text": "1 概念 1 ファイルの粒度で配置。既存ファイルを肥大化させない",
+      "sources": [
+        "discussion"
+      ]
+    },
+    {
+      "text": "後方互換性は対応しない",
+      "sources": [
+        "discussion"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "既存 100+ 型が reverse check で Red にならず、スキップされること",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §3 グループ 3"
+      ],
+      "task_refs": [
+        "T005",
+        "T006"
+      ]
+    },
+    {
+      "text": "baseline 後に追加された未宣言型が Red として検出されること (グループ 4)",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §3 グループ 4"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "baseline と構造が異なる未宣言型が Red として検出されること (グループ 3 構造変更)",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §3 グループ 3"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "baseline にあり現在のコードに存在しない未宣言型が Red として検出されること (グループ 3 削除)",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §3 グループ 3"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "宣言済み型は forward check で評価され、baseline 比較の対象外であること (グループ 1, 2)",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §3 グループ 1, 2"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "baseline-capture が baseline を正しく生成し、既に存在する場合はスキップすること (冪等動作)",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §4"
+      ],
+      "task_refs": [
+        "T006"
+      ]
+    },
+    {
+      "text": "domain-type-signals が baseline 不在時にエラーを返すこと",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §4"
+      ],
+      "task_refs": [
+        "T006"
+      ]
+    },
+    {
+      "text": "domain-types-baseline.json がオブジェクト形式で正しく encode/decode されること",
+      "sources": [
+        "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md §1"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "cargo make ci が通ること",
+      "sources": [
+        "convention — .claude/rules/07-dev-environment.md"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T005",
+        "T006",
+        "T007"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "knowledge/conventions/source-attribution.md"
+  ],
+  "signals": {
+    "blue": 26,
+    "yellow": 2,
+    "red": 0
+  },
+  "approved_at": "2026-04-11T07:19:43Z",
+  "content_hash": "sha256:24251147ae5edb4552bd9a7e70ef42966d7cd5b5c56e7316a24304dce9d4e6c0"
+}

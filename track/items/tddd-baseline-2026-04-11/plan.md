@@ -1,0 +1,56 @@
+<!-- Generated from metadata.json — DO NOT EDIT DIRECTLY -->
+# TDDD-02: Baseline reverse signal — 既存型ノイズ排除
+
+ADR 2026-04-11-0001 (TDDD-02) の実装。reverse check で 100+ の既存型が Red ノイズとなる問題を、design 時点の TypeGraph スナップショット (baseline) との差分比較で解決する。
+宣言 (A) と baseline (B) の集合関係で 4 グループに分類し、グループごとに forward/reverse check を適用する。
+各層に tddd/ モジュールを新設し、baseline 関連コードを 1 概念 1 ファイルで配置する。
+
+## モジュール構造の準備
+
+domain / infrastructure / cli の 3 層に tddd/ モジュールディレクトリを作成する。
+既存ファイルを tddd/ 配下に移動: domain_types.rs → tddd/catalogue.rs, domain_types_codec.rs → tddd/catalogue_codec.rs, domain_state_signals.rs → tddd/signals.rs。
+移動に伴う mod.rs, use パス, Cargo.toml の更新を含む。
+
+- [ ] tddd/ モジュール構造を domain / infrastructure / cli の 3 層に作成し、既存ファイル (domain_types.rs, domain_types_codec.rs, domain_state_signals.rs) を tddd/ 配下に移動
+
+## Baseline 型定義 (domain 層)
+
+TypeBaseline (HashMap<String, TypeBaselineEntry> + HashMap<String, TraitBaselineEntry>) を定義する。
+TypeBaselineEntry は kind (TypeKind) + members (Vec<String>) + method_return_types (Vec<String>) を保持。
+TraitBaselineEntry は methods (Vec<String>) を保持。
+構造比較関数: TypeBaselineEntry 同士の equality (kind + sorted members + sorted method_return_types)、TraitBaselineEntry 同士の equality (sorted methods)。
+TypeNode の outgoing と module_path は baseline に含めない。outgoing は method_return_types から導出可能で冗長、module_path はモジュール移動は構造変更ではないため。
+
+- [ ] TypeBaseline / TypeBaselineEntry / TraitBaselineEntry 型を domain 層 tddd/baseline.rs に実装 (純粋データ型 + 構造比較関数)
+
+## Baseline codec + builder (infrastructure 層)
+
+baseline_codec.rs: TypeBaseline の JSON encode/decode。オブジェクト形式 (型名をキー) で HashMap と 1:1 対応。
+baseline_builder.rs: TypeGraph → TypeBaseline 変換。TypeNode から kind + members + method_return_types を抽出、TraitNode から method_names を抽出。outgoing と module_path は除外。
+
+- [ ] Baseline codec (encode/decode) を infrastructure 層 tddd/baseline_codec.rs に実装
+- [ ] TypeGraph → TypeBaseline 変換を infrastructure 層 tddd/baseline_builder.rs に実装
+
+## 4 グループ評価の実装 (domain 層)
+
+check_consistency のシグネチャを (entries: &[DomainTypeEntry], graph: &TypeGraph, baseline: &TypeBaseline) に変更。
+4 グループ評価: A\B (forward check), A∩B (forward check), B\A (baseline 比較 → スキップ or Red), ∁(A∪B)∩C (Red)。
+B\A で C に存在しない場合も Red (未宣言の削除)。TDDD-03 実装まで /track:design と既存型削除は併用不可の制約。
+ConsistencyReport に skipped_count (B\A で構造同一の件数) を追加。
+
+- [ ] check_consistency を拡張: &TypeBaseline 引数追加、4 グループ評価 (A\B, A∩B, B\A, ∁(A∪B)∩C)、ConsistencyReport に skipped_count 追加
+
+## CLI コマンド分離
+
+tddd/baseline.rs に baseline-capture コマンドを実装: rustdoc → TypeGraph → TypeBaseline → encode → atomic_write。既に存在する場合はスキップ (冪等動作、--force で再生成)。
+tddd/signals.rs (旧 domain_state_signals.rs) を更新: baseline 読み込み (存在しない場合はエラー) → check_consistency に baseline を渡す。baseline の生成ロジックは含めない。
+サマリ出力に skipped_count を追加。
+
+- [ ] CLI baseline-capture コマンドを tddd/baseline.rs に実装 (生成専用、既存時スキップで冪等、--force で再生成)。tddd/signals.rs (旧 domain_state_signals.rs) を拡張して baseline 読み込み (不在時エラー) + 4 グループ評価呼び出しを追加
+
+## /track:design コマンド更新
+
+.claude/commands/track/design.md の Step 4 を更新: baseline-capture を呼び出して baseline を生成する旨を記載。
+baseline を design 成果物と一緒にコミットすることを推奨する旨を追記。
+
+- [ ] /track:design コマンドを更新: Step 4 で baseline-capture を呼び出す旨を記載、design 成果物と一緒にコミット推奨を追記

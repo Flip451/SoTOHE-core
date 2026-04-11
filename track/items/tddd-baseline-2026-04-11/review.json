@@ -1,0 +1,353 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The acceptance criterion for missing baselines conflicts with ADR 0001's CLI bootstrap path. `domain-type-signals` is supposed to create `domain-types-baseline.json` on the first run and continue, so a generic \"baseline missing => error\" assertion will fail the intended initial `/track:design` flow. Narrow this to the post-bootstrap path or change the bootstrap behavior.",
+              "severity": "P1",
+              "file": "track/items/tddd-baseline-2026-04-11/spec.json",
+              "line": 193,
+              "category": "spec-adr alignment"
+            },
+            {
+              "message": "TDDD-01 changes the shape of the `TypeGraph` snapshot that TDDD-02 persists (`TypeNode::methods` / `TraitNode::methods` and structured members), but the plan never specifies how existing `schema_version: 1` baseline files are migrated or regenerated. That makes Step 3 dependent on a hidden baseline schema transition and breaks the claim that the steps are independently runnable tracks.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+              "line": 443,
+              "category": "feasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:62e570ab99f50c20a2a52d52000ab7a04b53a6040fda855459b4682bfdd22b3d",
+          "at": "2026-04-11T06:10:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The missing-baseline behavior is still contradictory: this Constraints section says baseline absence is an error, but the ADR and the acceptance criterion later in this spec require generating the baseline and continuing. The same stale error wording also remains in `metadata.json`, `plan.md`, and `verification.md`, so the implementation and verification bundle is not internally consistent.",
+              "severity": "P1",
+              "file": "track/items/tddd-baseline-2026-04-11/spec.json",
+              "line": 115,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:1c0792bd7ad3d74b3f4d1a7bdeb93ad785adc44f8795e2fa3dda20c6b217acba",
+          "at": "2026-04-11T06:21:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain-types-baseline.json` is still described as being auto-captured by the first `domain-type-signals` run in the lifecycle table, which contradicts the new `baseline-capture` / `domain-type-signals` split in §4 and leaves two incompatible lifecycles in the same ADR.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
+              "line": 77,
+              "category": "consistency"
+            },
+            {
+              "message": "The implementation plan still bundles baseline generation and baseline reading into `baseline.rs` and says `/track:design` auto-generates the baseline, but the ADR now assigns generation to `baseline-capture` and signal evaluation/loading to `signals.rs`. Following this plan would put the responsibilities in the wrong module.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/strategy/tddd-implementation-plan.md",
+              "line": 31,
+              "category": "consistency"
+            },
+            {
+              "message": "The split-command design no longer matches the \"same rustdoc export\" rationale: both `baseline-capture` and `domain-type-signals` independently build TypeGraph, so `/track:design` now implies a second rustdoc export unless a shared cache/hand-off is specified. That cost and data flow need to be made explicit or the rationale removed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
+              "line": 34,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:c900f709db9051aa18603c0002bd13777f68a05b2c674c01fc25c02c0ff4f304",
+          "at": "2026-04-11T06:28:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 0001 still keeps the removed implicit-baseline assumptions: the Consequences section says baseline capture reuses the existing rustdoc export, and the Bad list still says `domain-type-signals` auto-generates the baseline on first run. That contradicts the explicit `baseline-capture` / `domain-type-signals` split introduced in §4 and leaves the old workflow rationale in place.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
+              "line": 291,
+              "category": "consistency"
+            },
+            {
+              "message": "The approved spec still lists `CLI baseline 読み書き・統合 (domain_state_signals.rs 更新)` in `in_scope`, so the spec remains inconsistent with the new split-command constraints in the same file. The same integrated/auto-generate wording is mirrored in `metadata.json` and `plan.md`, which means the track artifact bundle is still not fully aligned with ADR §4.",
+              "severity": "P1",
+              "file": "track/items/tddd-baseline-2026-04-11/spec.json",
+              "line": 41,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:c9a4041008870fc207605fd37b335843f0e06c22cfa21fe3565eaf1b006fb7fd",
+          "at": "2026-04-11T06:31:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The task bundle still describes the removed auto-capture flow: `T006` says baseline generation/load lives in `baseline.rs`, and `T007` still says `/track:design` auto-generates the baseline. That contradicts the new split-command ADR and can steer implementation back to the old bootstrap path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-baseline-2026-04-11/metadata.json",
+              "line": 48,
+              "category": "consistency"
+            },
+            {
+              "message": "The manual verification list no longer checks the required `/track:design` integration. It validates `baseline-capture` and `domain-type-signals` directly, but a broken Step 4 that never calls `baseline-capture` would still pass every listed check.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-baseline-2026-04-11/verification.md",
+              "line": 11,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:eb66c4b0b10bf47ff4474d186e3ae14efa08674201c4096874689341b1fc611c",
+          "at": "2026-04-11T06:33:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:design` now unconditionally calls `baseline-capture`, but `baseline-capture` is specified to error whenever `domain-types-baseline.json` already exists. Because the baseline is also meant to be committed with the design artifacts, rerunning the design workflow on the same track becomes non-idempotent and will fail unless the user manually deletes the file or the command threads `--force` through.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
+              "line": 159,
+              "category": "workflow"
+            },
+            {
+              "message": "`action: \"delete\"` is accepted as Blue whenever the type is absent from code, but the ADR never requires that the declaration actually match an entry in the baseline. That means a fabricated delete declaration for a type that never existed can pass as a successful deletion instead of being rejected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-11-0003-type-action-declarations.md",
+              "line": 31,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:a0a2e08854831f772dd4749ab49b1e53f58860d7d5c46fe70aaf018c2ee63f0b",
+          "at": "2026-04-11T06:36:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `baseline-capture` behavior is still contradictory inside the tracker bundle: `metadata.json`'s S5 description here and `plan.md`'s CLI section say an existing baseline should error, but the checklist/spec/ADR now require idempotent skip. That leaves the implementation target ambiguous and could reintroduce the old non-idempotent behavior.",
+              "severity": "P1",
+              "file": "track/items/tddd-baseline-2026-04-11/metadata.json",
+              "line": 105,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:e324d77829a8947d274e5d51f258e5d627550bdcd8e646dd3fd6a470046a57d8",
+          "at": "2026-04-11T06:40:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`baseline-capture` decides to skip purely on file existence. After the schema break called out in `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md:472`, an existing track baseline can become stale/incompatible, but the capture step will never refresh it because it skips before checking schema/version. That leaves no recovery path for old baselines in the documented workflow; make the skip version-aware or require an explicit `--force` regeneration path in `/track:design`.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
+              "line": 162,
+              "category": "logic"
+            },
+            {
+              "message": "The new baseline-existence check for `action: \"delete\"` must be a hard error, not a warning. If this is only a warning, a delete declaration for a type that never existed in the baseline will still be accepted and evaluated as Blue, which keeps the false-success hole open.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0003-type-action-declarations.md",
+              "line": 56,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:057573dbef4338858f8336efe466b299bb4b77aaa55eaa69ddb269e843f2f1f1",
+          "at": "2026-04-11T06:43:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`baseline-capture` is now skipped purely by file existence, but `/track:design` still always invokes it. If the same track is re-run after design edits, the workflow will silently keep the previous baseline unless the user remembers `--force`, so the documented flow can compare against a stale snapshot and miss or misclassify changes.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
+              "line": 168,
+              "category": "correctness"
+            },
+            {
+              "message": "The verification list does not exercise the end-to-end `/track:design` flow. It checks `baseline-capture` and `domain-type-signals` in isolation and only asserts that Step 4 mentions `baseline-capture`, so a broken Step 4 ordering or wiring could still pass this checklist.",
+              "severity": "P1",
+              "file": "track/items/tddd-baseline-2026-04-11/verification.md",
+              "line": 11,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:df500648e59dc56b0bfa5fb8a775a5df593d569b76623bc7bc2be15b1c4aeabd",
+          "at": "2026-04-11T06:45:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d093c3e548c94e1d5c29fcae7a215c7998a524343a55d9c5f046cae29d6aad9",
+          "at": "2026-04-11T06:47:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 0001's main-merge remediation is internally inconsistent: when a type is introduced by merging `main` after the baseline was captured, adding it to `domain-types.json` does not move it into group `A∩B` because it is still absent from the baseline set `B`. That path is group `A\\B`, so the current text gives the wrong expected classification for the documented recovery flow and can drive incorrect implementation or verification logic.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
+              "line": 211,
+              "category": "design"
+            },
+            {
+              "message": "The TDDD-02 track artifacts no longer cover ADR 0001 §7 consistently. ADR 0001 says the existing catalogue/codec/signals files are moved into `tddd/` now, but this plan explicitly defers those moves to TDDD-01 and still tells T006 to edit `domain_state_signals.rs`. As written, the track cannot satisfy its own verification goal that every Decision section in ADR 0001 is covered, and implementers do not have a single authoritative target path for the CLI changes.",
+              "severity": "P1",
+              "file": "track/items/tddd-baseline-2026-04-11/plan.md",
+              "line": 11,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:6d093c3e548c94e1d5c29fcae7a215c7998a524343a55d9c5f046cae29d6aad9",
+          "at": "2026-04-11T06:51:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The implementation plan still points Step 1's `domain-type-signals` work at `libs/domain/src/tddd/signals.rs`, but ADR 0001 §7 defines that command as a CLI file under `apps/cli/src/commands/track/tddd/signals.rs`. That leaves the TDDD-02 rollout without a single authoritative target for the command split and can send implementers to put CLI behavior in the domain layer.",
+              "severity": "P1",
+              "file": "knowledge/strategy/tddd-implementation-plan.md",
+              "line": 33,
+              "category": "consistency"
+            },
+            {
+              "message": "Step 3 still schedules `domain_types.rs -> tddd/catalogue.rs` and `domain_state_signals.rs -> tddd/signals.rs` as if those moves have not happened yet, even though Step 1 already performs them. That contradicts the statement that the stages are independently implementable tracks: once TDDD-02 lands, TDDD-01 no longer has those source files available to rename, so the rollout plan still lacks a coherent starting state.",
+              "severity": "P1",
+              "file": "knowledge/strategy/tddd-implementation-plan.md",
+              "line": 81,
+              "category": "feasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:c99d65d97ae1235fe489ae2f38c097b9cf4a905b685ee8ce97e3ac9cc5f72cb5",
+          "at": "2026-04-11T06:58:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The baseline format is keyed only by bare type/trait name (`HashMap<String, ...>`) and explicitly drops `module_path`. That preserves the existing collision problem for same-named public items in different modules: two `Foo` types collapse into one baseline entry, so a later undeclared addition/change can be hidden or attributed to the wrong symbol. The design needs a stable fully-qualified identity in the baseline before the 4-group comparison is reliable.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
+              "line": 38,
+              "category": "design"
+            },
+            {
+              "message": "D1 says the default catalogue file is `<crate>-types.json`, but D3 later says the default becomes `type-catalogue.json`. Those defaults are mutually exclusive and directly affect what path the CLI/verifier should read when `catalogue_file` is omitted, so the multilayer design cannot be implemented consistently as written.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+              "line": 64,
+              "category": "design"
+            },
+            {
+              "message": "The L1 signature design intentionally strips module paths and compares only the final segment of parameter/return types. That makes distinct types like `domain::user::Id` and `domain::order::Id` both normalize to `Id`, so a method can drift to the wrong type and still pass Blue. For a multilayer architecture check, removing the namespace loses the only disambiguator and undermines the promised signature validation.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+              "line": 128,
+              "category": "design"
+            },
+            {
+              "message": "This ADR marks `\"reference\" + baseline にない (A\\B)` as a contradiction that should warn, but ADR 0001 explicitly relies on `reference` declarations to absorb types introduced by a later `main` merge, and those are also A\\B by definition. As written, the TDDD-03 validation would warn on the documented TDDD-02 happy path, so the two ADRs cannot both be implemented faithfully without carving out an exception or redefining the rule.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0003-type-action-declarations.md",
+              "line": 42,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:b8a3916f02a50706b18b7ff2782256f5d921e7bb7ed43365bb61fcd3fbb7a6ed",
+          "at": "2026-04-11T07:02:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 0003 still assumes the catalogue will be renamed to `type-catalogue.json`, and the implementation plan repeats that rename, but ADR 0002 now makes `<crate>-types.json` the single naming rule. Leaving this in the design set will send Step 2/3 work toward the wrong filename and reintroduce the naming contradiction that Round 4 was supposed to eliminate.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0003-type-action-declarations.md",
+              "line": 17,
+              "category": "design"
+            },
+            {
+              "message": "`action` defaults to `\"add\"`, yet TDDD-02 explicitly allows A∩B entries that copy existing types for reference/documentation. Those existing catalogues would now be interpreted as contradictory \"new type\" declarations (`\"add\" + baseline exists`) and start warning until every legacy entry is backfilled, which contradicts the claim that old `domain-types.json` files need no changes. The default or migration story needs to account for pre-existing reference entries.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0003-type-action-declarations.md",
+              "line": 33,
+              "category": "compatibility"
+            },
+            {
+              "message": "The L1 forward-check algorithm never requires parameter-count equality. As written, a method with the same name/receiver/return type and matching prefix parameter types could still reach step 6 and be marked Blue even if the implementation added an extra argument, which is a signature regression the ADR is supposed to catch.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+              "line": 145,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5e534c48f7d743710d5f603b94bd61f2d2fc8fd6270b480c005a980ddd21b97a",
+          "at": "2026-04-11T07:09:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`action` is still specified as optional with omission meaning `\"add\"`, and the design also adds a contradiction warning for `\"add\"` on baseline-existing types. This makes pre-TDDD-03 tracks with no `action` field semantically ambiguous: they will either be reinterpreted as adds or start emitting false contradiction warnings. The new consequence text says backward compatibility is not supported and no migration will happen, but the rollout behavior for those existing tracks is therefore under-specified.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0003-type-action-declarations.md",
+              "line": 83,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:c4dde2450bdb7ffb2b9f8e54394ba39ba3f4e1ff06174eb5a7b6781683ba9861",
+          "at": "2026-04-11T07:14:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The phased rollout is still under-specified for in-progress TDDD tracks. This plan ships TDDD-02, TDDD-03, and TDDD-01 as separate tracks, but ADR 0003 only exempts completed tracks from `action` backfill and ADR 0002 only exempts completed tracks from baseline-schema migration. Any track started after Step 1 but still active when Step 2 or Step 3 lands would carry an old `domain-types.json` and/or `domain-types-baseline.json` that later code must still read, with no migration path and no defined fail-closed rejection path. That leaves the advertised Step 1 -> Step 2 -> Step 3 upgrade path impossible to implement safely.",
+              "severity": "P1",
+              "file": "knowledge/strategy/tddd-implementation-plan.md",
+              "line": 15,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:6ab49f6edd4b9d6fa372eb532f3ba52a5601224fe0f15b7c7ecd2f38d77b837e",
+          "at": "2026-04-11T07:19:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2342798376f3241f689199518aec0a497bfb2779ff9fe51bc8c5815a5a8ccbc",
+          "at": "2026-04-11T07:20:57Z"
+        }
+      ]
+    }
+  }
+}

@@ -72,6 +72,9 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Stage 2 信号機にコンパイル通過を条件に入れない](2026-03-24-0910-stage2-no-compile-check.md) | Accepted | 2026-03-24 |
 | [3-12 spec ↔ code 整合性チェック — TypeGraph + 既知課題の解決](2026-04-08-0045-spec-code-consistency-check-design.md) | Accepted | 2026-04-08 |
 | [TDDD: 逆方向チェック信号機統合 + designer capability](2026-04-08-1800-reverse-signal-integration.md) | Accepted | 2026-04-08 |
+| [TDDD-02: Baseline-Aware Reverse Signal Detection](2026-04-11-0001-baseline-reverse-signals.md) | Proposed | 2026-04-11 |
+| [TDDD-01: Multilayer Extension — 型カタログ多層化 + シグネチャ検証](2026-04-11-0002-tddd-multilayer-extension.md) | Proposed | 2026-04-11 |
+| [TDDD-03: 型アクション宣言 — add / modify / delete](2026-04-11-0003-type-action-declarations.md) | Proposed | 2026-04-11 |
 
 ### ADR 運用
 
