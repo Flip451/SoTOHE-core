@@ -412,6 +412,58 @@ fn check_tasks_resolved(branch: &str, repo_root: &std::path::Path) -> ExitCode {
     ExitCode::SUCCESS
 }
 
+/// Strict spec signal gate: blocks merge when spec signals have any Yellow.
+///
+/// Reads `spec.json` from the remote branch via `git show` and checks signals.
+/// If Yellow > 0, merge is blocked — all requirements must have authoritative
+/// sources (document/feedback/convention) to reach Blue.
+fn check_spec_signals_strict(branch: &str, repo_root: &std::path::Path) -> ExitCode {
+    if branch.starts_with("plan/") {
+        return ExitCode::SUCCESS;
+    }
+
+    let track_id_str = branch.strip_prefix("track/").unwrap_or(branch);
+    let blob_path = format!("track/items/{track_id_str}/spec.json");
+    let git_ref = format!("origin/{branch}:{blob_path}");
+
+    let output =
+        std::process::Command::new("git").args(["show", &git_ref]).current_dir(repo_root).output();
+
+    let json = match output {
+        Ok(o) if o.status.success() => String::from_utf8_lossy(&o.stdout).into_owned(),
+        Ok(_) => {
+            // spec.json not found on remote — skip gate (legacy tracks without spec.json)
+            return ExitCode::SUCCESS;
+        }
+        Err(e) => {
+            eprintln!("[BLOCKED] failed to run git show for spec.json: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    let spec_doc = match infrastructure::spec::codec::decode(&json) {
+        Ok(doc) => doc,
+        Err(e) => {
+            eprintln!("[BLOCKED] failed to decode spec.json: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    if let Some(signals) = spec_doc.signals() {
+        if signals.yellow() > 0 {
+            eprintln!(
+                "[BLOCKED] spec signals have yellow={} — all requirements must have \
+                 authoritative sources (document/feedback/convention) for merge. \
+                 Run /track:plan to upgrade inference/discussion sources to ADR/feedback.",
+                signals.yellow()
+            );
+            return ExitCode::FAILURE;
+        }
+    }
+
+    ExitCode::SUCCESS
+}
+
 fn wait_and_merge(pr: &str, interval: u64, timeout: u64, method: &str) -> ExitCode {
     // Task completion guard: validate against the PR's head branch metadata,
     // not the local checkout. Skips worktree dirty checks since the PR branch
@@ -448,6 +500,13 @@ fn wait_and_merge(pr: &str, interval: u64, timeout: u64, method: &str) -> ExitCo
     let guard_result = check_tasks_resolved(&branch, repo.root());
     if guard_result != ExitCode::SUCCESS {
         return guard_result;
+    }
+
+    // Strict spec signal gate: Yellow signals block merge.
+    // Requires all spec requirements to have authoritative sources (document/feedback/convention).
+    let spec_gate = check_spec_signals_strict(&branch, repo.root());
+    if spec_gate != ExitCode::SUCCESS {
+        return spec_gate;
     }
 
     wait_and_merge_with(pr, interval, timeout, method, &client, &thread::sleep)

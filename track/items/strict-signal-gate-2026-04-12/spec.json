@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "status": "approved",
+  "version": "1.0.0",
+  "title": "Strict spec signal gate — Yellow blocks merge",
+  "goal": [
+    "verify spec-states --strict を track-pr-merge に配線し、spec signals に Yellow が残る PR のマージを阻止する。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "wait-and-merge のタスク完了ガード直後に verify spec-states --strict を呼び出す配線追加",
+        "sources": [
+          "discussion"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "verify spec-states --strict の実装自体 (既に完了済み)",
+        "sources": [
+          "inference — libs/infrastructure/src/verify/spec_states.rs に実装済み"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "既存の --strict 実装をそのまま使い、新規ロジックは追加しない",
+      "sources": [
+        "discussion"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "spec signals に Yellow がある状態で track-pr-merge を実行するとマージが阻止されること",
+      "sources": [
+        "discussion"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "cargo make ci が通ること",
+      "sources": [
+        "convention — .claude/rules/07-dev-environment.md"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    }
+  ],
+  "signals": {
+    "blue": 1,
+    "yellow": 4,
+    "red": 0
+  },
+  "approved_at": "2026-04-11T22:08:44Z",
+  "content_hash": "sha256:f863694de27241e12e44fa22aab0619e9c3e0735ef258a543f0e35c19f8c2eae"
+}
