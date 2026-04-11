@@ -449,8 +449,17 @@ fn check_spec_signals_strict(branch: &str, repo_root: &std::path::Path) -> ExitC
     }
 
     // Stage 2: domain-types.json signals (optional — TDDD tracks only).
-    if let Ok(dt_json) = git_show_blob(repo_root, branch, track_id_str, "domain-types.json") {
-        if let Ok(dt_doc) = infrastructure::tddd::catalogue_codec::decode(&dt_json) {
+    // File not found → skip (TDDD not active). File found but malformed → fail-closed.
+    match git_show_blob(repo_root, branch, track_id_str, "domain-types.json") {
+        Err(_) => {} // File not found on remote — TDDD not active, skip.
+        Ok(dt_json) => {
+            let dt_doc = match infrastructure::tddd::catalogue_codec::decode(&dt_json) {
+                Ok(d) => d,
+                Err(e) => {
+                    eprintln!("[BLOCKED] failed to decode domain-types.json: {e}");
+                    return ExitCode::FAILURE;
+                }
+            };
             let stage2 =
                 infrastructure::verify::spec_states::check_domain_types_signals(&dt_doc, true);
             if stage2.has_errors() {
