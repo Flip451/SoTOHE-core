@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e98387ad20c18fb481f1e18898f0d7c8db768b74e0939c9c8df0e2a34911ad5",
+          "at": "2026-04-11T12:30:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T004` and ADR 0003 require four contradiction warnings (`add+baseline`, `modify+no-baseline`, `reference+no-baseline`, `reference+not-blue`), but the acceptance criteria only lock down the first one. That means an implementation can omit three required warning paths and still satisfy the approved spec.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/spec.json",
+              "line": 179,
+              "category": "coverage"
+            },
+            {
+              "message": "The spec gives conflicting direction on compatibility: line 112 frames omitted `action` as a backward-compatibility requirement, while line 137 and ADR 0003 explicitly say backward compatibility is not supported for pre-TDDD-03 tracks. This ambiguity matters for `T006`, because the codec contract is underspecified in two incompatible ways.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/spec.json",
+              "line": 112,
+              "category": "consistency"
+            },
+            {
+              "message": "The `skip_serializing_if=add` requirement is sourced to ADR 0003, but that ADR never specifies encode-time omission; it only covers optional/default `action`. Because this provenance is wrong, both the scope item here and the matching acceptance criterion are no longer traceable to their stated source.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/spec.json",
+              "line": 43,
+              "category": "traceability"
+            }
+          ],
+          "hash": "rvw1:sha256:9e98387ad20c18fb481f1e18898f0d7c8db768b74e0939c9c8df0e2a34911ad5",
+          "at": "2026-04-11T12:33:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5d6e17e28574a5461a511d2d97d5c4958b12eea5535ff9d61fc2ebbe9040431",
+          "at": "2026-04-11T12:36:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The planner note still says the codec change is for \"backward-compatible JSON\", but ADR 0003 §Consequences and this track's spec now explicitly say completed-track backward compatibility is out of scope. Because `spec.json` cites this planner section as a source, the provenance is internally contradictory and can mislead implementation toward migration behavior the ADR rejected.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-11-1203-planner-tddd-03-type-action.md",
+              "line": 14,
+              "category": "consistency"
+            },
+            {
+              "message": "The acceptance criteria never require a happy-path check for explicit `modify`/`reference`/`delete` action values surviving codec round-trip and behaving correctly when the declaration matches reality. Right now the new criteria cover default/add serialization and contradiction/error paths, so TDDD-03 could be marked complete without proving most of the new public `action` variants actually work.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/spec.json",
+              "line": 151,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:a5d6e17e28574a5461a511d2d97d5c4958b12eea5535ff9d61fc2ebbe9040431",
+          "at": "2026-04-11T12:39:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` is still `2026-04-11T12:23:13Z`, but this track's `spec.json` was re-approved later at `2026-04-11T12:39:33Z`. The track workflow falls back to `metadata.json.updated_at` to resolve the latest materialized track, so leaving this stale can misorder or skip this track in `track/status` and non-track `track/commit` flows.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/metadata.json",
+              "line": 8,
+              "category": "workflow"
+            },
+            {
+              "message": "EC-7 says duplicate action is \"handled by existing name uniqueness\", but this track now requires a codec-level exception that accepts exactly one same-name `delete` + `add` pair. That design note is now inconsistent with the spec/metadata for T006 and can mislead implementation of the duplicate-name validation change.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-11-1203-planner-tddd-03-type-action.md",
+              "line": 36,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:213ea3b56866550aa7abfc8be34557d949514b38bf48640481eba8c825cb0ed1",
+          "at": "2026-04-11T12:41:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The acceptance criteria still lack an explicit happy-path check for `action: delete` surviving the codec boundary and reaching the delete forward-check path. Right now the spec covers default/add omission plus modify/reference round-trips and delete error handling, so T006/T002 could still be marked complete without proving the new `delete` variant works end to end.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/spec.json",
+              "line": 181,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:a4a12bdd90c0460a9482b6a25650272c485c1c3ad2c3f6a3ff316cb07fd2ff31",
+          "at": "2026-04-11T12:43:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ca4bf9fa93a1e2e2626779c9aa440bf412d18ed336cd6519ba93cdeac8e9c02",
+          "at": "2026-04-11T12:45:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ca4bf9fa93a1e2e2626779c9aa440bf412d18ed336cd6519ba93cdeac8e9c02",
+          "at": "2026-04-11T12:47:16Z"
+        }
+      ]
+    }
+  }
+}

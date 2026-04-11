@@ -1,0 +1,146 @@
+{
+  "schema_version": 3,
+  "id": "tddd-action-declarations-2026-04-11",
+  "branch": "track/tddd-action-declarations-2026-04-11",
+  "title": "TDDD-03: Type action declarations — add/modify/reference/delete",
+  "status": "planned",
+  "created_at": "2026-04-11T12:23:13Z",
+  "updated_at": "2026-04-11T12:39:33Z",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Domain: TypeAction enum (Add/Modify/Reference/Delete) 定義 + DomainTypeEntry に action フィールド追加 + new() シグネチャ変更 + 全 call site 修正",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Domain: evaluate_delete ヘルパー追加 + evaluate_single で Delete を kind dispatch 前に分岐 (TraitPort は get_trait、他は get_type で不在=Blue/存在=Yellow)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "Domain: ActionContradiction / ActionContradictionKind 型 + ConsistencyReport に contradictions と delete_errors フィールド追加",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "Domain: check_consistency に contradiction 検出 (add+baseline=warn, modify+no-baseline=warn, reference+no-baseline=warn, reference+not-blue=warn) + delete baseline 検証 (delete+no-baseline=error) + TDDD-03 コメント更新",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T005",
+      "description": "Domain: lib.rs exports 更新 — TypeAction, ActionContradiction, ActionContradictionKind を pub use に追加",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T006",
+      "description": "Infrastructure: Codec DTO 拡張 — TypeActionDto enum + action フィールド (default=add, skip_serializing_if=add) + duplicate name 検証緩和 (同名は delete+add ペアのみ許可、3件以上は常にエラー)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "Infrastructure: domain_types_render に Action 列追加 (Add='—', 他=action名)",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T008",
+      "description": "CLI: verify.rs に contradictions → Finding::warning + delete_errors → Finding::error + print_consistency_report_json に新フィールド追加",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T009",
+      "description": "CLI: signals.rs に contradictions → [WARN] 出力 + delete_errors → CliError 失敗",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T010",
+      "description": "Command: /track:design の Step 2 に action 選択ガイダンス追加 + Step 3 の JSON スキーマ例に action フィールド追加",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "ADR 2026-04-11-0003 (TDDD-03) の実装。domain-types.json の各エントリに optional な action フィールド (add/modify/reference/delete) を追加し、型操作の意図を明示的に記録する。",
+      "TDDD-02 の「既存型の削除と TDDD の併用不可」制約を解消する。action: delete で意図的な削除を宣言でき、kind migration (struct→trait) は同名 delete+add ペアで表現する。",
+      "action と baseline の矛盾を警告 (contradiction) として検出し、delete + baseline 不在はエラーとして阻止する。"
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Domain 層: TypeAction enum + DomainTypeEntry 拡張",
+        "description": [
+          "TypeAction enum (Add/Modify/Reference/Delete, Default=Add) を catalogue.rs に定義する。",
+          "DomainTypeEntry に action フィールドを追加し、new() シグネチャを変更する。",
+          "全 call site (テスト含む) を修正する。"
+        ],
+        "task_ids": ["T001"]
+      },
+      {
+        "id": "S2",
+        "title": "Domain 層: Delete forward check 反転",
+        "description": [
+          "evaluate_delete ヘルパー関数を追加。TraitPort は graph.get_trait()、他は graph.get_type() で判定。",
+          "evaluate_single で TypeAction::Delete を kind dispatch 前に分岐。不在→Blue、存在→Yellow。"
+        ],
+        "task_ids": ["T002"]
+      },
+      {
+        "id": "S3",
+        "title": "Domain 層: ConsistencyReport 拡張 + contradiction 検出",
+        "description": [
+          "ActionContradiction struct + ActionContradictionKind enum を定義する。",
+          "ConsistencyReport に contradictions (Vec<ActionContradiction>) と delete_errors (Vec<String>) を追加。",
+          "check_consistency に action-baseline 矛盾検出ロジックと delete baseline 検証を実装する。",
+          "check_consistency の TDDD-03 関連コメントを更新する。"
+        ],
+        "task_ids": ["T003", "T004"]
+      },
+      {
+        "id": "S4",
+        "title": "Domain 層: exports 更新",
+        "description": [
+          "lib.rs の pub use に TypeAction, ActionContradiction, ActionContradictionKind を追加する。"
+        ],
+        "task_ids": ["T005"]
+      },
+      {
+        "id": "S5",
+        "title": "Infrastructure 層: Codec + Render",
+        "description": [
+          "TypeActionDto enum (serde rename_all snake_case) を定義。action フィールドを DTO に追加 (default=add, skip_serializing_if)。",
+          "duplicate name 検証を緩和: 同名エントリは delete+add ペア (2件) のみ許可、3件以上は常にエラー。",
+          "domain_types_render に Action 列を追加 (Add='—', 他=action名)。"
+        ],
+        "task_ids": ["T006", "T007"]
+      },
+      {
+        "id": "S6",
+        "title": "CLI 層: verify + signals",
+        "description": [
+          "verify.rs: contradictions → Finding::warning, delete_errors → Finding::error, JSON 出力に新フィールド追加。",
+          "signals.rs: contradictions → [WARN] 出力, delete_errors → CliError。"
+        ],
+        "task_ids": ["T008", "T009"]
+      },
+      {
+        "id": "S7",
+        "title": "/track:design コマンド更新",
+        "description": [
+          "Step 2 に action 選択ガイダンスを追加する。",
+          "Step 3 の JSON スキーマ例に action フィールドを追加する。"
+        ],
+        "task_ids": ["T010"]
+      }
+    ]
+  }
+}
