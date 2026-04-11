@@ -412,8 +412,8 @@ fn check_tasks_resolved(branch: &str, repo_root: &std::path::Path) -> ExitCode {
     ExitCode::SUCCESS
 }
 
-/// Strict spec signal gate: reads spec.json from the PR head ref (not local worktree)
-/// and blocks merge when signals contain Red or Yellow.
+/// Strict spec signal gate: reads spec.json and domain-types.json from the PR head ref
+/// and delegates to the shared signal check functions.
 ///
 /// Follows the same `git show origin/branch:path → decode → check` pattern as
 /// `check_tasks_resolved` for metadata.json.
@@ -423,57 +423,67 @@ fn check_spec_signals_strict(branch: &str, repo_root: &std::path::Path) -> ExitC
     }
 
     let track_id_str = branch.strip_prefix("track/").unwrap_or(branch);
-    let blob_path = format!("track/items/{track_id_str}/spec.json");
-    let git_ref = format!("origin/{branch}:{blob_path}");
 
-    let output =
-        std::process::Command::new("git").args(["show", &git_ref]).current_dir(repo_root).output();
-
-    let json = match output {
-        Ok(o) if o.status.success() => String::from_utf8_lossy(&o.stdout).into_owned(),
-        Ok(o) => {
-            let stderr = String::from_utf8_lossy(&o.stderr);
-            eprintln!("[BLOCKED] spec.json not found on origin/{branch}: {stderr}");
-            return ExitCode::FAILURE;
-        }
-        Err(e) => {
-            eprintln!("[BLOCKED] failed to run git show for spec.json: {e}");
+    // Stage 1: spec.json signals (required, fail-closed).
+    let spec_json = match git_show_blob(repo_root, branch, track_id_str, "spec.json") {
+        Ok(json) => json,
+        Err(msg) => {
+            eprintln!("[BLOCKED] {msg}");
             return ExitCode::FAILURE;
         }
     };
-
-    let spec_doc = match infrastructure::spec::codec::decode(&json) {
+    let spec_doc = match infrastructure::spec::codec::decode(&spec_json) {
         Ok(doc) => doc,
         Err(e) => {
             eprintln!("[BLOCKED] failed to decode spec.json: {e}");
             return ExitCode::FAILURE;
         }
     };
+    let stage1 = infrastructure::verify::spec_states::check_spec_doc_signals(&spec_doc, true);
+    if stage1.has_errors() {
+        eprintln!("[BLOCKED] strict spec signal gate failed:");
+        for finding in stage1.findings() {
+            eprintln!("  {}", finding.message());
+        }
+        return ExitCode::FAILURE;
+    }
 
-    match spec_doc.signals() {
-        None => {
-            eprintln!(
-                "[BLOCKED] spec.json has no signals — run `cargo make track-signals` to evaluate"
-            );
-            ExitCode::FAILURE
+    // Stage 2: domain-types.json signals (optional — TDDD tracks only).
+    if let Ok(dt_json) = git_show_blob(repo_root, branch, track_id_str, "domain-types.json") {
+        if let Ok(dt_doc) = infrastructure::tddd::catalogue_codec::decode(&dt_json) {
+            let stage2 =
+                infrastructure::verify::spec_states::check_domain_types_signals(&dt_doc, true);
+            if stage2.has_errors() {
+                eprintln!("[BLOCKED] strict domain type signal gate failed:");
+                for finding in stage2.findings() {
+                    eprintln!("  {}", finding.message());
+                }
+                return ExitCode::FAILURE;
+            }
         }
-        Some(signals) if signals.red() > 0 => {
-            eprintln!(
-                "[BLOCKED] spec signals have red={} — resolve missing sources before merge",
-                signals.red()
-            );
-            ExitCode::FAILURE
+    }
+
+    ExitCode::SUCCESS
+}
+
+/// Read a blob from `origin/{branch}:track/items/{track_id}/{filename}`.
+fn git_show_blob(
+    repo_root: &std::path::Path,
+    branch: &str,
+    track_id: &str,
+    filename: &str,
+) -> Result<String, String> {
+    let blob_path = format!("track/items/{track_id}/{filename}");
+    let git_ref = format!("origin/{branch}:{blob_path}");
+    let output =
+        std::process::Command::new("git").args(["show", &git_ref]).current_dir(repo_root).output();
+    match output {
+        Ok(o) if o.status.success() => Ok(String::from_utf8_lossy(&o.stdout).into_owned()),
+        Ok(o) => {
+            let stderr = String::from_utf8_lossy(&o.stderr);
+            Err(format!("{filename} not found on origin/{branch}: {stderr}"))
         }
-        Some(signals) if signals.yellow() > 0 => {
-            eprintln!(
-                "[BLOCKED] spec signals have yellow={} — all requirements must have \
-                 authoritative sources (document/feedback/convention) for merge. \
-                 Run /track:plan to upgrade inference/discussion sources to ADR/feedback.",
-                signals.yellow()
-            );
-            ExitCode::FAILURE
-        }
-        _ => ExitCode::SUCCESS,
+        Err(e) => Err(format!("failed to run git show for {filename}: {e}")),
     }
 }
 

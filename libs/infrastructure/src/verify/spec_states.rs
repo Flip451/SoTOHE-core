@@ -13,6 +13,84 @@ use crate::tddd::catalogue_codec;
 
 use super::frontmatter::parse_yaml_frontmatter;
 
+/// Checks spec.json signals (Stage 1).
+///
+/// - Default: red == 0 (Yellow WIP allowed)
+/// - Strict:  red == 0 AND yellow == 0 (all Blue required for merge)
+#[must_use]
+pub fn check_spec_doc_signals(
+    spec_doc: &domain::spec::SpecDocument,
+    strict: bool,
+) -> VerifyOutcome {
+    match spec_doc.signals() {
+        None => VerifyOutcome::from_findings(vec![Finding::error(
+            "spec signals not yet evaluated — run `cargo make track-signals`".to_owned(),
+        )]),
+        Some(counts) if counts.has_red() => VerifyOutcome::from_findings(vec![Finding::error(
+            format!("spec signals have red={} (must be 0)", counts.red()),
+        )]),
+        Some(counts) if strict && counts.yellow() > 0 => {
+            VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "spec signals have yellow={} — all must be Blue for merge. \
+                 Write an ADR in knowledge/adr/ and update spec.json sources.",
+                counts.yellow()
+            ))])
+        }
+        _ => VerifyOutcome::pass(),
+    }
+}
+
+/// Checks domain-types.json signals (Stage 2) for strict mode.
+///
+/// Red signals always block. Yellow signals block only in strict mode.
+/// Returns `pass()` if the document has no entries or no signals (TDDD not active).
+#[must_use]
+pub fn check_domain_types_signals(
+    doc: &domain::DomainTypesDocument,
+    strict: bool,
+) -> VerifyOutcome {
+    if doc.entries().is_empty() {
+        return VerifyOutcome::pass();
+    }
+
+    let Some(signals) = doc.signals() else {
+        return VerifyOutcome::pass();
+    };
+
+    let red_entries: Vec<&str> = signals
+        .iter()
+        .filter(|s| s.signal() == ConfidenceSignal::Red)
+        .map(|s| s.type_name())
+        .collect();
+    if !red_entries.is_empty() {
+        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            "{} domain type(s) have Red signal: {}",
+            red_entries.len(),
+            red_entries.join(", ")
+        ))]);
+    }
+
+    if strict {
+        let entry_keys: std::collections::HashSet<(&str, &str)> =
+            doc.entries().iter().map(|e| (e.name(), e.kind().kind_tag())).collect();
+        let yellow_entries: Vec<&str> = signals
+            .iter()
+            .filter(|s| entry_keys.contains(&(s.type_name(), s.kind_tag())))
+            .filter(|s| s.signal() == ConfidenceSignal::Yellow)
+            .map(|s| s.type_name())
+            .collect();
+        if !yellow_entries.is_empty() {
+            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "{} domain type(s) have Yellow signal (all must be Blue for merge): {}",
+                yellow_entries.len(),
+                yellow_entries.join(", ")
+            ))]);
+        }
+    }
+
+    VerifyOutcome::pass()
+}
+
 /// Verifies domain types using a sibling `domain-types.json` file.
 ///
 /// The `domain-types.json` file is expected to reside in the same directory as
@@ -49,31 +127,10 @@ pub fn verify_from_spec_json(spec_json_path: &Path, strict: bool) -> VerifyOutco
         }
     };
 
-    // Stage 1 prerequisite: spec signals must exist and satisfy the mode gate.
-    // - Default: red == 0 (Yellow WIP allowed)
-    // - Strict:  red == 0 AND yellow == 0 (all Blue required for merge)
-    match spec_doc.signals() {
-        None => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
-                "{}: Stage 1 prerequisite not met: spec signals not yet evaluated. Run `sotp track signals` first.",
-                spec_json_path.display()
-            ))]);
-        }
-        Some(counts) if counts.has_red() => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
-                "{}: Stage 1 prerequisite not met: spec signals have red={} (must be 0)",
-                spec_json_path.display(),
-                counts.red()
-            ))]);
-        }
-        Some(counts) if strict && counts.yellow() > 0 => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
-                "{}: Stage 1 prerequisite not met in strict mode: spec signals have yellow={} (all must be Blue for merge — run /track:design)",
-                spec_json_path.display(),
-                counts.yellow()
-            ))]);
-        }
-        _ => {}
+    // Stage 1: check spec signals.
+    let stage1 = check_spec_doc_signals(&spec_doc, strict);
+    if stage1.has_errors() {
+        return stage1;
     }
 
     let dir = match spec_json_path.parent() {
@@ -109,6 +166,7 @@ pub fn verify_from_spec_json(spec_json_path: &Path, strict: bool) -> VerifyOutco
         }
     };
 
+    // CI path requires entries and signals to be present (fail-closed for TDDD tracks).
     if doc.entries().is_empty() {
         return VerifyOutcome::from_findings(vec![Finding::error(format!(
             "{}: domain-types.json has no entries; add at least one domain type declaration",
@@ -116,14 +174,13 @@ pub fn verify_from_spec_json(spec_json_path: &Path, strict: bool) -> VerifyOutco
         ))]);
     }
 
+    // Check signal coverage by name + kind: every entry must have a matching signal
     let Some(signals) = doc.signals() else {
         return VerifyOutcome::from_findings(vec![Finding::error(format!(
             "{}: domain type signals not yet evaluated; run `sotp track domain-type-signals` first",
             domain_types_path.display()
         ))]);
     };
-
-    // Check signal coverage by name + kind: every entry must have a matching signal
     let signal_keys: std::collections::HashSet<(&str, &str)> =
         signals.iter().map(|s| (s.type_name(), s.kind_tag())).collect();
     let uncovered: Vec<&str> = doc
@@ -141,46 +198,8 @@ pub fn verify_from_spec_json(spec_json_path: &Path, strict: bool) -> VerifyOutco
         ))]);
     }
 
-    // Two-stage gate (TDDD):
-    // - Default (interim commit): Red → fail, Yellow → pass (WIP allowed)
-    // - Strict (merge gate): any non-Blue → fail (Yellow also blocked)
-    // Red check: ALL signals (forward + reverse undeclared) — single gate per ADR §Decision.4
-    let all_red: Vec<&str> = signals
-        .iter()
-        .filter(|s| s.signal() == ConfidenceSignal::Red)
-        .map(|s| s.type_name())
-        .collect();
-    if !all_red.is_empty() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
-            "{}: {} type(s) have Red signal (TDDD violation — run /track:design): {}",
-            domain_types_path.display(),
-            all_red.len(),
-            all_red.join(", ")
-        ))]);
-    }
-
-    // Yellow check (strict only): declared entries only (undeclared signals are never Yellow)
-    let entry_keys: std::collections::HashSet<(&str, &str)> =
-        doc.entries().iter().map(|e| (e.name(), e.kind().kind_tag())).collect();
-
-    if strict {
-        let yellow_entries: Vec<&str> = signals
-            .iter()
-            .filter(|s| entry_keys.contains(&(s.type_name(), s.kind_tag())))
-            .filter(|s| s.signal() == ConfidenceSignal::Yellow)
-            .map(|s| s.type_name())
-            .collect();
-        if !yellow_entries.is_empty() {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
-                "{}: {} domain type(s) have Yellow signal (not yet implemented — all must be Blue for merge): {}",
-                domain_types_path.display(),
-                yellow_entries.len(),
-                yellow_entries.join(", ")
-            ))]);
-        }
-    }
-
-    VerifyOutcome::pass()
+    // Delegate signal Red/Yellow check to shared function.
+    check_domain_types_signals(&doc, strict)
 }
 
 /// Verifies that `spec.md` contains a `## Domain States` section with a markdown table

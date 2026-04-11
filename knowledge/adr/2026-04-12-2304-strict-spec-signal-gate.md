@@ -99,15 +99,14 @@ Yellow ソースは永続的な記録を持たない:
 - **ADR 作成が構造的に促進される**: Yellow → Blue の昇格には永続的なドキュメントの作成が必要。設計判断がマージ前に自然に記録される
 - **Fail-closed**: 未評価・根拠不十分な spec はマージをブロックする
 - **既存ゲートと一貫性**: タスク完了ガードと同じパターン
+- **Stage 1 + Stage 2 の両方をチェック**: マージゲートは spec signals (Stage 1) と domain type signals (Stage 2) の両方で Yellow/Red をブロックする。domain-types.json が存在しない track (TDDD 未使用) では Stage 2 をスキップする
 
 ### Bad
 
 - **小規模変更の摩擦増加**: trivial な機能でも spec ソースにファイル参照が必要。5 行の変更に ADR を書くのは不釣り合いに感じる場合がある
-- **Domain type signal 未チェック**: マージゲートは Stage 1 (spec signals) のみ。Stage 2 (domain type signals) は CI の default モード (Red ブロック) でカバーされるが、Yellow domain type signal は main に到達しうる
 - **Race condition**: ガードはポーリングループの前に 1 回実行され、マージ時には再検証されない。ポーリング中の push でバイパス可能。SEC-10 として TODO.md に記録済み
 
 ## Reassess When
 
 - 小規模変更の摩擦を軽減する「micro-track」ワークフローが導入された場合
-- Domain type signal の strict gate がマージ時に必要になった場合
 - `feedback` を Blue に再昇格する必要がある場合 (永続的アーティファクトの要件付き)
