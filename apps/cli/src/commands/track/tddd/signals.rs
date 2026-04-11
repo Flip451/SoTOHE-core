@@ -91,8 +91,29 @@ pub fn execute_domain_type_signals(
         }
     };
 
+    // Delegate to the core evaluator (nightly-free, directly testable).
+    evaluate_and_write_signals(&mut doc, &profile, &baseline, &domain_types_path, &track_dir)
+}
+
+/// Core signal evaluation and catalogue write given pre-built domain components.
+///
+/// Separated from `execute_domain_type_signals` so the abort-before-write ordering
+/// and signal assembly can be exercised in unit tests without requiring the nightly
+/// toolchain that `RustdocSchemaExporter` depends on.
+///
+/// # Errors
+///
+/// Returns `CliError` if action diagnostics fail (delete errors), encoding fails,
+/// or either atomic write fails.
+pub(crate) fn evaluate_and_write_signals(
+    doc: &mut domain::DomainTypesDocument,
+    profile: &domain::TypeGraph,
+    baseline: &domain::TypeBaseline,
+    domain_types_path: &std::path::Path,
+    track_dir: &std::path::Path,
+) -> Result<ExitCode, CliError> {
     // Bidirectional consistency check: forward (spec → code) + reverse (code → spec).
-    let report = domain::check_consistency(doc.entries(), &profile, &baseline);
+    let report = domain::check_consistency(doc.entries(), profile, baseline);
 
     // Convert undeclared types/traits (group 4) to Red DomainTypeSignals.
     // Capture the count before appending group-3 baseline reds so the summary
@@ -135,25 +156,85 @@ pub fn execute_domain_type_signals(
 
     doc.set_signals(all_signals.clone());
 
-    // Encode and write back.
-    let encoded = catalogue_codec::encode(&doc)
-        .map_err(|e| CliError::Message(format!("domain-types.json encode error: {e}")))?;
-
-    atomic_write_file(&domain_types_path, format!("{encoded}\n").as_bytes()).map_err(|e| {
-        CliError::Message(format!("cannot write {}: {e}", domain_types_path.display()))
-    })?;
-
-    // Re-render domain-types.md so the view stays in sync.
-    let domain_types_md_path = track_dir.join("domain-types.md");
-    let rendered = infrastructure::domain_types_render::render_domain_types(&doc);
-    atomic_write_file(&domain_types_md_path, rendered.as_bytes()).map_err(|e| {
-        CliError::Message(format!("cannot write {}: {e}", domain_types_md_path.display()))
-    })?;
+    // Validate action diagnostics, then write only if validation succeeds.
+    // This ordering guarantees no files are mutated on delete-error failure.
+    validate_and_write_catalogue(&report, doc, domain_types_path, track_dir)?;
 
     let skipped = report.skipped_count();
     print_signal_summary(&all_signals, undeclared_count, skipped);
 
     Ok(ExitCode::SUCCESS)
+}
+
+/// Validate action-baseline diagnostics, then encode and write back the catalogue.
+///
+/// Calls [`print_action_diagnostics`] first.  If that returns `Err` (delete-error
+/// abort), no files are written.  On success the catalogue JSON and the rendered
+/// Markdown view are atomically written to disk.
+///
+/// Extracted so that the validate-before-write ordering can be tested without
+/// requiring the nightly toolchain that `execute_domain_type_signals` uses.
+///
+/// # Errors
+///
+/// Returns `CliError` if action diagnostics fail, encoding fails, or either
+/// atomic write fails.
+fn validate_and_write_catalogue(
+    report: &domain::ConsistencyReport,
+    doc: &domain::DomainTypesDocument,
+    domain_types_path: &std::path::Path,
+    track_dir: &std::path::Path,
+) -> Result<(), CliError> {
+    // Validate first: abort before any writes if delete errors are present.
+    print_action_diagnostics(report)?;
+
+    // Encode and write back.
+    let encoded = catalogue_codec::encode(doc)
+        .map_err(|e| CliError::Message(format!("domain-types.json encode error: {e}")))?;
+
+    atomic_write_file(domain_types_path, format!("{encoded}\n").as_bytes()).map_err(|e| {
+        CliError::Message(format!("cannot write {}: {e}", domain_types_path.display()))
+    })?;
+
+    // Re-render domain-types.md so the view stays in sync.
+    let domain_types_md_path = track_dir.join("domain-types.md");
+    let rendered = infrastructure::domain_types_render::render_domain_types(doc);
+    atomic_write_file(&domain_types_md_path, rendered.as_bytes()).map_err(|e| {
+        CliError::Message(format!("cannot write {}: {e}", domain_types_md_path.display()))
+    })?;
+
+    Ok(())
+}
+
+/// Print action-baseline contradiction warnings and delete validation errors.
+///
+/// Contradictions are printed as `[WARN]` to stderr. Delete errors cause an
+/// early return with `CliError`.
+fn print_action_diagnostics(report: &domain::ConsistencyReport) -> Result<(), CliError> {
+    for contradiction in report.contradictions() {
+        eprintln!(
+            "[WARN] {} (action={}): {:?}",
+            contradiction.name(),
+            contradiction.action().action_tag(),
+            contradiction.kind(),
+        );
+    }
+
+    if !report.delete_errors().is_empty() {
+        for name in report.delete_errors() {
+            eprintln!(
+                "[ERROR] action=delete for `{name}` but type not in baseline — \
+                 cannot delete non-existent type"
+            );
+        }
+        return Err(CliError::Message(
+            "delete action validation failed: one or more entries reference non-existent \
+             baseline types"
+                .to_owned(),
+        ));
+    }
+
+    Ok(())
 }
 
 /// Format the signal summary line with baseline-aware counts.
@@ -306,6 +387,182 @@ mod tests {
         let out = format_signal_summary(&signals, 1, 0);
         // invariant: blue + yellow + red == total
         assert!(out.contains("blue=1 yellow=2 red=1 (total=4,"), "totals must sum: {out}");
+    }
+
+    // --- print_action_diagnostics tests (pure, no nightly needed) ---
+
+    fn make_entry_d(name: &str, action: domain::TypeAction) -> domain::DomainTypeEntry {
+        domain::DomainTypeEntry::new(
+            name,
+            "desc",
+            domain::DomainTypeKind::ValueObject,
+            action,
+            true,
+        )
+        .unwrap()
+    }
+
+    fn empty_graph_d() -> domain::TypeGraph {
+        domain::TypeGraph::new(std::collections::HashMap::new(), std::collections::HashMap::new())
+    }
+
+    fn empty_baseline_d() -> domain::TypeBaseline {
+        domain::TypeBaseline::new(
+            1,
+            domain::Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
+            std::collections::HashMap::new(),
+            std::collections::HashMap::new(),
+        )
+    }
+
+    #[test]
+    fn test_print_action_diagnostics_with_clean_report_returns_ok() {
+        // A report with no contradictions and no delete errors must return Ok.
+        let report = domain::check_consistency(&[], &empty_graph_d(), &empty_baseline_d());
+        let result = print_action_diagnostics(&report);
+        assert!(result.is_ok(), "clean report must return Ok: {result:?}");
+    }
+
+    #[test]
+    fn test_print_action_diagnostics_with_delete_error_returns_cli_error() {
+        // action=delete on a type not in baseline → delete_errors non-empty → Err.
+        let entry = make_entry_d("Ghost", domain::TypeAction::Delete);
+        let report = domain::check_consistency(&[entry], &empty_graph_d(), &empty_baseline_d());
+        assert!(!report.delete_errors().is_empty(), "delete_errors must be non-empty");
+        let result = print_action_diagnostics(&report);
+        assert!(result.is_err(), "delete error must return Err: {result:?}");
+        let err_msg = format!("{}", result.unwrap_err());
+        assert!(
+            err_msg.contains("delete action validation failed"),
+            "error must mention delete validation, got: {err_msg}"
+        );
+    }
+
+    #[test]
+    fn test_print_action_diagnostics_does_not_write_files_on_failure() {
+        // Verifies that print_action_diagnostics itself has no write side effects —
+        // it only prints to stderr and returns Err on delete errors.
+        // (File-write invariant for execute_domain_type_signals is covered by the
+        // fact that print_action_diagnostics is called before atomic_write_file.)
+        let entry = make_entry_d("Phantom", domain::TypeAction::Delete);
+        let report = domain::check_consistency(&[entry], &empty_graph_d(), &empty_baseline_d());
+        // Calling the function must not panic and must return Err.
+        let result = print_action_diagnostics(&report);
+        assert!(result.is_err(), "must return Err for delete_errors");
+    }
+
+    #[test]
+    fn test_validate_and_write_catalogue_does_not_write_on_delete_error() {
+        // Verifies the validate-before-write ordering in validate_and_write_catalogue:
+        // when delete errors are present, no files should be created or modified.
+        let dir = tempfile::tempdir().unwrap();
+        let domain_types_path = dir.path().join("domain-types.json");
+        let track_dir = dir.path().to_path_buf();
+
+        let entry = make_entry_d("Ghost", domain::TypeAction::Delete);
+        let doc = domain::DomainTypesDocument::new(1, vec![entry.clone()]);
+        let report = domain::check_consistency(&[entry], &empty_graph_d(), &empty_baseline_d());
+
+        assert!(
+            !report.delete_errors().is_empty(),
+            "precondition: delete_errors must be non-empty"
+        );
+
+        let result = validate_and_write_catalogue(&report, &doc, &domain_types_path, &track_dir);
+
+        assert!(result.is_err(), "delete errors must cause validate_and_write_catalogue to fail");
+        assert!(
+            !domain_types_path.exists(),
+            "domain-types.json must NOT be written on delete-error abort"
+        );
+        assert!(
+            !dir.path().join("domain-types.md").exists(),
+            "domain-types.md must NOT be written on delete-error abort"
+        );
+    }
+
+    #[test]
+    fn test_validate_and_write_catalogue_writes_files_when_no_errors() {
+        // Verifies that validate_and_write_catalogue writes both files when there
+        // are no delete errors (contradiction warnings are advisory and do not block writes).
+        let dir = tempfile::tempdir().unwrap();
+        let domain_types_path = dir.path().join("domain-types.json");
+        let track_dir = dir.path().to_path_buf();
+
+        // A report with no errors: empty entries against empty baseline/graph.
+        let doc = domain::DomainTypesDocument::new(1, vec![]);
+        let report = domain::check_consistency(&[], &empty_graph_d(), &empty_baseline_d());
+
+        assert!(report.delete_errors().is_empty(), "precondition: no delete errors");
+
+        let result = validate_and_write_catalogue(&report, &doc, &domain_types_path, &track_dir);
+
+        assert!(result.is_ok(), "no-error report must succeed: {result:?}");
+        assert!(domain_types_path.exists(), "domain-types.json must be written on success");
+        assert!(
+            dir.path().join("domain-types.md").exists(),
+            "domain-types.md must be written on success"
+        );
+    }
+
+    // --- evaluate_and_write_signals tests (core path, no nightly needed) ---
+
+    #[test]
+    fn test_evaluate_and_write_signals_with_delete_error_returns_err_and_leaves_files_untouched() {
+        // End-to-end test for the abort-before-write path via the public core evaluator.
+        // Proves that `execute_domain_type_signals` cannot write files on delete errors
+        // regardless of where the `validate_and_write_catalogue` call is placed.
+        let dir = tempfile::tempdir().unwrap();
+        let domain_types_path = dir.path().join("domain-types.json");
+        let track_dir = dir.path().to_path_buf();
+
+        let entry = make_entry_d("Ghost", domain::TypeAction::Delete);
+        let mut doc = domain::DomainTypesDocument::new(1, vec![entry.clone()]);
+
+        let result = evaluate_and_write_signals(
+            &mut doc,
+            &empty_graph_d(),
+            &empty_baseline_d(),
+            &domain_types_path,
+            &track_dir,
+        );
+
+        assert!(result.is_err(), "delete error must cause evaluate_and_write_signals to fail");
+        assert!(
+            !domain_types_path.exists(),
+            "domain-types.json must NOT be written on delete-error abort"
+        );
+        assert!(
+            !dir.path().join("domain-types.md").exists(),
+            "domain-types.md must NOT be written on delete-error abort"
+        );
+    }
+
+    #[test]
+    fn test_evaluate_and_write_signals_with_clean_report_returns_success_and_writes_files() {
+        // End-to-end test for the success path via the public core evaluator.
+        // Proves that `execute_domain_type_signals` writes both files on a clean report.
+        let dir = tempfile::tempdir().unwrap();
+        let domain_types_path = dir.path().join("domain-types.json");
+        let track_dir = dir.path().to_path_buf();
+
+        let mut doc = domain::DomainTypesDocument::new(1, vec![]);
+
+        let result = evaluate_and_write_signals(
+            &mut doc,
+            &empty_graph_d(),
+            &empty_baseline_d(),
+            &domain_types_path,
+            &track_dir,
+        );
+
+        assert!(result.is_ok(), "clean report must succeed: {result:?}");
+        assert_eq!(result.unwrap(), ExitCode::SUCCESS, "must return EXIT_SUCCESS");
+        assert!(domain_types_path.exists(), "domain-types.json must be written on success");
+        assert!(
+            dir.path().join("domain-types.md").exists(),
+            "domain-types.md must be written on success"
+        );
     }
 
     /// Success-path integration test.  Requires nightly toolchain for `cargo +nightly rustdoc`.

@@ -50,8 +50,9 @@ pub use spec::{
 };
 pub use tddd::baseline::{TraitBaselineEntry, TypeBaseline, TypeBaselineEntry};
 pub use tddd::catalogue::{
-    ConsistencyReport, DomainTypeEntry, DomainTypeKind, DomainTypeSignal, DomainTypesDocument,
-    TypestateTransitions, check_consistency, evaluate_domain_type_signals, undeclared_to_signals,
+    ActionContradiction, ActionContradictionKind, ConsistencyReport, DomainTypeEntry,
+    DomainTypeKind, DomainTypeSignal, DomainTypesDocument, TypeAction, TypestateTransitions,
+    check_consistency, evaluate_domain_type_signals, undeclared_to_signals,
 };
 pub use timestamp::Timestamp;
 pub use track::{

@@ -13,7 +13,8 @@
 //! The Signal column shows `🔵` / `🔴` / `—` (no signal yet).
 
 use domain::{
-    ConfidenceSignal, DomainTypeEntry, DomainTypeKind, DomainTypesDocument, TypestateTransitions,
+    ConfidenceSignal, DomainTypeEntry, DomainTypeKind, DomainTypesDocument, TypeAction,
+    TypestateTransitions,
 };
 
 /// Renders the full `domain-types.md` document for a `DomainTypesDocument`.
@@ -27,16 +28,24 @@ pub fn render_domain_types(doc: &DomainTypesDocument) -> String {
 
     out.push_str("\n## Domain Types\n\n");
 
-    out.push_str("| Name | Kind | Details | Signal |\n");
-    out.push_str("|------|------|---------|--------|\n");
+    out.push_str("| Name | Kind | Action | Details | Signal |\n");
+    out.push_str("|------|------|--------|---------|--------|\n");
+
+    // Track consumed signal indices to handle delete+add pairs that share the same
+    // (name, kind_tag) key. The first matching signal is consumed by the first entry;
+    // any second entry with the same key skips past it to the next match.
+    let mut consumed: std::collections::HashSet<usize> = std::collections::HashSet::new();
 
     for entry in doc.entries() {
-        let signal_col = signal_for_entry(doc, entry.name(), entry.kind().kind_tag());
+        let signal_col =
+            signal_for_entry(doc, entry.name(), entry.kind().kind_tag(), &mut consumed);
         let details_col = render_details(entry);
+        let action_col = render_action(entry.action());
         out.push_str(&format!(
-            "| {} | {} | {} | {} |\n",
+            "| {} | {} | {} | {} | {} |\n",
             entry.name(),
             entry.kind().kind_tag(),
+            action_col,
             details_col,
             signal_col,
         ));
@@ -47,9 +56,27 @@ pub fn render_domain_types(doc: &DomainTypesDocument) -> String {
 }
 
 /// Returns the signal emoji string for a named entry, or `"—"` if not evaluated.
-fn signal_for_entry(doc: &DomainTypesDocument, name: &str, kind_tag: &str) -> String {
-    doc.signals()
-        .and_then(|sigs| sigs.iter().find(|s| s.type_name() == name && s.kind_tag() == kind_tag))
+///
+/// `consumed` tracks signal indices already rendered so that a delete+add pair sharing
+/// the same `(name, kind_tag)` identity does not show the same signal twice.
+fn signal_for_entry(
+    doc: &DomainTypesDocument,
+    name: &str,
+    kind_tag: &str,
+    consumed: &mut std::collections::HashSet<usize>,
+) -> String {
+    let matched = doc.signals().and_then(|sigs| {
+        sigs.iter()
+            .enumerate()
+            .find(|(idx, s)| {
+                s.type_name() == name && s.kind_tag() == kind_tag && !consumed.contains(idx)
+            })
+            .map(|(idx, s)| {
+                consumed.insert(idx);
+                s
+            })
+    });
+    matched
         .map(|sig| match sig.signal() {
             ConfidenceSignal::Blue => "\u{1f535}".to_owned(),
             ConfidenceSignal::Yellow => "\u{1f7e1}".to_owned(),
@@ -57,6 +84,11 @@ fn signal_for_entry(doc: &DomainTypesDocument, name: &str, kind_tag: &str) -> St
             _ => "?".to_owned(),
         })
         .unwrap_or_else(|| "\u{2014}".to_owned()) // —
+}
+
+/// Renders the Action column: `"—"` for the default `Add`, or the action tag otherwise.
+fn render_action(action: TypeAction) -> &'static str {
+    if action.is_default() { "\u{2014}" } else { action.action_tag() }
 }
 
 /// Renders the Details column for a single entry based on its kind.
@@ -101,7 +133,7 @@ mod tests {
     use super::*;
 
     fn make_entry(name: &str, kind: DomainTypeKind) -> DomainTypeEntry {
-        DomainTypeEntry::new(name, "description", kind, true).unwrap()
+        DomainTypeEntry::new(name, "description", kind, domain::TypeAction::Add, true).unwrap()
     }
 
     fn make_doc(entries: Vec<DomainTypeEntry>) -> DomainTypesDocument {
@@ -133,8 +165,14 @@ mod tests {
     fn test_render_domain_types_includes_table_header() {
         let doc = make_doc(vec![]);
         let output = render_domain_types(&doc);
-        assert!(output.contains("| Name | Kind | Details | Signal |"), "missing table header");
-        assert!(output.contains("|------|------|---------|--------|"), "missing table separator");
+        assert!(
+            output.contains("| Name | Kind | Action | Details | Signal |"),
+            "missing table header"
+        );
+        assert!(
+            output.contains("|------|------|--------|---------|--------|"),
+            "missing table separator"
+        );
     }
 
     // ---------------------------------------------------------------------------
@@ -276,6 +314,34 @@ mod tests {
         assert!(output.contains("Draft"), "missing Draft");
         assert!(output.contains("TrackStatus"), "missing TrackStatus");
         assert!(output.contains("TrackId"), "missing TrackId");
+    }
+
+    // ---------------------------------------------------------------------------
+    // render_domain_types: Action column
+    // ---------------------------------------------------------------------------
+
+    #[test]
+    fn test_render_add_action_shows_dash() {
+        let entry = make_entry("Foo", DomainTypeKind::ValueObject);
+        let doc = make_doc(vec![entry]);
+        let output = render_domain_types(&doc);
+        // Add action renders as em-dash
+        assert!(output.contains("| \u{2014} |"), "Add action should show em-dash");
+    }
+
+    #[test]
+    fn test_render_delete_action_shows_delete() {
+        let entry = DomainTypeEntry::new(
+            "OldType",
+            "deleted",
+            DomainTypeKind::ValueObject,
+            domain::TypeAction::Delete,
+            true,
+        )
+        .unwrap();
+        let doc = make_doc(vec![entry]);
+        let output = render_domain_types(&doc);
+        assert!(output.contains("| delete |"), "Delete action should show 'delete'");
     }
 
     #[test]

@@ -9,7 +9,7 @@
 
 use domain::{
     ConfidenceSignal, DomainTypeEntry, DomainTypeKind, DomainTypeSignal, DomainTypesDocument,
-    SpecValidationError, TypestateTransitions,
+    SpecValidationError, TypeAction, TypestateTransitions,
 };
 use serde::{Deserialize, Serialize};
 
@@ -52,18 +52,38 @@ struct DomainTypesDocDto {
 /// Common fields (`name`, `description`, `approved`) live at the struct level.
 /// Kind-specific fields are encoded via `DomainTypeKindDto` which is flattened
 /// into the same JSON object and uses `"kind"` as the tag discriminator.
+/// DTO for the `action` field on a domain type entry.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum TypeActionDto {
+    Add,
+    Modify,
+    Reference,
+    Delete,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct DomainTypeEntryDto {
     pub name: String,
     pub description: String,
     #[serde(default = "default_approved")]
     pub approved: bool,
+    #[serde(default = "default_action", skip_serializing_if = "is_add_action")]
+    pub action: TypeActionDto,
     #[serde(flatten)]
     pub kind: DomainTypeKindDto,
 }
 
 fn default_approved() -> bool {
     true
+}
+
+fn default_action() -> TypeActionDto {
+    TypeActionDto::Add
+}
+
+fn is_add_action(action: &TypeActionDto) -> bool {
+    matches!(action, TypeActionDto::Add)
 }
 
 /// Internally-tagged enum for kind-specific fields.
@@ -129,29 +149,109 @@ pub fn decode(json: &str) -> Result<DomainTypesDocument, DomainTypesCodecError> 
         entries.push(domain_type_entry_from_dto(entry_dto)?);
     }
 
-    // Reject duplicate entry names
-    let mut seen_names = std::collections::HashSet::new();
-    for entry in &entries {
-        if !seen_names.insert(entry.name()) {
-            return Err(DomainTypesCodecError::InvalidEntry {
-                name: entry.name().to_owned(),
-                reason: "duplicate entry name".to_owned(),
-            });
+    // Validate entry name uniqueness with delete+add pair exception.
+    // Same name is allowed only when exactly 2 entries exist: one delete + one add,
+    // and the two entries must have different kinds.
+    // Rationale: signals are keyed by (type_name, kind_tag); a same-kind pair would
+    // produce two signals with the same key, making one unaddressable and leading to
+    // ambiguous rendering. Different kinds is also the primary use case (kind migration).
+    {
+        let mut name_entries: std::collections::HashMap<&str, Vec<(TypeAction, &str)>> =
+            std::collections::HashMap::new();
+        for entry in &entries {
+            name_entries
+                .entry(entry.name())
+                .or_default()
+                .push((entry.action(), entry.kind().kind_tag()));
+        }
+        for (name, pairs) in &name_entries {
+            if pairs.len() < 2 {
+                continue;
+            }
+            if pairs.len() > 2 {
+                return Err(DomainTypesCodecError::InvalidEntry {
+                    name: (*name).to_owned(),
+                    reason: format!(
+                        "name appears {} times (max 2 for delete+add pair)",
+                        pairs.len()
+                    ),
+                });
+            }
+            // Exactly 2: must be one Delete + one Add
+            let actions: Vec<TypeAction> = pairs.iter().map(|(a, _)| *a).collect();
+            let has_delete = actions.contains(&TypeAction::Delete);
+            let has_add = actions.contains(&TypeAction::Add);
+            if !(has_delete && has_add) {
+                return Err(DomainTypesCodecError::InvalidEntry {
+                    name: (*name).to_owned(),
+                    reason: format!(
+                        "duplicate name requires exactly one delete + one add (got {:?})",
+                        actions.iter().map(|a| a.action_tag()).collect::<Vec<_>>()
+                    ),
+                });
+            }
+            // The two entries must have different kinds AND be in different partitions.
+            // Same kind would produce two signals with the same (type_name, kind_tag) key.
+            // Same partition (both trait_port or both non-trait_port) would cause
+            // evaluate_delete to find the new type by name and stay Yellow forever.
+            // Use action:"modify" for same-partition kind changes.
+            if let [(_, kind_a), (_, kind_b)] = pairs.as_slice() {
+                if kind_a == kind_b {
+                    return Err(DomainTypesCodecError::InvalidEntry {
+                        name: (*name).to_owned(),
+                        reason: format!(
+                            "delete+add pair must have different kinds to avoid signal key \
+                             collision (both are '{kind_a}')"
+                        ),
+                    });
+                }
+                let is_trait_a = *kind_a == "trait_port";
+                let is_trait_b = *kind_b == "trait_port";
+                if is_trait_a == is_trait_b {
+                    return Err(DomainTypesCodecError::InvalidEntry {
+                        name: (*name).to_owned(),
+                        reason: format!(
+                            "delete+add pair must cross the trait/non-trait partition \
+                             ('{kind_a}' and '{kind_b}' are in the same partition). \
+                             Use action:\"modify\" for same-partition kind changes"
+                        ),
+                    });
+                }
+            }
         }
     }
 
-    // Typestate transitions_to referential integrity: targets must exist AND be typestate kind
-    let typestate_names: std::collections::HashSet<&str> = entries
+    // Typestate transitions_to referential integrity: targets must exist AND be typestate kind.
+    //
+    // Two target sets:
+    // - `live_typestate_names`: non-delete typestate entries (valid targets for non-delete entries)
+    // - `all_typestate_names`: all typestate entries (valid targets for delete entries, which
+    //   document an outgoing transition from the type's pre-deletion state)
+    let all_typestate_names: std::collections::HashSet<&str> = entries
         .iter()
         .filter(|e| matches!(e.kind(), DomainTypeKind::Typestate { .. }))
+        .map(|e| e.name())
+        .collect();
+    let live_typestate_names: std::collections::HashSet<&str> = entries
+        .iter()
+        .filter(|e| {
+            matches!(e.kind(), DomainTypeKind::Typestate { .. }) && e.action() != TypeAction::Delete
+        })
         .map(|e| e.name())
         .collect();
     for entry in &entries {
         if let DomainTypeKind::Typestate { transitions: TypestateTransitions::To(targets) } =
             entry.kind()
         {
+            // Delete entries may reference any typestate (including other delete entries).
+            // Non-delete entries must only reference live (non-delete) typestates.
+            let valid_targets = if entry.action() == TypeAction::Delete {
+                &all_typestate_names
+            } else {
+                &live_typestate_names
+            };
             for target in targets {
-                if !typestate_names.contains(target.as_str()) {
+                if !valid_targets.contains(target.as_str()) {
                     return Err(DomainTypesCodecError::InvalidEntry {
                         name: entry.name().to_owned(),
                         reason: format!(
@@ -192,8 +292,27 @@ fn domain_type_entry_from_dto(
     dto: &DomainTypeEntryDto,
 ) -> Result<DomainTypeEntry, DomainTypesCodecError> {
     let kind = domain_type_kind_from_dto(&dto.kind);
-    DomainTypeEntry::new(&dto.name, &dto.description, kind, dto.approved)
+    let action = type_action_from_dto(dto.action);
+    DomainTypeEntry::new(&dto.name, &dto.description, kind, action, dto.approved)
         .map_err(DomainTypesCodecError::Validation)
+}
+
+fn type_action_from_dto(dto: TypeActionDto) -> TypeAction {
+    match dto {
+        TypeActionDto::Add => TypeAction::Add,
+        TypeActionDto::Modify => TypeAction::Modify,
+        TypeActionDto::Reference => TypeAction::Reference,
+        TypeActionDto::Delete => TypeAction::Delete,
+    }
+}
+
+fn type_action_to_dto(action: TypeAction) -> TypeActionDto {
+    match action {
+        TypeAction::Add => TypeActionDto::Add,
+        TypeAction::Modify => TypeActionDto::Modify,
+        TypeAction::Reference => TypeActionDto::Reference,
+        TypeAction::Delete => TypeActionDto::Delete,
+    }
 }
 
 fn domain_type_kind_from_dto(dto: &DomainTypeKindDto) -> DomainTypeKind {
@@ -282,6 +401,7 @@ fn domain_type_entry_to_dto(entry: &DomainTypeEntry) -> DomainTypeEntryDto {
         name: entry.name().to_owned(),
         description: entry.description().to_owned(),
         approved: entry.approved(),
+        action: type_action_to_dto(entry.action()),
         kind,
     }
 }
@@ -521,6 +641,225 @@ mod tests {
 }"#;
         let doc = decode(json).unwrap();
         assert!(doc.signals().is_none());
+    }
+
+    // --- TypeAction codec ---
+
+    #[test]
+    fn test_decode_action_absent_defaults_to_add() {
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "Foo", "kind": "value_object", "description": "d" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert_eq!(doc.entries()[0].action(), TypeAction::Add);
+    }
+
+    #[test]
+    fn test_decode_action_delete_parsed_correctly() {
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "OldType", "kind": "value_object", "description": "d", "action": "delete" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert_eq!(doc.entries()[0].action(), TypeAction::Delete);
+    }
+
+    #[test]
+    fn test_decode_action_modify_parsed_correctly() {
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "Changed", "kind": "value_object", "description": "d", "action": "modify" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert_eq!(doc.entries()[0].action(), TypeAction::Modify);
+    }
+
+    #[test]
+    fn test_decode_action_reference_parsed_correctly() {
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "Ref", "kind": "value_object", "description": "d", "action": "reference" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert_eq!(doc.entries()[0].action(), TypeAction::Reference);
+    }
+
+    #[test]
+    fn test_encode_add_action_omits_field() {
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "Foo", "kind": "value_object", "description": "d" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        assert!(!encoded.contains("\"action\""));
+    }
+
+    #[test]
+    fn test_encode_delete_action_includes_field() {
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "OldType", "kind": "value_object", "description": "d", "action": "delete" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        assert!(encoded.contains("\"action\": \"delete\""));
+    }
+
+    #[test]
+    fn test_round_trip_preserves_delete_action() {
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "OldType", "kind": "value_object", "description": "d", "action": "delete" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].action(), TypeAction::Delete);
+    }
+
+    #[test]
+    fn test_decode_unknown_action_returns_error() {
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "Foo", "kind": "value_object", "description": "d", "action": "rename" }
+  ]
+}"#;
+        assert!(decode(json).is_err());
+    }
+
+    // --- Duplicate name validation (delete+add pair) ---
+
+    #[test]
+    fn test_decode_delete_add_pair_succeeds() {
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "Foo", "kind": "value_object", "description": "old", "action": "delete" },
+    { "name": "Foo", "kind": "trait_port", "description": "new", "action": "add", "expected_methods": ["find"] }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert_eq!(doc.entries().len(), 2);
+        assert_eq!(doc.entries()[0].action(), TypeAction::Delete);
+        assert_eq!(doc.entries()[1].action(), TypeAction::Add);
+    }
+
+    #[test]
+    fn test_decode_add_add_duplicate_returns_error() {
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "Foo", "kind": "value_object", "description": "a" },
+    { "name": "Foo", "kind": "value_object", "description": "b" }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(matches!(err, DomainTypesCodecError::InvalidEntry { .. }));
+    }
+
+    #[test]
+    fn test_decode_delete_delete_duplicate_returns_error() {
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "Foo", "kind": "value_object", "description": "a", "action": "delete" },
+    { "name": "Foo", "kind": "value_object", "description": "b", "action": "delete" }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(matches!(err, DomainTypesCodecError::InvalidEntry { .. }));
+    }
+
+    #[test]
+    fn test_decode_three_same_name_returns_error() {
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "Foo", "kind": "value_object", "description": "a", "action": "delete" },
+    { "name": "Foo", "kind": "value_object", "description": "b", "action": "add" },
+    { "name": "Foo", "kind": "value_object", "description": "c", "action": "add" }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(matches!(err, DomainTypesCodecError::InvalidEntry { .. }));
+    }
+
+    #[test]
+    fn test_decode_delete_add_same_kind_returns_error() {
+        // Signals are keyed by (type_name, kind_tag). A same-kind delete+add pair produces
+        // two signals with the same key, making one unaddressable.
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "Foo", "kind": "value_object", "description": "old", "action": "delete" },
+    { "name": "Foo", "kind": "value_object", "description": "new" }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(matches!(err, DomainTypesCodecError::InvalidEntry { .. }));
+    }
+
+    #[test]
+    fn test_decode_delete_add_same_partition_returns_error() {
+        // Same partition (both non-trait) — evaluate_delete would find the new type
+        // by name and stay Yellow forever. Use action:"modify" instead.
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "Foo", "kind": "value_object", "description": "old", "action": "delete" },
+    { "name": "Foo", "kind": "enum", "description": "new", "expected_variants": ["A"] }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(matches!(err, DomainTypesCodecError::InvalidEntry { .. }));
+    }
+
+    #[test]
+    fn test_decode_delete_typestate_graph_succeeds() {
+        // Deleting a connected typestate graph: OldDraft -> OldPublished, both deleted.
+        // Delete entries may reference other delete-action typestates as targets.
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "OldDraft", "kind": "typestate", "description": "old draft", "action": "delete", "transitions_to": ["OldPublished"] },
+    { "name": "OldPublished", "kind": "typestate", "description": "old published", "action": "delete", "transitions_to": [] }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert_eq!(doc.entries().len(), 2);
+        assert_eq!(doc.entries()[0].action(), TypeAction::Delete);
+        assert_eq!(doc.entries()[1].action(), TypeAction::Delete);
+    }
+
+    #[test]
+    fn test_decode_non_delete_typestate_cannot_target_delete_entry() {
+        // A live (non-delete) typestate must not transition to a delete-marked typestate.
+        let json = r#"{
+  "schema_version": 1,
+  "domain_types": [
+    { "name": "Active", "kind": "typestate", "description": "live state", "transitions_to": ["OldState"] },
+    { "name": "OldState", "kind": "typestate", "description": "being deleted", "action": "delete", "transitions_to": [] }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(matches!(err, DomainTypesCodecError::InvalidEntry { .. }));
     }
 
     #[test]

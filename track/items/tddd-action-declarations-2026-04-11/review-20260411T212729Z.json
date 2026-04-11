@@ -1,0 +1,953 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db808571f395002d480393689243103a59236e912e409e366b6374c96a6a9446",
+          "at": "2026-04-11T13:07:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeAction::Delete` on a name that is not in the baseline only appends to `delete_errors` here, while the delete entry still suppresses group-4 undeclared detection for that name. That means an invalid `delete` declaration can produce no Red signals at all and will be silently accepted by existing `ConsistencyReport` consumers unless they are updated to consult the new field.",
+              "severity": "P0",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 937,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:db808571f395002d480393689243103a59236e912e409e366b6374c96a6a9446",
+          "at": "2026-04-11T13:10:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e6d852352d25cb96fd8428280a955f7036cde1f999b97ebd4b79ae35156f131d",
+          "at": "2026-04-11T13:14:31Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new delete-error abort runs after both `atomic_write_file` calls, so a rejected `delete` still rewrites `domain-types.json` and `domain-types.md` before returning `Err`. That leaves the track mutated even though the command reports failure; the validation should happen before any write or be rolled back.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 153,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:63af412129637a594b4a5da5cc4e6dffaab5c3c70846cfd1dac9e01a16e53949",
+          "at": "2026-04-11T13:30:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6aa6b6b35d17ffb10633b67dfcc1904fb3cde859c8f83b2e55d9a7b79afde54e",
+          "at": "2026-04-11T13:32:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_spec_code_consistency()` now reports each invalid `action=delete` twice. `check_consistency()` already rewrites a delete-without-baseline entry into a Red forward signal, so the existing loop at lines 271-280 emits an error for it; the new `report.delete_errors()` loop adds a second error for the same root cause. That makes `sotp verify spec-code-consistency` produce duplicate CI findings for one invalid delete.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 318,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6aa6b6b35d17ffb10633b67dfcc1904fb3cde859c8f83b2e55d9a7b79afde54e",
+          "at": "2026-04-11T13:34:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_spec_code_consistency()` never converts `report.delete_errors()` into `Finding::error`s. It relies on the patched red forward signal instead, so callers only get a generic `Red` mismatch message and lose the explicit `action=delete` / missing-baseline diagnostic that this change set was supposed to add.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 317,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5e10405c488eceaa9c2f01da4efcf74eb181db06cb85e763b748e0971d5fc335",
+          "at": "2026-04-11T13:37:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Suppressing red forward signals by `type_name` alone is too coarse: `domain-types.json` already allows same-name delete+add pairs with different kinds, so a delete error on one entry can mask a real red failure on the paired entry. Key the suppression by both name and `kind_tag`, or suppress only the specific delete entry.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 275,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a93116d13bf1872b2e13279d66bc3d363c2f3ceb17bc928856a31908d67338f1",
+          "at": "2026-04-11T13:39:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:edf505c013ac37f0ee2a8c75d954f9496c6f55fce2efb2264b2b32c2642d75e6",
+          "at": "2026-04-11T13:42:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new delete-error/contradiction handling in `execute_spec_code_consistency` has no regression test coverage. That logic now relies on a nontrivial fingerprint to suppress the synthetic Red signal and emits new warning/error findings plus new JSON fields; without a dedicated test, a later change can easily reintroduce duplicate delete errors or accidentally suppress a real Red finding.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 270,
+              "category": "tests"
+            },
+            {
+              "message": "`execute_domain_type_signals` now has a new abort-before-write path for `delete_errors()`, but there is no test proving the command leaves `domain-types.json`/`domain-types.md` untouched on failure or that contradiction-only reports continue through to a successful write. This is a material side-effect change in a public CLI path and needs coverage.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 138,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:edf505c013ac37f0ee2a8c75d954f9496c6f55fce2efb2264b2b32c2642d75e6",
+          "at": "2026-04-11T13:46:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `delete_errors` abort path is only covered at the helper level. There is no integration test that exercises `execute_domain_type_signals` end-to-end and asserts `domain-types.json` / `domain-types.md` are not rewritten when `print_action_diagnostics()` returns `Err`, so a future refactor could move the abort below the writes without any failing test.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 140,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:529d283559a4e8909292d842a643ac049e6de1c450ad3a5a7e813330e54b32a6",
+          "at": "2026-04-11T13:53:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `delete_errors()` abort path in `execute_domain_type_signals` is only covered by helper tests. There is no end-to-end test that asserts the public command leaves `domain-types.json` and `domain-types.md` untouched when a delete error is present, so a future refactor could move the abort below the write calls without failing coverage.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 135,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:529d283559a4e8909292d842a643ac049e6de1c450ad3a5a7e813330e54b32a6",
+          "at": "2026-04-11T13:55:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `delete_errors` abort path is only covered by `validate_and_write_catalogue` unit tests; there is still no end-to-end test for `execute_domain_type_signals` that proves the public command returns `Err` and leaves `domain-types.json`/`domain-types.md` untouched when delete errors are present.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": null,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The new contradiction / delete-error mapping is only exercised through `consistency_report_to_findings`; there is no test that drives `execute(VerifyCommand::SpecCodeConsistency)` and asserts the public CLI still emits warning-only contradictions, error-level delete diagnostics, and the expected exit status.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": null,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:076c66a59e9f51d62d4501db79b7e401787934a46c86f3bf5c634fb663ff746b",
+          "at": "2026-04-11T13:59:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:076c66a59e9f51d62d4501db79b7e401787934a46c86f3bf5c634fb663ff746b",
+          "at": "2026-04-11T14:00:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `spec-code-consistency` behavior is only exercised through `consistency_report_to_findings()`. There is still no test that drives `execute(VerifyCommand::SpecCodeConsistency)` and asserts warning-only contradictions keep exit code 0 while `delete_errors` fail and the added `contradictions`/`delete_errors` JSON fields are emitted, so the public CLI contract can regress without detection.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 267,
+              "category": "testing"
+            },
+            {
+              "message": "`execute_domain_type_signals()`'s new validate-before-write path is only covered via helper tests. There is no end-to-end test for the public command proving `delete_errors` leave both `domain-types.json` and `domain-types.md` untouched, or that contradiction-only reports still write successfully, so future refactors can break those command-level guarantees without a failing test.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 140,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:076c66a59e9f51d62d4501db79b7e401787934a46c86f3bf5c634fb663ff746b",
+          "at": "2026-04-11T14:03:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 test coverage gap: the new SpecCodeConsistency behavior is only exercised through `consistency_report_to_findings` and a manually constructed `VerifyOutcome`. There is no test that drives the public `execute(VerifyCommand::SpecCodeConsistency(...))` path, so a wiring regression at the CLI boundary could skip the new warning/error mapping or JSON fields without failing tests.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 267,
+              "category": "test_coverage"
+            },
+            {
+              "message": "P1 test coverage gap: `validate_and_write_catalogue` is tested directly, but the public `execute_domain_type_signals(...)` path is not exercised for the new delete-error abort or contradiction-only success behavior. A regression in the call site could reintroduce writes-after-failure or suppress the summary while still passing the current helper tests.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 140,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:244a4e2e4f9949fe6d92bda9d9bdc81e14247afc8df312a834e6fd10282de3cd",
+          "at": "2026-04-11T14:09:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40de6646409178cb023c95e684eaf479d71f13541ef330dc2d2b07a843518930",
+          "at": "2026-04-11T14:13:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40de6646409178cb023c95e684eaf479d71f13541ef330dc2d2b07a843518930",
+          "at": "2026-04-11T14:16:10Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25b166f7bdc5dea443c5cae550640982a618510b1f6b416ff2937424a6f4aaa5",
+          "at": "2026-04-11T13:30:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new kind-migration guidance says to represent a kind change as a same-name `delete` + `add` pair, but Step 3 still instructs `/track:design` to update `kind` in place when an existing entry changes kind. Those instructions are incompatible: a user following the merge step will collapse the pair back into one entry and lose the explicit delete declaration that the new action model relies on. Update the later merge rules to preserve the delete+add pair for kind migrations instead of telling users to rewrite `kind` in place.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 53,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:25b166f7bdc5dea443c5cae550640982a618510b1f6b416ff2937424a6f4aaa5",
+          "at": "2026-04-11T13:32:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ecea34dbd5b7a31e87886fda1f8f1cd2478822b0e727a73546aca7d4f3e5ba1a",
+          "at": "2026-04-11T13:34:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 now makes `action` part of every type design, but the merge rules still only update `description` and kind-specific fields for existing entries. On a rerun of `/track:design`, an entry that should change from the old implicit `add` to `modify`/`reference`/`delete` will be preserved with the stale action, so the catalogue records the wrong intent and can trigger the wrong consistency checks. The merge step needs to include `action` among the fields that are refreshed from the new design.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 93,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:ecea34dbd5b7a31e87886fda1f8f1cd2478822b0e727a73546aca7d4f3e5ba1a",
+          "at": "2026-04-11T13:35:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3d272f9869e90f199f05b1f45a03a6c8f19d8f1627177d04e36eb01b958b93a",
+          "at": "2026-04-11T13:36:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new merge guidance says every `kind` change should be represented as a same-name `delete` + `add` pair, but the current signal logic only treats `delete` as “name absent” within the type/trait partition. For migrations that stay in the non-trait bucket (`value_object` -> `enum`, `enum` -> `error_type`, etc.), the `delete` entry will stay Yellow forever because `graph.get_type(name)` still finds the new type. This instruction would generate uncompletable `domain-types.json` files; it only works for cross-partition moves such as type -> trait.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 93,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e3d272f9869e90f199f05b1f45a03a6c8f19d8f1627177d04e36eb01b958b93a",
+          "at": "2026-04-11T13:39:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e0f7ab3dbed6f8b2e6a5a07ef32afa20cc090b1a20f931deafdc1d306384834",
+          "at": "2026-04-11T13:42:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new same-partition migration guidance tells users to update `kind` in place with `action: \"modify\"`, but this track’s TDDD-03 contract says kind migrations are represented as same-name `delete` + `add` pairs, and the codec rule only permits that exact pair. As written, the command would steer users away from the migration pattern the feature is supposed to support.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 57,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9e0f7ab3dbed6f8b2e6a5a07ef32afa20cc090b1a20f931deafdc1d306384834",
+          "at": "2026-04-11T13:42:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:90244222ceb810b3dca54808b27a8509aa3d0e6211cf2706118c9e0ce2e55d3e",
+          "at": "2026-04-11T13:44:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The incremental-merge rules are inconsistent for kind migrations. Line 92 says to preserve existing entries that are still in the plan, but line 93 also says a kind change must be represented as a `delete` + `add` pair with the same name. Starting from an existing single entry like `Foo`, following both instructions literally produces three `Foo` entries (old entry + delete + add), and the codec rejects anything other than exactly one delete/add pair for a duplicate name. The guidance should explicitly say to replace the old entry with the pair during kind migrations.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 92,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:90244222ceb810b3dca54808b27a8509aa3d0e6211cf2706118c9e0ce2e55d3e",
+          "at": "2026-04-11T13:46:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new \"kind change => delete + add pair\" guidance is too broad. That pattern only works for cross-partition moves such as `value_object` -> `trait_port`; for migrations that stay in the type partition (`value_object` -> `enum`, `enum` -> `error_type`, etc.), the delete entry will still see the replacement through `graph.get_type(name)` and never turn Blue, so `/track:design` can produce a catalogue that cannot pass validation. Restrict this rule to cross-partition moves or define a separate same-partition migration rule.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 93,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:acf50b061930a46b408d3737452a194fb1cb322a11e6965ee9d05b2cb73a3cdc",
+          "at": "2026-04-11T13:48:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91f663bf4e3f1d34d299f89925ee96cde9b8104f3aef853c4ef9b8d6a65630e1",
+          "at": "2026-04-11T13:51:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`action` now defaults to `\"add\"` when omitted, but the incremental-update path still tells `/track:design` to preserve entries from an existing `domain-types.json`. ADR 0003 explicitly relies on there being no migration for pre-TDDD-03 catalogues, and the implementation warns on `add` entries that already exist in the baseline, so rerunning this command on an older in-progress track will preserve legacy action-less entries and immediately create false `AddButAlreadyInBaseline` contradictions. Add a backfill rule for preserved entries or scope this workflow to new tracks only.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 96,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:91f663bf4e3f1d34d299f89925ee96cde9b8104f3aef853c4ef9b8d6a65630e1",
+          "at": "2026-04-11T13:53:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9b330788b494d0124686fa8721b2636eb3fc989d1f9bf23a54e121c80c46603",
+          "at": "2026-04-11T13:55:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new same-partition migration rule at lines 57-61/103 tells users to rewrite `kind` in place with `action: \"modify\"`, but the TDDD-03 contract for kind migration still expects same-name `delete` + `add` pairs. As written, `/track:design` will steer value_object→enum (and similar) changes away from the declared migration format and drop the explicit delete declaration that the feature is meant to capture.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 57,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a9b330788b494d0124686fa8721b2636eb3fc989d1f9bf23a54e121c80c46603",
+          "at": "2026-04-11T13:57:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The pre-TDDD-03 backfill rule is too broad: it rewrites any actionless entry that exists in the baseline to `action: \"modify\"`, but the next bullet requires cross-partition kind migrations to become a `delete` + `add` pair. A legacy entry that moves between non-trait and trait partitions will be guided to the wrong action and then fail validation (`ModifyButNotInBaseline`).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 100,
+              "category": "workflow correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a9b330788b494d0124686fa8721b2636eb3fc989d1f9bf23a54e121c80c46603",
+          "at": "2026-04-11T14:00:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9b330788b494d0124686fa8721b2636eb3fc989d1f9bf23a54e121c80c46603",
+          "at": "2026-04-11T14:01:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new pre-TDDD-03 backfill rule conflicts with ADR 0003. This command now tells `/track:design` to rewrite legacy action-less entries based on `domain-types-baseline.json`, but ADR `2026-04-11-0003` explicitly says backward compatibility/migration for existing `domain-types.json` is out of scope and that `action` is only used for tracks started after TDDD-03. Leaving this guidance here makes Step 3 no longer accurate to the ADR and can send operators down a migration path the design explicitly rejected.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 100,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:a9b330788b494d0124686fa8721b2636eb3fc989d1f9bf23a54e121c80c46603",
+          "at": "2026-04-11T14:03:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The same-partition kind-migration rule updates `kind` in place but no longer tells the user to drop kind-specific fields that no longer apply. A `typestate`→`enum` or `error_type`→`value_object` change can leave stale `transitions_to`/`expected_variants`/`expected_methods` keys in `domain-types.json`, and the flattened serde codec rejects illegal field combinations. The earlier explicit cleanup instruction should be kept here.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 102,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:91f663bf4e3f1d34d299f89925ee96cde9b8104f3aef853c4ef9b8d6a65630e1",
+          "at": "2026-04-11T14:05:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b47a1782e7d5e9e25f1e6fee5246463599885e098b9345df5a3debbc455aaeef",
+          "at": "2026-04-11T14:07:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new cross-partition migration guidance is unconditional, but `action: \"delete\"` is only valid for types that already exist in `domain-types-baseline.json`. If a designer changes a newly declared-but-not-yet-baselined type from non-trait to trait (or vice versa), following this delete+add advice will produce a hard delete validation error. The command should say to use the pair only for baselined existing types; otherwise update the entry in place and keep the default `add` action.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 53,
+              "category": "correctness"
+            },
+            {
+              "message": "The merge rule for same-partition kind changes now says to set `action: \"modify\"` unconditionally, which contradicts the earlier `if the type was already in the baseline` caveat and the checker behavior. For a newly declared type whose kind changes before it ever appears in the baseline, this instruction yields a `ModifyButNotInBaseline` contradiction. This should stay `add`/omitted until the type actually exists in the baseline.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 102,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b47a1782e7d5e9e25f1e6fee5246463599885e098b9345df5a3debbc455aaeef",
+          "at": "2026-04-11T14:09:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The merge rules preserve existing entries verbatim, but after introducing `action` that is unsafe: any unchanged entry that already exists in `domain-types-baseline.json` and still omits `action` is now interpreted as `add`, which will trip `AddButAlreadyInBaseline` on the next `/track:design` run. This makes the command non-idempotent for tracks that already have a populated `domain-types.json`; the merge section needs an explicit backfill rule for preserved baseline-resident entries.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 103,
+              "category": "workflow correctness"
+            },
+            {
+              "message": "The cross-partition merge note relies on a validation guarantee that is not present in the current code path: `DomainTypesDocument` stores entries in a `Vec`, and the consistency checks do not reject duplicate names. As written, the docs promise that any duplicate-name layout other than a single `delete` + `add` pair will be rejected, but malformed duplicates can still reach evaluation and produce ambiguous results.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 106,
+              "category": "validation mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:9ba082ae02d255d10ea387e03d3ffc31b2cd9fd337e52b58ef0573638dd14df8",
+          "at": "2026-04-11T14:11:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df32570f8a4489716bbff9a452e4ec98efca2173ec5ed0dd6b157fdab357e400",
+          "at": "2026-04-11T14:14:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 now tells `/track:design` to choose `modify`/`delete` and kind-migration behavior by checking whether a type already exists in `domain-types-baseline.json`, but this command does not create that file until Step 4. On the first run for a new track there is therefore no baseline to consult when these decisions must be made, so the new action rules are not actually actionable and can misclassify existing types as `add`. The guidance needs to key off the current code / soon-to-be-captured baseline, or move baseline capture/read earlier in the workflow.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 52,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:df32570f8a4489716bbff9a452e4ec98efca2173ec5ed0dd6b157fdab357e400",
+          "at": "2026-04-11T14:16:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bbb5f546c03156cd548c8d174afbdc2169ca6c37aafeb7ac6087cf9f2b975940",
+          "at": "2026-04-11T14:18:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 now tells `/track:design` to choose `add`/`modify`/`reference`/`delete` from the live codebase, but the actual TDDD-03 validation keys those actions off `domain-types-baseline.json`, not current code. That breaks reruns on in-progress tracks: once a newly added type has been implemented, this guidance will flip its entry from implicit `add` to `modify`, and `check_consistency()` will then emit `ModifyButNotInBaseline` because the baseline never contained it. The same live-code test also rejects legitimate `delete` entries after the old type has already been removed. Action selection needs to use baseline membership when a baseline already exists, with live code only as the first-run fallback before Step 4 has created one.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 47,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bbb5f546c03156cd548c8d174afbdc2169ca6c37aafeb7ac6087cf9f2b975940",
+          "at": "2026-04-11T14:21:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Preserving existing entries without rewriting baseline-resident ones to `modify`/`reference` leaves reruns with actionless entries that decode as `add`; once `domain-types-baseline.json` exists, those preserved rows will trip `AddButAlreadyInBaseline` warnings and `/track:design` stops being idempotent for valid updates.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 102,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dfe327c17823980769feaf2aaf4b389605d42d88f89b9b7e53f20c72655ef28b",
+          "at": "2026-04-11T14:23:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The first-run action-selection rules are internally inconsistent. Step 2 says to use the current codebase as the authority when no baseline exists, but the next bullet says to use the delete+add migration form only when the type is in `domain-types-baseline.json`, and then immediately falls back to `add` when it is not. On a first `/track:design` run, that makes the delete+add path unreachable for every type, so the guidance cannot actually follow the stated first-run approximation.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 47,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c65a0627af81c36aad33c478104fceeac77ce44149f0284a897195ac650acd20",
+          "at": "2026-04-11T14:25:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new merge/backfill guidance tells `/track:design` to preserve existing entries and rewrite actionless pre-existing ones to `action: \"modify\"`, but the note immediately above says migration of pre-TDDD-03 `domain-types.json` files is out of scope per ADR 0003. On an existing legacy track, following this instruction would silently perform the very migration the ADR rejects, so the command is no longer aligned with the stated rollout boundary.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 105,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a05ef6d0f2fd61e356f5a4c8d464d67d96363664029d4782da14aa3d14b8b245",
+          "at": "2026-04-11T14:27:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a50bd5609986af159a5278beb31d9692ab1ba667cb6c8f83d010c12e60bb41b",
+          "at": "2026-04-11T14:30:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a50bd5609986af159a5278beb31d9692ab1ba667cb6c8f83d010c12e60bb41b",
+          "at": "2026-04-11T14:32:33Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45335a53e493006c75f9c4876529e8dd8f5ae179291c039bdfeb27483d21f269",
+          "at": "2026-04-11T13:05:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45335a53e493006c75f9c4876529e8dd8f5ae179291c039bdfeb27483d21f269",
+          "at": "2026-04-11T13:06:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40d8a9d8eef8024cb129503b968a030515bee841842a2337167755c21e1f8836",
+          "at": "2026-04-11T13:31:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The duplicate-name relaxation is too broad here: any `delete`+`add` pair is accepted even when both entries keep the same `kind`. That creates two signals with the same `(type_name, kind_tag)` identity, but signals are serialized and rendered using only those fields, so one of the rows becomes unaddressable and `domain-types.md` will show the wrong signal for at least one entry. This needs to reject same-kind pairs here or carry `action` through the signal key.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 174,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:40d8a9d8eef8024cb129503b968a030515bee841842a2337167755c21e1f8836",
+          "at": "2026-04-11T13:34:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf796c86b0be81feb75d902200c144a5179144cc3d628c5428821c70fad7c7c0",
+          "at": "2026-04-11T13:37:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `kind_a == kind_b` rejection narrows the duplicate-name contract beyond the T006 brief: the track says an exact same-name `delete`+`add` pair should be accepted, but this now rejects those pairs unless the kind changes. That makes valid delete/add replacements with the same kind fail to decode even though they satisfy the only documented duplicate-name rule.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 191,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cf796c86b0be81feb75d902200c144a5179144cc3d628c5428821c70fad7c7c0",
+          "at": "2026-04-11T13:40:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Row signal lookup is still keyed only by `name` + `kind`. With the new delete/add duplicate-name allowance, two rows can share both values, and both will resolve to the first matching signal. That makes the later row render the wrong confidence icon/status. The renderer needs to associate signals by entry position or include `action` in the lookup.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/domain_types_render.rs",
+              "line": 35,
+              "category": "correctness"
+            },
+            {
+              "message": "`typestate_names` includes typestate entries even when they are marked `delete`, so the `transitions_to` integrity check can be satisfied by a deleted typestate. A spec can therefore transition to a type that is only present as a delete row and still decode successfully. Exclude `Delete` rows from the valid typestate target set, or otherwise validate against the live entry state.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 189,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:40d8a9d8eef8024cb129503b968a030515bee841842a2337167755c21e1f8836",
+          "at": "2026-04-11T13:44:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d48a191fecb0f5e056d8d2028299bccea0650908eec86f800a83a32d5b40e50",
+          "at": "2026-04-11T13:48:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Relaxing duplicate-name validation at line 152 now permits a `delete` + `add` pair even when both entries have the same `kind`. In that case the persisted signals are no longer uniquely identifiable: `DomainTypeSignalDto` still keys them only by `(type_name, kind_tag)`, and the new renderer can only match them positionally. A stale or reordered `signals` array can therefore silently attach the delete signal to the add row (or vice versa). The codec should reject same-name/same-kind pairs, or persist a disambiguator, instead of accepting this ambiguous state.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 152,
+              "category": null
+            },
+            {
+              "message": "Excluding `action: delete` typestates from `typestate_names` breaks valid deletion batches for connected state graphs. A declaration like `OldDraft(delete -> OldPublished)` plus `OldPublished(delete)` now fails decode at line 202 because `OldPublished` is removed from the allowed target set, even though delete entries are evaluated via `evaluate_delete` and never use their `transitions_to` metadata. This makes it impossible to express deletion of an existing typestate graph without first rewriting its historical transitions.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 190,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:9d48a191fecb0f5e056d8d2028299bccea0650908eec86f800a83a32d5b40e50",
+          "at": "2026-04-11T13:51:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54aad9881c775a4c5cff41f694e56b60d2922c2036ae35ef15c11ab968d8e3d2",
+          "at": "2026-04-11T13:55:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54aad9881c775a4c5cff41f694e56b60d2922c2036ae35ef15c11ab968d8e3d2",
+          "at": "2026-04-11T13:58:28Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e98387ad20c18fb481f1e18898f0d7c8db768b74e0939c9c8df0e2a34911ad5",
+          "at": "2026-04-11T12:30:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T004` and ADR 0003 require four contradiction warnings (`add+baseline`, `modify+no-baseline`, `reference+no-baseline`, `reference+not-blue`), but the acceptance criteria only lock down the first one. That means an implementation can omit three required warning paths and still satisfy the approved spec.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/spec.json",
+              "line": 179,
+              "category": "coverage"
+            },
+            {
+              "message": "The spec gives conflicting direction on compatibility: line 112 frames omitted `action` as a backward-compatibility requirement, while line 137 and ADR 0003 explicitly say backward compatibility is not supported for pre-TDDD-03 tracks. This ambiguity matters for `T006`, because the codec contract is underspecified in two incompatible ways.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/spec.json",
+              "line": 112,
+              "category": "consistency"
+            },
+            {
+              "message": "The `skip_serializing_if=add` requirement is sourced to ADR 0003, but that ADR never specifies encode-time omission; it only covers optional/default `action`. Because this provenance is wrong, both the scope item here and the matching acceptance criterion are no longer traceable to their stated source.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/spec.json",
+              "line": 43,
+              "category": "traceability"
+            }
+          ],
+          "hash": "rvw1:sha256:9e98387ad20c18fb481f1e18898f0d7c8db768b74e0939c9c8df0e2a34911ad5",
+          "at": "2026-04-11T12:33:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5d6e17e28574a5461a511d2d97d5c4958b12eea5535ff9d61fc2ebbe9040431",
+          "at": "2026-04-11T12:36:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The planner note still says the codec change is for \"backward-compatible JSON\", but ADR 0003 §Consequences and this track's spec now explicitly say completed-track backward compatibility is out of scope. Because `spec.json` cites this planner section as a source, the provenance is internally contradictory and can mislead implementation toward migration behavior the ADR rejected.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-11-1203-planner-tddd-03-type-action.md",
+              "line": 14,
+              "category": "consistency"
+            },
+            {
+              "message": "The acceptance criteria never require a happy-path check for explicit `modify`/`reference`/`delete` action values surviving codec round-trip and behaving correctly when the declaration matches reality. Right now the new criteria cover default/add serialization and contradiction/error paths, so TDDD-03 could be marked complete without proving most of the new public `action` variants actually work.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/spec.json",
+              "line": 151,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:a5d6e17e28574a5461a511d2d97d5c4958b12eea5535ff9d61fc2ebbe9040431",
+          "at": "2026-04-11T12:39:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` is still `2026-04-11T12:23:13Z`, but this track's `spec.json` was re-approved later at `2026-04-11T12:39:33Z`. The track workflow falls back to `metadata.json.updated_at` to resolve the latest materialized track, so leaving this stale can misorder or skip this track in `track/status` and non-track `track/commit` flows.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/metadata.json",
+              "line": 8,
+              "category": "workflow"
+            },
+            {
+              "message": "EC-7 says duplicate action is \"handled by existing name uniqueness\", but this track now requires a codec-level exception that accepts exactly one same-name `delete` + `add` pair. That design note is now inconsistent with the spec/metadata for T006 and can mislead implementation of the duplicate-name validation change.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-11-1203-planner-tddd-03-type-action.md",
+              "line": 36,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:213ea3b56866550aa7abfc8be34557d949514b38bf48640481eba8c825cb0ed1",
+          "at": "2026-04-11T12:41:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The acceptance criteria still lack an explicit happy-path check for `action: delete` surviving the codec boundary and reaching the delete forward-check path. Right now the spec covers default/add omission plus modify/reference round-trips and delete error handling, so T006/T002 could still be marked complete without proving the new `delete` variant works end to end.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/spec.json",
+              "line": 181,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:a4a12bdd90c0460a9482b6a25650272c485c1c3ad2c3f6a3ff316cb07fd2ff31",
+          "at": "2026-04-11T12:43:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ca4bf9fa93a1e2e2626779c9aa440bf412d18ed336cd6519ba93cdeac8e9c02",
+          "at": "2026-04-11T12:45:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ca4bf9fa93a1e2e2626779c9aa440bf412d18ed336cd6519ba93cdeac8e9c02",
+          "at": "2026-04-11T12:47:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ba81577c591ee9290098b0ce609fb1e89519e10bd19de9c49b0d33632180f15",
+          "at": "2026-04-11T13:05:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` broadens the approved TDDD-03 scope with `T011` (`catalogue.rs` split into three modules), but neither the ADR, planner review, nor `spec.json` define that refactor as part of this track. Adding unscoped work here means the generated plan now requires an unrelated structural change before the feature is complete, which creates review churn and can delay delivery of the actual action-declaration behavior.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/metadata.json",
+              "line": 152,
+              "category": "scope"
+            }
+          ],
+          "hash": "rvw1:sha256:efc57fd9c884a06ef98505dcb540d5e26a5571385fa4dba748304acac6bbd78e",
+          "at": "2026-04-11T13:12:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_version: 3` track metadata requires each task object to carry `{id, description, status, commit_hash}`, but this edit removes `commit_hash` from every task. That breaks the documented SSoT shape for `metadata.json` and will prevent per-task completion provenance from being recorded once tasks transition to `done`.",
+              "severity": "P1",
+              "file": "track/items/tddd-action-declarations-2026-04-11/metadata.json",
+              "line": 99,
+              "category": "schema"
+            }
+          ],
+          "hash": "rvw1:sha256:bcb1ba111d44c10d2d220ab1179016faca878b9f19356ec5b68eadbca6d54bd0",
+          "at": "2026-04-11T13:15:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bcb1ba111d44c10d2d220ab1179016faca878b9f19356ec5b68eadbca6d54bd0",
+          "at": "2026-04-11T13:16:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bcb1ba111d44c10d2d220ab1179016faca878b9f19356ec5b68eadbca6d54bd0",
+          "at": "2026-04-11T13:17:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bcb1ba111d44c10d2d220ab1179016faca878b9f19356ec5b68eadbca6d54bd0",
+          "at": "2026-04-11T13:17:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7b363da33ff8b526d28d94520457e7ef98e8b6988c94d089bad7531734168f9",
+          "at": "2026-04-11T13:30:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7b363da33ff8b526d28d94520457e7ef98e8b6988c94d089bad7531734168f9",
+          "at": "2026-04-11T13:31:12Z"
+        }
+      ]
+    }
+  }
+}

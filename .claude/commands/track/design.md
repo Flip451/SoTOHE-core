@@ -44,9 +44,31 @@ For each type needed by the plan:
    - State-dependent data + transitions? -> typestate + enum-first state types
    - Serde/persistence needed? -> domain: typestate, infra: serde enum DTO conversion
 
-3. For each type, declare:
+3. Determine the `action` field. The authority for whether a type "pre-exists" is:
+   - If `domain-types-baseline.json` already exists: a type pre-exists if it is in the baseline
+   - If no baseline exists yet (first run): a type pre-exists if it currently exists in the domain crate code
+   - Note: `"delete"`, `"modify"`, and `"reference"` are validated against `domain-types-baseline.json` at Step 4; using them for types not in the baseline triggers contradiction warnings or errors
+
+   Using "pre-exists" as defined above:
+   - Omit or use `"add"` for types that do NOT pre-exist (default — omitted from JSON on encode)
+   - `"modify"` when changing an existing type's structure — type must pre-exist
+   - `"reference"` when declaring an existing type for documentation purposes only — type must pre-exist
+   - `"delete"` when intentionally removing an existing type from the codebase — type must pre-exist
+   - For cross-partition kind migration (non-trait ↔ trait, e.g., `value_object` → `trait_port`):
+     if the type pre-exists, use two entries with the same name — one with `action: "delete"` (old
+     kind) and one with `action: "add"` (new kind). The delete entry turns Blue when the type
+     disappears from the old partition, and the add entry turns Blue when the new code is present.
+     If the type does NOT pre-exist, use a single entry with the new `kind` and keep `action: "add"`.
+   - For same-partition kind migration (within non-trait kinds, e.g., `value_object` → `enum`;
+     or within trait kinds): update `kind` in place. Do NOT use a delete+add pair — the delete
+     forward check looks up the type by name within the same partition, and the entry will stay
+     Yellow as long as any type with that name exists in that partition. Use `"modify"` if the
+     type pre-exists; otherwise keep `"add"` (omitted).
+
+4. For each type, declare:
    - `name`: PascalCase Rust type name
    - `kind`: one of the DomainTypeKind values above
+   - `action`: (optional) one of `add`, `modify`, `reference`, `delete` — omit for `add`
    - `description`: one-line English description
    - `approved`: `true` (human-reviewed design)
    - Kind-specific fields (expected_variants, transitions_to, expected_methods)
@@ -64,14 +86,26 @@ Write the designed types to `track/items/<id>/domain-types.json`:
       "kind": "value_object",
       "description": "One-line description",
       "approved": true
+    },
+    {
+      "name": "OldType",
+      "kind": "value_object",
+      "action": "delete",
+      "description": "Intentionally deleted type",
+      "approved": true
     }
   ]
 }
 ```
 
+Note: `action` defaults to `"add"` when omitted. Only `"delete"`, `"modify"`, and `"reference"` need explicit declaration.
+Note: The `action` field applies to tracks started after TDDD-03 (ADR 0003). Migration of existing pre-TDDD-03 `domain-types.json` files is explicitly out of scope per ADR 0003 §Consequences.
+
 If the file already exists, merge new types with existing ones:
-- Preserve existing entries that are still in the plan
-- Update changed fields (`kind`, `description`, `expected_variants`, `transitions_to`, `expected_methods`) for types whose design has evolved. When a type's `kind` changes, remove kind-specific fields that no longer apply (e.g., remove `transitions_to` when changing from `typestate` to `value_object`)
+- Preserve existing entries that are still in the plan, except during cross-partition kind migrations (see below)
+- Update changed fields (`action`, `description`, `expected_variants`, `transitions_to`, `expected_methods`) for types whose design has evolved. When a type's `kind` changes:
+  - Cross-partition migration (non-trait ↔ trait): if the type pre-exists, REPLACE the old single entry with a `delete` + `add` pair (one entry with `action: "delete"` for the old kind, one with `action: "add"` for the new kind). The old entry must not be preserved alongside the pair — the codec rejects any duplicate name that is not exactly one delete + one add pair. If the type does NOT pre-exist, update the entry in place (new `kind`, keep `action: "add"`).
+  - Same-partition migration (within non-trait kinds or within trait kinds): update `kind` in place and set `action: "modify"` only if the type pre-exists; otherwise keep `action: "add"` (omitted). Do NOT use a delete+add pair. Also remove any kind-specific fields that no longer apply (e.g., remove `transitions_to` when changing from `typestate` to `enum`).
 - Add new entries for types not yet declared
 - Remove entries for types no longer in the plan (with user confirmation)
 - Do not modify `approved` status of existing entries
