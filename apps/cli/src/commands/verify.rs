@@ -262,21 +262,72 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
     };
 
     // Run bidirectional consistency check with baseline-aware 4-group evaluation.
-    let report = domain::check_consistency(doc.entries(), &graph, &baseline);
+    evaluate_consistency_from_components(&doc, &graph, &baseline)
+}
 
-    // Convert to VerifyOutcome.
+/// Core spec-code consistency evaluation given pre-built domain components.
+///
+/// Separated from `execute_spec_code_consistency` so the wiring from
+/// `check_consistency` → `consistency_report_to_findings` → `VerifyOutcome` can be
+/// exercised in unit tests without requiring the nightly toolchain.
+///
+/// # Arguments
+/// * `doc` — decoded `DomainTypesDocument` (entries read from `domain-types.json`)
+/// * `graph` — `TypeGraph` built from the schema export
+/// * `baseline` — decoded `TypeBaseline` from `domain-types-baseline.json`
+fn evaluate_consistency_from_components(
+    doc: &domain::DomainTypesDocument,
+    graph: &domain::TypeGraph,
+    baseline: &domain::TypeBaseline,
+) -> VerifyOutcome {
+    let report = domain::check_consistency(doc.entries(), graph, baseline);
+    let findings = consistency_report_to_findings(&report);
+    print_consistency_report_json(&report);
+    if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
+}
+
+/// Convert a `ConsistencyReport` into a flat list of `Finding`s for `VerifyOutcome`.
+///
+/// The domain layer patches an invalid `action=delete` (no baseline match) entry into a
+/// Red forward signal AND stores the name in `delete_errors()`.  To avoid duplicate
+/// findings for the same root cause, this function identifies the synthetic Red via its
+/// fingerprint (`found_type==false`, empty `missing_items`, empty `extra_items`) and
+/// suppresses it in favour of the more specific `delete_errors` message.  This is safe
+/// for same-name delete+add pairs because the `add` half has a different kind/found_type
+/// state and will not match the fingerprint.
+///
+/// # Returns
+///
+/// A `Vec<Finding>` with errors for Red signals, errors for undeclared/baseline-red
+/// items, warnings for contradictions, and errors for invalid delete declarations.
+fn consistency_report_to_findings(
+    report: &domain::ConsistencyReport,
+) -> Vec<domain::verify::Finding> {
     let mut findings = Vec::new();
 
-    // Forward: red signals become errors.
+    // Collect delete_error names upfront so their patched forward signals can be
+    // suppressed.  The fingerprint (name in delete_errors + found_type==false +
+    // empty missing + empty extra) identifies only the synthetic patch produced by
+    // the domain layer's delete-baseline validation — not the paired add entry.
+    let delete_error_names: std::collections::HashSet<&str> =
+        report.delete_errors().iter().map(String::as_str).collect();
+
+    // Forward: red signals become errors (excluding synthetic delete-error patches).
     for sig in report.forward_signals() {
         if sig.signal() == domain::ConfidenceSignal::Red {
-            findings.push(domain::verify::Finding::error(format!(
-                "{} ({}): Red — missing={:?}, extra={:?}",
-                sig.type_name(),
-                sig.kind_tag(),
-                sig.missing_items(),
-                sig.extra_items(),
-            )));
+            let is_delete_error_signal = delete_error_names.contains(sig.type_name())
+                && !sig.found_type()
+                && sig.missing_items().is_empty()
+                && sig.extra_items().is_empty();
+            if !is_delete_error_signal {
+                findings.push(domain::verify::Finding::error(format!(
+                    "{} ({}): Red — missing={:?}, extra={:?}",
+                    sig.type_name(),
+                    sig.kind_tag(),
+                    sig.missing_items(),
+                    sig.extra_items(),
+                )));
+            }
         }
     }
 
@@ -304,9 +355,25 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
         )));
     }
 
-    print_consistency_report_json(&report);
+    // Action-baseline contradictions → warnings (advisory, not CI-blocking).
+    for contradiction in report.contradictions() {
+        findings.push(domain::verify::Finding::warning(format!(
+            "{} (action={}): {:?}",
+            contradiction.name(),
+            contradiction.action().action_tag(),
+            contradiction.kind(),
+        )));
+    }
 
-    if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
+    // Delete baseline validation errors → hard errors (CI-blocking, specific diagnostic).
+    // These replace the suppressed generic Red forward signal for the same entry.
+    for name in report.delete_errors() {
+        findings.push(domain::verify::Finding::error(format!(
+            "action=delete for `{name}` but type not in baseline — cannot delete non-existent type"
+        )));
+    }
+
+    findings
 }
 
 /// Serialize a `ConsistencyReport` as a JSON line to stdout via serde_json.
@@ -332,6 +399,17 @@ fn print_consistency_report_json(report: &domain::ConsistencyReport) {
             })
         })
         .collect();
+    let contradictions: Vec<serde_json::Value> = report
+        .contradictions()
+        .iter()
+        .map(|c| {
+            serde_json::json!({
+                "name": c.name(),
+                "action": c.action().action_tag(),
+                "kind": format!("{:?}", c.kind()),
+            })
+        })
+        .collect();
     let output = serde_json::json!({
         "forward_signals": forward,
         "undeclared_types": report.undeclared_types(),
@@ -339,6 +417,8 @@ fn print_consistency_report_json(report: &domain::ConsistencyReport) {
         "skipped_count": report.skipped_count(),
         "baseline_red_types": report.baseline_red_types(),
         "baseline_red_traits": report.baseline_red_traits(),
+        "contradictions": contradictions,
+        "delete_errors": report.delete_errors(),
     });
     println!("{output}");
 }
@@ -372,7 +452,7 @@ fn print_outcome(label: &str, outcome: &VerifyOutcome) -> ExitCode {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use clap::Parser;
     use tempfile::TempDir;
@@ -795,5 +875,223 @@ mod tests {
         );
         let exit = execute(VerifyCommand::SpecCoverage(SpecCoverageArgs { track_dir: Some(dir) }));
         assert_eq!(exit, ExitCode::FAILURE);
+    }
+
+    // --- consistency_report_to_findings tests ---
+
+    fn make_entry_for_test(name: &str, action: domain::TypeAction) -> domain::DomainTypeEntry {
+        domain::DomainTypeEntry::new(
+            name,
+            "desc",
+            domain::DomainTypeKind::ValueObject,
+            action,
+            true,
+        )
+        .unwrap()
+    }
+
+    fn empty_graph_for_test() -> domain::TypeGraph {
+        domain::TypeGraph::new(std::collections::HashMap::new(), std::collections::HashMap::new())
+    }
+
+    fn empty_baseline_for_test() -> domain::TypeBaseline {
+        domain::TypeBaseline::new(
+            1,
+            domain::Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
+            std::collections::HashMap::new(),
+            std::collections::HashMap::new(),
+        )
+    }
+
+    #[test]
+    fn test_consistency_report_to_findings_with_delete_not_in_baseline_produces_single_error() {
+        // action=delete for a type not in baseline → delete_errors fires.
+        // The domain layer also patches the forward signal to Red.
+        // consistency_report_to_findings must emit exactly ONE finding (the specific
+        // delete diagnostic) and suppress the duplicate generic Red finding.
+        let entry = make_entry_for_test("Ghost", domain::TypeAction::Delete);
+        let report = domain::check_consistency(
+            &[entry],
+            &empty_graph_for_test(),
+            &empty_baseline_for_test(),
+        );
+
+        assert!(!report.delete_errors().is_empty(), "delete_errors must be non-empty");
+
+        let findings = consistency_report_to_findings(&report);
+        // Exactly one finding: the specific delete_errors message (no duplicate generic Red).
+        assert_eq!(findings.len(), 1, "expected exactly 1 finding, got: {findings:?}");
+        let msg = findings[0].message();
+        assert!(
+            msg.contains("action=delete") && msg.contains("Ghost"),
+            "finding must be the specific delete diagnostic, got: {msg}"
+        );
+        assert_eq!(
+            findings[0].severity(),
+            domain::verify::Severity::Error,
+            "delete error must be reported as error severity"
+        );
+    }
+
+    #[test]
+    fn test_consistency_report_to_findings_with_empty_report_produces_no_findings() {
+        // No entries at all — empty report must produce no findings.
+        let report =
+            domain::check_consistency(&[], &empty_graph_for_test(), &empty_baseline_for_test());
+        let findings = consistency_report_to_findings(&report);
+        assert!(findings.is_empty(), "clean report must produce no findings: {findings:?}");
+    }
+
+    #[test]
+    fn test_consistency_report_to_findings_with_add_in_baseline_produces_warning() {
+        // action=add (default) when type is already in baseline → contradiction warning, not error.
+        // This tests that contradiction findings are emitted as warnings (advisory).
+        use std::collections::HashMap;
+        let entry = make_entry_for_test("Existing", domain::TypeAction::Add);
+        let baseline = domain::TypeBaseline::new(
+            1,
+            domain::Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
+            HashMap::from([(
+                "Existing".to_string(),
+                domain::TypeBaselineEntry::new(domain::schema::TypeKind::Struct, vec![], vec![]),
+            )]),
+            HashMap::new(),
+        );
+        let report = domain::check_consistency(&[entry], &empty_graph_for_test(), &baseline);
+
+        let findings = consistency_report_to_findings(&report);
+        // Contradiction should produce exactly one warning finding.
+        let warnings: Vec<_> =
+            findings.iter().filter(|f| f.severity() == domain::verify::Severity::Warning).collect();
+        assert!(!warnings.is_empty(), "contradiction must produce at least one warning");
+        // Must not produce any errors for a contradiction-only report.
+        let errors: Vec<_> =
+            findings.iter().filter(|f| f.severity() == domain::verify::Severity::Error).collect();
+        assert!(errors.is_empty(), "contradiction must not produce errors: {errors:?}");
+    }
+
+    #[test]
+    fn test_contradiction_only_report_produces_exit_success_via_print_outcome() {
+        // End-to-end contract test: contradiction warnings must not fail the CI gate.
+        // This bridges consistency_report_to_findings (warning) → VerifyOutcome → print_outcome
+        // → ExitCode::SUCCESS, proving the full chain executed by SpecCodeConsistency.
+        use std::collections::HashMap;
+        let entry = make_entry_for_test("Existing", domain::TypeAction::Add);
+        let baseline = domain::TypeBaseline::new(
+            1,
+            domain::Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
+            HashMap::from([(
+                "Existing".to_string(),
+                domain::TypeBaselineEntry::new(domain::schema::TypeKind::Struct, vec![], vec![]),
+            )]),
+            HashMap::new(),
+        );
+        let report = domain::check_consistency(&[entry], &empty_graph_for_test(), &baseline);
+        assert!(
+            !report.contradictions().is_empty(),
+            "precondition: must have at least one contradiction"
+        );
+
+        let findings = consistency_report_to_findings(&report);
+        let outcome = if findings.is_empty() {
+            domain::verify::VerifyOutcome::pass()
+        } else {
+            domain::verify::VerifyOutcome::from_findings(findings)
+        };
+        // Contradiction-only report must NOT fail the CI gate (exit code 0).
+        let exit = print_outcome("test", &outcome);
+        assert_eq!(
+            exit,
+            ExitCode::SUCCESS,
+            "contradiction-only report must exit 0 (advisory, not CI-blocking)"
+        );
+    }
+
+    #[test]
+    fn test_delete_error_report_produces_exit_failure_via_print_outcome() {
+        // End-to-end contract test: delete errors must fail the CI gate.
+        // This bridges consistency_report_to_findings (error) → VerifyOutcome → print_outcome
+        // → ExitCode::FAILURE, proving the full chain executed by SpecCodeConsistency.
+        let entry = make_entry_for_test("Ghost", domain::TypeAction::Delete);
+        let report = domain::check_consistency(
+            &[entry],
+            &empty_graph_for_test(),
+            &empty_baseline_for_test(),
+        );
+        assert!(!report.delete_errors().is_empty(), "precondition: must have delete errors");
+
+        let findings = consistency_report_to_findings(&report);
+        let outcome = domain::verify::VerifyOutcome::from_findings(findings);
+        // Delete errors must fail the CI gate (exit code 1).
+        let exit = print_outcome("test", &outcome);
+        assert_eq!(exit, ExitCode::FAILURE, "delete error report must exit 1 (CI-blocking)");
+    }
+
+    // --- evaluate_consistency_from_components tests (core CLI wiring, no nightly needed) ---
+
+    fn make_doc_with_entry(entry: domain::DomainTypeEntry) -> domain::DomainTypesDocument {
+        domain::DomainTypesDocument::new(1, vec![entry])
+    }
+
+    fn empty_doc_for_test() -> domain::DomainTypesDocument {
+        domain::DomainTypesDocument::new(1, vec![])
+    }
+
+    #[test]
+    fn test_evaluate_consistency_from_components_with_delete_error_returns_failure_outcome() {
+        // Proves the wiring inside execute_spec_code_consistency: delete errors must
+        // produce a VerifyOutcome with Error severity findings (which exits 1 via print_outcome).
+        let entry = make_entry_for_test("Ghost", domain::TypeAction::Delete);
+        let doc = make_doc_with_entry(entry);
+        let outcome = evaluate_consistency_from_components(
+            &doc,
+            &empty_graph_for_test(),
+            &empty_baseline_for_test(),
+        );
+        // Must have error-severity findings so the CLI exits 1.
+        let has_errors =
+            outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Error);
+        assert!(has_errors, "delete error must produce error-severity findings in VerifyOutcome");
+        let exit = print_outcome("test", &outcome);
+        assert_eq!(exit, ExitCode::FAILURE, "delete error must cause exit 1");
+    }
+
+    #[test]
+    fn test_evaluate_consistency_from_components_with_contradiction_only_returns_success_outcome() {
+        // Proves the wiring inside execute_spec_code_consistency: contradiction warnings
+        // must produce a VerifyOutcome that exits 0 (advisory, not CI-blocking).
+        use std::collections::HashMap;
+        let entry = make_entry_for_test("Existing", domain::TypeAction::Add);
+        let baseline = domain::TypeBaseline::new(
+            1,
+            domain::Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
+            HashMap::from([(
+                "Existing".to_string(),
+                domain::TypeBaselineEntry::new(domain::schema::TypeKind::Struct, vec![], vec![]),
+            )]),
+            HashMap::new(),
+        );
+        let doc = make_doc_with_entry(entry);
+        let outcome =
+            evaluate_consistency_from_components(&doc, &empty_graph_for_test(), &baseline);
+        // Must have only warning-severity findings (no errors) — exit code 0.
+        let has_errors =
+            outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Error);
+        assert!(!has_errors, "contradiction must not produce error-severity findings");
+        let exit = print_outcome("test", &outcome);
+        assert_eq!(exit, ExitCode::SUCCESS, "contradiction-only must exit 0");
+    }
+
+    #[test]
+    fn test_evaluate_consistency_from_components_with_empty_report_returns_pass_outcome() {
+        // Empty report (no entries, no errors) must produce VerifyOutcome::pass() → exit 0.
+        let outcome = evaluate_consistency_from_components(
+            &empty_doc_for_test(),
+            &empty_graph_for_test(),
+            &empty_baseline_for_test(),
+        );
+        assert!(outcome.findings().is_empty(), "empty report must produce zero findings");
+        let exit = print_outcome("test", &outcome);
+        assert_eq!(exit, ExitCode::SUCCESS, "empty report must exit 0");
     }
 }

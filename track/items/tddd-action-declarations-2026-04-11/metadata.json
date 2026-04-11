@@ -98,56 +98,61 @@
   "status": "in_progress",
   "tasks": [
     {
+      "commit_hash": "bf44c19",
       "description": "Domain: TypeAction enum (Add/Modify/Reference/Delete) 定義 + DomainTypeEntry に action フィールド追加 + new() シグネチャ変更 + 全 call site 修正",
       "id": "T001",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "bf44c19",
       "description": "Domain: evaluate_delete ヘルパー追加 + evaluate_single で Delete を kind dispatch 前に分岐 (TraitPort は get_trait、他は get_type で不在=Blue/存在=Yellow)",
       "id": "T002",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "bf44c19",
       "description": "Domain: ActionContradiction / ActionContradictionKind 型 + ConsistencyReport に contradictions と delete_errors フィールド追加",
       "id": "T003",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "bf44c19",
       "description": "Domain: check_consistency に contradiction 検出 (add+baseline=warn, modify+no-baseline=warn, reference+no-baseline=warn, reference+not-blue=warn) + delete baseline 検証 (delete+no-baseline=error) + TDDD-03 コメント更新",
       "id": "T004",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "bf44c19",
       "description": "Domain: lib.rs exports 更新 — TypeAction, ActionContradiction, ActionContradictionKind を pub use に追加",
       "id": "T005",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "Infrastructure: Codec DTO 拡張 — TypeActionDto enum + action フィールド (default=add, skip_serializing_if=add) + duplicate name 検証緩和 (同名は delete+add ペアのみ許可、3件以上は常にエラー)",
       "id": "T006",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Infrastructure: domain_types_render に Action 列追加 (Add='—', 他=action名)",
       "id": "T007",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "CLI: verify.rs に contradictions → Finding::warning + delete_errors → Finding::error + print_consistency_report_json に新フィールド追加",
       "id": "T008",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "CLI: signals.rs に contradictions → [WARN] 出力 + delete_errors → CliError 失敗",
       "id": "T009",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "Command: /track:design の Step 2 に action 選択ガイダンス追加 + Step 3 の JSON スキーマ例に action フィールド追加",
       "id": "T010",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "title": "TDDD-03: Type action declarations — add/modify/reference/delete",
-  "updated_at": "2026-04-11T13:16:00Z"
+  "updated_at": "2026-04-11T13:25:07Z"
 }
