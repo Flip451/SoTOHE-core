@@ -647,26 +647,18 @@ pub fn check_consistency(
     // Forward check (groups 1 + 2): evaluate declared entries against code.
     let forward_signals = evaluate_domain_type_signals(entries, graph);
 
-    let declared_type_names: HashSet<&str> = entries
-        .iter()
-        .filter(|e| !matches!(e.kind(), DomainTypeKind::TraitPort { .. }))
-        .map(|e| e.name())
-        .collect();
-
-    let declared_trait_names: HashSet<&str> = entries
-        .iter()
-        .filter(|e| matches!(e.kind(), DomainTypeKind::TraitPort { .. }))
-        .map(|e| e.name())
-        .collect();
+    // All declared names regardless of kind — ADR §3 sets A/B are kind-agnostic.
+    // This prevents cross-kind misclassification (e.g., baseline type declared as trait).
+    let declared_names: HashSet<&str> = entries.iter().map(|e| e.name()).collect();
 
     let mut skipped_count: usize = 0;
     let mut baseline_red_types: Vec<String> = Vec::new();
     let mut baseline_red_traits: Vec<String> = Vec::new();
 
-    // Group 3 — types: B\A (in baseline, not declared)
+    // Group 3 — types: B\A (in baseline types, not declared under any kind)
     for (name, baseline_entry) in baseline.types() {
-        if declared_type_names.contains(name.as_str()) {
-            continue; // Group 2: declared → handled by forward check
+        if declared_names.contains(name.as_str()) {
+            continue; // Group 2: declared ��� handled by forward check
         }
         match graph.get_type(name) {
             Some(code_node) => {
@@ -688,9 +680,9 @@ pub fn check_consistency(
         }
     }
 
-    // Group 3 — traits: B\A (in baseline, not declared)
+    // Group 3 — traits: B\A (in baseline traits, not declared under any kind)
     for (name, baseline_entry) in baseline.traits() {
-        if declared_trait_names.contains(name.as_str()) {
+        if declared_names.contains(name.as_str()) {
             continue; // Group 2: declared → handled by forward check
         }
         match graph.get_trait(name) {
@@ -711,17 +703,25 @@ pub fn check_consistency(
     baseline_red_types.sort();
     baseline_red_traits.sort();
 
-    // Group 4 — ∁(A∪B)∩C: in code, not declared, not in baseline → Red
+    // Group 4 — ∁(A∪B)∩C: in code, not declared, not in baseline (either kind) → Red
     let mut undeclared_types: Vec<String> = graph
         .type_names()
-        .filter(|name| !declared_type_names.contains(name.as_str()) && !baseline.has_type(name))
+        .filter(|name| {
+            !declared_names.contains(name.as_str())
+                && !baseline.has_type(name)
+                && !baseline.has_trait(name)
+        })
         .cloned()
         .collect();
     undeclared_types.sort();
 
     let mut undeclared_traits: Vec<String> = graph
         .trait_names()
-        .filter(|name| !declared_trait_names.contains(name.as_str()) && !baseline.has_trait(name))
+        .filter(|name| {
+            !declared_names.contains(name.as_str())
+                && !baseline.has_type(name)
+                && !baseline.has_trait(name)
+        })
         .cloned()
         .collect();
     undeclared_traits.sort();
