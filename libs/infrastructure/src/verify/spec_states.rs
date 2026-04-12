@@ -61,6 +61,25 @@ pub fn check_domain_types_signals(
         )]);
     };
 
+    // Signal coverage: every entry must have a matching signal (by name + kind).
+    // Missing coverage = fail-closed (stale all-Blue signals must not pass after
+    // new entries are added without re-running signal evaluation).
+    let signal_keys: std::collections::HashSet<(&str, &str)> =
+        signals.iter().map(|s| (s.type_name(), s.kind_tag())).collect();
+    let uncovered: Vec<&str> = doc
+        .entries()
+        .iter()
+        .filter(|e| !signal_keys.contains(&(e.name(), e.kind().kind_tag())))
+        .map(|e| e.name())
+        .collect();
+    if !uncovered.is_empty() {
+        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            "{} domain type(s) have no signal evaluation: {}; re-run `sotp track domain-type-signals`",
+            uncovered.len(),
+            uncovered.join(", ")
+        ))]);
+    }
+
     let red_entries: Vec<&str> = signals
         .iter()
         .filter(|s| s.signal() == ConfidenceSignal::Red)
@@ -170,7 +189,7 @@ pub fn verify_from_spec_json(spec_json_path: &Path, strict: bool) -> VerifyOutco
         }
     };
 
-    // CI path requires entries and signals to be present (fail-closed for TDDD tracks).
+    // CI path requires at least one entry (fail-closed for TDDD tracks).
     if doc.entries().is_empty() {
         return VerifyOutcome::from_findings(vec![Finding::error(format!(
             "{}: domain-types.json has no entries; add at least one domain type declaration",
@@ -178,31 +197,7 @@ pub fn verify_from_spec_json(spec_json_path: &Path, strict: bool) -> VerifyOutco
         ))]);
     }
 
-    // Check signal coverage by name + kind: every entry must have a matching signal
-    let Some(signals) = doc.signals() else {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
-            "{}: domain type signals not yet evaluated; run `sotp track domain-type-signals` first",
-            domain_types_path.display()
-        ))]);
-    };
-    let signal_keys: std::collections::HashSet<(&str, &str)> =
-        signals.iter().map(|s| (s.type_name(), s.kind_tag())).collect();
-    let uncovered: Vec<&str> = doc
-        .entries()
-        .iter()
-        .filter(|e| !signal_keys.contains(&(e.name(), e.kind().kind_tag())))
-        .map(|e| e.name())
-        .collect();
-    if !uncovered.is_empty() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
-            "{}: {} domain type(s) have no signal evaluation: {}; re-run `sotp track domain-type-signals`",
-            domain_types_path.display(),
-            uncovered.len(),
-            uncovered.join(", ")
-        ))]);
-    }
-
-    // Delegate signal Red/Yellow check to shared function.
+    // Delegate signal coverage + Red/Yellow check to shared function.
     check_domain_types_signals(&doc, strict)
 }
 
