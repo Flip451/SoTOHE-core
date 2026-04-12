@@ -204,9 +204,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "7a0db96d3220426aa5b6ae19737710c3014fbb0b",
       "description": "domain: check_domain_types_signals(&DomainTypesDocument, strict: bool) -> VerifyOutcome を libs/domain/src/tddd/catalogue.rs に追加 + D7–D13 tests (Red/空/coverage 常に error, Yellow は strict で error / non-strict で warning)",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "domain: libs/domain/src/git_ref.rs 新設 + validate_branch_ref + RefValidationError (DisallowedCharacter / Empty) + D14–D22 tests (.., @{, ~, ^, :, 空白, 制御文字を拒否)",
@@ -265,5 +266,5 @@
     }
   ],
   "title": "Strict Spec Signal Gate v2 — Yellow blocks merge (fail-closed)",
-  "updated_at": "2026-04-12T02:55:07Z"
+  "updated_at": "2026-04-12T03:22:01Z"
 }

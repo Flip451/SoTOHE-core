@@ -29,7 +29,7 @@ check_domain_types_signals(&DomainTypesDocument, strict: bool) -> VerifyOutcome 
 entries 非空 / coverage 完全 / Red / Yellow (strict で error、non-strict で warning + 型名リスト) を検査する。
 D7–D13 の domain 層ユニットテストを追加する。
 
-- [ ] domain: check_domain_types_signals(&DomainTypesDocument, strict: bool) -> VerifyOutcome を libs/domain/src/tddd/catalogue.rs に追加 + D7–D13 tests (Red/空/coverage 常に error, Yellow は strict で error / non-strict で warning)
+- [x] domain: check_domain_types_signals(&DomainTypesDocument, strict: bool) -> VerifyOutcome を libs/domain/src/tddd/catalogue.rs に追加 + D7–D13 tests (Red/空/coverage 常に error, Yellow は strict で error / non-strict で warning) 7a0db96d3220426aa5b6ae19737710c3014fbb0b
 
 ## domain: validate_branch_ref + RefValidationError 新設
 
