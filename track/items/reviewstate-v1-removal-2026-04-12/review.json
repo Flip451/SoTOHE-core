@@ -1,6 +1,60 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e807630eb4091cb221a10599307e89eb4b8820306560ac17393f29f4426c6ad",
+          "at": "2026-04-12T19:08:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e807630eb4091cb221a10599307e89eb4b8820306560ac17393f29f4426c6ad",
+          "at": "2026-04-12T19:11:41Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c72091e9ec182126443ae714f156088bcf2dfca9cb469d48b0fc7916432c6b1",
+          "at": "2026-04-12T18:42:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c72091e9ec182126443ae714f156088bcf2dfca9cb469d48b0fc7916432c6b1",
+          "at": "2026-04-12T18:44:14Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1a4393f93f43beaff74498dde341bcb3f1b922a82f0522a0175de29703f8c3d",
+          "at": "2026-04-12T18:51:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1a4393f93f43beaff74498dde341bcb3f1b922a82f0522a0175de29703f8c3d",
+          "at": "2026-04-12T18:53:47Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -99,42 +153,35 @@
           "findings": [],
           "hash": "rvw1:sha256:f0d3d98a77140dbf556184800c86a1a37820427b4d54d31a76d06e6e7244a5ce",
           "at": "2026-04-12T18:52:38Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0c72091e9ec182126443ae714f156088bcf2dfca9cb469d48b0fc7916432c6b1",
-          "at": "2026-04-12T18:42:20Z"
+          "hash": "rvw1:sha256:c6af1d3ab8f1255fec4ccd4c7481a68576e62ab6b52c5dbccb104f04d16888b1",
+          "at": "2026-04-12T19:08:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T004` is now marked `\"done\"`, but its task object no longer includes a `commit_hash` field at all. The review checklist for this scope explicitly expects `commit_hash: null` until the T004 commit is created, and other task records in this repo keep the field present even when null. Leaving the key absent makes `metadata.json` inconsistent with the expected task shape and with the rendered track metadata contract.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/metadata.json",
+              "line": 123,
+              "category": "artifact_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:c6af1d3ab8f1255fec4ccd4c7481a68576e62ab6b52c5dbccb104f04d16888b1",
+          "at": "2026-04-12T19:11:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0c72091e9ec182126443ae714f156088bcf2dfca9cb469d48b0fc7916432c6b1",
-          "at": "2026-04-12T18:44:14Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a1a4393f93f43beaff74498dde341bcb3f1b922a82f0522a0175de29703f8c3d",
-          "at": "2026-04-12T18:51:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a1a4393f93f43beaff74498dde341bcb3f1b922a82f0522a0175de29703f8c3d",
-          "at": "2026-04-12T18:53:47Z"
+          "hash": "rvw1:sha256:82081e3003e426377d15409b44fe9d77af0c876a0f14f11129b1d1ab93f19473",
+          "at": "2026-04-12T19:12:30Z"
         }
       ]
     }

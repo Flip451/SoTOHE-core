@@ -7,8 +7,6 @@ pub mod domain_types_render;
 pub mod gh_cli;
 pub mod git_cli;
 pub mod guides_codec;
-pub mod review_json_codec;
-pub mod review_json_store;
 pub mod review_v2;
 pub mod schema_export;
 #[cfg(test)]

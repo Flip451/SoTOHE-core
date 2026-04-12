@@ -115,14 +115,16 @@
       "status": "done"
     },
     {
+      "commit_hash": "439c6ddfd1253f91954a4cec1fc5516eb55dd0d7",
       "description": "usecase: libs/usecase/src/review_workflow/usecases.rs + scope.rs 全削除 + review_workflow/mod.rs prune (verdict モジュールのみ残す) + verdict.rs 行 185/193 の domain::review::extract_verdict_json_candidates_* 呼び出しを domain::review_v2::extract_verdict_json_candidates_* に切り替え",
       "id": "T003",
       "status": "done"
     },
     {
+      "commit_hash": null,
       "description": "infra: libs/infrastructure/src/git_cli/mod.rs から index_tree_hash_normalizing trait method + SystemGitRepo impl + 関連ユニット/統合テスト + rrz test helper 削除 + private_index.rs::normalized_tree_hash 削除 (PrivateIndex が dead なら file ごと削除) + review_json_codec.rs + review_json_store.rs ファイル削除 + infrastructure/lib.rs re-export prune + track/codec.rs の TrackDocumentV2.review field + V1 review DTO tree + helpers + V1 codec tests 削除 (#[serde(flatten)] extra は保持して 30 metadata.json の review は素通し) + 既存テストが review blob roundtrip を網羅していない場合は D9 passthrough を確認するユニットテストを追加する (V1 codec tests 削除後も roundtrip 保証が残ること)",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "domain: review_v2/types.rs に RoundType を追加 + review/state.rs + escalation.rs + concern.rs + types.rs + cycle/ + error.rs 削除 + review/mod.rs prune + lib.rs V1 re-export 削除 + track.rs の TrackMetadata.review field と accessors と ctor init 削除 + repository.rs から ReviewJsonReader/ReviewJsonWriter 削除 + apps/cli 側の domain::RoundType import 調整 + cargo make ci PASS 確認 + bin/sotp track baseline-capture + domain-type-signals で ReviewState 同名衝突消滅を回帰確認 + ADR Status を Accepted に更新 + knowledge/strategy/TODO.md の RV2-07 done マーク (V1 domain コード全体削除の同一コミットで行う)",
@@ -131,5 +133,5 @@
     }
   ],
   "title": "Review System V1 完全撤去 — metadata.json review + V1 review.json codec + escalation + index_tree_hash_normalizing",
-  "updated_at": "2026-04-12T18:48:59Z"
+  "updated_at": "2026-04-12T19:05:32Z"
 }
