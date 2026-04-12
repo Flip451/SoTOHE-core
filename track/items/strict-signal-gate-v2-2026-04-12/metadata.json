@@ -198,9 +198,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "9302f2fdbcb1d7b625279047d592e1b18f2547ce",
       "description": "domain: check_spec_doc_signals(&SpecDocument, strict: bool) -> VerifyOutcome を libs/domain/src/spec.rs に追加 + D1–D6 tests (strict=false で yellow を Finding::warning として emit)",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "domain: check_domain_types_signals(&DomainTypesDocument, strict: bool) -> VerifyOutcome を libs/domain/src/tddd/catalogue.rs に追加 + D7–D13 tests (Red/空/coverage 常に error, Yellow は strict で error / non-strict で warning)",
@@ -264,5 +265,5 @@
     }
   ],
   "title": "Strict Spec Signal Gate v2 — Yellow blocks merge (fail-closed)",
-  "updated_at": "2026-04-12T02:44:53Z"
+  "updated_at": "2026-04-12T02:55:07Z"
 }

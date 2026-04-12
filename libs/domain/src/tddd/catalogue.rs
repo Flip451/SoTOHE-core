@@ -962,6 +962,111 @@ pub fn check_consistency(
 }
 
 // ---------------------------------------------------------------------------
+// Stage 2 signal gate (check_domain_types_signals)
+// ---------------------------------------------------------------------------
+
+/// Evaluates Stage 2 signal gate rules against a `DomainTypesDocument`.
+///
+/// Shared pure function used by both the CI path (`verify_from_spec_json`
+/// Stage 2) and the merge gate (via `usecase::merge_gate`). The caller is
+/// responsible for handling the `NotFound` case (no `domain-types.json` =
+/// TDDD not active for the track, per ADR §D2.1 opt-in model).
+///
+/// # Rules
+///
+/// - `entries` is empty → `Finding::error` (malformed catalogue)
+/// - `signals` is `None` → `Finding::error` (unevaluated; run `sotp track domain-type-signals`)
+/// - Signal coverage incomplete (entry has no matching signal) → `Finding::error`
+/// - Any Red signal (forward or reverse) → `Finding::error` (always an error, regardless of mode)
+/// - Declared-entry Yellow signal, `strict = true` → `Finding::error`
+/// - Declared-entry Yellow signal, `strict = false` → `Finding::warning` (D8.6 visualization)
+/// - Undeclared reverse signals (outside entry set) that are Yellow are not blocked
+///   (only their Red counterparts are caught by the Red check above)
+/// - All Blue / no declared Yellow → `VerifyOutcome::pass()`
+///
+/// The `strict` parameter is:
+/// - `true` for the merge gate (all declared Yellow must be upgraded to Blue)
+/// - `false` for CI interim mode (declared Yellow is allowed but visualized)
+///
+/// Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md` §D2, §D8.6.
+#[must_use]
+pub fn check_domain_types_signals(
+    doc: &DomainTypesDocument,
+    strict: bool,
+) -> crate::verify::VerifyOutcome {
+    use crate::verify::{Finding, VerifyOutcome};
+
+    if doc.entries().is_empty() {
+        return VerifyOutcome::from_findings(vec![Finding::error(
+            "domain-types.json has no entries — add at least one domain type declaration"
+                .to_owned(),
+        )]);
+    }
+
+    let Some(signals) = doc.signals() else {
+        return VerifyOutcome::from_findings(vec![Finding::error(
+            "domain type signals not yet evaluated — run `sotp track domain-type-signals` first"
+                .to_owned(),
+        )]);
+    };
+
+    // Signal coverage: every entry must have a matching (name, kind_tag) signal.
+    let signal_keys: std::collections::HashSet<(&str, &str)> =
+        signals.iter().map(|s| (s.type_name(), s.kind_tag())).collect();
+    let uncovered: Vec<&str> = doc
+        .entries()
+        .iter()
+        .filter(|e| !signal_keys.contains(&(e.name(), e.kind().kind_tag())))
+        .map(|e| e.name())
+        .collect();
+    if !uncovered.is_empty() {
+        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            "{} domain type(s) have no signal evaluation: {} — re-run `sotp track domain-type-signals`",
+            uncovered.len(),
+            uncovered.join(", ")
+        ))]);
+    }
+
+    // Red check: applies to all signals (forward + reverse).
+    let all_red: Vec<&str> = signals
+        .iter()
+        .filter(|s| s.signal() == ConfidenceSignal::Red)
+        .map(|s| s.type_name())
+        .collect();
+    if !all_red.is_empty() {
+        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            "{} domain type(s) have Red signal (TDDD violation — run /track:design): {}",
+            all_red.len(),
+            all_red.join(", ")
+        ))]);
+    }
+
+    // Yellow check: declared entries only. Mode-dependent: error in strict, warning in interim.
+    let entry_keys: std::collections::HashSet<(&str, &str)> =
+        doc.entries().iter().map(|e| (e.name(), e.kind().kind_tag())).collect();
+    let yellow_entries: Vec<&str> = signals
+        .iter()
+        .filter(|s| entry_keys.contains(&(s.type_name(), s.kind_tag())))
+        .filter(|s| s.signal() == ConfidenceSignal::Yellow)
+        .map(|s| s.type_name())
+        .collect();
+
+    if !yellow_entries.is_empty() {
+        let message = format!(
+            "domain-types.json: {} declared type(s) have Yellow signal: {} — merge gate will block these until upgraded to Blue. Resolve each type (implement or remove per its declared action) and re-run `sotp track domain-type-signals`.",
+            yellow_entries.len(),
+            yellow_entries.join(", ")
+        );
+        if strict {
+            return VerifyOutcome::from_findings(vec![Finding::error(message)]);
+        }
+        return VerifyOutcome::from_findings(vec![Finding::warning(message)]);
+    }
+
+    VerifyOutcome::pass()
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -2112,5 +2217,151 @@ mod tests {
         )]);
         let report = check_consistency(&[entry], &graph, &baseline);
         assert!(report.delete_errors().is_empty());
+    }
+
+    // --- check_domain_types_signals (Stage 2 signal gate) ---
+    //
+    // Cases mirror the D7–D13 rows in the ADR Test Matrix. The function is
+    // shared by both the CI path and the merge gate; Yellow flips between
+    // warning and error based on the `strict` parameter.
+
+    fn make_entry(name: &str) -> DomainTypeEntry {
+        DomainTypeEntry::new(name, "test entry", DomainTypeKind::ValueObject, TypeAction::Add, true)
+            .unwrap()
+    }
+
+    fn make_signal(name: &str, signal: ConfidenceSignal) -> DomainTypeSignal {
+        DomainTypeSignal::new(
+            name,
+            "value_object",
+            signal,
+            true,
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+        )
+    }
+
+    #[test]
+    fn test_check_domain_types_signals_empty_entries_returns_error() {
+        // D7: entries=[] → BLOCKED
+        let doc = DomainTypesDocument::new(1, Vec::new());
+        let outcome = check_domain_types_signals(&doc, false);
+        assert!(outcome.has_errors(), "empty entries must be an error");
+        assert!(outcome.findings()[0].message().contains("no entries"));
+    }
+
+    #[test]
+    fn test_check_domain_types_signals_none_signals_returns_error() {
+        // D8: signals=None → BLOCKED (unevaluated)
+        let doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
+        let outcome = check_domain_types_signals(&doc, false);
+        assert!(outcome.has_errors(), "None signals must be an error");
+        assert!(outcome.findings()[0].message().contains("not yet evaluated"));
+    }
+
+    #[test]
+    fn test_check_domain_types_signals_coverage_gap_returns_error() {
+        // D9: entry has no matching signal → BLOCKED
+        let mut doc =
+            DomainTypesDocument::new(1, vec![make_entry("TrackId"), make_entry("ReviewState")]);
+        // Only TrackId has a signal; ReviewState is uncovered
+        doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Blue)]);
+        let outcome = check_domain_types_signals(&doc, false);
+        assert!(outcome.has_errors());
+        let msg = outcome.findings()[0].message();
+        assert!(msg.contains("no signal evaluation"), "message: {msg}");
+        assert!(msg.contains("ReviewState"));
+    }
+
+    #[test]
+    fn test_check_domain_types_signals_red_is_error_regardless_of_mode() {
+        // D10: Red signal → BLOCKED in both modes
+        let mut doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
+        doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Red)]);
+        let outcome_interim = check_domain_types_signals(&doc, false);
+        assert!(outcome_interim.has_errors(), "red in interim must be an error");
+        let outcome_strict = check_domain_types_signals(&doc, true);
+        assert!(outcome_strict.has_errors(), "red in strict must be an error");
+    }
+
+    #[test]
+    fn test_check_domain_types_signals_yellow_is_warning_in_interim_mode() {
+        // D11: declared Yellow, strict=false → PASS with warning
+        let mut doc =
+            DomainTypesDocument::new(1, vec![make_entry("TrackId"), make_entry("ReviewState")]);
+        doc.set_signals(vec![
+            make_signal("TrackId", ConfidenceSignal::Blue),
+            make_signal("ReviewState", ConfidenceSignal::Yellow),
+        ]);
+        let outcome = check_domain_types_signals(&doc, false);
+        assert!(!outcome.has_errors(), "yellow in interim must not be an error");
+        let findings = outcome.findings();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].severity(), crate::verify::Severity::Warning);
+        let msg = findings[0].message();
+        assert!(msg.contains("1 declared type"), "must mention count: {msg}");
+        assert!(msg.contains("ReviewState"), "must list the type name: {msg}");
+        assert!(msg.contains("merge gate will block"), "must warn: {msg}");
+    }
+
+    #[test]
+    fn test_check_domain_types_signals_yellow_is_error_in_strict_mode() {
+        // D12: declared Yellow, strict=true → BLOCKED
+        let mut doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
+        doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Yellow)]);
+        let outcome = check_domain_types_signals(&doc, true);
+        assert!(outcome.has_errors());
+        let findings = outcome.findings();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].severity(), crate::verify::Severity::Error);
+        assert!(findings[0].message().contains("TrackId"));
+    }
+
+    #[test]
+    fn test_check_domain_types_signals_all_blue_passes_in_both_modes() {
+        // D13: all Blue + coverage complete → PASS
+        let mut doc =
+            DomainTypesDocument::new(1, vec![make_entry("TrackId"), make_entry("ReviewState")]);
+        doc.set_signals(vec![
+            make_signal("TrackId", ConfidenceSignal::Blue),
+            make_signal("ReviewState", ConfidenceSignal::Blue),
+        ]);
+
+        let outcome_interim = check_domain_types_signals(&doc, false);
+        assert!(!outcome_interim.has_errors());
+        assert!(outcome_interim.findings().is_empty());
+
+        let outcome_strict = check_domain_types_signals(&doc, true);
+        assert!(!outcome_strict.has_errors());
+        assert!(outcome_strict.findings().is_empty());
+    }
+
+    #[test]
+    fn test_check_domain_types_signals_undeclared_yellow_is_not_blocked() {
+        // Undeclared reverse signals that are Yellow are allowed even in strict
+        // mode (per existing verify_from_spec_json logic — only declared Yellow
+        // is gated). Undeclared Red is caught by the Red check.
+        let mut doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
+        doc.set_signals(vec![
+            make_signal("TrackId", ConfidenceSignal::Blue),
+            // Yellow signal for a type not in the entries list (reverse/undeclared)
+            DomainTypeSignal::new(
+                "UndeclaredType",
+                "undeclared_type",
+                ConfidenceSignal::Yellow,
+                false,
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+            ),
+        ]);
+
+        let outcome_strict = check_domain_types_signals(&doc, true);
+        assert!(
+            !outcome_strict.has_errors(),
+            "undeclared Yellow must not block even in strict mode: {outcome_strict:?}"
+        );
+        assert!(outcome_strict.findings().is_empty());
     }
 }

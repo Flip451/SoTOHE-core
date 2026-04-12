@@ -21,7 +21,7 @@ strict=true では yellow を Finding::error、strict=false では yellow を Fi
 Red / None / all-zero は strict に関わらず常に Finding::error。
 D1–D6 の domain 層ユニットテストを追加する。
 
-- [ ] domain: check_spec_doc_signals(&SpecDocument, strict: bool) -> VerifyOutcome を libs/domain/src/spec.rs に追加 + D1–D6 tests (strict=false で yellow を Finding::warning として emit)
+- [x] domain: check_spec_doc_signals(&SpecDocument, strict: bool) -> VerifyOutcome を libs/domain/src/spec.rs に追加 + D1–D6 tests (strict=false で yellow を Finding::warning として emit) 9302f2fdbcb1d7b625279047d592e1b18f2547ce
 
 ## domain: check_domain_types_signals 追加
 
