@@ -21,10 +21,6 @@ use codex_local::execute_codex_local;
 
 const DEFAULT_TIMEOUT_SECONDS: u64 = 1800;
 
-fn make_timestamp() -> Result<domain::Timestamp, String> {
-    let s = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
-    domain::Timestamp::new(s).map_err(|e| format!("invalid timestamp: {e}"))
-}
 #[cfg(test)]
 pub(super) const REVIEW_RUNTIME_DIR: &str = "tmp/reviewer-runtime";
 #[cfg(test)]
@@ -38,12 +34,8 @@ pub enum ReviewCommand {
     CodexLocal(CodexLocalArgs),
     /// Check if review is approved for commit.
     CheckApproved(CheckApprovedArgs),
-    /// Resolve an active review escalation block.
-    ResolveEscalation(ResolveEscalationArgs),
     /// Show per-scope review state for a track.
     Status(StatusArgs),
-    /// Set approved_head in review.json (recovery command for post-commit persistence failure).
-    SetApprovedHead(SetApprovedHeadArgs),
 }
 
 /// CLI round type for auto-record.
@@ -140,38 +132,6 @@ pub(super) fn validate_auto_record_args(
 }
 
 #[derive(Debug, Args)]
-pub struct ResolveEscalationArgs {
-    /// Track ID.
-    #[arg(long)]
-    track_id: String,
-
-    /// Comma-separated list of blocked concerns to resolve.
-    /// Must match the concerns currently blocking escalation.
-    #[arg(long)]
-    blocked_concerns: String,
-
-    /// Path to workspace search artifact.
-    #[arg(long)]
-    workspace_search_ref: String,
-
-    /// Path to reinvention check artifact.
-    #[arg(long)]
-    reinvention_check_ref: String,
-
-    /// Decision: adopt_workspace, adopt_crate, or continue_self.
-    #[arg(long)]
-    decision: String,
-
-    /// Summary of the decision rationale.
-    #[arg(long)]
-    summary: String,
-
-    /// Path to the track items directory.
-    #[arg(long, default_value = "track/items")]
-    items_dir: PathBuf,
-}
-
-#[derive(Debug, Args)]
 pub struct CheckApprovedArgs {
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
@@ -184,17 +144,6 @@ pub struct CheckApprovedArgs {
 
 #[derive(Debug, Args)]
 pub struct StatusArgs {
-    /// Path to the track items directory.
-    #[arg(long, default_value = "track/items")]
-    items_dir: PathBuf,
-
-    /// Track ID.
-    #[arg(long)]
-    track_id: String,
-}
-
-#[derive(Debug, Args)]
-pub struct SetApprovedHeadArgs {
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
     items_dir: PathBuf,
@@ -233,53 +182,8 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
     match cmd {
         ReviewCommand::CodexLocal(args) => execute_codex_local(&args),
         ReviewCommand::CheckApproved(args) => execute_check_approved(&args),
-        ReviewCommand::ResolveEscalation(args) => execute_resolve_escalation(&args),
         ReviewCommand::Status(args) => execute_status(&args),
-        ReviewCommand::SetApprovedHead(args) => execute_set_approved_head(&args),
     }
-}
-
-// ---------------------------------------------------------------------------
-// resolve-escalation: Resolve an active review escalation block
-// ---------------------------------------------------------------------------
-
-fn execute_resolve_escalation(args: &ResolveEscalationArgs) -> ExitCode {
-    match run_resolve_escalation(args) {
-        Ok(decision) => {
-            println!("[OK] Escalation resolved: {decision}");
-            ExitCode::SUCCESS
-        }
-        Err(msg) => {
-            eprintln!("{msg}");
-            ExitCode::FAILURE
-        }
-    }
-}
-
-fn run_resolve_escalation(args: &ResolveEscalationArgs) -> Result<String, String> {
-    // Validate artifact paths exist before calling usecase.
-    if !std::path::Path::new(&args.workspace_search_ref).exists() {
-        return Err(format!("workspace search artifact not found: {}", args.workspace_search_ref));
-    }
-    if !std::path::Path::new(&args.reinvention_check_ref).exists() {
-        return Err(format!(
-            "reinvention check artifact not found: {}",
-            args.reinvention_check_ref
-        ));
-    }
-    let store = infrastructure::track::fs_store::FsTrackStore::new(&args.items_dir);
-    let timestamp = make_timestamp()?;
-    let input = usecase::review_workflow::usecases::ResolveEscalationInput {
-        track_id: args.track_id.clone(),
-        blocked_concerns: args.blocked_concerns.clone(),
-        workspace_search_ref: args.workspace_search_ref.clone(),
-        reinvention_check_ref: args.reinvention_check_ref.clone(),
-        decision: args.decision.clone(),
-        summary: args.summary.clone(),
-        items_dir: args.items_dir.clone(),
-        timestamp,
-    };
-    usecase::review_workflow::usecases::resolve_escalation(input, &store)
 }
 
 // ---------------------------------------------------------------------------
@@ -306,27 +210,6 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
     // Empty scopes are NotRequired(Empty), reviewed scopes are NotRequired(ZeroFindings).
     // The commit gate simply checks all scopes are NotRequired.
     let track_id = domain::TrackId::try_new(&args.track_id).map_err(|e| format!("{e}"))?;
-
-    // Fail-closed: check metadata.json escalation gate.
-    // Escalation state lives in metadata.json until it is migrated to review.json.
-    {
-        use domain::TrackReader;
-        let store = infrastructure::track::fs_store::FsTrackStore::new(&args.items_dir);
-        let track = store
-            .find(&track_id)
-            .map_err(|e| format!("failed to read track: {e}"))?
-            .ok_or_else(|| format!("track '{}' not found", track_id.as_ref()))?;
-        if let Some(review_state) = track.review() {
-            if let domain::EscalationPhase::Blocked(block) = review_state.escalation().phase() {
-                let concerns: Vec<_> =
-                    block.concerns().iter().map(|c| c.as_ref().to_owned()).collect();
-                return Err(format!(
-                    "[BLOCKED] Review escalation active for concerns: {concerns:?}. \
-                     Run `sotp review resolve-escalation` first."
-                ));
-            }
-        }
-    }
 
     let comp = compose_v2::build_review_v2(&track_id, &args.items_dir)?;
 
@@ -378,69 +261,6 @@ fn run_check_approved(args: &CheckApprovedArgs) -> Result<(), String> {
 // ---------------------------------------------------------------------------
 // status: Show per-group Fast/Final review state
 // ---------------------------------------------------------------------------
-
-fn execute_set_approved_head(args: &SetApprovedHeadArgs) -> ExitCode {
-    match run_set_approved_head(args) {
-        Ok(()) => {
-            eprintln!("[OK] approved_head updated");
-            ExitCode::SUCCESS
-        }
-        Err(msg) => {
-            eprintln!("[ERROR] {msg}");
-            ExitCode::FAILURE
-        }
-    }
-}
-
-fn run_set_approved_head(args: &SetApprovedHeadArgs) -> Result<(), String> {
-    use domain::{ApprovedHead, ReviewJsonReader, ReviewJsonWriter, TrackId};
-
-    let track_id =
-        TrackId::try_new(&args.track_id).map_err(|e| format!("invalid track id: {e}"))?;
-
-    // Verify current branch matches the requested track to prevent cross-track corruption.
-    let current_branch = std::process::Command::new("git")
-        .args(["rev-parse", "--abbrev-ref", "HEAD"])
-        .output()
-        .map_err(|e| format!("failed to detect branch: {e}"))?;
-    if !current_branch.status.success() {
-        return Err("failed to detect current branch (git rev-parse failed)".to_owned());
-    }
-    let branch_name = String::from_utf8_lossy(&current_branch.stdout).trim().to_owned();
-    let expected_branch = format!("track/{}", args.track_id);
-    if branch_name != expected_branch {
-        return Err(format!(
-            "current branch '{branch_name}' does not match track branch '{expected_branch}'. \
-             Run this command from the correct track branch to prevent cross-track corruption."
-        ));
-    }
-
-    let store = infrastructure::review_json_store::FsReviewJsonStore::new(&args.items_dir);
-
-    let mut review = store
-        .find_review(&track_id)
-        .map_err(|e| format!("failed to read review.json: {e}"))?
-        .ok_or_else(|| "no review.json found".to_owned())?;
-
-    let cycle =
-        review.current_cycle_mut().ok_or_else(|| "no current cycle in review.json".to_owned())?;
-
-    // Resolve HEAD SHA
-    let head_output = std::process::Command::new("git")
-        .args(["rev-parse", "HEAD"])
-        .output()
-        .map_err(|e| format!("failed to run git rev-parse: {e}"))?;
-    if !head_output.status.success() {
-        return Err("git rev-parse HEAD failed".to_owned());
-    }
-    let head_sha = String::from_utf8_lossy(&head_output.stdout).trim().to_owned();
-    let approved_head = ApprovedHead::try_new(&head_sha).map_err(|e| format!("{e}"))?;
-
-    cycle.set_approved_head(approved_head);
-    store.save_review(&track_id, &review).map_err(|e| format!("{e}"))?;
-    eprintln!("[set-approved-head] Recorded: {head_sha}");
-    Ok(())
-}
 
 fn execute_status(args: &StatusArgs) -> ExitCode {
     match run_status(args) {

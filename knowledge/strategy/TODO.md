@@ -810,10 +810,10 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **RVW-49** (LOW): `sotp review scope-check` コマンド — review.json のサイクルスコープと現在の worktree diff を比較し、スコープ不整合（リセットが必要か）を事前検知
 - [ ] **RVW-50** (MEDIUM): partition → record-round → review.json の結合テスト強化 — 個々のコンポーネントは正しくても境界面のバリデーションが手薄。RVW-34 T003 完了後のフォローアップ候補
 - [ ] **RVW-51** (MEDIUM): auto-record verdict 反転バグ — Codex が zero_findings を返したのに review.json に findings_remain が記録されるケースを確認。RVW-34（lossy conversion）とは別問題。review flow を fail-closed 側へ誤誘導し approval/commit を不正にブロックしうるため、LOW ではなく MEDIUM 相当。verdict 変換か前ラウンド verdict の再利用、またはセッションログの誤抽出の可能性。発見: 2026-04-02 incremental-review-scope セッション
-- [ ] **RVW-52** (MEDIUM): `/track:done` で approved_head 書き込み後の dirty review.json を処理 — 最後のコミット後に persist_approved_head が review.json を変更するため、worktree が dirty になり track-switch-main が失敗する。review.json を破棄するのではなく、approved_head を保持したまま clean に戻せる同期フロー（例: commit/note への取り込み、または別の永続化ポイント）が必要
-- [ ] **RVW-53** (LOW): `/track:commit` に APPROVED_HEAD_FAILED 自動リカバリを追加 — track-commit-message の stdout に APPROVED_HEAD_FAILED が出たら即座に `bin/sotp review set-approved-head` を実行する指示をスキル定義に追加
-- [ ] **RVW-54** (MEDIUM): CLI 統合テストハーネス構築 — make.rs の persist_approved_head、review/mod.rs の set-approved-head 等、git repo + プロセス実行を伴う CLI パスのテスト基盤が存在しない。infra 層の setup_test_repo パターンを CLI 層にも導入すべき
-- [ ] **RVW-55** (MEDIUM): v1 `persist_approved_head` 残骸の削除 — `apps/cli/src/commands/make.rs` L561-566 に v1 review.json の `approved_head` 書き込みコードが残っている（コメント: "kept for backwards compat, T007 cleanup"）。v2 scope-based review.json (`scopes` フィールド) を v1 codec (`schema_version` + `cycles`) で読もうとして毎回 soft fail する。v2 `persist_commit_hash_v2` が正常動作しており v1 パスは完全にデッドコード。`persist_approved_head` 関数本体と呼び出し元、および関連する RVW-52 / RVW-53 の前提を再評価して削除すべき。発見: 2026-04-10 agent-profiles-redesign planning commit
+- [x] ~~**RVW-52** (MEDIUM): `/track:done` で approved_head 書き込み後の dirty review.json を処理~~ ✅ obsolete (`reviewstate-v1-removal-2026-04-12` で `persist_approved_head` を削除。問題の前提である V1 `approved_head` 書き込みが消滅した)
+- [x] ~~**RVW-53** (LOW): `/track:commit` に APPROVED_HEAD_FAILED 自動リカバリを追加~~ ✅ obsolete (`reviewstate-v1-removal-2026-04-12` で `sotp review set-approved-head` CLI 自体を削除。自動リカバリ対象のコマンドが消滅した)
+- [ ] **RVW-54** (MEDIUM): CLI 統合テストハーネス構築 — git repo + プロセス実行を伴う CLI パスのテスト基盤が存在しない。infra 層の setup_test_repo パターンを CLI 層にも導入すべき
+- [x] ~~**RVW-55** (MEDIUM): v1 `persist_approved_head` 残骸の削除~~ ✅ done (`reviewstate-v1-removal-2026-04-12` T002 で `apps/cli/src/commands/make.rs::persist_approved_head` 関数と `dispatch_commit_from_file` 内の呼び出しを削除)
 
 ---
 
@@ -902,7 +902,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 
 - [ ] **RV2-05** (HIGH): プロセスグループ kill 不可 — `codex_reviewer.rs` の `terminate_reviewer_child` は `child.kill()` のみ。`killpg` は `#[forbid(unsafe_code)]` で使えない。timeout 後に孫プロセスが残留し、繰り返すとホストリソース消費。CLI 層での process group kill wrapper を実装する
 - [ ] **RV2-06** (HIGH): v2 escalation 完全切断 — `codex_local.rs` の `write_verdict` は `record_round` / concern 追跡 / metadata.json escalation state を一切更新しない。同じ finding が無限ループ可能。v2 terms で escalation を再設計する
-- [ ] **RV2-07** (MEDIUM): v1 domain コード残存 — `track/codec.rs` が v1 review 型（`ReviewCycle`, `CycleGroupState`, `ReviewState` v1, escalation）に依存し削除不可。track codec のリファクタリングが必要
+- [x] ~~**RV2-07** (MEDIUM): v1 domain コード残存 — `track/codec.rs` が v1 review 型（`ReviewCycle`, `CycleGroupState`, `ReviewState` v1, escalation）に依存し削除不可。track codec のリファクタリングが必要~~ ✅ done (`reviewstate-v1-removal-2026-04-12` で V1 review 系統を全削除: `ReviewState` struct + `ReviewEscalationState` + V1 `ReviewCycle`/`CycleGroupState` + `index_tree_hash_normalizing` + `review_json_codec`/`store` + `RecordRoundProtocol` + `resolve_escalation` CLI + `set-approved-head` CLI。ADR `2026-04-12-1800-reviewstate-v1-decommission.md`)
 - [ ] **RV2-08** (MEDIUM): v2 CLI パスのテスト不在 — `execute_codex_local` → `ReviewCycle` → `write_verdict` のフルパスが未テスト。サブコンポーネントは独立テスト済みだが integration test がない
 - [ ] **RV2-09** (LOW): `main` ハードコード — `compose_v2.rs` の `resolve_diff_base` が `.commit_hash` 不在時に `git rev-parse main` にフォールバック。default branch が `main` でないリポジトリで動作しない
 

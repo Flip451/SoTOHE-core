@@ -10,7 +10,6 @@ pub mod hook;
 mod ids;
 mod plan;
 mod repository;
-pub mod review;
 pub mod review_v2;
 pub mod schema;
 mod signal;
@@ -30,17 +29,8 @@ pub use error::{
 pub use git_ref::{RefValidationError, validate_branch_ref};
 pub use ids::{CommitHash, NonEmptyString, ReviewGroupName, TaskId, TrackBranch, TrackId};
 pub use plan::{PlanSection, PlanView};
-pub use repository::{
-    ReviewJsonReader, ReviewJsonWriter, TrackReader, TrackWriter, WorktreeReader,
-};
-pub use review::{
-    ApprovedHead, CodeHash, CycleError, CycleGroupState, EscalationPhase, GroupRound,
-    GroupRoundOutcome, GroupRoundVerdict, NonEmptyFindings, ReviewConcern, ReviewConcernStreak,
-    ReviewCycle, ReviewCycleSummary, ReviewError, ReviewEscalationBlock, ReviewEscalationDecision,
-    ReviewEscalationResolution, ReviewEscalationState, ReviewGroupState, ReviewJson,
-    ReviewRoundResult, ReviewStalenessReason, ReviewState, ReviewStatus, RoundType, StoredFinding,
-    Verdict, file_path_to_concern,
-};
+pub use repository::{TrackReader, TrackWriter, WorktreeReader};
+pub use review_v2::RoundType;
 pub use schema::{TraitNode, TypeGraph, TypeNode};
 pub use signal::{
     ConfidenceSignal, SignalBasis, SignalCounts, classify_source_tag, evaluate_source_tag,

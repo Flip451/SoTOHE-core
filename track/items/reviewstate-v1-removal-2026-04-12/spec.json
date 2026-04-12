@@ -1,0 +1,665 @@
+{
+  "schema_version": 1,
+  "status": "approved",
+  "version": "1.0.0",
+  "title": "Review System V1 完全撤去 — metadata.json review + V1 review.json codec + escalation + index_tree_hash_normalizing",
+  "goal": [
+    "ADR 2026-04-04-1456 (Review System v2 Redesign, Accepted) が廃止宣言した V1 review 系統の残存コードを完全撤去する。",
+    "直接の動機は TDDD-01 baseline reverse check の ReviewState 同名衝突 (V1 struct vs V2 enum) を構造的に解消することだが、V1 review 系統は密結合しており、部分削除は compile 不可状態を生む。従って V1 review 系統全体を 1 トラックで一括撤去する。",
+    "escalation 機構 (3 連続 closed cycle 自動 block) は V2 に未実装であり、V1 撤去と同時に暫定喪失する。V2 再実装は RV2-06 として別トラックで扱う。",
+    "既存 30 track/items/*/metadata.json の review JSON section は migrate せず、codec の #[serde(flatten)] extra が opaque JSON として吸収する (プロジェクトポリシーとして後方互換は追跡しない)。",
+    "依存順で CLI → usecase → infra → domain の順にタスク分割し、各タスク境界で cargo check が通ることを確認しながら進める。最終 T005 で cargo make ci + bin/sotp track baseline-capture + bin/sotp track domain-type-signals を走らせ、TDDD-01 ブロッカーの解消を回帰確認する。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "ADR knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md を本トラック起点に Proposed で作成し、T005 完了時に Accepted へ更新する",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §Status"
+        ],
+        "task_refs": [
+          "T001",
+          "T005"
+        ]
+      },
+      {
+        "text": ".claude/rules/10-guardrails.md の 'Review Escalation Threshold (Enforced by sotp review record-round)' セクション (行 95-163) を削除し、sotp review record-round / sotp review resolve-escalation への言及を全て除去する",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "knowledge/strategy/TODO.md の RVW-54 から set-approved-head / persist_approved_head への言及を削除する (T001 時点では TODO.md の status 変更は行わない。各 TODO エントリのステータス更新は該当コードを実際に削除するタスクのコミットと同じ commit で行う)",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "T002 完了時に knowledge/strategy/TODO.md の RVW-52 を obsolete マーク、RVW-53 を obsolete マーク、RVW-55 を done マークする (T002 で persist_approved_head と set-approved-head CLI を削除するため、RVW-52 / RVW-53 / RVW-55 の問題が解消される)",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "T005 完了時に knowledge/strategy/TODO.md の RV2-07 を done マークする (本 ADR / track への参照追加。T005 で V1 domain コード全体が削除され RV2-07 の目的が達成される)",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "knowledge/DESIGN.md から V1 review state (ReviewState 構造体 / metadata.json review field / record_round_with_pending / check_commit_ready / set_code_hash 等の V1 固有シンボル) への言及を削除し、V1 のみの機能 (escalation / record-round / resolve-escalation / set-approved-head) を説明する設計記述があればそれも削除する (実装時に grep で確認し、該当する言及が存在しなかった場合はそのまま通過)",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "knowledge/conventions/hexagonal-architecture.md から V1 API への参照 (RecordRoundProtocol / ReviewJsonReader など) を削除または置き換える。knowledge/conventions/security.md から FsReviewJsonStore への参照を削除する (いずれも削除後は dead reference となるため T001 の docs cleanup に含める)",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "apps/cli/src/commands/review/mod.rs の ReviewCommand::ResolveEscalation variant + ResolveEscalationArgs + execute_resolve_escalation + run_resolve_escalation を削除する",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D3"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "apps/cli/src/commands/review/mod.rs の run_check_approved 内 fail-closed escalation gate (track.review().escalation().phase() == EscalationPhase::Blocked を検査する if let ブロック、行 310-329) を削除する",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D3"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "apps/cli/src/commands/review/mod.rs の ReviewCommand::SetApprovedHead variant + SetApprovedHeadArgs + execute_set_approved_head + run_set_approved_head を削除する",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D6"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "apps/cli/src/commands/make.rs の persist_approved_head 関数と dispatch_commit_from_file 内の呼び出し (行 561-566) を削除する。V2 代替は同 file の persist_commit_hash_v2 + track-set-commit-hash wrapper で完備済み",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D6",
+          "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "libs/usecase/src/review_workflow/usecases.rs をファイルごと削除する (RecordRoundProtocol trait, RecordRoundProtocolError, record_round, record_round_typed, RecordRoundInput, RecordRoundError, resolve_escalation, ResolveEscalationInput, validation helpers, および対応するユニットテスト)",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D3",
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D4"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "libs/usecase/src/review_workflow/scope.rs をファイルごと削除する (DiffScope / DiffScopeProvider / DiffScopeProviderError / FindingScopeClass / RepoRelativePath / ScopeFilterResult / ScopeFilteredPayload / apply_scope_filter / classify_finding_scope / partition_findings_by_scope — module 外参照ゼロを事前 grep で確認済み)",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D4"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "libs/usecase/src/review_workflow/mod.rs の mod usecases; / mod scope; 宣言と対応する pub use を除去し、verdict モジュールと関連 re-export のみ残す",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D4"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "libs/usecase/src/review_workflow/verdict.rs 行 185/193 の domain::review::extract_verdict_json_candidates_compact / _multiline 呼び出しを domain::review_v2::extract_verdict_json_candidates_compact / _multiline に切り替える (V2 側に等価実装あり)",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D8"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "libs/infrastructure/src/git_cli/mod.rs の GitRepository trait から index_tree_hash_normalizing メソッド (default impl + SystemGitRepo 実装) を削除する",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D5"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "libs/infrastructure/src/git_cli/private_index.rs の normalized_tree_hash メソッドを削除する。PrivateIndex 本体が他で未使用になるならファイルごと削除する (実装時に最終判断)",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D5"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "libs/infrastructure/src/git_cli/mod.rs の index_tree_hash_normalizing_* ユニットテスト 3 本 + V1 integration tests 7 本 + rrz test helper を削除する",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D5"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "libs/infrastructure/src/review_json_codec.rs + libs/infrastructure/src/review_json_store.rs をファイルごと削除し、libs/infrastructure/src/lib.rs の pub mod review_json_codec; / pub mod review_json_store; を除去する",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D2"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "libs/infrastructure/src/track/codec.rs の TrackDocumentV2.review field + TrackReviewDocument / ReviewGroupDocument / ReviewRoundDocument / TrackReviewEscalationDocument / EscalationPhaseDocument / ReviewCycleDocument / ConcernStreakDocument / ResolutionDocument DTO 群 + review_from_document / review_to_document / escalation_from_document / escalation_to_document / escalation_phase_from_document / resolution_from_document / parse_review_status / parse_round_type / parse_escalation_decision / escalation_decision_to_str ヘルパー + 対応する V1 codec テストを削除する",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D1"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "TrackDocumentV2 の #[serde(flatten)] pub extra: serde_json::Map を保持し、V1 DTO tree 削除後も既存 30 track/items/*/metadata.json の review JSON section が opaque blob として素通りすることを cargo make test の infra codec roundtrip テストで確認する (D9 passthrough 検証。テストが存在しない場合は T004 完了時に libs/infrastructure/src/track/codec.rs に追加する。注: cargo make test は全クレートのテストを実行するため infrastructure クレートのテストも含まれる)",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D9"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "libs/domain/src/review_v2/types.rs に RoundType enum (Fast/Final, strum::Display + strum::EnumString, snake_case) を追加し、libs/domain/src/review_v2/mod.rs から pub use する",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D7"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "libs/domain/src/review/state.rs + escalation.rs + concern.rs + types.rs + error.rs + cycle/ ディレクトリをファイル/ディレクトリごと削除する (V1 ReviewState / ReviewEscalationState / ReviewConcernStreak / ReviewCycleSummary / file_path_to_concern / Verdict v1 / CodeHash / ApprovedHead / ReviewStatus / RoundType v1 / ReviewRoundResult / ReviewGroupState / ReviewJson / ReviewCycle v1 / CycleGroupState / GroupRound / NonEmptyFindings v1 / StoredFinding / CycleError / ReviewStalenessReason / extract_verdict_json_candidates_* v1 / ReviewError)",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D1",
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D2",
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D3",
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D8"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "libs/domain/src/review/mod.rs を prune (V1 sub-module 宣言と pub use を除去、file が空になるなら削除) + libs/domain/src/lib.rs から V1 re-export を一掃し、RoundType は pub use review_v2::RoundType; として公開する",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D1",
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D7"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "libs/domain/src/track.rs の TrackMetadata.review field + review() / review_mut() / set_review() アクセサ + with_branch ctor の review: None 初期化を削除する",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D1"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "libs/domain/src/repository.rs から ReviewJsonReader / ReviewJsonWriter port trait を削除する",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D2"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "apps/cli/src/commands/review/codex_local.rs および apps/cli/src/commands/review/mod.rs の domain::RoundType import が V2 経由で解決されることを確認する (pub use review_v2::RoundType; で据え置き or 明示的に use domain::review_v2::RoundType に切替)",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D7"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "T005 完了時に knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md の Status を Proposed から Accepted に更新する",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §Status"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "knowledge/adr/README.md の索引に本 ADR (2026-04-12-1800-reviewstate-v1-decommission.md) を追加する (ドメインモデル・型設計セクションが自然な配置先)",
+        "sources": [
+          "convention — knowledge/conventions/adr.md",
+          "knowledge/adr/README.md §索引"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "V2 escalation の再設計と再実装 (RV2-06) — 本トラックは V1 escalation の撤去のみ扱い、V2 での新設計は別トラックで行う",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §Rejected Alternatives B",
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §Reassess When"
+        ]
+      },
+      {
+        "text": "既存 30 track/items/*/metadata.json の review JSON section の migrate — 後方互換を追跡しない方針に従い、codec の #[serde(flatten)] extra で opaque JSON として吸収させる",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D9",
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §Rejected Alternatives C"
+        ]
+      },
+      {
+        "text": "build_type_graph の HashMap non-determinism 修正 (short name → fully-qualified name keying) — 本トラックは V1 ReviewState 削除で同名衝突の根源を消すが、HashMap 実装自体は触らない。他の同名型衝突が再発した場合は別トラック",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §Reassess When"
+        ]
+      },
+      {
+        "text": "knowledge/WORKFLOW.md / track/workflow.md / skill 定義など運用ドキュメントにおける record-round / resolve-escalation / set-approved-head への言及のうち、.claude/rules/10-guardrails.md と knowledge/strategy/TODO.md 以外の箇所は本トラックでは触らない (grep で検出された場合のみ最小限更新)",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+        ]
+      },
+      {
+        "text": "knowledge/strategy/TODO.md の WF-61 / RVW-08 / RVW-09 / WF-48 / WF-52 などの D10 で明示されていない他の TODO エントリの更新 — これらは本トラックで削除されるコードを参照しているが、ADR §D10 は明示的に列挙した項目 (RV2-07, RVW-52, RVW-53, RVW-54, RVW-55) の更新のみを決定している。他の stale エントリの整理は follow-up トラックで行う",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+        ]
+      },
+      {
+        "text": "knowledge/strategy/refactoring-plan-2026-03-19.md や knowledge/research/ 配下の履歴ドキュメントにおける record-round / resolve-escalation への言及 — これらは歴史的文脈の記述であり、削除後も残存してよい",
+        "sources": [
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "本トラックは dead code 削除が主たる作業であり、新規コードは次の 3 箇所に限定する: (1) RoundType enum の review_v2/types.rs への移設, (2) usecase::review_workflow::verdict.rs の extract_verdict_json_candidates_* import 切替 (2 行), (3) D9 passthrough 検証のための libs/infrastructure/src/track/codec.rs roundtrip ユニットテスト追加 (既存テストが不十分な場合のみ)。機能追加や挙動変更は行わない",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §Decision"
+      ]
+    },
+    {
+      "text": "タスク実行順は CLI → usecase → infra → domain とする。逆順 (下位層から削除) は compile 不可状態を生むため選択しない",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §Rejected Alternatives E"
+      ]
+    },
+    {
+      "text": "T001 の docs 先行クリーンアップは意図的な設計選択である。.claude/rules/10-guardrails.md の Escalation Threshold セクションや knowledge/DESIGN.md の V1 設計記述は、V1 API 自体の削除 (T002-T005) より前に削除してよい。理由: (1) これらは deprecated API のドキュメントであり、T001 実施後も該当 API はコードベースに存在するため build は通る; (2) docs-first アプローチにより、実装前に不正確なガイダンスを削除する; (3) 中間コミットは通常 API の廃止予告期間を経ることなく進行するため短期間の docs/code 不一致は許容される。各中間タスク境界での cargo check 通過が build 健全性の保証",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+      ]
+    },
+    {
+      "text": "各タスク境界で cargo check が通ることを確認する。最終 T005 完了後に cargo make ci (fmt-check + clippy + test + deny + check-layers + verify-*) が PASS することを必須ゲートとする",
+      "sources": [
+        "convention — .claude/rules/07-dev-environment.md"
+      ]
+    },
+    {
+      "text": "既存 30 track/items/*/metadata.json には一切触れない。codec 側の #[serde(flatten)] pub extra: serde_json::Map は保持して、unknown review フィールドを opaque 塊として吸収させる",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D9"
+      ]
+    },
+    {
+      "text": "V2 review の既存の論理・挙動 (compose_v2 / ReviewCycle<R,H,D> / SystemReviewHasher / FsReviewStore / ReviewJsonV2 / FsCommitHashStore / ScopeName / Verdict / FastVerdict / Finding / NonEmptyFindings / ReviewState v2 enum などの状態機械とオーケストレーション) は本トラックで一切触らない。依存方向は V1 → 消える / V2 → 不変。ただし D7 の定義通り、純粋な enum 型である RoundType を libs/domain/src/review_v2/types.rs に追加する (V1 types.rs 削除に伴う relocation のみで、機能追加や挙動変更を伴わない) ことは明示的例外として許容される",
+      "sources": [
+        "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md",
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D7"
+      ]
+    },
+    {
+      "text": "層依存ルール (domain ← usecase ← infrastructure ← cli) を維持する。cargo make check-layers / cargo make deny が通ること",
+      "sources": [
+        "convention — knowledge/conventions/hexagonal-architecture.md",
+        "track/tech-stack.md §アーキテクチャ"
+      ]
+    },
+    {
+      "text": "escalation 機能の暫定喪失 (3 連続 closed cycle 自動 block がなくなること) を受け入れる。人手運用でカバーし、V2 再実装は RV2-06 で別途扱う",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §Consequences",
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §Rejected Alternatives B"
+      ]
+    },
+    {
+      "text": "set-approved-head CLI サブコマンドは削除するが、ユーザー向けリカバリ手段 (.commit_hash + cargo make track-set-commit-hash wrapper) は V2 代替として残るため、運用上のリカバリパスは維持される",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D6",
+        "knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md"
+      ]
+    },
+    {
+      "text": "ADR knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md は本トラック起点で Proposed として作成し、T005 で CI + baseline 検証が通った後に Accepted へ更新する (ADR 運用規約の two-phase life-cycle)",
+      "sources": [
+        "convention — knowledge/conventions/adr.md",
+        "knowledge/adr/README.md"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md が作成され、Status が最終的に Accepted になっていること",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §Status"
+      ],
+      "task_refs": [
+        "T001",
+        "T005"
+      ]
+    },
+    {
+      "text": "knowledge/adr/README.md の索引に本 ADR が追加されていること (ドメインモデル・型設計セクションに追記)",
+      "sources": [
+        "convention — knowledge/conventions/adr.md",
+        "knowledge/adr/README.md §索引"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": ".claude/rules/10-guardrails.md から 'Review Escalation Threshold' セクションが削除され、sotp review record-round / sotp review resolve-escalation への言及が 0 件になること (grep で確認)",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "knowledge/strategy/TODO.md の RV2-07 が done マークされていること (T005 で V1 domain コード全体が削除された後のコミットに含める)",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "knowledge/strategy/TODO.md の RVW-52 が obsolete マーク付きになっていること (T002 で persist_approved_head を削除した後のコミットに含める。grep で RVW-52 行に obsolete タグが付いていることを確認)",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "knowledge/strategy/TODO.md の RVW-55 (v1 persist_approved_head 残骸の削除) が done マーク付きになっていること (T002 で persist_approved_head 関数を削除した後のコミットに含める。grep で RVW-55 行に done タグが付いていることを確認)",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "knowledge/strategy/TODO.md の RVW-54 本文から set-approved-head / persist_approved_head への言及が削除されていること (T001 の docs 整理コミットに含める。grep で RVW-54 行に set-approved-head / persist_approved_head が 0 件であることを確認)",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "knowledge/strategy/TODO.md の RVW-53 (set-approved-head auto-recovery) が obsolete マーク付きになっていること (T002 で set-approved-head CLI を削除した同一コミットに含める。grep で RVW-53 行に obsolete タグが付いていることを確認)",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "knowledge/DESIGN.md から V1 review state (ReviewState 構造体 / metadata.json review field / record_round_with_pending / check_commit_ready / set_code_hash 等の V1 固有シンボル) への言及、および V1 のみの機能 (escalation / record-round / resolve-escalation / set-approved-head) を説明する設計記述が 0 件になっていること (grep で確認)。もしもともと該当する言及が存在しなかった場合はそのまま通過する",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "knowledge/conventions/hexagonal-architecture.md に RecordRoundProtocol / ReviewJsonReader への参照が残っていないこと (grep で 0 件)。knowledge/conventions/security.md に FsReviewJsonStore への参照が残っていないこと (grep で 0 件)",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D10"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "apps/cli/src/commands/review/mod.rs から ReviewCommand::ResolveEscalation + SetApprovedHead 両 variant が消え、run_check_approved が track.review() を参照していないこと (grep で escalation / SetApprovedHead / track.review が 0 件)",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D3",
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D6"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "apps/cli/src/commands/make.rs に persist_approved_head 関数が存在せず、dispatch_commit_from_file が V1 approved_head を書き込まないこと (grep で persist_approved_head が 0 件)",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D6"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "libs/usecase/src/review_workflow/usecases.rs + scope.rs が存在しないこと (file 削除済み)",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D3",
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D4"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "libs/usecase/src/review_workflow/verdict.rs の extract_verdict_from_content が domain::review_v2::extract_verdict_json_candidates_* を呼んでおり、V1 domain::review::extract_* への参照が全コードベースで 0 件であること",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D8"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "libs/infrastructure/src/git_cli/mod.rs に index_tree_hash_normalizing シンボルが存在しないこと + libs/infrastructure/src/git_cli/private_index.rs に normalized_tree_hash シンボルが存在しないこと (grep で 0 件)",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D5"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "libs/infrastructure/src/review_json_codec.rs + libs/infrastructure/src/review_json_store.rs が存在しないこと + libs/infrastructure/src/lib.rs に pub mod review_json_codec; / pub mod review_json_store; が存在しないこと",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D2"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "libs/infrastructure/src/track/codec.rs に TrackReviewDocument / ReviewGroupDocument / ReviewRoundDocument / TrackReviewEscalationDocument / EscalationPhaseDocument / ReviewCycleDocument / ConcernStreakDocument / ResolutionDocument / review_from_document / review_to_document / escalation_from_document / escalation_to_document / escalation_phase_from_document / resolution_from_document / parse_review_status / parse_round_type / parse_escalation_decision / escalation_decision_to_str の symbol が全て存在しないこと + TrackDocumentV2 から review field が消えていること",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D1"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "T004 完了時点で、libs/infrastructure/src/track/codec.rs に unknown field (例: '{\\\"review\\\": {...}}' を含む JSON) を TrackDocumentV2 としてデシリアライズし extra にキャプチャした後、再シリアライズすると元の JSON が保持されることを検証するユニットテストが存在すること。T004 で V1 codec テストを削除した後も、このラウンドトリップ検証は維持される (既存テストが D9 を十分にカバーしている場合はそのまま; カバーしていない場合は T004 で追加する)",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D9"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "libs/domain/src/review/state.rs / escalation.rs / concern.rs / types.rs / error.rs / cycle/ が全て存在しないこと (file / directory 削除済み)",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D1",
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D2",
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D3",
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D8"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "libs/domain/src/review_v2/types.rs に RoundType enum (Fast/Final variants, strum::Display + strum::EnumString, snake_case serialization) が定義され、pub use されていること",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D7"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "libs/domain/src/track.rs の TrackMetadata 構造体に review field が存在せず、review() / review_mut() / set_review() メソッドが存在しないこと + with_branch ctor に review: None 行が存在しないこと",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D1"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "libs/domain/src/repository.rs に ReviewJsonReader / ReviewJsonWriter trait が存在しないこと (grep で 0 件)",
+      "sources": [
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §D2"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "cargo make ci が track branch (track/reviewstate-v1-removal-2026-04-12) 上で PASS すること (fmt-check + clippy + test + deny + check-layers + verify-* 全て green)",
+      "sources": [
+        "convention — .claude/rules/07-dev-environment.md"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "bin/sotp track baseline-capture --force <active-track-id> を実行したログに 'same-name type collision for ReviewState' warning が出現しないこと (TDDD-01 ブロッカーの直接目的)。D2/D8 により V1 side の Finding / NonEmptyFindings / Verdict / StoredFinding の衝突も解消される見込みだが、V1 review 系統以外の同名衝突 (domain::verify::Finding 等、本トラック範囲外の型) が残存する場合は許容する",
+      "sources": [
+        "tmp/2026-04-12-handoff-reviewstate-v1-removal.md §Acceptance criteria",
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §Context TDDD-01 ブロッカー"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "bin/sotp track domain-type-signals <active-track-id> が ReviewState を baseline_changed_type Red として報告しないこと (本トラックの直接目的である TDDD-01 ブロッカー解消の最終確認)",
+      "sources": [
+        "tmp/2026-04-12-handoff-reviewstate-v1-removal.md §Acceptance criteria",
+        "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md §Context TDDD-01 ブロッカー"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "grep -r 'ReviewState' libs/domain/src/ --include='*.rs' | grep '/review/' | grep -v '/review_v2/' の結果が 0 件であること (V1 ReviewState への参照が `libs/domain/src/review/` に残存していない。T005 で `libs/domain/src/review/` が丸ごと削除される可能性があるため、ディレクトリ存在を前提にした grep を避ける)",
+      "sources": [
+        "tmp/2026-04-12-handoff-reviewstate-v1-removal.md §Acceptance criteria"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "cargo make deny / cargo make check-layers が全て通ること",
+      "sources": [
+        "convention — .claude/rules/07-dev-environment.md",
+        "convention — knowledge/conventions/hexagonal-architecture.md"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T005"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "knowledge/conventions/hexagonal-architecture.md",
+    "knowledge/conventions/adr.md",
+    "knowledge/conventions/source-attribution.md",
+    ".claude/rules/07-dev-environment.md"
+  ],
+  "signals": {
+    "blue": 72,
+    "yellow": 0,
+    "red": 0
+  },
+  "approved_at": "2026-04-12T17:42:14Z",
+  "content_hash": "sha256:a2a5486e16c0dc5383be9c80ec4aa8d8ce804c6523092fae5a2ffdba5b1cf195"
+}

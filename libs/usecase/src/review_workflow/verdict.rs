@@ -182,7 +182,7 @@ pub fn classify_review_verdict(
 #[must_use]
 pub fn extract_verdict_from_content(content: &str) -> Option<ReviewFinalMessageState> {
     // Strategy 1: compact single-line JSON (bottom-up scan).
-    for candidate in domain::review::extract_verdict_json_candidates_compact(content) {
+    for candidate in domain::review_v2::extract_verdict_json_candidates_compact(content) {
         let state = parse_review_final_message(Some(&candidate));
         if matches!(state, ReviewFinalMessageState::Parsed(_)) {
             return Some(state);
@@ -190,7 +190,7 @@ pub fn extract_verdict_from_content(content: &str) -> Option<ReviewFinalMessageS
     }
 
     // Strategy 2: pretty-printed multi-line JSON (bottom-up scan).
-    for candidate in domain::review::extract_verdict_json_candidates_multiline(content) {
+    for candidate in domain::review_v2::extract_verdict_json_candidates_multiline(content) {
         let state = parse_review_final_message(Some(&candidate));
         if matches!(state, ReviewFinalMessageState::Parsed(_)) {
             return Some(state);

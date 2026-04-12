@@ -1,0 +1,221 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:030c2687441fd5e0dd239fcf75ad684f79631c8a39881dcdba722d61bfc457c2",
+          "at": "2026-04-12T18:28:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `other` scope is not isolated to the six files listed in the briefing: `git diff --name-only` also includes `.claude/rules/10-guardrails.md`, `knowledge/conventions/hexagonal-architecture.md`, and `knowledge/conventions/security.md`. That breaks the stated scope boundary for this review slice and creates a real risk of double-review or missed-review across scopes.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "scope_discipline"
+            }
+          ],
+          "hash": "rvw1:sha256:030c2687441fd5e0dd239fcf75ad684f79631c8a39881dcdba722d61bfc457c2",
+          "at": "2026-04-12T18:31:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:030c2687441fd5e0dd239fcf75ad684f79631c8a39881dcdba722d61bfc457c2",
+          "at": "2026-04-12T18:33:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a8e4e664f4b7a2872fd7d6b32e3dee65a53c0c0294f824e7a3fce134aeced35",
+          "at": "2026-04-12T18:42:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a8e4e664f4b7a2872fd7d6b32e3dee65a53c0c0294f824e7a3fce134aeced35",
+          "at": "2026-04-12T18:45:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0d3d98a77140dbf556184800c86a1a37820427b4d54d31a76d06e6e7244a5ce",
+          "at": "2026-04-12T18:51:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0d3d98a77140dbf556184800c86a1a37820427b4d54d31a76d06e6e7244a5ce",
+          "at": "2026-04-12T18:52:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6af1d3ab8f1255fec4ccd4c7481a68576e62ab6b52c5dbccb104f04d16888b1",
+          "at": "2026-04-12T19:08:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T004` is now marked `\"done\"`, but its task object no longer includes a `commit_hash` field at all. The review checklist for this scope explicitly expects `commit_hash: null` until the T004 commit is created, and other task records in this repo keep the field present even when null. Leaving the key absent makes `metadata.json` inconsistent with the expected task shape and with the rendered track metadata contract.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/metadata.json",
+              "line": 123,
+              "category": "artifact_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:c6af1d3ab8f1255fec4ccd4c7481a68576e62ab6b52c5dbccb104f04d16888b1",
+          "at": "2026-04-12T19:11:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82081e3003e426377d15409b44fe9d77af0c876a0f14f11129b1d1ab93f19473",
+          "at": "2026-04-12T19:12:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b20a97a826b9a711f5a1e6a9a6d089c93cfb8e233bbf1a580f5a936bf721d892",
+          "at": "2026-04-12T19:25:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b20a97a826b9a711f5a1e6a9a6d089c93cfb8e233bbf1a580f5a936bf721d892",
+          "at": "2026-04-12T19:28:05Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1a4393f93f43beaff74498dde341bcb3f1b922a82f0522a0175de29703f8c3d",
+          "at": "2026-04-12T18:51:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1a4393f93f43beaff74498dde341bcb3f1b922a82f0522a0175de29703f8c3d",
+          "at": "2026-04-12T18:53:47Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c72091e9ec182126443ae714f156088bcf2dfca9cb469d48b0fc7916432c6b1",
+          "at": "2026-04-12T18:42:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c72091e9ec182126443ae714f156088bcf2dfca9cb469d48b0fc7916432c6b1",
+          "at": "2026-04-12T18:44:14Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f24ce4fc7ccaf5be5a029f3363da9a3789fb8d59e109f1faf38d92e662a23489",
+          "at": "2026-04-12T19:24:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f24ce4fc7ccaf5be5a029f3363da9a3789fb8d59e109f1faf38d92e662a23489",
+          "at": "2026-04-12T19:27:23Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/conventions/security.md` says `FsTrackStore` uses `reject_symlinks_below()` before the `metadata.json` atomic write, but `libs/infrastructure/src/track/fs_store.rs` never performs that check. This documents a symlink defense that the current adapter does not provide.",
+              "severity": "P1",
+              "file": "knowledge/conventions/security.md",
+              "line": 65,
+              "category": "security documentation"
+            },
+            {
+              "message": "The new `check_approved<R, H, D>` example cannot compile as written: `ReviewCycle::get_review_states()` is only available when `R: Reviewer`, `H: ReviewHasher`, and `D: DiffGetter`, but the snippet omits those bounds. Add a `where` clause or make the example concrete.",
+              "severity": "P1",
+              "file": "knowledge/conventions/hexagonal-architecture.md",
+              "line": 89,
+              "category": "docs correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ee55ae718373bfbf0be937f94b4fb9db73f186f3d943be77a9c4e24fffb5aee9",
+          "at": "2026-04-12T18:20:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3500719e972924184828f2e04546deac1e31b7519a7a5b0ee5175216aaadf400",
+          "at": "2026-04-12T18:22:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3500719e972924184828f2e04546deac1e31b7519a7a5b0ee5175216aaadf400",
+          "at": "2026-04-12T18:25:36Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e807630eb4091cb221a10599307e89eb4b8820306560ac17393f29f4426c6ad",
+          "at": "2026-04-12T19:08:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e807630eb4091cb221a10599307e89eb4b8820306560ac17393f29f4426c6ad",
+          "at": "2026-04-12T19:11:41Z"
+        }
+      ]
+    }
+  }
+}

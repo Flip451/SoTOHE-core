@@ -1,6 +1,4 @@
-use crate::{
-    DomainError, ReviewJson, TrackId, TrackMetadata, TrackReadError, TrackWriteError, WorktreeError,
-};
+use crate::{DomainError, TrackId, TrackMetadata, TrackReadError, TrackWriteError, WorktreeError};
 
 /// Read-only port for track retrieval.
 pub trait TrackReader: Send + Sync {
@@ -46,29 +44,4 @@ pub trait TrackWriter: Send + Sync {
     fn update<F>(&self, id: &TrackId, mutate: F) -> Result<TrackMetadata, TrackWriteError>
     where
         F: FnOnce(&mut TrackMetadata) -> Result<(), DomainError>;
-}
-
-/// Read-only port for review.json retrieval.
-///
-/// Separate from `TrackReader` because review.json has a different lifecycle
-/// (may not exist for older tracks) and different callers.
-pub trait ReviewJsonReader: Send + Sync {
-    /// Reads the review.json for the given track.
-    ///
-    /// Returns `Ok(None)` if review.json does not exist (NoCycle state).
-    ///
-    /// # Errors
-    /// Returns `TrackReadError` on I/O or codec failure.
-    fn find_review(&self, id: &TrackId) -> Result<Option<ReviewJson>, TrackReadError>;
-}
-
-/// Write port for review.json persistence.
-///
-/// Implementations should use atomic writes for crash safety.
-pub trait ReviewJsonWriter: Send + Sync {
-    /// Persists review.json for the given track (upsert semantics).
-    ///
-    /// # Errors
-    /// Returns `TrackWriteError` on persistence or codec failure.
-    fn save_review(&self, id: &TrackId, review: &ReviewJson) -> Result<(), TrackWriteError>;
 }

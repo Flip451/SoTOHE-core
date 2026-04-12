@@ -1,0 +1,557 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` requires adding this ADR to `knowledge/adr/README.md`, but neither `spec.json` nor `metadata.json` includes that work item. If the index update is meant to be part of the track, it needs an explicit task/source reference; otherwise the track can be closed without publishing the ADR in the index.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 54,
+              "category": "scope-gap"
+            },
+            {
+              "message": "The T004 acceptance check only proves that a subset of `track/codec.rs` helpers disappeared. It does not cover several helpers named in D1/T004 (`escalation_phase_from_document`, `resolution_from_document`, `parse_review_status`, `parse_round_type`, `parse_escalation_decision`, `escalation_decision_to_str`), so a partial cleanup could still satisfy the written criteria.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 405,
+              "category": "verification-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:777e2da45b8ef7d10467866231aa0f91957644c514daa2e3de0ccda9d066b6d1",
+          "at": "2026-04-12T09:07:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The required-reading list omits `.claude/rules/07-dev-environment.md` even though the CI-gate constraint cites it. That makes the mandatory `cargo make ci` requirement under-documented in the spec.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 290,
+              "category": "spec-completeness"
+            },
+            {
+              "message": "The verification checklist adds a `knowledge/adr/README.md` index update, but no ADR/spec/metadata task assigns that work. As written, the track scope cannot satisfy this check.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 54,
+              "category": "scope-creep"
+            }
+          ],
+          "hash": "rvw1:sha256:777e2da45b8ef7d10467866231aa0f91957644c514daa2e3de0ccda9d066b6d1",
+          "at": "2026-04-12T09:09:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58c701e7956ba99794d8bfb8d4f5e4e8a57a0b326bc1f294a803605214c5755f",
+          "at": "2026-04-12T09:13:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's acceptance coverage is incomplete. `metadata.json` and ADR D10 require updating `knowledge/strategy/TODO.md` for RVW-53/RVW-54 and removing any V1 review-state references from `knowledge/DESIGN.md`, but the spec only makes guardrails removal and RV2-07 completion verifiable. Because those checks are missing from the SSoT, the track can be marked done while leaving currently-existing legacy references in `TODO.md`/`DESIGN.md` untouched.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 350,
+              "category": "spec-completeness"
+            },
+            {
+              "message": "The spec is internally contradictory about V2 edits. Constraint C5 says the track must not touch `review_v2` or any V2 review types, but T005 explicitly requires adding `RoundType` to `libs/domain/src/review_v2/types.rs` and re-exporting it. An implementer cannot satisfy both statements at once, so one side needs to be corrected before work starts.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 295,
+              "category": "spec-consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:58c701e7956ba99794d8bfb8d4f5e4e8a57a0b326bc1f294a803605214c5755f",
+          "at": "2026-04-12T09:18:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D10/T001 retires RVW-53 and trims RVW-54, but it leaves RVW-52 untouched even though RVW-52's entire problem statement is the dirty `review.json` side effect from `persist_approved_head`, which D6 deletes. If the track ships as planned, `knowledge/strategy/TODO.md` will still claim a live MEDIUM issue for a removed code path.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md",
+              "line": 145,
+              "category": "adr-completeness"
+            },
+            {
+              "message": "The `knowledge/DESIGN.md` cleanup appears in acceptance criteria, but there is no matching `scope.in_scope` item for it under T001. That breaks ADR→spec traceability for part of D10 and makes one required doc edit effectively out-of-scope in the formal spec.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 379,
+              "category": "scope-consistency"
+            },
+            {
+              "message": "This acceptance criterion explicitly allows `baseline-capture` to keep warning on `Finding` / `NonEmptyFindings` / `Verdict` collisions, but D2/D8 also delete the v1 definitions behind those same-name collisions. Leaving those warnings as 'allowed' weakens the final gate and can let an incomplete V1 cleanup pass even though the ADR says those types should be removed too.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 501,
+              "category": "acceptance-criteria"
+            }
+          ],
+          "hash": "rvw1:sha256:0faa787cac4d948a250f52a83d3bf11c17d37f901b8d67918a7255006ac4a5cf",
+          "at": "2026-04-12T09:23:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The verification plan hard-codes `grep -l '\"review\"' track/items/*/metadata.json | wc -l == 30`, which will start failing as soon as unrelated tracks add or remove legacy `review` payloads. D9's real requirement is to preserve pre-existing residual `review` blobs, not to freeze a repo-wide count, so this check is brittle and can block T005 even when the cleanup was implemented correctly.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 45,
+              "category": "verification-brittleness"
+            }
+          ],
+          "hash": "rvw1:sha256:0faa787cac4d948a250f52a83d3bf11c17d37f901b8d67918a7255006ac4a5cf",
+          "at": "2026-04-12T09:26:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D9 only appears here as a constraint, not as an in-scope item with task ownership or an acceptance criterion. That leaves no task formally responsible for preserving `#[serde(flatten)] extra` passthrough of the 30 legacy `metadata.json` `review` blobs while T004 removes the V1 DTO tree, so an implementation could regress old track metadata and still satisfy the current checklist.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 289,
+              "category": "spec-traceability"
+            },
+            {
+              "message": "The legacy-metadata passthrough check is not reproducible as written: it asks the implementer to compare against the files seen 'before starting this track', but that baseline set is not recorded anywhere in the tracked artifacts. A later implementer cannot tell which `metadata.json` files are supposed to remain unchanged, so D9 is not actually verifiable from the plan alone.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 46,
+              "category": "verification-gap"
+            }
+          ],
+          "hash": "rvw1:sha256:be53c35272de13a4bd26fef377003f0d66f3a4c7291d13f15a635749bd08e8ee",
+          "at": "2026-04-12T09:33:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 no longer maps the ADR/spec's RVW-52 work item. D10 now explicitly requires marking `knowledge/strategy/TODO.md` entry `RVW-52` obsolete, but the task/section text still only mentions `RV2-07`, `RVW-53`, and `RVW-54`, so an implementer following `metadata.json` can complete T001 without doing part of the approved scope.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/metadata.json",
+              "line": 12,
+              "category": "task-mapping"
+            },
+            {
+              "message": "The acceptance criteria never verify the new `RVW-52` requirement. `spec.json` added RVW-52 to T001's in-scope work, but the T001 acceptance checks only cover `RV2-07`, `RVW-53`, and `RVW-54`, so the track can be marked complete while leaving that D10 update undone.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 387,
+              "category": "acceptance-coverage"
+            },
+            {
+              "message": "The D9 verification was weakened to a check that this new track's own `metadata.json` does not contain `\"review\"`. D9's risk is the opposite: accidentally migrating or dropping the 30 existing legacy `track/items/*/metadata.json` review blobs. This check will pass even if every legacy file is modified, so it no longer verifies the non-migration policy the ADR/spec rely on.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 46,
+              "category": "verification-gap"
+            }
+          ],
+          "hash": "rvw1:sha256:f87347e8aa4e1e5db9be19f19b82bc7fd4803982fe2b79b38e9f44f88b624a62",
+          "at": "2026-04-12T09:38:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 scopes `knowledge/DESIGN.md` cleanup to a narrow set of `ReviewState` symbols, but the live design doc still contains current guidance for removed `record-round` / `resolve-escalation` behavior (for example the `Review Escalation Threshold` section). As written, the track can satisfy its doc task while leaving authoritative design docs describing commands and state that no longer exist.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 44,
+              "category": "docs-completeness"
+            },
+            {
+              "message": "The D9 passthrough acceptance gate is too weak: after T004 deletes the existing V1 `track/codec.rs` review tests, `cargo make test -p infrastructure` passing does not by itself prove that any remaining test round-trips a legacy `metadata.json` with a `review` blob through `#[serde(flatten)] extra`. Without requiring a specific regression test or fixture, the plan can go green while the opaque-blob compatibility it relies on is untested.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 480,
+              "category": "test-coverage"
+            },
+            {
+              "message": "`git diff HEAD -- track/items/` cannot verify that the implementation avoided rewriting the existing 30 `track/items/*/metadata.json` files, because it only compares the working tree to the current commit. On a clean branch this returns zero even if earlier commits already modified those files, so the stated D9 verification would miss exactly the regression it is supposed to catch.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 46,
+              "category": "verification-gap"
+            }
+          ],
+          "hash": "rvw1:sha256:730a7a44a36231bae5f2c14c2016789571b466aaa60c0f8e43b9797f8ca7508a",
+          "at": "2026-04-12T09:43:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005's final gate is now too strict to be satisfiable by this track. `spec.json` requires `baseline-capture` to emit no same-name collision warnings at all, but the domain crate still exposes another duplicate public type outside the V1 review scope (`domain::verify::Finding` vs `domain::review_v2::Finding`). Because `build_type_graph` warns on any short-name collision, a correct V1 cleanup can still fail this acceptance check. The gate should stay focused on the `ReviewState` collision unless the track also owns the remaining duplicate names.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 537,
+              "category": "acceptance_criteria"
+            },
+            {
+              "message": "The T004 acceptance criterion only checks a subset of the V1 codec cleanup. The corresponding in-scope item explicitly includes removing `escalation_phase_from_document`, `resolution_from_document`, `parse_review_status`, `parse_round_type`, `parse_escalation_decision`, and `escalation_decision_to_str`, but none of those helpers are covered here. An implementation could leave part of the legacy decode path behind and still satisfy the written acceptance criteria.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 471,
+              "category": "acceptance_criteria"
+            },
+            {
+              "message": "The D9 non-migration check is not actually verifiable with the stated command. `git log --oneline --diff-filter=M -- 'track/items/*/metadata.json'` shows the repository's overall history for that pathset, not the commits introduced by this branch, so it cannot tell a reviewer whether this track rewrote any of the 30 legacy `metadata.json` files. The verification step needs a branch-scoped diff/log range.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 46,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:54842ab35ff29dd7c6b179295c5530db6a27a3d7b47c5bf85959e569fa1c91a6",
+          "at": "2026-04-12T09:48:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's planned TODO cleanup retires RV2-07/RVW-52/RVW-53/RVW-54 but omits RVW-55, even though RVW-55 is the backlog item for deleting `persist_approved_head` itself. If this track lands as planned, `knowledge/strategy/TODO.md` will still claim that the removed V1 path is outstanding work, so the docs cleanup is incomplete.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 35,
+              "category": "planning-completeness"
+            }
+          ],
+          "hash": "rvw1:sha256:4e2889e0853b12e5dad7bb2f35bffd0e8bcf5e58fb2f3b89c16853e0700c1925",
+          "at": "2026-04-12T09:53:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is a docs-only kickoff task, but it already tells the implementer to mark `knowledge/strategy/TODO.md` entries `RV2-07` and `RVW-55` done and `RVW-52`/`RVW-53` obsolete. Those states do not become true until the later code-removal tasks (T002/T004/T005) land, so if the branch stops after T001 the backlog will falsely report the V1 cleanup as complete/obsolete while the implementation is still present.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/metadata.json",
+              "line": 104,
+              "category": "task-ordering"
+            },
+            {
+              "message": "The D9 verification step uses `git log --diff-filter=M main..HEAD -- 'track/items/*/metadata.json'`, which checks branch history rather than the final tree. That will also report this track's own `metadata.json` edits, and any reverted temporary edits, so the check can fail even when none of the 30 legacy `metadata.json` files are modified at `HEAD`.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 46,
+              "category": "verification-gap"
+            }
+          ],
+          "hash": "rvw1:sha256:211185ff7ef032d6a2ea9777d4016c33a601acde93d79d574fa0fd713f333f3b",
+          "at": "2026-04-12T09:58:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` was edited after approval, but the stored `content_hash` was not recomputed. Rebuilding the hash from the current hashable fields yields `sha256:3edb2e6ec707c4dd6a88547037a15267e3c6eb9c5d81cf16c2e306e02081a656`, not the checked-in `sha256:935443b10b5b763f00feba63902860fdfb40ddad15df3c6e8f9410c892877ac8`. Because the spec codec auto-demotes approved specs on hash mismatch, downstream tooling will treat this plan as draft until it is re-approved.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 619,
+              "category": "spec-approval"
+            },
+            {
+              "message": "The verification grep is scoped too broadly to be satisfiable: it scans `.claude/`, `knowledge/`, and `track/` for `record-round` / `resolve-escalation` / `set-approved-head`, but this ADR and the current track artifacts intentionally contain those strings. Since the allowlist only mentions past artifacts, the check will flag the track's own planning docs as unexpected residue. Limit the grep to operational docs or explicitly whitelist the current ADR/current track files.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 50,
+              "category": "verification"
+            },
+            {
+              "message": "This acceptance check assumes `libs/domain/src/review/` still exists, but T005 explicitly allows deleting `review/mod.rs` when it becomes empty. In the intended end state the whole `review/` path can disappear from git, so `grep 'ReviewState' libs/domain/src/review/` will fail with `No such file or directory` even when the cleanup is correct. Use file-absence checks or search from a stable parent path instead.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 584,
+              "category": "acceptance-criteria"
+            }
+          ],
+          "hash": "rvw1:sha256:3a871251b4d6908d4f68aada22f7b6255a24068ea5255f2d872feb9381a68d68",
+          "at": "2026-04-12T10:05:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` still uses `grep -r 'ReviewState' libs/domain/src/review/` as the T005 dead-reference check, but the plan/spec explicitly allow deleting `libs/domain/src/review/` entirely. In that valid end state this command fails on a missing path instead of expressing the acceptance criterion, so the verification doc will reject a correct implementation.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 32,
+              "category": "verification-consistency"
+            },
+            {
+              "message": "`spec.json` says the only non-deletion code changes are the `RoundType` relocation and the verdict import swap, but the same spec also requires adding a new `track/codec.rs` passthrough unit test when existing coverage is insufficient. That internal contradiction makes the D9 test addition look out of scope even though the acceptance criteria depend on it.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 307,
+              "category": "spec-consistency"
+            },
+            {
+              "message": "The verification checklist is out of sync on ADR indexing: `metadata.json`/`spec.json` moved the `knowledge/adr/README.md` update into T001, but `verification.md` still treats the placement as something to decide at T005. That can leave T001 incomplete or force an unnecessary second docs touch later.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 54,
+              "category": "task-mapping"
+            }
+          ],
+          "hash": "rvw1:sha256:77c8d0c4e06d7aff349276ab6c6a193fe0c974092d7bfe5f0645e4907e0d8582",
+          "at": "2026-04-12T10:09:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The manual checklist never verifies the D10 documentation/TODO work that `spec.json` now makes required. There is no concrete step for RVW-52/RVW-53/RVW-55 obsolete/done, RV2-07 done, RVW-54 text pruning, or removal of the V1-only symbols from `knowledge/DESIGN.md`, so T001/T002/T005 can be signed off even if several accepted doc changes were missed.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 48,
+              "category": "verification-completeness"
+            }
+          ],
+          "hash": "rvw1:sha256:1bc35e4908efe640cf2014b37127996ccf2d1af8dd888a69aee3c07c87c3e12c",
+          "at": "2026-04-12T10:18:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The D10 doc-cleanup scope is still too narrow. The track only plans to scrub `10-guardrails`, `TODO.md`, and `knowledge/DESIGN.md`, but live conventions that this track itself cites still point at APIs being deleted: `knowledge/conventions/hexagonal-architecture.md:29,93` names `RecordRoundProtocol` and `ReviewJsonReader`, and `knowledge/conventions/security.md:64` names `FsReviewJsonStore`. As written, T005 can finish with current architecture/security guidance referring to removed types, so those convention files need to be added to scope and acceptance coverage.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 62,
+              "category": "scope-completeness"
+            }
+          ],
+          "hash": "rvw1:sha256:742539c3b8fc168f61133f1ae36154d5120b8aef658d06107a3c8fd77297a14e",
+          "at": "2026-04-12T10:23:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's convention-doc cleanup is sourced to ADR §D10 here, but §D10 only lists `.claude/rules/10-guardrails.md`, `knowledge/strategy/TODO.md`, and `knowledge/DESIGN.md` as required doc updates. As written, the plan adds `knowledge/conventions/hexagonal-architecture.md` / `knowledge/conventions/security.md` edits without an ADR decision or other primary source that actually requires them. Either expand §D10 or cite the document that mandates those cleanups.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 71,
+              "category": "source-traceability"
+            },
+            {
+              "message": "The dead-reference check `grep -rn 'RecordRoundProtocol\\|record_round\\b' apps/ libs/` will false-fail on surviving comment-only references that this plan never schedules for cleanup, e.g. `apps/cli/src/commands/review/codex_local.rs:46` and `apps/cli/src/commands/review/tests.rs:791`. That means the track can complete every listed deletion and still fail its own verification unless the grep is narrowed or those extra files are explicitly added to scope.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 36,
+              "category": "verification-gap"
+            },
+            {
+              "message": "The `knowledge/DESIGN.md` cleanup check is too narrow for the stated acceptance target. It only greps a small keyword set, but the current design doc still contains other V1-only symbols such as `record_round_with_pending` and `check_commit_ready` (for example at `knowledge/DESIGN.md:1070` and `:1246`) that are supposed to disappear. As written, T001 can be marked verified while stale V1 design content remains.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 53,
+              "category": "verification-gap"
+            }
+          ],
+          "hash": "rvw1:sha256:828ff341a7cb0b94855d738e0c4bb59e8d257190da0f9cc6c7bc52ba0695dae8",
+          "at": "2026-04-12T10:57:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The dead-reference check for `RecordRoundProtocol` will still fail on comment-only hits, because `grep -rn ... | grep -v '^\\s*//'` never strips lines once `grep -n` has prefixed them with `path:line:`. There are already allowed comment-only references in `apps/cli/src/commands/review/tests.rs:791` and `apps/cli/src/commands/review/codex_local.rs:46`, so the track can complete every planned deletion and still fail its own verification unless this pipeline is fixed or those comments are brought into scope.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 36,
+              "category": "verification-correctness"
+            },
+            {
+              "message": "The T002 checklist says RVW-53 should become obsolete because `resolve-escalation` is removed, but RVW-53 in `knowledge/strategy/TODO.md` is actually the `set-approved-head` auto-recovery item. That breaks the task-to-TODO traceability the plan is relying on and leaves the verification text pointing at the wrong removal rationale.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 58,
+              "category": "traceability"
+            }
+          ],
+          "hash": "rvw1:sha256:ed3d9b0f54d2676bbd1e857df265c7d696c82d9dd141924aa9041629a7e8d3f8",
+          "at": "2026-04-12T11:18:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T001 DESIGN cleanup check is too narrow. The listed grep at this line only looks for `ReviewState`, escalation terms, `review_json`, and a few CLI symbols, but `knowledge/DESIGN.md` currently still contains other V1-only API names such as `ReviewCycleSummary`, `ReviewRoundResult`, `ReviewStatus`, and `RoundType` that would survive this check. That means T001 can pass while dead V1 design references remain.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 53,
+              "category": "verification-completeness"
+            },
+            {
+              "message": "This verification note says any remaining `Finding` / `NonEmptyFindings` / `Verdict` / `StoredFinding` collision warning is unexpected, but the spec explicitly allows non-review collisions to remain, and the repo already has `verify::Finding` alongside `review_v2::Finding`. As written, T005 can be marked failed even when the intended ReviewState cleanup succeeded.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 25,
+              "category": "verification-consistency"
+            },
+            {
+              "message": "The checklist requires `grep -rn 'RecordRoundProtocol\\|record_round\\b' apps/ libs/` to return zero hits, then immediately says historical comment-only hits are allowed. The raw command will still match those allowed comments, so this step is self-contradictory and can produce a false failure after a correct implementation.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 36,
+              "category": "verification-consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:8e64ded572ecb837c9b0d42c5dbd994ce2ba1a6c472ab3455b66dbf4c61e1c3c",
+          "at": "2026-04-12T12:52:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The documentation-consistency grep in `verification.md` is not executable as written: it treats only track artifacts, archives, `rvw-remediation-plan.md`, and the new ADR as allowed residual references, but the repo already has older ADRs that still mention `sotp review record-round` / `resolve-escalation` (for example `knowledge/adr/2026-03-26-0010-tamper-proof-review-verdict.md:12,27` and `knowledge/adr/2026-03-24-0930-adr-auto-derivation-design.md:26`). That means the prescribed check will fail unless implementers edit historical ADRs that are outside this track’s intended scope.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 64,
+              "category": "verification-completeness"
+            },
+            {
+              "message": "The T001 DESIGN cleanup grep is stricter than the actual scope: it requires `RoundType` to disappear from `knowledge/DESIGN.md`, but D7 explicitly keeps `RoundType` by relocating it into `review_v2`, and the spec’s DESIGN acceptance criterion does not require removing every `RoundType` mention. This can produce a false failure or unnecessary doc churn if DESIGN is updated to describe the surviving V2 enum.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 53,
+              "category": "verification-consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:32935d90cc07ff51d4bc2d518ad1bc401df2cdef31069af2c7c975ac067d34c7",
+          "at": "2026-04-12T13:01:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T004` in `metadata.json` still scopes the infrastructure work as deletion plus keeping `#[serde(flatten)] extra`, but it never assigns the new D9 round-trip test that `spec.json` now requires. That leaves the only proof that legacy `metadata.json.review` blobs survive decode/encode outside the executable task plan, so someone following `plan.md` can finish T004 without adding the coverage needed to catch data-loss regressions.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/metadata.json",
+              "line": 124,
+              "category": "task-completeness"
+            },
+            {
+              "message": "The acceptance criteria now tie the `RVW-54` cleanup to `T002`, even though the scope/plan for `T001` says that removal happens in `T001` and only the status flips are deferred. This makes task ownership inconsistent: either `T001` can be marked complete without the promised TODO cleanup, or the same edit is being tracked against two different tasks.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 433,
+              "category": "task-consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:1cddd2a0bc859519b4a18ac5752f9b9b385da6865be8f53341a975c52f315064",
+          "at": "2026-04-12T17:28:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 now removes guardrail, design, and convention references to the V1 review APIs before those APIs are actually deleted in T002-T005. That creates intermediate task commits where the docs describe a future state rather than the checked-in code; these cleanups should be moved to the same tasks that remove the referenced commands/types, just like the TODO status flips were deferred.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/metadata.json",
+              "line": 11,
+              "category": "task-ordering"
+            },
+            {
+              "message": "The D9 passthrough check is specified as `cargo make test -p infrastructure`, but in cargo-make `-p` selects the cargo-make profile, not the Cargo package. As written, this verification step will not run the intended infrastructure tests; use `cargo make test -- -p infrastructure` or an explicit `cargo test -p infrastructure` path instead.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 199,
+              "category": "verification-command"
+            },
+            {
+              "message": "The T001 `knowledge/DESIGN.md` cleanup grep is too narrow: it does not match current V1 spellings like `record_round` or `review.json`, both of which are present in `knowledge/DESIGN.md` today. That means the verification can pass while V1 design references remain, so the pattern needs to be expanded before this is a reliable acceptance check.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 53,
+              "category": "verification-completeness"
+            }
+          ],
+          "hash": "rvw1:sha256:5d0a51a206496aa7325f360ed23310fe70f15a0e2c6206cb177698643a879b10",
+          "at": "2026-04-12T17:35:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 front-loads the docs cleanup before the code removal that makes those references obsolete. After the first commit, `.claude/rules/10-guardrails.md`, `knowledge/DESIGN.md`, and the convention docs would stop describing `resolve-escalation`, `RecordRoundProtocol`, `ReviewJsonReader`, and `FsReviewJsonStore` even though those APIs still exist until T002-T005 (`apps/cli/src/commands/review/mod.rs`, `libs/usecase/src/review_workflow/usecases.rs`, `libs/domain/src/repository.rs`, `libs/infrastructure/src/review_json_store.rs`). That leaves the branch intentionally documentation-inconsistent across intermediate task boundaries.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/metadata.json",
+              "line": 11,
+              "category": "task-ordering"
+            },
+            {
+              "message": "The D9 passthrough gate is specified as `cargo make test -p infrastructure`, but this repo's `test` task is a fixed cargo-make wrapper (`Makefile.toml` `[tasks.test]` -> `cargo make --allow-private test-local`) and `test-local` hardcodes `cargo nextest run --all-targets --all-features`. The `-p infrastructure` package filter is therefore not forwarded, so the acceptance criterion does not actually run the targeted codec tests it relies on.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 199,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:5d0a51a206496aa7325f360ed23310fe70f15a0e2c6206cb177698643a879b10",
+          "at": "2026-04-12T17:37:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The planned TODO.md cleanup is too narrow. `spec.json` only retires RVW-54, RVW-52/53/55, and RV2-07, but open backlog items such as `WF-61`, `RVW-08`, `RVW-09`, `WF-48`, and `WF-52` still point at `record-round`, `resolve-escalation`, `scope.rs`, or `review/state.rs`, all of which T003/T005 delete. If those entries are not obsoleted or rewritten as part of D10, the strategy backlog will immediately reference codepaths that no longer exist.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/spec.json",
+              "line": 35,
+              "category": "plan-completeness"
+            },
+            {
+              "message": "The verification grep for surviving `sotp review record-round` / `resolve-escalation` / `set-approved-head` mentions is over-strict for the planned scope. It only whitelists ADRs, archives, and track artifacts, but current historical docs like `knowledge/strategy/refactoring-plan-2026-03-19.md:491` and `knowledge/research/2026-04-07-1234-harness-engineering-landscape.md:188` already contain those strings and are not in T001. As written, this gate will fail even after a correct implementation unless the whitelist is expanded or those files are added to scope.",
+              "severity": "P1",
+              "file": "track/items/reviewstate-v1-removal-2026-04-12/verification.md",
+              "line": 64,
+              "category": "verification-gap"
+            }
+          ],
+          "hash": "rvw1:sha256:5d0a51a206496aa7325f360ed23310fe70f15a0e2c6206cb177698643a879b10",
+          "at": "2026-04-12T17:38:51Z"
+        }
+      ]
+    }
+  }
+}
