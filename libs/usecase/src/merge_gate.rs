@@ -14,11 +14,11 @@
 //! Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md`
 //! §D2, §D5.2, §D6, §D8.
 
-use domain::TrackId;
 use domain::spec::{SpecDocument, check_spec_doc_signals};
 use domain::tddd::catalogue::{DomainTypesDocument, check_domain_types_signals};
 use domain::validate_branch_ref;
 use domain::verify::{Finding, VerifyOutcome};
+use domain::{TrackId, TrackMetadata};
 
 /// Result of a port-level blob fetch.
 ///
@@ -64,6 +64,13 @@ pub trait TrackBlobReader {
         branch: &str,
         track_id: &str,
     ) -> BlobFetchResult<DomainTypesDocument>;
+
+    /// Reads and decodes `track/items/<track_id>/metadata.json` into a
+    /// [`TrackMetadata`] aggregate.
+    ///
+    /// Used by the task-completion gate (see `usecase::task_completion`)
+    /// which checks that all tasks are resolved before merge.
+    fn read_track_metadata(&self, branch: &str, track_id: &str) -> BlobFetchResult<TrackMetadata>;
 }
 
 /// Evaluates the strict merge gate for the given branch using the provided
@@ -218,6 +225,16 @@ mod tests {
             }
             self.dt.borrow_mut().take().expect("dt read called twice")
         }
+
+        fn read_track_metadata(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<TrackMetadata> {
+            // merge_gate tests don't exercise this port method;
+            // task_completion tests (T007) use a separate mock.
+            panic!("read_track_metadata must not be called by merge_gate tests")
+        }
     }
 
     /// Recording mock that captures the branch and track_id arguments passed by
@@ -263,6 +280,14 @@ mod tests {
             *self.recorded_dt_branch.borrow_mut() = Some(branch.to_owned());
             *self.recorded_dt_track_id.borrow_mut() = Some(track_id.to_owned());
             BlobFetchResult::NotFound
+        }
+
+        fn read_track_metadata(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<TrackMetadata> {
+            panic!("read_track_metadata must not be called by merge_gate tests")
         }
     }
 

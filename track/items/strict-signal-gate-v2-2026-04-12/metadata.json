@@ -222,9 +222,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "8ff4c45a6bb0636d9d587dac17819d091b6a4a22",
       "description": "usecase: libs/usecase/src/merge_gate/ 新設 — BlobFetchResult<T> + TrackBlobReader port (read_spec_document / read_domain_types_document / read_track_metadata) + check_strict_merge_gate orchestration + U1–U18 MockTrackBlobReader tests",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "usecase: libs/usecase/src/task_completion.rs 新設 — check_tasks_resolved_from_git_ref (plan/ skip + validate_branch_ref + read_track_metadata + all_tasks_resolved) + K1–K7 MockTrackBlobReader tests",
@@ -268,5 +269,5 @@
     }
   ],
   "title": "Strict Spec Signal Gate v2 — Yellow blocks merge (fail-closed)",
-  "updated_at": "2026-04-12T03:41:10Z"
+  "updated_at": "2026-04-12T04:14:48Z"
 }

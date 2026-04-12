@@ -8,6 +8,7 @@ pub mod pr_review;
 pub mod pr_workflow;
 pub mod review_v2;
 pub mod review_workflow;
+pub mod task_completion;
 pub mod track_activation;
 pub mod track_phase;
 pub mod track_resolution;

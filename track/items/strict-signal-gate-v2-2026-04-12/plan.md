@@ -56,7 +56,7 @@ BlobFetchResult<T> enum (Found/NotFound/FetchError) と TrackBlobReader port tra
 check_strict_merge_gate(&str, &impl TrackBlobReader) -> VerifyOutcome を実装する (strict=true 固定)。
 U1–U18 の MockTrackBlobReader を使った分岐網羅テストを追加する。
 
-- [ ] usecase: libs/usecase/src/merge_gate/ 新設 — BlobFetchResult<T> + TrackBlobReader port (read_spec_document / read_domain_types_document / read_track_metadata) + check_strict_merge_gate orchestration + U1–U18 MockTrackBlobReader tests
+- [x] usecase: libs/usecase/src/merge_gate/ 新設 — BlobFetchResult<T> + TrackBlobReader port (read_spec_document / read_domain_types_document / read_track_metadata) + check_strict_merge_gate orchestration + U1–U18 MockTrackBlobReader tests 8ff4c45a6bb0636d9d587dac17819d091b6a4a22
 
 ## usecase: task_completion モジュール
 

@@ -1,6 +1,105 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The derived `track_id` is never validated. `validate_branch_ref` accepts branches like `track/`, `track//foo`, or `track/UPPER`, and those values are passed straight into the reader as `track_id`. That makes the gate consult malformed `track/items/<track_id>/...` paths instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 104,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
+          "at": "2026-04-12T03:57:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
+          "at": "2026-04-12T03:58:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MockTrackBlobReader` ignores both `branch` and `track_id`, so the new tests never verify the key port contract that `check_strict_merge_gate()` must pass the original branch ref to the reader while stripping only the `track/` prefix for `track_id`. A regression in either argument would still leave U1-U18 green, even though the adapter would start reading the wrong `origin/{branch}:track/items/{track_id}/...` blobs. Add a test/mock that records and asserts the received arguments.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 172,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
+          "at": "2026-04-12T04:01:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/` branches are never validated beyond the generic ref check, so malformed slugs like `track/`, `track//foo`, or `track/UPPER` are passed straight through as `track_id` to the reader. That makes the gate consult `track/items/<raw suffix>/...` instead of failing closed on invalid track branches; validate the `track/` suffix with the domain track-id rules before calling the port.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 104,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:97ceb7fdfaa729d4fc06cd722bc16ad5fe76b6ac064eabbc6d979b6df6b6e8e8",
+          "at": "2026-04-12T04:04:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`with_unreachable_dt` does not actually make Stage 2 unreachable: it preloads a normal `FetchError`, so if `check_strict_merge_gate` regressed and kept calling `read_domain_types_document` after a Stage 1 failure, these tests would still see a generic blocked outcome instead of detecting the extra read. Use a panic-on-call or call-count asserting stub here so the short-circuit contract is observable.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 185,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:989ba9c75065466381ac661462766b48cd939cc3165c340503240bfe80b742e8",
+          "at": "2026-04-12T04:08:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79290e2c0fb1fc39d7de5ec4e758ffc2986111c5103b2a43e8606a1dd7c88996",
+          "at": "2026-04-12T04:11:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79290e2c0fb1fc39d7de5ec4e758ffc2986111c5103b2a43e8606a1dd7c88996",
+          "at": "2026-04-12T04:13:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca4d347c72a59d0b63878bba9b00d3b79cb664d236b3d2bd68d1529487c839a6",
+          "at": "2026-04-12T04:22:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca4d347c72a59d0b63878bba9b00d3b79cb664d236b3d2bd68d1529487c839a6",
+          "at": "2026-04-12T04:24:55Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -203,6 +302,67 @@
           "findings": [],
           "hash": "rvw1:sha256:c5b5cecfd510bb752c2569cfe12867259c504413b1a913c4e6f39ccb69f7bed3",
           "at": "2026-04-12T03:57:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7202d0364fc47b4f6cf1f7a2e3faf28d96013a11b62da3d3157397b24c05dc03",
+          "at": "2026-04-12T04:20:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7202d0364fc47b4f6cf1f7a2e3faf28d96013a11b62da3d3157397b24c05dc03",
+          "at": "2026-04-12T04:21:03Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6dca83a4134dc803833d7c66e5ad09f3cb400485180b8ca6ecede094f82c87c",
+          "at": "2026-04-12T02:42:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6dca83a4134dc803833d7c66e5ad09f3cb400485180b8ca6ecede094f82c87c",
+          "at": "2026-04-12T02:43:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
+          "at": "2026-04-12T03:34:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_from_spec_json` only merges Stage 1 findings after `domain-types.json` decodes successfully. If Stage 1 returns a warning in interim mode (for example, `spec.json` has Yellow signals) and Stage 2 then hits a symlink/read/decode failure, the early returns here replace the accumulated Stage 1 warning with a fresh error-only outcome. That contradicts the intended behavior of preserving Stage 1 findings alongside Stage 2 results, so these Stage 2 error branches should merge into `stage1` instead of returning a new outcome.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 115,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
+          "at": "2026-04-12T03:37:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
+          "at": "2026-04-12T03:39:09Z"
         }
       ]
     },
@@ -366,138 +526,6 @@
           "findings": [],
           "hash": "rvw1:sha256:13025cc11de9c96b3633dba0f57fbd206ecafe976239d94f4656e78986f0fd1a",
           "at": "2026-04-12T03:26:08Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The derived `track_id` is never validated. `validate_branch_ref` accepts branches like `track/`, `track//foo`, or `track/UPPER`, and those values are passed straight into the reader as `track_id`. That makes the gate consult malformed `track/items/<track_id>/...` paths instead of failing closed.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 104,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
-          "at": "2026-04-12T03:57:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
-          "at": "2026-04-12T03:58:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`MockTrackBlobReader` ignores both `branch` and `track_id`, so the new tests never verify the key port contract that `check_strict_merge_gate()` must pass the original branch ref to the reader while stripping only the `track/` prefix for `track_id`. A regression in either argument would still leave U1-U18 green, even though the adapter would start reading the wrong `origin/{branch}:track/items/{track_id}/...` blobs. Add a test/mock that records and asserts the received arguments.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 172,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
-          "at": "2026-04-12T04:01:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track/` branches are never validated beyond the generic ref check, so malformed slugs like `track/`, `track//foo`, or `track/UPPER` are passed straight through as `track_id` to the reader. That makes the gate consult `track/items/<raw suffix>/...` instead of failing closed on invalid track branches; validate the `track/` suffix with the domain track-id rules before calling the port.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 104,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:97ceb7fdfaa729d4fc06cd722bc16ad5fe76b6ac064eabbc6d979b6df6b6e8e8",
-          "at": "2026-04-12T04:04:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`with_unreachable_dt` does not actually make Stage 2 unreachable: it preloads a normal `FetchError`, so if `check_strict_merge_gate` regressed and kept calling `read_domain_types_document` after a Stage 1 failure, these tests would still see a generic blocked outcome instead of detecting the extra read. Use a panic-on-call or call-count asserting stub here so the short-circuit contract is observable.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 185,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:989ba9c75065466381ac661462766b48cd939cc3165c340503240bfe80b742e8",
-          "at": "2026-04-12T04:08:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79290e2c0fb1fc39d7de5ec4e758ffc2986111c5103b2a43e8606a1dd7c88996",
-          "at": "2026-04-12T04:11:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79290e2c0fb1fc39d7de5ec4e758ffc2986111c5103b2a43e8606a1dd7c88996",
-          "at": "2026-04-12T04:13:14Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d6dca83a4134dc803833d7c66e5ad09f3cb400485180b8ca6ecede094f82c87c",
-          "at": "2026-04-12T02:42:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d6dca83a4134dc803833d7c66e5ad09f3cb400485180b8ca6ecede094f82c87c",
-          "at": "2026-04-12T02:43:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
-          "at": "2026-04-12T03:34:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`verify_from_spec_json` only merges Stage 1 findings after `domain-types.json` decodes successfully. If Stage 1 returns a warning in interim mode (for example, `spec.json` has Yellow signals) and Stage 2 then hits a symlink/read/decode failure, the early returns here replace the accumulated Stage 1 warning with a fresh error-only outcome. That contradicts the intended behavior of preserving Stage 1 findings alongside Stage 2 results, so these Stage 2 error branches should merge into `stage1` instead of returning a new outcome.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/spec_states.rs",
-              "line": 115,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
-          "at": "2026-04-12T03:37:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
-          "at": "2026-04-12T03:39:09Z"
         }
       ]
     }
