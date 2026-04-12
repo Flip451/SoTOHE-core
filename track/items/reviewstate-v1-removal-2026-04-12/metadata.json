@@ -103,6 +103,7 @@
   "status": "in_progress",
   "tasks": [
     {
+      "commit_hash": "23b28af76cc1d15bf32a47629d33b1a4e8d577a8",
       "description": "docs: ADR 2026-04-12-1800-reviewstate-v1-decommission.md 作成 (Proposed) + knowledge/adr/README.md の索引に本 ADR 追加 + .claude/rules/10-guardrails.md の Review Escalation Threshold セクション削除 + knowledge/strategy/TODO.md の RVW-54 から set-approved-head 言及のみ削除 (TODO.md の done/obsolete マークは当該コードを削除するタスクのコミットで行う: T002 で RVW-52/53/55、T005 で RV2-07) + knowledge/DESIGN.md の V1 review 言及 grep cleanup + knowledge/conventions/hexagonal-architecture.md の RecordRoundProtocol / ReviewJsonReader 参照削除 + knowledge/conventions/security.md の FsReviewJsonStore 参照削除",
       "id": "T001",
       "status": "done"
@@ -110,7 +111,7 @@
     {
       "description": "cli: apps/cli/src/commands/review/mod.rs の ResolveEscalation サブコマンド + check_approved 内 escalation fail-closed gate + SetApprovedHead サブコマンド を削除 + apps/cli/src/commands/make.rs の persist_approved_head 関数と dispatch_commit_from_file 内の呼び出し削除 + knowledge/strategy/TODO.md の RVW-52 obsolete マーク / RVW-53 obsolete マーク / RVW-55 done マーク (コードを削除した同一コミットで行う)",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "usecase: libs/usecase/src/review_workflow/usecases.rs + scope.rs 全削除 + review_workflow/mod.rs prune (verdict モジュールのみ残す) + verdict.rs 行 185/193 の domain::review::extract_verdict_json_candidates_* 呼び出しを domain::review_v2::extract_verdict_json_candidates_* に切り替え",
@@ -129,5 +130,5 @@
     }
   ],
   "title": "Review System V1 完全撤去 — metadata.json review + V1 review.json codec + escalation + index_tree_hash_normalizing",
-  "updated_at": "2026-04-12T18:16:09Z"
+  "updated_at": "2026-04-12T18:39:13Z"
 }

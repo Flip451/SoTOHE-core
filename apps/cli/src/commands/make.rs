@@ -544,12 +544,9 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
         return Ok(commit_result);
     }
 
-    // Post-commit: persist HEAD SHA for incremental review scope.
-    // Both steps run regardless of individual failures so that neither blocks the other.
-    // We propagate a failure exit code only after both have been attempted.
+    // Post-commit: persist HEAD SHA to .commit_hash for incremental review scope.
     let mut post_commit_failed = false;
     if let Some(ref track_id) = current_branch_track_id_strict()? {
-        // v2: write HEAD SHA to .commit_hash
         if let Err(msg) = persist_commit_hash_v2(track_id) {
             eprintln!("[track-commit-message] WARNING: .commit_hash persistence failed: {msg}");
             eprintln!(
@@ -557,12 +554,6 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
                  {track_id}` to set the v2 diff base manually."
             );
             post_commit_failed = true;
-        }
-        // v1: write approved_head to review.json (kept for backwards compat, T007 cleanup).
-        // Soft failure only — v1 codec cannot read v2 review.json, so this will
-        // fail on v2 tracks. Do NOT set post_commit_failed for v1 legacy errors.
-        if let Err(msg) = persist_approved_head(track_id) {
-            eprintln!("[track-commit-message] NOTE: v1 approved_head skipped: {msg}");
         }
     }
 
@@ -639,50 +630,6 @@ fn persist_commit_hash_v2(track_id: &str) -> Result<(), String> {
     store.write(&commit_hash).map_err(|e| format!("{e}"))?;
 
     eprintln!("[track-commit-message] Recorded .commit_hash: {head_sha}");
-    Ok(())
-}
-
-/// Persists the current HEAD SHA as `approved_head` in the track's review.json.
-///
-/// No-op if review.json does not exist or has no current cycle.
-///
-/// # Errors
-/// Returns a human-readable error string on failure.
-fn persist_approved_head(track_id: &str) -> Result<(), String> {
-    use domain::{ApprovedHead, ReviewJsonReader, ReviewJsonWriter, TrackId};
-
-    let track_id = TrackId::try_new(track_id).map_err(|e| format!("{e}"))?;
-    let store = infrastructure::review_json_store::FsReviewJsonStore::new(std::path::Path::new(
-        "track/items",
-    ));
-
-    let mut review = match store.find_review(&track_id).map_err(|e| format!("{e}"))? {
-        Some(r) => r,
-        None => return Ok(()), // no review.json — no-op
-    };
-
-    if review.current_cycle().is_none() {
-        return Ok(()); // no cycle — no-op
-    }
-
-    // Resolve HEAD SHA
-    let head_output = std::process::Command::new("git")
-        .args(["rev-parse", "HEAD"])
-        .output()
-        .map_err(|e| format!("failed to run git rev-parse: {e}"))?;
-    if !head_output.status.success() {
-        return Err("git rev-parse HEAD failed".to_owned());
-    }
-    let head_sha = String::from_utf8_lossy(&head_output.stdout).trim().to_owned();
-    let approved_head = ApprovedHead::try_new(&head_sha).map_err(|e| format!("{e}"))?;
-
-    review
-        .current_cycle_mut()
-        .ok_or_else(|| "no current cycle".to_owned())?
-        .set_approved_head(approved_head);
-
-    store.save_review(&track_id, &review).map_err(|e| format!("{e}"))?;
-    eprintln!("[track-commit-message] Recorded approved_head: {head_sha}");
     Ok(())
 }
 
