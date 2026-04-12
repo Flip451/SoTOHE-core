@@ -1,0 +1,857 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:087bb6fb1d030d6fcb95f1f6721d6bfe64c5b7eeee5ecf595b83fe35b3085de2",
+          "at": "2026-04-12T02:41:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:087bb6fb1d030d6fcb95f1f6721d6bfe64c5b7eeee5ecf595b83fe35b3085de2",
+          "at": "2026-04-12T02:43:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84477470d3cbfd1e36985fae18115d17faafe0ffb14ca02b3b42f773ac4d6483",
+          "at": "2026-04-12T02:50:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84477470d3cbfd1e36985fae18115d17faafe0ffb14ca02b3b42f773ac4d6483",
+          "at": "2026-04-12T02:52:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:00:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_domain_types_signals()` is documented as a single gate where any Red signal, including undeclared reverse signals, must fail, but the new tests only exercise Red on a declared entry. There is no domain-level regression test for an undeclared reverse Red signal, so a future refactor that accidentally limits the Red check to declared entries would still pass this suite.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 2276,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:03:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:04:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Yellow branch message omits the remediation hint required for this Stage 2 gate. It reports that the merge gate will block, but unlike the Stage 1 warning it never tells the caller how to turn Yellow into Blue, so the user-visible contract in the briefing/ADR is not met.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 1055,
+              "category": "requirements"
+            },
+            {
+              "message": "The new tests never exercise a Red signal on an undeclared reverse entry. That special case is the key distinction in the ADR ('Red over all signals, Yellow over declared only'), so a regression that accidentally limits the Red gate to declared entries would still pass this suite.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 2276,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:07:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:09:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
+          "at": "2026-04-12T03:13:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Yellow-stage message does not include the ADR-required upgrade hint for how to resolve the warning before merge. At this line it only says the merge gate will block `until resolved`, so callers lose the actionable guidance promised in D8.6 / the review brief for declared Yellow findings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 1056,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
+          "at": "2026-04-12T03:15:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The declared-Yellow branch does not include the required upgrade hint in its warning/error text. The briefing/ADR requires Yellow findings to name the declared types and tell callers how to upgrade them before merge, but this message only says the merge gate will block `until resolved`, so users lose the actionable remediation contract in both strict and interim modes.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 1055,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
+          "at": "2026-04-12T03:17:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Yellow-gate message hardcodes \"Implement the listed type(s)\" as the remediation, but Yellow is also emitted for valid `Delete` entries that are still present in code. In that case the correct fix is to remove the type, not implement it, so the gate will return misleading guidance for a supported domain-type workflow.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 1056,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:dfd2a3949710ce4bac82013b5be758e6576be7cafae4908bd96ff696bcb72f4b",
+          "at": "2026-04-12T03:19:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd1595f0bd3b2773962215a516a5aa696f255fa66de0afd3af7d95c95ec397f4",
+          "at": "2026-04-12T03:20:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13025cc11de9c96b3633dba0f57fbd206ecafe976239d94f4656e78986f0fd1a",
+          "at": "2026-04-12T03:25:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13025cc11de9c96b3633dba0f57fbd206ecafe976239d94f4656e78986f0fd1a",
+          "at": "2026-04-12T03:26:08Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7798f5105f96a250904d1abc84fb6aada16d32780868270b58f84a7efe62dc26",
+          "at": "2026-04-12T02:09:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D4.3 says the CI path can get fail-closed path safety by calling `reject_symlinks_below` before `read_to_string`, but that helper only detects filesystem symlinks. A checked-out git submodule appears as a normal directory, so `track/items/<id>/spec.json` inside a submodule would still be read successfully even though the truth table later says case #18 is BLOCKED. The plan needs an explicit CI-side submodule guard or the fail-closed table is overstated.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md",
+              "line": 187,
+              "category": "architecture"
+            },
+            {
+              "message": "The approved acceptance criterion for `validate_branch_ref` no longer requires rejecting control characters, even though D4.2 and task T004 describe control-char rejection as part of the contract. An implementation can satisfy the current spec while still accepting refs with embedded `\\n`/NUL, leaving the `origin/{branch}:...` pre-validation incomplete.",
+              "severity": "P1",
+              "file": "track/items/strict-signal-gate-v2-2026-04-12/spec.json",
+              "line": 314,
+              "category": "validation"
+            },
+            {
+              "message": "`spec.json` still cites `.claude/rules/07-dev-environment.md` and `track/tech-stack.md` as direct sources for the layer/build requirement instead of tracing that requirement back through this ADR. That breaks the stated ADR-only source attribution for this track and means an external convention edit can change the approved basis of the spec without any ADR update.",
+              "severity": "P1",
+              "file": "track/items/strict-signal-gate-v2-2026-04-12/spec.json",
+              "line": 248,
+              "category": "traceability"
+            }
+          ],
+          "hash": "rvw1:sha256:7798f5105f96a250904d1abc84fb6aada16d32780868270b58f84a7efe62dc26",
+          "at": "2026-04-12T02:15:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR is self-contradictory about layer ownership: the Context says this redesign will place the gate logic under `libs/infrastructure/src/verify/`, but D5/D9 and the rest of the track move orchestration into `libs/usecase`. Leaving the source-of-truth ADR split like this makes it easy to implement the gate in infrastructure again and violate the intended hexagonal boundary.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md",
+              "line": 21,
+              "category": "architecture"
+            },
+            {
+              "message": "D2.0 defines `validate_branch_ref` as a domain API returning `RefValidationError`, but D4.2 redefines the same function as `Result<(), GateError>`. That ambiguity leaks a gate-specific error type back into the domain contract and gives implementers two incompatible signatures to follow.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md",
+              "line": 168,
+              "category": "architecture"
+            },
+            {
+              "message": "The T004 acceptance criterion no longer covers control-character rejection, even though D4.2 and task T004 both require `validate_branch_ref` to reject control bytes. As written, the spec can be satisfied without testing one of the fail-closed branch-name cases the ADR calls out.",
+              "severity": "P1",
+              "file": "track/items/strict-signal-gate-v2-2026-04-12/spec.json",
+              "line": 314,
+              "category": "testing"
+            },
+            {
+              "message": "The out-of-scope race-condition item hardcodes `SEC-18` as the follow-up TODO id. The briefing explicitly requires describing this race without assigning a SEC number because numbering is deferred; if another SEC is created first, this plan will immediately point at the wrong follow-up identifier.",
+              "severity": "P1",
+              "file": "track/items/strict-signal-gate-v2-2026-04-12/spec.json",
+              "line": 161,
+              "category": "traceability"
+            }
+          ],
+          "hash": "rvw1:sha256:7798f5105f96a250904d1abc84fb6aada16d32780868270b58f84a7efe62dc26",
+          "at": "2026-04-12T02:19:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 now requires `validate_branch_ref` to reject both `:` and control characters, but the planned domain test budget is still only `D14–D20`, and the ADR matrix behind those IDs never exercises either input. As written, the implementation can satisfy the tracked tests while leaving two fail-closed branches unverified.",
+              "severity": "P1",
+              "file": "track/items/strict-signal-gate-v2-2026-04-12/spec.json",
+              "line": 314,
+              "category": "testing"
+            },
+            {
+              "message": "The spec was updated to defer the wait-and-merge follow-up to 'the next available SEC number', but D7 in the ADR still hardcodes `SEC-18` as the next slot. That leaves the planning artifacts inconsistent and reintroduces the stale-numbering problem this cleanup was supposed to remove.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md",
+              "line": 556,
+              "category": "traceability"
+            }
+          ],
+          "hash": "rvw1:sha256:62d04f341c57ef472168edae566a5ad5384f5258c40cb2fa3de47c1ccf2df6b8",
+          "at": "2026-04-12T02:24:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` still defines T004 as only `D14–D20 tests`, even though the ADR, spec, and metadata were expanded to require `D21` (`:`) and `D22` (control character) rejection. As written, this track can be signed off without verifying the two newly added fail-closed branch-ref cases.",
+              "severity": "P1",
+              "file": "track/items/strict-signal-gate-v2-2026-04-12/verification.md",
+              "line": 8,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:b5f5e83cb11028880491ad4ac41d6c6b09621f530fcde2256d0446da6a9e5947",
+          "at": "2026-04-12T02:27:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c225bfbc54b1ac3fd5a61b647e73deaffc641358b29ee19a1e591ee61ccc3c8",
+          "at": "2026-04-12T02:30:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8829feb13175c2c4466875f7a5e6e14078b515d109da4483df01f8738eb92beb",
+          "at": "2026-04-12T02:49:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` was regenerated as `2026-04-12T02:44:53Z`, which is earlier than this track's `created_at` (`2026-04-12T12:00:00Z`). The transition now records an impossible timeline for the item, and any tooling that relies on monotonic track timestamps can misorder or reject it.",
+              "severity": "P1",
+              "file": "track/items/strict-signal-gate-v2-2026-04-12/metadata.json",
+              "line": 267,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8829feb13175c2c4466875f7a5e6e14078b515d109da4483df01f8738eb92beb",
+          "at": "2026-04-12T02:52:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8829feb13175c2c4466875f7a5e6e14078b515d109da4483df01f8738eb92beb",
+          "at": "2026-04-12T02:53:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05c345db2252e300432c948388d01675b04d83bdf1af91862131a564f8e0fc85",
+          "at": "2026-04-12T02:58:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05c345db2252e300432c948388d01675b04d83bdf1af91862131a564f8e0fc85",
+          "at": "2026-04-12T03:01:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a18a4ac9868eae874c48c0e178724fa615cea57c95c0533e161e6f525c44806",
+          "at": "2026-04-12T03:25:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a18a4ac9868eae874c48c0e178724fa615cea57c95c0533e161e6f525c44806",
+          "at": "2026-04-12T03:25:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27e35f0ace18da6a96bbeaf0c8f958f82d23a1f1a28b24decf34439db054837b",
+          "at": "2026-04-12T03:33:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27e35f0ace18da6a96bbeaf0c8f958f82d23a1f1a28b24decf34439db054837b",
+          "at": "2026-04-12T03:34:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c5b5cecfd510bb752c2569cfe12867259c504413b1a913c4e6f39ccb69f7bed3",
+          "at": "2026-04-12T03:56:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c5b5cecfd510bb752c2569cfe12867259c504413b1a913c4e6f39ccb69f7bed3",
+          "at": "2026-04-12T03:57:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7202d0364fc47b4f6cf1f7a2e3faf28d96013a11b62da3d3157397b24c05dc03",
+          "at": "2026-04-12T04:20:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7202d0364fc47b4f6cf1f7a2e3faf28d96013a11b62da3d3157397b24c05dc03",
+          "at": "2026-04-12T04:21:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d6789d3b23f7afb1fc2a45c93d3360cade2b1c12a77bb568da71c25b2d98bc7",
+          "at": "2026-04-12T04:30:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d6789d3b23f7afb1fc2a45c93d3360cade2b1c12a77bb568da71c25b2d98bc7",
+          "at": "2026-04-12T04:31:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba649b3241b3dcc7ba4483e679df1eaa078476610590c979eff6b5bd77b977b5",
+          "at": "2026-04-12T04:46:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba649b3241b3dcc7ba4483e679df1eaa078476610590c979eff6b5bd77b977b5",
+          "at": "2026-04-12T04:47:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:946a20edeb3f24ba18e2b44c6ccbb178a9cd678577d12edead7d1488e0dcf5e7",
+          "at": "2026-04-12T04:54:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:946a20edeb3f24ba18e2b44c6ccbb178a9cd678577d12edead7d1488e0dcf5e7",
+          "at": "2026-04-12T04:55:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a3c673a8738316a3aa7cfa1eaefed241214c3d594a7eb7cb038dae87444106a",
+          "at": "2026-04-12T05:03:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a3c673a8738316a3aa7cfa1eaefed241214c3d594a7eb7cb038dae87444106a",
+          "at": "2026-04-12T05:05:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dabf0f5ad220fe75fa532dfbd5da3cc1ae8ffac81ab7055f29cdcabc213fa17f",
+          "at": "2026-04-12T05:09:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dabf0f5ad220fe75fa532dfbd5da3cc1ae8ffac81ab7055f29cdcabc213fa17f",
+          "at": "2026-04-12T05:10:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:97f94f75b1b65b787237ad74e273645246ece7a89f8c53200c364bf7ce162934",
+          "at": "2026-04-12T05:15:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verified_at` is earlier than the last completed work this document claims to verify. `verification.md` marks T012 complete with commit `df48608`, whose commit time is `2026-04-12T05:11:39Z`, and `metadata.json` was updated at `2026-04-12T05:11:57Z`, but `verified_at` is `2026-04-12T05:00:00Z`. That makes the final verification record chronologically impossible for T012/T013 and breaks consumers that rely on `verified_at` as the actual completion time.",
+              "severity": "P1",
+              "file": "track/items/strict-signal-gate-v2-2026-04-12/verification.md",
+              "line": 82,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:97f94f75b1b65b787237ad74e273645246ece7a89f8c53200c364bf7ce162934",
+          "at": "2026-04-12T05:17:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verified_at` is internally inconsistent with the verification claims: the document says I1 was confirmed at the T012 commit, but `verified_at` is `2026-04-12T05:00:00Z`, which is earlier than commit `df48608d4723e40dc5d307aa9d4dd1d30c1886e6` (`2026-04-12T14:11:39+09:00`). This makes the final verification record chronologically impossible and should be updated to a timestamp at or after the latest verified evidence.",
+              "severity": "P1",
+              "file": "track/items/strict-signal-gate-v2-2026-04-12/verification.md",
+              "line": 82,
+              "category": "correctness"
+            },
+            {
+              "message": "I7-I9 are marked complete, but the only evidence given is that the Makefile case statement exists. The briefing explicitly requires the I1-I11 matrix to cite tests or concrete verification results for each scenario, and the accepted deviation says these skip behaviors are justified by semantic test coverage rather than manual runs. As written, the non-`track/*` / missing-spec skip paths are asserted, not actually evidenced.",
+              "severity": "P1",
+              "file": "track/items/strict-signal-gate-v2-2026-04-12/verification.md",
+              "line": 37,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:97f94f75b1b65b787237ad74e273645246ece7a89f8c53200c364bf7ce162934",
+          "at": "2026-04-12T05:18:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` marks I7–I9 as covered by a single branch-bound skip note, but that note provides no test/CI evidence and does not actually substantiate I9 (`spec.md` missing on a `track/*` branch). The review checklist requires each I-row to have `[x]` plus test/CI evidence, so T013's verification record is incomplete here.",
+              "severity": "P1",
+              "file": "track/items/strict-signal-gate-v2-2026-04-12/verification.md",
+              "line": 37,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:97f94f75b1b65b787237ad74e273645246ece7a89f8c53200c364bf7ce162934",
+          "at": "2026-04-12T05:20:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c2d13ce024d90f86677a6c118116237c478bd3e2536922ac05bc1e8c4c77ae4",
+          "at": "2026-04-12T05:25:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "I7–I9 are marked `[x]`, but the cited evidence is only static inspection of `Makefile.toml` branches rather than a test name or CI run. That leaves the T013 artifact without actual verification evidence for the `main`, `plan/*`, and missing-`spec.md` skip paths that this checklist requires.",
+              "severity": "P1",
+              "file": "track/items/strict-signal-gate-v2-2026-04-12/verification.md",
+              "line": 37,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:9c2d13ce024d90f86677a6c118116237c478bd3e2536922ac05bc1e8c4c77ae4",
+          "at": "2026-04-12T05:27:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19b65df2a937992fc846f4003f2dd3d5ba7b5fcff832c398c4082794f733a60e",
+          "at": "2026-04-12T05:31:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` does not mark the I1–I11 integration matrix as complete: the I7–I9 row is recorded as `[~]` with only static review, even though this T013 artifact is supposed to report each I1–I11 entry as `[x]` with verification evidence. As written, the document overstates completion of the integration checklist while leaving those scenarios unverified.",
+              "severity": "P1",
+              "file": "track/items/strict-signal-gate-v2-2026-04-12/verification.md",
+              "line": 37,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:19b65df2a937992fc846f4003f2dd3d5ba7b5fcff832c398c4082794f733a60e",
+          "at": "2026-04-12T05:32:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:071871c1942a34adb9760eabed85af132628b5419092912cb06dc1a3afbff1bd",
+          "at": "2026-04-12T05:33:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` leaves I7–I9 unchecked and explicitly says those scenarios were not verified, but T013 is the CI integration regression-test record and the review brief requires every I1–I11 row to be marked `[x]` with evidence. As written, the artifact reports T013 complete while three required integration cases (`main` skip, `plan/*` skip, missing `spec.md` skip) remain unverified.",
+              "severity": "P1",
+              "file": "track/items/strict-signal-gate-v2-2026-04-12/verification.md",
+              "line": 37,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:071871c1942a34adb9760eabed85af132628b5419092912cb06dc1a3afbff1bd",
+          "at": "2026-04-12T05:34:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:071871c1942a34adb9760eabed85af132628b5419092912cb06dc1a3afbff1bd",
+          "at": "2026-04-12T05:36:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db96cc174baf078790c7fae03207b0d35023f8a4650f06c3bae9f1f8b85ca966",
+          "at": "2026-04-12T05:40:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db96cc174baf078790c7fae03207b0d35023f8a4650f06c3bae9f1f8b85ca966",
+          "at": "2026-04-12T05:41:07Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be538119ccc604fe5e6d5704cb94c42be0a7fce0337ec71328a3fe26524b46d3",
+          "at": "2026-04-12T04:56:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be538119ccc604fe5e6d5704cb94c42be0a7fce0337ec71328a3fe26524b46d3",
+          "at": "2026-04-12T04:59:02Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dd5f7926e3658de5b5370a8d5a83b6d7ad1745e064c00c8e469a2c06645a610",
+          "at": "2026-04-12T05:03:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dd5f7926e3658de5b5370a8d5a83b6d7ad1745e064c00c8e469a2c06645a610",
+          "at": "2026-04-12T05:04:38Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The derived `track_id` is never validated. `validate_branch_ref` accepts branches like `track/`, `track//foo`, or `track/UPPER`, and those values are passed straight into the reader as `track_id`. That makes the gate consult malformed `track/items/<track_id>/...` paths instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 104,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
+          "at": "2026-04-12T03:57:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
+          "at": "2026-04-12T03:58:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MockTrackBlobReader` ignores both `branch` and `track_id`, so the new tests never verify the key port contract that `check_strict_merge_gate()` must pass the original branch ref to the reader while stripping only the `track/` prefix for `track_id`. A regression in either argument would still leave U1-U18 green, even though the adapter would start reading the wrong `origin/{branch}:track/items/{track_id}/...` blobs. Add a test/mock that records and asserts the received arguments.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 172,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
+          "at": "2026-04-12T04:01:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/` branches are never validated beyond the generic ref check, so malformed slugs like `track/`, `track//foo`, or `track/UPPER` are passed straight through as `track_id` to the reader. That makes the gate consult `track/items/<raw suffix>/...` instead of failing closed on invalid track branches; validate the `track/` suffix with the domain track-id rules before calling the port.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 104,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:97ceb7fdfaa729d4fc06cd722bc16ad5fe76b6ac064eabbc6d979b6df6b6e8e8",
+          "at": "2026-04-12T04:04:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`with_unreachable_dt` does not actually make Stage 2 unreachable: it preloads a normal `FetchError`, so if `check_strict_merge_gate` regressed and kept calling `read_domain_types_document` after a Stage 1 failure, these tests would still see a generic blocked outcome instead of detecting the extra read. Use a panic-on-call or call-count asserting stub here so the short-circuit contract is observable.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 185,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:989ba9c75065466381ac661462766b48cd939cc3165c340503240bfe80b742e8",
+          "at": "2026-04-12T04:08:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79290e2c0fb1fc39d7de5ec4e758ffc2986111c5103b2a43e8606a1dd7c88996",
+          "at": "2026-04-12T04:11:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79290e2c0fb1fc39d7de5ec4e758ffc2986111c5103b2a43e8606a1dd7c88996",
+          "at": "2026-04-12T04:13:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca4d347c72a59d0b63878bba9b00d3b79cb664d236b3d2bd68d1529487c839a6",
+          "at": "2026-04-12T04:22:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca4d347c72a59d0b63878bba9b00d3b79cb664d236b3d2bd68d1529487c839a6",
+          "at": "2026-04-12T04:24:55Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6dca83a4134dc803833d7c66e5ad09f3cb400485180b8ca6ecede094f82c87c",
+          "at": "2026-04-12T02:42:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6dca83a4134dc803833d7c66e5ad09f3cb400485180b8ca6ecede094f82c87c",
+          "at": "2026-04-12T02:43:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
+          "at": "2026-04-12T03:34:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_from_spec_json` only merges Stage 1 findings after `domain-types.json` decodes successfully. If Stage 1 returns a warning in interim mode (for example, `spec.json` has Yellow signals) and Stage 2 then hits a symlink/read/decode failure, the early returns here replace the accumulated Stage 1 warning with a fresh error-only outcome. That contradicts the intended behavior of preserving Stage 1 findings alongside Stage 2 results, so these Stage 2 error branches should merge into `stage1` instead of returning a new outcome.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 115,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
+          "at": "2026-04-12T03:37:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
+          "at": "2026-04-12T03:39:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `TreeEntryKind::Submodule` rejection path in `fetch_blob_safe` is not covered by any fixture test. Because this is a security-sensitive fail-closed branch, a regression in 160000 handling could ship without detection. Please add an integration test that commits a submodule and asserts `fetch_blob_safe` returns `BlobResult::CommandFailed` for it.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/show.rs",
+              "line": 185,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:f6fbdaa20cd5e98936473be59b4fbc357266a5b2421f2e578c214fe63b1306ea",
+          "at": "2026-04-12T04:31:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f6fbdaa20cd5e98936473be59b4fbc357266a5b2421f2e578c214fe63b1306ea",
+          "at": "2026-04-12T04:33:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f6fbdaa20cd5e98936473be59b4fbc357266a5b2421f2e578c214fe63b1306ea",
+          "at": "2026-04-12T04:35:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9b8d527ba1869757296eef23a9c47f7745cf637241e98884190561e54e56f11",
+          "at": "2026-04-12T04:37:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fetch_blob_safe` validates `origin/<branch>` with `git ls-tree` and then does a second symbolic-ref lookup in `git_show_blob`. If a concurrent `git fetch` moves `origin/<branch>` between those calls, the mode check can approve commit A while `git show` returns bytes from commit B. That breaks the D4.3 fail-closed guarantee; a symlink blob in commit B can carry attacker-controlled JSON text and bypass the intended pre-read rejection. Resolve `origin/<branch>` to a commit once and use that object ID for both commands.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/git_cli/show.rs",
+              "line": 185,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:a9b8d527ba1869757296eef23a9c47f7745cf637241e98884190561e54e56f11",
+          "at": "2026-04-12T04:40:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9b8d527ba1869757296eef23a9c47f7745cf637241e98884190561e54e56f11",
+          "at": "2026-04-12T04:40:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb6cc0eac796dede2c46d01db6da2883d32a05d91227bd5315ff9aa6a21f4e49",
+          "at": "2026-04-12T04:47:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb6cc0eac796dede2c46d01db6da2883d32a05d91227bd5315ff9aa6a21f4e49",
+          "at": "2026-04-12T04:49:34Z"
+        }
+      ]
+    }
+  }
+}

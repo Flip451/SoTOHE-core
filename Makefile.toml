@@ -559,6 +559,31 @@ case "$BRANCH" in
 esac
 ''']
 
+[tasks.verify-spec-states-current-local]
+private = true
+description = "[internal] Verify current track's spec.json signals in CI interim mode. Yellow surfaces as Finding::warning; only red blocks. Strict enforcement happens at sotp pr wait-and-merge."
+script_runner = "@shell"
+script = ['''
+BRANCH=$(git branch --show-current 2>/dev/null || true)
+case "$BRANCH" in
+  track/*)
+    TRACK_ID="${BRANCH#track/}"
+    SPEC_PATH="track/items/$TRACK_ID/spec.md"
+    if [ -f "$SPEC_PATH" ]; then
+      cargo run --quiet -p cli -- verify spec-states "$SPEC_PATH"
+    else
+      echo "[SKIP] $SPEC_PATH not found"
+    fi
+    ;;
+  plan/*|main)
+    echo "[SKIP] $BRANCH is not a track branch"
+    ;;
+  *)
+    echo "[SKIP] not on a track branch (branch: ${BRANCH:-detached})"
+    ;;
+esac
+''']
+
 [tasks.ci-rust-local]
 private = true
 description = "[internal] Run Rust-only CI checks (fmt + clippy + test + deny + check-layers + canonical-modules)"
@@ -567,7 +592,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local CI checks"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-spec-coverage-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-spec-coverage-local", "verify-spec-states-current-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
@@ -575,7 +600,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-spec-coverage-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-spec-coverage-local", "verify-spec-states-current-local"]
 
 # Compose wrappers
 [tasks.fmt]

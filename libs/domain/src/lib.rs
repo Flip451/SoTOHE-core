@@ -4,6 +4,7 @@
 pub mod auto_phase;
 mod decision;
 mod error;
+pub mod git_ref;
 pub mod guard;
 pub mod hook;
 mod ids;
@@ -26,6 +27,7 @@ pub use error::{
     DomainError, RepositoryError, TrackReadError, TrackWriteError, TransitionError,
     ValidationError, WorktreeError,
 };
+pub use git_ref::{RefValidationError, validate_branch_ref};
 pub use ids::{CommitHash, NonEmptyString, ReviewGroupName, TaskId, TrackBranch, TrackId};
 pub use plan::{PlanSection, PlanView};
 pub use repository::{

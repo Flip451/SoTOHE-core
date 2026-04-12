@@ -71,8 +71,8 @@ impl SignalBasis {
     #[must_use]
     pub const fn signal(&self) -> ConfidenceSignal {
         match self {
-            Self::Document | Self::Feedback | Self::Convention => ConfidenceSignal::Blue,
-            Self::Discussion | Self::Inference => ConfidenceSignal::Yellow,
+            Self::Document | Self::Convention => ConfidenceSignal::Blue,
+            Self::Feedback | Self::Discussion | Self::Inference => ConfidenceSignal::Yellow,
             Self::MissingSource => ConfidenceSignal::Red,
         }
     }
@@ -257,8 +257,8 @@ mod tests {
 
     #[rstest]
     #[case::document(SignalBasis::Document, ConfidenceSignal::Blue)]
-    #[case::feedback(SignalBasis::Feedback, ConfidenceSignal::Blue)]
     #[case::convention(SignalBasis::Convention, ConfidenceSignal::Blue)]
+    #[case::feedback(SignalBasis::Feedback, ConfidenceSignal::Yellow)]
     #[case::discussion(SignalBasis::Discussion, ConfidenceSignal::Yellow)]
     #[case::inference(SignalBasis::Inference, ConfidenceSignal::Yellow)]
     #[case::missing_source(SignalBasis::MissingSource, ConfidenceSignal::Red)]

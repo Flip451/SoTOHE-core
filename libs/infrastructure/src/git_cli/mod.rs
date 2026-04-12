@@ -7,6 +7,7 @@ use serde::Deserialize;
 use thiserror::Error;
 
 pub mod private_index;
+pub(crate) mod show;
 
 /// Structured error type for git CLI operations.
 #[derive(Debug, Error)]

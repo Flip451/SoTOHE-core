@@ -155,10 +155,27 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
         VerifyCommand::SpecSignals(args) => {
             ("verify spec signals", infrastructure::verify::spec_signals::verify(&args.spec_path))
         }
-        VerifyCommand::SpecStates(args) => (
-            "verify spec states",
-            infrastructure::verify::spec_states::verify(&args.spec_path, args.strict),
-        ),
+        VerifyCommand::SpecStates(args) => {
+            // Resolve trusted_root via the infrastructure-layer helper.
+            // All filesystem I/O (git discover, .git walk-up, symlink
+            // verification) lives in `infrastructure::verify::trusted_root`;
+            // the CLI is a pure composition root that maps Result → finding.
+            let outcome =
+                match infrastructure::verify::trusted_root::resolve_trusted_root(&args.spec_path) {
+                    Ok(trusted_root) => infrastructure::verify::spec_states::verify(
+                        &args.spec_path,
+                        args.strict,
+                        &trusted_root,
+                    ),
+                    Err(e) => {
+                        VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
+                            "cannot resolve trusted_root for {}: {e}",
+                            args.spec_path.display()
+                        ))])
+                    }
+                };
+            ("verify spec states", outcome)
+        }
         VerifyCommand::SpecCoverage(args) => {
             let outcome = match &args.track_dir {
                 Some(dir) if dir.is_dir() => infrastructure::verify::spec_coverage::verify(dir),
