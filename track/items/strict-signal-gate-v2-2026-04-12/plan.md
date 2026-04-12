@@ -110,7 +110,7 @@ branch-bound な track 解決: track/* ブランチなら sotp verify spec-state
 ci-local / ci-container の dependencies に verify-spec-states-current-local を追加する (D8.4)。
 --strict は付けない (CI は interim mode)。
 
-- [ ] build: Makefile.toml に verify-spec-states-current-local 新設 (branch-bound, interim mode, --strict なし) + ci-local / ci-container dependencies に追加
+- [x] build: Makefile.toml に verify-spec-states-current-local 新設 (branch-bound, interim mode, --strict なし) + ci-local / ci-container dependencies に追加 df48608d4723e40dc5d307aa9d4dd1d30c1886e6
 
 ## docs: CI 統合回帰テスト記録
 

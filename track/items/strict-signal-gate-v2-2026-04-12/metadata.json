@@ -258,9 +258,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "df48608d4723e40dc5d307aa9d4dd1d30c1886e6",
       "description": "build: Makefile.toml に verify-spec-states-current-local 新設 (branch-bound, interim mode, --strict なし) + ci-local / ci-container dependencies に追加",
       "id": "T012",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "docs: CI 統合回帰テスト I1–I11 を手動実行 + verification.md に結果記録",
@@ -274,5 +275,5 @@
     }
   ],
   "title": "Strict Spec Signal Gate v2 — Yellow blocks merge (fail-closed)",
-  "updated_at": "2026-04-12T05:06:22Z"
+  "updated_at": "2026-04-12T05:11:57Z"
 }
