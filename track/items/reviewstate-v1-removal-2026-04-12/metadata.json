@@ -127,12 +127,12 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "fd095c450601203803274c94c747ada80ae7b597",
       "description": "domain: review_v2/types.rs に RoundType を追加 + review/state.rs + escalation.rs + concern.rs + types.rs + cycle/ + error.rs 削除 + review/mod.rs prune + lib.rs V1 re-export 削除 + track.rs の TrackMetadata.review field と accessors と ctor init 削除 + repository.rs から ReviewJsonReader/ReviewJsonWriter 削除 + apps/cli 側の domain::RoundType import 調整 + cargo make ci PASS 確認 + bin/sotp track baseline-capture + domain-type-signals で ReviewState 同名衝突消滅を回帰確認 + ADR Status を Accepted に更新 + knowledge/strategy/TODO.md の RV2-07 done マーク (V1 domain コード全体削除の同一コミットで行う)",
       "id": "T005",
       "status": "done"
     }
   ],
   "title": "Review System V1 完全撤去 — metadata.json review + V1 review.json codec + escalation + index_tree_hash_normalizing",
-  "updated_at": "2026-04-12T19:20:59Z"
+  "updated_at": "2026-04-12T19:29:56Z"
 }
