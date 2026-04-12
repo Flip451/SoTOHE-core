@@ -8,7 +8,6 @@ use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
 use domain::verify::VerifyOutcome;
-use infrastructure::git_cli::GitRepository;
 
 /// Arguments for spec-level verify subcommands.
 #[derive(Args)]
@@ -157,34 +156,24 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
             ("verify spec signals", infrastructure::verify::spec_signals::verify(&args.spec_path))
         }
         VerifyCommand::SpecStates(args) => {
-            // Anchor the symlink guard at an absolute path that is a
-            // lexical ancestor of `spec_path`. Three-step resolution:
-            //
-            // 1. Normalize spec_path to an absolute path (without following
-            //    symlinks — we want to DETECT them, not follow them).
-            // 2. If `SystemGitRepo::discover()` succeeds AND the absolute
-            //    spec path is lexically under the discovered repo root,
-            //    use the repo root. This covers the normal in-repo CLI flow.
-            // 3. Otherwise fall back to `fallback_trusted_root(&args.spec_path)`,
-            //    which walks up from the spec path looking for a `.git`
-            //    marker (or lands on `spec_path.parent()` if none is found).
-            //    This preserves standalone usability outside a git checkout
-            //    AND when the spec path points outside the discovered repo
-            //    (e.g. `sotp verify spec-states /tmp/other/spec.md` from
-            //    inside a workspace checkout).
-            let spec_abs = absolutize(&args.spec_path);
-            let trusted_root = infrastructure::git_cli::SystemGitRepo::discover()
-                .ok()
-                .and_then(|repo| {
-                    let repo_root = repo.root().to_path_buf();
-                    if spec_abs.starts_with(&repo_root) { Some(repo_root) } else { None }
-                })
-                .unwrap_or_else(|| fallback_trusted_root(&args.spec_path));
-            let outcome = infrastructure::verify::spec_states::verify(
-                &args.spec_path,
-                args.strict,
-                &trusted_root,
-            );
+            // Resolve trusted_root via the infrastructure-layer helper.
+            // All filesystem I/O (git discover, .git walk-up, symlink
+            // verification) lives in `infrastructure::verify::trusted_root`;
+            // the CLI is a pure composition root that maps Result → finding.
+            let outcome =
+                match infrastructure::verify::trusted_root::resolve_trusted_root(&args.spec_path) {
+                    Ok(trusted_root) => infrastructure::verify::spec_states::verify(
+                        &args.spec_path,
+                        args.strict,
+                        &trusted_root,
+                    ),
+                    Err(e) => {
+                        VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
+                            "cannot resolve trusted_root for {}: {e}",
+                            args.spec_path.display()
+                        ))])
+                    }
+                };
             ("verify spec states", outcome)
         }
         VerifyCommand::SpecCoverage(args) => {
@@ -457,42 +446,6 @@ fn verify_arch_docs(root: &std::path::Path) -> VerifyOutcome {
     outcome.merge(infrastructure::verify::doc_patterns::verify(root));
     outcome.merge(infrastructure::verify::convention_docs::verify(root));
     outcome
-}
-
-/// Normalizes `path` to an absolute path **without following symlinks**.
-///
-/// Uses `std::env::current_dir()` as the base for relative paths. If
-/// `current_dir()` fails (e.g. chroot without cwd), falls back to the
-/// original path. Does NOT canonicalize — callers that need symlink
-/// detection must preserve the original link structure.
-fn absolutize(path: &std::path::Path) -> PathBuf {
-    if path.is_absolute() {
-        return path.to_path_buf();
-    }
-    std::env::current_dir().map(|cwd| cwd.join(path)).unwrap_or_else(|_| path.to_path_buf())
-}
-
-/// Fallback `trusted_root` for the spec-states symlink guard when
-/// `SystemGitRepo::discover()` is unusable (either the command fails,
-/// or the discovered repo root is not a lexical ancestor of the spec
-/// path — e.g. `sotp verify spec-states /tmp/other/spec.md` from inside
-/// a workspace checkout, or standalone execution outside any git
-/// checkout). Walks up from the spec path looking for a `.git` marker;
-/// if none is found, falls back to the spec path's immediate parent.
-///
-/// The fallback preserves standalone usability at the cost of a slightly
-/// relaxed guard (only the parent directory and the spec file itself are
-/// verified for symlinks, not arbitrary deeper ancestors). The primary
-/// repo-root path (via `SystemGitRepo::discover()`) remains the preferred
-/// trusted_root for in-repo CLI invocations.
-fn fallback_trusted_root(spec_path: &std::path::Path) -> PathBuf {
-    let start = spec_path.parent().unwrap_or(spec_path);
-    for ancestor in start.ancestors() {
-        if ancestor.join(".git").exists() {
-            return ancestor.to_path_buf();
-        }
-    }
-    start.to_path_buf()
 }
 
 fn print_outcome(label: &str, outcome: &VerifyOutcome) -> ExitCode {
