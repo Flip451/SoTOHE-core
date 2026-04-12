@@ -252,9 +252,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "eb6ea713bddc2036576d80fa475df1a78d51e63d",
       "description": "docs: knowledge/conventions/source-attribution.md に Signal 列追加 + feedback Yellow 降格の upgrade ガイダンス追記",
       "id": "T011",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "build: Makefile.toml に verify-spec-states-current-local 新設 (branch-bound, interim mode, --strict なし) + ci-local / ci-container dependencies に追加",
@@ -273,5 +274,5 @@
     }
   ],
   "title": "Strict Spec Signal Gate v2 — Yellow blocks merge (fail-closed)",
-  "updated_at": "2026-04-12T05:00:30Z"
+  "updated_at": "2026-04-12T05:06:22Z"
 }

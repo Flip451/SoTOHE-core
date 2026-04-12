@@ -101,7 +101,7 @@ knowledge/conventions/source-attribution.md に Signal 列を追加する。
 Blue ソース (document, convention) と Yellow ソース (feedback, inference, discussion) を明示する。
 feedback が Yellow に降格した理由と upgrade (ADR 作成) ガイダンスを追記する。
 
-- [ ] docs: knowledge/conventions/source-attribution.md に Signal 列追加 + feedback Yellow 降格の upgrade ガイダンス追記
+- [x] docs: knowledge/conventions/source-attribution.md に Signal 列追加 + feedback Yellow 降格の upgrade ガイダンス追記 eb6ea713bddc2036576d80fa475df1a78d51e63d
 
 ## build: Makefile.toml CI interim mode 組み込み
 
