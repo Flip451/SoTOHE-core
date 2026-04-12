@@ -246,9 +246,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "d93f8753a8acb99f953a0ae0e32bff7e5f13af3b",
       "description": "cli: apps/cli/src/commands/pr.rs::wait_and_merge + check_tasks_resolved を GitShowTrackBlobReader + usecase::merge_gate / task_completion の thin wrapper に書き換え + 既存テスト移植 + C1–C4 最小 wrapper tests",
       "id": "T010",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "docs: knowledge/conventions/source-attribution.md に Signal 列追加 + feedback Yellow 降格の upgrade ガイダンス追記",
@@ -272,5 +273,5 @@
     }
   ],
   "title": "Strict Spec Signal Gate v2 — Yellow blocks merge (fail-closed)",
-  "updated_at": "2026-04-12T04:50:55Z"
+  "updated_at": "2026-04-12T05:00:30Z"
 }

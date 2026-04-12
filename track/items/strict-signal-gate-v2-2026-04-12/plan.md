@@ -93,7 +93,7 @@ apps/cli/src/commands/pr.rs::wait_and_merge を薄いラッパー化する。Git
 既存の check_tasks_resolved_* テストを削除し、C1–C4 の最小 wrapper テストのみ残す。
 CLI 層から std::process::Command::new("git") の直呼び出しが完全に消えたことを確認する。
 
-- [ ] cli: apps/cli/src/commands/pr.rs::wait_and_merge + check_tasks_resolved を GitShowTrackBlobReader + usecase::merge_gate / task_completion の thin wrapper に書き換え + 既存テスト移植 + C1–C4 最小 wrapper tests
+- [x] cli: apps/cli/src/commands/pr.rs::wait_and_merge + check_tasks_resolved を GitShowTrackBlobReader + usecase::merge_gate / task_completion の thin wrapper に書き換え + 既存テスト移植 + C1–C4 最小 wrapper tests d93f8753a8acb99f953a0ae0e32bff7e5f13af3b
 
 ## docs: source-attribution convention 更新
 

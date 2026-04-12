@@ -1,6 +1,105 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The derived `track_id` is never validated. `validate_branch_ref` accepts branches like `track/`, `track//foo`, or `track/UPPER`, and those values are passed straight into the reader as `track_id`. That makes the gate consult malformed `track/items/<track_id>/...` paths instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 104,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
+          "at": "2026-04-12T03:57:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
+          "at": "2026-04-12T03:58:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MockTrackBlobReader` ignores both `branch` and `track_id`, so the new tests never verify the key port contract that `check_strict_merge_gate()` must pass the original branch ref to the reader while stripping only the `track/` prefix for `track_id`. A regression in either argument would still leave U1-U18 green, even though the adapter would start reading the wrong `origin/{branch}:track/items/{track_id}/...` blobs. Add a test/mock that records and asserts the received arguments.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 172,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
+          "at": "2026-04-12T04:01:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/` branches are never validated beyond the generic ref check, so malformed slugs like `track/`, `track//foo`, or `track/UPPER` are passed straight through as `track_id` to the reader. That makes the gate consult `track/items/<raw suffix>/...` instead of failing closed on invalid track branches; validate the `track/` suffix with the domain track-id rules before calling the port.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 104,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:97ceb7fdfaa729d4fc06cd722bc16ad5fe76b6ac064eabbc6d979b6df6b6e8e8",
+          "at": "2026-04-12T04:04:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`with_unreachable_dt` does not actually make Stage 2 unreachable: it preloads a normal `FetchError`, so if `check_strict_merge_gate` regressed and kept calling `read_domain_types_document` after a Stage 1 failure, these tests would still see a generic blocked outcome instead of detecting the extra read. Use a panic-on-call or call-count asserting stub here so the short-circuit contract is observable.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 185,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:989ba9c75065466381ac661462766b48cd939cc3165c340503240bfe80b742e8",
+          "at": "2026-04-12T04:08:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79290e2c0fb1fc39d7de5ec4e758ffc2986111c5103b2a43e8606a1dd7c88996",
+          "at": "2026-04-12T04:11:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79290e2c0fb1fc39d7de5ec4e758ffc2986111c5103b2a43e8606a1dd7c88996",
+          "at": "2026-04-12T04:13:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca4d347c72a59d0b63878bba9b00d3b79cb664d236b3d2bd68d1529487c839a6",
+          "at": "2026-04-12T04:22:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca4d347c72a59d0b63878bba9b00d3b79cb664d236b3d2bd68d1529487c839a6",
+          "at": "2026-04-12T04:24:55Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -135,6 +234,187 @@
           "findings": [],
           "hash": "rvw1:sha256:fb6cc0eac796dede2c46d01db6da2883d32a05d91227bd5315ff9aa6a21f4e49",
           "at": "2026-04-12T04:49:34Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dd5f7926e3658de5b5370a8d5a83b6d7ad1745e064c00c8e469a2c06645a610",
+          "at": "2026-04-12T05:03:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dd5f7926e3658de5b5370a8d5a83b6d7ad1745e064c00c8e469a2c06645a610",
+          "at": "2026-04-12T05:04:38Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:087bb6fb1d030d6fcb95f1f6721d6bfe64c5b7eeee5ecf595b83fe35b3085de2",
+          "at": "2026-04-12T02:41:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:087bb6fb1d030d6fcb95f1f6721d6bfe64c5b7eeee5ecf595b83fe35b3085de2",
+          "at": "2026-04-12T02:43:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84477470d3cbfd1e36985fae18115d17faafe0ffb14ca02b3b42f773ac4d6483",
+          "at": "2026-04-12T02:50:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84477470d3cbfd1e36985fae18115d17faafe0ffb14ca02b3b42f773ac4d6483",
+          "at": "2026-04-12T02:52:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:00:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_domain_types_signals()` is documented as a single gate where any Red signal, including undeclared reverse signals, must fail, but the new tests only exercise Red on a declared entry. There is no domain-level regression test for an undeclared reverse Red signal, so a future refactor that accidentally limits the Red check to declared entries would still pass this suite.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 2276,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:03:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:04:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Yellow branch message omits the remediation hint required for this Stage 2 gate. It reports that the merge gate will block, but unlike the Stage 1 warning it never tells the caller how to turn Yellow into Blue, so the user-visible contract in the briefing/ADR is not met.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 1055,
+              "category": "requirements"
+            },
+            {
+              "message": "The new tests never exercise a Red signal on an undeclared reverse entry. That special case is the key distinction in the ADR ('Red over all signals, Yellow over declared only'), so a regression that accidentally limits the Red gate to declared entries would still pass this suite.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 2276,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:07:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:09:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
+          "at": "2026-04-12T03:13:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Yellow-stage message does not include the ADR-required upgrade hint for how to resolve the warning before merge. At this line it only says the merge gate will block `until resolved`, so callers lose the actionable guidance promised in D8.6 / the review brief for declared Yellow findings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 1056,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
+          "at": "2026-04-12T03:15:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The declared-Yellow branch does not include the required upgrade hint in its warning/error text. The briefing/ADR requires Yellow findings to name the declared types and tell callers how to upgrade them before merge, but this message only says the merge gate will block `until resolved`, so users lose the actionable remediation contract in both strict and interim modes.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 1055,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
+          "at": "2026-04-12T03:17:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Yellow-gate message hardcodes \"Implement the listed type(s)\" as the remediation, but Yellow is also emitted for valid `Delete` entries that are still present in code. In that case the correct fix is to remove the type, not implement it, so the gate will return misleading guidance for a supported domain-type workflow.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 1056,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:dfd2a3949710ce4bac82013b5be758e6576be7cafae4908bd96ff696bcb72f4b",
+          "at": "2026-04-12T03:19:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd1595f0bd3b2773962215a516a5aa696f255fa66de0afd3af7d95c95ec397f4",
+          "at": "2026-04-12T03:20:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13025cc11de9c96b3633dba0f57fbd206ecafe976239d94f4656e78986f0fd1a",
+          "at": "2026-04-12T03:25:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13025cc11de9c96b3633dba0f57fbd206ecafe976239d94f4656e78986f0fd1a",
+          "at": "2026-04-12T03:26:08Z"
         }
       ]
     },
@@ -396,268 +676,20 @@
           "findings": [],
           "hash": "rvw1:sha256:946a20edeb3f24ba18e2b44c6ccbb178a9cd678577d12edead7d1488e0dcf5e7",
           "at": "2026-04-12T04:55:27Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The derived `track_id` is never validated. `validate_branch_ref` accepts branches like `track/`, `track//foo`, or `track/UPPER`, and those values are passed straight into the reader as `track_id`. That makes the gate consult malformed `track/items/<track_id>/...` paths instead of failing closed.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 104,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
-          "at": "2026-04-12T03:57:24Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
-          "at": "2026-04-12T03:58:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`MockTrackBlobReader` ignores both `branch` and `track_id`, so the new tests never verify the key port contract that `check_strict_merge_gate()` must pass the original branch ref to the reader while stripping only the `track/` prefix for `track_id`. A regression in either argument would still leave U1-U18 green, even though the adapter would start reading the wrong `origin/{branch}:track/items/{track_id}/...` blobs. Add a test/mock that records and asserts the received arguments.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 172,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:52a140a5d3fa3184f2b69afe438fdf2c8489c03b3e9440928898d06af5db4615",
-          "at": "2026-04-12T04:01:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track/` branches are never validated beyond the generic ref check, so malformed slugs like `track/`, `track//foo`, or `track/UPPER` are passed straight through as `track_id` to the reader. That makes the gate consult `track/items/<raw suffix>/...` instead of failing closed on invalid track branches; validate the `track/` suffix with the domain track-id rules before calling the port.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 104,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:97ceb7fdfaa729d4fc06cd722bc16ad5fe76b6ac064eabbc6d979b6df6b6e8e8",
-          "at": "2026-04-12T04:04:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`with_unreachable_dt` does not actually make Stage 2 unreachable: it preloads a normal `FetchError`, so if `check_strict_merge_gate` regressed and kept calling `read_domain_types_document` after a Stage 1 failure, these tests would still see a generic blocked outcome instead of detecting the extra read. Use a panic-on-call or call-count asserting stub here so the short-circuit contract is observable.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 185,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:989ba9c75065466381ac661462766b48cd939cc3165c340503240bfe80b742e8",
-          "at": "2026-04-12T04:08:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79290e2c0fb1fc39d7de5ec4e758ffc2986111c5103b2a43e8606a1dd7c88996",
-          "at": "2026-04-12T04:11:05Z"
+          "hash": "rvw1:sha256:6a3c673a8738316a3aa7cfa1eaefed241214c3d594a7eb7cb038dae87444106a",
+          "at": "2026-04-12T05:03:42Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:79290e2c0fb1fc39d7de5ec4e758ffc2986111c5103b2a43e8606a1dd7c88996",
-          "at": "2026-04-12T04:13:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca4d347c72a59d0b63878bba9b00d3b79cb664d236b3d2bd68d1529487c839a6",
-          "at": "2026-04-12T04:22:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca4d347c72a59d0b63878bba9b00d3b79cb664d236b3d2bd68d1529487c839a6",
-          "at": "2026-04-12T04:24:55Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:087bb6fb1d030d6fcb95f1f6721d6bfe64c5b7eeee5ecf595b83fe35b3085de2",
-          "at": "2026-04-12T02:41:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:087bb6fb1d030d6fcb95f1f6721d6bfe64c5b7eeee5ecf595b83fe35b3085de2",
-          "at": "2026-04-12T02:43:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:84477470d3cbfd1e36985fae18115d17faafe0ffb14ca02b3b42f773ac4d6483",
-          "at": "2026-04-12T02:50:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:84477470d3cbfd1e36985fae18115d17faafe0ffb14ca02b3b42f773ac4d6483",
-          "at": "2026-04-12T02:52:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
-          "at": "2026-04-12T03:00:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_domain_types_signals()` is documented as a single gate where any Red signal, including undeclared reverse signals, must fail, but the new tests only exercise Red on a declared entry. There is no domain-level regression test for an undeclared reverse Red signal, so a future refactor that accidentally limits the Red check to declared entries would still pass this suite.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 2276,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
-          "at": "2026-04-12T03:03:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
-          "at": "2026-04-12T03:04:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Yellow branch message omits the remediation hint required for this Stage 2 gate. It reports that the merge gate will block, but unlike the Stage 1 warning it never tells the caller how to turn Yellow into Blue, so the user-visible contract in the briefing/ADR is not met.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 1055,
-              "category": "requirements"
-            },
-            {
-              "message": "The new tests never exercise a Red signal on an undeclared reverse entry. That special case is the key distinction in the ADR ('Red over all signals, Yellow over declared only'), so a regression that accidentally limits the Red gate to declared entries would still pass this suite.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 2276,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
-          "at": "2026-04-12T03:07:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
-          "at": "2026-04-12T03:09:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
-          "at": "2026-04-12T03:13:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new Yellow-stage message does not include the ADR-required upgrade hint for how to resolve the warning before merge. At this line it only says the merge gate will block `until resolved`, so callers lose the actionable guidance promised in D8.6 / the review brief for declared Yellow findings.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 1056,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
-          "at": "2026-04-12T03:15:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The declared-Yellow branch does not include the required upgrade hint in its warning/error text. The briefing/ADR requires Yellow findings to name the declared types and tell callers how to upgrade them before merge, but this message only says the merge gate will block `until resolved`, so users lose the actionable remediation contract in both strict and interim modes.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 1055,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
-          "at": "2026-04-12T03:17:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new Yellow-gate message hardcodes \"Implement the listed type(s)\" as the remediation, but Yellow is also emitted for valid `Delete` entries that are still present in code. In that case the correct fix is to remove the type, not implement it, so the gate will return misleading guidance for a supported domain-type workflow.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 1056,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:dfd2a3949710ce4bac82013b5be758e6576be7cafae4908bd96ff696bcb72f4b",
-          "at": "2026-04-12T03:19:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fd1595f0bd3b2773962215a516a5aa696f255fa66de0afd3af7d95c95ec397f4",
-          "at": "2026-04-12T03:20:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13025cc11de9c96b3633dba0f57fbd206ecafe976239d94f4656e78986f0fd1a",
-          "at": "2026-04-12T03:25:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13025cc11de9c96b3633dba0f57fbd206ecafe976239d94f4656e78986f0fd1a",
-          "at": "2026-04-12T03:26:08Z"
+          "hash": "rvw1:sha256:6a3c673a8738316a3aa7cfa1eaefed241214c3d594a7eb7cb038dae87444106a",
+          "at": "2026-04-12T05:05:22Z"
         }
       ]
     }
