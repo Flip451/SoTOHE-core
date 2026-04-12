@@ -65,7 +65,7 @@ check_tasks_resolved_from_git_ref(&str, &impl TrackBlobReader) -> VerifyOutcome 
 plan/ branch skip / validate_branch_ref / read_track_metadata / all_tasks_resolved 検査を行う。
 K1–K7 の MockTrackBlobReader テストを追加する。
 
-- [ ] usecase: libs/usecase/src/task_completion.rs 新設 — check_tasks_resolved_from_git_ref (plan/ skip + validate_branch_ref + read_track_metadata + all_tasks_resolved) + K1–K7 MockTrackBlobReader tests
+- [x] usecase: libs/usecase/src/task_completion.rs 新設 — check_tasks_resolved_from_git_ref (plan/ skip + validate_branch_ref + read_track_metadata + all_tasks_resolved) + K1–K7 MockTrackBlobReader tests 3c9ed5ad96669a6a2045fb54b65e22ab8c5bfd21
 
 ## infra: git_cli::show プリミティブ (symlink 拒絶対応)
 

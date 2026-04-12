@@ -228,9 +228,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "3c9ed5ad96669a6a2045fb54b65e22ab8c5bfd21",
       "description": "usecase: libs/usecase/src/task_completion.rs 新設 — check_tasks_resolved_from_git_ref (plan/ skip + validate_branch_ref + read_track_metadata + all_tasks_resolved) + K1–K7 MockTrackBlobReader tests",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "infra: libs/infrastructure/src/git_cli/show.rs 新設 — BlobResult / TreeEntryKind / git_show_blob / git_ls_tree_entry_kind / fetch_blob_safe / is_path_not_found_stderr (pub(crate), LANG=C 固定, 2 段 symlink 検査)",
@@ -269,5 +270,5 @@
     }
   ],
   "title": "Strict Spec Signal Gate v2 — Yellow blocks merge (fail-closed)",
-  "updated_at": "2026-04-12T04:14:48Z"
+  "updated_at": "2026-04-12T04:26:20Z"
 }
