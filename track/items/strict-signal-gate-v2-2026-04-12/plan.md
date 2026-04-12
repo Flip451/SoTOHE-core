@@ -84,7 +84,7 @@ TrackBlobReader port の 3 メソッド (read_spec_document / read_domain_types_
 内部で fetch_blob_safe を呼び、BlobResult → BlobFetchResult<T> への変換、UTF-8 decode、JSON decode を行う。
 A1–A16 の実 git repo fixture テスト (symlink / submodule commit 含む) を追加する。
 
-- [ ] infra: libs/infrastructure/src/verify/merge_gate_adapter.rs 新設 — GitShowTrackBlobReader が TrackBlobReader port を実装 (fetch_blob_safe → BlobFetchResult<T> 変換 + codec decode) + A1–A16 tests (symlink/submodule fixture 含む)
+- [x] infra: libs/infrastructure/src/verify/merge_gate_adapter.rs 新設 — GitShowTrackBlobReader が TrackBlobReader port を実装 (fetch_blob_safe → BlobFetchResult<T> 変換 + codec decode) + A1–A16 tests (symlink/submodule fixture 含む) e03add6b13714709ef850858f3b5027b847ba829
 
 ## cli: pr.rs thin wrapper 化
 

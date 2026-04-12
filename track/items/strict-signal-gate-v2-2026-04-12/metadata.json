@@ -240,9 +240,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "e03add6b13714709ef850858f3b5027b847ba829",
       "description": "infra: libs/infrastructure/src/verify/merge_gate_adapter.rs 新設 — GitShowTrackBlobReader が TrackBlobReader port を実装 (fetch_blob_safe → BlobFetchResult<T> 変換 + codec decode) + A1–A16 tests (symlink/submodule fixture 含む)",
       "id": "T009",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "cli: apps/cli/src/commands/pr.rs::wait_and_merge + check_tasks_resolved を GitShowTrackBlobReader + usecase::merge_gate / task_completion の thin wrapper に書き換え + 既存テスト移植 + C1–C4 最小 wrapper tests",
@@ -271,5 +272,5 @@
     }
   ],
   "title": "Strict Spec Signal Gate v2 — Yellow blocks merge (fail-closed)",
-  "updated_at": "2026-04-12T04:41:40Z"
+  "updated_at": "2026-04-12T04:50:55Z"
 }
