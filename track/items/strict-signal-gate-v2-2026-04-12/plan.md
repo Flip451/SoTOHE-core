@@ -47,7 +47,7 @@ Stage 2 NotFound を BLOCKED から skip に変更する (D2.1)。
 std::fs::read_to_string 直前に libs/infrastructure/src/track/symlink_guard.rs::reject_symlinks_below を呼ぶ (D4.3 CI 経路)。
 既存テストを更新し、test_verify_from_spec_json_with_missing_domain_types_returns_error を削除、S1–S5 (symlink 拒絶) テストを追加する。
 
-- [ ] infra: verify_from_spec_json を T002/T003 に delegate する thin wrapper にリファクタ + Stage 2 NotFound → skip + reject_symlinks_below integration (D4.3 CI 経路) + S1–S5 tests + 旧 missing_domain_types テスト削除
+- [x] infra: verify_from_spec_json を T002/T003 に delegate する thin wrapper にリファクタ + Stage 2 NotFound → skip + reject_symlinks_below integration (D4.3 CI 経路) + S1–S5 tests + 旧 missing_domain_types テスト削除 9726a035bca24bf3828ee7b218eea39a43f749ad
 
 ## usecase: merge_gate モジュール + TrackBlobReader port
 

@@ -3,6 +3,7 @@
 
 pub mod git_workflow;
 pub mod hook;
+pub mod merge_gate;
 pub mod pr_review;
 pub mod pr_workflow;
 pub mod review_v2;
