@@ -1,0 +1,933 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-04-12T19:58:49Z",
+  "types": {
+    "ActionContradiction": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "ActionContradictionKind",
+        "TypeAction"
+      ]
+    },
+    "ActionContradictionKind": {
+      "kind": "enum",
+      "members": [
+        "AddButAlreadyInBaseline",
+        "ModifyButNotInBaseline",
+        "ReferenceButNotBlue",
+        "ReferenceButNotInBaseline"
+      ],
+      "method_return_types": []
+    },
+    "AutoPhase": {
+      "kind": "enum",
+      "members": [
+        "CodeReview",
+        "Committed",
+        "Escalated",
+        "Implement",
+        "Plan",
+        "PlanReview",
+        "TypeDesign",
+        "TypeReview"
+      ],
+      "method_return_types": []
+    },
+    "AutoPhaseError": {
+      "kind": "enum",
+      "members": [
+        "InvalidRollback",
+        "InvalidTransition",
+        "NotEscalated"
+      ],
+      "method_return_types": []
+    },
+    "AutoPhaseTransition": {
+      "kind": "enum",
+      "members": [
+        "Advance",
+        "Escalate",
+        "Resume",
+        "Rollback"
+      ],
+      "method_return_types": []
+    },
+    "CommitHashError": {
+      "kind": "enum",
+      "members": [
+        "Format",
+        "Io",
+        "SymlinkDetected"
+      ],
+      "method_return_types": []
+    },
+    "ComplianceContext": {
+      "kind": "struct",
+      "members": [
+        "guide_matches",
+        "skill_match"
+      ],
+      "method_return_types": [
+        "String"
+      ]
+    },
+    "ConfidenceSignal": {
+      "kind": "enum",
+      "members": [
+        "Blue",
+        "Red",
+        "Yellow"
+      ],
+      "method_return_types": []
+    },
+    "ConsistencyReport": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "CoverageResult": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "Decision": {
+      "kind": "enum",
+      "members": [
+        "Allow",
+        "Block"
+      ],
+      "method_return_types": []
+    },
+    "DomainError": {
+      "kind": "enum",
+      "members": [
+        "Transition",
+        "Validation"
+      ],
+      "method_return_types": []
+    },
+    "DomainTypeEntry": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "DomainTypeKind",
+        "TypeAction"
+      ]
+    },
+    "DomainTypeKind": {
+      "kind": "enum",
+      "members": [
+        "Enum",
+        "ErrorType",
+        "TraitPort",
+        "Typestate",
+        "ValueObject"
+      ],
+      "method_return_types": []
+    },
+    "DomainTypeSignal": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "ConfidenceSignal"
+      ]
+    },
+    "DomainTypesDocument": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "HashSet"
+      ]
+    },
+    "FastVerdict": {
+      "kind": "enum",
+      "members": [
+        "FindingsRemain",
+        "ZeroFindings"
+      ],
+      "method_return_types": []
+    },
+    "FilePath": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "FilePathError": {
+      "kind": "enum",
+      "members": [
+        "Absolute",
+        "Empty",
+        "Traversal"
+      ],
+      "method_return_types": []
+    },
+    "Finding": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "Severity"
+      ]
+    },
+    "FindingError": {
+      "kind": "enum",
+      "members": [
+        "EmptyMessage"
+      ],
+      "method_return_types": []
+    },
+    "FindingSeverity": {
+      "kind": "enum",
+      "members": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "method_return_types": []
+    },
+    "FunctionInfo": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "GuardVerdict": {
+      "kind": "struct",
+      "members": [
+        "decision",
+        "reason"
+      ],
+      "method_return_types": []
+    },
+    "GuideEntry": {
+      "kind": "struct",
+      "members": [
+        "cache_path",
+        "id",
+        "project_usage",
+        "summary",
+        "trigger_keywords"
+      ],
+      "method_return_types": []
+    },
+    "GuideMatch": {
+      "kind": "struct",
+      "members": [
+        "cache_path",
+        "id",
+        "project_usage",
+        "summary",
+        "trigger"
+      ],
+      "method_return_types": []
+    },
+    "HearingMode": {
+      "kind": "enum",
+      "members": [
+        "Focused",
+        "Full",
+        "Quick"
+      ],
+      "method_return_types": []
+    },
+    "HearingRecord": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "HearingMode",
+        "HearingSignalDelta",
+        "Timestamp"
+      ]
+    },
+    "HearingSignalDelta": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "HearingSignalSnapshot"
+      ]
+    },
+    "HearingSignalSnapshot": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "HookContext": {
+      "kind": "struct",
+      "members": [
+        "project_dir"
+      ],
+      "method_return_types": []
+    },
+    "HookError": {
+      "kind": "enum",
+      "members": [
+        "Guard",
+        "Input",
+        "Unsupported"
+      ],
+      "method_return_types": []
+    },
+    "HookInput": {
+      "kind": "struct",
+      "members": [
+        "command",
+        "content",
+        "file_path",
+        "tool_name"
+      ],
+      "method_return_types": []
+    },
+    "HookName": {
+      "kind": "enum",
+      "members": [
+        "BlockDirectGitOps",
+        "BlockTestFileDeletion"
+      ],
+      "method_return_types": []
+    },
+    "HookVerdict": {
+      "kind": "struct",
+      "members": [
+        "additional_context",
+        "decision",
+        "reason"
+      ],
+      "method_return_types": []
+    },
+    "ImplInfo": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "LogInfo": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "MainScopeName": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "NextCommand": {
+      "kind": "enum",
+      "members": [
+        "ActivateTrack",
+        "Done",
+        "Implement",
+        "PlanNewFeature",
+        "Status"
+      ],
+      "method_return_types": []
+    },
+    "NonEmptyFindings": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "Vec"
+      ]
+    },
+    "NotRequiredReason": {
+      "kind": "enum",
+      "members": [
+        "Empty",
+        "ZeroFindings"
+      ],
+      "method_return_types": []
+    },
+    "ParseError": {
+      "kind": "enum",
+      "members": [
+        "NestingDepthExceeded",
+        "UnmatchedQuote"
+      ],
+      "method_return_types": []
+    },
+    "PlanSection": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "PlanView": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "RefValidationError": {
+      "kind": "enum",
+      "members": [
+        "DisallowedCharacter",
+        "Empty"
+      ],
+      "method_return_types": []
+    },
+    "RepositoryError": {
+      "kind": "enum",
+      "members": [
+        "Message",
+        "TrackNotFound"
+      ],
+      "method_return_types": []
+    },
+    "RequiredReason": {
+      "kind": "enum",
+      "members": [
+        "FindingsRemain",
+        "NotStarted",
+        "StaleHash"
+      ],
+      "method_return_types": []
+    },
+    "ReviewHash": {
+      "kind": "enum",
+      "members": [
+        "Computed",
+        "Empty"
+      ],
+      "method_return_types": []
+    },
+    "ReviewHashError": {
+      "kind": "enum",
+      "members": [
+        "InvalidFormat"
+      ],
+      "method_return_types": []
+    },
+    "ReviewHashValue": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "ReviewOutcome": {
+      "kind": "enum",
+      "members": [
+        "Reviewed",
+        "Skipped"
+      ],
+      "method_return_types": []
+    },
+    "ReviewReaderError": {
+      "kind": "enum",
+      "members": [
+        "Codec",
+        "InvalidData",
+        "Io",
+        "SymlinkDetected"
+      ],
+      "method_return_types": []
+    },
+    "ReviewScopeConfig": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "HashMap",
+        "HashSet"
+      ]
+    },
+    "ReviewState": {
+      "kind": "enum",
+      "members": [
+        "NotRequired",
+        "Required"
+      ],
+      "method_return_types": []
+    },
+    "ReviewTarget": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "ReviewWriterError": {
+      "kind": "enum",
+      "members": [
+        "Codec",
+        "IncompatibleSchema",
+        "Io",
+        "SymlinkDetected"
+      ],
+      "method_return_types": []
+    },
+    "RollbackTarget": {
+      "kind": "enum",
+      "members": [
+        "Implement",
+        "Plan",
+        "TypeDesign"
+      ],
+      "method_return_types": []
+    },
+    "RoundType": {
+      "kind": "enum",
+      "members": [
+        "Fast",
+        "Final"
+      ],
+      "method_return_types": []
+    },
+    "SchemaExport": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "SchemaExportError": {
+      "kind": "enum",
+      "members": [
+        "CrateNotFound",
+        "NightlyNotFound",
+        "ParseFailed",
+        "RustdocFailed"
+      ],
+      "method_return_types": []
+    },
+    "ScopeConfigError": {
+      "kind": "enum",
+      "members": [
+        "InvalidOperationalPattern",
+        "InvalidOtherTrackPattern",
+        "InvalidPattern",
+        "InvalidScopeName"
+      ],
+      "method_return_types": []
+    },
+    "ScopeName": {
+      "kind": "enum",
+      "members": [
+        "Main",
+        "Other"
+      ],
+      "method_return_types": []
+    },
+    "ScopeNameError": {
+      "kind": "enum",
+      "members": [
+        "Empty",
+        "NotAscii",
+        "Reserved"
+      ],
+      "method_return_types": []
+    },
+    "Severity": {
+      "kind": "enum",
+      "members": [
+        "Error",
+        "Info",
+        "Warning"
+      ],
+      "method_return_types": []
+    },
+    "SignalBasis": {
+      "kind": "enum",
+      "members": [
+        "Convention",
+        "Discussion",
+        "Document",
+        "Feedback",
+        "Inference",
+        "MissingSource"
+      ],
+      "method_return_types": [
+        "ConfidenceSignal"
+      ]
+    },
+    "SignalCounts": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "SimpleCommand": {
+      "kind": "struct",
+      "members": [
+        "argv",
+        "has_output_redirect",
+        "redirect_texts"
+      ],
+      "method_return_types": []
+    },
+    "SkillMatch": {
+      "kind": "struct",
+      "members": [
+        "command",
+        "reminders"
+      ],
+      "method_return_types": []
+    },
+    "SpecDocument": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "CoverageResult",
+        "SignalCounts",
+        "SpecScope",
+        "SpecStatus",
+        "Timestamp",
+        "Vec"
+      ]
+    },
+    "SpecRequirement": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "ConfidenceSignal"
+      ]
+    },
+    "SpecScope": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "SpecSection": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "SpecStatus": {
+      "kind": "enum",
+      "members": [
+        "Approved",
+        "Draft"
+      ],
+      "method_return_types": []
+    },
+    "SpecValidationError": {
+      "kind": "enum",
+      "members": [
+        "ApprovalMetadataMissing",
+        "EmptyDomainStateName",
+        "EmptyRequirementText",
+        "EmptySectionTitle",
+        "EmptyTitle",
+        "EmptyVersion"
+      ],
+      "method_return_types": []
+    },
+    "StatusOverride": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "StatusOverrideKind",
+        "TrackStatus"
+      ]
+    },
+    "StatusOverrideKind": {
+      "kind": "enum",
+      "members": [
+        "Blocked",
+        "Cancelled"
+      ],
+      "method_return_types": []
+    },
+    "TaskStatus": {
+      "kind": "enum",
+      "members": [
+        "DonePending",
+        "DoneTraced",
+        "InProgress",
+        "Skipped",
+        "Todo"
+      ],
+      "method_return_types": [
+        "TaskStatusKind"
+      ]
+    },
+    "TaskStatusKind": {
+      "kind": "enum",
+      "members": [
+        "Done",
+        "InProgress",
+        "Skipped",
+        "Todo"
+      ],
+      "method_return_types": []
+    },
+    "TaskTransition": {
+      "kind": "enum",
+      "members": [
+        "BackfillHash",
+        "Complete",
+        "Reopen",
+        "ResetToTodo",
+        "Skip",
+        "Start"
+      ],
+      "method_return_types": [
+        "TaskStatusKind"
+      ]
+    },
+    "Timestamp": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "DateTime"
+      ]
+    },
+    "TrackMetadata": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "PlanView",
+        "StatusOverride",
+        "TaskId",
+        "TrackBranch",
+        "TrackId",
+        "TrackStatus",
+        "TrackTask"
+      ]
+    },
+    "TrackPhase": {
+      "kind": "enum",
+      "members": [
+        "Archived",
+        "Blocked",
+        "Cancelled",
+        "InProgress",
+        "Planning",
+        "ReadyToActivate",
+        "ReadyToShip"
+      ],
+      "method_return_types": []
+    },
+    "TrackPhaseInfo": {
+      "kind": "struct",
+      "members": [
+        "blocker",
+        "next_command",
+        "phase",
+        "reason"
+      ],
+      "method_return_types": []
+    },
+    "TrackReadError": {
+      "kind": "enum",
+      "members": [
+        "Repository"
+      ],
+      "method_return_types": []
+    },
+    "TrackStatus": {
+      "kind": "enum",
+      "members": [
+        "Archived",
+        "Blocked",
+        "Cancelled",
+        "Done",
+        "InProgress",
+        "Planned"
+      ],
+      "method_return_types": []
+    },
+    "TrackTask": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "TaskId",
+        "TaskStatus"
+      ]
+    },
+    "TrackWriteError": {
+      "kind": "enum",
+      "members": [
+        "Domain",
+        "Repository"
+      ],
+      "method_return_types": []
+    },
+    "TraitBaselineEntry": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "TraitInfo": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "TraitNode": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "TransitionError": {
+      "kind": "enum",
+      "members": [
+        "InvalidTaskTransition",
+        "TaskNotFound"
+      ],
+      "method_return_types": []
+    },
+    "TypeAction": {
+      "kind": "enum",
+      "members": [
+        "Add",
+        "Delete",
+        "Modify",
+        "Reference"
+      ],
+      "method_return_types": []
+    },
+    "TypeBaseline": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "HashMap",
+        "Timestamp",
+        "TraitBaselineEntry",
+        "TypeBaselineEntry"
+      ]
+    },
+    "TypeBaselineEntry": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "TypeKind"
+      ]
+    },
+    "TypeGraph": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "TraitNode",
+        "TypeNode"
+      ]
+    },
+    "TypeInfo": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "TypeKind"
+      ]
+    },
+    "TypeKind": {
+      "kind": "enum",
+      "members": [
+        "Enum",
+        "Struct",
+        "TypeAlias"
+      ],
+      "method_return_types": []
+    },
+    "TypeNode": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "HashSet",
+        "TypeKind"
+      ]
+    },
+    "TypestateTransitions": {
+      "kind": "enum",
+      "members": [
+        "Terminal",
+        "To"
+      ],
+      "method_return_types": []
+    },
+    "ValidationError": {
+      "kind": "enum",
+      "members": [
+        "DuplicatePlanSectionId",
+        "DuplicateTaskId",
+        "DuplicateTaskReference",
+        "EmptyPlanSectionId",
+        "EmptyPlanSectionTitle",
+        "EmptyString",
+        "EmptyTaskDescription",
+        "EmptyTrackTitle",
+        "InvalidCommitHash",
+        "InvalidTaskId",
+        "InvalidTimestamp",
+        "InvalidTrackBranch",
+        "InvalidTrackId",
+        "NoSectionsAvailable",
+        "OverrideIncompatibleWithResolvedTasks",
+        "SectionNotFound",
+        "TaskDescriptionMutated",
+        "TaskRemoved",
+        "TrackActivationRequiresPlanningOnly",
+        "TrackActivationRequiresSchemaV3",
+        "TrackAlreadyMaterialized",
+        "UnknownTaskReference",
+        "UnreferencedTask",
+        "UnsupportedTargetStatus"
+      ],
+      "method_return_types": []
+    },
+    "Verdict": {
+      "kind": "enum",
+      "members": [
+        "FindingsRemain",
+        "ZeroFindings"
+      ],
+      "method_return_types": []
+    },
+    "VerdictError": {
+      "kind": "enum",
+      "members": [
+        "EmptyFindings"
+      ],
+      "method_return_types": []
+    },
+    "VerifyOutcome": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": []
+    },
+    "WorktreeError": {
+      "kind": "enum",
+      "members": [
+        "StatusFailed"
+      ],
+      "method_return_types": []
+    }
+  },
+  "traits": {
+    "CommitHashReader": {
+      "methods": [
+        "read"
+      ]
+    },
+    "CommitHashWriter": {
+      "methods": [
+        "clear",
+        "write"
+      ]
+    },
+    "ReviewReader": {
+      "methods": [
+        "read_latest_finals"
+      ]
+    },
+    "ReviewWriter": {
+      "methods": [
+        "init",
+        "reset",
+        "write_fast_verdict",
+        "write_verdict"
+      ]
+    },
+    "SchemaExporter": {
+      "methods": [
+        "export"
+      ]
+    },
+    "ShellParser": {
+      "methods": [
+        "split_shell"
+      ]
+    },
+    "TrackReader": {
+      "methods": [
+        "find"
+      ]
+    },
+    "TrackWriter": {
+      "methods": [
+        "save",
+        "update"
+      ]
+    },
+    "WorktreeReader": {
+      "methods": [
+        "porcelain_status"
+      ]
+    }
+  }
+}

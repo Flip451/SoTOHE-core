@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "domain_types": [
+    {
+      "name": "ParamDeclaration",
+      "description": "A single parameter in a method signature, holding a name and its type string",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "MethodDeclaration",
+      "description": "Structured method signature (L1 resolution) with name, receiver, params, returns, and async flag",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "MemberDeclaration",
+      "description": "Composite type member: either an enum variant (Variant) or a struct field (Field)",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "Variant",
+        "Field"
+      ]
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "ParamDeclaration",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "MethodDeclaration",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "MemberDeclaration",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}
