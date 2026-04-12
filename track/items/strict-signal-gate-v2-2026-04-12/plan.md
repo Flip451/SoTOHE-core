@@ -124,4 +124,4 @@ I1–I11 の CI 統合回帰テストを手動実行し、結果を verification
 knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md の Status を Proposed から Accepted に更新する。
 実装完了 + CI 通過 + レビュー完了後に実施する最終ステップ。
 
-- [ ] docs: knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md を Proposed → Accepted に更新
+- [x] docs: knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md を Proposed → Accepted に更新 17ef5dd8da53bc1b4f8a010ad0c1c19c1b3702fe

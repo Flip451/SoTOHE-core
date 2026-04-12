@@ -189,7 +189,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "commit_hash": "36ca580022f90a742cca9897b5cec0b32f8a4da4",
@@ -270,11 +270,12 @@
       "status": "done"
     },
     {
+      "commit_hash": "17ef5dd8da53bc1b4f8a010ad0c1c19c1b3702fe",
       "description": "docs: knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md を Proposed → Accepted に更新",
       "id": "T014",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "Strict Spec Signal Gate v2 — Yellow blocks merge (fail-closed)",
-  "updated_at": "2026-04-12T05:38:23Z"
+  "updated_at": "2026-04-12T05:42:23Z"
 }
