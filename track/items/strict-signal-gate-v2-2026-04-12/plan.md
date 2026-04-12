@@ -38,7 +38,7 @@ RefValidationError enum (DisallowedCharacter / Empty) を thiserror で定義す
 禁止文字: .., @{, ~, ^, :, 空白, 制御文字。
 D14–D22 の domain 層ユニットテストを追加する。
 
-- [ ] domain: libs/domain/src/git_ref.rs 新設 + validate_branch_ref + RefValidationError (DisallowedCharacter / Empty) + D14–D22 tests (.., @{, ~, ^, :, 空白, 制御文字を拒否)
+- [x] domain: libs/domain/src/git_ref.rs 新設 + validate_branch_ref + RefValidationError (DisallowedCharacter / Empty) + D14–D22 tests (.., @{, ~, ^, :, 空白, 制御文字を拒否) 07a3c936aacbced5f570fb8586f5a99eb5121516
 
 ## infra: verify_from_spec_json リファクタ + symlink 拒絶
 

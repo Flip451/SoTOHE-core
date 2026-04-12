@@ -16,6 +16,35 @@
           "findings": [],
           "hash": "rvw1:sha256:d6dca83a4134dc803833d7c66e5ad09f3cb400485180b8ca6ecede094f82c87c",
           "at": "2026-04-12T02:43:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
+          "at": "2026-04-12T03:34:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_from_spec_json` only merges Stage 1 findings after `domain-types.json` decodes successfully. If Stage 1 returns a warning in interim mode (for example, `spec.json` has Yellow signals) and Stage 2 then hits a symlink/read/decode failure, the early returns here replace the accumulated Stage 1 warning with a fresh error-only outcome. That contradicts the intended behavior of preserving Stage 1 findings alongside Stage 2 results, so these Stage 2 error branches should merge into `stage1` instead of returning a new outcome.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 115,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
+          "at": "2026-04-12T03:37:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
+          "at": "2026-04-12T03:39:09Z"
         }
       ]
     },
@@ -193,6 +222,20 @@
           "findings": [],
           "hash": "rvw1:sha256:2a18a4ac9868eae874c48c0e178724fa615cea57c95c0533e161e6f525c44806",
           "at": "2026-04-12T03:25:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27e35f0ace18da6a96bbeaf0c8f958f82d23a1f1a28b24decf34439db054837b",
+          "at": "2026-04-12T03:33:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27e35f0ace18da6a96bbeaf0c8f958f82d23a1f1a28b24decf34439db054837b",
+          "at": "2026-04-12T03:34:11Z"
         }
       ]
     },

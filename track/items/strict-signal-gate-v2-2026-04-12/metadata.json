@@ -210,9 +210,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "07a3c936aacbced5f570fb8586f5a99eb5121516",
       "description": "domain: libs/domain/src/git_ref.rs 新設 + validate_branch_ref + RefValidationError (DisallowedCharacter / Empty) + D14–D22 tests (.., @{, ~, ^, :, 空白, 制御文字を拒否)",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "infra: verify_from_spec_json を T002/T003 に delegate する thin wrapper にリファクタ + Stage 2 NotFound → skip + reject_symlinks_below integration (D4.3 CI 経路) + S1–S5 tests + 旧 missing_domain_types テスト削除",
@@ -266,5 +267,5 @@
     }
   ],
   "title": "Strict Spec Signal Gate v2 — Yellow blocks merge (fail-closed)",
-  "updated_at": "2026-04-12T03:22:01Z"
+  "updated_at": "2026-04-12T03:27:36Z"
 }
