@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed (to be flipped to Accepted after track `reviewstate-v1-removal-2026-04-12` completes CI + baseline verification)
+Accepted (implemented in track `reviewstate-v1-removal-2026-04-12`, 2026-04-12)
 
 ## Context
 

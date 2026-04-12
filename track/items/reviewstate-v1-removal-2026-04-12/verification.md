@@ -6,7 +6,7 @@
 - [x] T002: CLI `ResolveEscalation` / `SetApprovedHead` subcommand 削除 + `ResolveEscalationArgs` / `SetApprovedHeadArgs` struct 削除 + dispatcher 分岐削除 + `run_check_approved` 内 escalation fail-closed gate 削除 (V1 `track.review().escalation()` 参照除去) + `make_timestamp` helper 削除 (V1 resolve_escalation 専用だった) + `make.rs::persist_approved_head` 関数 + `dispatch_commit_from_file` 内呼び出し削除
 - [x] T003: `libs/usecase/src/review_workflow/usecases.rs` (1700+ 行 — `RecordRoundProtocol` trait + `record_round` + `record_round_typed` + `resolve_escalation` + `RecordRoundInput` + `RecordRoundError` + `RecordRoundProtocolError` + `ResolveEscalationInput` + validation helpers + 全テスト) ファイル削除 + `libs/usecase/src/review_workflow/scope.rs` (550+ 行 — `DiffScope` + `DiffScopeProvider` + `FindingScopeClass` + `RepoRelativePath` + `ScopeFilterResult` + `ScopeFilteredPayload` + `apply_scope_filter` + `classify_finding_scope` + `partition_findings_by_scope` + 全テスト) ファイル削除 + `libs/usecase/src/review_workflow/mod.rs` prune (`mod usecases;` / `mod scope;` 宣言と関連 `pub use` 削除、`verdict` のみ残す) + `libs/usecase/src/review_workflow/verdict.rs` 行 185/193 の `domain::review::extract_verdict_json_candidates_compact/_multiline` 呼び出しを `domain::review_v2::extract_verdict_json_candidates_compact/_multiline` に切替 (V2 側に等価実装あり)
 - [x] T004: `libs/infrastructure/src/git_cli/mod.rs::GitRepository::index_tree_hash_normalizing` trait method + `SystemGitRepo::index_tree_hash_normalizing` 実装削除 (~200 行) + V1 integration tests 7 本 + V1 unit tests 3 本 + `rrz` test helper + `init_git_repo_with_identity` helper + `write_full_metadata` / `setup_integration_repo` helpers 削除 (448 行) + unused imports (`Stdio`, `std::io::Write as _`) 除去 + `libs/infrastructure/src/git_cli/private_index.rs` ファイルごと削除 (PrivateIndex 全体、約 400 行、外部参照ゼロ) + `git_cli/mod.rs` から `pub mod private_index;` 除去 + `libs/infrastructure/src/review_json_codec.rs` ファイルごと削除 (V1 review.json codec、~750 行) + `libs/infrastructure/src/review_json_store.rs` ファイルごと削除 (FsReviewJsonStore、~310 行) + `libs/infrastructure/src/lib.rs` から `pub mod review_json_codec;` / `pub mod review_json_store;` 除去 + `libs/infrastructure/src/track/codec.rs` の `TrackDocumentV2.review` field + V1 review DTO tree (`TrackReviewDocument`, `ReviewGroupDocument`, `ReviewRoundDocument`, `TrackReviewEscalationDocument`, `EscalationPhaseDocument`, `ReviewCycleDocument`, `ConcernStreakDocument`, `ResolutionDocument`) + V1 codec helpers (`review_from_document`, `review_to_document`, `escalation_from_document`, `escalation_to_document`, `escalation_phase_from_document`, `resolution_from_document`, `round_result_from_document`, `round_result_to_document`, `parse_timestamp`, `parse_round_type`, `parse_escalation_decision`, `escalation_decision_to_str`, `parse_review_status`) + V1 codec tests 22 本 削除 + V1 review 型 import 一掃 (`#[serde(flatten)] extra` は保持して既存 30 metadata.json の review フィールドは opaque JSON として素通し)
-- [ ] T005: domain `review/` 全 V1 削除 + `RoundType` を `review_v2/types.rs` に移設 + `TrackMetadata.review` field 削除 + `ReviewJsonReader/Writer` ports 削除 + CI / baseline 検証 + ADR を Accepted に更新
+- [x] T005: `libs/domain/src/review/` ディレクトリまるごと削除 (`state.rs` / `escalation.rs` / `concern.rs` / `types.rs` / `error.rs` / `cycle/` + `mod.rs`) + `RoundType` enum を `libs/domain/src/review_v2/types.rs` に新設 + `libs/domain/src/review_v2/mod.rs` から `pub use types::RoundType` 追加 + `libs/domain/src/lib.rs` から V1 re-export 一掃 (`ApprovedHead`, `CodeHash`, `CycleError`, `CycleGroupState`, `EscalationPhase`, `GroupRound*`, `NonEmptyFindings` v1, `ReviewConcern`, `ReviewConcernStreak`, `ReviewCycle`, `ReviewCycleSummary`, `ReviewError`, `ReviewEscalation*`, `ReviewGroupState`, `ReviewJson`, `ReviewRoundResult`, `ReviewStalenessReason`, `ReviewState` v1, `ReviewStatus`, `StoredFinding`, `Verdict` v1, `extract_verdict_json_candidates_*` v1, `file_path_to_concern`) + `pub mod review;` 宣言削除 + `pub use review_v2::RoundType;` 追加 + `libs/domain/src/repository.rs` の `ReviewJsonReader` / `ReviewJsonWriter` trait 削除 + `use crate::ReviewJson;` import 除去 + `libs/domain/src/track.rs` の `TrackMetadata.review: Option<ReviewState>` field 削除 + `review()` / `review_mut()` / `set_review()` accessor 削除 + `with_branch` ctor の `review: None` 初期化削除 + `ReviewState` import 除去 + 6 箇所の test fixture `review: None,` 行削除 + `cargo make ci` PASS 確認 + `bin/sotp track baseline-capture --force` で `ReviewState` 同名衝突 warning 消滅確認 (残存する `Finding` collision は `domain::review_v2::types` vs `domain::verify` で本トラック範囲外) + baseline domain-types.json に V2 `ReviewState` enum (Required/NotRequired variants) のみ記録されていることを確認 + `knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md` Status を `Proposed` → `Accepted` に更新 + `knowledge/adr/README.md` 索引の Status を更新 + `knowledge/strategy/TODO.md` の RV2-07 done マーク + RVW-52/53 obsolete マーク + RVW-55 done マーク
 
 ## Manual verification steps
 
@@ -76,8 +76,31 @@
 
 ## Result / Open issues
 
-(T005 完了後に記録)
+### Result: ✅ All 5 tasks complete, TDDD-01 blocker resolved
+
+- **T001** (23b28af): docs cleanup + ADR proposed + guardrails/DESIGN.md/conventions V1 reference removal
+- **T002** (84bdb2c): CLI V1 removal (ResolveEscalation/SetApprovedHead subcommands + escalation gate + persist_approved_head)
+- **T003** (439c6dd): usecase V1 removal (usecases.rs + scope.rs + mod.rs prune + verdict.rs import switch)
+- **T004** (c00787a): infra V1 removal (index_tree_hash_normalizing + PrivateIndex + review_json_codec/store + track/codec V1 DTO tree)
+- **T005** (pending commit): domain V1 removal (review/ dir + RoundType relocation + TrackMetadata.review + ReviewJson ports) + CI + baseline regression verification + ADR Accepted flip + TODO.md markers
+
+**Total deletions across 5 commits:** ~7000 lines of dead V1 code removed.
+
+**TDDD-01 blocker resolution (the primary goal):**
+- `bin/sotp track baseline-capture --force reviewstate-v1-removal-2026-04-12` log no longer emits `same-name type collision for ReviewState` warning (verified after T005).
+- `domain-types-baseline.json` now contains only V2 `ReviewState` enum (`NotRequired` / `Required` variants) at line 426 — the V1 struct with `status`/`code_hash`/`groups`/`escalation` fields is completely absent.
+- Remaining same-name collisions (`Finding`: `domain::review_v2::types` vs `domain::verify`) are out of scope for this track per the verification allowlist.
+
+**Grep-based dead reference confirmation (post-T005):**
+- `apps/`+`libs/` no longer contain any non-comment references to: `ReviewState` (V1), `ReviewEscalation*`, `EscalationPhase`, `ReviewConcernStreak`, `ReviewCycleSummary`, `RecordRoundProtocol`, `record_round`/`record_round_typed`, `resolve_escalation`, `persist_approved_head`, `set_approved_head`/`SetApprovedHead`, `index_tree_hash_normalizing`, `normalized_tree_hash`, `ReviewJsonReader`/`ReviewJsonWriter`/`FsReviewJsonStore`, `track.review()`, `domain::review::extract_verdict_json_candidates_*`.
+- Residual comment-only references remain in `apps/cli/src/commands/review/codex_local.rs:46` ("v1 escalation ... NOT preserved") and `apps/cli/src/commands/review/tests.rs:791` ("uses v2 ReviewWriter instead of v1 RecordRoundProtocol") — both are historical breadcrumbs, not live code paths.
+
+### Open issues
+
+- None blocking this track.
+- `Finding` same-name collision (V2 types vs domain::verify) remains. Follow-up track may address via `build_type_graph` fully-qualified name keying. Out of scope per ADR §Reassess When.
+- RV2-06 (v2 escalation redesign) remains open. V1 escalation was removed, and V2 escalation is not yet implemented — a transitional regression tracked in TODO.md. Out of scope per ADR §Rejected Alternatives B.
 
 ## verified_at
 
-(T005 完了後に記録)
+2026-04-12 (commits 24faabe plan → 23b28af T001 → 84bdb2c T002 → 439c6dd T003 → c00787a T004 → T005 pending commit)

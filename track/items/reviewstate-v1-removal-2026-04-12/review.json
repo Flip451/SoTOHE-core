@@ -1,100 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3e807630eb4091cb221a10599307e89eb4b8820306560ac17393f29f4426c6ad",
-          "at": "2026-04-12T19:08:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3e807630eb4091cb221a10599307e89eb4b8820306560ac17393f29f4426c6ad",
-          "at": "2026-04-12T19:11:41Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c72091e9ec182126443ae714f156088bcf2dfca9cb469d48b0fc7916432c6b1",
-          "at": "2026-04-12T18:42:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c72091e9ec182126443ae714f156088bcf2dfca9cb469d48b0fc7916432c6b1",
-          "at": "2026-04-12T18:44:14Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a1a4393f93f43beaff74498dde341bcb3f1b922a82f0522a0175de29703f8c3d",
-          "at": "2026-04-12T18:51:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a1a4393f93f43beaff74498dde341bcb3f1b922a82f0522a0175de29703f8c3d",
-          "at": "2026-04-12T18:53:47Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`knowledge/conventions/security.md` says `FsTrackStore` uses `reject_symlinks_below()` before the `metadata.json` atomic write, but `libs/infrastructure/src/track/fs_store.rs` never performs that check. This documents a symlink defense that the current adapter does not provide.",
-              "severity": "P1",
-              "file": "knowledge/conventions/security.md",
-              "line": 65,
-              "category": "security documentation"
-            },
-            {
-              "message": "The new `check_approved<R, H, D>` example cannot compile as written: `ReviewCycle::get_review_states()` is only available when `R: Reviewer`, `H: ReviewHasher`, and `D: DiffGetter`, but the snippet omits those bounds. Add a `where` clause or make the example concrete.",
-              "severity": "P1",
-              "file": "knowledge/conventions/hexagonal-architecture.md",
-              "line": 89,
-              "category": "docs correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ee55ae718373bfbf0be937f94b4fb9db73f186f3d943be77a9c4e24fffb5aee9",
-          "at": "2026-04-12T18:20:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3500719e972924184828f2e04546deac1e31b7519a7a5b0ee5175216aaadf400",
-          "at": "2026-04-12T18:22:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3500719e972924184828f2e04546deac1e31b7519a7a5b0ee5175216aaadf400",
-          "at": "2026-04-12T18:25:36Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -182,6 +88,132 @@
           "findings": [],
           "hash": "rvw1:sha256:82081e3003e426377d15409b44fe9d77af0c876a0f14f11129b1d1ab93f19473",
           "at": "2026-04-12T19:12:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b20a97a826b9a711f5a1e6a9a6d089c93cfb8e233bbf1a580f5a936bf721d892",
+          "at": "2026-04-12T19:25:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b20a97a826b9a711f5a1e6a9a6d089c93cfb8e233bbf1a580f5a936bf721d892",
+          "at": "2026-04-12T19:28:05Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1a4393f93f43beaff74498dde341bcb3f1b922a82f0522a0175de29703f8c3d",
+          "at": "2026-04-12T18:51:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1a4393f93f43beaff74498dde341bcb3f1b922a82f0522a0175de29703f8c3d",
+          "at": "2026-04-12T18:53:47Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c72091e9ec182126443ae714f156088bcf2dfca9cb469d48b0fc7916432c6b1",
+          "at": "2026-04-12T18:42:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c72091e9ec182126443ae714f156088bcf2dfca9cb469d48b0fc7916432c6b1",
+          "at": "2026-04-12T18:44:14Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f24ce4fc7ccaf5be5a029f3363da9a3789fb8d59e109f1faf38d92e662a23489",
+          "at": "2026-04-12T19:24:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f24ce4fc7ccaf5be5a029f3363da9a3789fb8d59e109f1faf38d92e662a23489",
+          "at": "2026-04-12T19:27:23Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/conventions/security.md` says `FsTrackStore` uses `reject_symlinks_below()` before the `metadata.json` atomic write, but `libs/infrastructure/src/track/fs_store.rs` never performs that check. This documents a symlink defense that the current adapter does not provide.",
+              "severity": "P1",
+              "file": "knowledge/conventions/security.md",
+              "line": 65,
+              "category": "security documentation"
+            },
+            {
+              "message": "The new `check_approved<R, H, D>` example cannot compile as written: `ReviewCycle::get_review_states()` is only available when `R: Reviewer`, `H: ReviewHasher`, and `D: DiffGetter`, but the snippet omits those bounds. Add a `where` clause or make the example concrete.",
+              "severity": "P1",
+              "file": "knowledge/conventions/hexagonal-architecture.md",
+              "line": 89,
+              "category": "docs correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ee55ae718373bfbf0be937f94b4fb9db73f186f3d943be77a9c4e24fffb5aee9",
+          "at": "2026-04-12T18:20:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3500719e972924184828f2e04546deac1e31b7519a7a5b0ee5175216aaadf400",
+          "at": "2026-04-12T18:22:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3500719e972924184828f2e04546deac1e31b7519a7a5b0ee5175216aaadf400",
+          "at": "2026-04-12T18:25:36Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e807630eb4091cb221a10599307e89eb4b8820306560ac17393f29f4426c6ad",
+          "at": "2026-04-12T19:08:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e807630eb4091cb221a10599307e89eb4b8820306560ac17393f29f4426c6ad",
+          "at": "2026-04-12T19:11:41Z"
         }
       ]
     }

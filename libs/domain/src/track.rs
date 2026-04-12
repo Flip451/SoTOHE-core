@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 use std::fmt;
 
 use crate::{
-    CommitHash, DomainError, NonEmptyString, PlanView, ReviewState, TaskId, TrackBranch, TrackId,
+    CommitHash, DomainError, NonEmptyString, PlanView, TaskId, TrackBranch, TrackId,
     TransitionError, ValidationError,
 };
 
@@ -254,7 +254,7 @@ impl TrackTask {
     }
 }
 
-/// Root aggregate for a track: tasks, plan, optional status override, and review state.
+/// Root aggregate for a track: tasks, plan, and optional status override.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TrackMetadata {
     id: TrackId,
@@ -263,7 +263,6 @@ pub struct TrackMetadata {
     tasks: Vec<TrackTask>,
     plan: PlanView,
     status_override: Option<StatusOverride>,
-    review: Option<ReviewState>,
 }
 
 impl TrackMetadata {
@@ -297,7 +296,7 @@ impl TrackMetadata {
 
         validate_plan_invariants(&tasks, &plan)?;
 
-        let track = Self { id, branch, title, tasks, plan, status_override, review: None };
+        let track = Self { id, branch, title, tasks, plan, status_override };
         track.ensure_override_is_compatible()?;
 
         Ok(track)
@@ -335,19 +334,6 @@ impl TrackMetadata {
     #[must_use]
     pub fn status_override(&self) -> Option<&StatusOverride> {
         self.status_override.as_ref()
-    }
-
-    #[must_use]
-    pub fn review(&self) -> Option<&ReviewState> {
-        self.review.as_ref()
-    }
-
-    pub fn review_mut(&mut self) -> &mut Option<ReviewState> {
-        &mut self.review
-    }
-
-    pub fn set_review(&mut self, review: Option<ReviewState>) {
-        self.review = review;
     }
 
     #[must_use]
@@ -653,7 +639,6 @@ mod tests {
             tasks: vec![],
             plan,
             status_override: None,
-            review: None,
         };
         assert_eq!(track.next_task_id().unwrap().as_ref(), "T001");
     }
@@ -717,7 +702,6 @@ mod tests {
             tasks,
             plan,
             status_override: None,
-            review: None,
         };
         let new_id = track.add_task("Task in S2", Some("S2"), None).unwrap();
         assert_eq!(track.plan().sections()[1].task_ids().len(), 1);
@@ -768,7 +752,6 @@ mod tests {
             tasks,
             plan,
             status_override: None,
-            review: None,
         };
         assert_eq!(track.next_task_id().unwrap().as_ref(), expected);
     }
@@ -783,7 +766,6 @@ mod tests {
             tasks: vec![],
             plan,
             status_override: None,
-            review: None,
         };
         let result = track.add_task("Some task", None, None);
         assert!(matches!(
@@ -920,7 +902,6 @@ mod tests {
             tasks: vec![],
             plan,
             status_override: None,
-            review: None,
         };
         assert!(!track.all_tasks_resolved());
     }
@@ -1053,7 +1034,6 @@ mod tests {
             tasks: vec![task],
             plan,
             status_override: None,
-            review: None,
         };
         let result = track.next_task_id();
         assert!(matches!(result, Err(ValidationError::InvalidTaskId(_))));

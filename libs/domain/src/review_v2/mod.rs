@@ -21,6 +21,6 @@ pub use scope_config::ReviewScopeConfig;
 pub use types::{
     FastVerdict, FilePath, Finding, LogInfo, MainScopeName, NonEmptyFindings, NotRequiredReason,
     RequiredReason, ReviewHash, ReviewHashValue, ReviewOutcome, ReviewState, ReviewTarget,
-    ScopeName, Verdict, extract_verdict_json_candidates_compact,
+    RoundType, ScopeName, Verdict, extract_verdict_json_candidates_compact,
     extract_verdict_json_candidates_multiline,
 };

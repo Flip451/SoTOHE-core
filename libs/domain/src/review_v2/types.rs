@@ -307,6 +307,16 @@ impl Verdict {
     }
 }
 
+/// Round type discriminant for CLI `--round-type` arguments.
+///
+/// Used by `sotp review codex-local` to select fast vs final round semantics.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, strum::Display, strum::EnumString)]
+#[strum(serialize_all = "snake_case")]
+pub enum RoundType {
+    Fast,
+    Final,
+}
+
 /// Fast review verdict (advisory only — not used for approval decisions).
 ///
 /// Same structure as `Verdict` but distinct type to prevent misuse.
