@@ -8,6 +8,7 @@ use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
 use domain::verify::VerifyOutcome;
+use infrastructure::git_cli::GitRepository;
 
 /// Arguments for spec-level verify subcommands.
 #[derive(Args)]
@@ -155,10 +156,22 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
         VerifyCommand::SpecSignals(args) => {
             ("verify spec signals", infrastructure::verify::spec_signals::verify(&args.spec_path))
         }
-        VerifyCommand::SpecStates(args) => (
-            "verify spec states",
-            infrastructure::verify::spec_states::verify(&args.spec_path, args.strict),
-        ),
+        VerifyCommand::SpecStates(args) => {
+            // Anchor the symlink guard at the repo root (absolute path), so
+            // `reject_symlinks_below` does not walk host-level symlinks above
+            // the repository (e.g. `/var` on macOS).
+            let outcome = match infrastructure::git_cli::SystemGitRepo::discover() {
+                Ok(repo) => infrastructure::verify::spec_states::verify(
+                    &args.spec_path,
+                    args.strict,
+                    repo.root(),
+                ),
+                Err(e) => VerifyOutcome::from_findings(vec![domain::verify::Finding::error(
+                    format!("failed to discover git repo root for symlink guard: {e}"),
+                )]),
+            };
+            ("verify spec states", outcome)
+        }
         VerifyCommand::SpecCoverage(args) => {
             let outcome = match &args.track_dir {
                 Some(dir) if dir.is_dir() => infrastructure::verify::spec_coverage::verify(dir),
