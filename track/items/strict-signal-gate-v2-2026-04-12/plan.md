@@ -12,7 +12,7 @@ SignalBasis::Feedback を Blue から Yellow に再マッピングする (D1)。
 domain::signal のユニットテスト (rstest cases) を更新し、新しいマッピングを反映する。
 infrastructure::verify::spec_signals の関連 fixture / テストも feedback を Yellow 扱いに揃える。
 
-- [ ] domain: SignalBasis::Feedback → Yellow 降格 + domain::signal / infrastructure::verify::spec_signals のテスト更新
+- [x] domain: SignalBasis::Feedback → Yellow 降格 + domain::signal / infrastructure::verify::spec_signals のテスト更新 36ca580022f90a742cca9897b5cec0b32f8a4da4
 
 ## domain: check_spec_doc_signals 追加
 

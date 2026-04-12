@@ -189,93 +189,80 @@
     ]
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
   "tasks": [
     {
-      "commit_hash": null,
+      "commit_hash": "36ca580022f90a742cca9897b5cec0b32f8a4da4",
       "description": "domain: SignalBasis::Feedback → Yellow 降格 + domain::signal / infrastructure::verify::spec_signals のテスト更新",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
-      "commit_hash": null,
       "description": "domain: check_spec_doc_signals(&SpecDocument, strict: bool) -> VerifyOutcome を libs/domain/src/spec.rs に追加 + D1–D6 tests (strict=false で yellow を Finding::warning として emit)",
       "id": "T002",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "domain: check_domain_types_signals(&DomainTypesDocument, strict: bool) -> VerifyOutcome を libs/domain/src/tddd/catalogue.rs に追加 + D7–D13 tests (Red/空/coverage 常に error, Yellow は strict で error / non-strict で warning)",
       "id": "T003",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "domain: libs/domain/src/git_ref.rs 新設 + validate_branch_ref + RefValidationError (DisallowedCharacter / Empty) + D14–D22 tests (.., @{, ~, ^, :, 空白, 制御文字を拒否)",
       "id": "T004",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "infra: verify_from_spec_json を T002/T003 に delegate する thin wrapper にリファクタ + Stage 2 NotFound → skip + reject_symlinks_below integration (D4.3 CI 経路) + S1–S5 tests + 旧 missing_domain_types テスト削除",
       "id": "T005",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "usecase: libs/usecase/src/merge_gate/ 新設 — BlobFetchResult<T> + TrackBlobReader port (read_spec_document / read_domain_types_document / read_track_metadata) + check_strict_merge_gate orchestration + U1–U18 MockTrackBlobReader tests",
       "id": "T006",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "usecase: libs/usecase/src/task_completion.rs 新設 — check_tasks_resolved_from_git_ref (plan/ skip + validate_branch_ref + read_track_metadata + all_tasks_resolved) + K1–K7 MockTrackBlobReader tests",
       "id": "T007",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "infra: libs/infrastructure/src/git_cli/show.rs 新設 — BlobResult / TreeEntryKind / git_show_blob / git_ls_tree_entry_kind / fetch_blob_safe / is_path_not_found_stderr (pub(crate), LANG=C 固定, 2 段 symlink 検査)",
       "id": "T008",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "infra: libs/infrastructure/src/verify/merge_gate_adapter.rs 新設 — GitShowTrackBlobReader が TrackBlobReader port を実装 (fetch_blob_safe → BlobFetchResult<T> 変換 + codec decode) + A1–A16 tests (symlink/submodule fixture 含む)",
       "id": "T009",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "cli: apps/cli/src/commands/pr.rs::wait_and_merge + check_tasks_resolved を GitShowTrackBlobReader + usecase::merge_gate / task_completion の thin wrapper に書き換え + 既存テスト移植 + C1–C4 最小 wrapper tests",
       "id": "T010",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "docs: knowledge/conventions/source-attribution.md に Signal 列追加 + feedback Yellow 降格の upgrade ガイダンス追記",
       "id": "T011",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "build: Makefile.toml に verify-spec-states-current-local 新設 (branch-bound, interim mode, --strict なし) + ci-local / ci-container dependencies に追加",
       "id": "T012",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "docs: CI 統合回帰テスト I1–I11 を手動実行 + verification.md に結果記録",
       "id": "T013",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "docs: knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md を Proposed → Accepted に更新",
       "id": "T014",
       "status": "todo"
     }
   ],
   "title": "Strict Spec Signal Gate v2 — Yellow blocks merge (fail-closed)",
-  "updated_at": "2026-04-12T12:00:00Z"
+  "updated_at": "2026-04-12T02:44:53Z"
 }

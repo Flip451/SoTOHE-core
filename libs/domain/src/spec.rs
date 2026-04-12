@@ -504,6 +504,67 @@ pub fn evaluate_requirement_signal(sources: &[String]) -> ConfidenceSignal {
 }
 
 // ---------------------------------------------------------------------------
+// Stage 1 signal gate (check_spec_doc_signals)
+// ---------------------------------------------------------------------------
+
+/// Evaluates Stage 1 signal gate rules against a `SpecDocument`.
+///
+/// Shared pure function used by both the CI path (`verify_from_spec_json`)
+/// and the merge gate (via `usecase::merge_gate::check_strict_merge_gate`).
+///
+/// # Rules
+///
+/// - `signals` is `None` → `Finding::error` (unevaluated; run `sotp track signals` first)
+/// - `SignalCounts::total() == 0` → `Finding::error` (evaluated but empty — treated as unevaluated)
+/// - `signals.red > 0` → `Finding::error` (red is always an error, regardless of mode)
+/// - `signals.yellow > 0` and `strict = true` → `Finding::error` (merge gate rejects Yellow)
+/// - `signals.yellow > 0` and `strict = false` → `Finding::warning` (interim mode visualizes Yellow, PASSes)
+/// - All Blue → `VerifyOutcome::pass()` (no findings)
+///
+/// The `strict` parameter is:
+/// - `true` for the merge gate (all Yellow must be upgraded to Blue before merge)
+/// - `false` for CI interim mode (Yellow is allowed during iteration but visualized)
+///
+/// Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md` §D2, §D8.6.
+#[must_use]
+pub fn check_spec_doc_signals(doc: &SpecDocument, strict: bool) -> crate::verify::VerifyOutcome {
+    use crate::verify::{Finding, VerifyOutcome};
+
+    let Some(counts) = doc.signals() else {
+        return VerifyOutcome::from_findings(vec![Finding::error(
+            "spec signals not yet evaluated — run `sotp track signals` first".to_owned(),
+        )]);
+    };
+
+    if counts.total() == 0 {
+        return VerifyOutcome::from_findings(vec![Finding::error(
+            "spec signals are all-zero (blue=0, yellow=0, red=0) — treated as unevaluated"
+                .to_owned(),
+        )]);
+    }
+
+    if counts.has_red() {
+        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            "spec signals have red={} (source attribution missing — every requirement must carry a `[source: ...]` tag)",
+            counts.red()
+        ))]);
+    }
+
+    if counts.yellow() > 0 {
+        let message = format!(
+            "spec.json: {} yellow signal(s) detected — merge gate will block these until upgraded to Blue. Upgrade by creating an ADR or convention document and referencing it via `[source: ...]` tag.",
+            counts.yellow()
+        );
+        if strict {
+            return VerifyOutcome::from_findings(vec![Finding::error(message)]);
+        }
+        return VerifyOutcome::from_findings(vec![Finding::warning(message)]);
+    }
+
+    VerifyOutcome::pass()
+}
+
+// ---------------------------------------------------------------------------
 // Coverage evaluation
 // ---------------------------------------------------------------------------
 
@@ -1503,5 +1564,118 @@ mod tests {
         doc.append_hearing_record(rec);
         assert_eq!(doc.hearing_history().len(), 1);
         assert_eq!(doc.hearing_history()[0].mode(), HearingMode::Full);
+    }
+
+    // --- check_spec_doc_signals (Stage 1 signal gate) ---
+    //
+    // These tests cover the pure function that both the CI path
+    // (`verify_from_spec_json`) and the merge gate (via `usecase::merge_gate`)
+    // delegate to. Cases mirror the D1–D6 rows in the ADR Test Matrix.
+
+    fn doc_with_signals(signals: Option<SignalCounts>) -> SpecDocument {
+        let mut doc = SpecDocument::new(
+            "Feature",
+            SpecStatus::Draft,
+            "1.0",
+            vec!["Goal line".to_owned()],
+            SpecScope::new(Vec::new(), Vec::new()),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            None,
+            None,
+            None,
+        )
+        .unwrap();
+        if let Some(counts) = signals {
+            doc.set_signals(counts);
+        }
+        doc
+    }
+
+    #[test]
+    fn test_check_spec_doc_signals_none_returns_error() {
+        // D1: signals=None → BLOCKED (unevaluated)
+        let doc = doc_with_signals(None);
+        let outcome = check_spec_doc_signals(&doc, false);
+        assert!(outcome.has_errors(), "None signals must be an error");
+        assert!(
+            outcome.findings()[0].message().contains("not yet evaluated"),
+            "finding must mention unevaluated state: {:?}",
+            outcome.findings()[0].message()
+        );
+    }
+
+    #[test]
+    fn test_check_spec_doc_signals_all_zero_returns_error() {
+        // D2: signals=(0,0,0) → BLOCKED (evaluated but empty — treated as unevaluated)
+        let doc = doc_with_signals(Some(SignalCounts::new(0, 0, 0)));
+        let outcome = check_spec_doc_signals(&doc, false);
+        assert!(outcome.has_errors(), "all-zero signals must be an error");
+        assert!(outcome.findings()[0].message().contains("all-zero"));
+    }
+
+    #[test]
+    fn test_check_spec_doc_signals_red_is_error_in_interim_mode() {
+        // D3a: red>0, strict=false → BLOCKED (red is always an error)
+        let doc = doc_with_signals(Some(SignalCounts::new(1, 0, 2)));
+        let outcome = check_spec_doc_signals(&doc, false);
+        assert!(outcome.has_errors(), "red>0 must be an error in interim mode");
+        assert!(outcome.findings()[0].message().contains("red=2"));
+    }
+
+    #[test]
+    fn test_check_spec_doc_signals_red_is_error_in_strict_mode() {
+        // D3b: red>0, strict=true → BLOCKED
+        let doc = doc_with_signals(Some(SignalCounts::new(1, 0, 2)));
+        let outcome = check_spec_doc_signals(&doc, true);
+        assert!(outcome.has_errors(), "red>0 must be an error in strict mode");
+    }
+
+    #[test]
+    fn test_check_spec_doc_signals_yellow_is_warning_in_interim_mode() {
+        // D4: yellow>0, strict=false → PASS with Finding::warning
+        let doc = doc_with_signals(Some(SignalCounts::new(3, 2, 0)));
+        let outcome = check_spec_doc_signals(&doc, false);
+        assert!(!outcome.has_errors(), "yellow in interim mode must not be an error: {outcome:?}");
+        let findings = outcome.findings();
+        assert_eq!(findings.len(), 1, "expected exactly one warning finding");
+        assert_eq!(findings[0].severity(), crate::verify::Severity::Warning);
+        let msg = findings[0].message();
+        assert!(msg.contains("2 yellow signal"), "message must mention yellow count: {msg}");
+        assert!(msg.contains("merge gate will block"), "message must warn about merge gate: {msg}");
+    }
+
+    #[test]
+    fn test_check_spec_doc_signals_yellow_is_error_in_strict_mode() {
+        // D5: yellow>0, strict=true → BLOCKED with Finding::error
+        let doc = doc_with_signals(Some(SignalCounts::new(3, 2, 0)));
+        let outcome = check_spec_doc_signals(&doc, true);
+        assert!(outcome.has_errors(), "yellow in strict mode must be an error");
+        let findings = outcome.findings();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].severity(), crate::verify::Severity::Error);
+        assert!(findings[0].message().contains("2 yellow signal"));
+    }
+
+    #[test]
+    fn test_check_spec_doc_signals_all_blue_passes_in_both_modes() {
+        // D6: all Blue → PASS (no findings) in both modes
+        let doc = doc_with_signals(Some(SignalCounts::new(10, 0, 0)));
+
+        let outcome_interim = check_spec_doc_signals(&doc, false);
+        assert!(!outcome_interim.has_errors());
+        assert!(
+            outcome_interim.findings().is_empty(),
+            "all-Blue must produce zero findings in interim mode"
+        );
+
+        let outcome_strict = check_spec_doc_signals(&doc, true);
+        assert!(!outcome_strict.has_errors());
+        assert!(
+            outcome_strict.findings().is_empty(),
+            "all-Blue must produce zero findings in strict mode"
+        );
     }
 }
