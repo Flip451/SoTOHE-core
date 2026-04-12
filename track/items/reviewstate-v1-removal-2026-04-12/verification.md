@@ -2,7 +2,7 @@
 
 ## Scope verified
 
-- [ ] T001: ADR 作成 (Proposed) + `.claude/rules/10-guardrails.md` Escalation Threshold セクション削除 + `knowledge/strategy/TODO.md` の RVW-54 から set-approved-head 言及のみ削除 + `knowledge/DESIGN.md` の V1 review 言及 grep cleanup (RVW-52/53/55 の obsolete/done マークは T002 コミットで; RV2-07 の done マークは T005 コミットで)
+- [x] T001: ADR 作成 (Proposed, planning commit 24faabe で実施済み) + `.claude/rules/10-guardrails.md` Escalation Threshold セクション削除 + `knowledge/adr/README.md` 索引追加 + `knowledge/strategy/TODO.md` の RVW-54 から set-approved-head 言及のみ削除 + `knowledge/DESIGN.md` の V1 review 2 セクション (WF-36 Review Escalation Threshold + tamper-proof-review-2026-03-26 Tamper-Proof Review Verdict) 削除 + `knowledge/conventions/hexagonal-architecture.md` RecordRoundProtocol/ReviewJsonReader 参照置換 + `knowledge/conventions/security.md` FsReviewJsonStore 参照置換 (RVW-52/53/55 の obsolete/done マークは T002 コミットで; RV2-07 の done マークは T005 コミットで)
 - [ ] T002: CLI `ResolveEscalation` / `SetApprovedHead` subcommand 削除 + `run_check_approved` 内 escalation fail-closed gate 削除 + `make.rs::persist_approved_head` と呼び出し削除
 - [ ] T003: `usecase::review_workflow::usecases.rs` + `scope.rs` ファイル削除 + `mod.rs` prune + `verdict.rs` の `extract_verdict_json_candidates_*` import を V2 側へ切替
 - [ ] T004: `git_cli::index_tree_hash_normalizing` + `PrivateIndex::normalized_tree_hash` + `review_json_codec.rs` + `review_json_store.rs` + `track/codec.rs` V1 review DTO tree 削除 + `infrastructure/lib.rs` re-export prune

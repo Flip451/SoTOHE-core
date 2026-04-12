@@ -92,64 +92,6 @@ Do not use `--full-auto` for `reviewer` or `researcher` — use `--sandbox read-
 3. Hook protections apply to all operations performed during autonomous task execution.
    Do not bypass hook coverage by routing through external subprocesses.
 
-## Review Escalation Threshold (Enforced by `sotp review record-round`)
-
-When the **same concern category appears in 3 consecutive closed review cycles**,
-`sotp review record-round` automatically blocks further fix-review cycles with
-`EscalationActive` error (exit code 3).
-
-This is **enforced by the domain layer** (`ReviewState::record_round` /
-`record_round_with_pending` / `check_commit_ready`), not by prompt instructions.
-
-The threshold defaults to 3 (hardcoded in domain layer).
-Future configurability may be added to the review feature directly.
-
-### When Escalation Triggers
-
-The blocked message instructs the developer to execute three steps:
-
-1. **Workspace Search**: Use `Grep` to check whether existing code solves the problem.
-2. **Reinvention Check**: Invoke the `researcher` capability to survey crates.io.
-   Save results to `knowledge/research/reinvention-check-{concern}.md`.
-3. **Decision**: Run `sotp review resolve-escalation` with evidence:
-   ```
-   sotp review resolve-escalation \
-     --track-id <id> \
-     --blocked-concerns <comma-separated-concern-slugs> \
-     --workspace-search-ref <path-to-search-artifact> \
-     --reinvention-check-ref <path-to-research-artifact> \
-     --decision <adopt_workspace|adopt_crate|continue_self> \
-     --summary "Justification for the decision"
-   ```
-   Both artifact paths must exist on disk. `--blocked-concerns` must match the
-   concerns currently blocking escalation (the domain layer validates the match).
-
-Resolution clears the escalation block, invalidates the review state, and requires
-a fresh review cycle. The resolution record is persisted in `metadata.json`.
-
-### Concern Categories
-
-The `--concerns` flag on `sotp review record-round` accepts comma-separated concern slugs.
-The calling workflow (e.g., `/track:review`) is responsible for extracting concerns from
-reviewer findings using `findings_to_concerns()` (usecase layer), which applies a 3-stage
-fallback:
-1. Reviewer-provided `category` field (if present in findings JSON)
-2. File path normalization (e.g., `libs/domain/src/review.rs` → `domain.review`)
-3. Fallback: `"other"`
-
-Note: The automatic extraction is available as a library function but is not yet wired
-into the `record-round` CLI command directly. The calling orchestrator must pass `--concerns`.
-
-### Design Reference
-
-Full design with Canonical Blocks: `knowledge/DESIGN.md` → "Review Escalation Threshold (WF-36)"
-
-### Known Limitation (CLI-02)
-
-The `resolve-escalation` logic currently lives in `apps/cli/src/commands/review.rs`.
-Per `tmp/refactoring-plan-2026-03-19.md` CLI-02, this should be extracted to
-`libs/usecase/src/review_workflow.rs` as a UseCase in a follow-up track.
-
 ## Duplicate Implementation Prevention
 
 Before writing new parsing/analysis logic, verify the following:

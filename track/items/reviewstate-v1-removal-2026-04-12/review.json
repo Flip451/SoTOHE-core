@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:030c2687441fd5e0dd239fcf75ad684f79631c8a39881dcdba722d61bfc457c2",
+          "at": "2026-04-12T18:28:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `other` scope is not isolated to the six files listed in the briefing: `git diff --name-only` also includes `.claude/rules/10-guardrails.md`, `knowledge/conventions/hexagonal-architecture.md`, and `knowledge/conventions/security.md`. That breaks the stated scope boundary for this review slice and creates a real risk of double-review or missed-review across scopes.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "scope_discipline"
+            }
+          ],
+          "hash": "rvw1:sha256:030c2687441fd5e0dd239fcf75ad684f79631c8a39881dcdba722d61bfc457c2",
+          "at": "2026-04-12T18:31:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:030c2687441fd5e0dd239fcf75ad684f79631c8a39881dcdba722d61bfc457c2",
+          "at": "2026-04-12T18:33:51Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/conventions/security.md` says `FsTrackStore` uses `reject_symlinks_below()` before the `metadata.json` atomic write, but `libs/infrastructure/src/track/fs_store.rs` never performs that check. This documents a symlink defense that the current adapter does not provide.",
+              "severity": "P1",
+              "file": "knowledge/conventions/security.md",
+              "line": 65,
+              "category": "security documentation"
+            },
+            {
+              "message": "The new `check_approved<R, H, D>` example cannot compile as written: `ReviewCycle::get_review_states()` is only available when `R: Reviewer`, `H: ReviewHasher`, and `D: DiffGetter`, but the snippet omits those bounds. Add a `where` clause or make the example concrete.",
+              "severity": "P1",
+              "file": "knowledge/conventions/hexagonal-architecture.md",
+              "line": 89,
+              "category": "docs correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ee55ae718373bfbf0be937f94b4fb9db73f186f3d943be77a9c4e24fffb5aee9",
+          "at": "2026-04-12T18:20:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3500719e972924184828f2e04546deac1e31b7519a7a5b0ee5175216aaadf400",
+          "at": "2026-04-12T18:22:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3500719e972924184828f2e04546deac1e31b7519a7a5b0ee5175216aaadf400",
+          "at": "2026-04-12T18:25:36Z"
+        }
+      ]
+    }
+  }
+}

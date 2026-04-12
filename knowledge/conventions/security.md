@@ -61,8 +61,7 @@ Infrastructure 層のファイル I/O アダプターは、対象ファイルと
 
 ### 適用例
 
-- `FsReviewJsonStore`: `reject_symlink()` を read/write の前に呼び出し
-- `review_adapters.rs`: `open_regular_file_nofollow()` で no-follow open
+- `FsReviewStore` (review_v2): `reject_symlinks_below()` + `WriteGuard` で read/write の前に symlink / 外部書き込みを拒絶
 
 ### 新規アダプター追加時
 

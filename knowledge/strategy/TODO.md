@@ -812,7 +812,7 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 - [ ] **RVW-51** (MEDIUM): auto-record verdict 反転バグ — Codex が zero_findings を返したのに review.json に findings_remain が記録されるケースを確認。RVW-34（lossy conversion）とは別問題。review flow を fail-closed 側へ誤誘導し approval/commit を不正にブロックしうるため、LOW ではなく MEDIUM 相当。verdict 変換か前ラウンド verdict の再利用、またはセッションログの誤抽出の可能性。発見: 2026-04-02 incremental-review-scope セッション
 - [ ] **RVW-52** (MEDIUM): `/track:done` で approved_head 書き込み後の dirty review.json を処理 — 最後のコミット後に persist_approved_head が review.json を変更するため、worktree が dirty になり track-switch-main が失敗する。review.json を破棄するのではなく、approved_head を保持したまま clean に戻せる同期フロー（例: commit/note への取り込み、または別の永続化ポイント）が必要
 - [ ] **RVW-53** (LOW): `/track:commit` に APPROVED_HEAD_FAILED 自動リカバリを追加 — track-commit-message の stdout に APPROVED_HEAD_FAILED が出たら即座に `bin/sotp review set-approved-head` を実行する指示をスキル定義に追加
-- [ ] **RVW-54** (MEDIUM): CLI 統合テストハーネス構築 — make.rs の persist_approved_head、review/mod.rs の set-approved-head 等、git repo + プロセス実行を伴う CLI パスのテスト基盤が存在しない。infra 層の setup_test_repo パターンを CLI 層にも導入すべき
+- [ ] **RVW-54** (MEDIUM): CLI 統合テストハーネス構築 — git repo + プロセス実行を伴う CLI パスのテスト基盤が存在しない。infra 層の setup_test_repo パターンを CLI 層にも導入すべき
 - [ ] **RVW-55** (MEDIUM): v1 `persist_approved_head` 残骸の削除 — `apps/cli/src/commands/make.rs` L561-566 に v1 review.json の `approved_head` 書き込みコードが残っている（コメント: "kept for backwards compat, T007 cleanup"）。v2 scope-based review.json (`scopes` フィールド) を v1 codec (`schema_version` + `cycles`) で読もうとして毎回 soft fail する。v2 `persist_commit_hash_v2` が正常動作しており v1 パスは完全にデッドコード。`persist_approved_head` 関数本体と呼び出し元、および関連する RVW-52 / RVW-53 の前提を再評価して削除すべき。発見: 2026-04-10 agent-profiles-redesign planning commit
 
 ---
