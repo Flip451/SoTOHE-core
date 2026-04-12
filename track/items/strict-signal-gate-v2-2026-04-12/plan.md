@@ -75,7 +75,7 @@ LANG=C LC_ALL=C LANGUAGE=C を Command の env に必ず設定する (D4.1)。
 fetch_blob_safe は git_ls_tree_entry_kind でモード検査 → git_show_blob の 2 段呼び出し (D4.3)。
 プリミティブのユニットテストを追加する。
 
-- [ ] infra: libs/infrastructure/src/git_cli/show.rs 新設 — BlobResult / TreeEntryKind / git_show_blob / git_ls_tree_entry_kind / fetch_blob_safe / is_path_not_found_stderr (pub(crate), LANG=C 固定, 2 段 symlink 検査)
+- [x] infra: libs/infrastructure/src/git_cli/show.rs 新設 — BlobResult / TreeEntryKind / git_show_blob / git_ls_tree_entry_kind / fetch_blob_safe / is_path_not_found_stderr (pub(crate), LANG=C 固定, 2 段 symlink 検査) a012b3f878f1190e00719c953c239f81637e2157
 
 ## infra: GitShowTrackBlobReader adapter
 

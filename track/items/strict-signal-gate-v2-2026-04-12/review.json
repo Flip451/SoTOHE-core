@@ -231,6 +231,20 @@
           "findings": [],
           "hash": "rvw1:sha256:4d6789d3b23f7afb1fc2a45c93d3360cade2b1c12a77bb568da71c25b2d98bc7",
           "at": "2026-04-12T04:31:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba649b3241b3dcc7ba4483e679df1eaa078476610590c979eff6b5bd77b977b5",
+          "at": "2026-04-12T04:46:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba649b3241b3dcc7ba4483e679df1eaa078476610590c979eff6b5bd77b977b5",
+          "at": "2026-04-12T04:47:13Z"
         }
       ]
     },
@@ -330,6 +344,125 @@
           "findings": [],
           "hash": "rvw1:sha256:ca4d347c72a59d0b63878bba9b00d3b79cb664d236b3d2bd68d1529487c839a6",
           "at": "2026-04-12T04:24:55Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6dca83a4134dc803833d7c66e5ad09f3cb400485180b8ca6ecede094f82c87c",
+          "at": "2026-04-12T02:42:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6dca83a4134dc803833d7c66e5ad09f3cb400485180b8ca6ecede094f82c87c",
+          "at": "2026-04-12T02:43:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
+          "at": "2026-04-12T03:34:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_from_spec_json` only merges Stage 1 findings after `domain-types.json` decodes successfully. If Stage 1 returns a warning in interim mode (for example, `spec.json` has Yellow signals) and Stage 2 then hits a symlink/read/decode failure, the early returns here replace the accumulated Stage 1 warning with a fresh error-only outcome. That contradicts the intended behavior of preserving Stage 1 findings alongside Stage 2 results, so these Stage 2 error branches should merge into `stage1` instead of returning a new outcome.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 115,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
+          "at": "2026-04-12T03:37:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
+          "at": "2026-04-12T03:39:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `TreeEntryKind::Submodule` rejection path in `fetch_blob_safe` is not covered by any fixture test. Because this is a security-sensitive fail-closed branch, a regression in 160000 handling could ship without detection. Please add an integration test that commits a submodule and asserts `fetch_blob_safe` returns `BlobResult::CommandFailed` for it.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/show.rs",
+              "line": 185,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:f6fbdaa20cd5e98936473be59b4fbc357266a5b2421f2e578c214fe63b1306ea",
+          "at": "2026-04-12T04:31:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f6fbdaa20cd5e98936473be59b4fbc357266a5b2421f2e578c214fe63b1306ea",
+          "at": "2026-04-12T04:33:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f6fbdaa20cd5e98936473be59b4fbc357266a5b2421f2e578c214fe63b1306ea",
+          "at": "2026-04-12T04:35:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9b8d527ba1869757296eef23a9c47f7745cf637241e98884190561e54e56f11",
+          "at": "2026-04-12T04:37:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fetch_blob_safe` validates `origin/<branch>` with `git ls-tree` and then does a second symbolic-ref lookup in `git_show_blob`. If a concurrent `git fetch` moves `origin/<branch>` between those calls, the mode check can approve commit A while `git show` returns bytes from commit B. That breaks the D4.3 fail-closed guarantee; a symlink blob in commit B can carry attacker-controlled JSON text and bypass the intended pre-read rejection. Resolve `origin/<branch>` to a commit once and use that object ID for both commands.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/git_cli/show.rs",
+              "line": 185,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:a9b8d527ba1869757296eef23a9c47f7745cf637241e98884190561e54e56f11",
+          "at": "2026-04-12T04:40:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9b8d527ba1869757296eef23a9c47f7745cf637241e98884190561e54e56f11",
+          "at": "2026-04-12T04:40:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb6cc0eac796dede2c46d01db6da2883d32a05d91227bd5315ff9aa6a21f4e49",
+          "at": "2026-04-12T04:47:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb6cc0eac796dede2c46d01db6da2883d32a05d91227bd5315ff9aa6a21f4e49",
+          "at": "2026-04-12T04:49:34Z"
         }
       ]
     },
@@ -493,111 +626,6 @@
           "findings": [],
           "hash": "rvw1:sha256:13025cc11de9c96b3633dba0f57fbd206ecafe976239d94f4656e78986f0fd1a",
           "at": "2026-04-12T03:26:08Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d6dca83a4134dc803833d7c66e5ad09f3cb400485180b8ca6ecede094f82c87c",
-          "at": "2026-04-12T02:42:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d6dca83a4134dc803833d7c66e5ad09f3cb400485180b8ca6ecede094f82c87c",
-          "at": "2026-04-12T02:43:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
-          "at": "2026-04-12T03:34:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`verify_from_spec_json` only merges Stage 1 findings after `domain-types.json` decodes successfully. If Stage 1 returns a warning in interim mode (for example, `spec.json` has Yellow signals) and Stage 2 then hits a symlink/read/decode failure, the early returns here replace the accumulated Stage 1 warning with a fresh error-only outcome. That contradicts the intended behavior of preserving Stage 1 findings alongside Stage 2 results, so these Stage 2 error branches should merge into `stage1` instead of returning a new outcome.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/spec_states.rs",
-              "line": 115,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
-          "at": "2026-04-12T03:37:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dc4897fa955dd245d6423da8fddadc44a4a528bc5b6ba1c9a056478ef82369e4",
-          "at": "2026-04-12T03:39:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `TreeEntryKind::Submodule` rejection path in `fetch_blob_safe` is not covered by any fixture test. Because this is a security-sensitive fail-closed branch, a regression in 160000 handling could ship without detection. Please add an integration test that commits a submodule and asserts `fetch_blob_safe` returns `BlobResult::CommandFailed` for it.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/show.rs",
-              "line": 185,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:f6fbdaa20cd5e98936473be59b4fbc357266a5b2421f2e578c214fe63b1306ea",
-          "at": "2026-04-12T04:31:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f6fbdaa20cd5e98936473be59b4fbc357266a5b2421f2e578c214fe63b1306ea",
-          "at": "2026-04-12T04:33:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f6fbdaa20cd5e98936473be59b4fbc357266a5b2421f2e578c214fe63b1306ea",
-          "at": "2026-04-12T04:35:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9b8d527ba1869757296eef23a9c47f7745cf637241e98884190561e54e56f11",
-          "at": "2026-04-12T04:37:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fetch_blob_safe` validates `origin/<branch>` with `git ls-tree` and then does a second symbolic-ref lookup in `git_show_blob`. If a concurrent `git fetch` moves `origin/<branch>` between those calls, the mode check can approve commit A while `git show` returns bytes from commit B. That breaks the D4.3 fail-closed guarantee; a symlink blob in commit B can carry attacker-controlled JSON text and bypass the intended pre-read rejection. Resolve `origin/<branch>` to a commit once and use that object ID for both commands.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/git_cli/show.rs",
-              "line": 185,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:a9b8d527ba1869757296eef23a9c47f7745cf637241e98884190561e54e56f11",
-          "at": "2026-04-12T04:40:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9b8d527ba1869757296eef23a9c47f7745cf637241e98884190561e54e56f11",
-          "at": "2026-04-12T04:40:35Z"
         }
       ]
     }

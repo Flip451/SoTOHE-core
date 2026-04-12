@@ -20,17 +20,8 @@
 //! Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md`
 //! §D4, §D4.1, §D4.3, §D5.3.
 
-// Until the T009 adapter (`merge_gate_adapter::GitShowTrackBlobReader`)
-// consumes these primitives, they have no non-test caller inside the
-// infrastructure crate. The allow is lifted automatically once the adapter
-// imports `fetch_blob_safe` / `BlobResult`.
-#![allow(dead_code)]
-
 use std::path::Path;
 use std::process::Command;
-
-// Keep the allow attribute inside the module (inner attribute) so rustfmt
-// accepts the ordering: `//!` doc → `#![allow(...)]` → `use` → items.
 
 /// Low-level result of running `git show origin/<ref>:<path>`.
 #[derive(Debug)]

@@ -13,6 +13,7 @@ pub mod domain_strings;
 pub mod frontmatter;
 pub mod latest_track;
 pub mod layers;
+pub mod merge_gate_adapter;
 pub mod module_size;
 pub mod orchestra;
 pub mod spec_attribution;
