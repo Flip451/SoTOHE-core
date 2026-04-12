@@ -157,19 +157,22 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
             ("verify spec signals", infrastructure::verify::spec_signals::verify(&args.spec_path))
         }
         VerifyCommand::SpecStates(args) => {
-            // Anchor the symlink guard at the repo root (absolute path), so
+            // Anchor the symlink guard at the repo root (absolute path) so
             // `reject_symlinks_below` does not walk host-level symlinks above
-            // the repository (e.g. `/var` on macOS).
-            let outcome = match infrastructure::git_cli::SystemGitRepo::discover() {
-                Ok(repo) => infrastructure::verify::spec_states::verify(
-                    &args.spec_path,
-                    args.strict,
-                    repo.root(),
-                ),
-                Err(e) => VerifyOutcome::from_findings(vec![domain::verify::Finding::error(
-                    format!("failed to discover git repo root for symlink guard: {e}"),
-                )]),
-            };
+            // the repository (e.g. `/var` on macOS). Prefer
+            // `SystemGitRepo::discover()` for an authoritative repo root,
+            // but fall back to walking up from the spec path looking for a
+            // `.git` marker so `verify spec-states` remains usable outside
+            // of a git checkout (standalone / external tooling use cases).
+            let trusted_root = infrastructure::git_cli::SystemGitRepo::discover()
+                .ok()
+                .map(|repo| repo.root().to_path_buf())
+                .unwrap_or_else(|| fallback_trusted_root(&args.spec_path));
+            let outcome = infrastructure::verify::spec_states::verify(
+                &args.spec_path,
+                args.strict,
+                &trusted_root,
+            );
             ("verify spec states", outcome)
         }
         VerifyCommand::SpecCoverage(args) => {
@@ -442,6 +445,26 @@ fn verify_arch_docs(root: &std::path::Path) -> VerifyOutcome {
     outcome.merge(infrastructure::verify::doc_patterns::verify(root));
     outcome.merge(infrastructure::verify::convention_docs::verify(root));
     outcome
+}
+
+/// Fallback `trusted_root` for the spec-states symlink guard when
+/// `SystemGitRepo::discover()` fails (e.g. standalone execution outside a
+/// git checkout). Walks up from the spec path looking for a `.git` marker;
+/// if none is found, falls back to the spec path's immediate parent.
+///
+/// The fallback preserves standalone usability at the cost of a slightly
+/// relaxed guard (only the parent directory and the spec file itself are
+/// verified for symlinks, not arbitrary deeper ancestors). The primary
+/// repo-root path (via `SystemGitRepo::discover()`) remains the preferred
+/// trusted_root for all normal workflow invocations.
+fn fallback_trusted_root(spec_path: &std::path::Path) -> PathBuf {
+    let start = spec_path.parent().unwrap_or(spec_path);
+    for ancestor in start.ancestors() {
+        if ancestor.join(".git").exists() {
+            return ancestor.to_path_buf();
+        }
+    }
+    start.to_path_buf()
 }
 
 fn print_outcome(label: &str, outcome: &VerifyOutcome) -> ExitCode {
