@@ -1,6 +1,169 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:087bb6fb1d030d6fcb95f1f6721d6bfe64c5b7eeee5ecf595b83fe35b3085de2",
+          "at": "2026-04-12T02:41:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:087bb6fb1d030d6fcb95f1f6721d6bfe64c5b7eeee5ecf595b83fe35b3085de2",
+          "at": "2026-04-12T02:43:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84477470d3cbfd1e36985fae18115d17faafe0ffb14ca02b3b42f773ac4d6483",
+          "at": "2026-04-12T02:50:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84477470d3cbfd1e36985fae18115d17faafe0ffb14ca02b3b42f773ac4d6483",
+          "at": "2026-04-12T02:52:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:00:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check_domain_types_signals()` is documented as a single gate where any Red signal, including undeclared reverse signals, must fail, but the new tests only exercise Red on a declared entry. There is no domain-level regression test for an undeclared reverse Red signal, so a future refactor that accidentally limits the Red check to declared entries would still pass this suite.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 2276,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:03:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:04:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Yellow branch message omits the remediation hint required for this Stage 2 gate. It reports that the merge gate will block, but unlike the Stage 1 warning it never tells the caller how to turn Yellow into Blue, so the user-visible contract in the briefing/ADR is not met.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 1055,
+              "category": "requirements"
+            },
+            {
+              "message": "The new tests never exercise a Red signal on an undeclared reverse entry. That special case is the key distinction in the ADR ('Red over all signals, Yellow over declared only'), so a regression that accidentally limits the Red gate to declared entries would still pass this suite.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 2276,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:07:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
+          "at": "2026-04-12T03:09:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
+          "at": "2026-04-12T03:13:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Yellow-stage message does not include the ADR-required upgrade hint for how to resolve the warning before merge. At this line it only says the merge gate will block `until resolved`, so callers lose the actionable guidance promised in D8.6 / the review brief for declared Yellow findings.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 1056,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
+          "at": "2026-04-12T03:15:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The declared-Yellow branch does not include the required upgrade hint in its warning/error text. The briefing/ADR requires Yellow findings to name the declared types and tell callers how to upgrade them before merge, but this message only says the merge gate will block `until resolved`, so users lose the actionable remediation contract in both strict and interim modes.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 1055,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
+          "at": "2026-04-12T03:17:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Yellow-gate message hardcodes \"Implement the listed type(s)\" as the remediation, but Yellow is also emitted for valid `Delete` entries that are still present in code. In that case the correct fix is to remove the type, not implement it, so the gate will return misleading guidance for a supported domain-type workflow.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 1056,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:dfd2a3949710ce4bac82013b5be758e6576be7cafae4908bd96ff696bcb72f4b",
+          "at": "2026-04-12T03:19:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd1595f0bd3b2773962215a516a5aa696f255fa66de0afd3af7d95c95ec397f4",
+          "at": "2026-04-12T03:20:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13025cc11de9c96b3633dba0f57fbd206ecafe976239d94f4656e78986f0fd1a",
+          "at": "2026-04-12T03:25:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13025cc11de9c96b3633dba0f57fbd206ecafe976239d94f4656e78986f0fd1a",
+          "at": "2026-04-12T03:26:08Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -419,6 +582,38 @@
           "findings": [],
           "hash": "rvw1:sha256:071871c1942a34adb9760eabed85af132628b5419092912cb06dc1a3afbff1bd",
           "at": "2026-04-12T05:36:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db96cc174baf078790c7fae03207b0d35023f8a4650f06c3bae9f1f8b85ca966",
+          "at": "2026-04-12T05:40:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db96cc174baf078790c7fae03207b0d35023f8a4650f06c3bae9f1f8b85ca966",
+          "at": "2026-04-12T05:41:07Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be538119ccc604fe5e6d5704cb94c42be0a7fce0337ec71328a3fe26524b46d3",
+          "at": "2026-04-12T04:56:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be538119ccc604fe5e6d5704cb94c42be0a7fce0337ec71328a3fe26524b46d3",
+          "at": "2026-04-12T04:59:02Z"
         }
       ]
     },
@@ -536,187 +731,6 @@
           "findings": [],
           "hash": "rvw1:sha256:ca4d347c72a59d0b63878bba9b00d3b79cb664d236b3d2bd68d1529487c839a6",
           "at": "2026-04-12T04:24:55Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:087bb6fb1d030d6fcb95f1f6721d6bfe64c5b7eeee5ecf595b83fe35b3085de2",
-          "at": "2026-04-12T02:41:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:087bb6fb1d030d6fcb95f1f6721d6bfe64c5b7eeee5ecf595b83fe35b3085de2",
-          "at": "2026-04-12T02:43:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:84477470d3cbfd1e36985fae18115d17faafe0ffb14ca02b3b42f773ac4d6483",
-          "at": "2026-04-12T02:50:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:84477470d3cbfd1e36985fae18115d17faafe0ffb14ca02b3b42f773ac4d6483",
-          "at": "2026-04-12T02:52:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
-          "at": "2026-04-12T03:00:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`check_domain_types_signals()` is documented as a single gate where any Red signal, including undeclared reverse signals, must fail, but the new tests only exercise Red on a declared entry. There is no domain-level regression test for an undeclared reverse Red signal, so a future refactor that accidentally limits the Red check to declared entries would still pass this suite.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 2276,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
-          "at": "2026-04-12T03:03:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
-          "at": "2026-04-12T03:04:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Yellow branch message omits the remediation hint required for this Stage 2 gate. It reports that the merge gate will block, but unlike the Stage 1 warning it never tells the caller how to turn Yellow into Blue, so the user-visible contract in the briefing/ADR is not met.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 1055,
-              "category": "requirements"
-            },
-            {
-              "message": "The new tests never exercise a Red signal on an undeclared reverse entry. That special case is the key distinction in the ADR ('Red over all signals, Yellow over declared only'), so a regression that accidentally limits the Red gate to declared entries would still pass this suite.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 2276,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
-          "at": "2026-04-12T03:07:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4268f973c7790aaed3c8268612297ba2fce0797f27dc4492005f625f8ffe1302",
-          "at": "2026-04-12T03:09:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
-          "at": "2026-04-12T03:13:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new Yellow-stage message does not include the ADR-required upgrade hint for how to resolve the warning before merge. At this line it only says the merge gate will block `until resolved`, so callers lose the actionable guidance promised in D8.6 / the review brief for declared Yellow findings.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 1056,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
-          "at": "2026-04-12T03:15:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The declared-Yellow branch does not include the required upgrade hint in its warning/error text. The briefing/ADR requires Yellow findings to name the declared types and tell callers how to upgrade them before merge, but this message only says the merge gate will block `until resolved`, so users lose the actionable remediation contract in both strict and interim modes.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 1055,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:b3d3daf696bfc84ae3f1736d565adcfcc41cfc30e811e15ac32421ebe3aff164",
-          "at": "2026-04-12T03:17:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new Yellow-gate message hardcodes \"Implement the listed type(s)\" as the remediation, but Yellow is also emitted for valid `Delete` entries that are still present in code. In that case the correct fix is to remove the type, not implement it, so the gate will return misleading guidance for a supported domain-type workflow.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 1056,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:dfd2a3949710ce4bac82013b5be758e6576be7cafae4908bd96ff696bcb72f4b",
-          "at": "2026-04-12T03:19:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fd1595f0bd3b2773962215a516a5aa696f255fa66de0afd3af7d95c95ec397f4",
-          "at": "2026-04-12T03:20:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13025cc11de9c96b3633dba0f57fbd206ecafe976239d94f4656e78986f0fd1a",
-          "at": "2026-04-12T03:25:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13025cc11de9c96b3633dba0f57fbd206ecafe976239d94f4656e78986f0fd1a",
-          "at": "2026-04-12T03:26:08Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:be538119ccc604fe5e6d5704cb94c42be0a7fce0337ec71328a3fe26524b46d3",
-          "at": "2026-04-12T04:56:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:be538119ccc604fe5e6d5704cb94c42be0a7fce0337ec71328a3fe26524b46d3",
-          "at": "2026-04-12T04:59:02Z"
         }
       ]
     },

@@ -264,9 +264,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "5869375dae583da7b834181812493ca72e696536",
       "description": "docs: CI 統合回帰テスト I1–I11 を手動実行 + verification.md に結果記録",
       "id": "T013",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "docs: knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md を Proposed → Accepted に更新",
@@ -275,5 +276,5 @@
     }
   ],
   "title": "Strict Spec Signal Gate v2 — Yellow blocks merge (fail-closed)",
-  "updated_at": "2026-04-12T05:11:57Z"
+  "updated_at": "2026-04-12T05:38:23Z"
 }

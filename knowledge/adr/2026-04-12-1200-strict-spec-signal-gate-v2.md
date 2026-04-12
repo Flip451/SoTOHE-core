@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed
+Accepted (implemented in track `strict-signal-gate-v2-2026-04-12`, 2026-04-12)
 
 ## Context
 
