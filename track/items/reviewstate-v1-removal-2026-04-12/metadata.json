@@ -1,0 +1,138 @@
+{
+  "branch": "track/reviewstate-v1-removal-2026-04-12",
+  "created_at": "2026-04-12T18:00:00Z",
+  "id": "reviewstate-v1-removal-2026-04-12",
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "ADR knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md を Proposed で作成する (本トラック起点に既設)。",
+          "knowledge/adr/README.md の索引に本 ADR (2026-04-12-1800-reviewstate-v1-decommission.md) を追加する (ドメインモデル・型設計セクションが自然な配置先)。",
+          ".claude/rules/10-guardrails.md の 'Review Escalation Threshold (Enforced by sotp review record-round)' セクション (行 95-163) を削除し、sotp review record-round / sotp review resolve-escalation への言及を全て除去する (D10)。",
+          "knowledge/strategy/TODO.md の RVW-54 から set-approved-head / persist_approved_head 言及部分のみ削除する (D10)。RVW-52 / RVW-53 / RVW-55 の obsolete/done マークは T002 のコミットで、RV2-07 の done マークは T005 のコミットで行う (コードが実際に削除された後に status を変更する)。",
+          "knowledge/DESIGN.md に V1 review state への言及があれば grep で検出して削除する (D10)。",
+          "knowledge/conventions/hexagonal-architecture.md の RecordRoundProtocol / ReviewJsonReader への参照を削除する (D10 — 削除後は dead reference となるため)。",
+          "knowledge/conventions/security.md の FsReviewJsonStore への参照を削除する (D10 — 削除後は dead reference となるため)。"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "docs: ADR 起点 + guardrails + TODO.md + DESIGN.md + conventions 整理"
+      },
+      {
+        "description": [
+          "apps/cli/src/commands/review/mod.rs の ReviewCommand::ResolveEscalation variant + ResolveEscalationArgs + execute_resolve_escalation + run_resolve_escalation を削除する (D3)。",
+          "apps/cli/src/commands/review/mod.rs の run_check_approved 内 fail-closed escalation gate (track.review().escalation().phase() == Blocked の if let ブロック、行 310-329) を削除する (D3)。",
+          "apps/cli/src/commands/review/mod.rs の ReviewCommand::SetApprovedHead variant + SetApprovedHeadArgs + execute_set_approved_head + run_set_approved_head を削除する (D6)。",
+          "apps/cli/src/commands/make.rs の persist_approved_head 関数 + dispatch_commit_from_file 内の呼び出し (行 564-566) + 関連 use 文を削除する (D6)。",
+          "この時点で cargo check (CLI only) が通り、CLI 層から V1 review 系統 への参照が消えたことを確認する。"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "cli: ResolveEscalation / SetApprovedHead / check_approved gate / persist_approved_head 削除"
+      },
+      {
+        "description": [
+          "libs/usecase/src/review_workflow/usecases.rs をファイルごと削除する (RecordRoundProtocol trait, RecordRoundProtocolError, record_round, record_round_typed, RecordRoundInput, RecordRoundError, resolve_escalation, ResolveEscalationInput, validation helpers, および対応するユニットテスト) (D3 / D4)。",
+          "libs/usecase/src/review_workflow/scope.rs をファイルごと削除する (DiffScope, DiffScopeProvider, DiffScopeProviderError, FindingScopeClass, RepoRelativePath, ScopeFilterResult, ScopeFilteredPayload, apply_scope_filter, classify_finding_scope, partition_findings_by_scope およびテスト) — module 外参照ゼロを事前 grep で確認済み (D4)。",
+          "libs/usecase/src/review_workflow/mod.rs を prune: mod usecases; / mod scope; の宣言と対応する pub use を除去し、verdict モジュールと再エクスポートのみ残す (D4)。",
+          "libs/usecase/src/review_workflow/verdict.rs 行 185/193 の domain::review::extract_verdict_json_candidates_compact / _multiline 呼び出しを domain::review_v2::extract_verdict_json_candidates_* に切り替える (D8)。",
+          "cargo check (usecase only) が通り、CLI → usecase パスで未使用 import が残っていないことを確認する。"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "usecase: usecases.rs / scope.rs 全削除 + mod.rs prune + verdict.rs import 切替"
+      },
+      {
+        "description": [
+          "libs/infrastructure/src/git_cli/mod.rs の GitRepository trait から index_tree_hash_normalizing メソッドを削除 + default impl 削除 + SystemGitRepo の 10 ステップ実装 (行 216-387) を削除する (D5)。",
+          "libs/infrastructure/src/git_cli/private_index.rs の normalized_tree_hash メソッドを削除する。PrivateIndex 本体が他で未使用ならファイルごと削除する (D5)。",
+          "libs/infrastructure/src/git_cli/mod.rs の V1 integration tests (integration_full_protocol_record_set_check / integration_source_code_change_fails_check_approved / integration_review_status_tamper_fails_check_approved / integration_first_round_no_prior_code_hash_succeeds / integration_pre_update_freshness_check_detects_code_change_between_rounds / integration_updated_at_variation_does_not_affect_hash / integration_multi_group_btreemap_produces_stable_hash) + index_tree_hash_normalizing_* ユニットテスト + rrz test helper を削除する (D5)。",
+          "libs/infrastructure/src/review_json_codec.rs ファイルを削除する (D2)。",
+          "libs/infrastructure/src/review_json_store.rs ファイルを削除する (D2)。",
+          "libs/infrastructure/src/lib.rs の pub mod review_json_codec; / pub mod review_json_store; を除去する (D2)。",
+          "libs/infrastructure/src/track/codec.rs の TrackDocumentV2.review field + TrackReviewDocument / ReviewGroupDocument / ReviewRoundDocument / TrackReviewEscalationDocument / EscalationPhaseDocument / ReviewCycleDocument / ConcernStreakDocument / ResolutionDocument DTO 群 + review_from_document / review_to_document / escalation_* / parse_review_status / parse_round_type / parse_escalation_decision / escalation_decision_to_str ヘルパー + V1 codec テストを削除する (D1)。#[serde(flatten)] extra は保持し、既存 30 metadata.json の review フィールドは extra 経由で素通しさせる (D9)。",
+          "D9 passthrough 検証: 既存テストが review blob を含む JSON の roundtrip を網羅していない場合は、unknown review フィールドを TrackDocumentV2 として serialize → deserialize する roundtrip ユニットテストを libs/infrastructure/src/track/codec.rs に追加する (D9 保証の維持)。",
+          "cargo check (infrastructure only) が通り、infra 層から V1 review 系統への参照が消えたことを確認する。"
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "infra: git_cli index_tree_hash_normalizing + review_json_{codec,store} + track/codec V1 DTO 削除"
+      },
+      {
+        "description": [
+          "libs/domain/src/review_v2/types.rs に RoundType enum (Fast/Final, strum::Display + strum::EnumString) を追加し、libs/domain/src/review_v2/mod.rs から pub use する (D7)。",
+          "libs/domain/src/review/state.rs をファイルごと削除する (D1)。",
+          "libs/domain/src/review/escalation.rs をファイルごと削除する (D3)。",
+          "libs/domain/src/review/concern.rs をファイルごと削除する (ReviewConcern / ReviewConcernStreak / ReviewCycleSummary / file_path_to_concern — いずれも V1 のみ使用) (D3)。",
+          "libs/domain/src/review/types.rs をファイルごと削除する (V1 Verdict / CodeHash / ApprovedHead / ReviewStatus / RoundType / ReviewRoundResult / ReviewGroupState / extract_verdict_json_candidates_*) (D8)。",
+          "libs/domain/src/review/cycle/ ディレクトリをまるごと削除する (ReviewJson / ReviewCycle / CycleGroupState / GroupRound / GroupRoundOutcome / GroupRoundVerdict / NonEmptyFindings (v1) / StoredFinding / CycleError / ReviewStalenessReason) (D2)。",
+          "libs/domain/src/review/error.rs をファイルごと削除する (ReviewError — V1 のみ使用) (D8)。",
+          "libs/domain/src/review/mod.rs を prune: V1 sub-module 宣言 (pub mod concern; / pub mod cycle; / pub mod error; / pub mod escalation; / pub mod state; / pub mod types;) と全 V1 pub use を除去する。file 自体が空になるなら削除する (D1 / D2 / D3 / D8)。",
+          "libs/domain/src/lib.rs から V1 re-export (ApprovedHead / CodeHash / CycleError / CycleGroupState / EscalationPhase / GroupRound / GroupRoundOutcome / GroupRoundVerdict / NonEmptyFindings / ReviewConcern / ReviewConcernStreak / ReviewCycle / ReviewCycleSummary / ReviewError / ReviewEscalationBlock / ReviewEscalationDecision / ReviewEscalationResolution / ReviewEscalationState / ReviewGroupState / ReviewJson / ReviewRoundResult / ReviewStalenessReason / ReviewState / ReviewStatus / RoundType / StoredFinding / Verdict / extract_verdict_json_candidates_* / file_path_to_concern) を削除し、RoundType は pub use review_v2::RoundType; として公開する。",
+          "libs/domain/src/track.rs の TrackMetadata.review field + review() / review_mut() / set_review() アクセサ + with_branch ctor の review: None 初期化を削除する (D1)。",
+          "libs/domain/src/repository.rs から ReviewJsonReader / ReviewJsonWriter port trait を削除する (D2)。",
+          "apps/cli/src/commands/review/codex_local.rs および apps/cli/src/commands/review/mod.rs の domain::RoundType import を domain::review_v2::RoundType (または domain::RoundType pub use 経由で変更不要なら据え置き) に切り替える (D7)。",
+          "cargo make ci が track branch 上で PASS することを確認する。",
+          "bin/sotp track baseline-capture --force <active-track-id> を実行し、ログに ReviewState 同名衝突 warning が出ないことを確認する (TDDD-01 ブロッカー解消の根本確認)。",
+          "bin/sotp track domain-type-signals <active-track-id> を実行し、baseline_changed_type に ReviewState エントリが出ないことを確認する (D1 の目的達成確認)。",
+          "knowledge/adr/2026-04-12-1800-reviewstate-v1-decommission.md の Status を Proposed から Accepted に更新する。"
+        ],
+        "id": "S5",
+        "task_ids": [
+          "T005"
+        ],
+        "title": "domain: review/ 全 V1 削除 + RoundType 移設 + TrackMetadata.review 削除 + ReviewJson ports 削除 + CI / baseline 検証 + ADR Accepted 化"
+      }
+    ],
+    "summary": [
+      "ADR 2026-04-04-1456 (Review System v2 Redesign, Accepted) が廃止宣言した V1 review 系統の残存部分を一括撤去する。TDDD-01 baseline reverse check の ReviewState 同名衝突 (V1 struct vs V2 enum) を構造的に解消することが直接の動機だが、V2 移行の最終クリーンアップとして index_tree_hash_normalizing / RecordRoundProtocol / resolve_escalation CLI / set-approved-head CLI を含む ~7000 行の dead code を削除する。",
+      "新規コードはほぼゼロで、RoundType を review/types.rs から review_v2/types.rs に移設する 1 箇所と、usecase::review_workflow::verdict.rs の extract_verdict_json_candidates_* を V2 側に向ける import 切替のみ。残りは純粋な削除。",
+      "escalation (3 連続 closed cycle 自動 block 機構) は V2 に未実装のため暫定喪失となる。V2 再実装は RV2-06 として別トラックで扱う。既存 30 track/items/*/metadata.json の review section は migrate せず、codec 側の #[serde(flatten)] extra が opaque JSON として吸収する (後方互換は追跡しない方針)。",
+      "依存順で CLI → usecase → infra → domain の順にタスク分割し、各タスク境界で cargo check が通ることを確認しながら進める。最終 T005 で cargo make ci + bin/sotp track baseline-capture + bin/sotp track domain-type-signals を走らせ、TDDD-01 のブロッカーが消えたことを回帰確認する。"
+    ]
+  },
+  "schema_version": 3,
+  "status": "planned",
+  "tasks": [
+    {
+      "commit_hash": null,
+      "description": "docs: ADR 2026-04-12-1800-reviewstate-v1-decommission.md 作成 (Proposed) + knowledge/adr/README.md の索引に本 ADR 追加 + .claude/rules/10-guardrails.md の Review Escalation Threshold セクション削除 + knowledge/strategy/TODO.md の RVW-54 から set-approved-head 言及のみ削除 (TODO.md の done/obsolete マークは当該コードを削除するタスクのコミットで行う: T002 で RVW-52/53/55、T005 で RV2-07) + knowledge/DESIGN.md の V1 review 言及 grep cleanup + knowledge/conventions/hexagonal-architecture.md の RecordRoundProtocol / ReviewJsonReader 参照削除 + knowledge/conventions/security.md の FsReviewJsonStore 参照削除",
+      "id": "T001",
+      "status": "todo"
+    },
+    {
+      "commit_hash": null,
+      "description": "cli: apps/cli/src/commands/review/mod.rs の ResolveEscalation サブコマンド + check_approved 内 escalation fail-closed gate + SetApprovedHead サブコマンド を削除 + apps/cli/src/commands/make.rs の persist_approved_head 関数と dispatch_commit_from_file 内の呼び出し削除 + knowledge/strategy/TODO.md の RVW-52 obsolete マーク / RVW-53 obsolete マーク / RVW-55 done マーク (コードを削除した同一コミットで行う)",
+      "id": "T002",
+      "status": "todo"
+    },
+    {
+      "commit_hash": null,
+      "description": "usecase: libs/usecase/src/review_workflow/usecases.rs + scope.rs 全削除 + review_workflow/mod.rs prune (verdict モジュールのみ残す) + verdict.rs 行 185/193 の domain::review::extract_verdict_json_candidates_* 呼び出しを domain::review_v2::extract_verdict_json_candidates_* に切り替え",
+      "id": "T003",
+      "status": "todo"
+    },
+    {
+      "commit_hash": null,
+      "description": "infra: libs/infrastructure/src/git_cli/mod.rs から index_tree_hash_normalizing trait method + SystemGitRepo impl + 関連ユニット/統合テスト + rrz test helper 削除 + private_index.rs::normalized_tree_hash 削除 (PrivateIndex が dead なら file ごと削除) + review_json_codec.rs + review_json_store.rs ファイル削除 + infrastructure/lib.rs re-export prune + track/codec.rs の TrackDocumentV2.review field + V1 review DTO tree + helpers + V1 codec tests 削除 (#[serde(flatten)] extra は保持して 30 metadata.json の review は素通し) + 既存テストが review blob roundtrip を網羅していない場合は D9 passthrough を確認するユニットテストを追加する (V1 codec tests 削除後も roundtrip 保証が残ること)",
+      "id": "T004",
+      "status": "todo"
+    },
+    {
+      "commit_hash": null,
+      "description": "domain: review_v2/types.rs に RoundType を追加 + review/state.rs + escalation.rs + concern.rs + types.rs + cycle/ + error.rs 削除 + review/mod.rs prune + lib.rs V1 re-export 削除 + track.rs の TrackMetadata.review field と accessors と ctor init 削除 + repository.rs から ReviewJsonReader/ReviewJsonWriter 削除 + apps/cli 側の domain::RoundType import 調整 + cargo make ci PASS 確認 + bin/sotp track baseline-capture + domain-type-signals で ReviewState 同名衝突消滅を回帰確認 + ADR Status を Accepted に更新 + knowledge/strategy/TODO.md の RV2-07 done マーク (V1 domain コード全体削除の同一コミットで行う)",
+      "id": "T005",
+      "status": "todo"
+    }
+  ],
+  "title": "Review System V1 完全撤去 — metadata.json review + V1 review.json codec + escalation + index_tree_hash_normalizing",
+  "updated_at": "2026-04-12T18:00:00Z"
+}
