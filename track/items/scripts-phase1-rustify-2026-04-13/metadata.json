@@ -159,7 +159,7 @@
     {
       "description": "[Cleanup] `scripts/track_registry.py` と `scripts/test_track_registry.py` を削除する。`Makefile.toml:109-128` の `scripts-selftest-local` args リストから `scripts/test_track_registry.py` を除外する。重要: `scripts/test_track_resolution.py:47` の `test_package_style_imports_work_from_repo_root` テストが `import sys; sys.path = ['.', *sys.path]; import scripts.track_resolution, scripts.track_registry, scripts.external_guides` を含む。`track_registry.py` 削除と同じコミット内で、この import 文から `scripts.track_registry` を除外する修正 (`scripts.track_resolution, scripts.external_guides` のみ残す) を本 task に含める。`track_registry.py` 自身は `track_schema` と `atomic_write` に依存するが、ファイル全体を削除するため依存ごと消える (track_schema.py / atomic_write.py 自体はフェーズ 2/3 対象で本 track では touch しない)。`cargo make scripts-selftest` が pass することを確認する。",
       "id": "T013",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "[Test] `apps/cli/tests/transition_integration.rs` を新規作成し、`scripts/test_track_state_machine.py` が持つ CLI level regression の 5 観点を Rust integration test として移植する。移植対象の観点カテゴリ: (a) `transition` サブコマンドの正常系 (status 更新 + metadata.json persistence の確認), (b) 不正な status 遷移の拒否, (c) 存在しない / 不正なパスを渡したときのエラー終了, (d) `--commit-hash` による commit hash の done 状態での persistence, (e) `views sync` サブコマンドが plan.md / registry.md を render すること。実装時に `scripts/test_track_state_machine.py` を `grep 'def test_'` で実際の test 関数名を確認し、各 regression の expected behavior (assertion 内容, stdout/stderr, exit code) を Python source から読み取った上で Rust 側に相当するテストを書く (planning 段階では具体的な Python 関数名・アサーション内容の転記を避け、実装時判断に委ねる)。Rust 側の `execute_transition()` (`apps/cli/src/commands/track/transition.rs`) と `execute_views()` (`apps/cli/src/commands/track/views.rs`) は既に実装済みのため、テスト追加のみで pass する見込み。実装方針: `assert_cmd` または `std::process::Command` + `Command::cargo_bin('sotp')` を使い tempdir で `<tmp>/track/items/<id>/metadata.json` を含む project-root 構造を作成して sotp process を spawn する。`--items-dir` は `<project-root>/track/items` の形でないと arg-shape guard で reject される、`views sync` は `--project-root` を使う、等の CLI 契約の詳細は `apps/cli/src/commands/track/mod.rs` と `transition.rs` / `views.rs` の最新実装を実装時に直接読んで反映する。`apps/cli/Cargo.toml` の dev-dependencies に `assert_cmd` が未登録のため、必要なら `cargo add -p cli --dev assert_cmd` で追加する (workspace virtual root からは `-p cli` で package 指定が必要、`tempfile` は既登録)。",
@@ -183,5 +183,5 @@
     }
   ],
   "title": "scripts/ Python ヘルパー削減 フェーズ1 — track_branch_guard / markdown / registry / state_machine の Rust 移植",
-  "updated_at": "2026-04-13T14:26:38Z"
+  "updated_at": "2026-04-13T14:43:26Z"
 }

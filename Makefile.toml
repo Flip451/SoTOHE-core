@@ -119,7 +119,6 @@ args = [
   "scripts/test_convention_docs.py",
   "scripts/test_external_guides.py",
   "scripts/test_make_wrappers.py",
-  "scripts/test_track_registry.py",
   "scripts/test_track_resolution.py",
 ]
 
