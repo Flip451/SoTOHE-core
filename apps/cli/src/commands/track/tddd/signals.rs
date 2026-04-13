@@ -89,20 +89,16 @@ pub fn execute_type_signals(
     let bindings = resolve_layers(&workspace_root, layer.as_deref())?;
 
     // Phase 1 behavior: only the `domain` layer is fully wired to a
-    // catalogue file path and signal evaluator. Other enabled layers (e.g.,
-    // `usecase`) are detected and rejected fail-closed so that a no-filter
-    // invocation can never silently skip an enabled catalogue.
+    // catalogue file path and signal evaluator. Other enabled layers (e.g.
+    // `usecase`) produce an explicit stderr warning and are skipped so
+    // that callers are NOT silently deceived into thinking those layers
+    // were evaluated. This matches the "process enabled layers" contract
+    // (no-filter path), while keeping the Phase 1 single-layer scope.
     //
-    // * If `--layer <id>` was supplied and the binding is not `domain`, we
-    //   return a clear error.
-    // * If no filter was supplied and `architecture-rules.json` contains any
-    //   non-`domain` `tddd.enabled` layer, we return an error asking the
-    //   caller to re-run with `--layer domain` explicitly (which acknowledges
-    //   the single-layer scope) or to disable the extra layers.
-    // * If the `domain` layer is not present in the resolved bindings at all
-    //   (i.e., `tddd.enabled = false` on the domain entry, or no layers are
-    //   enabled), we fail-closed rather than running the single-layer
-    //   evaluator against an opted-out layer.
+    // * `--layer <id>` with `id != "domain"` → fail-closed (Phase 2 wires it).
+    // * `--layer domain` → run domain regardless of other layers' state.
+    // * No filter → run domain if enabled, warn+skip every non-domain
+    //   enabled layer, and fail-closed when domain is not enabled.
     let non_domain_enabled: Vec<&str> =
         bindings.iter().map(|b| b.layer_id()).filter(|id| *id != "domain").collect();
     let has_domain = bindings.iter().any(|b| b.layer_id() == "domain");
@@ -115,14 +111,18 @@ pub fn execute_type_signals(
                  Re-run with `--layer domain`."
             )));
         }
-    } else if !non_domain_enabled.is_empty() {
-        return Err(CliError::Message(format!(
-            "architecture-rules.json has tddd.enabled layers that are not yet supported \
-             by `type-signals` in Phase 1: {joined}. Re-run with `--layer domain` to \
-             acknowledge the single-layer scope, or set `tddd.enabled = false` on the \
-             non-domain layers.",
-            joined = non_domain_enabled.join(", ")
-        )));
+        // `--layer domain` explicitly selected — proceed regardless of
+        // other layers' state. Those layers are caller-acknowledged.
+    } else {
+        // No filter — visible warning for each non-domain enabled layer.
+        for layer_id in &non_domain_enabled {
+            eprintln!(
+                "[WARN] layer '{layer_id}' is tddd.enabled in architecture-rules.json but \
+                 is not yet supported by `type-signals` in Phase 1. \
+                 Skipping this layer; run `sotp track type-signals <id> --layer {layer_id}` \
+                 once Phase 2 wires it."
+            );
+        }
     }
 
     if !has_domain {

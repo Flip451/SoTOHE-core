@@ -54,7 +54,7 @@ pub fn execute_baseline_capture(
     // domain (or deleted the rules file entirely), capturing a baseline for
     // an inactive layer would overwrite `domain-types-baseline.json` on a
     // layer the rest of the pipeline treats as opted out. Reject the run.
-    enforce_domain_tddd_enabled(&workspace_root)?;
+    enforce_domain_tddd_enabled(&workspace_root, layer.as_deref())?;
 
     let _valid_id = domain::TrackId::try_new(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
@@ -154,22 +154,22 @@ pub fn execute_baseline_capture(
     Ok(ExitCode::SUCCESS)
 }
 
-/// Fails closed on two Phase 1 invariants:
-///
-/// 1. `domain` must be `tddd.enabled=true` in `architecture-rules.json` —
-///    otherwise `baseline-capture` would overwrite `domain-types-baseline.json`
-///    for a layer the rest of the pipeline treats as opted out.
-///
-/// 2. No layer other than `domain` may be `tddd.enabled=true`. Phase 1
-///    only wires the `domain` layer; if `usecase` / `infrastructure` / `cli`
-///    were also enabled, a no-filter `baseline-capture` invocation would
-///    capture only the domain baseline and silently leave other enabled
-///    layers without a baseline. The caller must either disable those
-///    layers or wait for Phase 2 wiring.
+/// Fails closed unless `domain` is `tddd.enabled=true` in
+/// `architecture-rules.json`. Non-domain enabled layers produce a stderr
+/// warning when `--layer` is omitted, mirroring the `type-signals`
+/// behavior: Phase 1 wires only domain, so extra layers are skipped with
+/// an explicit warning rather than silently or fail-closed.
 ///
 /// When the rules file does not exist we allow the legacy fallback (there
 /// is nothing to contradict).
-fn enforce_domain_tddd_enabled(workspace_root: &std::path::Path) -> Result<(), CliError> {
+///
+/// `layer_filter` is `Some("domain")` when the caller asked for domain
+/// explicitly — in that case no warning is printed for other layers
+/// (the caller already acknowledged the single-layer scope).
+fn enforce_domain_tddd_enabled(
+    workspace_root: &std::path::Path,
+    layer_filter: Option<&str>,
+) -> Result<(), CliError> {
     let rules_path = workspace_root.join("architecture-rules.json");
     if !rules_path.is_file() {
         return Ok(());
@@ -182,20 +182,25 @@ fn enforce_domain_tddd_enabled(workspace_root: &std::path::Path) -> Result<(), C
         return Err(CliError::Message(
             "`domain` is not tddd.enabled in architecture-rules.json. baseline-capture \
              refuses to write domain-types-baseline.json for an opted-out layer. \
-             Enable `domain.tddd.enabled = true` or remove `--layer domain`."
+             Enable `domain.tddd.enabled = true` or run a Phase 2 command for the \
+             active layers."
                 .to_owned(),
         ));
     }
-    let non_domain: Vec<&str> =
-        bindings.iter().map(|b| b.layer_id()).filter(|id| *id != "domain").collect();
-    if !non_domain.is_empty() {
-        return Err(CliError::Message(format!(
-            "architecture-rules.json has tddd.enabled layers that are not yet supported \
-             by `baseline-capture` in Phase 1: {joined}. Disable those layers \
-             (`tddd.enabled = false`) or wait for Phase 2 wiring before running \
-             `baseline-capture`.",
-            joined = non_domain.join(", ")
-        )));
+    // Only warn about non-domain layers when the caller did NOT explicitly
+    // select `--layer domain` — an explicit domain filter is a conscious
+    // choice to run only the domain baseline, and the warning would be
+    // noise.
+    if layer_filter != Some("domain") {
+        let non_domain: Vec<&str> =
+            bindings.iter().map(|b| b.layer_id()).filter(|id| *id != "domain").collect();
+        for layer_id in &non_domain {
+            eprintln!(
+                "[WARN] layer '{layer_id}' is tddd.enabled in architecture-rules.json but \
+                 is not yet supported by `baseline-capture` in Phase 1. \
+                 Skipping this layer; Phase 2 will add per-layer baseline capture."
+            );
+        }
     }
     Ok(())
 }
