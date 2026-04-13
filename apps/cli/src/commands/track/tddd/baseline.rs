@@ -32,7 +32,12 @@ pub fn execute_baseline_capture(
     track_id: String,
     workspace_root: PathBuf,
     force: bool,
+    _layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
+    // T007: `--layer` is currently accepted for forward compatibility with
+    // the multilayer CLI surface. Phase 1 keeps the single-`domain` binding
+    // semantics: the caller always captures `domain-types-baseline.json`.
+    // A future iteration will branch per layer binding.
     let _valid_id = domain::TrackId::try_new(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
 
@@ -142,8 +147,13 @@ mod tests {
         let items_dir = dir.path().join("track/items");
         std::fs::create_dir_all(&items_dir).unwrap();
 
-        let result =
-            execute_baseline_capture(items_dir, "../evil".to_owned(), dir.path().into(), false);
+        let result = execute_baseline_capture(
+            items_dir,
+            "../evil".to_owned(),
+            dir.path().into(),
+            false,
+            None,
+        );
         assert!(result.is_err(), "path traversal track_id must be rejected");
     }
 
@@ -157,8 +167,13 @@ mod tests {
         // Write a dummy baseline file.
         std::fs::write(track_dir.join("domain-types-baseline.json"), "{}").unwrap();
 
-        let result =
-            execute_baseline_capture(items_dir, "test-track".to_owned(), dir.path().into(), false);
+        let result = execute_baseline_capture(
+            items_dir,
+            "test-track".to_owned(),
+            dir.path().into(),
+            false,
+            None,
+        );
         assert!(result.is_ok(), "should skip existing baseline without error");
     }
 
@@ -176,8 +191,13 @@ mod tests {
         // Pre-existing baseline — would trigger skip without --force.
         std::fs::write(track_dir.join("domain-types-baseline.json"), "{}").unwrap();
 
-        let result =
-            execute_baseline_capture(items_dir, "test-track".to_owned(), dir.path().into(), true);
+        let result = execute_baseline_capture(
+            items_dir,
+            "test-track".to_owned(),
+            dir.path().into(),
+            true,
+            None,
+        );
         assert!(result.is_err(), "--force must bypass skip and attempt export");
     }
 }

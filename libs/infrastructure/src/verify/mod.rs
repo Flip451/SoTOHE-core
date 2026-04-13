@@ -21,6 +21,7 @@ pub mod spec_coverage;
 pub mod spec_frontmatter;
 pub mod spec_signals;
 pub mod spec_states;
+pub mod tddd_layers;
 pub mod tech_stack;
 pub mod trusted_root;
 pub mod usecase_purity;

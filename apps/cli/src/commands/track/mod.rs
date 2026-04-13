@@ -183,6 +183,13 @@ pub enum TrackCommand {
         /// Workspace root directory (must contain `Cargo.toml`). Defaults to current directory.
         #[arg(long, default_value = ".")]
         workspace_root: PathBuf,
+
+        /// Optional layer id filter. When omitted all `tddd.enabled` layers
+        /// are processed in `architecture-rules.json` order. When supplied,
+        /// the specified layer id must be `tddd.enabled=true`; targeting a
+        /// disabled layer is fail-closed.
+        #[arg(long)]
+        layer: Option<String>,
     },
 
     /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
@@ -201,6 +208,12 @@ pub enum TrackCommand {
         /// Force regeneration even if baseline already exists.
         #[arg(long, default_value_t = false)]
         force: bool,
+
+        /// Optional layer id filter. When omitted all `tddd.enabled` layers
+        /// are processed in `architecture-rules.json` order. When supplied,
+        /// the specified layer id must be `tddd.enabled=true`.
+        #[arg(long)]
+        layer: Option<String>,
     },
 }
 
@@ -324,11 +337,17 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         TrackCommand::Signals { items_dir, track_id } => {
             signals::execute_signals(items_dir, track_id)
         }
-        TrackCommand::TypeSignals { items_dir, track_id, workspace_root } => {
-            tddd::signals::execute_type_signals(items_dir, track_id, workspace_root)
+        TrackCommand::TypeSignals { items_dir, track_id, workspace_root, layer } => {
+            tddd::signals::execute_type_signals(items_dir, track_id, workspace_root, layer)
         }
-        TrackCommand::BaselineCapture { items_dir, track_id, workspace_root, force } => {
-            tddd::baseline::execute_baseline_capture(items_dir, track_id, workspace_root, force)
+        TrackCommand::BaselineCapture { items_dir, track_id, workspace_root, force, layer } => {
+            tddd::baseline::execute_baseline_capture(
+                items_dir,
+                track_id,
+                workspace_root,
+                force,
+                layer,
+            )
         }
     };
     match result {

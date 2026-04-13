@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed
+Accepted (implemented in track tddd-01-multilayer-2026-04-12, 2026-04-13)
 
 ## Context
 

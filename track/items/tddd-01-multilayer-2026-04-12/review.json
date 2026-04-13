@@ -1,67 +1,129 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
-          "at": "2026-04-13T00:20:35Z"
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-12T23:58:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new module docs tell consumers to import from `crate::tddd::*`, but `libs/domain/src/tddd/mod.rs` only publishes submodules and does not re-export these items. That leaves the documented import path dead immediately after this refactor; the actual re-exports live at the crate root via `libs/domain/src/lib.rs`.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 11,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-13T00:01:47Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
-          "at": "2026-04-13T00:21:01Z"
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-13T00:04:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db36c79eb63679aedaa6ecb594969b26c6faa93d54dd6165544ae26e727449db",
+          "at": "2026-04-13T00:08:26Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4bbb01e15dd280d5a47b568e28bcd059ff078ead7aeca28030bbf9d4e837f42a",
-          "at": "2026-04-13T00:35:21Z"
+          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
+          "at": "2026-04-13T00:34:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4bbb01e15dd280d5a47b568e28bcd059ff078ead7aeca28030bbf9d4e837f42a",
-          "at": "2026-04-13T00:36:36Z"
+          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
+          "at": "2026-04-13T00:35:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FunctionInfo::new` now accepts both `has_self_receiver` and `receiver`, but it does not enforce that they agree. That lets callers construct contradictory values such as `has_self_receiver = false` with `receiver = Some(\"&self\")`, and downstream code can silently filter or classify the method incorrectly. Derive one field from the other or validate the pair in the constructor.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 176,
+              "category": "typestate boundary leak"
+            }
+          ],
+          "hash": "rvw1:sha256:da8f3b6b5c46b93a19f63c5149fd922bd6087f0fb76884eaefbb3ec010c60c47",
+          "at": "2026-04-13T01:04:09Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3adad182f142f26704fa5b270f289520d84947315a10609dd1005f450ff27f55",
-          "at": "2026-04-13T01:58:39Z"
+          "hash": "rvw1:sha256:a2b05fad307e27cc9b14ee19d262a340e0cc56807b1bdc331b3f27a834fcc0e7",
+          "at": "2026-04-13T01:08:31Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3adad182f142f26704fa5b270f289520d84947315a10609dd1005f450ff27f55",
-          "at": "2026-04-13T01:59:29Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+          "hash": "rvw1:sha256:a2b05fad307e27cc9b14ee19d262a340e0cc56807b1bdc331b3f27a834fcc0e7",
+          "at": "2026-04-13T01:10:59Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a60e280eb3b13ef2d5320ffc9c92a6921a4b68e4156a20de6a32c088cb3ec427",
-          "at": "2026-04-13T00:34:57Z"
+          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
+          "at": "2026-04-13T01:37:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeNode::new` now stores `outgoing` verbatim instead of enforcing the previous invariant that transitions must be backed by the node's actual methods. Because `evaluate_typestate` trusts `outgoing()` directly, external callers can now fabricate typestate edges on a `TypeNode` and get false Blue/Red signal results that the old constructor would have filtered out.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 428,
+              "category": "behavior_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
+          "at": "2026-04-13T01:40:19Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a60e280eb3b13ef2d5320ffc9c92a6921a4b68e4156a20de6a32c088cb3ec427",
-          "at": "2026-04-13T00:36:17Z"
+          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
+          "at": "2026-04-13T01:42:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27f736706e773ee52c0e7b600ad55c0ebadc8d83cf072d6415aaef2b73cb6d9d",
+          "at": "2026-04-13T01:59:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27f736706e773ee52c0e7b600ad55c0ebadc8d83cf072d6415aaef2b73cb6d9d",
+          "at": "2026-04-13T02:00:56Z"
         }
       ]
     },
@@ -721,132 +783,209 @@
           "findings": [],
           "hash": "rvw1:sha256:a245d55752ad3a07d52c2350c34b8eb7c34f8d3d243f9a31ea4bfcd651310e06",
           "at": "2026-04-13T02:00:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 is still `todo` in the authoritative track metadata, so the lifecycle update for this change did not land and the generated plan entry remains unchecked.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 116,
+              "category": "logical contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c39eb18f90767ac9446087ae15e9d2477517c9b85c83d3d07db1f44d979f5356",
+          "at": "2026-04-13T03:13:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3376bbe436bbfd6c1bd2dfba97c25c4b6d02c8fc794a2eec6eb9adc3c275e56",
+          "at": "2026-04-13T03:15:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` still marks T007 as `in_progress`, but the ADR status now says this design is already \"implemented in track tddd-01-multilayer-2026-04-12\". Those two authoritative artifacts now disagree about whether the multilayer/TDDD work is complete, so downstream tooling or reviewers that trust track metadata will see the change as unfinished.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 116,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:f3376bbe436bbfd6c1bd2dfba97c25c4b6d02c8fc794a2eec6eb9adc3c275e56",
+          "at": "2026-04-13T03:17:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This generated plan is stale relative to `metadata.json` and the ADR: T007 is marked `done` in metadata, but the rendered plan still shows the task unchecked and keeps the old `2026-04-12` acceptance date. That leaves the track artifacts inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-01-multilayer-2026-04-12/plan.md",
+              "line": 48,
+              "category": "logical contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b740f4b9290f60b993810b06129164255bdec652c79ff23393d4728a5a25923d",
+          "at": "2026-04-13T03:19:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The track metadata still records the ADR acceptance date as `2026-04-12`, but the ADR status was updated to `2026-04-13`. Because `plan.md` is generated from this metadata, the rendered plan will stay inconsistent with the ADR until this date is corrected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 48,
+              "category": "logical contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:aff99ec5eaba6831ca8dade195ae6bbc712ad5640545a474da67e49ca181317b",
+          "at": "2026-04-13T03:20:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c582a5f8d5e19756ac180775bfcb0bc069f09be0d197da0ccb03e916f7ad31",
+          "at": "2026-04-13T03:21:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c582a5f8d5e19756ac180775bfcb0bc069f09be0d197da0ccb03e916f7ad31",
+          "at": "2026-04-13T03:23:33Z"
         }
       ]
     },
-    "domain": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
-          "at": "2026-04-12T23:58:59Z"
+          "hash": "rvw1:sha256:a60e280eb3b13ef2d5320ffc9c92a6921a4b68e4156a20de6a32c088cb3ec427",
+          "at": "2026-04-13T00:34:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a60e280eb3b13ef2d5320ffc9c92a6921a4b68e4156a20de6a32c088cb3ec427",
+          "at": "2026-04-13T00:36:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0fb36b24609319f2c1bf2c530de0c750d8269201ad9caf3b9110ca84d6eb9a7",
+          "at": "2026-04-13T03:12:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0fb36b24609319f2c1bf2c530de0c750d8269201ad9caf3b9110ca84d6eb9a7",
+          "at": "2026-04-13T03:14:10Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
+          "at": "2026-04-13T00:20:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
+          "at": "2026-04-13T00:21:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bbb01e15dd280d5a47b568e28bcd059ff078ead7aeca28030bbf9d4e837f42a",
+          "at": "2026-04-13T00:35:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bbb01e15dd280d5a47b568e28bcd059ff078ead7aeca28030bbf9d4e837f42a",
+          "at": "2026-04-13T00:36:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3adad182f142f26704fa5b270f289520d84947315a10609dd1005f450ff27f55",
+          "at": "2026-04-13T01:58:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3adad182f142f26704fa5b270f289520d84947315a10609dd1005f450ff27f55",
+          "at": "2026-04-13T01:59:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0562253acba4c68331bc5bfbb6af2ec69360027593cc457403420ec4962cebbf",
+          "at": "2026-04-13T03:13:12Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new module docs tell consumers to import from `crate::tddd::*`, but `libs/domain/src/tddd/mod.rs` only publishes submodules and does not re-export these items. That leaves the documented import path dead immediately after this refactor; the actual re-exports live at the crate root via `libs/domain/src/lib.rs`.",
+              "message": "`resolve_layers()` now admits every `tddd.enabled` binding from `architecture-rules.json`, but the new loop ignores each binding and still calls the hard-coded domain-only path. In the current authoritative `architecture-rules.json`, both `domain` and `usecase` are enabled, so `sotp track type-signals --layer usecase` silently evaluates and rewrites `domain-types.json` instead of `usecase-types.json`, and the unfiltered command runs the domain pass twice. That is a public behavior regression in the new `--layer` surface.",
               "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 11,
-              "category": "broken_reference"
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 95,
+              "category": "behavior regression"
             }
           ],
-          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
-          "at": "2026-04-13T00:01:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
-          "at": "2026-04-13T00:04:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db36c79eb63679aedaa6ecb594969b26c6faa93d54dd6165544ae26e727449db",
-          "at": "2026-04-13T00:08:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
-          "at": "2026-04-13T00:34:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
-          "at": "2026-04-13T00:35:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FunctionInfo::new` now accepts both `has_self_receiver` and `receiver`, but it does not enforce that they agree. That lets callers construct contradictory values such as `has_self_receiver = false` with `receiver = Some(\"&self\")`, and downstream code can silently filter or classify the method incorrectly. Derive one field from the other or validate the pair in the constructor.",
-              "severity": "P1",
-              "file": "libs/domain/src/schema.rs",
-              "line": 176,
-              "category": "typestate boundary leak"
-            }
-          ],
-          "hash": "rvw1:sha256:da8f3b6b5c46b93a19f63c5149fd922bd6087f0fb76884eaefbb3ec010c60c47",
-          "at": "2026-04-13T01:04:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2b05fad307e27cc9b14ee19d262a340e0cc56807b1bdc331b3f27a834fcc0e7",
-          "at": "2026-04-13T01:08:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2b05fad307e27cc9b14ee19d262a340e0cc56807b1bdc331b3f27a834fcc0e7",
-          "at": "2026-04-13T01:10:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
-          "at": "2026-04-13T01:37:15Z"
+          "hash": "rvw1:sha256:0562253acba4c68331bc5bfbb6af2ec69360027593cc457403420ec4962cebbf",
+          "at": "2026-04-13T03:16:13Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`TypeNode::new` now stores `outgoing` verbatim instead of enforcing the previous invariant that transitions must be backed by the node's actual methods. Because `evaluate_typestate` trusts `outgoing()` directly, external callers can now fabricate typestate edges on a `TypeNode` and get false Blue/Red signal results that the old constructor would have filtered out.",
+              "message": "`architecture-rules.json` in this repo currently has both `domain` and `usecase` as `tddd.enabled=true`, but `execute_type_signals` discards each resolved binding and always calls the hard-coded `execute_type_signals_single` path. That means `sotp track type-signals --layer usecase` still exports the `domain` crate and rewrites `domain-types.json`, and the no-filter path runs the same domain pass twice. This is a real behavior regression caused by the new layer-resolution flow relying on an authoritative artifact that no longer matches the Phase 1 assumption.",
               "severity": "P1",
-              "file": "libs/domain/src/schema.rs",
-              "line": 428,
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 89,
               "category": "behavior_regression"
             }
           ],
-          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
-          "at": "2026-04-13T01:40:19Z"
+          "hash": "rvw1:sha256:0562253acba4c68331bc5bfbb6af2ec69360027593cc457403420ec4962cebbf",
+          "at": "2026-04-13T03:17:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
-          "at": "2026-04-13T01:42:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:27f736706e773ee52c0e7b600ad55c0ebadc8d83cf072d6415aaef2b73cb6d9d",
-          "at": "2026-04-13T01:59:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:27f736706e773ee52c0e7b600ad55c0ebadc8d83cf072d6415aaef2b73cb6d9d",
-          "at": "2026-04-13T02:00:56Z"
+          "hash": "rvw1:sha256:ba3c2b654ca2f8a6ba7ca1da77ed14bbda7ea696dbd1ae7f7a8d10e44eb6b565",
+          "at": "2026-04-13T03:21:07Z"
         }
       ]
     },
@@ -1040,6 +1179,261 @@
           "findings": [],
           "hash": "rvw1:sha256:05bff59224f2a5e6fe63caec4391dac0f3ac6574f918ac058674feabf81221e0",
           "at": "2026-04-13T02:21:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`default_domain_binding()` uses `expect()` in non-test library code, so the fallback path taken when `architecture-rules.json` is absent can panic instead of returning a `Finding::error` if the embedded JSON or parser behavior ever changes. This violates the no-panics policy on a runtime code path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/spec_states.rs",
+              "line": 163,
+              "category": "panic"
+            }
+          ],
+          "hash": "rvw1:sha256:f6d45084cd410f4b14390c7fbf09b25253bd3c09349b1bf770faf5c9ea86118a",
+          "at": "2026-04-13T03:14:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`crate` and `catalogue_file` are accepted verbatim here and later used to build filesystem/git paths. Because neither field is constrained to a safe relative filename, a crafted `architecture-rules.json` can inject `../` or an absolute path and make the verifier/merge gate read outside the intended track catalogue directory.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 137,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:f8d2663af99184a013664644017ecc0a5e16fb51aa0fa82e16d494f36e6e6f44",
+          "at": "2026-04-13T03:18:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_tddd_layers` reads `architecture-rules.json` with plain `read_to_string` and never applies the symlink/submodule guard used for `spec.json` and the catalogues. A symlinked rules file under `trusted_root` can now redirect Stage 2 configuration to an arbitrary filesystem target, which violates the fail-closed D4.3 boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 145,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:25aeb562f546ee666c6f3de6ca4881b5e2305499220772d15dd5ccb3d388b5c9",
+          "at": "2026-04-13T03:22:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d22a54fb675c6bf7b29c4c068ad20f91f92de0566e657991439d4de19f5c2e20",
+          "at": "2026-04-13T03:25:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_tddd_layers` resolves each enabled layer's `catalogue_file`, but `GitShowTrackBlobReader` drops that information and later reconstructs the blob path as `<layer_id>-types.json`. For any repo that uses a non-default `catalogue_file`, CI (`verify_from_spec_json`) will read the configured file while the merge gate reads the wrong blob and usually gets `NotFound`, silently opting that layer out of Stage 2. This contradicts the accepted T007 spec/ADR that `catalogue_file` is configurable and that merge-gate path resolution must follow the same rules as the other paths.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 121,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:d22a54fb675c6bf7b29c4c068ad20f91f92de0566e657991439d4de19f5c2e20",
+          "at": "2026-04-13T03:27:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_tddd_layers` treats an explicit empty `schema_export.targets: []` as if the field were omitted and silently substitutes `[layer_id]`. That masks a malformed `architecture-rules.json` entry and can make the exporter/validator operate on the wrong crate set instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 196,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:8f98db7feda8952302b72b94a9d61e15d3afd4c1c82758518e8d3e99ae8d2da3",
+          "at": "2026-04-13T03:32:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b308a2f6c044a5eaad478fc6d1634cd21b511826151cedf92277bf06f8519393",
+          "at": "2026-04-13T03:36:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_tddd_layers` now errors when `schema_export` is present but `targets` is omitted, because `SchemaExportBlock.targets` defaults to `[]` and the `Some(se) if se.targets.is_empty()` arm turns that into `EmptyTargets`. T007's contract in the briefing says omitted `targets` should default to `[crate]`, so configs like `{ \"tddd\": { \"enabled\": true, \"schema_export\": { \"method\": \"rustdoc\" } } }` will fail instead of using the layer's own crate.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 205,
+              "category": null
+            },
+            {
+              "message": "`is_safe_path_component` only rejects `/`, `\\\\`, and bare `..`, so a layer id such as `core::domain` is accepted and the default catalogue name becomes `core::domain-types.json`. The review brief explicitly calls out `::` as an invalid default-catalogue leak; this should be rejected fail-closed instead of silently deriving a mismatched filename.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 105,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:b308a2f6c044a5eaad478fc6d1634cd21b511826151cedf92277bf06f8519393",
+          "at": "2026-04-13T03:39:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "An enabled layer with `tddd.schema_export` present but no `targets` is rejected as `EmptyTargets` here, but the T007 contract says omitted `targets` should default to `[layer_id]`. That makes valid `architecture-rules.json` entries fail-closed in both `verify_from_spec_json` and the merge-gate layer reader.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 214,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:730992bd82f9d1aab4100ffbf2a12178fe64a67e9c56add4554eebce73e47522",
+          "at": "2026-04-13T03:42:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00bcb8d54734957a29ab3b2242d086feaa13bb669850f9535e385d76ffe0a3e",
+          "at": "2026-04-13T03:47:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00bcb8d54734957a29ab3b2242d086feaa13bb669850f9535e385d76ffe0a3e",
+          "at": "2026-04-13T03:50:53Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 still tells users to run `domain-type-signals` to rebuild signals, but this document has renamed the command to `type-signals`. Following this instruction would point users at a dead CLI entrypoint and skip the required rebuild step.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 118,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:dcc4f56dc3b137990980cd738e120c52c97224c3cfb94b03bb1410c1a1647096",
+          "at": "2026-04-13T03:12:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 still refers to `domain-type-signals`, but the CLI subcommand has been renamed to `type-signals`; this is a dead command reference and will send operators to a non-existent invocation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 118,
+              "category": "broken reference"
+            },
+            {
+              "message": "The baseline filename guidance uses `<layer>-types-baseline.json`, but multilayer bindings derive the baseline from `catalogue_file` as `<stem>-baseline.json`. For any layer whose catalogue file is not the default `<layer>-types.json`, this points at the wrong file and contradicts the current layer-binding rules.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 123,
+              "category": "logical contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:dcc4f56dc3b137990980cd738e120c52c97224c3cfb94b03bb1410c1a1647096",
+          "at": "2026-04-13T03:14:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This claims the multilayer flow is already supported (`--layer` on `type-signals` and `baseline-capture`), but the current CLI still hardcodes the `domain` path: `apps/cli/src/commands/track/tddd/baseline.rs` always writes `domain-types-baseline.json` and ignores `--layer`, and `apps/cli/src/commands/track/tddd/signals.rs` still rejects non-domain layers. The doc therefore points users at a workflow that does not exist yet.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 14,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2329af1a2ae065557904ad0ee521eb92ec62c9fc280dc9d945d35e5474e2a3b9",
+          "at": "2026-04-13T03:19:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The intro paragraph says the `--layer` flag on both `sotp track type-signals` and `baseline-capture` returns an error for non-`domain` values until Phase 2, but `baseline-capture` currently ignores `--layer` and still writes `domain-types-baseline.json`. That makes the documented Phase 1 behavior incorrect for the baseline command.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 13,
+              "category": "logical contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:790aac1cad8e5d264071cbf0be21a5888f6915391048feff59cceb6695882dfb",
+          "at": "2026-04-13T03:22:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 sends users to `sotp verify spec-states` as the multilayer TDDD gate, but `spec-states` only verifies that `spec.md` contains a `## Domain States` table. It does not evaluate layer catalogues or Red type signals, so this guidance points to the wrong command.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 137,
+              "category": "logical_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a55210841b35da9670b50e291f8b1e64ff3f8a917afcb30a3eb6ebfb1655fa7c",
+          "at": "2026-04-13T03:24:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4.1 says `track-baseline-capture` snapshots a baseline file for every `tddd.enabled` layer, but the current Phase 1 implementation still ignores `--layer` and always writes only `domain-types-baseline.json` for the single wired domain layer. That makes the multilayer instruction inaccurate for tracks with additional enabled layers.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 124,
+              "category": "logical contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a55210841b35da9670b50e291f8b1e64ff3f8a917afcb30a3eb6ebfb1655fa7c",
+          "at": "2026-04-13T03:26:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0a5f2d07da22e543eb735be68957456665ed2f4438950872e4b825db6f73037",
+          "at": "2026-04-13T03:28:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0a5f2d07da22e543eb735be68957456665ed2f4438950872e4b825db6f73037",
+          "at": "2026-04-13T03:30:53Z"
         }
       ]
     }

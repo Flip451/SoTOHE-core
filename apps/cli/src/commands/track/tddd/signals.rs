@@ -4,7 +4,7 @@
 //! public API via rustdoc JSON, evaluates signals for each declared type, and writes
 //! the updated document back to `domain-types.json`.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use domain::schema::{SchemaExportError, SchemaExporter};
@@ -12,8 +12,52 @@ use infrastructure::code_profile_builder::build_type_graph;
 use infrastructure::schema_export::RustdocSchemaExporter;
 use infrastructure::tddd::catalogue_codec;
 use infrastructure::track::atomic_write::atomic_write_file;
+use infrastructure::verify::tddd_layers::{TdddLayerBinding, parse_tddd_layers};
 
 use crate::CliError;
+
+/// Resolves the set of TDDD-enabled layers for this invocation.
+///
+/// - Reads `architecture-rules.json` from `workspace_root`.
+/// - When `layer_filter` is `None`, returns every `tddd.enabled` layer in
+///   `layers[]` order.
+/// - When `layer_filter` is `Some(id)`, returns only the matching enabled
+///   binding. An unknown or disabled layer id is fail-closed.
+/// - When `architecture-rules.json` is absent, falls back to a single
+///   synthetic `domain` binding so legacy tracks continue to work.
+fn resolve_layers(
+    workspace_root: &Path,
+    layer_filter: Option<&str>,
+) -> Result<Vec<TdddLayerBinding>, CliError> {
+    let rules_path = workspace_root.join("architecture-rules.json");
+    let bindings = if rules_path.is_file() {
+        let content = std::fs::read_to_string(&rules_path)
+            .map_err(|e| CliError::Message(format!("cannot read {}: {e}", rules_path.display())))?;
+        parse_tddd_layers(&content)
+            .map_err(|e| CliError::Message(format!("{}: {e}", rules_path.display())))?
+    } else {
+        // Legacy fallback: a single synthetic domain binding.
+        parse_tddd_layers(
+            r#"{
+              "layers": [
+                { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
+              ]
+            }"#,
+        )
+        .unwrap_or_default()
+    };
+
+    if let Some(filter) = layer_filter {
+        let Some(binding) = bindings.iter().find(|b| b.layer_id() == filter) else {
+            return Err(CliError::Message(format!(
+                "layer '{filter}' is not tddd.enabled in architecture-rules.json"
+            )));
+        };
+        Ok(vec![binding.clone()])
+    } else {
+        Ok(bindings)
+    }
+}
 
 /// Evaluate domain type signals via rustdoc schema export and write back to `domain-types.json`.
 ///
@@ -32,12 +76,60 @@ pub fn execute_type_signals(
     items_dir: PathBuf,
     track_id: String,
     workspace_root: PathBuf,
+    layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
     // Validate track_id to prevent path traversal.
     let _valid_id = domain::TrackId::try_new(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
 
-    let track_dir = items_dir.join(&track_id);
+    // T007: resolve the set of TDDD-enabled layers to process. When
+    // `architecture-rules.json` is absent we fall back to the legacy
+    // single-`domain` binding so older tracks keep working. When `--layer`
+    // is supplied we fail-closed on an unknown or disabled layer id.
+    let bindings = resolve_layers(&workspace_root, layer.as_deref())?;
+
+    // Phase 1 behavior: only the `domain` layer is fully wired to a
+    // catalogue file path and signal evaluator. Other enabled layers (e.g.,
+    // `usecase`) exist in `architecture-rules.json` but the per-layer file
+    // routing is deferred to Phase 2. To avoid silently running the wrong
+    // layer's signals, we check each resolved binding up-front:
+    //
+    // * If `--layer <id>` was supplied and the binding is not `domain`, we
+    //   return a clear, actionable error rather than silently evaluating the
+    //   `domain` catalogue under the wrong name.
+    // * If no filter was supplied and only non-domain layers are enabled, we
+    //   skip them (they are not yet wired), but still process `domain` when
+    //   it is present.
+    let domain_bindings: Vec<_> = bindings.iter().filter(|b| b.layer_id() == "domain").collect();
+
+    // Explicit layer filter: reject non-domain targets fail-closed.
+    if let Some(ref filter) = layer {
+        if filter != "domain" {
+            return Err(CliError::Message(format!(
+                "layer '{filter}' is enabled in architecture-rules.json but is not yet \
+                 supported by `type-signals` in Phase 1. Only `domain` is wired. \
+                 Re-run without `--layer` or with `--layer domain`."
+            )));
+        }
+    }
+
+    // Process the domain binding (there should be exactly one, but guard either way).
+    let mut exit = ExitCode::SUCCESS;
+    for _binding in &domain_bindings {
+        exit = execute_type_signals_single(&items_dir, &track_id, &workspace_root)?;
+    }
+    Ok(exit)
+}
+
+/// Legacy single-layer signal evaluator. Retained so the existing tests and
+/// the single-`domain` production path can continue to invoke the hard-coded
+/// `domain-types.json` / `domain-types-baseline.json` files.
+fn execute_type_signals_single(
+    items_dir: &std::path::Path,
+    track_id: &str,
+    workspace_root: &std::path::Path,
+) -> Result<ExitCode, CliError> {
+    let track_dir = items_dir.join(track_id);
     let domain_types_path = track_dir.join("domain-types.json");
 
     // Read and decode domain-types.json.
@@ -57,7 +149,7 @@ pub fn execute_type_signals(
         .map_err(|e| CliError::Message(format!("domain-types.json decode error: {e}")))?;
 
     // Export the domain crate's public API via rustdoc JSON.
-    let exporter = RustdocSchemaExporter::new(workspace_root);
+    let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
     let schema = exporter.export("domain").map_err(|e| {
         let hint = if matches!(e, SchemaExportError::NightlyNotFound) {
             " (install with: rustup toolchain install nightly)".to_owned()
@@ -298,7 +390,7 @@ mod tests {
         std::fs::create_dir_all(&items_dir).unwrap();
         let workspace_root = dir.path().to_path_buf();
 
-        let result = execute_type_signals(items_dir, "../evil".to_owned(), workspace_root);
+        let result = execute_type_signals(items_dir, "../evil".to_owned(), workspace_root, None);
         assert!(result.is_err(), "path traversal track_id must be rejected");
     }
 
@@ -309,7 +401,7 @@ mod tests {
         std::fs::create_dir_all(items_dir.join("test-track")).unwrap();
         let workspace_root = dir.path().to_path_buf();
 
-        let result = execute_type_signals(items_dir, "test-track".to_owned(), workspace_root);
+        let result = execute_type_signals(items_dir, "test-track".to_owned(), workspace_root, None);
         let err = result.unwrap_err();
         let msg = format!("{err}");
         assert!(msg.contains("/track:design"), "error must suggest /track:design, got: {msg}");
@@ -321,7 +413,7 @@ mod tests {
         let (items_dir, track_id) = setup_track(dir.path(), "{not valid json}");
         let workspace_root = dir.path().to_path_buf();
 
-        let result = execute_type_signals(items_dir, track_id, workspace_root);
+        let result = execute_type_signals(items_dir, track_id, workspace_root, None);
         assert!(result.is_err(), "malformed domain-types.json must return error");
     }
 
@@ -593,7 +685,8 @@ mod tests {
             .expect("workspace root")
             .to_path_buf();
 
-        let result = execute_type_signals(items_dir.clone(), track_id.clone(), workspace_root);
+        let result =
+            execute_type_signals(items_dir.clone(), track_id.clone(), workspace_root, None);
         assert!(result.is_ok(), "success path must return Ok: {result:?}");
 
         // Verify signals were written back

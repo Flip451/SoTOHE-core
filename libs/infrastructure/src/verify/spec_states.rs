@@ -14,6 +14,7 @@ use crate::tddd::catalogue_codec;
 use crate::track::symlink_guard;
 
 use super::frontmatter::parse_yaml_frontmatter;
+use super::tddd_layers::{TdddLayerBinding, parse_tddd_layers};
 
 /// Verifies spec.json Stage 1 signals and (if present) Stage 2 domain type signals.
 ///
@@ -103,36 +104,119 @@ pub fn verify_from_spec_json(
         return stage1;
     }
 
-    // Locate the sibling domain-types.json. Stage 2 is opt-in:
-    // NotFound → skip entirely (TDDD not active).
+    // Stage 2 multi-layer loop: read architecture-rules.json from the trusted
+    // root, enumerate every `tddd.enabled` layer, and run the signal gate
+    // against each layer's catalogue file. All findings are AND-aggregated.
+    let bindings = match load_tddd_layers(trusted_root) {
+        Ok(bindings) => bindings,
+        Err(finding) => {
+            let mut outcome = stage1;
+            outcome.merge(VerifyOutcome::from_findings(vec![finding]));
+            return outcome;
+        }
+    };
+
+    // Locate the track directory (sibling of spec.json) to resolve each
+    // layer's catalogue_file against.
     let dir = match spec_json_path.parent() {
         Some(d) if !d.as_os_str().is_empty() => d,
         _ => Path::new("."),
     };
-    let domain_types_path = dir.join("domain-types.json");
 
-    // D4.3 CI path: reject symlinks on domain-types.json as well.
-    // Same trusted_root logic as spec_json: use `.` to walk every ancestor.
-    match symlink_guard::reject_symlinks_below(&domain_types_path, trusted_root) {
+    let mut outcome = stage1;
+    for binding in &bindings {
+        outcome.merge(evaluate_layer_catalogue(binding, dir, trusted_root, strict));
+    }
+    outcome
+}
+
+/// Loads `architecture-rules.json` from `trusted_root` and returns the list
+/// of enabled TDDD layer bindings.
+///
+/// When `architecture-rules.json` is absent we fall back to the legacy
+/// single-layer behavior by returning a synthetic `domain` binding pointing
+/// at `domain-types.json`. This keeps the CI path working in test tmp dirs
+/// and in repos that have not yet adopted the T007 multilayer block.
+///
+/// The symlink guard (`reject_symlinks_below`, D4.3) is applied before reading
+/// the file, consistent with how `spec.json` and per-layer catalogues are read.
+fn load_tddd_layers(trusted_root: &Path) -> Result<Vec<TdddLayerBinding>, Finding> {
+    let path = trusted_root.join("architecture-rules.json");
+    // D4.3 CI path: reject symlinks before reading, consistent with spec.json
+    // and catalogue guards.
+    match symlink_guard::reject_symlinks_below(&path, trusted_root) {
         Ok(true) => {}
         Ok(false) => {
-            // Stage 2 NotFound: TDDD not active for this track — merge stage 1 result.
-            return stage1;
+            // File does not exist — fall back to the legacy single-domain binding.
+            return default_domain_binding();
+        }
+        Err(e) => {
+            return Err(Finding::error(format!("{}: {e}", path.display())));
+        }
+    }
+    let content = std::fs::read_to_string(&path)
+        .map_err(|e| Finding::error(format!("cannot read {}: {e}", path.display())))?;
+    parse_tddd_layers(&content).map_err(|e| Finding::error(format!("{}: {e}", path.display())))
+}
+
+/// Returns the fallback binding used when `architecture-rules.json` is
+/// absent — a single `domain` layer pointing at `domain-types.json`.
+///
+/// # Errors
+///
+/// Returns a [`Finding::error`] if the embedded static JSON fails to parse,
+/// which indicates a programming error (the static string is malformed). This
+/// cannot panic because non-test library code must not call `.expect()`.
+fn default_domain_binding() -> Result<Vec<TdddLayerBinding>, Finding> {
+    // `parse_tddd_layers` is the canonical constructor for `TdddLayerBinding`;
+    // we reuse it here to avoid duplicating the default-targets logic.
+    // The static JSON is known-good; an error here indicates a programming
+    // error, but we surface it as a Finding rather than panicking.
+    let json = r#"{
+      "layers": [
+        { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
+      ]
+    }"#;
+    parse_tddd_layers(json).map_err(|e| {
+        Finding::error(format!("internal: default domain binding failed to parse: {e}"))
+    })
+}
+
+/// Runs Stage 2 signal evaluation for a single enabled TDDD layer.
+///
+/// `dir` is the track directory that contains the catalogue file.
+/// NotFound on the catalogue file is treated as "TDDD not active for this
+/// layer" and returns a clean outcome (no findings). Other errors return
+/// fail-closed [`Finding::error`] entries.
+fn evaluate_layer_catalogue(
+    binding: &TdddLayerBinding,
+    dir: &Path,
+    trusted_root: &Path,
+    strict: bool,
+) -> VerifyOutcome {
+    let catalogue_path = dir.join(binding.catalogue_file());
+
+    // D4.3 CI path: reject symlinks per layer.
+    match symlink_guard::reject_symlinks_below(&catalogue_path, trusted_root) {
+        Ok(true) => {}
+        Ok(false) => {
+            // NotFound for this layer → TDDD not active for the layer.
+            return VerifyOutcome::pass();
         }
         Err(e) => {
             return VerifyOutcome::from_findings(vec![Finding::error(format!(
                 "{}: {e}",
-                domain_types_path.display()
+                catalogue_path.display()
             ))]);
         }
     }
 
-    let json = match std::fs::read_to_string(&domain_types_path) {
+    let json = match std::fs::read_to_string(&catalogue_path) {
         Ok(s) => s,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![Finding::error(format!(
                 "cannot read {}: {e}",
-                domain_types_path.display()
+                catalogue_path.display()
             ))]);
         }
     };
@@ -141,18 +225,14 @@ pub fn verify_from_spec_json(
         Ok(d) => d,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![Finding::error(format!(
-                "{}: invalid domain-types.json: {e}",
-                domain_types_path.display()
+                "{}: invalid {}: {e}",
+                catalogue_path.display(),
+                binding.catalogue_file()
             ))]);
         }
     };
 
-    // Stage 2: delegate to the shared domain-layer pure function.
-    // Merge with stage1 findings so Yellow warnings from Stage 1 are preserved
-    // alongside Stage 2 results.
-    let mut outcome = stage1;
-    outcome.merge(check_type_signals(&doc, strict));
-    outcome
+    check_type_signals(&doc, strict)
 }
 
 /// Verifies that `spec.md` contains a `## Domain States` section with a markdown table
@@ -528,6 +608,30 @@ mod tests {
     }
 
     // --- verify_from_spec_json() tests ---
+
+    /// Writes a minimal `architecture-rules.json` with only `domain` TDDD-enabled
+    /// into the given tmp dir. All `verify_from_spec_json` tests that expect
+    /// Stage 2 evaluation must call this helper so that the multi-layer loop
+    /// (T007) finds exactly one enabled layer pointing at `domain-types.json`.
+    #[allow(dead_code)]
+    fn write_minimal_arch_rules(dir: &Path) {
+        let content = r#"{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "domain-types.json"
+      }
+    }
+  ]
+}"#;
+        std::fs::write(dir.join("architecture-rules.json"), content).unwrap();
+    }
 
     const SPEC_JSON_MINIMAL: &str = r#"{
   "schema_version": 1,

@@ -136,6 +136,7 @@ mod tests {
             &self,
             _branch: &str,
             _track_id: &str,
+            _layer_id: &str,
         ) -> BlobFetchResult<TypeCatalogueDocument> {
             panic!("read_type_catalogue must not be called by task_completion tests")
         }

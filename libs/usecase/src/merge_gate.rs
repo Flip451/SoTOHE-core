@@ -55,14 +55,19 @@ pub trait TrackBlobReader {
     /// `branch` (e.g. `"track/foo-2026-04-12"`).
     fn read_spec_document(&self, branch: &str, track_id: &str) -> BlobFetchResult<SpecDocument>;
 
-    /// Reads and decodes `track/items/<track_id>/domain-types.json`.
+    /// Reads and decodes the TDDD catalogue file for a single layer on the
+    /// given branch.
     ///
-    /// Returns `NotFound` when the file does not exist on the target ref.
-    /// This corresponds to "TDDD not active for this track" per ADR §D2.1.
+    /// T007 (Phase 1 Task 7): accepts a `layer_id` so the merge-gate
+    /// multilayer loop can read each layer's catalogue (`domain-types.json`,
+    /// `usecase-types.json`, …). Returns `NotFound` when the file does not
+    /// exist on the target ref — this corresponds to "TDDD not active for
+    /// this layer" per ADR §D2.1.
     fn read_type_catalogue(
         &self,
         branch: &str,
         track_id: &str,
+        layer_id: &str,
     ) -> BlobFetchResult<TypeCatalogueDocument>;
 
     /// Reads and decodes `track/items/<track_id>/metadata.json` into a
@@ -71,6 +76,17 @@ pub trait TrackBlobReader {
     /// Used by the task-completion gate (see `usecase::task_completion`)
     /// which checks that all tasks are resolved before merge.
     fn read_track_metadata(&self, branch: &str, track_id: &str) -> BlobFetchResult<TrackMetadata>;
+
+    /// Returns the list of TDDD-enabled layer ids on the given branch.
+    ///
+    /// The infrastructure adapter reads `architecture-rules.json` from the
+    /// PR branch blob (not the local workspace) so that tracks which modify
+    /// `architecture-rules.json` itself are evaluated against the PR's own
+    /// rules. A default implementation returns `["domain"]` for backward
+    /// compatibility with mocks that have not been updated.
+    fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
+        BlobFetchResult::Found(vec!["domain".to_string()])
+    }
 }
 
 /// Evaluates the strict merge gate for the given branch using the provided
@@ -148,18 +164,44 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
         return stage1;
     }
 
-    // 5. Stage 2: domain-types.json is opt-in (D2.1).
-    match reader.read_type_catalogue(branch, track_id) {
-        BlobFetchResult::NotFound => stage1, // TDDD opt-out → preserve stage1
-        BlobFetchResult::FetchError(msg) => VerifyOutcome::from_findings(vec![Finding::error(
-            format!("failed to read domain-types.json on origin/{branch}: {msg}"),
-        )]),
-        BlobFetchResult::Found(dt_doc) => {
-            let mut outcome = stage1;
-            outcome.merge(check_type_signals(&dt_doc, /* strict */ true));
-            outcome
+    // 5. Stage 2: multi-layer TDDD gate. T007 — loop every `tddd.enabled`
+    //    layer read from `architecture-rules.json` on the PR branch blob.
+    //    For each layer:
+    //      - NotFound → TDDD opt-out for that layer (no finding)
+    //      - FetchError → fail-closed
+    //      - Found → run `check_type_signals` with strict=true
+    //    All findings are merged (AND-aggregation across layers) so one
+    //    diagnostic shows every problem.
+    let layer_ids = match reader.read_enabled_layers(branch) {
+        BlobFetchResult::Found(ids) => ids,
+        BlobFetchResult::NotFound => {
+            // No architecture-rules.json on the branch → TDDD not active.
+            return stage1;
+        }
+        BlobFetchResult::FetchError(msg) => {
+            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "failed to read architecture-rules.json on origin/{branch}: {msg}"
+            ))]);
+        }
+    };
+
+    let mut outcome = stage1;
+    for layer_id in &layer_ids {
+        match reader.read_type_catalogue(branch, track_id, layer_id) {
+            BlobFetchResult::NotFound => {
+                // TDDD opt-out for this layer — skip silently.
+            }
+            BlobFetchResult::FetchError(msg) => {
+                outcome.merge(VerifyOutcome::from_findings(vec![Finding::error(format!(
+                    "failed to read {layer_id}-types.json on origin/{branch}: {msg}"
+                ))]));
+            }
+            BlobFetchResult::Found(dt_doc) => {
+                outcome.merge(check_type_signals(&dt_doc, /* strict */ true));
+            }
         }
     }
+    outcome
 }
 
 #[cfg(test)]
@@ -217,6 +259,7 @@ mod tests {
             &self,
             _branch: &str,
             _track_id: &str,
+            _layer_id: &str,
         ) -> BlobFetchResult<TypeCatalogueDocument> {
             if self.dt_unreachable {
                 panic!("Stage 2 must not be reached: read_type_catalogue was called unexpectedly");
@@ -274,6 +317,7 @@ mod tests {
             &self,
             branch: &str,
             track_id: &str,
+            _layer_id: &str,
         ) -> BlobFetchResult<TypeCatalogueDocument> {
             *self.recorded_dt_branch.borrow_mut() = Some(branch.to_owned());
             *self.recorded_dt_track_id.borrow_mut() = Some(track_id.to_owned());
@@ -645,5 +689,191 @@ mod tests {
         let outcome = check_strict_merge_gate("track//foo", &reader);
         assert!(outcome.has_errors());
         assert!(outcome.findings().iter().any(|f| f.message().contains("invalid track id")));
+    }
+
+    // ===============================================================
+    // U19–U26 — multilayer merge gate tests (T007)
+    //
+    // A `MultiLayerMock` returns per-layer catalogue outcomes keyed by
+    // `layer_id`, and also drives `read_enabled_layers`. The 8 scenarios
+    // below exercise the AND-aggregation of findings across 2 layers.
+    // ===============================================================
+
+    struct MultiLayerMock {
+        spec: BlobFetchResult<SpecDocument>,
+        enabled_layers: BlobFetchResult<Vec<String>>,
+        catalogues: std::collections::HashMap<String, BlobFetchResult<TypeCatalogueDocument>>,
+    }
+
+    impl MultiLayerMock {
+        fn new(
+            spec: BlobFetchResult<SpecDocument>,
+            enabled_layers: Vec<String>,
+            catalogues: Vec<(&str, BlobFetchResult<TypeCatalogueDocument>)>,
+        ) -> Self {
+            Self {
+                spec,
+                enabled_layers: BlobFetchResult::Found(enabled_layers),
+                catalogues: catalogues.into_iter().map(|(k, v)| (k.to_owned(), v)).collect(),
+            }
+        }
+
+        fn with_enabled_layer_error(spec: BlobFetchResult<SpecDocument>, error: &str) -> Self {
+            Self {
+                spec,
+                enabled_layers: BlobFetchResult::FetchError(error.to_owned()),
+                catalogues: std::collections::HashMap::new(),
+            }
+        }
+    }
+
+    impl TrackBlobReader for MultiLayerMock {
+        fn read_spec_document(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<SpecDocument> {
+            self.spec.clone()
+        }
+
+        fn read_type_catalogue(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            layer_id: &str,
+        ) -> BlobFetchResult<TypeCatalogueDocument> {
+            self.catalogues.get(layer_id).cloned().unwrap_or(BlobFetchResult::NotFound)
+        }
+
+        fn read_track_metadata(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<TrackMetadata> {
+            panic!("read_track_metadata must not be called by merge_gate tests")
+        }
+
+        fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
+            self.enabled_layers.clone()
+        }
+    }
+
+    #[test]
+    fn test_u19_two_layers_both_not_found_passes() {
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(!outcome.has_errors(), "both layers NotFound must pass: {outcome:?}");
+    }
+
+    #[test]
+    fn test_u20_two_layers_both_all_blue_passes() {
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![
+                ("domain", BlobFetchResult::Found(dt_all_blue())),
+                ("usecase", BlobFetchResult::Found(dt_all_blue())),
+            ],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(!outcome.has_errors(), "both all-Blue must pass: {outcome:?}");
+    }
+
+    #[test]
+    fn test_u21_two_layers_one_blue_one_red_blocks() {
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![
+                ("domain", BlobFetchResult::Found(dt_all_blue())),
+                ("usecase", BlobFetchResult::Found(dt_with_red())),
+            ],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(outcome.has_errors(), "Red in usecase must block: {outcome:?}");
+    }
+
+    #[test]
+    fn test_u22_two_layers_one_not_found_one_blue_passes() {
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![("domain", BlobFetchResult::Found(dt_all_blue()))],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            !outcome.has_errors(),
+            "NotFound for usecase + Blue for domain must pass: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u23_two_layers_one_yellow_one_blue_blocks_strict() {
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![
+                ("domain", BlobFetchResult::Found(dt_all_blue())),
+                ("usecase", BlobFetchResult::Found(dt_with_yellow())),
+            ],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            outcome.has_errors(),
+            "Yellow in strict mode must block even with the other layer Blue: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u24_two_layers_one_fetch_error_one_blue_blocks() {
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![
+                ("domain", BlobFetchResult::Found(dt_all_blue())),
+                ("usecase", BlobFetchResult::FetchError("network".to_string())),
+            ],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(outcome.has_errors(), "FetchError must block: {outcome:?}");
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("failed to read usecase-types.json")),
+            "error message must mention the failing layer: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u25_read_enabled_layers_not_found_skips_stage2() {
+        let reader = MultiLayerMock {
+            spec: BlobFetchResult::Found(all_blue_spec()),
+            enabled_layers: BlobFetchResult::NotFound,
+            catalogues: std::collections::HashMap::new(),
+        };
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            !outcome.has_errors(),
+            "architecture-rules.json NotFound must opt-out Stage 2: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u26_read_enabled_layers_fetch_error_blocks() {
+        let reader = MultiLayerMock::with_enabled_layer_error(
+            BlobFetchResult::Found(all_blue_spec()),
+            "git show failed",
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(outcome.has_errors(), "architecture-rules.json FetchError must block");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("architecture-rules.json")),
+            "error must mention architecture-rules.json: {outcome:?}"
+        );
     }
 }
