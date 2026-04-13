@@ -42,10 +42,31 @@ pub use spec::{
 };
 pub use tddd::baseline::{TraitBaselineEntry, TypeBaseline, TypeBaselineEntry};
 pub use tddd::catalogue::{
-    ActionContradiction, ActionContradictionKind, ConsistencyReport, DomainTypeEntry,
-    DomainTypeKind, DomainTypeSignal, DomainTypesDocument, TypeAction, TypestateTransitions,
-    check_consistency, evaluate_domain_type_signals, undeclared_to_signals,
+    TypeAction, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal,
+    TypestateTransitions,
 };
+pub use tddd::consistency::{
+    ActionContradiction, ActionContradictionKind, ConsistencyReport, check_consistency,
+    check_type_signals,
+};
+pub use tddd::signals::{evaluate_type_signals, undeclared_to_signals};
+
+// ---------------------------------------------------------------------------
+// T001 alias strategy (removed in T003): expose the old `DomainType*` names as
+// type aliases so that T002 (infrastructure) and T003 (usecase / CLI) can
+// migrate one layer at a time while the codebase keeps compiling. These
+// aliases and the `evaluate_domain_type_signals` /
+// `check_domain_types_signals` shims are REMOVED in T003 along with the last
+// downstream call site. Do NOT introduce new references to them.
+// ---------------------------------------------------------------------------
+
+pub use tddd::catalogue::TypeCatalogueDocument as DomainTypesDocument;
+pub use tddd::catalogue::TypeCatalogueEntry as DomainTypeEntry;
+pub use tddd::catalogue::TypeDefinitionKind as DomainTypeKind;
+pub use tddd::catalogue::TypeSignal as DomainTypeSignal;
+pub use tddd::consistency::check_type_signals as check_domain_types_signals;
+pub use tddd::signals::evaluate_type_signals as evaluate_domain_type_signals;
+
 pub use timestamp::Timestamp;
 pub use track::{
     StatusOverride, StatusOverrideKind, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata,

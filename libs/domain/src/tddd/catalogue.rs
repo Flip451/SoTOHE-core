@@ -1,8 +1,24 @@
-//! Domain types for domain-types.json SSoT.
+//! Type catalogue — declared type entries for the per-track TDDD catalogue.
 //!
-//! `DomainTypesDocument` is the aggregate root for the catalogue of domain types
-//! that a track's specification declares.  `domain-types.json` is the SSoT;
-//! `domain-types.md` is a read-only rendered view.
+//! This module owns the **type definitions** only: `TypeAction`,
+//! `TypestateTransitions`, `TypeDefinitionKind`, `TypeCatalogueEntry`,
+//! `TypeSignal`, and the aggregate root `TypeCatalogueDocument`.
+//!
+//! Signal evaluation (`evaluate_type_signals` and per-kind evaluators) lives in
+//! `super::signals`, and bidirectional consistency + Stage 2 signal-gate
+//! checking (`check_consistency`, `check_type_signals`, `ConsistencyReport`)
+//! lives in `super::consistency`. The three modules collaborate via
+//! `pub`/`pub(crate)` items — consumers should import via the crate-root
+//! re-exports in `libs/domain/src/lib.rs` (e.g. `use domain::TypeCatalogueEntry`)
+//! rather than from these submodules directly.
+//!
+//! Historical note (T001): this file used to hold all three responsibilities in
+//! a single 2088-line module under the name `DomainType*`. The split and the
+//! rename were performed together in the TDDD-01 track (see ADR
+//! `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` D3 and DM-06 in
+//! `knowledge/strategy/TODO.md`).
+
+use std::collections::HashSet;
 
 use crate::ConfidenceSignal;
 use crate::spec::SpecValidationError;
@@ -11,10 +27,11 @@ use crate::spec::SpecValidationError;
 // TypeAction enum
 // ---------------------------------------------------------------------------
 
-/// Declares the intended operation for a domain type entry.
+/// Declares the intended operation for a type catalogue entry.
 ///
-/// Used in `domain-types.json` to record developer intent about how a type
-/// should be evaluated relative to the baseline.
+/// Used in the per-layer catalogue file (e.g. `domain-types.json`) to record
+/// developer intent about how a type should be evaluated relative to the
+/// baseline.
 ///
 /// - `Add` (default): type is being newly added
 /// - `Modify`: type is being modified from its baseline structure
@@ -53,7 +70,7 @@ impl TypeAction {
 }
 
 // ---------------------------------------------------------------------------
-// DomainTypeKind enum
+// TypeDefinitionKind enum + TypestateTransitions
 // ---------------------------------------------------------------------------
 
 /// Declared transitions for a typestate type.
@@ -68,12 +85,17 @@ pub enum TypestateTransitions {
     To(Vec<String>),
 }
 
-/// Classifies a domain type by its structural role in the codebase.
+/// Classifies a type-catalogue entry by its structural role in the codebase.
 ///
 /// Each variant carries the expected items that the type should expose so that
-/// an automated scanner can compute a `DomainTypeSignal` for the entry.
+/// an automated scanner can compute a `TypeSignal` for the entry.
+///
+/// Layer-neutral naming (T001): this used to be `DomainTypeKind` when the
+/// catalogue lived only in the domain layer. The rename reflects that TDDD now
+/// applies to usecase and future layers via `architecture-rules.json` layer
+/// blocks (ADR 0002 §D1).
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum DomainTypeKind {
+pub enum TypeDefinitionKind {
     /// A type whose instances carry state-machine phase information.
     Typestate { transitions: TypestateTransitions },
     /// A `pub enum` with a fixed set of variants.
@@ -85,12 +107,12 @@ pub enum DomainTypeKind {
     /// An `enum` used exclusively as an error type.
     /// `expected_variants` lists the variants that must appear.
     ErrorType { expected_variants: Vec<String> },
-    /// A `pub trait` that defines a domain port (hexagonal architecture boundary).
+    /// A `pub trait` that defines a hexagonal port boundary.
     /// `expected_methods` lists the method names that must appear.
     TraitPort { expected_methods: Vec<String> },
 }
 
-impl DomainTypeKind {
+impl TypeDefinitionKind {
     /// Returns the canonical lowercase string tag for this kind.
     #[must_use]
     pub fn kind_tag(&self) -> &'static str {
@@ -105,34 +127,37 @@ impl DomainTypeKind {
 }
 
 // ---------------------------------------------------------------------------
-// DomainTypeEntry
+// TypeCatalogueEntry
 // ---------------------------------------------------------------------------
 
-/// A single entry in the domain-types catalogue.
+/// A single entry in the type catalogue (`<catalogue_file>.json`).
 ///
-/// Each entry records one named domain type together with its expected structure
+/// Each entry records one named type together with its expected structure
 /// (`kind`), intended operation (`action`), and whether the entry has been
 /// human-approved.
+///
+/// Layer-neutral naming (T001, formerly `DomainTypeEntry`).
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DomainTypeEntry {
+pub struct TypeCatalogueEntry {
     name: String,
     description: String,
-    kind: DomainTypeKind,
+    kind: TypeDefinitionKind,
     action: TypeAction,
     approved: bool,
 }
 
-impl DomainTypeEntry {
-    /// Creates a new `DomainTypeEntry`.
+impl TypeCatalogueEntry {
+    /// Creates a new `TypeCatalogueEntry`.
     ///
     /// # Errors
     ///
     /// Returns `SpecValidationError::EmptyDomainStateName` if `name` is empty or
-    /// whitespace-only.
+    /// whitespace-only. (The error variant keeps its historical name for
+    /// compatibility with existing call sites in the spec validator.)
     pub fn new(
         name: impl Into<String>,
         description: impl Into<String>,
-        kind: DomainTypeKind,
+        kind: TypeDefinitionKind,
         action: TypeAction,
         approved: bool,
     ) -> Result<Self, SpecValidationError> {
@@ -157,7 +182,7 @@ impl DomainTypeEntry {
 
     /// Returns the structural classification of this type.
     #[must_use]
-    pub fn kind(&self) -> &DomainTypeKind {
+    pub fn kind(&self) -> &TypeDefinitionKind {
         &self.kind
     }
 
@@ -175,13 +200,15 @@ impl DomainTypeEntry {
 }
 
 // ---------------------------------------------------------------------------
-// DomainTypeSignal
+// TypeSignal
 // ---------------------------------------------------------------------------
 
-/// Per-type signal evaluation result produced by comparing a `DomainTypeEntry`
-/// against scanned code output.
+/// Per-type signal evaluation result produced by comparing a
+/// `TypeCatalogueEntry` against scanned code output.
+///
+/// Layer-neutral naming (T001, formerly `DomainTypeSignal`).
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DomainTypeSignal {
+pub struct TypeSignal {
     type_name: String,
     /// Canonical kind tag (e.g. `"typestate"`, `"enum"`, `"value_object"`, …).
     kind_tag: String,
@@ -196,8 +223,8 @@ pub struct DomainTypeSignal {
     extra_items: Vec<String>,
 }
 
-impl DomainTypeSignal {
-    /// Creates a new `DomainTypeSignal`.
+impl TypeSignal {
+    /// Creates a new `TypeSignal`.
     #[must_use]
     pub fn new(
         type_name: impl Into<String>,
@@ -263,24 +290,26 @@ impl DomainTypeSignal {
 }
 
 // ---------------------------------------------------------------------------
-// DomainTypesDocument
+// TypeCatalogueDocument
 // ---------------------------------------------------------------------------
 
-/// Aggregate root for the domain-types catalogue (`domain-types.json`).
+/// Aggregate root for a layer's type catalogue (e.g. `domain-types.json`).
 ///
-/// The document records the full set of declared domain types together with
-/// their optional scan signals.
+/// The document records the full set of declared types together with their
+/// optional scan signals.
+///
+/// Layer-neutral naming (T001, formerly `DomainTypesDocument`).
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DomainTypesDocument {
+pub struct TypeCatalogueDocument {
     schema_version: u32,
-    entries: Vec<DomainTypeEntry>,
-    signals: Option<Vec<DomainTypeSignal>>,
+    entries: Vec<TypeCatalogueEntry>,
+    signals: Option<Vec<TypeSignal>>,
 }
 
-impl DomainTypesDocument {
-    /// Creates a new `DomainTypesDocument` with no signals.
+impl TypeCatalogueDocument {
+    /// Creates a new `TypeCatalogueDocument` with no signals.
     #[must_use]
-    pub fn new(schema_version: u32, entries: Vec<DomainTypeEntry>) -> Self {
+    pub fn new(schema_version: u32, entries: Vec<TypeCatalogueEntry>) -> Self {
         Self { schema_version, entries, signals: None }
     }
 
@@ -290,20 +319,20 @@ impl DomainTypesDocument {
         self.schema_version
     }
 
-    /// Returns the domain type entries in this document.
+    /// Returns the type catalogue entries in this document.
     #[must_use]
-    pub fn entries(&self) -> &[DomainTypeEntry] {
+    pub fn entries(&self) -> &[TypeCatalogueEntry] {
         &self.entries
     }
 
     /// Returns the scan signals, if they have been populated.
     #[must_use]
-    pub fn signals(&self) -> Option<&[DomainTypeSignal]> {
+    pub fn signals(&self) -> Option<&[TypeSignal]> {
         self.signals.as_deref()
     }
 
     /// Replaces the signals with a new set derived from a code scan.
-    pub fn set_signals(&mut self, signals: Vec<DomainTypeSignal>) {
+    pub fn set_signals(&mut self, signals: Vec<TypeSignal>) {
         self.signals = Some(signals);
     }
 
@@ -314,760 +343,40 @@ impl DomainTypesDocument {
     pub fn typestate_names(&self) -> HashSet<String> {
         self.entries
             .iter()
-            .filter(|e| matches!(e.kind(), DomainTypeKind::Typestate { .. }))
+            .filter(|e| matches!(e.kind(), TypeDefinitionKind::Typestate { .. }))
             .map(|e| e.name().to_string())
             .collect()
     }
 }
 
 // ---------------------------------------------------------------------------
-// Signal evaluation
+// T001 alias facade (removed in T003)
 // ---------------------------------------------------------------------------
+//
+// These `pub use` shims expose the pre-rename `DomainType*` names — and the
+// function entry points that formerly lived in this module — inside the
+// `catalogue` submodule path, so that T002 (infrastructure) and T003
+// (usecase / CLI) migrations can proceed one layer at a time without forcing
+// every downstream file to update its import path in the same commit.
+//
+// Downstream code can continue to write e.g.
+// `use domain::tddd::catalogue::DomainTypeKind;` and receive the renamed
+// `TypeDefinitionKind` enum, or
+// `use domain::tddd::catalogue::check_domain_types_signals;` and receive the
+// renamed `check_type_signals` function (now hosted in `super::consistency`).
+//
+// These aliases are REMOVED in T003 together with the last downstream call
+// site. Do NOT add new references to them in new code.
 
-use std::collections::HashSet;
-
-use crate::schema::{TypeGraph, TypeKind};
-
-/// Evaluates domain type signals by comparing spec entries against a pre-indexed `TypeGraph`.
-///
-/// Only types declared as `Typestate` in entries are considered valid transition targets.
-///
-/// Signal rules: Blue = spec and code fully match. Red = everything else.
-#[must_use]
-pub fn evaluate_domain_type_signals(
-    entries: &[DomainTypeEntry],
-    profile: &TypeGraph,
-) -> Vec<DomainTypeSignal> {
-    // Collect names of typestate-declared types — only these count as valid transition targets.
-    let typestate_names: HashSet<&str> = entries
-        .iter()
-        .filter(|e| matches!(e.kind(), DomainTypeKind::Typestate { .. }))
-        .map(|e| e.name())
-        .collect();
-    entries.iter().map(|entry| evaluate_single(entry, profile, &typestate_names)).collect()
-}
-
-fn evaluate_single(
-    entry: &DomainTypeEntry,
-    profile: &TypeGraph,
-    typestate_names: &HashSet<&str>,
-) -> DomainTypeSignal {
-    let name = entry.name();
-    let kind_tag = entry.kind().kind_tag().to_string();
-
-    // Delete action inverts the forward check: absent → Blue, present → Yellow.
-    // This is orthogonal to kind, so we branch before the kind dispatch.
-    if entry.action() == TypeAction::Delete {
-        return evaluate_delete(name, &kind_tag, entry.kind(), profile);
-    }
-
-    match entry.kind() {
-        DomainTypeKind::Typestate { transitions } => {
-            evaluate_typestate(name, &kind_tag, transitions, profile, typestate_names)
-        }
-        DomainTypeKind::Enum { expected_variants } => {
-            evaluate_enum(name, &kind_tag, expected_variants, profile)
-        }
-        DomainTypeKind::ValueObject => evaluate_value_object(name, &kind_tag, profile),
-        DomainTypeKind::ErrorType { expected_variants } => {
-            evaluate_error_type(name, &kind_tag, expected_variants, profile)
-        }
-        DomainTypeKind::TraitPort { expected_methods } => {
-            evaluate_trait_port(name, &kind_tag, expected_methods, profile)
-        }
-    }
-}
-
-/// Evaluates a `Delete`-action entry: absent from code → Blue, still present → Yellow.
-///
-/// TraitPort entries check `graph.get_trait()`; all other kinds check `graph.get_type()`.
-fn evaluate_delete(
-    name: &str,
-    kind_tag: &str,
-    kind: &DomainTypeKind,
-    profile: &TypeGraph,
-) -> DomainTypeSignal {
-    let present = if matches!(kind, DomainTypeKind::TraitPort { .. }) {
-        profile.get_trait(name).is_some()
-    } else {
-        profile.get_type(name).is_some()
-    };
-
-    if present {
-        // Type still exists — not yet deleted.
-        DomainTypeSignal::new(
-            name,
-            kind_tag,
-            ConfidenceSignal::Yellow,
-            true,
-            vec![],
-            vec![],
-            vec![],
-        )
-    } else {
-        // Type is gone — deletion complete.
-        DomainTypeSignal::new(name, kind_tag, ConfidenceSignal::Blue, false, vec![], vec![], vec![])
-    }
-}
-
-fn red(name: &str, kind_tag: &str, found_type: bool) -> DomainTypeSignal {
-    DomainTypeSignal::new(name, kind_tag, ConfidenceSignal::Red, found_type, vec![], vec![], vec![])
-}
-
-fn yellow(name: &str, kind_tag: &str) -> DomainTypeSignal {
-    DomainTypeSignal::new(name, kind_tag, ConfidenceSignal::Yellow, false, vec![], vec![], vec![])
-}
-
-fn blue(name: &str, kind_tag: &str) -> DomainTypeSignal {
-    DomainTypeSignal::new(name, kind_tag, ConfidenceSignal::Blue, true, vec![], vec![], vec![])
-}
-
-fn evaluate_typestate(
-    name: &str,
-    kind_tag: &str,
-    transitions: &TypestateTransitions,
-    profile: &TypeGraph,
-    _typestate_names: &HashSet<&str>,
-) -> DomainTypeSignal {
-    let Some(code_type) = profile.get_type(name) else {
-        return yellow(name, kind_tag);
-    };
-
-    // Use pre-filtered outgoing transitions from TypeGraph (set by build_type_graph).
-    // Self-transitions are excluded during construction.
-    let code_transitions: HashSet<&str> =
-        code_type.outgoing().iter().filter(|t| t.as_str() != name).map(|s| s.as_str()).collect();
-
-    match transitions {
-        TypestateTransitions::Terminal => {
-            if code_transitions.is_empty() {
-                blue(name, kind_tag)
-            } else {
-                let mut extra: Vec<String> =
-                    code_transitions.into_iter().map(|s| s.to_string()).collect();
-                extra.sort();
-                DomainTypeSignal::new(
-                    name,
-                    kind_tag,
-                    ConfidenceSignal::Red,
-                    true,
-                    vec![],
-                    vec![],
-                    extra,
-                )
-            }
-        }
-        TypestateTransitions::To(targets) => {
-            let declared: HashSet<&str> = targets.iter().map(|s| s.as_str()).collect();
-
-            let mut found = Vec::new();
-            let mut missing = Vec::new();
-            for target in targets {
-                if code_transitions.contains(target.as_str()) {
-                    found.push(target.clone());
-                } else {
-                    missing.push(target.clone());
-                }
-            }
-
-            // Detect undeclared transitions (code has them, spec doesn't).
-            let mut extra: Vec<String> = code_transitions
-                .iter()
-                .filter(|ct| !declared.contains(**ct))
-                .map(|s| s.to_string())
-                .collect();
-            extra.sort();
-
-            let signal = if missing.is_empty() && extra.is_empty() {
-                ConfidenceSignal::Blue
-            } else {
-                ConfidenceSignal::Red
-            };
-            DomainTypeSignal::new(name, kind_tag, signal, true, found, missing, extra)
-        }
-    }
-}
-
-fn evaluate_enum(
-    name: &str,
-    kind_tag: &str,
-    expected_variants: &[String],
-    profile: &TypeGraph,
-) -> DomainTypeSignal {
-    let Some(code_type) = profile.get_type(name) else {
-        return yellow(name, kind_tag);
-    };
-    if *code_type.kind() != TypeKind::Enum {
-        return DomainTypeSignal::new(
-            name,
-            kind_tag,
-            ConfidenceSignal::Red,
-            true,
-            vec![],
-            expected_variants.to_vec(),
-            vec![],
-        );
-    }
-
-    let code_variants: HashSet<&str> = code_type.members().iter().map(|s| s.as_str()).collect();
-    let spec_variants: HashSet<&str> = expected_variants.iter().map(|s| s.as_str()).collect();
-
-    let mut missing: Vec<String> =
-        spec_variants.difference(&code_variants).map(|s| s.to_string()).collect();
-    let mut extra: Vec<String> =
-        code_variants.difference(&spec_variants).map(|s| s.to_string()).collect();
-    let mut found: Vec<String> =
-        spec_variants.intersection(&code_variants).map(|s| s.to_string()).collect();
-    missing.sort();
-    extra.sort();
-    found.sort();
-
-    let signal = if missing.is_empty() && extra.is_empty() {
-        ConfidenceSignal::Blue
-    } else {
-        ConfidenceSignal::Red
-    };
-
-    DomainTypeSignal::new(name, kind_tag, signal, true, found, missing, extra)
-}
-
-fn evaluate_value_object(name: &str, kind_tag: &str, profile: &TypeGraph) -> DomainTypeSignal {
-    let Some(code_type) = profile.get_type(name) else {
-        return yellow(name, kind_tag);
-    };
-    // ValueObject must be a Struct (not Enum or TypeAlias).
-    if *code_type.kind() == TypeKind::Struct {
-        blue(name, kind_tag)
-    } else {
-        red(name, kind_tag, true)
-    }
-}
-
-fn evaluate_error_type(
-    name: &str,
-    kind_tag: &str,
-    expected_variants: &[String],
-    profile: &TypeGraph,
-) -> DomainTypeSignal {
-    let Some(code_type) = profile.get_type(name) else {
-        return yellow(name, kind_tag);
-    };
-    if *code_type.kind() != TypeKind::Enum {
-        return DomainTypeSignal::new(
-            name,
-            kind_tag,
-            ConfidenceSignal::Red,
-            true,
-            vec![],
-            expected_variants.to_vec(),
-            vec![],
-        );
-    }
-
-    // Empty expected_variants with enum confirmation = Blue (existence-only).
-    if expected_variants.is_empty() {
-        return blue(name, kind_tag);
-    }
-
-    let code_variants: HashSet<&str> = code_type.members().iter().map(|s| s.as_str()).collect();
-
-    let mut found = Vec::new();
-    let mut missing = Vec::new();
-    for v in expected_variants {
-        if code_variants.contains(v.as_str()) {
-            found.push(v.clone());
-        } else {
-            missing.push(v.clone());
-        }
-    }
-
-    let signal = if missing.is_empty() { ConfidenceSignal::Blue } else { ConfidenceSignal::Red };
-    DomainTypeSignal::new(name, kind_tag, signal, true, found, missing, vec![])
-}
-
-fn evaluate_trait_port(
-    name: &str,
-    kind_tag: &str,
-    expected_methods: &[String],
-    profile: &TypeGraph,
-) -> DomainTypeSignal {
-    let Some(code_trait) = profile.get_trait(name) else {
-        return yellow(name, kind_tag);
-    };
-
-    let code_methods: HashSet<&str> =
-        code_trait.method_names().iter().map(|s| s.as_str()).collect();
-
-    let mut found = Vec::new();
-    let mut missing = Vec::new();
-    for m in expected_methods {
-        if code_methods.contains(m.as_str()) {
-            found.push(m.clone());
-        } else {
-            missing.push(m.clone());
-        }
-    }
-
-    let signal = if missing.is_empty() { ConfidenceSignal::Blue } else { ConfidenceSignal::Red };
-    DomainTypeSignal::new(name, kind_tag, signal, true, found, missing, vec![])
-}
+pub use self::TypeCatalogueDocument as DomainTypesDocument;
+pub use self::TypeCatalogueEntry as DomainTypeEntry;
+pub use self::TypeDefinitionKind as DomainTypeKind;
+pub use self::TypeSignal as DomainTypeSignal;
+pub use super::consistency::check_type_signals as check_domain_types_signals;
+pub use super::signals::evaluate_type_signals as evaluate_domain_type_signals;
 
 // ---------------------------------------------------------------------------
-// undeclared_to_signals — reverse check Red signal conversion
-// ---------------------------------------------------------------------------
-
-/// Converts undeclared type and trait names into Red `DomainTypeSignal`s.
-///
-/// - Undeclared types get `kind_tag = "undeclared_type"`
-/// - Undeclared traits get `kind_tag = "undeclared_trait"`
-/// - All signals are `ConfidenceSignal::Red` with `found_type = true`
-///   (they exist in code but not in domain-types.json).
-///
-/// # Errors
-///
-/// This function is infallible.
-#[must_use]
-pub fn undeclared_to_signals(
-    undeclared_types: &[String],
-    undeclared_traits: &[String],
-) -> Vec<DomainTypeSignal> {
-    let mut signals = Vec::with_capacity(undeclared_types.len() + undeclared_traits.len());
-
-    for name in undeclared_types {
-        signals.push(DomainTypeSignal::new(
-            name.clone(),
-            "undeclared_type",
-            ConfidenceSignal::Red,
-            true,
-            vec![],
-            vec![],
-            vec![],
-        ));
-    }
-
-    for name in undeclared_traits {
-        signals.push(DomainTypeSignal::new(
-            name.clone(),
-            "undeclared_trait",
-            ConfidenceSignal::Red,
-            true,
-            vec![],
-            vec![],
-            vec![],
-        ));
-    }
-
-    signals
-}
-
-// ---------------------------------------------------------------------------
-// ActionContradiction — action vs baseline mismatch warnings
-// ---------------------------------------------------------------------------
-
-/// Describes a contradiction between an entry's declared `action` and the baseline state.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ActionContradiction {
-    name: String,
-    action: TypeAction,
-    kind: ActionContradictionKind,
-}
-
-impl ActionContradiction {
-    /// Creates a new `ActionContradiction`.
-    #[must_use]
-    pub fn new(name: impl Into<String>, action: TypeAction, kind: ActionContradictionKind) -> Self {
-        Self { name: name.into(), action, kind }
-    }
-
-    /// Returns the type name.
-    #[must_use]
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    /// Returns the declared action.
-    #[must_use]
-    pub fn action(&self) -> TypeAction {
-        self.action
-    }
-
-    /// Returns the kind of contradiction.
-    #[must_use]
-    pub fn kind(&self) -> &ActionContradictionKind {
-        &self.kind
-    }
-}
-
-/// Classifies the nature of an action-baseline contradiction.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ActionContradictionKind {
-    /// `action: "add"` but type already exists in baseline.
-    AddButAlreadyInBaseline,
-    /// `action: "modify"` but type not found in baseline.
-    ModifyButNotInBaseline,
-    /// `action: "reference"` but type not found in baseline.
-    ReferenceButNotInBaseline,
-    /// `action: "reference"` but forward check signal is not Blue (implementation differs).
-    ReferenceButNotBlue,
-}
-
-// ---------------------------------------------------------------------------
-// ConsistencyReport — bidirectional spec ↔ code check
-// ---------------------------------------------------------------------------
-
-/// Result of a bidirectional consistency check between domain-types.json (spec)
-/// and the crate's public API (code), with baseline-aware filtering.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ConsistencyReport {
-    /// Forward signals: spec → code evaluation results (groups 1 + 2).
-    forward_signals: Vec<DomainTypeSignal>,
-    /// Types found in code but not in declarations or baseline (group 4).
-    undeclared_types: Vec<String>,
-    /// Traits found in code but not in declarations or baseline (group 4).
-    undeclared_traits: Vec<String>,
-    /// Count of baseline types/traits skipped because structure is unchanged (group 3).
-    skipped_count: usize,
-    /// Red signals from baseline comparison: structural changes or deletions (group 3).
-    baseline_red_types: Vec<String>,
-    /// Red signals from baseline comparison for traits (group 3).
-    baseline_red_traits: Vec<String>,
-    /// Advisory warnings for action-baseline contradictions.
-    contradictions: Vec<ActionContradiction>,
-    /// Hard errors: `delete` action declared for types not in baseline.
-    delete_errors: Vec<String>,
-}
-
-impl ConsistencyReport {
-    /// Returns the forward (spec → code) signals.
-    #[must_use]
-    pub fn forward_signals(&self) -> &[DomainTypeSignal] {
-        &self.forward_signals
-    }
-
-    /// Returns type names found in code but not in declarations or baseline (group 4).
-    #[must_use]
-    pub fn undeclared_types(&self) -> &[String] {
-        &self.undeclared_types
-    }
-
-    /// Returns trait names found in code but not in declarations or baseline (group 4).
-    #[must_use]
-    pub fn undeclared_traits(&self) -> &[String] {
-        &self.undeclared_traits
-    }
-
-    /// Returns the count of baseline entries skipped (structure unchanged, group 3).
-    #[must_use]
-    pub fn skipped_count(&self) -> usize {
-        self.skipped_count
-    }
-
-    /// Returns type names from baseline with structural changes or deletions (group 3 Red).
-    #[must_use]
-    pub fn baseline_red_types(&self) -> &[String] {
-        &self.baseline_red_types
-    }
-
-    /// Returns trait names from baseline with structural changes or deletions (group 3 Red).
-    #[must_use]
-    pub fn baseline_red_traits(&self) -> &[String] {
-        &self.baseline_red_traits
-    }
-
-    /// Returns advisory warnings for action-baseline contradictions.
-    #[must_use]
-    pub fn contradictions(&self) -> &[ActionContradiction] {
-        &self.contradictions
-    }
-
-    /// Returns hard errors for `delete` action on types not in baseline.
-    #[must_use]
-    pub fn delete_errors(&self) -> &[String] {
-        &self.delete_errors
-    }
-}
-
-/// Performs a baseline-aware bidirectional consistency check.
-///
-/// Uses the 4-group evaluation from ADR TDDD-02 §3:
-/// - **Group 1 (A\B)**: declared, not in baseline → forward check
-/// - **Group 2 (A∩B)**: declared and in baseline → forward check
-/// - **Group 3 (B\A)**: baseline, not declared → skip if unchanged, Red if changed/deleted
-/// - **Group 4 (∁(A∪B)∩C)**: not declared, not in baseline, in code → Red
-///
-/// Groups 1+2 are handled by `evaluate_domain_type_signals` (forward check).
-/// Groups 3+4 replace the old undeclared-types reverse check.
-#[must_use]
-pub fn check_consistency(
-    entries: &[DomainTypeEntry],
-    graph: &TypeGraph,
-    baseline: &crate::TypeBaseline,
-) -> ConsistencyReport {
-    // Forward check (groups 1 + 2): evaluate declared entries against code.
-    let mut forward_signals = evaluate_domain_type_signals(entries, graph);
-
-    // Kind-specific declared sets: types and traits are partitioned separately
-    // so that cross-kind undeclared code is detected by reverse check.
-    // Kind migration (e.g., struct -> trait) is handled via delete+add pairs:
-    // declare the old kind with action:"delete" and the new kind with action:"add".
-    let declared_type_names: HashSet<&str> = entries
-        .iter()
-        .filter(|e| !matches!(e.kind(), DomainTypeKind::TraitPort { .. }))
-        .map(|e| e.name())
-        .collect();
-
-    let declared_trait_names: HashSet<&str> = entries
-        .iter()
-        .filter(|e| matches!(e.kind(), DomainTypeKind::TraitPort { .. }))
-        .map(|e| e.name())
-        .collect();
-
-    let mut skipped_count: usize = 0;
-    let mut baseline_red_types: Vec<String> = Vec::new();
-    let mut baseline_red_traits: Vec<String> = Vec::new();
-
-    // Group 3 — types: B\A (in baseline types, not declared as a type)
-    for (name, baseline_entry) in baseline.types() {
-        if declared_type_names.contains(name.as_str()) {
-            continue; // Group 2: declared ��� handled by forward check
-        }
-        match graph.get_type(name) {
-            Some(code_node) => {
-                // Compare baseline entry against current code structure.
-                let current = crate::TypeBaselineEntry::new(
-                    code_node.kind().clone(),
-                    code_node.members().to_vec(),
-                    code_node.method_return_types().iter().cloned().collect(),
-                );
-                if baseline_entry.structurally_equal(&current) {
-                    skipped_count += 1; // Unchanged → skip
-                } else {
-                    baseline_red_types.push(name.clone()); // Structural change → Red
-                }
-            }
-            None => {
-                baseline_red_types.push(name.clone()); // Deleted → Red
-            }
-        }
-    }
-
-    // Group 3 — traits: B\A (in baseline traits, not declared as a trait)
-    for (name, baseline_entry) in baseline.traits() {
-        if declared_trait_names.contains(name.as_str()) {
-            continue; // Group 2: declared → handled by forward check
-        }
-        match graph.get_trait(name) {
-            Some(code_node) => {
-                let current = crate::TraitBaselineEntry::new(code_node.method_names().to_vec());
-                if baseline_entry.structurally_equal(&current) {
-                    skipped_count += 1;
-                } else {
-                    baseline_red_traits.push(name.clone());
-                }
-            }
-            None => {
-                baseline_red_traits.push(name.clone());
-            }
-        }
-    }
-
-    baseline_red_types.sort();
-    baseline_red_traits.sort();
-
-    // Group 4 — ∁(A∪B)∩C: in code, not declared (same kind), not in baseline → Red
-    let mut undeclared_types: Vec<String> = graph
-        .type_names()
-        .filter(|name| !declared_type_names.contains(name.as_str()) && !baseline.has_type(name))
-        .cloned()
-        .collect();
-    undeclared_types.sort();
-
-    let mut undeclared_traits: Vec<String> = graph
-        .trait_names()
-        .filter(|name| !declared_trait_names.contains(name.as_str()) && !baseline.has_trait(name))
-        .cloned()
-        .collect();
-    undeclared_traits.sort();
-
-    // Action-baseline contradiction detection + delete validation.
-    let mut contradictions = Vec::new();
-    let mut delete_errors = Vec::new();
-
-    for (i, entry) in entries.iter().enumerate() {
-        let name = entry.name();
-        let is_trait = matches!(entry.kind(), DomainTypeKind::TraitPort { .. });
-        let in_baseline = if is_trait { baseline.has_trait(name) } else { baseline.has_type(name) };
-
-        match entry.action() {
-            TypeAction::Add => {
-                if in_baseline {
-                    contradictions.push(ActionContradiction::new(
-                        name,
-                        TypeAction::Add,
-                        ActionContradictionKind::AddButAlreadyInBaseline,
-                    ));
-                }
-            }
-            TypeAction::Modify => {
-                if !in_baseline {
-                    contradictions.push(ActionContradiction::new(
-                        name,
-                        TypeAction::Modify,
-                        ActionContradictionKind::ModifyButNotInBaseline,
-                    ));
-                }
-            }
-            TypeAction::Reference => {
-                if !in_baseline {
-                    contradictions.push(ActionContradiction::new(
-                        name,
-                        TypeAction::Reference,
-                        ActionContradictionKind::ReferenceButNotInBaseline,
-                    ));
-                } else if let Some(signal) = forward_signals.get(i) {
-                    if signal.signal() != ConfidenceSignal::Blue {
-                        contradictions.push(ActionContradiction::new(
-                            name,
-                            TypeAction::Reference,
-                            ActionContradictionKind::ReferenceButNotBlue,
-                        ));
-                    }
-                }
-            }
-            TypeAction::Delete => {
-                if !in_baseline {
-                    delete_errors.push(name.to_string());
-                    // Patch the forward signal to Red so that existing consumers
-                    // that only inspect `forward_signals` see this as an error.
-                    // Without baseline evidence the delete declaration cannot be
-                    // validated, so the entry must not silently resolve to Blue.
-                    if let Some(sig) = forward_signals.get_mut(i) {
-                        *sig = red(name, entry.kind().kind_tag(), false);
-                    }
-                }
-            }
-        }
-    }
-
-    ConsistencyReport {
-        forward_signals,
-        undeclared_types,
-        undeclared_traits,
-        skipped_count,
-        baseline_red_types,
-        baseline_red_traits,
-        contradictions,
-        delete_errors,
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Stage 2 signal gate (check_domain_types_signals)
-// ---------------------------------------------------------------------------
-
-/// Evaluates Stage 2 signal gate rules against a `DomainTypesDocument`.
-///
-/// Shared pure function used by both the CI path (`verify_from_spec_json`
-/// Stage 2) and the merge gate (via `usecase::merge_gate`). The caller is
-/// responsible for handling the `NotFound` case (no `domain-types.json` =
-/// TDDD not active for the track, per ADR §D2.1 opt-in model).
-///
-/// # Rules
-///
-/// - `entries` is empty → `Finding::error` (malformed catalogue)
-/// - `signals` is `None` → `Finding::error` (unevaluated; run `sotp track domain-type-signals`)
-/// - Signal coverage incomplete (entry has no matching signal) → `Finding::error`
-/// - Any Red signal (forward or reverse) → `Finding::error` (always an error, regardless of mode)
-/// - Declared-entry Yellow signal, `strict = true` → `Finding::error`
-/// - Declared-entry Yellow signal, `strict = false` → `Finding::warning` (D8.6 visualization)
-/// - Undeclared reverse signals (outside entry set) that are Yellow are not blocked
-///   (only their Red counterparts are caught by the Red check above)
-/// - All Blue / no declared Yellow → `VerifyOutcome::pass()`
-///
-/// The `strict` parameter is:
-/// - `true` for the merge gate (all declared Yellow must be upgraded to Blue)
-/// - `false` for CI interim mode (declared Yellow is allowed but visualized)
-///
-/// Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md` §D2, §D8.6.
-#[must_use]
-pub fn check_domain_types_signals(
-    doc: &DomainTypesDocument,
-    strict: bool,
-) -> crate::verify::VerifyOutcome {
-    use crate::verify::{Finding, VerifyOutcome};
-
-    if doc.entries().is_empty() {
-        return VerifyOutcome::from_findings(vec![Finding::error(
-            "domain-types.json has no entries — add at least one domain type declaration"
-                .to_owned(),
-        )]);
-    }
-
-    let Some(signals) = doc.signals() else {
-        return VerifyOutcome::from_findings(vec![Finding::error(
-            "domain type signals not yet evaluated — run `sotp track domain-type-signals` first"
-                .to_owned(),
-        )]);
-    };
-
-    // Signal coverage: every entry must have a matching (name, kind_tag) signal.
-    let signal_keys: std::collections::HashSet<(&str, &str)> =
-        signals.iter().map(|s| (s.type_name(), s.kind_tag())).collect();
-    let uncovered: Vec<&str> = doc
-        .entries()
-        .iter()
-        .filter(|e| !signal_keys.contains(&(e.name(), e.kind().kind_tag())))
-        .map(|e| e.name())
-        .collect();
-    if !uncovered.is_empty() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
-            "{} domain type(s) have no signal evaluation: {} — re-run `sotp track domain-type-signals`",
-            uncovered.len(),
-            uncovered.join(", ")
-        ))]);
-    }
-
-    // Red check: applies to all signals (forward + reverse).
-    let all_red: Vec<&str> = signals
-        .iter()
-        .filter(|s| s.signal() == ConfidenceSignal::Red)
-        .map(|s| s.type_name())
-        .collect();
-    if !all_red.is_empty() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
-            "{} domain type(s) have Red signal (TDDD violation — run /track:design): {}",
-            all_red.len(),
-            all_red.join(", ")
-        ))]);
-    }
-
-    // Yellow check: declared entries only. Mode-dependent: error in strict, warning in interim.
-    let entry_keys: std::collections::HashSet<(&str, &str)> =
-        doc.entries().iter().map(|e| (e.name(), e.kind().kind_tag())).collect();
-    let yellow_entries: Vec<&str> = signals
-        .iter()
-        .filter(|s| entry_keys.contains(&(s.type_name(), s.kind_tag())))
-        .filter(|s| s.signal() == ConfidenceSignal::Yellow)
-        .map(|s| s.type_name())
-        .collect();
-
-    if !yellow_entries.is_empty() {
-        let message = format!(
-            "domain-types.json: {} declared type(s) have Yellow signal: {} — merge gate will block these until upgraded to Blue. Resolve each type (implement or remove per its declared action) and re-run `sotp track domain-type-signals`.",
-            yellow_entries.len(),
-            yellow_entries.join(", ")
-        );
-        if strict {
-            return VerifyOutcome::from_findings(vec![Finding::error(message)]);
-        }
-        return VerifyOutcome::from_findings(vec![Finding::warning(message)]);
-    }
-
-    VerifyOutcome::pass()
-}
-
-// ---------------------------------------------------------------------------
-// Tests
+// Tests — type definitions
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
@@ -1102,20 +411,27 @@ mod tests {
         assert_eq!(TypeAction::Delete.action_tag(), "delete");
     }
 
+    // --- TypeCatalogueEntry action field ---
+
     #[test]
-    fn test_domain_type_entry_action_defaults_to_add() {
-        let entry =
-            DomainTypeEntry::new("Foo", "desc", DomainTypeKind::ValueObject, TypeAction::Add, true)
-                .unwrap();
+    fn test_type_catalogue_entry_action_defaults_to_add() {
+        let entry = TypeCatalogueEntry::new(
+            "Foo",
+            "desc",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
         assert_eq!(entry.action(), TypeAction::Add);
     }
 
     #[test]
-    fn test_domain_type_entry_stores_delete_action() {
-        let entry = DomainTypeEntry::new(
+    fn test_type_catalogue_entry_stores_delete_action() {
+        let entry = TypeCatalogueEntry::new(
             "OldType",
             "Intentionally deleted",
-            DomainTypeKind::ValueObject,
+            TypeDefinitionKind::ValueObject,
             TypeAction::Delete,
             true,
         )
@@ -1124,11 +440,11 @@ mod tests {
     }
 
     #[test]
-    fn test_domain_type_entry_stores_modify_action() {
-        let entry = DomainTypeEntry::new(
+    fn test_type_catalogue_entry_stores_modify_action() {
+        let entry = TypeCatalogueEntry::new(
             "ChangedType",
             "Modified existing type",
-            DomainTypeKind::ValueObject,
+            TypeDefinitionKind::ValueObject,
             TypeAction::Modify,
             true,
         )
@@ -1137,11 +453,11 @@ mod tests {
     }
 
     #[test]
-    fn test_domain_type_entry_stores_reference_action() {
-        let entry = DomainTypeEntry::new(
+    fn test_type_catalogue_entry_stores_reference_action() {
+        let entry = TypeCatalogueEntry::new(
             "RefType",
             "Referenced for docs",
-            DomainTypeKind::ValueObject,
+            TypeDefinitionKind::ValueObject,
             TypeAction::Reference,
             true,
         )
@@ -1149,13 +465,13 @@ mod tests {
         assert_eq!(entry.action(), TypeAction::Reference);
     }
 
-    // --- DomainTypeEntry helpers ---
+    // --- TypeCatalogueEntry constructor / accessors ---
 
-    fn typestate_entry() -> DomainTypeEntry {
-        DomainTypeEntry::new(
+    fn typestate_entry() -> TypeCatalogueEntry {
+        TypeCatalogueEntry::new(
             "ReviewState",
             "Typestate for review flow",
-            DomainTypeKind::Typestate {
+            TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["Approved".into(), "Rejected".into()]),
             },
             TypeAction::Add,
@@ -1165,7 +481,7 @@ mod tests {
     }
 
     #[test]
-    fn test_domain_type_entry_with_valid_name_succeeds() {
+    fn test_type_catalogue_entry_with_valid_name_succeeds() {
         let entry = typestate_entry();
         assert_eq!(entry.name(), "ReviewState");
         assert_eq!(entry.description(), "Typestate for review flow");
@@ -1174,38 +490,49 @@ mod tests {
     }
 
     #[test]
-    fn test_domain_type_entry_with_empty_name_returns_error() {
-        let result =
-            DomainTypeEntry::new("", "desc", DomainTypeKind::ValueObject, TypeAction::Add, true);
+    fn test_type_catalogue_entry_with_empty_name_returns_error() {
+        let result = TypeCatalogueEntry::new(
+            "",
+            "desc",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Add,
+            true,
+        );
         assert!(matches!(result, Err(SpecValidationError::EmptyDomainStateName)));
     }
 
     #[test]
-    fn test_domain_type_entry_with_whitespace_name_returns_error() {
-        let result =
-            DomainTypeEntry::new("   ", "desc", DomainTypeKind::ValueObject, TypeAction::Add, true);
+    fn test_type_catalogue_entry_with_whitespace_name_returns_error() {
+        let result = TypeCatalogueEntry::new(
+            "   ",
+            "desc",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Add,
+            true,
+        );
         assert!(matches!(result, Err(SpecValidationError::EmptyDomainStateName)));
     }
 
     #[test]
-    fn test_domain_type_entry_value_object_kind() {
-        let entry = DomainTypeEntry::new(
+    fn test_type_catalogue_entry_value_object_kind() {
+        let entry = TypeCatalogueEntry::new(
             "Email",
             "Validated email address",
-            DomainTypeKind::ValueObject,
+            TypeDefinitionKind::ValueObject,
             TypeAction::Add,
             true,
         )
         .unwrap();
-        assert_eq!(entry.kind(), &DomainTypeKind::ValueObject);
+        assert_eq!(entry.kind(), &TypeDefinitionKind::ValueObject);
         assert_eq!(entry.kind().kind_tag(), "value_object");
     }
 
     #[test]
-    fn test_domain_type_entry_enum_kind_with_variants() {
-        let kind =
-            DomainTypeKind::Enum { expected_variants: vec!["Active".into(), "Inactive".into()] };
-        let entry = DomainTypeEntry::new(
+    fn test_type_catalogue_entry_enum_kind_with_variants() {
+        let kind = TypeDefinitionKind::Enum {
+            expected_variants: vec!["Active".into(), "Inactive".into()],
+        };
+        let entry = TypeCatalogueEntry::new(
             "Status",
             "Track status enum",
             kind.clone(),
@@ -1218,11 +545,11 @@ mod tests {
     }
 
     #[test]
-    fn test_domain_type_entry_error_type_kind() {
-        let kind = DomainTypeKind::ErrorType {
+    fn test_type_catalogue_entry_error_type_kind() {
+        let kind = TypeDefinitionKind::ErrorType {
             expected_variants: vec!["NotFound".into(), "InvalidInput".into()],
         };
-        let entry = DomainTypeEntry::new(
+        let entry = TypeCatalogueEntry::new(
             "DomainError",
             "Domain error type",
             kind.clone(),
@@ -1235,11 +562,11 @@ mod tests {
     }
 
     #[test]
-    fn test_domain_type_entry_trait_port_kind() {
-        let kind = DomainTypeKind::TraitPort {
+    fn test_type_catalogue_entry_trait_port_kind() {
+        let kind = TypeDefinitionKind::TraitPort {
             expected_methods: vec!["find_by_id".into(), "save".into()],
         };
-        let entry = DomainTypeEntry::new(
+        let entry = TypeCatalogueEntry::new(
             "UserRepository",
             "User repo port",
             kind.clone(),
@@ -1252,19 +579,24 @@ mod tests {
     }
 
     #[test]
-    fn test_domain_type_entry_approved_default_true() {
-        let entry =
-            DomainTypeEntry::new("Foo", "desc", DomainTypeKind::ValueObject, TypeAction::Add, true)
-                .unwrap();
+    fn test_type_catalogue_entry_approved_default_true() {
+        let entry = TypeCatalogueEntry::new(
+            "Foo",
+            "desc",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
         assert!(entry.approved());
     }
 
     #[test]
-    fn test_domain_type_entry_approved_false_for_ai_added() {
-        let entry = DomainTypeEntry::new(
+    fn test_type_catalogue_entry_approved_false_for_ai_added() {
+        let entry = TypeCatalogueEntry::new(
             "AiSuggested",
             "AI-added type",
-            DomainTypeKind::ValueObject,
+            TypeDefinitionKind::ValueObject,
             TypeAction::Add,
             false,
         )
@@ -1272,19 +604,21 @@ mod tests {
         assert!(!entry.approved());
     }
 
+    // --- TypeCatalogueDocument ---
+
     #[test]
-    fn test_domain_types_document_creation() {
+    fn test_type_catalogue_document_creation() {
         let entries = vec![typestate_entry()];
-        let doc = DomainTypesDocument::new(1, entries.clone());
+        let doc = TypeCatalogueDocument::new(1, entries.clone());
         assert_eq!(doc.schema_version(), 1);
         assert_eq!(doc.entries(), entries.as_slice());
         assert!(doc.signals().is_none());
     }
 
     #[test]
-    fn test_domain_types_document_set_signals() {
-        let mut doc = DomainTypesDocument::new(1, vec![typestate_entry()]);
-        let signal = DomainTypeSignal::new(
+    fn test_type_catalogue_document_set_signals() {
+        let mut doc = TypeCatalogueDocument::new(1, vec![typestate_entry()]);
+        let signal = TypeSignal::new(
             "ReviewState",
             "typestate",
             ConfidenceSignal::Blue,
@@ -1302,23 +636,23 @@ mod tests {
     #[test]
     fn test_typestate_names_returns_only_typestate_entries() {
         let typestate = typestate_entry();
-        let value_obj = DomainTypeEntry::new(
+        let value_obj = TypeCatalogueEntry::new(
             "Email",
             "Validated email",
-            DomainTypeKind::ValueObject,
+            TypeDefinitionKind::ValueObject,
             TypeAction::Add,
             true,
         )
         .unwrap();
-        let enum_entry = DomainTypeEntry::new(
+        let enum_entry = TypeCatalogueEntry::new(
             "Status",
             "Status enum",
-            DomainTypeKind::Enum { expected_variants: vec!["Active".into()] },
+            TypeDefinitionKind::Enum { expected_variants: vec!["Active".into()] },
             TypeAction::Add,
             true,
         )
         .unwrap();
-        let doc = DomainTypesDocument::new(1, vec![typestate, value_obj, enum_entry]);
+        let doc = TypeCatalogueDocument::new(1, vec![typestate, value_obj, enum_entry]);
         let names = doc.typestate_names();
         assert_eq!(names.len(), 1);
         assert!(names.contains("ReviewState"));
@@ -1328,48 +662,50 @@ mod tests {
 
     #[test]
     fn test_typestate_names_with_no_typestate_entries_returns_empty_set() {
-        let value_obj = DomainTypeEntry::new(
+        let value_obj = TypeCatalogueEntry::new(
             "Email",
             "Validated email",
-            DomainTypeKind::ValueObject,
+            TypeDefinitionKind::ValueObject,
             TypeAction::Add,
             true,
         )
         .unwrap();
-        let doc = DomainTypesDocument::new(1, vec![value_obj]);
+        let doc = TypeCatalogueDocument::new(1, vec![value_obj]);
         assert!(doc.typestate_names().is_empty());
     }
 
     #[test]
     fn test_typestate_names_with_multiple_typestate_entries_returns_all() {
-        let ts1 = DomainTypeEntry::new(
+        let ts1 = TypeCatalogueEntry::new(
             "StateA",
             "First typestate",
-            DomainTypeKind::Typestate { transitions: TypestateTransitions::Terminal },
+            TypeDefinitionKind::Typestate { transitions: TypestateTransitions::Terminal },
             TypeAction::Add,
             true,
         )
         .unwrap();
-        let ts2 = DomainTypeEntry::new(
+        let ts2 = TypeCatalogueEntry::new(
             "StateB",
             "Second typestate",
-            DomainTypeKind::Typestate {
+            TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["StateA".into()]),
             },
             TypeAction::Add,
             true,
         )
         .unwrap();
-        let doc = DomainTypesDocument::new(1, vec![ts1, ts2]);
+        let doc = TypeCatalogueDocument::new(1, vec![ts1, ts2]);
         let names = doc.typestate_names();
         assert_eq!(names.len(), 2);
         assert!(names.contains("StateA"));
         assert!(names.contains("StateB"));
     }
 
+    // --- TypeSignal ---
+
     #[test]
-    fn test_domain_type_signal_accessors() {
-        let signal = DomainTypeSignal::new(
+    fn test_type_signal_accessors() {
+        let signal = TypeSignal::new(
             "TrackStatus",
             "enum",
             ConfidenceSignal::Yellow,
@@ -1385,983 +721,5 @@ mod tests {
         assert_eq!(signal.found_items(), &["Active"]);
         assert_eq!(signal.missing_items(), &["Done"]);
         assert_eq!(signal.extra_items(), &["Legacy"]);
-    }
-
-    // --- T003: evaluate_domain_type_signals ---
-
-    use std::collections::{HashMap, HashSet};
-
-    use crate::schema::{TraitNode, TypeGraph, TypeKind, TypeNode};
-
-    /// Build a `TypeGraph` with struct-kinded types only (no members, no return types).
-    fn make_profile(type_names: &[&str]) -> TypeGraph {
-        let mut types = HashMap::new();
-        for name in type_names {
-            types.insert(
-                name.to_string(),
-                TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
-            );
-        }
-        TypeGraph::new(types, HashMap::new())
-    }
-
-    /// Build a `TypeGraph` with a single enum type and given variants.
-    fn make_profile_with_enum(name: &str, variants: &[&str]) -> TypeGraph {
-        let mut types = HashMap::new();
-        types.insert(
-            name.to_string(),
-            TypeNode::new(
-                TypeKind::Enum,
-                variants.iter().map(|v| v.to_string()).collect(),
-                HashSet::new(),
-                HashSet::new(),
-            ),
-        );
-        TypeGraph::new(types, HashMap::new())
-    }
-
-    /// Build a `TypeGraph` where `from_type` has a method returning `to_type`.
-    fn make_profile_with_transition(from_type: &str, to_type: &str) -> TypeGraph {
-        let mut types = HashMap::new();
-        let return_types: HashSet<String> = [to_type.to_string()].into();
-        let outgoing: HashSet<String> = [to_type.to_string()].into();
-        let from_node = TypeNode::new(TypeKind::Struct, vec![], return_types, outgoing);
-        types.insert(from_type.to_string(), from_node);
-        types.insert(
-            to_type.to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
-        );
-        TypeGraph::new(types, HashMap::new())
-    }
-
-    /// Build a `TypeGraph` with a trait and given method names.
-    fn make_profile_with_trait(trait_name: &str, methods: &[&str]) -> TypeGraph {
-        let mut traits = HashMap::new();
-        traits.insert(
-            trait_name.to_string(),
-            TraitNode::new(methods.iter().map(|m| m.to_string()).collect()),
-        );
-        TypeGraph::new(HashMap::new(), traits)
-    }
-
-    #[test]
-    fn test_evaluate_typestate_blue_when_all_transitions_found() {
-        let draft = DomainTypeEntry::new(
-            "Draft",
-            "desc",
-            DomainTypeKind::Typestate {
-                transitions: TypestateTransitions::To(vec!["Published".into()]),
-            },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-        let published = DomainTypeEntry::new(
-            "Published",
-            "desc",
-            DomainTypeKind::Typestate { transitions: TypestateTransitions::Terminal },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-        let profile = make_profile_with_transition("Draft", "Published");
-        let results = evaluate_domain_type_signals(&[draft, published], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
-    }
-
-    #[test]
-    fn test_evaluate_typestate_yellow_when_type_not_implemented() {
-        let entry = DomainTypeEntry::new(
-            "Ghost",
-            "desc",
-            DomainTypeKind::Typestate { transitions: TypestateTransitions::Terminal },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-        let profile = make_profile(&[]);
-        let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
-        assert!(!results.first().unwrap().found_type());
-    }
-
-    #[test]
-    fn test_evaluate_typestate_red_when_transition_missing() {
-        let entry = DomainTypeEntry::new(
-            "Draft",
-            "desc",
-            DomainTypeKind::Typestate {
-                transitions: TypestateTransitions::To(vec!["Published".into()]),
-            },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-        // Type exists but no method returning Published.
-        let profile = make_profile(&["Draft"]);
-        let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Red);
-        assert_eq!(results.first().unwrap().missing_items(), &["Published"]);
-    }
-
-    #[test]
-    fn test_evaluate_value_object_blue_when_exists() {
-        let entry = DomainTypeEntry::new(
-            "TrackId",
-            "desc",
-            DomainTypeKind::ValueObject,
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-        let profile = make_profile(&["TrackId"]);
-        let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
-    }
-
-    #[test]
-    fn test_evaluate_value_object_yellow_when_not_implemented() {
-        let entry = DomainTypeEntry::new(
-            "TrackId",
-            "desc",
-            DomainTypeKind::ValueObject,
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-        let profile = make_profile(&[]);
-        let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
-        assert!(!results.first().unwrap().found_type());
-    }
-
-    // --- Delete action forward check ---
-
-    #[test]
-    fn test_delete_value_object_blue_when_absent() {
-        let entry = DomainTypeEntry::new(
-            "OldType",
-            "desc",
-            DomainTypeKind::ValueObject,
-            TypeAction::Delete,
-            true,
-        )
-        .unwrap();
-        let profile = make_profile(&[]); // type absent
-        let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
-        assert!(!results.first().unwrap().found_type());
-    }
-
-    #[test]
-    fn test_delete_value_object_yellow_when_still_present() {
-        let entry = DomainTypeEntry::new(
-            "OldType",
-            "desc",
-            DomainTypeKind::ValueObject,
-            TypeAction::Delete,
-            true,
-        )
-        .unwrap();
-        let profile = make_profile(&["OldType"]); // type still present
-        let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
-        assert!(results.first().unwrap().found_type());
-    }
-
-    #[test]
-    fn test_delete_trait_port_blue_when_absent() {
-        let entry = DomainTypeEntry::new(
-            "OldRepo",
-            "desc",
-            DomainTypeKind::TraitPort { expected_methods: vec!["find".into()] },
-            TypeAction::Delete,
-            true,
-        )
-        .unwrap();
-        let profile = make_profile(&[]); // trait absent
-        let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
-    }
-
-    #[test]
-    fn test_delete_trait_port_yellow_when_still_present() {
-        let entry = DomainTypeEntry::new(
-            "OldRepo",
-            "desc",
-            DomainTypeKind::TraitPort { expected_methods: vec!["find".into()] },
-            TypeAction::Delete,
-            true,
-        )
-        .unwrap();
-        // Build a profile with the trait present
-        let types = std::collections::HashMap::new();
-        let traits = std::collections::HashMap::from([(
-            "OldRepo".to_string(),
-            crate::schema::TraitNode::new(vec!["find".into()]),
-        )]);
-        let profile = TypeGraph::new(types, traits);
-        let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
-    }
-
-    #[test]
-    fn test_evaluate_enum_yellow_when_not_implemented() {
-        let entry = DomainTypeEntry::new(
-            "Status",
-            "desc",
-            DomainTypeKind::Enum { expected_variants: vec!["Active".into()] },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-        // Profile has no "Status" type.
-        let profile = make_profile(&[]);
-        let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
-        assert!(!results.first().unwrap().found_type());
-    }
-
-    #[test]
-    fn test_evaluate_error_type_yellow_when_not_implemented() {
-        let entry = DomainTypeEntry::new(
-            "DomainError",
-            "desc",
-            DomainTypeKind::ErrorType { expected_variants: vec!["NotFound".into()] },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-        // Profile has no "DomainError" type — declared in spec, not yet implemented.
-        let profile = make_profile(&[]);
-        let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
-        assert!(!results.first().unwrap().found_type());
-    }
-
-    #[test]
-    fn test_evaluate_enum_blue_when_variants_match() {
-        let entry = DomainTypeEntry::new(
-            "Status",
-            "desc",
-            DomainTypeKind::Enum { expected_variants: vec!["Active".into(), "Done".into()] },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-        let profile = make_profile_with_enum("Status", &["Active", "Done"]);
-        let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
-    }
-
-    #[test]
-    fn test_evaluate_trait_port_yellow_when_not_implemented() {
-        let entry = DomainTypeEntry::new(
-            "Repo",
-            "desc",
-            DomainTypeKind::TraitPort { expected_methods: vec!["save".into()] },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-        let profile = make_profile(&[]);
-        let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
-        assert!(!results.first().unwrap().found_type());
-    }
-
-    #[test]
-    fn test_evaluate_trait_port_blue_when_methods_match() {
-        let entry = DomainTypeEntry::new(
-            "Repo",
-            "desc",
-            DomainTypeKind::TraitPort { expected_methods: vec!["save".into(), "find".into()] },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-        let profile = make_profile_with_trait("Repo", &["save", "find"]);
-        let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
-    }
-
-    #[test]
-    fn test_evaluate_typestate_blue_empty_transitions() {
-        // Typestate with Terminal transitions = terminal state.
-        let entry = DomainTypeEntry::new(
-            "Final",
-            "desc",
-            DomainTypeKind::Typestate { transitions: TypestateTransitions::Terminal },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-        let profile = make_profile(&["Final"]);
-        let results = evaluate_domain_type_signals(&[entry], &profile);
-        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
-    }
-
-    #[test]
-    fn test_evaluate_typestate_uses_outgoing_not_method_return_types() {
-        // "Draft" has method_return_types = {"Published", "NonTypestate"},
-        // but outgoing = {"Published"} only (NonTypestate was filtered out by build_type_graph).
-        // Evaluation must use outgoing — not method_return_types — so "NonTypestate" must not
-        // appear in extra_items even though it is in method_return_types.
-        let draft_entry = DomainTypeEntry::new(
-            "Draft",
-            "desc",
-            DomainTypeKind::Typestate {
-                transitions: TypestateTransitions::To(vec!["Published".into()]),
-            },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-        let published_entry = DomainTypeEntry::new(
-            "Published",
-            "desc",
-            DomainTypeKind::Typestate { transitions: TypestateTransitions::Terminal },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-
-        // Construct a TypeGraph where method_return_types has a non-typestate extra entry.
-        let mut types = HashMap::new();
-        let method_return_types: HashSet<String> =
-            ["Published".to_string(), "NonTypestate".to_string()].into();
-        // outgoing only contains the typestate target — NonTypestate is intentionally absent.
-        let outgoing: HashSet<String> = ["Published".to_string()].into();
-        let from_node = TypeNode::new(TypeKind::Struct, vec![], method_return_types, outgoing);
-        types.insert("Draft".to_string(), from_node);
-        types.insert(
-            "Published".to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
-        );
-        let profile = TypeGraph::new(types, HashMap::new());
-
-        let results = evaluate_domain_type_signals(&[draft_entry, published_entry], &profile);
-        let draft_signal = results.first().unwrap();
-        // Blue: outgoing matches the declared transition exactly.
-        assert_eq!(draft_signal.signal(), ConfidenceSignal::Blue);
-        // NonTypestate must not appear in extra_items — evaluation must not read method_return_types.
-        assert!(
-            draft_signal.extra_items().is_empty(),
-            "expected no extra_items, got {:?}",
-            draft_signal.extra_items()
-        );
-    }
-
-    // --- undeclared_to_signals tests ---
-
-    #[test]
-    fn test_undeclared_to_signals_converts_types_to_red() {
-        let undeclared = vec!["Foo".to_string(), "Bar".to_string()];
-        let signals = undeclared_to_signals(&undeclared, &[]);
-
-        assert_eq!(signals.len(), 2);
-        assert_eq!(signals[0].type_name(), "Foo");
-        assert_eq!(signals[0].kind_tag(), "undeclared_type");
-        assert_eq!(signals[0].signal(), ConfidenceSignal::Red);
-        assert!(signals[0].found_type());
-        assert!(signals[0].missing_items().is_empty());
-        assert!(signals[0].extra_items().is_empty());
-
-        assert_eq!(signals[1].type_name(), "Bar");
-        assert_eq!(signals[1].kind_tag(), "undeclared_type");
-        assert_eq!(signals[1].signal(), ConfidenceSignal::Red);
-    }
-
-    #[test]
-    fn test_undeclared_to_signals_converts_traits_to_red() {
-        let undeclared_traits = vec!["MyTrait".to_string()];
-        let signals = undeclared_to_signals(&[], &undeclared_traits);
-
-        assert_eq!(signals.len(), 1);
-        assert_eq!(signals[0].type_name(), "MyTrait");
-        assert_eq!(signals[0].kind_tag(), "undeclared_trait");
-        assert_eq!(signals[0].signal(), ConfidenceSignal::Red);
-        assert!(signals[0].found_type());
-    }
-
-    #[test]
-    fn test_undeclared_to_signals_empty_inputs_returns_empty() {
-        let signals = undeclared_to_signals(&[], &[]);
-        assert!(signals.is_empty());
-    }
-
-    #[test]
-    fn test_undeclared_to_signals_mixed_types_and_traits() {
-        let types = vec!["Foo".to_string()];
-        let traits = vec!["Bar".to_string()];
-        let signals = undeclared_to_signals(&types, &traits);
-
-        assert_eq!(signals.len(), 2);
-        assert_eq!(signals[0].kind_tag(), "undeclared_type");
-        assert_eq!(signals[1].kind_tag(), "undeclared_trait");
-    }
-
-    // --- check_consistency tests (4-group baseline-aware) ---
-
-    use crate::Timestamp;
-    use crate::tddd::baseline::{TraitBaselineEntry, TypeBaseline, TypeBaselineEntry};
-
-    fn empty_baseline() -> TypeBaseline {
-        TypeBaseline::new(
-            1,
-            Timestamp::new("2026-04-11T00:00:00Z").unwrap(),
-            HashMap::new(),
-            HashMap::new(),
-        )
-    }
-
-    fn baseline_with_types(entries: Vec<(&str, TypeBaselineEntry)>) -> TypeBaseline {
-        let types = entries.into_iter().map(|(n, e)| (n.to_string(), e)).collect();
-        TypeBaseline::new(1, Timestamp::new("2026-04-11T00:00:00Z").unwrap(), types, HashMap::new())
-    }
-
-    fn baseline_with_traits(entries: Vec<(&str, TraitBaselineEntry)>) -> TypeBaseline {
-        let traits = entries.into_iter().map(|(n, e)| (n.to_string(), e)).collect();
-        TypeBaseline::new(
-            1,
-            Timestamp::new("2026-04-11T00:00:00Z").unwrap(),
-            HashMap::new(),
-            traits,
-        )
-    }
-
-    #[test]
-    fn test_group4_undeclared_new_type_is_red() {
-        // Type in code, not declared, not in baseline → group 4 Red
-        let mut types = HashMap::new();
-        types.insert(
-            "NewType".to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
-        );
-        let graph = TypeGraph::new(types, HashMap::new());
-
-        let report = check_consistency(&[], &graph, &empty_baseline());
-        assert_eq!(report.undeclared_types(), &["NewType"]);
-        assert_eq!(report.skipped_count(), 0);
-    }
-
-    #[test]
-    fn test_group3_baseline_unchanged_type_is_skipped() {
-        // Type in baseline and code, not declared, structure unchanged → skip
-        let bl = baseline_with_types(vec![(
-            "ExistingType",
-            TypeBaselineEntry::new(TypeKind::Struct, vec!["field".into()], vec![]),
-        )]);
-
-        let mut types = HashMap::new();
-        types.insert(
-            "ExistingType".to_string(),
-            TypeNode::new(TypeKind::Struct, vec!["field".into()], HashSet::new(), HashSet::new()),
-        );
-        let graph = TypeGraph::new(types, HashMap::new());
-
-        let report = check_consistency(&[], &graph, &bl);
-        assert_eq!(report.skipped_count(), 1);
-        assert!(report.undeclared_types().is_empty());
-        assert!(report.baseline_red_types().is_empty());
-    }
-
-    #[test]
-    fn test_group3_baseline_changed_type_is_red() {
-        // Type in baseline and code, not declared, structure changed → Red
-        let bl = baseline_with_types(vec![(
-            "ChangedType",
-            TypeBaselineEntry::new(TypeKind::Enum, vec!["A".into()], vec![]),
-        )]);
-
-        let mut types = HashMap::new();
-        types.insert(
-            "ChangedType".to_string(),
-            TypeNode::new(
-                TypeKind::Enum,
-                vec!["A".into(), "B".into()], // new variant added
-                HashSet::new(),
-                HashSet::new(),
-            ),
-        );
-        let graph = TypeGraph::new(types, HashMap::new());
-
-        let report = check_consistency(&[], &graph, &bl);
-        assert_eq!(report.baseline_red_types(), &["ChangedType"]);
-        assert_eq!(report.skipped_count(), 0);
-    }
-
-    #[test]
-    fn test_group3_baseline_deleted_type_is_red() {
-        // Type in baseline but not in code, not declared → Red (deletion)
-        let bl = baseline_with_types(vec![(
-            "DeletedType",
-            TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
-        )]);
-
-        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
-
-        let report = check_consistency(&[], &graph, &bl);
-        assert_eq!(report.baseline_red_types(), &["DeletedType"]);
-        assert_eq!(report.skipped_count(), 0);
-    }
-
-    #[test]
-    fn test_group2_declared_baseline_type_uses_forward_check() {
-        // Type in both baseline and declarations → forward check (group 2)
-        let bl = baseline_with_types(vec![(
-            "TrackId",
-            TypeBaselineEntry::new(TypeKind::Struct, vec!["0".into()], vec![]),
-        )]);
-
-        let entry = DomainTypeEntry::new(
-            "TrackId",
-            "desc",
-            DomainTypeKind::ValueObject,
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-
-        let mut types = HashMap::new();
-        types.insert(
-            "TrackId".to_string(),
-            TypeNode::new(TypeKind::Struct, vec!["0".into()], HashSet::new(), HashSet::new()),
-        );
-        let graph = TypeGraph::new(types, HashMap::new());
-
-        let report = check_consistency(&[entry], &graph, &bl);
-        assert_eq!(report.forward_signals().len(), 1);
-        assert_eq!(report.forward_signals()[0].signal(), ConfidenceSignal::Blue);
-        // Not counted as skipped (it's declared → forward check handles it)
-        assert_eq!(report.skipped_count(), 0);
-        assert!(report.baseline_red_types().is_empty());
-    }
-
-    #[test]
-    fn test_group1_new_declared_type_uses_forward_check() {
-        // Declared but not in baseline → group 1, forward check
-        let entry = DomainTypeEntry::new(
-            "NewType",
-            "desc",
-            DomainTypeKind::ValueObject,
-            TypeAction::Add,
-            true,
-        )
-        .unwrap();
-
-        let mut types = HashMap::new();
-        types.insert(
-            "NewType".to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
-        );
-        let graph = TypeGraph::new(types, HashMap::new());
-
-        let report = check_consistency(&[entry], &graph, &empty_baseline());
-        assert_eq!(report.forward_signals().len(), 1);
-        assert_eq!(report.forward_signals()[0].signal(), ConfidenceSignal::Blue);
-        assert!(report.undeclared_types().is_empty());
-    }
-
-    #[test]
-    fn test_group3_baseline_unchanged_trait_is_skipped() {
-        let bl = baseline_with_traits(vec![(
-            "MyTrait",
-            TraitBaselineEntry::new(vec!["method_a".into()]),
-        )]);
-
-        let mut traits = HashMap::new();
-        traits.insert("MyTrait".to_string(), TraitNode::new(vec!["method_a".into()]));
-        let graph = TypeGraph::new(HashMap::new(), traits);
-
-        let report = check_consistency(&[], &graph, &bl);
-        assert_eq!(report.skipped_count(), 1);
-        assert!(report.baseline_red_traits().is_empty());
-    }
-
-    #[test]
-    fn test_group3_baseline_changed_trait_is_red() {
-        let bl = baseline_with_traits(vec![(
-            "MyTrait",
-            TraitBaselineEntry::new(vec!["method_a".into()]),
-        )]);
-
-        let mut traits = HashMap::new();
-        traits.insert(
-            "MyTrait".to_string(),
-            TraitNode::new(vec!["method_a".into(), "method_b".into()]),
-        );
-        let graph = TypeGraph::new(HashMap::new(), traits);
-
-        let report = check_consistency(&[], &graph, &bl);
-        assert_eq!(report.baseline_red_traits(), &["MyTrait"]);
-        assert_eq!(report.skipped_count(), 0);
-    }
-
-    #[test]
-    fn test_mixed_groups_comprehensive() {
-        // Set up a scenario with all 4 groups:
-        // - "DeclaredNew" (group 1): declared, not in baseline
-        // - "DeclaredExisting" (group 2): declared, in baseline
-        // - "UnchangedExisting" (group 3 skip): in baseline, unchanged
-        // - "ChangedExisting" (group 3 red): in baseline, changed
-        // - "BrandNew" (group 4): not declared, not in baseline
-        let bl = baseline_with_types(vec![
-            ("DeclaredExisting", TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![])),
-            (
-                "UnchangedExisting",
-                TypeBaselineEntry::new(TypeKind::Struct, vec!["x".into()], vec![]),
-            ),
-            ("ChangedExisting", TypeBaselineEntry::new(TypeKind::Enum, vec!["A".into()], vec![])),
-        ]);
-
-        let entries = vec![
-            DomainTypeEntry::new(
-                "DeclaredNew",
-                "d",
-                DomainTypeKind::ValueObject,
-                TypeAction::Add,
-                true,
-            )
-            .unwrap(),
-            DomainTypeEntry::new(
-                "DeclaredExisting",
-                "d",
-                DomainTypeKind::ValueObject,
-                TypeAction::Add,
-                true,
-            )
-            .unwrap(),
-        ];
-
-        let mut types = HashMap::new();
-        for name in
-            &["DeclaredNew", "DeclaredExisting", "UnchangedExisting", "ChangedExisting", "BrandNew"]
-        {
-            let (kind, members) = if *name == "ChangedExisting" {
-                (TypeKind::Enum, vec!["A".into(), "B".into()]) // changed
-            } else if *name == "UnchangedExisting" {
-                (TypeKind::Struct, vec!["x".into()])
-            } else {
-                (TypeKind::Struct, vec![])
-            };
-            types.insert(
-                name.to_string(),
-                TypeNode::new(kind, members, HashSet::new(), HashSet::new()),
-            );
-        }
-        let graph = TypeGraph::new(types, HashMap::new());
-
-        let report = check_consistency(&entries, &graph, &bl);
-
-        // Groups 1+2: 2 forward signals
-        assert_eq!(report.forward_signals().len(), 2);
-        // Group 3 skip: UnchangedExisting
-        assert_eq!(report.skipped_count(), 1);
-        // Group 3 red: ChangedExisting
-        assert_eq!(report.baseline_red_types(), &["ChangedExisting"]);
-        // Group 4: BrandNew
-        assert_eq!(report.undeclared_types(), &["BrandNew"]);
-    }
-
-    // --- Contradiction detection (T003/T004) ---
-
-    #[test]
-    fn test_contradiction_add_already_in_baseline() {
-        let entry =
-            DomainTypeEntry::new("Foo", "d", DomainTypeKind::ValueObject, TypeAction::Add, true)
-                .unwrap();
-        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
-        let baseline = baseline_with_types(vec![(
-            "Foo",
-            TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
-        )]);
-        let report = check_consistency(&[entry], &graph, &baseline);
-        assert_eq!(report.contradictions().len(), 1);
-        assert_eq!(
-            report.contradictions()[0].kind(),
-            &ActionContradictionKind::AddButAlreadyInBaseline
-        );
-    }
-
-    #[test]
-    fn test_no_contradiction_add_not_in_baseline() {
-        let entry =
-            DomainTypeEntry::new("Foo", "d", DomainTypeKind::ValueObject, TypeAction::Add, true)
-                .unwrap();
-        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
-        let baseline = empty_baseline();
-        let report = check_consistency(&[entry], &graph, &baseline);
-        assert!(report.contradictions().is_empty());
-    }
-
-    #[test]
-    fn test_contradiction_modify_not_in_baseline() {
-        let entry =
-            DomainTypeEntry::new("Foo", "d", DomainTypeKind::ValueObject, TypeAction::Modify, true)
-                .unwrap();
-        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
-        let baseline = empty_baseline();
-        let report = check_consistency(&[entry], &graph, &baseline);
-        assert_eq!(report.contradictions().len(), 1);
-        assert_eq!(
-            report.contradictions()[0].kind(),
-            &ActionContradictionKind::ModifyButNotInBaseline
-        );
-    }
-
-    #[test]
-    fn test_no_contradiction_modify_in_baseline() {
-        let entry =
-            DomainTypeEntry::new("Foo", "d", DomainTypeKind::ValueObject, TypeAction::Modify, true)
-                .unwrap();
-        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
-        let baseline = baseline_with_types(vec![(
-            "Foo",
-            TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
-        )]);
-        let report = check_consistency(&[entry], &graph, &baseline);
-        assert!(report.contradictions().is_empty());
-    }
-
-    #[test]
-    fn test_contradiction_reference_not_in_baseline() {
-        let entry = DomainTypeEntry::new(
-            "Foo",
-            "d",
-            DomainTypeKind::ValueObject,
-            TypeAction::Reference,
-            true,
-        )
-        .unwrap();
-        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
-        let baseline = empty_baseline();
-        let report = check_consistency(&[entry], &graph, &baseline);
-        assert_eq!(report.contradictions().len(), 1);
-        assert_eq!(
-            report.contradictions()[0].kind(),
-            &ActionContradictionKind::ReferenceButNotInBaseline
-        );
-    }
-
-    #[test]
-    fn test_contradiction_reference_not_blue() {
-        // Reference entry with type in baseline but not in code → forward Yellow → contradiction
-        let entry = DomainTypeEntry::new(
-            "Foo",
-            "d",
-            DomainTypeKind::ValueObject,
-            TypeAction::Reference,
-            true,
-        )
-        .unwrap();
-        let graph = TypeGraph::new(HashMap::new(), HashMap::new()); // type absent → Yellow
-        let baseline = baseline_with_types(vec![(
-            "Foo",
-            TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
-        )]);
-        let report = check_consistency(&[entry], &graph, &baseline);
-        assert_eq!(report.contradictions().len(), 1);
-        assert_eq!(
-            report.contradictions()[0].kind(),
-            &ActionContradictionKind::ReferenceButNotBlue
-        );
-    }
-
-    #[test]
-    fn test_delete_error_not_in_baseline() {
-        let entry = DomainTypeEntry::new(
-            "Ghost",
-            "d",
-            DomainTypeKind::ValueObject,
-            TypeAction::Delete,
-            true,
-        )
-        .unwrap();
-        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
-        let baseline = empty_baseline();
-        let report = check_consistency(&[entry], &graph, &baseline);
-        assert_eq!(report.delete_errors(), &["Ghost"]);
-    }
-
-    #[test]
-    fn test_delete_error_not_in_baseline_signal_is_red() {
-        // An invalid delete (no baseline) must produce a Red forward signal so that
-        // consumers who only inspect `forward_signals` see the error without having
-        // to also consult `delete_errors`.
-        let entry = DomainTypeEntry::new(
-            "Ghost",
-            "d",
-            DomainTypeKind::ValueObject,
-            TypeAction::Delete,
-            true,
-        )
-        .unwrap();
-        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
-        let baseline = empty_baseline();
-        let report = check_consistency(&[entry], &graph, &baseline);
-        assert_eq!(report.delete_errors(), &["Ghost"]);
-        assert_eq!(report.forward_signals()[0].signal(), ConfidenceSignal::Red);
-        assert!(!report.forward_signals()[0].found_type());
-    }
-
-    #[test]
-    fn test_delete_in_baseline_no_error() {
-        let entry =
-            DomainTypeEntry::new("Foo", "d", DomainTypeKind::ValueObject, TypeAction::Delete, true)
-                .unwrap();
-        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
-        let baseline = baseline_with_types(vec![(
-            "Foo",
-            TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
-        )]);
-        let report = check_consistency(&[entry], &graph, &baseline);
-        assert!(report.delete_errors().is_empty());
-    }
-
-    // --- check_domain_types_signals (Stage 2 signal gate) ---
-    //
-    // Cases mirror the D7–D13 rows in the ADR Test Matrix. The function is
-    // shared by both the CI path and the merge gate; Yellow flips between
-    // warning and error based on the `strict` parameter.
-
-    fn make_entry(name: &str) -> DomainTypeEntry {
-        DomainTypeEntry::new(name, "test entry", DomainTypeKind::ValueObject, TypeAction::Add, true)
-            .unwrap()
-    }
-
-    fn make_signal(name: &str, signal: ConfidenceSignal) -> DomainTypeSignal {
-        DomainTypeSignal::new(
-            name,
-            "value_object",
-            signal,
-            true,
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-        )
-    }
-
-    #[test]
-    fn test_check_domain_types_signals_empty_entries_returns_error() {
-        // D7: entries=[] → BLOCKED
-        let doc = DomainTypesDocument::new(1, Vec::new());
-        let outcome = check_domain_types_signals(&doc, false);
-        assert!(outcome.has_errors(), "empty entries must be an error");
-        assert!(outcome.findings()[0].message().contains("no entries"));
-    }
-
-    #[test]
-    fn test_check_domain_types_signals_none_signals_returns_error() {
-        // D8: signals=None → BLOCKED (unevaluated)
-        let doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
-        let outcome = check_domain_types_signals(&doc, false);
-        assert!(outcome.has_errors(), "None signals must be an error");
-        assert!(outcome.findings()[0].message().contains("not yet evaluated"));
-    }
-
-    #[test]
-    fn test_check_domain_types_signals_coverage_gap_returns_error() {
-        // D9: entry has no matching signal → BLOCKED
-        let mut doc =
-            DomainTypesDocument::new(1, vec![make_entry("TrackId"), make_entry("ReviewState")]);
-        // Only TrackId has a signal; ReviewState is uncovered
-        doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Blue)]);
-        let outcome = check_domain_types_signals(&doc, false);
-        assert!(outcome.has_errors());
-        let msg = outcome.findings()[0].message();
-        assert!(msg.contains("no signal evaluation"), "message: {msg}");
-        assert!(msg.contains("ReviewState"));
-    }
-
-    #[test]
-    fn test_check_domain_types_signals_red_is_error_regardless_of_mode() {
-        // D10: Red signal → BLOCKED in both modes
-        let mut doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
-        doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Red)]);
-        let outcome_interim = check_domain_types_signals(&doc, false);
-        assert!(outcome_interim.has_errors(), "red in interim must be an error");
-        let outcome_strict = check_domain_types_signals(&doc, true);
-        assert!(outcome_strict.has_errors(), "red in strict must be an error");
-    }
-
-    #[test]
-    fn test_check_domain_types_signals_yellow_is_warning_in_interim_mode() {
-        // D11: declared Yellow, strict=false → PASS with warning
-        let mut doc =
-            DomainTypesDocument::new(1, vec![make_entry("TrackId"), make_entry("ReviewState")]);
-        doc.set_signals(vec![
-            make_signal("TrackId", ConfidenceSignal::Blue),
-            make_signal("ReviewState", ConfidenceSignal::Yellow),
-        ]);
-        let outcome = check_domain_types_signals(&doc, false);
-        assert!(!outcome.has_errors(), "yellow in interim must not be an error");
-        let findings = outcome.findings();
-        assert_eq!(findings.len(), 1);
-        assert_eq!(findings[0].severity(), crate::verify::Severity::Warning);
-        let msg = findings[0].message();
-        assert!(msg.contains("1 declared type"), "must mention count: {msg}");
-        assert!(msg.contains("ReviewState"), "must list the type name: {msg}");
-        assert!(msg.contains("merge gate will block"), "must warn: {msg}");
-    }
-
-    #[test]
-    fn test_check_domain_types_signals_yellow_is_error_in_strict_mode() {
-        // D12: declared Yellow, strict=true → BLOCKED
-        let mut doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
-        doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Yellow)]);
-        let outcome = check_domain_types_signals(&doc, true);
-        assert!(outcome.has_errors());
-        let findings = outcome.findings();
-        assert_eq!(findings.len(), 1);
-        assert_eq!(findings[0].severity(), crate::verify::Severity::Error);
-        assert!(findings[0].message().contains("TrackId"));
-    }
-
-    #[test]
-    fn test_check_domain_types_signals_all_blue_passes_in_both_modes() {
-        // D13: all Blue + coverage complete → PASS
-        let mut doc =
-            DomainTypesDocument::new(1, vec![make_entry("TrackId"), make_entry("ReviewState")]);
-        doc.set_signals(vec![
-            make_signal("TrackId", ConfidenceSignal::Blue),
-            make_signal("ReviewState", ConfidenceSignal::Blue),
-        ]);
-
-        let outcome_interim = check_domain_types_signals(&doc, false);
-        assert!(!outcome_interim.has_errors());
-        assert!(outcome_interim.findings().is_empty());
-
-        let outcome_strict = check_domain_types_signals(&doc, true);
-        assert!(!outcome_strict.has_errors());
-        assert!(outcome_strict.findings().is_empty());
-    }
-
-    #[test]
-    fn test_check_domain_types_signals_undeclared_yellow_is_not_blocked() {
-        // Undeclared reverse signals that are Yellow are allowed even in strict
-        // mode (per existing verify_from_spec_json logic — only declared Yellow
-        // is gated). Undeclared Red is caught by the Red check.
-        let mut doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
-        doc.set_signals(vec![
-            make_signal("TrackId", ConfidenceSignal::Blue),
-            // Yellow signal for a type not in the entries list (reverse/undeclared)
-            DomainTypeSignal::new(
-                "UndeclaredType",
-                "undeclared_type",
-                ConfidenceSignal::Yellow,
-                false,
-                Vec::new(),
-                Vec::new(),
-                Vec::new(),
-            ),
-        ]);
-
-        let outcome_strict = check_domain_types_signals(&doc, true);
-        assert!(
-            !outcome_strict.has_errors(),
-            "undeclared Yellow must not block even in strict mode: {outcome_strict:?}"
-        );
-        assert!(outcome_strict.findings().is_empty());
     }
 }

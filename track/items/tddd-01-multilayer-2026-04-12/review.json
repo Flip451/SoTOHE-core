@@ -1,6 +1,46 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-12T23:58:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new module docs tell consumers to import from `crate::tddd::*`, but `libs/domain/src/tddd/mod.rs` only publishes submodules and does not re-export these items. That leaves the documented import path dead immediately after this refactor; the actual re-exports live at the crate root via `libs/domain/src/lib.rs`.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 11,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-13T00:01:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-13T00:04:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db36c79eb63679aedaa6ecb594969b26c6faa93d54dd6165544ae26e727449db",
+          "at": "2026-04-13T00:08:26Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -521,6 +561,20 @@
           "findings": [],
           "hash": "rvw1:sha256:ff082c4e5d1499932cd6069726f9a4941acf576e77b0b8e2aeeb5f3f0389ae5f",
           "at": "2026-04-12T23:03:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91886baea106a9d5b33eb1819b55676bd04505d6b0b7abc72966207b1761bb02",
+          "at": "2026-04-12T23:57:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91886baea106a9d5b33eb1819b55676bd04505d6b0b7abc72966207b1761bb02",
+          "at": "2026-04-12T23:58:28Z"
         }
       ]
     }

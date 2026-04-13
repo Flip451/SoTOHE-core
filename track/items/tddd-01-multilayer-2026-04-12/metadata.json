@@ -72,51 +72,44 @@
     ]
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
   "tasks": [
     {
-      "commit_hash": null,
       "description": "`libs/domain/src/tddd/catalogue.rs` の `Domain*` シンボル (DomainTypeKind/DomainTypeEntry/DomainTypesDocument/DomainTypeSignal/evaluate_domain_type_signals/check_domain_types_signals) を `TypeDefinition*` / `TypeCatalogue*` / `TypeSignal` / `evaluate_type_signals` / `check_type_signals` に一括リネーム。catalogue.rs (2088行) を catalogue.rs (型定義 ~300行) / signals.rs (評価関数 ~350行) / consistency.rs (ConsistencyReport + check_consistency + check_type_signals ~320行) に 3 分割 (DM-06 同時解消)。`libs/domain/src/tddd/mod.rs` と `libs/domain/src/lib.rs` の re-export を更新",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
-      "commit_hash": null,
       "description": "infrastructure 層のリネーム: `libs/infrastructure/src/tddd/catalogue_codec.rs` の DTO 名と import を更新 (schema_version は T006 で 2 にバンプ)。`baseline_codec.rs` / `baseline_builder.rs` の import を更新。`domain_types_render.rs` の関数名を `render_type_catalogue` に変更し、section header を `## Domain Types` → `## Type Declarations` に改題。`libs/infrastructure/src/verify/spec_states.rs` と `merge_gate_adapter.rs` の import を更新",
       "id": "T002",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "usecase / CLI / Makefile のリネーム: `libs/usecase/src/merge_gate.rs` と `task_completion.rs` の import を更新。`apps/cli/src/commands/track/tddd/signals.rs` と `baseline.rs` のサブコマンドを `domain-type-signals` → `type-signals` に変更、`mod.rs` の dispatch を更新。`Makefile.toml` の `track-domain-type-signals` / `track-baseline-capture` タスク名を新名に合わせる (layer 対応は T007 で実施)",
       "id": "T003",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "`libs/domain/src/tddd/catalogue.rs` に `ParamDeclaration` (struct) / `MethodDeclaration` (struct + `signature_string()` ヘルパーメソッド) / `MemberDeclaration` (enum-first: Variant/Field) を追加。`libs/domain/src/schema.rs` の `FunctionInfo` から `signature: String` フィールドと `pub fn signature()` アクセサを削除 (C1)、`params`/`returns`/`receiver`/`is_async` を追加。`libs/infrastructure/src/schema_export.rs::format_sig` 関数も削除。`TypeInfo::members` を `Vec<MemberDeclaration>` に、`TypeNode` を `{kind, members: Vec<MemberDeclaration>, methods: Vec<MethodDeclaration>, outgoing}` に、`TraitNode` を `{methods: Vec<MethodDeclaration>}` に拡張。`libs/infrastructure/src/schema_export.rs` に recursive `format_type` / `format_args` を追加して rustdoc_types 0.57 から 4 フィールドを抽出。`SchemaExporter::export(&self, crate_name: &str)` ポートシグネチャは変更しない (BRIDGE-01 / domain.rs / verify.rs の既存 call-site 互換)。注: CLI が `schema_export.targets[]` をループして per-crate `export()` を呼び出し結果を統合する multi-crate 集約 wiring は T007 で実装する — T004 は per-crate 抽出ロジック (`format_type` / `format_args` を含む rustdoc JSON → 構造化フィールド変換) のみを担当。`libs/infrastructure/src/code_profile_builder.rs::build_type_graph` に FunctionInfo → MethodDeclaration 変換を追加。outgoing は従来通り return_type_names ∩ typestate_names から derive。BRIDGE-01 (`sotp domain export-schema`) JSON の `signature` キーが消える breaking change を受容",
       "id": "T004",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "`libs/domain/src/tddd/baseline.rs` の `TypeBaselineEntry` を `{kind, members: Vec<MemberDeclaration>, methods: Vec<MethodDeclaration>}` に、`TraitBaselineEntry` を `{methods: Vec<MethodDeclaration>}` に更新。`libs/infrastructure/src/tddd/baseline_codec.rs` の `schema_version` を 2 にバンプ、v1 検出時に `BaselineCodecError::UnsupportedSchemaVersion(1)` + 再実行手順付きエラーメッセージ。`libs/infrastructure/src/tddd/baseline_builder.rs` の TypeGraph → TypeBaseline 変換を新シェイプに更新。`libs/domain/src/tddd/consistency.rs::check_consistency` の `TypeBaselineEntry::new` 呼び出しを新シェイプ (`code_node.methods()` 使用) に更新",
       "id": "T005",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "`libs/domain/src/tddd/catalogue.rs` の `TypeDefinitionKind::TraitPort { expected_methods }` を `Vec<String>` から `Vec<MethodDeclaration>` に拡張。`libs/infrastructure/src/tddd/catalogue_codec.rs` の DTO 更新 + `schema_version: 2` にバンプ + top-level key を `domain_types` → `type_definitions` に変更 + ty/returns に `::` を含む場合は `InvalidEntry` でリジェクト (last-segment 強制)。`libs/domain/src/tddd/signals.rs::evaluate_trait_port` に L1 forward check (ステップ 1: 名前→2: receiver→3: params 数→4: params 型順序→5: returns→6: async) と reverse check (ステップ 7: カタログ未宣言のメソッドを Red) を実装。既存 TraitPort 名のみマッチテストを `MethodDeclaration` ベースに全面書き換え",
       "id": "T006",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "`architecture-rules.json` の各 `layers[]` に optional な `tddd { enabled, catalogue_file, schema_export: {method: \"rustdoc\", targets: [crate_names]} }` ブロックを追加 (domain=enabled, usecase=enabled, infrastructure=disabled, cli=disabled)。`catalogue_file` は optional — 省略時のデフォルトは当該 `layers[]` エントリの `crate` 値を用いて `<layers[].crate>-types.json` に resolve する (ADR D1)。この default resolution は CLI (`type-signals` / `baseline-capture`) / verify (`verify_from_spec_json`) / merge gate (`read_type_catalogue`) / renderer の 4 経路で一貫して適用され、1 箇所でも抜けていれば fail-closed。各 `tddd.enabled` 層の resolved `catalogue_file` は全層でユニークでなければならない — 起動時に重複チェックを行い、重複がある場合は fail-closed でエラーを返す (例: 2 層が同じ `domain-types.json` を参照することを禁止)。`sotp track type-signals` / `baseline-capture` に `--layer <layer_id>` flag を追加、未指定時は全 `tddd.enabled` 層を順次処理、`enabled=false` の層指定は fail-closed。per-layer ファイル名の命名規約: `catalogue_file` の stem をそのまま使用する — catalogue JSON は `<stem>.json`、rendered MD は `<stem>.md`、baseline JSON は `<stem>-baseline.json` (例: `catalogue_file: domain-types.json` → `domain-types.json` + `domain-types.md` + `domain-types-baseline.json`、`catalogue_file: usecase-types.json` → `usecase-types.json` + `usecase-types.md` + `usecase-types-baseline.json`)。これにより `--layer domain` と `--layer usecase` を順次実行しても catalogue / rendered view / baseline のどのファイルも互いを上書きしない。`libs/infrastructure/src/verify/spec_states.rs::verify_from_spec_json` で `trusted_root.join(\"architecture-rules.json\")` を読み、全 `tddd.enabled` 層の catalogue を per-layer symlink-guarded で読み、AND 集約。`libs/usecase/src/merge_gate.rs::TrackBlobReader` に `read_type_catalogue(branch, track_id, layer_id)` port method を追加、`check_strict_merge_gate` で per-layer loop + U19-U26 テスト (2-layer 組み合わせ、Blue/Yellow/Red/NotFound/FetchError の相互作用) を追加。`libs/infrastructure/src/verify/merge_gate_adapter.rs` で新 port method を実装。merge gate の `architecture-rules.json` ロード: `check_strict_merge_gate` はトラック blob を `origin/<branch>` から読み込むため、`architecture-rules.json` も同一ブランチ blob から取得する (ローカル `workspace_root` コピーではなく `read_architecture_rules(branch)` port method 経由)。これにより `architecture-rules.json` 自体を変更するトラック PR でも、merge gate は PR ブランチの rules を参照して評価できる。`.claude/commands/track/design.md` を多層 loop + リネーム済みフィールド参照に更新。`knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` の Status を `Proposed` → `Accepted (implemented in track tddd-01-multilayer-2026-04-12, 2026-04-12)` に更新",
       "id": "T007",
       "status": "todo"
     }
   ],
   "title": "TDDD-01: 型カタログ多層化 + L1 シグネチャ検証",
-  "updated_at": "2026-04-12T07:37:59Z"
+  "updated_at": "2026-04-12T23:53:36Z"
 }
