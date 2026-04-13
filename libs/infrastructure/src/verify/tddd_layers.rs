@@ -80,6 +80,9 @@ pub enum TdddLayerParseError {
     )]
     DuplicateCatalogueFile { path: String, first: String, second: String },
 
+    #[error("duplicate layer id '{id}' in TDDD-enabled bindings")]
+    DuplicateLayerId { id: String },
+
     #[error(
         "layer id '{id}' contains unsafe path characters (must be a simple name without '/', '\\\\', or '..')"
     )]
@@ -170,6 +173,7 @@ pub fn parse_tddd_layers(json: &str) -> Result<Vec<TdddLayerBinding>, TdddLayerP
 
     let mut bindings = Vec::new();
     let mut seen_catalogues: HashSet<String> = HashSet::new();
+    let mut seen_layer_ids: HashSet<String> = HashSet::new();
     for layer in root.layers {
         let Some(tddd) = layer.tddd else {
             continue;
@@ -180,6 +184,12 @@ pub fn parse_tddd_layers(json: &str) -> Result<Vec<TdddLayerBinding>, TdddLayerP
         // Validate the layer id before using it to derive a filename.
         if !is_safe_path_component(&layer.crate_name) {
             return Err(TdddLayerParseError::InvalidLayerId { id: layer.crate_name });
+        }
+        // Reject duplicate layer ids. `find_binding` is a first-match lookup,
+        // so a later duplicate would be silently shadowed and its catalogue
+        // never verified — fail-closed during parsing instead.
+        if !seen_layer_ids.insert(layer.crate_name.clone()) {
+            return Err(TdddLayerParseError::DuplicateLayerId { id: layer.crate_name });
         }
         let catalogue_file =
             tddd.catalogue_file.unwrap_or_else(|| format!("{}-types.json", layer.crate_name));
