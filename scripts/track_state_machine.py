@@ -13,7 +13,6 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
-from track_branch_guard import verify_track_branch
 from track_schema import (
     COMMIT_HASH_RE,
     VALID_OVERRIDE_STATUSES,
@@ -94,18 +93,11 @@ def _save_metadata(
     skip_branch_check: bool = False,
     current_branch: str | None = _SENTINEL,
 ) -> None:
-    # Branch guard: skip when now is set (test determinism) or explicitly skipped.
-    if now is None and not skip_branch_check:
-        if current_branch is _SENTINEL:
-            from track_resolution import current_git_branch
-
-            current_branch = current_git_branch(track_dir.parent.parent.parent)
-        try:
-            verify_track_branch(
-                track_dir, current_branch=current_branch, skip_branch_check=False
-            )
-        except Exception as e:
-            raise TransitionError(str(e)) from e
+    # Branch guard is enforced by sotp CLI in the production path (T001/T002
+    # Rust port).  This Python helper is dead fallback code — keep the
+    # signature compatible for test importers but do not duplicate guard
+    # logic here.
+    del skip_branch_check, current_branch
 
     if now is None:
         now = datetime.now(UTC)

@@ -94,11 +94,13 @@
   "status": "in_progress",
   "tasks": [
     {
+      "commit_hash": "43ddb54547fe4c62bdcc8d6c4a4d217b66c47564",
       "description": "[Red] `apps/cli/src/commands/track/transition.rs::tests` に `verify_branch_guard_with_branch()` 相当のユニットテストを 5 件追加する (`MockTrackReader` 使用)。観点: matching_branch_passes / mismatched_branch_raises / null_branch_skips_guard (metadata.json の `branch: null`) / detached_HEAD_raises / corrupt_metadata_raises。テストは内部関数 `verify_branch_guard_with_branch(reader, track_id, current_branch: &str) -> Result<(), String>` を呼ぶ想定で記述する (T002 で実装を切り出すため最初は failing state)。Python の `none_current_branch_raises` / `missing_metadata_skips` / `skip_branch_check_bypasses` は Rust では別レイヤで処理されるため helper レベルでは移植対象外 (前 2 つは `current_git_branch() -> Result<String, String>` のエラー伝播と `TrackReader::find()` の Some/None でカバー、最後は `execute_transition()` の `if !skip_branch_check` で既実装)。",
       "id": "T001",
       "status": "done"
     },
     {
+      "commit_hash": "43ddb54547fe4c62bdcc8d6c4a4d217b66c47564",
       "description": "[Green] `apps/cli/src/commands/track/transition.rs::verify_branch_guard()` の内部実装を `verify_branch_guard_with_branch(reader, track_id, current_branch: &str) -> Result<(), String>` に分離する。`current_git_branch(repo_dir)` の呼び出しは外側の `verify_branch_guard()` に残し、内部関数は注入された `current_branch` を使う。既存の production path (transition command の呼び出し元) は `verify_branch_guard()` 経由で継続動作する。T001 の 5 テストが pass すること。",
       "id": "T002",
       "status": "done"
@@ -106,7 +108,7 @@
     {
       "description": "[Cleanup] `scripts/track_branch_guard.py` と `scripts/test_track_branch_guard.py` を削除する。`Makefile.toml:109-128` の `scripts-selftest-local` args リストから `scripts/test_track_branch_guard.py` と `scripts/test_track_state_machine.py` の両方を除外する。注意: T002 完了後に削除すること。`scripts/track_state_machine.py` がまだ `from track_branch_guard import verify_track_branch` で import しているため、`track_branch_guard.py` 削除後は `test_track_state_machine.py` が ImportError で fail する。したがって `scripts-selftest-local` から `test_track_state_machine.py` もこの時点で除外しなければならない (T015 を待つのではなく T003 で先行除外する)。`test_track_state_machine.py` 自体の削除は T015 で行う。`cargo make scripts-selftest` が fail しないことを確認する。",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "[Red] `libs/infrastructure/src/track/render.rs::tests` に `validate_track_document()` 経由での domain 層バリデーション確認テストを追加する。観点: (1) UnreferencedTask の伝播確認 (tasks に T002 があるが sections の task_ids に含まれない場合) — domain 層の `validate_plan_invariants()` で既に実装、`codec::decode()` 経由で伝播することを確認, (2) DuplicateTaskReference の伝播確認 (T001 が S1 と S2 の両方で参照される場合) — 同上, (3) status drift の拒否 (tasks が全 done なのに track status が in_progress の場合), (4) archived + incomplete tasks の拒否 (status=archived で todo/in_progress タスクが残る場合), (5) reserved ID 'legit-cleanup' のような substring false positive が許可されること。これらは `scripts/test_track_schema.py::TestValidateMetadataV2` 系の観点を網羅する。重要: unreferenced task と cross-section duplicate は `libs/domain/src/track.rs` の `validate_plan_invariants()` 関数で既に `UnreferencedTask` / `DuplicateTaskReference` variant として実装済み、status drift と archived+incomplete も `render.rs::validate_track_document()` で既に実装済みのため、infrastructure 層への新規ロジック追加は不要 — テスト追加のみで観点をカバーできる。",
@@ -180,5 +182,5 @@
     }
   ],
   "title": "scripts/ Python ヘルパー削減 フェーズ1 — track_branch_guard / markdown / registry / state_machine の Rust 移植",
-  "updated_at": "2026-04-13T13:08:45Z"
+  "updated_at": "2026-04-13T13:34:02Z"
 }
