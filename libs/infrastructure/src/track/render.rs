@@ -707,6 +707,195 @@ mod tests {
         assert!(rendered.contains("- [ ] First task"));
     }
 
+    // --- T008/T009: render_plan marker tests ---
+
+    #[test]
+    fn render_plan_marks_in_progress_task_with_tilde() {
+        let json = sample_metadata_json(
+            "track-a",
+            "in_progress",
+            "2026-03-13T01:00:00Z",
+            r#"[
+    { "id": "T001", "description": "Working task", "status": "in_progress" }
+  ]"#,
+        );
+        let (track, _) = codec::decode(&json).unwrap();
+        let rendered = render_plan(&track);
+        assert!(
+            rendered.contains("- [~] Working task"),
+            "expected in_progress marker `[~]` for in_progress task:\n{rendered}"
+        );
+    }
+
+    #[test]
+    fn render_plan_marks_done_task_with_short_commit_hash() {
+        let json = sample_metadata_json(
+            "track-a",
+            "done",
+            "2026-03-13T01:00:00Z",
+            r#"[
+    {
+      "id": "T001",
+      "description": "Completed task",
+      "status": "done",
+      "commit_hash": "abc1234"
+    }
+  ]"#,
+        );
+        let (track, _) = codec::decode(&json).unwrap();
+        let rendered = render_plan(&track);
+        assert!(
+            rendered.contains("- [x] Completed task abc1234"),
+            "expected done marker `[x] <desc> <hash>`:\n{rendered}"
+        );
+    }
+
+    #[test]
+    fn render_plan_done_without_commit_hash_omits_literal_none() {
+        let json = sample_metadata_json(
+            "track-a",
+            "done",
+            "2026-03-13T01:00:00Z",
+            r#"[
+    { "id": "T001", "description": "Untraced done", "status": "done" }
+  ]"#,
+        );
+        let (track, _) = codec::decode(&json).unwrap();
+        let rendered = render_plan(&track);
+        assert!(
+            rendered.contains("- [x] Untraced done"),
+            "expected done marker `[x] <desc>`:\n{rendered}"
+        );
+        assert!(
+            !rendered.contains("- [x] Untraced done None"),
+            "literal 'None' must not be rendered for done without commit_hash:\n{rendered}"
+        );
+    }
+
+    #[test]
+    fn render_plan_marks_skipped_task_with_dash() {
+        let json = sample_metadata_json(
+            "track-a",
+            "done",
+            "2026-03-13T01:00:00Z",
+            r#"[
+    { "id": "T001", "description": "Skipped task", "status": "skipped" }
+  ]"#,
+        );
+        let (track, _) = codec::decode(&json).unwrap();
+        let rendered = render_plan(&track);
+        assert!(
+            rendered.contains("- [-] Skipped task"),
+            "expected skipped marker `[-] <desc>`:\n{rendered}"
+        );
+    }
+
+    #[test]
+    fn render_plan_preserves_multi_section_order() {
+        // Two sections S1 and S2; S1 must render before S2.
+        let json = r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": "track/track-a",
+  "title": "Title track-a",
+  "status": "planned",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T01:00:00Z",
+  "tasks": [
+    { "id": "T001", "description": "Task one",   "status": "todo" },
+    { "id": "T002", "description": "Task two",   "status": "todo" }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      { "id": "S1", "title": "First Section",  "description": [], "task_ids": ["T001"] },
+      { "id": "S2", "title": "Second Section", "description": [], "task_ids": ["T002"] }
+    ]
+  }
+}"#;
+        let (track, _) = codec::decode(json).unwrap();
+        let rendered = render_plan(&track);
+        let first_idx = rendered.find("## First Section").expect("S1 header missing");
+        let second_idx = rendered.find("## Second Section").expect("S2 header missing");
+        assert!(
+            first_idx < second_idx,
+            "section order not preserved: S1 at {first_idx}, S2 at {second_idx}"
+        );
+    }
+
+    #[test]
+    fn render_plan_places_summary_after_generated_header() {
+        let json = r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": "track/track-a",
+  "title": "Title track-a",
+  "status": "planned",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T01:00:00Z",
+  "tasks": [
+    { "id": "T001", "description": "Task", "status": "todo" }
+  ],
+  "plan": {
+    "summary": ["Summary line one", "Summary line two"],
+    "sections": [
+      { "id": "S1", "title": "Section", "description": [], "task_ids": ["T001"] }
+    ]
+  }
+}"#;
+        let (track, _) = codec::decode(json).unwrap();
+        let rendered = render_plan(&track);
+        let header_idx =
+            rendered.find("<!-- Generated from metadata.json").expect("generated header missing");
+        let summary_idx = rendered.find("Summary line one").expect("summary line missing");
+        let section_idx = rendered.find("## Section").expect("section header missing");
+        assert!(
+            header_idx < summary_idx,
+            "summary must follow the generated header: header={header_idx}, summary={summary_idx}"
+        );
+        assert!(
+            summary_idx < section_idx,
+            "summary must precede sections: summary={summary_idx}, section={section_idx}"
+        );
+    }
+
+    #[test]
+    fn render_plan_renders_section_description_lines() {
+        let json = r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": "track/track-a",
+  "title": "Title track-a",
+  "status": "planned",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T01:00:00Z",
+  "tasks": [
+    { "id": "T001", "description": "Task", "status": "todo" }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Section",
+        "description": ["Describe the section goal", "Additional context"],
+        "task_ids": ["T001"]
+      }
+    ]
+  }
+}"#;
+        let (track, _) = codec::decode(json).unwrap();
+        let rendered = render_plan(&track);
+        assert!(
+            rendered.contains("Describe the section goal"),
+            "first description line missing:\n{rendered}"
+        );
+        assert!(
+            rendered.contains("Additional context"),
+            "second description line missing:\n{rendered}"
+        );
+    }
+
     #[test]
     fn render_registry_places_active_completed_and_archived() {
         let active_json = sample_metadata_json(
