@@ -133,7 +133,11 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
         });
     }
 
-    snapshots.sort_by(|a, b| b.updated_at().cmp(a.updated_at()));
+    snapshots.sort_by(|a, b| {
+        b.updated_at()
+            .cmp(a.updated_at())
+            .then_with(|| a.track.id().as_ref().cmp(b.track.id().as_ref()))
+    });
     Ok(snapshots)
 }
 
@@ -707,6 +711,195 @@ mod tests {
         assert!(rendered.contains("- [ ] First task"));
     }
 
+    // --- T008/T009: render_plan marker tests ---
+
+    #[test]
+    fn render_plan_marks_in_progress_task_with_tilde() {
+        let json = sample_metadata_json(
+            "track-a",
+            "in_progress",
+            "2026-03-13T01:00:00Z",
+            r#"[
+    { "id": "T001", "description": "Working task", "status": "in_progress" }
+  ]"#,
+        );
+        let (track, _) = codec::decode(&json).unwrap();
+        let rendered = render_plan(&track);
+        assert!(
+            rendered.contains("- [~] Working task"),
+            "expected in_progress marker `[~]` for in_progress task:\n{rendered}"
+        );
+    }
+
+    #[test]
+    fn render_plan_marks_done_task_with_short_commit_hash() {
+        let json = sample_metadata_json(
+            "track-a",
+            "done",
+            "2026-03-13T01:00:00Z",
+            r#"[
+    {
+      "id": "T001",
+      "description": "Completed task",
+      "status": "done",
+      "commit_hash": "abc1234"
+    }
+  ]"#,
+        );
+        let (track, _) = codec::decode(&json).unwrap();
+        let rendered = render_plan(&track);
+        assert!(
+            rendered.contains("- [x] Completed task abc1234"),
+            "expected done marker `[x] <desc> <hash>`:\n{rendered}"
+        );
+    }
+
+    #[test]
+    fn render_plan_done_without_commit_hash_omits_literal_none() {
+        let json = sample_metadata_json(
+            "track-a",
+            "done",
+            "2026-03-13T01:00:00Z",
+            r#"[
+    { "id": "T001", "description": "Untraced done", "status": "done" }
+  ]"#,
+        );
+        let (track, _) = codec::decode(&json).unwrap();
+        let rendered = render_plan(&track);
+        assert!(
+            rendered.contains("- [x] Untraced done"),
+            "expected done marker `[x] <desc>`:\n{rendered}"
+        );
+        assert!(
+            !rendered.contains("- [x] Untraced done None"),
+            "literal 'None' must not be rendered for done without commit_hash:\n{rendered}"
+        );
+    }
+
+    #[test]
+    fn render_plan_marks_skipped_task_with_dash() {
+        let json = sample_metadata_json(
+            "track-a",
+            "done",
+            "2026-03-13T01:00:00Z",
+            r#"[
+    { "id": "T001", "description": "Skipped task", "status": "skipped" }
+  ]"#,
+        );
+        let (track, _) = codec::decode(&json).unwrap();
+        let rendered = render_plan(&track);
+        assert!(
+            rendered.contains("- [-] Skipped task"),
+            "expected skipped marker `[-] <desc>`:\n{rendered}"
+        );
+    }
+
+    #[test]
+    fn render_plan_preserves_multi_section_order() {
+        // Two sections S1 and S2; S1 must render before S2.
+        let json = r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": "track/track-a",
+  "title": "Title track-a",
+  "status": "planned",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T01:00:00Z",
+  "tasks": [
+    { "id": "T001", "description": "Task one",   "status": "todo" },
+    { "id": "T002", "description": "Task two",   "status": "todo" }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      { "id": "S1", "title": "First Section",  "description": [], "task_ids": ["T001"] },
+      { "id": "S2", "title": "Second Section", "description": [], "task_ids": ["T002"] }
+    ]
+  }
+}"#;
+        let (track, _) = codec::decode(json).unwrap();
+        let rendered = render_plan(&track);
+        let first_idx = rendered.find("## First Section").expect("S1 header missing");
+        let second_idx = rendered.find("## Second Section").expect("S2 header missing");
+        assert!(
+            first_idx < second_idx,
+            "section order not preserved: S1 at {first_idx}, S2 at {second_idx}"
+        );
+    }
+
+    #[test]
+    fn render_plan_places_summary_after_generated_header() {
+        let json = r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": "track/track-a",
+  "title": "Title track-a",
+  "status": "planned",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T01:00:00Z",
+  "tasks": [
+    { "id": "T001", "description": "Task", "status": "todo" }
+  ],
+  "plan": {
+    "summary": ["Summary line one", "Summary line two"],
+    "sections": [
+      { "id": "S1", "title": "Section", "description": [], "task_ids": ["T001"] }
+    ]
+  }
+}"#;
+        let (track, _) = codec::decode(json).unwrap();
+        let rendered = render_plan(&track);
+        let header_idx =
+            rendered.find("<!-- Generated from metadata.json").expect("generated header missing");
+        let summary_idx = rendered.find("Summary line one").expect("summary line missing");
+        let section_idx = rendered.find("## Section").expect("section header missing");
+        assert!(
+            header_idx < summary_idx,
+            "summary must follow the generated header: header={header_idx}, summary={summary_idx}"
+        );
+        assert!(
+            summary_idx < section_idx,
+            "summary must precede sections: summary={summary_idx}, section={section_idx}"
+        );
+    }
+
+    #[test]
+    fn render_plan_renders_section_description_lines() {
+        let json = r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": "track/track-a",
+  "title": "Title track-a",
+  "status": "planned",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T01:00:00Z",
+  "tasks": [
+    { "id": "T001", "description": "Task", "status": "todo" }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Section",
+        "description": ["Describe the section goal", "Additional context"],
+        "task_ids": ["T001"]
+      }
+    ]
+  }
+}"#;
+        let (track, _) = codec::decode(json).unwrap();
+        let rendered = render_plan(&track);
+        assert!(
+            rendered.contains("Describe the section goal"),
+            "first description line missing:\n{rendered}"
+        );
+        assert!(
+            rendered.contains("Additional context"),
+            "second description line missing:\n{rendered}"
+        );
+    }
+
     #[test]
     fn render_registry_places_active_completed_and_archived() {
         let active_json = sample_metadata_json(
@@ -957,6 +1150,104 @@ mod tests {
         assert!(changed.iter().any(|path| path.ends_with("registry.md")));
         assert!(track_dir.join("plan.md").is_file());
         assert!(dir.path().join("track/registry.md").is_file());
+    }
+
+    // --- T011/T012: registry / snapshot boundary tests ---
+
+    #[test]
+    fn collect_track_snapshots_ignores_plain_files_under_items() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_root = dir.path().join("track/items");
+        std::fs::create_dir_all(&items_root).unwrap();
+        // Valid track directory.
+        let track_dir = items_root.join("track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[
+    { "id": "T001", "description": "First", "status": "todo" }
+  ]"#,
+            ),
+        )
+        .unwrap();
+        // A stray file (not a directory) directly under track/items.
+        std::fs::write(items_root.join("stray.txt"), "not a track").unwrap();
+
+        let snapshots = collect_track_snapshots(dir.path()).unwrap();
+        assert_eq!(snapshots.len(), 1, "stray file must be ignored: got {snapshots:?}");
+        assert_eq!(snapshots[0].track.id().as_ref(), "track-a");
+    }
+
+    #[test]
+    fn collect_track_snapshots_tie_breaks_same_updated_at_by_track_id() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_root = dir.path().join("track/items");
+        std::fs::create_dir_all(&items_root).unwrap();
+
+        // track-b is inserted first to verify the tie-break applies regardless of
+        // directory traversal order.
+        for id in ["track-b", "track-a"] {
+            let td = items_root.join(id);
+            std::fs::create_dir_all(&td).unwrap();
+            std::fs::write(
+                td.join("metadata.json"),
+                sample_metadata_json(
+                    id,
+                    "planned",
+                    "2026-03-13T02:00:00Z", // identical updated_at
+                    r#"[
+    { "id": "T001", "description": "First", "status": "todo" }
+  ]"#,
+                ),
+            )
+            .unwrap();
+        }
+
+        let snapshots = collect_track_snapshots(dir.path()).unwrap();
+        let ids: Vec<&str> = snapshots.iter().map(|s| s.track.id().as_ref()).collect();
+        assert_eq!(
+            ids,
+            vec!["track-a", "track-b"],
+            "same updated_at must tie-break by track_id asc"
+        );
+    }
+
+    #[test]
+    fn sync_rendered_views_omits_unchanged_registry_from_changed_set() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[
+    { "id": "T001", "description": "First", "status": "todo" }
+  ]"#,
+            ),
+        )
+        .unwrap();
+
+        // First call populates plan.md and registry.md.
+        let first_changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+        assert!(first_changed.iter().any(|p| p.ends_with("registry.md")));
+
+        // Second call with no metadata changes must leave both outputs untouched.
+        let second_changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+        assert!(
+            !second_changed.iter().any(|p| p.ends_with("registry.md")),
+            "unchanged registry.md must be omitted from changed set: {second_changed:?}"
+        );
+        assert!(
+            !second_changed.iter().any(|p| p.ends_with("plan.md")),
+            "unchanged plan.md must be omitted from changed set: {second_changed:?}"
+        );
     }
 
     #[test]
@@ -1274,6 +1565,198 @@ mod tests {
         let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
 
         assert!(err.to_string().contains("Missing required field 'tasks'"));
+    }
+
+    #[test]
+    fn validate_track_document_rejects_unreferenced_task() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        // T002 is declared in tasks but not referenced from any plan section.
+        std::fs::write(
+            &metadata_path,
+            r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": "track/track-a",
+  "title": "Track A",
+  "status": "planned",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T02:00:00Z",
+  "tasks": [
+    { "id": "T001", "description": "Referenced task", "status": "todo" },
+    { "id": "T002", "description": "Unreferenced task", "status": "todo" }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      { "id": "S1", "title": "Build", "description": [], "task_ids": ["T001"] }
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+
+        let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
+
+        let message = err.to_string();
+        assert!(
+            message.contains("T002"),
+            "error should reference unreferenced task id T002: {message}"
+        );
+    }
+
+    #[test]
+    fn validate_track_document_rejects_duplicate_task_reference() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        // T001 is referenced by both S1 and S2 sections.
+        std::fs::write(
+            &metadata_path,
+            r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": "track/track-a",
+  "title": "Track A",
+  "status": "planned",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T02:00:00Z",
+  "tasks": [
+    { "id": "T001", "description": "Shared task", "status": "todo" }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      { "id": "S1", "title": "First",  "description": [], "task_ids": ["T001"] },
+      { "id": "S2", "title": "Second", "description": [], "task_ids": ["T001"] }
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+
+        let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
+
+        let message = err.to_string();
+        assert!(
+            message.contains("T001"),
+            "error should reference duplicated task id T001: {message}"
+        );
+    }
+
+    #[test]
+    fn validate_track_document_rejects_status_drift_in_progress_vs_done() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        // metadata.status is "in_progress" but all tasks are done (derived = "done").
+        std::fs::write(
+            &metadata_path,
+            r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": "track/track-a",
+  "title": "Track A",
+  "status": "in_progress",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T02:00:00Z",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Completed task",
+      "status": "done",
+      "commit_hash": "abc1234"
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      { "id": "S1", "title": "Build", "description": [], "task_ids": ["T001"] }
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+
+        let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
+
+        let message = err.to_string();
+        assert!(message.contains("Status drift"), "error should mention status drift: {message}");
+    }
+
+    #[test]
+    fn validate_track_document_rejects_archived_with_incomplete_tasks() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        // metadata.status is "archived" but one task is still "todo".
+        std::fs::write(
+            &metadata_path,
+            r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": "track/track-a",
+  "title": "Track A",
+  "status": "archived",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T02:00:00Z",
+  "tasks": [
+    { "id": "T001", "description": "Unfinished task", "status": "todo" }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      { "id": "S1", "title": "Build", "description": [], "task_ids": ["T001"] }
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+
+        let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
+
+        let message = err.to_string();
+        assert!(
+            message.contains("archived track must have all tasks resolved"),
+            "error should mention archived+incomplete rejection: {message}"
+        );
+    }
+
+    #[test]
+    fn validate_track_document_accepts_id_with_git_substring_in_segment() {
+        // "legit" contains "git" as a substring but is not a whole segment,
+        // so reserved-id matching must not reject the track.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/legit-cleanup-2026-03-11");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        std::fs::write(
+            &metadata_path,
+            sample_metadata_json_with_branch(
+                "legit-cleanup-2026-03-11",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[
+    { "id": "T001", "description": "First task", "status": "todo" }
+  ]"#,
+                None,
+            ),
+        )
+        .unwrap();
+
+        let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        let result = validate_track_document(&metadata_path, track_dir.file_name(), &doc);
+
+        assert!(result.is_ok(), "legit-cleanup-* must be accepted, got: {result:?}");
     }
 
     #[test]

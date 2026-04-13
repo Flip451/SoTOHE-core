@@ -1038,4 +1038,129 @@ mod tests {
         let result = track.next_task_id();
         assert!(matches!(result, Err(ValidationError::InvalidTaskId(_))));
     }
+
+    // --- T006: TrackMetadata::status() derivation tests ---
+
+    fn make_track_with_statuses(statuses: &[(&str, TaskStatus)]) -> TrackMetadata {
+        let tasks: Vec<TrackTask> = statuses
+            .iter()
+            .map(|(id, status)| {
+                TrackTask::with_status(
+                    TaskId::try_new(*id).unwrap(),
+                    format!("Task {id}"),
+                    status.clone(),
+                )
+                .unwrap()
+            })
+            .collect();
+        let section_task_ids: Vec<TaskId> =
+            statuses.iter().map(|(id, _)| TaskId::try_new(*id).unwrap()).collect();
+        let plan = if section_task_ids.is_empty() {
+            PlanView::new(vec![], vec![])
+        } else {
+            let section = PlanSection::new("S1", "Section 1", vec![], section_task_ids).unwrap();
+            PlanView::new(vec![], vec![section])
+        };
+        TrackMetadata::new(
+            TrackId::try_new("status-test").unwrap(),
+            "Status Test",
+            tasks,
+            plan,
+            None,
+        )
+        .unwrap()
+    }
+
+    fn done_traced(hash: &str) -> TaskStatus {
+        TaskStatus::DoneTraced { commit_hash: CommitHash::try_new(hash).unwrap() }
+    }
+
+    #[test]
+    fn test_status_empty_tasks_is_planned() {
+        let track = make_track_with_statuses(&[]);
+        assert_eq!(track.status(), TrackStatus::Planned);
+    }
+
+    #[test]
+    fn test_status_all_todo_is_planned() {
+        let track =
+            make_track_with_statuses(&[("T001", TaskStatus::Todo), ("T002", TaskStatus::Todo)]);
+        assert_eq!(track.status(), TrackStatus::Planned);
+    }
+
+    #[test]
+    fn test_status_any_in_progress_is_in_progress() {
+        let track = make_track_with_statuses(&[
+            ("T001", TaskStatus::Todo),
+            ("T002", TaskStatus::InProgress),
+        ]);
+        assert_eq!(track.status(), TrackStatus::InProgress);
+    }
+
+    #[test]
+    fn test_status_mixed_done_and_todo_is_in_progress() {
+        let track = make_track_with_statuses(&[
+            ("T001", done_traced("abc1234")),
+            ("T002", TaskStatus::Todo),
+        ]);
+        assert_eq!(track.status(), TrackStatus::InProgress);
+    }
+
+    #[test]
+    fn test_status_all_done_is_done() {
+        let track = make_track_with_statuses(&[
+            ("T001", done_traced("abc1234")),
+            ("T002", done_traced("def5678")),
+        ]);
+        assert_eq!(track.status(), TrackStatus::Done);
+    }
+
+    #[test]
+    fn test_status_all_skipped_is_done() {
+        let track = make_track_with_statuses(&[
+            ("T001", TaskStatus::Skipped),
+            ("T002", TaskStatus::Skipped),
+        ]);
+        assert_eq!(track.status(), TrackStatus::Done);
+    }
+
+    #[test]
+    fn test_status_mixed_done_and_skipped_is_done() {
+        let track = make_track_with_statuses(&[
+            ("T001", done_traced("abc1234")),
+            ("T002", TaskStatus::Skipped),
+        ]);
+        assert_eq!(track.status(), TrackStatus::Done);
+    }
+
+    #[test]
+    fn test_status_mixed_skipped_and_todo_is_in_progress() {
+        // Not all "todo" (so not Planned) and not all resolved (so not Done);
+        // the derivation falls through to InProgress.
+        let track =
+            make_track_with_statuses(&[("T001", TaskStatus::Skipped), ("T002", TaskStatus::Todo)]);
+        assert_eq!(track.status(), TrackStatus::InProgress);
+    }
+
+    #[test]
+    fn test_status_override_blocked_wins_over_derived() {
+        let mut track = make_track_with_statuses(&[
+            ("T001", TaskStatus::InProgress),
+            ("T002", TaskStatus::Todo),
+        ]);
+        track
+            .set_status_override(Some(StatusOverride::blocked("waiting on upstream").unwrap()))
+            .unwrap();
+        assert_eq!(track.status(), TrackStatus::Blocked);
+    }
+
+    #[test]
+    fn test_status_override_cancelled_wins_over_derived() {
+        let mut track =
+            make_track_with_statuses(&[("T001", TaskStatus::Todo), ("T002", TaskStatus::Todo)]);
+        track
+            .set_status_override(Some(StatusOverride::cancelled("de-prioritized").unwrap()))
+            .unwrap();
+        assert_eq!(track.status(), TrackStatus::Cancelled);
+    }
 }
