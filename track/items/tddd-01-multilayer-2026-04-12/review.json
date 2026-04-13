@@ -41,6 +41,42 @@
         }
       ]
     },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5051f18580807bfbbe0d4cbe6a6f89268010b9d39e1b60094c5d0adbf940d862",
+          "at": "2026-04-13T00:21:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5051f18580807bfbbe0d4cbe6a6f89268010b9d39e1b60094c5d0adbf940d862",
+          "at": "2026-04-13T00:22:40Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
+          "at": "2026-04-13T00:20:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
+          "at": "2026-04-13T00:21:01Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -575,6 +611,35 @@
           "findings": [],
           "hash": "rvw1:sha256:91886baea106a9d5b33eb1819b55676bd04505d6b0b7abc72966207b1761bb02",
           "at": "2026-04-12T23:58:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67d7a6964948b11ed2b4e3a7006747fedc6fc5953450f73731b95c17bc4b829f",
+          "at": "2026-04-13T00:20:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002's task description still references `domain_types_render.rs`, but that path is now dead in this change (`git diff --name-status` shows it deleted, and the renderer lives in `libs/infrastructure/src/type_catalogue_render.rs`). Because this metadata entry is the authoritative task text that plan.md re-renders, leaving the old path here creates a broken implementation reference for the infrastructure rename step.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 84,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:67d7a6964948b11ed2b4e3a7006747fedc6fc5953450f73731b95c17bc4b829f",
+          "at": "2026-04-13T00:22:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67d7a6964948b11ed2b4e3a7006747fedc6fc5953450f73731b95c17bc4b829f",
+          "at": "2026-04-13T00:23:01Z"
         }
       ]
     }

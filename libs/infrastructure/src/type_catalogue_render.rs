@@ -1,8 +1,9 @@
-//! Renderer for domain-types.md (read-only view of `DomainTypesDocument`).
+//! Renderer for the per-layer type catalogue markdown view (e.g.
+//! `domain-types.md`, a read-only view of `TypeCatalogueDocument`).
 //!
 //! Produces a markdown file with:
 //! - A generated-view header comment
-//! - A `## Domain Types` section with a table: Name | Kind | Details | Signal
+//! - A `## Type Declarations` section with a table: Name | Kind | Details | Signal
 //!
 //! The Details column summarises kind-specific payload:
 //! - Typestate: `→ A, → B` (declared transitions)
@@ -13,20 +14,20 @@
 //! The Signal column shows `🔵` / `🔴` / `—` (no signal yet).
 
 use domain::{
-    ConfidenceSignal, DomainTypeEntry, DomainTypeKind, DomainTypesDocument, TypeAction,
+    ConfidenceSignal, TypeAction, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
     TypestateTransitions,
 };
 
-/// Renders the full `domain-types.md` document for a `DomainTypesDocument`.
+/// Renders the full `domain-types.md` document for a `TypeCatalogueDocument`.
 ///
 /// Returns a markdown string suitable for writing to `domain-types.md`.
 #[must_use]
-pub fn render_domain_types(doc: &DomainTypesDocument) -> String {
+pub fn render_type_catalogue(doc: &TypeCatalogueDocument) -> String {
     let mut out = String::new();
 
     out.push_str("<!-- Generated from domain-types.json — DO NOT EDIT DIRECTLY -->\n");
 
-    out.push_str("\n## Domain Types\n\n");
+    out.push_str("\n## Type Declarations\n\n");
 
     out.push_str("| Name | Kind | Action | Details | Signal |\n");
     out.push_str("|------|------|--------|---------|--------|\n");
@@ -60,7 +61,7 @@ pub fn render_domain_types(doc: &DomainTypesDocument) -> String {
 /// `consumed` tracks signal indices already rendered so that a delete+add pair sharing
 /// the same `(name, kind_tag)` identity does not show the same signal twice.
 fn signal_for_entry(
-    doc: &DomainTypesDocument,
+    doc: &TypeCatalogueDocument,
     name: &str,
     kind_tag: &str,
     consumed: &mut std::collections::HashSet<usize>,
@@ -92,30 +93,30 @@ fn render_action(action: TypeAction) -> &'static str {
 }
 
 /// Renders the Details column for a single entry based on its kind.
-fn render_details(entry: &DomainTypeEntry) -> String {
+fn render_details(entry: &TypeCatalogueEntry) -> String {
     match entry.kind() {
-        DomainTypeKind::Typestate { transitions } => match transitions {
+        TypeDefinitionKind::Typestate { transitions } => match transitions {
             TypestateTransitions::Terminal => "\u{2205} (terminal)".to_owned(), // ∅ (terminal)
             TypestateTransitions::To(targets) => {
                 targets.iter().map(|t| format!("\u{2192} {t}")).collect::<Vec<_>>().join(", ")
             }
         },
-        DomainTypeKind::Enum { expected_variants }
-        | DomainTypeKind::ErrorType { expected_variants } => {
+        TypeDefinitionKind::Enum { expected_variants }
+        | TypeDefinitionKind::ErrorType { expected_variants } => {
             if expected_variants.is_empty() {
                 "\u{2014}".to_owned()
             } else {
                 expected_variants.join(", ")
             }
         }
-        DomainTypeKind::TraitPort { expected_methods } => {
+        TypeDefinitionKind::TraitPort { expected_methods } => {
             if expected_methods.is_empty() {
                 "\u{2014}".to_owned()
             } else {
                 expected_methods.iter().map(|m| format!("fn {m}")).collect::<Vec<_>>().join(", ")
             }
         }
-        DomainTypeKind::ValueObject => "\u{2014}".to_owned(),
+        TypeDefinitionKind::ValueObject => "\u{2014}".to_owned(),
     }
 }
 
@@ -127,27 +128,27 @@ fn render_details(entry: &DomainTypeEntry) -> String {
 #[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use domain::{
-        ConfidenceSignal, DomainTypeEntry, DomainTypeKind, DomainTypeSignal, DomainTypesDocument,
+        ConfidenceSignal, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal,
     };
 
     use super::*;
 
-    fn make_entry(name: &str, kind: DomainTypeKind) -> DomainTypeEntry {
-        DomainTypeEntry::new(name, "description", kind, domain::TypeAction::Add, true).unwrap()
+    fn make_entry(name: &str, kind: TypeDefinitionKind) -> TypeCatalogueEntry {
+        TypeCatalogueEntry::new(name, "description", kind, domain::TypeAction::Add, true).unwrap()
     }
 
-    fn make_doc(entries: Vec<DomainTypeEntry>) -> DomainTypesDocument {
-        DomainTypesDocument::new(1, entries)
+    fn make_doc(entries: Vec<TypeCatalogueEntry>) -> TypeCatalogueDocument {
+        TypeCatalogueDocument::new(1, entries)
     }
 
     // ---------------------------------------------------------------------------
-    // render_domain_types: header
+    // render_type_catalogue: header
     // ---------------------------------------------------------------------------
 
     #[test]
-    fn test_render_domain_types_includes_generated_header() {
+    fn test_render_type_catalogue_includes_generated_header() {
         let doc = make_doc(vec![]);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         assert!(
             output.contains("<!-- Generated from domain-types.json"),
             "missing generated header"
@@ -155,16 +156,16 @@ mod tests {
     }
 
     #[test]
-    fn test_render_domain_types_includes_section_heading() {
+    fn test_render_type_catalogue_includes_section_heading() {
         let doc = make_doc(vec![]);
-        let output = render_domain_types(&doc);
-        assert!(output.contains("## Domain Types\n"), "missing section heading");
+        let output = render_type_catalogue(&doc);
+        assert!(output.contains("## Type Declarations\n"), "missing section heading");
     }
 
     #[test]
-    fn test_render_domain_types_includes_table_header() {
+    fn test_render_type_catalogue_includes_table_header() {
         let doc = make_doc(vec![]);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         assert!(
             output.contains("| Name | Kind | Action | Details | Signal |"),
             "missing table header"
@@ -176,19 +177,19 @@ mod tests {
     }
 
     // ---------------------------------------------------------------------------
-    // render_domain_types: entry rows
+    // render_type_catalogue: entry rows
     // ---------------------------------------------------------------------------
 
     #[test]
     fn test_render_typestate_entry_row() {
         let entry = make_entry(
             "Draft",
-            DomainTypeKind::Typestate {
+            TypeDefinitionKind::Typestate {
                 transitions: TypestateTransitions::To(vec!["Published".into()]),
             },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         assert!(output.contains("| Draft | typestate |"), "missing typestate row");
         assert!(output.contains("\u{2192} Published"), "missing transition arrow");
     }
@@ -197,10 +198,10 @@ mod tests {
     fn test_render_typestate_terminal_shows_empty_set() {
         let entry = make_entry(
             "Final",
-            DomainTypeKind::Typestate { transitions: TypestateTransitions::Terminal },
+            TypeDefinitionKind::Typestate { transitions: TypestateTransitions::Terminal },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         assert!(output.contains("\u{2205} (terminal)"), "missing terminal marker");
     }
 
@@ -208,19 +209,19 @@ mod tests {
     fn test_render_enum_entry_row() {
         let entry = make_entry(
             "TrackStatus",
-            DomainTypeKind::Enum { expected_variants: vec!["Planned".into(), "Done".into()] },
+            TypeDefinitionKind::Enum { expected_variants: vec!["Planned".into(), "Done".into()] },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         assert!(output.contains("| TrackStatus | enum |"), "missing enum row");
         assert!(output.contains("Planned, Done"), "missing enum variants");
     }
 
     #[test]
     fn test_render_value_object_entry_row() {
-        let entry = make_entry("TrackId", DomainTypeKind::ValueObject);
+        let entry = make_entry("TrackId", TypeDefinitionKind::ValueObject);
         let doc = make_doc(vec![entry]);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         assert!(output.contains("| TrackId | value_object |"), "missing value_object row");
     }
 
@@ -228,10 +229,10 @@ mod tests {
     fn test_render_error_type_entry_row() {
         let entry = make_entry(
             "SchemaExportError",
-            DomainTypeKind::ErrorType { expected_variants: vec!["NightlyNotFound".into()] },
+            TypeDefinitionKind::ErrorType { expected_variants: vec!["NightlyNotFound".into()] },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         assert!(output.contains("| SchemaExportError | error_type |"), "missing error_type row");
         assert!(output.contains("NightlyNotFound"), "missing error variant");
     }
@@ -240,31 +241,31 @@ mod tests {
     fn test_render_trait_port_entry_row() {
         let entry = make_entry(
             "SchemaExporter",
-            DomainTypeKind::TraitPort { expected_methods: vec!["export".into()] },
+            TypeDefinitionKind::TraitPort { expected_methods: vec!["export".into()] },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         assert!(output.contains("| SchemaExporter | trait_port |"), "missing trait_port row");
         assert!(output.contains("fn export"), "missing method");
     }
 
     // ---------------------------------------------------------------------------
-    // render_domain_types: Signal column
+    // render_type_catalogue: Signal column
     // ---------------------------------------------------------------------------
 
     #[test]
     fn test_render_signal_column_shows_dash_when_no_signals() {
-        let entry = make_entry("Draft", DomainTypeKind::ValueObject);
+        let entry = make_entry("Draft", TypeDefinitionKind::ValueObject);
         let doc = make_doc(vec![entry]);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         assert!(output.contains("\u{2014}"), "missing em-dash for unevaluated signal");
     }
 
     #[test]
     fn test_render_signal_column_shows_blue_when_signal_blue() {
-        let entry = make_entry("Draft", DomainTypeKind::ValueObject);
+        let entry = make_entry("Draft", TypeDefinitionKind::ValueObject);
         let mut doc = make_doc(vec![entry]);
-        doc.set_signals(vec![DomainTypeSignal::new(
+        doc.set_signals(vec![TypeSignal::new(
             "Draft",
             "value_object",
             ConfidenceSignal::Blue,
@@ -273,15 +274,15 @@ mod tests {
             vec![],
             vec![],
         )]);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         assert!(output.contains("\u{1f535}"), "missing blue circle for Blue signal");
     }
 
     #[test]
     fn test_render_signal_column_shows_red_when_signal_red() {
-        let entry = make_entry("Ghost", DomainTypeKind::ValueObject);
+        let entry = make_entry("Ghost", TypeDefinitionKind::ValueObject);
         let mut doc = make_doc(vec![entry]);
-        doc.set_signals(vec![DomainTypeSignal::new(
+        doc.set_signals(vec![TypeSignal::new(
             "Ghost",
             "value_object",
             ConfidenceSignal::Red,
@@ -290,7 +291,7 @@ mod tests {
             vec![],
             vec![],
         )]);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         assert!(output.contains("\u{1f534}"), "missing red circle for Red signal");
     }
 
@@ -299,55 +300,55 @@ mod tests {
         let entries = vec![
             make_entry(
                 "Draft",
-                DomainTypeKind::Typestate {
+                TypeDefinitionKind::Typestate {
                     transitions: TypestateTransitions::To(vec!["Published".into()]),
                 },
             ),
             make_entry(
                 "TrackStatus",
-                DomainTypeKind::Enum { expected_variants: vec!["Planned".into()] },
+                TypeDefinitionKind::Enum { expected_variants: vec!["Planned".into()] },
             ),
-            make_entry("TrackId", DomainTypeKind::ValueObject),
+            make_entry("TrackId", TypeDefinitionKind::ValueObject),
         ];
         let doc = make_doc(entries);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         assert!(output.contains("Draft"), "missing Draft");
         assert!(output.contains("TrackStatus"), "missing TrackStatus");
         assert!(output.contains("TrackId"), "missing TrackId");
     }
 
     // ---------------------------------------------------------------------------
-    // render_domain_types: Action column
+    // render_type_catalogue: Action column
     // ---------------------------------------------------------------------------
 
     #[test]
     fn test_render_add_action_shows_dash() {
-        let entry = make_entry("Foo", DomainTypeKind::ValueObject);
+        let entry = make_entry("Foo", TypeDefinitionKind::ValueObject);
         let doc = make_doc(vec![entry]);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         // Add action renders as em-dash
         assert!(output.contains("| \u{2014} |"), "Add action should show em-dash");
     }
 
     #[test]
     fn test_render_delete_action_shows_delete() {
-        let entry = DomainTypeEntry::new(
+        let entry = TypeCatalogueEntry::new(
             "OldType",
             "deleted",
-            DomainTypeKind::ValueObject,
+            TypeDefinitionKind::ValueObject,
             domain::TypeAction::Delete,
             true,
         )
         .unwrap();
         let doc = make_doc(vec![entry]);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         assert!(output.contains("| delete |"), "Delete action should show 'delete'");
     }
 
     #[test]
     fn test_render_output_ends_with_newline() {
         let doc = make_doc(vec![]);
-        let output = render_domain_types(&doc);
+        let output = render_type_catalogue(&doc);
         assert!(output.ends_with('\n'), "output must end with trailing newline");
     }
 }

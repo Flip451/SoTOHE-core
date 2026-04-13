@@ -1,4 +1,4 @@
-//! Serde codec for domain-types.json (`DomainTypesDocument` SSoT).
+//! Serde codec for domain-types.json (`TypeCatalogueDocument` SSoT).
 //!
 //! The JSON schema uses an internally-tagged enum (`"kind"` field) with
 //! `#[serde(flatten)]` so that kind-specific fields are required at the type
@@ -8,8 +8,8 @@
 //! Schema version 1 is the only supported version.
 
 use domain::{
-    ConfidenceSignal, DomainTypeEntry, DomainTypeKind, DomainTypeSignal, DomainTypesDocument,
-    SpecValidationError, TypeAction, TypestateTransitions,
+    ConfidenceSignal, SpecValidationError, TypeAction, TypeCatalogueDocument, TypeCatalogueEntry,
+    TypeDefinitionKind, TypeSignal, TypestateTransitions,
 };
 use serde::{Deserialize, Serialize};
 
@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 
 /// Codec error for domain-types.json serialization/deserialization.
 #[derive(Debug, thiserror::Error)]
-pub enum DomainTypesCodecError {
+pub enum TypeCatalogueCodecError {
     #[error("JSON error: {0}")]
     Json(#[from] serde_json::Error),
 
@@ -39,18 +39,18 @@ pub enum DomainTypesCodecError {
 
 /// Top-level DTO for domain-types.json.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct DomainTypesDocDto {
+struct TypeCatalogueDocDto {
     pub schema_version: u32,
     #[serde(default)]
-    pub domain_types: Vec<DomainTypeEntryDto>,
+    pub domain_types: Vec<TypeCatalogueEntryDto>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub signals: Option<Vec<DomainTypeSignalDto>>,
+    pub signals: Option<Vec<TypeSignalDto>>,
 }
 
 /// Entry DTO with tagged kind enum.
 ///
 /// Common fields (`name`, `description`, `approved`) live at the struct level.
-/// Kind-specific fields are encoded via `DomainTypeKindDto` which is flattened
+/// Kind-specific fields are encoded via `TypeDefinitionKindDto` which is flattened
 /// into the same JSON object and uses `"kind"` as the tag discriminator.
 /// DTO for the `action` field on a domain type entry.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -63,7 +63,7 @@ enum TypeActionDto {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct DomainTypeEntryDto {
+struct TypeCatalogueEntryDto {
     pub name: String,
     pub description: String,
     #[serde(default = "default_approved")]
@@ -71,7 +71,7 @@ struct DomainTypeEntryDto {
     #[serde(default = "default_action", skip_serializing_if = "is_add_action")]
     pub action: TypeActionDto,
     #[serde(flatten)]
-    pub kind: DomainTypeKindDto,
+    pub kind: TypeDefinitionKindDto,
 }
 
 fn default_approved() -> bool {
@@ -92,7 +92,7 @@ fn is_add_action(action: &TypeActionDto) -> bool {
 /// `"enum"` is a Rust keyword, so we rename the variant via serde.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
-enum DomainTypeKindDto {
+enum TypeDefinitionKindDto {
     Typestate {
         transitions_to: Vec<String>,
     },
@@ -111,7 +111,7 @@ enum DomainTypeKindDto {
 
 /// DTO for a per-type signal evaluation result.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct DomainTypeSignalDto {
+struct TypeSignalDto {
     pub type_name: String,
     pub kind_tag: String,
     pub signal: String,
@@ -128,25 +128,25 @@ struct DomainTypeSignalDto {
 // Public API
 // ---------------------------------------------------------------------------
 
-/// Decodes a `domain-types.json` string into a `DomainTypesDocument`.
+/// Decodes a `domain-types.json` string into a `TypeCatalogueDocument`.
 ///
 /// # Errors
 ///
-/// Returns `DomainTypesCodecError` when:
+/// Returns `TypeCatalogueCodecError` when:
 /// - The string is not valid JSON.
 /// - `schema_version` is not 1.
 /// - Any entry has an unknown `kind` tag or missing required fields.
 /// - Any entry fails domain validation (e.g. empty name).
-pub fn decode(json: &str) -> Result<DomainTypesDocument, DomainTypesCodecError> {
-    let dto: DomainTypesDocDto = serde_json::from_str(json)?;
+pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecError> {
+    let dto: TypeCatalogueDocDto = serde_json::from_str(json)?;
 
     if dto.schema_version != 1 {
-        return Err(DomainTypesCodecError::UnsupportedSchemaVersion(dto.schema_version));
+        return Err(TypeCatalogueCodecError::UnsupportedSchemaVersion(dto.schema_version));
     }
 
     let mut entries = Vec::with_capacity(dto.domain_types.len());
     for entry_dto in &dto.domain_types {
-        entries.push(domain_type_entry_from_dto(entry_dto)?);
+        entries.push(type_catalogue_entry_from_dto(entry_dto)?);
     }
 
     // Validate entry name uniqueness with delete+add pair exception.
@@ -169,7 +169,7 @@ pub fn decode(json: &str) -> Result<DomainTypesDocument, DomainTypesCodecError> 
                 continue;
             }
             if pairs.len() > 2 {
-                return Err(DomainTypesCodecError::InvalidEntry {
+                return Err(TypeCatalogueCodecError::InvalidEntry {
                     name: (*name).to_owned(),
                     reason: format!(
                         "name appears {} times (max 2 for delete+add pair)",
@@ -182,7 +182,7 @@ pub fn decode(json: &str) -> Result<DomainTypesDocument, DomainTypesCodecError> 
             let has_delete = actions.contains(&TypeAction::Delete);
             let has_add = actions.contains(&TypeAction::Add);
             if !(has_delete && has_add) {
-                return Err(DomainTypesCodecError::InvalidEntry {
+                return Err(TypeCatalogueCodecError::InvalidEntry {
                     name: (*name).to_owned(),
                     reason: format!(
                         "duplicate name requires exactly one delete + one add (got {:?})",
@@ -197,7 +197,7 @@ pub fn decode(json: &str) -> Result<DomainTypesDocument, DomainTypesCodecError> 
             // Use action:"modify" for same-partition kind changes.
             if let [(_, kind_a), (_, kind_b)] = pairs.as_slice() {
                 if kind_a == kind_b {
-                    return Err(DomainTypesCodecError::InvalidEntry {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
                         name: (*name).to_owned(),
                         reason: format!(
                             "delete+add pair must have different kinds to avoid signal key \
@@ -208,7 +208,7 @@ pub fn decode(json: &str) -> Result<DomainTypesDocument, DomainTypesCodecError> 
                 let is_trait_a = *kind_a == "trait_port";
                 let is_trait_b = *kind_b == "trait_port";
                 if is_trait_a == is_trait_b {
-                    return Err(DomainTypesCodecError::InvalidEntry {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
                         name: (*name).to_owned(),
                         reason: format!(
                             "delete+add pair must cross the trait/non-trait partition \
@@ -229,18 +229,19 @@ pub fn decode(json: &str) -> Result<DomainTypesDocument, DomainTypesCodecError> 
     //   document an outgoing transition from the type's pre-deletion state)
     let all_typestate_names: std::collections::HashSet<&str> = entries
         .iter()
-        .filter(|e| matches!(e.kind(), DomainTypeKind::Typestate { .. }))
+        .filter(|e| matches!(e.kind(), TypeDefinitionKind::Typestate { .. }))
         .map(|e| e.name())
         .collect();
     let live_typestate_names: std::collections::HashSet<&str> = entries
         .iter()
         .filter(|e| {
-            matches!(e.kind(), DomainTypeKind::Typestate { .. }) && e.action() != TypeAction::Delete
+            matches!(e.kind(), TypeDefinitionKind::Typestate { .. })
+                && e.action() != TypeAction::Delete
         })
         .map(|e| e.name())
         .collect();
     for entry in &entries {
-        if let DomainTypeKind::Typestate { transitions: TypestateTransitions::To(targets) } =
+        if let TypeDefinitionKind::Typestate { transitions: TypestateTransitions::To(targets) } =
             entry.kind()
         {
             // Delete entries may reference any typestate (including other delete entries).
@@ -252,7 +253,7 @@ pub fn decode(json: &str) -> Result<DomainTypesDocument, DomainTypesCodecError> 
             };
             for target in targets {
                 if !valid_targets.contains(target.as_str()) {
-                    return Err(DomainTypesCodecError::InvalidEntry {
+                    return Err(TypeCatalogueCodecError::InvalidEntry {
                         name: entry.name().to_owned(),
                         reason: format!(
                             "transitions_to target '{target}' is not a typestate entry"
@@ -263,38 +264,38 @@ pub fn decode(json: &str) -> Result<DomainTypesDocument, DomainTypesCodecError> 
         }
     }
 
-    let mut doc = DomainTypesDocument::new(dto.schema_version, entries);
+    let mut doc = TypeCatalogueDocument::new(dto.schema_version, entries);
 
     if let Some(signal_dtos) = dto.signals {
         let signals =
-            signal_dtos.iter().map(domain_type_signal_from_dto).collect::<Result<Vec<_>, _>>()?;
+            signal_dtos.iter().map(type_signal_from_dto).collect::<Result<Vec<_>, _>>()?;
         doc.set_signals(signals);
     }
 
     Ok(doc)
 }
 
-/// Encodes a `DomainTypesDocument` to a pretty-printed JSON string.
+/// Encodes a `TypeCatalogueDocument` to a pretty-printed JSON string.
 ///
 /// # Errors
 ///
-/// Returns `DomainTypesCodecError::Json` if serialization fails.
-pub fn encode(doc: &DomainTypesDocument) -> Result<String, DomainTypesCodecError> {
-    let dto = domain_types_doc_to_dto(doc);
-    serde_json::to_string_pretty(&dto).map_err(DomainTypesCodecError::Json)
+/// Returns `TypeCatalogueCodecError::Json` if serialization fails.
+pub fn encode(doc: &TypeCatalogueDocument) -> Result<String, TypeCatalogueCodecError> {
+    let dto = type_catalogue_doc_to_dto(doc);
+    serde_json::to_string_pretty(&dto).map_err(TypeCatalogueCodecError::Json)
 }
 
 // ---------------------------------------------------------------------------
 // Conversion helpers: DTO → domain
 // ---------------------------------------------------------------------------
 
-fn domain_type_entry_from_dto(
-    dto: &DomainTypeEntryDto,
-) -> Result<DomainTypeEntry, DomainTypesCodecError> {
-    let kind = domain_type_kind_from_dto(&dto.kind);
+fn type_catalogue_entry_from_dto(
+    dto: &TypeCatalogueEntryDto,
+) -> Result<TypeCatalogueEntry, TypeCatalogueCodecError> {
+    let kind = type_definition_kind_from_dto(&dto.kind);
     let action = type_action_from_dto(dto.action);
-    DomainTypeEntry::new(&dto.name, &dto.description, kind, action, dto.approved)
-        .map_err(DomainTypesCodecError::Validation)
+    TypeCatalogueEntry::new(&dto.name, &dto.description, kind, action, dto.approved)
+        .map_err(TypeCatalogueCodecError::Validation)
 }
 
 fn type_action_from_dto(dto: TypeActionDto) -> TypeAction {
@@ -315,39 +316,37 @@ fn type_action_to_dto(action: TypeAction) -> TypeActionDto {
     }
 }
 
-fn domain_type_kind_from_dto(dto: &DomainTypeKindDto) -> DomainTypeKind {
+fn type_definition_kind_from_dto(dto: &TypeDefinitionKindDto) -> TypeDefinitionKind {
     match dto {
-        DomainTypeKindDto::Typestate { transitions_to } => {
+        TypeDefinitionKindDto::Typestate { transitions_to } => {
             let transitions = if transitions_to.is_empty() {
                 TypestateTransitions::Terminal
             } else {
                 TypestateTransitions::To(transitions_to.clone())
             };
-            DomainTypeKind::Typestate { transitions }
+            TypeDefinitionKind::Typestate { transitions }
         }
-        DomainTypeKindDto::Enum { expected_variants } => {
-            DomainTypeKind::Enum { expected_variants: expected_variants.clone() }
+        TypeDefinitionKindDto::Enum { expected_variants } => {
+            TypeDefinitionKind::Enum { expected_variants: expected_variants.clone() }
         }
-        DomainTypeKindDto::ValueObject {} => DomainTypeKind::ValueObject,
-        DomainTypeKindDto::ErrorType { expected_variants } => {
-            DomainTypeKind::ErrorType { expected_variants: expected_variants.clone() }
+        TypeDefinitionKindDto::ValueObject {} => TypeDefinitionKind::ValueObject,
+        TypeDefinitionKindDto::ErrorType { expected_variants } => {
+            TypeDefinitionKind::ErrorType { expected_variants: expected_variants.clone() }
         }
-        DomainTypeKindDto::TraitPort { expected_methods } => {
-            DomainTypeKind::TraitPort { expected_methods: expected_methods.clone() }
+        TypeDefinitionKindDto::TraitPort { expected_methods } => {
+            TypeDefinitionKind::TraitPort { expected_methods: expected_methods.clone() }
         }
     }
 }
 
-fn domain_type_signal_from_dto(
-    dto: &DomainTypeSignalDto,
-) -> Result<DomainTypeSignal, DomainTypesCodecError> {
+fn type_signal_from_dto(dto: &TypeSignalDto) -> Result<TypeSignal, TypeCatalogueCodecError> {
     let signal = confidence_signal_from_str(&dto.signal).ok_or_else(|| {
-        DomainTypesCodecError::InvalidEntry {
+        TypeCatalogueCodecError::InvalidEntry {
             name: dto.type_name.clone(),
             reason: format!("unknown signal value '{}'", dto.signal),
         }
     })?;
-    Ok(DomainTypeSignal::new(
+    Ok(TypeSignal::new(
         &dto.type_name,
         &dto.kind_tag,
         signal,
@@ -371,33 +370,33 @@ fn confidence_signal_from_str(s: &str) -> Option<ConfidenceSignal> {
 // Conversion helpers: domain → DTO
 // ---------------------------------------------------------------------------
 
-fn domain_types_doc_to_dto(doc: &DomainTypesDocument) -> DomainTypesDocDto {
-    let domain_types = doc.entries().iter().map(domain_type_entry_to_dto).collect();
-    let signals = doc.signals().map(|sigs| sigs.iter().map(domain_type_signal_to_dto).collect());
-    DomainTypesDocDto { schema_version: doc.schema_version(), domain_types, signals }
+fn type_catalogue_doc_to_dto(doc: &TypeCatalogueDocument) -> TypeCatalogueDocDto {
+    let domain_types = doc.entries().iter().map(type_catalogue_entry_to_dto).collect();
+    let signals = doc.signals().map(|sigs| sigs.iter().map(type_signal_to_dto).collect());
+    TypeCatalogueDocDto { schema_version: doc.schema_version(), domain_types, signals }
 }
 
-fn domain_type_entry_to_dto(entry: &DomainTypeEntry) -> DomainTypeEntryDto {
+fn type_catalogue_entry_to_dto(entry: &TypeCatalogueEntry) -> TypeCatalogueEntryDto {
     let kind = match entry.kind() {
-        DomainTypeKind::Typestate { transitions } => {
+        TypeDefinitionKind::Typestate { transitions } => {
             let transitions_to = match transitions {
                 TypestateTransitions::Terminal => vec![],
                 TypestateTransitions::To(v) => v.clone(),
             };
-            DomainTypeKindDto::Typestate { transitions_to }
+            TypeDefinitionKindDto::Typestate { transitions_to }
         }
-        DomainTypeKind::Enum { expected_variants } => {
-            DomainTypeKindDto::Enum { expected_variants: expected_variants.clone() }
+        TypeDefinitionKind::Enum { expected_variants } => {
+            TypeDefinitionKindDto::Enum { expected_variants: expected_variants.clone() }
         }
-        DomainTypeKind::ValueObject => DomainTypeKindDto::ValueObject {},
-        DomainTypeKind::ErrorType { expected_variants } => {
-            DomainTypeKindDto::ErrorType { expected_variants: expected_variants.clone() }
+        TypeDefinitionKind::ValueObject => TypeDefinitionKindDto::ValueObject {},
+        TypeDefinitionKind::ErrorType { expected_variants } => {
+            TypeDefinitionKindDto::ErrorType { expected_variants: expected_variants.clone() }
         }
-        DomainTypeKind::TraitPort { expected_methods } => {
-            DomainTypeKindDto::TraitPort { expected_methods: expected_methods.clone() }
+        TypeDefinitionKind::TraitPort { expected_methods } => {
+            TypeDefinitionKindDto::TraitPort { expected_methods: expected_methods.clone() }
         }
     };
-    DomainTypeEntryDto {
+    TypeCatalogueEntryDto {
         name: entry.name().to_owned(),
         description: entry.description().to_owned(),
         approved: entry.approved(),
@@ -406,8 +405,8 @@ fn domain_type_entry_to_dto(entry: &DomainTypeEntry) -> DomainTypeEntryDto {
     }
 }
 
-fn domain_type_signal_to_dto(sig: &DomainTypeSignal) -> DomainTypeSignalDto {
-    DomainTypeSignalDto {
+fn type_signal_to_dto(sig: &TypeSignal) -> TypeSignalDto {
+    TypeSignalDto {
         type_name: sig.type_name().to_owned(),
         kind_tag: sig.kind_tag().to_owned(),
         signal: confidence_signal_to_str(sig.signal()).to_owned(),
@@ -459,7 +458,7 @@ mod tests {
         let doc = decode(FULL_JSON).unwrap();
         assert!(matches!(
             doc.entries()[0].kind(),
-            DomainTypeKind::Typestate { transitions: TypestateTransitions::To(v) } if v == &["Published"]
+            TypeDefinitionKind::Typestate { transitions: TypestateTransitions::To(v) } if v == &["Published"]
         ));
     }
 
@@ -468,14 +467,14 @@ mod tests {
         let doc = decode(FULL_JSON).unwrap();
         assert!(matches!(
             doc.entries()[2].kind(),
-            DomainTypeKind::Enum { expected_variants } if expected_variants == &["Planned", "Done"]
+            TypeDefinitionKind::Enum { expected_variants } if expected_variants == &["Planned", "Done"]
         ));
     }
 
     #[test]
     fn test_decode_value_object_kind() {
         let doc = decode(FULL_JSON).unwrap();
-        assert!(matches!(doc.entries()[3].kind(), DomainTypeKind::ValueObject));
+        assert!(matches!(doc.entries()[3].kind(), TypeDefinitionKind::ValueObject));
     }
 
     #[test]
@@ -483,7 +482,7 @@ mod tests {
         let doc = decode(FULL_JSON).unwrap();
         assert!(matches!(
             doc.entries()[4].kind(),
-            DomainTypeKind::ErrorType { expected_variants } if expected_variants == &["NightlyNotFound"]
+            TypeDefinitionKind::ErrorType { expected_variants } if expected_variants == &["NightlyNotFound"]
         ));
     }
 
@@ -492,7 +491,7 @@ mod tests {
         let doc = decode(FULL_JSON).unwrap();
         assert!(matches!(
             doc.entries()[5].kind(),
-            DomainTypeKind::TraitPort { expected_methods } if expected_methods == &["export"]
+            TypeDefinitionKind::TraitPort { expected_methods } if expected_methods == &["export"]
         ));
     }
 
@@ -525,7 +524,7 @@ mod tests {
     fn test_decode_wrong_schema_version_returns_error() {
         let json = r#"{ "schema_version": 99, "domain_types": [] }"#;
         let err = decode(json).unwrap_err();
-        assert!(matches!(err, DomainTypesCodecError::UnsupportedSchemaVersion(99)));
+        assert!(matches!(err, TypeCatalogueCodecError::UnsupportedSchemaVersion(99)));
     }
 
     #[test]
@@ -548,7 +547,7 @@ mod tests {
   ]
 }"#;
         let err = decode(json).unwrap_err();
-        assert!(matches!(err, DomainTypesCodecError::Validation(_)));
+        assert!(matches!(err, TypeCatalogueCodecError::Validation(_)));
     }
 
     #[test]
@@ -582,7 +581,7 @@ mod tests {
   ]
 }"#;
         let err = decode(json).unwrap_err();
-        assert!(matches!(err, DomainTypesCodecError::InvalidEntry { .. }));
+        assert!(matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }));
     }
 
     #[test]
@@ -771,7 +770,7 @@ mod tests {
   ]
 }"#;
         let err = decode(json).unwrap_err();
-        assert!(matches!(err, DomainTypesCodecError::InvalidEntry { .. }));
+        assert!(matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }));
     }
 
     #[test]
@@ -784,7 +783,7 @@ mod tests {
   ]
 }"#;
         let err = decode(json).unwrap_err();
-        assert!(matches!(err, DomainTypesCodecError::InvalidEntry { .. }));
+        assert!(matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }));
     }
 
     #[test]
@@ -798,7 +797,7 @@ mod tests {
   ]
 }"#;
         let err = decode(json).unwrap_err();
-        assert!(matches!(err, DomainTypesCodecError::InvalidEntry { .. }));
+        assert!(matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }));
     }
 
     #[test]
@@ -813,7 +812,7 @@ mod tests {
   ]
 }"#;
         let err = decode(json).unwrap_err();
-        assert!(matches!(err, DomainTypesCodecError::InvalidEntry { .. }));
+        assert!(matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }));
     }
 
     #[test]
@@ -828,7 +827,7 @@ mod tests {
   ]
 }"#;
         let err = decode(json).unwrap_err();
-        assert!(matches!(err, DomainTypesCodecError::InvalidEntry { .. }));
+        assert!(matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }));
     }
 
     #[test]
@@ -859,7 +858,7 @@ mod tests {
   ]
 }"#;
         let err = decode(json).unwrap_err();
-        assert!(matches!(err, DomainTypesCodecError::InvalidEntry { .. }));
+        assert!(matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }));
     }
 
     #[test]

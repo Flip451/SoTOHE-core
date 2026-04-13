@@ -6,8 +6,8 @@
 
 use std::path::Path;
 
+use domain::check_type_signals;
 use domain::spec::check_spec_doc_signals;
-use domain::tddd::catalogue::check_domain_types_signals;
 use domain::verify::{Finding, VerifyOutcome};
 
 use crate::tddd::catalogue_codec;
@@ -18,7 +18,7 @@ use super::frontmatter::parse_yaml_frontmatter;
 /// Verifies spec.json Stage 1 signals and (if present) Stage 2 domain type signals.
 ///
 /// This is a thin wrapper around the shared domain-layer pure functions
-/// `check_spec_doc_signals` and `check_domain_types_signals`. It reads the
+/// `check_spec_doc_signals` and `check_type_signals`. It reads the
 /// files from the filesystem, rejects symlinks via `reject_symlinks_below`
 /// (D4.3), decodes the JSON, and delegates the actual rule evaluation to
 /// the domain layer.
@@ -151,7 +151,7 @@ pub fn verify_from_spec_json(
     // Merge with stage1 findings so Yellow warnings from Stage 1 are preserved
     // alongside Stage 2 results.
     let mut outcome = stage1;
-    outcome.merge(check_domain_types_signals(&doc, strict));
+    outcome.merge(check_type_signals(&doc, strict));
     outcome
 }
 

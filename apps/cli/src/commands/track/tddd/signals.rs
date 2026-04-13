@@ -198,7 +198,7 @@ fn validate_and_write_catalogue(
 
     // Re-render domain-types.md so the view stays in sync.
     let domain_types_md_path = track_dir.join("domain-types.md");
-    let rendered = infrastructure::domain_types_render::render_domain_types(doc);
+    let rendered = infrastructure::type_catalogue_render::render_type_catalogue(doc);
     atomic_write_file(&domain_types_md_path, rendered.as_bytes()).map_err(|e| {
         CliError::Message(format!("cannot write {}: {e}", domain_types_md_path.display()))
     })?;

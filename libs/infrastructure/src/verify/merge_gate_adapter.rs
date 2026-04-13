@@ -18,8 +18,8 @@
 use std::path::PathBuf;
 
 use domain::TrackMetadata;
+use domain::TypeCatalogueDocument;
 use domain::spec::SpecDocument;
-use domain::tddd::catalogue::DomainTypesDocument;
 use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
 
 use crate::git_cli::show::{BlobResult, fetch_blob_safe};
@@ -83,9 +83,9 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         &self,
         branch: &str,
         track_id: &str,
-    ) -> BlobFetchResult<DomainTypesDocument> {
+    ) -> BlobFetchResult<TypeCatalogueDocument> {
         let path = Self::blob_path(track_id, "domain-types.json");
-        let text = match self.fetch_string::<DomainTypesDocument>(branch, &path) {
+        let text = match self.fetch_string::<TypeCatalogueDocument>(branch, &path) {
             Ok(s) => s,
             Err(result) => return result,
         };

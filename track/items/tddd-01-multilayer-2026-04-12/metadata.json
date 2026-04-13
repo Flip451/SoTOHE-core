@@ -75,6 +75,7 @@
   "status": "in_progress",
   "tasks": [
     {
+      "commit_hash": "6ab44f6800c37e14dd7b3e9444e4aa721cfcaa6d",
       "description": "`libs/domain/src/tddd/catalogue.rs` の `Domain*` シンボル (DomainTypeKind/DomainTypeEntry/DomainTypesDocument/DomainTypeSignal/evaluate_domain_type_signals/check_domain_types_signals) を `TypeDefinition*` / `TypeCatalogue*` / `TypeSignal` / `evaluate_type_signals` / `check_type_signals` に一括リネーム。catalogue.rs (2088行) を catalogue.rs (型定義 ~300行) / signals.rs (評価関数 ~350行) / consistency.rs (ConsistencyReport + check_consistency + check_type_signals ~320行) に 3 分割 (DM-06 同時解消)。`libs/domain/src/tddd/mod.rs` と `libs/domain/src/lib.rs` の re-export を更新",
       "id": "T001",
       "status": "done"
@@ -82,7 +83,7 @@
     {
       "description": "infrastructure 層のリネーム: `libs/infrastructure/src/tddd/catalogue_codec.rs` の DTO 名と import を更新 (schema_version は T006 で 2 にバンプ)。`baseline_codec.rs` / `baseline_builder.rs` の import を更新。`domain_types_render.rs` の関数名を `render_type_catalogue` に変更し、section header を `## Domain Types` → `## Type Declarations` に改題。`libs/infrastructure/src/verify/spec_states.rs` と `merge_gate_adapter.rs` の import を更新",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "usecase / CLI / Makefile のリネーム: `libs/usecase/src/merge_gate.rs` と `task_completion.rs` の import を更新。`apps/cli/src/commands/track/tddd/signals.rs` と `baseline.rs` のサブコマンドを `domain-type-signals` → `type-signals` に変更、`mod.rs` の dispatch を更新。`Makefile.toml` の `track-domain-type-signals` / `track-baseline-capture` タスク名を新名に合わせる (layer 対応は T007 で実施)",
@@ -111,5 +112,5 @@
     }
   ],
   "title": "TDDD-01: 型カタログ多層化 + L1 シグネチャ検証",
-  "updated_at": "2026-04-12T23:53:36Z"
+  "updated_at": "2026-04-13T00:17:00Z"
 }

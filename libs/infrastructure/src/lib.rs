@@ -3,7 +3,6 @@
 
 pub mod agent_profiles;
 pub mod code_profile_builder;
-pub mod domain_types_render;
 pub mod gh_cli;
 pub mod git_cli;
 pub mod guides_codec;
@@ -15,6 +14,7 @@ pub mod shell;
 pub mod spec;
 pub mod tddd;
 pub mod track;
+pub mod type_catalogue_render;
 pub mod verify;
 
 /// Returns a `Timestamp` for the current UTC instant, truncated to whole seconds.
