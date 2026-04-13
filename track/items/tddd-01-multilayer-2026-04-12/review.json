@@ -1,6 +1,77 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
+          "at": "2026-04-13T00:20:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
+          "at": "2026-04-13T00:21:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bbb01e15dd280d5a47b568e28bcd059ff078ead7aeca28030bbf9d4e837f42a",
+          "at": "2026-04-13T00:35:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bbb01e15dd280d5a47b568e28bcd059ff078ead7aeca28030bbf9d4e837f42a",
+          "at": "2026-04-13T00:36:36Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5051f18580807bfbbe0d4cbe6a6f89268010b9d39e1b60094c5d0adbf940d862",
+          "at": "2026-04-13T00:21:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5051f18580807bfbbe0d4cbe6a6f89268010b9d39e1b60094c5d0adbf940d862",
+          "at": "2026-04-13T00:22:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55732279741aa8916fa740894e267f252f8ac98de77ae61fd6ca9b6866d6eb56",
+          "at": "2026-04-13T00:26:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22626bb800bba92ffbd33fac6aecee0ae9b92fa1873d6bd8c5ffb463653637bc",
+          "at": "2026-04-13T00:34:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22626bb800bba92ffbd33fac6aecee0ae9b92fa1873d6bd8c5ffb463653637bc",
+          "at": "2026-04-13T00:35:15Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -38,42 +109,20 @@
           "findings": [],
           "hash": "rvw1:sha256:db36c79eb63679aedaa6ecb594969b26c6faa93d54dd6165544ae26e727449db",
           "at": "2026-04-13T00:08:26Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5051f18580807bfbbe0d4cbe6a6f89268010b9d39e1b60094c5d0adbf940d862",
-          "at": "2026-04-13T00:21:04Z"
+          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
+          "at": "2026-04-13T00:34:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5051f18580807bfbbe0d4cbe6a6f89268010b9d39e1b60094c5d0adbf940d862",
-          "at": "2026-04-13T00:22:40Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
-          "at": "2026-04-13T00:20:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
-          "at": "2026-04-13T00:21:01Z"
+          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
+          "at": "2026-04-13T00:35:30Z"
         }
       ]
     },
@@ -640,6 +689,53 @@
           "findings": [],
           "hash": "rvw1:sha256:67d7a6964948b11ed2b4e3a7006747fedc6fc5953450f73731b95c17bc4b829f",
           "at": "2026-04-13T00:23:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfcf6f9cef63a0a4b16d5a81de975734c19fc60fdd1fa4e56f2b7b2ce6e1616c",
+          "at": "2026-04-13T00:35:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T003` is marked done, but its description still says this task renamed `apps/cli/src/commands/track/tddd/baseline.rs` and `Makefile.toml` tasks. That contradicts the actual T003 diff and the briefing, which explicitly says no `Makefile.toml` rename happened here and the changed CLI files were `signals.rs`, `verify.rs`, and `track/mod.rs`. Leaving the completed task with the old scope misstates what shipped and can misdirect later planning/review work.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 90,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:cfcf6f9cef63a0a4b16d5a81de975734c19fc60fdd1fa4e56f2b7b2ce6e1616c",
+          "at": "2026-04-13T00:36:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14c755d17ec5af397ea43336f889306048572fddb96d1fd052b725cef966f762",
+          "at": "2026-04-13T00:37:58Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a60e280eb3b13ef2d5320ffc9c92a6921a4b68e4156a20de6a32c088cb3ec427",
+          "at": "2026-04-13T00:34:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a60e280eb3b13ef2d5320ffc9c92a6921a4b68e4156a20de6a32c088cb3ec427",
+          "at": "2026-04-13T00:36:17Z"
         }
       ]
     }

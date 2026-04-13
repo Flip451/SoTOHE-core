@@ -350,32 +350,6 @@ impl TypeCatalogueDocument {
 }
 
 // ---------------------------------------------------------------------------
-// T001 alias facade (removed in T003)
-// ---------------------------------------------------------------------------
-//
-// These `pub use` shims expose the pre-rename `DomainType*` names — and the
-// function entry points that formerly lived in this module — inside the
-// `catalogue` submodule path, so that T002 (infrastructure) and T003
-// (usecase / CLI) migrations can proceed one layer at a time without forcing
-// every downstream file to update its import path in the same commit.
-//
-// Downstream code can continue to write e.g.
-// `use domain::tddd::catalogue::DomainTypeKind;` and receive the renamed
-// `TypeDefinitionKind` enum, or
-// `use domain::tddd::catalogue::check_domain_types_signals;` and receive the
-// renamed `check_type_signals` function (now hosted in `super::consistency`).
-//
-// These aliases are REMOVED in T003 together with the last downstream call
-// site. Do NOT add new references to them in new code.
-
-pub use self::TypeCatalogueDocument as DomainTypesDocument;
-pub use self::TypeCatalogueEntry as DomainTypeEntry;
-pub use self::TypeDefinitionKind as DomainTypeKind;
-pub use self::TypeSignal as DomainTypeSignal;
-pub use super::consistency::check_type_signals as check_domain_types_signals;
-pub use super::signals::evaluate_type_signals as evaluate_domain_type_signals;
-
-// ---------------------------------------------------------------------------
 // Tests — type definitions
 // ---------------------------------------------------------------------------
 

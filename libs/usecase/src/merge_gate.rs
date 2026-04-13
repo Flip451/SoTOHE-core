@@ -9,16 +9,16 @@
 //! Two-mode design (ADR §D8.0): the merge gate is always **strict** (Yellow
 //! is blocked). The companion CI path (`verify_from_spec_json`) runs in
 //! interim mode with Yellow warnings. Both paths delegate to the same pure
-//! domain functions (`check_spec_doc_signals` / `check_domain_types_signals`).
+//! domain functions (`check_spec_doc_signals` / `check_type_signals`).
 //!
 //! Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md`
 //! §D2, §D5.2, §D6, §D8.
 
 use domain::spec::{SpecDocument, check_spec_doc_signals};
-use domain::tddd::catalogue::{DomainTypesDocument, check_domain_types_signals};
 use domain::validate_branch_ref;
 use domain::verify::{Finding, VerifyOutcome};
 use domain::{TrackId, TrackMetadata};
+use domain::{TypeCatalogueDocument, check_type_signals};
 
 /// Result of a port-level blob fetch.
 ///
@@ -44,7 +44,7 @@ pub enum BlobFetchResult<T> {
 /// - Mapping their native I/O errors to [`BlobFetchResult::FetchError`]
 /// - Distinguishing path-not-found from other errors (NotFound vs FetchError)
 /// - Decoding raw bytes into domain aggregates (`SpecDocument`,
-///   `DomainTypesDocument`)
+///   `TypeCatalogueDocument`)
 /// - Any locale / stderr-parsing / symlink-rejection concerns that are
 ///   specific to the adapter implementation
 ///
@@ -59,11 +59,11 @@ pub trait TrackBlobReader {
     ///
     /// Returns `NotFound` when the file does not exist on the target ref.
     /// This corresponds to "TDDD not active for this track" per ADR §D2.1.
-    fn read_domain_types_document(
+    fn read_type_catalogue(
         &self,
         branch: &str,
         track_id: &str,
-    ) -> BlobFetchResult<DomainTypesDocument>;
+    ) -> BlobFetchResult<TypeCatalogueDocument>;
 
     /// Reads and decodes `track/items/<track_id>/metadata.json` into a
     /// [`TrackMetadata`] aggregate.
@@ -94,7 +94,7 @@ pub trait TrackBlobReader {
 ///    - `NotFound` → BLOCKED (spec.json is required for every track)
 ///    - `FetchError` → BLOCKED
 /// 5. If Stage 1 passes, read `domain-types.json`:
-///    - `Found(doc)` → delegate to [`check_domain_types_signals`] with `strict=true`
+///    - `Found(doc)` → delegate to [`check_type_signals`] with `strict=true`
 ///    - `NotFound` → skip (TDDD opt-in)
 ///    - `FetchError` → BLOCKED
 ///
@@ -149,14 +149,14 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
     }
 
     // 5. Stage 2: domain-types.json is opt-in (D2.1).
-    match reader.read_domain_types_document(branch, track_id) {
+    match reader.read_type_catalogue(branch, track_id) {
         BlobFetchResult::NotFound => stage1, // TDDD opt-out → preserve stage1
         BlobFetchResult::FetchError(msg) => VerifyOutcome::from_findings(vec![Finding::error(
             format!("failed to read domain-types.json on origin/{branch}: {msg}"),
         )]),
         BlobFetchResult::Found(dt_doc) => {
             let mut outcome = stage1;
-            outcome.merge(check_domain_types_signals(&dt_doc, /* strict */ true));
+            outcome.merge(check_type_signals(&dt_doc, /* strict */ true));
             outcome
         }
     }
@@ -168,7 +168,7 @@ mod tests {
     use std::cell::RefCell;
 
     use domain::spec::{SpecScope, SpecStatus};
-    use domain::tddd::catalogue::{DomainTypeEntry, DomainTypeKind, DomainTypeSignal, TypeAction};
+    use domain::tddd::catalogue::{TypeAction, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal};
     use domain::{ConfidenceSignal, SignalCounts};
 
     use super::*;
@@ -177,8 +177,8 @@ mod tests {
     struct MockTrackBlobReader {
         spec: RefCell<Option<BlobFetchResult<SpecDocument>>>,
         /// `Some(result)` → return result when called; `None` → panic (unreachable assertion).
-        dt: RefCell<Option<BlobFetchResult<DomainTypesDocument>>>,
-        /// When `true`, calling `read_domain_types_document` panics with a clear message,
+        dt: RefCell<Option<BlobFetchResult<TypeCatalogueDocument>>>,
+        /// When `true`, calling `read_type_catalogue` panics with a clear message,
         /// making the short-circuit contract directly observable in tests.
         dt_unreachable: bool,
     }
@@ -186,7 +186,7 @@ mod tests {
     impl MockTrackBlobReader {
         fn new(
             spec: BlobFetchResult<SpecDocument>,
-            dt: BlobFetchResult<DomainTypesDocument>,
+            dt: BlobFetchResult<TypeCatalogueDocument>,
         ) -> Self {
             Self {
                 spec: RefCell::new(Some(spec)),
@@ -197,7 +197,7 @@ mod tests {
 
         /// Shortcut for tests that must assert Stage 2 is never reached.
         ///
-        /// If `read_domain_types_document` is called, the test panics immediately,
+        /// If `read_type_catalogue` is called, the test panics immediately,
         /// making regressions in the short-circuit logic observable.
         fn with_unreachable_dt(spec: BlobFetchResult<SpecDocument>) -> Self {
             Self { spec: RefCell::new(Some(spec)), dt: RefCell::new(None), dt_unreachable: true }
@@ -213,15 +213,13 @@ mod tests {
             self.spec.borrow_mut().take().expect("spec read called twice")
         }
 
-        fn read_domain_types_document(
+        fn read_type_catalogue(
             &self,
             _branch: &str,
             _track_id: &str,
-        ) -> BlobFetchResult<DomainTypesDocument> {
+        ) -> BlobFetchResult<TypeCatalogueDocument> {
             if self.dt_unreachable {
-                panic!(
-                    "Stage 2 must not be reached: read_domain_types_document was called unexpectedly"
-                );
+                panic!("Stage 2 must not be reached: read_type_catalogue was called unexpectedly");
             }
             self.dt.borrow_mut().take().expect("dt read called twice")
         }
@@ -272,11 +270,11 @@ mod tests {
             self.spec_result.clone()
         }
 
-        fn read_domain_types_document(
+        fn read_type_catalogue(
             &self,
             branch: &str,
             track_id: &str,
-        ) -> BlobFetchResult<DomainTypesDocument> {
+        ) -> BlobFetchResult<TypeCatalogueDocument> {
             *self.recorded_dt_branch.borrow_mut() = Some(branch.to_owned());
             *self.recorded_dt_track_id.borrow_mut() = Some(track_id.to_owned());
             BlobFetchResult::NotFound
@@ -319,37 +317,35 @@ mod tests {
         spec_doc_with_signals(Some(SignalCounts::new(5, 0, 0)))
     }
 
-    fn make_entry(name: &str) -> DomainTypeEntry {
-        DomainTypeEntry::new(name, "test", DomainTypeKind::ValueObject, TypeAction::Add, true)
-            .unwrap()
-    }
-
-    fn make_signal(name: &str, signal: ConfidenceSignal) -> DomainTypeSignal {
-        DomainTypeSignal::new(
+    fn make_entry(name: &str) -> TypeCatalogueEntry {
+        TypeCatalogueEntry::new(
             name,
-            "value_object",
-            signal,
+            "test",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Add,
             true,
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
         )
+        .unwrap()
     }
 
-    fn dt_all_blue() -> DomainTypesDocument {
-        let mut doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
+    fn make_signal(name: &str, signal: ConfidenceSignal) -> TypeSignal {
+        TypeSignal::new(name, "value_object", signal, true, Vec::new(), Vec::new(), Vec::new())
+    }
+
+    fn dt_all_blue() -> TypeCatalogueDocument {
+        let mut doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
         doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Blue)]);
         doc
     }
 
-    fn dt_with_yellow() -> DomainTypesDocument {
-        let mut doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
+    fn dt_with_yellow() -> TypeCatalogueDocument {
+        let mut doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
         doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Yellow)]);
         doc
     }
 
-    fn dt_with_red() -> DomainTypesDocument {
-        let mut doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
+    fn dt_with_red() -> TypeCatalogueDocument {
+        let mut doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
         doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Red)]);
         doc
     }
@@ -408,7 +404,7 @@ mod tests {
         // U5: spec=Blue, dt=empty entries → BLOCKED
         let reader = MockTrackBlobReader::new(
             BlobFetchResult::Found(all_blue_spec()),
-            BlobFetchResult::Found(DomainTypesDocument::new(1, Vec::new())),
+            BlobFetchResult::Found(TypeCatalogueDocument::new(1, Vec::new())),
         );
         let outcome = check_strict_merge_gate("track/foo", &reader);
         assert!(outcome.has_errors());
@@ -417,7 +413,8 @@ mod tests {
     #[test]
     fn test_u6_spec_blue_dt_coverage_gap_blocks() {
         // U6: spec=Blue, dt has entry with no matching signal → BLOCKED
-        let mut doc = DomainTypesDocument::new(1, vec![make_entry("TrackId"), make_entry("Other")]);
+        let mut doc =
+            TypeCatalogueDocument::new(1, vec![make_entry("TrackId"), make_entry("Other")]);
         doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Blue)]);
         let reader = MockTrackBlobReader::new(
             BlobFetchResult::Found(all_blue_spec()),
@@ -430,7 +427,7 @@ mod tests {
     #[test]
     fn test_u7_spec_blue_dt_signals_none_blocks() {
         // U7: spec=Blue, dt=None (unevaluated) → BLOCKED
-        let doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
+        let doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
         let reader = MockTrackBlobReader::new(
             BlobFetchResult::Found(all_blue_spec()),
             BlobFetchResult::Found(doc),

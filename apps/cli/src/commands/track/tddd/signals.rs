@@ -1,4 +1,4 @@
-//! `sotp track domain-type-signals` — evaluate domain type signals via rustdoc schema export.
+//! `sotp track type-signals` — evaluate domain type signals via rustdoc schema export.
 //!
 //! Reads `domain-types.json` from the track directory, exports the domain crate's
 //! public API via rustdoc JSON, evaluates signals for each declared type, and writes
@@ -20,7 +20,7 @@ use crate::CliError;
 /// Steps:
 /// 1. Read `domain-types.json` from `<items_dir>/<track_id>/`.
 /// 2. Export the `domain` crate's public API using `RustdocSchemaExporter`.
-/// 3. Call `domain::evaluate_domain_type_signals()` with the entries and schema.
+/// 3. Call `domain::evaluate_type_signals()` with the entries and schema.
 /// 4. Set the signals on the document and write back to `domain-types.json`.
 /// 5. Print a signal summary to stdout.
 ///
@@ -28,7 +28,7 @@ use crate::CliError;
 ///
 /// Returns `CliError` when the track ID is invalid, the file cannot be read or
 /// decoded, rustdoc export fails (e.g., nightly not installed), or the write fails.
-pub fn execute_domain_type_signals(
+pub fn execute_type_signals(
     items_dir: PathBuf,
     track_id: String,
     workspace_root: PathBuf,
@@ -97,7 +97,7 @@ pub fn execute_domain_type_signals(
 
 /// Core signal evaluation and catalogue write given pre-built domain components.
 ///
-/// Separated from `execute_domain_type_signals` so the abort-before-write ordering
+/// Separated from `execute_type_signals` so the abort-before-write ordering
 /// and signal assembly can be exercised in unit tests without requiring the nightly
 /// toolchain that `RustdocSchemaExporter` depends on.
 ///
@@ -106,7 +106,7 @@ pub fn execute_domain_type_signals(
 /// Returns `CliError` if action diagnostics fail (delete errors), encoding fails,
 /// or either atomic write fails.
 pub(crate) fn evaluate_and_write_signals(
-    doc: &mut domain::DomainTypesDocument,
+    doc: &mut domain::TypeCatalogueDocument,
     profile: &domain::TypeGraph,
     baseline: &domain::TypeBaseline,
     domain_types_path: &std::path::Path,
@@ -115,7 +115,7 @@ pub(crate) fn evaluate_and_write_signals(
     // Bidirectional consistency check: forward (spec → code) + reverse (code → spec).
     let report = domain::check_consistency(doc.entries(), profile, baseline);
 
-    // Convert undeclared types/traits (group 4) to Red DomainTypeSignals.
+    // Convert undeclared types/traits (group 4) to Red TypeSignals.
     // Capture the count before appending group-3 baseline reds so the summary
     // WARN line only fires for truly new undeclared items (not baseline changes/deletions).
     let undeclared_signals =
@@ -128,7 +128,7 @@ pub(crate) fn evaluate_and_write_signals(
     // false when the name is absent from the type graph (deletion).
     for name in report.baseline_red_types() {
         let found_type = profile.get_type(name).is_some();
-        reverse_signals.push(domain::DomainTypeSignal::new(
+        reverse_signals.push(domain::TypeSignal::new(
             name.clone(),
             "baseline_changed_type",
             domain::ConfidenceSignal::Red,
@@ -140,7 +140,7 @@ pub(crate) fn evaluate_and_write_signals(
     }
     for name in report.baseline_red_traits() {
         let found_type = profile.get_trait(name).is_some();
-        reverse_signals.push(domain::DomainTypeSignal::new(
+        reverse_signals.push(domain::TypeSignal::new(
             name.clone(),
             "baseline_changed_trait",
             domain::ConfidenceSignal::Red,
@@ -173,7 +173,7 @@ pub(crate) fn evaluate_and_write_signals(
 /// Markdown view are atomically written to disk.
 ///
 /// Extracted so that the validate-before-write ordering can be tested without
-/// requiring the nightly toolchain that `execute_domain_type_signals` uses.
+/// requiring the nightly toolchain that `execute_type_signals` uses.
 ///
 /// # Errors
 ///
@@ -181,7 +181,7 @@ pub(crate) fn evaluate_and_write_signals(
 /// atomic write fails.
 fn validate_and_write_catalogue(
     report: &domain::ConsistencyReport,
-    doc: &domain::DomainTypesDocument,
+    doc: &domain::TypeCatalogueDocument,
     domain_types_path: &std::path::Path,
     track_dir: &std::path::Path,
 ) -> Result<(), CliError> {
@@ -241,12 +241,12 @@ fn print_action_diagnostics(report: &domain::ConsistencyReport) -> Result<(), Cl
 ///
 /// Returns a `String` containing the full output (newline-terminated lines) so the
 /// formatting logic is testable without requiring the nightly toolchain that the full
-/// `execute_domain_type_signals` path needs.
+/// `execute_type_signals` path needs.
 ///
 /// `total` equals `signals.len()` — it counts every emitted signal (forward + reverse),
 /// not just the entries in `domain-types.json`, to keep `blue + yellow + red == total`.
 fn format_signal_summary(
-    signals: &[domain::DomainTypeSignal],
+    signals: &[domain::TypeSignal],
     undeclared_count: usize,
     skipped_count: usize,
 ) -> String {
@@ -255,7 +255,7 @@ fn format_signal_summary(
     let red = signals.iter().filter(|s| s.signal() == domain::ConfidenceSignal::Red).count();
     let total = signals.len();
     let mut out = format!(
-        "[OK] domain-type-signals: blue={blue} yellow={yellow} red={red} (total={total}, undeclared={undeclared_count}, skipped={skipped_count})\n",
+        "[OK] type-signals: blue={blue} yellow={yellow} red={red} (total={total}, undeclared={undeclared_count}, skipped={skipped_count})\n",
     );
 
     if undeclared_count > 0 {
@@ -269,7 +269,7 @@ fn format_signal_summary(
 
 /// Print the signal summary produced by [`format_signal_summary`].
 fn print_signal_summary(
-    signals: &[domain::DomainTypeSignal],
+    signals: &[domain::TypeSignal],
     undeclared_count: usize,
     skipped_count: usize,
 ) {
@@ -292,44 +292,43 @@ mod tests {
     }
 
     #[test]
-    fn test_execute_domain_type_signals_with_invalid_track_id_returns_error() {
+    fn test_execute_type_signals_with_invalid_track_id_returns_error() {
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         std::fs::create_dir_all(&items_dir).unwrap();
         let workspace_root = dir.path().to_path_buf();
 
-        let result = execute_domain_type_signals(items_dir, "../evil".to_owned(), workspace_root);
+        let result = execute_type_signals(items_dir, "../evil".to_owned(), workspace_root);
         assert!(result.is_err(), "path traversal track_id must be rejected");
     }
 
     #[test]
-    fn test_execute_domain_type_signals_with_missing_domain_types_json_returns_error() {
+    fn test_execute_type_signals_with_missing_domain_types_json_returns_error() {
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         std::fs::create_dir_all(items_dir.join("test-track")).unwrap();
         let workspace_root = dir.path().to_path_buf();
 
-        let result =
-            execute_domain_type_signals(items_dir, "test-track".to_owned(), workspace_root);
+        let result = execute_type_signals(items_dir, "test-track".to_owned(), workspace_root);
         let err = result.unwrap_err();
         let msg = format!("{err}");
         assert!(msg.contains("/track:design"), "error must suggest /track:design, got: {msg}");
     }
 
     #[test]
-    fn test_execute_domain_type_signals_with_malformed_domain_types_json_returns_error() {
+    fn test_execute_type_signals_with_malformed_domain_types_json_returns_error() {
         let dir = tempfile::tempdir().unwrap();
         let (items_dir, track_id) = setup_track(dir.path(), "{not valid json}");
         let workspace_root = dir.path().to_path_buf();
 
-        let result = execute_domain_type_signals(items_dir, track_id, workspace_root);
+        let result = execute_type_signals(items_dir, track_id, workspace_root);
         assert!(result.is_err(), "malformed domain-types.json must return error");
     }
 
     // --- format_signal_summary tests (pure, no nightly needed) ---
 
-    fn make_signal(signal: domain::ConfidenceSignal) -> domain::DomainTypeSignal {
-        domain::DomainTypeSignal::new("Foo", "value_object", signal, true, vec![], vec![], vec![])
+    fn make_signal(signal: domain::ConfidenceSignal) -> domain::TypeSignal {
+        domain::TypeSignal::new("Foo", "value_object", signal, true, vec![], vec![], vec![])
     }
 
     #[test]
@@ -391,11 +390,11 @@ mod tests {
 
     // --- print_action_diagnostics tests (pure, no nightly needed) ---
 
-    fn make_entry_d(name: &str, action: domain::TypeAction) -> domain::DomainTypeEntry {
-        domain::DomainTypeEntry::new(
+    fn make_entry_d(name: &str, action: domain::TypeAction) -> domain::TypeCatalogueEntry {
+        domain::TypeCatalogueEntry::new(
             name,
             "desc",
-            domain::DomainTypeKind::ValueObject,
+            domain::TypeDefinitionKind::ValueObject,
             action,
             true,
         )
@@ -442,7 +441,7 @@ mod tests {
     fn test_print_action_diagnostics_does_not_write_files_on_failure() {
         // Verifies that print_action_diagnostics itself has no write side effects —
         // it only prints to stderr and returns Err on delete errors.
-        // (File-write invariant for execute_domain_type_signals is covered by the
+        // (File-write invariant for execute_type_signals is covered by the
         // fact that print_action_diagnostics is called before atomic_write_file.)
         let entry = make_entry_d("Phantom", domain::TypeAction::Delete);
         let report = domain::check_consistency(&[entry], &empty_graph_d(), &empty_baseline_d());
@@ -460,7 +459,7 @@ mod tests {
         let track_dir = dir.path().to_path_buf();
 
         let entry = make_entry_d("Ghost", domain::TypeAction::Delete);
-        let doc = domain::DomainTypesDocument::new(1, vec![entry.clone()]);
+        let doc = domain::TypeCatalogueDocument::new(1, vec![entry.clone()]);
         let report = domain::check_consistency(&[entry], &empty_graph_d(), &empty_baseline_d());
 
         assert!(
@@ -490,7 +489,7 @@ mod tests {
         let track_dir = dir.path().to_path_buf();
 
         // A report with no errors: empty entries against empty baseline/graph.
-        let doc = domain::DomainTypesDocument::new(1, vec![]);
+        let doc = domain::TypeCatalogueDocument::new(1, vec![]);
         let report = domain::check_consistency(&[], &empty_graph_d(), &empty_baseline_d());
 
         assert!(report.delete_errors().is_empty(), "precondition: no delete errors");
@@ -510,14 +509,14 @@ mod tests {
     #[test]
     fn test_evaluate_and_write_signals_with_delete_error_returns_err_and_leaves_files_untouched() {
         // End-to-end test for the abort-before-write path via the public core evaluator.
-        // Proves that `execute_domain_type_signals` cannot write files on delete errors
+        // Proves that `execute_type_signals` cannot write files on delete errors
         // regardless of where the `validate_and_write_catalogue` call is placed.
         let dir = tempfile::tempdir().unwrap();
         let domain_types_path = dir.path().join("domain-types.json");
         let track_dir = dir.path().to_path_buf();
 
         let entry = make_entry_d("Ghost", domain::TypeAction::Delete);
-        let mut doc = domain::DomainTypesDocument::new(1, vec![entry.clone()]);
+        let mut doc = domain::TypeCatalogueDocument::new(1, vec![entry.clone()]);
 
         let result = evaluate_and_write_signals(
             &mut doc,
@@ -541,12 +540,12 @@ mod tests {
     #[test]
     fn test_evaluate_and_write_signals_with_clean_report_returns_success_and_writes_files() {
         // End-to-end test for the success path via the public core evaluator.
-        // Proves that `execute_domain_type_signals` writes both files on a clean report.
+        // Proves that `execute_type_signals` writes both files on a clean report.
         let dir = tempfile::tempdir().unwrap();
         let domain_types_path = dir.path().join("domain-types.json");
         let track_dir = dir.path().to_path_buf();
 
-        let mut doc = domain::DomainTypesDocument::new(1, vec![]);
+        let mut doc = domain::TypeCatalogueDocument::new(1, vec![]);
 
         let result = evaluate_and_write_signals(
             &mut doc,
@@ -569,7 +568,7 @@ mod tests {
     /// Run with: `cargo test --package cli -- --ignored`
     #[test]
     #[ignore]
-    fn test_execute_domain_type_signals_success_path_writes_signals() {
+    fn test_execute_type_signals_success_path_writes_signals() {
         let dir = tempfile::tempdir().unwrap();
         let domain_types_json = r#"{
   "schema_version": 1,
@@ -594,8 +593,7 @@ mod tests {
             .expect("workspace root")
             .to_path_buf();
 
-        let result =
-            execute_domain_type_signals(items_dir.clone(), track_id.clone(), workspace_root);
+        let result = execute_type_signals(items_dir.clone(), track_id.clone(), workspace_root);
         assert!(result.is_ok(), "success path must return Ok: {result:?}");
 
         // Verify signals were written back

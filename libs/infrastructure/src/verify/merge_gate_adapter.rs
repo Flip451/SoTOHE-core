@@ -79,7 +79,7 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         }
     }
 
-    fn read_domain_types_document(
+    fn read_type_catalogue(
         &self,
         branch: &str,
         track_id: &str,
@@ -277,14 +277,14 @@ mod tests {
         }
     }
 
-    // --- read_domain_types_document ---
+    // --- read_type_catalogue ---
 
     #[test]
-    fn test_read_domain_types_document_found() {
+    fn test_read_type_catalogue_found() {
         let dir =
             setup_repo_with_track("foo", &[("domain-types.json", DOMAIN_TYPES_MINIMAL.as_bytes())]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        match reader.read_domain_types_document("main", "foo") {
+        match reader.read_type_catalogue("main", "foo") {
             BlobFetchResult::Found(doc) => {
                 assert_eq!(doc.entries().len(), 1);
             }
@@ -293,20 +293,17 @@ mod tests {
     }
 
     #[test]
-    fn test_read_domain_types_document_not_found() {
+    fn test_read_type_catalogue_not_found() {
         let dir = setup_repo_with_track("foo", &[("spec.json", SPEC_JSON_MINIMAL.as_bytes())]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        assert!(matches!(
-            reader.read_domain_types_document("main", "foo"),
-            BlobFetchResult::NotFound
-        ));
+        assert!(matches!(reader.read_type_catalogue("main", "foo"), BlobFetchResult::NotFound));
     }
 
     #[test]
-    fn test_read_domain_types_document_decode_error() {
+    fn test_read_type_catalogue_decode_error() {
         let dir = setup_repo_with_track("foo", &[("domain-types.json", b"{}")]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        match reader.read_domain_types_document("main", "foo") {
+        match reader.read_type_catalogue("main", "foo") {
             BlobFetchResult::FetchError(msg) => {
                 assert!(msg.contains("decode error"), "{msg}");
             }
@@ -377,7 +374,7 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn test_read_domain_types_document_rejects_symlink() {
+    fn test_read_type_catalogue_rejects_symlink() {
         let dir = tempfile::tempdir().unwrap();
         let repo = dir.path();
         git(repo, &["init", "--quiet", "--initial-branch=main"]);
@@ -391,7 +388,7 @@ mod tests {
         git(repo, &["fetch", "--quiet", "origin"]);
 
         let reader = GitShowTrackBlobReader::new(repo.to_path_buf());
-        match reader.read_domain_types_document("main", "foo") {
+        match reader.read_type_catalogue("main", "foo") {
             BlobFetchResult::FetchError(msg) => {
                 assert!(msg.contains("symlink"), "{msg}");
             }

@@ -81,14 +81,15 @@
       "status": "done"
     },
     {
+      "commit_hash": "6a67e77d5c58301557c122f10d033e314559073c",
       "description": "infrastructure 層のリネーム: `libs/infrastructure/src/tddd/catalogue_codec.rs` の DTO 名と import を更新 (schema_version は T006 で 2 にバンプ)。`baseline_codec.rs` / `baseline_builder.rs` の import を更新。`domain_types_render.rs` の関数名を `render_type_catalogue` に変更し、section header を `## Domain Types` → `## Type Declarations` に改題。`libs/infrastructure/src/verify/spec_states.rs` と `merge_gate_adapter.rs` の import を更新",
       "id": "T002",
       "status": "done"
     },
     {
-      "description": "usecase / CLI / Makefile のリネーム: `libs/usecase/src/merge_gate.rs` と `task_completion.rs` の import を更新。`apps/cli/src/commands/track/tddd/signals.rs` と `baseline.rs` のサブコマンドを `domain-type-signals` → `type-signals` に変更、`mod.rs` の dispatch を更新。`Makefile.toml` の `track-domain-type-signals` / `track-baseline-capture` タスク名を新名に合わせる (layer 対応は T007 で実施)",
+      "description": "usecase / CLI / domain alias 除去: `libs/usecase/src/merge_gate.rs` の `TrackBlobReader::read_domain_types_document` → `read_type_catalogue` リネームと import 更新。`task_completion.rs` のテストモック同期。`apps/cli/src/commands/track/tddd/signals.rs` の `DomainType*` → `TypeCatalogue*` / `TypeDefinitionKind` / `TypeSignal` リネームと `execute_domain_type_signals` → `execute_type_signals`。`verify.rs` / `track/mod.rs` の同リネーム。`libs/domain/src/lib.rs` と `libs/domain/src/tddd/catalogue.rs` の T001 alias facade (`pub use ... as DomainType*` + function shims) 除去。`Makefile.toml` は変更なし (該当タスク名が存在しなかったため)。`baseline.rs` は変更なし (T003 スコープ外)",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "`libs/domain/src/tddd/catalogue.rs` に `ParamDeclaration` (struct) / `MethodDeclaration` (struct + `signature_string()` ヘルパーメソッド) / `MemberDeclaration` (enum-first: Variant/Field) を追加。`libs/domain/src/schema.rs` の `FunctionInfo` から `signature: String` フィールドと `pub fn signature()` アクセサを削除 (C1)、`params`/`returns`/`receiver`/`is_async` を追加。`libs/infrastructure/src/schema_export.rs::format_sig` 関数も削除。`TypeInfo::members` を `Vec<MemberDeclaration>` に、`TypeNode` を `{kind, members: Vec<MemberDeclaration>, methods: Vec<MethodDeclaration>, outgoing}` に、`TraitNode` を `{methods: Vec<MethodDeclaration>}` に拡張。`libs/infrastructure/src/schema_export.rs` に recursive `format_type` / `format_args` を追加して rustdoc_types 0.57 から 4 フィールドを抽出。`SchemaExporter::export(&self, crate_name: &str)` ポートシグネチャは変更しない (BRIDGE-01 / domain.rs / verify.rs の既存 call-site 互換)。注: CLI が `schema_export.targets[]` をループして per-crate `export()` を呼び出し結果を統合する multi-crate 集約 wiring は T007 で実装する — T004 は per-crate 抽出ロジック (`format_type` / `format_args` を含む rustdoc JSON → 構造化フィールド変換) のみを担当。`libs/infrastructure/src/code_profile_builder.rs::build_type_graph` に FunctionInfo → MethodDeclaration 変換を追加。outgoing は従来通り return_type_names ∩ typestate_names から derive。BRIDGE-01 (`sotp domain export-schema`) JSON の `signature` キーが消える breaking change を受容",
@@ -112,5 +113,5 @@
     }
   ],
   "title": "TDDD-01: 型カタログ多層化 + L1 シグネチャ検証",
-  "updated_at": "2026-04-13T00:17:00Z"
+  "updated_at": "2026-04-13T00:31:49Z"
 }

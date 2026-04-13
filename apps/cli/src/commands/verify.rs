@@ -289,11 +289,11 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
 /// exercised in unit tests without requiring the nightly toolchain.
 ///
 /// # Arguments
-/// * `doc` — decoded `DomainTypesDocument` (entries read from `domain-types.json`)
+/// * `doc` — decoded `TypeCatalogueDocument` (entries read from `domain-types.json`)
 /// * `graph` — `TypeGraph` built from the schema export
 /// * `baseline` — decoded `TypeBaseline` from `domain-types-baseline.json`
 fn evaluate_consistency_from_components(
-    doc: &domain::DomainTypesDocument,
+    doc: &domain::TypeCatalogueDocument,
     graph: &domain::TypeGraph,
     baseline: &domain::TypeBaseline,
 ) -> VerifyOutcome {
@@ -896,11 +896,11 @@ mod tests {
 
     // --- consistency_report_to_findings tests ---
 
-    fn make_entry_for_test(name: &str, action: domain::TypeAction) -> domain::DomainTypeEntry {
-        domain::DomainTypeEntry::new(
+    fn make_entry_for_test(name: &str, action: domain::TypeAction) -> domain::TypeCatalogueEntry {
+        domain::TypeCatalogueEntry::new(
             name,
             "desc",
-            domain::DomainTypeKind::ValueObject,
+            domain::TypeDefinitionKind::ValueObject,
             action,
             true,
         )
@@ -1046,12 +1046,12 @@ mod tests {
 
     // --- evaluate_consistency_from_components tests (core CLI wiring, no nightly needed) ---
 
-    fn make_doc_with_entry(entry: domain::DomainTypeEntry) -> domain::DomainTypesDocument {
-        domain::DomainTypesDocument::new(1, vec![entry])
+    fn make_doc_with_entry(entry: domain::TypeCatalogueEntry) -> domain::TypeCatalogueDocument {
+        domain::TypeCatalogueDocument::new(1, vec![entry])
     }
 
-    fn empty_doc_for_test() -> domain::DomainTypesDocument {
-        domain::DomainTypesDocument::new(1, vec![])
+    fn empty_doc_for_test() -> domain::TypeCatalogueDocument {
+        domain::TypeCatalogueDocument::new(1, vec![])
     }
 
     #[test]

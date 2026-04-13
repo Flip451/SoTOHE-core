@@ -337,7 +337,7 @@ pub fn check_consistency(
 /// # Rules
 ///
 /// - `entries` is empty → `Finding::error` (malformed catalogue)
-/// - `signals` is `None` → `Finding::error` (unevaluated; run `sotp track domain-type-signals`)
+/// - `signals` is `None` → `Finding::error` (unevaluated; run `sotp track type-signals`)
 /// - Signal coverage incomplete (entry has no matching signal) → `Finding::error`
 /// - Any Red signal (forward or reverse) → `Finding::error` (always an error, regardless of mode)
 /// - Declared-entry Yellow signal, `strict = true` → `Finding::error`
@@ -362,7 +362,7 @@ pub fn check_type_signals(doc: &TypeCatalogueDocument, strict: bool) -> VerifyOu
 
     let Some(signals) = doc.signals() else {
         return VerifyOutcome::from_findings(vec![Finding::error(
-            "domain type signals not yet evaluated — run `sotp track domain-type-signals` first"
+            "domain type signals not yet evaluated — run `sotp track type-signals` first"
                 .to_owned(),
         )]);
     };
@@ -378,7 +378,7 @@ pub fn check_type_signals(doc: &TypeCatalogueDocument, strict: bool) -> VerifyOu
         .collect();
     if !uncovered.is_empty() {
         return VerifyOutcome::from_findings(vec![Finding::error(format!(
-            "{} domain type(s) have no signal evaluation: {} — re-run `sotp track domain-type-signals`",
+            "{} domain type(s) have no signal evaluation: {} — re-run `sotp track type-signals`",
             uncovered.len(),
             uncovered.join(", ")
         ))]);
@@ -410,7 +410,7 @@ pub fn check_type_signals(doc: &TypeCatalogueDocument, strict: bool) -> VerifyOu
 
     if !yellow_entries.is_empty() {
         let message = format!(
-            "domain-types.json: {} declared type(s) have Yellow signal: {} — merge gate will block these until upgraded to Blue. Resolve each type (implement or remove per its declared action) and re-run `sotp track domain-type-signals`.",
+            "domain-types.json: {} declared type(s) have Yellow signal: {} — merge gate will block these until upgraded to Blue. Resolve each type (implement or remove per its declared action) and re-run `sotp track type-signals`.",
             yellow_entries.len(),
             yellow_entries.join(", ")
         );

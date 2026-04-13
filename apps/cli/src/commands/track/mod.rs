@@ -172,7 +172,7 @@ pub enum TrackCommand {
     },
 
     /// Evaluate domain type signals via rustdoc schema export and store results in domain-types.json.
-    DomainTypeSignals {
+    TypeSignals {
         /// Path to the track items root directory (e.g., `track/items`).
         #[arg(long, default_value = "track/items")]
         items_dir: PathBuf,
@@ -324,8 +324,8 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         TrackCommand::Signals { items_dir, track_id } => {
             signals::execute_signals(items_dir, track_id)
         }
-        TrackCommand::DomainTypeSignals { items_dir, track_id, workspace_root } => {
-            tddd::signals::execute_domain_type_signals(items_dir, track_id, workspace_root)
+        TrackCommand::TypeSignals { items_dir, track_id, workspace_root } => {
+            tddd::signals::execute_type_signals(items_dir, track_id, workspace_root)
         }
         TrackCommand::BaselineCapture { items_dir, track_id, workspace_root, force } => {
             tddd::baseline::execute_baseline_capture(items_dir, track_id, workspace_root, force)

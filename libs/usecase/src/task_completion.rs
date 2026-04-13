@@ -102,8 +102,9 @@ mod tests {
     use std::cell::RefCell;
 
     use domain::spec::SpecDocument;
-    use domain::tddd::catalogue::DomainTypesDocument;
-    use domain::{PlanSection, PlanView, TaskId, TaskStatus, TrackMetadata, TrackTask};
+    use domain::{
+        PlanSection, PlanView, TaskId, TaskStatus, TrackMetadata, TrackTask, TypeCatalogueDocument,
+    };
 
     use super::*;
 
@@ -131,12 +132,12 @@ mod tests {
             panic!("read_spec_document must not be called by task_completion tests")
         }
 
-        fn read_domain_types_document(
+        fn read_type_catalogue(
             &self,
             _branch: &str,
             _track_id: &str,
-        ) -> BlobFetchResult<DomainTypesDocument> {
-            panic!("read_domain_types_document must not be called by task_completion tests")
+        ) -> BlobFetchResult<TypeCatalogueDocument> {
+            panic!("read_type_catalogue must not be called by task_completion tests")
         }
 
         fn read_track_metadata(
