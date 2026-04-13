@@ -1,0 +1,1463 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 still tells users to run `domain-type-signals` to rebuild signals, but this document has renamed the command to `type-signals`. Following this instruction would point users at a dead CLI entrypoint and skip the required rebuild step.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 118,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:dcc4f56dc3b137990980cd738e120c52c97224c3cfb94b03bb1410c1a1647096",
+          "at": "2026-04-13T03:12:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 still refers to `domain-type-signals`, but the CLI subcommand has been renamed to `type-signals`; this is a dead command reference and will send operators to a non-existent invocation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 118,
+              "category": "broken reference"
+            },
+            {
+              "message": "The baseline filename guidance uses `<layer>-types-baseline.json`, but multilayer bindings derive the baseline from `catalogue_file` as `<stem>-baseline.json`. For any layer whose catalogue file is not the default `<layer>-types.json`, this points at the wrong file and contradicts the current layer-binding rules.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 123,
+              "category": "logical contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:dcc4f56dc3b137990980cd738e120c52c97224c3cfb94b03bb1410c1a1647096",
+          "at": "2026-04-13T03:14:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This claims the multilayer flow is already supported (`--layer` on `type-signals` and `baseline-capture`), but the current CLI still hardcodes the `domain` path: `apps/cli/src/commands/track/tddd/baseline.rs` always writes `domain-types-baseline.json` and ignores `--layer`, and `apps/cli/src/commands/track/tddd/signals.rs` still rejects non-domain layers. The doc therefore points users at a workflow that does not exist yet.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 14,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2329af1a2ae065557904ad0ee521eb92ec62c9fc280dc9d945d35e5474e2a3b9",
+          "at": "2026-04-13T03:19:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The intro paragraph says the `--layer` flag on both `sotp track type-signals` and `baseline-capture` returns an error for non-`domain` values until Phase 2, but `baseline-capture` currently ignores `--layer` and still writes `domain-types-baseline.json`. That makes the documented Phase 1 behavior incorrect for the baseline command.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 13,
+              "category": "logical contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:790aac1cad8e5d264071cbf0be21a5888f6915391048feff59cceb6695882dfb",
+          "at": "2026-04-13T03:22:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 sends users to `sotp verify spec-states` as the multilayer TDDD gate, but `spec-states` only verifies that `spec.md` contains a `## Domain States` table. It does not evaluate layer catalogues or Red type signals, so this guidance points to the wrong command.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 137,
+              "category": "logical_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a55210841b35da9670b50e291f8b1e64ff3f8a917afcb30a3eb6ebfb1655fa7c",
+          "at": "2026-04-13T03:24:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4.1 says `track-baseline-capture` snapshots a baseline file for every `tddd.enabled` layer, but the current Phase 1 implementation still ignores `--layer` and always writes only `domain-types-baseline.json` for the single wired domain layer. That makes the multilayer instruction inaccurate for tracks with additional enabled layers.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 124,
+              "category": "logical contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a55210841b35da9670b50e291f8b1e64ff3f8a917afcb30a3eb6ebfb1655fa7c",
+          "at": "2026-04-13T03:26:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0a5f2d07da22e543eb735be68957456665ed2f4438950872e4b825db6f73037",
+          "at": "2026-04-13T03:28:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0a5f2d07da22e543eb735be68957456665ed2f4438950872e4b825db6f73037",
+          "at": "2026-04-13T03:30:53Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This research note is not compatible with `rustdoc-types` 0.57 as shipped in this repo: the crate defines `Function.sig`/`FunctionSignature`, `Type::ResolvedPath(Path { path, args, .. })`, and `BorrowedRef { is_mutable, type_ }`, not `Function.decl`, `Type::ResolvedPath.name`, or `BorrowedRef { mutable, type_prev }`. Following this doc literally would produce uncompilable Task 4 code and the wrong extraction shape.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-12-0709-rustdoc-types-extraction.md",
+              "line": 11,
+              "category": null
+            },
+            {
+              "message": "The ADR status target is inconsistent across the track artifacts: this spec requires `Accepted (implemented in track tddd-01-multilayer-2026-04-12, 2026-04-12)` here, but the task/metadata and the ADR diff use `Accepted (implemented in track tddd-01-multilayer-2026-04-12)` without the date. Those are different strings, so the track does not have a single satisfiable status value.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/spec.json",
+              "line": 418,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:9061afb916ad8414a508fe5c6fa3878acdb622880c13145c63e15741450fc7cd",
+          "at": "2026-04-12T20:09:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` is internally inconsistent about `FunctionInfo::signature`: S2 still says the field is kept for BRIDGE-01 compatibility, but T004 in the same file says it must be deleted, and the rendered `plan.md` repeats the same contradiction. That leaves the plan with two incompatible sources of truth for the same API change.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 23,
+              "category": "consistency"
+            },
+            {
+              "message": "The ADR status update string is not aligned across artifacts: `metadata.json`/`plan.md` omit the required `, 2026-04-12` suffix, while `spec.json`/`spec.md` require the dated form `Accepted (implemented in track tddd-01-multilayer-2026-04-12, 2026-04-12)`. If the shorter string is used verbatim, the acceptance criterion cannot be satisfied.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/plan.md",
+              "line": 48,
+              "category": "traceability"
+            }
+          ],
+          "hash": "rvw1:sha256:f221f09f891ef5abcf5d12b127b826da71faaaf51d781d163ff88018f524fdb8",
+          "at": "2026-04-12T20:12:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T004` still describes `TypeNode::outgoing` as being derived from `FunctionInfo::return_type_names`, but the authoritative ADR update now defines `outgoing` as derived from `methods`' return types after `MethodDeclaration` is introduced. This keeps the plan out of sync with the design and can make the implementation preserve the old typestate path instead of switching to the `MethodDeclaration`-based flow.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 26,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:9cf3f0607da5bd50299e2b06df6800f38b5964de116d7ff8a877f3950f47d273",
+          "at": "2026-04-12T20:15:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Rendered spec view is stale: `spec.md` still says `status: draft` and omits `approved_at`, but `spec.json` is already `status: approved` with an approval timestamp and content hash. This breaks the rendered-view contract used by track tooling and can make `activate`/`review` read the wrong state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-01-multilayer-2026-04-12/spec.md",
+              "line": 3,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:96f2c1d23295e06222d18c860ea3a89ce37ef1e65aa69dc3e4ae973fb40882ce",
+          "at": "2026-04-12T20:19:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "C1 is justified as if `FunctionInfo::signature` has no consumers, but `libs/domain/src/schema.rs` still exposes a public `FunctionInfo::signature()` accessor, and the constructor call sites still depend on that field. The task plan needs to include updating or removing that API; otherwise deleting the field will leave a stale public reader or a compile break.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 23,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:47d9105f442a67ccf60eb5b4abe903b7718cadba549f5fd395289a14a0e032e0",
+          "at": "2026-04-12T20:22:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Q2` still instructs readers to keep `signature: String` on `FunctionInfo`, but ADR C1 and the updated track metadata/spec have already decided to delete it. Because this document is used as the source for the canonical blocks copied into `plan.md`/`DESIGN.md`, leaving the superseded choice unannotated can propagate the wrong schema back into implementation. Please add a C1 supersession note or rewrite this section to match the accepted decision.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/research/2026-04-12-0709-planner-tddd-01.md",
+              "line": 486,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:97a825257eaddd5f5879ce068ec163fb4e82c8e91190864381b68f6e80b6ee9e",
+          "at": "2026-04-12T20:25:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Status` is still `Proposed` here, but the track spec and metadata explicitly require this ADR to be flipped to `Accepted (implemented in track tddd-01-multilayer-2026-04-12, 2026-04-12)`. Leaving the ADR unflipped makes the authoritative design doc disagree with the acceptance criteria for T007.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+              "line": 5,
+              "category": "consistency"
+            },
+            {
+              "message": "The `TypeNode::outgoing` row says outgoing transitions are derived from `methods` return values, but the rest of the design keeps `FunctionInfo::return_type_names` and says outgoing should continue to come from `return_type_names ∩ typestate_names`. As written, this row would push implementers toward reparsing `MethodDeclaration::returns` or changing typestate semantics.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+              "line": 499,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:cf3161506d1b1034769ae00f15a5fd118e4f1e53228e1672becfa31d0a201ef6",
+          "at": "2026-04-12T20:28:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f96eb2d71378dc80b439c6867506973b155f109aea092f5b5a33a4297f05c62b",
+          "at": "2026-04-12T20:31:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The spec now requires `RustdocSchemaExporter::export` to accept `targets: &[String]`, but the plan never explains how that fits the existing public `SchemaExporter::export(&self, crate_name: &str)` port and its non-TDDD callers. Without either a port update or an explicit compatibility shim, T004 misses required changes in `libs/domain/src/schema.rs` and callers such as `apps/cli/src/commands/domain.rs`.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/spec.json",
+              "line": 344,
+              "category": "planning"
+            },
+            {
+              "message": "The planner document's per-layer data-flow diagram still shows `FunctionInfo { name, signature, ... }`, even though ADR C1 and the track SSoT now require deleting `FunctionInfo::signature`. Because this research file is used as implementation guidance, that stale diagram can reintroduce the rejected schema.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-12-0709-planner-tddd-01.md",
+              "line": 415,
+              "category": "consistency"
+            },
+            {
+              "message": "The canonical baseline JSON example encodes `MemberDeclaration` as `{ \"Field\": ... }` / `{ \"Variant\": ... }`, but the same document defines `MemberDeclaration` as `#[serde(untagged)]`, which would serialize as a plain string for variants or `{ \"name\": ..., \"ty\": ... }` for fields. Leaving the wrong wire-format example in the canonical blocks is likely to mislead implementation and tests for baseline schema v2.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-12-0709-planner-tddd-01.md",
+              "line": 1053,
+              "category": "schema"
+            }
+          ],
+          "hash": "rvw1:sha256:f96eb2d71378dc80b439c6867506973b155f109aea092f5b5a33a4297f05c62b",
+          "at": "2026-04-12T20:36:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` still gives implementers two incompatible instructions for T004: the section description says `SchemaExporter::export(&self, crate_name: &str)` must stay unchanged, but the task text here says `RustdocSchemaExporter::export` should be changed to `targets: &[String]`. If someone follows this task entry literally, they will break the existing BRIDGE-01/domain/verify callers that the rest of the plan and spec explicitly preserve.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 97,
+              "category": "plan_consistency"
+            },
+            {
+              "message": "The planner output still prescribes keeping `FunctionInfo::signature` in the concrete type design block, even though ADR C1 and the approved spec/metadata now require deleting that field. Because this research document is referenced as design input, leaving the stale struct shape here can reintroduce the rejected design during implementation.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-12-0709-planner-tddd-01.md",
+              "line": 169,
+              "category": "research_consistency"
+            },
+            {
+              "message": "The verification checklist's rename grep is malformed: `domain_types\\|domain-type-signals` escapes the alternation, so it matches the literal text `domain_types|domain-type-signals` instead of either legacy identifier. A reviewer can therefore check this box while stale `domain_types` or `domain-type-signals` usages still remain.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/verification.md",
+              "line": 6,
+              "category": "verification"
+            },
+            {
+              "message": "`verification.md` documents the planned baseline wire format incorrectly. It says `MemberDeclaration` will serialize as tagged objects like `{\"Variant\": ...}` / `{\"Field\": ...}`, but the plan's canonical baseline example uses `#[serde(untagged)]` with plain strings for variants and plain objects for fields. Reviewers following this note would reject the intended JSON shape.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/verification.md",
+              "line": 53,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:fb15879d64437a9037b3be5b03abb76e298cb7899ad51345eaffa01bfbc17a8c",
+          "at": "2026-04-12T20:41:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 adds multilayer `baseline-capture --layer`, but the SSoT plan never defines a per-layer baseline filename. The planner research already answered Q8 with `<catalogue_stem>-baseline.json`, yet `metadata.json` only models `catalogue_file` and the current CLI still hard-codes `domain-types-baseline.json`; with the documented `--layer domain` then `--layer usecase` flow, one layer would overwrite or read the other's baseline. The baseline naming rule needs to be promoted into the task/spec.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 115,
+              "category": "correctness"
+            },
+            {
+              "message": "T007 says the merge-gate adapter should read `architecture-rules.json` from `workspace_root`, but merge gate evaluates track blobs from `origin/<branch>`. Because this track itself changes `architecture-rules.json`, using the local checkout's copy can evaluate the wrong enabled layers or wrong `catalogue_file` names whenever a PR edits the rules file. The plan needs branch-consistent rule loading for merge gate instead of the filesystem copy.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 115,
+              "category": "correctness"
+            },
+            {
+              "message": "The approved acceptance criteria for T004 never verify the C1 breaking change itself. They check shared type propagation and multi-crate export wiring, but there is no criterion that `FunctionInfo::signature`, its accessor, and `format_sig` are actually removed or that BRIDGE-01 stops emitting the `signature` key. An implementation could keep the redundant field and still satisfy the current checklist, which defeats the main drift-prevention reason for C1.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/spec.json",
+              "line": 333,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:26e7d935e812f53067ddebf48e3ef4c0108322606afa54b6e9826258f4c8bac2",
+          "at": "2026-04-12T20:46:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.sections.S4` still says the merge-gate adapter should read `architecture-rules.json` from `workspace_root`, but `T007` later in the same file requires `check_strict_merge_gate` to load the rules from the same `origin/<branch>` blob via `read_architecture_rules(branch)`. If an implementer follows the section summary, a PR that changes `architecture-rules.json` will be evaluated against the wrong ruleset.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 56,
+              "category": "correctness"
+            },
+            {
+              "message": "The planner research still recommends that the merge gate read `architecture-rules.json` from the filesystem `workspace_root`. That guidance is now stale relative to the accepted branch-blob design, and it reintroduces the bug where PRs that modify `architecture-rules.json` are checked against the local checkout instead of the PR branch contents.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-12-0709-planner-tddd-01.md",
+              "line": 529,
+              "category": "correctness"
+            },
+            {
+              "message": "This research file's addendum correctly says `decl.inputs`/`decl.output` are not the `rustdoc_types` 0.57 field names, but the final Integration Notes still tell Task 4 implementers to use those stale names. Copying this guidance into the implementation will produce code that does not compile; the note needs to be rewritten to `sig.inputs`/`sig.output` to match both the addendum and the current extractor.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-12-0709-rustdoc-types-extraction.md",
+              "line": 142,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7a16ce31ba1581755ac8ad78c48ae3877574551172a832271b5981a7fddecc3f",
+          "at": "2026-04-12T20:55:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The planner research doc still states in its main Type Design section that `FunctionInfo.signature: String` is kept for BRIDGE-01 compatibility, which directly contradicts ADR C1 and the task plan/spec that now delete the field. Because `spec.json` cites this research file as a T004 source, leaving this unsuperseded statement in the primary design narrative can send implementation back to the rejected design.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-12-0709-planner-tddd-01.md",
+              "line": 86,
+              "category": "consistency"
+            },
+            {
+              "message": "The rustdoc extraction research file is still wrong in its top-level API mapping and sample code (`Function.decl.inputs` / `decl.output`), even though a later addendum corrects it. `spec.json` uses this file as a T004 source, so the first extraction recipe a reader sees is still uncompilable guidance unless they happen to read through to the correction.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-12-0709-rustdoc-types-extraction.md",
+              "line": 14,
+              "category": "traceability"
+            }
+          ],
+          "hash": "rvw1:sha256:761b27590a56b73d00c137ac25feebd9b5aedb8d7a0fa1d697bf320837b24bf0",
+          "at": "2026-04-12T20:58:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` never asks reviewers to confirm ADR C1's accepted breaking change, even though `spec.json` makes removal of `FunctionInfo::signature`, its accessor, and `format_sig` a required acceptance criterion. As written, this track can be marked verified while still keeping the redundant signature path that C1 was added to eliminate.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/verification.md",
+              "line": 5,
+              "category": "testing"
+            },
+            {
+              "message": "The planner research doc still states that `TypeNode::outgoing` is derived from `methods` filtered by `typestate_names`, but the accepted Q4/ADR/metadata decision keeps `FunctionInfo::return_type_names` specifically to avoid reparsing `MethodDeclaration::returns`. Since `spec.json` cites this research file for T004, leaving this sentence unannotated can push implementation back toward the rejected typestate-extraction path.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-12-0709-planner-tddd-01.md",
+              "line": 98,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0ecdda2161153667272922aebb8e5184aa65b89b02863db3cbf5c759ca8293c2",
+          "at": "2026-04-12T21:04:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This briefing file is still carrying superseded design input: it tells the planner to keep `FunctionInfo::signature: String` for human readability, and later still describes `TypeNode::outgoing` as deriving from `methods`. ADR C1 and the approved metadata/spec now say the opposite (`signature` is deleted; outgoing stays on `return_type_names`). Because this file is the reusable planner prompt rather than a frozen output snapshot, rerunning or refreshing the plan from it will re-seed already-rejected assumptions.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-12-0709-planner-tddd-01-briefing.md",
+              "line": 45,
+              "category": "consistency"
+            },
+            {
+              "message": "T007 only isolates baseline filenames via `<catalogue_file stem>-baseline.json`; it never adds a per-layer naming rule for the rendered `type-signals` output, and it never requires enabled layers' `catalogue_file` values to be unique. The current command writes a fixed `domain-types.md`, so a multi-layer run can still overwrite another layer's human-readable report, and duplicate `catalogue_file` values would clobber JSON outputs as well. The multilayer contract needs a fail-closed uniqueness check and per-layer report/catalogue output naming.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 115,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ddf02c5c2a8ca03400c5f3e8af4d274c649739df5625c62759b5740bc12746e0",
+          "at": "2026-04-12T21:10:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007's approved spec entries only require `--layer` handling and per-layer aggregation, but they never capture the new Round-7 guardrails that `metadata.json` added: enabled layers must have unique `catalogue_file` values, and all generated outputs must use the catalogue stem (`<stem>.json`, `<stem>.md`, `<stem>-baseline.json`). Without those requirements in the SSoT, an implementation that still overwrites another layer's catalogue/rendered markdown/baseline would satisfy the current spec.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/spec.json",
+              "line": 108,
+              "category": "planning"
+            },
+            {
+              "message": "The merge-gate design in `metadata.json` was corrected to read `architecture-rules.json` from the PR branch via `read_architecture_rules(branch)`, but `spec.json` never requires that branch-consistent lookup. As written, T007 can still be implemented against the local workspace copy of `architecture-rules.json`; a PR that changes enabled layers or `catalogue_file` values would then be evaluated with stale rules and could be incorrectly passed or blocked.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/spec.json",
+              "line": 136,
+              "category": "planning"
+            },
+            {
+              "message": "T004 is specified to make the CLI read `schema_export.targets: Vec<String>` and export each crate, but that field is only introduced later in T007 when the `layers[].tddd` block is added to `architecture-rules.json`. This breaks the stated task dependency order and makes T004 impossible to complete or verify in isolation without partially doing T007 early.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/spec.json",
+              "line": 71,
+              "category": "planning"
+            }
+          ],
+          "hash": "rvw1:sha256:d45a7497ad2444a99eea25d7fe4f601b0df1015d3608fec0e7289c3018626a76",
+          "at": "2026-04-12T21:15:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` still makes the `schema_export.targets` CLI loop a T004 acceptance criterion, but the same spec already says at line 71 that this wiring is deferred to T007 until `architecture-rules.json` gains the multilayer `tddd` block. That contradiction breaks the stated dependency chain and makes T004 impossible to satisfy without pulling T007 work forward.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/spec.json",
+              "line": 362,
+              "category": "consistency"
+            },
+            {
+              "message": "The reusable planner briefing is still self-contradictory: line 45 says ADR C1 has already accepted deleting `FunctionInfo::signature`, but the later \"Questions that the ADR leaves open\" section still asks the planner to choose whether to keep it. Reusing this prompt can regenerate plans that conflict with the ADR/metadata/spec SSoT.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-12-0709-planner-tddd-01-briefing.md",
+              "line": 136,
+              "category": "planning_integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:90c977fc11e410bcd2f6a215f5e55e590c76122a848cc86df7e0ef7fb740fd46",
+          "at": "2026-04-12T21:20:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Task S2/T004 still assigns the `schema_export.targets[]` multi-crate CLI loop to this task (`SchemaExporter::export(...)` + per-crate export integration), but `spec.json:71` explicitly says that wiring belongs to T007 and T004 should only implement the per-crate extraction logic. That makes the task boundary inconsistent and risks starting the multi-layer wiring before the `architecture-rules.json` `tddd` block exists.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 25,
+              "category": "planning"
+            }
+          ],
+          "hash": "rvw1:sha256:c391e9440b9f00622f330624e534755986c50c8384b4508a6a2d2f1a5123200a",
+          "at": "2026-04-12T21:36:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5da4709898fc401eba9efbe6a6aac0cb752e15783490a855189e3c3290e9fb60",
+          "at": "2026-04-12T21:39:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_export.targets` is explicitly multi-crate, but this constraint still says `catalogue_file` is optional and defaults to `<crate>-types.json`. Once a layer aggregates more than one target crate, that default is no longer uniquely defined unless you spell out that `<crate>` means `layers[].crate` (or require `catalogue_file` whenever `targets.len() != 1`). Leaving it implicit risks the CLI, verify path, and merge gate deriving different track filenames for the same layer.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/spec.json",
+              "line": 247,
+              "category": "planning"
+            },
+            {
+              "message": "The verification plan never actually exercises the v1-baseline rejection path it requires. Step 6 only writes `/tmp/v1-baseline.json` and then stops, so there is no command that runs `baseline_codec`/`baseline-capture` against that file and confirms the promised `UnsupportedSchemaVersion(1)` plus rerun guidance. That leaves the schema-migration safety check unverified.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/verification.md",
+              "line": 42,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:5da4709898fc401eba9efbe6a6aac0cb752e15783490a855189e3c3290e9fb60",
+          "at": "2026-04-12T21:44:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T006` is defined as a breaking catalogue wire-format change (`schema_version` bump plus `domain_types` -> `type_definitions`), but the review contract never verifies that change. Neither the `acceptance_criteria` nor [verification.md] checks that v2 is actually emitted/decoded or that the old top-level key is rejected, so an implementation could keep the v1 catalogue shape and still pass the current checklist.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/spec.json",
+              "line": 90,
+              "category": "acceptance_criteria"
+            },
+            {
+              "message": "The rename acceptance check is impossible to satisfy as written: `rg 'DomainType|domain-type-signals|domain_types'` is unscoped, so it will keep matching historical tracks, frozen JSON examples, and test fixtures outside the live rename surface. That makes verification fail even after the actual code/config paths are fully renamed. The grep needs the same kind of path scoping that `verification.md` step 2 already uses.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/spec.json",
+              "line": 340,
+              "category": "acceptance_criteria"
+            },
+            {
+              "message": "`planner-tddd-01.md` still contains unannotated Q4 drift in implementation guidance: the impact surface says `build_type_graph` changes 'outgoing derivation from methods', and the canonical `TypeNode` block later says `outgoing` is 'derived from methods at construction'. ADR 0002 C1/Q4, `metadata.json`, and the planner's own later Q4 answer all say the accepted design keeps `outgoing` on `FunctionInfo::return_type_names ∩ typestate_names`. Leaving these stale lines in the reusable research doc can steer implementation back toward the rejected reparsing path.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-12-0709-planner-tddd-01.md",
+              "line": 57,
+              "category": "cross_document_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:ab9ae2a486372de5ed16395e94057957879307fb01ac4b95676d2b7c03896733",
+          "at": "2026-04-12T21:49:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 still says the CLI loops `schema_export.targets[]` and calls `SchemaExporter::export()` per crate, but the approved spec explicitly moved that wiring to T007 only. Leaving this in the task description blurs the dependency boundary and makes it easy to implement multilayer CLI work in the wrong task.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 97,
+              "category": "planning"
+            },
+            {
+              "message": "ADR D1's `catalogue_file` default contract (`<layers[].crate>-types.json` when omitted) is documented in the spec, but T007 never assigns or verifies that behavior. As written, the track can be marked complete while still rejecting or ignoring omitted `catalogue_file`, which would violate the promised multilayer interface.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 115,
+              "category": "planning"
+            }
+          ],
+          "hash": "rvw1:sha256:47dc114673228ce3ede8ec528ed75eaea6ca90745f961f7726876263689cb685",
+          "at": "2026-04-12T22:17:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The C1 verification checklist can pass even if `FunctionInfo::signature` is still present, because the grep only checks for the accessor and `format_sig`, not the struct field itself. That leaves the accepted BRIDGE-01 breaking change unverified and could miss an implementation that still serializes `signature`. The check should match the stronger spec criterion (for example including `FunctionInfo.*signature`).",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/verification.md",
+              "line": 7,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f18384f0e1ff7f7fc87004edb19c654b1479edd738acb776578b6eaaeb648fe3",
+          "at": "2026-04-12T22:21:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The C1 acceptance criterion can still pass even if `FunctionInfo::signature` remains on the struct, because the grep only checks `pub fn signature`, `fn signature(`, `format_sig`, and `FunctionInfo.*signature`. In `libs/domain/src/schema.rs`, the struct name and `signature: String` field are on different lines, so that last pattern will not catch a lingering field. This leaves the accepted BRIDGE-01 breaking change effectively unverified.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/spec.json",
+              "line": 381,
+              "category": "acceptance_criteria"
+            },
+            {
+              "message": "T007 makes branch-consistent rule loading part of scope (`read_architecture_rules(branch)` from the PR branch blob), but none of the acceptance criteria require proving that behavior. An implementation could satisfy the current checklist while still reading the local workspace copy of `architecture-rules.json`, which would evaluate PRs against the wrong ruleset whenever the PR changes that file.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/spec.json",
+              "line": 146,
+              "category": "acceptance_criteria"
+            },
+            {
+              "message": "The spec requires unique `catalogue_file` values and stem-based per-layer output naming so multilayer runs do not overwrite each other's catalogue/rendered/baseline artifacts, but there is no matching acceptance criterion. As written, T007 can be marked complete while still clobbering one layer's outputs with another's.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/spec.json",
+              "line": 155,
+              "category": "acceptance_criteria"
+            }
+          ],
+          "hash": "rvw1:sha256:ff082c4e5d1499932cd6069726f9a4941acf576e77b0b8e2aeeb5f3f0389ae5f",
+          "at": "2026-04-12T22:26:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff082c4e5d1499932cd6069726f9a4941acf576e77b0b8e2aeeb5f3f0389ae5f",
+          "at": "2026-04-12T23:03:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91886baea106a9d5b33eb1819b55676bd04505d6b0b7abc72966207b1761bb02",
+          "at": "2026-04-12T23:57:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91886baea106a9d5b33eb1819b55676bd04505d6b0b7abc72966207b1761bb02",
+          "at": "2026-04-12T23:58:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67d7a6964948b11ed2b4e3a7006747fedc6fc5953450f73731b95c17bc4b829f",
+          "at": "2026-04-13T00:20:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002's task description still references `domain_types_render.rs`, but that path is now dead in this change (`git diff --name-status` shows it deleted, and the renderer lives in `libs/infrastructure/src/type_catalogue_render.rs`). Because this metadata entry is the authoritative task text that plan.md re-renders, leaving the old path here creates a broken implementation reference for the infrastructure rename step.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 84,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:67d7a6964948b11ed2b4e3a7006747fedc6fc5953450f73731b95c17bc4b829f",
+          "at": "2026-04-13T00:22:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67d7a6964948b11ed2b4e3a7006747fedc6fc5953450f73731b95c17bc4b829f",
+          "at": "2026-04-13T00:23:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfcf6f9cef63a0a4b16d5a81de975734c19fc60fdd1fa4e56f2b7b2ce6e1616c",
+          "at": "2026-04-13T00:35:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T003` is marked done, but its description still says this task renamed `apps/cli/src/commands/track/tddd/baseline.rs` and `Makefile.toml` tasks. That contradicts the actual T003 diff and the briefing, which explicitly says no `Makefile.toml` rename happened here and the changed CLI files were `signals.rs`, `verify.rs`, and `track/mod.rs`. Leaving the completed task with the old scope misstates what shipped and can misdirect later planning/review work.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 90,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:cfcf6f9cef63a0a4b16d5a81de975734c19fc60fdd1fa4e56f2b7b2ce6e1616c",
+          "at": "2026-04-13T00:36:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14c755d17ec5af397ea43336f889306048572fddb96d1fd052b725cef966f762",
+          "at": "2026-04-13T00:37:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e99b9f1c2e44249c0cb2fdde1f8668a5af1c8faf9b1d99856bea3c59c97027d1",
+          "at": "2026-04-13T01:03:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e99b9f1c2e44249c0cb2fdde1f8668a5af1c8faf9b1d99856bea3c59c97027d1",
+          "at": "2026-04-13T01:04:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:75bb83b2a4b58e8f24e7eb5cadfa7749aff50c1c731b13f700e86d3a554d0e58",
+          "at": "2026-04-13T01:37:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` still marks T005 as `todo`, but this same patch already regenerates the T005-owned baseline artifact (`domain-types-baseline.json` schema_version 2) and updates the related catalogue/signal artifacts (`domain-types.json` / `domain-types.md`). That leaves the track metadata out of sync with the authoritative T005 outputs being reviewed.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 104,
+              "category": "logical_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:75bb83b2a4b58e8f24e7eb5cadfa7749aff50c1c731b13f700e86d3a554d0e58",
+          "at": "2026-04-13T01:39:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc62a042ded88b060bd4704c35b8134510431c48dad42ddb28f415c65370ccf4",
+          "at": "2026-04-13T01:42:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14d8f195be1bf9e13c3a423f6922f9de4d41efc5d6f5355f373d8f5900670aef",
+          "at": "2026-04-13T01:46:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a245d55752ad3a07d52c2350c34b8eb7c34f8d3d243f9a31ea4bfcd651310e06",
+          "at": "2026-04-13T01:59:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a245d55752ad3a07d52c2350c34b8eb7c34f8d3d243f9a31ea4bfcd651310e06",
+          "at": "2026-04-13T02:00:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 is still `todo` in the authoritative track metadata, so the lifecycle update for this change did not land and the generated plan entry remains unchecked.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 116,
+              "category": "logical contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c39eb18f90767ac9446087ae15e9d2477517c9b85c83d3d07db1f44d979f5356",
+          "at": "2026-04-13T03:13:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3376bbe436bbfd6c1bd2dfba97c25c4b6d02c8fc794a2eec6eb9adc3c275e56",
+          "at": "2026-04-13T03:15:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` still marks T007 as `in_progress`, but the ADR status now says this design is already \"implemented in track tddd-01-multilayer-2026-04-12\". Those two authoritative artifacts now disagree about whether the multilayer/TDDD work is complete, so downstream tooling or reviewers that trust track metadata will see the change as unfinished.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 116,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:f3376bbe436bbfd6c1bd2dfba97c25c4b6d02c8fc794a2eec6eb9adc3c275e56",
+          "at": "2026-04-13T03:17:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This generated plan is stale relative to `metadata.json` and the ADR: T007 is marked `done` in metadata, but the rendered plan still shows the task unchecked and keeps the old `2026-04-12` acceptance date. That leaves the track artifacts inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-01-multilayer-2026-04-12/plan.md",
+              "line": 48,
+              "category": "logical contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b740f4b9290f60b993810b06129164255bdec652c79ff23393d4728a5a25923d",
+          "at": "2026-04-13T03:19:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The track metadata still records the ADR acceptance date as `2026-04-12`, but the ADR status was updated to `2026-04-13`. Because `plan.md` is generated from this metadata, the rendered plan will stay inconsistent with the ADR until this date is corrected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "line": 48,
+              "category": "logical contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:aff99ec5eaba6831ca8dade195ae6bbc712ad5640545a474da67e49ca181317b",
+          "at": "2026-04-13T03:20:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c582a5f8d5e19756ac180775bfcb0bc069f09be0d197da0ccb03e916f7ad31",
+          "at": "2026-04-13T03:21:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c582a5f8d5e19756ac180775bfcb0bc069f09be0d197da0ccb03e916f7ad31",
+          "at": "2026-04-13T03:23:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Verification Results` now records task commits that contradict the authoritative track metadata: T001 cites `76e7aa3`, which does not resolve to any commit in this repository, and T003 cites `24b34d8`, which resolves to an unrelated PR merge commit instead of metadata.json's T003 commit `4a181723...`. This makes the verification artifact internally inconsistent with the track record.",
+              "severity": "P1",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/verification.md",
+              "line": 17,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:3abde13dc04b97209ff5ec475fbc77c798e52021b1fbcce769820346a4f18a8b",
+          "at": "2026-04-13T03:55:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:59b1aaf0024dd139c982bea9e4cd6f1affa563e761bfebd80257ce2668347fb0",
+          "at": "2026-04-13T03:57:49Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5051f18580807bfbbe0d4cbe6a6f89268010b9d39e1b60094c5d0adbf940d862",
+          "at": "2026-04-13T00:21:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5051f18580807bfbbe0d4cbe6a6f89268010b9d39e1b60094c5d0adbf940d862",
+          "at": "2026-04-13T00:22:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55732279741aa8916fa740894e267f252f8ac98de77ae61fd6ca9b6866d6eb56",
+          "at": "2026-04-13T00:26:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22626bb800bba92ffbd33fac6aecee0ae9b92fa1873d6bd8c5ffb463653637bc",
+          "at": "2026-04-13T00:34:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22626bb800bba92ffbd33fac6aecee0ae9b92fa1873d6bd8c5ffb463653637bc",
+          "at": "2026-04-13T00:35:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Storing `format_type(&i.for_)` here now preserves generic arguments in `ImplInfo.target_type` (for example `Foo<T>`), but `build_type_graph` still matches impls with `last_segment(i.target_type()) == type_info.name()`. Inherent impls on generic types will stop attaching to their `TypeNode`, so their methods and outgoing typestate edges disappear.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 161,
+              "category": "behavior regression"
+            },
+            {
+              "message": "`format_type` now copies array lengths and const generic expressions verbatim. Those strings can legally contain `::` (for example `N::VALUE`), so this renderer can emit invalid L1 type strings and break the codec validation that forbids `::`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 448,
+              "category": "invariant violation"
+            }
+          ],
+          "hash": "rvw1:sha256:7f3fd16b294173afe28b0a5748de3a9bf4e7dc79c5e0aebb6b0d1333e9288541",
+          "at": "2026-04-13T01:04:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`format_type` is still not faithful for several valid rustdoc type shapes: `Type::FunctionPointer` and `Type::QualifiedPath` fall through to `_`, `GenericArgs::Parenthesized` is discarded, and `DynTrait` drops its lifetime information. Any public callback, associated-type, or lifetime-qualified trait-object signature will be exported as an ambiguous string, which can poison `TypeInfo`/`MethodDeclaration` comparisons and downstream consistency checks.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 430,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1d0bf28cde927c12788bcd78b9568e0a3f2d48477318d8fff70d3ff802b167ee",
+          "at": "2026-04-13T01:13:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d0bf28cde927c12788bcd78b9568e0a3f2d48477318d8fff70d3ff802b167ee",
+          "at": "2026-04-13T01:17:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d0bf28cde927c12788bcd78b9568e0a3f2d48477318d8fff70d3ff802b167ee",
+          "at": "2026-04-13T01:19:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_decode_v1_rejected_with_rerun_hint` moves `err` into `match` and then uses `err` again on the next line (`err.to_string()`), which triggers E0382 and prevents the test module from compiling.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 381,
+              "category": "compilation"
+            }
+          ],
+          "hash": "rvw1:sha256:92e9bcc145e448548dd7f40a622b1d5dcc535c6e696bee6478cc4d1ad99fa07c",
+          "at": "2026-04-13T01:37:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f200320e163cd17f5fbb48c768b4fa7d32c79c41caa11e78e9937c43059240fe",
+          "at": "2026-04-13T01:40:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f200320e163cd17f5fbb48c768b4fa7d32c79c41caa11e78e9937c43059240fe",
+          "at": "2026-04-13T01:43:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeCatalogueDocDto` still accepts unknown top-level fields, so a schema v2 file that accidentally keeps the old `domain_types` key will deserialize as an empty catalogue instead of failing. That silently drops every entry and makes the v2 rename unsafe unless the top-level DTO rejects unknown fields (or explicitly aliases the old key).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 52,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:b41db95cc9cb8b6e9c9b00da4a6d8cf62a5ce2a8b3e13fe9123a4b5f430edbd9",
+          "at": "2026-04-13T02:00:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`method_to_dto` still serializes `MethodDeclaration`/`ParamDeclaration` values verbatim, but `decode()` now rejects any `ty` or `returns` containing `::`. Because the public constructors for those domain types do not validate that rule, a catalogue built in memory can be encoded successfully and then fail to decode immediately, so the codec no longer round-trips all representable `TypeCatalogueDocument` values.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 467,
+              "category": "Codec round-trip loss"
+            }
+          ],
+          "hash": "rvw1:sha256:205fa5abd509158efab338dbc910a3ff44c637e47c126d223e292de10497d138",
+          "at": "2026-04-13T02:03:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`encode()` still serializes `doc.schema_version()` unchanged, so any in-memory `TypeCatalogueDocument::new(1, ...)` will now emit `schema_version: 1` JSON even though `decode()` only accepts `2`. That breaks the codec's round-trip guarantee and leaves a public path that can write files the new decoder rejects.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 441,
+              "category": "Schema version drift"
+            }
+          ],
+          "hash": "rvw1:sha256:464b6dd3d83261c766f8a49d42aad356d4d003f5387b7f7cb5a9912f6d77705c",
+          "at": "2026-04-13T02:08:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`#[serde(deny_unknown_fields)]` on the top-level DTO makes legacy v1 payloads with the old `domain_types` key fail during deserialization, so `decode()` never reaches the `UnsupportedSchemaVersion` branch for the actual v1 shape. Callers now get a generic serde unknown-field error instead of the intended v2 migration hint, which is a behavior regression for the supported migration path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 56,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:8b191a53746b9a83a68a6400a02aee13dad0d61c43b1e5f77fb07cc62ce32b92",
+          "at": "2026-04-13T02:11:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05bff59224f2a5e6fe63caec4391dac0f3ac6574f918ac058674feabf81221e0",
+          "at": "2026-04-13T02:17:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05bff59224f2a5e6fe63caec4391dac0f3ac6574f918ac058674feabf81221e0",
+          "at": "2026-04-13T02:21:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`default_domain_binding()` uses `expect()` in non-test library code, so the fallback path taken when `architecture-rules.json` is absent can panic instead of returning a `Finding::error` if the embedded JSON or parser behavior ever changes. This violates the no-panics policy on a runtime code path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/spec_states.rs",
+              "line": 163,
+              "category": "panic"
+            }
+          ],
+          "hash": "rvw1:sha256:f6d45084cd410f4b14390c7fbf09b25253bd3c09349b1bf770faf5c9ea86118a",
+          "at": "2026-04-13T03:14:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`crate` and `catalogue_file` are accepted verbatim here and later used to build filesystem/git paths. Because neither field is constrained to a safe relative filename, a crafted `architecture-rules.json` can inject `../` or an absolute path and make the verifier/merge gate read outside the intended track catalogue directory.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 137,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:f8d2663af99184a013664644017ecc0a5e16fb51aa0fa82e16d494f36e6e6f44",
+          "at": "2026-04-13T03:18:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_tddd_layers` reads `architecture-rules.json` with plain `read_to_string` and never applies the symlink/submodule guard used for `spec.json` and the catalogues. A symlinked rules file under `trusted_root` can now redirect Stage 2 configuration to an arbitrary filesystem target, which violates the fail-closed D4.3 boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 145,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:25aeb562f546ee666c6f3de6ca4881b5e2305499220772d15dd5ccb3d388b5c9",
+          "at": "2026-04-13T03:22:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d22a54fb675c6bf7b29c4c068ad20f91f92de0566e657991439d4de19f5c2e20",
+          "at": "2026-04-13T03:25:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_tddd_layers` resolves each enabled layer's `catalogue_file`, but `GitShowTrackBlobReader` drops that information and later reconstructs the blob path as `<layer_id>-types.json`. For any repo that uses a non-default `catalogue_file`, CI (`verify_from_spec_json`) will read the configured file while the merge gate reads the wrong blob and usually gets `NotFound`, silently opting that layer out of Stage 2. This contradicts the accepted T007 spec/ADR that `catalogue_file` is configurable and that merge-gate path resolution must follow the same rules as the other paths.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 121,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:d22a54fb675c6bf7b29c4c068ad20f91f92de0566e657991439d4de19f5c2e20",
+          "at": "2026-04-13T03:27:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_tddd_layers` treats an explicit empty `schema_export.targets: []` as if the field were omitted and silently substitutes `[layer_id]`. That masks a malformed `architecture-rules.json` entry and can make the exporter/validator operate on the wrong crate set instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 196,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:8f98db7feda8952302b72b94a9d61e15d3afd4c1c82758518e8d3e99ae8d2da3",
+          "at": "2026-04-13T03:32:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b308a2f6c044a5eaad478fc6d1634cd21b511826151cedf92277bf06f8519393",
+          "at": "2026-04-13T03:36:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_tddd_layers` now errors when `schema_export` is present but `targets` is omitted, because `SchemaExportBlock.targets` defaults to `[]` and the `Some(se) if se.targets.is_empty()` arm turns that into `EmptyTargets`. T007's contract in the briefing says omitted `targets` should default to `[crate]`, so configs like `{ \"tddd\": { \"enabled\": true, \"schema_export\": { \"method\": \"rustdoc\" } } }` will fail instead of using the layer's own crate.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 205,
+              "category": null
+            },
+            {
+              "message": "`is_safe_path_component` only rejects `/`, `\\\\`, and bare `..`, so a layer id such as `core::domain` is accepted and the default catalogue name becomes `core::domain-types.json`. The review brief explicitly calls out `::` as an invalid default-catalogue leak; this should be rejected fail-closed instead of silently deriving a mismatched filename.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 105,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:b308a2f6c044a5eaad478fc6d1634cd21b511826151cedf92277bf06f8519393",
+          "at": "2026-04-13T03:39:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "An enabled layer with `tddd.schema_export` present but no `targets` is rejected as `EmptyTargets` here, but the T007 contract says omitted `targets` should default to `[layer_id]`. That makes valid `architecture-rules.json` entries fail-closed in both `verify_from_spec_json` and the merge-gate layer reader.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/tddd_layers.rs",
+              "line": 214,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:730992bd82f9d1aab4100ffbf2a12178fe64a67e9c56add4554eebce73e47522",
+          "at": "2026-04-13T03:42:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00bcb8d54734957a29ab3b2242d086feaa13bb669850f9535e385d76ffe0a3e",
+          "at": "2026-04-13T03:47:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00bcb8d54734957a29ab3b2242d086feaa13bb669850f9535e385d76ffe0a3e",
+          "at": "2026-04-13T03:50:53Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a60e280eb3b13ef2d5320ffc9c92a6921a4b68e4156a20de6a32c088cb3ec427",
+          "at": "2026-04-13T00:34:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a60e280eb3b13ef2d5320ffc9c92a6921a4b68e4156a20de6a32c088cb3ec427",
+          "at": "2026-04-13T00:36:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0fb36b24609319f2c1bf2c530de0c750d8269201ad9caf3b9110ca84d6eb9a7",
+          "at": "2026-04-13T03:12:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0fb36b24609319f2c1bf2c530de0c750d8269201ad9caf3b9110ca84d6eb9a7",
+          "at": "2026-04-13T03:14:10Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-12T23:58:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new module docs tell consumers to import from `crate::tddd::*`, but `libs/domain/src/tddd/mod.rs` only publishes submodules and does not re-export these items. That leaves the documented import path dead immediately after this refactor; the actual re-exports live at the crate root via `libs/domain/src/lib.rs`.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 11,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-13T00:01:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-13T00:04:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db36c79eb63679aedaa6ecb594969b26c6faa93d54dd6165544ae26e727449db",
+          "at": "2026-04-13T00:08:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
+          "at": "2026-04-13T00:34:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
+          "at": "2026-04-13T00:35:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FunctionInfo::new` now accepts both `has_self_receiver` and `receiver`, but it does not enforce that they agree. That lets callers construct contradictory values such as `has_self_receiver = false` with `receiver = Some(\"&self\")`, and downstream code can silently filter or classify the method incorrectly. Derive one field from the other or validate the pair in the constructor.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 176,
+              "category": "typestate boundary leak"
+            }
+          ],
+          "hash": "rvw1:sha256:da8f3b6b5c46b93a19f63c5149fd922bd6087f0fb76884eaefbb3ec010c60c47",
+          "at": "2026-04-13T01:04:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2b05fad307e27cc9b14ee19d262a340e0cc56807b1bdc331b3f27a834fcc0e7",
+          "at": "2026-04-13T01:08:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2b05fad307e27cc9b14ee19d262a340e0cc56807b1bdc331b3f27a834fcc0e7",
+          "at": "2026-04-13T01:10:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
+          "at": "2026-04-13T01:37:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeNode::new` now stores `outgoing` verbatim instead of enforcing the previous invariant that transitions must be backed by the node's actual methods. Because `evaluate_typestate` trusts `outgoing()` directly, external callers can now fabricate typestate edges on a `TypeNode` and get false Blue/Red signal results that the old constructor would have filtered out.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 428,
+              "category": "behavior_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
+          "at": "2026-04-13T01:40:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
+          "at": "2026-04-13T01:42:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27f736706e773ee52c0e7b600ad55c0ebadc8d83cf072d6415aaef2b73cb6d9d",
+          "at": "2026-04-13T01:59:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27f736706e773ee52c0e7b600ad55c0ebadc8d83cf072d6415aaef2b73cb6d9d",
+          "at": "2026-04-13T02:00:56Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
+          "at": "2026-04-13T00:20:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
+          "at": "2026-04-13T00:21:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bbb01e15dd280d5a47b568e28bcd059ff078ead7aeca28030bbf9d4e837f42a",
+          "at": "2026-04-13T00:35:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bbb01e15dd280d5a47b568e28bcd059ff078ead7aeca28030bbf9d4e837f42a",
+          "at": "2026-04-13T00:36:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3adad182f142f26704fa5b270f289520d84947315a10609dd1005f450ff27f55",
+          "at": "2026-04-13T01:58:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3adad182f142f26704fa5b270f289520d84947315a10609dd1005f450ff27f55",
+          "at": "2026-04-13T01:59:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0562253acba4c68331bc5bfbb6af2ec69360027593cc457403420ec4962cebbf",
+          "at": "2026-04-13T03:13:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_layers()` now admits every `tddd.enabled` binding from `architecture-rules.json`, but the new loop ignores each binding and still calls the hard-coded domain-only path. In the current authoritative `architecture-rules.json`, both `domain` and `usecase` are enabled, so `sotp track type-signals --layer usecase` silently evaluates and rewrites `domain-types.json` instead of `usecase-types.json`, and the unfiltered command runs the domain pass twice. That is a public behavior regression in the new `--layer` surface.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 95,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:0562253acba4c68331bc5bfbb6af2ec69360027593cc457403420ec4962cebbf",
+          "at": "2026-04-13T03:16:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`architecture-rules.json` in this repo currently has both `domain` and `usecase` as `tddd.enabled=true`, but `execute_type_signals` discards each resolved binding and always calls the hard-coded `execute_type_signals_single` path. That means `sotp track type-signals --layer usecase` still exports the `domain` crate and rewrites `domain-types.json`, and the no-filter path runs the same domain pass twice. This is a real behavior regression caused by the new layer-resolution flow relying on an authoritative artifact that no longer matches the Phase 1 assumption.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 89,
+              "category": "behavior_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:0562253acba4c68331bc5bfbb6af2ec69360027593cc457403420ec4962cebbf",
+          "at": "2026-04-13T03:17:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba3c2b654ca2f8a6ba7ca1da77ed14bbda7ea696dbd1ae7f7a8d10e44eb6b565",
+          "at": "2026-04-13T03:21:07Z"
+        }
+      ]
+    }
+  }
+}

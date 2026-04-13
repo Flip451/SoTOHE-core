@@ -42,10 +42,14 @@ pub use spec::{
 };
 pub use tddd::baseline::{TraitBaselineEntry, TypeBaseline, TypeBaselineEntry};
 pub use tddd::catalogue::{
-    ActionContradiction, ActionContradictionKind, ConsistencyReport, DomainTypeEntry,
-    DomainTypeKind, DomainTypeSignal, DomainTypesDocument, TypeAction, TypestateTransitions,
-    check_consistency, evaluate_domain_type_signals, undeclared_to_signals,
+    MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeAction, TypeCatalogueDocument,
+    TypeCatalogueEntry, TypeDefinitionKind, TypeSignal, TypestateTransitions,
 };
+pub use tddd::consistency::{
+    ActionContradiction, ActionContradictionKind, ConsistencyReport, check_consistency,
+    check_type_signals,
+};
+pub use tddd::signals::{evaluate_type_signals, undeclared_to_signals};
 pub use timestamp::Timestamp;
 pub use track::{
     StatusOverride, StatusOverrideKind, TaskStatus, TaskStatusKind, TaskTransition, TrackMetadata,

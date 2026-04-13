@@ -1,11 +1,23 @@
-//! Domain types for the `export-schema` feature (BRIDGE-01).
+//! Domain types for the `export-schema` feature (BRIDGE-01) and for the
+//! TDDD catalogue evaluator (`TypeGraph`).
 //!
 //! These types represent the public API surface of a Rust crate as extracted
-//! from rustdoc JSON. `Serialize` is derived for JSON output.
+//! from rustdoc JSON. `Serialize` is derived on the flat `SchemaExport` types
+//! for BRIDGE-01 JSON output; `TypeGraph` / `TypeNode` / `TraitNode` are the
+//! pre-indexed query interface used by `tddd::signals` and `tddd::consistency`.
+//!
+//! T004 (TDDD-01 3c) extends these types with structured signature fields
+//! (`params` / `returns` / `receiver` / `is_async`), replaces `TypeInfo::members`
+//! with `Vec<MemberDeclaration>`, and adds `TypeNode::methods` / `TraitNode::methods`
+//! as `Vec<MethodDeclaration>`. See ADR
+//! `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` §Phase 1-4
+//! and Consequences C1.
 
 use std::collections::{HashMap, HashSet};
 
 use serde::Serialize;
+
+use crate::tddd::catalogue::{MemberDeclaration, MethodDeclaration, ParamDeclaration};
 
 /// Top-level export result containing all public API elements of a crate.
 #[derive(Debug, Clone, Serialize)]
@@ -72,15 +84,21 @@ pub struct TypeInfo {
     name: String,
     kind: TypeKind,
     docs: Option<String>,
-    /// For enums: variant names. For structs: field names. Empty for type aliases.
-    members: Vec<String>,
+    /// For enums: variants. For structs: fields (name + type string).
+    /// Empty for type aliases.
+    members: Vec<MemberDeclaration>,
     /// Module path for disambiguation (e.g., `"domain::review"`). `None` if unknown.
     module_path: Option<String>,
 }
 
 impl TypeInfo {
     /// Creates a new type info.
-    pub fn new(name: String, kind: TypeKind, docs: Option<String>, members: Vec<String>) -> Self {
+    pub fn new(
+        name: String,
+        kind: TypeKind,
+        docs: Option<String>,
+        members: Vec<MemberDeclaration>,
+    ) -> Self {
         Self { name, kind, docs, members, module_path: None }
     }
 
@@ -89,7 +107,7 @@ impl TypeInfo {
         name: String,
         kind: TypeKind,
         docs: Option<String>,
-        members: Vec<String>,
+        members: Vec<MemberDeclaration>,
         module_path: String,
     ) -> Self {
         Self { name, kind, docs, members, module_path: Some(module_path) }
@@ -110,8 +128,8 @@ impl TypeInfo {
         self.docs.as_deref()
     }
 
-    /// Returns variant names (enums) or field names (structs).
-    pub fn members(&self) -> &[String] {
+    /// Returns struct fields or enum variants.
+    pub fn members(&self) -> &[MemberDeclaration] {
         &self.members
     }
 
@@ -122,38 +140,74 @@ impl TypeInfo {
 }
 
 /// Information about a public function or method.
+///
+/// T004: the historical `signature: String` field has been removed in favor
+/// of structured fields (`params` / `returns` / `receiver` / `is_async`).
+/// Callers that need a human-readable signature should construct a
+/// `MethodDeclaration` from `TypeNode::methods` / `TraitNode::methods` and
+/// call `MethodDeclaration::signature_string()`. This is a BRIDGE-01 JSON
+/// breaking change (ADR 0002 Consequences C1).
 #[derive(Debug, Clone, Serialize)]
 pub struct FunctionInfo {
     name: String,
-    /// Human-readable signature string (e.g., `fn foo(x: u32) -> bool`).
-    signature: String,
     docs: Option<String>,
-    /// Type names extracted from the return type (e.g., `["Published"]` for `-> Published`).
+    /// Type names extracted from the return type (e.g., `["Published"]` for
+    /// `-> Published`, `["User"]` for `-> Result<User, DomainError>`).
+    /// Used by `build_type_graph` to compute typestate `outgoing` edges.
     return_type_names: Vec<String>,
     /// `true` if the first parameter is `self`, `&self`, or `&mut self`.
     has_self_receiver: bool,
+    /// Structured parameter list (excluding the self receiver). L1 resolution:
+    /// last-segment short names, generics preserved verbatim.
+    params: Vec<ParamDeclaration>,
+    /// Return type string at L1 resolution. `"()"` when the return type is
+    /// the unit type.
+    returns: String,
+    /// Self-receiver form: `"&self"` / `"&mut self"` / `"self"`, or `None`
+    /// for associated functions.
+    receiver: Option<String>,
+    /// Whether the function is declared `async fn`.
+    is_async: bool,
 }
 
 impl FunctionInfo {
     /// Creates a new function info.
+    ///
+    /// `has_self_receiver` is derived from `receiver` to prevent the illegal state
+    /// where `has_self_receiver = true` but `receiver = None` (or vice versa).
+    /// Callers that pass an explicit `has_self_receiver` value should ensure it
+    /// agrees with `receiver`; the constructor silently corrects disagreements by
+    /// trusting `receiver` as the source of truth.
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         name: String,
-        signature: String,
         docs: Option<String>,
         return_type_names: Vec<String>,
-        has_self_receiver: bool,
+        _has_self_receiver: bool,
+        params: Vec<ParamDeclaration>,
+        returns: String,
+        receiver: Option<String>,
+        is_async: bool,
     ) -> Self {
-        Self { name, signature, docs, return_type_names, has_self_receiver }
+        // Derive `has_self_receiver` from `receiver` so the two fields can never
+        // disagree. The `_has_self_receiver` parameter is accepted for API
+        // compatibility but is intentionally ignored.
+        let has_self_receiver = receiver.is_some();
+        Self {
+            name,
+            docs,
+            return_type_names,
+            has_self_receiver,
+            params,
+            returns,
+            receiver,
+            is_async,
+        }
     }
 
     /// Returns the function name.
     pub fn name(&self) -> &str {
         &self.name
-    }
-
-    /// Returns the signature string.
-    pub fn signature(&self) -> &str {
-        &self.signature
     }
 
     /// Returns the documentation string.
@@ -169,6 +223,26 @@ impl FunctionInfo {
     /// Returns `true` if the first parameter is `self`, `&self`, or `&mut self`.
     pub fn has_self_receiver(&self) -> bool {
         self.has_self_receiver
+    }
+
+    /// Returns the structured parameter list (excluding the self receiver).
+    pub fn params(&self) -> &[ParamDeclaration] {
+        &self.params
+    }
+
+    /// Returns the return type string.
+    pub fn returns(&self) -> &str {
+        &self.returns
+    }
+
+    /// Returns the self-receiver form, or `None` for associated functions.
+    pub fn receiver(&self) -> Option<&str> {
+        self.receiver.as_deref()
+    }
+
+    /// Returns `true` if the function is declared `async fn`.
+    pub fn is_async(&self) -> bool {
+        self.is_async
     }
 }
 
@@ -272,7 +346,7 @@ pub trait SchemaExporter {
 // TypeGraph — pre-indexed query interface for domain type evaluation
 // ---------------------------------------------------------------------------
 
-/// Pre-indexed view of a crate's public API for domain type evaluation.
+/// Pre-indexed view of a crate's public API for type catalogue evaluation.
 ///
 /// Constructed from `SchemaExport` by infrastructure. The domain evaluation
 /// layer uses only this type — no raw string parsing needed.
@@ -318,15 +392,22 @@ impl TypeGraph {
     }
 }
 
-/// A public type in the crate.
+/// A public type in the crate, as indexed for TDDD evaluation.
+///
+/// T005 (Phase 1 Task 5): the legacy `method_return_types: HashSet<String>`
+/// bridge field is removed. `outgoing` is passed in directly from
+/// `build_type_graph`, which derives it by filtering self-receiver method
+/// return types against the set of typestate-declared type names
+/// (ADR 0002 Q4). Callers that need the full set of return type names
+/// should walk `methods().iter().flat_map(|m| ...)` directly.
 #[derive(Debug, Clone)]
 pub struct TypeNode {
     kind: TypeKind,
-    /// Variant names (for enums) or field names (for structs).
-    members: Vec<String>,
-    /// Type names returned by inherent (non-trait) impl methods.
-    method_return_types: HashSet<String>,
-    /// Outgoing typestate transitions: subset of `method_return_types`.
+    /// Variants (for enums) or fields (for structs).
+    members: Vec<MemberDeclaration>,
+    /// Full L1 signatures of inherent impl methods on this type.
+    methods: Vec<MethodDeclaration>,
+    /// Outgoing typestate transitions.
     outgoing: HashSet<String>,
     /// Module path for disambiguation (e.g., `"domain::review"`). `None` if unknown.
     module_path: Option<String>,
@@ -335,17 +416,16 @@ pub struct TypeNode {
 impl TypeNode {
     /// Creates a new `TypeNode`.
     ///
-    /// `outgoing` is intersected with `method_return_types` to enforce the invariant
-    /// that outgoing transitions are always a subset of the actual method return types.
+    /// `outgoing` is passed in by `build_type_graph` already filtered to the
+    /// typestate set — this constructor stores it as-is.
     #[must_use]
     pub fn new(
         kind: TypeKind,
-        members: Vec<String>,
-        method_return_types: HashSet<String>,
+        members: Vec<MemberDeclaration>,
+        methods: Vec<MethodDeclaration>,
         outgoing: HashSet<String>,
     ) -> Self {
-        let outgoing = outgoing.intersection(&method_return_types).cloned().collect();
-        Self { kind, members, method_return_types, outgoing, module_path: None }
+        Self { kind, members, methods, outgoing, module_path: None }
     }
 
     /// Sets the module path for disambiguation.
@@ -359,10 +439,16 @@ impl TypeNode {
         &self.kind
     }
 
-    /// Returns variant names (enums) or field names (structs).
+    /// Returns struct fields or enum variants.
     #[must_use]
-    pub fn members(&self) -> &[String] {
+    pub fn members(&self) -> &[MemberDeclaration] {
         &self.members
+    }
+
+    /// Returns the structured inherent method declarations.
+    #[must_use]
+    pub fn methods(&self) -> &[MethodDeclaration] {
+        &self.methods
     }
 
     /// Returns the module path, if known.
@@ -371,36 +457,34 @@ impl TypeNode {
         self.module_path.as_deref()
     }
 
-    /// Returns type names returned by inherent impl methods.
-    #[must_use]
-    pub fn method_return_types(&self) -> &HashSet<String> {
-        &self.method_return_types
-    }
-
-    /// Returns outgoing typestate transitions (filtered subset of `method_return_types`).
+    /// Returns outgoing typestate transitions.
     #[must_use]
     pub fn outgoing(&self) -> &HashSet<String> {
         &self.outgoing
     }
 }
 
-/// A public trait in the crate.
+/// A public trait in the crate, as indexed for TDDD evaluation.
+///
+/// T005 (Phase 1 Task 5): the legacy `method_names: Vec<String>` mirror is
+/// removed. Callers that need the list of method names should walk
+/// `methods().iter().map(|m| m.name())`.
 #[derive(Debug, Clone)]
 pub struct TraitNode {
-    method_names: Vec<String>,
+    methods: Vec<MethodDeclaration>,
 }
 
 impl TraitNode {
-    /// Creates a new `TraitNode`.
+    /// Creates a new `TraitNode` from the structured method list.
     #[must_use]
-    pub fn new(method_names: Vec<String>) -> Self {
-        Self { method_names }
+    pub fn new(methods: Vec<MethodDeclaration>) -> Self {
+        Self { methods }
     }
 
-    /// Returns the method names of this trait.
+    /// Returns the structured method declarations.
     #[must_use]
-    pub fn method_names(&self) -> &[String] {
-        &self.method_names
+    pub fn methods(&self) -> &[MethodDeclaration] {
+        &self.methods
     }
 }
 
@@ -413,21 +497,30 @@ mod tests {
     fn function_info_has_self_receiver_reflects_constructor_value() {
         let method = FunctionInfo::new(
             "consume".to_string(),
-            "fn consume(self) -> Done".to_string(),
             None,
             vec!["Done".to_string()],
             true,
+            vec![],
+            "Done".to_string(),
+            Some("self".to_string()),
+            false,
         );
         assert!(method.has_self_receiver());
+        assert_eq!(method.receiver(), Some("self"));
+        assert!(method.params().is_empty());
 
         let assoc_fn = FunctionInfo::new(
             "from_db".to_string(),
-            "fn from_db() -> Published".to_string(),
             None,
             vec!["Published".to_string()],
             false,
+            vec![],
+            "Published".to_string(),
+            None,
+            false,
         );
         assert!(!assoc_fn.has_self_receiver());
+        assert_eq!(assoc_fn.receiver(), None);
     }
 
     #[test]
@@ -438,7 +531,10 @@ mod tests {
                 "TrackStatus".to_string(),
                 TypeKind::Enum,
                 Some("Status of a track".to_string()),
-                vec!["Planned".to_string(), "InProgress".to_string()],
+                vec![
+                    MemberDeclaration::variant("Planned"),
+                    MemberDeclaration::variant("InProgress"),
+                ],
             )],
             vec![],
             vec![],
@@ -447,9 +543,12 @@ mod tests {
 
         assert_eq!(export.crate_name(), "domain");
         assert_eq!(export.types().len(), 1);
-        assert_eq!(export.types().first().unwrap().name(), "TrackStatus");
-        assert_eq!(export.types().first().unwrap().kind(), &TypeKind::Enum);
-        assert_eq!(export.types().first().unwrap().members(), &["Planned", "InProgress"]);
+        let track_status = export.types().first().unwrap();
+        assert_eq!(track_status.name(), "TrackStatus");
+        assert_eq!(track_status.kind(), &TypeKind::Enum);
+        let member_names: Vec<&str> =
+            track_status.members().iter().map(MemberDeclaration::name).collect();
+        assert_eq!(member_names, vec!["Planned", "InProgress"]);
     }
 
     #[test]
@@ -472,14 +571,38 @@ mod tests {
 
     #[test]
     fn type_node_module_path_none_by_default() {
-        let node = TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new());
+        let node = TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new());
         assert!(node.module_path().is_none());
     }
 
     #[test]
     fn type_node_set_module_path_stores_value() {
-        let mut node = TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new());
+        let mut node = TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new());
         node.set_module_path("domain::guard".to_string());
         assert_eq!(node.module_path(), Some("domain::guard"));
+    }
+
+    #[test]
+    fn trait_node_exposes_structured_methods() {
+        let methods = vec![
+            MethodDeclaration::new(
+                "save",
+                Some("&self".into()),
+                vec![],
+                "Result<(), Error>",
+                false,
+            ),
+            MethodDeclaration::new(
+                "find",
+                Some("&self".into()),
+                vec![ParamDeclaration::new("id", "UserId")],
+                "Option<User>",
+                false,
+            ),
+        ];
+        let node = TraitNode::new(methods);
+        let names: Vec<&str> = node.methods().iter().map(MethodDeclaration::name).collect();
+        assert_eq!(names, vec!["save", "find"]);
+        assert_eq!(node.methods().len(), 2);
     }
 }

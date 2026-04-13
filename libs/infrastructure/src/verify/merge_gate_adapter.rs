@@ -18,8 +18,8 @@
 use std::path::PathBuf;
 
 use domain::TrackMetadata;
+use domain::TypeCatalogueDocument;
 use domain::spec::SpecDocument;
-use domain::tddd::catalogue::DomainTypesDocument;
 use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
 
 use crate::git_cli::show::{BlobResult, fetch_blob_safe};
@@ -64,6 +64,47 @@ impl GitShowTrackBlobReader {
             BlobResult::CommandFailed(msg) => Err(BlobFetchResult::FetchError(msg)),
         }
     }
+
+    /// Resolves the catalogue filename for `layer_id` by reading
+    /// `architecture-rules.json` from the PR branch.
+    ///
+    /// Returns the explicit `catalogue_file` override if present, the
+    /// default `<layer_id>-types.json` when the rules file is absent
+    /// (preserving the legacy fallback for non-migrated repos), or a
+    /// `BlobFetchResult::FetchError` when the rules file is present but
+    /// unreadable / unparseable. The fail-closed path prevents a
+    /// silent downgrade to the default filename on `FetchError` of the
+    /// rules blob.
+    fn resolve_catalogue_filename(
+        &self,
+        branch: &str,
+        layer_id: &str,
+    ) -> Result<String, BlobFetchResult<TypeCatalogueDocument>> {
+        let text =
+            match self.fetch_string::<TypeCatalogueDocument>(branch, "architecture-rules.json") {
+                Ok(s) => s,
+                Err(BlobFetchResult::NotFound) => {
+                    // Legacy fallback: no rules file on the branch → use the
+                    // conventional default. This is a NotFound case, not a
+                    // fetch failure, so the gate's per-layer NotFound semantic
+                    // is still meaningful.
+                    return Ok(format!("{layer_id}-types.json"));
+                }
+                Err(result) => {
+                    // Fetch error on a rules file that exists → fail-closed.
+                    return Err(result);
+                }
+            };
+        match super::tddd_layers::parse_tddd_layers(&text) {
+            Ok(bindings) => Ok(super::tddd_layers::find_binding(&bindings, layer_id)
+                .map(|b| b.catalogue_file().to_owned())
+                .unwrap_or_else(|| format!("{layer_id}-types.json"))),
+            Err(e) => Err(BlobFetchResult::FetchError(format!(
+                "architecture-rules.json parse error while resolving catalogue file for \
+                 layer '{layer_id}': {e}"
+            ))),
+        }
+    }
 }
 
 impl TrackBlobReader for GitShowTrackBlobReader {
@@ -79,22 +120,54 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         }
     }
 
-    fn read_domain_types_document(
+    fn read_type_catalogue(
         &self,
         branch: &str,
         track_id: &str,
-    ) -> BlobFetchResult<DomainTypesDocument> {
-        let path = Self::blob_path(track_id, "domain-types.json");
-        let text = match self.fetch_string::<DomainTypesDocument>(branch, &path) {
+        layer_id: &str,
+    ) -> BlobFetchResult<TypeCatalogueDocument> {
+        // T007: resolve the catalogue filename from the PR branch's
+        // `architecture-rules.json` so that layers with an explicit
+        // `tddd.catalogue_file` override are handled consistently between
+        // the CI path (`verify_from_spec_json`) and the merge gate.
+        // Fall back to `<layer_id>-types.json` when the rules file is absent
+        // (NotFound); fail-closed when the rules file is present but
+        // unreadable or unparseable.
+        let filename = match self.resolve_catalogue_filename(branch, layer_id) {
+            Ok(name) => name,
+            Err(result) => return result,
+        };
+        let path = Self::blob_path(track_id, &filename);
+        let text = match self.fetch_string::<TypeCatalogueDocument>(branch, &path) {
             Ok(s) => s,
             Err(result) => return result,
         };
         match crate::tddd::catalogue_codec::decode(&text) {
             Ok(doc) => BlobFetchResult::Found(doc),
-            Err(e) => {
-                BlobFetchResult::FetchError(format!("{path}: domain-types.json decode error: {e}"))
-            }
+            Err(e) => BlobFetchResult::FetchError(format!("{path}: {filename} decode error: {e}")),
         }
+    }
+
+    fn read_enabled_layers(&self, branch: &str) -> BlobFetchResult<Vec<String>> {
+        // T007: read `architecture-rules.json` from the PR branch blob so
+        // that tracks which modify the rules file itself are evaluated
+        // against their own layer definitions (not the local workspace).
+        // An empty binding list (legacy rules file, or a PR that disables
+        // every layer) is returned verbatim — the usecase gate is the
+        // fail-closed authority and will reject an empty set explicitly.
+        let text = match self.fetch_string::<Vec<String>>(branch, "architecture-rules.json") {
+            Ok(s) => s,
+            Err(result) => return result,
+        };
+        let bindings = match super::tddd_layers::parse_tddd_layers(&text) {
+            Ok(b) => b,
+            Err(e) => {
+                return BlobFetchResult::FetchError(format!(
+                    "architecture-rules.json parse error: {e}"
+                ));
+            }
+        };
+        BlobFetchResult::Found(bindings.iter().map(|b| b.layer_id().to_owned()).collect())
     }
 
     fn read_track_metadata(&self, branch: &str, track_id: &str) -> BlobFetchResult<TrackMetadata> {
@@ -189,8 +262,8 @@ mod tests {
 }"#;
 
     const DOMAIN_TYPES_MINIMAL: &str = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "TrackId", "kind": "value_object", "description": "test", "approved": true }
   ],
   "signals": [
@@ -277,14 +350,14 @@ mod tests {
         }
     }
 
-    // --- read_domain_types_document ---
+    // --- read_type_catalogue ---
 
     #[test]
-    fn test_read_domain_types_document_found() {
+    fn test_read_type_catalogue_found() {
         let dir =
             setup_repo_with_track("foo", &[("domain-types.json", DOMAIN_TYPES_MINIMAL.as_bytes())]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        match reader.read_domain_types_document("main", "foo") {
+        match reader.read_type_catalogue("main", "foo", "domain") {
             BlobFetchResult::Found(doc) => {
                 assert_eq!(doc.entries().len(), 1);
             }
@@ -293,20 +366,20 @@ mod tests {
     }
 
     #[test]
-    fn test_read_domain_types_document_not_found() {
+    fn test_read_type_catalogue_not_found() {
         let dir = setup_repo_with_track("foo", &[("spec.json", SPEC_JSON_MINIMAL.as_bytes())]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
         assert!(matches!(
-            reader.read_domain_types_document("main", "foo"),
+            reader.read_type_catalogue("main", "foo", "domain"),
             BlobFetchResult::NotFound
         ));
     }
 
     #[test]
-    fn test_read_domain_types_document_decode_error() {
+    fn test_read_type_catalogue_decode_error() {
         let dir = setup_repo_with_track("foo", &[("domain-types.json", b"{}")]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        match reader.read_domain_types_document("main", "foo") {
+        match reader.read_type_catalogue("main", "foo", "domain") {
             BlobFetchResult::FetchError(msg) => {
                 assert!(msg.contains("decode error"), "{msg}");
             }
@@ -377,7 +450,7 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn test_read_domain_types_document_rejects_symlink() {
+    fn test_read_type_catalogue_rejects_symlink() {
         let dir = tempfile::tempdir().unwrap();
         let repo = dir.path();
         git(repo, &["init", "--quiet", "--initial-branch=main"]);
@@ -391,7 +464,7 @@ mod tests {
         git(repo, &["fetch", "--quiet", "origin"]);
 
         let reader = GitShowTrackBlobReader::new(repo.to_path_buf());
-        match reader.read_domain_types_document("main", "foo") {
+        match reader.read_type_catalogue("main", "foo", "domain") {
             BlobFetchResult::FetchError(msg) => {
                 assert!(msg.contains("symlink"), "{msg}");
             }

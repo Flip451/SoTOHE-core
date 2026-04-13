@@ -289,11 +289,11 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
 /// exercised in unit tests without requiring the nightly toolchain.
 ///
 /// # Arguments
-/// * `doc` — decoded `DomainTypesDocument` (entries read from `domain-types.json`)
+/// * `doc` — decoded `TypeCatalogueDocument` (entries read from `domain-types.json`)
 /// * `graph` — `TypeGraph` built from the schema export
 /// * `baseline` — decoded `TypeBaseline` from `domain-types-baseline.json`
 fn evaluate_consistency_from_components(
-    doc: &domain::DomainTypesDocument,
+    doc: &domain::TypeCatalogueDocument,
     graph: &domain::TypeGraph,
     baseline: &domain::TypeBaseline,
 ) -> VerifyOutcome {
@@ -802,9 +802,33 @@ mod tests {
         assert_eq!(exit, ExitCode::FAILURE);
     }
 
+    /// Writes a minimal `architecture-rules.json` with only `domain` TDDD-enabled
+    /// into the given tmp dir. Shared by the two Yellow-signal CLI tests below,
+    /// which both need the new T007 multilayer loop to find exactly one enabled
+    /// layer that points at `domain-types.json`.
+    fn write_minimal_arch_rules(dir: &std::path::Path) {
+        let content = r#"{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "domain-types.json"
+      }
+    }
+  ]
+}"#;
+        std::fs::write(dir.join("architecture-rules.json"), content).unwrap();
+    }
+
     #[test]
     fn test_spec_states_strict_false_passes_with_yellow_signal() {
         let tmp = TempDir::new().unwrap();
+        write_minimal_arch_rules(tmp.path());
         let spec = tmp.path().join("spec.md");
         // spec.md without ## Domain States (will delegate to spec.json).
         std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n").unwrap();
@@ -817,7 +841,7 @@ mod tests {
         // domain-types.json: one entry with a yellow signal.
         std::fs::write(
             tmp.path().join("domain-types.json"),
-            r#"{"schema_version":1,"domain_types":[{"name":"MyType","kind":"value_object","description":"d","approved":true}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
+            r#"{"schema_version":2,"type_definitions":[{"name":"MyType","kind":"value_object","description":"d","approved":true}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
         )
         .unwrap();
         let exit =
@@ -828,6 +852,7 @@ mod tests {
     #[test]
     fn test_spec_states_strict_true_fails_with_yellow_signal() {
         let tmp = TempDir::new().unwrap();
+        write_minimal_arch_rules(tmp.path());
         let spec = tmp.path().join("spec.md");
         // spec.md without ## Domain States (will delegate to spec.json).
         std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n").unwrap();
@@ -840,7 +865,7 @@ mod tests {
         // domain-types.json: one entry with a yellow signal.
         std::fs::write(
             tmp.path().join("domain-types.json"),
-            r#"{"schema_version":1,"domain_types":[{"name":"MyType","kind":"value_object","description":"d","approved":true}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
+            r#"{"schema_version":2,"type_definitions":[{"name":"MyType","kind":"value_object","description":"d","approved":true}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
         )
         .unwrap();
         let exit =
@@ -896,11 +921,11 @@ mod tests {
 
     // --- consistency_report_to_findings tests ---
 
-    fn make_entry_for_test(name: &str, action: domain::TypeAction) -> domain::DomainTypeEntry {
-        domain::DomainTypeEntry::new(
+    fn make_entry_for_test(name: &str, action: domain::TypeAction) -> domain::TypeCatalogueEntry {
+        domain::TypeCatalogueEntry::new(
             name,
             "desc",
-            domain::DomainTypeKind::ValueObject,
+            domain::TypeDefinitionKind::ValueObject,
             action,
             true,
         )
@@ -1046,12 +1071,12 @@ mod tests {
 
     // --- evaluate_consistency_from_components tests (core CLI wiring, no nightly needed) ---
 
-    fn make_doc_with_entry(entry: domain::DomainTypeEntry) -> domain::DomainTypesDocument {
-        domain::DomainTypesDocument::new(1, vec![entry])
+    fn make_doc_with_entry(entry: domain::TypeCatalogueEntry) -> domain::TypeCatalogueDocument {
+        domain::TypeCatalogueDocument::new(1, vec![entry])
     }
 
-    fn empty_doc_for_test() -> domain::DomainTypesDocument {
-        domain::DomainTypesDocument::new(1, vec![])
+    fn empty_doc_for_test() -> domain::TypeCatalogueDocument {
+        domain::TypeCatalogueDocument::new(1, vec![])
     }
 
     #[test]

@@ -4,10 +4,16 @@
 //! both [`SchemaExport`] (domain) and [`TypeGraph`] (domain), and bridges the
 //! flat serializable export into the pre-indexed query structure used by domain
 //! evaluation logic.
+//!
+//! T005 (TDDD-01 Phase 1 Task 5): `TypeNode::new` no longer takes a
+//! `method_return_types: HashSet<String>` argument — the legacy bridge is
+//! gone. `outgoing` is still computed here from `FunctionInfo::return_type_names`
+//! ∩ typestate_names.
 
 use std::collections::{HashMap, HashSet};
 
-use domain::schema::{SchemaExport, TraitNode, TypeGraph, TypeNode};
+use domain::schema::{FunctionInfo, SchemaExport, TraitNode, TypeGraph, TypeNode};
+use domain::tddd::catalogue::MethodDeclaration;
 
 /// Builds a [`TypeGraph`] from a [`SchemaExport`].
 ///
@@ -24,26 +30,25 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
     let mut types: HashMap<String, TypeNode> = HashMap::new();
 
     for type_info in schema.types() {
-        let method_return_types: HashSet<String> = schema
+        let inherent_methods: Vec<&FunctionInfo> = schema
             .impls()
             .iter()
-            .filter(|i| {
-                last_segment(i.target_type()) == type_info.name() && i.trait_name().is_none()
-            })
+            .filter(|i| base_name(i.target_type()) == type_info.name() && i.trait_name().is_none())
             .flat_map(|i| i.methods())
-            .filter(|m| m.has_self_receiver())
-            .flat_map(|m| m.return_type_names().iter().cloned())
             .collect();
 
-        let outgoing: HashSet<String> = method_return_types
+        let method_decls: Vec<MethodDeclaration> =
+            inherent_methods.iter().map(|f| function_info_to_method_decl(f)).collect();
+
+        let outgoing: HashSet<String> = inherent_methods
             .iter()
+            .filter(|m| m.has_self_receiver())
+            .flat_map(|m| m.return_type_names().iter().cloned())
             .filter(|rtn| typestate_names.contains(rtn.as_str()))
-            .cloned()
             .collect();
 
         let name_key = type_info.name().to_string();
 
-        // Warn on same-name type collision (different module paths).
         if let Some(existing) = types.get(&name_key) {
             eprintln!(
                 "warning: same-name type collision for `{}`: existing={:?}, new={:?} — later entry overwrites earlier",
@@ -56,7 +61,7 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
         let mut node = TypeNode::new(
             type_info.kind().clone(),
             type_info.members().to_vec(),
-            method_return_types,
+            method_decls,
             outgoing,
         );
         if let Some(mp) = type_info.module_path() {
@@ -68,26 +73,61 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
 
     let mut traits = HashMap::new();
     for trait_info in schema.traits() {
-        traits.insert(
-            trait_info.name().to_string(),
-            TraitNode::new(trait_info.methods().iter().map(|m| m.name().to_string()).collect()),
-        );
+        let method_decls: Vec<MethodDeclaration> =
+            trait_info.methods().iter().map(function_info_to_method_decl).collect();
+        traits.insert(trait_info.name().to_string(), TraitNode::new(method_decls));
     }
 
     TypeGraph::new(types, traits)
 }
 
-/// Extracts the last `::` segment from a path (e.g., `crate::Foo` → `Foo`).
-fn last_segment(path: &str) -> &str {
-    path.rsplit("::").next().unwrap_or(path)
+/// Converts a `FunctionInfo` (flat rustdoc-derived) into a `MethodDeclaration`
+/// (the structured L1 signature used by `TypeNode::methods` / `TraitNode::methods`).
+fn function_info_to_method_decl(f: &FunctionInfo) -> MethodDeclaration {
+    MethodDeclaration::new(
+        f.name().to_string(),
+        f.receiver().map(str::to_string),
+        f.params().to_vec(),
+        f.returns().to_string(),
+        f.is_async(),
+    )
+}
+
+/// Strips the generic parameter list from a `format_type`-rendered string.
+///
+/// `format_type` returns short names without `::`, but generic types include
+/// angle brackets (e.g., `"Foo<T>"`). Strip the `<...>` suffix so that
+/// `"Foo<T>"` matches the `TypeNode` keyed as `"Foo"`.
+fn base_name(formatted: &str) -> &str {
+    formatted.split('<').next().unwrap_or(formatted)
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use domain::schema::{FunctionInfo, ImplInfo, SchemaExport, TraitInfo, TypeInfo, TypeKind};
+    use domain::tddd::catalogue::MemberDeclaration;
 
     use super::*;
+
+    /// Helper: build a `FunctionInfo` for a method returning a single named type.
+    fn method_returning(
+        name: &str,
+        return_name: &str,
+        has_self_receiver: bool,
+        receiver: Option<&str>,
+    ) -> FunctionInfo {
+        FunctionInfo::new(
+            name.to_string(),
+            None,
+            vec![return_name.to_string()],
+            has_self_receiver,
+            vec![],
+            return_name.to_string(),
+            receiver.map(str::to_string),
+            false,
+        )
+    }
 
     fn make_schema_with_impl(
         type_name: &str,
@@ -101,13 +141,7 @@ mod tests {
         let impls = vec![ImplInfo::new(
             type_name.to_string(),
             None,
-            vec![FunctionInfo::new(
-                "transition".to_string(),
-                "fn transition(self) -> Target".to_string(),
-                None,
-                vec![method_return.to_string()],
-                true,
-            )],
+            vec![method_returning("transition", method_return, true, Some("self"))],
         )];
         SchemaExport::new("test".to_string(), types, vec![], vec![], impls)
     }
@@ -134,7 +168,7 @@ mod tests {
                 "Status".to_string(),
                 TypeKind::Enum,
                 None,
-                vec!["Active".to_string(), "Done".to_string()],
+                vec![MemberDeclaration::variant("Active"), MemberDeclaration::variant("Done")],
             )],
             vec![],
             vec![],
@@ -143,21 +177,33 @@ mod tests {
         let profile = build_type_graph(&schema, &HashSet::new());
         let code_type = profile.get_type("Status").unwrap();
         assert_eq!(code_type.kind(), &TypeKind::Enum);
-        assert_eq!(code_type.members(), &["Active", "Done"]);
+        let names: Vec<&str> = code_type.members().iter().map(|m| m.name()).collect();
+        assert_eq!(names, vec!["Active", "Done"]);
     }
 
     #[test]
-    fn test_build_type_graph_with_inherent_impl_collects_return_types() {
+    fn test_build_type_graph_with_inherent_impl_collects_method_returns() {
+        let schema = make_schema_with_impl("Draft", "Published", "Published");
+        let typestates = HashSet::from(["Draft".to_string(), "Published".to_string()]);
+        let profile = build_type_graph(&schema, &typestates);
+        let draft = profile.get_type("Draft").unwrap();
+        assert!(draft.outgoing().contains("Published"));
+    }
+
+    #[test]
+    fn test_build_type_graph_with_inherent_impl_populates_method_decls() {
         let schema = make_schema_with_impl("Draft", "Published", "Published");
         let profile = build_type_graph(&schema, &HashSet::new());
         let draft = profile.get_type("Draft").unwrap();
-        assert!(draft.method_return_types().contains("Published"));
+        assert_eq!(draft.methods().len(), 1);
+        let transition = &draft.methods()[0];
+        assert_eq!(transition.name(), "transition");
+        assert_eq!(transition.returns(), "Published");
+        assert_eq!(transition.receiver(), Some("self"));
     }
 
     #[test]
     fn test_build_type_graph_associated_fn_without_self_excluded_from_transitions() {
-        // An associated function (no self receiver) like `fn from_db() -> Published`
-        // must NOT appear in method_return_types — it is not a state transition.
         let types = vec![
             TypeInfo::new("Draft".to_string(), TypeKind::Struct, None, vec![]),
             TypeInfo::new("Published".to_string(), TypeKind::Struct, None, vec![]),
@@ -165,42 +211,31 @@ mod tests {
         let impls = vec![ImplInfo::new(
             "Draft".to_string(),
             None,
-            vec![FunctionInfo::new(
-                "from_db".to_string(),
-                "fn from_db() -> Published".to_string(),
-                None,
-                vec!["Published".to_string()],
-                false, // associated function — no self receiver
-            )],
+            vec![method_returning("from_db", "Published", false, None)],
         )];
         let schema = SchemaExport::new("test".to_string(), types, vec![], vec![], impls);
-        let profile = build_type_graph(&schema, &HashSet::new());
+        let typestates = HashSet::from(["Published".to_string()]);
+        let profile = build_type_graph(&schema, &typestates);
         let draft = profile.get_type("Draft").unwrap();
         assert!(
-            !draft.method_return_types().contains("Published"),
+            !draft.outgoing().contains("Published"),
             "associated fn without self receiver must be excluded from transitions"
         );
     }
 
     #[test]
-    fn test_build_type_graph_with_trait_impl_excludes_return_types() {
+    fn test_build_type_graph_with_trait_impl_excludes_outgoing() {
         let types = vec![TypeInfo::new("Foo".to_string(), TypeKind::Struct, None, vec![])];
         let impls = vec![ImplInfo::new(
             "Foo".to_string(),
             Some("Display".to_string()),
-            vec![FunctionInfo::new(
-                "fmt".to_string(),
-                "fn fmt(&self, f: &mut Formatter) -> fmt::Result".to_string(),
-                None,
-                vec!["fmt::Result".to_string()],
-                true,
-            )],
+            vec![method_returning("fmt", "Result", true, Some("&self"))],
         )];
         let schema = SchemaExport::new("test".to_string(), types, vec![], vec![], impls);
-        let profile = build_type_graph(&schema, &HashSet::new());
+        let typestates = HashSet::from(["Result".to_string()]);
+        let profile = build_type_graph(&schema, &typestates);
         let foo = profile.get_type("Foo").unwrap();
-        // trait impls must be excluded — no return types collected
-        assert!(foo.method_return_types().is_empty());
+        assert!(foo.outgoing().is_empty());
     }
 
     #[test]
@@ -209,27 +244,17 @@ mod tests {
             "Repo".to_string(),
             None,
             vec![
-                FunctionInfo::new(
-                    "save".to_string(),
-                    "fn save(&self)".to_string(),
-                    None,
-                    vec![],
-                    true,
-                ),
-                FunctionInfo::new(
-                    "find".to_string(),
-                    "fn find(&self)".to_string(),
-                    None,
-                    vec![],
-                    true,
-                ),
+                method_returning("save", "()", true, Some("&self")),
+                method_returning("find", "()", true, Some("&self")),
             ],
         );
         let schema =
             SchemaExport::new("test".to_string(), vec![], vec![], vec![trait_info], vec![]);
         let profile = build_type_graph(&schema, &HashSet::new());
         let code_trait = profile.get_trait("Repo").unwrap();
-        assert_eq!(code_trait.method_names(), &["save", "find"]);
+        let names: Vec<&str> = code_trait.methods().iter().map(|m| m.name()).collect();
+        assert_eq!(names, vec!["save", "find"]);
+        assert_eq!(code_trait.methods().len(), 2);
     }
 
     #[test]
@@ -241,8 +266,6 @@ mod tests {
 
     #[test]
     fn test_build_type_graph_outgoing_contains_only_typestate_targets() {
-        // "Draft" has methods returning both "Published" (a typestate) and "Archived" (not a typestate).
-        // Only "Published" should appear in outgoing.
         let types = vec![
             TypeInfo::new("Draft".to_string(), TypeKind::Struct, None, vec![]),
             TypeInfo::new("Published".to_string(), TypeKind::Struct, None, vec![]),
@@ -252,20 +275,8 @@ mod tests {
             "Draft".to_string(),
             None,
             vec![
-                FunctionInfo::new(
-                    "publish".to_string(),
-                    "fn publish(self) -> Published".to_string(),
-                    None,
-                    vec!["Published".to_string()],
-                    true,
-                ),
-                FunctionInfo::new(
-                    "archive".to_string(),
-                    "fn archive(self) -> Archived".to_string(),
-                    None,
-                    vec!["Archived".to_string()],
-                    true,
-                ),
+                method_returning("publish", "Published", true, Some("self")),
+                method_returning("archive", "Archived", true, Some("self")),
             ],
         )];
         let schema = SchemaExport::new("test".to_string(), types, vec![], vec![], impls);
@@ -276,11 +287,6 @@ mod tests {
         let profile = build_type_graph(&schema, &typestate_names);
         let draft = profile.get_type("Draft").unwrap();
 
-        // method_return_types includes both "Published" and "Archived"
-        assert!(draft.method_return_types().contains("Published"));
-        assert!(draft.method_return_types().contains("Archived"));
-
-        // outgoing only includes the typestate target "Published"
         assert!(draft.outgoing().contains("Published"), "Published must be in outgoing");
         assert!(
             !draft.outgoing().contains("Archived"),

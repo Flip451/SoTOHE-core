@@ -9,16 +9,16 @@
 //! Two-mode design (ADR §D8.0): the merge gate is always **strict** (Yellow
 //! is blocked). The companion CI path (`verify_from_spec_json`) runs in
 //! interim mode with Yellow warnings. Both paths delegate to the same pure
-//! domain functions (`check_spec_doc_signals` / `check_domain_types_signals`).
+//! domain functions (`check_spec_doc_signals` / `check_type_signals`).
 //!
 //! Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md`
 //! §D2, §D5.2, §D6, §D8.
 
 use domain::spec::{SpecDocument, check_spec_doc_signals};
-use domain::tddd::catalogue::{DomainTypesDocument, check_domain_types_signals};
 use domain::validate_branch_ref;
 use domain::verify::{Finding, VerifyOutcome};
 use domain::{TrackId, TrackMetadata};
+use domain::{TypeCatalogueDocument, check_type_signals};
 
 /// Result of a port-level blob fetch.
 ///
@@ -44,7 +44,7 @@ pub enum BlobFetchResult<T> {
 /// - Mapping their native I/O errors to [`BlobFetchResult::FetchError`]
 /// - Distinguishing path-not-found from other errors (NotFound vs FetchError)
 /// - Decoding raw bytes into domain aggregates (`SpecDocument`,
-///   `DomainTypesDocument`)
+///   `TypeCatalogueDocument`)
 /// - Any locale / stderr-parsing / symlink-rejection concerns that are
 ///   specific to the adapter implementation
 ///
@@ -55,15 +55,20 @@ pub trait TrackBlobReader {
     /// `branch` (e.g. `"track/foo-2026-04-12"`).
     fn read_spec_document(&self, branch: &str, track_id: &str) -> BlobFetchResult<SpecDocument>;
 
-    /// Reads and decodes `track/items/<track_id>/domain-types.json`.
+    /// Reads and decodes the TDDD catalogue file for a single layer on the
+    /// given branch.
     ///
-    /// Returns `NotFound` when the file does not exist on the target ref.
-    /// This corresponds to "TDDD not active for this track" per ADR §D2.1.
-    fn read_domain_types_document(
+    /// T007 (Phase 1 Task 7): accepts a `layer_id` so the merge-gate
+    /// multilayer loop can read each layer's catalogue (`domain-types.json`,
+    /// `usecase-types.json`, …). Returns `NotFound` when the file does not
+    /// exist on the target ref — this corresponds to "TDDD not active for
+    /// this layer" per ADR §D2.1.
+    fn read_type_catalogue(
         &self,
         branch: &str,
         track_id: &str,
-    ) -> BlobFetchResult<DomainTypesDocument>;
+        layer_id: &str,
+    ) -> BlobFetchResult<TypeCatalogueDocument>;
 
     /// Reads and decodes `track/items/<track_id>/metadata.json` into a
     /// [`TrackMetadata`] aggregate.
@@ -71,6 +76,17 @@ pub trait TrackBlobReader {
     /// Used by the task-completion gate (see `usecase::task_completion`)
     /// which checks that all tasks are resolved before merge.
     fn read_track_metadata(&self, branch: &str, track_id: &str) -> BlobFetchResult<TrackMetadata>;
+
+    /// Returns the list of TDDD-enabled layer ids on the given branch.
+    ///
+    /// The infrastructure adapter reads `architecture-rules.json` from the
+    /// PR branch blob (not the local workspace) so that tracks which modify
+    /// `architecture-rules.json` itself are evaluated against the PR's own
+    /// rules. A default implementation returns `["domain"]` for backward
+    /// compatibility with mocks that have not been updated.
+    fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
+        BlobFetchResult::Found(vec!["domain".to_string()])
+    }
 }
 
 /// Evaluates the strict merge gate for the given branch using the provided
@@ -94,7 +110,7 @@ pub trait TrackBlobReader {
 ///    - `NotFound` → BLOCKED (spec.json is required for every track)
 ///    - `FetchError` → BLOCKED
 /// 5. If Stage 1 passes, read `domain-types.json`:
-///    - `Found(doc)` → delegate to [`check_domain_types_signals`] with `strict=true`
+///    - `Found(doc)` → delegate to [`check_type_signals`] with `strict=true`
 ///    - `NotFound` → skip (TDDD opt-in)
 ///    - `FetchError` → BLOCKED
 ///
@@ -148,18 +164,64 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
         return stage1;
     }
 
-    // 5. Stage 2: domain-types.json is opt-in (D2.1).
-    match reader.read_domain_types_document(branch, track_id) {
-        BlobFetchResult::NotFound => stage1, // TDDD opt-out → preserve stage1
-        BlobFetchResult::FetchError(msg) => VerifyOutcome::from_findings(vec![Finding::error(
-            format!("failed to read domain-types.json on origin/{branch}: {msg}"),
-        )]),
-        BlobFetchResult::Found(dt_doc) => {
-            let mut outcome = stage1;
-            outcome.merge(check_domain_types_signals(&dt_doc, /* strict */ true));
-            outcome
+    // 5. Stage 2: multi-layer TDDD gate. T007 — loop every `tddd.enabled`
+    //    layer read from `architecture-rules.json` on the PR branch blob.
+    //    For each layer:
+    //      - NotFound → TDDD opt-out for that layer (no finding)
+    //      - FetchError → fail-closed
+    //      - Found → run `check_type_signals` with strict=true
+    //    All findings are merged (AND-aggregation across layers) so one
+    //    diagnostic shows every problem.
+    let layer_ids = match reader.read_enabled_layers(branch) {
+        BlobFetchResult::Found(ids) => {
+            if ids.is_empty() {
+                // Fail-closed: architecture-rules.json parses but no layers
+                // are `tddd.enabled = true`. Skipping Stage 2 would let a
+                // PR that disables every layer bypass strict gating. The
+                // caller must enable at least one layer (or explicitly
+                // delete the file, which is caught by the `NotFound` arm).
+                return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                    "architecture-rules.json on origin/{branch} declares no tddd.enabled \
+                     layers — the strict merge gate cannot verify an empty layer set"
+                ))]);
+            }
+            ids
+        }
+        BlobFetchResult::NotFound => {
+            // Fail-closed: a PR branch that removes or renames
+            // `architecture-rules.json` must not be able to bypass Stage 2
+            // enforcement. The strict merge gate always requires the file
+            // to exist so that the enabled-layer set is auditable on the PR
+            // branch itself (ADR 0002 D1 + strict-signal-gate-v2 §D5.2).
+            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "architecture-rules.json not found on origin/{branch} — \
+                 the strict merge gate requires the file to exist to enumerate TDDD layers"
+            ))]);
+        }
+        BlobFetchResult::FetchError(msg) => {
+            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "failed to read architecture-rules.json on origin/{branch}: {msg}"
+            ))]);
+        }
+    };
+
+    let mut outcome = stage1;
+    for layer_id in &layer_ids {
+        match reader.read_type_catalogue(branch, track_id, layer_id) {
+            BlobFetchResult::NotFound => {
+                // TDDD opt-out for this layer — skip silently.
+            }
+            BlobFetchResult::FetchError(msg) => {
+                outcome.merge(VerifyOutcome::from_findings(vec![Finding::error(format!(
+                    "failed to read {layer_id}-types.json on origin/{branch}: {msg}"
+                ))]));
+            }
+            BlobFetchResult::Found(dt_doc) => {
+                outcome.merge(check_type_signals(&dt_doc, /* strict */ true));
+            }
         }
     }
+    outcome
 }
 
 #[cfg(test)]
@@ -168,7 +230,7 @@ mod tests {
     use std::cell::RefCell;
 
     use domain::spec::{SpecScope, SpecStatus};
-    use domain::tddd::catalogue::{DomainTypeEntry, DomainTypeKind, DomainTypeSignal, TypeAction};
+    use domain::tddd::catalogue::{TypeAction, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal};
     use domain::{ConfidenceSignal, SignalCounts};
 
     use super::*;
@@ -177,8 +239,8 @@ mod tests {
     struct MockTrackBlobReader {
         spec: RefCell<Option<BlobFetchResult<SpecDocument>>>,
         /// `Some(result)` → return result when called; `None` → panic (unreachable assertion).
-        dt: RefCell<Option<BlobFetchResult<DomainTypesDocument>>>,
-        /// When `true`, calling `read_domain_types_document` panics with a clear message,
+        dt: RefCell<Option<BlobFetchResult<TypeCatalogueDocument>>>,
+        /// When `true`, calling `read_type_catalogue` panics with a clear message,
         /// making the short-circuit contract directly observable in tests.
         dt_unreachable: bool,
     }
@@ -186,7 +248,7 @@ mod tests {
     impl MockTrackBlobReader {
         fn new(
             spec: BlobFetchResult<SpecDocument>,
-            dt: BlobFetchResult<DomainTypesDocument>,
+            dt: BlobFetchResult<TypeCatalogueDocument>,
         ) -> Self {
             Self {
                 spec: RefCell::new(Some(spec)),
@@ -197,7 +259,7 @@ mod tests {
 
         /// Shortcut for tests that must assert Stage 2 is never reached.
         ///
-        /// If `read_domain_types_document` is called, the test panics immediately,
+        /// If `read_type_catalogue` is called, the test panics immediately,
         /// making regressions in the short-circuit logic observable.
         fn with_unreachable_dt(spec: BlobFetchResult<SpecDocument>) -> Self {
             Self { spec: RefCell::new(Some(spec)), dt: RefCell::new(None), dt_unreachable: true }
@@ -213,15 +275,14 @@ mod tests {
             self.spec.borrow_mut().take().expect("spec read called twice")
         }
 
-        fn read_domain_types_document(
+        fn read_type_catalogue(
             &self,
             _branch: &str,
             _track_id: &str,
-        ) -> BlobFetchResult<DomainTypesDocument> {
+            _layer_id: &str,
+        ) -> BlobFetchResult<TypeCatalogueDocument> {
             if self.dt_unreachable {
-                panic!(
-                    "Stage 2 must not be reached: read_domain_types_document was called unexpectedly"
-                );
+                panic!("Stage 2 must not be reached: read_type_catalogue was called unexpectedly");
             }
             self.dt.borrow_mut().take().expect("dt read called twice")
         }
@@ -272,11 +333,12 @@ mod tests {
             self.spec_result.clone()
         }
 
-        fn read_domain_types_document(
+        fn read_type_catalogue(
             &self,
             branch: &str,
             track_id: &str,
-        ) -> BlobFetchResult<DomainTypesDocument> {
+            _layer_id: &str,
+        ) -> BlobFetchResult<TypeCatalogueDocument> {
             *self.recorded_dt_branch.borrow_mut() = Some(branch.to_owned());
             *self.recorded_dt_track_id.borrow_mut() = Some(track_id.to_owned());
             BlobFetchResult::NotFound
@@ -319,37 +381,35 @@ mod tests {
         spec_doc_with_signals(Some(SignalCounts::new(5, 0, 0)))
     }
 
-    fn make_entry(name: &str) -> DomainTypeEntry {
-        DomainTypeEntry::new(name, "test", DomainTypeKind::ValueObject, TypeAction::Add, true)
-            .unwrap()
-    }
-
-    fn make_signal(name: &str, signal: ConfidenceSignal) -> DomainTypeSignal {
-        DomainTypeSignal::new(
+    fn make_entry(name: &str) -> TypeCatalogueEntry {
+        TypeCatalogueEntry::new(
             name,
-            "value_object",
-            signal,
+            "test",
+            TypeDefinitionKind::ValueObject,
+            TypeAction::Add,
             true,
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
         )
+        .unwrap()
     }
 
-    fn dt_all_blue() -> DomainTypesDocument {
-        let mut doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
+    fn make_signal(name: &str, signal: ConfidenceSignal) -> TypeSignal {
+        TypeSignal::new(name, "value_object", signal, true, Vec::new(), Vec::new(), Vec::new())
+    }
+
+    fn dt_all_blue() -> TypeCatalogueDocument {
+        let mut doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
         doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Blue)]);
         doc
     }
 
-    fn dt_with_yellow() -> DomainTypesDocument {
-        let mut doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
+    fn dt_with_yellow() -> TypeCatalogueDocument {
+        let mut doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
         doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Yellow)]);
         doc
     }
 
-    fn dt_with_red() -> DomainTypesDocument {
-        let mut doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
+    fn dt_with_red() -> TypeCatalogueDocument {
+        let mut doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
         doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Red)]);
         doc
     }
@@ -408,7 +468,7 @@ mod tests {
         // U5: spec=Blue, dt=empty entries → BLOCKED
         let reader = MockTrackBlobReader::new(
             BlobFetchResult::Found(all_blue_spec()),
-            BlobFetchResult::Found(DomainTypesDocument::new(1, Vec::new())),
+            BlobFetchResult::Found(TypeCatalogueDocument::new(1, Vec::new())),
         );
         let outcome = check_strict_merge_gate("track/foo", &reader);
         assert!(outcome.has_errors());
@@ -417,7 +477,8 @@ mod tests {
     #[test]
     fn test_u6_spec_blue_dt_coverage_gap_blocks() {
         // U6: spec=Blue, dt has entry with no matching signal → BLOCKED
-        let mut doc = DomainTypesDocument::new(1, vec![make_entry("TrackId"), make_entry("Other")]);
+        let mut doc =
+            TypeCatalogueDocument::new(1, vec![make_entry("TrackId"), make_entry("Other")]);
         doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Blue)]);
         let reader = MockTrackBlobReader::new(
             BlobFetchResult::Found(all_blue_spec()),
@@ -430,7 +491,7 @@ mod tests {
     #[test]
     fn test_u7_spec_blue_dt_signals_none_blocks() {
         // U7: spec=Blue, dt=None (unevaluated) → BLOCKED
-        let doc = DomainTypesDocument::new(1, vec![make_entry("TrackId")]);
+        let doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
         let reader = MockTrackBlobReader::new(
             BlobFetchResult::Found(all_blue_spec()),
             BlobFetchResult::Found(doc),
@@ -648,5 +709,201 @@ mod tests {
         let outcome = check_strict_merge_gate("track//foo", &reader);
         assert!(outcome.has_errors());
         assert!(outcome.findings().iter().any(|f| f.message().contains("invalid track id")));
+    }
+
+    // ===============================================================
+    // U19–U26 — multilayer merge gate tests (T007)
+    //
+    // A `MultiLayerMock` returns per-layer catalogue outcomes keyed by
+    // `layer_id`, and also drives `read_enabled_layers`. The 8 scenarios
+    // below exercise the AND-aggregation of findings across 2 layers.
+    // ===============================================================
+
+    struct MultiLayerMock {
+        spec: BlobFetchResult<SpecDocument>,
+        enabled_layers: BlobFetchResult<Vec<String>>,
+        catalogues: std::collections::HashMap<String, BlobFetchResult<TypeCatalogueDocument>>,
+    }
+
+    impl MultiLayerMock {
+        fn new(
+            spec: BlobFetchResult<SpecDocument>,
+            enabled_layers: Vec<String>,
+            catalogues: Vec<(&str, BlobFetchResult<TypeCatalogueDocument>)>,
+        ) -> Self {
+            Self {
+                spec,
+                enabled_layers: BlobFetchResult::Found(enabled_layers),
+                catalogues: catalogues.into_iter().map(|(k, v)| (k.to_owned(), v)).collect(),
+            }
+        }
+
+        fn with_enabled_layer_error(spec: BlobFetchResult<SpecDocument>, error: &str) -> Self {
+            Self {
+                spec,
+                enabled_layers: BlobFetchResult::FetchError(error.to_owned()),
+                catalogues: std::collections::HashMap::new(),
+            }
+        }
+    }
+
+    impl TrackBlobReader for MultiLayerMock {
+        fn read_spec_document(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<SpecDocument> {
+            self.spec.clone()
+        }
+
+        fn read_type_catalogue(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+            layer_id: &str,
+        ) -> BlobFetchResult<TypeCatalogueDocument> {
+            self.catalogues.get(layer_id).cloned().unwrap_or(BlobFetchResult::NotFound)
+        }
+
+        fn read_track_metadata(
+            &self,
+            _branch: &str,
+            _track_id: &str,
+        ) -> BlobFetchResult<TrackMetadata> {
+            panic!("read_track_metadata must not be called by merge_gate tests")
+        }
+
+        fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
+            self.enabled_layers.clone()
+        }
+    }
+
+    #[test]
+    fn test_u19_two_layers_both_not_found_passes() {
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(!outcome.has_errors(), "both layers NotFound must pass: {outcome:?}");
+    }
+
+    #[test]
+    fn test_u20_two_layers_both_all_blue_passes() {
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![
+                ("domain", BlobFetchResult::Found(dt_all_blue())),
+                ("usecase", BlobFetchResult::Found(dt_all_blue())),
+            ],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(!outcome.has_errors(), "both all-Blue must pass: {outcome:?}");
+    }
+
+    #[test]
+    fn test_u21_two_layers_one_blue_one_red_blocks() {
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![
+                ("domain", BlobFetchResult::Found(dt_all_blue())),
+                ("usecase", BlobFetchResult::Found(dt_with_red())),
+            ],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(outcome.has_errors(), "Red in usecase must block: {outcome:?}");
+    }
+
+    #[test]
+    fn test_u22_two_layers_one_not_found_one_blue_passes() {
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![("domain", BlobFetchResult::Found(dt_all_blue()))],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            !outcome.has_errors(),
+            "NotFound for usecase + Blue for domain must pass: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u23_two_layers_one_yellow_one_blue_blocks_strict() {
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![
+                ("domain", BlobFetchResult::Found(dt_all_blue())),
+                ("usecase", BlobFetchResult::Found(dt_with_yellow())),
+            ],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            outcome.has_errors(),
+            "Yellow in strict mode must block even with the other layer Blue: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u24_two_layers_one_fetch_error_one_blue_blocks() {
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![
+                ("domain", BlobFetchResult::Found(dt_all_blue())),
+                ("usecase", BlobFetchResult::FetchError("network".to_string())),
+            ],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(outcome.has_errors(), "FetchError must block: {outcome:?}");
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("failed to read usecase-types.json")),
+            "error message must mention the failing layer: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u25_read_enabled_layers_not_found_fails_closed() {
+        // Fail-closed: removing / renaming architecture-rules.json on the
+        // PR branch must not bypass Stage 2 enforcement. The strict merge
+        // gate reports an error that mentions the missing file.
+        let reader = MultiLayerMock {
+            spec: BlobFetchResult::Found(all_blue_spec()),
+            enabled_layers: BlobFetchResult::NotFound,
+            catalogues: std::collections::HashMap::new(),
+        };
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            outcome.has_errors(),
+            "architecture-rules.json NotFound must fail-closed: {outcome:?}"
+        );
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("architecture-rules.json not found")),
+            "error must mention architecture-rules.json: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u26_read_enabled_layers_fetch_error_blocks() {
+        let reader = MultiLayerMock::with_enabled_layer_error(
+            BlobFetchResult::Found(all_blue_spec()),
+            "git show failed",
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(outcome.has_errors(), "architecture-rules.json FetchError must block");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("architecture-rules.json")),
+            "error must mention architecture-rules.json: {outcome:?}"
+        );
     }
 }

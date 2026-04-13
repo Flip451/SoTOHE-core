@@ -46,7 +46,15 @@
       "crate": "domain",
       "path": "libs/domain",
       "may_depend_on": [],
-      "deny_reason": "Domain dependencies are controlled by layer boundaries."
+      "deny_reason": "Domain dependencies are controlled by layer boundaries.",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "domain-types.json",
+        "schema_export": {
+          "method": "rustdoc",
+          "targets": ["domain"]
+        }
+      }
     },
     {
       "crate": "usecase",
@@ -54,7 +62,10 @@
       "may_depend_on": [
         "domain"
       ],
-      "deny_reason": "Usecase crate must only be consumed by the cli layer."
+      "deny_reason": "Usecase crate must only be consumed by the cli layer.",
+      "tddd": {
+        "enabled": false
+      }
     },
     {
       "crate": "infrastructure",
@@ -63,7 +74,10 @@
         "domain",
         "usecase"
       ],
-      "deny_reason": "Infrastructure implements usecase ports and domain ports; wired at composition root."
+      "deny_reason": "Infrastructure implements usecase ports and domain ports; wired at composition root.",
+      "tddd": {
+        "enabled": false
+      }
     },
     {
       "crate": "cli",
@@ -73,7 +87,10 @@
         "infrastructure",
         "usecase"
       ],
-      "deny_reason": ""
+      "deny_reason": "",
+      "tddd": {
+        "enabled": false
+      }
     }
   ]
 }
