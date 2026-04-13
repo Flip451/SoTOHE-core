@@ -1,6 +1,70 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
+          "at": "2026-04-13T13:45:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
+          "at": "2026-04-13T13:47:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5240666f29ac533d80fe2598962f11a0bbc6c2feec5d04b72940b1d956b30593",
+          "at": "2026-04-13T14:14:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5240666f29ac533d80fe2598962f11a0bbc6c2feec5d04b72940b1d956b30593",
+          "at": "2026-04-13T14:17:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63f63f8f982c8c53e9406b961c0bbeaf698e1b0afc500c0ea19be2173af52114",
+          "at": "2026-04-13T14:28:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63f63f8f982c8c53e9406b961c0bbeaf698e1b0afc500c0ea19be2173af52114",
+          "at": "2026-04-13T14:30:36Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
+          "at": "2026-04-13T13:54:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
+          "at": "2026-04-13T13:56:34Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -1029,70 +1093,35 @@
           "findings": [],
           "hash": "rvw1:sha256:9a260090240c0d69584d0a2d93568521b3a7dc637d046168dfdb80a1ed13db4b",
           "at": "2026-04-13T15:07:31Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
-          "at": "2026-04-13T13:54:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
-          "at": "2026-04-13T13:56:34Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
-          "at": "2026-04-13T13:45:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
-          "at": "2026-04-13T13:47:56Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5240666f29ac533d80fe2598962f11a0bbc6c2feec5d04b72940b1d956b30593",
-          "at": "2026-04-13T14:14:57Z"
+          "hash": "rvw1:sha256:774542146f0c85629f681e52c546ccf78227d35bf2eb4ddaffc3d7ed41346281",
+          "at": "2026-04-13T15:14:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T016 is marked complete even though this deletion removes the only coverage for `workspace_graph` edge cases around build-dependency filtering and metadata fallbacks (`dep_kinds` missing / `deps` absent). `libs/infrastructure/src/verify/layers.rs` still has those branches, but its Rust tests only cover clean/direct/transitive/dev-dependency/BFS cases, so this cleanup leaves `check-layers` without regression tests for real `cargo metadata` variants.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/plan.md",
+              "line": 64,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:774542146f0c85629f681e52c546ccf78227d35bf2eb4ddaffc3d7ed41346281",
+          "at": "2026-04-13T15:17:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5240666f29ac533d80fe2598962f11a0bbc6c2feec5d04b72940b1d956b30593",
-          "at": "2026-04-13T14:17:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:63f63f8f982c8c53e9406b961c0bbeaf698e1b0afc500c0ea19be2173af52114",
-          "at": "2026-04-13T14:28:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:63f63f8f982c8c53e9406b961c0bbeaf698e1b0afc500c0ea19be2173af52114",
-          "at": "2026-04-13T14:30:36Z"
+          "hash": "rvw1:sha256:774542146f0c85629f681e52c546ccf78227d35bf2eb4ddaffc3d7ed41346281",
+          "at": "2026-04-13T15:18:13Z"
         }
       ]
     }
