@@ -2,7 +2,7 @@
 
 > **出典**: `tmp/review-2026-03-10.md`（Gemini による包括的レビュー）
 > **作成日**: 2026-03-11
-> **最終更新**: 2026-04-06
+> **最終更新**: 2026-04-13
 > **アーカイブ**: 解決済み項目は `tmp/TODO-archived-2026-03-16.md` に移動済み
 > **全体計画**: [`knowledge/strategy/TODO-PLAN.md`](TODO-PLAN.md)（v3: ハーネス vs テンプレート出力の区別）
 > **全体計画 (旧版)**: `tmp/archive-2026-03-20/`
@@ -880,6 +880,8 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
   - **既存トラック互換**: 新規トラックのみ新フォーマット適用。完了/アーカイブ済みトラックはマイグレーション不要。`schema_version` で新旧を区別し、codec 内部で後方互換を吸収
   - **ビジョンとの整合**: 探索的精緻化ループが SSoT 上で閉じる。信号機の `signal` フィールドが Phase 2 (TODO-PLAN 2-1 TSUMIKI-01) の基盤になる
   - **実装タイミング**: CLI-02 完了後に metadata.json codec を触るタイミングで Phase 2-3 を実装するのが効率的
+
+- [ ] **WF-81** (HIGH): `/track:plan` workflow validator CLI — `cargo make track-validate <id>` を追加し、`/track:review` (外部 codex reviewer) 起動前の self-check を CLI 化する。2026-04-13 `scripts-phase1-rustify-2026-04-13` track で **34 rounds** の review loop に陥った経験から、pedantic な text correctness finding の過半数が事前 validator で検出可能だった (CLI flag 誤記 / test 名誤記 / task_refs stale / updated_at stale / content_hash stale / selftest list 不整合 / ファイル削除順序の依存グラフ違反 / `feedback —` 単独 source の Yellow 化 等)。チェック観点: (1) 削除予定 / 残存予定ファイルの allowlist 整合、(2) spec.json の `task_refs` → metadata.json task ID 整合、(3) section `task_ids` の exactly-once referencing (既存 `validate_plan_invariants()` を再利用)、(4) `updated_at` / `content_hash` の最新化 (spec.json 編集後の re-approve 忘れ検出)、(5) scripts/ 内 import 依存グラフと削除順序の整合 (`from X import ...` を try/except 内 indented 含めて grep)、(6) source 文字列の Blue/Yellow/Red 分類 dry-run、(7) 言及された Rust 関数名 / CLI 引数名 / Python test 名の実コード grep 照合。`~/.claude/projects/.../memory/feedback_self_review_before_codex.md` の checklist を実装ロジックとして反映する。34 rounds × 数分/round = 数時間を毎 planning で節約可能、reviewer コンピュート削減効果も大きい。出典: scripts-phase1-rustify-2026-04-13 track planning experience 2026-04-13.
 
 ---
 

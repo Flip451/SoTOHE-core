@@ -91,6 +91,23 @@ pub(super) fn verify_branch_guard<R: TrackReader>(
     track_id: &TrackId,
     repo_dir: &std::path::Path,
 ) -> Result<(), String> {
+    // Read metadata first: branchless tracks skip the guard without touching git.
+    let track = reader
+        .find(track_id)
+        .map_err(|e| format!("failed to read track: {e}"))?
+        .ok_or_else(|| format!("track '{track_id}' not found"))?;
+    if track.branch().is_none() {
+        return Ok(());
+    }
+    let actual = current_git_branch(repo_dir)?;
+    verify_branch_guard_with_branch(reader, track_id, &actual)
+}
+
+pub(super) fn verify_branch_guard_with_branch<R: TrackReader>(
+    reader: &R,
+    track_id: &TrackId,
+    current_branch: &str,
+) -> Result<(), String> {
     let track = reader
         .find(track_id)
         .map_err(|e| format!("failed to read track: {e}"))?
@@ -101,16 +118,14 @@ pub(super) fn verify_branch_guard<R: TrackReader>(
         None => return Ok(()), // branch=null → skip guard
     };
 
-    let actual = current_git_branch(repo_dir)?;
-
     // Detached HEAD → reject (ambiguous state).
-    if actual == "HEAD" {
+    if current_branch == "HEAD" {
         return Err(format!("detached HEAD — expected branch '{expected_branch}', cannot verify"));
     }
 
-    if actual != expected_branch.as_ref() {
+    if current_branch != expected_branch.as_ref() {
         return Err(format!(
-            "current branch '{actual}' does not match expected '{expected_branch}'"
+            "current branch '{current_branch}' does not match expected '{expected_branch}'"
         ));
     }
 
@@ -131,4 +146,124 @@ fn current_git_branch(cwd: &std::path::Path) -> Result<String, String> {
 
     let branch = String::from_utf8_lossy(&output.stdout).trim().to_owned();
     Ok(branch)
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+mod tests {
+    use std::collections::HashMap;
+    use std::sync::Mutex;
+
+    use domain::{
+        PlanSection, PlanView, RepositoryError, TrackBranch, TrackMetadata, TrackReadError,
+        TrackTask,
+    };
+
+    use super::*;
+
+    struct StubReader {
+        tracks: Mutex<HashMap<TrackId, TrackMetadata>>,
+    }
+
+    impl StubReader {
+        fn new() -> Self {
+            Self { tracks: Mutex::new(HashMap::new()) }
+        }
+
+        fn insert(&self, track: TrackMetadata) {
+            self.tracks.lock().unwrap().insert(track.id().clone(), track);
+        }
+    }
+
+    impl TrackReader for StubReader {
+        fn find(&self, id: &TrackId) -> Result<Option<TrackMetadata>, TrackReadError> {
+            Ok(self.tracks.lock().unwrap().get(id).cloned())
+        }
+    }
+
+    struct FailingReader;
+
+    impl TrackReader for FailingReader {
+        fn find(&self, _id: &TrackId) -> Result<Option<TrackMetadata>, TrackReadError> {
+            Err(RepositoryError::Message("corrupt metadata".to_owned()).into())
+        }
+    }
+
+    fn sample_track(id: &str, branch: Option<&str>) -> TrackMetadata {
+        let task_id = TaskId::try_new("T1").unwrap();
+        let task = TrackTask::new(task_id.clone(), "Test task").unwrap();
+        let section = PlanSection::new("S1", "Test", Vec::new(), vec![task_id]).unwrap();
+        let plan = PlanView::new(Vec::new(), vec![section]);
+        TrackMetadata::with_branch(
+            TrackId::try_new(id).unwrap(),
+            branch.map(|b| TrackBranch::try_new(b).unwrap()),
+            "Test Track",
+            vec![task],
+            plan,
+            None,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn verify_branch_guard_with_branch_matching_branch_passes() {
+        let reader = StubReader::new();
+        reader.insert(sample_track("test", Some("track/test")));
+        let id = TrackId::try_new("test").unwrap();
+        assert!(verify_branch_guard_with_branch(&reader, &id, "track/test").is_ok());
+    }
+
+    #[test]
+    fn verify_branch_guard_with_branch_mismatched_branch_raises() {
+        let reader = StubReader::new();
+        reader.insert(sample_track("test", Some("track/test")));
+        let id = TrackId::try_new("test").unwrap();
+        let err = verify_branch_guard_with_branch(&reader, &id, "track/other").unwrap_err();
+        assert!(err.contains("track/test"), "error should reference expected branch: {err}");
+        assert!(err.contains("track/other"), "error should reference actual branch: {err}");
+    }
+
+    #[test]
+    fn verify_branch_guard_with_branch_null_branch_skips_guard() {
+        let reader = StubReader::new();
+        reader.insert(sample_track("test", None));
+        let id = TrackId::try_new("test").unwrap();
+        assert!(verify_branch_guard_with_branch(&reader, &id, "any/branch").is_ok());
+    }
+
+    #[test]
+    fn verify_branch_guard_with_branch_detached_head_raises() {
+        let reader = StubReader::new();
+        reader.insert(sample_track("test", Some("track/test")));
+        let id = TrackId::try_new("test").unwrap();
+        let err = verify_branch_guard_with_branch(&reader, &id, "HEAD").unwrap_err();
+        assert!(err.contains("detached"), "error should mention detached HEAD: {err}");
+    }
+
+    #[test]
+    fn verify_branch_guard_with_branch_corrupt_metadata_raises() {
+        let reader = FailingReader;
+        let id = TrackId::try_new("test").unwrap();
+        let err = verify_branch_guard_with_branch(&reader, &id, "track/test").unwrap_err();
+        assert!(
+            err.contains("failed to read track"),
+            "error should propagate reader failure: {err}"
+        );
+    }
+
+    /// Verifies that `verify_branch_guard` skips the git subprocess entirely for
+    /// branchless tracks. A non-existent `repo_dir` is intentional: if the guard
+    /// ever regresses to calling `current_git_branch` before the null-branch check,
+    /// the subprocess will fail in a missing directory and the test will catch it.
+    #[test]
+    fn verify_branch_guard_null_branch_skips_git() {
+        let reader = StubReader::new();
+        reader.insert(sample_track("test", None));
+        let id = TrackId::try_new("test").unwrap();
+        let nonexistent = std::path::Path::new("/nonexistent/repo/dir");
+        assert!(
+            verify_branch_guard(&reader, &id, nonexistent).is_ok(),
+            "branchless track must return Ok without running git"
+        );
+    }
 }
