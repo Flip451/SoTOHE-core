@@ -169,7 +169,7 @@
     {
       "description": "[Cleanup] `scripts/track_state_machine.py` と `scripts/test_track_state_machine.py` を削除する (planner 推奨の選択肢 B: ファイル全体削除)。本番パスは sotp CLI に委譲済みで Python fallback は dead path、CLI level regression は T014 で Rust integration test に移植済み。`Makefile.toml:109-128` の `scripts-selftest-local` args リストからは `scripts/test_track_state_machine.py` が T003 で既に除外済みのため、Makefile.toml の変更は不要。`track_state_machine.py` は `track_branch_guard` / `track_schema` / `track_resolution` を import するが、ファイル全体を削除するため依存ごと消える。`add_task` / `next_open_task` / `task_counts` / `set_track_override` 相当は `libs/usecase` / `libs/domain` + `apps/cli/src/commands/track/state_ops.rs` で既に Rust 実装済み。",
       "id": "T015",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "[Cleanup] `scripts/test_check_layers.py` を削除する (完全な dead code)。このファイルは先頭行 `import scripts.check_layers as check_layers` が即 ImportError で実行不可能。`check_layers.py` は既に `libs/infrastructure/src/verify/layers.rs` に移植・削除済みで、`#[cfg(test)] mod tests` で `test_clean_workspace_passes` / `test_direct_violation_detected` / `test_transitive_violation_detected` / `test_dev_dependencies_ignored` / `test_reachable_paths_bfs_order` 等の同等テストが網羅されている。`scripts-selftest-local` 対象外であることは既に確認済みのため Makefile.toml の変更は不要。T001 と並列実施可能。",
@@ -183,5 +183,5 @@
     }
   ],
   "title": "scripts/ Python ヘルパー削減 フェーズ1 — track_branch_guard / markdown / registry / state_machine の Rust 移植",
-  "updated_at": "2026-04-13T14:52:34Z"
+  "updated_at": "2026-04-13T15:03:42Z"
 }
