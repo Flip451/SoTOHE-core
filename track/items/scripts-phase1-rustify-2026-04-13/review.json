@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
-          "at": "2026-04-13T13:54:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
-          "at": "2026-04-13T13:56:34Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -957,6 +939,82 @@
           "findings": [],
           "hash": "rvw1:sha256:af82a4b05891c9e4bb13bed1e80b9a54618e5d34bb86e518fe69d2699643bd64",
           "at": "2026-04-13T14:47:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6c498abbbd5fd321c7b64c9d43354428df38ad934dac209eaed20be1ee0c370",
+          "at": "2026-04-13T14:54:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a6c498abbbd5fd321c7b64c9d43354428df38ad934dac209eaed20be1ee0c370",
+          "at": "2026-04-13T14:57:12Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9373cdc00fb3a4055cae98e28ef813fb6da662e7c558051a5bde84db27993ae7",
+          "at": "2026-04-13T13:12:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_branch_guard()` now calls `current_git_branch(repo_dir)?` before it loads the track metadata. Before this change, tracks with `branch: null` returned `Ok(())` without touching git; after the refactor, the same branchless track will fail in any non-git cwd (or if `git rev-parse` fails) even though the guard is supposed to be skipped. This is a behavior regression in the production path and also masks track-read errors behind git errors.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/track/transition.rs",
+              "line": 94,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:9373cdc00fb3a4055cae98e28ef813fb6da662e7c558051a5bde84db27993ae7",
+          "at": "2026-04-13T13:15:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The null-branch regression fix in `verify_branch_guard()` is still untested: every new test calls `verify_branch_guard_with_branch()` directly, so the suite never exercises the production path that must return before `current_git_branch()` runs. A future refactor could move the git lookup ahead of the `branch().is_none()` check and reintroduce the branchless-track failure in non-git directories without any test catching it.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/transition.rs",
+              "line": 89,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:1774c80de9f26ba53d5b5917d6e6b9c0cf05b623aab9fd71a2eae9455f6a8229",
+          "at": "2026-04-13T13:19:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cabd11ed67b697ec93bcc661d5dac7b6d470b9fd681a9e957c5eb22b6dd2c48",
+          "at": "2026-04-13T13:22:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4b4cc8a82e32d459fecf03cb9e7be17458fc445f37a30d7b3aa825e243969b7",
+          "at": "2026-04-13T14:55:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4b4cc8a82e32d459fecf03cb9e7be17458fc445f37a30d7b3aa825e243969b7",
+          "at": "2026-04-13T15:00:10Z"
         }
       ]
     },
@@ -1006,51 +1064,21 @@
         }
       ]
     },
-    "cli": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9373cdc00fb3a4055cae98e28ef813fb6da662e7c558051a5bde84db27993ae7",
-          "at": "2026-04-13T13:12:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`verify_branch_guard()` now calls `current_git_branch(repo_dir)?` before it loads the track metadata. Before this change, tracks with `branch: null` returned `Ok(())` without touching git; after the refactor, the same branchless track will fail in any non-git cwd (or if `git rev-parse` fails) even though the guard is supposed to be skipped. This is a behavior regression in the production path and also masks track-read errors behind git errors.",
-              "severity": "P0",
-              "file": "apps/cli/src/commands/track/transition.rs",
-              "line": 94,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:9373cdc00fb3a4055cae98e28ef813fb6da662e7c558051a5bde84db27993ae7",
-          "at": "2026-04-13T13:15:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The null-branch regression fix in `verify_branch_guard()` is still untested: every new test calls `verify_branch_guard_with_branch()` directly, so the suite never exercises the production path that must return before `current_git_branch()` runs. A future refactor could move the git lookup ahead of the `branch().is_none()` check and reintroduce the branchless-track failure in non-git directories without any test catching it.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/transition.rs",
-              "line": 89,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:1774c80de9f26ba53d5b5917d6e6b9c0cf05b623aab9fd71a2eae9455f6a8229",
-          "at": "2026-04-13T13:19:29Z"
+          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
+          "at": "2026-04-13T13:54:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9cabd11ed67b697ec93bcc661d5dac7b6d470b9fd681a9e957c5eb22b6dd2c48",
-          "at": "2026-04-13T13:22:18Z"
+          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
+          "at": "2026-04-13T13:56:34Z"
         }
       ]
     }
