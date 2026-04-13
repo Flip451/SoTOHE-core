@@ -159,12 +159,18 @@ fn load_tddd_layers(trusted_root: &Path) -> Result<Vec<TdddLayerBinding>, Findin
     let bindings = parse_tddd_layers(&content)
         .map_err(|e| Finding::error(format!("{}: {e}", path.display())))?;
     // T007 fail-closed: a parsed-but-empty binding list (every layer
-    // `tddd.enabled = false`, or a legacy rules file without `tddd` blocks)
-    // must not silently skip Stage 2. Fall back to the synthetic domain
-    // binding so `domain-types.json` is still evaluated when present — this
-    // preserves the previous CI behavior for legacy / partially-migrated
-    // rules files.
-    if bindings.is_empty() { default_domain_binding() } else { Ok(bindings) }
+    // `tddd.enabled = false`, or a rules file without any `tddd` blocks)
+    // is treated as a configuration error. Silently skipping Stage 2 would
+    // let CI pass on a rules file that disabled every layer, which breaks
+    // the strict enforcement contract shared with `check_strict_merge_gate`.
+    if bindings.is_empty() {
+        return Err(Finding::error(format!(
+            "{}: architecture-rules.json declares no tddd.enabled layers — \
+             the type-signal gate cannot verify an empty layer set",
+            path.display()
+        )));
+    }
+    Ok(bindings)
 }
 
 /// Returns the fallback binding used when `architecture-rules.json` is

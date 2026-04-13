@@ -154,12 +154,21 @@ pub fn execute_baseline_capture(
     Ok(ExitCode::SUCCESS)
 }
 
-/// Fails closed unless `domain` is a `tddd.enabled=true` layer in the
-/// workspace's `architecture-rules.json`.
+/// Fails closed on two Phase 1 invariants:
 ///
-/// When the rules file does not exist, we allow the legacy fallback (there
-/// is nothing to contradict). When it exists, the parse must succeed AND
-/// include `domain` among the enabled layers.
+/// 1. `domain` must be `tddd.enabled=true` in `architecture-rules.json` —
+///    otherwise `baseline-capture` would overwrite `domain-types-baseline.json`
+///    for a layer the rest of the pipeline treats as opted out.
+///
+/// 2. No layer other than `domain` may be `tddd.enabled=true`. Phase 1
+///    only wires the `domain` layer; if `usecase` / `infrastructure` / `cli`
+///    were also enabled, a no-filter `baseline-capture` invocation would
+///    capture only the domain baseline and silently leave other enabled
+///    layers without a baseline. The caller must either disable those
+///    layers or wait for Phase 2 wiring.
+///
+/// When the rules file does not exist we allow the legacy fallback (there
+/// is nothing to contradict).
 fn enforce_domain_tddd_enabled(workspace_root: &std::path::Path) -> Result<(), CliError> {
     let rules_path = workspace_root.join("architecture-rules.json");
     if !rules_path.is_file() {
@@ -176,6 +185,17 @@ fn enforce_domain_tddd_enabled(workspace_root: &std::path::Path) -> Result<(), C
              Enable `domain.tddd.enabled = true` or remove `--layer domain`."
                 .to_owned(),
         ));
+    }
+    let non_domain: Vec<&str> =
+        bindings.iter().map(|b| b.layer_id()).filter(|id| *id != "domain").collect();
+    if !non_domain.is_empty() {
+        return Err(CliError::Message(format!(
+            "architecture-rules.json has tddd.enabled layers that are not yet supported \
+             by `baseline-capture` in Phase 1: {joined}. Disable those layers \
+             (`tddd.enabled = false`) or wait for Phase 2 wiring before running \
+             `baseline-capture`.",
+            joined = non_domain.join(", ")
+        )));
     }
     Ok(())
 }

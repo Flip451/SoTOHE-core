@@ -134,6 +134,9 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         // T007: read `architecture-rules.json` from the PR branch blob so
         // that tracks which modify the rules file itself are evaluated
         // against their own layer definitions (not the local workspace).
+        // An empty binding list (legacy rules file, or a PR that disables
+        // every layer) is returned verbatim — the usecase gate is the
+        // fail-closed authority and will reject an empty set explicitly.
         let text = match self.fetch_string::<Vec<String>>(branch, "architecture-rules.json") {
             Ok(s) => s,
             Err(result) => return result,
@@ -146,14 +149,6 @@ impl TrackBlobReader for GitShowTrackBlobReader {
                 ));
             }
         };
-        // Fallback: when the rules file parses but contains no tddd.enabled
-        // layers (legacy rules file, or a PR that disables every layer),
-        // return a synthetic `["domain"]` list so the merge gate still
-        // evaluates the domain catalogue. This preserves the pre-T007 gate
-        // behavior and prevents a silent bypass.
-        if bindings.is_empty() {
-            return BlobFetchResult::Found(vec!["domain".to_string()]);
-        }
         BlobFetchResult::Found(bindings.iter().map(|b| b.layer_id().to_owned()).collect())
     }
 
