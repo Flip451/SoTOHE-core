@@ -144,7 +144,7 @@
     {
       "description": "[Cleanup] `scripts/track_markdown.py` と `scripts/test_track_markdown.py` を削除する。`Makefile.toml:109-128` の `scripts-selftest-local` args リストから `scripts/test_track_markdown.py` を除外する。`track_markdown.py` は `track_schema` を import するが、ファイル全体を削除するため依存ごと消える。`track_markdown.py` を import する他の Python ファイルは存在しないことを確認する (test_track_markdown.py のみ依存)。Python 固有の `summarize_plan` 系 35 テスト (チェックボックス正規化の双方向パース) は Rust の一方向 render_plan では観点自体が陳腐化しているため移植対象外と判断する。",
       "id": "T010",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "[Red] `libs/infrastructure/src/track/render.rs::tests` に `render_registry()` / `collect_track_snapshots()` / `sync_rendered_views()` の境界観点テストを追加する。観点: (1) `track/items` 配下にファイル (ディレクトリではなく) が存在する場合に空リストを返す / (2) 同時刻 updated_at の場合に track_id 順の安定ソートになる / (3) `sync_rendered_views()` が registry.md の内容が unchanged の場合に changed set に含めない。これらは `scripts/test_track_registry.py` の未カバー境界観点 3 件を網羅する。",
@@ -183,5 +183,5 @@
     }
   ],
   "title": "scripts/ Python ヘルパー削減 フェーズ1 — track_branch_guard / markdown / registry / state_machine の Rust 移植",
-  "updated_at": "2026-04-13T14:13:08Z"
+  "updated_at": "2026-04-13T14:20:28Z"
 }
