@@ -190,11 +190,12 @@
       "status": "done"
     },
     {
+      "commit_hash": "355282f0a4893bfe657696c0f7413b0a21239835",
       "description": "[Verify] `cargo make ci` を実行して `ci-local` gate 全サブタスク (Makefile.toml:595: fmt-check / clippy / test / deny / check-layers / verify-arch-docs / verify-spec-states-current-local / test-doc / python-lint / scripts-selftest / verify-doc-links / verify-track-metadata / verify-view-freshness 等) が pass することを確認する。`cargo make scripts-selftest` も併せて実行し、削除後の selftest 対象 (`test_architecture_rules.py` / `test_atomic_write.py` / `test_convention_docs.py` / `test_external_guides.py` / `test_make_wrappers.py` / `test_track_resolution.py`) が pass することを確認する。Phase 1 完了時点で `scripts/` 配下の tracked file 集合が以下 15 ファイルと **完全一致** すること (削除対象 10 件の不在 AND 残存 15 件の存在 AND その他の想定外ファイルが無いこと、の 3 条件を同時に満たす): `__init__.py`, `conftest.py`, `architecture_rules.py`, `test_architecture_rules.py`, `atomic_write.py`, `test_atomic_write.py`, `convention_docs.py`, `test_convention_docs.py`, `external_guides.py`, `test_external_guides.py`, `track_schema.py`, `track_resolution.py`, `test_track_resolution.py`, `test_make_wrappers.py`, `test_verify_scripts.py`。削除対象は `track_branch_guard.py` / `test_track_branch_guard.py` / `track_markdown.py` / `test_track_markdown.py` / `track_registry.py` / `test_track_registry.py` / `track_state_machine.py` / `test_track_state_machine.py` / `test_track_schema.py` / `test_check_layers.py` の 10 件。完全一致性を verify する手段は実装時に環境 (worktree vs index, `__pycache__` の有無 等) に応じて選択する (`find` / `git ls-files` / `ls` の組み合わせ) — 本質は「3 条件の同時成立」であり、具体コマンドは問わない。",
       "id": "T017",
       "status": "done"
     }
   ],
   "title": "scripts/ Python ヘルパー削減 フェーズ1 — track_branch_guard / markdown / registry / state_machine の Rust 移植",
-  "updated_at": "2026-04-13T15:22:40Z"
+  "updated_at": "2026-04-13T15:57:02Z"
 }
