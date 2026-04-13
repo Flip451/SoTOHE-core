@@ -1277,6 +1277,198 @@ mod tests {
     }
 
     #[test]
+    fn validate_track_document_rejects_unreferenced_task() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        // T002 is declared in tasks but not referenced from any plan section.
+        std::fs::write(
+            &metadata_path,
+            r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": "track/track-a",
+  "title": "Track A",
+  "status": "planned",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T02:00:00Z",
+  "tasks": [
+    { "id": "T001", "description": "Referenced task", "status": "todo" },
+    { "id": "T002", "description": "Unreferenced task", "status": "todo" }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      { "id": "S1", "title": "Build", "description": [], "task_ids": ["T001"] }
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+
+        let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
+
+        let message = err.to_string();
+        assert!(
+            message.contains("T002"),
+            "error should reference unreferenced task id T002: {message}"
+        );
+    }
+
+    #[test]
+    fn validate_track_document_rejects_duplicate_task_reference() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        // T001 is referenced by both S1 and S2 sections.
+        std::fs::write(
+            &metadata_path,
+            r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": "track/track-a",
+  "title": "Track A",
+  "status": "planned",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T02:00:00Z",
+  "tasks": [
+    { "id": "T001", "description": "Shared task", "status": "todo" }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      { "id": "S1", "title": "First",  "description": [], "task_ids": ["T001"] },
+      { "id": "S2", "title": "Second", "description": [], "task_ids": ["T001"] }
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+
+        let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
+
+        let message = err.to_string();
+        assert!(
+            message.contains("T001"),
+            "error should reference duplicated task id T001: {message}"
+        );
+    }
+
+    #[test]
+    fn validate_track_document_rejects_status_drift_in_progress_vs_done() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        // metadata.status is "in_progress" but all tasks are done (derived = "done").
+        std::fs::write(
+            &metadata_path,
+            r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": "track/track-a",
+  "title": "Track A",
+  "status": "in_progress",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T02:00:00Z",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Completed task",
+      "status": "done",
+      "commit_hash": "abc1234"
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      { "id": "S1", "title": "Build", "description": [], "task_ids": ["T001"] }
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+
+        let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
+
+        let message = err.to_string();
+        assert!(message.contains("Status drift"), "error should mention status drift: {message}");
+    }
+
+    #[test]
+    fn validate_track_document_rejects_archived_with_incomplete_tasks() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        // metadata.status is "archived" but one task is still "todo".
+        std::fs::write(
+            &metadata_path,
+            r#"{
+  "schema_version": 3,
+  "id": "track-a",
+  "branch": "track/track-a",
+  "title": "Track A",
+  "status": "archived",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T02:00:00Z",
+  "tasks": [
+    { "id": "T001", "description": "Unfinished task", "status": "todo" }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      { "id": "S1", "title": "Build", "description": [], "task_ids": ["T001"] }
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+
+        let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        let err = validate_track_document(&metadata_path, track_dir.file_name(), &doc).unwrap_err();
+
+        let message = err.to_string();
+        assert!(
+            message.contains("archived track must have all tasks resolved"),
+            "error should mention archived+incomplete rejection: {message}"
+        );
+    }
+
+    #[test]
+    fn validate_track_document_accepts_id_with_git_substring_in_segment() {
+        // "legit" contains "git" as a substring but is not a whole segment,
+        // so reserved-id matching must not reject the track.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/legit-cleanup-2026-03-11");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let metadata_path = track_dir.join("metadata.json");
+        std::fs::write(
+            &metadata_path,
+            sample_metadata_json_with_branch(
+                "legit-cleanup-2026-03-11",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[
+    { "id": "T001", "description": "First task", "status": "todo" }
+  ]"#,
+                None,
+            ),
+        )
+        .unwrap();
+
+        let doc = serde_json::from_str(&std::fs::read_to_string(&metadata_path).unwrap()).unwrap();
+        let result = validate_track_document(&metadata_path, track_dir.file_name(), &doc);
+
+        assert!(result.is_ok(), "legit-cleanup-* must be accepted, got: {result:?}");
+    }
+
+    #[test]
     fn sync_rendered_views_generates_spec_md_from_spec_json() {
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/track-a");

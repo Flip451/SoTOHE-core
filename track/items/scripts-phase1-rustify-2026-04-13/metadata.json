@@ -106,6 +106,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "ae3578fef6e18603158cf6ae51d3250c9c714929",
       "description": "[Cleanup] `scripts/track_branch_guard.py` と `scripts/test_track_branch_guard.py` を削除する。`Makefile.toml:109-128` の `scripts-selftest-local` args リストから `scripts/test_track_branch_guard.py` と `scripts/test_track_state_machine.py` の両方を除外する。注意: T002 完了後に削除すること。`scripts/track_state_machine.py` がまだ `from track_branch_guard import verify_track_branch` で import しているため、`track_branch_guard.py` 削除後は `test_track_state_machine.py` が ImportError で fail する。したがって `scripts-selftest-local` から `test_track_state_machine.py` もこの時点で除外しなければならない (T015 を待つのではなく T003 で先行除外する)。`test_track_state_machine.py` 自体の削除は T015 で行う。`cargo make scripts-selftest` が fail しないことを確認する。",
       "id": "T003",
       "status": "done"
@@ -113,12 +114,12 @@
     {
       "description": "[Red] `libs/infrastructure/src/track/render.rs::tests` に `validate_track_document()` 経由での domain 層バリデーション確認テストを追加する。観点: (1) UnreferencedTask の伝播確認 (tasks に T002 があるが sections の task_ids に含まれない場合) — domain 層の `validate_plan_invariants()` で既に実装、`codec::decode()` 経由で伝播することを確認, (2) DuplicateTaskReference の伝播確認 (T001 が S1 と S2 の両方で参照される場合) — 同上, (3) status drift の拒否 (tasks が全 done なのに track status が in_progress の場合), (4) archived + incomplete tasks の拒否 (status=archived で todo/in_progress タスクが残る場合), (5) reserved ID 'legit-cleanup' のような substring false positive が許可されること。これらは `scripts/test_track_schema.py::TestValidateMetadataV2` 系の観点を網羅する。重要: unreferenced task と cross-section duplicate は `libs/domain/src/track.rs` の `validate_plan_invariants()` 関数で既に `UnreferencedTask` / `DuplicateTaskReference` variant として実装済み、status drift と archived+incomplete も `render.rs::validate_track_document()` で既に実装済みのため、infrastructure 層への新規ロジック追加は不要 — テスト追加のみで観点をカバーできる。",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "[Verify] T004 で追加した `validate_track_document()` テストが既存実装のみで全て pass することを確認する。新規ロジック追加は行わない (UnreferencedTask / DuplicateTaskReference は domain 層、status drift / archived+incomplete は infrastructure 層で既に実装済み)。もし既存実装で pass しないテストがあれば最小限の修正で対応するが、その場合は実装の現状を再確認する (planner 前提が誤っている可能性)。既存 `track/items/*` の全 metadata.json が `validate_track_document()` を引き続き pass することも確認する。",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "[Red] `libs/domain/src/track.rs::tests` に `TrackMetadata::status()` 導出ロジックのテスト 10 件を追加する。観点: empty tasks → planned / all todo → planned / any in_progress → in_progress / mixed done+todo → in_progress / all done → done / all skipped → done / mixed done+skipped → done / skipped+todo → in_progress / override=blocked wins / override=cancelled wins。これらは `scripts/test_track_schema.py::TestEffectiveTrackStatus` の 10 観点を網羅する。`TrackMetadata::status()` は既実装のため、基本的には実装変更不要でテスト追加のみで pass する見込み。",
@@ -182,5 +183,5 @@
     }
   ],
   "title": "scripts/ Python ヘルパー削減 フェーズ1 — track_branch_guard / markdown / registry / state_machine の Rust 移植",
-  "updated_at": "2026-04-13T13:34:02Z"
+  "updated_at": "2026-04-13T13:42:36Z"
 }
