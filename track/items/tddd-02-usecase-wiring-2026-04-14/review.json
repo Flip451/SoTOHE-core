@@ -1,0 +1,241 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ca45b63c4694f81d89a99b23cd77bde33f0e4832cd8e330cfa5b75a05c47d9f",
+          "at": "2026-04-13T18:31:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` cites planner T006 as the source for switching the usecase seed from `value_object` to `use_case`, but the cited research document still says `use_case` is invalid and that the 11-entry seed should use `value_object`/`trait_port`. The approved plan is therefore backed by a source that argues for the opposite implementation.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 103,
+              "category": "design_contradiction"
+            },
+            {
+              "message": "`verification.md` still expects `type-signals` to print `skipped=0`, but the plan/spec explicitly remove `skipped_enabled_layers` and the acceptance criterion defines the target summary without any `skipped` field. These artifacts disagree on whether the skipped counter survives the CLI generalization.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 55,
+              "category": "design_contradiction"
+            },
+            {
+              "message": "The acceptance gate requires zero `\"domain\"` hits anywhere under `apps/cli/src/commands/track/tddd/`, but T005/T006 simultaneously preserve domain-layer behavior and domain regression tests in those same files. That over-constrains the implementation and conflicts with the stated non-regression strategy.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 353,
+              "category": "design_contradiction"
+            },
+            {
+              "message": "Two scoped requirements are not covered by any acceptance criterion: the rendered section-header rename/additions from ADR D7, and the layer-agnostic grep sanity check. Because neither is part of the approved completion gate, those planned obligations can be missed without failing the track.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 43,
+              "category": "acceptance_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:0ca45b63c4694f81d89a99b23cd77bde33f0e4832cd8e330cfa5b75a05c47d9f",
+          "at": "2026-04-13T18:34:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The acceptance gate requires `rg '\"domain\"|non_domain_enabled|skipped_enabled_layers|enforce_domain_tddd_enabled' apps/cli/src/commands/track/tddd/` to return zero hits, but the plan still relies on a legacy synthetic `domain` fallback when `architecture-rules.json` is absent. A correct multilayer implementation can therefore satisfy the design and still fail this criterion, so the success condition contradicts the stated CLI behavior.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 353,
+              "category": "consistency"
+            },
+            {
+              "message": "`spec.json` makes T003 (layer-agnostic grep sanity check) and T004 (`RustdocSchemaExporter::export(\"usecase\")` validation) in-scope, but none of the acceptance criteria reference either task. That leaves part of the approved scope unverifiable in the spec itself, so the track can be declared complete without ever proving two scoped checks were done.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 53,
+              "category": "acceptance_criteria"
+            }
+          ],
+          "hash": "rvw1:sha256:0ca45b63c4694f81d89a99b23cd77bde33f0e4832cd8e330cfa5b75a05c47d9f",
+          "at": "2026-04-13T18:39:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T008 seed is still sourced to planner T006 as if it had already switched to an 11-entry `application_service`/`secondary_port`/`use_case` design, but the research doc says the opposite: line 1 declares `use_case` invalid, and T006 (lines 281-299) still describes `TraitPort`/`ValueObject` entries. That leaves the canonical spec pointing at a source that contradicts the final kind assignments.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 103,
+              "category": "design"
+            },
+            {
+              "message": "The acceptance criterion requires `rg '\"domain\"|non_domain_enabled|skipped_enabled_layers|enforce_domain_tddd_enabled' apps/cli/src/commands/track/tddd/` to go to zero, but T006 explicitly keeps the legacy domain fallback by folding `synthetic_domain_binding` into `resolve_layers` rather than removing every `\"domain\"` literal. As written, the verification rule cannot be satisfied while implementing the documented design.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 371,
+              "category": "design"
+            },
+            {
+              "message": "The T002 acceptance criterion says the codec must round-trip '8' kind tags, but the list immediately enumerates 12 tags (`typestate`, `enum`, `value_object`, `error_type`, `secondary_port`, plus 7 new tags). This gives reviewers two incompatible pass conditions for the same task.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 334,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:af890e14f11835093e9df79cfd5b76377553a0be84776c9f6e5f3956134898d8",
+          "at": "2026-04-13T18:45:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The planner still defines the T006 seed as `5 TraitPort + 4 ErrorType + 2 ValueObject` (`HookHandler` included as a trait port) here, which conflicts with the final seed shape in `spec.json`/`metadata.json` (`1 application_service + 4 secondary_port + 4 error_type + 2 use_case`). Because the corresponding acceptance criterion only checks `11 entries / 4 kinds`, an implementation can satisfy the spec while following this opposite planner guidance, so the planning artifacts no longer agree on the required catalogue composition.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-14-0203-planner-tddd-02-usecase-wiring.md",
+              "line": 299,
+              "category": "design"
+            },
+            {
+              "message": "The T005/T006 scope promises full multi-layer generalization, including looping all enabled bindings when `--layer` is omitted, but the acceptance criteria for those tasks only check deletion of Phase-1 identifiers and replacement of the `export(\"domain\")` hardcode. A partial implementation that works only for explicit `--layer usecase` could still pass these criteria, leaving the advertised no-filter multi-layer behavior unverified.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 371,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:6b5431617ee6e32368ce882f815b730ad13d60268a50c649933f65e9b8cec249",
+          "at": "2026-04-13T18:51:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D6 says the taxonomy expansion requires no `libs/domain/src/tddd/*` changes beyond the enum/codec/renderer, but the actual plan still needs domain-layer edits in `signals.rs` and `consistency.rs` to introduce `ApplicationService` handling and replace `TraitPort` matches. That makes the ADR’s scope statement factually inconsistent with the implementation plan.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md",
+              "line": 104,
+              "category": "design"
+            },
+            {
+              "message": "The verification checklist still requires `rg '\"domain\"|non_domain_enabled|skipped_enabled_layers|enforce_domain_tddd_enabled|synthetic_domain_binding' apps/cli/src/commands/track/tddd/` to return zero hits, but `spec.json` explicitly exempts the `resolve_layers` legacy fallback JSON from this check. As written, verification will fail even if the implementation matches the accepted design.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 41,
+              "category": "design"
+            },
+            {
+              "message": "`spec.json`’s source attribution for the core taxonomy changes is broken: it cites ADR 0002 `D3` as the source for adding the 7 new variants and codec tags, but ADR 0002 `D3` only covers the earlier `DomainTypeKind` rename. That leaves the main design decision mis-traced to the wrong ADR section.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 17,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:0f5fd1b4e2d42214c0e818a7246cdb7a8a106939b8ede1a176ab9887a580b9ae",
+          "at": "2026-04-13T18:56:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's first acceptance criterion is not executable as written: it tries to prove the enum has 12 variants with `rg 'TypeDefinitionKind::(...)' libs/domain/src/tddd/catalogue.rs`, but enum variant definitions in `catalogue.rs` are declared as bare variants, not `TypeDefinitionKind::Variant`. That check can miss a broken enum or pass on incidental match arms/comments, so the plan lacks a reliable gate for the core taxonomy change. The same broken probe is copied into `verification.md`.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 316,
+              "category": "design"
+            },
+            {
+              "message": "The `TraitPort` removal criterion contradicts its own exemption. The text allows doc comments and historical references to remain, but the verification command still greps `libs apps .claude Makefile.toml` and expects zero hits, which would also catch allowed historical/doc-comment references (for example the existing `TraitPort` mention in `libs/domain/src/tddd/catalogue.rs` docs). As written, implementers must delete references that the spec explicitly says are acceptable; `verification.md` line 34 repeats the same stricter rule.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 325,
+              "category": "design"
+            },
+            {
+              "message": "The verification plan never exercises the spec's required no-`--layer` path. `spec.json` requires proving that `baseline-capture` and `type-signals` process all enabled layers when `--layer` is omitted, but `verification.md` only runs both commands with `--layer usecase`. A regression in the default multi-layer loop / two-binding path would therefore pass the planned verification unchanged.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 52,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:4737bb1246a5b3dd6c941ffd3eeba35f315aef98438d3856b4b053febab9caaa",
+          "at": "2026-04-13T19:03:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 asks implementers to add new `check_consistency` match arms for `UseCase`/`Interactor`/`Dto`/`Command`/`Query`/`Factory`, but ADR D6 narrows `consistency.rs` to the mechanical `TraitPort` -> `SecondaryPort` classification rename and explicitly says the domain algorithm stays unchanged. Because `check_consistency` already partitions only trait vs non-trait, this task description expands domain-layer work beyond the ADR-approved scope.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/metadata.json",
+              "line": 95,
+              "category": "design"
+            },
+            {
+              "message": "The rendered-header rewrite (`## Application Services` / `## Secondary Ports` / etc.) is in scope, but `spec.json` never gives it an acceptance criterion. An implementation can satisfy every current acceptance check without updating `type_catalogue_render.rs`, so ADR D7 is not actually verified by the spec.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 44,
+              "category": "design"
+            },
+            {
+              "message": "The `usecase-types.json` acceptance criterion only checks '11 entries using 4 kind variants'. It does not verify the committed seed composition from the in-scope item and metadata (`1 application_service + 4 secondary_port + 4 error_type + 2 use_case`, with `HookHandler` as the `application_service`). A wrong taxonomy split could still pass the spec while violating the planned dogfooding decision.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 410,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:458cc6a084f041b11d18be7b239a2e38c1b8d670ba003e12122ca31355afe45e",
+          "at": "2026-04-13T19:08:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR-to-spec traceability is still broken for the taxonomy expansion: this item cites ADR 0002 D2 Forward check, but the `TraitPort`→`SecondaryPort` rename and the new application-layer variants are decided in `2026-04-13-1813-tddd-taxonomy-expansion.md` (D1/D2/D4). The same stale citation pattern recurs in the acceptance criteria for the 12-variant check and `ApplicationService` parity, so a reviewer following the cited sources lands on the old multilayer ADR instead of the authoritative taxonomy ADR.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 27,
+              "category": "cross_reference"
+            },
+            {
+              "message": "T014 reintroduces a second, incompatible definition of done for the rename cleanup: it says `TraitPort|trait_port` may remain in doc/comments, but the approved acceptance criteria and verification steps require `rg 'TraitPort|trait_port' ...` to return zero hits across `libs apps .claude Makefile.toml`. That contradiction will let self-review pass a state that the formal acceptance gate still rejects.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/metadata.json",
+              "line": 160,
+              "category": "design_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1c2dbcf391da43cc2c1dccaa75b46568e6495a406ef3d14216413b16c9b1fc91",
+          "at": "2026-04-13T19:14:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc029d21b338c6cf5959029addeca4ea56bd462bce62e81809748a1fd779222a",
+          "at": "2026-04-13T19:18:30Z"
+        }
+      ]
+    }
+  }
+}
