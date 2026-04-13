@@ -280,8 +280,7 @@ fn evaluate_trait_port(
         return yellow(name, kind_tag);
     };
 
-    let code_methods: HashSet<&str> =
-        code_trait.method_names().iter().map(|s| s.as_str()).collect();
+    let code_methods: HashSet<&str> = code_trait.methods().iter().map(|m| m.name()).collect();
 
     let mut found = Vec::new();
     let mut missing = Vec::new();
@@ -363,13 +362,13 @@ mod tests {
         MethodDeclaration::new(name, Some("&self".into()), vec![], "()", false)
     }
 
-    /// Build a `TypeGraph` with struct-kinded types only (no members, no return types).
+    /// Build a `TypeGraph` with struct-kinded types only (no members, no methods).
     fn make_profile(type_names: &[&str]) -> TypeGraph {
         let mut types = HashMap::new();
         for name in type_names {
             types.insert(
                 name.to_string(),
-                TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new(), HashSet::new()),
+                TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new()),
             );
         }
         TypeGraph::new(types, HashMap::new())
@@ -385,7 +384,6 @@ mod tests {
                 variants.iter().copied().map(MemberDeclaration::variant).collect(),
                 vec![],
                 HashSet::new(),
-                HashSet::new(),
             ),
         );
         TypeGraph::new(types, HashMap::new())
@@ -394,13 +392,12 @@ mod tests {
     /// Build a `TypeGraph` where `from_type` has a method returning `to_type`.
     fn make_profile_with_transition(from_type: &str, to_type: &str) -> TypeGraph {
         let mut types = HashMap::new();
-        let return_types: HashSet<String> = [to_type.to_string()].into();
         let outgoing: HashSet<String> = [to_type.to_string()].into();
-        let from_node = TypeNode::new(TypeKind::Struct, vec![], vec![], return_types, outgoing);
+        let from_node = TypeNode::new(TypeKind::Struct, vec![], vec![], outgoing);
         types.insert(from_type.to_string(), from_node);
         types.insert(
             to_type.to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new(), HashSet::new()),
+            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new()),
         );
         TypeGraph::new(types, HashMap::new())
     }
@@ -697,26 +694,25 @@ mod tests {
         )
         .unwrap();
 
-        // Construct a TypeGraph where method_return_types has a non-typestate extra entry.
+        // T005: `outgoing` is the sole source of truth for typestate
+        // transitions; there is no separate `method_return_types` field
+        // that could smuggle non-typestate extras through to the Draft
+        // signal. This test now constructs `outgoing` directly with only
+        // the typestate target and asserts that the evaluation is Blue and
+        // reports no extras.
         let mut types = HashMap::new();
-        let method_return_types: HashSet<String> =
-            ["Published".to_string(), "NonTypestate".to_string()].into();
-        // outgoing only contains the typestate target — NonTypestate is intentionally absent.
         let outgoing: HashSet<String> = ["Published".to_string()].into();
-        let from_node =
-            TypeNode::new(TypeKind::Struct, vec![], vec![], method_return_types, outgoing);
+        let from_node = TypeNode::new(TypeKind::Struct, vec![], vec![], outgoing);
         types.insert("Draft".to_string(), from_node);
         types.insert(
             "Published".to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new(), HashSet::new()),
+            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new()),
         );
         let profile = TypeGraph::new(types, HashMap::new());
 
         let results = evaluate_type_signals(&[draft_entry, published_entry], &profile);
         let draft_signal = results.first().unwrap();
-        // Blue: outgoing matches the declared transition exactly.
         assert_eq!(draft_signal.signal(), ConfidenceSignal::Blue);
-        // NonTypestate must not appear in extra_items — evaluation must not read method_return_types.
         assert!(
             draft_signal.extra_items().is_empty(),
             "expected no extra_items, got {:?}",

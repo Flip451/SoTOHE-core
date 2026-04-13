@@ -4,7 +4,8 @@
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| ParamDeclaration | value_object | — | — | 🔵 |
-| MethodDeclaration | value_object | — | — | 🔵 |
-| MemberDeclaration | enum | — | Variant, Field | 🔵 |
+| ParamDeclaration | value_object | reference | — | 🔵 |
+| MethodDeclaration | value_object | reference | — | 🔵 |
+| MemberDeclaration | enum | reference | Variant, Field | 🔵 |
+| Finding | value_object | reference | — | 🔵 |
 

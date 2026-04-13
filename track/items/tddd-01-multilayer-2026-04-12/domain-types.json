@@ -5,23 +5,33 @@
       "name": "ParamDeclaration",
       "description": "A single parameter in a method signature, holding a name and its type string",
       "approved": true,
+      "action": "reference",
       "kind": "value_object"
     },
     {
       "name": "MethodDeclaration",
       "description": "Structured method signature (L1 resolution) with name, receiver, params, returns, and async flag",
       "approved": true,
+      "action": "reference",
       "kind": "value_object"
     },
     {
       "name": "MemberDeclaration",
       "description": "Composite type member: either an enum variant (Variant) or a struct field (Field)",
       "approved": true,
+      "action": "reference",
       "kind": "enum",
       "expected_variants": [
         "Variant",
         "Field"
       ]
+    },
+    {
+      "name": "Finding",
+      "description": "Reference entry for the pre-existing same-name type collision between domain::verify::Finding and domain::review_v2::types::Finding. The collision is documented as a known issue; this reference declaration suppresses the baseline_changed_type Red signal caused by non-deterministic HashMap ordering at TypeGraph build time",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
     }
   ],
   "signals": [
@@ -46,6 +56,12 @@
         "Field",
         "Variant"
       ]
+    },
+    {
+      "type_name": "Finding",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

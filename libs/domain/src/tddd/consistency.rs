@@ -193,16 +193,12 @@ pub fn check_consistency(
         }
         match graph.get_type(name) {
             Some(code_node) => {
-                // Compare baseline entry against current code structure.
-                // T004: `members()` now returns `&[MemberDeclaration]`; extract
-                // names to match the baseline's `Vec<String>` schema until T005
-                // bumps the baseline to v2.
-                let member_names: Vec<String> =
-                    code_node.members().iter().map(|m| m.name().to_string()).collect();
+                // T005: compare using the full structured shape
+                // (`Vec<MemberDeclaration>` and `Vec<MethodDeclaration>`).
                 let current = crate::TypeBaselineEntry::new(
                     code_node.kind().clone(),
-                    member_names,
-                    code_node.method_return_types().iter().cloned().collect(),
+                    code_node.members().to_vec(),
+                    code_node.methods().to_vec(),
                 );
                 if baseline_entry.structurally_equal(&current) {
                     skipped_count += 1; // Unchanged → skip
@@ -223,7 +219,7 @@ pub fn check_consistency(
         }
         match graph.get_trait(name) {
             Some(code_node) => {
-                let current = crate::TraitBaselineEntry::new(code_node.method_names().to_vec());
+                let current = crate::TraitBaselineEntry::new(code_node.methods().to_vec());
                 if baseline_entry.structurally_equal(&current) {
                     skipped_count += 1;
                 } else {
@@ -485,7 +481,7 @@ mod tests {
         let mut types = HashMap::new();
         types.insert(
             "NewType".to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new(), HashSet::new()),
+            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new()),
         );
         let graph = TypeGraph::new(types, HashMap::new());
 
@@ -499,7 +495,11 @@ mod tests {
         // Type in baseline and code, not declared, structure unchanged → skip
         let bl = baseline_with_types(vec![(
             "ExistingType",
-            TypeBaselineEntry::new(TypeKind::Struct, vec!["field".into()], vec![]),
+            TypeBaselineEntry::new(
+                TypeKind::Struct,
+                vec![MemberDeclaration::field("field", "String")],
+                vec![],
+            ),
         )]);
 
         let mut types = HashMap::new();
@@ -509,7 +509,6 @@ mod tests {
                 TypeKind::Struct,
                 vec![MemberDeclaration::field("field", "String")],
                 vec![],
-                HashSet::new(),
                 HashSet::new(),
             ),
         );
@@ -526,7 +525,7 @@ mod tests {
         // Type in baseline and code, not declared, structure changed → Red
         let bl = baseline_with_types(vec![(
             "ChangedType",
-            TypeBaselineEntry::new(TypeKind::Enum, vec!["A".into()], vec![]),
+            TypeBaselineEntry::new(TypeKind::Enum, variants(&["A"]), vec![]),
         )]);
 
         let mut types = HashMap::new();
@@ -536,7 +535,6 @@ mod tests {
                 TypeKind::Enum,
                 variants(&["A", "B"]), // new variant added
                 vec![],
-                HashSet::new(),
                 HashSet::new(),
             ),
         );
@@ -567,7 +565,11 @@ mod tests {
         // Type in both baseline and declarations → forward check (group 2)
         let bl = baseline_with_types(vec![(
             "TrackId",
-            TypeBaselineEntry::new(TypeKind::Struct, vec!["0".into()], vec![]),
+            TypeBaselineEntry::new(
+                TypeKind::Struct,
+                vec![MemberDeclaration::field("0", "u64")],
+                vec![],
+            ),
         )]);
 
         let entry = TypeCatalogueEntry::new(
@@ -586,7 +588,6 @@ mod tests {
                 TypeKind::Struct,
                 vec![MemberDeclaration::field("0", "u64")],
                 vec![],
-                HashSet::new(),
                 HashSet::new(),
             ),
         );
@@ -615,7 +616,7 @@ mod tests {
         let mut types = HashMap::new();
         types.insert(
             "NewType".to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new(), HashSet::new()),
+            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new()),
         );
         let graph = TypeGraph::new(types, HashMap::new());
 
@@ -629,7 +630,7 @@ mod tests {
     fn test_group3_baseline_unchanged_trait_is_skipped() {
         let bl = baseline_with_traits(vec![(
             "MyTrait",
-            TraitBaselineEntry::new(vec!["method_a".into()]),
+            TraitBaselineEntry::new(vec![unit_method("method_a")]),
         )]);
 
         let mut traits = HashMap::new();
@@ -645,7 +646,7 @@ mod tests {
     fn test_group3_baseline_changed_trait_is_red() {
         let bl = baseline_with_traits(vec![(
             "MyTrait",
-            TraitBaselineEntry::new(vec!["method_a".into()]),
+            TraitBaselineEntry::new(vec![unit_method("method_a")]),
         )]);
 
         let mut traits = HashMap::new();
@@ -672,9 +673,13 @@ mod tests {
             ("DeclaredExisting", TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![])),
             (
                 "UnchangedExisting",
-                TypeBaselineEntry::new(TypeKind::Struct, vec!["x".into()], vec![]),
+                TypeBaselineEntry::new(
+                    TypeKind::Struct,
+                    vec![MemberDeclaration::field("x", "String")],
+                    vec![],
+                ),
             ),
-            ("ChangedExisting", TypeBaselineEntry::new(TypeKind::Enum, vec!["A".into()], vec![])),
+            ("ChangedExisting", TypeBaselineEntry::new(TypeKind::Enum, variants(&["A"]), vec![])),
         ]);
 
         let entries = vec![
@@ -708,10 +713,7 @@ mod tests {
             } else {
                 (TypeKind::Struct, vec![])
             };
-            types.insert(
-                name.to_string(),
-                TypeNode::new(kind, members, vec![], HashSet::new(), HashSet::new()),
-            );
+            types.insert(name.to_string(), TypeNode::new(kind, members, vec![], HashSet::new()));
         }
         let graph = TypeGraph::new(types, HashMap::new());
 

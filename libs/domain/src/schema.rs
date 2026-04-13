@@ -394,12 +394,12 @@ impl TypeGraph {
 
 /// A public type in the crate, as indexed for TDDD evaluation.
 ///
-/// T004 (3c): `members` is now `Vec<MemberDeclaration>` and `methods` is a
-/// new `Vec<MethodDeclaration>` holding the full L1 signature of every
-/// inherent method on this type. The legacy `method_return_types: HashSet<String>`
-/// field is retained as a temporary bridge for `build_type_graph` and
-/// `check_consistency`; it will be removed in T005 once the baseline codec
-/// adopts the structured `methods` field.
+/// T005 (Phase 1 Task 5): the legacy `method_return_types: HashSet<String>`
+/// bridge field is removed. `outgoing` is passed in directly from
+/// `build_type_graph`, which derives it by filtering self-receiver method
+/// return types against the set of typestate-declared type names
+/// (ADR 0002 Q4). Callers that need the full set of return type names
+/// should walk `methods().iter().flat_map(|m| ...)` directly.
 #[derive(Debug, Clone)]
 pub struct TypeNode {
     kind: TypeKind,
@@ -407,14 +407,7 @@ pub struct TypeNode {
     members: Vec<MemberDeclaration>,
     /// Full L1 signatures of inherent impl methods on this type.
     methods: Vec<MethodDeclaration>,
-    /// Type names returned by inherent (non-trait) impl methods.
-    ///
-    /// T004-T005 transition: kept alongside `methods` so `build_type_graph`
-    /// can derive `outgoing` via set intersection (ADR 0002 Q4) without
-    /// re-parsing `MethodDeclaration::returns`. Removed in T005 together
-    /// with the baseline schema v2 bump.
-    method_return_types: HashSet<String>,
-    /// Outgoing typestate transitions: subset of `method_return_types`.
+    /// Outgoing typestate transitions.
     outgoing: HashSet<String>,
     /// Module path for disambiguation (e.g., `"domain::review"`). `None` if unknown.
     module_path: Option<String>,
@@ -423,19 +416,16 @@ pub struct TypeNode {
 impl TypeNode {
     /// Creates a new `TypeNode`.
     ///
-    /// `outgoing` is intersected with `method_return_types` to enforce the
-    /// invariant that outgoing transitions are always a subset of the actual
-    /// method return types.
+    /// `outgoing` is passed in by `build_type_graph` already filtered to the
+    /// typestate set — this constructor stores it as-is.
     #[must_use]
     pub fn new(
         kind: TypeKind,
         members: Vec<MemberDeclaration>,
         methods: Vec<MethodDeclaration>,
-        method_return_types: HashSet<String>,
         outgoing: HashSet<String>,
     ) -> Self {
-        let outgoing = outgoing.intersection(&method_return_types).cloned().collect();
-        Self { kind, members, methods, method_return_types, outgoing, module_path: None }
+        Self { kind, members, methods, outgoing, module_path: None }
     }
 
     /// Sets the module path for disambiguation.
@@ -467,13 +457,7 @@ impl TypeNode {
         self.module_path.as_deref()
     }
 
-    /// Returns type names returned by inherent impl methods (legacy, T005 removes this).
-    #[must_use]
-    pub fn method_return_types(&self) -> &HashSet<String> {
-        &self.method_return_types
-    }
-
-    /// Returns outgoing typestate transitions (filtered subset of `method_return_types`).
+    /// Returns outgoing typestate transitions.
     #[must_use]
     pub fn outgoing(&self) -> &HashSet<String> {
         &self.outgoing
@@ -482,36 +466,25 @@ impl TypeNode {
 
 /// A public trait in the crate, as indexed for TDDD evaluation.
 ///
-/// T004 (3c): stores full L1 method signatures in `methods`. The legacy
-/// `method_names: Vec<String>` accessor is derived from `methods` for
-/// backward-compat within the T004 commit and is removed in T005.
+/// T005 (Phase 1 Task 5): the legacy `method_names: Vec<String>` mirror is
+/// removed. Callers that need the list of method names should walk
+/// `methods().iter().map(|m| m.name())`.
 #[derive(Debug, Clone)]
 pub struct TraitNode {
     methods: Vec<MethodDeclaration>,
-    /// Legacy flat list of method names — derived from `methods` at
-    /// construction time. Removed in T005 along with the
-    /// `method_names()` accessor.
-    method_names: Vec<String>,
 }
 
 impl TraitNode {
     /// Creates a new `TraitNode` from the structured method list.
     #[must_use]
     pub fn new(methods: Vec<MethodDeclaration>) -> Self {
-        let method_names = methods.iter().map(|m| m.name().to_string()).collect();
-        Self { methods, method_names }
+        Self { methods }
     }
 
     /// Returns the structured method declarations.
     #[must_use]
     pub fn methods(&self) -> &[MethodDeclaration] {
         &self.methods
-    }
-
-    /// Returns the method names of this trait (legacy, T005 removes this).
-    #[must_use]
-    pub fn method_names(&self) -> &[String] {
-        &self.method_names
     }
 }
 
@@ -598,20 +571,19 @@ mod tests {
 
     #[test]
     fn type_node_module_path_none_by_default() {
-        let node = TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new(), HashSet::new());
+        let node = TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new());
         assert!(node.module_path().is_none());
     }
 
     #[test]
     fn type_node_set_module_path_stores_value() {
-        let mut node =
-            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new(), HashSet::new());
+        let mut node = TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new());
         node.set_module_path("domain::guard".to_string());
         assert_eq!(node.module_path(), Some("domain::guard"));
     }
 
     #[test]
-    fn trait_node_derives_method_names_from_methods() {
+    fn trait_node_exposes_structured_methods() {
         let methods = vec![
             MethodDeclaration::new(
                 "save",
@@ -629,7 +601,8 @@ mod tests {
             ),
         ];
         let node = TraitNode::new(methods);
-        assert_eq!(node.method_names(), &["save", "find"]);
+        let names: Vec<&str> = node.methods().iter().map(MethodDeclaration::name).collect();
+        assert_eq!(names, vec!["save", "find"]);
         assert_eq!(node.methods().len(), 2);
     }
 }

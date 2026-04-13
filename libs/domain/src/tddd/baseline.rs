@@ -3,10 +3,17 @@
 //! A `TypeBaseline` captures the TypeGraph structure at `/track:design` time.
 //! During signal evaluation, types present in the baseline with unchanged
 //! structure are skipped (not flagged as Red), filtering out existing-type noise.
+//!
+//! T005 (TDDD-01 Phase 1 Task 5): baseline schema v2 replaces the flat
+//! `Vec<String>` members / method_return_types / methods representation with
+//! structured `Vec<MemberDeclaration>` and `Vec<MethodDeclaration>` so that
+//! the baseline captures full L1 signatures. Legacy `method_return_types` /
+//! `method_names` fields are removed.
 
 use std::collections::HashMap;
 
 use crate::schema::TypeKind;
+use crate::tddd::catalogue::{MemberDeclaration, MethodDeclaration};
 use crate::timestamp::Timestamp;
 
 // ---------------------------------------------------------------------------
@@ -15,27 +22,28 @@ use crate::timestamp::Timestamp;
 
 /// A single type entry in the baseline snapshot.
 ///
-/// Fields are stored sorted for deterministic comparison and serialization.
+/// Members are sorted by name and methods by method name for deterministic
+/// comparison and serialization.
 #[derive(Debug, Clone)]
 pub struct TypeBaselineEntry {
     kind: TypeKind,
-    /// Variant names (enums) or field names (structs), sorted.
-    members: Vec<String>,
-    /// Type names returned by inherent impl methods, sorted.
-    method_return_types: Vec<String>,
+    /// Variants (for enums) or fields (for structs), sorted by name.
+    members: Vec<MemberDeclaration>,
+    /// Structured L1 signatures of inherent impl methods, sorted by name.
+    methods: Vec<MethodDeclaration>,
 }
 
 impl TypeBaselineEntry {
-    /// Creates a new `TypeBaselineEntry` with members and method_return_types sorted.
+    /// Creates a new `TypeBaselineEntry` with members and methods sorted.
     #[must_use]
     pub fn new(
         kind: TypeKind,
-        mut members: Vec<String>,
-        mut method_return_types: Vec<String>,
+        mut members: Vec<MemberDeclaration>,
+        mut methods: Vec<MethodDeclaration>,
     ) -> Self {
-        members.sort();
-        method_return_types.sort();
-        Self { kind, members, method_return_types }
+        members.sort_by(|a, b| a.name().cmp(b.name()));
+        methods.sort_by(|a, b| a.name().cmp(b.name()));
+        Self { kind, members, methods }
     }
 
     /// Returns the kind of this type.
@@ -44,27 +52,25 @@ impl TypeBaselineEntry {
         &self.kind
     }
 
-    /// Returns the sorted member names.
+    /// Returns the sorted members (variants or fields).
     #[must_use]
-    pub fn members(&self) -> &[String] {
+    pub fn members(&self) -> &[MemberDeclaration] {
         &self.members
     }
 
-    /// Returns the sorted method return type names.
+    /// Returns the sorted method declarations.
     #[must_use]
-    pub fn method_return_types(&self) -> &[String] {
-        &self.method_return_types
+    pub fn methods(&self) -> &[MethodDeclaration] {
+        &self.methods
     }
 
     /// Returns `true` if this entry is structurally equal to `other`.
     ///
-    /// Compares kind, sorted members, and sorted method_return_types.
-    /// Since fields are sorted at construction, this is a direct field comparison.
+    /// Compares kind, sorted members, and sorted method declarations. Since
+    /// both fields are sorted at construction, this is a direct comparison.
     #[must_use]
     pub fn structurally_equal(&self, other: &Self) -> bool {
-        self.kind == other.kind
-            && self.members == other.members
-            && self.method_return_types == other.method_return_types
+        self.kind == other.kind && self.members == other.members && self.methods == other.methods
     }
 }
 
@@ -74,30 +80,28 @@ impl TypeBaselineEntry {
 
 /// A single trait entry in the baseline snapshot.
 ///
-/// Methods are stored sorted for deterministic comparison and serialization.
+/// Methods are sorted by name for deterministic comparison and serialization.
 #[derive(Debug, Clone)]
 pub struct TraitBaselineEntry {
-    /// Method names defined by this trait, sorted.
-    methods: Vec<String>,
+    /// Structured L1 signatures of trait methods, sorted by name.
+    methods: Vec<MethodDeclaration>,
 }
 
 impl TraitBaselineEntry {
     /// Creates a new `TraitBaselineEntry` with methods sorted.
     #[must_use]
-    pub fn new(mut methods: Vec<String>) -> Self {
-        methods.sort();
+    pub fn new(mut methods: Vec<MethodDeclaration>) -> Self {
+        methods.sort_by(|a, b| a.name().cmp(b.name()));
         Self { methods }
     }
 
-    /// Returns the sorted method names.
+    /// Returns the sorted method declarations.
     #[must_use]
-    pub fn methods(&self) -> &[String] {
+    pub fn methods(&self) -> &[MethodDeclaration] {
         &self.methods
     }
 
     /// Returns `true` if this entry is structurally equal to `other`.
-    ///
-    /// Compares sorted method names.
     #[must_use]
     pub fn structurally_equal(&self, other: &Self) -> bool {
         self.methods == other.methods
@@ -186,11 +190,16 @@ impl TypeBaseline {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use super::*;
     use crate::schema::TypeKind;
+    use crate::tddd::catalogue::ParamDeclaration;
     use crate::timestamp::Timestamp;
+
+    fn unit_method(name: &str) -> MethodDeclaration {
+        MethodDeclaration::new(name, Some("&self".into()), vec![], "()", false)
+    }
 
     // --- TypeBaselineEntry ---
 
@@ -198,33 +207,39 @@ mod tests {
     fn test_type_baseline_entry_sorts_members_on_construction() {
         let entry = TypeBaselineEntry::new(
             TypeKind::Enum,
-            vec!["Zebra".into(), "Alpha".into(), "Middle".into()],
+            vec![
+                MemberDeclaration::variant("Zebra"),
+                MemberDeclaration::variant("Alpha"),
+                MemberDeclaration::variant("Middle"),
+            ],
             vec![],
         );
-        assert_eq!(entry.members(), &["Alpha", "Middle", "Zebra"]);
+        let names: Vec<&str> = entry.members().iter().map(|m| m.name()).collect();
+        assert_eq!(names, vec!["Alpha", "Middle", "Zebra"]);
     }
 
     #[test]
-    fn test_type_baseline_entry_sorts_method_return_types_on_construction() {
+    fn test_type_baseline_entry_sorts_methods_on_construction() {
         let entry = TypeBaselineEntry::new(
             TypeKind::Struct,
             vec![],
-            vec!["Published".into(), "Approved".into()],
+            vec![unit_method("publish"), unit_method("archive")],
         );
-        assert_eq!(entry.method_return_types(), &["Approved", "Published"]);
+        let names: Vec<&str> = entry.methods().iter().map(|m| m.name()).collect();
+        assert_eq!(names, vec!["archive", "publish"]);
     }
 
     #[test]
     fn test_type_baseline_entry_structurally_equal_with_same_fields() {
         let a = TypeBaselineEntry::new(
             TypeKind::Enum,
-            vec!["B".into(), "A".into()],
-            vec!["Y".into(), "X".into()],
+            vec![MemberDeclaration::variant("B"), MemberDeclaration::variant("A")],
+            vec![unit_method("y"), unit_method("x")],
         );
         let b = TypeBaselineEntry::new(
             TypeKind::Enum,
-            vec!["A".into(), "B".into()],
-            vec!["X".into(), "Y".into()],
+            vec![MemberDeclaration::variant("A"), MemberDeclaration::variant("B")],
+            vec![unit_method("x"), unit_method("y")],
         );
         assert!(a.structurally_equal(&b));
     }
@@ -238,46 +253,72 @@ mod tests {
 
     #[test]
     fn test_type_baseline_entry_not_equal_with_different_members() {
-        let a = TypeBaselineEntry::new(TypeKind::Enum, vec!["A".into()], vec![]);
-        let b = TypeBaselineEntry::new(TypeKind::Enum, vec!["B".into()], vec![]);
+        let a =
+            TypeBaselineEntry::new(TypeKind::Enum, vec![MemberDeclaration::variant("A")], vec![]);
+        let b =
+            TypeBaselineEntry::new(TypeKind::Enum, vec![MemberDeclaration::variant("B")], vec![]);
         assert!(!a.structurally_equal(&b));
     }
 
     #[test]
-    fn test_type_baseline_entry_not_equal_with_different_method_return_types() {
-        let a = TypeBaselineEntry::new(TypeKind::Struct, vec![], vec!["X".into()]);
-        let b = TypeBaselineEntry::new(TypeKind::Struct, vec![], vec!["Y".into()]);
+    fn test_type_baseline_entry_not_equal_with_different_method_signature() {
+        let a = TypeBaselineEntry::new(
+            TypeKind::Struct,
+            vec![],
+            vec![MethodDeclaration::new("find", Some("&self".into()), vec![], "()", false)],
+        );
+        let b = TypeBaselineEntry::new(
+            TypeKind::Struct,
+            vec![],
+            vec![MethodDeclaration::new(
+                "find",
+                Some("&self".into()),
+                vec![ParamDeclaration::new("id", "UserId")],
+                "()",
+                false,
+            )],
+        );
         assert!(!a.structurally_equal(&b));
     }
 
     #[test]
     fn test_type_baseline_entry_accessors() {
-        let entry =
-            TypeBaselineEntry::new(TypeKind::Struct, vec!["field".into()], vec!["RetType".into()]);
+        let entry = TypeBaselineEntry::new(
+            TypeKind::Struct,
+            vec![MemberDeclaration::field("field", "String")],
+            vec![unit_method("get")],
+        );
         assert_eq!(entry.kind(), &TypeKind::Struct);
-        assert_eq!(entry.members(), &["field"]);
-        assert_eq!(entry.method_return_types(), &["RetType"]);
+        assert_eq!(entry.members().len(), 1);
+        assert_eq!(entry.members()[0].name(), "field");
+        assert_eq!(entry.methods().len(), 1);
+        assert_eq!(entry.methods()[0].name(), "get");
     }
 
     // --- TraitBaselineEntry ---
 
     #[test]
     fn test_trait_baseline_entry_sorts_methods_on_construction() {
-        let entry = TraitBaselineEntry::new(vec!["save".into(), "find".into(), "delete".into()]);
-        assert_eq!(entry.methods(), &["delete", "find", "save"]);
+        let entry = TraitBaselineEntry::new(vec![
+            unit_method("save"),
+            unit_method("find"),
+            unit_method("delete"),
+        ]);
+        let names: Vec<&str> = entry.methods().iter().map(|m| m.name()).collect();
+        assert_eq!(names, vec!["delete", "find", "save"]);
     }
 
     #[test]
     fn test_trait_baseline_entry_structurally_equal_with_same_methods() {
-        let a = TraitBaselineEntry::new(vec!["save".into(), "find".into()]);
-        let b = TraitBaselineEntry::new(vec!["find".into(), "save".into()]);
+        let a = TraitBaselineEntry::new(vec![unit_method("save"), unit_method("find")]);
+        let b = TraitBaselineEntry::new(vec![unit_method("find"), unit_method("save")]);
         assert!(a.structurally_equal(&b));
     }
 
     #[test]
     fn test_trait_baseline_entry_not_equal_with_different_methods() {
-        let a = TraitBaselineEntry::new(vec!["save".into()]);
-        let b = TraitBaselineEntry::new(vec!["delete".into()]);
+        let a = TraitBaselineEntry::new(vec![unit_method("save")]);
+        let b = TraitBaselineEntry::new(vec![unit_method("delete")]);
         assert!(!a.structurally_equal(&b));
     }
 
@@ -287,33 +328,47 @@ mod tests {
         let mut types = HashMap::new();
         types.insert(
             "TrackId".into(),
-            TypeBaselineEntry::new(TypeKind::Struct, vec!["0".into()], vec![]),
+            TypeBaselineEntry::new(
+                TypeKind::Struct,
+                vec![MemberDeclaration::field("0", "u64")],
+                vec![],
+            ),
         );
         types.insert(
             "TaskStatus".into(),
             TypeBaselineEntry::new(
                 TypeKind::Enum,
-                vec!["Todo".into(), "InProgress".into(), "Done".into()],
-                vec!["TaskStatusKind".into()],
+                vec![
+                    MemberDeclaration::variant("Todo"),
+                    MemberDeclaration::variant("InProgress"),
+                    MemberDeclaration::variant("Done"),
+                ],
+                vec![MethodDeclaration::new(
+                    "kind",
+                    Some("&self".into()),
+                    vec![],
+                    "TaskStatusKind",
+                    false,
+                )],
             ),
         );
 
         let mut traits = HashMap::new();
-        traits.insert("TrackReader".into(), TraitBaselineEntry::new(vec!["find".into()]));
+        traits.insert("TrackReader".into(), TraitBaselineEntry::new(vec![unit_method("find")]));
 
-        TypeBaseline::new(1, Timestamp::new("2026-04-11T00:01:00Z").unwrap(), types, traits)
+        TypeBaseline::new(2, Timestamp::new("2026-04-13T00:01:00Z").unwrap(), types, traits)
     }
 
     #[test]
     fn test_type_baseline_schema_version() {
         let bl = sample_baseline();
-        assert_eq!(bl.schema_version(), 1);
+        assert_eq!(bl.schema_version(), 2);
     }
 
     #[test]
     fn test_type_baseline_captured_at() {
         let bl = sample_baseline();
-        assert_eq!(bl.captured_at().as_str(), "2026-04-11T00:01:00Z");
+        assert_eq!(bl.captured_at().as_str(), "2026-04-13T00:01:00Z");
     }
 
     #[test]
@@ -321,7 +376,8 @@ mod tests {
         let bl = sample_baseline();
         let entry = bl.get_type("TrackId").unwrap();
         assert_eq!(entry.kind(), &TypeKind::Struct);
-        assert_eq!(entry.members(), &["0"]);
+        assert_eq!(entry.members().len(), 1);
+        assert_eq!(entry.members()[0].name(), "0");
     }
 
     #[test]
@@ -334,7 +390,8 @@ mod tests {
     fn test_type_baseline_get_trait_returns_entry() {
         let bl = sample_baseline();
         let entry = bl.get_trait("TrackReader").unwrap();
-        assert_eq!(entry.methods(), &["find"]);
+        assert_eq!(entry.methods().len(), 1);
+        assert_eq!(entry.methods()[0].name(), "find");
     }
 
     #[test]
