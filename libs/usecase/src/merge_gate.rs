@@ -173,7 +173,20 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
     //    All findings are merged (AND-aggregation across layers) so one
     //    diagnostic shows every problem.
     let layer_ids = match reader.read_enabled_layers(branch) {
-        BlobFetchResult::Found(ids) => ids,
+        BlobFetchResult::Found(ids) => {
+            if ids.is_empty() {
+                // Fail-closed: architecture-rules.json parses but no layers
+                // are `tddd.enabled = true`. Skipping Stage 2 would let a
+                // PR that disables every layer bypass strict gating. The
+                // caller must enable at least one layer (or explicitly
+                // delete the file, which is caught by the `NotFound` arm).
+                return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                    "architecture-rules.json on origin/{branch} declares no tddd.enabled \
+                     layers — the strict merge gate cannot verify an empty layer set"
+                ))]);
+            }
+            ids
+        }
         BlobFetchResult::NotFound => {
             // Fail-closed: a PR branch that removes or renames
             // `architecture-rules.json` must not be able to bypass Stage 2

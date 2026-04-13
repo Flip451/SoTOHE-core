@@ -156,7 +156,15 @@ fn load_tddd_layers(trusted_root: &Path) -> Result<Vec<TdddLayerBinding>, Findin
     }
     let content = std::fs::read_to_string(&path)
         .map_err(|e| Finding::error(format!("cannot read {}: {e}", path.display())))?;
-    parse_tddd_layers(&content).map_err(|e| Finding::error(format!("{}: {e}", path.display())))
+    let bindings = parse_tddd_layers(&content)
+        .map_err(|e| Finding::error(format!("{}: {e}", path.display())))?;
+    // T007 fail-closed: a parsed-but-empty binding list (every layer
+    // `tddd.enabled = false`, or a legacy rules file without `tddd` blocks)
+    // must not silently skip Stage 2. Fall back to the synthetic domain
+    // binding so `domain-types.json` is still evaluated when present — this
+    // preserves the previous CI behavior for legacy / partially-migrated
+    // rules files.
+    if bindings.is_empty() { default_domain_binding() } else { Ok(bindings) }
 }
 
 /// Returns the fallback binding used when `architecture-rules.json` is
