@@ -133,10 +133,10 @@ pub fn verify_from_spec_json(
 /// Loads `architecture-rules.json` from `trusted_root` and returns the list
 /// of enabled TDDD layer bindings.
 ///
-/// When `architecture-rules.json` is absent we fall back to the legacy
-/// single-layer behavior by returning a synthetic `domain` binding pointing
-/// at `domain-types.json`. This keeps the CI path working in test tmp dirs
-/// and in repos that have not yet adopted the T007 multilayer block.
+/// T007 alignment (round 5): fails closed when the rules file is absent or
+/// contains no `tddd.enabled` layers. Both conditions match the strict
+/// merge-gate behavior in `check_strict_merge_gate`, so a dev who sees CI
+/// pass can be sure the merge gate will also pass (and vice-versa).
 ///
 /// The symlink guard (`reject_symlinks_below`, D4.3) is applied before reading
 /// the file, consistent with how `spec.json` and per-layer catalogues are read.
@@ -147,8 +147,13 @@ fn load_tddd_layers(trusted_root: &Path) -> Result<Vec<TdddLayerBinding>, Findin
     match symlink_guard::reject_symlinks_below(&path, trusted_root) {
         Ok(true) => {}
         Ok(false) => {
-            // File does not exist — fall back to the legacy single-domain binding.
-            return default_domain_binding();
+            // Fail-closed: match the merge-gate contract. A repo / test dir
+            // without architecture-rules.json cannot run Stage 2 at all.
+            return Err(Finding::error(format!(
+                "{}: architecture-rules.json not found — \
+                 the type-signal gate requires the file to enumerate TDDD layers",
+                path.display()
+            )));
         }
         Err(e) => {
             return Err(Finding::error(format!("{}: {e}", path.display())));
@@ -171,29 +176,6 @@ fn load_tddd_layers(trusted_root: &Path) -> Result<Vec<TdddLayerBinding>, Findin
         )));
     }
     Ok(bindings)
-}
-
-/// Returns the fallback binding used when `architecture-rules.json` is
-/// absent — a single `domain` layer pointing at `domain-types.json`.
-///
-/// # Errors
-///
-/// Returns a [`Finding::error`] if the embedded static JSON fails to parse,
-/// which indicates a programming error (the static string is malformed). This
-/// cannot panic because non-test library code must not call `.expect()`.
-fn default_domain_binding() -> Result<Vec<TdddLayerBinding>, Finding> {
-    // `parse_tddd_layers` is the canonical constructor for `TdddLayerBinding`;
-    // we reuse it here to avoid duplicating the default-targets logic.
-    // The static JSON is known-good; an error here indicates a programming
-    // error, but we surface it as a Finding rather than panicking.
-    let json = r#"{
-      "layers": [
-        { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
-      ]
-    }"#;
-    parse_tddd_layers(json).map_err(|e| {
-        Finding::error(format!("internal: default domain binding failed to parse: {e}"))
-    })
 }
 
 /// Runs Stage 2 signal evaluation for a single enabled TDDD layer.
@@ -627,7 +609,6 @@ mod tests {
     /// into the given tmp dir. All `verify_from_spec_json` tests that expect
     /// Stage 2 evaluation must call this helper so that the multi-layer loop
     /// (T007) finds exactly one enabled layer pointing at `domain-types.json`.
-    #[allow(dead_code)]
     fn write_minimal_arch_rules(dir: &Path) {
         let content = r#"{
   "version": 2,
@@ -700,6 +681,7 @@ mod tests {
     #[test]
     fn test_verify_from_spec_json_with_valid_domain_types_and_blue_signals_passes() {
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
@@ -714,6 +696,7 @@ mod tests {
     #[test]
     fn test_verify_from_spec_json_with_no_signals_returns_error() {
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ONE_ENTRY).unwrap();
@@ -725,6 +708,7 @@ mod tests {
     fn test_verify_from_spec_json_with_missing_domain_types_passes_in_interim_mode() {
         // ADR §D2.1: domain-types.json absent = TDDD opt-out. Stage 2 is skipped.
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         // No domain-types.json — TDDD not active
@@ -739,6 +723,7 @@ mod tests {
     fn test_verify_from_spec_json_with_missing_domain_types_passes_in_strict_mode() {
         // Same opt-out behavior in strict mode — NotFound is always skipped.
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         let outcome = verify_from_spec_json(&spec_json_path, true, dir.path());
@@ -751,6 +736,7 @@ mod tests {
     #[test]
     fn test_verify_from_spec_json_with_empty_entries_returns_error() {
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_EMPTY_ENTRIES).unwrap();
@@ -761,6 +747,7 @@ mod tests {
     #[test]
     fn test_verify_from_spec_json_with_all_blue_signals_passes() {
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
@@ -782,6 +769,7 @@ mod tests {
     #[test]
     fn test_verify_from_spec_json_with_yellow_signal_passes_in_default_mode() {
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_YELLOW_SIGNAL)
@@ -796,6 +784,7 @@ mod tests {
     #[test]
     fn test_verify_from_spec_json_with_yellow_signal_fails_in_strict_mode() {
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_YELLOW_SIGNAL)
@@ -812,6 +801,7 @@ mod tests {
     #[test]
     fn test_verify_from_spec_json_with_spec_yellow_signals_passes_in_default_mode() {
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_WITH_YELLOW_SIGNALS).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
@@ -826,6 +816,7 @@ mod tests {
     #[test]
     fn test_verify_from_spec_json_with_spec_yellow_signals_fails_in_strict_mode() {
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_WITH_YELLOW_SIGNALS).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
@@ -851,6 +842,7 @@ mod tests {
     #[test]
     fn test_verify_from_spec_json_with_undeclared_red_signal_returns_error() {
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(
@@ -868,6 +860,7 @@ mod tests {
     #[test]
     fn test_verify_from_spec_json_with_red_signal_returns_error() {
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_RED_SIGNAL).unwrap();
@@ -878,6 +871,7 @@ mod tests {
     #[test]
     fn test_verify_from_spec_json_with_invalid_json_returns_error() {
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), "not valid json").unwrap();
@@ -890,6 +884,7 @@ mod tests {
     #[test]
     fn test_verify_delegates_to_spec_json_when_sibling_exists() {
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         // Write a minimal spec.json and a valid domain-types.json
         std::fs::write(dir.path().join("spec.json"), SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
@@ -965,6 +960,7 @@ mod tests {
     fn test_verify_from_spec_json_rejects_domain_types_symlink() {
         // S3: spec.json is a regular file but domain-types.json is a symlink — BLOCKED
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
 
@@ -981,6 +977,7 @@ mod tests {
     fn test_verify_from_spec_json_regular_files_pass() {
         // S5 (control): both files are regular, Stage 1 and Stage 2 both pass.
         let dir = tempfile::tempdir().unwrap();
+        write_minimal_arch_rules(dir.path());
         let spec_json_path = dir.path().join("spec.json");
         std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)

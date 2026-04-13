@@ -802,9 +802,33 @@ mod tests {
         assert_eq!(exit, ExitCode::FAILURE);
     }
 
+    /// Writes a minimal `architecture-rules.json` with only `domain` TDDD-enabled
+    /// into the given tmp dir. Shared by the two Yellow-signal CLI tests below,
+    /// which both need the new T007 multilayer loop to find exactly one enabled
+    /// layer that points at `domain-types.json`.
+    fn write_minimal_arch_rules(dir: &std::path::Path) {
+        let content = r#"{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "domain-types.json"
+      }
+    }
+  ]
+}"#;
+        std::fs::write(dir.join("architecture-rules.json"), content).unwrap();
+    }
+
     #[test]
     fn test_spec_states_strict_false_passes_with_yellow_signal() {
         let tmp = TempDir::new().unwrap();
+        write_minimal_arch_rules(tmp.path());
         let spec = tmp.path().join("spec.md");
         // spec.md without ## Domain States (will delegate to spec.json).
         std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n").unwrap();
@@ -828,6 +852,7 @@ mod tests {
     #[test]
     fn test_spec_states_strict_true_fails_with_yellow_signal() {
         let tmp = TempDir::new().unwrap();
+        write_minimal_arch_rules(tmp.path());
         let spec = tmp.path().join("spec.md");
         // spec.md without ## Domain States (will delegate to spec.json).
         std::fs::write(&spec, "---\nstatus: draft\nversion: \"1.0\"\n---\n# Overview\n").unwrap();
