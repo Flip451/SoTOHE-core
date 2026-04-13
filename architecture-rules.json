@@ -64,12 +64,7 @@
       ],
       "deny_reason": "Usecase crate must only be consumed by the cli layer.",
       "tddd": {
-        "enabled": true,
-        "catalogue_file": "usecase-types.json",
-        "schema_export": {
-          "method": "rustdoc",
-          "targets": ["usecase"]
-        }
+        "enabled": false
       }
     },
     {

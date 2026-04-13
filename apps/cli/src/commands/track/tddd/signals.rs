@@ -90,35 +90,40 @@ pub fn execute_type_signals(
 
     // Phase 1 behavior: only the `domain` layer is fully wired to a
     // catalogue file path and signal evaluator. Other enabled layers (e.g.,
-    // `usecase`) exist in `architecture-rules.json` but the per-layer file
-    // routing is deferred to Phase 2. To avoid silently running the wrong
-    // layer's signals, we check each resolved binding up-front:
+    // `usecase`) are detected and rejected fail-closed so that a no-filter
+    // invocation can never silently skip an enabled catalogue.
     //
     // * If `--layer <id>` was supplied and the binding is not `domain`, we
-    //   return a clear, actionable error rather than silently evaluating the
-    //   `domain` catalogue under the wrong name.
-    // * If no filter was supplied and only non-domain layers are enabled, we
-    //   skip them (they are not yet wired), but still process `domain` when
-    //   it is present.
-    let domain_bindings: Vec<_> = bindings.iter().filter(|b| b.layer_id() == "domain").collect();
+    //   return a clear error.
+    // * If no filter was supplied and `architecture-rules.json` contains any
+    //   non-`domain` `tddd.enabled` layer, we return an error asking the
+    //   caller to re-run with `--layer domain` explicitly (which acknowledges
+    //   the single-layer scope) or to disable the extra layers.
+    let non_domain_enabled: Vec<&str> =
+        bindings.iter().map(|b| b.layer_id()).filter(|id| *id != "domain").collect();
 
-    // Explicit layer filter: reject non-domain targets fail-closed.
     if let Some(ref filter) = layer {
         if filter != "domain" {
             return Err(CliError::Message(format!(
                 "layer '{filter}' is enabled in architecture-rules.json but is not yet \
                  supported by `type-signals` in Phase 1. Only `domain` is wired. \
-                 Re-run without `--layer` or with `--layer domain`."
+                 Re-run with `--layer domain`."
             )));
         }
+    } else if !non_domain_enabled.is_empty() {
+        return Err(CliError::Message(format!(
+            "architecture-rules.json has tddd.enabled layers that are not yet supported \
+             by `type-signals` in Phase 1: {joined}. Re-run with `--layer domain` to \
+             acknowledge the single-layer scope, or set `tddd.enabled = false` on the \
+             non-domain layers.",
+            joined = non_domain_enabled.join(", ")
+        )));
     }
 
-    // Process the domain binding (there should be exactly one, but guard either way).
-    let mut exit = ExitCode::SUCCESS;
-    for _binding in &domain_bindings {
-        exit = execute_type_signals_single(&items_dir, &track_id, &workspace_root)?;
-    }
-    Ok(exit)
+    // Only the `domain` layer is actually evaluated in Phase 1. Running the
+    // legacy single-layer evaluator keeps the existing hard-coded
+    // `domain-types.json` / `domain-types-baseline.json` path stable.
+    execute_type_signals_single(&items_dir, &track_id, &workspace_root)
 }
 
 /// Legacy single-layer signal evaluator. Retained so the existing tests and

@@ -32,12 +32,21 @@ pub fn execute_baseline_capture(
     track_id: String,
     workspace_root: PathBuf,
     force: bool,
-    _layer: Option<String>,
+    layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    // T007: `--layer` is currently accepted for forward compatibility with
-    // the multilayer CLI surface. Phase 1 keeps the single-`domain` binding
-    // semantics: the caller always captures `domain-types-baseline.json`.
-    // A future iteration will branch per layer binding.
+    // T007: Phase 1 wires only the `domain` layer. `--layer` is accepted on
+    // the CLI surface so Phase 2 can extend it without another breaking
+    // change, but any non-`domain` value is rejected fail-closed so that a
+    // request like `baseline-capture --layer usecase` cannot silently
+    // overwrite `domain-types-baseline.json` with the wrong target.
+    if let Some(ref layer_id) = layer {
+        if layer_id != "domain" {
+            return Err(CliError::Message(format!(
+                "layer '{layer_id}' is not yet supported by `baseline-capture` in Phase 1. \
+                 Only `domain` is wired. Re-run with `--layer domain` (or omit `--layer`)."
+            )));
+        }
+    }
     let _valid_id = domain::TrackId::try_new(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
 

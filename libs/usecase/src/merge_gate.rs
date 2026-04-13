@@ -175,8 +175,15 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
     let layer_ids = match reader.read_enabled_layers(branch) {
         BlobFetchResult::Found(ids) => ids,
         BlobFetchResult::NotFound => {
-            // No architecture-rules.json on the branch → TDDD not active.
-            return stage1;
+            // Fail-closed: a PR branch that removes or renames
+            // `architecture-rules.json` must not be able to bypass Stage 2
+            // enforcement. The strict merge gate always requires the file
+            // to exist so that the enabled-layer set is auditable on the PR
+            // branch itself (ADR 0002 D1 + strict-signal-gate-v2 §D5.2).
+            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                "architecture-rules.json not found on origin/{branch} — \
+                 the strict merge gate requires the file to exist to enumerate TDDD layers"
+            ))]);
         }
         BlobFetchResult::FetchError(msg) => {
             return VerifyOutcome::from_findings(vec![Finding::error(format!(
@@ -850,7 +857,10 @@ mod tests {
     }
 
     #[test]
-    fn test_u25_read_enabled_layers_not_found_skips_stage2() {
+    fn test_u25_read_enabled_layers_not_found_fails_closed() {
+        // Fail-closed: removing / renaming architecture-rules.json on the
+        // PR branch must not bypass Stage 2 enforcement. The strict merge
+        // gate reports an error that mentions the missing file.
         let reader = MultiLayerMock {
             spec: BlobFetchResult::Found(all_blue_spec()),
             enabled_layers: BlobFetchResult::NotFound,
@@ -858,8 +868,15 @@ mod tests {
         };
         let outcome = check_strict_merge_gate("track/foo", &reader);
         assert!(
-            !outcome.has_errors(),
-            "architecture-rules.json NotFound must opt-out Stage 2: {outcome:?}"
+            outcome.has_errors(),
+            "architecture-rules.json NotFound must fail-closed: {outcome:?}"
+        );
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("architecture-rules.json not found")),
+            "error must mention architecture-rules.json: {outcome:?}"
         );
     }
 
