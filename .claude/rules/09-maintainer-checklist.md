@@ -19,7 +19,7 @@ Always consider:
 - enforcement:
   - `Makefile.toml`
   - `sotp verify` subcommands (Rust CLI, replaces deleted `scripts/verify_*.py`)
-  - `scripts/track_schema.py` / `track_state_machine.py` / `track_markdown.py`
+  - `scripts/track_schema.py` (Phase 3 で Rust 化予定)
   - `.claude/settings.json` (Rust hook entries: `skill-compliance`, `block-direct-git-ops`, `block-test-file-deletion` — dispatched via `bin/sotp hook dispatch ...`)
   - `scripts/external_guides.py`
 

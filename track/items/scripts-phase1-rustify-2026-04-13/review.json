@@ -1,6 +1,42 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
+          "at": "2026-04-13T13:54:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
+          "at": "2026-04-13T13:56:34Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9f9359bc317d392b4252002266439983639d35e9f718dc169569b33abaa95ac",
+          "at": "2026-04-13T15:24:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9f9359bc317d392b4252002266439983639d35e9f718dc169569b33abaa95ac",
+          "at": "2026-04-13T15:25:50Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -44,24 +80,6 @@
           "findings": [],
           "hash": "rvw1:sha256:63f63f8f982c8c53e9406b961c0bbeaf698e1b0afc500c0ea19be2173af52114",
           "at": "2026-04-13T14:30:36Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
-          "at": "2026-04-13T13:54:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
-          "at": "2026-04-13T13:56:34Z"
         }
       ]
     },
@@ -1122,6 +1140,72 @@
           "findings": [],
           "hash": "rvw1:sha256:774542146f0c85629f681e52c546ccf78227d35bf2eb4ddaffc3d7ed41346281",
           "at": "2026-04-13T15:18:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T017` is marked `done`, but its `commit_hash` is still missing. The briefing says the final commit must backfill T017 with the current commit hash, so the rendered `plan.md`/`verification.md` suffixes remain out of sync with the source of truth.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 194,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fb32c6021b9699ad15aeaa8ee31afc15ad9088cc8458eb34b1cf5ec5d2f1e7de",
+          "at": "2026-04-13T15:25:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb32c6021b9699ad15aeaa8ee31afc15ad9088cc8458eb34b1cf5ec5d2f1e7de",
+          "at": "2026-04-13T15:26:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo make test-one-exec transition_subcommand` does not validate all five T014 CLI regressions: it matches the four `transition_subcommand_*` tests but skips `views_sync_subcommand_renders_plan_and_registry()`. This means the file marks the full T014 acceptance criterion as verified even though the `views sync` path was not actually exercised by the documented command.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/verification.md",
+              "line": 44,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:fb32c6021b9699ad15aeaa8ee31afc15ad9088cc8458eb34b1cf5ec5d2f1e7de",
+          "at": "2026-04-13T15:30:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo make test-one-exec transition_subcommand` cannot verify the claimed 5 CLI regression tests: `test-one-exec` forwards the filter to `cargo nextest run`, so this only matches the four `transition_subcommand_*` tests and skips `views_sync_subcommand_renders_plan_and_registry`. The verification note therefore overstates coverage for T014.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/verification.md",
+              "line": 44,
+              "category": "testing"
+            },
+            {
+              "message": "The T017 file-set check is documented as satisfied by `ls scripts/*.py`, but that command does not prove the required 'tracked file set exactly matches these 15 files' invariant: it ignores non-`.py` entries and nested files, and it does not distinguish tracked from untracked files. As written, the verification can miss extra files while still reporting success.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/verification.md",
+              "line": 36,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:fb32c6021b9699ad15aeaa8ee31afc15ad9088cc8458eb34b1cf5ec5d2f1e7de",
+          "at": "2026-04-13T15:33:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb32c6021b9699ad15aeaa8ee31afc15ad9088cc8458eb34b1cf5ec5d2f1e7de",
+          "at": "2026-04-13T15:55:35Z"
         }
       ]
     }
