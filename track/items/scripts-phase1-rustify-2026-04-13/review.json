@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
+          "at": "2026-04-13T13:54:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
+          "at": "2026-04-13T13:56:34Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -46,6 +64,24 @@
           "findings": [],
           "hash": "rvw1:sha256:9cabd11ed67b697ec93bcc661d5dac7b6d470b9fd681a9e957c5eb22b6dd2c48",
           "at": "2026-04-13T13:22:18Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
+          "at": "2026-04-13T13:45:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
+          "at": "2026-04-13T13:47:56Z"
         }
       ]
     },
@@ -887,42 +923,35 @@
           "findings": [],
           "hash": "rvw1:sha256:bf48afd541debba9f49f00043142326daf8a111c6e8e43af0cfc802b5b3ce53f",
           "at": "2026-04-13T13:59:04Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
-          "at": "2026-04-13T13:54:11Z"
+          "hash": "rvw1:sha256:b3e77111e601556414d250b23140b91b91d558e09a0bc1c0ecc74024906e7d31",
+          "at": "2026-04-13T14:04:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `scripts/test_track_schema.py` removes the only direct coverage for `track_schema.all_track_directories()` (`AllTrackDirectoriesTest`), but `scripts/track_schema.py` is still shipped and that helper is still used by `scripts/external_guides.py` and `scripts/track_registry.py`. The surviving Rust migrations only cover metadata/status validation, so cases like merging `track/items` + `track/archive` and skipping plain files under those directories will no longer be exercised by `cargo make scripts-selftest` even though the Python implementation remains live until Phase 3.",
+              "severity": "P1",
+              "file": "scripts/test_track_schema.py",
+              "line": 720,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:b3e77111e601556414d250b23140b91b91d558e09a0bc1c0ecc74024906e7d31",
+          "at": "2026-04-13T14:08:49Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
-          "at": "2026-04-13T13:56:34Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
-          "at": "2026-04-13T13:45:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
-          "at": "2026-04-13T13:47:56Z"
+          "hash": "rvw1:sha256:b3e77111e601556414d250b23140b91b91d558e09a0bc1c0ecc74024906e7d31",
+          "at": "2026-04-13T14:10:38Z"
         }
       ]
     }

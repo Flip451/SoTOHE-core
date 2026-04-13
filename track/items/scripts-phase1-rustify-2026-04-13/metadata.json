@@ -129,7 +129,7 @@
     {
       "description": "[Cleanup] `scripts/test_track_schema.py` を削除する (impl の `scripts/track_schema.py` は Phase 3 で削除予定のため本 track では残す)。`Makefile.toml:109-128` の `scripts-selftest-local` args リストから `scripts/test_track_schema.py` を除外する。Python 固有の観点 (non-string フィールドで TypeError/AttributeError にならないこと) は Rust の型システムで構造的に排除されるため移植対象外と判断する。`scripts/track_schema.py` が `scripts/track_resolution.py` および `scripts/external_guides.py` から引き続き import されることを確認する。",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "[Red] `libs/infrastructure/src/track/render.rs::tests` に `render_plan()` の個別マーカーテストを追加する。観点: (1) in_progress task で `- [~] <desc>` が出力される / (2) done + commit_hash で `- [x] <desc> <short_hash>` が出力される / (3) done without commit_hash で literal 'None' が出力されず `- [x] <desc>` のみ出力される (Python 版の `NoneType` 表示バグ相当の防止) / (4) skipped task で `- [-] <desc>` が出力される / (5) 複数セクション (S1 → S2) の順序が preserved される / (6) summary 行が `<!-- Generated from metadata.json` ヘッダー後に配置される / (7) section description が rendering される。これらは `scripts/test_track_markdown.py::TestRenderPlan` の 10 観点のうち決定論性テスト (Rust では純関数で構造的保証) を除いた項目を網羅する。",
@@ -183,5 +183,5 @@
     }
   ],
   "title": "scripts/ Python ヘルパー削減 フェーズ1 — track_branch_guard / markdown / registry / state_machine の Rust 移植",
-  "updated_at": "2026-04-13T13:51:36Z"
+  "updated_at": "2026-04-13T14:03:14Z"
 }
