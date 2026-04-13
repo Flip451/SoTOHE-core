@@ -1,10 +1,10 @@
 <!-- Generated from domain-types.json — DO NOT EDIT DIRECTLY -->
 
-## Domain Types
+## Type Declarations
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| ParamDeclaration | value_object | — | — | 🟡 |
-| MethodDeclaration | value_object | — | — | 🟡 |
-| MemberDeclaration | enum | — | Variant, Field | 🟡 |
+| ParamDeclaration | value_object | — | — | 🔵 |
+| MethodDeclaration | value_object | — | — | 🔵 |
+| MemberDeclaration | enum | — | Variant, Field | 🔵 |
 

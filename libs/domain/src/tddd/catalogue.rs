@@ -20,8 +20,219 @@
 
 use std::collections::HashSet;
 
+use serde::Serialize;
+
 use crate::ConfidenceSignal;
 use crate::spec::SpecValidationError;
+
+// ---------------------------------------------------------------------------
+// ParamDeclaration — single parameter in a method signature
+// ---------------------------------------------------------------------------
+
+/// A single parameter in a method signature, captured at L1 resolution.
+///
+/// L1 resolution means: the type string uses last-segment short names and
+/// preserves the generic structure verbatim (e.g. `"Result<Option<User>, DomainError>"`).
+/// Module paths (`domain::user::UserId`) are NOT included — codec validation
+/// rejects `ty` strings containing `::`.
+///
+/// # Examples
+///
+/// ```text
+/// // fn find_by_id(&self, id: UserId) -> Result<User, DomainError>
+/// // ...
+/// // params[0]: { name: "id", ty: "UserId" }
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ParamDeclaration {
+    name: String,
+    ty: String,
+}
+
+impl ParamDeclaration {
+    /// Creates a new `ParamDeclaration`.
+    #[must_use]
+    pub fn new(name: impl Into<String>, ty: impl Into<String>) -> Self {
+        Self { name: name.into(), ty: ty.into() }
+    }
+
+    /// Returns the parameter binding name.
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// Returns the parameter type string (L1 short names, generics preserved).
+    #[must_use]
+    pub fn ty(&self) -> &str {
+        &self.ty
+    }
+}
+
+// ---------------------------------------------------------------------------
+// MethodDeclaration — structured method signature at L1 resolution
+// ---------------------------------------------------------------------------
+
+/// A structured method signature at L1 resolution.
+///
+/// Shared across three contexts:
+/// - Catalogue declaration: `TypeDefinitionKind::TraitPort { expected_methods }`
+///   (populated in T006)
+/// - `TypeGraph`: `TypeNode::methods` / `TraitNode::methods` (the "code reality"
+///   extracted from rustdoc JSON)
+/// - Baseline: `TypeBaselineEntry::methods` / `TraitBaselineEntry::methods`
+///   (captured snapshot at `/track:design` time — populated in T005)
+///
+/// Type strings (`ParamDeclaration::ty`, `returns`) use last-segment short
+/// names and preserve generics verbatim (e.g. `"Result<Option<User>, DomainError>"`,
+/// not `"Result"` or `"domain::user::Result"`). Codec validation rejects
+/// strings containing `::`.
+///
+/// See ADR `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` §D2
+/// for the L1 JSON schema and forward-check rules.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct MethodDeclaration {
+    name: String,
+    /// Self-receiver form: `"&self"` / `"&mut self"` / `"self"` / `None`
+    /// (associated function without a self parameter).
+    receiver: Option<String>,
+    params: Vec<ParamDeclaration>,
+    /// Return type string (`"()"` when the return type is the unit type).
+    returns: String,
+    /// Whether the method is declared `async fn`.
+    is_async: bool,
+}
+
+impl MethodDeclaration {
+    /// Creates a new `MethodDeclaration`.
+    #[must_use]
+    pub fn new(
+        name: impl Into<String>,
+        receiver: Option<String>,
+        params: Vec<ParamDeclaration>,
+        returns: impl Into<String>,
+        is_async: bool,
+    ) -> Self {
+        Self { name: name.into(), receiver, params, returns: returns.into(), is_async }
+    }
+
+    /// Returns the method name.
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// Returns the self-receiver form (`"&self"` / `"&mut self"` / `"self"`),
+    /// or `None` for associated functions.
+    #[must_use]
+    pub fn receiver(&self) -> Option<&str> {
+        self.receiver.as_deref()
+    }
+
+    /// Returns the ordered parameter list (excluding the self receiver).
+    #[must_use]
+    pub fn params(&self) -> &[ParamDeclaration] {
+        &self.params
+    }
+
+    /// Returns the return type string.
+    #[must_use]
+    pub fn returns(&self) -> &str {
+        &self.returns
+    }
+
+    /// Returns `true` if the method is declared `async fn`.
+    #[must_use]
+    pub fn is_async(&self) -> bool {
+        self.is_async
+    }
+
+    /// Reconstructs a human-readable signature string from the structured
+    /// fields for rendering / debugging.
+    ///
+    /// Layout:
+    ///
+    /// ```text
+    /// [async ]fn name(receiver[, param1: ty1, param2: ty2]) -> returns
+    /// ```
+    ///
+    /// The unit return type is rendered as `"()"`.
+    #[must_use]
+    pub fn signature_string(&self) -> String {
+        let async_prefix = if self.is_async { "async " } else { "" };
+        let receiver = self.receiver.as_deref().unwrap_or("");
+        let params_str = self
+            .params
+            .iter()
+            .map(|p| format!("{}: {}", p.name, p.ty))
+            .collect::<Vec<_>>()
+            .join(", ");
+        let args = match (receiver.is_empty(), params_str.is_empty()) {
+            (true, true) => String::new(),
+            (true, false) => params_str,
+            (false, true) => receiver.to_string(),
+            (false, false) => format!("{receiver}, {params_str}"),
+        };
+        format!("{async_prefix}fn {}({}) -> {}", self.name, args, self.returns)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// MemberDeclaration — composite type member (enum variant or struct field)
+// ---------------------------------------------------------------------------
+
+/// A member of a composite type: either an enum variant (name only) or a
+/// struct field (name + type string).
+///
+/// **Enum-first design** (see `.claude/rules/04-coding-principles.md` § Enum-first):
+/// the two states carry structurally distinct data — a variant has only a name
+/// while a field has a name and a type string. A `struct { name, ty: Option<String> }`
+/// shape would allow the illegal `Field { ty: None }` state; the enum shape
+/// prevents it at compile time.
+///
+/// Type strings (on `Field`) follow the same L1 convention as
+/// `MethodDeclaration`: last-segment short names, generics preserved verbatim.
+/// Module paths containing `::` are rejected by codec validation.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub enum MemberDeclaration {
+    /// An enum variant: only a name is tracked at L1 (payload types are
+    /// out of scope until L2).
+    Variant(String),
+    /// A struct field with its type string.
+    Field { name: String, ty: String },
+}
+
+impl MemberDeclaration {
+    /// Creates a new enum-variant member.
+    #[must_use]
+    pub fn variant(name: impl Into<String>) -> Self {
+        Self::Variant(name.into())
+    }
+
+    /// Creates a new struct-field member.
+    #[must_use]
+    pub fn field(name: impl Into<String>, ty: impl Into<String>) -> Self {
+        Self::Field { name: name.into(), ty: ty.into() }
+    }
+
+    /// Returns the member name regardless of kind.
+    #[must_use]
+    pub fn name(&self) -> &str {
+        match self {
+            Self::Variant(name) => name,
+            Self::Field { name, .. } => name,
+        }
+    }
+
+    /// Returns the field type, or `None` for enum variants.
+    #[must_use]
+    pub fn ty(&self) -> Option<&str> {
+        match self {
+            Self::Variant(_) => None,
+            Self::Field { ty, .. } => Some(ty),
+        }
+    }
+}
 
 // ---------------------------------------------------------------------------
 // TypeAction enum

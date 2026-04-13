@@ -107,15 +107,22 @@
       ],
       "method_return_types": []
     },
-    "DomainTypeEntry": {
+    "TypeCatalogueDocument": {
       "kind": "struct",
       "members": [],
       "method_return_types": [
-        "DomainTypeKind",
-        "TypeAction"
+        "HashSet"
       ]
     },
-    "DomainTypeKind": {
+    "TypeCatalogueEntry": {
+      "kind": "struct",
+      "members": [],
+      "method_return_types": [
+        "TypeAction",
+        "TypeDefinitionKind"
+      ]
+    },
+    "TypeDefinitionKind": {
       "kind": "enum",
       "members": [
         "Enum",
@@ -126,18 +133,11 @@
       ],
       "method_return_types": []
     },
-    "DomainTypeSignal": {
+    "TypeSignal": {
       "kind": "struct",
       "members": [],
       "method_return_types": [
         "ConfidenceSignal"
-      ]
-    },
-    "DomainTypesDocument": {
-      "kind": "struct",
-      "members": [],
-      "method_return_types": [
-        "HashSet"
       ]
     },
     "FastVerdict": {

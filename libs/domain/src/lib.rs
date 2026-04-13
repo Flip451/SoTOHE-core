@@ -42,8 +42,8 @@ pub use spec::{
 };
 pub use tddd::baseline::{TraitBaselineEntry, TypeBaseline, TypeBaselineEntry};
 pub use tddd::catalogue::{
-    TypeAction, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal,
-    TypestateTransitions,
+    MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeAction, TypeCatalogueDocument,
+    TypeCatalogueEntry, TypeDefinitionKind, TypeSignal, TypestateTransitions,
 };
 pub use tddd::consistency::{
     ActionContradiction, ActionContradictionKind, ConsistencyReport, check_consistency,

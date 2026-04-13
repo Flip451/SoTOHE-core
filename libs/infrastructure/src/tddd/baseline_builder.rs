@@ -4,6 +4,11 @@
 //! and method_names from each `TraitNode`. Excludes `outgoing` (derivable
 //! from method_return_types) and `module_path` (module moves are not
 //! structural changes).
+//!
+//! T004 (TDDD-01 3c): `TypeNode::members` now returns `&[MemberDeclaration]`,
+//! so the builder extracts the `name()` of each member to maintain the
+//! existing baseline `Vec<String>` schema. The structural bump to include
+//! structured `MethodDeclaration` data lands in T005 (baseline schema v2).
 
 use std::collections::HashMap;
 
@@ -27,9 +32,11 @@ pub fn build_baseline(graph: &TypeGraph, captured_at: Timestamp) -> TypeBaseline
     let mut types = HashMap::new();
     for name in graph.type_names() {
         if let Some(node) = graph.get_type(name) {
+            let member_names: Vec<String> =
+                node.members().iter().map(|m| m.name().to_string()).collect();
             let entry = TypeBaselineEntry::new(
                 node.kind().clone(),
-                node.members().to_vec(),
+                member_names,
                 node.method_return_types().iter().cloned().collect(),
             );
             types.insert(name.clone(), entry);
@@ -57,6 +64,7 @@ mod tests {
     use std::collections::HashSet;
 
     use domain::schema::{TraitNode, TypeKind, TypeNode};
+    use domain::tddd::catalogue::{MemberDeclaration, MethodDeclaration};
 
     use super::*;
 
@@ -64,12 +72,24 @@ mod tests {
         Timestamp::new("2026-04-11T00:00:00Z").unwrap()
     }
 
+    /// Helper: build a `MethodDeclaration` named `name` that takes no args and
+    /// returns the unit type. Used where the baseline only looks at names.
+    fn unit_method(name: &str) -> MethodDeclaration {
+        MethodDeclaration::new(name, Some("&self".into()), vec![], "()", false)
+    }
+
     #[test]
     fn test_build_baseline_extracts_struct_type() {
         let mut types = HashMap::new();
         types.insert(
             "TrackId".to_string(),
-            TypeNode::new(TypeKind::Struct, vec!["0".into()], HashSet::new(), HashSet::new()),
+            TypeNode::new(
+                TypeKind::Struct,
+                vec![MemberDeclaration::field("0", "u64")],
+                vec![],
+                HashSet::new(),
+                HashSet::new(),
+            ),
         );
         let graph = TypeGraph::new(types, HashMap::new());
 
@@ -88,7 +108,12 @@ mod tests {
             "TaskStatus".to_string(),
             TypeNode::new(
                 TypeKind::Enum,
-                vec!["Todo".into(), "InProgress".into(), "Done".into()],
+                vec![
+                    MemberDeclaration::variant("Todo"),
+                    MemberDeclaration::variant("InProgress"),
+                    MemberDeclaration::variant("Done"),
+                ],
+                vec![],
                 HashSet::from(["TaskStatusKind".to_string()]),
                 HashSet::new(),
             ),
@@ -99,7 +124,6 @@ mod tests {
 
         let entry = bl.get_type("TaskStatus").unwrap();
         assert_eq!(entry.kind(), &TypeKind::Enum);
-        // Members are sorted by TypeBaselineEntry::new
         assert_eq!(entry.members(), &["Done", "InProgress", "Todo"]);
         assert_eq!(entry.method_return_types(), &["TaskStatusKind"]);
     }
@@ -111,28 +135,28 @@ mod tests {
         let outgoing = HashSet::from(["Published".to_string()]);
         types.insert(
             "Draft".to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], method_return_types, outgoing),
+            TypeNode::new(TypeKind::Struct, vec![], vec![], method_return_types, outgoing),
         );
         let graph = TypeGraph::new(types, HashMap::new());
 
         let bl = build_baseline(&graph, make_timestamp());
 
         let entry = bl.get_type("Draft").unwrap();
-        // method_return_types is included, but outgoing is not a field on TypeBaselineEntry
         assert_eq!(entry.method_return_types(), &["Published"]);
     }
 
     #[test]
     fn test_build_baseline_extracts_trait() {
         let mut traits = HashMap::new();
-        traits
-            .insert("TrackReader".to_string(), TraitNode::new(vec!["find".into(), "list".into()]));
+        traits.insert(
+            "TrackReader".to_string(),
+            TraitNode::new(vec![unit_method("find"), unit_method("list")]),
+        );
         let graph = TypeGraph::new(HashMap::new(), traits);
 
         let bl = build_baseline(&graph, make_timestamp());
 
         let entry = bl.get_trait("TrackReader").unwrap();
-        // Methods are sorted by TraitBaselineEntry::new
         assert_eq!(entry.methods(), &["find", "list"]);
     }
 
@@ -159,16 +183,22 @@ mod tests {
         let mut types = HashMap::new();
         types.insert(
             "A".to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
+            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new(), HashSet::new()),
         );
         types.insert(
             "B".to_string(),
-            TypeNode::new(TypeKind::Enum, vec!["X".into()], HashSet::new(), HashSet::new()),
+            TypeNode::new(
+                TypeKind::Enum,
+                vec![MemberDeclaration::variant("X")],
+                vec![],
+                HashSet::new(),
+                HashSet::new(),
+            ),
         );
 
         let mut traits = HashMap::new();
-        traits.insert("T1".to_string(), TraitNode::new(vec!["m1".into()]));
-        traits.insert("T2".to_string(), TraitNode::new(vec!["m2".into()]));
+        traits.insert("T1".to_string(), TraitNode::new(vec![unit_method("m1")]));
+        traits.insert("T2".to_string(), TraitNode::new(vec![unit_method("m2")]));
 
         let graph = TypeGraph::new(types, traits);
         let bl = build_baseline(&graph, make_timestamp());

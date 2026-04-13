@@ -1,38 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
-          "at": "2026-04-13T00:20:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
-          "at": "2026-04-13T00:21:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4bbb01e15dd280d5a47b568e28bcd059ff078ead7aeca28030bbf9d4e837f42a",
-          "at": "2026-04-13T00:35:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4bbb01e15dd280d5a47b568e28bcd059ff078ead7aeca28030bbf9d4e837f42a",
-          "at": "2026-04-13T00:36:36Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -69,60 +37,89 @@
           "findings": [],
           "hash": "rvw1:sha256:22626bb800bba92ffbd33fac6aecee0ae9b92fa1873d6bd8c5ffb463653637bc",
           "at": "2026-04-13T00:35:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Storing `format_type(&i.for_)` here now preserves generic arguments in `ImplInfo.target_type` (for example `Foo<T>`), but `build_type_graph` still matches impls with `last_segment(i.target_type()) == type_info.name()`. Inherent impls on generic types will stop attaching to their `TypeNode`, so their methods and outgoing typestate edges disappear.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 161,
+              "category": "behavior regression"
+            },
+            {
+              "message": "`format_type` now copies array lengths and const generic expressions verbatim. Those strings can legally contain `::` (for example `N::VALUE`), so this renderer can emit invalid L1 type strings and break the codec validation that forbids `::`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 448,
+              "category": "invariant violation"
+            }
+          ],
+          "hash": "rvw1:sha256:7f3fd16b294173afe28b0a5748de3a9bf4e7dc79c5e0aebb6b0d1333e9288541",
+          "at": "2026-04-13T01:04:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`format_type` is still not faithful for several valid rustdoc type shapes: `Type::FunctionPointer` and `Type::QualifiedPath` fall through to `_`, `GenericArgs::Parenthesized` is discarded, and `DynTrait` drops its lifetime information. Any public callback, associated-type, or lifetime-qualified trait-object signature will be exported as an ambiguous string, which can poison `TypeInfo`/`MethodDeclaration` comparisons and downstream consistency checks.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 430,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1d0bf28cde927c12788bcd78b9568e0a3f2d48477318d8fff70d3ff802b167ee",
+          "at": "2026-04-13T01:13:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d0bf28cde927c12788bcd78b9568e0a3f2d48477318d8fff70d3ff802b167ee",
+          "at": "2026-04-13T01:17:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d0bf28cde927c12788bcd78b9568e0a3f2d48477318d8fff70d3ff802b167ee",
+          "at": "2026-04-13T01:19:36Z"
         }
       ]
     },
-    "domain": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
-          "at": "2026-04-12T23:58:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new module docs tell consumers to import from `crate::tddd::*`, but `libs/domain/src/tddd/mod.rs` only publishes submodules and does not re-export these items. That leaves the documented import path dead immediately after this refactor; the actual re-exports live at the crate root via `libs/domain/src/lib.rs`.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 11,
-              "category": "broken_reference"
-            }
-          ],
-          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
-          "at": "2026-04-13T00:01:47Z"
+          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
+          "at": "2026-04-13T00:20:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
-          "at": "2026-04-13T00:04:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db36c79eb63679aedaa6ecb594969b26c6faa93d54dd6165544ae26e727449db",
-          "at": "2026-04-13T00:08:26Z"
+          "hash": "rvw1:sha256:a6bad67520fa551df455edbef9f742742c61e3501d001bb630d885ac2e945680",
+          "at": "2026-04-13T00:21:01Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
-          "at": "2026-04-13T00:34:40Z"
+          "hash": "rvw1:sha256:4bbb01e15dd280d5a47b568e28bcd059ff078ead7aeca28030bbf9d4e837f42a",
+          "at": "2026-04-13T00:35:21Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
-          "at": "2026-04-13T00:35:30Z"
+          "hash": "rvw1:sha256:4bbb01e15dd280d5a47b568e28bcd059ff078ead7aeca28030bbf9d4e837f42a",
+          "at": "2026-04-13T00:36:36Z"
         }
       ]
     },
@@ -718,6 +715,103 @@
           "findings": [],
           "hash": "rvw1:sha256:14c755d17ec5af397ea43336f889306048572fddb96d1fd052b725cef966f762",
           "at": "2026-04-13T00:37:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e99b9f1c2e44249c0cb2fdde1f8668a5af1c8faf9b1d99856bea3c59c97027d1",
+          "at": "2026-04-13T01:03:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e99b9f1c2e44249c0cb2fdde1f8668a5af1c8faf9b1d99856bea3c59c97027d1",
+          "at": "2026-04-13T01:04:32Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-12T23:58:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new module docs tell consumers to import from `crate::tddd::*`, but `libs/domain/src/tddd/mod.rs` only publishes submodules and does not re-export these items. That leaves the documented import path dead immediately after this refactor; the actual re-exports live at the crate root via `libs/domain/src/lib.rs`.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 11,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-13T00:01:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-13T00:04:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db36c79eb63679aedaa6ecb594969b26c6faa93d54dd6165544ae26e727449db",
+          "at": "2026-04-13T00:08:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
+          "at": "2026-04-13T00:34:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
+          "at": "2026-04-13T00:35:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FunctionInfo::new` now accepts both `has_self_receiver` and `receiver`, but it does not enforce that they agree. That lets callers construct contradictory values such as `has_self_receiver = false` with `receiver = Some(\"&self\")`, and downstream code can silently filter or classify the method incorrectly. Derive one field from the other or validate the pair in the constructor.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 176,
+              "category": "typestate boundary leak"
+            }
+          ],
+          "hash": "rvw1:sha256:da8f3b6b5c46b93a19f63c5149fd922bd6087f0fb76884eaefbb3ec010c60c47",
+          "at": "2026-04-13T01:04:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2b05fad307e27cc9b14ee19d262a340e0cc56807b1bdc331b3f27a834fcc0e7",
+          "at": "2026-04-13T01:08:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2b05fad307e27cc9b14ee19d262a340e0cc56807b1bdc331b3f27a834fcc0e7",
+          "at": "2026-04-13T01:10:59Z"
         }
       ]
     },

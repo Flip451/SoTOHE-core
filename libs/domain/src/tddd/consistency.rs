@@ -194,9 +194,14 @@ pub fn check_consistency(
         match graph.get_type(name) {
             Some(code_node) => {
                 // Compare baseline entry against current code structure.
+                // T004: `members()` now returns `&[MemberDeclaration]`; extract
+                // names to match the baseline's `Vec<String>` schema until T005
+                // bumps the baseline to v2.
+                let member_names: Vec<String> =
+                    code_node.members().iter().map(|m| m.name().to_string()).collect();
                 let current = crate::TypeBaselineEntry::new(
                     code_node.kind().clone(),
-                    code_node.members().to_vec(),
+                    member_names,
                     code_node.method_return_types().iter().cloned().collect(),
                 );
                 if baseline_entry.structurally_equal(&current) {
@@ -436,6 +441,19 @@ mod tests {
     use crate::Timestamp;
     use crate::schema::{TraitNode, TypeGraph, TypeKind, TypeNode};
     use crate::tddd::baseline::{TraitBaselineEntry, TypeBaseline, TypeBaselineEntry};
+    use crate::tddd::catalogue::{MemberDeclaration, MethodDeclaration};
+
+    /// Helper: build a `MethodDeclaration` that takes no args and returns unit.
+    fn unit_method(name: &str) -> MethodDeclaration {
+        MethodDeclaration::new(name, Some("&self".into()), vec![], "()", false)
+    }
+
+    /// Helper: turn a slice of field/variant names into `Vec<MemberDeclaration>`
+    /// by treating each as an enum variant (field/variant name is the only
+    /// thing the tests below inspect).
+    fn variants(names: &[&str]) -> Vec<MemberDeclaration> {
+        names.iter().copied().map(MemberDeclaration::variant).collect()
+    }
 
     fn empty_baseline() -> TypeBaseline {
         TypeBaseline::new(
@@ -467,7 +485,7 @@ mod tests {
         let mut types = HashMap::new();
         types.insert(
             "NewType".to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
+            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new(), HashSet::new()),
         );
         let graph = TypeGraph::new(types, HashMap::new());
 
@@ -487,7 +505,13 @@ mod tests {
         let mut types = HashMap::new();
         types.insert(
             "ExistingType".to_string(),
-            TypeNode::new(TypeKind::Struct, vec!["field".into()], HashSet::new(), HashSet::new()),
+            TypeNode::new(
+                TypeKind::Struct,
+                vec![MemberDeclaration::field("field", "String")],
+                vec![],
+                HashSet::new(),
+                HashSet::new(),
+            ),
         );
         let graph = TypeGraph::new(types, HashMap::new());
 
@@ -510,7 +534,8 @@ mod tests {
             "ChangedType".to_string(),
             TypeNode::new(
                 TypeKind::Enum,
-                vec!["A".into(), "B".into()], // new variant added
+                variants(&["A", "B"]), // new variant added
+                vec![],
                 HashSet::new(),
                 HashSet::new(),
             ),
@@ -557,7 +582,13 @@ mod tests {
         let mut types = HashMap::new();
         types.insert(
             "TrackId".to_string(),
-            TypeNode::new(TypeKind::Struct, vec!["0".into()], HashSet::new(), HashSet::new()),
+            TypeNode::new(
+                TypeKind::Struct,
+                vec![MemberDeclaration::field("0", "u64")],
+                vec![],
+                HashSet::new(),
+                HashSet::new(),
+            ),
         );
         let graph = TypeGraph::new(types, HashMap::new());
 
@@ -584,7 +615,7 @@ mod tests {
         let mut types = HashMap::new();
         types.insert(
             "NewType".to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
+            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new(), HashSet::new()),
         );
         let graph = TypeGraph::new(types, HashMap::new());
 
@@ -602,7 +633,7 @@ mod tests {
         )]);
 
         let mut traits = HashMap::new();
-        traits.insert("MyTrait".to_string(), TraitNode::new(vec!["method_a".into()]));
+        traits.insert("MyTrait".to_string(), TraitNode::new(vec![unit_method("method_a")]));
         let graph = TypeGraph::new(HashMap::new(), traits);
 
         let report = check_consistency(&[], &graph, &bl);
@@ -620,7 +651,7 @@ mod tests {
         let mut traits = HashMap::new();
         traits.insert(
             "MyTrait".to_string(),
-            TraitNode::new(vec!["method_a".into(), "method_b".into()]),
+            TraitNode::new(vec![unit_method("method_a"), unit_method("method_b")]),
         );
         let graph = TypeGraph::new(HashMap::new(), traits);
 
@@ -669,16 +700,17 @@ mod tests {
         for name in
             &["DeclaredNew", "DeclaredExisting", "UnchangedExisting", "ChangedExisting", "BrandNew"]
         {
-            let (kind, members) = if *name == "ChangedExisting" {
-                (TypeKind::Enum, vec!["A".into(), "B".into()]) // changed
+            let (kind, members): (TypeKind, Vec<MemberDeclaration>) = if *name == "ChangedExisting"
+            {
+                (TypeKind::Enum, variants(&["A", "B"])) // changed
             } else if *name == "UnchangedExisting" {
-                (TypeKind::Struct, vec!["x".into()])
+                (TypeKind::Struct, vec![MemberDeclaration::field("x", "String")])
             } else {
                 (TypeKind::Struct, vec![])
             };
             types.insert(
                 name.to_string(),
-                TypeNode::new(kind, members, HashSet::new(), HashSet::new()),
+                TypeNode::new(kind, members, vec![], HashSet::new(), HashSet::new()),
             );
         }
         let graph = TypeGraph::new(types, HashMap::new());

@@ -194,7 +194,7 @@ fn evaluate_enum(
         );
     }
 
-    let code_variants: HashSet<&str> = code_type.members().iter().map(|s| s.as_str()).collect();
+    let code_variants: HashSet<&str> = code_type.members().iter().map(|m| m.name()).collect();
     let spec_variants: HashSet<&str> = expected_variants.iter().map(|s| s.as_str()).collect();
 
     let mut missing: Vec<String> =
@@ -254,7 +254,7 @@ fn evaluate_error_type(
         return blue(name, kind_tag);
     }
 
-    let code_variants: HashSet<&str> = code_type.members().iter().map(|s| s.as_str()).collect();
+    let code_variants: HashSet<&str> = code_type.members().iter().map(|m| m.name()).collect();
 
     let mut found = Vec::new();
     let mut missing = Vec::new();
@@ -356,6 +356,12 @@ mod tests {
 
     use super::*;
     use crate::schema::{TraitNode, TypeNode};
+    use crate::tddd::catalogue::{MemberDeclaration, MethodDeclaration};
+
+    /// Build a `MethodDeclaration` that takes no args and returns unit.
+    fn unit_method(name: &str) -> MethodDeclaration {
+        MethodDeclaration::new(name, Some("&self".into()), vec![], "()", false)
+    }
 
     /// Build a `TypeGraph` with struct-kinded types only (no members, no return types).
     fn make_profile(type_names: &[&str]) -> TypeGraph {
@@ -363,7 +369,7 @@ mod tests {
         for name in type_names {
             types.insert(
                 name.to_string(),
-                TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
+                TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new(), HashSet::new()),
             );
         }
         TypeGraph::new(types, HashMap::new())
@@ -376,7 +382,8 @@ mod tests {
             name.to_string(),
             TypeNode::new(
                 TypeKind::Enum,
-                variants.iter().map(|v| v.to_string()).collect(),
+                variants.iter().copied().map(MemberDeclaration::variant).collect(),
+                vec![],
                 HashSet::new(),
                 HashSet::new(),
             ),
@@ -389,11 +396,11 @@ mod tests {
         let mut types = HashMap::new();
         let return_types: HashSet<String> = [to_type.to_string()].into();
         let outgoing: HashSet<String> = [to_type.to_string()].into();
-        let from_node = TypeNode::new(TypeKind::Struct, vec![], return_types, outgoing);
+        let from_node = TypeNode::new(TypeKind::Struct, vec![], vec![], return_types, outgoing);
         types.insert(from_type.to_string(), from_node);
         types.insert(
             to_type.to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
+            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new(), HashSet::new()),
         );
         TypeGraph::new(types, HashMap::new())
     }
@@ -403,7 +410,7 @@ mod tests {
         let mut traits = HashMap::new();
         traits.insert(
             trait_name.to_string(),
-            TraitNode::new(methods.iter().map(|m| m.to_string()).collect()),
+            TraitNode::new(methods.iter().copied().map(unit_method).collect()),
         );
         TypeGraph::new(HashMap::new(), traits)
     }
@@ -562,7 +569,7 @@ mod tests {
         let types = std::collections::HashMap::new();
         let traits = std::collections::HashMap::from([(
             "OldRepo".to_string(),
-            TraitNode::new(vec!["find".into()]),
+            TraitNode::new(vec![unit_method("find")]),
         )]);
         let profile = TypeGraph::new(types, traits);
         let results = evaluate_type_signals(&[entry], &profile);
@@ -696,11 +703,12 @@ mod tests {
             ["Published".to_string(), "NonTypestate".to_string()].into();
         // outgoing only contains the typestate target — NonTypestate is intentionally absent.
         let outgoing: HashSet<String> = ["Published".to_string()].into();
-        let from_node = TypeNode::new(TypeKind::Struct, vec![], method_return_types, outgoing);
+        let from_node =
+            TypeNode::new(TypeKind::Struct, vec![], vec![], method_return_types, outgoing);
         types.insert("Draft".to_string(), from_node);
         types.insert(
             "Published".to_string(),
-            TypeNode::new(TypeKind::Struct, vec![], HashSet::new(), HashSet::new()),
+            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new(), HashSet::new()),
         );
         let profile = TypeGraph::new(types, HashMap::new());
 

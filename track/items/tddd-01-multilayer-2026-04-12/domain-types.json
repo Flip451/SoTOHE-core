@@ -28,20 +28,24 @@
     {
       "type_name": "ParamDeclaration",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "MethodDeclaration",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "MemberDeclaration",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Field",
+        "Variant"
+      ]
     }
   ]
 }

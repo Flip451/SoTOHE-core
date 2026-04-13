@@ -87,6 +87,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "4a181723dc3fa6676feb94bef35ac27b4ee541ee",
       "description": "usecase / CLI / domain alias 除去: `libs/usecase/src/merge_gate.rs` の `TrackBlobReader::read_domain_types_document` → `read_type_catalogue` リネームと import 更新。`task_completion.rs` のテストモック同期。`apps/cli/src/commands/track/tddd/signals.rs` の `DomainType*` → `TypeCatalogue*` / `TypeDefinitionKind` / `TypeSignal` リネームと `execute_domain_type_signals` → `execute_type_signals`。`verify.rs` / `track/mod.rs` の同リネーム。`libs/domain/src/lib.rs` と `libs/domain/src/tddd/catalogue.rs` の T001 alias facade (`pub use ... as DomainType*` + function shims) 除去。`Makefile.toml` は変更なし (該当タスク名が存在しなかったため)。`baseline.rs` は変更なし (T003 スコープ外)",
       "id": "T003",
       "status": "done"
@@ -94,7 +95,7 @@
     {
       "description": "`libs/domain/src/tddd/catalogue.rs` に `ParamDeclaration` (struct) / `MethodDeclaration` (struct + `signature_string()` ヘルパーメソッド) / `MemberDeclaration` (enum-first: Variant/Field) を追加。`libs/domain/src/schema.rs` の `FunctionInfo` から `signature: String` フィールドと `pub fn signature()` アクセサを削除 (C1)、`params`/`returns`/`receiver`/`is_async` を追加。`libs/infrastructure/src/schema_export.rs::format_sig` 関数も削除。`TypeInfo::members` を `Vec<MemberDeclaration>` に、`TypeNode` を `{kind, members: Vec<MemberDeclaration>, methods: Vec<MethodDeclaration>, outgoing}` に、`TraitNode` を `{methods: Vec<MethodDeclaration>}` に拡張。`libs/infrastructure/src/schema_export.rs` に recursive `format_type` / `format_args` を追加して rustdoc_types 0.57 から 4 フィールドを抽出。`SchemaExporter::export(&self, crate_name: &str)` ポートシグネチャは変更しない (BRIDGE-01 / domain.rs / verify.rs の既存 call-site 互換)。注: CLI が `schema_export.targets[]` をループして per-crate `export()` を呼び出し結果を統合する multi-crate 集約 wiring は T007 で実装する — T004 は per-crate 抽出ロジック (`format_type` / `format_args` を含む rustdoc JSON → 構造化フィールド変換) のみを担当。`libs/infrastructure/src/code_profile_builder.rs::build_type_graph` に FunctionInfo → MethodDeclaration 変換を追加。outgoing は従来通り return_type_names ∩ typestate_names から derive。BRIDGE-01 (`sotp domain export-schema`) JSON の `signature` キーが消える breaking change を受容",
       "id": "T004",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "description": "`libs/domain/src/tddd/baseline.rs` の `TypeBaselineEntry` を `{kind, members: Vec<MemberDeclaration>, methods: Vec<MethodDeclaration>}` に、`TraitBaselineEntry` を `{methods: Vec<MethodDeclaration>}` に更新。`libs/infrastructure/src/tddd/baseline_codec.rs` の `schema_version` を 2 にバンプ、v1 検出時に `BaselineCodecError::UnsupportedSchemaVersion(1)` + 再実行手順付きエラーメッセージ。`libs/infrastructure/src/tddd/baseline_builder.rs` の TypeGraph → TypeBaseline 変換を新シェイプに更新。`libs/domain/src/tddd/consistency.rs::check_consistency` の `TypeBaselineEntry::new` 呼び出しを新シェイプ (`code_node.methods()` 使用) に更新",
@@ -113,5 +114,5 @@
     }
   ],
   "title": "TDDD-01: 型カタログ多層化 + L1 シグネチャ検証",
-  "updated_at": "2026-04-13T00:31:49Z"
+  "updated_at": "2026-04-13T00:41:30Z"
 }

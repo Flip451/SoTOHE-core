@@ -2,6 +2,14 @@
 //!
 //! Uses `cargo +nightly rustdoc` to generate rustdoc JSON, then parses the output
 //! with `rustdoc_types` to build domain `SchemaExport` values.
+//!
+//! T004 (TDDD-01 3c) rewrites `extract_methods` / `build_schema_export` to
+//! populate the new structured signature fields (`params` / `returns` /
+//! `receiver` / `is_async`) and to build `TypeInfo::members` as
+//! `Vec<MemberDeclaration>`. The old single-string `signature` field is gone;
+//! callers that need a human-readable signature should rebuild a
+//! `MethodDeclaration` and call `signature_string()`. See ADR
+//! `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` §Phase 1-4.
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -10,7 +18,8 @@ use domain::schema::{
     FunctionInfo, ImplInfo, SchemaExport, SchemaExportError, SchemaExporter, TraitInfo, TypeInfo,
     TypeKind,
 };
-use rustdoc_types::{ItemEnum, Visibility};
+use domain::tddd::catalogue::{MemberDeclaration, ParamDeclaration};
+use rustdoc_types::{GenericArg, GenericArgs, ItemEnum, Type, Visibility};
 
 /// Adapter implementing `SchemaExporter` via rustdoc JSON.
 pub struct RustdocSchemaExporter {
@@ -89,7 +98,6 @@ fn run_rustdoc(workspace_root: &Path, crate_name: &str) -> Result<PathBuf, Schem
 
 /// Resolves the Cargo target directory, respecting `CARGO_TARGET_DIR` and workspace config.
 fn resolve_target_dir(workspace_root: &Path) -> Result<PathBuf, SchemaExportError> {
-    // Check environment variable first
     if let Ok(dir) = std::env::var("CARGO_TARGET_DIR") {
         let path = PathBuf::from(dir);
         if path.is_relative() {
@@ -97,7 +105,6 @@ fn resolve_target_dir(workspace_root: &Path) -> Result<PathBuf, SchemaExportErro
         }
         return Ok(path);
     }
-    // Fall back to `cargo metadata` for reliable resolution
     let output = Command::new("cargo")
         .args(["metadata", "--format-version", "1", "--no-deps"])
         .current_dir(workspace_root)
@@ -105,13 +112,10 @@ fn resolve_target_dir(workspace_root: &Path) -> Result<PathBuf, SchemaExportErro
         .map_err(|e| SchemaExportError::RustdocFailed(format!("cargo metadata failed: {e}")))?;
 
     if !output.status.success() {
-        // Default fallback
         return Ok(workspace_root.join("target"));
     }
 
     let stdout = String::from_utf8_lossy(&output.stdout);
-    // Extract target_directory from JSON without pulling in a full JSON parser dependency
-    // (serde_json is already available via rustdoc_types)
     if let Ok(meta) = serde_json::from_str::<serde_json::Value>(&stdout) {
         if let Some(dir) = meta.get("target_directory").and_then(|v| v.as_str()) {
             return Ok(PathBuf::from(dir));
@@ -146,17 +150,15 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
     }
 
     for item in krate.index.values() {
-        // Skip items from external crates (crate_id 0 = local crate).
         if item.crate_id != 0 {
             continue;
         }
 
-        // Impl blocks have name=None and non-Public visibility; handle them separately.
         if let ItemEnum::Impl(i) = &item.inner {
             if i.is_synthetic || i.blanket_impl.is_some() {
                 continue;
             }
-            let target = type_name(&i.for_);
+            let target = format_type(&i.for_);
             let trait_name = i.trait_.as_ref().map(|p| p.path.clone());
             let methods = extract_methods(&i.items, krate);
             if !methods.is_empty() || trait_name.is_some() {
@@ -173,7 +175,6 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
             None => continue,
         };
 
-        // Extract module path from the rustdoc paths table for type items.
         let module_path = extract_module_path(&item.id, krate);
 
         match &item.inner {
@@ -222,15 +223,19 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
                 types.push(ti);
             }
             ItemEnum::Function(f) if !method_ids.contains(&item.id) => {
-                let sig = format_sig(&name, &f.sig);
                 let return_type_names = extract_return_type_names(&f.sig);
+                let params = extract_params(&f.sig);
+                let returns = format_return(&f.sig);
                 // Free functions never have a self receiver.
                 functions.push(FunctionInfo::new(
                     name,
-                    sig,
                     item.docs.clone(),
                     return_type_names,
                     false,
+                    params,
+                    returns,
+                    None,
+                    f.header.is_async,
                 ));
             }
             ItemEnum::Trait(t) => {
@@ -241,7 +246,6 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
         }
     }
 
-    // Sort for deterministic output (HashMap iteration order is non-deterministic).
     types.sort_by(|a, b| a.name().cmp(b.name()));
     functions.sort_by(|a, b| a.name().cmp(b.name()));
     traits.sort_by(|a, b| a.name().cmp(b.name()));
@@ -252,40 +256,58 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
     SchemaExport::new(crate_name.to_owned(), types, functions, traits, impls)
 }
 
-/// Extract public field names from a struct.
-fn extract_struct_fields(s: &rustdoc_types::Struct, krate: &rustdoc_types::Crate) -> Vec<String> {
+/// Extract public fields from a struct as `MemberDeclaration::Field`.
+fn extract_struct_fields(
+    s: &rustdoc_types::Struct,
+    krate: &rustdoc_types::Crate,
+) -> Vec<MemberDeclaration> {
     match &s.kind {
         rustdoc_types::StructKind::Plain { fields, .. } => fields
             .iter()
             .filter_map(|id| krate.index.get(id))
             .filter(|item| matches!(item.visibility, Visibility::Public))
-            .filter_map(|item| item.name.clone())
+            .filter_map(|item| {
+                let name = item.name.clone()?;
+                if let ItemEnum::StructField(ty) = &item.inner {
+                    Some(MemberDeclaration::field(name, format_type(ty)))
+                } else {
+                    None
+                }
+            })
             .collect(),
         rustdoc_types::StructKind::Tuple(fields) => fields
             .iter()
             .enumerate()
-            .filter_map(|(i, opt)| opt.as_ref().map(|_| i.to_string()))
+            .filter_map(|(i, opt)| {
+                let id = opt.as_ref()?;
+                let item = krate.index.get(id)?;
+                if let ItemEnum::StructField(ty) = &item.inner {
+                    Some(MemberDeclaration::field(i.to_string(), format_type(ty)))
+                } else {
+                    None
+                }
+            })
             .collect(),
         rustdoc_types::StructKind::Unit => Vec::new(),
     }
 }
 
-/// Extract variant names from an enum.
-fn extract_enum_variants(e: &rustdoc_types::Enum, krate: &rustdoc_types::Crate) -> Vec<String> {
+/// Extract enum variants as `MemberDeclaration::Variant`.
+fn extract_enum_variants(
+    e: &rustdoc_types::Enum,
+    krate: &rustdoc_types::Crate,
+) -> Vec<MemberDeclaration> {
     e.variants
         .iter()
         .filter_map(|id| krate.index.get(id))
         .filter_map(|item| item.name.clone())
+        .map(MemberDeclaration::variant)
         .collect()
 }
 
 /// Extract the module path for a type from the rustdoc `paths` table.
-///
-/// Returns the parent module path (e.g., `"review"` for `crate::review::Error`),
-/// or `None` if the item is not found in the paths table.
 fn extract_module_path(id: &rustdoc_types::Id, krate: &rustdoc_types::Crate) -> Option<String> {
     let summary = krate.paths.get(id)?;
-    // path is e.g. ["crate_name", "module", "TypeName"] — take all but last as module path.
     summary
         .path
         .get(..summary.path.len().saturating_sub(1))
@@ -293,13 +315,41 @@ fn extract_module_path(id: &rustdoc_types::Id, krate: &rustdoc_types::Crate) -> 
         .map(|parent| parent.join("::"))
 }
 
-/// Returns `true` if the function signature's first parameter is a self receiver
-/// (`self`, `&self`, or `&mut self`).
+/// Returns the self-receiver form (`"&self"` / `"&mut self"` / `"self"`), or
+/// `None` if the first input is not a self receiver.
+fn extract_receiver(sig: &rustdoc_types::FunctionSignature) -> Option<String> {
+    let (name, ty) = sig.inputs.first()?;
+    if name != "self" {
+        return None;
+    }
+    match ty {
+        Type::BorrowedRef { is_mutable: false, .. } => Some("&self".to_string()),
+        Type::BorrowedRef { is_mutable: true, .. } => Some("&mut self".to_string()),
+        _ => Some("self".to_string()),
+    }
+}
+
+/// Returns `true` if the function signature's first parameter is a self receiver.
 fn has_self_param(sig: &rustdoc_types::FunctionSignature) -> bool {
     sig.inputs.first().map(|(name, _)| name == "self").unwrap_or(false)
 }
 
-/// Extract method FunctionInfos from a list of item Ids.
+/// Extract the ordered parameter list from a function signature, excluding
+/// the self receiver if present.
+fn extract_params(sig: &rustdoc_types::FunctionSignature) -> Vec<ParamDeclaration> {
+    sig.inputs
+        .iter()
+        .filter(|(name, _)| name != "self")
+        .map(|(name, ty)| ParamDeclaration::new(name.clone(), format_type(ty)))
+        .collect()
+}
+
+/// Format the return type. `Option<Type>::None` is rendered as `"()"`.
+fn format_return(sig: &rustdoc_types::FunctionSignature) -> String {
+    sig.output.as_ref().map_or_else(|| "()".to_string(), format_type)
+}
+
+/// Extract method `FunctionInfo`s from a list of item Ids.
 /// Accepts both `Public` and `Default` visibility (trait associated items use `Default`).
 fn extract_methods(ids: &[rustdoc_types::Id], krate: &rustdoc_types::Crate) -> Vec<FunctionInfo> {
     ids.iter()
@@ -310,12 +360,18 @@ fn extract_methods(ids: &[rustdoc_types::Id], krate: &rustdoc_types::Crate) -> V
             if let ItemEnum::Function(f) = &item.inner {
                 let return_type_names = extract_return_type_names(&f.sig);
                 let has_self = has_self_param(&f.sig);
+                let receiver = extract_receiver(&f.sig);
+                let params = extract_params(&f.sig);
+                let returns = format_return(&f.sig);
                 Some(FunctionInfo::new(
                     name.clone(),
-                    format_sig(name, &f.sig),
                     item.docs.clone(),
                     return_type_names,
                     has_self,
+                    params,
+                    returns,
+                    receiver,
+                    f.header.is_async,
                 ))
             } else {
                 None
@@ -340,90 +396,140 @@ fn extract_return_type_names(sig: &rustdoc_types::FunctionSignature) -> Vec<Stri
 /// are added as bare names without recursing into their type arguments.
 /// `BorrowedRef` (`&T`) is unwrapped to extract the inner type.
 /// `Tuple` elements are NOT expanded (tuples are not transition targets).
-fn collect_type_names(ty: &rustdoc_types::Type, out: &mut Vec<String>) {
+fn collect_type_names(ty: &Type, out: &mut Vec<String>) {
     match ty {
-        rustdoc_types::Type::ResolvedPath(p) => {
+        Type::ResolvedPath(p) => {
             let name = p.path.rsplit("::").next().unwrap_or(&p.path);
             match name {
                 "Result" | "Option" => {
-                    // Unwrap first generic argument only.
                     if let Some(args) = &p.args {
-                        if let rustdoc_types::GenericArgs::AngleBracketed { args, .. } =
-                            args.as_ref()
-                        {
-                            if let Some(rustdoc_types::GenericArg::Type(inner)) = args.first() {
+                        if let GenericArgs::AngleBracketed { args, .. } = args.as_ref() {
+                            if let Some(GenericArg::Type(inner)) = args.first() {
                                 collect_type_names(inner, out);
                             }
                         }
                     }
                 }
                 _ => {
-                    // Non-wrapper type — add bare name, do NOT recurse into generics.
                     out.push(name.to_string());
                 }
             }
         }
-        rustdoc_types::Type::BorrowedRef { type_: inner, .. } => {
+        Type::BorrowedRef { type_: inner, .. } => {
             collect_type_names(inner, out);
         }
         _ => {}
     }
 }
 
-/// Build a human-readable signature from FunctionSignature.
-/// Keeps it simple: only param names and top-level type names. No recursive Type formatting.
-fn format_sig(name: &str, sig: &rustdoc_types::FunctionSignature) -> String {
-    let params: Vec<String> = sig
-        .inputs
-        .iter()
-        .map(|(param_name, ty)| format!("{param_name}: {}", type_name(ty)))
-        .collect();
-    let ret = sig.output.as_ref().map(|ty| format!(" -> {}", type_name(ty)));
-    format!("fn {name}({}){}", params.join(", "), ret.unwrap_or_default())
-}
-
-/// Extract a short type name. Only resolves the outermost type — no recursive expansion.
-fn type_name(ty: &rustdoc_types::Type) -> String {
+/// Recursive type formatter at L1 resolution.
+///
+/// Renders a rustdoc `Type` as a short-name string, preserving generic
+/// structure verbatim. Module paths are stripped (last segment only). The
+/// unit type `()` is rendered explicitly.
+fn format_type(ty: &Type) -> String {
     match ty {
-        rustdoc_types::Type::ResolvedPath(p) => p.path.clone(),
-        rustdoc_types::Type::Primitive(p) => p.clone(),
-        rustdoc_types::Type::BorrowedRef { is_mutable, type_: inner, .. } => {
-            if *is_mutable {
-                format!("&mut {}", type_name(inner))
+        Type::ResolvedPath(p) => {
+            let short = p.path.rsplit("::").next().unwrap_or(&p.path).to_string();
+            if let Some(args) = &p.args {
+                let rendered = format_args(args);
+                if rendered.is_empty() { short } else { format!("{short}<{rendered}>") }
             } else {
-                format!("&{}", type_name(inner))
+                short
             }
         }
-        rustdoc_types::Type::Slice(inner) => format!("[{}]", type_name(inner)),
-        rustdoc_types::Type::Tuple(types) if types.is_empty() => "()".to_owned(),
-        _ => "_".to_owned(),
+        Type::Generic(name) => name.clone(),
+        Type::Primitive(name) => name.clone(),
+        Type::BorrowedRef { is_mutable, type_: inner, .. } => {
+            let mut_str = if *is_mutable { "mut " } else { "" };
+            format!("&{mut_str}{}", format_type(inner))
+        }
+        Type::Slice(inner) => format!("[{}]", format_type(inner)),
+        Type::Array { type_: inner, len } => {
+            // Sanitize: const-generic length expressions may contain `::` (e.g. `N::VALUE`).
+            // Replace `::` with `.` to preserve the L1 invariant that rendered type strings
+            // never contain `::`.
+            let safe_len = len.replace("::", ".");
+            format!("[{}; {}]", format_type(inner), safe_len)
+        }
+        Type::Tuple(tys) if tys.is_empty() => "()".to_string(),
+        Type::Tuple(tys) => {
+            let items: Vec<String> = tys.iter().map(format_type).collect();
+            format!("({})", items.join(", "))
+        }
+        Type::RawPointer { is_mutable, type_: inner } => {
+            let kw = if *is_mutable { "mut" } else { "const" };
+            format!("*{kw} {}", format_type(inner))
+        }
+        Type::ImplTrait(bounds) => {
+            let rendered = bounds
+                .iter()
+                .filter_map(|b| match b {
+                    rustdoc_types::GenericBound::TraitBound { trait_, .. } => {
+                        Some(trait_.path.rsplit("::").next().unwrap_or(&trait_.path).to_string())
+                    }
+                    _ => None,
+                })
+                .collect::<Vec<_>>()
+                .join(" + ");
+            if rendered.is_empty() { "impl _".to_string() } else { format!("impl {rendered}") }
+        }
+        Type::DynTrait(dyn_trait) => {
+            let rendered = dyn_trait
+                .traits
+                .iter()
+                .map(|pt| pt.trait_.path.rsplit("::").next().unwrap_or(&pt.trait_.path).to_string())
+                .collect::<Vec<_>>()
+                .join(" + ");
+            if rendered.is_empty() { "dyn _".to_string() } else { format!("dyn {rendered}") }
+        }
+        _ => "_".to_string(),
+    }
+}
+
+/// Render angle-bracketed generic argument lists. Lifetime and const
+/// arguments are preserved in source order; type arguments are recursively
+/// formatted via `format_type`.
+fn format_args(args: &GenericArgs) -> String {
+    match args {
+        GenericArgs::AngleBracketed { args, .. } => args
+            .iter()
+            .map(|arg| match arg {
+                GenericArg::Type(t) => format_type(t),
+                GenericArg::Lifetime(lt) => lt.clone(),
+                // Sanitize: const expressions may contain `::` (e.g. `N::VALUE`).
+                // Replace `::` with `.` to preserve the L1 invariant that rendered
+                // type strings never contain `::`.
+                GenericArg::Const(c) => c.expr.replace("::", "."),
+                GenericArg::Infer => "_".to_string(),
+            })
+            .collect::<Vec<_>>()
+            .join(", "),
+        GenericArgs::Parenthesized { .. } => String::new(),
+        GenericArgs::ReturnTypeNotation => String::new(),
     }
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use super::*;
 
     /// Helper: build a `ResolvedPath` type with optional generic args.
-    fn resolved(name: &str, args: Option<Vec<rustdoc_types::GenericArg>>) -> rustdoc_types::Type {
-        rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+    fn resolved(name: &str, args: Option<Vec<GenericArg>>) -> Type {
+        Type::ResolvedPath(rustdoc_types::Path {
             path: name.to_string(),
             id: rustdoc_types::Id(0),
-            args: args.map(|a| {
-                Box::new(rustdoc_types::GenericArgs::AngleBracketed {
-                    args: a,
-                    constraints: vec![],
-                })
-            }),
+            args: args
+                .map(|a| Box::new(GenericArgs::AngleBracketed { args: a, constraints: vec![] })),
         })
     }
 
-    fn type_arg(ty: rustdoc_types::Type) -> rustdoc_types::GenericArg {
-        rustdoc_types::GenericArg::Type(ty)
+    fn type_arg(ty: Type) -> GenericArg {
+        GenericArg::Type(ty)
     }
 
-    fn simple(name: &str) -> rustdoc_types::Type {
+    fn simple(name: &str) -> Type {
         resolved(name, None)
     }
 
@@ -475,7 +581,7 @@ mod tests {
 
     #[test]
     fn test_collect_type_names_borrowed_ref_unwraps_inner() {
-        let ty = rustdoc_types::Type::BorrowedRef {
+        let ty = Type::BorrowedRef {
             lifetime: None,
             is_mutable: false,
             type_: Box::new(simple("Draft")),
@@ -487,7 +593,7 @@ mod tests {
 
     #[test]
     fn test_collect_type_names_tuple_does_not_expand() {
-        let ty = rustdoc_types::Type::Tuple(vec![simple("A"), simple("B")]);
+        let ty = Type::Tuple(vec![simple("A"), simple("B")]);
         let mut out = Vec::new();
         collect_type_names(&ty, &mut out);
         assert!(out.is_empty());
@@ -503,11 +609,116 @@ mod tests {
 
     #[test]
     fn test_collect_type_names_result_with_nested_option() {
-        // Result<Option<Published>, Error> → unwrap Result → unwrap Option → Published
         let inner = resolved("Option", Some(vec![type_arg(simple("Published"))]));
         let ty = resolved("Result", Some(vec![type_arg(inner), type_arg(simple("Error"))]));
         let mut out = Vec::new();
         collect_type_names(&ty, &mut out);
         assert_eq!(out, vec!["Published"]);
+    }
+
+    #[test]
+    fn format_type_strips_module_path_to_short_name() {
+        let ty = resolved("domain::review::Draft", None);
+        assert_eq!(format_type(&ty), "Draft");
+    }
+
+    #[test]
+    fn format_type_preserves_generics_recursively() {
+        let inner = resolved("Option", Some(vec![type_arg(simple("User"))]));
+        let ty = resolved("Result", Some(vec![type_arg(inner), type_arg(simple("DomainError"))]));
+        assert_eq!(format_type(&ty), "Result<Option<User>, DomainError>");
+    }
+
+    #[test]
+    fn format_type_renders_borrowed_ref() {
+        let ty =
+            Type::BorrowedRef { lifetime: None, is_mutable: false, type_: Box::new(simple("str")) };
+        assert_eq!(format_type(&ty), "&str");
+
+        let mut_ty =
+            Type::BorrowedRef { lifetime: None, is_mutable: true, type_: Box::new(simple("User")) };
+        assert_eq!(format_type(&mut_ty), "&mut User");
+    }
+
+    #[test]
+    fn format_type_renders_unit_tuple() {
+        let ty = Type::Tuple(vec![]);
+        assert_eq!(format_type(&ty), "()");
+    }
+
+    #[test]
+    fn format_return_maps_none_to_unit() {
+        let sig =
+            rustdoc_types::FunctionSignature { inputs: vec![], output: None, is_c_variadic: false };
+        assert_eq!(format_return(&sig), "()");
+    }
+
+    #[test]
+    fn format_return_renders_resolved_path() {
+        let sig = rustdoc_types::FunctionSignature {
+            inputs: vec![],
+            output: Some(simple("Published")),
+            is_c_variadic: false,
+        };
+        assert_eq!(format_return(&sig), "Published");
+    }
+
+    #[test]
+    fn extract_receiver_detects_ref_self() {
+        let self_ty = Type::BorrowedRef {
+            lifetime: None,
+            is_mutable: false,
+            type_: Box::new(simple("Self")),
+        };
+        let sig = rustdoc_types::FunctionSignature {
+            inputs: vec![("self".to_string(), self_ty)],
+            output: None,
+            is_c_variadic: false,
+        };
+        assert_eq!(extract_receiver(&sig), Some("&self".to_string()));
+    }
+
+    #[test]
+    fn extract_receiver_detects_owned_self() {
+        let sig = rustdoc_types::FunctionSignature {
+            inputs: vec![("self".to_string(), simple("Self"))],
+            output: None,
+            is_c_variadic: false,
+        };
+        assert_eq!(extract_receiver(&sig), Some("self".to_string()));
+    }
+
+    #[test]
+    fn extract_receiver_none_for_associated_function() {
+        let sig = rustdoc_types::FunctionSignature {
+            inputs: vec![("id".to_string(), simple("UserId"))],
+            output: None,
+            is_c_variadic: false,
+        };
+        assert_eq!(extract_receiver(&sig), None);
+    }
+
+    #[test]
+    fn extract_params_skips_self_receiver() {
+        let self_ty = Type::BorrowedRef {
+            lifetime: None,
+            is_mutable: false,
+            type_: Box::new(simple("Self")),
+        };
+        let sig = rustdoc_types::FunctionSignature {
+            inputs: vec![
+                ("self".to_string(), self_ty),
+                ("id".to_string(), simple("UserId")),
+                ("name".to_string(), simple("String")),
+            ],
+            output: None,
+            is_c_variadic: false,
+        };
+        let params = extract_params(&sig);
+        assert_eq!(params.len(), 2);
+        assert_eq!(params[0].name(), "id");
+        assert_eq!(params[0].ty(), "UserId");
+        assert_eq!(params[1].name(), "name");
+        assert_eq!(params[1].ty(), "String");
     }
 }
