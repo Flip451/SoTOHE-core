@@ -68,27 +68,41 @@ impl GitShowTrackBlobReader {
     /// Resolves the catalogue filename for `layer_id` by reading
     /// `architecture-rules.json` from the PR branch.
     ///
-    /// Returns the explicit `catalogue_file` override if present; otherwise
-    /// returns the default `<layer_id>-types.json`. Any error reading or
-    /// parsing the rules file causes a silent fallback to the default so
-    /// that the caller's `NotFound` / `FetchError` semantics are preserved
-    /// for the catalogue blob itself.
-    fn resolve_catalogue_filename(&self, branch: &str, layer_id: &str) -> String {
-        let text = match self.fetch_string::<Vec<String>>(branch, "architecture-rules.json") {
-            Ok(s) => s,
-            // Rules file absent or unreadable — fall back to default.
-            Err(_) => return format!("{layer_id}-types.json"),
-        };
+    /// Returns the explicit `catalogue_file` override if present, the
+    /// default `<layer_id>-types.json` when the rules file is absent
+    /// (preserving the legacy fallback for non-migrated repos), or a
+    /// `BlobFetchResult::FetchError` when the rules file is present but
+    /// unreadable / unparseable. The fail-closed path prevents a
+    /// silent downgrade to the default filename on `FetchError` of the
+    /// rules blob.
+    fn resolve_catalogue_filename(
+        &self,
+        branch: &str,
+        layer_id: &str,
+    ) -> Result<String, BlobFetchResult<TypeCatalogueDocument>> {
+        let text =
+            match self.fetch_string::<TypeCatalogueDocument>(branch, "architecture-rules.json") {
+                Ok(s) => s,
+                Err(BlobFetchResult::NotFound) => {
+                    // Legacy fallback: no rules file on the branch → use the
+                    // conventional default. This is a NotFound case, not a
+                    // fetch failure, so the gate's per-layer NotFound semantic
+                    // is still meaningful.
+                    return Ok(format!("{layer_id}-types.json"));
+                }
+                Err(result) => {
+                    // Fetch error on a rules file that exists → fail-closed.
+                    return Err(result);
+                }
+            };
         match super::tddd_layers::parse_tddd_layers(&text) {
-            Ok(bindings) => {
-                // Use the configured catalogue_file for this layer; fall back
-                // to the default if the layer is not in the bindings.
-                super::tddd_layers::find_binding(&bindings, layer_id)
-                    .map(|b| b.catalogue_file().to_owned())
-                    .unwrap_or_else(|| format!("{layer_id}-types.json"))
-            }
-            // Parse error — fall back to default.
-            Err(_) => format!("{layer_id}-types.json"),
+            Ok(bindings) => Ok(super::tddd_layers::find_binding(&bindings, layer_id)
+                .map(|b| b.catalogue_file().to_owned())
+                .unwrap_or_else(|| format!("{layer_id}-types.json"))),
+            Err(e) => Err(BlobFetchResult::FetchError(format!(
+                "architecture-rules.json parse error while resolving catalogue file for \
+                 layer '{layer_id}': {e}"
+            ))),
         }
     }
 }
@@ -117,8 +131,12 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         // `tddd.catalogue_file` override are handled consistently between
         // the CI path (`verify_from_spec_json`) and the merge gate.
         // Fall back to `<layer_id>-types.json` when the rules file is absent
-        // (NotFound) — the same default convention used elsewhere.
-        let filename = self.resolve_catalogue_filename(branch, layer_id);
+        // (NotFound); fail-closed when the rules file is present but
+        // unreadable or unparseable.
+        let filename = match self.resolve_catalogue_filename(branch, layer_id) {
+            Ok(name) => name,
+            Err(result) => return result,
+        };
         let path = Self::blob_path(track_id, &filename);
         let text = match self.fetch_string::<TypeCatalogueDocument>(branch, &path) {
             Ok(s) => s,

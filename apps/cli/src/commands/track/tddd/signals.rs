@@ -101,7 +101,6 @@ pub fn execute_type_signals(
     //   enabled layer, and fail-closed when domain is not enabled.
     let non_domain_enabled: Vec<&str> =
         bindings.iter().map(|b| b.layer_id()).filter(|id| *id != "domain").collect();
-    let has_domain = bindings.iter().any(|b| b.layer_id() == "domain");
 
     if let Some(ref filter) = layer {
         if filter != "domain" {
@@ -125,38 +124,41 @@ pub fn execute_type_signals(
         }
     }
 
-    if !has_domain {
+    // Resolve the domain binding and pass its catalogue_file / baseline_file
+    // stems through to the evaluator so non-default `tddd.catalogue_file`
+    // overrides are honored consistently with the CI / merge-gate paths.
+    let Some(domain_binding) = bindings.iter().find(|b| b.layer_id() == "domain").cloned() else {
         return Err(CliError::Message(
             "`domain` is not tddd.enabled in architecture-rules.json. type-signals refuses \
              to read/write domain-types.json for an opted-out layer. Enable \
              `domain.tddd.enabled = true` or run a Phase 2 command for the active layers."
                 .to_owned(),
         ));
-    }
+    };
 
-    // Only the `domain` layer is actually evaluated in Phase 1. Running the
-    // legacy single-layer evaluator keeps the existing hard-coded
-    // `domain-types.json` / `domain-types-baseline.json` path stable.
-    execute_type_signals_single(&items_dir, &track_id, &workspace_root)
+    execute_type_signals_single(&items_dir, &track_id, &workspace_root, &domain_binding)
 }
 
-/// Legacy single-layer signal evaluator. Retained so the existing tests and
-/// the single-`domain` production path can continue to invoke the hard-coded
-/// `domain-types.json` / `domain-types-baseline.json` files.
+/// Legacy single-layer signal evaluator. `domain_binding` provides the
+/// configured catalogue / baseline filenames; callers pass the resolved
+/// domain binding so that an explicit `tddd.catalogue_file` override
+/// (Phase 1: still `domain-types.json` by convention) is honored.
 fn execute_type_signals_single(
     items_dir: &std::path::Path,
     track_id: &str,
     workspace_root: &std::path::Path,
+    domain_binding: &TdddLayerBinding,
 ) -> Result<ExitCode, CliError> {
     let track_dir = items_dir.join(track_id);
-    let domain_types_path = track_dir.join("domain-types.json");
+    let catalogue_file = domain_binding.catalogue_file();
+    let domain_types_path = track_dir.join(catalogue_file);
 
-    // Read and decode domain-types.json.
+    // Read and decode the configured catalogue file.
     // If not found, instruct the user to run /track:design first (TDDD requirement).
     let json = std::fs::read_to_string(&domain_types_path).map_err(|e| {
         if e.kind() == std::io::ErrorKind::NotFound {
             CliError::Message(format!(
-                "domain-types.json not found for track '{track_id}'. \
+                "{catalogue_file} not found for track '{track_id}'. \
                  Run /track:design first to create it (TDDD: type definitions must be written before implementation)."
             ))
         } else {
@@ -165,7 +167,7 @@ fn execute_type_signals_single(
     })?;
 
     let mut doc = catalogue_codec::decode(&json)
-        .map_err(|e| CliError::Message(format!("domain-types.json decode error: {e}")))?;
+        .map_err(|e| CliError::Message(format!("{catalogue_file} decode error: {e}")))?;
 
     // Export the domain crate's public API via rustdoc JSON.
     let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
@@ -184,16 +186,18 @@ fn execute_type_signals_single(
     // Build a pre-indexed TypeGraph from the flat schema export.
     let profile = build_type_graph(&schema, &typestate_names);
 
-    // Load baseline for 4-group evaluation.
-    // Match directly on read_to_string so permissions errors and broken symlinks are
-    // surfaced instead of being silently misreported as "file not found".
-    let baseline_path = track_dir.join("domain-types-baseline.json");
+    // Load baseline for 4-group evaluation. The baseline filename is
+    // derived from the binding's catalogue stem (e.g.
+    // `domain-types-baseline.json` for the default `domain-types.json`),
+    // so an override via `tddd.catalogue_file` is honored automatically.
+    let baseline_filename = domain_binding.baseline_file();
+    let baseline_path = track_dir.join(&baseline_filename);
     let baseline = match std::fs::read_to_string(&baseline_path) {
         Ok(bl_json) => infrastructure::tddd::baseline_codec::decode(&bl_json)
             .map_err(|e| CliError::Message(format!("baseline decode error: {e}")))?,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
             return Err(CliError::Message(format!(
-                "domain-types-baseline.json not found for track '{track_id}'. \
+                "{baseline_filename} not found for track '{track_id}'. \
                  Run `sotp track baseline-capture {track_id}` first."
             )));
         }
