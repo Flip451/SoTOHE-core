@@ -99,9 +99,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "15f56d0b7dbe3e48499844e8f5614ec0678b4739",
       "description": "`libs/domain/src/tddd/baseline.rs` の `TypeBaselineEntry` を `{kind, members: Vec<MemberDeclaration>, methods: Vec<MethodDeclaration>}` に、`TraitBaselineEntry` を `{methods: Vec<MethodDeclaration>}` に更新。`libs/infrastructure/src/tddd/baseline_codec.rs` の `schema_version` を 2 にバンプ、v1 検出時に `BaselineCodecError::UnsupportedSchemaVersion(1)` + 再実行手順付きエラーメッセージ。`libs/infrastructure/src/tddd/baseline_builder.rs` の TypeGraph → TypeBaseline 変換を新シェイプに更新。`libs/domain/src/tddd/consistency.rs::check_consistency` の `TypeBaselineEntry::new` 呼び出しを新シェイプ (`code_node.methods()` 使用) に更新",
       "id": "T005",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "`libs/domain/src/tddd/catalogue.rs` の `TypeDefinitionKind::TraitPort { expected_methods }` を `Vec<String>` から `Vec<MethodDeclaration>` に拡張。`libs/infrastructure/src/tddd/catalogue_codec.rs` の DTO 更新 + `schema_version: 2` にバンプ + top-level key を `domain_types` → `type_definitions` に変更 + ty/returns に `::` を含む場合は `InvalidEntry` でリジェクト (last-segment 強制)。`libs/domain/src/tddd/signals.rs::evaluate_trait_port` に L1 forward check (ステップ 1: 名前→2: receiver→3: params 数→4: params 型順序→5: returns→6: async) と reverse check (ステップ 7: カタログ未宣言のメソッドを Red) を実装。既存 TraitPort 名のみマッチテストを `MethodDeclaration` ベースに全面書き換え",
@@ -115,5 +116,5 @@
     }
   ],
   "title": "TDDD-01: 型カタログ多層化 + L1 シグネチャ検証",
-  "updated_at": "2026-04-13T01:21:44Z"
+  "updated_at": "2026-04-13T01:46:58Z"
 }

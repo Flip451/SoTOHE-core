@@ -1447,8 +1447,8 @@ mod tests {
     // ---------------------------------------------------------------------------
 
     const DOMAIN_TYPES_JSON_MINIMAL: &str = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
   ]
 }"#;

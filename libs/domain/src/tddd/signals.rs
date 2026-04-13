@@ -270,30 +270,90 @@ fn evaluate_error_type(
     TypeSignal::new(name, kind_tag, signal, true, found, missing, vec![])
 }
 
+/// L1 forward+reverse check for a `TraitPort` entry.
+///
+/// Forward check (ADR 0002 §D2): each declared method must match a code
+/// method on all six L1 axes — step 1 name, step 2 receiver, step 3 params
+/// count, step 4 params type order, step 5 returns, step 6 `is_async`. A
+/// mismatch on any axis adds the method (as rendered `signature_string()`)
+/// to `missing`.
+///
+/// Reverse check (step 7): any code method on the trait that is not
+/// declared in `expected_methods` (keyed by name) is added to `extra`.
+///
+/// The signal is `Yellow` when the trait does not exist in code, else
+/// `Blue` when `missing` and `extra` are both empty, else `Red`.
 fn evaluate_trait_port(
     name: &str,
     kind_tag: &str,
-    expected_methods: &[String],
+    expected_methods: &[crate::tddd::catalogue::MethodDeclaration],
     profile: &TypeGraph,
 ) -> TypeSignal {
     let Some(code_trait) = profile.get_trait(name) else {
         return yellow(name, kind_tag);
     };
 
-    let code_methods: HashSet<&str> = code_trait.methods().iter().map(|m| m.name()).collect();
-
+    // Forward check — every expected method must appear and match.
     let mut found = Vec::new();
     let mut missing = Vec::new();
-    for m in expected_methods {
-        if code_methods.contains(m.as_str()) {
-            found.push(m.clone());
-        } else {
-            missing.push(m.clone());
+    for declared in expected_methods {
+        let rendered = declared.signature_string();
+        match code_trait.methods().iter().find(|c| c.name() == declared.name()) {
+            Some(code) if method_structurally_matches(declared, code) => {
+                found.push(rendered);
+            }
+            _ => {
+                missing.push(rendered);
+            }
         }
     }
 
-    let signal = if missing.is_empty() { ConfidenceSignal::Blue } else { ConfidenceSignal::Red };
-    TypeSignal::new(name, kind_tag, signal, true, found, missing, vec![])
+    // Reverse check — any code method not declared is extra.
+    let declared_names: HashSet<&str> = expected_methods.iter().map(|m| m.name()).collect();
+    let mut extra: Vec<String> = code_trait
+        .methods()
+        .iter()
+        .filter(|c| !declared_names.contains(c.name()))
+        .map(|c| c.signature_string())
+        .collect();
+    extra.sort();
+
+    let signal = if missing.is_empty() && extra.is_empty() {
+        ConfidenceSignal::Blue
+    } else {
+        ConfidenceSignal::Red
+    };
+    TypeSignal::new(name, kind_tag, signal, true, found, missing, extra)
+}
+
+/// Returns `true` if two `MethodDeclaration`s match on all six L1 axes:
+/// name → receiver → params count → params types (ordered) → returns → async.
+/// Parameter names are intentionally ignored — only the type strings matter.
+fn method_structurally_matches(
+    a: &crate::tddd::catalogue::MethodDeclaration,
+    b: &crate::tddd::catalogue::MethodDeclaration,
+) -> bool {
+    if a.name() != b.name() {
+        return false;
+    }
+    if a.receiver() != b.receiver() {
+        return false;
+    }
+    if a.params().len() != b.params().len() {
+        return false;
+    }
+    for (pa, pb) in a.params().iter().zip(b.params()) {
+        if pa.ty() != pb.ty() {
+            return false;
+        }
+    }
+    if a.returns() != b.returns() {
+        return false;
+    }
+    if a.is_async() != b.is_async() {
+        return false;
+    }
+    true
 }
 
 // ---------------------------------------------------------------------------
@@ -542,7 +602,7 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "OldRepo",
             "desc",
-            TypeDefinitionKind::TraitPort { expected_methods: vec!["find".into()] },
+            TypeDefinitionKind::TraitPort { expected_methods: vec![unit_method("find")] },
             TypeAction::Delete,
             true,
         )
@@ -557,7 +617,7 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "OldRepo",
             "desc",
-            TypeDefinitionKind::TraitPort { expected_methods: vec!["find".into()] },
+            TypeDefinitionKind::TraitPort { expected_methods: vec![unit_method("find")] },
             TypeAction::Delete,
             true,
         )
@@ -627,7 +687,7 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Repo",
             "desc",
-            TypeDefinitionKind::TraitPort { expected_methods: vec!["save".into()] },
+            TypeDefinitionKind::TraitPort { expected_methods: vec![unit_method("save")] },
             TypeAction::Add,
             true,
         )
@@ -643,7 +703,9 @@ mod tests {
         let entry = TypeCatalogueEntry::new(
             "Repo",
             "desc",
-            TypeDefinitionKind::TraitPort { expected_methods: vec!["save".into(), "find".into()] },
+            TypeDefinitionKind::TraitPort {
+                expected_methods: vec![unit_method("save"), unit_method("find")],
+            },
             TypeAction::Add,
             true,
         )
@@ -651,6 +713,62 @@ mod tests {
         let profile = make_profile_with_trait("Repo", &["save", "find"]);
         let results = evaluate_type_signals(&[entry], &profile);
         assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_evaluate_trait_port_red_when_returns_mismatch() {
+        // Declared `fn save(&self, user: User) -> Result<(), DomainError>` but
+        // the code trait has `fn save(&self, user: User) -> ()` — step 5 miss.
+        let entry = TypeCatalogueEntry::new(
+            "Repo",
+            "desc",
+            TypeDefinitionKind::TraitPort {
+                expected_methods: vec![MethodDeclaration::new(
+                    "save",
+                    Some("&self".into()),
+                    vec![crate::tddd::catalogue::ParamDeclaration::new("user", "User")],
+                    "Result<(), DomainError>",
+                    false,
+                )],
+            },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        // Code trait has the same name and params but different return.
+        let mut traits = HashMap::new();
+        let code_method = MethodDeclaration::new(
+            "save",
+            Some("&self".into()),
+            vec![crate::tddd::catalogue::ParamDeclaration::new("user", "User")],
+            "()",
+            false,
+        );
+        traits.insert("Repo".to_string(), TraitNode::new(vec![code_method]));
+        let profile = TypeGraph::new(HashMap::new(), traits);
+        let results = evaluate_type_signals(&[entry], &profile);
+        let sig = results.first().unwrap();
+        assert_eq!(sig.signal(), ConfidenceSignal::Red);
+        assert_eq!(sig.missing_items().len(), 1);
+    }
+
+    #[test]
+    fn test_evaluate_trait_port_red_when_extra_method_in_code() {
+        // Code has an extra `delete` method that the catalogue does not declare.
+        let entry = TypeCatalogueEntry::new(
+            "Repo",
+            "desc",
+            TypeDefinitionKind::TraitPort { expected_methods: vec![unit_method("save")] },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile_with_trait("Repo", &["save", "delete"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        let sig = results.first().unwrap();
+        assert_eq!(sig.signal(), ConfidenceSignal::Red);
+        assert_eq!(sig.extra_items().len(), 1);
+        assert!(sig.extra_items()[0].contains("delete"));
     }
 
     #[test]

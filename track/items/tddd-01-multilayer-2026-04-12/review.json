@@ -1,255 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a60e280eb3b13ef2d5320ffc9c92a6921a4b68e4156a20de6a32c088cb3ec427",
-          "at": "2026-04-13T00:34:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a60e280eb3b13ef2d5320ffc9c92a6921a4b68e4156a20de6a32c088cb3ec427",
-          "at": "2026-04-13T00:36:17Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5051f18580807bfbbe0d4cbe6a6f89268010b9d39e1b60094c5d0adbf940d862",
-          "at": "2026-04-13T00:21:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5051f18580807bfbbe0d4cbe6a6f89268010b9d39e1b60094c5d0adbf940d862",
-          "at": "2026-04-13T00:22:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:55732279741aa8916fa740894e267f252f8ac98de77ae61fd6ca9b6866d6eb56",
-          "at": "2026-04-13T00:26:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22626bb800bba92ffbd33fac6aecee0ae9b92fa1873d6bd8c5ffb463653637bc",
-          "at": "2026-04-13T00:34:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22626bb800bba92ffbd33fac6aecee0ae9b92fa1873d6bd8c5ffb463653637bc",
-          "at": "2026-04-13T00:35:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Storing `format_type(&i.for_)` here now preserves generic arguments in `ImplInfo.target_type` (for example `Foo<T>`), but `build_type_graph` still matches impls with `last_segment(i.target_type()) == type_info.name()`. Inherent impls on generic types will stop attaching to their `TypeNode`, so their methods and outgoing typestate edges disappear.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/schema_export.rs",
-              "line": 161,
-              "category": "behavior regression"
-            },
-            {
-              "message": "`format_type` now copies array lengths and const generic expressions verbatim. Those strings can legally contain `::` (for example `N::VALUE`), so this renderer can emit invalid L1 type strings and break the codec validation that forbids `::`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/schema_export.rs",
-              "line": 448,
-              "category": "invariant violation"
-            }
-          ],
-          "hash": "rvw1:sha256:7f3fd16b294173afe28b0a5748de3a9bf4e7dc79c5e0aebb6b0d1333e9288541",
-          "at": "2026-04-13T01:04:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`format_type` is still not faithful for several valid rustdoc type shapes: `Type::FunctionPointer` and `Type::QualifiedPath` fall through to `_`, `GenericArgs::Parenthesized` is discarded, and `DynTrait` drops its lifetime information. Any public callback, associated-type, or lifetime-qualified trait-object signature will be exported as an ambiguous string, which can poison `TypeInfo`/`MethodDeclaration` comparisons and downstream consistency checks.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/schema_export.rs",
-              "line": 430,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1d0bf28cde927c12788bcd78b9568e0a3f2d48477318d8fff70d3ff802b167ee",
-          "at": "2026-04-13T01:13:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d0bf28cde927c12788bcd78b9568e0a3f2d48477318d8fff70d3ff802b167ee",
-          "at": "2026-04-13T01:17:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d0bf28cde927c12788bcd78b9568e0a3f2d48477318d8fff70d3ff802b167ee",
-          "at": "2026-04-13T01:19:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`test_decode_v1_rejected_with_rerun_hint` moves `err` into `match` and then uses `err` again on the next line (`err.to_string()`), which triggers E0382 and prevents the test module from compiling.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
-              "line": 381,
-              "category": "compilation"
-            }
-          ],
-          "hash": "rvw1:sha256:92e9bcc145e448548dd7f40a622b1d5dcc535c6e696bee6478cc4d1ad99fa07c",
-          "at": "2026-04-13T01:37:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f200320e163cd17f5fbb48c768b4fa7d32c79c41caa11e78e9937c43059240fe",
-          "at": "2026-04-13T01:40:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f200320e163cd17f5fbb48c768b4fa7d32c79c41caa11e78e9937c43059240fe",
-          "at": "2026-04-13T01:43:16Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
-          "at": "2026-04-12T23:58:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new module docs tell consumers to import from `crate::tddd::*`, but `libs/domain/src/tddd/mod.rs` only publishes submodules and does not re-export these items. That leaves the documented import path dead immediately after this refactor; the actual re-exports live at the crate root via `libs/domain/src/lib.rs`.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 11,
-              "category": "broken_reference"
-            }
-          ],
-          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
-          "at": "2026-04-13T00:01:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
-          "at": "2026-04-13T00:04:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db36c79eb63679aedaa6ecb594969b26c6faa93d54dd6165544ae26e727449db",
-          "at": "2026-04-13T00:08:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
-          "at": "2026-04-13T00:34:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
-          "at": "2026-04-13T00:35:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FunctionInfo::new` now accepts both `has_self_receiver` and `receiver`, but it does not enforce that they agree. That lets callers construct contradictory values such as `has_self_receiver = false` with `receiver = Some(\"&self\")`, and downstream code can silently filter or classify the method incorrectly. Derive one field from the other or validate the pair in the constructor.",
-              "severity": "P1",
-              "file": "libs/domain/src/schema.rs",
-              "line": 176,
-              "category": "typestate boundary leak"
-            }
-          ],
-          "hash": "rvw1:sha256:da8f3b6b5c46b93a19f63c5149fd922bd6087f0fb76884eaefbb3ec010c60c47",
-          "at": "2026-04-13T01:04:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2b05fad307e27cc9b14ee19d262a340e0cc56807b1bdc331b3f27a834fcc0e7",
-          "at": "2026-04-13T01:08:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2b05fad307e27cc9b14ee19d262a340e0cc56807b1bdc331b3f27a834fcc0e7",
-          "at": "2026-04-13T01:10:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
-          "at": "2026-04-13T01:37:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeNode::new` now stores `outgoing` verbatim instead of enforcing the previous invariant that transitions must be backed by the node's actual methods. Because `evaluate_typestate` trusts `outgoing()` directly, external callers can now fabricate typestate edges on a `TypeNode` and get false Blue/Red signal results that the old constructor would have filtered out.",
-              "severity": "P1",
-              "file": "libs/domain/src/schema.rs",
-              "line": 428,
-              "category": "behavior_regression"
-            }
-          ],
-          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
-          "at": "2026-04-13T01:40:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
-          "at": "2026-04-13T01:42:49Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -279,6 +30,38 @@
           "findings": [],
           "hash": "rvw1:sha256:4bbb01e15dd280d5a47b568e28bcd059ff078ead7aeca28030bbf9d4e837f42a",
           "at": "2026-04-13T00:36:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3adad182f142f26704fa5b270f289520d84947315a10609dd1005f450ff27f55",
+          "at": "2026-04-13T01:58:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3adad182f142f26704fa5b270f289520d84947315a10609dd1005f450ff27f55",
+          "at": "2026-04-13T01:59:29Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a60e280eb3b13ef2d5320ffc9c92a6921a4b68e4156a20de6a32c088cb3ec427",
+          "at": "2026-04-13T00:34:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a60e280eb3b13ef2d5320ffc9c92a6921a4b68e4156a20de6a32c088cb3ec427",
+          "at": "2026-04-13T00:36:17Z"
         }
       ]
     },
@@ -924,6 +707,339 @@
           "findings": [],
           "hash": "rvw1:sha256:14d8f195be1bf9e13c3a423f6922f9de4d41efc5d6f5355f373d8f5900670aef",
           "at": "2026-04-13T01:46:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a245d55752ad3a07d52c2350c34b8eb7c34f8d3d243f9a31ea4bfcd651310e06",
+          "at": "2026-04-13T01:59:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a245d55752ad3a07d52c2350c34b8eb7c34f8d3d243f9a31ea4bfcd651310e06",
+          "at": "2026-04-13T02:00:20Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-12T23:58:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new module docs tell consumers to import from `crate::tddd::*`, but `libs/domain/src/tddd/mod.rs` only publishes submodules and does not re-export these items. That leaves the documented import path dead immediately after this refactor; the actual re-exports live at the crate root via `libs/domain/src/lib.rs`.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 11,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-13T00:01:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8674edd8f94ee151b4457d141c525d9b3644529add23a6d395a4f8823149dc45",
+          "at": "2026-04-13T00:04:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db36c79eb63679aedaa6ecb594969b26c6faa93d54dd6165544ae26e727449db",
+          "at": "2026-04-13T00:08:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
+          "at": "2026-04-13T00:34:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8718e7c5429d5cb096fa4491222defe51a761012cafde9a5f77ff0f59609545",
+          "at": "2026-04-13T00:35:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FunctionInfo::new` now accepts both `has_self_receiver` and `receiver`, but it does not enforce that they agree. That lets callers construct contradictory values such as `has_self_receiver = false` with `receiver = Some(\"&self\")`, and downstream code can silently filter or classify the method incorrectly. Derive one field from the other or validate the pair in the constructor.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 176,
+              "category": "typestate boundary leak"
+            }
+          ],
+          "hash": "rvw1:sha256:da8f3b6b5c46b93a19f63c5149fd922bd6087f0fb76884eaefbb3ec010c60c47",
+          "at": "2026-04-13T01:04:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2b05fad307e27cc9b14ee19d262a340e0cc56807b1bdc331b3f27a834fcc0e7",
+          "at": "2026-04-13T01:08:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2b05fad307e27cc9b14ee19d262a340e0cc56807b1bdc331b3f27a834fcc0e7",
+          "at": "2026-04-13T01:10:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
+          "at": "2026-04-13T01:37:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeNode::new` now stores `outgoing` verbatim instead of enforcing the previous invariant that transitions must be backed by the node's actual methods. Because `evaluate_typestate` trusts `outgoing()` directly, external callers can now fabricate typestate edges on a `TypeNode` and get false Blue/Red signal results that the old constructor would have filtered out.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 428,
+              "category": "behavior_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
+          "at": "2026-04-13T01:40:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74b0ce1345b7a80d53506f0d5a83344b872e5e1384a5c32a88ebb395f57e983b",
+          "at": "2026-04-13T01:42:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27f736706e773ee52c0e7b600ad55c0ebadc8d83cf072d6415aaef2b73cb6d9d",
+          "at": "2026-04-13T01:59:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27f736706e773ee52c0e7b600ad55c0ebadc8d83cf072d6415aaef2b73cb6d9d",
+          "at": "2026-04-13T02:00:56Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5051f18580807bfbbe0d4cbe6a6f89268010b9d39e1b60094c5d0adbf940d862",
+          "at": "2026-04-13T00:21:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5051f18580807bfbbe0d4cbe6a6f89268010b9d39e1b60094c5d0adbf940d862",
+          "at": "2026-04-13T00:22:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55732279741aa8916fa740894e267f252f8ac98de77ae61fd6ca9b6866d6eb56",
+          "at": "2026-04-13T00:26:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22626bb800bba92ffbd33fac6aecee0ae9b92fa1873d6bd8c5ffb463653637bc",
+          "at": "2026-04-13T00:34:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22626bb800bba92ffbd33fac6aecee0ae9b92fa1873d6bd8c5ffb463653637bc",
+          "at": "2026-04-13T00:35:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Storing `format_type(&i.for_)` here now preserves generic arguments in `ImplInfo.target_type` (for example `Foo<T>`), but `build_type_graph` still matches impls with `last_segment(i.target_type()) == type_info.name()`. Inherent impls on generic types will stop attaching to their `TypeNode`, so their methods and outgoing typestate edges disappear.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 161,
+              "category": "behavior regression"
+            },
+            {
+              "message": "`format_type` now copies array lengths and const generic expressions verbatim. Those strings can legally contain `::` (for example `N::VALUE`), so this renderer can emit invalid L1 type strings and break the codec validation that forbids `::`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 448,
+              "category": "invariant violation"
+            }
+          ],
+          "hash": "rvw1:sha256:7f3fd16b294173afe28b0a5748de3a9bf4e7dc79c5e0aebb6b0d1333e9288541",
+          "at": "2026-04-13T01:04:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`format_type` is still not faithful for several valid rustdoc type shapes: `Type::FunctionPointer` and `Type::QualifiedPath` fall through to `_`, `GenericArgs::Parenthesized` is discarded, and `DynTrait` drops its lifetime information. Any public callback, associated-type, or lifetime-qualified trait-object signature will be exported as an ambiguous string, which can poison `TypeInfo`/`MethodDeclaration` comparisons and downstream consistency checks.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 430,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1d0bf28cde927c12788bcd78b9568e0a3f2d48477318d8fff70d3ff802b167ee",
+          "at": "2026-04-13T01:13:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d0bf28cde927c12788bcd78b9568e0a3f2d48477318d8fff70d3ff802b167ee",
+          "at": "2026-04-13T01:17:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d0bf28cde927c12788bcd78b9568e0a3f2d48477318d8fff70d3ff802b167ee",
+          "at": "2026-04-13T01:19:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_decode_v1_rejected_with_rerun_hint` moves `err` into `match` and then uses `err` again on the next line (`err.to_string()`), which triggers E0382 and prevents the test module from compiling.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
+              "line": 381,
+              "category": "compilation"
+            }
+          ],
+          "hash": "rvw1:sha256:92e9bcc145e448548dd7f40a622b1d5dcc535c6e696bee6478cc4d1ad99fa07c",
+          "at": "2026-04-13T01:37:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f200320e163cd17f5fbb48c768b4fa7d32c79c41caa11e78e9937c43059240fe",
+          "at": "2026-04-13T01:40:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f200320e163cd17f5fbb48c768b4fa7d32c79c41caa11e78e9937c43059240fe",
+          "at": "2026-04-13T01:43:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeCatalogueDocDto` still accepts unknown top-level fields, so a schema v2 file that accidentally keeps the old `domain_types` key will deserialize as an empty catalogue instead of failing. That silently drops every entry and makes the v2 rename unsafe unless the top-level DTO rejects unknown fields (or explicitly aliases the old key).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 52,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:b41db95cc9cb8b6e9c9b00da4a6d8cf62a5ce2a8b3e13fe9123a4b5f430edbd9",
+          "at": "2026-04-13T02:00:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`method_to_dto` still serializes `MethodDeclaration`/`ParamDeclaration` values verbatim, but `decode()` now rejects any `ty` or `returns` containing `::`. Because the public constructors for those domain types do not validate that rule, a catalogue built in memory can be encoded successfully and then fail to decode immediately, so the codec no longer round-trips all representable `TypeCatalogueDocument` values.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 467,
+              "category": "Codec round-trip loss"
+            }
+          ],
+          "hash": "rvw1:sha256:205fa5abd509158efab338dbc910a3ff44c637e47c126d223e292de10497d138",
+          "at": "2026-04-13T02:03:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`encode()` still serializes `doc.schema_version()` unchanged, so any in-memory `TypeCatalogueDocument::new(1, ...)` will now emit `schema_version: 1` JSON even though `decode()` only accepts `2`. That breaks the codec's round-trip guarantee and leaves a public path that can write files the new decoder rejects.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 441,
+              "category": "Schema version drift"
+            }
+          ],
+          "hash": "rvw1:sha256:464b6dd3d83261c766f8a49d42aad356d4d003f5387b7f7cb5a9912f6d77705c",
+          "at": "2026-04-13T02:08:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`#[serde(deny_unknown_fields)]` on the top-level DTO makes legacy v1 payloads with the old `domain_types` key fail during deserialization, so `decode()` never reaches the `UnsupportedSchemaVersion` branch for the actual v1 shape. Callers now get a generic serde unknown-field error instead of the intended v2 migration hint, which is a behavior regression for the supported migration path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 56,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:8b191a53746b9a83a68a6400a02aee13dad0d61c43b1e5f77fb07cc62ce32b92",
+          "at": "2026-04-13T02:11:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05bff59224f2a5e6fe63caec4391dac0f3ac6574f918ac058674feabf81221e0",
+          "at": "2026-04-13T02:17:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05bff59224f2a5e6fe63caec4391dac0f3ac6574f918ac058674feabf81221e0",
+          "at": "2026-04-13T02:21:16Z"
         }
       ]
     }

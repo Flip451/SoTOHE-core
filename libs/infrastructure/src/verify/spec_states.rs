@@ -548,20 +548,20 @@ mod tests {
 }"#;
 
     const DOMAIN_TYPES_WITH_ONE_ENTRY: &str = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
   ]
 }"#;
 
     const DOMAIN_TYPES_EMPTY_ENTRIES: &str = r#"{
-  "schema_version": 1,
-  "domain_types": []
+  "schema_version": 2,
+  "type_definitions": []
 }"#;
 
     const DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS: &str = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
   ],
   "signals": [
@@ -570,8 +570,8 @@ mod tests {
 }"#;
 
     const DOMAIN_TYPES_WITH_RED_SIGNAL: &str = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
   ],
   "signals": [
@@ -652,8 +652,8 @@ mod tests {
     }
 
     const DOMAIN_TYPES_WITH_YELLOW_SIGNAL: &str = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
   ],
   "signals": [
@@ -720,8 +720,8 @@ mod tests {
     }
 
     const DOMAIN_TYPES_WITH_UNDECLARED_RED_SIGNAL: &str = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
   ],
   "signals": [

@@ -319,8 +319,13 @@ pub enum TypeDefinitionKind {
     /// `expected_variants` lists the variants that must appear.
     ErrorType { expected_variants: Vec<String> },
     /// A `pub trait` that defines a hexagonal port boundary.
-    /// `expected_methods` lists the method names that must appear.
-    TraitPort { expected_methods: Vec<String> },
+    ///
+    /// `expected_methods` holds the full L1 method signatures that the trait
+    /// should expose. The forward check compares each declared method against
+    /// the code by name → receiver → params count → params types → return
+    /// type → `is_async` (ADR 0002 §D2). A reverse check flags any trait
+    /// method found in code that the catalogue does not declare.
+    TraitPort { expected_methods: Vec<MethodDeclaration> },
 }
 
 impl TypeDefinitionKind {
@@ -749,7 +754,22 @@ mod tests {
     #[test]
     fn test_type_catalogue_entry_trait_port_kind() {
         let kind = TypeDefinitionKind::TraitPort {
-            expected_methods: vec!["find_by_id".into(), "save".into()],
+            expected_methods: vec![
+                MethodDeclaration::new(
+                    "find_by_id",
+                    Some("&self".into()),
+                    vec![ParamDeclaration::new("id", "UserId")],
+                    "Option<User>",
+                    false,
+                ),
+                MethodDeclaration::new(
+                    "save",
+                    Some("&self".into()),
+                    vec![ParamDeclaration::new("user", "User")],
+                    "Result<(), DomainError>",
+                    false,
+                ),
+            ],
         };
         let entry = TypeCatalogueEntry::new(
             "UserRepository",

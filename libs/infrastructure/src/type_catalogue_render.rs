@@ -113,7 +113,7 @@ fn render_details(entry: &TypeCatalogueEntry) -> String {
             if expected_methods.is_empty() {
                 "\u{2014}".to_owned()
             } else {
-                expected_methods.iter().map(|m| format!("fn {m}")).collect::<Vec<_>>().join(", ")
+                expected_methods.iter().map(|m| m.signature_string()).collect::<Vec<_>>().join(", ")
             }
         }
         TypeDefinitionKind::ValueObject => "\u{2014}".to_owned(),
@@ -241,7 +241,15 @@ mod tests {
     fn test_render_trait_port_entry_row() {
         let entry = make_entry(
             "SchemaExporter",
-            TypeDefinitionKind::TraitPort { expected_methods: vec!["export".into()] },
+            TypeDefinitionKind::TraitPort {
+                expected_methods: vec![domain::tddd::catalogue::MethodDeclaration::new(
+                    "export",
+                    Some("&self".into()),
+                    vec![domain::tddd::catalogue::ParamDeclaration::new("crate_name", "str")],
+                    "Result<SchemaExport, SchemaExportError>",
+                    false,
+                )],
+            },
         );
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc);

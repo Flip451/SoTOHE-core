@@ -817,7 +817,7 @@ mod tests {
         // domain-types.json: one entry with a yellow signal.
         std::fs::write(
             tmp.path().join("domain-types.json"),
-            r#"{"schema_version":1,"domain_types":[{"name":"MyType","kind":"value_object","description":"d","approved":true}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
+            r#"{"schema_version":2,"type_definitions":[{"name":"MyType","kind":"value_object","description":"d","approved":true}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
         )
         .unwrap();
         let exit =
@@ -840,7 +840,7 @@ mod tests {
         // domain-types.json: one entry with a yellow signal.
         std::fs::write(
             tmp.path().join("domain-types.json"),
-            r#"{"schema_version":1,"domain_types":[{"name":"MyType","kind":"value_object","description":"d","approved":true}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
+            r#"{"schema_version":2,"type_definitions":[{"name":"MyType","kind":"value_object","description":"d","approved":true}],"signals":[{"type_name":"MyType","kind_tag":"value_object","signal":"yellow","found_type":false}]}"#,
         )
         .unwrap();
         let exit =

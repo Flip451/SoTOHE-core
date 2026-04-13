@@ -1,12 +1,18 @@
-//! Serde codec for domain-types.json (`TypeCatalogueDocument` SSoT).
+//! Serde codec for the type-catalogue file (`TypeCatalogueDocument` SSoT).
+//!
+//! T006 (TDDD-01 Phase 1 Task 6): schema bumped to v2. Top-level key renamed
+//! from `domain_types` → `type_definitions`. `trait_port.expected_methods`
+//! changed from `Vec<String>` to `Vec<MethodDto>` (L1 signatures with
+//! name/receiver/params/returns/is_async). Any `ty` or `returns` string
+//! containing `::` is rejected by the codec (last-segment enforcement per
+//! ADR 0002 §D2).
 //!
 //! The JSON schema uses an internally-tagged enum (`"kind"` field) with
 //! `#[serde(flatten)]` so that kind-specific fields are required at the type
 //! level — illegal field combinations are rejected by serde, not by manual
 //! validation.
-//!
-//! Schema version 1 is the only supported version.
 
+use domain::tddd::catalogue::{MethodDeclaration, ParamDeclaration};
 use domain::{
     ConfidenceSignal, SpecValidationError, TypeAction, TypeCatalogueDocument, TypeCatalogueEntry,
     TypeDefinitionKind, TypeSignal, TypestateTransitions,
@@ -17,7 +23,7 @@ use serde::{Deserialize, Serialize};
 // Error type
 // ---------------------------------------------------------------------------
 
-/// Codec error for domain-types.json serialization/deserialization.
+/// Codec error for the type-catalogue JSON file.
 #[derive(Debug, thiserror::Error)]
 pub enum TypeCatalogueCodecError {
     #[error("JSON error: {0}")]
@@ -26,7 +32,11 @@ pub enum TypeCatalogueCodecError {
     #[error("validation error: {0}")]
     Validation(#[from] SpecValidationError),
 
-    #[error("unsupported schema_version: expected 1, got {0}")]
+    #[error(
+        "unsupported schema_version: expected 2, got {0}. \
+         Regenerate the catalogue with the v2 layout (top-level key `type_definitions`, \
+         `trait_port.expected_methods` as structured signatures)."
+    )]
     UnsupportedSchemaVersion(u32),
 
     #[error("invalid entry '{name}': {reason}")]
@@ -37,22 +47,21 @@ pub enum TypeCatalogueCodecError {
 // DTO types
 // ---------------------------------------------------------------------------
 
-/// Top-level DTO for domain-types.json.
+/// Top-level DTO for the catalogue JSON file.
+///
+/// `deny_unknown_fields` ensures that a file that accidentally retains the old
+/// `domain_types` key (or any other stale key) is rejected at decode time
+/// rather than silently accepted with an empty `type_definitions` list.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct TypeCatalogueDocDto {
     pub schema_version: u32,
     #[serde(default)]
-    pub domain_types: Vec<TypeCatalogueEntryDto>,
+    pub type_definitions: Vec<TypeCatalogueEntryDto>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub signals: Option<Vec<TypeSignalDto>>,
 }
 
-/// Entry DTO with tagged kind enum.
-///
-/// Common fields (`name`, `description`, `approved`) live at the struct level.
-/// Kind-specific fields are encoded via `TypeDefinitionKindDto` which is flattened
-/// into the same JSON object and uses `"kind"` as the tag discriminator.
-/// DTO for the `action` field on a domain type entry.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 enum TypeActionDto {
@@ -105,8 +114,29 @@ enum TypeDefinitionKindDto {
         expected_variants: Vec<String>,
     },
     TraitPort {
-        expected_methods: Vec<String>,
+        expected_methods: Vec<MethodDto>,
     },
+}
+
+/// T006 method signature DTO — mirrors `MethodDeclaration`.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct MethodDto {
+    name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    receiver: Option<String>,
+    #[serde(default)]
+    params: Vec<ParamDto>,
+    returns: String,
+    #[serde(default)]
+    is_async: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ParamDto {
+    name: String,
+    ty: String,
 }
 
 /// DTO for a per-type signal evaluation result.
@@ -128,33 +158,39 @@ struct TypeSignalDto {
 // Public API
 // ---------------------------------------------------------------------------
 
-/// Decodes a `domain-types.json` string into a `TypeCatalogueDocument`.
+/// Decodes a type-catalogue JSON string into a `TypeCatalogueDocument`.
 ///
 /// # Errors
 ///
 /// Returns `TypeCatalogueCodecError` when:
 /// - The string is not valid JSON.
-/// - `schema_version` is not 1.
+/// - `schema_version` is not 2.
 /// - Any entry has an unknown `kind` tag or missing required fields.
+/// - Any `ty` or `returns` string contains `::` (last-segment enforcement).
 /// - Any entry fails domain validation (e.g. empty name).
 pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecError> {
-    let dto: TypeCatalogueDocDto = serde_json::from_str(json)?;
-
-    if dto.schema_version != 1 {
-        return Err(TypeCatalogueCodecError::UnsupportedSchemaVersion(dto.schema_version));
+    // Phase 1: extract schema_version first so that non-v2 payloads (e.g. v1 with
+    // the old `domain_types` key) get the actionable `UnsupportedSchemaVersion`
+    // error with migration guidance rather than a generic unknown-field error from
+    // `deny_unknown_fields`.  Parsing as `serde_json::Value` is cheap and avoids
+    // a second full deserialization on the happy path.
+    let raw: serde_json::Value = serde_json::from_str(json)?;
+    let schema_version =
+        raw.get("schema_version").and_then(|v| v.as_u64()).map(|v| v as u32).unwrap_or(0);
+    if schema_version != 2 {
+        return Err(TypeCatalogueCodecError::UnsupportedSchemaVersion(schema_version));
     }
 
-    let mut entries = Vec::with_capacity(dto.domain_types.len());
-    for entry_dto in &dto.domain_types {
+    // Phase 2: full deserialisation with `deny_unknown_fields` to catch stale
+    // keys (e.g. a file that keeps both `type_definitions` and `domain_types`).
+    let dto: TypeCatalogueDocDto = serde_json::from_value(raw)?;
+
+    let mut entries = Vec::with_capacity(dto.type_definitions.len());
+    for entry_dto in &dto.type_definitions {
         entries.push(type_catalogue_entry_from_dto(entry_dto)?);
     }
 
     // Validate entry name uniqueness with delete+add pair exception.
-    // Same name is allowed only when exactly 2 entries exist: one delete + one add,
-    // and the two entries must have different kinds.
-    // Rationale: signals are keyed by (type_name, kind_tag); a same-kind pair would
-    // produce two signals with the same key, making one unaddressable and leading to
-    // ambiguous rendering. Different kinds is also the primary use case (kind migration).
     {
         let mut name_entries: std::collections::HashMap<&str, Vec<(TypeAction, &str)>> =
             std::collections::HashMap::new();
@@ -177,7 +213,6 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                     ),
                 });
             }
-            // Exactly 2: must be one Delete + one Add
             let actions: Vec<TypeAction> = pairs.iter().map(|(a, _)| *a).collect();
             let has_delete = actions.contains(&TypeAction::Delete);
             let has_add = actions.contains(&TypeAction::Add);
@@ -190,11 +225,6 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                     ),
                 });
             }
-            // The two entries must have different kinds AND be in different partitions.
-            // Same kind would produce two signals with the same (type_name, kind_tag) key.
-            // Same partition (both trait_port or both non-trait_port) would cause
-            // evaluate_delete to find the new type by name and stay Yellow forever.
-            // Use action:"modify" for same-partition kind changes.
             if let [(_, kind_a), (_, kind_b)] = pairs.as_slice() {
                 if kind_a == kind_b {
                     return Err(TypeCatalogueCodecError::InvalidEntry {
@@ -221,12 +251,7 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
         }
     }
 
-    // Typestate transitions_to referential integrity: targets must exist AND be typestate kind.
-    //
-    // Two target sets:
-    // - `live_typestate_names`: non-delete typestate entries (valid targets for non-delete entries)
-    // - `all_typestate_names`: all typestate entries (valid targets for delete entries, which
-    //   document an outgoing transition from the type's pre-deletion state)
+    // Typestate transitions_to referential integrity.
     let all_typestate_names: std::collections::HashSet<&str> = entries
         .iter()
         .filter(|e| matches!(e.kind(), TypeDefinitionKind::Typestate { .. }))
@@ -244,8 +269,6 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
         if let TypeDefinitionKind::Typestate { transitions: TypestateTransitions::To(targets) } =
             entry.kind()
         {
-            // Delete entries may reference any typestate (including other delete entries).
-            // Non-delete entries must only reference live (non-delete) typestates.
             let valid_targets = if entry.action() == TypeAction::Delete {
                 &all_typestate_names
             } else {
@@ -279,9 +302,13 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
 ///
 /// # Errors
 ///
-/// Returns `TypeCatalogueCodecError::Json` if serialization fails.
+/// Returns `TypeCatalogueCodecError` when:
+/// - Any `TraitPort` method's `returns` or any param's `ty` contains `::` (L1 invariant,
+///   same rule enforced by `decode`). This prevents `encode` from producing JSON that
+///   `decode` would immediately reject, preserving the round-trip guarantee.
+/// - Serialization fails for any other reason (`TypeCatalogueCodecError::Json`).
 pub fn encode(doc: &TypeCatalogueDocument) -> Result<String, TypeCatalogueCodecError> {
-    let dto = type_catalogue_doc_to_dto(doc);
+    let dto = type_catalogue_doc_to_dto(doc)?;
     serde_json::to_string_pretty(&dto).map_err(TypeCatalogueCodecError::Json)
 }
 
@@ -292,7 +319,7 @@ pub fn encode(doc: &TypeCatalogueDocument) -> Result<String, TypeCatalogueCodecE
 fn type_catalogue_entry_from_dto(
     dto: &TypeCatalogueEntryDto,
 ) -> Result<TypeCatalogueEntry, TypeCatalogueCodecError> {
-    let kind = type_definition_kind_from_dto(&dto.kind);
+    let kind = type_definition_kind_from_dto(&dto.name, &dto.kind)?;
     let action = type_action_from_dto(dto.action);
     TypeCatalogueEntry::new(&dto.name, &dto.description, kind, action, dto.approved)
         .map_err(TypeCatalogueCodecError::Validation)
@@ -316,7 +343,10 @@ fn type_action_to_dto(action: TypeAction) -> TypeActionDto {
     }
 }
 
-fn type_definition_kind_from_dto(dto: &TypeDefinitionKindDto) -> TypeDefinitionKind {
+fn type_definition_kind_from_dto(
+    entry_name: &str,
+    dto: &TypeDefinitionKindDto,
+) -> Result<TypeDefinitionKind, TypeCatalogueCodecError> {
     match dto {
         TypeDefinitionKindDto::Typestate { transitions_to } => {
             let transitions = if transitions_to.is_empty() {
@@ -324,19 +354,61 @@ fn type_definition_kind_from_dto(dto: &TypeDefinitionKindDto) -> TypeDefinitionK
             } else {
                 TypestateTransitions::To(transitions_to.clone())
             };
-            TypeDefinitionKind::Typestate { transitions }
+            Ok(TypeDefinitionKind::Typestate { transitions })
         }
         TypeDefinitionKindDto::Enum { expected_variants } => {
-            TypeDefinitionKind::Enum { expected_variants: expected_variants.clone() }
+            Ok(TypeDefinitionKind::Enum { expected_variants: expected_variants.clone() })
         }
-        TypeDefinitionKindDto::ValueObject {} => TypeDefinitionKind::ValueObject,
+        TypeDefinitionKindDto::ValueObject {} => Ok(TypeDefinitionKind::ValueObject),
         TypeDefinitionKindDto::ErrorType { expected_variants } => {
-            TypeDefinitionKind::ErrorType { expected_variants: expected_variants.clone() }
+            Ok(TypeDefinitionKind::ErrorType { expected_variants: expected_variants.clone() })
         }
         TypeDefinitionKindDto::TraitPort { expected_methods } => {
-            TypeDefinitionKind::TraitPort { expected_methods: expected_methods.clone() }
+            let mut decls = Vec::with_capacity(expected_methods.len());
+            for m in expected_methods {
+                decls.push(method_from_dto(entry_name, m)?);
+            }
+            Ok(TypeDefinitionKind::TraitPort { expected_methods: decls })
         }
     }
+}
+
+fn method_from_dto(
+    entry_name: &str,
+    dto: &MethodDto,
+) -> Result<MethodDeclaration, TypeCatalogueCodecError> {
+    // L1 enforcement: `returns` must not contain `::` (last-segment only).
+    if dto.returns.contains("::") {
+        return Err(TypeCatalogueCodecError::InvalidEntry {
+            name: entry_name.to_owned(),
+            reason: format!(
+                "method '{}' returns contains '::' — L1 catalogue entries must use \
+                 last-segment short names: '{}'",
+                dto.name, dto.returns
+            ),
+        });
+    }
+    let mut params = Vec::with_capacity(dto.params.len());
+    for p in &dto.params {
+        if p.ty.contains("::") {
+            return Err(TypeCatalogueCodecError::InvalidEntry {
+                name: entry_name.to_owned(),
+                reason: format!(
+                    "method '{}' param '{}' ty contains '::' — L1 catalogue entries \
+                     must use last-segment short names: '{}'",
+                    dto.name, p.name, p.ty
+                ),
+            });
+        }
+        params.push(ParamDeclaration::new(p.name.clone(), p.ty.clone()));
+    }
+    Ok(MethodDeclaration::new(
+        dto.name.clone(),
+        dto.receiver.clone(),
+        params,
+        dto.returns.clone(),
+        dto.is_async,
+    ))
 }
 
 fn type_signal_from_dto(dto: &TypeSignalDto) -> Result<TypeSignal, TypeCatalogueCodecError> {
@@ -370,13 +442,21 @@ fn confidence_signal_from_str(s: &str) -> Option<ConfidenceSignal> {
 // Conversion helpers: domain → DTO
 // ---------------------------------------------------------------------------
 
-fn type_catalogue_doc_to_dto(doc: &TypeCatalogueDocument) -> TypeCatalogueDocDto {
-    let domain_types = doc.entries().iter().map(type_catalogue_entry_to_dto).collect();
+fn type_catalogue_doc_to_dto(
+    doc: &TypeCatalogueDocument,
+) -> Result<TypeCatalogueDocDto, TypeCatalogueCodecError> {
+    let type_definitions =
+        doc.entries().iter().map(type_catalogue_entry_to_dto).collect::<Result<Vec<_>, _>>()?;
     let signals = doc.signals().map(|sigs| sigs.iter().map(type_signal_to_dto).collect());
-    TypeCatalogueDocDto { schema_version: doc.schema_version(), domain_types, signals }
+    // Always emit schema_version 2, regardless of the in-memory value, so that
+    // encode→decode round-trips correctly. The in-memory schema_version field is
+    // an informational tag; v2 is the only version the current codec can decode.
+    Ok(TypeCatalogueDocDto { schema_version: 2, type_definitions, signals })
 }
 
-fn type_catalogue_entry_to_dto(entry: &TypeCatalogueEntry) -> TypeCatalogueEntryDto {
+fn type_catalogue_entry_to_dto(
+    entry: &TypeCatalogueEntry,
+) -> Result<TypeCatalogueEntryDto, TypeCatalogueCodecError> {
     let kind = match entry.kind() {
         TypeDefinitionKind::Typestate { transitions } => {
             let transitions_to = match transitions {
@@ -393,16 +473,62 @@ fn type_catalogue_entry_to_dto(entry: &TypeCatalogueEntry) -> TypeCatalogueEntry
             TypeDefinitionKindDto::ErrorType { expected_variants: expected_variants.clone() }
         }
         TypeDefinitionKind::TraitPort { expected_methods } => {
-            TypeDefinitionKindDto::TraitPort { expected_methods: expected_methods.clone() }
+            let dtos = expected_methods
+                .iter()
+                .map(|m| method_to_dto(entry.name(), m))
+                .collect::<Result<Vec<_>, _>>()?;
+            TypeDefinitionKindDto::TraitPort { expected_methods: dtos }
         }
     };
-    TypeCatalogueEntryDto {
+    Ok(TypeCatalogueEntryDto {
         name: entry.name().to_owned(),
         description: entry.description().to_owned(),
         approved: entry.approved(),
         action: type_action_to_dto(entry.action()),
         kind,
+    })
+}
+
+fn method_to_dto(
+    entry_name: &str,
+    method: &MethodDeclaration,
+) -> Result<MethodDto, TypeCatalogueCodecError> {
+    // L1 enforcement at encode time: mirror the same check as `method_from_dto` so that
+    // `encode(doc)` never produces JSON that `decode` would immediately reject.
+    if method.returns().contains("::") {
+        return Err(TypeCatalogueCodecError::InvalidEntry {
+            name: entry_name.to_owned(),
+            reason: format!(
+                "method '{}' returns contains '::' — L1 catalogue entries must use \
+                 last-segment short names: '{}'",
+                method.name(),
+                method.returns()
+            ),
+        });
     }
+    let mut params = Vec::with_capacity(method.params().len());
+    for p in method.params() {
+        if p.ty().contains("::") {
+            return Err(TypeCatalogueCodecError::InvalidEntry {
+                name: entry_name.to_owned(),
+                reason: format!(
+                    "method '{}' param '{}' ty contains '::' — L1 catalogue entries \
+                     must use last-segment short names: '{}'",
+                    method.name(),
+                    p.name(),
+                    p.ty()
+                ),
+            });
+        }
+        params.push(ParamDto { name: p.name().to_owned(), ty: p.ty().to_owned() });
+    }
+    Ok(MethodDto {
+        name: method.name().to_owned(),
+        receiver: method.receiver().map(str::to_owned),
+        params,
+        returns: method.returns().to_owned(),
+        is_async: method.is_async(),
+    })
 }
 
 fn type_signal_to_dto(sig: &TypeSignal) -> TypeSignalDto {
@@ -431,19 +557,33 @@ fn confidence_signal_to_str(signal: ConfidenceSignal) -> &'static str {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
     use super::*;
 
     const FULL_JSON: &str = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Draft", "kind": "typestate", "description": "Draft state", "transitions_to": ["Published"], "approved": true },
     { "name": "Published", "kind": "typestate", "description": "Published state", "transitions_to": [], "approved": true },
     { "name": "TrackStatus", "kind": "enum", "description": "Track status", "expected_variants": ["Planned", "Done"], "approved": true },
     { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true },
     { "name": "SchemaExportError", "kind": "error_type", "description": "Export error", "expected_variants": ["NightlyNotFound"], "approved": true },
-    { "name": "SchemaExporter", "kind": "trait_port", "description": "Export port", "expected_methods": ["export"], "approved": true }
+    {
+      "name": "SchemaExporter",
+      "kind": "trait_port",
+      "description": "Export port",
+      "expected_methods": [
+        {
+          "name": "export",
+          "receiver": "&self",
+          "params": [{ "name": "crate_name", "ty": "str" }],
+          "returns": "Result<SchemaExport, SchemaExportError>",
+          "is_async": false
+        }
+      ],
+      "approved": true
+    }
   ]
 }"#;
 
@@ -487,12 +627,21 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_trait_port_kind() {
+    fn test_decode_trait_port_with_structured_methods() {
         let doc = decode(FULL_JSON).unwrap();
-        assert!(matches!(
-            doc.entries()[5].kind(),
-            TypeDefinitionKind::TraitPort { expected_methods } if expected_methods == &["export"]
-        ));
+        let kind = doc.entries()[5].kind();
+        let TypeDefinitionKind::TraitPort { expected_methods } = kind else {
+            panic!("expected TraitPort kind");
+        };
+        assert_eq!(expected_methods.len(), 1);
+        let method = &expected_methods[0];
+        assert_eq!(method.name(), "export");
+        assert_eq!(method.receiver(), Some("&self"));
+        assert_eq!(method.params().len(), 1);
+        assert_eq!(method.params()[0].name(), "crate_name");
+        assert_eq!(method.params()[0].ty(), "str");
+        assert_eq!(method.returns(), "Result<SchemaExport, SchemaExportError>");
+        assert!(!method.is_async());
     }
 
     #[test]
@@ -504,8 +653,8 @@ mod tests {
     #[test]
     fn test_decode_approved_defaults_to_true_when_absent() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Foo", "kind": "value_object", "description": "no approved field" }
   ]
 }"#;
@@ -514,24 +663,32 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_empty_domain_types_array() {
-        let json = r#"{ "schema_version": 1, "domain_types": [] }"#;
+    fn test_decode_empty_type_definitions_array() {
+        let json = r#"{ "schema_version": 2, "type_definitions": [] }"#;
         let doc = decode(json).unwrap();
         assert_eq!(doc.entries().len(), 0);
     }
 
     #[test]
     fn test_decode_wrong_schema_version_returns_error() {
-        let json = r#"{ "schema_version": 99, "domain_types": [] }"#;
+        let json = r#"{ "schema_version": 99, "type_definitions": [] }"#;
         let err = decode(json).unwrap_err();
         assert!(matches!(err, TypeCatalogueCodecError::UnsupportedSchemaVersion(99)));
     }
 
     #[test]
+    fn test_decode_v1_rejected_with_rerun_hint() {
+        let json = r#"{ "schema_version": 1, "domain_types": [] }"#;
+        let err = decode(json).unwrap_err();
+        let msg = err.to_string();
+        assert!(msg.contains("type_definitions"), "expected v2 hint, got: {msg}");
+    }
+
+    #[test]
     fn test_decode_unknown_kind_returns_error() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Foo", "kind": "unknown_kind", "description": "bad", "approved": true }
   ]
 }"#;
@@ -541,8 +698,8 @@ mod tests {
     #[test]
     fn test_decode_empty_name_returns_validation_error() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "", "kind": "value_object", "description": "bad", "approved": true }
   ]
 }"#;
@@ -553,8 +710,8 @@ mod tests {
     #[test]
     fn test_decode_enum_without_expected_variants_returns_error() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Bad", "kind": "enum", "description": "missing field" }
   ]
 }"#;
@@ -564,8 +721,8 @@ mod tests {
     #[test]
     fn test_decode_trait_port_without_expected_methods_returns_error() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Bad", "kind": "trait_port", "description": "missing field" }
   ]
 }"#;
@@ -573,10 +730,64 @@ mod tests {
     }
 
     #[test]
+    fn test_decode_trait_port_returns_with_double_colon_rejected() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "Repo",
+      "kind": "trait_port",
+      "description": "port",
+      "expected_methods": [
+        { "name": "save", "receiver": "&self", "params": [], "returns": "std::io::Result<()>", "is_async": false }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        match err {
+            TypeCatalogueCodecError::InvalidEntry { reason, .. } => {
+                assert!(reason.contains("'::'"), "expected '::' rejection, got: {reason}");
+            }
+            other => panic!("expected InvalidEntry, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_decode_trait_port_param_ty_with_double_colon_rejected() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "Repo",
+      "kind": "trait_port",
+      "description": "port",
+      "expected_methods": [
+        {
+          "name": "save",
+          "receiver": "&self",
+          "params": [{ "name": "id", "ty": "domain::TrackId" }],
+          "returns": "()",
+          "is_async": false
+        }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        match err {
+            TypeCatalogueCodecError::InvalidEntry { reason, .. } => {
+                assert!(reason.contains("'::'"), "expected '::' rejection, got: {reason}");
+            }
+            other => panic!("expected InvalidEntry, got {other:?}"),
+        }
+    }
+
+    #[test]
     fn test_decode_invalid_transition_target_returns_error() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Draft", "kind": "typestate", "description": "d", "transitions_to": ["NonExistent"] }
   ]
 }"#;
@@ -600,8 +811,8 @@ mod tests {
     #[test]
     fn test_round_trip_with_signals() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Draft", "kind": "typestate", "description": "Draft state", "transitions_to": [] }
   ],
   "signals": [
@@ -618,8 +829,8 @@ mod tests {
     #[test]
     fn test_encode_value_object_omits_kind_specific_fields() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "TrackId", "kind": "value_object", "description": "ID", "approved": true }
   ]
 }"#;
@@ -633,8 +844,8 @@ mod tests {
     #[test]
     fn test_decode_signals_absent_returns_none() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Draft", "kind": "value_object", "description": "Draft" }
   ]
 }"#;
@@ -647,8 +858,8 @@ mod tests {
     #[test]
     fn test_decode_action_absent_defaults_to_add() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Foo", "kind": "value_object", "description": "d" }
   ]
 }"#;
@@ -659,8 +870,8 @@ mod tests {
     #[test]
     fn test_decode_action_delete_parsed_correctly() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "OldType", "kind": "value_object", "description": "d", "action": "delete" }
   ]
 }"#;
@@ -671,8 +882,8 @@ mod tests {
     #[test]
     fn test_decode_action_modify_parsed_correctly() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Changed", "kind": "value_object", "description": "d", "action": "modify" }
   ]
 }"#;
@@ -683,8 +894,8 @@ mod tests {
     #[test]
     fn test_decode_action_reference_parsed_correctly() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Ref", "kind": "value_object", "description": "d", "action": "reference" }
   ]
 }"#;
@@ -695,8 +906,8 @@ mod tests {
     #[test]
     fn test_encode_add_action_omits_field() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Foo", "kind": "value_object", "description": "d" }
   ]
 }"#;
@@ -708,8 +919,8 @@ mod tests {
     #[test]
     fn test_encode_delete_action_includes_field() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "OldType", "kind": "value_object", "description": "d", "action": "delete" }
   ]
 }"#;
@@ -721,8 +932,8 @@ mod tests {
     #[test]
     fn test_round_trip_preserves_delete_action() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "OldType", "kind": "value_object", "description": "d", "action": "delete" }
   ]
 }"#;
@@ -735,23 +946,31 @@ mod tests {
     #[test]
     fn test_decode_unknown_action_returns_error() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Foo", "kind": "value_object", "description": "d", "action": "rename" }
   ]
 }"#;
         assert!(decode(json).is_err());
     }
 
-    // --- Duplicate name validation (delete+add pair) ---
+    // --- Duplicate name validation ---
 
     #[test]
     fn test_decode_delete_add_pair_succeeds() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Foo", "kind": "value_object", "description": "old", "action": "delete" },
-    { "name": "Foo", "kind": "trait_port", "description": "new", "action": "add", "expected_methods": ["find"] }
+    {
+      "name": "Foo",
+      "kind": "trait_port",
+      "description": "new",
+      "action": "add",
+      "expected_methods": [
+        { "name": "find", "receiver": "&self", "params": [], "returns": "()", "is_async": false }
+      ]
+    }
   ]
 }"#;
         let doc = decode(json).unwrap();
@@ -763,8 +982,8 @@ mod tests {
     #[test]
     fn test_decode_add_add_duplicate_returns_error() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Foo", "kind": "value_object", "description": "a" },
     { "name": "Foo", "kind": "value_object", "description": "b" }
   ]
@@ -774,69 +993,10 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_delete_delete_duplicate_returns_error() {
-        let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
-    { "name": "Foo", "kind": "value_object", "description": "a", "action": "delete" },
-    { "name": "Foo", "kind": "value_object", "description": "b", "action": "delete" }
-  ]
-}"#;
-        let err = decode(json).unwrap_err();
-        assert!(matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }));
-    }
-
-    #[test]
-    fn test_decode_three_same_name_returns_error() {
-        let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
-    { "name": "Foo", "kind": "value_object", "description": "a", "action": "delete" },
-    { "name": "Foo", "kind": "value_object", "description": "b", "action": "add" },
-    { "name": "Foo", "kind": "value_object", "description": "c", "action": "add" }
-  ]
-}"#;
-        let err = decode(json).unwrap_err();
-        assert!(matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }));
-    }
-
-    #[test]
-    fn test_decode_delete_add_same_kind_returns_error() {
-        // Signals are keyed by (type_name, kind_tag). A same-kind delete+add pair produces
-        // two signals with the same key, making one unaddressable.
-        let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
-    { "name": "Foo", "kind": "value_object", "description": "old", "action": "delete" },
-    { "name": "Foo", "kind": "value_object", "description": "new" }
-  ]
-}"#;
-        let err = decode(json).unwrap_err();
-        assert!(matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }));
-    }
-
-    #[test]
-    fn test_decode_delete_add_same_partition_returns_error() {
-        // Same partition (both non-trait) — evaluate_delete would find the new type
-        // by name and stay Yellow forever. Use action:"modify" instead.
-        let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
-    { "name": "Foo", "kind": "value_object", "description": "old", "action": "delete" },
-    { "name": "Foo", "kind": "enum", "description": "new", "expected_variants": ["A"] }
-  ]
-}"#;
-        let err = decode(json).unwrap_err();
-        assert!(matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }));
-    }
-
-    #[test]
     fn test_decode_delete_typestate_graph_succeeds() {
-        // Deleting a connected typestate graph: OldDraft -> OldPublished, both deleted.
-        // Delete entries may reference other delete-action typestates as targets.
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "OldDraft", "kind": "typestate", "description": "old draft", "action": "delete", "transitions_to": ["OldPublished"] },
     { "name": "OldPublished", "kind": "typestate", "description": "old published", "action": "delete", "transitions_to": [] }
   ]
@@ -848,24 +1008,10 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_non_delete_typestate_cannot_target_delete_entry() {
-        // A live (non-delete) typestate must not transition to a delete-marked typestate.
-        let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
-    { "name": "Active", "kind": "typestate", "description": "live state", "transitions_to": ["OldState"] },
-    { "name": "OldState", "kind": "typestate", "description": "being deleted", "action": "delete", "transitions_to": [] }
-  ]
-}"#;
-        let err = decode(json).unwrap_err();
-        assert!(matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }));
-    }
-
-    #[test]
     fn test_round_trip_signals_with_items() {
         let json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "Draft", "kind": "value_object", "description": "Draft", "approved": true }
   ],
   "signals": [

@@ -571,15 +571,15 @@ mod tests {
     fn test_execute_type_signals_success_path_writes_signals() {
         let dir = tempfile::tempdir().unwrap();
         let domain_types_json = r#"{
-  "schema_version": 1,
-  "domain_types": [
+  "schema_version": 2,
+  "type_definitions": [
     { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true }
   ]
 }"#;
         let (items_dir, track_id) = setup_track(dir.path(), domain_types_json);
         // Write an empty baseline so the baseline-required code path succeeds.
         let baseline_json = r#"{
-  "schema_version": 1,
+  "schema_version": 2,
   "captured_at": "2026-01-01T00:00:00Z",
   "types": {},
   "traits": {}

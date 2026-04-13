@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "captured_at": "2026-04-13T01:31:24Z",
+  "captured_at": "2026-04-13T01:54:59Z",
   "types": {
     "ActionContradiction": {
       "kind": "struct",
@@ -487,6 +487,21 @@
           "name": "new",
           "params": [
             {
+              "name": "severity",
+              "ty": "Severity"
+            },
+            {
+              "name": "message",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
               "name": "message",
               "ty": "impl Into"
             },
@@ -511,18 +526,10 @@
           "is_async": false
         },
         {
-          "name": "new",
-          "params": [
-            {
-              "name": "severity",
-              "ty": "Severity"
-            },
-            {
-              "name": "message",
-              "ty": "impl Into"
-            }
-          ],
-          "returns": "Self",
+          "name": "severity",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Severity",
           "is_async": false
         },
         {
@@ -530,13 +537,6 @@
           "receiver": "&self",
           "params": [],
           "returns": "Option<&str>",
-          "is_async": false
-        },
-        {
-          "name": "severity",
-          "receiver": "&self",
-          "params": [],
-          "returns": "Severity",
           "is_async": false
         },
         {
