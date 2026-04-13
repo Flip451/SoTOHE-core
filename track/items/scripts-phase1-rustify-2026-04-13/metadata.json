@@ -124,7 +124,7 @@
     {
       "description": "[Red] `libs/domain/src/track.rs::tests` に `TrackMetadata::status()` 導出ロジックのテスト 10 件を追加する。観点: empty tasks → planned / all todo → planned / any in_progress → in_progress / mixed done+todo → in_progress / all done → done / all skipped → done / mixed done+skipped → done / skipped+todo → in_progress / override=blocked wins / override=cancelled wins。これらは `scripts/test_track_schema.py::TestEffectiveTrackStatus` の 10 観点を網羅する。`TrackMetadata::status()` は既実装のため、基本的には実装変更不要でテスト追加のみで pass する見込み。",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "[Cleanup] `scripts/test_track_schema.py` を削除する (impl の `scripts/track_schema.py` は Phase 3 で削除予定のため本 track では残す)。`Makefile.toml:109-128` の `scripts-selftest-local` args リストから `scripts/test_track_schema.py` を除外する。Python 固有の観点 (non-string フィールドで TypeError/AttributeError にならないこと) は Rust の型システムで構造的に排除されるため移植対象外と判断する。`scripts/track_schema.py` が `scripts/track_resolution.py` および `scripts/external_guides.py` から引き続き import されることを確認する。",
@@ -183,5 +183,5 @@
     }
   ],
   "title": "scripts/ Python ヘルパー削減 フェーズ1 — track_branch_guard / markdown / registry / state_machine の Rust 移植",
-  "updated_at": "2026-04-13T13:42:36Z"
+  "updated_at": "2026-04-13T13:51:36Z"
 }

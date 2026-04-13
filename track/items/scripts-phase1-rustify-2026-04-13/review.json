@@ -49,24 +49,6 @@
         }
       ]
     },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
-          "at": "2026-04-13T13:45:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
-          "at": "2026-04-13T13:47:56Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -876,6 +858,71 @@
           "findings": [],
           "hash": "rvw1:sha256:e33e93898b3c3ac6916e351f6e990d763c8046b207874fb7afa255179ae08152",
           "at": "2026-04-13T13:46:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21d2f1cdee0ebe8e1aa1962ec155aa18e9821e8fcc658eb8c8e0b678e0ab2dc7",
+          "at": "2026-04-13T13:54:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The other-scope brief says this change should only flip T006 from `todo` to `done`, but this hunk also backfills `commit_hash` on the already-complete T004 and T005 entries. That is an extra metadata mutation in this scope, and it is what causes the unrelated `plan.md` re-render at lines 28-29.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 115,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:21d2f1cdee0ebe8e1aa1962ec155aa18e9821e8fcc658eb8c8e0b678e0ab2dc7",
+          "at": "2026-04-13T13:57:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf48afd541debba9f49f00043142326daf8a111c6e8e43af0cfc802b5b3ce53f",
+          "at": "2026-04-13T13:59:04Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
+          "at": "2026-04-13T13:54:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
+          "at": "2026-04-13T13:56:34Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
+          "at": "2026-04-13T13:45:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
+          "at": "2026-04-13T13:47:56Z"
         }
       ]
     }
