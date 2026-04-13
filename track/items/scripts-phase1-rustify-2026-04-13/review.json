@@ -1,0 +1,775 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This track misclassifies `validate_track_document()` as missing unreferenced-task / cross-section-duplicate validation. Those invariants are already enforced in Rust by `TrackMetadata::with_branch()` via `validate_plan_invariants()` (`libs/domain/src/track.rs:572-599`), which rejects both `UnreferencedTask` and `DuplicateTaskReference`. As written, T004/T005 would duplicate an existing Rust guard rather than close a real gap.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 13,
+              "category": "technical"
+            }
+          ],
+          "hash": "rvw1:sha256:d9a75cce6847102ecbd4a619fb8de26b43314afb553a67b58562a6aa233fc8f8",
+          "at": "2026-04-13T07:51:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/items/scripts-phase1-rustify-2026-04-13/spec.json` is `schema_version: 1` but omits the required top-level `domain_states` and `additional_sections` fields; it jumps from `constraints` straight to `acceptance_criteria`, so the spec does not satisfy the track schema.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 276,
+              "category": "schema"
+            }
+          ],
+          "hash": "rvw1:sha256:d9a75cce6847102ecbd4a619fb8de26b43314afb553a67b58562a6aa233fc8f8",
+          "at": "2026-04-13T07:53:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T016` keeps `scripts/test_track_resolution.py` in the surviving selftest set, but that test still runs `import scripts.track_resolution, scripts.track_registry, scripts.external_guides` in `test_package_style_imports_work_from_repo_root()`; once `T013` deletes `scripts/track_registry.py`, `cargo make scripts-selftest` will fail unless this test is updated or dropped.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 149,
+              "category": "correctness"
+            },
+            {
+              "message": "`T005` treats unreferenced-task and cross-section duplicate rejection as missing Rust logic, but `TrackMetadata::new()` already calls `validate_plan_invariants()` and rejects both cases in the domain layer. This means the plan is duplicating an invariant that is already enforced in Rust, rather than filling a real gap.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 34,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d9a75cce6847102ecbd4a619fb8de26b43314afb553a67b58562a6aa233fc8f8",
+          "at": "2026-04-13T07:58:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S2 contradicts itself and the current Rust implementation: it says `validate_track_document()` still needs new unreferenced-task / cross-section-duplicate validation, but T004/T005 later say those checks already come from `libs/domain/src/track.rs::validate_plan_invariants()` and only need test coverage. `render.rs` already propagates `codec::decode()` errors, so this overstates the implementation scope and will mislead the Phase 1 work.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 32,
+              "category": "logic"
+            },
+            {
+              "message": "The branch-guard test split does not match the proposed helper signature. The listed `skip_branch_check_bypasses` case is handled by `execute_transition()` / `state_ops`, but `verify_branch_guard_with_branch(reader, track_id, current_branch: &str)` has no skip flag, so that case cannot be covered at the helper level as written. Either move the skip test to the caller or widen the helper API.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 22,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:eeb26b54a32857ab9a1517f5623238499f0bd97038ebf62dae50a320a0f98bea",
+          "at": "2026-04-13T08:03:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The planner research still says T005 should add unreferenced-task and cross-section-duplicate validation to `validate_track_document()`, but `libs/domain/src/track.rs::validate_plan_invariants()` already emits `UnreferencedTask` / `DuplicateTaskReference` and `libs/infrastructure/src/track/render.rs::validate_track_document()` already propagates those errors through `codec::decode()`. This should be rewritten as test coverage only; otherwise phase 1 is built around a nonexistent code gap. The same wrong premise is repeated in `track/items/scripts-phase1-rustify-2026-04-13/verification.md:13`.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-13-0726-planner-scripts-phase1.md",
+              "line": 144,
+              "category": "technical correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1cb76c5da79278e1c9bfee24ed45547a1d6d57e2707b1adc790caedf20ebe7d6",
+          "at": "2026-04-13T08:07:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fac6577ff2831a75d898006d26298b34463c100a961ac9251e01c2d12efe2e91",
+          "at": "2026-04-13T08:10:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The approved spec still treats `validate_track_document()` as missing unreferenced-task / cross-section-duplicate validation, but those invariants are already enforced in `libs/domain/src/track.rs::validate_plan_invariants()` and surfaced through `codec::decode()` before `validate_track_document()` returns (`libs/domain/src/track.rs:572-605`, `libs/infrastructure/src/track/render.rs:400-402`). Keeping this stale premise in the goal/plan invites redundant validation work and unnecessary compatibility checks against existing tracks.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 9,
+              "category": "correctness"
+            },
+            {
+              "message": "T001/T002 ask for `none_current` and `missing_metadata` branch-guard cases to be ported into `verify_branch_guard_with_branch(reader, track_id, current_branch: &str)`, but that API cannot represent `current_branch=None`, and the current Rust semantics explicitly error when `TrackReader::find()` returns `None` (`apps/cli/src/commands/track/transition.rs:94-97`) rather than skipping like the old Python helper did. As written, this task is internally inconsistent and will either force a behavior change or produce unimplementable tests.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 74,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:adb37a73f703b64c369406d2a7bc4a186b1bb070523754af9f8cffdd70d35e5d",
+          "at": "2026-04-13T08:15:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`goal[2]` still says Phase 1 must add missing `validate_track_document()` checks for unreferenced tasks and cross-section duplicates, but those invariants are already enforced today via `validate_plan_invariants()` and the `codec::decode()` call inside `validate_track_document()` (`libs/domain/src/track.rs:572-605`, `libs/infrastructure/src/track/render.rs:400-402`). Later sections of this same track (T004/T005) correctly treat them as test-only, so leaving the summary/spec text as-is creates a contradictory implementation target and can push the work toward redundant validation in the wrong layer.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 9,
+              "category": "correctness"
+            },
+            {
+              "message": "The ADR sends Phase 2/3 follow-up work to `crates/cli` (`crates/cli/src/commands/` here, and again at line 117), but this repository’s CLI lives under `apps/cli` and there is no `crates/` directory. Future tracks built from this ADR will be pointed at nonexistent paths.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md",
+              "line": 97,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:adb37a73f703b64c369406d2a7bc4a186b1bb070523754af9f8cffdd70d35e5d",
+          "at": "2026-04-13T08:19:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json:14` explicitly drops the Python `test_skip_branch_check_bypasses` observation on the assumption that `execute_transition()` already covers it, but the Rust tree has no test exercising the `if !skip_branch_check` branch in `apps/cli/src/commands/track/transition.rs`. If Phase 1 deletes `scripts/test_track_branch_guard.py` as planned, `--skip-branch-check` loses its only regression coverage.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 14,
+              "category": "coverage"
+            },
+            {
+              "message": "`spec.json` is internally inconsistent about T004/T005. Lines 34-35 correctly say unreferenced-task and cross-section-duplicate rejection already exist in `libs/domain/src/track.rs::validate_plan_invariants()` and only need coverage, but line 199 still refers to them as 'new `validate_track_document()` logic'. Leaving the constraint that way makes the implementation scope ambiguous and can send the implementer toward unnecessary validation changes.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 199,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:398aedc405c9cf19b91aa5faaa0db7fea665e1ef5125c68453ae72ff516086f7",
+          "at": "2026-04-13T08:25:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001/T002 explicitly exclude migrating `test_skip_branch_check_bypasses`, but `spec.json` still requires a Rust skip-check bypass test and there are no existing Rust tests covering `skip_branch_check` in `apps/cli/src/commands/track/*`. As written, implementers can satisfy the task list/verification while silently dropping one of the current branch-guard regressions.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 74,
+              "category": null
+            },
+            {
+              "message": "T014 deletes `scripts/test_track_state_machine.py` wholesale on the premise that its tests are all Python-fallback-only, but that file currently contains the only happy/error-path tests for the transition CLI entrypoint (`main([\"transition\", ...])`, invalid transition, missing dir, commit-hash path). I could not find replacement tests in `apps/cli/src/commands/track/transition.rs`, so the track currently removes public API coverage without reintroducing it elsewhere.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 138,
+              "category": null
+            },
+            {
+              "message": "`verification.md` does not cover the `scripts/test_track_resolution.py` import cleanup that T013 requires after deleting `scripts/track_registry.py`. The checklist only asks for the file deletions and Makefile update, so it can be checked off while leaving `cargo make scripts-selftest` broken on the stale `import scripts.track_registry` assertion.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/verification.md",
+              "line": 8,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:21e80bc22d97ec5234cb2cc89e9684c5cd2483fcf117bf4b0b2d4b05df1e0b61",
+          "at": "2026-04-13T08:31:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T014 under-specifies the `track_state_machine` test migration. The task only requires re-adding transition success/invalid/missing-dir coverage, but `scripts/test_track_state_machine.py` also contains CLI-level regressions for `transition --commit-hash` persistence and `sync-views` dispatch (`test_transition_with_commit_hash`, `test_sync_views_subcommand`). If this is implemented as written, Phase 1 will delete the only end-to-end coverage for two still-supported Rust CLI behaviors.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 139,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:9175e4d3026ce50763ec0e1e142a49111d77e7c11a204504d4e4511d26657d81",
+          "at": "2026-04-13T08:39:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Phase 1 ADR source is not aligned with the track scope: the authoritative deletion list still only mentions removing the Python fallback inside `scripts/track_state_machine.py` and does not list `scripts/test_track_state_machine.py`, while this track’s spec/metadata now require deleting both files. Because the spec cites this ADR section as the source, implementers do not have a source-backed decision for the full-file/test deletion currently planned.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md",
+              "line": 68,
+              "category": "consistency"
+            },
+            {
+              "message": "The branch-guard plan is internally unimplementable as written: it requires porting the Python `none_current_branch_raises` case, but the proposed helper signature is `verify_branch_guard_with_branch(reader, track_id, current_branch: &str)`. A `&str` cannot represent the Python helper’s `current_branch=None` state, so T001/T002 cannot cover all 7 promised observations without redesigning the interface (for example to accept `Option<&str>` or a mocked branch resolver).",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 14,
+              "category": "correctness"
+            },
+            {
+              "message": "The final verification plan overstates what `cargo make scripts-selftest` proves. T016/manual verification treat that target as validation for the surviving Python regression suites, but `scripts-selftest-local` still omits `scripts/test_verify_scripts.py`. Since this track explicitly expects `test_verify_scripts.py` to remain after Phase 1, the plan can report success while one retained regression test never ran.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/verification.md",
+              "line": 28,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:82b76f3c86e3279b8a5fb692ed4bae35fac6de6450c19799e66e915cc1df6d4b",
+          "at": "2026-04-13T08:44:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Phase 1 ADR misstates the deletion scope as \"実装 4 + fallback 1 + テスト 6 + dead code 1 = 12 ファイル\", but the enumerated list is only 11 files (5 implementation/test pairs plus `scripts/test_check_layers.py`). The planner, metadata, and spec all use 11-file scope, so leaving the ADR at 12 creates a cross-artifact scope contradiction.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md",
+              "line": 68,
+              "category": "logic"
+            },
+            {
+              "message": "T007 plans to delete `scripts/track_schema.py`, while the same track keeps `scripts/external_guides.py` and `scripts/track_resolution.py` out of scope and expects `cargo make scripts-selftest` to stay green. Both retained modules still import `track_schema` at import time (`scripts/external_guides.py:18-33`, `scripts/track_resolution.py:15-26`), so Phase 1 as written would strand the remaining Python scripts with `ImportError` unless those dependencies are migrated or preserved.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 64,
+              "category": "logic"
+            },
+            {
+              "message": "T003 requires deleting `scripts/track_branch_guard.py` without breaking `cargo make scripts-selftest`, but `scripts/test_track_state_machine.py` remains in `scripts-selftest-local` until T014 (`Makefile.toml:124`) and its production module still imports `track_branch_guard` (`scripts/track_state_machine.py:16`). The planned task order therefore cannot satisfy T003's own verification gate.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 83,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:e889b197c2ec86f4d6f2e1b42de7ba5cb632ced863b9ca76acb4af3bd4f4727f",
+          "at": "2026-04-13T08:50:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 does not have a satisfiable implementation path. The plan still requires `scripts/track_schema.py` to be deleted in Phase 1, but that module is currently imported by retained Phase 3 scripts (`scripts/external_guides.py:20-25`, `scripts/track_resolution.py:16-25`). The task text here already acknowledges the only two ways forward are either keeping a stub (which violates the Phase 1 deletion list / acceptance criteria) or editing those Phase 2/3 files early (which violates the no-touch scope constraint). As written, the track cannot be completed while satisfying both scope and verification requirements.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 103,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:782ddd0641b1059e69a4c56abf6c35129ff5e8d302e065796c0908b4d769eb77",
+          "at": "2026-04-13T08:56:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The planner still schedules `scripts/track_schema.py` for Phase 1 deletion and includes it in the \"11 files\" removal set, but the ADR/spec/metadata for this track explicitly defer that file because it is still imported by `scripts/external_guides.py` and `scripts/track_resolution.py`. If an implementer follows the planner as written, Phase 1 will remove a live dependency and break the remaining Python helpers/selftests.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-13-0726-planner-scripts-phase1.md",
+              "line": 149,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:fb46380edf7d14fa3ab86e5cdc9f945a884e6d4d8e96fde0820b0f7c3bf768b7",
+          "at": "2026-04-13T09:03:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The planner still states that `validate_track_document()` is missing unreferenced-task / cross-section-duplicate validation and should gain new logic, but the same document already says those checks are implemented in `libs/domain/src/track.rs::validate_plan_invariants()` and the current code confirms that. Leaving this contradiction in the planning artifact can drive an implementation toward redundant validation in `render.rs` instead of the intended test-only work.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-13-0726-planner-scripts-phase1.md",
+              "line": 182,
+              "category": "technical_incorrectness"
+            },
+            {
+              "message": "The spec hard-codes a `verify_branch_guard_with_branch(..., current_branch: Option<&str>)` helper so it can port Python’s `current_branch=None` test case, but the actual Rust adapter never produces `None`: `current_git_branch()` returns `Result<String, String>` and `verify_branch_guard()` only sees a real branch string or an error. Following this plan would either introduce dead behavior solely for tests or silently change CLI error semantics. The task should target the real Rust failure mode instead of requiring a synthetic `None` branch state.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 14,
+              "category": "technical_incorrectness"
+            },
+            {
+              "message": "The ADR’s phase-1 rationale says the work removes 11 files, but the ADR’s own deletion list, the planner output, and the track spec all enumerate only 10 deletions because `scripts/track_schema.py` is explicitly retained for later phases. This scope mismatch will confuse verification and progress reporting for the track.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md",
+              "line": 128,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:a1d3df3753fd601e1e7a6b71af88147488d51cbe3d5a5672994a6459dbbae1c7",
+          "at": "2026-04-13T09:08:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The approved acceptance criterion is internally inconsistent with the planned API and the current CLI code: it requires 7 `verify_branch_guard_with_branch` tests and an `Option<&str>` helper to model `none_current`, but the design elsewhere in this track uses `verify_branch_guard_with_branch(..., current_branch: &str)` and `current_git_branch()` returns `Result<String, String>`, so the `none_current` case is handled by the outer `verify_branch_guard()` before the helper is called. Leaving this as-is means the track can be marked incomplete unless the implementer invents a different signature/state model than the one the planner and metadata specify.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 314,
+              "category": "logical_contradiction"
+            },
+            {
+              "message": "T016's verification target is self-contradictory: `scripts-selftest-local` currently lists 11 Python tests in `Makefile.toml`, and Phase 1 removes 5 of them, so `cargo make scripts-selftest` should have 6 remaining tests, not 7. The same sentence also says the final `scripts/` contents should exclude `track_schema.py`, even though this track explicitly keeps `track_schema.py` for Phase 2/3 dependencies. As written, the verifier can fail a correct implementation.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 149,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:42b67114c514f010022a5b3beb72b12ba0521603ebceb25fbd0414f393834824",
+          "at": "2026-04-13T09:18:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 6 R4's retained-file list omits `track_schema.py`, even though the same section's deletion list removes only `test_track_schema.py` and the ADR/metadata/spec acceptance criteria all defer deleting `track_schema.py` to Phase 2/3. Because `spec.json` copies this retained-files list into T016, an implementer following the planning artifacts can either delete a still-imported Phase 2/3 file or fail the final verification after correctly keeping it.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-13-0726-planner-scripts-phase1.md",
+              "line": 193,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:34e7a98f95662c2172921fe3cc759e4b839e67d76d0f67fbb6d5529c5b658555",
+          "at": "2026-04-13T09:22:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`scope.in_scope` for T016 says Phase 1 should leave only `__init__.py`, `conftest.py`, `architecture_rules*`, `atomic_write*`, `convention_docs*`, `external_guides*`, `track_resolution*`, `test_make_wrappers.py`, and `test_verify_scripts.py`, but omits `track_schema.py`. That contradicts the ADR, the spec acceptance criteria, and the current code: both `scripts/external_guides.py` and `scripts/track_resolution.py` still import `track_schema`, so implementing this scoped requirement would wrongly delete a Phase-2 file and break the helpers that are supposed to remain after Phase 1.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 141,
+              "category": "logical_contradiction"
+            },
+            {
+              "message": "The approved spec lets T014 delete `scripts/test_track_state_machine.py` without requiring Rust replacements for the five CLI regression scenarios that file currently covers (`test_transition_subcommand_success`, `...invalid_transition`, `...missing_dir`, `...with_commit_hash`, `test_sync_views_subcommand`). Metadata and `verification.md` do require porting those cases, but `spec.json` only scopes the deletion itself here, so an implementation that follows the approved spec can drop real CLI coverage with no acceptance check.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 121,
+              "category": "test_coverage_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:edc7a3d1250d726fe59f337ffbe9183e7793551018fecb47ecf5cae3fdcb66a8",
+          "at": "2026-04-13T09:29:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 of the planner output still says unreferenced-task and cross-section-duplicate rejection are absent from Rust and require new implementation, but `libs/domain/src/track.rs::validate_plan_invariants()` already enforces both and the spec/metadata later in this track correctly describe T004/T005 as test-only coverage additions. Leaving the planner artifact contradictory here can send implementers toward redundant validation changes in `render.rs` instead of the intended test migration.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-13-0726-planner-scripts-phase1.md",
+              "line": 73,
+              "category": "technical_incorrectness"
+            }
+          ],
+          "hash": "rvw1:sha256:edc7a3d1250d726fe59f337ffbe9183e7793551018fecb47ecf5cae3fdcb66a8",
+          "at": "2026-04-13T09:31:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Phase 1 branch-guard plan still requires a `missing_metadata_skips` helper test, but the Rust command has no matching behavior: `verify_branch_guard()` fails when `TrackReader::find()` returns `None` (`apps/cli/src/commands/track/transition.rs:94-97`), while the Python case being ported is specifically “metadata.json absent -> skip” (`scripts/test_track_branch_guard.py:74-78`). As written, T001/T002 either force a semantic change that does not exist today or leave the planned test unsatisfiable.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 14,
+              "category": "technical_incorrectness"
+            },
+            {
+              "message": "This scope item requires editing `scripts/test_track_resolution.py` after deleting `track_registry.py`, but the ADR explicitly defers both `scripts/track_resolution.py` and `scripts/test_track_resolution.py` to Phase 3 (`knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md:103-110`). That makes the Phase 1 boundary self-contradictory: implementers must either touch a deferred file or violate the plan.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 112,
+              "category": "consistency"
+            },
+            {
+              "message": "The Phase 1 end-state list here omits `track_schema.py`, even though this same spec later says `track_schema.py` must remain after Phase 1 (`spec.json:292`) and the planner’s R4 list retains it because `external_guides.py`/`track_resolution.py` still import it. That contradiction makes the cleanup verification ambiguous and can lead reviewers to approve the wrong remaining-file set.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 141,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:edc7a3d1250d726fe59f337ffbe9183e7793551018fecb47ecf5cae3fdcb66a8",
+          "at": "2026-04-13T09:32:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87bd88dc54bb8c3b0fc56390d4767db552882724607982e3144c5f3a370b9b8b",
+          "at": "2026-04-13T10:32:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is planned immediately after T002 and even requires `cargo make scripts-selftest` to keep passing, but `scripts/track_state_machine.py` still imports `track_branch_guard` at module load time (`scripts/track_state_machine.py:16`) and its tests remain in `scripts-selftest-local` until T015. Deleting `scripts/track_branch_guard.py` at T003 therefore breaks the still-planned `test_track_registry.py`/`test_track_state_machine.py` phase and contradicts the ADR's own safe deletion order.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 87,
+              "category": "dependency-order"
+            },
+            {
+              "message": "The plan/spec turns the registry edge case into 'return an empty list when a file exists under `track/items`', but the source Python regression being cited is only `test_track_items_is_file_not_dir` (`scripts/test_track_registry.py:547`), where `track/items` itself is a file. That wording creates a new acceptance criterion and could force an unnecessary behavior change in `collect_track_snapshots()` instead of porting the actual existing test.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 106,
+              "category": "acceptance-criteria"
+            },
+            {
+              "message": "T014 states that the CLI coverage can rely on existing `execute_transition()` / `execute_sync_views()` implementations, but there is no Rust `execute_sync_views()` entry point in the current codebase. The sync command is implemented through `execute_views(ViewAction::Sync { .. })` in `apps/cli/src/commands/track/views.rs:6-38`, so this task currently references a nonexistent API.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 143,
+              "category": "api-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:87bd88dc54bb8c3b0fc56390d4767db552882724607982e3144c5f3a370b9b8b",
+          "at": "2026-04-13T10:37:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/adr/README.md` defines ADR Status as only `Accepted` / `Superseded` / `Deprecated`, but this new ADR is authored as `Proposed` and the new index row mirrors that value. That leaves the planning artifact out of compliance with the repository’s own ADR template/checklist the review asked us to enforce.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md",
+              "line": 5,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:87bd88dc54bb8c3b0fc56390d4767db552882724607982e3144c5f3a370b9b8b",
+          "at": "2026-04-13T10:41:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 schedules `scripts/track_branch_guard.py` for deletion immediately after T002, but `scripts/track_state_machine.py` still imports it and `scripts/test_track_state_machine.py` remains in `scripts-selftest-local` until T015. That contradicts the safe-order constraint in `spec.json` and would make the intermediate `cargo make scripts-selftest` check fail.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 88,
+              "category": "logical_contradiction"
+            },
+            {
+              "message": "T014 describes the Rust CLI regression port against a command/handler shape that does not exist: `track transition` requires `--items-dir` plus a track id (`apps/cli/src/commands/track/mod.rs`), the original `_missing_dir` test exercises a nonexistent track directory (`scripts/test_track_state_machine.py:1013-1017`) rather than a missing track id, and there is no `execute_sync_views()` entrypoint (`apps/cli/src/commands/track/views.rs` exposes `execute_views`). As written, the integration-test task can be implemented against the wrong CLI behavior and miss the regression it claims to preserve.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 143,
+              "category": "technical_incorrectness"
+            }
+          ],
+          "hash": "rvw1:sha256:716acc87113320592a2f3d3f144ce6c40cfae982bd0e3940ff95fbbd396a4593",
+          "at": "2026-04-13T10:48:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T014 specifies the Rust regression test as `sotp track transition <id> <task> <new_status>`, but the real CLI requires a mandatory `--items-dir <project-root>/track/items` flag before `track_id` (`apps/cli/src/commands/track/mod.rs:43-63`), and the current Python wrapper delegates with that flag today (`scripts/track_state_machine.py:239-245`). As written, this plan drives the implementation toward an invalid command line that will fail in clap parsing instead of covering the intended transition behavior.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 143,
+              "category": "technical_incorrectness"
+            }
+          ],
+          "hash": "rvw1:sha256:716acc87113320592a2f3d3f144ce6c40cfae982bd0e3940ff95fbbd396a4593",
+          "at": "2026-04-13T10:52:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T014's sync-views regression is specified with the wrong CLI shape: `sotp track views sync --items-dir <dir> --track-id <id>`. The current Rust CLI only accepts `--project-root` on `track views sync` (`ViewAction::Sync`), so implementing the task as written will fail on an unknown flag instead of exercising `execute_views`. Update the task text to use the real command shape before this plan is executed.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 143,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:db6dc681a2673b57f8c8d4e945a19149512d8fe5f5f5d6020656e23939beca3c",
+          "at": "2026-04-13T11:06:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The cleanup sequence is still internally contradictory. `spec.json` declares the only dependency-safe order as “delete all 6 test files, then `track_state_machine.py`, and only then `track_branch_guard.py`”, but the actual task list executes T003 (`track_branch_guard.py` cleanup) before T007/T010/T013/T015 and other artifacts still describe T015 as owning the `test_track_state_machine.py` selftest removal. An implementer cannot follow both the declared safe order and the enumerated tasks without reinterpreting the plan, so the Phase 1 sequencing is not reliably specified.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 273,
+              "category": "planning_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:db6dc681a2673b57f8c8d4e945a19149512d8fe5f5f5d6020656e23939beca3c",
+          "at": "2026-04-13T11:10:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T014` still describes the `sync_views_subcommand` regression test as `sotp track views sync --items-dir <dir> --track-id <id>`, but the real CLI only exposes `--project-root` on `track views sync` (`apps/cli/src/commands/track/mod.rs`). If implemented as written, the new integration test will fail on an unknown flag before it exercises `execute_views()`.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 143,
+              "category": "correctness"
+            },
+            {
+              "message": "The manual verification step is technically wrong: `bin/sotp track type-signals scripts-phase1-rustify-2026-04-13` checks domain-type signals, not Stage 1 spec signals, and this track has no `domain-types.json` to evaluate. The intended spec-signal command is `sotp track signals`, and even then this spec is intentionally `blue=41, yellow=2, red=0`, so asking reviewers to confirm it stays “Blue” is impossible as written.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/verification.md",
+              "line": 42,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:680dbfc76e68c67ccaec07d25fb0af6f5251e840af7a341c94d72dd381a3b9d2",
+          "at": "2026-04-13T11:16:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `transition_integration.rs` canonical block is still documenting the stale CLI contract: it calls `sotp track transition` without the mandatory `--items-dir` argument and describes `_missing_dir` as a nonexistent track id. The actual parser requires `--items-dir` for `track transition` and the corrected `_missing_dir` case is an invalid path, so following this guidance would reintroduce the very T014 regression the redraft was meant to fix.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-13-0726-planner-scripts-phase1.md",
+              "line": 261,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b2f9e432a88acfa4e9e4877b79ae1801b6f900b5d765528ae24ac401982292f5",
+          "at": "2026-04-13T11:25:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` is still marked `approved`, but the stored `content_hash` is stale. Recomputing the hash from the current substantive fields (`title`, `version`, `goal`, `scope`, `constraints`, `acceptance_criteria`) yields `sha256:ef77c704a5a5125ecfa4faf02fc0097f06fbe58d04912101060700c64179dffb`, not the checked-in `sha256:549e55fa1b431aac35e204b0537ba697d9d1fe9f871cde5e520400ff3170ca57`. Because `libs/infrastructure/src/spec/codec.rs:193-198` auto-demotes approved specs whose hash no longer matches, downstream tooling will treat this track as draft despite the file claiming approval. Re-approve the spec (or update the status back to draft) after the content changes.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 441,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:386133b3cb99ab0cbad00ef882c9305a388e022d9e7091601e504002e1db876b",
+          "at": "2026-04-13T11:31:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` says to verify `validate_track_document()` by running `cargo make track-sync-views` for \"all tracks\", but that command no longer bulk-renders every track. `dispatch_track_sync_views()` hardcodes `sotp track views sync --project-root .`, and `execute_views()` only refreshes the explicitly requested `--track-id` or the one auto-detected from the current branch, otherwise it updates `registry.md` only. As written, this step does not actually exercise every `track/items/*` entry it claims to cover.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/verification.md",
+              "line": 39,
+              "category": "technical_incorrectness"
+            },
+            {
+              "message": "The CI acceptance criteria repeatedly name a `verify-spec-states` check, but the current Makefile has no such task; `ci` depends on `verify-spec-states-current-local`. That makes the spec/verification text technically inaccurate and will mislead whoever tries to reconcile a `cargo make ci` failure with the documented gate list.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 302,
+              "category": "technical_incorrectness"
+            },
+            {
+              "message": "The final manual check requires `ls scripts/` to match exactly 15 entries, but this repository already has a `scripts/__pycache__/` directory and pytest commonly recreates it during the earlier verification steps. That means the prescribed command will produce a false failure even when the Phase 1 deletion set is correct. The check needs to filter to regular tracked files instead of raw `ls` output.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/verification.md",
+              "line": 41,
+              "category": "verification_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:ddd01c7674aa3a7ed1adf2a7305b3e75d12966e717f2ee9f644e33eecd9b4acc",
+          "at": "2026-04-13T11:38:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` still assigns the `scripts-selftest-local` removal of `test_track_state_machine.py` to T015 (`...args リストから除外する`), but the ADR deletion order and `metadata.json` both require that exclusion in T003 so selftest does not import the already-deleted `track_branch_guard.py`. This leaves the track SSoT internally contradictory about a dependency-critical step and can send implementation back to the broken ordering the re-draft was supposed to fix.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 145,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:cf54072cabc9b3912070373931ff3d3857c6692d4e1ffd74d353d131c55b6bfe",
+          "at": "2026-04-13T11:45:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` was edited in this revision (for example T017’s description changed), but `updated_at` is still `2026-04-13T07:26:02Z`. The track workflow and latest-track selection use `updated_at` to rank tracks, so leaving it stale can misorder or skip this track after these planning updates. Bump `updated_at` to the actual edit time when changing the track artifact.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 8,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3ba561631c808582c555d0a128068067246a99feb6e95159d7f420faa0b3dea4",
+          "at": "2026-04-13T11:56:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo make ci` is still documented as if it only runs `fmt-check + clippy + test + deny + check-layers + verify-arch-docs + verify-spec-states-current-local`, but the real `ci-local` gate includes many additional checks such as `test-doc-local`, `python-lint-local`, `scripts-selftest-local`, `verify-doc-links-local`, `verify-track-metadata-local`, `verify-view-freshness-local`, and others (Makefile.toml:595). Because T017 and the acceptance criteria treat that shortened list as “all checks”, the planning/verification artifacts would incorrectly consider CI coverage complete while omitting several actual gates. The same mismatch is repeated in metadata.json:158 and verification.md:37.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/spec.json",
+              "line": 302,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6ad6cfa83ac4d4231b0e36bec101f3b87002e3d1f949f32dc79c31a81b56d30c",
+          "at": "2026-04-13T12:01:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: T017 now verifies the post-cleanup `scripts/` contents with `git ls-files scripts/`, but that command reads the index, not the worktree. If an implementer deletes the 10 Phase 1 files with plain `rm`/editor changes and runs the verification step before staging, `git ls-files` will still list the deleted paths and the plan will incorrectly report failure. The same broken check is mirrored in `plan.md` and `verification.md`, so the track's final acceptance procedure is not reliable unless you also require `git rm`/`git add -u` first.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 158,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:b5e655ce6336837ff411875dc4a44d1d23f9e67ae63223efae7d59fdb740d87a",
+          "at": "2026-04-13T12:08:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T014 now tells the implementer to add `assert_cmd` by running `cargo add --dev assert_cmd`, but this repo is a workspace with a virtual root manifest, so that command fails from the project root (`cargo add --dev assert_cmd --dry-run` reports that `--package` is required). As written, the task is not executable; it needs `cargo add -p cli --dev assert_cmd` or `cargo add --manifest-path apps/cli/Cargo.toml --dev assert_cmd` instead. The same incorrect command is repeated in `spec.json`/`spec.md`.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 143,
+              "category": "planning"
+            }
+          ],
+          "hash": "rvw1:sha256:6723b394f05937dcc18ad2de937b1c54103df3eea68a3f8949cf0479095f3a22",
+          "at": "2026-04-13T12:20:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T014` still defines the `_missing_dir` regression as `--items-dir /nonexistent/path`, but `track transition` rejects any `--items-dir` that is not shaped like `<project-root>/track/items` before it ever checks for a missing track directory (`apps/cli/src/commands/track/mod.rs:25-35`, `transition.rs:30-32`). Implementing the test as written would only cover the argument-shape guard, not the Python regression being ported. The fixture needs a nonexistent path ending in `/track/items` (or the make-wrapper entrypoint) to preserve the intended behavior.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 143,
+              "category": "correctness"
+            },
+            {
+              "message": "The canonical `transition_integration.rs` sketch still conflates a per-track fixture with `--items-dir`: `setup_track_dir()` is described as creating a fake track directory, then `dir.path()` is passed directly to `--items-dir`. The real CLI only accepts the parent `track/items` directory there (`apps/cli/src/commands/track/mod.rs:25-35`), so following this sample will make the happy-path test fail before it exercises transition logic. The sample should build a project root containing `track/items/<id>/metadata.json` and pass `.../track/items`, not the track directory itself.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-13-0726-planner-scripts-phase1.md",
+              "line": 256,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2c6694c1913d79c226af467607b74fd342ab22ae4f4e678d4a0cfe5a9308d6af",
+          "at": "2026-04-13T12:30:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T014’s source-test mapping names the commit-hash regression as `test_transition_subcommand_with_commit_hash`, but the actual Python suite only defines `test_transition_with_commit_hash` (`scripts/test_track_state_machine.py:1020`). Because this track is explicitly about porting those five existing CLI regressions, the nonexistent source test name makes the coverage mapping unverifiable and can send the implementer looking for a test that is not in the codebase.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 67,
+              "category": "correctness"
+            },
+            {
+              "message": "T017 verifies the final survivor set with `find scripts -maxdepth 1 -type f ...`. That inspects the live worktree, so any unrelated untracked regular file under `scripts/` will fail the track even when the 15 repository-owned survivors are exactly correct. This makes the final gate environment-dependent instead of validating the planned tracked-file set.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 158,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c83a8ec4721b60b1faaee7245ef349236c3b09ae6d9ef5ea544647652385c05b",
+          "at": "2026-04-13T12:36:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T017` weakens the Phase 1 cleanup check from the ADR/spec requirement of `scripts/` being exactly the 15-file allowlist to only proving that the 10 deletions are gone and those 15 files exist. An unexpected extra tracked file under `scripts/` would still satisfy this task, so the plan no longer verifies the accepted criterion at `spec.json` (`scripts/` must \"完全一致\" with those 15 files). The same weakened check is repeated in `verification.md:41`.",
+              "severity": "P1",
+              "file": "track/items/scripts-phase1-rustify-2026-04-13/metadata.json",
+              "line": 158,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:79387790b85e0e2c47842ed59349baefe392e3c7b59dc3d492b0ae58d9d67a2f",
+          "at": "2026-04-13T12:44:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19e3c95b372f76f7e4a67697e363028bbd9685cd3ffc7e9dc9b7f08e4bb9ec2b",
+          "at": "2026-04-13T12:50:45Z"
+        }
+      ]
+    }
+  }
+}

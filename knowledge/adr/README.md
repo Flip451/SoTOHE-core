@@ -7,7 +7,11 @@
 - **フォーマット**: Nygard 式 + Rejected Alternatives + Reassess When
 - **言語**: 日本語
 - **採番**: `YYYY-MM-DD-HHMM-slug.md`（例: `2026-03-11-1430-track-status-derived.md`）
-- **Status**: `Accepted` / `Superseded` / `Deprecated`
+- **Status**: `Proposed` / `Accepted` / `Superseded` / `Deprecated`
+  - `Proposed`: ADR is authored and under review / pending activation of the associated track
+  - `Accepted`: Decision is accepted and implementation may proceed
+  - `Superseded`: Replaced by a newer ADR (reference the superseding ADR)
+  - `Deprecated`: Decision is withdrawn without replacement
 - **Superseded の場合**: 新 ADR を作成し、旧 ADR の Status を `Superseded by YYYY-MM-DD-HHMM-slug.md` に変更
 
 ## ADR テンプレート
@@ -17,7 +21,7 @@
 
 ## Status
 
-Accepted / Superseded / Deprecated
+Proposed / Accepted / Superseded / Deprecated
 
 ## Context
 
@@ -61,6 +65,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 |-----|--------|------|
 | [Phase 1.5 を good enough 宣言](2026-03-23-2100-phase-1.5-good-enough.md) | Accepted | 2026-03-23 |
 | [sotp CLI 外部ツール化は Moat 後に再評価](2026-03-23-2110-sotp-extraction-deferred.md) | Accepted | 2026-03-23 |
+| [scripts/ Python ヘルパーの段階的 Rust 移行ロードマップ](2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md) | Proposed | 2026-04-13 |
 
 ### 信号機アーキテクチャ
 
