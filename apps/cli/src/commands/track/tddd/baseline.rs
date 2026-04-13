@@ -12,6 +12,7 @@ use infrastructure::schema_export::RustdocSchemaExporter;
 use infrastructure::tddd::{baseline_builder, baseline_codec};
 use infrastructure::track::atomic_write::atomic_write_file;
 use infrastructure::track::symlink_guard::reject_symlinks_below;
+use infrastructure::verify::tddd_layers::parse_tddd_layers;
 
 use crate::CliError;
 
@@ -47,6 +48,14 @@ pub fn execute_baseline_capture(
             )));
         }
     }
+
+    // T007 fail-closed: verify that `domain` is actually `tddd.enabled` in
+    // the workspace's `architecture-rules.json`. If the caller disabled
+    // domain (or deleted the rules file entirely), capturing a baseline for
+    // an inactive layer would overwrite `domain-types-baseline.json` on a
+    // layer the rest of the pipeline treats as opted out. Reject the run.
+    enforce_domain_tddd_enabled(&workspace_root)?;
+
     let _valid_id = domain::TrackId::try_new(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
 
@@ -143,6 +152,32 @@ pub fn execute_baseline_capture(
     );
 
     Ok(ExitCode::SUCCESS)
+}
+
+/// Fails closed unless `domain` is a `tddd.enabled=true` layer in the
+/// workspace's `architecture-rules.json`.
+///
+/// When the rules file does not exist, we allow the legacy fallback (there
+/// is nothing to contradict). When it exists, the parse must succeed AND
+/// include `domain` among the enabled layers.
+fn enforce_domain_tddd_enabled(workspace_root: &std::path::Path) -> Result<(), CliError> {
+    let rules_path = workspace_root.join("architecture-rules.json");
+    if !rules_path.is_file() {
+        return Ok(());
+    }
+    let content = std::fs::read_to_string(&rules_path)
+        .map_err(|e| CliError::Message(format!("cannot read {}: {e}", rules_path.display())))?;
+    let bindings = parse_tddd_layers(&content)
+        .map_err(|e| CliError::Message(format!("{}: {e}", rules_path.display())))?;
+    if !bindings.iter().any(|b| b.layer_id() == "domain") {
+        return Err(CliError::Message(
+            "`domain` is not tddd.enabled in architecture-rules.json. baseline-capture \
+             refuses to write domain-types-baseline.json for an opted-out layer. \
+             Enable `domain.tddd.enabled = true` or remove `--layer domain`."
+                .to_owned(),
+        ));
+    }
+    Ok(())
 }
 
 #[cfg(test)]

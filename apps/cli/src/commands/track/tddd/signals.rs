@@ -99,8 +99,13 @@ pub fn execute_type_signals(
     //   non-`domain` `tddd.enabled` layer, we return an error asking the
     //   caller to re-run with `--layer domain` explicitly (which acknowledges
     //   the single-layer scope) or to disable the extra layers.
+    // * If the `domain` layer is not present in the resolved bindings at all
+    //   (i.e., `tddd.enabled = false` on the domain entry, or no layers are
+    //   enabled), we fail-closed rather than running the single-layer
+    //   evaluator against an opted-out layer.
     let non_domain_enabled: Vec<&str> =
         bindings.iter().map(|b| b.layer_id()).filter(|id| *id != "domain").collect();
+    let has_domain = bindings.iter().any(|b| b.layer_id() == "domain");
 
     if let Some(ref filter) = layer {
         if filter != "domain" {
@@ -118,6 +123,15 @@ pub fn execute_type_signals(
              non-domain layers.",
             joined = non_domain_enabled.join(", ")
         )));
+    }
+
+    if !has_domain {
+        return Err(CliError::Message(
+            "`domain` is not tddd.enabled in architecture-rules.json. type-signals refuses \
+             to read/write domain-types.json for an opted-out layer. Enable \
+             `domain.tddd.enabled = true` or run a Phase 2 command for the active layers."
+                .to_owned(),
+        ));
     }
 
     // Only the `domain` layer is actually evaluated in Phase 1. Running the
