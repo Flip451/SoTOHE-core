@@ -54,7 +54,8 @@ pub fn execute_baseline_capture(
     // domain (or deleted the rules file entirely), capturing a baseline for
     // an inactive layer would overwrite `domain-types-baseline.json` on a
     // layer the rest of the pipeline treats as opted out. Reject the run.
-    let domain_binding = enforce_domain_tddd_enabled(&workspace_root, layer.as_deref())?;
+    let (domain_binding, skipped_enabled_layers) =
+        enforce_domain_tddd_enabled(&workspace_root, layer.as_deref())?;
     let catalogue_filename = domain_binding.catalogue_file().to_owned();
     let baseline_filename = domain_binding.baseline_file();
 
@@ -154,6 +155,19 @@ pub fn execute_baseline_capture(
         "[OK] baseline-capture: wrote {baseline_filename} ({type_count} types, {trait_count} traits)"
     );
 
+    // Phase 1 partial-success exit: if any enabled non-`domain` layer was
+    // skipped with a warning, downgrade the exit code so CI/automation
+    // cannot treat the multilayer capture as complete. The domain baseline
+    // was still written on disk so subsequent runs can converge.
+    if !skipped_enabled_layers.is_empty() {
+        eprintln!(
+            "[ERROR] baseline-capture skipped enabled non-domain layers in Phase 1: {}. \
+             Exit code 1 to prevent CI/automation from treating the run as complete.",
+            skipped_enabled_layers.join(", ")
+        );
+        return Ok(ExitCode::FAILURE);
+    }
+
     Ok(ExitCode::SUCCESS)
 }
 
@@ -177,12 +191,12 @@ pub fn execute_baseline_capture(
 fn enforce_domain_tddd_enabled(
     workspace_root: &std::path::Path,
     layer_filter: Option<&str>,
-) -> Result<infrastructure::verify::tddd_layers::TdddLayerBinding, CliError> {
+) -> Result<(infrastructure::verify::tddd_layers::TdddLayerBinding, Vec<String>), CliError> {
     let rules_path = workspace_root.join("architecture-rules.json");
     if !rules_path.is_file() {
         // Legacy fallback: no rules file → synthetic default-domain
         // binding (`domain-types.json` + `domain-types-baseline.json`).
-        return synthetic_domain_binding();
+        return Ok((synthetic_domain_binding()?, Vec::new()));
     }
     let content = std::fs::read_to_string(&rules_path)
         .map_err(|e| CliError::Message(format!("cannot read {}: {e}", rules_path.display())))?;
@@ -200,19 +214,24 @@ fn enforce_domain_tddd_enabled(
     // Only warn about non-domain layers when the caller did NOT explicitly
     // select `--layer domain` — an explicit domain filter is a conscious
     // choice to run only the domain baseline, and the warning would be
-    // noise.
+    // noise. Return the skipped layer ids so the caller can downgrade the
+    // exit code (Codex round 10).
+    let mut skipped: Vec<String> = Vec::new();
     if layer_filter != Some("domain") {
-        let non_domain: Vec<&str> =
-            bindings.iter().map(|b| b.layer_id()).filter(|id| *id != "domain").collect();
-        for layer_id in &non_domain {
+        for binding in &bindings {
+            if binding.layer_id() == "domain" {
+                continue;
+            }
+            let layer_id = binding.layer_id();
             eprintln!(
                 "[WARN] layer '{layer_id}' is tddd.enabled in architecture-rules.json but \
                  is not yet supported by `baseline-capture` in Phase 1. \
                  Skipping this layer; Phase 2 will add per-layer baseline capture."
             );
+            skipped.push(layer_id.to_owned());
         }
     }
-    Ok(domain_binding)
+    Ok((domain_binding, skipped))
 }
 
 /// Returns a synthetic default-domain binding for the case where

@@ -102,6 +102,15 @@ pub fn execute_type_signals(
     let non_domain_enabled: Vec<&str> =
         bindings.iter().map(|b| b.layer_id()).filter(|id| *id != "domain").collect();
 
+    // Track whether any enabled layer was skipped so we can surface a
+    // non-zero exit code at the end. Codex rounds 6 + 10 want: (a) the
+    // default command path to keep running in a multilayer config so
+    // developers can make progress, and (b) the exit code to signal that
+    // enabled layers were skipped so pipelines cannot treat the run as
+    // "complete". `skipped_enabled_layers` captures (a) and we return
+    // `ExitCode::FAILURE` at the end to satisfy (b).
+    let mut skipped_enabled_layers: Vec<String> = Vec::new();
+
     if let Some(ref filter) = layer {
         if filter != "domain" {
             return Err(CliError::Message(format!(
@@ -113,14 +122,16 @@ pub fn execute_type_signals(
         // `--layer domain` explicitly selected — proceed regardless of
         // other layers' state. Those layers are caller-acknowledged.
     } else {
-        // No filter — visible warning for each non-domain enabled layer.
+        // No filter — visible warning for each non-domain enabled layer
+        // and record each as "skipped" so the final exit code signals
+        // incomplete multilayer processing.
         for layer_id in &non_domain_enabled {
             eprintln!(
                 "[WARN] layer '{layer_id}' is tddd.enabled in architecture-rules.json but \
                  is not yet supported by `type-signals` in Phase 1. \
-                 Skipping this layer; run `sotp track type-signals <id> --layer {layer_id}` \
-                 once Phase 2 wires it."
+                 Skipping this layer; Phase 2 will wire it."
             );
+            skipped_enabled_layers.push((*layer_id).to_owned());
         }
     }
 
@@ -136,7 +147,23 @@ pub fn execute_type_signals(
         ));
     };
 
-    execute_type_signals_single(&items_dir, &track_id, &workspace_root, &domain_binding)
+    let exit =
+        execute_type_signals_single(&items_dir, &track_id, &workspace_root, &domain_binding)?;
+
+    // T007 Phase 1 partial-failure exit: if any non-`domain` enabled layer
+    // was skipped, downgrade the exit code so CI/automation sees the
+    // incomplete run. The domain signals were still written on disk so
+    // subsequent runs can converge when Phase 2 wires the skipped layers.
+    if !skipped_enabled_layers.is_empty() {
+        eprintln!(
+            "[ERROR] type-signals skipped enabled non-domain layers in Phase 1: {}. \
+             Exit code 1 to prevent CI/automation from treating the run as complete.",
+            skipped_enabled_layers.join(", ")
+        );
+        return Ok(ExitCode::FAILURE);
+    }
+
+    Ok(exit)
 }
 
 /// Legacy single-layer signal evaluator. `domain_binding` provides the
