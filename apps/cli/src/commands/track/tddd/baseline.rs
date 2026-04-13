@@ -54,7 +54,9 @@ pub fn execute_baseline_capture(
     // domain (or deleted the rules file entirely), capturing a baseline for
     // an inactive layer would overwrite `domain-types-baseline.json` on a
     // layer the rest of the pipeline treats as opted out. Reject the run.
-    enforce_domain_tddd_enabled(&workspace_root, layer.as_deref())?;
+    let domain_binding = enforce_domain_tddd_enabled(&workspace_root, layer.as_deref())?;
+    let catalogue_filename = domain_binding.catalogue_file().to_owned();
+    let baseline_filename = domain_binding.baseline_file();
 
     let _valid_id = domain::TrackId::try_new(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
@@ -79,7 +81,7 @@ pub fn execute_baseline_capture(
     }
 
     let track_dir = items_dir.join(&track_id);
-    let baseline_path = track_dir.join("domain-types-baseline.json");
+    let baseline_path = track_dir.join(&baseline_filename);
 
     // Security: reject symlinks in path components below items_dir.
     reject_symlinks_below(&baseline_path, &items_dir)
@@ -91,7 +93,7 @@ pub fn execute_baseline_capture(
     // fail at the write step with a meaningful error instead.
     if baseline_path.is_file() && !force {
         println!(
-            "[OK] baseline-capture: domain-types-baseline.json already exists for '{track_id}' (use --force to regenerate)"
+            "[OK] baseline-capture: {baseline_filename} already exists for '{track_id}' (use --force to regenerate)"
         );
         return Ok(ExitCode::SUCCESS);
     }
@@ -104,10 +106,11 @@ pub fn execute_baseline_capture(
         )));
     }
 
-    // Read domain-types.json to get typestate names for build_type_graph.
-    // Security: guard the leaf path too — a symlinked domain-types.json inside the
-    // track directory could redirect reads outside the trusted tree.
-    let domain_types_path = track_dir.join("domain-types.json");
+    // Read the configured catalogue file to extract typestate names for
+    // `build_type_graph`. Security: guard the leaf path too — a symlinked
+    // catalogue file inside the track directory could redirect reads
+    // outside the trusted tree.
+    let domain_types_path = track_dir.join(&catalogue_filename);
     reject_symlinks_below(&domain_types_path, &items_dir)
         .map_err(|e| CliError::Message(format!("symlink guard: {e}")))?;
     let typestate_names: std::collections::HashSet<String> =
@@ -148,20 +151,25 @@ pub fn execute_baseline_capture(
     let type_count = baseline.types().len();
     let trait_count = baseline.traits().len();
     println!(
-        "[OK] baseline-capture: wrote domain-types-baseline.json ({type_count} types, {trait_count} traits)"
+        "[OK] baseline-capture: wrote {baseline_filename} ({type_count} types, {trait_count} traits)"
     );
 
     Ok(ExitCode::SUCCESS)
 }
 
 /// Fails closed unless `domain` is `tddd.enabled=true` in
-/// `architecture-rules.json`. Non-domain enabled layers produce a stderr
-/// warning when `--layer` is omitted, mirroring the `type-signals`
-/// behavior: Phase 1 wires only domain, so extra layers are skipped with
-/// an explicit warning rather than silently or fail-closed.
+/// `architecture-rules.json`, and returns the resolved domain binding
+/// so the caller can use `binding.catalogue_file()` /
+/// `binding.baseline_file()` for filename-driven I/O.
 ///
-/// When the rules file does not exist we allow the legacy fallback (there
-/// is nothing to contradict).
+/// Non-domain enabled layers produce a stderr warning when `--layer` is
+/// omitted, mirroring the `type-signals` behavior: Phase 1 wires only
+/// domain, so extra layers are skipped with an explicit warning rather
+/// than silently or fail-closed.
+///
+/// When the rules file does not exist we fall back to a synthetic
+/// default-domain binding so legacy repos (without a `tddd` block) still
+/// behave the same as before T007.
 ///
 /// `layer_filter` is `Some("domain")` when the caller asked for domain
 /// explicitly — in that case no warning is printed for other layers
@@ -169,24 +177,26 @@ pub fn execute_baseline_capture(
 fn enforce_domain_tddd_enabled(
     workspace_root: &std::path::Path,
     layer_filter: Option<&str>,
-) -> Result<(), CliError> {
+) -> Result<infrastructure::verify::tddd_layers::TdddLayerBinding, CliError> {
     let rules_path = workspace_root.join("architecture-rules.json");
     if !rules_path.is_file() {
-        return Ok(());
+        // Legacy fallback: no rules file → synthetic default-domain
+        // binding (`domain-types.json` + `domain-types-baseline.json`).
+        return synthetic_domain_binding();
     }
     let content = std::fs::read_to_string(&rules_path)
         .map_err(|e| CliError::Message(format!("cannot read {}: {e}", rules_path.display())))?;
     let bindings = parse_tddd_layers(&content)
         .map_err(|e| CliError::Message(format!("{}: {e}", rules_path.display())))?;
-    if !bindings.iter().any(|b| b.layer_id() == "domain") {
+    let Some(domain_binding) = bindings.iter().find(|b| b.layer_id() == "domain").cloned() else {
         return Err(CliError::Message(
             "`domain` is not tddd.enabled in architecture-rules.json. baseline-capture \
-             refuses to write domain-types-baseline.json for an opted-out layer. \
+             refuses to write domain baseline for an opted-out layer. \
              Enable `domain.tddd.enabled = true` or run a Phase 2 command for the \
              active layers."
                 .to_owned(),
         ));
-    }
+    };
     // Only warn about non-domain layers when the caller did NOT explicitly
     // select `--layer domain` — an explicit domain filter is a conscious
     // choice to run only the domain baseline, and the warning would be
@@ -202,7 +212,27 @@ fn enforce_domain_tddd_enabled(
             );
         }
     }
-    Ok(())
+    Ok(domain_binding)
+}
+
+/// Returns a synthetic default-domain binding for the case where
+/// `architecture-rules.json` is absent entirely.
+fn synthetic_domain_binding()
+-> Result<infrastructure::verify::tddd_layers::TdddLayerBinding, CliError> {
+    let json = r#"{
+      "layers": [
+        { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
+      ]
+    }"#;
+    parse_tddd_layers(json)
+        .map_err(|e| {
+            CliError::Message(format!("internal: default domain binding failed to parse: {e}"))
+        })?
+        .into_iter()
+        .next()
+        .ok_or_else(|| {
+            CliError::Message("internal: default domain binding produced empty list".to_owned())
+        })
 }
 
 #[cfg(test)]

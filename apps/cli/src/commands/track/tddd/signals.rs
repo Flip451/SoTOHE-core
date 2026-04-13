@@ -207,7 +207,15 @@ fn execute_type_signals_single(
     };
 
     // Delegate to the core evaluator (nightly-free, directly testable).
-    evaluate_and_write_signals(&mut doc, &profile, &baseline, &domain_types_path, &track_dir)
+    let rendered_stem = domain_binding.rendered_file();
+    evaluate_and_write_signals(
+        &mut doc,
+        &profile,
+        &baseline,
+        &domain_types_path,
+        &track_dir,
+        &rendered_stem,
+    )
 }
 
 /// Core signal evaluation and catalogue write given pre-built domain components.
@@ -226,6 +234,7 @@ pub(crate) fn evaluate_and_write_signals(
     baseline: &domain::TypeBaseline,
     domain_types_path: &std::path::Path,
     track_dir: &std::path::Path,
+    rendered_file_stem: &str,
 ) -> Result<ExitCode, CliError> {
     // Bidirectional consistency check: forward (spec → code) + reverse (code → spec).
     let report = domain::check_consistency(doc.entries(), profile, baseline);
@@ -273,7 +282,7 @@ pub(crate) fn evaluate_and_write_signals(
 
     // Validate action diagnostics, then write only if validation succeeds.
     // This ordering guarantees no files are mutated on delete-error failure.
-    validate_and_write_catalogue(&report, doc, domain_types_path, track_dir)?;
+    validate_and_write_catalogue(&report, doc, domain_types_path, track_dir, rendered_file_stem)?;
 
     let skipped = report.skipped_count();
     print_signal_summary(&all_signals, undeclared_count, skipped);
@@ -299,23 +308,26 @@ fn validate_and_write_catalogue(
     doc: &domain::TypeCatalogueDocument,
     domain_types_path: &std::path::Path,
     track_dir: &std::path::Path,
+    rendered_file_stem: &str,
 ) -> Result<(), CliError> {
     // Validate first: abort before any writes if delete errors are present.
     print_action_diagnostics(report)?;
 
     // Encode and write back.
     let encoded = catalogue_codec::encode(doc)
-        .map_err(|e| CliError::Message(format!("domain-types.json encode error: {e}")))?;
+        .map_err(|e| CliError::Message(format!("catalogue encode error: {e}")))?;
 
     atomic_write_file(domain_types_path, format!("{encoded}\n").as_bytes()).map_err(|e| {
         CliError::Message(format!("cannot write {}: {e}", domain_types_path.display()))
     })?;
 
-    // Re-render domain-types.md so the view stays in sync.
-    let domain_types_md_path = track_dir.join("domain-types.md");
+    // Re-render the markdown view so it stays in sync with the catalogue.
+    // The markdown filename is `<catalogue_stem>.md` where `<catalogue_stem>`
+    // is derived from the binding's `catalogue_file`.
+    let rendered_md_path = track_dir.join(rendered_file_stem);
     let rendered = infrastructure::type_catalogue_render::render_type_catalogue(doc);
-    atomic_write_file(&domain_types_md_path, rendered.as_bytes()).map_err(|e| {
-        CliError::Message(format!("cannot write {}: {e}", domain_types_md_path.display()))
+    atomic_write_file(&rendered_md_path, rendered.as_bytes()).map_err(|e| {
+        CliError::Message(format!("cannot write {}: {e}", rendered_md_path.display()))
     })?;
 
     Ok(())
@@ -582,7 +594,13 @@ mod tests {
             "precondition: delete_errors must be non-empty"
         );
 
-        let result = validate_and_write_catalogue(&report, &doc, &domain_types_path, &track_dir);
+        let result = validate_and_write_catalogue(
+            &report,
+            &doc,
+            &domain_types_path,
+            &track_dir,
+            "domain-types.md",
+        );
 
         assert!(result.is_err(), "delete errors must cause validate_and_write_catalogue to fail");
         assert!(
@@ -609,7 +627,13 @@ mod tests {
 
         assert!(report.delete_errors().is_empty(), "precondition: no delete errors");
 
-        let result = validate_and_write_catalogue(&report, &doc, &domain_types_path, &track_dir);
+        let result = validate_and_write_catalogue(
+            &report,
+            &doc,
+            &domain_types_path,
+            &track_dir,
+            "domain-types.md",
+        );
 
         assert!(result.is_ok(), "no-error report must succeed: {result:?}");
         assert!(domain_types_path.exists(), "domain-types.json must be written on success");
@@ -639,6 +663,7 @@ mod tests {
             &empty_baseline_d(),
             &domain_types_path,
             &track_dir,
+            "domain-types.md",
         );
 
         assert!(result.is_err(), "delete error must cause evaluate_and_write_signals to fail");
@@ -668,6 +693,7 @@ mod tests {
             &empty_baseline_d(),
             &domain_types_path,
             &track_dir,
+            "domain-types.md",
         );
 
         assert!(result.is_ok(), "clean report must succeed: {result:?}");
