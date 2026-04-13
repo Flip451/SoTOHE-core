@@ -896,38 +896,35 @@
           "findings": [],
           "hash": "rvw1:sha256:731e4f00533a47e52d3af3db9d8bf9e8a7396c1285ff2a8c9919137ecf7b4fde",
           "at": "2026-04-13T14:23:08Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
-          "at": "2026-04-13T13:45:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
-          "at": "2026-04-13T13:47:56Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5240666f29ac533d80fe2598962f11a0bbc6c2feec5d04b72940b1d956b30593",
-          "at": "2026-04-13T14:14:57Z"
+          "hash": "rvw1:sha256:b1719aac199ceb90a6fdbe08bc2248d98623e47ba1e473faa04db85ddb41447b",
+          "at": "2026-04-13T14:28:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `other` scope is not isolated: `git diff --name-only` still includes `libs/infrastructure/src/track/render.rs`, even though this scope is supposed to contain only the metadata/plan state transition for T011/T012. Split or drop that implementation-scope change before landing this slice.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": null,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:b1719aac199ceb90a6fdbe08bc2248d98623e47ba1e473faa04db85ddb41447b",
+          "at": "2026-04-13T14:30:43Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5240666f29ac533d80fe2598962f11a0bbc6c2feec5d04b72940b1d956b30593",
-          "at": "2026-04-13T14:17:08Z"
+          "hash": "rvw1:sha256:b1719aac199ceb90a6fdbe08bc2248d98623e47ba1e473faa04db85ddb41447b",
+          "at": "2026-04-13T14:36:05Z"
         }
       ]
     },
@@ -994,6 +991,52 @@
           "findings": [],
           "hash": "rvw1:sha256:032d35c731f520079f6dd3456a250c192f9e7a133c1ecf3877f3f6a230e7b5d8",
           "at": "2026-04-13T13:56:34Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
+          "at": "2026-04-13T13:45:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a5f09e899bb06ee162dc5b723572496453424d6fd1cded3a7f1b8b1316c30f6",
+          "at": "2026-04-13T13:47:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5240666f29ac533d80fe2598962f11a0bbc6c2feec5d04b72940b1d956b30593",
+          "at": "2026-04-13T14:14:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5240666f29ac533d80fe2598962f11a0bbc6c2feec5d04b72940b1d956b30593",
+          "at": "2026-04-13T14:17:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63f63f8f982c8c53e9406b961c0bbeaf698e1b0afc500c0ea19be2173af52114",
+          "at": "2026-04-13T14:28:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63f63f8f982c8c53e9406b961c0bbeaf698e1b0afc500c0ea19be2173af52114",
+          "at": "2026-04-13T14:30:36Z"
         }
       ]
     }

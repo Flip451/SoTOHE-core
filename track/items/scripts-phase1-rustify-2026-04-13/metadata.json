@@ -149,12 +149,12 @@
     {
       "description": "[Red] `libs/infrastructure/src/track/render.rs::tests` に `render_registry()` / `collect_track_snapshots()` / `sync_rendered_views()` の境界観点テストを追加する。観点: (1) `track/items` 配下にファイル (ディレクトリではなく) が存在する場合に空リストを返す / (2) 同時刻 updated_at の場合に track_id 順の安定ソートになる / (3) `sync_rendered_views()` が registry.md の内容が unchanged の場合に changed set に含めない。これらは `scripts/test_track_registry.py` の未カバー境界観点 3 件を網羅する。",
       "id": "T011",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "[Green] 必要に応じて `libs/infrastructure/src/track/render.rs::collect_track_snapshots()` に `updated_at` 同時刻時の tie-break (track_id lexicographic 順) を追加する。`sort_by` を `sort_by_key` に変更するか、secondary key を追加する。既存テスト (`render_registry_*` / `sync_rendered_views_*` / `validate_track_snapshots_*`) が壊れないことを確認する。T011 の全テストが pass すること。",
       "id": "T012",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "[Cleanup] `scripts/track_registry.py` と `scripts/test_track_registry.py` を削除する。`Makefile.toml:109-128` の `scripts-selftest-local` args リストから `scripts/test_track_registry.py` を除外する。重要: `scripts/test_track_resolution.py:47` の `test_package_style_imports_work_from_repo_root` テストが `import sys; sys.path = ['.', *sys.path]; import scripts.track_resolution, scripts.track_registry, scripts.external_guides` を含む。`track_registry.py` 削除と同じコミット内で、この import 文から `scripts.track_registry` を除外する修正 (`scripts.track_resolution, scripts.external_guides` のみ残す) を本 task に含める。`track_registry.py` 自身は `track_schema` と `atomic_write` に依存するが、ファイル全体を削除するため依存ごと消える (track_schema.py / atomic_write.py 自体はフェーズ 2/3 対象で本 track では touch しない)。`cargo make scripts-selftest` が pass することを確認する。",
@@ -183,5 +183,5 @@
     }
   ],
   "title": "scripts/ Python ヘルパー削減 フェーズ1 — track_branch_guard / markdown / registry / state_machine の Rust 移植",
-  "updated_at": "2026-04-13T14:20:28Z"
+  "updated_at": "2026-04-13T14:26:38Z"
 }

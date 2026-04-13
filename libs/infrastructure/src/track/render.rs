@@ -133,7 +133,11 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
         });
     }
 
-    snapshots.sort_by(|a, b| b.updated_at().cmp(a.updated_at()));
+    snapshots.sort_by(|a, b| {
+        b.updated_at()
+            .cmp(a.updated_at())
+            .then_with(|| a.track.id().as_ref().cmp(b.track.id().as_ref()))
+    });
     Ok(snapshots)
 }
 
@@ -1146,6 +1150,104 @@ mod tests {
         assert!(changed.iter().any(|path| path.ends_with("registry.md")));
         assert!(track_dir.join("plan.md").is_file());
         assert!(dir.path().join("track/registry.md").is_file());
+    }
+
+    // --- T011/T012: registry / snapshot boundary tests ---
+
+    #[test]
+    fn collect_track_snapshots_ignores_plain_files_under_items() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_root = dir.path().join("track/items");
+        std::fs::create_dir_all(&items_root).unwrap();
+        // Valid track directory.
+        let track_dir = items_root.join("track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[
+    { "id": "T001", "description": "First", "status": "todo" }
+  ]"#,
+            ),
+        )
+        .unwrap();
+        // A stray file (not a directory) directly under track/items.
+        std::fs::write(items_root.join("stray.txt"), "not a track").unwrap();
+
+        let snapshots = collect_track_snapshots(dir.path()).unwrap();
+        assert_eq!(snapshots.len(), 1, "stray file must be ignored: got {snapshots:?}");
+        assert_eq!(snapshots[0].track.id().as_ref(), "track-a");
+    }
+
+    #[test]
+    fn collect_track_snapshots_tie_breaks_same_updated_at_by_track_id() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_root = dir.path().join("track/items");
+        std::fs::create_dir_all(&items_root).unwrap();
+
+        // track-b is inserted first to verify the tie-break applies regardless of
+        // directory traversal order.
+        for id in ["track-b", "track-a"] {
+            let td = items_root.join(id);
+            std::fs::create_dir_all(&td).unwrap();
+            std::fs::write(
+                td.join("metadata.json"),
+                sample_metadata_json(
+                    id,
+                    "planned",
+                    "2026-03-13T02:00:00Z", // identical updated_at
+                    r#"[
+    { "id": "T001", "description": "First", "status": "todo" }
+  ]"#,
+                ),
+            )
+            .unwrap();
+        }
+
+        let snapshots = collect_track_snapshots(dir.path()).unwrap();
+        let ids: Vec<&str> = snapshots.iter().map(|s| s.track.id().as_ref()).collect();
+        assert_eq!(
+            ids,
+            vec!["track-a", "track-b"],
+            "same updated_at must tie-break by track_id asc"
+        );
+    }
+
+    #[test]
+    fn sync_rendered_views_omits_unchanged_registry_from_changed_set() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[
+    { "id": "T001", "description": "First", "status": "todo" }
+  ]"#,
+            ),
+        )
+        .unwrap();
+
+        // First call populates plan.md and registry.md.
+        let first_changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+        assert!(first_changed.iter().any(|p| p.ends_with("registry.md")));
+
+        // Second call with no metadata changes must leave both outputs untouched.
+        let second_changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+        assert!(
+            !second_changed.iter().any(|p| p.ends_with("registry.md")),
+            "unchanged registry.md must be omitted from changed set: {second_changed:?}"
+        );
+        assert!(
+            !second_changed.iter().any(|p| p.ends_with("plan.md")),
+            "unchanged plan.md must be omitted from changed set: {second_changed:?}"
+        );
     }
 
     #[test]
