@@ -18,7 +18,7 @@ use crate::tddd::catalogue::{
     TypeAction, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal,
 };
 use crate::tddd::signals::{evaluate_type_signals, red};
-use crate::verify::{Finding, VerifyOutcome};
+use crate::verify::{VerifyFinding, VerifyOutcome};
 
 // ---------------------------------------------------------------------------
 // ActionContradiction — action vs baseline mismatch warnings
@@ -353,12 +353,12 @@ pub fn check_consistency(
 ///
 /// # Rules
 ///
-/// - `entries` is empty → `Finding::error` (malformed catalogue)
-/// - `signals` is `None` → `Finding::error` (unevaluated; run `sotp track type-signals`)
-/// - Signal coverage incomplete (entry has no matching signal) → `Finding::error`
-/// - Any Red signal (forward or reverse) → `Finding::error` (always an error, regardless of mode)
-/// - Declared-entry Yellow signal, `strict = true` → `Finding::error`
-/// - Declared-entry Yellow signal, `strict = false` → `Finding::warning` (D8.6 visualization)
+/// - `entries` is empty → `VerifyFinding::error` (malformed catalogue)
+/// - `signals` is `None` → `VerifyFinding::error` (unevaluated; run `sotp track type-signals`)
+/// - Signal coverage incomplete (entry has no matching signal) → `VerifyFinding::error`
+/// - Any Red signal (forward or reverse) → `VerifyFinding::error` (always an error, regardless of mode)
+/// - Declared-entry Yellow signal, `strict = true` → `VerifyFinding::error`
+/// - Declared-entry Yellow signal, `strict = false` → `VerifyFinding::warning` (D8.6 visualization)
 /// - Undeclared reverse signals (outside entry set) that are Yellow are not blocked
 ///   (only their Red counterparts are caught by the Red check above)
 /// - All Blue / no declared Yellow → `VerifyOutcome::pass()`
@@ -371,14 +371,14 @@ pub fn check_consistency(
 #[must_use]
 pub fn check_type_signals(doc: &TypeCatalogueDocument, strict: bool) -> VerifyOutcome {
     if doc.entries().is_empty() {
-        return VerifyOutcome::from_findings(vec![Finding::error(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(
             "domain-types.json has no entries — add at least one domain type declaration"
                 .to_owned(),
         )]);
     }
 
     let Some(signals) = doc.signals() else {
-        return VerifyOutcome::from_findings(vec![Finding::error(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(
             "domain type signals not yet evaluated — run `sotp track type-signals` first"
                 .to_owned(),
         )]);
@@ -394,7 +394,7 @@ pub fn check_type_signals(doc: &TypeCatalogueDocument, strict: bool) -> VerifyOu
         .map(|e| e.name())
         .collect();
     if !uncovered.is_empty() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{} domain type(s) have no signal evaluation: {} — re-run `sotp track type-signals`",
             uncovered.len(),
             uncovered.join(", ")
@@ -408,7 +408,7 @@ pub fn check_type_signals(doc: &TypeCatalogueDocument, strict: bool) -> VerifyOu
         .map(|s| s.type_name())
         .collect();
     if !all_red.is_empty() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{} domain type(s) have Red signal (TDDD violation — run /track:design): {}",
             all_red.len(),
             all_red.join(", ")
@@ -432,9 +432,9 @@ pub fn check_type_signals(doc: &TypeCatalogueDocument, strict: bool) -> VerifyOu
             yellow_entries.join(", ")
         );
         if strict {
-            return VerifyOutcome::from_findings(vec![Finding::error(message)]);
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(message)]);
         }
-        return VerifyOutcome::from_findings(vec![Finding::warning(message)]);
+        return VerifyOutcome::from_findings(vec![VerifyFinding::warning(message)]);
     }
 
     VerifyOutcome::pass()

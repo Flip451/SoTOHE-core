@@ -7,7 +7,7 @@
 use std::path::Path;
 use std::sync::LazyLock;
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 use regex::Regex;
 
 static LINK_RE: LazyLock<Option<Regex>> =
@@ -22,7 +22,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let link_re = match LINK_RE.as_ref() {
         Some(re) => re,
         None => {
-            return VerifyOutcome::from_findings(vec![Finding::error(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(
                 "Failed to compile link regex".to_owned(),
             )]);
         }
@@ -33,7 +33,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let md_files = match collect_md_files(root) {
         Ok(files) => files,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Failed to collect markdown files: {e}"
             ))]);
         }
@@ -43,7 +43,8 @@ pub fn verify(root: &Path) -> VerifyOutcome {
         let content = match std::fs::read_to_string(md_path) {
             Ok(c) => c,
             Err(e) => {
-                findings.push(Finding::error(format!("Cannot read {}: {e}", md_path.display())));
+                findings
+                    .push(VerifyFinding::error(format!("Cannot read {}: {e}", md_path.display())));
                 continue;
             }
         };
@@ -96,7 +97,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
 
                 if !resolved.exists() {
                     let rel_md = md_path.strip_prefix(root).unwrap_or(md_path);
-                    findings.push(Finding::error(format!(
+                    findings.push(VerifyFinding::error(format!(
                         "{}:{}: broken link to '{}'",
                         rel_md.display(),
                         line_num + 1,

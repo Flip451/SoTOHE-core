@@ -11,7 +11,7 @@ use std::collections::HashSet;
 use std::path::Path;
 
 use domain::TaskId;
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 
 use crate::spec::codec as spec_codec;
 use crate::track::codec as track_codec;
@@ -35,7 +35,7 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
 
     let metadata_path = track_dir.join("metadata.json");
     if !metadata_path.is_file() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "spec.json found but metadata.json missing in {}",
             track_dir.display()
         ))]);
@@ -45,7 +45,7 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
     let spec_content = match std::fs::read_to_string(&spec_json_path) {
         Ok(c) => c,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Cannot read spec.json: {e}"
             ))]);
         }
@@ -53,7 +53,7 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
     let spec_doc = match spec_codec::decode(&spec_content) {
         Ok(d) => d,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Cannot parse spec.json: {e}"
             ))]);
         }
@@ -63,7 +63,7 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
     let meta_content = match std::fs::read_to_string(&metadata_path) {
         Ok(c) => c,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Cannot read metadata.json: {e}"
             ))]);
         }
@@ -71,7 +71,7 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
     let (track_meta, _doc_meta) = match track_codec::decode(&meta_content) {
         Ok(m) => m,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Cannot parse metadata.json: {e}"
             ))]);
         }
@@ -84,15 +84,15 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
     // Evaluate coverage (in_scope + acceptance_criteria enforcement)
     let result = spec_doc.evaluate_coverage(&valid_task_ids);
 
-    let mut findings: Vec<Finding> = Vec::new();
+    let mut findings: Vec<VerifyFinding> = Vec::new();
 
     for text in result.uncovered() {
-        findings.push(Finding::error(format!("Requirement missing task_refs: \"{text}\"")));
+        findings.push(VerifyFinding::error(format!("Requirement missing task_refs: \"{text}\"")));
     }
 
     // Referential integrity for ALL sections (domain logic)
     for ref_id in spec_doc.validate_all_task_refs(&valid_task_ids) {
-        findings.push(Finding::error(format!(
+        findings.push(VerifyFinding::error(format!(
             "task_ref \"{ref_id}\" does not exist in metadata.json tasks"
         )));
     }

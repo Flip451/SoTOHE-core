@@ -6,7 +6,7 @@
 //! check (legacy path) is used.
 
 use super::frontmatter::parse_yaml_frontmatter;
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 use std::path::Path;
 
 /// Serde-compatible mirror of `domain::SignalCounts` for YAML deserialization.
@@ -50,7 +50,7 @@ pub fn verify_spec_schema(spec_json_path: &Path) -> VerifyOutcome {
     let json = match std::fs::read_to_string(spec_json_path) {
         Ok(s) => s,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "cannot read {}: {e}",
                 spec_json_path.display()
             ))]);
@@ -59,7 +59,7 @@ pub fn verify_spec_schema(spec_json_path: &Path) -> VerifyOutcome {
 
     match crate::spec::codec::decode(&json) {
         Ok(_) => VerifyOutcome::pass(),
-        Err(e) => VerifyOutcome::from_findings(vec![Finding::error(format!(
+        Err(e) => VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{}: spec.json schema invalid: {e}",
             spec_json_path.display()
         ))]),
@@ -102,7 +102,7 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
     let content = match std::fs::read_to_string(spec_path) {
         Ok(c) => c,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "cannot read {}: {e}",
                 spec_path.display()
             ))]);
@@ -110,7 +110,7 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
     };
 
     let Some(fm) = parse_yaml_frontmatter(&content) else {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{}: missing or invalid YAML frontmatter (expected '---' delimiters)",
             spec_path.display()
         ))]);
@@ -123,7 +123,7 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
         Ok(dto) => {
             // Post-validation: if signals key is present but null/empty, reject.
             if dto.signals.is_none() && fm.frontmatter.lines().any(|l| l.starts_with("signals:")) {
-                return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                     "{}: 'signals' field is present but empty/null; \
                      provide a mapping like `signals: {{ blue: 0, yellow: 0, red: 0 }}`",
                     spec_path.display()
@@ -142,19 +142,19 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
 
             if missing_status || missing_version {
                 if missing_status {
-                    findings.push(Finding::error(format!(
+                    findings.push(VerifyFinding::error(format!(
                         "{}: YAML frontmatter missing required field 'status'",
                         spec_path.display()
                     )));
                 }
                 if missing_version {
-                    findings.push(Finding::error(format!(
+                    findings.push(VerifyFinding::error(format!(
                         "{}: YAML frontmatter missing required field 'version'",
                         spec_path.display()
                     )));
                 }
             } else {
-                findings.push(Finding::error(format!(
+                findings.push(VerifyFinding::error(format!(
                     "{}: invalid YAML frontmatter: {e}",
                     spec_path.display()
                 )));

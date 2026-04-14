@@ -11,7 +11,7 @@
 
 use std::path::Path;
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 use domain::{ConfidenceSignal, SignalCounts, evaluate_source_tag};
 
 use super::frontmatter::parse_yaml_frontmatter;
@@ -175,7 +175,7 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
     let json = match std::fs::read_to_string(spec_json_path) {
         Ok(s) => s,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "cannot read {}: {e}",
                 spec_json_path.display()
             ))]);
@@ -185,7 +185,7 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
     let doc = match crate::spec::codec::decode(&json) {
         Ok(d) => d,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "{}: spec.json decode error: {e}",
                 spec_json_path.display()
             ))]);
@@ -196,7 +196,7 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
     let mut findings = Vec::new();
 
     if evaluated.red() > 0 {
-        findings.push(Finding::error(format!(
+        findings.push(VerifyFinding::error(format!(
             "{}: red > 0 gate policy violation — {} item(s) missing or have unverified sources",
             spec_json_path.display(),
             evaluated.red()
@@ -206,7 +206,7 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
     // Warn if cached signals are stale (mismatch with fresh evaluation)
     if let Some(cached) = doc.signals() {
         if *cached != evaluated {
-            findings.push(Finding::error(format!(
+            findings.push(VerifyFinding::error(format!(
                 "{}: cached signals (blue={} yellow={} red={}) differ from evaluated (blue={} yellow={} red={}). Run `sotp track signals` to update.",
                 spec_json_path.display(),
                 cached.blue(), cached.yellow(), cached.red(),
@@ -251,7 +251,7 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
     let content = match std::fs::read_to_string(spec_path) {
         Ok(c) => c,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "cannot read {}: {e}",
                 spec_path.display()
             ))]);
@@ -259,7 +259,7 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
     };
 
     let Some(fm) = parse_yaml_frontmatter(&content) else {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{}: missing or invalid YAML frontmatter (expected '---' delimiters)",
             spec_path.display()
         ))]);
@@ -276,7 +276,7 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
 
     // Gate: red > 0 is a policy violation
     if evaluated.red() > 0 {
-        findings.push(Finding::error(format!(
+        findings.push(VerifyFinding::error(format!(
             "{}: red > 0 gate policy violation — {} item(s) missing [source: ...] tag or have unverified sources",
             spec_path.display(),
             evaluated.red()

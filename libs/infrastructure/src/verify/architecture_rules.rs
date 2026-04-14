@@ -5,7 +5,7 @@
 
 use std::path::Path;
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 
 /// Verify architecture rules synchronization.
 ///
@@ -23,7 +23,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let rules = match load_rules(root) {
         Ok(r) => r,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Failed to load architecture rules: {e}"
             ))]);
         }
@@ -32,7 +32,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let layers = match parse_layers(&rules) {
         Ok(l) => l,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Failed to parse architecture rules: {e}"
             ))]);
         }
@@ -151,7 +151,7 @@ fn verify_cargo_members(root: &Path, layers: &[LayerRule]) -> VerifyOutcome {
     let content = match std::fs::read_to_string(&cargo_path) {
         Ok(c) => c,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Failed to read Cargo.toml: {e}"
             ))]);
         }
@@ -160,7 +160,7 @@ fn verify_cargo_members(root: &Path, layers: &[LayerRule]) -> VerifyOutcome {
     let cargo_data: toml::Table = match toml::from_str(&content) {
         Ok(v) => v,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Failed to parse Cargo.toml: {e}"
             ))]);
         }
@@ -178,7 +178,7 @@ fn verify_cargo_members(root: &Path, layers: &[LayerRule]) -> VerifyOutcome {
                 match v.as_str() {
                     Some(s) if !s.is_empty() => members.push(s.to_owned()),
                     _ => {
-                        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                             "Cargo.toml workspace.members[{i}] must be a non-empty string"
                         ))]);
                     }
@@ -197,7 +197,7 @@ fn verify_cargo_members(root: &Path, layers: &[LayerRule]) -> VerifyOutcome {
     expected_sorted.sort();
 
     if actual_sorted != expected_sorted {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "Cargo.toml workspace members mismatch: expected {expected_members:?}, got {actual_members:?}"
         ))]);
     }
@@ -214,7 +214,7 @@ fn verify_deny_rules(
     let content = match std::fs::read_to_string(&deny_path) {
         Ok(c) => c,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Failed to read deny.toml: {e}"
             ))]);
         }
@@ -223,7 +223,7 @@ fn verify_deny_rules(
     let deny_data: toml::Table = match toml::from_str(&content) {
         Ok(v) => v,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Failed to parse deny.toml: {e}"
             ))]);
         }
@@ -232,7 +232,7 @@ fn verify_deny_rules(
     let actual_deny = match parse_deny_entries(&toml::Value::Table(deny_data)) {
         Ok(d) => d,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Failed to parse deny.toml: {e}"
             ))]);
         }
@@ -240,14 +240,14 @@ fn verify_deny_rules(
     let expected_deny = match expected_deny_rules(rules, layers) {
         Ok(d) => d,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Failed to compute expected deny rules: {e}"
             ))]);
         }
     };
 
     if actual_deny != expected_deny {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "deny.toml layer policy mismatch: expected {expected_deny:?}, got {actual_deny:?}"
         ))]);
     }
@@ -367,13 +367,14 @@ fn verify_member_references(root: &Path, layers: &[LayerRule]) -> VerifyOutcome 
         // Check Cargo.toml contains the member path (quoted).
         let quoted = format!("\"{member}\"");
         if !cargo_content.contains(&quoted) {
-            outcome
-                .add(Finding::error(format!("Missing in Cargo.toml: workspace member {member}")));
+            outcome.add(VerifyFinding::error(format!(
+                "Missing in Cargo.toml: workspace member {member}"
+            )));
         }
 
         // Check tech-stack.md contains the member path.
         if !tech_stack_content.contains(member.as_str()) {
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "Missing in track/tech-stack.md: tech-stack workspace map {member}"
             )));
         }

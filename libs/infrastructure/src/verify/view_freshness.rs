@@ -5,7 +5,7 @@
 
 use std::path::Path;
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 
 const TRACK_ITEMS_DIR: &str = "track/items";
 
@@ -25,7 +25,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let entries = match std::fs::read_dir(&items_dir) {
         Ok(e) => e,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Cannot read {TRACK_ITEMS_DIR}: {e}"
             ))]);
         }
@@ -35,7 +35,9 @@ pub fn verify(root: &Path) -> VerifyOutcome {
         let entry = match entry {
             Ok(e) => e,
             Err(e) => {
-                findings.push(Finding::error(format!("{TRACK_ITEMS_DIR}: cannot read entry: {e}")));
+                findings.push(VerifyFinding::error(format!(
+                    "{TRACK_ITEMS_DIR}: cannot read entry: {e}"
+                )));
                 continue;
             }
         };
@@ -56,7 +58,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
 
         // plan.md must exist if metadata.json exists (it's a generated view)
         if !plan_path.is_file() {
-            findings.push(Finding::error(format!(
+            findings.push(VerifyFinding::error(format!(
                 "{track_name}/plan.md: missing — run `cargo make track-sync-views` to generate"
             )));
             continue;
@@ -66,7 +68,8 @@ pub fn verify(root: &Path) -> VerifyOutcome {
         let on_disk = match std::fs::read_to_string(&plan_path) {
             Ok(c) => c,
             Err(e) => {
-                findings.push(Finding::error(format!("{track_name}/plan.md: cannot read: {e}")));
+                findings
+                    .push(VerifyFinding::error(format!("{track_name}/plan.md: cannot read: {e}")));
                 continue;
             }
         };
@@ -75,7 +78,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
         let rendered = match render_plan_from_metadata(&metadata_path) {
             Ok(c) => c,
             Err(e) => {
-                findings.push(Finding::error(format!(
+                findings.push(VerifyFinding::error(format!(
                     "{track_name}/plan.md: cannot render from metadata.json: {e}"
                 )));
                 continue;
@@ -84,7 +87,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
 
         // Normalize trailing whitespace for comparison (files may have trailing newline)
         if on_disk.trim_end() != rendered.trim_end() {
-            findings.push(Finding::error(format!(
+            findings.push(VerifyFinding::error(format!(
                 "{track_name}/plan.md: stale — run `cargo make track-sync-views` to update"
             )));
         }

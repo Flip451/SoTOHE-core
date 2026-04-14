@@ -6,7 +6,7 @@ use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::path::Path;
 use std::process::Command;
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 
 const ARCH_RULES_FILE: &str = "architecture-rules.json";
 
@@ -31,7 +31,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let rules_json = match load_architecture_rules(root) {
         Ok(v) => v,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Failed to load {ARCH_RULES_FILE}: {e}"
             ))]);
         }
@@ -40,7 +40,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let metadata = match load_cargo_metadata(root) {
         Ok(v) => v,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Failed to run cargo metadata: {e}"
             ))]);
         }
@@ -66,7 +66,7 @@ pub fn verify_with_metadata(
     let rules = match layer_rules(rules_json) {
         Ok(r) => r,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Failed to parse layer rules: {e}"
             ))]);
         }
@@ -75,7 +75,7 @@ pub fn verify_with_metadata(
     let actual_graph = match workspace_graph(metadata) {
         Ok(g) => g,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Failed to build workspace graph: {e}"
             ))]);
         }
@@ -89,7 +89,7 @@ pub fn verify_with_metadata(
     // Report crates required by rules but absent from workspace metadata.
     for rule in &rules {
         if !actual_graph.contains_key(rule.crate_name.as_str()) {
-            findings.push(Finding::error(format!(
+            findings.push(VerifyFinding::error(format!(
                 "{}: required crate not found in workspace metadata",
                 rule.crate_name
             )));
@@ -102,10 +102,10 @@ pub fn verify_with_metadata(
             continue;
         }
         for msg in direct_violations(&rule.crate_name, &actual_graph, &allowed_graph) {
-            findings.push(Finding::error(msg));
+            findings.push(VerifyFinding::error(msg));
         }
         for msg in transitive_violations(&rule.crate_name, &actual_graph, &allowed_graph) {
-            findings.push(Finding::error(msg));
+            findings.push(VerifyFinding::error(msg));
         }
     }
 

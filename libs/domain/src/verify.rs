@@ -25,12 +25,12 @@ impl fmt::Display for Severity {
 
 /// A single verification finding.
 #[derive(Debug, Clone)]
-pub struct Finding {
+pub struct VerifyFinding {
     severity: Severity,
     message: String,
 }
 
-impl Finding {
+impl VerifyFinding {
     /// Creates a new finding.
     pub fn new(severity: Severity, message: impl Into<String>) -> Self {
         Self { severity, message: message.into() }
@@ -57,7 +57,7 @@ impl Finding {
     }
 }
 
-impl fmt::Display for Finding {
+impl fmt::Display for VerifyFinding {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "[{}] {}", self.severity, self.message)
     }
@@ -66,7 +66,7 @@ impl fmt::Display for Finding {
 /// Outcome of a verification check.
 #[derive(Debug, Clone)]
 pub struct VerifyOutcome {
-    findings: Vec<Finding>,
+    findings: Vec<VerifyFinding>,
 }
 
 impl VerifyOutcome {
@@ -76,7 +76,7 @@ impl VerifyOutcome {
     }
 
     /// Creates an outcome from a list of findings.
-    pub fn from_findings(findings: Vec<Finding>) -> Self {
+    pub fn from_findings(findings: Vec<VerifyFinding>) -> Self {
         Self { findings }
     }
 
@@ -91,12 +91,12 @@ impl VerifyOutcome {
     }
 
     /// Returns all findings.
-    pub fn findings(&self) -> &[Finding] {
+    pub fn findings(&self) -> &[VerifyFinding] {
         &self.findings
     }
 
     /// Adds a finding to the outcome.
-    pub fn add(&mut self, finding: Finding) {
+    pub fn add(&mut self, finding: VerifyFinding) {
         self.findings.push(finding);
     }
 
@@ -143,7 +143,8 @@ mod tests {
 
     #[test]
     fn test_outcome_with_error_is_not_ok() {
-        let outcome = VerifyOutcome::from_findings(vec![Finding::error("something is wrong")]);
+        let outcome =
+            VerifyOutcome::from_findings(vec![VerifyFinding::error("something is wrong")]);
         assert!(!outcome.is_ok());
         assert!(outcome.has_errors());
         assert_eq!(outcome.error_count(), 1);
@@ -151,15 +152,16 @@ mod tests {
 
     #[test]
     fn test_outcome_with_only_warnings_is_ok() {
-        let outcome = VerifyOutcome::from_findings(vec![Finding::warning("might be an issue")]);
+        let outcome =
+            VerifyOutcome::from_findings(vec![VerifyFinding::warning("might be an issue")]);
         assert!(outcome.is_ok());
         assert!(!outcome.has_errors());
     }
 
     #[test]
     fn test_merge_combines_findings() {
-        let mut a = VerifyOutcome::from_findings(vec![Finding::error("err1")]);
-        let b = VerifyOutcome::from_findings(vec![Finding::warning("warn1")]);
+        let mut a = VerifyOutcome::from_findings(vec![VerifyFinding::error("err1")]);
+        let b = VerifyOutcome::from_findings(vec![VerifyFinding::warning("warn1")]);
         a.merge(b);
         assert_eq!(a.findings().len(), 2);
         assert_eq!(a.error_count(), 1);
@@ -173,7 +175,7 @@ mod tests {
 
     #[test]
     fn test_finding_display() {
-        let f = Finding::error("bad config");
+        let f = VerifyFinding::error("bad config");
         assert_eq!(f.to_string(), "[error] bad config");
     }
 

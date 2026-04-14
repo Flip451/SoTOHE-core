@@ -8,7 +8,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 
 // ---------------------------------------------------------------------------
 // File paths
@@ -590,10 +590,10 @@ fn permission_set(settings: &serde_json::Value, key: &str) -> Result<BTreeSet<St
 fn verify_hook_paths(commands: &[String], root: &Path, outcome: &mut VerifyOutcome) {
     for (hook_path, label) in EXPECTED_HOOK_PATHS {
         if !commands.iter().any(|c| c.contains(hook_path)) {
-            outcome.add(Finding::error(format!("Missing in {SETTINGS_PATH}: {label}")));
+            outcome.add(VerifyFinding::error(format!("Missing in {SETTINGS_PATH}: {label}")));
         }
         if !root.join(hook_path).is_file() {
-            outcome.add(Finding::error(format!("Missing hook file: {hook_path}")));
+            outcome.add(VerifyFinding::error(format!("Missing hook file: {hook_path}")));
         }
     }
 
@@ -601,7 +601,7 @@ fn verify_hook_paths(commands: &[String], root: &Path, outcome: &mut VerifyOutco
         let found = commands.iter().any(|c| fragments.iter().all(|f| c.contains(*f)));
         if !found {
             let frags = fragments.join(", ");
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "Missing in {SETTINGS_PATH}: {label} (expected fragments: {frags})"
             )));
         }
@@ -616,13 +616,13 @@ fn verify_allowlist(allow: &BTreeSet<String>, extra_allow: &[String], outcome: &
 
     for (entry, label) in &expected {
         if !allow.contains(*entry) {
-            outcome.add(Finding::error(format!("Missing in {SETTINGS_PATH}: {label}")));
+            outcome.add(VerifyFinding::error(format!("Missing in {SETTINGS_PATH}: {label}")));
         }
     }
 
     for entry in &forbidden {
         if allow.contains(*entry) {
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "{SETTINGS_PATH} contains {entry} - direct access would be silently allowed"
             )));
         }
@@ -634,14 +634,14 @@ fn verify_allowlist(allow: &BTreeSet<String>, extra_allow: &[String], outcome: &
             continue; // already reported above
         }
         if entry.starts_with("Bash(") && entry.contains("scripts/") {
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "{SETTINGS_PATH} contains {entry} - direct repo scripts must be routed \
                 through cargo make wrappers"
             )));
             continue;
         }
         if !expected.contains_key(s) && !extra_set.contains(s) {
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "{SETTINGS_PATH} contains unexpected allow entry: {entry} - \
                 add it to {PERMISSION_EXTENSIONS_PATH} if this project intentionally extends \
                 the baseline"
@@ -666,7 +666,7 @@ fn validate_permission_extensions(
         let s = entry.as_str();
 
         if !allow.contains(s) {
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "{PERMISSION_EXTENSIONS_PATH} contains latent extra_allow entry not present in \
                 {SETTINGS_PATH} permissions.allow: {entry}"
             )));
@@ -674,7 +674,7 @@ fn validate_permission_extensions(
         }
 
         if expected.contains_key(s) {
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "{PERMISSION_EXTENSIONS_PATH} contains baseline allow entry: {entry} - \
                 extra_allow is only for project-specific additions"
             )));
@@ -682,7 +682,7 @@ fn validate_permission_extensions(
         }
 
         if forbidden.contains(s) {
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "{PERMISSION_EXTENSIONS_PATH} contains forbidden extra_allow entry: {entry} - \
                 direct access would be silently allowed"
             )));
@@ -690,7 +690,7 @@ fn validate_permission_extensions(
         }
 
         if entry.starts_with("Bash(") && entry.contains("scripts/") {
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "{PERMISSION_EXTENSIONS_PATH} contains {entry} - \
                 direct repo scripts must be routed through cargo make wrappers"
             )));
@@ -699,7 +699,7 @@ fn validate_permission_extensions(
 
         if let Some(task) = cargo_make_task_name(s) {
             if known_tasks.contains(&task) {
-                outcome.add(Finding::error(format!(
+                outcome.add(VerifyFinding::error(format!(
                     "{PERMISSION_EXTENSIONS_PATH} contains extension for guarded cargo make \
                     task: {entry} - baseline or approval-gated cargo make task names cannot be \
                     widened via extra_allow"
@@ -712,7 +712,7 @@ fn validate_permission_extensions(
         if let Some(sub) = git_subcommand_name(s) {
             if allowed_git_subs.contains(sub.as_str()) {
                 if known_git.contains(&sub) {
-                    outcome.add(Finding::error(format!(
+                    outcome.add(VerifyFinding::error(format!(
                         "{PERMISSION_EXTENSIONS_PATH} contains extension for guarded git \
                         subcommand: {entry} - baseline git permissions cannot be widened via \
                         extra_allow"
@@ -723,7 +723,7 @@ fn validate_permission_extensions(
             }
         }
 
-        outcome.add(Finding::error(format!(
+        outcome.add(VerifyFinding::error(format!(
             "{PERMISSION_EXTENSIONS_PATH} contains unsupported extra_allow entry: {entry} - \
             only project-specific Bash(cargo make <task>) / Bash(cargo make <task>:*) and \
             whitelisted read-only Bash(git <subcommand>) / Bash(git <subcommand>:*) are allowed"
@@ -735,7 +735,7 @@ fn validate_permission_extensions(
 fn verify_denylist(deny: &BTreeSet<String>, outcome: &mut VerifyOutcome) {
     for (entry, label) in EXPECTED_DENY {
         if !deny.contains(*entry) {
-            outcome.add(Finding::error(format!("Missing in {SETTINGS_PATH}: {label}")));
+            outcome.add(VerifyFinding::error(format!("Missing in {SETTINGS_PATH}: {label}")));
         }
     }
 }
@@ -745,7 +745,8 @@ fn verify_env(settings: &serde_json::Value, outcome: &mut VerifyOutcome) {
     let env = match settings.get("env").and_then(|v| v.as_object()) {
         Some(e) => e,
         None => {
-            outcome.add(Finding::error(format!("{SETTINGS_PATH} is missing env configuration")));
+            outcome
+                .add(VerifyFinding::error(format!("{SETTINGS_PATH} is missing env configuration")));
             return;
         }
     };
@@ -753,7 +754,9 @@ fn verify_env(settings: &serde_json::Value, outcome: &mut VerifyOutcome) {
     match env.get("CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS").and_then(|v| v.as_str()) {
         Some("1") => {}
         _ => {
-            outcome.add(Finding::error(format!("Missing in {SETTINGS_PATH}: agent teams enabled")));
+            outcome.add(VerifyFinding::error(format!(
+                "Missing in {SETTINGS_PATH}: agent teams enabled"
+            )));
         }
     }
 
@@ -762,7 +765,7 @@ fn verify_env(settings: &serde_json::Value, outcome: &mut VerifyOutcome) {
         Some(m) if SUBAGENT_MODEL_ALLOWLIST.contains(&m) => {}
         other => {
             let allowlist: Vec<&str> = SUBAGENT_MODEL_ALLOWLIST.to_vec();
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "{SETTINGS_PATH}: CLAUDE_CODE_SUBAGENT_MODEL must be one of {allowlist:?}, \
                 got {other:?}"
             )));
@@ -792,7 +795,7 @@ fn verify_teammate_idle_feedback(settings: &serde_json::Value, outcome: &mut Ver
 
     for (marker, label) in TEAMMATE_IDLE_MARKERS {
         if !feedback_text.contains(marker) {
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "Missing in {SETTINGS_PATH} TeammateIdle feedback: {label:?}"
             )));
         }
@@ -803,7 +806,7 @@ fn verify_teammate_idle_feedback(settings: &serde_json::Value, outcome: &mut Ver
 fn verify_agent_definitions(root: &Path, outcome: &mut VerifyOutcome) {
     for required in REQUIRED_AGENT_FILES {
         if !root.join(AGENTS_DIR).join(required).is_file() {
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "Missing required agent definition: {AGENTS_DIR}/{required}"
             )));
         }
@@ -818,7 +821,7 @@ fn verify_no_hardcoded_codex_model_literals(root: &Path, outcome: &mut VerifyOut
             continue;
         }
         if let Err(e) = scan_dir_for_gpt_pattern(&base, outcome) {
-            outcome.add(Finding::error(format!("Error scanning {dir}: {e}")));
+            outcome.add(VerifyFinding::error(format!("Error scanning {dir}: {e}")));
         }
     }
 }
@@ -841,7 +844,7 @@ fn scan_dir_for_gpt_pattern(dir: &Path, outcome: &mut VerifyOutcome) -> Result<(
             let text = std::fs::read_to_string(&path)
                 .map_err(|e| format!("Cannot read {}: {e}", path.display()))?;
             if HARDCODED_CODEX_MODEL_RE.as_ref().is_some_and(|re| re.is_match(&text)) {
-                outcome.add(Finding::error(format!(
+                outcome.add(VerifyFinding::error(format!(
                     "{} contains hardcoded Codex model literal matching {}",
                     path.display(),
                     r"gpt-\d+"
@@ -857,13 +860,14 @@ fn verify_override_first_model_resolution(root: &Path, outcome: &mut VerifyOutco
     for (rel_path, label, required_snippets, forbidden_snippets) in MODEL_RESOLUTION_TARGETS {
         let path = root.join(rel_path);
         if !path.is_file() {
-            outcome.add(Finding::error(format!("Missing model resolution target: {rel_path}")));
+            outcome
+                .add(VerifyFinding::error(format!("Missing model resolution target: {rel_path}")));
             continue;
         }
         let content = match std::fs::read_to_string(&path) {
             Ok(c) => c,
             Err(e) => {
-                outcome.add(Finding::error(format!("Cannot read {rel_path}: {e}")));
+                outcome.add(VerifyFinding::error(format!("Cannot read {rel_path}: {e}")));
                 continue;
             }
         };
@@ -872,7 +876,7 @@ fn verify_override_first_model_resolution(root: &Path, outcome: &mut VerifyOutco
             required_snippets.iter().filter(|s| !content.contains(**s)).collect();
         if !missing.is_empty() {
             let joined: Vec<&str> = missing.iter().map(|s| **s).collect();
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "{rel_path} is missing canonical override-first guidance for {label}: {}",
                 joined.join("; ")
             )));
@@ -880,7 +884,7 @@ fn verify_override_first_model_resolution(root: &Path, outcome: &mut VerifyOutco
 
         for forbidden in *forbidden_snippets {
             if content.contains(*forbidden) {
-                outcome.add(Finding::error(format!(
+                outcome.add(VerifyFinding::error(format!(
                     "{rel_path} still contains stale default_model-only guidance: {forbidden}"
                 )));
             }
@@ -893,13 +897,14 @@ fn verify_reviewer_wrapper_guidance(root: &Path, outcome: &mut VerifyOutcome) {
     for (rel_path, label, required_snippets, forbidden_snippets) in REVIEW_WRAPPER_TARGETS {
         let path = root.join(rel_path);
         if !path.is_file() {
-            outcome.add(Finding::error(format!("Missing reviewer wrapper target: {rel_path}")));
+            outcome
+                .add(VerifyFinding::error(format!("Missing reviewer wrapper target: {rel_path}")));
             continue;
         }
         let content = match std::fs::read_to_string(&path) {
             Ok(c) => c,
             Err(e) => {
-                outcome.add(Finding::error(format!("Cannot read {rel_path}: {e}")));
+                outcome.add(VerifyFinding::error(format!("Cannot read {rel_path}: {e}")));
                 continue;
             }
         };
@@ -908,7 +913,7 @@ fn verify_reviewer_wrapper_guidance(root: &Path, outcome: &mut VerifyOutcome) {
             required_snippets.iter().filter(|s| !content.contains(**s)).collect();
         if !missing.is_empty() {
             let joined: Vec<&str> = missing.iter().map(|s| **s).collect();
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "{rel_path} is missing reviewer wrapper guidance for {label}: {}",
                 joined.join("; ")
             )));
@@ -916,7 +921,7 @@ fn verify_reviewer_wrapper_guidance(root: &Path, outcome: &mut VerifyOutcome) {
 
         for forbidden in *forbidden_snippets {
             if content.contains(*forbidden) {
-                outcome.add(Finding::error(format!(
+                outcome.add(VerifyFinding::error(format!(
                     "{rel_path} still contains stale reviewer command guidance: {forbidden}"
                 )));
             }
@@ -933,13 +938,13 @@ fn verify_no_local_settings_committed(root: &Path, outcome: &mut VerifyOutcome) 
 
     match result {
         Err(e) => {
-            outcome.add(Finding::error(format!(
+            outcome.add(VerifyFinding::error(format!(
                 "Cannot run git ls-files to check {SETTINGS_LOCAL_PATH}: {e}"
             )));
         }
         Ok(output) => {
             if output.status.success() {
-                outcome.add(Finding::error(format!(
+                outcome.add(VerifyFinding::error(format!(
                     "{SETTINGS_LOCAL_PATH} is tracked by git. \
                     Local overrides must not be committed — add to .gitignore and run: \
                     git rm --cached .claude/settings.local.json"
@@ -951,7 +956,7 @@ fn verify_no_local_settings_committed(root: &Path, outcome: &mut VerifyOutcome) 
                 if code == 128 && stderr.to_lowercase().contains("not a git repository") {
                     // Not a git repo — that's fine
                 } else if code != 1 {
-                    outcome.add(Finding::error(format!(
+                    outcome.add(VerifyFinding::error(format!(
                         "git ls-files failed (exit {code}): {}",
                         stderr.trim()
                     )));
@@ -979,7 +984,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let settings = match load_settings(root) {
         Ok(s) => s,
         Err(e) => {
-            outcome.add(Finding::error(e));
+            outcome.add(VerifyFinding::error(e));
             return outcome;
         }
     };
@@ -987,7 +992,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let extra_allow = match load_permission_extensions(root) {
         Ok(e) => e,
         Err(e) => {
-            outcome.add(Finding::error(e));
+            outcome.add(VerifyFinding::error(e));
             return outcome;
         }
     };
@@ -995,7 +1000,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let commands = match hook_commands(&settings) {
         Ok(c) => c,
         Err(e) => {
-            outcome.add(Finding::error(e));
+            outcome.add(VerifyFinding::error(e));
             return outcome;
         }
     };
@@ -1003,7 +1008,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let allow = match permission_set(&settings, "allow") {
         Ok(a) => a,
         Err(e) => {
-            outcome.add(Finding::error(e));
+            outcome.add(VerifyFinding::error(e));
             return outcome;
         }
     };
@@ -1011,7 +1016,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let deny = match permission_set(&settings, "deny") {
         Ok(d) => d,
         Err(e) => {
-            outcome.add(Finding::error(e));
+            outcome.add(VerifyFinding::error(e));
             return outcome;
         }
     };

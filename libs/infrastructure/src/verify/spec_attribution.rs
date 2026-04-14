@@ -5,7 +5,7 @@
 //! have non-empty sources. Otherwise falls back to the markdown scan (legacy).
 
 use super::frontmatter::parse_yaml_frontmatter;
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 use std::path::Path;
 
 /// Checks if a line contains a valid `[source: <non-empty>]` tag.
@@ -43,7 +43,7 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
     let json = match std::fs::read_to_string(spec_json_path) {
         Ok(s) => s,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "cannot read {}: {e}",
                 spec_json_path.display()
             ))]);
@@ -53,7 +53,7 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
     let doc = match crate::spec::codec::decode(&json) {
         Ok(d) => d,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "{}: spec.json decode error: {e}",
                 spec_json_path.display()
             ))]);
@@ -74,7 +74,7 @@ pub fn verify_from_spec_json(spec_json_path: &Path) -> VerifyOutcome {
         let has_valid_source =
             !req.sources().is_empty() && req.sources().iter().any(|s| !s.trim().is_empty());
         if !has_valid_source {
-            findings.push(Finding::error(format!(
+            findings.push(VerifyFinding::error(format!(
                 "{}: requirement missing attribution: \"{}\"",
                 spec_json_path.display(),
                 req.text()
@@ -121,7 +121,7 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
     let content = match std::fs::read_to_string(spec_path) {
         Ok(c) => c,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "cannot read {}: {e}",
                 spec_path.display()
             ))]);
@@ -166,7 +166,7 @@ pub fn verify(spec_path: &Path) -> VerifyOutcome {
             continue;
         }
         if !has_valid_source_tag(line) {
-            findings.push(Finding::error(format!(
+            findings.push(VerifyFinding::error(format!(
                 "{}:{}: requirement line missing [source: ...] tag: {}",
                 spec_path.display(),
                 line_num + 1,

@@ -5,7 +5,7 @@
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 use regex::Regex;
 
 const TRACK_ITEMS_DIR: &str = "track/items";
@@ -15,7 +15,7 @@ const TRACK_ARCHIVE_DIR: &str = "track/archive";
 type TrackMeta = (i64, String, Option<String>, u32);
 
 /// Type alias for file-validator function pointers used in the verify loop.
-type FileValidator = fn(&Path, &Path) -> Vec<Finding>;
+type FileValidator = fn(&Path, &Path) -> Vec<VerifyFinding>;
 
 static PLACEHOLDER_LINE_RE: LazyLock<Option<Regex>> =
     LazyLock::new(|| Regex::new(r"(?i)TODO:|TEMPLATE STUB").ok());
@@ -79,7 +79,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
                     outcome.add(finding);
                 }
             } else {
-                outcome.add(Finding::error(format!(
+                outcome.add(VerifyFinding::error(format!(
                     "[ERROR] Latest track is missing spec.md (and no spec.json found): {}",
                     display_path(&spec_md_path, root)
                 )));
@@ -90,7 +90,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
             for (filename, validator) in &other_files {
                 let path = track_dir.join(filename);
                 if !path.is_file() {
-                    outcome.add(Finding::error(format!(
+                    outcome.add(VerifyFinding::error(format!(
                         "[ERROR] Latest track is missing {filename}: {}",
                         display_path(&path, root)
                     )));
@@ -126,7 +126,7 @@ fn all_track_directories(root: &Path) -> Vec<PathBuf> {
 ///
 /// Returns `Ok(None)` when no tracks exist.
 /// Returns `Err(findings)` when any `metadata.json` is malformed.
-fn latest_track_dir(root: &Path) -> Result<Option<PathBuf>, Vec<Finding>> {
+fn latest_track_dir(root: &Path) -> Result<Option<PathBuf>, Vec<VerifyFinding>> {
     let dirs = all_track_directories(root);
     if dirs.is_empty() {
         return Ok(None);
@@ -137,7 +137,7 @@ fn latest_track_dir(root: &Path) -> Result<Option<PathBuf>, Vec<Finding>> {
     let mut latest_dir: Option<PathBuf> = None;
     // Rank tuple: (priority, updated_at_secs, dir_name)
     let mut latest_rank: (u32, i64, String) = (0, i64::MIN, String::new());
-    let mut errors: Vec<Finding> = Vec::new();
+    let mut errors: Vec<VerifyFinding> = Vec::new();
 
     for dir_path in dirs {
         // Skip tracks under track/archive/ regardless of metadata content.
@@ -176,10 +176,13 @@ fn latest_track_dir(root: &Path) -> Result<Option<PathBuf>, Vec<Finding>> {
 /// Returns `Err(findings)` for malformed metadata.
 ///
 /// On success returns `(updated_at_unix_secs, status, branch, schema_version)`.
-fn load_track_metadata(track_dir: &Path, root: &Path) -> Result<Option<TrackMeta>, Vec<Finding>> {
+fn load_track_metadata(
+    track_dir: &Path,
+    root: &Path,
+) -> Result<Option<TrackMeta>, Vec<VerifyFinding>> {
     let metadata_file = track_dir.join("metadata.json");
     if !metadata_file.is_file() {
-        return Err(vec![Finding::error(format!(
+        return Err(vec![VerifyFinding::error(format!(
             "[ERROR] Cannot determine latest track because metadata.json is missing: {}",
             display_path(&metadata_file, root)
         ))]);
@@ -188,7 +191,7 @@ fn load_track_metadata(track_dir: &Path, root: &Path) -> Result<Option<TrackMeta
     let content = match std::fs::read_to_string(&metadata_file) {
         Ok(c) => c,
         Err(e) => {
-            return Err(vec![Finding::error(format!(
+            return Err(vec![VerifyFinding::error(format!(
                 "[ERROR] Cannot determine latest track because metadata.json is invalid: {} ({e})",
                 display_path(&metadata_file, root)
             ))]);
@@ -198,7 +201,7 @@ fn load_track_metadata(track_dir: &Path, root: &Path) -> Result<Option<TrackMeta
     let data: serde_json::Value = match serde_json::from_str(&content) {
         Ok(v) => v,
         Err(e) => {
-            return Err(vec![Finding::error(format!(
+            return Err(vec![VerifyFinding::error(format!(
                 "[ERROR] Cannot determine latest track because metadata.json is invalid: {} ({e})",
                 display_path(&metadata_file, root)
             ))]);
@@ -208,7 +211,7 @@ fn load_track_metadata(track_dir: &Path, root: &Path) -> Result<Option<TrackMeta
     let obj = match data.as_object() {
         Some(o) => o,
         None => {
-            return Err(vec![Finding::error(format!(
+            return Err(vec![VerifyFinding::error(format!(
                 "[ERROR] Cannot determine latest track because metadata.json is invalid: {} (metadata.json must be a JSON object)",
                 display_path(&metadata_file, root)
             ))]);
@@ -227,19 +230,19 @@ fn load_track_metadata(track_dir: &Path, root: &Path) -> Result<Option<TrackMeta
 
     // v3 branch field validation.
     if v3_branch_field_missing(&data) {
-        return Err(vec![Finding::error(format!(
+        return Err(vec![VerifyFinding::error(format!(
             "[ERROR] Cannot determine latest track because branch is missing: {}",
             display_path(&metadata_file, root)
         ))]);
     }
     if v3_branchless_track_invalid(&data) {
-        return Err(vec![Finding::error(format!(
+        return Err(vec![VerifyFinding::error(format!(
             "[ERROR] Cannot determine latest track because branchless v3 metadata is only valid for planning-only tracks: {}",
             display_path(&metadata_file, root)
         ))]);
     }
     if v3_non_null_branch_invalid(&data) {
-        return Err(vec![Finding::error(format!(
+        return Err(vec![VerifyFinding::error(format!(
             "[ERROR] Cannot determine latest track because branch is invalid: {}",
             display_path(&metadata_file, root)
         ))]);
@@ -249,7 +252,7 @@ fn load_track_metadata(track_dir: &Path, root: &Path) -> Result<Option<TrackMeta
     let updated_at_raw = match obj.get("updated_at").and_then(|v| v.as_str()) {
         Some(s) => s,
         None => {
-            return Err(vec![Finding::error(format!(
+            return Err(vec![VerifyFinding::error(format!(
                 "[ERROR] Cannot determine latest track because updated_at is missing or invalid: {}",
                 display_path(&metadata_file, root)
             ))]);
@@ -259,7 +262,7 @@ fn load_track_metadata(track_dir: &Path, root: &Path) -> Result<Option<TrackMeta
     let updated_at_secs = match parse_updated_at(updated_at_raw) {
         Ok(secs) => secs,
         Err(e) => {
-            return Err(vec![Finding::error(format!(
+            return Err(vec![VerifyFinding::error(format!(
                 "[ERROR] Cannot determine latest track because updated_at is invalid: {} ({e})",
                 display_path(&metadata_file, root)
             ))]);
@@ -654,18 +657,18 @@ fn scaffold_placeholder_lines(text: &str) -> Vec<(usize, String)> {
 // ---------------------------------------------------------------------------
 
 /// Validate a `spec.json` artifact: must be readable and decode without error.
-fn validate_spec_json_file(path: &Path, root: &Path) -> Vec<Finding> {
+fn validate_spec_json_file(path: &Path, root: &Path) -> Vec<VerifyFinding> {
     let text = match std::fs::read_to_string(path) {
         Ok(t) => t,
         Err(e) => {
-            return vec![Finding::error(format!(
+            return vec![VerifyFinding::error(format!(
                 "[ERROR] Cannot read spec.json: {} ({e})",
                 display_path(path, root)
             ))];
         }
     };
     if text.trim().is_empty() {
-        return vec![Finding::error(format!(
+        return vec![VerifyFinding::error(format!(
             "[ERROR] Latest track spec.json is empty: {}",
             display_path(path, root)
         ))];
@@ -673,7 +676,7 @@ fn validate_spec_json_file(path: &Path, root: &Path) -> Vec<Finding> {
     let doc = match crate::spec::codec::decode(&text) {
         Ok(d) => d,
         Err(e) => {
-            return vec![Finding::error(format!(
+            return vec![VerifyFinding::error(format!(
                 "[ERROR] Latest track spec.json is invalid: {} ({e})",
                 display_path(path, root)
             ))];
@@ -713,7 +716,7 @@ fn validate_spec_json_file(path: &Path, root: &Path) -> Vec<Finding> {
         let upper = text.to_uppercase();
         for pattern in &placeholder_patterns {
             if upper.contains(pattern) {
-                findings.push(Finding::error(format!(
+                findings.push(VerifyFinding::error(format!(
                     "[ERROR] Latest track spec.json contains placeholder '{pattern}': {display}"
                 )));
                 // One finding per placeholder pattern per document is enough
@@ -727,11 +730,11 @@ fn validate_spec_json_file(path: &Path, root: &Path) -> Vec<Finding> {
     findings
 }
 
-fn validate_spec_file(path: &Path, root: &Path) -> Vec<Finding> {
+fn validate_spec_file(path: &Path, root: &Path) -> Vec<VerifyFinding> {
     let text = match std::fs::read_to_string(path) {
         Ok(t) => t,
         Err(e) => {
-            return vec![Finding::error(format!(
+            return vec![VerifyFinding::error(format!(
                 "[ERROR] Cannot read spec.md: {} ({e})",
                 display_path(path, root)
             ))];
@@ -739,23 +742,23 @@ fn validate_spec_file(path: &Path, root: &Path) -> Vec<Finding> {
     };
     let mut findings = Vec::new();
     if text.trim().is_empty() {
-        return vec![Finding::error(format!(
+        return vec![VerifyFinding::error(format!(
             "[ERROR] Latest track spec.md is empty: {}",
             display_path(path, root)
         ))];
     }
     let placeholders = placeholder_lines(&text);
     if !placeholders.is_empty() {
-        findings.push(Finding::error(format!(
+        findings.push(VerifyFinding::error(format!(
             "[ERROR] Latest track spec.md still contains placeholders: {}",
             display_path(path, root)
         )));
         for (line_number, line) in &placeholders {
-            findings.push(Finding::error(format!("  {line_number}:{line}")));
+            findings.push(VerifyFinding::error(format!("  {line_number}:{line}")));
         }
     }
     if meaningful_non_heading_lines(&text).is_empty() {
-        findings.push(Finding::error(format!(
+        findings.push(VerifyFinding::error(format!(
             "[ERROR] Latest track spec.md lacks substantive content beyond headings: {}",
             display_path(path, root)
         )));
@@ -763,11 +766,11 @@ fn validate_spec_file(path: &Path, root: &Path) -> Vec<Finding> {
     findings
 }
 
-fn validate_plan_file(path: &Path, root: &Path) -> Vec<Finding> {
+fn validate_plan_file(path: &Path, root: &Path) -> Vec<VerifyFinding> {
     let text = match std::fs::read_to_string(path) {
         Ok(t) => t,
         Err(e) => {
-            return vec![Finding::error(format!(
+            return vec![VerifyFinding::error(format!(
                 "[ERROR] Cannot read plan.md: {} ({e})",
                 display_path(path, root)
             ))];
@@ -775,23 +778,23 @@ fn validate_plan_file(path: &Path, root: &Path) -> Vec<Finding> {
     };
     let mut findings = Vec::new();
     if text.trim().is_empty() {
-        return vec![Finding::error(format!(
+        return vec![VerifyFinding::error(format!(
             "[ERROR] Latest track plan.md is empty: {}",
             display_path(path, root)
         ))];
     }
     let placeholders = placeholder_lines(&text);
     if !placeholders.is_empty() {
-        findings.push(Finding::error(format!(
+        findings.push(VerifyFinding::error(format!(
             "[ERROR] Latest track plan.md still contains placeholders: {}",
             display_path(path, root)
         )));
         for (line_number, line) in &placeholders {
-            findings.push(Finding::error(format!("  {line_number}:{line}")));
+            findings.push(VerifyFinding::error(format!("  {line_number}:{line}")));
         }
     }
     if !has_task_items(&text) {
-        findings.push(Finding::error(format!(
+        findings.push(VerifyFinding::error(format!(
             "[ERROR] Latest track plan.md does not contain any task items: {}",
             display_path(path, root)
         )));
@@ -799,11 +802,11 @@ fn validate_plan_file(path: &Path, root: &Path) -> Vec<Finding> {
     findings
 }
 
-fn validate_verification_file(path: &Path, root: &Path) -> Vec<Finding> {
+fn validate_verification_file(path: &Path, root: &Path) -> Vec<VerifyFinding> {
     let text = match std::fs::read_to_string(path) {
         Ok(t) => t,
         Err(e) => {
-            return vec![Finding::error(format!(
+            return vec![VerifyFinding::error(format!(
                 "[ERROR] Cannot read verification.md: {} ({e})",
                 display_path(path, root)
             ))];
@@ -811,35 +814,35 @@ fn validate_verification_file(path: &Path, root: &Path) -> Vec<Finding> {
     };
     let mut findings = Vec::new();
     if text.trim().is_empty() {
-        return vec![Finding::error(format!(
+        return vec![VerifyFinding::error(format!(
             "[ERROR] Latest track verification.md is empty: {}",
             display_path(path, root)
         ))];
     }
     let placeholders = placeholder_lines(&text);
     if !placeholders.is_empty() {
-        findings.push(Finding::error(format!(
+        findings.push(VerifyFinding::error(format!(
             "[ERROR] Latest track verification.md still contains placeholders: {}",
             display_path(path, root)
         )));
         for (line_number, line) in &placeholders {
-            findings.push(Finding::error(format!("  {line_number}:{line}")));
+            findings.push(VerifyFinding::error(format!("  {line_number}:{line}")));
         }
     }
     if meaningful_non_heading_lines(&text).is_empty() {
-        findings.push(Finding::error(format!(
+        findings.push(VerifyFinding::error(format!(
             "[ERROR] Latest track verification.md lacks substantive content beyond headings: {}",
             display_path(path, root)
         )));
     }
     let scaffold_lines = scaffold_placeholder_lines(&text);
     if !scaffold_lines.is_empty() {
-        findings.push(Finding::error(format!(
+        findings.push(VerifyFinding::error(format!(
             "[ERROR] Latest track verification.md still contains scaffold placeholders: {}",
             display_path(path, root)
         )));
         for (line_number, line) in &scaffold_lines {
-            findings.push(Finding::error(format!("  {line_number}:{line}")));
+            findings.push(VerifyFinding::error(format!("  {line_number}:{line}")));
         }
     }
     findings
