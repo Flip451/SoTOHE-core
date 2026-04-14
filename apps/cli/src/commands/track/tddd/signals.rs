@@ -30,15 +30,20 @@ pub(crate) fn resolve_layers(
     layer_filter: Option<&str>,
 ) -> Result<Vec<TdddLayerBinding>, CliError> {
     let rules_path = workspace_root.join("architecture-rules.json");
-    // Only fall back to the synthetic domain binding when `architecture-rules.json`
-    // is truly absent (NotFound). Any other condition — the path exists but is a
-    // directory, broken symlink, or any I/O error — is fail-closed so that a
-    // misconfigured environment does not silently run against the domain layer.
-    let bindings = match std::fs::read_to_string(&rules_path) {
-        Ok(content) => parse_tddd_layers(&content)
-            .map_err(|e| CliError::Message(format!("{}: {e}", rules_path.display())))?,
+    // Distinguish "truly absent" from "broken symlink / other I/O error" by
+    // probing the path with `symlink_metadata` first. Only the former should
+    // trigger the legacy single-domain synthetic fallback; a broken symlink at
+    // `architecture-rules.json` is a misconfiguration and must fail-closed
+    // (otherwise the caller silently runs against the wrong layer set).
+    // `read_to_string` alone cannot distinguish these cases — it returns
+    // `NotFound` for both an absent path and a broken symlink whose target is
+    // missing. `symlink_metadata` does not follow symlinks and returns
+    // metadata for the link itself, so a broken symlink returns `Ok(meta)`
+    // here and the subsequent `read_to_string` surfaces the real error.
+    let bindings = match std::fs::symlink_metadata(&rules_path) {
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            // Legacy fallback: a single synthetic domain binding.
+            // Legacy fallback: a single synthetic domain binding (path truly
+            // absent — no file, no symlink, nothing at the expected location).
             parse_tddd_layers(
                 r#"{
                   "layers": [
@@ -49,7 +54,17 @@ pub(crate) fn resolve_layers(
             .unwrap_or_default()
         }
         Err(e) => {
-            return Err(CliError::Message(format!("cannot read {}: {e}", rules_path.display())));
+            return Err(CliError::Message(format!("cannot stat {}: {e}", rules_path.display())));
+        }
+        Ok(_meta) => {
+            // Path exists as a file or symlink. Read it. A broken symlink
+            // surfaces as a read error here (not NotFound-fallback) so the
+            // misconfiguration is reported instead of masked.
+            let content = std::fs::read_to_string(&rules_path).map_err(|e| {
+                CliError::Message(format!("cannot read {}: {e}", rules_path.display()))
+            })?;
+            parse_tddd_layers(&content)
+                .map_err(|e| CliError::Message(format!("{}: {e}", rules_path.display())))?
         }
     };
 
