@@ -1,6 +1,6 @@
 //! `sotp track baseline-capture` — capture TypeGraph snapshot as baseline.
 //!
-//! Generates `domain-types-baseline.json` from the current TypeGraph.
+//! Generates `<layer>-types-baseline.json` from the current TypeGraph.
 //! Skips if baseline already exists (idempotent). Use `--force` to regenerate.
 
 use std::path::PathBuf;
@@ -12,17 +12,22 @@ use infrastructure::schema_export::RustdocSchemaExporter;
 use infrastructure::tddd::{baseline_builder, baseline_codec};
 use infrastructure::track::atomic_write::atomic_write_file;
 use infrastructure::track::symlink_guard::reject_symlinks_below;
-use infrastructure::verify::tddd_layers::parse_tddd_layers;
+use infrastructure::verify::tddd_layers::TdddLayerBinding;
 
 use crate::CliError;
+use crate::commands::track::tddd::signals::resolve_layers;
 
 /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
 ///
 /// Steps:
-/// 1. Check if `domain-types-baseline.json` already exists (skip unless `--force`).
-/// 2. Export domain crate schema via rustdoc JSON.
-/// 3. Build TypeGraph and convert to TypeBaseline.
-/// 4. Encode and write to `domain-types-baseline.json`.
+/// 1. Resolve the set of TDDD-enabled layers to process (all enabled, or just the
+///    specified `--layer`).
+/// 2. For each layer binding, check if the baseline already exists (skip unless `--force`).
+/// 3. Export the target crate schema via rustdoc JSON.
+/// 4. Build TypeGraph and convert to TypeBaseline.
+/// 5. Encode and write to `<layer>-types-baseline.json`.
+///
+/// When `--layer` is omitted, all TDDD-enabled layers are processed in `layers[]` order.
 ///
 /// # Errors
 ///
@@ -35,29 +40,22 @@ pub fn execute_baseline_capture(
     force: bool,
     layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    // T007: Phase 1 wires only the `domain` layer. `--layer` is accepted on
-    // the CLI surface so Phase 2 can extend it without another breaking
-    // change, but any non-`domain` value is rejected fail-closed so that a
-    // request like `baseline-capture --layer usecase` cannot silently
-    // overwrite `domain-types-baseline.json` with the wrong target.
-    if let Some(ref layer_id) = layer {
-        if layer_id != "domain" {
-            return Err(CliError::Message(format!(
-                "layer '{layer_id}' is not yet supported by `baseline-capture` in Phase 1. \
-                 Only `domain` is wired. Re-run with `--layer domain` (or omit `--layer`)."
-            )));
-        }
-    }
+    // Resolve the set of TDDD-enabled layers to process. When
+    // `architecture-rules.json` is absent we fall back to the legacy
+    // single-`domain` binding so older tracks keep working. When `--layer`
+    // is supplied we fail-closed on an unknown or disabled layer id.
+    let bindings = resolve_layers(&workspace_root, layer.as_deref())?;
 
-    // T007 fail-closed: verify that `domain` is actually `tddd.enabled` in
-    // the workspace's `architecture-rules.json`. If the caller disabled
-    // domain (or deleted the rules file entirely), capturing a baseline for
-    // an inactive layer would overwrite `domain-types-baseline.json` on a
-    // layer the rest of the pipeline treats as opted out. Reject the run.
-    let (domain_binding, skipped_enabled_layers) =
-        enforce_domain_tddd_enabled(&workspace_root, layer.as_deref())?;
-    let catalogue_filename = domain_binding.catalogue_file().to_owned();
-    let baseline_filename = domain_binding.baseline_file();
+    // Fail-closed when no layers are enabled: returning SUCCESS with no
+    // work done would silently mask a misconfigured `architecture-rules.json`
+    // (e.g. all layers have `tddd.enabled = false`).
+    if bindings.is_empty() {
+        return Err(CliError::Message(
+            "no tddd.enabled layers found in architecture-rules.json; \
+             nothing to capture"
+                .to_owned(),
+        ));
+    }
 
     let _valid_id = domain::TrackId::try_new(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
@@ -81,11 +79,32 @@ pub fn execute_baseline_capture(
         }
     }
 
-    let track_dir = items_dir.join(&track_id);
+    for binding in &bindings {
+        capture_baseline_for_layer(&items_dir, &track_id, &workspace_root, force, binding)?;
+    }
+
+    Ok(ExitCode::SUCCESS)
+}
+
+/// Capture the baseline for a single TDDD layer binding.
+///
+/// Handles the skip-if-exists logic, symlink guards, rustdoc export,
+/// TypeGraph build, and atomic write for a single layer.
+fn capture_baseline_for_layer(
+    items_dir: &std::path::Path,
+    track_id: &str,
+    workspace_root: &std::path::Path,
+    force: bool,
+    binding: &TdddLayerBinding,
+) -> Result<(), CliError> {
+    let catalogue_filename = binding.catalogue_file();
+    let baseline_filename = binding.baseline_file();
+
+    let track_dir = items_dir.join(track_id);
     let baseline_path = track_dir.join(&baseline_filename);
 
     // Security: reject symlinks in path components below items_dir.
-    reject_symlinks_below(&baseline_path, &items_dir)
+    reject_symlinks_below(&baseline_path, items_dir)
         .map_err(|e| CliError::Message(format!("symlink guard: {e}")))?;
 
     // Idempotent: skip if baseline already exists as a regular file (unless --force).
@@ -96,7 +115,7 @@ pub fn execute_baseline_capture(
         println!(
             "[OK] baseline-capture: {baseline_filename} already exists for '{track_id}' (use --force to regenerate)"
         );
-        return Ok(ExitCode::SUCCESS);
+        return Ok(());
     }
 
     // Fail fast if the track directory does not exist.
@@ -111,23 +130,45 @@ pub fn execute_baseline_capture(
     // `build_type_graph`. Security: guard the leaf path too — a symlinked
     // catalogue file inside the track directory could redirect reads
     // outside the trusted tree.
-    let domain_types_path = track_dir.join(&catalogue_filename);
-    reject_symlinks_below(&domain_types_path, &items_dir)
+    let catalogue_path = track_dir.join(catalogue_filename);
+    reject_symlinks_below(&catalogue_path, items_dir)
         .map_err(|e| CliError::Message(format!("symlink guard: {e}")))?;
+    // Read the catalogue file to extract typestate names. The catalogue is
+    // optional — it may not yet exist for a brand-new track. When it is
+    // absent we fall back to an empty set (conservative: treats all types as
+    // non-typestate, which is safe for baseline capture). When the catalogue
+    // is present but malformed we fail-closed to prevent silently capturing
+    // an incorrect baseline.
     let typestate_names: std::collections::HashSet<String> =
-        if let Ok(json) = std::fs::read_to_string(&domain_types_path) {
-            if let Ok(doc) = infrastructure::tddd::catalogue_codec::decode(&json) {
-                doc.typestate_names()
-            } else {
-                std::collections::HashSet::new()
+        match std::fs::read_to_string(&catalogue_path) {
+            Ok(json) => infrastructure::tddd::catalogue_codec::decode(&json)
+                .map(|doc| doc.typestate_names())
+                .map_err(|e| {
+                    CliError::Message(format!(
+                        "{} is malformed; fix or delete it before capturing baseline: {e}",
+                        catalogue_path.display()
+                    ))
+                })?,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => std::collections::HashSet::new(),
+            Err(e) => {
+                return Err(CliError::Message(format!(
+                    "cannot read {}: {e}",
+                    catalogue_path.display()
+                )));
             }
-        } else {
-            std::collections::HashSet::new()
         };
 
-    // Export the domain crate's public API via rustdoc JSON.
-    let exporter = RustdocSchemaExporter::new(workspace_root);
-    let schema = exporter.export("domain").map_err(|e| {
+    // Resolve the target crate for schema export from the binding.
+    let target_crate = binding.targets().first().ok_or_else(|| {
+        CliError::Message(format!(
+            "schema_export.targets is empty for layer '{}'; check architecture-rules.json",
+            binding.layer_id()
+        ))
+    })?;
+
+    // Export the target crate's public API via rustdoc JSON.
+    let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
+    let schema = exporter.export(target_crate).map_err(|e| {
         let hint = if matches!(e, SchemaExportError::NightlyNotFound) {
             " (install with: rustup toolchain install nightly)".to_owned()
         } else {
@@ -155,103 +196,7 @@ pub fn execute_baseline_capture(
         "[OK] baseline-capture: wrote {baseline_filename} ({type_count} types, {trait_count} traits)"
     );
 
-    // Phase 1 partial-success exit: if any enabled non-`domain` layer was
-    // skipped with a warning, downgrade the exit code so CI/automation
-    // cannot treat the multilayer capture as complete. The domain baseline
-    // was still written on disk so subsequent runs can converge.
-    if !skipped_enabled_layers.is_empty() {
-        eprintln!(
-            "[ERROR] baseline-capture skipped enabled non-domain layers in Phase 1: {}. \
-             Exit code 1 to prevent CI/automation from treating the run as complete.",
-            skipped_enabled_layers.join(", ")
-        );
-        return Ok(ExitCode::FAILURE);
-    }
-
-    Ok(ExitCode::SUCCESS)
-}
-
-/// Fails closed unless `domain` is `tddd.enabled=true` in
-/// `architecture-rules.json`, and returns the resolved domain binding
-/// so the caller can use `binding.catalogue_file()` /
-/// `binding.baseline_file()` for filename-driven I/O.
-///
-/// Non-domain enabled layers produce a stderr warning when `--layer` is
-/// omitted, mirroring the `type-signals` behavior: Phase 1 wires only
-/// domain, so extra layers are skipped with an explicit warning rather
-/// than silently or fail-closed.
-///
-/// When the rules file does not exist we fall back to a synthetic
-/// default-domain binding so legacy repos (without a `tddd` block) still
-/// behave the same as before T007.
-///
-/// `layer_filter` is `Some("domain")` when the caller asked for domain
-/// explicitly — in that case no warning is printed for other layers
-/// (the caller already acknowledged the single-layer scope).
-fn enforce_domain_tddd_enabled(
-    workspace_root: &std::path::Path,
-    layer_filter: Option<&str>,
-) -> Result<(infrastructure::verify::tddd_layers::TdddLayerBinding, Vec<String>), CliError> {
-    let rules_path = workspace_root.join("architecture-rules.json");
-    if !rules_path.is_file() {
-        // Legacy fallback: no rules file → synthetic default-domain
-        // binding (`domain-types.json` + `domain-types-baseline.json`).
-        return Ok((synthetic_domain_binding()?, Vec::new()));
-    }
-    let content = std::fs::read_to_string(&rules_path)
-        .map_err(|e| CliError::Message(format!("cannot read {}: {e}", rules_path.display())))?;
-    let bindings = parse_tddd_layers(&content)
-        .map_err(|e| CliError::Message(format!("{}: {e}", rules_path.display())))?;
-    let Some(domain_binding) = bindings.iter().find(|b| b.layer_id() == "domain").cloned() else {
-        return Err(CliError::Message(
-            "`domain` is not tddd.enabled in architecture-rules.json. baseline-capture \
-             refuses to write domain baseline for an opted-out layer. \
-             Enable `domain.tddd.enabled = true` or run a Phase 2 command for the \
-             active layers."
-                .to_owned(),
-        ));
-    };
-    // Only warn about non-domain layers when the caller did NOT explicitly
-    // select `--layer domain` — an explicit domain filter is a conscious
-    // choice to run only the domain baseline, and the warning would be
-    // noise. Return the skipped layer ids so the caller can downgrade the
-    // exit code (Codex round 10).
-    let mut skipped: Vec<String> = Vec::new();
-    if layer_filter != Some("domain") {
-        for binding in &bindings {
-            if binding.layer_id() == "domain" {
-                continue;
-            }
-            let layer_id = binding.layer_id();
-            eprintln!(
-                "[WARN] layer '{layer_id}' is tddd.enabled in architecture-rules.json but \
-                 is not yet supported by `baseline-capture` in Phase 1. \
-                 Skipping this layer; Phase 2 will add per-layer baseline capture."
-            );
-            skipped.push(layer_id.to_owned());
-        }
-    }
-    Ok((domain_binding, skipped))
-}
-
-/// Returns a synthetic default-domain binding for the case where
-/// `architecture-rules.json` is absent entirely.
-fn synthetic_domain_binding()
--> Result<infrastructure::verify::tddd_layers::TdddLayerBinding, CliError> {
-    let json = r#"{
-      "layers": [
-        { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
-      ]
-    }"#;
-    parse_tddd_layers(json)
-        .map_err(|e| {
-            CliError::Message(format!("internal: default domain binding failed to parse: {e}"))
-        })?
-        .into_iter()
-        .next()
-        .ok_or_else(|| {
-            CliError::Message("internal: default domain binding produced empty list".to_owned())
-        })
+    Ok(())
 }
 
 #[cfg(test)]
@@ -282,7 +227,7 @@ mod tests {
         let track_dir = items_dir.join("test-track");
         std::fs::create_dir_all(&track_dir).unwrap();
 
-        // Write a dummy baseline file.
+        // Write a dummy baseline file (domain layer — default when no architecture-rules.json).
         std::fs::write(track_dir.join("domain-types-baseline.json"), "{}").unwrap();
 
         let result = execute_baseline_capture(
@@ -317,5 +262,109 @@ mod tests {
             None,
         );
         assert!(result.is_err(), "--force must bypass skip and attempt export");
+    }
+
+    #[test]
+    fn test_baseline_capture_with_usecase_layer_dispatches_to_usecase_binding() {
+        // Proves that --layer usecase dispatches to the usecase binding specifically:
+        // a pre-existing `usecase-types-baseline.json` (not domain) triggers the skip
+        // path, returning Ok(SUCCESS). If the command were dispatching to the domain
+        // binding, it would NOT see the usecase baseline and would proceed to export
+        // (failing with a schema export error instead of Ok).
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("track/items");
+        let track_dir = items_dir.join("test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        // Write architecture-rules.json with usecase enabled.
+        let rules_json = r#"{
+          "layers": [
+            { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
+            {
+              "crate": "usecase",
+              "tddd": {
+                "enabled": true,
+                "catalogue_file": "usecase-types.json",
+                "schema_export": { "method": "rustdoc", "targets": ["usecase"] }
+              }
+            }
+          ]
+        }"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+
+        // Write usecase-types-baseline.json but NOT domain-types-baseline.json.
+        // The skip check in capture_baseline_for_layer checks usecase-types-baseline.json
+        // (derived from the usecase catalogue_file stem). Finding it must trigger the
+        // skip path → Ok(SUCCESS). If the dispatch went to domain, the baseline
+        // file checked would be domain-types-baseline.json, which is absent, so the
+        // command would proceed to export and fail — proving the dispatch is wrong.
+        std::fs::write(track_dir.join("usecase-types-baseline.json"), "{}").unwrap();
+
+        let result = execute_baseline_capture(
+            items_dir,
+            "test-track".to_owned(),
+            dir.path().into(),
+            false,
+            Some("usecase".to_owned()),
+        );
+
+        // Ok(SUCCESS) proves skip triggered for usecase-types-baseline.json.
+        assert!(
+            result.is_ok(),
+            "dispatch to usecase binding must find existing baseline and skip, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_baseline_capture_no_layer_filter_iterates_all_enabled_bindings() {
+        // Regression guard: when --layer is omitted, the loop must iterate ALL enabled
+        // bindings, not stop after the first one.
+        //
+        // Setup: domain and usecase both enabled. The domain baseline already exists,
+        // so the domain binding triggers the skip path (Ok return from
+        // capture_baseline_for_layer). The usecase baseline does NOT exist — the loop
+        // must continue past the domain skip and attempt the usecase export.
+        //
+        // Expected: Err (usecase export fails — nightly unavailable in test env).
+        // If the loop stopped after the domain skip and returned Ok(SUCCESS), a
+        // regression that silently processes only the first binding would pass
+        // undetected. This test catches that.
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("track/items");
+        let track_dir = items_dir.join("test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        let rules_json = r#"{
+          "layers": [
+            { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
+            {
+              "crate": "usecase",
+              "tddd": {
+                "enabled": true,
+                "catalogue_file": "usecase-types.json",
+                "schema_export": { "method": "rustdoc", "targets": ["usecase"] }
+              }
+            }
+          ]
+        }"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+
+        // domain baseline exists → skip; usecase baseline absent → proceeds to export → fails.
+        std::fs::write(track_dir.join("domain-types-baseline.json"), "{}").unwrap();
+        // do NOT write usecase-types-baseline.json
+
+        let result = execute_baseline_capture(
+            items_dir,
+            "test-track".to_owned(),
+            dir.path().into(),
+            false,
+            None,
+        );
+
+        assert!(
+            result.is_err(),
+            "loop must continue past domain skip to usecase and fail at export; \
+             Ok(SUCCESS) would mean the loop stopped after the first binding"
+        );
     }
 }
