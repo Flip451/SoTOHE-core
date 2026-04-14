@@ -1,0 +1,349 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "HookHandler",
+      "description": "usecase 層 primary port trait (application_service). CLI から hook dispatch 経由で呼ばれ、business logic を実装。GuardHookHandler / TestFileDeletionGuardHandler が実装する",
+      "approved": true,
+      "action": "reference",
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "handle",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "ctx",
+              "ty": "&HookContext"
+            },
+            {
+              "name": "input",
+              "ty": "&HookInput"
+            }
+          ],
+          "returns": "Result<HookVerdict, HookError>",
+          "is_async": false
+        }
+      ]
+    },
+    {
+      "name": "TrackBlobReader",
+      "description": "usecase 層 secondary port — PR branch の blob (spec.json / {layer}-types.json / metadata.json / architecture-rules.json) を読んで domain 型にデコードする。infrastructure が GitShowTrackBlobReader として実装",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "read_spec_document",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<SpecDocument>",
+          "is_async": false
+        },
+        {
+          "name": "read_type_catalogue",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<TypeCatalogueDocument>",
+          "is_async": false
+        },
+        {
+          "name": "read_track_metadata",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<TrackMetadata>",
+          "is_async": false
+        },
+        {
+          "name": "read_enabled_layers",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            }
+          ],
+          "returns": "BlobFetchResult<Vec<String>>",
+          "is_async": false
+        }
+      ]
+    },
+    {
+      "name": "Reviewer",
+      "description": "usecase 層 secondary port — 外部 reviewer (Codex 等) にレビューを委譲する。final review と fast (advisory) review の 2 メソッドを持つ。infrastructure が CodexReviewer として実装",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "review",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&ReviewTarget"
+            }
+          ],
+          "returns": "Result<(Verdict, LogInfo), ReviewerError>",
+          "is_async": false
+        },
+        {
+          "name": "fast_review",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&ReviewTarget"
+            }
+          ],
+          "returns": "Result<(FastVerdict, LogInfo), ReviewerError>",
+          "is_async": false
+        }
+      ]
+    },
+    {
+      "name": "DiffGetter",
+      "description": "usecase 層 secondary port — 指定 base コミットからの変更ファイル一覧を取得する。git merge-base + 4-source union で実装される",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "list_diff_files",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "base",
+              "ty": "&CommitHash"
+            }
+          ],
+          "returns": "Result<Vec<FilePath>, DiffGetError>",
+          "is_async": false
+        }
+      ]
+    },
+    {
+      "name": "ReviewHasher",
+      "description": "usecase 層 secondary port — review target の file content hash を計算する。infrastructure が sorted manifest + SHA256 + O_NOFOLLOW で実装",
+      "approved": true,
+      "action": "reference",
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "calc",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&ReviewTarget"
+            }
+          ],
+          "returns": "Result<ReviewHash, ReviewHasherError>",
+          "is_async": false
+        }
+      ]
+    },
+    {
+      "name": "ReviewerError",
+      "description": "Reviewer port のエラー enum。UserAbort / ReviewerAbort / Timeout / IllegalVerdict / Unexpected の 5 variant を持つ",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "UserAbort",
+        "ReviewerAbort",
+        "Timeout",
+        "IllegalVerdict",
+        "Unexpected"
+      ]
+    },
+    {
+      "name": "DiffGetError",
+      "description": "DiffGetter port のエラー enum。Failed variant 1 つ (生 error メッセージを保持)",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "Failed"
+      ]
+    },
+    {
+      "name": "ReviewHasherError",
+      "description": "ReviewHasher port のエラー enum。Failed variant 1 つ",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "Failed"
+      ]
+    },
+    {
+      "name": "ReviewCycleError",
+      "description": "ReviewCycle orchestrator のエラー enum。UnknownScope / FileChangedDuringReview / Diff / Hash / Reviewer / Reader の 6 variant を持つ。port errors を #[from] で包含する",
+      "approved": true,
+      "action": "reference",
+      "kind": "error_type",
+      "expected_variants": [
+        "UnknownScope",
+        "FileChangedDuringReview",
+        "Diff",
+        "Hash",
+        "Reviewer",
+        "Reader"
+      ]
+    },
+    {
+      "name": "SaveTrackUseCase",
+      "description": "track aggregate を TrackWriter port 経由で永続化する struct-only use case。CLI から SaveTrackUseCase::new(writer).execute(&track) と呼ばれる",
+      "approved": true,
+      "action": "reference",
+      "kind": "use_case"
+    },
+    {
+      "name": "LoadTrackUseCase",
+      "description": "track aggregate を TrackReader port 経由で ID から読み出す struct-only use case。CLI から LoadTrackUseCase::new(reader).execute(&id) と呼ばれる",
+      "approved": true,
+      "action": "reference",
+      "kind": "use_case"
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "HookHandler",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn handle(&self, ctx: &HookContext, input: &HookInput) -> Result<HookVerdict, HookError>"
+      ]
+    },
+    {
+      "type_name": "TrackBlobReader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn read_spec_document(&self, branch: &str, track_id: &str) -> BlobFetchResult<SpecDocument>",
+        "fn read_type_catalogue(&self, branch: &str, track_id: &str, layer_id: &str) -> BlobFetchResult<TypeCatalogueDocument>",
+        "fn read_track_metadata(&self, branch: &str, track_id: &str) -> BlobFetchResult<TrackMetadata>",
+        "fn read_enabled_layers(&self, branch: &str) -> BlobFetchResult<Vec<String>>"
+      ]
+    },
+    {
+      "type_name": "Reviewer",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn review(&self, target: &ReviewTarget) -> Result<(Verdict, LogInfo), ReviewerError>",
+        "fn fast_review(&self, target: &ReviewTarget) -> Result<(FastVerdict, LogInfo), ReviewerError>"
+      ]
+    },
+    {
+      "type_name": "DiffGetter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn list_diff_files(&self, base: &CommitHash) -> Result<Vec<FilePath>, DiffGetError>"
+      ]
+    },
+    {
+      "type_name": "ReviewHasher",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn calc(&self, target: &ReviewTarget) -> Result<ReviewHash, ReviewHasherError>"
+      ]
+    },
+    {
+      "type_name": "ReviewerError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "UserAbort",
+        "ReviewerAbort",
+        "Timeout",
+        "IllegalVerdict",
+        "Unexpected"
+      ]
+    },
+    {
+      "type_name": "DiffGetError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Failed"
+      ]
+    },
+    {
+      "type_name": "ReviewHasherError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Failed"
+      ]
+    },
+    {
+      "type_name": "ReviewCycleError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "UnknownScope",
+        "FileChangedDuringReview",
+        "Diff",
+        "Hash",
+        "Reviewer",
+        "Reader"
+      ]
+    },
+    {
+      "type_name": "SaveTrackUseCase",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "LoadTrackUseCase",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
