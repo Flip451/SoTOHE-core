@@ -1,35 +1,53 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8a3e32b4125b8f85c2d583cd71c5cf200fa6bf76992321f33aaaa2e782df9d8d",
-          "at": "2026-04-14T12:20:50Z"
+          "hash": "rvw1:sha256:5341a911748542c602425e327a90b175ba8979d6db68ab18722f8ee949126a3d",
+          "at": "2026-04-14T12:21:03Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8a3e32b4125b8f85c2d583cd71c5cf200fa6bf76992321f33aaaa2e782df9d8d",
-          "at": "2026-04-14T12:22:31Z"
+          "hash": "rvw1:sha256:5341a911748542c602425e327a90b175ba8979d6db68ab18722f8ee949126a3d",
+          "at": "2026-04-14T12:22:08Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c16b92d1350cbdf657258d79d240c88ea9ecc72d932c86a48bf8e2e8665ee16",
+          "at": "2026-04-14T12:21:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c16b92d1350cbdf657258d79d240c88ea9ecc72d932c86a48bf8e2e8665ee16",
+          "at": "2026-04-14T12:23:11Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:46468327a1a6701d9b4640f273d43a2443809a7178bcb380518b391d61e3a712",
-          "at": "2026-04-14T12:41:58Z"
+          "hash": "rvw1:sha256:fe1253fc6b5f64ba2ee6db522135ee4da9c78f7e04fb9425536ed0385d796f67",
+          "at": "2026-04-14T12:42:00Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:46468327a1a6701d9b4640f273d43a2443809a7178bcb380518b391d61e3a712",
-          "at": "2026-04-14T12:43:39Z"
+          "hash": "rvw1:sha256:fe1253fc6b5f64ba2ee6db522135ee4da9c78f7e04fb9425536ed0385d796f67",
+          "at": "2026-04-14T12:43:16Z"
         }
       ]
     },
@@ -746,24 +764,264 @@
           "findings": [],
           "hash": "rvw1:sha256:bf37f46ecf4a9f6c4e93613aacf8af802255939ff2578066e1048fd0469266cf",
           "at": "2026-04-14T11:46:42Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 is recorded here as adding four catalogue entries, including `ReviewerFindingError`, but the approved scope in `metadata.json` and the generated `plan.md` only authorizes three new `declare` entries (`ReviewerFinding`, `NonEmptyReviewerFindings`, `VerifyFinding`). The completion record is therefore out of sync with the plan.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/verification.md",
+              "line": 20,
+              "category": "scope mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:72ca09cf4b520396f05be5ef6f7533f3fc4bea040f4405069666e974fe44b9f9",
+          "at": "2026-04-14T13:09:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` now says T006 added four catalog entries, including `ReviewerFindingError` as `kind=enum`, but `plan.md` and `metadata.json` still define T006 as adding only three `declare` `value_object` entries (`ReviewerFinding`, `NonEmptyReviewerFindings`, `VerifyFinding`). The completion record is inconsistent unless the plan/metadata are updated to match the new catalog shape.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/verification.md",
+              "line": 20,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:72ca09cf4b520396f05be5ef6f7533f3fc4bea040f4405069666e974fe44b9f9",
+          "at": "2026-04-14T13:09:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T006 summary still says the catalogue update adds \"3 declare entries\", but the detailed T006 description immediately below and the rendered plan both specify 4 declarations, including `ReviewerFindingError`. Please update the summary wording so the track plan is internally consistent.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/metadata.json",
+              "line": 64,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:bae02f910d6574d7eb430ec03f115d5225d52606730612aefe64857639676115",
+          "at": "2026-04-14T13:12:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` records the T006/T007 evidence against `tddd-01-multilayer-2026-04-12` (`type-signals` / `baseline-capture`), but the completion task in `metadata.json` and `plan.md` is for `tddd-04-finding-taxonomy-cleanup-2026-04-14`. As written, the verification log is attached to the wrong track item, so the completion record is not self-consistent.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/verification.md",
+              "line": 21,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:49c87428326f6d77827d29381d6fd48eaa9220b2412ade507eb408a668548fd3",
+          "at": "2026-04-14T13:14:22Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5341a911748542c602425e327a90b175ba8979d6db68ab18722f8ee949126a3d",
-          "at": "2026-04-14T12:21:03Z"
+          "hash": "rvw1:sha256:7f94b22d49f678480187850a5d65427136afb135850e07e8282cf2e4f704e6f2",
+          "at": "2026-04-14T13:17:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md`'s completion summary is inconsistent with the actual review log. It says C3/C4 fell outside the reviewer partition and that only 18 `zero_findings` verdicts were recorded, with T006/T007 needing no reviewer rounds, but `track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/review.json` already records non-empty C4 `other` reviews at 2026-04-14T13:09:01Z through 13:17:08Z, including multiple `findings_remain` rounds before the latest fast `zero_findings`. That makes the task-completion record premature and factually wrong about the review history.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/verification.md",
+              "line": 155,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:7f94b22d49f678480187850a5d65427136afb135850e07e8282cf2e4f704e6f2",
+          "at": "2026-04-14T13:21:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006's verification checklist now says the `Finding` suppression entry was replaced by four new `reference entries`, but the approved plan/metadata require four `declare` entries instead. That weakens the completion record in exactly the wrong direction: a reviewer following this file could accept a catalogue that still suppresses the types rather than declaring them.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/verification.md",
+              "line": 20,
+              "category": "consistency"
+            },
+            {
+              "message": "The review-history summary is no longer aligned with the track's actual review record. It claims only 18 reviewer verdicts were recorded and that all were `zero_findings`, but `track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/review.json` already contains many `findings_remain` retries in `other` and far more than 18 rounds overall. Since C4 is supposed to finalize the track state without rewriting `review.json`, this completion note records a review history that did not happen.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/verification.md",
+              "line": 155,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:7f94b22d49f678480187850a5d65427136afb135850e07e8282cf2e4f704e6f2",
+          "at": "2026-04-14T13:23:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` finalizes the track (`status: \"done\"` and T007 `status: \"done\"`), but the actual review log is not closed yet: `track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/review.json` still ends with an `other` `final` round at 2026-04-14T13:23:07Z whose verdict is `findings_remain`. Marking the track complete before a clean final review makes the completion state inconsistent with the recorded review history.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/metadata.json",
+              "line": 70,
+              "category": "consistency"
+            },
+            {
+              "message": "The T006 manual verification still says to check for four new \"reference entries\", even though the approved T006 plan/metadata now require four `declare` entries (`ReviewerFinding`, `NonEmptyReviewerFindings`, `VerifyFinding`, `ReviewerFindingError`). That wording weakens the completion check and could let the old suppression-style catalogue shape be accepted as correct.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/verification.md",
+              "line": 87,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:cd7f8252e4a66da30172b1a125de549132586e6d0f47a0dfa17f3a2ea8c720b9",
+          "at": "2026-04-14T13:27:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` finalizes the track (`status: \"done\"`) even though the current review log is still open: `track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/review.json` ends with an `other` `final` round at 2026-04-14T13:27:20Z whose verdict is `findings_remain`. Marking the track complete before a clean final `other` review leaves the completion state inconsistent with the recorded review history.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/metadata.json",
+              "line": 70,
+              "category": "consistency"
+            },
+            {
+              "message": "The completion summary in `verification.md` is stale against the actual review log. It says the C4 completion point had 63 total rounds / 45 `other` rounds and then declares no open issues remaining, but the current `review.json` has 64 total rounds / 46 `other` rounds and still ends in `findings_remain`. That makes the Result section factually inconsistent with the verification record it is supposed to summarize.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/verification.md",
+              "line": 155,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:2d091c90d9d68ce1e3f7403dbbfe12d08c902466bf1d60a1cf90195ce2e8ac98",
+          "at": "2026-04-14T13:29:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` marks the track complete (`status: \"done\"`) even though the current verification log is still open: `track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/review.json` ends with an `other` `final` round at `2026-04-14T13:29:56Z` whose verdict is `findings_remain`. That leaves the completion state inconsistent with the recorded C4 review history.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/metadata.json",
+              "line": 70,
+              "category": "consistency"
+            },
+            {
+              "message": "The completion note says there are no open issues remaining, but the actual review log still has unresolved C4 `other` findings: the latest `other` round in `track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/review.json` is a `final` `findings_remain` at `2026-04-14T13:29:56Z`. The verification record is therefore stale against the current review history.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/verification.md",
+              "line": 170,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:0b6ddfa3c2b7be0039123db7276ffa4ebc7355bb51f4384df74edbf11500b9b1",
+          "at": "2026-04-14T13:32:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` still says the C4 `other`-scope review is in progress and that the track is only fully closed after a future `zero_findings` round. That contradicts this commit's own completion state in `metadata.json`/`plan.md` (`status: \"done\"` for the track and all tasks) and the C4 design intent that the Result section record no open issues remaining. As written, the completion commit simultaneously claims the track is done and not yet closed.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/verification.md",
+              "line": 170,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:bd48a0db9072db164b980960f4f8cce767ad215cb568e3ddbec799c51caf337a",
+          "at": "2026-04-14T13:34:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` marks the track complete (`status: \"done\"`) even though the current review log is still open: `track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/review.json` ends with an `other` `final` round at `2026-04-14T13:34:42Z` whose verdict is `findings_remain`. That leaves the C4 completion state inconsistent with the recorded review history.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/metadata.json",
+              "line": 69,
+              "category": "consistency"
+            },
+            {
+              "message": "`verification.md` says there are no open issues remaining, but the current review log still has unresolved C4 `other` findings: the latest `other` round in `track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/review.json` is a `final` `findings_remain` at `2026-04-14T13:34:42Z`. The completion record is therefore stale against the verification history it is supposed to summarize.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/verification.md",
+              "line": 168,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:656bd9cca8c4cb2e69ff7130b116db08176e19825b309a229452ee7678b7d3de",
+          "at": "2026-04-14T13:36:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` marks the track complete (`status: \"done\"` and all tasks done), but the actual review log is still open: `track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/review.json` currently ends with an `other` `final` round at `2026-04-14T13:36:39Z` whose verdict is `findings_remain`. Finalizing C4 before that clean final review makes the completion state inconsistent with the recorded review history.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/metadata.json",
+              "line": 70,
+              "category": "consistency"
+            },
+            {
+              "message": "`verification.md` already records a finalized Result/`verified_at` completion note and then jumps to out-of-scope follow-up tracks, but it does not reflect the still-open C4 `other` review: `review.json` still ends in `findings_remain` at `2026-04-14T13:36:39Z`. That makes the completion record stale and omits the active blocking issue instead of reporting `open issues: none remaining` only after review is actually closed.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/verification.md",
+              "line": 143,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:fcaccb893c21536dda97a06f95bf3234223b73202f66cb51107c183b5bc612af",
+          "at": "2026-04-14T13:41:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Result table's review-round accounting is internally inconsistent. T003 is the `infra/cli` cascade, but its row only records one fast+final pair plus harness-policy, so T001-T005 add up to 16 rounds, while the summary immediately below claims 18 rounds across the five non-`other` scopes. The completion record needs to account for the missing CLI fast+final pair or the stated totals do not reconcile.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/verification.md",
+              "line": 155,
+              "category": "consistency"
+            },
+            {
+              "message": "The completion record no longer includes the required `Open Issues` closure note. After `Key verification results`, the file jumps straight to `Follow-Up Tracks (Out of Scope)` and never states that open issues are `none remaining`, leaving the C4 completion state ambiguous instead of explicitly closed.",
+              "severity": "P1",
+              "file": "track/items/tddd-04-finding-taxonomy-cleanup-2026-04-14/verification.md",
+              "line": 172,
+              "category": "completion"
+            }
+          ],
+          "hash": "rvw1:sha256:c01b645ebcc7b537d973235bb0e1bd575281cd361751a3039642802f5249c4c0",
+          "at": "2026-04-14T13:45:55Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5341a911748542c602425e327a90b175ba8979d6db68ab18722f8ee949126a3d",
-          "at": "2026-04-14T12:22:08Z"
+          "hash": "rvw1:sha256:2f3d6d7281f8cb8dd9c4cd59633b5b877e15869b62434085c3ce24015a213f35",
+          "at": "2026-04-14T13:48:16Z"
         }
       ]
     },
@@ -799,35 +1057,35 @@
         }
       ]
     },
-    "cli": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1c16b92d1350cbdf657258d79d240c88ea9ecc72d932c86a48bf8e2e8665ee16",
-          "at": "2026-04-14T12:21:35Z"
+          "hash": "rvw1:sha256:8a3e32b4125b8f85c2d583cd71c5cf200fa6bf76992321f33aaaa2e782df9d8d",
+          "at": "2026-04-14T12:20:50Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1c16b92d1350cbdf657258d79d240c88ea9ecc72d932c86a48bf8e2e8665ee16",
-          "at": "2026-04-14T12:23:11Z"
+          "hash": "rvw1:sha256:8a3e32b4125b8f85c2d583cd71c5cf200fa6bf76992321f33aaaa2e782df9d8d",
+          "at": "2026-04-14T12:22:31Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fe1253fc6b5f64ba2ee6db522135ee4da9c78f7e04fb9425536ed0385d796f67",
-          "at": "2026-04-14T12:42:00Z"
+          "hash": "rvw1:sha256:46468327a1a6701d9b4640f273d43a2443809a7178bcb380518b391d61e3a712",
+          "at": "2026-04-14T12:41:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fe1253fc6b5f64ba2ee6db522135ee4da9c78f7e04fb9425536ed0385d796f67",
-          "at": "2026-04-14T12:43:16Z"
+          "hash": "rvw1:sha256:46468327a1a6701d9b4640f273d43a2443809a7178bcb380518b391d61e3a712",
+          "at": "2026-04-14T12:43:39Z"
         }
       ]
     }
