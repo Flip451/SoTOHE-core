@@ -1,6 +1,135 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Per-layer catalogue read/decoding errors are converted to `HashSet::new()` here, so `baseline-capture` can silently write a baseline when `<layer>-types.json` is missing or malformed instead of failing closed. That masks a configuration error and can produce an incorrect baseline.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/baseline.rs",
+              "line": 125,
+              "category": "correctness"
+            },
+            {
+              "message": "There is no regression test that actually exercises `execute_type_signals` on an enabled non-domain layer. The new `usecase` test lives in `baseline.rs` and would still pass if this function kept exporting `domain`, so a regression in this multi-layer dispatch path could reintroduce the old hardcode unnoticed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 91,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c0630ad9d8f72ae7458d69618f7d94753a840d79172367a2d76f6b4cdb1f075e",
+          "at": "2026-04-14T01:26:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If `resolve_layers()` returns an empty set because every layer in `architecture-rules.json` is disabled, `execute_baseline_capture()` returns `ExitCode::SUCCESS` after doing nothing. That silently accepts a misconfigured rules file instead of failing closed; `signals.rs` has the same no-op pattern.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/baseline.rs",
+              "line": 71,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `usecase` regression test does not actually assert which binding was chosen. It only checks that the old rejection text is gone, so it would still pass if `--layer usecase` were routed to the domain binding. Baseline-layer dispatch is therefore untested.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/baseline.rs",
+              "line": 257,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:fcc38fc1122162e0f9f72ea989a5173badfb79e7ff25ffb69af2a9b914e90794",
+          "at": "2026-04-14T01:31:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e899667ba5a7a908d6135a2817cebab09a9e73f765d8af57237293a5d024237f",
+          "at": "2026-04-14T01:34:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_layers` only checks `rules_path.is_file()` before falling back to the synthetic `domain` binding. That means a present-but-broken `architecture-rules.json` path (for example a directory, broken symlink, or any stat/read error) is treated as \"file absent\", so both `type-signals` and `baseline-capture` silently run against `domain` instead of failing closed on the configuration error. The design intent only allows the legacy fallback when the rules file is truly absent.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 33,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:e899667ba5a7a908d6135a2817cebab09a9e73f765d8af57237293a5d024237f",
+          "at": "2026-04-14T01:37:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_baseline_capture` now documents the no-`--layer` path as iterating all TDDD-enabled bindings, but the added coverage only exercises the legacy domain fallback and explicit `--layer usecase`. There is no regression test with a multi-layer `architecture-rules.json` and omitted `--layer`, so a fallback to domain-only behavior in the default path would still pass.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/baseline.rs",
+              "line": 36,
+              "category": "tests"
+            },
+            {
+              "message": "`execute_type_signals` changed from the old domain-only path to a pure loop over all enabled bindings, but the new tests only prove unknown-layer rejection and explicit `--layer usecase` dispatch. There is still no test covering a multi-layer config with `--layer` omitted, so a regression that stops after the first binding would not be caught.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 81,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:eea7b596bcfaf28662f8fc52ee08ee549a81610a0293b60085ccf7a024fc8bcf",
+          "at": "2026-04-14T01:39:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`type-signals` still hardcodes `domain-types.json` in the undeclared-types warning. When the command runs against `--layer usecase` (or any non-domain binding), the summary tells the user to update the wrong catalogue file, which contradicts the new multilayer CLI contract and leaves the only layer-specific guidance misleading.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 374,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:9cbe7c59ca195875c707a7e3d7848862d13b29517d8dae263c7b63ca0bab9178",
+          "at": "2026-04-14T01:45:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new multilayer no-filter regression test does not actually verify that `execute_type_signals` advances past the first successful binding. In this setup the first layer (`domain`) fails immediately because `domain-types-baseline.json` is absent, so the loop short-circuits before `usecase` is ever exercised. A regression that returned after the first successful layer would still pass here, leaving T005's new default multilayer behavior unprotected. The test should mirror the baseline coverage by making the first binding succeed/skip and asserting the second binding is then processed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 818,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:44525517cc2f4dec13b37632d963a1589d00f3355ee0c55570e3970aeec4ae56",
+          "at": "2026-04-14T01:49:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:adebc2e331f46d430708275e9be1c7f0f6b524f47f0da1c6c96bd30c7cbb39ba",
+          "at": "2026-04-14T01:53:48Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -472,234 +601,72 @@
           "findings": [],
           "hash": "rvw1:sha256:e723727dbc216744d5b4d388c531fc61a05c9d6c9cc0f605e4d325ae8bf711af",
           "at": "2026-04-14T03:53:04Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Per-layer catalogue read/decoding errors are converted to `HashSet::new()` here, so `baseline-capture` can silently write a baseline when `<layer>-types.json` is missing or malformed instead of failing closed. That masks a configuration error and can produce an incorrect baseline.",
+              "message": "`verification.md` is self-contradictory: the Scope Verified checklist still leaves T012 and T013 unchecked, but the Result section says all 14 tasks are done, and the T013 summary uses the truncated status string `Accepted (Phase 1 complete)` instead of the final two-track status recorded in metadata.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/baseline.rs",
-              "line": 125,
-              "category": "correctness"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 21,
+              "category": "consistency"
             },
             {
-              "message": "There is no regression test that actually exercises `execute_type_signals` on an enabled non-domain layer. The new `usecase` test lives in `baseline.rs` and would still pass if this function kept exporting `domain`, so a regression in this multi-layer dispatch path could reintroduce the old hardcode unnoticed.",
+              "message": "The T010 manual success criterion expects `skipped=0`, but the recorded successful output in the Result section is `skipped=29`; the verification step and its own evidence do not match.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/signals.rs",
-              "line": 91,
-              "category": "testing"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 56,
+              "category": "consistency"
             }
           ],
-          "hash": "rvw1:sha256:c0630ad9d8f72ae7458d69618f7d94753a840d79172367a2d76f6b4cdb1f075e",
-          "at": "2026-04-14T01:26:47Z"
+          "hash": "rvw1:sha256:93485b67b7f6def3bf3041b1dbf65f24e4ca6f74badf5efbf0710a9d21597a80",
+          "at": "2026-04-14T03:58:06Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "If `resolve_layers()` returns an empty set because every layer in `architecture-rules.json` is disabled, `execute_baseline_capture()` returns `ExitCode::SUCCESS` after doing nothing. That silently accepts a misconfigured rules file instead of failing closed; `signals.rs` has the same no-op pattern.",
+              "message": "`verification.md` still leaves T012/T013 unchecked in the Scope Verified section (lines 21-23) even though the Result section claims all 14 tasks are done and `verified_at` is set. That makes the completion record internally inconsistent and violates the requirement that all verification checkboxes be `[x]`.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/baseline.rs",
-              "line": 71,
-              "category": "correctness"
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 21,
+              "category": "verification"
             },
             {
-              "message": "The new `usecase` regression test does not actually assert which binding was chosen. It only checks that the old rejection text is gone, so it would still pass if `--layer usecase` were routed to the domain binding. Baseline-layer dispatch is therefore untested.",
+              "message": "The T013 summary row records `Status \\`Accepted (Phase 1 complete)\\`` instead of the required full status string `Accepted (Phase 1 complete: tddd-01-multilayer-2026-04-12 + tddd-02-usecase-wiring-2026-04-14)`, so the verification summary drifts from the committed metadata and the scope checklist.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/baseline.rs",
-              "line": 257,
-              "category": "test coverage"
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 116,
+              "category": "status drift"
             }
           ],
-          "hash": "rvw1:sha256:fcc38fc1122162e0f9f72ea989a5173badfb79e7ff25ffb69af2a9b914e90794",
-          "at": "2026-04-14T01:31:45Z"
+          "hash": "rvw1:sha256:93485b67b7f6def3bf3041b1dbf65f24e4ca6f74badf5efbf0710a9d21597a80",
+          "at": "2026-04-14T03:59:13Z"
         },
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e899667ba5a7a908d6135a2817cebab09a9e73f765d8af57237293a5d024237f",
-          "at": "2026-04-14T01:34:40Z"
-        },
-        {
-          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`resolve_layers` only checks `rules_path.is_file()` before falling back to the synthetic `domain` binding. That means a present-but-broken `architecture-rules.json` path (for example a directory, broken symlink, or any stat/read error) is treated as \"file absent\", so both `type-signals` and `baseline-capture` silently run against `domain` instead of failing closed on the configuration error. The design intent only allows the legacy fallback when the rules file is truly absent.",
+              "message": "`Scope Verified` still leaves T012 and T013 unchecked even though the `Result` section claims all 14 tasks are complete. That makes the verification record internally inconsistent and violates the requirement that all checkboxes be `[x]`.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/signals.rs",
-              "line": 33,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:e899667ba5a7a908d6135a2817cebab09a9e73f765d8af57237293a5d024237f",
-          "at": "2026-04-14T01:37:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute_baseline_capture` now documents the no-`--layer` path as iterating all TDDD-enabled bindings, but the added coverage only exercises the legacy domain fallback and explicit `--layer usecase`. There is no regression test with a multi-layer `architecture-rules.json` and omitted `--layer`, so a fallback to domain-only behavior in the default path would still pass.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/baseline.rs",
-              "line": 36,
-              "category": "tests"
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 21,
+              "category": "status drift"
             },
             {
-              "message": "`execute_type_signals` changed from the old domain-only path to a pure loop over all enabled bindings, but the new tests only prove unknown-layer rejection and explicit `--layer usecase` dispatch. There is still no test covering a multi-layer config with `--layer` omitted, so a regression that stops after the first binding would not be caught.",
+              "message": "The recorded `type-signals` expectation says `skipped=0`, but the completed result records `skipped=29`. That is a direct contradiction in the verification facts and needs to be reconciled.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/signals.rs",
-              "line": 81,
-              "category": "tests"
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 55,
+              "category": "verification drift"
             }
           ],
-          "hash": "rvw1:sha256:eea7b596bcfaf28662f8fc52ee08ee549a81610a0293b60085ccf7a024fc8bcf",
-          "at": "2026-04-14T01:39:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`type-signals` still hardcodes `domain-types.json` in the undeclared-types warning. When the command runs against `--layer usecase` (or any non-domain binding), the summary tells the user to update the wrong catalogue file, which contradicts the new multilayer CLI contract and leaves the only layer-specific guidance misleading.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/signals.rs",
-              "line": 374,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:9cbe7c59ca195875c707a7e3d7848862d13b29517d8dae263c7b63ca0bab9178",
-          "at": "2026-04-14T01:45:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new multilayer no-filter regression test does not actually verify that `execute_type_signals` advances past the first successful binding. In this setup the first layer (`domain`) fails immediately because `domain-types-baseline.json` is absent, so the loop short-circuits before `usecase` is ever exercised. A regression that returned after the first successful layer would still pass here, leaving T005's new default multilayer behavior unprotected. The test should mirror the baseline coverage by making the first binding succeed/skip and asserting the second binding is then processed.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/signals.rs",
-              "line": 818,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:44525517cc2f4dec13b37632d963a1589d00f3355ee0c55570e3970aeec4ae56",
-          "at": "2026-04-14T01:49:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:adebc2e331f46d430708275e9be1c7f0f6b524f47f0da1c6c96bd30c7cbb39ba",
-          "at": "2026-04-14T01:53:48Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:798eca772a45a81cd43d724912bddd29bb904c6eb87bc77c4f2b1d957ea8c012",
-          "at": "2026-04-14T00:58:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:798eca772a45a81cd43d724912bddd29bb904c6eb87bc77c4f2b1d957ea8c012",
-          "at": "2026-04-14T00:59:43Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The renderer still emits only a single `## Type Declarations` section. The required sectioned output for `Secondary Ports`, `Application Services`, `Use Cases`, `Interactors`, `DTOs`, `Commands`, `Queries`, and `Factories` is never produced, so the D7 layout change is unimplemented.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/type_catalogue_render.rs",
-              "line": 36,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f1820d9dfdef6c73f206730f5e4cb1d82b1ecd21d447cd7d8c2a7b598dc14575",
-          "at": "2026-04-14T00:57:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30d7e7c7798cb879ce6e2d088670d3ce7aeec4226d3aaf19aa574966b8a1aa1d",
-          "at": "2026-04-14T01:01:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeCatalogueEntryDto` still flattens `TypeDefinitionKindDto` without any unknown-field rejection, so the new existence-only kinds (`use_case`, `interactor`, `dto`, `command`, `query`, `factory`) will silently accept stale payload fields like `expected_methods`/`expected_variants` instead of failing decode. That contradicts the T002 schema intent that illegal kind/field combinations be rejected at the codec boundary rather than mapped to a domain variant.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 80,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:30d7e7c7798cb879ce6e2d088670d3ce7aeec4226d3aaf19aa574966b8a1aa1d",
-          "at": "2026-04-14T01:03:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9b0a89058ea2363df0494bafde61436213c4a5351044dacf9a90d73889d1241",
-          "at": "2026-04-14T01:09:14Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:26f7208b4b02468ba7d23632ee65509a1dbdd343e4e210860d15995f3d6e3887",
-          "at": "2026-04-14T02:38:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`test_u27_usecase_blue_domain_not_found_passes` does not actually verify the claimed loop-order/role-swap behavior. With `enabled_layers = [\"domain\", \"usecase\"]` and `MultiLayerMock` returning `NotFound` for the omitted `domain` catalogue, the test still passes even if `check_strict_merge_gate` incorrectly stops after the first `NotFound` and never reads `usecase`. That makes U27 effectively duplicate U22's \"one Blue + one NotFound passes\" coverage instead of adding a distinct regression check for early-layer opt-out handling.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 921,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:26f7208b4b02468ba7d23632ee65509a1dbdd343e4e210860d15995f3d6e3887",
-          "at": "2026-04-14T02:40:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:26f7208b4b02468ba7d23632ee65509a1dbdd343e4e210860d15995f3d6e3887",
-          "at": "2026-04-14T02:41:08Z"
+          "hash": "rvw1:sha256:93485b67b7f6def3bf3041b1dbf65f24e4ca6f74badf5efbf0710a9d21597a80",
+          "at": "2026-04-14T04:01:38Z"
         }
       ]
     },
@@ -933,6 +900,105 @@
           "findings": [],
           "hash": "rvw1:sha256:9c3121fdb9db8c2a4b616749299e91961dcdfd8d54feb9fecef0f7a95def97fa",
           "at": "2026-04-14T03:40:50Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:798eca772a45a81cd43d724912bddd29bb904c6eb87bc77c4f2b1d957ea8c012",
+          "at": "2026-04-14T00:58:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:798eca772a45a81cd43d724912bddd29bb904c6eb87bc77c4f2b1d957ea8c012",
+          "at": "2026-04-14T00:59:43Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The renderer still emits only a single `## Type Declarations` section. The required sectioned output for `Secondary Ports`, `Application Services`, `Use Cases`, `Interactors`, `DTOs`, `Commands`, `Queries`, and `Factories` is never produced, so the D7 layout change is unimplemented.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 36,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f1820d9dfdef6c73f206730f5e4cb1d82b1ecd21d447cd7d8c2a7b598dc14575",
+          "at": "2026-04-14T00:57:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30d7e7c7798cb879ce6e2d088670d3ce7aeec4226d3aaf19aa574966b8a1aa1d",
+          "at": "2026-04-14T01:01:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeCatalogueEntryDto` still flattens `TypeDefinitionKindDto` without any unknown-field rejection, so the new existence-only kinds (`use_case`, `interactor`, `dto`, `command`, `query`, `factory`) will silently accept stale payload fields like `expected_methods`/`expected_variants` instead of failing decode. That contradicts the T002 schema intent that illegal kind/field combinations be rejected at the codec boundary rather than mapped to a domain variant.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 80,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:30d7e7c7798cb879ce6e2d088670d3ce7aeec4226d3aaf19aa574966b8a1aa1d",
+          "at": "2026-04-14T01:03:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9b0a89058ea2363df0494bafde61436213c4a5351044dacf9a90d73889d1241",
+          "at": "2026-04-14T01:09:14Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26f7208b4b02468ba7d23632ee65509a1dbdd343e4e210860d15995f3d6e3887",
+          "at": "2026-04-14T02:38:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_u27_usecase_blue_domain_not_found_passes` does not actually verify the claimed loop-order/role-swap behavior. With `enabled_layers = [\"domain\", \"usecase\"]` and `MultiLayerMock` returning `NotFound` for the omitted `domain` catalogue, the test still passes even if `check_strict_merge_gate` incorrectly stops after the first `NotFound` and never reads `usecase`. That makes U27 effectively duplicate U22's \"one Blue + one NotFound passes\" coverage instead of adding a distinct regression check for early-layer opt-out handling.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 921,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:26f7208b4b02468ba7d23632ee65509a1dbdd343e4e210860d15995f3d6e3887",
+          "at": "2026-04-14T02:40:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26f7208b4b02468ba7d23632ee65509a1dbdd343e4e210860d15995f3d6e3887",
+          "at": "2026-04-14T02:41:08Z"
         }
       ]
     }
