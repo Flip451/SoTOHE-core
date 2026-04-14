@@ -67,22 +67,35 @@ fn evaluate_single(
         TypeDefinitionKind::ErrorType { expected_variants } => {
             evaluate_error_type(name, &kind_tag, expected_variants, profile)
         }
-        TypeDefinitionKind::TraitPort { expected_methods } => {
-            evaluate_trait_port(name, &kind_tag, expected_methods, profile)
+        TypeDefinitionKind::SecondaryPort { expected_methods } => {
+            evaluate_secondary_port(name, &kind_tag, expected_methods, profile)
         }
+        TypeDefinitionKind::ApplicationService { expected_methods } => {
+            evaluate_application_service(name, &kind_tag, expected_methods, profile)
+        }
+        TypeDefinitionKind::UseCase
+        | TypeDefinitionKind::Interactor
+        | TypeDefinitionKind::Dto
+        | TypeDefinitionKind::Command
+        | TypeDefinitionKind::Query
+        | TypeDefinitionKind::Factory => evaluate_struct_only(name, &kind_tag, profile),
     }
 }
 
 /// Evaluates a `Delete`-action entry: absent from code → Blue, still present → Yellow.
 ///
-/// TraitPort entries check `graph.get_trait()`; all other kinds check `graph.get_type()`.
+/// `SecondaryPort` and `ApplicationService` entries check `graph.get_trait()`; all other
+/// kinds check `graph.get_type()`.
 fn evaluate_delete(
     name: &str,
     kind_tag: &str,
     kind: &TypeDefinitionKind,
     profile: &TypeGraph,
 ) -> TypeSignal {
-    let present = if matches!(kind, TypeDefinitionKind::TraitPort { .. }) {
+    let present = if matches!(
+        kind,
+        TypeDefinitionKind::SecondaryPort { .. } | TypeDefinitionKind::ApplicationService { .. }
+    ) {
         profile.get_trait(name).is_some()
     } else {
         profile.get_type(name).is_some()
@@ -270,7 +283,7 @@ fn evaluate_error_type(
     TypeSignal::new(name, kind_tag, signal, true, found, missing, vec![])
 }
 
-/// L1 forward+reverse check for a `TraitPort` entry.
+/// L1 forward+reverse check for a `SecondaryPort` entry (secondary/driven port boundary).
 ///
 /// Forward check (ADR 0002 §D2): each declared method must match a code
 /// method on all six L1 axes — step 1 name, step 2 receiver, step 3 params
@@ -283,7 +296,42 @@ fn evaluate_error_type(
 ///
 /// The signal is `Yellow` when the trait does not exist in code, else
 /// `Blue` when `missing` and `extra` are both empty, else `Red`.
-fn evaluate_trait_port(
+///
+/// Delegates to `evaluate_trait_methods` which is shared with `ApplicationService`.
+fn evaluate_secondary_port(
+    name: &str,
+    kind_tag: &str,
+    expected_methods: &[crate::tddd::catalogue::MethodDeclaration],
+    profile: &TypeGraph,
+) -> TypeSignal {
+    evaluate_trait_methods(name, kind_tag, expected_methods, profile)
+}
+
+/// L1 forward+reverse check for an `ApplicationService` entry (primary/driving port boundary).
+///
+/// Identical evaluation logic to `SecondaryPort` — the difference is semantic (primary vs
+/// secondary port role), not structural. Both use the six L1 axes for forward check and
+/// the name-keyed reverse check.
+fn evaluate_application_service(
+    name: &str,
+    kind_tag: &str,
+    expected_methods: &[crate::tddd::catalogue::MethodDeclaration],
+    profile: &TypeGraph,
+) -> TypeSignal {
+    evaluate_trait_methods(name, kind_tag, expected_methods, profile)
+}
+
+/// Existence-only check for struct-only variants (`UseCase`, `Interactor`, `Dto`, `Command`,
+/// `Query`, `Factory`). Checks `graph.get_type()` — Yellow if absent, Blue if present as
+/// a `Struct`, Red if present as a different kind.
+fn evaluate_struct_only(name: &str, kind_tag: &str, profile: &TypeGraph) -> TypeSignal {
+    evaluate_value_object(name, kind_tag, profile)
+}
+
+/// Shared L1 forward+reverse method check for both `SecondaryPort` and `ApplicationService`.
+///
+/// Yellow when the trait does not exist, Blue when all methods match, Red otherwise.
+fn evaluate_trait_methods(
     name: &str,
     kind_tag: &str,
     expected_methods: &[crate::tddd::catalogue::MethodDeclaration],
@@ -598,11 +646,11 @@ mod tests {
     }
 
     #[test]
-    fn test_delete_trait_port_blue_when_absent() {
+    fn test_delete_secondary_port_blue_when_absent() {
         let entry = TypeCatalogueEntry::new(
             "OldRepo",
             "desc",
-            TypeDefinitionKind::TraitPort { expected_methods: vec![unit_method("find")] },
+            TypeDefinitionKind::SecondaryPort { expected_methods: vec![unit_method("find")] },
             TypeAction::Delete,
             true,
         )
@@ -613,11 +661,11 @@ mod tests {
     }
 
     #[test]
-    fn test_delete_trait_port_yellow_when_still_present() {
+    fn test_delete_secondary_port_yellow_when_still_present() {
         let entry = TypeCatalogueEntry::new(
             "OldRepo",
             "desc",
-            TypeDefinitionKind::TraitPort { expected_methods: vec![unit_method("find")] },
+            TypeDefinitionKind::SecondaryPort { expected_methods: vec![unit_method("find")] },
             TypeAction::Delete,
             true,
         )
@@ -683,11 +731,11 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_trait_port_yellow_when_not_implemented() {
+    fn test_evaluate_secondary_port_yellow_when_not_implemented() {
         let entry = TypeCatalogueEntry::new(
             "Repo",
             "desc",
-            TypeDefinitionKind::TraitPort { expected_methods: vec![unit_method("save")] },
+            TypeDefinitionKind::SecondaryPort { expected_methods: vec![unit_method("save")] },
             TypeAction::Add,
             true,
         )
@@ -699,11 +747,11 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_trait_port_blue_when_methods_match() {
+    fn test_evaluate_secondary_port_blue_when_methods_match() {
         let entry = TypeCatalogueEntry::new(
             "Repo",
             "desc",
-            TypeDefinitionKind::TraitPort {
+            TypeDefinitionKind::SecondaryPort {
                 expected_methods: vec![unit_method("save"), unit_method("find")],
             },
             TypeAction::Add,
@@ -716,13 +764,13 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_trait_port_red_when_returns_mismatch() {
+    fn test_evaluate_secondary_port_red_when_returns_mismatch() {
         // Declared `fn save(&self, user: User) -> Result<(), DomainError>` but
         // the code trait has `fn save(&self, user: User) -> ()` — step 5 miss.
         let entry = TypeCatalogueEntry::new(
             "Repo",
             "desc",
-            TypeDefinitionKind::TraitPort {
+            TypeDefinitionKind::SecondaryPort {
                 expected_methods: vec![MethodDeclaration::new(
                     "save",
                     Some("&self".into()),
@@ -753,12 +801,12 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_trait_port_red_when_extra_method_in_code() {
+    fn test_evaluate_secondary_port_red_when_extra_method_in_code() {
         // Code has an extra `delete` method that the catalogue does not declare.
         let entry = TypeCatalogueEntry::new(
             "Repo",
             "desc",
-            TypeDefinitionKind::TraitPort { expected_methods: vec![unit_method("save")] },
+            TypeDefinitionKind::SecondaryPort { expected_methods: vec![unit_method("save")] },
             TypeAction::Add,
             true,
         )
@@ -769,6 +817,245 @@ mod tests {
         assert_eq!(sig.signal(), ConfidenceSignal::Red);
         assert_eq!(sig.extra_items().len(), 1);
         assert!(sig.extra_items()[0].contains("delete"));
+    }
+
+    // --- ApplicationService tests ---
+
+    #[test]
+    fn test_evaluate_application_service_yellow_when_not_implemented() {
+        let entry = TypeCatalogueEntry::new(
+            "CreateUseCase",
+            "desc",
+            TypeDefinitionKind::ApplicationService {
+                expected_methods: vec![unit_method("execute")],
+            },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&[]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+        assert!(!results.first().unwrap().found_type());
+    }
+
+    #[test]
+    fn test_evaluate_application_service_blue_when_methods_match() {
+        let entry = TypeCatalogueEntry::new(
+            "CreateUseCase",
+            "desc",
+            TypeDefinitionKind::ApplicationService {
+                expected_methods: vec![unit_method("execute"), unit_method("validate")],
+            },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile_with_trait("CreateUseCase", &["execute", "validate"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_evaluate_application_service_red_when_extra_method_in_code() {
+        // Code has an extra method not declared in ApplicationService.
+        let entry = TypeCatalogueEntry::new(
+            "CreateUseCase",
+            "desc",
+            TypeDefinitionKind::ApplicationService {
+                expected_methods: vec![unit_method("execute")],
+            },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile_with_trait("CreateUseCase", &["execute", "rollback"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        let sig = results.first().unwrap();
+        assert_eq!(sig.signal(), ConfidenceSignal::Red);
+        assert_eq!(sig.extra_items().len(), 1);
+    }
+
+    // --- Struct-only new variant tests ---
+
+    #[test]
+    fn test_evaluate_use_case_blue_when_type_exists() {
+        let entry = TypeCatalogueEntry::new(
+            "SaveTrackUseCase",
+            "desc",
+            TypeDefinitionKind::UseCase,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&["SaveTrackUseCase"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_evaluate_use_case_yellow_when_absent() {
+        let entry = TypeCatalogueEntry::new(
+            "SaveTrackUseCase",
+            "desc",
+            TypeDefinitionKind::UseCase,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&[]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+    }
+
+    #[test]
+    fn test_evaluate_interactor_blue_when_type_exists() {
+        let entry = TypeCatalogueEntry::new(
+            "SaveTrackInteractor",
+            "desc",
+            TypeDefinitionKind::Interactor,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&["SaveTrackInteractor"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_evaluate_interactor_yellow_when_absent() {
+        let entry = TypeCatalogueEntry::new(
+            "SaveTrackInteractor",
+            "desc",
+            TypeDefinitionKind::Interactor,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&[]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+    }
+
+    #[test]
+    fn test_evaluate_dto_blue_when_type_exists() {
+        let entry = TypeCatalogueEntry::new(
+            "TrackDto",
+            "desc",
+            TypeDefinitionKind::Dto,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&["TrackDto"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_evaluate_dto_yellow_when_absent() {
+        let entry = TypeCatalogueEntry::new(
+            "TrackDto",
+            "desc",
+            TypeDefinitionKind::Dto,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&[]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+    }
+
+    #[test]
+    fn test_evaluate_command_blue_when_type_exists() {
+        let entry = TypeCatalogueEntry::new(
+            "CreateTrackCommand",
+            "desc",
+            TypeDefinitionKind::Command,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&["CreateTrackCommand"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_evaluate_command_yellow_when_absent() {
+        let entry = TypeCatalogueEntry::new(
+            "CreateTrackCommand",
+            "desc",
+            TypeDefinitionKind::Command,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&[]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+    }
+
+    #[test]
+    fn test_evaluate_query_blue_when_type_exists() {
+        let entry = TypeCatalogueEntry::new(
+            "FindTrackQuery",
+            "desc",
+            TypeDefinitionKind::Query,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&["FindTrackQuery"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_evaluate_query_yellow_when_absent() {
+        let entry = TypeCatalogueEntry::new(
+            "FindTrackQuery",
+            "desc",
+            TypeDefinitionKind::Query,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&[]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
+    }
+
+    #[test]
+    fn test_evaluate_factory_blue_when_type_exists() {
+        let entry = TypeCatalogueEntry::new(
+            "TrackFactory",
+            "desc",
+            TypeDefinitionKind::Factory,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&["TrackFactory"]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_evaluate_factory_yellow_when_absent() {
+        let entry = TypeCatalogueEntry::new(
+            "TrackFactory",
+            "desc",
+            TypeDefinitionKind::Factory,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&[]);
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results.first().unwrap().signal(), ConfidenceSignal::Yellow);
     }
 
     #[test]

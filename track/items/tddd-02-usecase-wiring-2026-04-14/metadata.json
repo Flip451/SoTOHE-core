@@ -89,17 +89,17 @@
     ]
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
   "tasks": [
     {
       "description": "`libs/domain/src/tddd/catalogue.rs::TypeDefinitionKind` に 7 新 variants を追加: `ApplicationService { expected_methods: Vec<MethodDeclaration> }` (primary port trait、`SecondaryPort` と同じ shape だが semantic が異なる), `UseCase` (struct-only use case、存在チェックのみ), `Interactor` (ApplicationService の impl、存在チェックのみ), `Dto` (純粋データ容器、存在チェックのみ), `Command` (CQRS command object、存在チェックのみ), `Query` (CQRS query object、存在チェックのみ), `Factory` (aggregate/entity factory struct、存在チェックのみ)。既存 `TraitPort` を `SecondaryPort` にリネームし、`kind_tag()` match arm を `\"trait_port\"` → `\"secondary_port\"` に変更。`libs/domain/src/tddd/signals.rs::evaluate_trait_port` を `evaluate_secondary_port` にリネームし、`evaluate_application_service` を追加 (forward check ロジックは両方で同一)。`libs/domain/src/tddd/consistency.rs` の trait vs type 分類判定を更新: `matches!(entry.kind(), TypeDefinitionKind::TraitPort { .. })` を `matches!(entry.kind(), TypeDefinitionKind::SecondaryPort { .. } | TypeDefinitionKind::ApplicationService { .. })` に変更 (expected_methods を持つ両 variant が trait 分類となる)。UseCase/Interactor/Dto/Command/Query/Factory は type 分類に自動的に属するため追加の match arm は不要。後方互換性は対応せず、旧 `TraitPort` variant は完全削除。既存テスト (5 variants 前提) を新 12 variants に対応",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "infrastructure 層の新 variants 対応: `libs/infrastructure/src/tddd/catalogue_codec.rs` で decode/encode の kind_tag 文字列を拡張 — `\"application_service\"`, `\"use_case\"`, `\"interactor\"`, `\"dto\"`, `\"command\"`, `\"query\"`, `\"factory\"` を全て受け付け、`\"trait_port\"` → `\"secondary_port\"` に変更。`ApplicationService` は `expected_methods` を持つので `SecondaryPort` の既存 decode/encode ロジックを共通ヘルパーに抽出して再利用。他の新 variants は `ValueObject` と同じ単純パスを使用。`libs/infrastructure/src/type_catalogue_render.rs` のセクションヘッダ / ラベルを新 variants に対応 — section header 例: `## Application Services`, `## Use Cases`, `## Interactors`, `## DTOs`, `## Commands`, `## Queries`, `## Factories`, `## Secondary Ports`。既存 `## Trait Ports` セクションヘッダを `## Secondary Ports` に変更。新 variants の decode/encode round-trip テスト + `ApplicationService` の `expected_methods` L1 マッチテスト + `SecondaryPort` rename 後の既存テストを全通過させる",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "`libs/domain/src/tddd/` 配下 (catalogue.rs / signals.rs / consistency.rs) が layer-agnostic であることを grep で検証する read-only タスク。`rg 'fn.*\"domain\"|\"domain\"\\s*\\.to_string|layer_id.*==.*\"domain\"' libs/domain/src/tddd/` を実行してヒットがないことを確認。ヒットがあった場合のみ本 task を修正 task に昇格し、具体的な hardcode 箇所を description に追記して対処。T001/T002 完了後でも失敗する状況は想定しないが、sanity check として実施",
@@ -163,5 +163,5 @@
     }
   ],
   "title": "TDDD-02: usecase 層 TDDD wiring + Type Catalogue Taxonomy 拡張",
-  "updated_at": "2026-04-13T17:56:37Z"
+  "updated_at": "2026-04-14T01:10:27Z"
 }

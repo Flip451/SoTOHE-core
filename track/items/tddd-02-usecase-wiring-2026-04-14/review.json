@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:798eca772a45a81cd43d724912bddd29bb904c6eb87bc77c4f2b1d957ea8c012",
+          "at": "2026-04-14T00:58:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:798eca772a45a81cd43d724912bddd29bb904c6eb87bc77c4f2b1d957ea8c012",
+          "at": "2026-04-14T00:59:43Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -234,6 +252,68 @@
           "findings": [],
           "hash": "rvw1:sha256:dc029d21b338c6cf5959029addeca4ea56bd462bce62e81809748a1fd779222a",
           "at": "2026-04-13T19:18:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f69fef6d56f7cd84279240349e5317d49f25ff109d26f83aa7e6e4ec279f7097",
+          "at": "2026-04-14T00:56:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f69fef6d56f7cd84279240349e5317d49f25ff109d26f83aa7e6e4ec279f7097",
+          "at": "2026-04-14T00:58:15Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The renderer still emits only a single `## Type Declarations` section. The required sectioned output for `Secondary Ports`, `Application Services`, `Use Cases`, `Interactors`, `DTOs`, `Commands`, `Queries`, and `Factories` is never produced, so the D7 layout change is unimplemented.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 36,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f1820d9dfdef6c73f206730f5e4cb1d82b1ecd21d447cd7d8c2a7b598dc14575",
+          "at": "2026-04-14T00:57:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30d7e7c7798cb879ce6e2d088670d3ce7aeec4226d3aaf19aa574966b8a1aa1d",
+          "at": "2026-04-14T01:01:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeCatalogueEntryDto` still flattens `TypeDefinitionKindDto` without any unknown-field rejection, so the new existence-only kinds (`use_case`, `interactor`, `dto`, `command`, `query`, `factory`) will silently accept stale payload fields like `expected_methods`/`expected_variants` instead of failing decode. That contradicts the T002 schema intent that illegal kind/field combinations be rejected at the codec boundary rather than mapped to a domain variant.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 80,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:30d7e7c7798cb879ce6e2d088670d3ce7aeec4226d3aaf19aa574966b8a1aa1d",
+          "at": "2026-04-14T01:03:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9b0a89058ea2363df0494bafde61436213c4a5351044dacf9a90d73889d1241",
+          "at": "2026-04-14T01:09:14Z"
         }
       ]
     }

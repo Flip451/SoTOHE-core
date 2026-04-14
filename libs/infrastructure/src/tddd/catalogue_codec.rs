@@ -7,6 +7,12 @@
 //! containing `::` is rejected by the codec (last-segment enforcement per
 //! ADR 0002 §D2).
 //!
+//! T002 (TDDD-02 Task 2): added 7 new variants (`secondary_port`,
+//! `application_service`, `use_case`, `interactor`, `dto`, `command`, `query`,
+//! `factory`). `trait_port` removed — any JSON containing `"kind":
+//! "trait_port"` is now rejected with `InvalidEntry`. `schema_version` stays
+//! at 2; this is an additive change within v2.
+//!
 //! The JSON schema uses an internally-tagged enum (`"kind"` field) with
 //! `#[serde(flatten)]` so that kind-specific fields are required at the type
 //! level — illegal field combinations are rejected by serde, not by manual
@@ -99,6 +105,10 @@ fn is_add_action(action: &TypeActionDto) -> bool {
 ///
 /// serde enforces that each variant's fields are present in the JSON.
 /// `"enum"` is a Rust keyword, so we rename the variant via serde.
+///
+/// T002: `TraitPort` removed; `SecondaryPort` and `ApplicationService` added
+/// (same shape — `expected_methods`). Seven existence-check-only variants
+/// added: `UseCase`, `Interactor`, `Dto`, `Command`, `Query`, `Factory`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 enum TypeDefinitionKindDto {
@@ -113,9 +123,26 @@ enum TypeDefinitionKindDto {
     ErrorType {
         expected_variants: Vec<String>,
     },
-    TraitPort {
+    /// Hexagonal secondary (driven) port — replaces `TraitPort`.
+    SecondaryPort {
         expected_methods: Vec<MethodDto>,
     },
+    /// Hexagonal primary (driving) port — same shape as `SecondaryPort`.
+    ApplicationService {
+        expected_methods: Vec<MethodDto>,
+    },
+    /// Struct-only use case; existence check only.
+    UseCase {},
+    /// ApplicationService implementation struct; existence check only.
+    Interactor {},
+    /// Pure data-transfer object struct; existence check only.
+    Dto {},
+    /// CQRS command object struct; existence check only.
+    Command {},
+    /// CQRS query object struct; existence check only.
+    Query {},
+    /// Aggregate/entity factory struct; existence check only.
+    Factory {},
 }
 
 /// T006 method signature DTO — mirrors `MethodDeclaration`.
@@ -181,6 +208,47 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
         return Err(TypeCatalogueCodecError::UnsupportedSchemaVersion(schema_version));
     }
 
+    // Phase 1.5: reject existence-only entries that carry stale kind-specific fields.
+    //
+    // `#[serde(flatten)]` + internally-tagged enum means `deny_unknown_fields` on
+    // `TypeCatalogueEntryDto` does not propagate to the individual variant struct
+    // deserialization (known serde limitation).  Fields like `expected_methods` or
+    // `expected_variants` on `use_case`/`interactor`/`dto`/`command`/`query`/`factory`
+    // would be silently dropped by serde instead of triggering an error.  This pass
+    // catches illegal kind/field combinations at the codec boundary, before Phase 2.
+    if let Some(entries) = raw.get("type_definitions").and_then(|v| v.as_array()) {
+        for entry in entries {
+            let entry_obj = entry.as_object();
+            let kind = entry_obj.and_then(|o| o.get("kind")).and_then(|v| v.as_str()).unwrap_or("");
+            let name = entry_obj
+                .and_then(|o| o.get("name"))
+                .and_then(|v| v.as_str())
+                .unwrap_or("<unnamed>");
+            // Existence-only kinds must not carry `expected_methods`, `expected_variants`,
+            // or `transitions_to` (those fields belong to other variants).
+            const EXISTENCE_ONLY_KINDS: &[&str] =
+                &["use_case", "interactor", "dto", "command", "query", "factory", "value_object"];
+            const FORBIDDEN_FIELDS: &[&str] =
+                &["expected_methods", "expected_variants", "transitions_to"];
+            if EXISTENCE_ONLY_KINDS.contains(&kind) {
+                if let Some(obj) = entry_obj {
+                    for forbidden in FORBIDDEN_FIELDS {
+                        if obj.contains_key(*forbidden) {
+                            return Err(TypeCatalogueCodecError::InvalidEntry {
+                                name: name.to_owned(),
+                                reason: format!(
+                                    "kind '{}' does not support field '{}' — \
+                                     existence-only kinds carry no structural fields",
+                                    kind, forbidden
+                                ),
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Phase 2: full deserialisation with `deny_unknown_fields` to catch stale
     // keys (e.g. a file that keeps both `type_definitions` and `domain_types`).
     let dto: TypeCatalogueDocDto = serde_json::from_value(raw)?;
@@ -235,8 +303,10 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                         ),
                     });
                 }
-                let is_trait_a = *kind_a == "trait_port";
-                let is_trait_b = *kind_b == "trait_port";
+                let is_method_bearing =
+                    |k: &str| -> bool { k == "secondary_port" || k == "application_service" };
+                let is_trait_a = is_method_bearing(kind_a);
+                let is_trait_b = is_method_bearing(kind_b);
                 if is_trait_a == is_trait_b {
                     return Err(TypeCatalogueCodecError::InvalidEntry {
                         name: (*name).to_owned(),
@@ -303,9 +373,10 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
 /// # Errors
 ///
 /// Returns `TypeCatalogueCodecError` when:
-/// - Any `TraitPort` method's `returns` or any param's `ty` contains `::` (L1 invariant,
-///   same rule enforced by `decode`). This prevents `encode` from producing JSON that
-///   `decode` would immediately reject, preserving the round-trip guarantee.
+/// - Any `SecondaryPort` or `ApplicationService` method's `returns` or any
+///   param's `ty` contains `::` (L1 invariant, same rule enforced by `decode`).
+///   This prevents `encode` from producing JSON that `decode` would immediately
+///   reject, preserving the round-trip guarantee.
 /// - Serialization fails for any other reason (`TypeCatalogueCodecError::Json`).
 pub fn encode(doc: &TypeCatalogueDocument) -> Result<String, TypeCatalogueCodecError> {
     let dto = type_catalogue_doc_to_dto(doc)?;
@@ -363,14 +434,37 @@ fn type_definition_kind_from_dto(
         TypeDefinitionKindDto::ErrorType { expected_variants } => {
             Ok(TypeDefinitionKind::ErrorType { expected_variants: expected_variants.clone() })
         }
-        TypeDefinitionKindDto::TraitPort { expected_methods } => {
-            let mut decls = Vec::with_capacity(expected_methods.len());
-            for m in expected_methods {
-                decls.push(method_from_dto(entry_name, m)?);
-            }
-            Ok(TypeDefinitionKind::TraitPort { expected_methods: decls })
+        TypeDefinitionKindDto::SecondaryPort { expected_methods } => {
+            let decls = decode_method_list(entry_name, expected_methods)?;
+            Ok(TypeDefinitionKind::SecondaryPort { expected_methods: decls })
         }
+        TypeDefinitionKindDto::ApplicationService { expected_methods } => {
+            let decls = decode_method_list(entry_name, expected_methods)?;
+            Ok(TypeDefinitionKind::ApplicationService { expected_methods: decls })
+        }
+        TypeDefinitionKindDto::UseCase {} => Ok(TypeDefinitionKind::UseCase),
+        TypeDefinitionKindDto::Interactor {} => Ok(TypeDefinitionKind::Interactor),
+        TypeDefinitionKindDto::Dto {} => Ok(TypeDefinitionKind::Dto),
+        TypeDefinitionKindDto::Command {} => Ok(TypeDefinitionKind::Command),
+        TypeDefinitionKindDto::Query {} => Ok(TypeDefinitionKind::Query),
+        TypeDefinitionKindDto::Factory {} => Ok(TypeDefinitionKind::Factory),
     }
+}
+
+/// Shared helper: decode a `Vec<MethodDto>` into `Vec<MethodDeclaration>`.
+///
+/// Used by both `SecondaryPort` and `ApplicationService` decode paths, which
+/// share the same `expected_methods` shape (mirrors `evaluate_trait_methods`
+/// on the domain side).
+fn decode_method_list(
+    entry_name: &str,
+    dtos: &[MethodDto],
+) -> Result<Vec<MethodDeclaration>, TypeCatalogueCodecError> {
+    let mut decls = Vec::with_capacity(dtos.len());
+    for m in dtos {
+        decls.push(method_from_dto(entry_name, m)?);
+    }
+    Ok(decls)
 }
 
 fn method_from_dto(
@@ -472,13 +566,20 @@ fn type_catalogue_entry_to_dto(
         TypeDefinitionKind::ErrorType { expected_variants } => {
             TypeDefinitionKindDto::ErrorType { expected_variants: expected_variants.clone() }
         }
-        TypeDefinitionKind::TraitPort { expected_methods } => {
-            let dtos = expected_methods
-                .iter()
-                .map(|m| method_to_dto(entry.name(), m))
-                .collect::<Result<Vec<_>, _>>()?;
-            TypeDefinitionKindDto::TraitPort { expected_methods: dtos }
+        TypeDefinitionKind::SecondaryPort { expected_methods } => {
+            let dtos = encode_method_list(entry.name(), expected_methods)?;
+            TypeDefinitionKindDto::SecondaryPort { expected_methods: dtos }
         }
+        TypeDefinitionKind::ApplicationService { expected_methods } => {
+            let dtos = encode_method_list(entry.name(), expected_methods)?;
+            TypeDefinitionKindDto::ApplicationService { expected_methods: dtos }
+        }
+        TypeDefinitionKind::UseCase => TypeDefinitionKindDto::UseCase {},
+        TypeDefinitionKind::Interactor => TypeDefinitionKindDto::Interactor {},
+        TypeDefinitionKind::Dto => TypeDefinitionKindDto::Dto {},
+        TypeDefinitionKind::Command => TypeDefinitionKindDto::Command {},
+        TypeDefinitionKind::Query => TypeDefinitionKindDto::Query {},
+        TypeDefinitionKind::Factory => TypeDefinitionKindDto::Factory {},
     };
     Ok(TypeCatalogueEntryDto {
         name: entry.name().to_owned(),
@@ -487,6 +588,17 @@ fn type_catalogue_entry_to_dto(
         action: type_action_to_dto(entry.action()),
         kind,
     })
+}
+
+/// Shared helper: encode a `Vec<MethodDeclaration>` into `Vec<MethodDto>`.
+///
+/// Used by both `SecondaryPort` and `ApplicationService` encode paths, mirroring
+/// `decode_method_list` on the decode side.
+fn encode_method_list(
+    entry_name: &str,
+    methods: &[MethodDeclaration],
+) -> Result<Vec<MethodDto>, TypeCatalogueCodecError> {
+    methods.iter().map(|m| method_to_dto(entry_name, m)).collect()
 }
 
 fn method_to_dto(
@@ -571,7 +683,7 @@ mod tests {
     { "name": "SchemaExportError", "kind": "error_type", "description": "Export error", "expected_variants": ["NightlyNotFound"], "approved": true },
     {
       "name": "SchemaExporter",
-      "kind": "trait_port",
+      "kind": "secondary_port",
       "description": "Export port",
       "expected_methods": [
         {
@@ -627,11 +739,11 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_trait_port_with_structured_methods() {
+    fn test_decode_secondary_port_with_structured_methods() {
         let doc = decode(FULL_JSON).unwrap();
         let kind = doc.entries()[5].kind();
-        let TypeDefinitionKind::TraitPort { expected_methods } = kind else {
-            panic!("expected TraitPort kind");
+        let TypeDefinitionKind::SecondaryPort { expected_methods } = kind else {
+            panic!("expected SecondaryPort kind");
         };
         assert_eq!(expected_methods.len(), 1);
         let method = &expected_methods[0];
@@ -719,24 +831,47 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_trait_port_without_expected_methods_returns_error() {
+    fn test_decode_secondary_port_without_expected_methods_returns_error() {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
-    { "name": "Bad", "kind": "trait_port", "description": "missing field" }
+    { "name": "Bad", "kind": "secondary_port", "description": "missing field" }
   ]
 }"#;
         assert!(decode(json).is_err());
     }
 
     #[test]
-    fn test_decode_trait_port_returns_with_double_colon_rejected() {
+    fn test_decode_trait_port_tag_rejected_with_error() {
+        // T002: "trait_port" kind_tag is removed; any JSON that still uses it
+        // must be rejected. This documents the no-backward-compatibility decision.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "LegacyPort",
+      "kind": "trait_port",
+      "description": "old tag",
+      "expected_methods": [
+        { "name": "find", "receiver": "&self", "params": [], "returns": "()", "is_async": false }
+      ]
+    }
+  ]
+}"#;
+        assert!(
+            decode(json).is_err(),
+            "\"trait_port\" kind_tag must be rejected after T002 rename"
+        );
+    }
+
+    #[test]
+    fn test_decode_secondary_port_returns_with_double_colon_rejected() {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
     {
       "name": "Repo",
-      "kind": "trait_port",
+      "kind": "secondary_port",
       "description": "port",
       "expected_methods": [
         { "name": "save", "receiver": "&self", "params": [], "returns": "std::io::Result<()>", "is_async": false }
@@ -754,13 +889,13 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_trait_port_param_ty_with_double_colon_rejected() {
+    fn test_decode_secondary_port_param_ty_with_double_colon_rejected() {
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
     {
       "name": "Repo",
-      "kind": "trait_port",
+      "kind": "secondary_port",
       "description": "port",
       "expected_methods": [
         {
@@ -964,7 +1099,7 @@ mod tests {
     { "name": "Foo", "kind": "value_object", "description": "old", "action": "delete" },
     {
       "name": "Foo",
-      "kind": "trait_port",
+      "kind": "secondary_port",
       "description": "new",
       "action": "add",
       "expected_methods": [
@@ -1034,5 +1169,334 @@ mod tests {
         let sigs2 = doc2.signals().unwrap();
         assert_eq!(sigs2[0].signal(), ConfidenceSignal::Red);
         assert_eq!(sigs2[0].missing_items(), &["Draft"]);
+    }
+
+    // --- T002: new variant decode tests ---
+
+    #[test]
+    fn test_decode_application_service_kind() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "HookHandler",
+      "kind": "application_service",
+      "description": "Primary port",
+      "expected_methods": [
+        { "name": "handle", "receiver": "&self", "params": [{ "name": "ctx", "ty": "HookContext" }], "returns": "Result<HookVerdict, HookError>", "is_async": false }
+      ]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        let TypeDefinitionKind::ApplicationService { expected_methods } = kind else {
+            panic!("expected ApplicationService kind, got {:?}", kind);
+        };
+        assert_eq!(expected_methods.len(), 1);
+        assert_eq!(expected_methods[0].name(), "handle");
+    }
+
+    #[test]
+    fn test_decode_use_case_kind() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "SaveTrackUseCase", "kind": "use_case", "description": "Save track use case" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::UseCase));
+    }
+
+    #[test]
+    fn test_decode_interactor_kind() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "SaveTrackInteractor", "kind": "interactor", "description": "Interactor" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Interactor));
+    }
+
+    #[test]
+    fn test_decode_dto_kind() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "CreateUserDto", "kind": "dto", "description": "DTO" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Dto));
+    }
+
+    #[test]
+    fn test_decode_command_kind() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "CreateUserCommand", "kind": "command", "description": "CQRS command" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Command));
+    }
+
+    #[test]
+    fn test_decode_query_kind() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "GetUserQuery", "kind": "query", "description": "CQRS query" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Query));
+    }
+
+    #[test]
+    fn test_decode_factory_kind() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "UserFactory", "kind": "factory", "description": "Factory" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert!(matches!(doc.entries()[0].kind(), TypeDefinitionKind::Factory));
+    }
+
+    // --- T002: new variant encode/round-trip tests ---
+
+    #[test]
+    fn test_round_trip_application_service() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "HookHandler",
+      "kind": "application_service",
+      "description": "Primary port",
+      "expected_methods": [
+        { "name": "handle", "receiver": "&self", "params": [], "returns": "Result<HookVerdict, HookError>", "is_async": false }
+      ]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+        assert!(encoded.contains("\"application_service\""));
+    }
+
+    #[test]
+    fn test_round_trip_use_case() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "SaveTrackUseCase", "kind": "use_case", "description": "use case" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+        assert!(encoded.contains("\"use_case\""));
+    }
+
+    #[test]
+    fn test_round_trip_interactor() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "SaveTrackInteractor", "kind": "interactor", "description": "interactor" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+        assert!(encoded.contains("\"interactor\""));
+    }
+
+    #[test]
+    fn test_round_trip_dto() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "CreateUserDto", "kind": "dto", "description": "dto" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+        assert!(encoded.contains("\"dto\""));
+    }
+
+    #[test]
+    fn test_round_trip_command() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "CreateUserCommand", "kind": "command", "description": "command" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+        assert!(encoded.contains("\"command\""));
+    }
+
+    #[test]
+    fn test_round_trip_query() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "GetUserQuery", "kind": "query", "description": "query" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+        assert!(encoded.contains("\"query\""));
+    }
+
+    #[test]
+    fn test_round_trip_factory() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "UserFactory", "kind": "factory", "description": "factory" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+        assert!(encoded.contains("\"factory\""));
+    }
+
+    #[test]
+    fn test_round_trip_all_12_variants() {
+        // Verifies that all 12 TypeDefinitionKind variants round-trip through
+        // JSON encode/decode correctly (replaces the old "5 variants" FULL_JSON test).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "Draft", "kind": "typestate", "description": "typestate", "transitions_to": ["Published"] },
+    { "name": "Published", "kind": "typestate", "description": "typestate terminal", "transitions_to": [] },
+    { "name": "TrackStatus", "kind": "enum", "description": "enum", "expected_variants": ["Planned", "Done"] },
+    { "name": "TrackId", "kind": "value_object", "description": "value object" },
+    { "name": "AppError", "kind": "error_type", "description": "error type", "expected_variants": ["NotFound"] },
+    {
+      "name": "TrackRepo",
+      "kind": "secondary_port",
+      "description": "secondary port",
+      "expected_methods": [
+        { "name": "save", "receiver": "&self", "params": [], "returns": "()", "is_async": false }
+      ]
+    },
+    {
+      "name": "UseHandler",
+      "kind": "application_service",
+      "description": "application service",
+      "expected_methods": [
+        { "name": "execute", "receiver": "&self", "params": [], "returns": "()", "is_async": false }
+      ]
+    },
+    { "name": "SaveUseCase", "kind": "use_case", "description": "use case" },
+    { "name": "SaveInteractor", "kind": "interactor", "description": "interactor" },
+    { "name": "SaveDto", "kind": "dto", "description": "dto" },
+    { "name": "SaveCommand", "kind": "command", "description": "command" },
+    { "name": "GetQuery", "kind": "query", "description": "query" },
+    { "name": "AggFactory", "kind": "factory", "description": "factory" }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        assert_eq!(doc.entries().len(), 13);
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries().len(), 13);
+        for (a, b) in doc.entries().iter().zip(doc2.entries()) {
+            assert_eq!(a.name(), b.name());
+            assert_eq!(a.kind(), b.kind());
+        }
+    }
+
+    // --- T002: existence-only variant stale-field rejection (Phase 1.5) ---
+
+    #[test]
+    fn test_decode_use_case_with_stale_expected_methods_rejected() {
+        // Phase 1.5: existence-only variants must not carry kind-specific fields
+        // that belong to other variants (e.g. expected_methods from SecondaryPort).
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "SaveUseCase",
+      "kind": "use_case",
+      "description": "use case with stale field",
+      "expected_methods": [
+        { "name": "execute", "receiver": "&self", "params": [], "returns": "()", "is_async": false }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for stale expected_methods on use_case, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_dto_with_stale_expected_variants_rejected() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "CreateUserDto",
+      "kind": "dto",
+      "description": "dto with stale field",
+      "expected_variants": ["A", "B"]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for stale expected_variants on dto, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_value_object_with_stale_transitions_to_rejected() {
+        // value_object is also existence-only (pre-existing); same protection applies.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TrackId",
+      "kind": "value_object",
+      "description": "value object with stale field",
+      "transitions_to": ["Published"]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for stale transitions_to on value_object, got: {:?}",
+            err
+        );
     }
 }
