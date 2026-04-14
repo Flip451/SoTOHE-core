@@ -3,13 +3,24 @@
 //!
 //! Produces a markdown file with:
 //! - A generated-view header comment
-//! - A `## Type Declarations` section with a table: Name | Kind | Details | Signal
+//! - Per-kind section headers with per-section tables: Name | Kind | Action | Details | Signal
+//!
+//! Section order (non-empty sections only):
+//! `## Typestates`, `## Enums`, `## Value Objects`, `## Error Types`,
+//! `## Secondary Ports`, `## Application Services`, `## Use Cases`,
+//! `## Interactors`, `## DTOs`, `## Commands`, `## Queries`, `## Factories`
 //!
 //! The Details column summarises kind-specific payload:
 //! - Typestate: `→ A, → B` (declared transitions)
 //! - Enum / ErrorType: `A | B | C` (expected variants)
-//! - TraitPort: `fn a, fn b` (expected methods)
-//! - ValueObject: `—`
+//! - SecondaryPort / ApplicationService: `fn a, fn b` (expected methods)
+//! - ValueObject / UseCase / Interactor / Dto / Command / Query / Factory: `—`
+//!
+//! T002: `TraitPort` removed; `SecondaryPort` and `ApplicationService` added
+//! (method-list details). Seven existence-check-only variants added with `—`
+//! details. Section header `## Trait Ports` renamed to `## Secondary Ports`.
+//! New section headers: `## Application Services`, `## Use Cases`,
+//! `## Interactors`, `## DTOs`, `## Commands`, `## Queries`, `## Factories`.
 //!
 //! The Signal column shows `🔵` / `🔴` / `—` (no signal yet).
 
@@ -18,38 +29,73 @@ use domain::{
     TypestateTransitions,
 };
 
+/// Section descriptor: a heading label paired with the predicate that selects entries.
+struct Section {
+    heading: &'static str,
+    kind_tag: &'static str,
+}
+
+/// Canonical section order (D7).  Empty sections are skipped.
+const SECTIONS: &[Section] = &[
+    Section { heading: "## Typestates", kind_tag: "typestate" },
+    Section { heading: "## Enums", kind_tag: "enum" },
+    Section { heading: "## Value Objects", kind_tag: "value_object" },
+    Section { heading: "## Error Types", kind_tag: "error_type" },
+    Section { heading: "## Secondary Ports", kind_tag: "secondary_port" },
+    Section { heading: "## Application Services", kind_tag: "application_service" },
+    Section { heading: "## Use Cases", kind_tag: "use_case" },
+    Section { heading: "## Interactors", kind_tag: "interactor" },
+    Section { heading: "## DTOs", kind_tag: "dto" },
+    Section { heading: "## Commands", kind_tag: "command" },
+    Section { heading: "## Queries", kind_tag: "query" },
+    Section { heading: "## Factories", kind_tag: "factory" },
+];
+
 /// Renders the full `domain-types.md` document for a `TypeCatalogueDocument`.
 ///
 /// Returns a markdown string suitable for writing to `domain-types.md`.
+/// Entries are grouped by kind into per-section tables in the canonical order
+/// defined by D7 of ADR `2026-04-13-1813-tddd-taxonomy-expansion.md`.
+/// Sections with no entries are omitted.
 #[must_use]
 pub fn render_type_catalogue(doc: &TypeCatalogueDocument) -> String {
     let mut out = String::new();
 
     out.push_str("<!-- Generated from domain-types.json — DO NOT EDIT DIRECTLY -->\n");
 
-    out.push_str("\n## Type Declarations\n\n");
-
-    out.push_str("| Name | Kind | Action | Details | Signal |\n");
-    out.push_str("|------|------|--------|---------|--------|\n");
-
     // Track consumed signal indices to handle delete+add pairs that share the same
     // (name, kind_tag) key. The first matching signal is consumed by the first entry;
     // any second entry with the same key skips past it to the next match.
     let mut consumed: std::collections::HashSet<usize> = std::collections::HashSet::new();
 
-    for entry in doc.entries() {
-        let signal_col =
-            signal_for_entry(doc, entry.name(), entry.kind().kind_tag(), &mut consumed);
-        let details_col = render_details(entry);
-        let action_col = render_action(entry.action());
-        out.push_str(&format!(
-            "| {} | {} | {} | {} | {} |\n",
-            entry.name(),
-            entry.kind().kind_tag(),
-            action_col,
-            details_col,
-            signal_col,
-        ));
+    for section in SECTIONS {
+        let section_entries: Vec<&TypeCatalogueEntry> =
+            doc.entries().iter().filter(|e| e.kind().kind_tag() == section.kind_tag).collect();
+
+        if section_entries.is_empty() {
+            continue;
+        }
+
+        out.push('\n');
+        out.push_str(section.heading);
+        out.push_str("\n\n");
+        out.push_str("| Name | Kind | Action | Details | Signal |\n");
+        out.push_str("|------|------|--------|---------|--------|\n");
+
+        for entry in section_entries {
+            let signal_col =
+                signal_for_entry(doc, entry.name(), entry.kind().kind_tag(), &mut consumed);
+            let details_col = render_details(entry);
+            let action_col = render_action(entry.action());
+            out.push_str(&format!(
+                "| {} | {} | {} | {} | {} |\n",
+                entry.name(),
+                entry.kind().kind_tag(),
+                action_col,
+                details_col,
+                signal_col,
+            ));
+        }
     }
 
     out.push('\n');
@@ -109,14 +155,26 @@ fn render_details(entry: &TypeCatalogueEntry) -> String {
                 expected_variants.join(", ")
             }
         }
-        TypeDefinitionKind::TraitPort { expected_methods } => {
+        TypeDefinitionKind::SecondaryPort { expected_methods }
+        | TypeDefinitionKind::ApplicationService { expected_methods } => {
             if expected_methods.is_empty() {
                 "\u{2014}".to_owned()
             } else {
-                expected_methods.iter().map(|m| m.signature_string()).collect::<Vec<_>>().join(", ")
+                expected_methods
+                    .iter()
+                    .map(|m: &domain::tddd::catalogue::MethodDeclaration| m.signature_string())
+                    .collect::<Vec<_>>()
+                    .join(", ")
             }
         }
-        TypeDefinitionKind::ValueObject => "\u{2014}".to_owned(),
+        // Existence-check-only variants render as em-dash (no structural detail).
+        TypeDefinitionKind::ValueObject
+        | TypeDefinitionKind::UseCase
+        | TypeDefinitionKind::Interactor
+        | TypeDefinitionKind::Dto
+        | TypeDefinitionKind::Command
+        | TypeDefinitionKind::Query
+        | TypeDefinitionKind::Factory => "\u{2014}".to_owned(),
     }
 }
 
@@ -156,15 +214,20 @@ mod tests {
     }
 
     #[test]
-    fn test_render_type_catalogue_includes_section_heading() {
+    fn test_render_type_catalogue_no_type_declarations_heading() {
+        // D7: the old flat "## Type Declarations" heading is replaced by per-kind
+        // section headings.  An empty catalogue produces no section headings at all.
         let doc = make_doc(vec![]);
         let output = render_type_catalogue(&doc);
-        assert!(output.contains("## Type Declarations\n"), "missing section heading");
+        assert!(
+            !output.contains("## Type Declarations"),
+            "old flat heading must not appear after D7 rewrite"
+        );
     }
 
     #[test]
-    fn test_render_type_catalogue_includes_table_header() {
-        let doc = make_doc(vec![]);
+    fn test_render_type_catalogue_table_header_present_when_entries_exist() {
+        let doc = make_doc(vec![make_entry("Foo", TypeDefinitionKind::ValueObject)]);
         let output = render_type_catalogue(&doc);
         assert!(
             output.contains("| Name | Kind | Action | Details | Signal |"),
@@ -174,6 +237,33 @@ mod tests {
             output.contains("|------|------|--------|---------|--------|"),
             "missing table separator"
         );
+    }
+
+    #[test]
+    fn test_render_type_catalogue_section_headers_appear_for_present_kinds() {
+        // D7: each present kind renders under its designated section header.
+        let doc = make_doc(vec![
+            make_entry("Foo", TypeDefinitionKind::ValueObject),
+            make_entry("Bar", TypeDefinitionKind::SecondaryPort { expected_methods: vec![] }),
+        ]);
+        let output = render_type_catalogue(&doc);
+        assert!(output.contains("## Value Objects"), "missing ## Value Objects");
+        assert!(output.contains("## Secondary Ports"), "missing ## Secondary Ports");
+        // Other section headers must NOT appear when no entries exist for them
+        assert!(!output.contains("## Typestates"), "unexpected ## Typestates");
+        assert!(!output.contains("## Factories"), "unexpected ## Factories");
+    }
+
+    #[test]
+    fn test_render_type_catalogue_trait_ports_heading_absent() {
+        // D7: the old "## Trait Ports" heading was renamed to "## Secondary Ports".
+        let doc = make_doc(vec![make_entry(
+            "MyPort",
+            TypeDefinitionKind::SecondaryPort { expected_methods: vec![] },
+        )]);
+        let output = render_type_catalogue(&doc);
+        assert!(!output.contains("## Trait Ports"), "old ## Trait Ports heading must not appear");
+        assert!(output.contains("## Secondary Ports"), "## Secondary Ports must appear");
     }
 
     // ---------------------------------------------------------------------------
@@ -238,10 +328,10 @@ mod tests {
     }
 
     #[test]
-    fn test_render_trait_port_entry_row() {
+    fn test_render_secondary_port_entry_row() {
         let entry = make_entry(
             "SchemaExporter",
-            TypeDefinitionKind::TraitPort {
+            TypeDefinitionKind::SecondaryPort {
                 expected_methods: vec![domain::tddd::catalogue::MethodDeclaration::new(
                     "export",
                     Some("&self".into()),
@@ -253,8 +343,186 @@ mod tests {
         );
         let doc = make_doc(vec![entry]);
         let output = render_type_catalogue(&doc);
-        assert!(output.contains("| SchemaExporter | trait_port |"), "missing trait_port row");
+        assert!(
+            output.contains("| SchemaExporter | secondary_port |"),
+            "missing secondary_port row"
+        );
         assert!(output.contains("fn export"), "missing method");
+    }
+
+    #[test]
+    fn test_render_application_service_entry_row() {
+        let entry = make_entry(
+            "HookHandler",
+            TypeDefinitionKind::ApplicationService {
+                expected_methods: vec![domain::tddd::catalogue::MethodDeclaration::new(
+                    "handle",
+                    Some("&self".into()),
+                    vec![],
+                    "Result<HookVerdict, HookError>",
+                    false,
+                )],
+            },
+        );
+        let doc = make_doc(vec![entry]);
+        let output = render_type_catalogue(&doc);
+        assert!(
+            output.contains("| HookHandler | application_service |"),
+            "missing application_service row"
+        );
+        assert!(output.contains("fn handle"), "missing method");
+    }
+
+    #[test]
+    fn test_render_use_case_entry_row() {
+        let entry = make_entry("SaveTrackUseCase", TypeDefinitionKind::UseCase);
+        let doc = make_doc(vec![entry]);
+        let output = render_type_catalogue(&doc);
+        assert!(output.contains("| SaveTrackUseCase | use_case |"), "missing use_case row");
+    }
+
+    #[test]
+    fn test_render_interactor_entry_row() {
+        let entry = make_entry("SaveTrackInteractor", TypeDefinitionKind::Interactor);
+        let doc = make_doc(vec![entry]);
+        let output = render_type_catalogue(&doc);
+        assert!(output.contains("| SaveTrackInteractor | interactor |"), "missing interactor row");
+    }
+
+    #[test]
+    fn test_render_dto_entry_row() {
+        let entry = make_entry("CreateUserDto", TypeDefinitionKind::Dto);
+        let doc = make_doc(vec![entry]);
+        let output = render_type_catalogue(&doc);
+        assert!(output.contains("| CreateUserDto | dto |"), "missing dto row");
+    }
+
+    #[test]
+    fn test_render_command_entry_row() {
+        let entry = make_entry("CreateUserCommand", TypeDefinitionKind::Command);
+        let doc = make_doc(vec![entry]);
+        let output = render_type_catalogue(&doc);
+        assert!(output.contains("| CreateUserCommand | command |"), "missing command row");
+    }
+
+    #[test]
+    fn test_render_query_entry_row() {
+        let entry = make_entry("GetUserQuery", TypeDefinitionKind::Query);
+        let doc = make_doc(vec![entry]);
+        let output = render_type_catalogue(&doc);
+        assert!(output.contains("| GetUserQuery | query |"), "missing query row");
+    }
+
+    #[test]
+    fn test_render_factory_entry_row() {
+        let entry = make_entry("UserFactory", TypeDefinitionKind::Factory);
+        let doc = make_doc(vec![entry]);
+        let output = render_type_catalogue(&doc);
+        assert!(output.contains("| UserFactory | factory |"), "missing factory row");
+    }
+
+    #[test]
+    fn test_render_all_12_variants_in_one_catalogue() {
+        // Verifies that all 12 TypeDefinitionKind variants render in one catalogue.
+        let entries = vec![
+            make_entry(
+                "Draft",
+                TypeDefinitionKind::Typestate {
+                    transitions: TypestateTransitions::To(vec!["Published".into()]),
+                },
+            ),
+            make_entry(
+                "TrackStatus",
+                TypeDefinitionKind::Enum {
+                    expected_variants: vec!["Planned".into(), "Done".into()],
+                },
+            ),
+            make_entry("TrackId", TypeDefinitionKind::ValueObject),
+            make_entry(
+                "AppError",
+                TypeDefinitionKind::ErrorType { expected_variants: vec!["NotFound".into()] },
+            ),
+            make_entry(
+                "TrackRepo",
+                TypeDefinitionKind::SecondaryPort {
+                    expected_methods: vec![domain::tddd::catalogue::MethodDeclaration::new(
+                        "save",
+                        Some("&self".into()),
+                        vec![],
+                        "()",
+                        false,
+                    )],
+                },
+            ),
+            make_entry(
+                "UseHandler",
+                TypeDefinitionKind::ApplicationService {
+                    expected_methods: vec![domain::tddd::catalogue::MethodDeclaration::new(
+                        "execute",
+                        Some("&self".into()),
+                        vec![],
+                        "()",
+                        false,
+                    )],
+                },
+            ),
+            make_entry("SaveUseCase", TypeDefinitionKind::UseCase),
+            make_entry("SaveInteractor", TypeDefinitionKind::Interactor),
+            make_entry("SaveDto", TypeDefinitionKind::Dto),
+            make_entry("SaveCommand", TypeDefinitionKind::Command),
+            make_entry("GetQuery", TypeDefinitionKind::Query),
+            make_entry("AggFactory", TypeDefinitionKind::Factory),
+        ];
+        let doc = make_doc(entries);
+        let output = render_type_catalogue(&doc);
+
+        // All 12 kind tags must appear in the output
+        assert!(output.contains("typestate"), "missing typestate");
+        assert!(output.contains("enum"), "missing enum");
+        assert!(output.contains("value_object"), "missing value_object");
+        assert!(output.contains("error_type"), "missing error_type");
+        assert!(output.contains("secondary_port"), "missing secondary_port");
+        assert!(output.contains("application_service"), "missing application_service");
+        assert!(output.contains("use_case"), "missing use_case");
+        assert!(output.contains("interactor"), "missing interactor");
+        assert!(output.contains("dto"), "missing dto");
+        assert!(output.contains("command"), "missing command");
+        assert!(output.contains("query"), "missing query");
+        assert!(output.contains("factory"), "missing factory");
+
+        // Existence-check variants render em-dash in details
+        assert!(output.contains("| SaveUseCase | use_case |"), "missing use_case row");
+        assert!(output.contains("| SaveInteractor | interactor |"), "missing interactor row");
+        assert!(output.contains("| SaveDto | dto |"), "missing dto row");
+        assert!(output.contains("| SaveCommand | command |"), "missing command row");
+        assert!(output.contains("| GetQuery | query |"), "missing query row");
+        assert!(output.contains("| AggFactory | factory |"), "missing factory row");
+
+        // Method-bearing variants render method list in details
+        assert!(output.contains("fn save"), "missing fn save for secondary_port");
+        assert!(output.contains("fn execute"), "missing fn execute for application_service");
+
+        // trait_port must not appear
+        assert!(!output.contains("trait_port"), "trait_port must not appear after T002 rename");
+
+        // D7: all 12 section headers must appear (one per kind present)
+        assert!(output.contains("## Typestates"), "missing ## Typestates");
+        assert!(output.contains("## Enums"), "missing ## Enums");
+        assert!(output.contains("## Value Objects"), "missing ## Value Objects");
+        assert!(output.contains("## Error Types"), "missing ## Error Types");
+        assert!(output.contains("## Secondary Ports"), "missing ## Secondary Ports");
+        assert!(output.contains("## Application Services"), "missing ## Application Services");
+        assert!(output.contains("## Use Cases"), "missing ## Use Cases");
+        assert!(output.contains("## Interactors"), "missing ## Interactors");
+        assert!(output.contains("## DTOs"), "missing ## DTOs");
+        assert!(output.contains("## Commands"), "missing ## Commands");
+        assert!(output.contains("## Queries"), "missing ## Queries");
+        assert!(output.contains("## Factories"), "missing ## Factories");
+
+        // Old flat heading must not appear
+        assert!(!output.contains("## Type Declarations"), "flat heading must not appear after D7");
+        // Old Trait Ports heading must not appear
+        assert!(!output.contains("## Trait Ports"), "old ## Trait Ports must not appear");
     }
 
     // ---------------------------------------------------------------------------

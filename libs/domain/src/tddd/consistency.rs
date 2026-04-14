@@ -172,13 +172,25 @@ pub fn check_consistency(
     // declare the old kind with action:"delete" and the new kind with action:"add".
     let declared_type_names: HashSet<&str> = entries
         .iter()
-        .filter(|e| !matches!(e.kind(), TypeDefinitionKind::TraitPort { .. }))
+        .filter(|e| {
+            !matches!(
+                e.kind(),
+                TypeDefinitionKind::SecondaryPort { .. }
+                    | TypeDefinitionKind::ApplicationService { .. }
+            )
+        })
         .map(|e| e.name())
         .collect();
 
     let declared_trait_names: HashSet<&str> = entries
         .iter()
-        .filter(|e| matches!(e.kind(), TypeDefinitionKind::TraitPort { .. }))
+        .filter(|e| {
+            matches!(
+                e.kind(),
+                TypeDefinitionKind::SecondaryPort { .. }
+                    | TypeDefinitionKind::ApplicationService { .. }
+            )
+        })
         .map(|e| e.name())
         .collect();
 
@@ -256,7 +268,11 @@ pub fn check_consistency(
 
     for (i, entry) in entries.iter().enumerate() {
         let name = entry.name();
-        let is_trait = matches!(entry.kind(), TypeDefinitionKind::TraitPort { .. });
+        let is_trait = matches!(
+            entry.kind(),
+            TypeDefinitionKind::SecondaryPort { .. }
+                | TypeDefinitionKind::ApplicationService { .. }
+        );
         let in_baseline = if is_trait { baseline.has_trait(name) } else { baseline.has_type(name) };
 
         match entry.action() {
@@ -624,6 +640,62 @@ mod tests {
         assert_eq!(report.forward_signals().len(), 1);
         assert_eq!(report.forward_signals()[0].signal(), ConfidenceSignal::Blue);
         assert!(report.undeclared_types().is_empty());
+    }
+
+    // --- Trait vs type classification for new variants ---
+
+    #[test]
+    fn test_application_service_entry_is_classified_as_trait() {
+        // ApplicationService uses `get_trait()` — declared as a trait-shaped variant.
+        // Declaring an ApplicationService entry means it goes to `declared_trait_names`.
+        // Supplying the trait in the graph → forward check Blue.
+        let method = unit_method("execute");
+        let entry = TypeCatalogueEntry::new(
+            "CreateUseCase",
+            "Primary port",
+            TypeDefinitionKind::ApplicationService { expected_methods: vec![method.clone()] },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+
+        let mut traits = HashMap::new();
+        traits.insert("CreateUseCase".to_string(), TraitNode::new(vec![method]));
+        let graph = TypeGraph::new(HashMap::new(), traits);
+
+        let report = check_consistency(&[entry], &graph, &empty_baseline());
+        // Forward check passes (Blue) — trait was found via get_trait.
+        assert_eq!(report.forward_signals().len(), 1);
+        assert_eq!(report.forward_signals()[0].signal(), ConfidenceSignal::Blue);
+        // Not classified as an undeclared type.
+        assert!(report.undeclared_types().is_empty());
+    }
+
+    #[test]
+    fn test_use_case_entry_is_classified_as_type() {
+        // UseCase uses `get_type()` — classified as a type (not a trait).
+        let entry = TypeCatalogueEntry::new(
+            "SaveTrackUseCase",
+            "Struct use case",
+            TypeDefinitionKind::UseCase,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+
+        let mut types = HashMap::new();
+        types.insert(
+            "SaveTrackUseCase".to_string(),
+            TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new()),
+        );
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let report = check_consistency(&[entry], &graph, &empty_baseline());
+        // Forward check passes (Blue) — type was found via get_type.
+        assert_eq!(report.forward_signals().len(), 1);
+        assert_eq!(report.forward_signals()[0].signal(), ConfidenceSignal::Blue);
+        // Not classified as an undeclared trait.
+        assert!(report.undeclared_traits().is_empty());
     }
 
     #[test]

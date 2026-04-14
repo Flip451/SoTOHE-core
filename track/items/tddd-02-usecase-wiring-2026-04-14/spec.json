@@ -1,0 +1,498 @@
+{
+  "schema_version": 1,
+  "status": "approved",
+  "version": "1.0.0",
+  "title": "TDDD-02: usecase 層 TDDD wiring + Type Catalogue Taxonomy 拡張",
+  "goal": [
+    "ADR `2026-04-11-0002-tddd-multilayer-extension.md` Phase 1 の CLI-side 完遂 — tddd-01 で整備した multilayer infrastructure (MethodDeclaration, per-layer merge gate, parse_tddd_layers) の実利用者として usecase 層を最初の multilayer TDDD ターゲットに wire する。",
+    "SoTOHE がテンプレートとして採用する application 層パターンの幅を広げるため、`TypeDefinitionKind` に 7 新 variants (`ApplicationService`, `UseCase`, `Interactor`, `Dto`, `Command`, `Query`, `Factory`) を追加し、Clean Architecture / DDD Application Service / CQRS / 現 SoTOHE struct-only use case パターンを同一 catalogue 語彙で表現可能にする。既存 `TraitPort` を `SecondaryPort` にリネームして primary/secondary port の対称性を確立する。",
+    "`apps/cli/src/commands/track/tddd/{baseline,signals}.rs` から `\"domain\"` ハードコードと Phase 1 reject block を完全削除し、`resolve_layers_to_process(Option<&str>)` で全 `tddd.enabled` 層を loop 処理する形式に一般化する。`architecture-rules.json` で `usecase.tddd.enabled = true` に flip し、`usecase-types.json` を手動 seed + `baseline-capture --layer usecase` + `type-signals --layer usecase` を実行して usecase 層 TDDD を dogfood 検証する。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "`libs/domain/src/tddd/catalogue.rs::TypeDefinitionKind` に 7 新 variants を追加: `ApplicationService { expected_methods: Vec<MethodDeclaration> }` (primary port trait), `UseCase` (struct-only use case), `Interactor` (ApplicationService の impl), `Dto` (純粋データ容器), `Command` (CQRS command object), `Query` (CQRS query object), `Factory` (aggregate/entity factory struct)。ApplicationService 以外は存在チェックのみ",
+        "sources": [
+          "feedback — 2026-04-13 user 確認 (SoTOHE はテンプレートとして採用先プロジェクトパターンの幅を要する)",
+          "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D1"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "既存 `TraitPort` variant を `SecondaryPort` にリネーム。`kind_tag` は `\"trait_port\"` → `\"secondary_port\"`。`libs/domain/src/tddd/signals.rs::evaluate_trait_port` → `evaluate_secondary_port`、`evaluate_application_service` を追加 (forward check ロジックは両方で同一)。後方互換 alias なし",
+        "sources": [
+          "feedback — 2026-04-13 user 確認 (primary/secondary port の対称性確立)",
+          "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D2"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "`libs/infrastructure/src/tddd/catalogue_codec.rs` の decode/encode に新 kind_tag 文字列 (`application_service` / `use_case` / `interactor` / `dto` / `command` / `query` / `factory` / `secondary_port`) を追加。`ApplicationService` の expected_methods は `SecondaryPort` と共通ヘルパーに抽出。他の新 variants は `ValueObject` パス準拠",
+        "sources": [
+          "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D1",
+          "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D4"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "`libs/infrastructure/src/type_catalogue_render.rs` のセクションヘッダ / ラベルを新 variants に対応: `## Application Services`, `## Use Cases`, `## Interactors`, `## DTOs`, `## Commands`, `## Queries`, `## Factories`, `## Secondary Ports` (既存 `## Trait Ports` を rename)",
+        "sources": [
+          "inference — rename + 新 variants の rendered view 一貫性",
+          "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D7"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "`libs/domain/src/tddd/` 配下 (catalogue / signals / consistency) が layer-agnostic であることを grep 検証する read-only タスク (tddd-01 で既に multilayer 対応済みの sanity check)",
+        "sources": [
+          "inference — tddd-01 で multilayer 対応済みのため変更不要を確認",
+          "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D6"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "`libs/infrastructure/src/schema_export.rs::RustdocSchemaExporter::export(crate_name)` が `\"usecase\"` を引数に取って正常動作することを確認。`run_rustdoc` は parametric なので production コード変更不要。必要なら軽量 unit test 追加",
+        "sources": [
+          "knowledge/research/2026-04-14-0203-planner-tddd-02-usecase-wiring.md T002"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "`apps/cli/src/commands/track/tddd/signals.rs` の一般化: Phase 1 reject block (lines ~102-136), domain-specific `find` (lines ~141-148), partial-failure exit code (lines ~157-164) を削除。`execute_type_signals_single` → `execute_type_signals_for_layer` にリネーム。`execute_type_signals` は `bindings` 全体を loop。`exporter.export(\"domain\")` → `exporter.export(binding.targets().first()?)` 置換",
+        "sources": [
+          "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md Phase 1 step 5",
+          "knowledge/research/2026-04-14-0203-planner-tddd-02-usecase-wiring.md T003"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "`apps/cli/src/commands/track/tddd/baseline.rs` の一般化: `--layer usecase` reject (lines 43-49), `enforce_domain_tddd_enabled` (lines 191-235), `synthetic_domain_binding` (lines 239-255), partial-failure exit code (lines 162-169), Phase 1 comment block (lines 38-50) を削除。`resolve_layers_to_process` 共有化。`capture_baseline_for_layer` ヘルパー新設",
+        "sources": [
+          "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md Phase 1 step 5",
+          "knowledge/research/2026-04-14-0203-planner-tddd-02-usecase-wiring.md T004"
+        ],
+        "task_refs": [
+          "T006"
+        ]
+      },
+      {
+        "text": "`architecture-rules.json` の `usecase.tddd.enabled` を `false` → `true` にフリップ。`catalogue_file: \"usecase-types.json\"` + `schema_export: { method: \"rustdoc\", targets: [\"usecase\"] }` を追加",
+        "sources": [
+          "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md D1"
+        ],
+        "task_refs": [
+          "T007"
+        ]
+      },
+      {
+        "text": "`track/items/tddd-02-usecase-wiring-2026-04-14/usecase-types.json` を手動 seed (11 entries, 4 kind variants): 1 `application_service` (HookHandler), 4 `secondary_port` (TrackBlobReader/Reviewer/DiffGetter/ReviewHasher), 4 `error_type` (ReviewerError/DiffGetError/ReviewHasherError/ReviewCycleError), 2 `use_case` (SaveTrackUseCase/LoadTrackUseCase)。`expected_methods` は `libs/usecase/src/` のソースコードを直接参照して last-segment 短縮名で完全一致",
+        "sources": [
+          "feedback — 2026-04-13 user 確認 (application_service + use_case 変種の dogfood)",
+          "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D1 (UseCase variant の追加)"
+        ],
+        "task_refs": [
+          "T008"
+        ]
+      },
+      {
+        "text": "`sotp track baseline-capture tddd-02-usecase-wiring-2026-04-14 --layer usecase --force` を実行し `usecase-types-baseline.json` を生成・commit",
+        "sources": [
+          "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md Phase 1 step 6"
+        ],
+        "task_refs": [
+          "T009"
+        ]
+      },
+      {
+        "text": "`sotp track type-signals tddd-02-usecase-wiring-2026-04-14 --layer usecase` を実行し、全 11 entries が Blue になるまで iterate (Yellow/Red 残存時は `usecase-types.json` の expected_methods / expected_variants / kind 選択を修正)",
+        "sources": [
+          "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md Phase 1 step 5"
+        ],
+        "task_refs": [
+          "T010"
+        ]
+      },
+      {
+        "text": "`.claude/commands/track/design.md` を multi-layer loop に書き換え: 「Phase 1 only: domain」削除、`--layer <id>` optional flag 説明、未指定時の全 enabled layers loop 動作、catalogue read → baseline-capture → type-signals の per-layer step 列挙",
+        "sources": [
+          "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md Phase 1 step 7"
+        ],
+        "task_refs": [
+          "T011"
+        ]
+      },
+      {
+        "text": "`libs/usecase/src/merge_gate.rs` の tests module に U27-U30 を追加: (U27) usecase=Blue + domain=NotFound → pass, (U28) 両方 Blue → pass, (U29) usecase=Yellow + strict block, (U30) 両方 enabled=false → fail-closed",
+        "sources": [
+          "knowledge/research/2026-04-14-0203-planner-tddd-02-usecase-wiring.md T010"
+        ],
+        "task_refs": [
+          "T012"
+        ]
+      },
+      {
+        "text": "`knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` に Phase 1 Completion Amendment を追加: CLI-side 完遂宣言, 7 新 variants 設計根拠, TraitPort → SecondaryPort rename 理由, handoff §3.B (Finding collision) を tddd-04 'finding-taxonomy-cleanup' に分離する理由, §3.C (async-trait) defer, §3.E (CI cache) 分離, Status 更新",
+        "sources": [
+          "knowledge/conventions/adr.md"
+        ],
+        "task_refs": [
+          "T013"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "`domain::review_v2::Finding` 同名衝突の解消 (handoff §3.B) — 新名 `ReviewFinding` が `usecase::review_workflow::ReviewFinding` で既使用、`Verdict::FindingsRemain(NonEmptyFindings)` の cascade rename + 4 種 Finding 系型の taxonomy 再設計が必要なため、follow-up track 'tddd-04 finding-taxonomy-cleanup' に独立分離",
+        "sources": [
+          "tmp/handoff/tddd-phase2-handoff-2026-04-13.md §3.B",
+          "feedback — 2026-04-13 user 確認 (Finding が不安定なため今 track では扱わない)"
+        ]
+      },
+      {
+        "text": "async-trait proc-macro `is_async` 検出 (handoff §3.C) — 現 usecase traits は全て sync のため defer。採用先プロジェクトで async traits が入るタイミングで個別対応",
+        "sources": [
+          "tmp/handoff/tddd-phase2-handoff-2026-04-13.md §3.C",
+          "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md Consequences C2"
+        ]
+      },
+      {
+        "text": "CI rustdoc cache strategy (handoff §3.E) — 独立 track (tddd-future-ci-cache) に分離",
+        "sources": [
+          "tmp/handoff/tddd-phase2-handoff-2026-04-13.md §3.E"
+        ]
+      },
+      {
+        "text": "L2 generics/bounds フィールドの catalogue 対応 — ADR 0002 Phase 2 以降",
+        "sources": [
+          "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md Phase 2"
+        ]
+      },
+      {
+        "text": "Cross-layer 型参照の catalogue 明示と評価 — ADR 0002 Phase 2 以降 (現在は cargo + L1 forward check が last-segment 名で検証をカバー)",
+        "sources": [
+          "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md D5, R4, Phase 2"
+        ]
+      },
+      {
+        "text": "新 variants (UseCase/Interactor/Dto/Command/Query/Factory) の variant 固有 forward check 振る舞い (例: Dto は「メソッドなし」検証、Interactor は「ApplicationService を impl すること」検証) — 今回は存在チェックのみとし、variant 別検証は別 track",
+        "sources": [
+          "feedback — 2026-04-13 user 確認 (YAGNI / 広い間口を優先)",
+          "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D3"
+        ]
+      },
+      {
+        "text": "Multi-target (`schema_export.targets` に複数 crate) のマージ戦略実装 — 現在は全 layer が single-element targets のため `targets.first()` + 空 guard のみ。本格 merge は複数 crate layer が出現する別 track で実装",
+        "sources": [
+          "knowledge/research/2026-04-14-0203-planner-tddd-02-usecase-wiring.md Decision 3"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "後方互換性は対応しない。`\"trait_port\"` kind_tag は codec から完全削除、旧 `TraitPort` variant も削除 (tddd-01 precedent + 2026-04-13 user 確認)",
+      "sources": [
+        "feedback — 2026-04-13 user 確認",
+        "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D2"
+      ],
+      "task_refs": [
+        "T001",
+        "T002"
+      ]
+    },
+    {
+      "text": "`TypeDefinitionKind` の新 variants 追加は catalogue 側のみ影響 (baseline_codec とは独立)。`baseline_codec` の schema_version は 2 のまま、baseline 再生成不要",
+      "sources": [
+        "knowledge/research/2026-04-14-0203-planner-tddd-02-usecase-wiring.md Section 2"
+      ],
+      "task_refs": [
+        "T001",
+        "T002"
+      ]
+    },
+    {
+      "text": "`ApplicationService` と `SecondaryPort` は構造的に同じ shape (`expected_methods: Vec<MethodDeclaration>`) だが、semantic 情報を保持するため別 variant として定義する。共通の forward/reverse check ロジックはヘルパー関数に抽出して再利用",
+      "sources": [
+        "feedback — 2026-04-13 user 確認 (primary/secondary port の対称性)",
+        "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D4"
+      ],
+      "task_refs": [
+        "T001",
+        "T002"
+      ]
+    },
+    {
+      "text": "新 variants (UseCase/Interactor/Dto/Command/Query/Factory) の forward check は存在チェックのみ (`ValueObject` と同じ)。variant 別振る舞い差分は将来の follow-up track で追加可能な設計",
+      "sources": [
+        "feedback — 2026-04-13 user 確認 (YAGNI + 広い間口)",
+        "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D3"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "`architecture-rules.json` の `usecase.tddd.enabled = true` flip は T005/T006 完了後に commit する。順序を逆にすると既存 CLI が非対応設定を読み fail する",
+      "sources": [
+        "inference — CLI 一般化前に architecture-rules.json を変更すると runtime error",
+        "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D5"
+      ],
+      "task_refs": [
+        "T007"
+      ]
+    },
+    {
+      "text": "`usecase-types.json` seed の `expected_methods[].ty` / `returns` は last-segment 短縮名のみ (`::` 含む文字列は codec で reject)。`Finding` 型は直接参照しない — transitive に `Verdict::FindingsRemain(NonEmptyFindings)` 経由で含まれるが catalogue 上は `Verdict` としてのみ出現",
+      "sources": [
+        "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md D2 型表現の解像度",
+        "discussion — 2026-04-13 Finding 不安定性の検討で確認"
+      ],
+      "task_refs": [
+        "T008"
+      ]
+    },
+    {
+      "text": "`skipped_enabled_layers` / partial-failure exit code logic は完全削除。Phase 1 の応急処置 (Codex rounds 6+10) は一般化後 dead code となり、Phase 1 PR #95 の 11 ラウンド振動の主原因を根絶する",
+      "sources": [
+        "tmp/handoff/tddd-phase2-handoff-2026-04-13.md §5",
+        "knowledge/research/2026-04-14-0203-planner-tddd-02-usecase-wiring.md Decision 2"
+      ],
+      "task_refs": [
+        "T005",
+        "T006"
+      ]
+    },
+    {
+      "text": "各 task は <500 行 diff を遵守する (`.claude/rules/10-guardrails.md` Small task commits)。大きくなる場合はさらに細分化する",
+      "sources": [
+        ".claude/rules/10-guardrails.md"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T005",
+        "T006"
+      ]
+    },
+    {
+      "text": "`cargo make ci` (fmt-check + clippy -D warnings + test + deny + check-layers + verify-spec-states + verify-arch-docs) が全通過すること",
+      "sources": [
+        ".claude/rules/07-dev-environment.md"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T005",
+        "T006",
+        "T007",
+        "T008",
+        "T009",
+        "T010",
+        "T011",
+        "T012",
+        "T013",
+        "T014"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "`TypeDefinitionKind` が 12 variants を持つこと: 既存 4 (`Typestate`/`Enum`/`ValueObject`/`ErrorType`) + rename 1 (`SecondaryPort`, 旧 `TraitPort`) + 新規 7 (`ApplicationService`/`UseCase`/`Interactor`/`Dto`/`Command`/`Query`/`Factory`)。確認方法: `rg '^    (ApplicationService|UseCase|Interactor|Dto|Command|Query|Factory|SecondaryPort|Typestate|Enum|ValueObject|ErrorType)' libs/domain/src/tddd/catalogue.rs` — enum 定義ブロック内の variant 名 (行頭 4 スペースインデント) を直接検索し、全 12 variant が存在することを確認する",
+      "sources": [
+        "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D1"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "旧 `TraitPort` variant / `\"trait_port\"` kind_tag が production code (Rust ソース / JSON / Makefile) 全域で残存しないこと。`rg 'TraitPort|trait_port' libs apps .claude Makefile.toml -- --glob '!track/items/tddd-01-multilayer-2026-04-12/**'` がゼロ件 (tddd-01 アーカイブを除外)",
+      "sources": [
+        "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D2"
+      ],
+      "task_refs": [
+        "T001",
+        "T002"
+      ]
+    },
+    {
+      "text": "`catalogue_codec` が 12 の kind_tag (`typestate` / `enum` / `value_object` / `error_type` / `secondary_port` / `application_service` / `use_case` / `interactor` / `dto` / `command` / `query` / `factory`) を decode/encode round-trip できること。`trait_port` は `UnsupportedKindTag` または `InvalidEntry` でリジェクト",
+      "sources": [
+        "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D1"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "`ApplicationService` の forward check が `SecondaryPort` と同じ L1 マッチ (name / receiver / params / returns / is_async 完全一致) を実行し、不一致時は Yellow、完全一致時は Blue を返すこと",
+      "sources": [
+        "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D4"
+      ],
+      "task_refs": [
+        "T001",
+        "T002"
+      ]
+    },
+    {
+      "text": "`libs/infrastructure/src/type_catalogue_render.rs` のセクションヘッダが新 variants に対応していること: `## Secondary Ports` (旧 `## Trait Ports` をリネーム)、`## Application Services`, `## Use Cases`, `## Interactors`, `## DTOs`, `## Commands`, `## Queries`, `## Factories` の 8 ヘッダが存在し、旧 `## Trait Ports` が存在しないこと",
+      "sources": [
+        "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D7"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "`rg 'fn.*\"domain\"|\"domain\"\\.to_string|layer_id.*==.*\"domain\"' libs/domain/src/tddd/` がゼロ件であること (domain layer-agnostic 不変条件の sanity check — tddd-01 で既に対応済みの確認)",
+      "sources": [
+        "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D6"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "`RustdocSchemaExporter::export(\"usecase\")` が正常動作すること — `cargo +nightly rustdoc -p usecase -- -Z unstable-options --output-format json` が `target/doc/usecase.json` を生成し、`artifact_name` resolution が `\"usecase\"` → `\"usecase.json\"` に正しく解決すること",
+      "sources": [
+        "knowledge/research/2026-04-14-0203-planner-tddd-02-usecase-wiring.md T002"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "T005/T006 実装後: `rg 'non_domain_enabled|skipped_enabled_layers|enforce_domain_tddd_enabled|synthetic_domain_binding' apps/cli/src/commands/track/tddd/` がゼロ件 (Phase 1 reject block の固有識別子が完全削除済み)。`exporter.export(\"domain\")` ハードコード (signals.rs ~L201 / baseline.rs ~L130) が `exporter.export(binding.targets().first()?)` に置換済み。注: `resolve_layers` 関数内の `architecture-rules.json` 非存在時のレガシーフォールバック JSON はこのチェックの対象外 (フォールバックの削除は本 track の scope 外)",
+      "sources": [
+        "knowledge/research/2026-04-14-0203-planner-tddd-02-usecase-wiring.md Decision 2"
+      ],
+      "task_refs": [
+        "T005",
+        "T006"
+      ]
+    },
+    {
+      "text": "`apps/cli/src/commands/track/tddd/baseline.rs` 内 `enforce_domain_tddd_enabled` / `synthetic_domain_binding` 関数が存在しないこと、`--layer usecase` reject block が存在しないこと",
+      "sources": [
+        "knowledge/research/2026-04-14-0203-planner-tddd-02-usecase-wiring.md Decision 2"
+      ],
+      "task_refs": [
+        "T006"
+      ]
+    },
+    {
+      "text": "`--layer` 未指定時の multi-layer loop 動作: `sotp track type-signals tddd-02-usecase-wiring-2026-04-14` (layer 引数なし) を実行すると、`architecture-rules.json` の全 `tddd.enabled=true` 層 (domain + usecase) を順次処理すること。`sotp track baseline-capture tddd-02-usecase-wiring-2026-04-14` (layer 引数なし) も同様に全 enabled 層を処理すること",
+      "sources": [
+        "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md Phase 1 step 5"
+      ],
+      "task_refs": [
+        "T005",
+        "T006"
+      ]
+    },
+    {
+      "text": "`architecture-rules.json` の `usecase.tddd` が `{ enabled: true, catalogue_file: \"usecase-types.json\", schema_export: { method: \"rustdoc\", targets: [\"usecase\"] } }` を持つこと。`parse_tddd_layers` が 2 bindings (domain + usecase) を返すこと",
+      "sources": [
+        "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md D1"
+      ],
+      "task_refs": [
+        "T007"
+      ]
+    },
+    {
+      "text": "`track/items/tddd-02-usecase-wiring-2026-04-14/usecase-types.json` が正確に 11 entries を持ち、内訳が `application_service` 1 件 (`HookHandler`) + `secondary_port` 4 件 (`TrackBlobReader` / `Reviewer` / `DiffGetter` / `ReviewHasher`) + `error_type` 4 件 (`ReviewerError` / `DiffGetError` / `ReviewHasherError` / `ReviewCycleError`) + `use_case` 2 件 (`SaveTrackUseCase` / `LoadTrackUseCase`) であること。旧 `trait_port` / `value_object` はこのファイルに出現してはならない。`catalogue_codec::decode` で JSON 妥当性を確認",
+      "sources": [
+        "feedback — 2026-04-13 user 確認 (application_service + use_case 変種の dogfood)",
+        "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md D1"
+      ],
+      "task_refs": [
+        "T008"
+      ]
+    },
+    {
+      "text": "`sotp track baseline-capture tddd-02-usecase-wiring-2026-04-14 --layer usecase --force` が `usecase-types-baseline.json` を生成し、`baseline_codec::decode` で valid JSON としてパースできること",
+      "sources": [
+        "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md Phase 1 step 6"
+      ],
+      "task_refs": [
+        "T009"
+      ]
+    },
+    {
+      "text": "`sotp track type-signals tddd-02-usecase-wiring-2026-04-14 --layer usecase` 実行結果が `blue=11 yellow=0 red=0 (total=11, undeclared=0)` となり、`usecase-types.md` が track dir に生成されていること",
+      "sources": [
+        "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md Phase 1 step 5"
+      ],
+      "task_refs": [
+        "T010"
+      ]
+    },
+    {
+      "text": "`.claude/commands/track/design.md` に 'Phase 1 only: domain' / 'Phase 2 will wire' / 'only `domain` is wired' の文字列が残存しないこと。`--layer <id>` optional flag の説明と multi-layer loop 動作が記述されていること",
+      "sources": [
+        "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md Phase 1 step 7"
+      ],
+      "task_refs": [
+        "T011"
+      ]
+    },
+    {
+      "text": "merge gate の U27-U30 新規テストが全て pass し、既存 U1-U18 (single-layer) と U19-U26 (2-layer combinations) は non-regression で pass すること",
+      "sources": [
+        "knowledge/research/2026-04-14-0203-planner-tddd-02-usecase-wiring.md T010"
+      ],
+      "task_refs": [
+        "T012"
+      ]
+    },
+    {
+      "text": "`knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` の Status が `Accepted (Phase 1 complete: tddd-01-multilayer-2026-04-12 + tddd-02-usecase-wiring-2026-04-14)` に更新され、Phase 1 Completion Amendment セクションが 7 項目 (完遂宣言 / 7 新 variants 根拠 / rename 理由 / §3.B 分離 / §3.C defer / §3.E 分離 / Status 更新) を含むこと",
+      "sources": [
+        "knowledge/conventions/adr.md"
+      ],
+      "task_refs": [
+        "T013"
+      ]
+    },
+    {
+      "text": "`cargo make ci` (fmt-check + clippy -D warnings + test + deny + check-layers + verify-spec-states + verify-arch-docs) が全通過すること",
+      "sources": [
+        ".claude/rules/07-dev-environment.md"
+      ],
+      "task_refs": [
+        "T014"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "knowledge/conventions/hexagonal-architecture.md",
+    "knowledge/conventions/prefer-type-safe-abstractions.md",
+    "knowledge/conventions/typed-deserialization.md",
+    "knowledge/conventions/source-attribution.md",
+    "knowledge/conventions/nightly-dev-tool.md",
+    "knowledge/conventions/adr.md"
+  ],
+  "signals": {
+    "blue": 49,
+    "yellow": 0,
+    "red": 0
+  },
+  "approved_at": "2026-04-13T19:15:08Z",
+  "content_hash": "sha256:98a6b909c1716a89cae2f64b7cdb1783ab5d0095e9962cb83377917ecf17fdd6"
+}

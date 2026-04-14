@@ -1,0 +1,1006 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Per-layer catalogue read/decoding errors are converted to `HashSet::new()` here, so `baseline-capture` can silently write a baseline when `<layer>-types.json` is missing or malformed instead of failing closed. That masks a configuration error and can produce an incorrect baseline.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/baseline.rs",
+              "line": 125,
+              "category": "correctness"
+            },
+            {
+              "message": "There is no regression test that actually exercises `execute_type_signals` on an enabled non-domain layer. The new `usecase` test lives in `baseline.rs` and would still pass if this function kept exporting `domain`, so a regression in this multi-layer dispatch path could reintroduce the old hardcode unnoticed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 91,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c0630ad9d8f72ae7458d69618f7d94753a840d79172367a2d76f6b4cdb1f075e",
+          "at": "2026-04-14T01:26:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If `resolve_layers()` returns an empty set because every layer in `architecture-rules.json` is disabled, `execute_baseline_capture()` returns `ExitCode::SUCCESS` after doing nothing. That silently accepts a misconfigured rules file instead of failing closed; `signals.rs` has the same no-op pattern.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/baseline.rs",
+              "line": 71,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `usecase` regression test does not actually assert which binding was chosen. It only checks that the old rejection text is gone, so it would still pass if `--layer usecase` were routed to the domain binding. Baseline-layer dispatch is therefore untested.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/baseline.rs",
+              "line": 257,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:fcc38fc1122162e0f9f72ea989a5173badfb79e7ff25ffb69af2a9b914e90794",
+          "at": "2026-04-14T01:31:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e899667ba5a7a908d6135a2817cebab09a9e73f765d8af57237293a5d024237f",
+          "at": "2026-04-14T01:34:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_layers` only checks `rules_path.is_file()` before falling back to the synthetic `domain` binding. That means a present-but-broken `architecture-rules.json` path (for example a directory, broken symlink, or any stat/read error) is treated as \"file absent\", so both `type-signals` and `baseline-capture` silently run against `domain` instead of failing closed on the configuration error. The design intent only allows the legacy fallback when the rules file is truly absent.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 33,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:e899667ba5a7a908d6135a2817cebab09a9e73f765d8af57237293a5d024237f",
+          "at": "2026-04-14T01:37:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_baseline_capture` now documents the no-`--layer` path as iterating all TDDD-enabled bindings, but the added coverage only exercises the legacy domain fallback and explicit `--layer usecase`. There is no regression test with a multi-layer `architecture-rules.json` and omitted `--layer`, so a fallback to domain-only behavior in the default path would still pass.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/baseline.rs",
+              "line": 36,
+              "category": "tests"
+            },
+            {
+              "message": "`execute_type_signals` changed from the old domain-only path to a pure loop over all enabled bindings, but the new tests only prove unknown-layer rejection and explicit `--layer usecase` dispatch. There is still no test covering a multi-layer config with `--layer` omitted, so a regression that stops after the first binding would not be caught.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 81,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:eea7b596bcfaf28662f8fc52ee08ee549a81610a0293b60085ccf7a024fc8bcf",
+          "at": "2026-04-14T01:39:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`type-signals` still hardcodes `domain-types.json` in the undeclared-types warning. When the command runs against `--layer usecase` (or any non-domain binding), the summary tells the user to update the wrong catalogue file, which contradicts the new multilayer CLI contract and leaves the only layer-specific guidance misleading.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 374,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:9cbe7c59ca195875c707a7e3d7848862d13b29517d8dae263c7b63ca0bab9178",
+          "at": "2026-04-14T01:45:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new multilayer no-filter regression test does not actually verify that `execute_type_signals` advances past the first successful binding. In this setup the first layer (`domain`) fails immediately because `domain-types-baseline.json` is absent, so the loop short-circuits before `usecase` is ever exercised. A regression that returned after the first successful layer would still pass here, leaving T005's new default multilayer behavior unprotected. The test should mirror the baseline coverage by making the first binding succeed/skip and asserting the second binding is then processed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 818,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:44525517cc2f4dec13b37632d963a1589d00f3355ee0c55570e3970aeec4ae56",
+          "at": "2026-04-14T01:49:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:adebc2e331f46d430708275e9be1c7f0f6b524f47f0da1c6c96bd30c7cbb39ba",
+          "at": "2026-04-14T01:53:48Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ca45b63c4694f81d89a99b23cd77bde33f0e4832cd8e330cfa5b75a05c47d9f",
+          "at": "2026-04-13T18:31:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` cites planner T006 as the source for switching the usecase seed from `value_object` to `use_case`, but the cited research document still says `use_case` is invalid and that the 11-entry seed should use `value_object`/`trait_port`. The approved plan is therefore backed by a source that argues for the opposite implementation.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 103,
+              "category": "design_contradiction"
+            },
+            {
+              "message": "`verification.md` still expects `type-signals` to print `skipped=0`, but the plan/spec explicitly remove `skipped_enabled_layers` and the acceptance criterion defines the target summary without any `skipped` field. These artifacts disagree on whether the skipped counter survives the CLI generalization.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 55,
+              "category": "design_contradiction"
+            },
+            {
+              "message": "The acceptance gate requires zero `\"domain\"` hits anywhere under `apps/cli/src/commands/track/tddd/`, but T005/T006 simultaneously preserve domain-layer behavior and domain regression tests in those same files. That over-constrains the implementation and conflicts with the stated non-regression strategy.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 353,
+              "category": "design_contradiction"
+            },
+            {
+              "message": "Two scoped requirements are not covered by any acceptance criterion: the rendered section-header rename/additions from ADR D7, and the layer-agnostic grep sanity check. Because neither is part of the approved completion gate, those planned obligations can be missed without failing the track.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 43,
+              "category": "acceptance_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:0ca45b63c4694f81d89a99b23cd77bde33f0e4832cd8e330cfa5b75a05c47d9f",
+          "at": "2026-04-13T18:34:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The acceptance gate requires `rg '\"domain\"|non_domain_enabled|skipped_enabled_layers|enforce_domain_tddd_enabled' apps/cli/src/commands/track/tddd/` to return zero hits, but the plan still relies on a legacy synthetic `domain` fallback when `architecture-rules.json` is absent. A correct multilayer implementation can therefore satisfy the design and still fail this criterion, so the success condition contradicts the stated CLI behavior.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 353,
+              "category": "consistency"
+            },
+            {
+              "message": "`spec.json` makes T003 (layer-agnostic grep sanity check) and T004 (`RustdocSchemaExporter::export(\"usecase\")` validation) in-scope, but none of the acceptance criteria reference either task. That leaves part of the approved scope unverifiable in the spec itself, so the track can be declared complete without ever proving two scoped checks were done.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 53,
+              "category": "acceptance_criteria"
+            }
+          ],
+          "hash": "rvw1:sha256:0ca45b63c4694f81d89a99b23cd77bde33f0e4832cd8e330cfa5b75a05c47d9f",
+          "at": "2026-04-13T18:39:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T008 seed is still sourced to planner T006 as if it had already switched to an 11-entry `application_service`/`secondary_port`/`use_case` design, but the research doc says the opposite: line 1 declares `use_case` invalid, and T006 (lines 281-299) still describes `TraitPort`/`ValueObject` entries. That leaves the canonical spec pointing at a source that contradicts the final kind assignments.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 103,
+              "category": "design"
+            },
+            {
+              "message": "The acceptance criterion requires `rg '\"domain\"|non_domain_enabled|skipped_enabled_layers|enforce_domain_tddd_enabled' apps/cli/src/commands/track/tddd/` to go to zero, but T006 explicitly keeps the legacy domain fallback by folding `synthetic_domain_binding` into `resolve_layers` rather than removing every `\"domain\"` literal. As written, the verification rule cannot be satisfied while implementing the documented design.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 371,
+              "category": "design"
+            },
+            {
+              "message": "The T002 acceptance criterion says the codec must round-trip '8' kind tags, but the list immediately enumerates 12 tags (`typestate`, `enum`, `value_object`, `error_type`, `secondary_port`, plus 7 new tags). This gives reviewers two incompatible pass conditions for the same task.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 334,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:af890e14f11835093e9df79cfd5b76377553a0be84776c9f6e5f3956134898d8",
+          "at": "2026-04-13T18:45:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The planner still defines the T006 seed as `5 TraitPort + 4 ErrorType + 2 ValueObject` (`HookHandler` included as a trait port) here, which conflicts with the final seed shape in `spec.json`/`metadata.json` (`1 application_service + 4 secondary_port + 4 error_type + 2 use_case`). Because the corresponding acceptance criterion only checks `11 entries / 4 kinds`, an implementation can satisfy the spec while following this opposite planner guidance, so the planning artifacts no longer agree on the required catalogue composition.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-14-0203-planner-tddd-02-usecase-wiring.md",
+              "line": 299,
+              "category": "design"
+            },
+            {
+              "message": "The T005/T006 scope promises full multi-layer generalization, including looping all enabled bindings when `--layer` is omitted, but the acceptance criteria for those tasks only check deletion of Phase-1 identifiers and replacement of the `export(\"domain\")` hardcode. A partial implementation that works only for explicit `--layer usecase` could still pass these criteria, leaving the advertised no-filter multi-layer behavior unverified.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 371,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:6b5431617ee6e32368ce882f815b730ad13d60268a50c649933f65e9b8cec249",
+          "at": "2026-04-13T18:51:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D6 says the taxonomy expansion requires no `libs/domain/src/tddd/*` changes beyond the enum/codec/renderer, but the actual plan still needs domain-layer edits in `signals.rs` and `consistency.rs` to introduce `ApplicationService` handling and replace `TraitPort` matches. That makes the ADR’s scope statement factually inconsistent with the implementation plan.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md",
+              "line": 104,
+              "category": "design"
+            },
+            {
+              "message": "The verification checklist still requires `rg '\"domain\"|non_domain_enabled|skipped_enabled_layers|enforce_domain_tddd_enabled|synthetic_domain_binding' apps/cli/src/commands/track/tddd/` to return zero hits, but `spec.json` explicitly exempts the `resolve_layers` legacy fallback JSON from this check. As written, verification will fail even if the implementation matches the accepted design.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 41,
+              "category": "design"
+            },
+            {
+              "message": "`spec.json`’s source attribution for the core taxonomy changes is broken: it cites ADR 0002 `D3` as the source for adding the 7 new variants and codec tags, but ADR 0002 `D3` only covers the earlier `DomainTypeKind` rename. That leaves the main design decision mis-traced to the wrong ADR section.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 17,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:0f5fd1b4e2d42214c0e818a7246cdb7a8a106939b8ede1a176ab9887a580b9ae",
+          "at": "2026-04-13T18:56:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's first acceptance criterion is not executable as written: it tries to prove the enum has 12 variants with `rg 'TypeDefinitionKind::(...)' libs/domain/src/tddd/catalogue.rs`, but enum variant definitions in `catalogue.rs` are declared as bare variants, not `TypeDefinitionKind::Variant`. That check can miss a broken enum or pass on incidental match arms/comments, so the plan lacks a reliable gate for the core taxonomy change. The same broken probe is copied into `verification.md`.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 316,
+              "category": "design"
+            },
+            {
+              "message": "The `TraitPort` removal criterion contradicts its own exemption. The text allows doc comments and historical references to remain, but the verification command still greps `libs apps .claude Makefile.toml` and expects zero hits, which would also catch allowed historical/doc-comment references (for example the existing `TraitPort` mention in `libs/domain/src/tddd/catalogue.rs` docs). As written, implementers must delete references that the spec explicitly says are acceptable; `verification.md` line 34 repeats the same stricter rule.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 325,
+              "category": "design"
+            },
+            {
+              "message": "The verification plan never exercises the spec's required no-`--layer` path. `spec.json` requires proving that `baseline-capture` and `type-signals` process all enabled layers when `--layer` is omitted, but `verification.md` only runs both commands with `--layer usecase`. A regression in the default multi-layer loop / two-binding path would therefore pass the planned verification unchanged.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 52,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:4737bb1246a5b3dd6c941ffd3eeba35f315aef98438d3856b4b053febab9caaa",
+          "at": "2026-04-13T19:03:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 asks implementers to add new `check_consistency` match arms for `UseCase`/`Interactor`/`Dto`/`Command`/`Query`/`Factory`, but ADR D6 narrows `consistency.rs` to the mechanical `TraitPort` -> `SecondaryPort` classification rename and explicitly says the domain algorithm stays unchanged. Because `check_consistency` already partitions only trait vs non-trait, this task description expands domain-layer work beyond the ADR-approved scope.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/metadata.json",
+              "line": 95,
+              "category": "design"
+            },
+            {
+              "message": "The rendered-header rewrite (`## Application Services` / `## Secondary Ports` / etc.) is in scope, but `spec.json` never gives it an acceptance criterion. An implementation can satisfy every current acceptance check without updating `type_catalogue_render.rs`, so ADR D7 is not actually verified by the spec.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 44,
+              "category": "design"
+            },
+            {
+              "message": "The `usecase-types.json` acceptance criterion only checks '11 entries using 4 kind variants'. It does not verify the committed seed composition from the in-scope item and metadata (`1 application_service + 4 secondary_port + 4 error_type + 2 use_case`, with `HookHandler` as the `application_service`). A wrong taxonomy split could still pass the spec while violating the planned dogfooding decision.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 410,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:458cc6a084f041b11d18be7b239a2e38c1b8d670ba003e12122ca31355afe45e",
+          "at": "2026-04-13T19:08:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR-to-spec traceability is still broken for the taxonomy expansion: this item cites ADR 0002 D2 Forward check, but the `TraitPort`→`SecondaryPort` rename and the new application-layer variants are decided in `2026-04-13-1813-tddd-taxonomy-expansion.md` (D1/D2/D4). The same stale citation pattern recurs in the acceptance criteria for the 12-variant check and `ApplicationService` parity, so a reviewer following the cited sources lands on the old multilayer ADR instead of the authoritative taxonomy ADR.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/spec.json",
+              "line": 27,
+              "category": "cross_reference"
+            },
+            {
+              "message": "T014 reintroduces a second, incompatible definition of done for the rename cleanup: it says `TraitPort|trait_port` may remain in doc/comments, but the approved acceptance criteria and verification steps require `rg 'TraitPort|trait_port' ...` to return zero hits across `libs apps .claude Makefile.toml`. That contradiction will let self-review pass a state that the formal acceptance gate still rejects.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/metadata.json",
+              "line": 160,
+              "category": "design_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1c2dbcf391da43cc2c1dccaa75b46568e6495a406ef3d14216413b16c9b1fc91",
+          "at": "2026-04-13T19:14:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc029d21b338c6cf5959029addeca4ea56bd462bce62e81809748a1fd779222a",
+          "at": "2026-04-13T19:18:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f69fef6d56f7cd84279240349e5317d49f25ff109d26f83aa7e6e4ec279f7097",
+          "at": "2026-04-14T00:56:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f69fef6d56f7cd84279240349e5317d49f25ff109d26f83aa7e6e4ec279f7097",
+          "at": "2026-04-14T00:58:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2a8b0e949999b856cadfe4d68e13fc16ab98459f62fd91c0d926c784e1ea5b7",
+          "at": "2026-04-14T01:12:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2a8b0e949999b856cadfe4d68e13fc16ab98459f62fd91c0d926c784e1ea5b7",
+          "at": "2026-04-14T01:12:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Pre-populated `commit_hash` values on T001/T002 violate the track workflow in the briefing: these hashes should remain `null` until after review/commit, otherwise the regenerated metadata claims those tasks are already committed.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/metadata.json",
+              "line": 95,
+              "category": "workflow"
+            },
+            {
+              "message": "Flipping `usecase.tddd.enabled` to `true` is premature while the prerequisite CLI generalization tasks T005/T006 are still `in_progress`; this can make the repo read the new layer configuration before the multi-layer wiring is actually ready.",
+              "severity": "P1",
+              "file": "architecture-rules.json",
+              "line": 67,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:ad8a1221db76d45526970c54f0f9da9a7e65b805b8ee575530e3ea2fef595e30",
+          "at": "2026-04-14T01:26:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad8a1221db76d45526970c54f0f9da9a7e65b805b8ee575530e3ea2fef595e30",
+          "at": "2026-04-14T01:27:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad8a1221db76d45526970c54f0f9da9a7e65b805b8ee575530e3ea2fef595e30",
+          "at": "2026-04-14T01:28:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7496343412fdde297d68dd9f08bfd8bb70e9ad582062af35bb172ba0d298b79d",
+          "at": "2026-04-14T01:55:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7496343412fdde297d68dd9f08bfd8bb70e9ad582062af35bb172ba0d298b79d",
+          "at": "2026-04-14T01:57:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Unexpected file `track/items/tddd-02-usecase-wiring-2026-04-14/review.json` is modified in the worktree, but the `other` scope is limited to the five listed files. That violates the scope boundary.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/review.json",
+              "line": null,
+              "category": "scope"
+            }
+          ],
+          "hash": "rvw1:sha256:a895c09a5d676b282dfdf128e01c97893e2f86662bb5e6f31d028356af4aa941",
+          "at": "2026-04-14T02:07:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types-baseline.json` is not a fresh/useful baseline snapshot for the usecase layer: it contains 35 types but no trait entries at all, contradicting the T009 expectation that the captured baseline include the usecase traits needed for downstream type-signals/baseline checks.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/usecase-types-baseline.json",
+              "line": null,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a895c09a5d676b282dfdf128e01c97893e2f86662bb5e6f31d028356af4aa941",
+          "at": "2026-04-14T02:09:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a895c09a5d676b282dfdf128e01c97893e2f86662bb5e6f31d028356af4aa941",
+          "at": "2026-04-14T02:10:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.md` still hard-codes `domain-types.json` as its source, so the rendered view points reviewers and editors at the wrong single source of truth for this multilayer usecase catalogue. That contradicts the T008/T010 wiring goal even though the table body is for `usecase-types.json`.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/usecase-types.md",
+              "line": 1,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:a895c09a5d676b282dfdf128e01c97893e2f86662bb5e6f31d028356af4aa941",
+          "at": "2026-04-14T02:12:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a895c09a5d676b282dfdf128e01c97893e2f86662bb5e6f31d028356af4aa941",
+          "at": "2026-04-14T02:14:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be70d7ecdcd08e8f49da900b603cbf591cac1f2cdc632647314fdb818593a34b",
+          "at": "2026-04-14T02:17:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be70d7ecdcd08e8f49da900b603cbf591cac1f2cdc632647314fdb818593a34b",
+          "at": "2026-04-14T02:18:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:feb77d9a545473f63e14249dad4fb41a7d9e26179cafa01563d8e6a3f18bf2fd",
+          "at": "2026-04-14T02:39:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:feb77d9a545473f63e14249dad4fb41a7d9e26179cafa01563d8e6a3f18bf2fd",
+          "at": "2026-04-14T02:40:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` has already flipped the T011-T014 block to `done`, but this review stage still expects those tasks to remain `in_progress` until approval. That leaves the track in an illegal intermediate state, and the `done` tasks also lack the commit-hash bookkeeping that the completed tasks in this file use elsewhere.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/metadata.json",
+              "line": 92,
+              "category": "status drift"
+            }
+          ],
+          "hash": "rvw1:sha256:c564a5212691b837270b4b727dd450420b2e8ea3e361f694b81950b07d749d47",
+          "at": "2026-04-14T03:43:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c564a5212691b837270b4b727dd450420b2e8ea3e361f694b81950b07d749d47",
+          "at": "2026-04-14T03:44:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new accepted Phase 1 amendment points readers to `2026-04-13-1813-tddd-taxonomy-expansion.md` as the child ADR for the implemented 12-variant taxonomy, but that referenced ADR still has Status `Proposed`. That leaves the accepted parent ADR anchored to an unaccepted child decision, which is ADR status drift in the design record chain.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+              "line": 7,
+              "category": "design"
+            },
+            {
+              "message": "The amendment now says the seed and Consequences §C2 use the catalogue key `\"is_async\"`, but ADR 0002's normative schema/examples and C2 rule still define that field as `\"async\"`. This makes the accepted ADR internally inconsistent about the JSON contract authors should write, so future catalogue updates can legitimately follow either spelling and diverge from the documented design.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+              "line": 55,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:c564a5212691b837270b4b727dd450420b2e8ea3e361f694b81950b07d749d47",
+          "at": "2026-04-14T03:47:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR states that `knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md` is already accepted, but that referenced ADR still has `Proposed` as its status. This is a status drift between the parent ADR and the child ADR it points to.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+              "line": 7,
+              "category": "status drift"
+            }
+          ],
+          "hash": "rvw1:sha256:05ea71719272a1ed2b02f21e906c505878c15dd0d054495ffe19ad128607c912",
+          "at": "2026-04-14T03:50:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e723727dbc216744d5b4d388c531fc61a05c9d6c9cc0f605e4d325ae8bf711af",
+          "at": "2026-04-14T03:51:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e723727dbc216744d5b4d388c531fc61a05c9d6c9cc0f605e4d325ae8bf711af",
+          "at": "2026-04-14T03:53:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` is self-contradictory: the Scope Verified checklist still leaves T012 and T013 unchecked, but the Result section says all 14 tasks are done, and the T013 summary uses the truncated status string `Accepted (Phase 1 complete)` instead of the final two-track status recorded in metadata.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 21,
+              "category": "consistency"
+            },
+            {
+              "message": "The T010 manual success criterion expects `skipped=0`, but the recorded successful output in the Result section is `skipped=29`; the verification step and its own evidence do not match.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 56,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:93485b67b7f6def3bf3041b1dbf65f24e4ca6f74badf5efbf0710a9d21597a80",
+          "at": "2026-04-14T03:58:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` still leaves T012/T013 unchecked in the Scope Verified section (lines 21-23) even though the Result section claims all 14 tasks are done and `verified_at` is set. That makes the completion record internally inconsistent and violates the requirement that all verification checkboxes be `[x]`.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 21,
+              "category": "verification"
+            },
+            {
+              "message": "The T013 summary row records `Status \\`Accepted (Phase 1 complete)\\`` instead of the required full status string `Accepted (Phase 1 complete: tddd-01-multilayer-2026-04-12 + tddd-02-usecase-wiring-2026-04-14)`, so the verification summary drifts from the committed metadata and the scope checklist.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 116,
+              "category": "status drift"
+            }
+          ],
+          "hash": "rvw1:sha256:93485b67b7f6def3bf3041b1dbf65f24e4ca6f74badf5efbf0710a9d21597a80",
+          "at": "2026-04-14T03:59:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Scope Verified` still leaves T012 and T013 unchecked even though the `Result` section claims all 14 tasks are complete. That makes the verification record internally inconsistent and violates the requirement that all checkboxes be `[x]`.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 21,
+              "category": "status drift"
+            },
+            {
+              "message": "The recorded `type-signals` expectation says `skipped=0`, but the completed result records `skipped=29`. That is a direct contradiction in the verification facts and needs to be reconciled.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 55,
+              "category": "verification drift"
+            }
+          ],
+          "hash": "rvw1:sha256:93485b67b7f6def3bf3041b1dbf65f24e4ca6f74badf5efbf0710a9d21597a80",
+          "at": "2026-04-14T04:01:38Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 tells users to run `sotp verify spec-states` without the required `spec_path` argument. The CLI entrypoint for `spec-states` requires a path, so this instruction cannot be followed as written.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 188,
+              "category": "correctness"
+            },
+            {
+              "message": "The multi-layer summary is underspecified: Step 4 says to print a per-layer summary, but it never requires the layer identifier to appear in the summary text. In a multi-layer run that makes the output ambiguous and does not satisfy the layer-aware contract.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 179,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:19f858a60d88f7d4a23073e72d838464a60c4baad532f37212c8bc1732a4e920",
+          "at": "2026-04-14T02:39:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 treats `architecture-rules.json` as mandatory for layer resolution, but the CLI intentionally falls back to a synthetic `domain` binding when that file is absent. On legacy tracks this doc would incorrectly suggest the command cannot resolve layers, even though `baseline-capture` and `type-signals` still work with the fallback.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 35,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:01c74ebf942358be766bfc69ecbe9c4f97e5775eb720295b79e5af81d32474a3",
+          "at": "2026-04-14T02:47:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The no-`--layer` path never defines what happens when `architecture-rules.json` has zero enabled layers, but the CLI actually fails closed with an error (`no tddd.enabled layers found...`) instead of succeeding with an empty loop. As written, the spec reads like a no-op in that case.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 41,
+              "category": "behavior"
+            },
+            {
+              "message": "Step 4 requires each summary block to start with the layer identifier, but the current `type-signals` implementation prints a generic `[OK] type-signals: ...` line and only mentions the catalogue file in the warning line. This summary format is not implemented and misstates the command output.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 181,
+              "category": "behavior"
+            },
+            {
+              "message": "Step 4 item 2 and Step 5 hardcode `{layer}-types.md` / `{layer}-types-baseline.json`, but the actual rendered and baseline filenames are derived from the configured `catalogue_file` stem. Any layer that overrides `tddd.catalogue_file` would be documented with the wrong artifact names.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 179,
+              "category": "behavior"
+            }
+          ],
+          "hash": "rvw1:sha256:d4c491a01240dcafb0909d7d31e260945f56929f21ed2167bb4fae49ee4ad71e",
+          "at": "2026-04-14T02:53:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 requires each `type-signals` run to print a per-layer summary block with the layer identifier in the heading, but the current CLI summary is still the generic `[OK] type-signals: ...` line and warning output. That makes the documented multi-layer output contract impossible to satisfy as written.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 183,
+              "category": "design-contract"
+            },
+            {
+              "message": "The post-design guidance says to commit only `{layer}-types.json` and `{layer}-types-baseline.json`, but Step 4 also generates `{rendered_file}` and the track plan already treats `{layer}-types.md` as part of the deliverable set. Omitting the rendered markdown from the commit guidance leaves a required artifact out of the workflow.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 204,
+              "category": "design-contract"
+            }
+          ],
+          "hash": "rvw1:sha256:316ae0c077f48ba4a37fca9ed37b6c064951105c10c28842a00e58b38b6e12c4",
+          "at": "2026-04-14T02:59:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 still hardcodes the serde/persistence rule as `domain: typestate, infra: serde enum DTO conversion`. That is leftover Phase 1 domain/infra language in a multilayer design command, and it leaves the new non-domain layers without matching guidance.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 92,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:b75a6f7cfb5073639f7158de0bb1052c1033dda186d82d14636d858bba61fe15",
+          "at": "2026-04-14T03:03:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:355a06a4fc87451ab07e815b2be5e989cf6ac0653d57368e1ba72245afcc46f7",
+          "at": "2026-04-14T03:07:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 explicitly allows `/track:design` to run against `track/items/<id>/plan.md` when `spec.md` does not exist, but Step 4 hardcodes `sotp verify spec-states track/items/<id>/spec.md`. On planning-only / pre-spec tracks that path is absent, so the rewritten workflow contradicts its own earlier fallback and cannot be executed as documented. Step 4 should verify the same document path resolved in Step 0 (`spec.md` if present, otherwise `plan.md`).",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 197,
+              "category": "workflow_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:355a06a4fc87451ab07e815b2be5e989cf6ac0653d57368e1ba72245afcc46f7",
+          "at": "2026-04-14T03:09:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 now says that if `architecture-rules.json` is missing the command falls back to a synthetic `domain` layer so legacy tracks keep working, but Step 4 still unconditionally sends the flow through `sotp verify spec-states ...`. The verifier fails closed when `architecture-rules.json` is absent, so the documented legacy fallback still breaks during validation instead of completing as described.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 35,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:81f9f9863d39e564e2e632ca532463eb36480d163d76f030cbabbbd1f52073d7",
+          "at": "2026-04-14T03:13:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 says `sotp verify spec-states` should be run against the document resolved in Step 0, including `plan.md` when `spec.md` is absent. The verifier does not actually support `plan.md` as an equivalent input: it always looks for sibling `spec.json`, and without that it falls back to scanning the supplied markdown for a `## Domain States` section. On plan-only tracks that only have `plan.md`, this validation step will fail despite Step 0 explicitly treating that path as supported.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 197,
+              "category": "correctness"
+            },
+            {
+              "message": "The legacy-track note says to skip `verify spec-states` when `architecture-rules.json` is absent and rely on `cargo make ci` instead, but `cargo make ci` still runs `verify-spec-states-current-local` on track branches. Because `verify spec-states` itself now fails closed when `architecture-rules.json` is missing, this fallback does not work: the same legacy tracks will still fail in CI.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 202,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bdfd64ac35b41263e765b976e89a3420539fcc37d4d455190795155e869a067e",
+          "at": "2026-04-14T03:17:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 documents a legacy-track escape hatch that no longer matches the verifier: lines 197-202 say `/track:design` should skip `sotp verify spec-states` when `architecture-rules.json` is absent because that path 'produces no signal output', but `libs/infrastructure/src/verify/spec_states.rs` now fails closed in that case (`load_tddd_layers` returns an error when the file is missing). That leaves the command doc describing a green path the actual CI/merge gate rejects.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 197,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:0a5563ae83fdcf6567f35334a2dfb70547fcc6f8645386ee87c9093a31c58eca",
+          "at": "2026-04-14T03:21:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Step 4 guidance says `sotp verify spec-states track/items/<id>/spec.md` and to use `plan.md` when `spec.md` is absent, while also claiming this runs the Stage 2 per-layer catalogue loop. That does not match the implementation: `spec-states` only runs Stage 2 when the input has a sibling `spec.json`; otherwise it falls back to the legacy markdown scan. On a planning-only track with `plan.md`, following this instruction would skip TDDD signal validation entirely.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 197,
+              "category": "design_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9938e308b0bf7327da4e37fddb6168a71ac952361474446f8da715971621b530",
+          "at": "2026-04-14T03:24:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 says `sotp verify spec-states track/items/<id>/spec.md` will run the multilayer Stage 2 gate whenever `spec.md` and `architecture-rules.json` exist, but the implementation only enters that JSON-based multilayer path when a sibling `spec.json` is present; otherwise `verify spec-states` falls back to the legacy markdown scan and skips all layer catalogue checks. As written, this gives false confidence on spec-md-only tracks because the documented Red-signal gate never runs there.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 197,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ae96f77f445ece2dab31df8030f83b69712e816d8f22176007feff893fa8f75c",
+          "at": "2026-04-14T03:29:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 says `/track:design` can operate from `track/items/<id>/plan.md` when `spec.md` is absent, but Step 4 hardcodes `sotp verify spec-states track/items/<id>/spec.md`. On a planning-only track that only has `plan.md`, the validation step cannot be run as documented, so the rewritten workflow still contradicts its own plan.md fallback.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 197,
+              "category": "design_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0b558ea5cd6cff3a0efd3d2f524161bc471199ba41e23c488d0d79780adbdb64",
+          "at": "2026-04-14T03:33:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c3121fdb9db8c2a4b616749299e91961dcdfd8d54feb9fecef0f7a95def97fa",
+          "at": "2026-04-14T03:40:50Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:798eca772a45a81cd43d724912bddd29bb904c6eb87bc77c4f2b1d957ea8c012",
+          "at": "2026-04-14T00:58:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:798eca772a45a81cd43d724912bddd29bb904c6eb87bc77c4f2b1d957ea8c012",
+          "at": "2026-04-14T00:59:43Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The renderer still emits only a single `## Type Declarations` section. The required sectioned output for `Secondary Ports`, `Application Services`, `Use Cases`, `Interactors`, `DTOs`, `Commands`, `Queries`, and `Factories` is never produced, so the D7 layout change is unimplemented.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 36,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f1820d9dfdef6c73f206730f5e4cb1d82b1ecd21d447cd7d8c2a7b598dc14575",
+          "at": "2026-04-14T00:57:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30d7e7c7798cb879ce6e2d088670d3ce7aeec4226d3aaf19aa574966b8a1aa1d",
+          "at": "2026-04-14T01:01:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeCatalogueEntryDto` still flattens `TypeDefinitionKindDto` without any unknown-field rejection, so the new existence-only kinds (`use_case`, `interactor`, `dto`, `command`, `query`, `factory`) will silently accept stale payload fields like `expected_methods`/`expected_variants` instead of failing decode. That contradicts the T002 schema intent that illegal kind/field combinations be rejected at the codec boundary rather than mapped to a domain variant.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 80,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:30d7e7c7798cb879ce6e2d088670d3ce7aeec4226d3aaf19aa574966b8a1aa1d",
+          "at": "2026-04-14T01:03:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9b0a89058ea2363df0494bafde61436213c4a5351044dacf9a90d73889d1241",
+          "at": "2026-04-14T01:09:14Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26f7208b4b02468ba7d23632ee65509a1dbdd343e4e210860d15995f3d6e3887",
+          "at": "2026-04-14T02:38:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_u27_usecase_blue_domain_not_found_passes` does not actually verify the claimed loop-order/role-swap behavior. With `enabled_layers = [\"domain\", \"usecase\"]` and `MultiLayerMock` returning `NotFound` for the omitted `domain` catalogue, the test still passes even if `check_strict_merge_gate` incorrectly stops after the first `NotFound` and never reads `usecase`. That makes U27 effectively duplicate U22's \"one Blue + one NotFound passes\" coverage instead of adding a distinct regression check for early-layer opt-out handling.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 921,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:26f7208b4b02468ba7d23632ee65509a1dbdd343e4e210860d15995f3d6e3887",
+          "at": "2026-04-14T02:40:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26f7208b4b02468ba7d23632ee65509a1dbdd343e4e210860d15995f3d6e3887",
+          "at": "2026-04-14T02:41:08Z"
+        }
+      ]
+    }
+  }
+}

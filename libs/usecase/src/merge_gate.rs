@@ -906,4 +906,85 @@ mod tests {
             "error must mention architecture-rules.json: {outcome:?}"
         );
     }
+
+    // ===============================================================
+    // U27-U30: tddd-02 usecase-enablement-focused scenarios.
+    //
+    // These scenarios treat `usecase` as the foreground layer. They assert
+    // that the gate behaves symmetrically when the roles of `domain` and
+    // `usecase` are swapped versus the U19-U26 baselines, and add one new
+    // fail-closed scenario (empty enabled_layers list) that U19-U26 did
+    // not cover.
+    // ===============================================================
+
+    #[test]
+    fn test_u27_usecase_blue_domain_not_found_passes() {
+        // Symmetric to U22 (which has domain Blue + usecase NotFound).
+        // Confirms that opt-out on either layer works in isolation when the
+        // other layer is all-Blue.
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![("usecase", BlobFetchResult::Found(dt_all_blue()))],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            !outcome.has_errors(),
+            "NotFound for domain + Blue for usecase must pass: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u28_usecase_red_domain_not_found_blocks() {
+        // Asserts that domain opt-out (NotFound) does not mask a Red on the
+        // usecase layer. This is a usecase-forward version of "any Red blocks",
+        // distinct from U21 which pairs Red with Blue.
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![("usecase", BlobFetchResult::Found(dt_with_red()))],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            outcome.has_errors(),
+            "Red in usecase must block even when domain is NotFound: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u29_usecase_yellow_domain_not_found_blocks_strict() {
+        // Strict-mode Yellow blocking, with domain opted out. This is distinct
+        // from U23 (Yellow paired with Blue) because it verifies that an
+        // opt-out on one layer does not downgrade strict-mode enforcement on
+        // another layer's Yellow signal.
+        let reader = MultiLayerMock::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            vec!["domain".to_string(), "usecase".to_string()],
+            vec![("usecase", BlobFetchResult::Found(dt_with_yellow()))],
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(
+            outcome.has_errors(),
+            "Yellow in usecase must block in strict mode even when domain is NotFound: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u30_empty_enabled_layers_list_fails_closed() {
+        // Empty enabled_layers list (every layer `tddd.enabled=false` in
+        // architecture-rules.json) must fail-closed with a clear error that
+        // mentions architecture-rules.json. This is distinct from U25
+        // (architecture-rules.json NotFound) because here the file exists
+        // and parses, but yields no enabled layers. The gate must not
+        // silently pass on the assumption that "no layers are enabled means
+        // nothing to check" — fail-closed prevents a configuration-level
+        // bypass of Stage 2 enforcement.
+        let reader = MultiLayerMock::new(BlobFetchResult::Found(all_blue_spec()), vec![], vec![]);
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(outcome.has_errors(), "empty enabled_layers must fail-closed: {outcome:?}");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("architecture-rules.json")),
+            "fail-closed error must mention architecture-rules.json: {outcome:?}"
+        );
+    }
 }

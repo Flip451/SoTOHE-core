@@ -76,8 +76,8 @@ impl ParamDeclaration {
 /// A structured method signature at L1 resolution.
 ///
 /// Shared across three contexts:
-/// - Catalogue declaration: `TypeDefinitionKind::TraitPort { expected_methods }`
-///   (populated in T006)
+/// - Catalogue declaration: `TypeDefinitionKind::SecondaryPort { expected_methods }`
+///   or `TypeDefinitionKind::ApplicationService { expected_methods }` (populated in T006)
 /// - `TypeGraph`: `TypeNode::methods` / `TraitNode::methods` (the "code reality"
 ///   extracted from rustdoc JSON)
 /// - Baseline: `TypeBaselineEntry::methods` / `TraitBaselineEntry::methods`
@@ -318,14 +318,36 @@ pub enum TypeDefinitionKind {
     /// An `enum` used exclusively as an error type.
     /// `expected_variants` lists the variants that must appear.
     ErrorType { expected_variants: Vec<String> },
-    /// A `pub trait` that defines a hexagonal port boundary.
+    /// A `pub trait` that defines a hexagonal secondary (driven/infrastructure) port boundary.
     ///
     /// `expected_methods` holds the full L1 method signatures that the trait
     /// should expose. The forward check compares each declared method against
     /// the code by name → receiver → params count → params types → return
     /// type → `is_async` (ADR 0002 §D2). A reverse check flags any trait
     /// method found in code that the catalogue does not declare.
-    TraitPort { expected_methods: Vec<MethodDeclaration> },
+    ///
+    /// Use `ApplicationService` for primary (driving) port boundaries instead.
+    SecondaryPort { expected_methods: Vec<MethodDeclaration> },
+    /// A `pub trait` that defines a hexagonal primary (driving/application) port boundary.
+    ///
+    /// Semantically paired with `SecondaryPort`: where `SecondaryPort` describes
+    /// driven/infrastructure ports (repositories, adapters), `ApplicationService`
+    /// describes the driving side — the use-case interface exposed to the outer world.
+    ///
+    /// Forward and reverse checks are identical to `SecondaryPort` (same L1 axes).
+    ApplicationService { expected_methods: Vec<MethodDeclaration> },
+    /// A struct-only use case type; evaluated by existence check only.
+    UseCase,
+    /// An `ApplicationService` implementation struct; evaluated by existence check only.
+    Interactor,
+    /// A pure data-transfer object struct; evaluated by existence check only.
+    Dto,
+    /// A CQRS command object struct; evaluated by existence check only.
+    Command,
+    /// A CQRS query object struct; evaluated by existence check only.
+    Query,
+    /// An aggregate or entity factory struct; evaluated by existence check only.
+    Factory,
 }
 
 impl TypeDefinitionKind {
@@ -337,7 +359,14 @@ impl TypeDefinitionKind {
             Self::Enum { .. } => "enum",
             Self::ValueObject => "value_object",
             Self::ErrorType { .. } => "error_type",
-            Self::TraitPort { .. } => "trait_port",
+            Self::SecondaryPort { .. } => "secondary_port",
+            Self::ApplicationService { .. } => "application_service",
+            Self::UseCase => "use_case",
+            Self::Interactor => "interactor",
+            Self::Dto => "dto",
+            Self::Command => "command",
+            Self::Query => "query",
+            Self::Factory => "factory",
         }
     }
 }
@@ -752,8 +781,8 @@ mod tests {
     }
 
     #[test]
-    fn test_type_catalogue_entry_trait_port_kind() {
-        let kind = TypeDefinitionKind::TraitPort {
+    fn test_type_catalogue_entry_secondary_port_kind() {
+        let kind = TypeDefinitionKind::SecondaryPort {
             expected_methods: vec![
                 MethodDeclaration::new(
                     "find_by_id",
@@ -780,7 +809,135 @@ mod tests {
         )
         .unwrap();
         assert_eq!(entry.kind(), &kind);
-        assert_eq!(entry.kind().kind_tag(), "trait_port");
+        assert_eq!(entry.kind().kind_tag(), "secondary_port");
+    }
+
+    #[test]
+    fn test_type_catalogue_entry_application_service_kind() {
+        let kind = TypeDefinitionKind::ApplicationService {
+            expected_methods: vec![MethodDeclaration::new(
+                "execute",
+                Some("&self".into()),
+                vec![ParamDeclaration::new("cmd", "CreateCommand")],
+                "Result<(), AppError>",
+                false,
+            )],
+        };
+        let entry = TypeCatalogueEntry::new(
+            "CreateUseCase",
+            "Primary port for create operation",
+            kind.clone(),
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        assert_eq!(entry.kind(), &kind);
+        assert_eq!(entry.kind().kind_tag(), "application_service");
+    }
+
+    #[test]
+    fn test_type_catalogue_entry_use_case_kind() {
+        let entry = TypeCatalogueEntry::new(
+            "SaveTrackUseCase",
+            "Use case for saving a track",
+            TypeDefinitionKind::UseCase,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        assert_eq!(entry.kind(), &TypeDefinitionKind::UseCase);
+        assert_eq!(entry.kind().kind_tag(), "use_case");
+    }
+
+    #[test]
+    fn test_type_catalogue_entry_interactor_kind() {
+        let entry = TypeCatalogueEntry::new(
+            "SaveTrackInteractor",
+            "Interactor implementing SaveTrackUseCase",
+            TypeDefinitionKind::Interactor,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        assert_eq!(entry.kind(), &TypeDefinitionKind::Interactor);
+        assert_eq!(entry.kind().kind_tag(), "interactor");
+    }
+
+    #[test]
+    fn test_type_catalogue_entry_dto_kind() {
+        let entry = TypeCatalogueEntry::new(
+            "TrackDto",
+            "Data transfer object for a track",
+            TypeDefinitionKind::Dto,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        assert_eq!(entry.kind(), &TypeDefinitionKind::Dto);
+        assert_eq!(entry.kind().kind_tag(), "dto");
+    }
+
+    #[test]
+    fn test_type_catalogue_entry_command_kind() {
+        let entry = TypeCatalogueEntry::new(
+            "CreateTrackCommand",
+            "CQRS command to create a track",
+            TypeDefinitionKind::Command,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        assert_eq!(entry.kind(), &TypeDefinitionKind::Command);
+        assert_eq!(entry.kind().kind_tag(), "command");
+    }
+
+    #[test]
+    fn test_type_catalogue_entry_query_kind() {
+        let entry = TypeCatalogueEntry::new(
+            "FindTrackQuery",
+            "CQRS query to find a track",
+            TypeDefinitionKind::Query,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        assert_eq!(entry.kind(), &TypeDefinitionKind::Query);
+        assert_eq!(entry.kind().kind_tag(), "query");
+    }
+
+    #[test]
+    fn test_type_catalogue_entry_factory_kind() {
+        let entry = TypeCatalogueEntry::new(
+            "TrackFactory",
+            "Factory for creating Track aggregates",
+            TypeDefinitionKind::Factory,
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        assert_eq!(entry.kind(), &TypeDefinitionKind::Factory);
+        assert_eq!(entry.kind().kind_tag(), "factory");
+    }
+
+    #[test]
+    fn test_all_twelve_kind_tags_are_unique() {
+        let tags = [
+            TypeDefinitionKind::Typestate { transitions: TypestateTransitions::Terminal }
+                .kind_tag(),
+            TypeDefinitionKind::Enum { expected_variants: vec![] }.kind_tag(),
+            TypeDefinitionKind::ValueObject.kind_tag(),
+            TypeDefinitionKind::ErrorType { expected_variants: vec![] }.kind_tag(),
+            TypeDefinitionKind::SecondaryPort { expected_methods: vec![] }.kind_tag(),
+            TypeDefinitionKind::ApplicationService { expected_methods: vec![] }.kind_tag(),
+            TypeDefinitionKind::UseCase.kind_tag(),
+            TypeDefinitionKind::Interactor.kind_tag(),
+            TypeDefinitionKind::Dto.kind_tag(),
+            TypeDefinitionKind::Command.kind_tag(),
+            TypeDefinitionKind::Query.kind_tag(),
+            TypeDefinitionKind::Factory.kind_tag(),
+        ];
+        let unique: std::collections::HashSet<&str> = tags.iter().copied().collect();
+        assert_eq!(unique.len(), 12, "all 12 kind tags must be distinct");
     }
 
     #[test]
