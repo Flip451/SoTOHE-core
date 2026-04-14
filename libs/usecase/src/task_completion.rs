@@ -9,7 +9,7 @@
 //! Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md`
 //! §D9, §D9.1.
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 use domain::{TaskStatus, TrackId, validate_branch_ref};
 
 use crate::merge_gate::{BlobFetchResult, TrackBlobReader};
@@ -45,7 +45,7 @@ pub fn check_tasks_resolved_from_git_ref(
 
     // 2. Branch-ref validation
     if let Err(err) = validate_branch_ref(branch) {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "invalid branch ref: {err}"
         ))]);
     }
@@ -54,7 +54,7 @@ pub fn check_tasks_resolved_from_git_ref(
     let track_id_str = branch.strip_prefix("track/").unwrap_or(branch);
     if branch.starts_with("track/") {
         if let Err(err) = TrackId::try_new(track_id_str) {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "invalid track id derived from branch '{branch}': {err}"
             ))]);
         }
@@ -64,12 +64,12 @@ pub fn check_tasks_resolved_from_git_ref(
     let track = match reader.read_track_metadata(branch, track_id_str) {
         BlobFetchResult::Found(t) => t,
         BlobFetchResult::NotFound => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "metadata.json not found on origin/{branch} — every track must have a metadata.json"
             ))]);
         }
         BlobFetchResult::FetchError(msg) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "failed to read metadata.json on origin/{branch}: {msg}"
             ))]);
         }
@@ -87,7 +87,7 @@ pub fn check_tasks_resolved_from_git_ref(
             })
             .map(|t| format!("{} ({})", t.id(), t.status().kind()))
             .collect();
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "track has unresolved tasks: {} — run track-transition to mark tasks as done before merging",
             unresolved.join(", ")
         ))]);

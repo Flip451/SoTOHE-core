@@ -52,6 +52,18 @@ The following sub-items from `tmp/handoff/tddd-phase2-handoff-2026-04-13.md` §3
 - Four distinct `Finding` types exist across the codebase (`domain::review_v2::Finding`, `domain::verify::Finding`, `usecase::review_workflow::ReviewFinding`, `usecase::pr_review::PrReviewFinding`) — a proper fix requires taxonomy-level redesign, not a simple rename.
 - Attempting a partial fix would destabilize the type system during tddd-02's code wiring. The decision is to defer and handle Finding taxonomy as a dedicated track after tddd-02 is merged.
 
+**§3.B Resolution (2026-04-14)**: resolved by track `tddd-04-finding-taxonomy-cleanup-2026-04-14` and ADR `2026-04-14-0625-finding-taxonomy-cleanup.md` (Accepted). Decision summary:
+
+- Option B adopted — full rename of both colliding domain types, no integration with usecase DTOs. Hexagonal purity and the non-empty-message invariant are preserved.
+- `domain::review_v2::Finding` → `ReviewerFinding` (plus cascade: `NonEmptyFindings` → `NonEmptyReviewerFindings`, `FindingError` → `ReviewerFindingError`).
+- `domain::verify::Finding` → `VerifyFinding`.
+- `usecase::review_workflow::ReviewFinding` and `usecase::pr_review::PrReviewFinding` unchanged (already distinct last-segment names).
+- `VerdictError::EmptyFindings` variant kept as-is (accurate semantic name).
+- `domain-types.json` suppression reference entry for `Finding` deleted and replaced with three `declare` entries (`ReviewerFinding`, `NonEmptyReviewerFindings`, `VerifyFinding`).
+- No backward-compatibility aliases; historical ADR and track artifact references to the old names are left as documented history. The sole exception is `track/items/tddd-01-multilayer-2026-04-12/domain-types.json`, which is the live catalogue source referenced from `architecture-rules.json` and is updated by T006 (per the previous bullet). Historical ADRs such as `knowledge/adr/2026-04-04-1456-review-system-v2-redesign.md` (contains 8 in-line `Finding` struct/type references across prose and Rust code blocks) and `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md` (contains 33 in-line `Finding::error` / `Finding::warning` pseudo-code references) are NOT retroactively edited.
+
+See ADR `2026-04-14-0625-finding-taxonomy-cleanup.md` for the full rationale, rejected alternatives, cascade rename enumeration, and consequences.
+
 **§3.C — async-trait proc-macro `is_async` detection**: deferred until async traits actually enter the codebase. Current usecase traits are all synchronous (verified by the tddd-02 seed: all 5 declared traits have `"is_async": false`). The existing Consequences §C2 constraint (catalog authors must use `"is_async": false` for `async-trait`-decorated methods) is sufficient for now. When an adoption project introduces `async fn in trait` or `async-trait`, a follow-up track should evaluate heuristic detection or a catalogue field extension.
 
 **§3.E — CI rustdoc cache strategy**: deferred to a dedicated optimization track. Enabling additional TDDD layers linearly grows `cargo +nightly rustdoc` invocations (2 layers now, more in the future). Caching the rustdoc JSON artifacts is orthogonal to the tddd-02 scope and should be measured / implemented independently.

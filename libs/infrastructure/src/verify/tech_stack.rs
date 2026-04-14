@@ -4,7 +4,7 @@
 
 use std::path::{Path, PathBuf};
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 use regex::Regex;
 
 const TECH_STACK_FILE: &str = "track/tech-stack.md";
@@ -21,7 +21,7 @@ const TRACK_ARCHIVE_DIR: &str = "track/archive";
 pub fn verify(root: &Path) -> VerifyOutcome {
     let tech_stack = root.join(TECH_STACK_FILE);
     if !tech_stack.is_file() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "Missing tech stack file: {TECH_STACK_FILE}"
         ))]);
     }
@@ -36,7 +36,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let content = match std::fs::read_to_string(&tech_stack) {
         Ok(c) => c,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Cannot read {TECH_STACK_FILE}: {e}"
             ))]);
         }
@@ -45,7 +45,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let unresolved_re = match Regex::new(r"(?m)^\s*(?:-|\||理由:).*TODO:") {
         Ok(re) => re,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Internal regex error: {e}"
             ))]);
         }
@@ -61,17 +61,18 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     match all_tracks_planned(root) {
         Some(true) => return VerifyOutcome::pass(),
         None => {
-            return VerifyOutcome::from_findings(vec![Finding::error(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(
                 "Cannot read track metadata; refusing to skip tech stack check".to_owned(),
             )]);
         }
         Some(false) => {}
     }
 
-    let mut findings =
-        vec![Finding::error(format!("Unresolved tech stack TODOs found in {TECH_STACK_FILE}:"))];
+    let mut findings = vec![VerifyFinding::error(format!(
+        "Unresolved tech stack TODOs found in {TECH_STACK_FILE}:"
+    ))];
     for line in &unresolved {
-        findings.push(Finding::error(format!("  {line}")));
+        findings.push(VerifyFinding::error(format!("  {line}")));
     }
     VerifyOutcome::from_findings(findings)
 }

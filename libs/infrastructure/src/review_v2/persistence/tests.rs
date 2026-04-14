@@ -3,7 +3,8 @@
 #![allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
 
 use domain::review_v2::{
-    FastVerdict, Finding, MainScopeName, ReviewHash, ReviewReader, ReviewWriter, ScopeName, Verdict,
+    FastVerdict, MainScopeName, ReviewHash, ReviewReader, ReviewWriter, ReviewerFinding, ScopeName,
+    Verdict,
 };
 
 use super::review_store::FsReviewStore;
@@ -20,8 +21,8 @@ fn sample_hash() -> ReviewHash {
     ReviewHash::computed("rvw1:sha256:abcdef0123456789").unwrap()
 }
 
-fn sample_finding() -> Finding {
-    Finding::new(
+fn sample_finding() -> ReviewerFinding {
+    ReviewerFinding::new(
         "test finding",
         Some("P2".to_owned()),
         Some("lib.rs".to_owned()),

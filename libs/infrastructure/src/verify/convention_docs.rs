@@ -5,7 +5,7 @@
 
 use std::path::Path;
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 use regex::Regex;
 
 const INDEX_START: &str = "<!-- convention-docs:start -->";
@@ -46,7 +46,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
 
     if !readme_path.is_file() {
         if has_convention_docs {
-            return VerifyOutcome::from_findings(vec![Finding::error(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(
                 "knowledge/conventions contains convention documents but is missing README.md"
                     .to_owned(),
             )]);
@@ -58,7 +58,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let content = match std::fs::read_to_string(&readme_path) {
         Ok(c) => c,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Cannot read knowledge/conventions/README.md: {e}"
             ))]);
         }
@@ -72,7 +72,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     )) {
         Ok(re) => re,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Internal regex error: {e}"
             ))]);
         }
@@ -81,7 +81,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let actual_block = match marker_re.find(&content) {
         Some(m) => m.as_str().to_owned(),
         None => {
-            return VerifyOutcome::from_findings(vec![Finding::error(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(
                 "README index markers not found in knowledge/conventions/README.md".to_owned(),
             )]);
         }
@@ -90,11 +90,11 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let expected = match render_index_block(&conventions_dir) {
         Ok(block) => block,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(e)]);
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(e)]);
         }
     };
     if actual_block != expected {
-        return VerifyOutcome::from_findings(vec![Finding::error(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(
             "Convention README index is out of sync. To fix: run `cargo make conventions-update-index`."
                 .to_owned(),
         )]);

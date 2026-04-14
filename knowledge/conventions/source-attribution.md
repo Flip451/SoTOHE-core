@@ -26,7 +26,7 @@ Every requirement, constraint, and acceptance criterion in `spec.md` must carry 
 
 The merge gate (invoked via `sotp pr wait-and-merge`) blocks merge when any
 requirement still has a Yellow source. CI runs in interim mode and surfaces
-Yellow as a `Finding::warning` (visible in `cargo make ci` output) without
+Yellow as a `VerifyFinding::warning` (visible in `cargo make ci` output) without
 blocking development iteration — see ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md` §D8.
 
 ### Upgrading Yellow to Blue

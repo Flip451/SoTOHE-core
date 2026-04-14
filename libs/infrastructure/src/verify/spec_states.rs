@@ -8,7 +8,7 @@ use std::path::Path;
 
 use domain::check_type_signals;
 use domain::spec::check_spec_doc_signals;
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 
 use crate::tddd::catalogue_codec;
 use crate::track::symlink_guard;
@@ -29,11 +29,11 @@ use super::tddd_layers::{TdddLayerBinding, parse_tddd_layers};
 /// The same opt-in semantics apply to both the CI path and the merge gate.
 ///
 /// The `strict` parameter controls Yellow handling:
-/// - `true`: declared Yellow → `Finding::error` (merge gate)
-/// - `false`: declared Yellow → `Finding::warning` (CI interim mode — D8.6)
+/// - `true`: declared Yellow → `VerifyFinding::error` (merge gate)
+/// - `false`: declared Yellow → `VerifyFinding::warning` (CI interim mode — D8.6)
 ///
 /// Red, None, all-zero, empty entries, and coverage-gap conditions always
-/// return `Finding::error` regardless of `strict`.
+/// return `VerifyFinding::error` regardless of `strict`.
 ///
 /// The `trusted_root` parameter anchors the symlink guard (`reject_symlinks_below`):
 /// the guard walks ancestors of `spec_json_path` only until it reaches
@@ -66,13 +66,13 @@ pub fn verify_from_spec_json(
     match symlink_guard::reject_symlinks_below(spec_json_path, trusted_root) {
         Ok(true) => {}
         Ok(false) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "cannot read {}: file not found",
                 spec_json_path.display()
             ))]);
         }
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "{}: {e}",
                 spec_json_path.display()
             ))]);
@@ -82,7 +82,7 @@ pub fn verify_from_spec_json(
     let spec_json = match std::fs::read_to_string(spec_json_path) {
         Ok(s) => s,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "cannot read {}: {e}",
                 spec_json_path.display()
             ))]);
@@ -91,7 +91,7 @@ pub fn verify_from_spec_json(
     let spec_doc = match crate::spec::codec::decode(&spec_json) {
         Ok(d) => d,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "{}: spec.json decode error: {e}",
                 spec_json_path.display()
             ))]);
@@ -140,7 +140,7 @@ pub fn verify_from_spec_json(
 ///
 /// The symlink guard (`reject_symlinks_below`, D4.3) is applied before reading
 /// the file, consistent with how `spec.json` and per-layer catalogues are read.
-fn load_tddd_layers(trusted_root: &Path) -> Result<Vec<TdddLayerBinding>, Finding> {
+fn load_tddd_layers(trusted_root: &Path) -> Result<Vec<TdddLayerBinding>, VerifyFinding> {
     let path = trusted_root.join("architecture-rules.json");
     // D4.3 CI path: reject symlinks before reading, consistent with spec.json
     // and catalogue guards.
@@ -149,27 +149,27 @@ fn load_tddd_layers(trusted_root: &Path) -> Result<Vec<TdddLayerBinding>, Findin
         Ok(false) => {
             // Fail-closed: match the merge-gate contract. A repo / test dir
             // without architecture-rules.json cannot run Stage 2 at all.
-            return Err(Finding::error(format!(
+            return Err(VerifyFinding::error(format!(
                 "{}: architecture-rules.json not found — \
                  the type-signal gate requires the file to enumerate TDDD layers",
                 path.display()
             )));
         }
         Err(e) => {
-            return Err(Finding::error(format!("{}: {e}", path.display())));
+            return Err(VerifyFinding::error(format!("{}: {e}", path.display())));
         }
     }
     let content = std::fs::read_to_string(&path)
-        .map_err(|e| Finding::error(format!("cannot read {}: {e}", path.display())))?;
+        .map_err(|e| VerifyFinding::error(format!("cannot read {}: {e}", path.display())))?;
     let bindings = parse_tddd_layers(&content)
-        .map_err(|e| Finding::error(format!("{}: {e}", path.display())))?;
+        .map_err(|e| VerifyFinding::error(format!("{}: {e}", path.display())))?;
     // T007 fail-closed: a parsed-but-empty binding list (every layer
     // `tddd.enabled = false`, or a rules file without any `tddd` blocks)
     // is treated as a configuration error. Silently skipping Stage 2 would
     // let CI pass on a rules file that disabled every layer, which breaks
     // the strict enforcement contract shared with `check_strict_merge_gate`.
     if bindings.is_empty() {
-        return Err(Finding::error(format!(
+        return Err(VerifyFinding::error(format!(
             "{}: architecture-rules.json declares no tddd.enabled layers — \
              the type-signal gate cannot verify an empty layer set",
             path.display()
@@ -183,7 +183,7 @@ fn load_tddd_layers(trusted_root: &Path) -> Result<Vec<TdddLayerBinding>, Findin
 /// `dir` is the track directory that contains the catalogue file.
 /// NotFound on the catalogue file is treated as "TDDD not active for this
 /// layer" and returns a clean outcome (no findings). Other errors return
-/// fail-closed [`Finding::error`] entries.
+/// fail-closed [`VerifyFinding::error`] entries.
 fn evaluate_layer_catalogue(
     binding: &TdddLayerBinding,
     dir: &Path,
@@ -200,7 +200,7 @@ fn evaluate_layer_catalogue(
             return VerifyOutcome::pass();
         }
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "{}: {e}",
                 catalogue_path.display()
             ))]);
@@ -210,7 +210,7 @@ fn evaluate_layer_catalogue(
     let json = match std::fs::read_to_string(&catalogue_path) {
         Ok(s) => s,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "cannot read {}: {e}",
                 catalogue_path.display()
             ))]);
@@ -220,7 +220,7 @@ fn evaluate_layer_catalogue(
     let doc = match catalogue_codec::decode(&json) {
         Ok(d) => d,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "{}: invalid {}: {e}",
                 catalogue_path.display(),
                 binding.catalogue_file()
@@ -259,7 +259,7 @@ pub fn verify(spec_path: &Path, strict: bool, trusted_root: &Path) -> VerifyOutc
     let content = match std::fs::read_to_string(spec_path) {
         Ok(c) => c,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "cannot read {}: {e}",
                 spec_path.display()
             ))]);
@@ -306,7 +306,7 @@ pub fn verify(spec_path: &Path, strict: bool, trusted_root: &Path) -> VerifyOutc
     }
 
     let Some(section_idx) = section_start else {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{}: missing '## Domain States' section",
             spec_path.display()
         ))]);
@@ -350,7 +350,7 @@ pub fn verify(spec_path: &Path, strict: bool, trusted_root: &Path) -> VerifyOutc
     }
 
     if table_lines.is_empty() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{}: '## Domain States' section has no markdown table",
             spec_path.display()
         ))]);
@@ -361,7 +361,7 @@ pub fn verify(spec_path: &Path, strict: bool, trusted_root: &Path) -> VerifyOutc
     let sep_idx = table_lines.iter().position(|l| is_table_separator(l));
 
     let Some(sep_pos) = sep_idx else {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{}: '## Domain States' table has no separator row (header-only table)",
             spec_path.display()
         ))]);
@@ -369,7 +369,7 @@ pub fn verify(spec_path: &Path, strict: bool, trusted_root: &Path) -> VerifyOutc
 
     // Separator must be preceded by at least one header row.
     if sep_pos == 0 {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{}: '## Domain States' table has no header row before separator",
             spec_path.display()
         ))]);
@@ -380,7 +380,7 @@ pub fn verify(spec_path: &Path, strict: bool, trusted_root: &Path) -> VerifyOutc
         table_lines.iter().skip(sep_pos + 1).copied().filter(|l| !is_table_separator(l)).collect();
 
     if data_rows.is_empty() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{}: '## Domain States' table has no data rows (header + separator only)",
             spec_path.display()
         ))]);

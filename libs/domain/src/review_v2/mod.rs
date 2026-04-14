@@ -13,14 +13,14 @@ pub mod types;
 mod tests;
 
 pub use error::{
-    CommitHashError, FilePathError, FindingError, ReviewHashError, ReviewReaderError,
-    ReviewWriterError, ScopeConfigError, ScopeNameError, VerdictError,
+    CommitHashError, FilePathError, ReviewHashError, ReviewReaderError, ReviewWriterError,
+    ReviewerFindingError, ScopeConfigError, ScopeNameError, VerdictError,
 };
 pub use ports::{CommitHashReader, CommitHashWriter, ReviewReader, ReviewWriter};
 pub use scope_config::ReviewScopeConfig;
 pub use types::{
-    FastVerdict, FilePath, Finding, LogInfo, MainScopeName, NonEmptyFindings, NotRequiredReason,
+    FastVerdict, FilePath, LogInfo, MainScopeName, NonEmptyReviewerFindings, NotRequiredReason,
     RequiredReason, ReviewHash, ReviewHashValue, ReviewOutcome, ReviewState, ReviewTarget,
-    RoundType, ScopeName, Verdict, extract_verdict_json_candidates_compact,
+    ReviewerFinding, RoundType, ScopeName, Verdict, extract_verdict_json_candidates_compact,
     extract_verdict_json_candidates_multiline,
 };

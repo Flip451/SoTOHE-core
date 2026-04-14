@@ -4,7 +4,7 @@
 
 use std::path::Path;
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 
 const ARCH_RULES_FILE: &str = "architecture-rules.json";
 
@@ -18,7 +18,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let rules_content = match std::fs::read_to_string(&rules_path) {
         Ok(c) => c,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Cannot read {ARCH_RULES_FILE}: {e}"
             ))]);
         }
@@ -27,7 +27,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let rules: serde_json::Value = match serde_json::from_str(&rules_content) {
         Ok(v) => v,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "Cannot parse {ARCH_RULES_FILE}: {e}"
             ))]);
         }
@@ -53,11 +53,11 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     for (rel_path, line_count) in file_sizes {
         if line_count > max_lines {
             // Warning (not error) until Phase 1.5 refactoring reduces existing large files.
-            findings.push(Finding::warning(format!(
+            findings.push(VerifyFinding::warning(format!(
                 "{rel_path}: {line_count} lines (max {max_lines})"
             )));
         } else if line_count > warn_lines {
-            findings.push(Finding::warning(format!(
+            findings.push(VerifyFinding::warning(format!(
                 "{rel_path}: {line_count} lines (warn threshold {warn_lines})"
             )));
         }
@@ -70,14 +70,14 @@ fn collect_rs_files(
     root: &Path,
     dir: &Path,
     excludes: &[&str],
-    findings: &mut Vec<Finding>,
+    findings: &mut Vec<VerifyFinding>,
     results: &mut Vec<(String, usize)>,
 ) {
     let entries = match std::fs::read_dir(dir) {
         Ok(e) => e,
         Err(e) => {
             let rel = dir.strip_prefix(root).unwrap_or(dir);
-            findings.push(Finding::error(format!(
+            findings.push(VerifyFinding::error(format!(
                 "{}: cannot read directory: {e}",
                 rel.to_string_lossy()
             )));
@@ -90,7 +90,7 @@ fn collect_rs_files(
             Ok(e) => e,
             Err(e) => {
                 let rel = dir.strip_prefix(root).unwrap_or(dir);
-                findings.push(Finding::error(format!(
+                findings.push(VerifyFinding::error(format!(
                     "{}: cannot read entry: {e}",
                     rel.to_string_lossy()
                 )));
@@ -115,7 +115,8 @@ fn collect_rs_files(
             let line_count = match std::fs::read_to_string(&path) {
                 Ok(content) => content.lines().count(),
                 Err(e) => {
-                    findings.push(Finding::error(format!("{rel_str}: cannot read file: {e}")));
+                    findings
+                        .push(VerifyFinding::error(format!("{rel_str}: cannot read file: {e}")));
                     continue;
                 }
             };

@@ -150,9 +150,9 @@ fn emit_verdict_output_fast(verdict: &domain::review_v2::FastVerdict) -> Result<
     Ok(exit_code)
 }
 
-/// Converts a domain `Finding` to a `ReviewFinding` for JSON serialization.
+/// Converts a domain `ReviewerFinding` to a `ReviewFinding` for JSON serialization.
 fn finding_to_review_finding(
-    f: &domain::review_v2::Finding,
+    f: &domain::review_v2::ReviewerFinding,
 ) -> usecase::review_workflow::ReviewFinding {
     usecase::review_workflow::ReviewFinding {
         message: f.message().to_owned(),

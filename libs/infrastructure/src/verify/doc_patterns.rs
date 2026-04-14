@@ -5,7 +5,7 @@
 
 use std::path::Path;
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 
 /// A single "require file exists" check.
 struct RequireFile {
@@ -56,7 +56,7 @@ fn require_file(root: &Path, rel_path: &str, label: &str) -> VerifyOutcome {
     if root.join(rel_path).is_file() {
         VerifyOutcome::pass()
     } else {
-        VerifyOutcome::from_findings(vec![Finding::error(format!(
+        VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "Missing file: {rel_path} ({label})"
         ))])
     }
@@ -65,7 +65,7 @@ fn require_file(root: &Path, rel_path: &str, label: &str) -> VerifyOutcome {
 fn require_line(root: &Path, rel_path: &str, pattern: &str, label: &str) -> VerifyOutcome {
     let path = root.join(rel_path);
     if !path.is_file() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{rel_path} not found (checking for: {label})"
         ))]);
     }
@@ -74,12 +74,12 @@ fn require_line(root: &Path, rel_path: &str, pattern: &str, label: &str) -> Veri
             if content.contains(pattern) {
                 VerifyOutcome::pass()
             } else {
-                VerifyOutcome::from_findings(vec![Finding::error(format!(
+                VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                     "Missing in {rel_path}: {label}"
                 ))])
             }
         }
-        Err(e) => VerifyOutcome::from_findings(vec![Finding::error(format!(
+        Err(e) => VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "Cannot read {rel_path}: {e}"
         ))]),
     }

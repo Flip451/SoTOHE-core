@@ -27,11 +27,35 @@
       ]
     },
     {
-      "name": "Finding",
-      "description": "Reference entry for the pre-existing same-name type collision between domain::verify::Finding and domain::review_v2::types::Finding. The collision is documented as a known issue; this reference declaration suppresses the baseline_changed_type Red signal caused by non-deterministic HashMap ordering at TypeGraph build time",
+      "name": "VerifyFinding",
+      "description": "Structured error or warning produced by sotp verify subcommands. Has a Severity (Info/Warning/Error) and a message string.",
       "approved": true,
       "action": "reference",
       "kind": "value_object"
+    },
+    {
+      "name": "ReviewerFinding",
+      "description": "Domain-validated reviewer finding. Invariant: message is non-empty. Counterpart to usecase::review_workflow::ReviewFinding (serde DTO).",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
+    },
+    {
+      "name": "NonEmptyReviewerFindings",
+      "description": "Non-empty collection of ReviewerFinding values. Used as the inner payload of Verdict::FindingsRemain and FastVerdict::FindingsRemain.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
+    },
+    {
+      "name": "ReviewerFindingError",
+      "description": "Error variants for ReviewerFinding::new constructor validation. Variant EmptyMessage indicates that the reviewer finding message is empty or whitespace-only.",
+      "approved": true,
+      "action": "reference",
+      "kind": "enum",
+      "expected_variants": [
+        "EmptyMessage"
+      ]
     }
   ],
   "signals": [
@@ -58,10 +82,31 @@
       ]
     },
     {
-      "type_name": "Finding",
+      "type_name": "VerifyFinding",
       "kind_tag": "value_object",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "ReviewerFinding",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "NonEmptyReviewerFindings",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewerFindingError",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "EmptyMessage"
+      ]
     }
   ]
 }

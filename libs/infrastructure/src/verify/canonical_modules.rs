@@ -7,7 +7,7 @@
 
 use std::path::Path;
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 use regex::Regex;
 use serde::Deserialize;
 
@@ -53,7 +53,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let content = match std::fs::read_to_string(&rules_path) {
         Ok(c) => c,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "cannot read {ARCH_RULES_FILE}: {e}"
             ))]);
         }
@@ -62,7 +62,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let arch_rules: ArchitectureRules = match serde_json::from_str(&content) {
         Ok(v) => v,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "cannot parse {ARCH_RULES_FILE}: {e}"
             ))]);
         }
@@ -71,7 +71,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     let rules = match compile_canonical_rules(&arch_rules.canonical_modules) {
         Ok(r) => r,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(e)]);
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(e)]);
         }
     };
 
@@ -106,7 +106,7 @@ fn compile_canonical_rules(raw_rules: &[RawCanonicalRule]) -> Result<Vec<Canonic
     Ok(rules)
 }
 
-fn scan_rust_files(root: &Path, rules: &[CanonicalRule], findings: &mut Vec<Finding>) {
+fn scan_rust_files(root: &Path, rules: &[CanonicalRule], findings: &mut Vec<VerifyFinding>) {
     // Walk libs/ and apps/ directories for .rs files
     for dir_name in &["libs", "apps"] {
         let dir = root.join(dir_name);
@@ -116,11 +116,14 @@ fn scan_rust_files(root: &Path, rules: &[CanonicalRule], findings: &mut Vec<Find
     }
 }
 
-fn walk_dir(dir: &Path, root: &Path, rules: &[CanonicalRule], findings: &mut Vec<Finding>) {
+fn walk_dir(dir: &Path, root: &Path, rules: &[CanonicalRule], findings: &mut Vec<VerifyFinding>) {
     let entries = match std::fs::read_dir(dir) {
         Ok(e) => e,
         Err(e) => {
-            findings.push(Finding::error(format!("cannot read directory {}: {e}", dir.display())));
+            findings.push(VerifyFinding::error(format!(
+                "cannot read directory {}: {e}",
+                dir.display()
+            )));
             return;
         }
     };
@@ -129,8 +132,10 @@ fn walk_dir(dir: &Path, root: &Path, rules: &[CanonicalRule], findings: &mut Vec
         let entry = match entry {
             Ok(e) => e,
             Err(e) => {
-                findings
-                    .push(Finding::error(format!("cannot read entry in {}: {e}", dir.display())));
+                findings.push(VerifyFinding::error(format!(
+                    "cannot read entry in {}: {e}",
+                    dir.display()
+                )));
                 continue;
             }
         };
@@ -149,7 +154,12 @@ fn walk_dir(dir: &Path, root: &Path, rules: &[CanonicalRule], findings: &mut Vec
     }
 }
 
-fn check_file(path: &Path, root: &Path, rules: &[CanonicalRule], findings: &mut Vec<Finding>) {
+fn check_file(
+    path: &Path,
+    root: &Path,
+    rules: &[CanonicalRule],
+    findings: &mut Vec<VerifyFinding>,
+) {
     let rel = match path.strip_prefix(root) {
         Ok(r) => r.to_string_lossy().to_string(),
         Err(_) => return,
@@ -161,7 +171,8 @@ fn check_file(path: &Path, root: &Path, rules: &[CanonicalRule], findings: &mut 
     let content = match std::fs::read_to_string(path) {
         Ok(c) => c,
         Err(e) => {
-            findings.push(Finding::error(format!("cannot read file {}: {e}", path.display())));
+            findings
+                .push(VerifyFinding::error(format!("cannot read file {}: {e}", path.display())));
             return;
         }
     };
@@ -188,7 +199,7 @@ fn check_file(path: &Path, root: &Path, rules: &[CanonicalRule], findings: &mut 
                         format!(" (see {})", rule.convention)
                     };
 
-                    findings.push(Finding::error(format!(
+                    findings.push(VerifyFinding::error(format!(
                         "{}:{}: forbidden pattern for '{}' concern: `{}`{}",
                         rel_normalized,
                         line_num + 1,

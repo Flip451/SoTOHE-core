@@ -168,10 +168,12 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
                         &trusted_root,
                     ),
                     Err(e) => {
-                        VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
-                            "cannot resolve trusted_root for {}: {e}",
-                            args.spec_path.display()
-                        ))])
+                        VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                            format!(
+                                "cannot resolve trusted_root for {}: {e}",
+                                args.spec_path.display()
+                            ),
+                        )])
                     }
                 };
             ("verify spec states", outcome)
@@ -179,9 +181,11 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
         VerifyCommand::SpecCoverage(args) => {
             let outcome = match &args.track_dir {
                 Some(dir) if dir.is_dir() => infrastructure::verify::spec_coverage::verify(dir),
-                Some(dir) => VerifyOutcome::from_findings(vec![domain::verify::Finding::error(
-                    format!("Track directory does not exist: {}", dir.display()),
-                )]),
+                Some(dir) => {
+                    VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                        format!("Track directory does not exist: {}", dir.display()),
+                    )])
+                }
                 None => VerifyOutcome::pass(),
             };
             ("verify spec coverage", outcome)
@@ -203,9 +207,9 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
     let track_id = match domain::TrackId::try_new(&args.track_id) {
         Ok(id) => id,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
-                "invalid track ID: {e}"
-            ))]);
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("invalid track ID: {e}"),
+            )]);
         }
     };
 
@@ -216,19 +220,18 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
     let json = match std::fs::read_to_string(&domain_types_path) {
         Ok(s) => s,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
-                "cannot read {}: {e}",
-                domain_types_path.display()
-            ))]);
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("cannot read {}: {e}", domain_types_path.display()),
+            )]);
         }
     };
 
     let doc = match infrastructure::tddd::catalogue_codec::decode(&json) {
         Ok(d) => d,
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
-                "domain-types.json decode error: {e}"
-            ))]);
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("domain-types.json decode error: {e}"),
+            )]);
         }
     };
 
@@ -243,9 +246,9 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
             } else {
                 ""
             };
-            return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
-                "schema export failed: {e}{hint}"
-            ))]);
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("schema export failed: {e}{hint}"),
+            )]);
         }
     };
 
@@ -259,22 +262,23 @@ fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome
         Ok(bl_json) => match infrastructure::tddd::baseline_codec::decode(&bl_json) {
             Ok(bl) => bl,
             Err(e) => {
-                return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(
+                return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
                     format!("baseline decode error: {e}"),
                 )]);
             }
         },
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
-                "domain-types-baseline.json not found — run `sotp track baseline-capture {}`",
-                args.track_id
-            ))]);
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!(
+                    "domain-types-baseline.json not found — run `sotp track baseline-capture {}`",
+                    args.track_id
+                ),
+            )]);
         }
         Err(e) => {
-            return VerifyOutcome::from_findings(vec![domain::verify::Finding::error(format!(
-                "cannot read {}: {e}",
-                baseline_path.display()
-            ))]);
+            return VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+                format!("cannot read {}: {e}", baseline_path.display()),
+            )]);
         }
     };
 
@@ -303,7 +307,7 @@ fn evaluate_consistency_from_components(
     if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
 }
 
-/// Convert a `ConsistencyReport` into a flat list of `Finding`s for `VerifyOutcome`.
+/// Convert a `ConsistencyReport` into a flat list of `VerifyFinding`s for `VerifyOutcome`.
 ///
 /// The domain layer patches an invalid `action=delete` (no baseline match) entry into a
 /// Red forward signal AND stores the name in `delete_errors()`.  To avoid duplicate
@@ -315,11 +319,11 @@ fn evaluate_consistency_from_components(
 ///
 /// # Returns
 ///
-/// A `Vec<Finding>` with errors for Red signals, errors for undeclared/baseline-red
+/// A `Vec<VerifyFinding>` with errors for Red signals, errors for undeclared/baseline-red
 /// items, warnings for contradictions, and errors for invalid delete declarations.
 fn consistency_report_to_findings(
     report: &domain::ConsistencyReport,
-) -> Vec<domain::verify::Finding> {
+) -> Vec<domain::verify::VerifyFinding> {
     let mut findings = Vec::new();
 
     // Collect delete_error names upfront so their patched forward signals can be
@@ -337,7 +341,7 @@ fn consistency_report_to_findings(
                 && sig.missing_items().is_empty()
                 && sig.extra_items().is_empty();
             if !is_delete_error_signal {
-                findings.push(domain::verify::Finding::error(format!(
+                findings.push(domain::verify::VerifyFinding::error(format!(
                     "{} ({}): Red — missing={:?}, extra={:?}",
                     sig.type_name(),
                     sig.kind_tag(),
@@ -350,31 +354,31 @@ fn consistency_report_to_findings(
 
     // Group 4: undeclared types/traits (not in baseline, not declared) → Red.
     for name in report.undeclared_types() {
-        findings.push(domain::verify::Finding::error(format!(
+        findings.push(domain::verify::VerifyFinding::error(format!(
             "undeclared new type in code: `{name}` — add to domain-types.json"
         )));
     }
     for name in report.undeclared_traits() {
-        findings.push(domain::verify::Finding::error(format!(
+        findings.push(domain::verify::VerifyFinding::error(format!(
             "undeclared new trait in code: `{name}` — add to domain-types.json"
         )));
     }
 
     // Group 3: baseline structural changes or deletions → Red.
     for name in report.baseline_red_types() {
-        findings.push(domain::verify::Finding::error(format!(
+        findings.push(domain::verify::VerifyFinding::error(format!(
             "undeclared structural change to baseline type: `{name}` — add to domain-types.json"
         )));
     }
     for name in report.baseline_red_traits() {
-        findings.push(domain::verify::Finding::error(format!(
+        findings.push(domain::verify::VerifyFinding::error(format!(
             "undeclared structural change to baseline trait: `{name}` — add to domain-types.json"
         )));
     }
 
     // Action-baseline contradictions → warnings (advisory, not CI-blocking).
     for contradiction in report.contradictions() {
-        findings.push(domain::verify::Finding::warning(format!(
+        findings.push(domain::verify::VerifyFinding::warning(format!(
             "{} (action={}): {:?}",
             contradiction.name(),
             contradiction.action().action_tag(),
@@ -385,7 +389,7 @@ fn consistency_report_to_findings(
     // Delete baseline validation errors → hard errors (CI-blocking, specific diagnostic).
     // These replace the suppressed generic Red forward signal for the same entry.
     for name in report.delete_errors() {
-        findings.push(domain::verify::Finding::error(format!(
+        findings.push(domain::verify::VerifyFinding::error(format!(
             "action=delete for `{name}` but type not in baseline — cannot delete non-existent type"
         )));
     }
@@ -584,8 +588,9 @@ mod tests {
 
     #[test]
     fn test_print_outcome_returns_failure_for_errors() {
-        let outcome =
-            VerifyOutcome::from_findings(vec![domain::verify::Finding::error("something broke")]);
+        let outcome = VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::error(
+            "something broke",
+        )]);
         let exit = print_outcome("test", &outcome);
         assert_eq!(exit, ExitCode::FAILURE);
     }
@@ -593,7 +598,7 @@ mod tests {
     #[test]
     fn test_print_outcome_returns_success_for_warnings_only() {
         let outcome =
-            VerifyOutcome::from_findings(vec![domain::verify::Finding::warning("note this")]);
+            VerifyOutcome::from_findings(vec![domain::verify::VerifyFinding::warning("note this")]);
         let exit = print_outcome("test", &outcome);
         assert_eq!(exit, ExitCode::SUCCESS);
     }

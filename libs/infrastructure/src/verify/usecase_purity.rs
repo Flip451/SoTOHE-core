@@ -7,7 +7,7 @@
 
 use std::path::Path;
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 use syn::spanned::Spanned;
 use syn::visit::Visit;
 
@@ -49,7 +49,7 @@ const FORBIDDEN_MACROS: &[(&str, &str)] = &[
 pub(crate) fn check_layer_purity(root: &Path, src_dir: &str, layer_label: &str) -> VerifyOutcome {
     let src = root.join(src_dir);
     if !src.is_dir() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "{layer_label} source directory not found: {src_dir}"
         ))]);
     }
@@ -68,12 +68,12 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     check_layer_purity(root, USECASE_SRC_DIR, "Usecase")
 }
 
-fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<Finding>) {
+fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<VerifyFinding>) {
     let entries = match std::fs::read_dir(dir) {
         Ok(e) => e,
         Err(e) => {
             let rel = dir.strip_prefix(root).unwrap_or(dir);
-            findings.push(Finding::error(format!(
+            findings.push(VerifyFinding::error(format!(
                 "{}: cannot read directory: {e}",
                 rel.to_string_lossy()
             )));
@@ -86,7 +86,7 @@ fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<Finding>) {
             Ok(e) => e,
             Err(e) => {
                 let rel = dir.strip_prefix(root).unwrap_or(dir);
-                findings.push(Finding::error(format!(
+                findings.push(VerifyFinding::error(format!(
                     "{}: cannot read entry: {e}",
                     rel.to_string_lossy()
                 )));
@@ -104,7 +104,7 @@ fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<Finding>) {
                 }
                 Err(e) => {
                     let rel = path.strip_prefix(root).unwrap_or(&path);
-                    findings.push(Finding::error(format!(
+                    findings.push(VerifyFinding::error(format!(
                         "{}: cannot read file: {e}",
                         rel.to_string_lossy()
                     )));
@@ -114,11 +114,11 @@ fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<Finding>) {
     }
 }
 
-fn check_content(rel_path: &str, content: &str, findings: &mut Vec<Finding>) {
+fn check_content(rel_path: &str, content: &str, findings: &mut Vec<VerifyFinding>) {
     let file = match syn::parse_file(content) {
         Ok(f) => f,
         Err(e) => {
-            findings.push(Finding::warning(format!("{rel_path}: failed to parse: {e}")));
+            findings.push(VerifyFinding::warning(format!("{rel_path}: failed to parse: {e}")));
             return;
         }
     };
@@ -229,7 +229,7 @@ impl<'ast> Visit<'ast> for UseCollector {
 // ---------------------------------------------------------------------------
 
 struct PurityVisitor {
-    findings: Vec<Finding>,
+    findings: Vec<VerifyFinding>,
     rel_path: String,
     /// Maps local name → (full forbidden path, reason) for use-imported forbidden modules.
     /// E.g. `use std::process;` adds ("process", ["std", "process"]) so that
@@ -240,7 +240,7 @@ struct PurityVisitor {
 impl PurityVisitor {
     fn report(&mut self, span: proc_macro2::Span, pattern: &str, reason: &str) {
         let line = span.start().line;
-        self.findings.push(Finding::error(format!(
+        self.findings.push(VerifyFinding::error(format!(
             "{}:{}: `{}` found — {}",
             self.rel_path, line, pattern, reason
         )));

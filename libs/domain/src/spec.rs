@@ -514,11 +514,11 @@ pub fn evaluate_requirement_signal(sources: &[String]) -> ConfidenceSignal {
 ///
 /// # Rules
 ///
-/// - `signals` is `None` → `Finding::error` (unevaluated; run `sotp track signals` first)
-/// - `SignalCounts::total() == 0` → `Finding::error` (evaluated but empty — treated as unevaluated)
-/// - `signals.red > 0` → `Finding::error` (red is always an error, regardless of mode)
-/// - `signals.yellow > 0` and `strict = true` → `Finding::error` (merge gate rejects Yellow)
-/// - `signals.yellow > 0` and `strict = false` → `Finding::warning` (interim mode visualizes Yellow, PASSes)
+/// - `signals` is `None` → `VerifyFinding::error` (unevaluated; run `sotp track signals` first)
+/// - `SignalCounts::total() == 0` → `VerifyFinding::error` (evaluated but empty — treated as unevaluated)
+/// - `signals.red > 0` → `VerifyFinding::error` (red is always an error, regardless of mode)
+/// - `signals.yellow > 0` and `strict = true` → `VerifyFinding::error` (merge gate rejects Yellow)
+/// - `signals.yellow > 0` and `strict = false` → `VerifyFinding::warning` (interim mode visualizes Yellow, PASSes)
 /// - All Blue → `VerifyOutcome::pass()` (no findings)
 ///
 /// The `strict` parameter is:
@@ -528,23 +528,23 @@ pub fn evaluate_requirement_signal(sources: &[String]) -> ConfidenceSignal {
 /// Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md` §D2, §D8.6.
 #[must_use]
 pub fn check_spec_doc_signals(doc: &SpecDocument, strict: bool) -> crate::verify::VerifyOutcome {
-    use crate::verify::{Finding, VerifyOutcome};
+    use crate::verify::{VerifyFinding, VerifyOutcome};
 
     let Some(counts) = doc.signals() else {
-        return VerifyOutcome::from_findings(vec![Finding::error(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(
             "spec signals not yet evaluated — run `sotp track signals` first".to_owned(),
         )]);
     };
 
     if counts.total() == 0 {
-        return VerifyOutcome::from_findings(vec![Finding::error(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(
             "spec signals are all-zero (blue=0, yellow=0, red=0) — treated as unevaluated"
                 .to_owned(),
         )]);
     }
 
     if counts.has_red() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "spec signals have red={} (source attribution missing — every requirement must carry a `[source: ...]` tag)",
             counts.red()
         ))]);
@@ -556,9 +556,9 @@ pub fn check_spec_doc_signals(doc: &SpecDocument, strict: bool) -> crate::verify
             counts.yellow()
         );
         if strict {
-            return VerifyOutcome::from_findings(vec![Finding::error(message)]);
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(message)]);
         }
-        return VerifyOutcome::from_findings(vec![Finding::warning(message)]);
+        return VerifyOutcome::from_findings(vec![VerifyFinding::warning(message)]);
     }
 
     VerifyOutcome::pass()
@@ -1635,7 +1635,7 @@ mod tests {
 
     #[test]
     fn test_check_spec_doc_signals_yellow_is_warning_in_interim_mode() {
-        // D4: yellow>0, strict=false → PASS with Finding::warning
+        // D4: yellow>0, strict=false → PASS with VerifyFinding::warning
         let doc = doc_with_signals(Some(SignalCounts::new(3, 2, 0)));
         let outcome = check_spec_doc_signals(&doc, false);
         assert!(!outcome.has_errors(), "yellow in interim mode must not be an error: {outcome:?}");
@@ -1649,7 +1649,7 @@ mod tests {
 
     #[test]
     fn test_check_spec_doc_signals_yellow_is_error_in_strict_mode() {
-        // D5: yellow>0, strict=true → BLOCKED with Finding::error
+        // D5: yellow>0, strict=true → BLOCKED with VerifyFinding::error
         let doc = doc_with_signals(Some(SignalCounts::new(3, 2, 0)));
         let outcome = check_spec_doc_signals(&doc, true);
         assert!(outcome.has_errors(), "yellow in strict mode must be an error");

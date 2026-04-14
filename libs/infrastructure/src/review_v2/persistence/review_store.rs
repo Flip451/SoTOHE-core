@@ -4,8 +4,8 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 
 use domain::review_v2::{
-    FastVerdict, Finding, MainScopeName, ReviewHash, ReviewReader, ReviewReaderError, ReviewWriter,
-    ReviewWriterError, ScopeName, Verdict,
+    FastVerdict, MainScopeName, ReviewHash, ReviewReader, ReviewReaderError, ReviewWriter,
+    ReviewWriterError, ReviewerFinding, ScopeName, Verdict,
 };
 
 use super::{
@@ -142,7 +142,7 @@ impl FsReviewStore {
         scope: &ScopeName,
         round_type: &str,
         verdict_str: &str,
-        findings: &[Finding],
+        findings: &[ReviewerFinding],
         hash: &ReviewHash,
     ) -> Result<(), ReviewWriterError> {
         let _guard = WriteGuard::acquire(&self.path, &self.trusted_root)
@@ -285,10 +285,10 @@ fn parse_verdict(
             findings.len()
         ))),
         "findings_remain" => {
-            let domain_findings: Result<Vec<Finding>, _> = findings
+            let domain_findings: Result<Vec<ReviewerFinding>, _> = findings
                 .iter()
                 .map(|f| {
-                    Finding::new(
+                    ReviewerFinding::new(
                         &f.message,
                         f.severity.clone(),
                         f.file.clone(),

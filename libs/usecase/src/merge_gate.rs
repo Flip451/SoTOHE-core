@@ -16,7 +16,7 @@
 
 use domain::spec::{SpecDocument, check_spec_doc_signals};
 use domain::validate_branch_ref;
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 use domain::{TrackId, TrackMetadata};
 use domain::{TypeCatalogueDocument, check_type_signals};
 
@@ -124,7 +124,7 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
 
     // 2. Branch-name validation (D4.2, D5.2)
     if let Err(err) = validate_branch_ref(branch) {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "invalid branch ref: {err}"
         ))]);
     }
@@ -135,7 +135,7 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
     //    Non-track/ branches fall back to the full branch name (best-effort passthrough).
     let track_id = if let Some(suffix) = branch.strip_prefix("track/") {
         if let Err(err) = TrackId::try_new(suffix) {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "invalid track id derived from branch '{branch}': {err}"
             ))]);
         }
@@ -148,12 +148,12 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
     let spec_doc = match reader.read_spec_document(branch, track_id) {
         BlobFetchResult::Found(doc) => doc,
         BlobFetchResult::NotFound => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "spec.json not found on origin/{branch} — every track must have a spec.json"
             ))]);
         }
         BlobFetchResult::FetchError(msg) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "failed to read spec.json on origin/{branch}: {msg}"
             ))]);
         }
@@ -180,7 +180,7 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
                 // PR that disables every layer bypass strict gating. The
                 // caller must enable at least one layer (or explicitly
                 // delete the file, which is caught by the `NotFound` arm).
-                return VerifyOutcome::from_findings(vec![Finding::error(format!(
+                return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                     "architecture-rules.json on origin/{branch} declares no tddd.enabled \
                      layers — the strict merge gate cannot verify an empty layer set"
                 ))]);
@@ -193,13 +193,13 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
             // enforcement. The strict merge gate always requires the file
             // to exist so that the enabled-layer set is auditable on the PR
             // branch itself (ADR 0002 D1 + strict-signal-gate-v2 §D5.2).
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "architecture-rules.json not found on origin/{branch} — \
                  the strict merge gate requires the file to exist to enumerate TDDD layers"
             ))]);
         }
         BlobFetchResult::FetchError(msg) => {
-            return VerifyOutcome::from_findings(vec![Finding::error(format!(
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "failed to read architecture-rules.json on origin/{branch}: {msg}"
             ))]);
         }
@@ -212,7 +212,7 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
                 // TDDD opt-out for this layer — skip silently.
             }
             BlobFetchResult::FetchError(msg) => {
-                outcome.merge(VerifyOutcome::from_findings(vec![Finding::error(format!(
+                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                     "failed to read {layer_id}-types.json on origin/{branch}: {msg}"
                 ))]));
             }

@@ -5,7 +5,7 @@
 
 use std::path::Path;
 
-use domain::verify::{Finding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 
 const DOMAIN_SRC_DIR: &str = "libs/domain/src";
 
@@ -17,7 +17,7 @@ const DOMAIN_SRC_DIR: &str = "libs/domain/src";
 pub fn verify(root: &Path) -> VerifyOutcome {
     let domain_src = root.join(DOMAIN_SRC_DIR);
     if !domain_src.is_dir() {
-        return VerifyOutcome::from_findings(vec![Finding::error(format!(
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "Domain source directory not found: {DOMAIN_SRC_DIR}"
         ))]);
     }
@@ -27,12 +27,12 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     VerifyOutcome::from_findings(findings)
 }
 
-fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<Finding>) {
+fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<VerifyFinding>) {
     let entries = match std::fs::read_dir(dir) {
         Ok(e) => e,
         Err(e) => {
             let rel = dir.strip_prefix(root).unwrap_or(dir);
-            findings.push(Finding::error(format!(
+            findings.push(VerifyFinding::error(format!(
                 "{}: cannot read directory: {e}",
                 rel.to_string_lossy()
             )));
@@ -45,7 +45,7 @@ fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<Finding>) {
             Ok(e) => e,
             Err(e) => {
                 let rel = dir.strip_prefix(root).unwrap_or(dir);
-                findings.push(Finding::error(format!(
+                findings.push(VerifyFinding::error(format!(
                     "{}: cannot read entry: {e}",
                     rel.to_string_lossy()
                 )));
@@ -60,7 +60,7 @@ fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<Finding>) {
                 Ok(content) => check_file(&path, root, &content, findings),
                 Err(e) => {
                     let rel = path.strip_prefix(root).unwrap_or(&path);
-                    findings.push(Finding::error(format!(
+                    findings.push(VerifyFinding::error(format!(
                         "{}: cannot read file: {e}",
                         rel.to_string_lossy()
                     )));
@@ -70,14 +70,14 @@ fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<Finding>) {
     }
 }
 
-fn check_file(path: &Path, root: &Path, content: &str, findings: &mut Vec<Finding>) {
+fn check_file(path: &Path, root: &Path, content: &str, findings: &mut Vec<VerifyFinding>) {
     let rel = path.strip_prefix(root).unwrap_or(path);
     let rel_str = rel.to_string_lossy();
 
     check_content(&rel_str, content, findings);
 }
 
-fn check_content(rel_path: &str, content: &str, findings: &mut Vec<Finding>) {
+fn check_content(rel_path: &str, content: &str, findings: &mut Vec<VerifyFinding>) {
     // Stop scanning at #[cfg(test)] — test modules are conventionally at file end.
     // This avoids complex brace-depth tracking edge cases.
     let production_content = content.split("\n#[cfg(test)]").next().unwrap_or(content);
@@ -89,7 +89,7 @@ fn check_content(rel_path: &str, content: &str, findings: &mut Vec<Finding>) {
         // But NOT inside tuple structs (those are newtypes)
         if is_pub_string_field(trimmed) {
             // Warning (not error) until DM-01/02/03 type migration completes.
-            findings.push(Finding::warning(format!(
+            findings.push(VerifyFinding::warning(format!(
                 "{rel_path}:{}: pub String field: `{trimmed}` — \
                  if finite states, use an enum; if free text, wrap in a newtype",
                 line_num + 1

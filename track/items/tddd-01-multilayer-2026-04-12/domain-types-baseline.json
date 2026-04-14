@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "captured_at": "2026-04-13T01:54:59Z",
+  "captured_at": "2026-04-14T12:49:32Z",
   "types": {
     "ActionContradiction": {
       "kind": "struct",
@@ -383,7 +383,7 @@
           "params": [
             {
               "name": "findings",
-              "ty": "Vec<Finding>"
+              "ty": "Vec<ReviewerFinding>"
             }
           ],
           "returns": "Result<Self, VerdictError>",
@@ -429,135 +429,6 @@
         {
           "kind": "variant",
           "name": "Traversal"
-        }
-      ],
-      "methods": []
-    },
-    "Finding": {
-      "kind": "struct",
-      "members": [],
-      "methods": [
-        {
-          "name": "category",
-          "receiver": "&self",
-          "params": [],
-          "returns": "Option<&str>",
-          "is_async": false
-        },
-        {
-          "name": "error",
-          "params": [
-            {
-              "name": "message",
-              "ty": "impl Into"
-            }
-          ],
-          "returns": "Self",
-          "is_async": false
-        },
-        {
-          "name": "file",
-          "receiver": "&self",
-          "params": [],
-          "returns": "Option<&str>",
-          "is_async": false
-        },
-        {
-          "name": "line",
-          "receiver": "&self",
-          "params": [],
-          "returns": "Option<u64>",
-          "is_async": false
-        },
-        {
-          "name": "message",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&str",
-          "is_async": false
-        },
-        {
-          "name": "message",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&str",
-          "is_async": false
-        },
-        {
-          "name": "new",
-          "params": [
-            {
-              "name": "severity",
-              "ty": "Severity"
-            },
-            {
-              "name": "message",
-              "ty": "impl Into"
-            }
-          ],
-          "returns": "Self",
-          "is_async": false
-        },
-        {
-          "name": "new",
-          "params": [
-            {
-              "name": "message",
-              "ty": "impl Into"
-            },
-            {
-              "name": "severity",
-              "ty": "Option<String>"
-            },
-            {
-              "name": "file",
-              "ty": "Option<String>"
-            },
-            {
-              "name": "line",
-              "ty": "Option<u64>"
-            },
-            {
-              "name": "category",
-              "ty": "Option<String>"
-            }
-          ],
-          "returns": "Result<Self, FindingError>",
-          "is_async": false
-        },
-        {
-          "name": "severity",
-          "receiver": "&self",
-          "params": [],
-          "returns": "Severity",
-          "is_async": false
-        },
-        {
-          "name": "severity",
-          "receiver": "&self",
-          "params": [],
-          "returns": "Option<&str>",
-          "is_async": false
-        },
-        {
-          "name": "warning",
-          "params": [
-            {
-              "name": "message",
-              "ty": "impl Into"
-            }
-          ],
-          "returns": "Self",
-          "is_async": false
-        }
-      ]
-    },
-    "FindingError": {
-      "kind": "enum",
-      "members": [
-        {
-          "kind": "variant",
-          "name": "EmptyMessage"
         }
       ],
       "methods": []
@@ -1335,7 +1206,7 @@
       ],
       "methods": []
     },
-    "NonEmptyFindings": {
+    "NonEmptyReviewerFindings": {
       "kind": "struct",
       "members": [],
       "methods": [
@@ -1343,14 +1214,14 @@
           "name": "as_slice",
           "receiver": "&self",
           "params": [],
-          "returns": "&[Finding]",
+          "returns": "&[ReviewerFinding]",
           "is_async": false
         },
         {
           "name": "into_vec",
           "receiver": "self",
           "params": [],
-          "returns": "Vec<Finding>",
+          "returns": "Vec<ReviewerFinding>",
           "is_async": false
         },
         {
@@ -1358,7 +1229,7 @@
           "params": [
             {
               "name": "findings",
-              "ty": "Vec<Finding>"
+              "ty": "Vec<ReviewerFinding>"
             }
           ],
           "returns": "Result<Self, VerdictError>",
@@ -1820,6 +1691,84 @@
         {
           "kind": "variant",
           "name": "SymlinkDetected"
+        }
+      ],
+      "methods": []
+    },
+    "ReviewerFinding": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "category",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "file",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "line",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<u64>",
+          "is_async": false
+        },
+        {
+          "name": "message",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "message",
+              "ty": "impl Into"
+            },
+            {
+              "name": "severity",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "file",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "line",
+              "ty": "Option<u64>"
+            },
+            {
+              "name": "category",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Result<Self, ReviewerFindingError>",
+          "is_async": false
+        },
+        {
+          "name": "severity",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        }
+      ]
+    },
+    "ReviewerFindingError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "EmptyMessage"
         }
       ],
       "methods": []
@@ -3666,6 +3615,18 @@
       "members": [
         {
           "kind": "variant",
+          "name": "ApplicationService"
+        },
+        {
+          "kind": "variant",
+          "name": "Command"
+        },
+        {
+          "kind": "variant",
+          "name": "Dto"
+        },
+        {
+          "kind": "variant",
           "name": "Enum"
         },
         {
@@ -3674,11 +3635,27 @@
         },
         {
           "kind": "variant",
-          "name": "TraitPort"
+          "name": "Factory"
+        },
+        {
+          "kind": "variant",
+          "name": "Interactor"
+        },
+        {
+          "kind": "variant",
+          "name": "Query"
+        },
+        {
+          "kind": "variant",
+          "name": "SecondaryPort"
         },
         {
           "kind": "variant",
           "name": "Typestate"
+        },
+        {
+          "kind": "variant",
+          "name": "UseCase"
         },
         {
           "kind": "variant",
@@ -4175,7 +4152,7 @@
           "params": [
             {
               "name": "findings",
-              "ty": "Vec<Finding>"
+              "ty": "Vec<ReviewerFinding>"
             }
           ],
           "returns": "Result<Self, VerdictError>",
@@ -4193,6 +4170,63 @@
       ],
       "methods": []
     },
+    "VerifyFinding": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "error",
+          "params": [
+            {
+              "name": "message",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "message",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "severity",
+              "ty": "Severity"
+            },
+            {
+              "name": "message",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "severity",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Severity",
+          "is_async": false
+        },
+        {
+          "name": "warning",
+          "params": [
+            {
+              "name": "message",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
     "VerifyOutcome": {
       "kind": "struct",
       "members": [],
@@ -4203,7 +4237,7 @@
           "params": [
             {
               "name": "finding",
-              "ty": "Finding"
+              "ty": "VerifyFinding"
             }
           ],
           "returns": "()",
@@ -4220,7 +4254,7 @@
           "name": "findings",
           "receiver": "&self",
           "params": [],
-          "returns": "&[Finding]",
+          "returns": "&[VerifyFinding]",
           "is_async": false
         },
         {
@@ -4228,7 +4262,7 @@
           "params": [
             {
               "name": "findings",
-              "ty": "Vec<Finding>"
+              "ty": "Vec<VerifyFinding>"
             }
           ],
           "returns": "Self",

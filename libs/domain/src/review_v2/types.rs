@@ -1,6 +1,8 @@
 use std::fmt;
 
-use super::error::{FilePathError, FindingError, ReviewHashError, ScopeNameError, VerdictError};
+use super::error::{
+    FilePathError, ReviewHashError, ReviewerFindingError, ScopeNameError, VerdictError,
+};
 
 // ── FilePath ──────────────────────────────────────────────────────────
 
@@ -201,13 +203,13 @@ impl ReviewHash {
     }
 }
 
-// ── Finding ───────────────────────────────────────────────────────────
+// ── ReviewerFinding ───────────────────────────────────────────────────────────
 
 /// A single reviewer finding with optional location metadata.
 ///
 /// Invariant: `message` is non-empty (enforced by constructor).
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Finding {
+pub struct ReviewerFinding {
     message: String,
     severity: Option<String>,
     file: Option<String>,
@@ -215,21 +217,21 @@ pub struct Finding {
     category: Option<String>,
 }
 
-impl Finding {
+impl ReviewerFinding {
     /// Creates a new finding.
     ///
     /// # Errors
-    /// Returns `FindingError::EmptyMessage` if `message` is empty or whitespace-only.
+    /// Returns `ReviewerFindingError::EmptyMessage` if `message` is empty or whitespace-only.
     pub fn new(
         message: impl Into<String>,
         severity: Option<String>,
         file: Option<String>,
         line: Option<u64>,
         category: Option<String>,
-    ) -> Result<Self, FindingError> {
+    ) -> Result<Self, ReviewerFindingError> {
         let message = message.into();
         if message.trim().is_empty() {
-            return Err(FindingError::EmptyMessage);
+            return Err(ReviewerFindingError::EmptyMessage);
         }
         Ok(Self { message, severity, file, line, category })
     }
@@ -255,32 +257,32 @@ impl Finding {
     }
 }
 
-// ── NonEmptyFindings ──────────────────────────────────────────────────
+// ── NonEmptyReviewerFindings ──────────────────────────────────────────────────
 
 /// A non-empty collection of findings.
 ///
-/// Guarantees at least one `Finding` is present. The inner `Vec` is private —
+/// Guarantees at least one `ReviewerFinding` is present. The inner `Vec` is private —
 /// construction only through `new()`.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct NonEmptyFindings(Vec<Finding>);
+pub struct NonEmptyReviewerFindings(Vec<ReviewerFinding>);
 
-impl NonEmptyFindings {
+impl NonEmptyReviewerFindings {
     /// Creates a validated non-empty findings collection.
     ///
     /// # Errors
     /// Returns `VerdictError::EmptyFindings` if `findings` is empty.
-    pub fn new(findings: Vec<Finding>) -> Result<Self, VerdictError> {
+    pub fn new(findings: Vec<ReviewerFinding>) -> Result<Self, VerdictError> {
         if findings.is_empty() {
             return Err(VerdictError::EmptyFindings);
         }
         Ok(Self(findings))
     }
 
-    pub fn as_slice(&self) -> &[Finding] {
+    pub fn as_slice(&self) -> &[ReviewerFinding] {
         &self.0
     }
 
-    pub fn into_vec(self) -> Vec<Finding> {
+    pub fn into_vec(self) -> Vec<ReviewerFinding> {
         self.0
     }
 }
@@ -290,11 +292,11 @@ impl NonEmptyFindings {
 /// Final review verdict for a scope.
 ///
 /// Invariant: `FindingsRemain` always contains at least one finding
-/// (enforced by `NonEmptyFindings`).
+/// (enforced by `NonEmptyReviewerFindings`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Verdict {
     ZeroFindings,
-    FindingsRemain(NonEmptyFindings),
+    FindingsRemain(NonEmptyReviewerFindings),
 }
 
 impl Verdict {
@@ -302,8 +304,8 @@ impl Verdict {
     ///
     /// # Errors
     /// Returns `VerdictError::EmptyFindings` if `findings` is empty.
-    pub fn findings_remain(findings: Vec<Finding>) -> Result<Self, VerdictError> {
-        Ok(Self::FindingsRemain(NonEmptyFindings::new(findings)?))
+    pub fn findings_remain(findings: Vec<ReviewerFinding>) -> Result<Self, VerdictError> {
+        Ok(Self::FindingsRemain(NonEmptyReviewerFindings::new(findings)?))
     }
 }
 
@@ -323,7 +325,7 @@ pub enum RoundType {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FastVerdict {
     ZeroFindings,
-    FindingsRemain(NonEmptyFindings),
+    FindingsRemain(NonEmptyReviewerFindings),
 }
 
 impl FastVerdict {
@@ -331,8 +333,8 @@ impl FastVerdict {
     ///
     /// # Errors
     /// Returns `VerdictError::EmptyFindings` if `findings` is empty.
-    pub fn findings_remain(findings: Vec<Finding>) -> Result<Self, VerdictError> {
-        Ok(Self::FindingsRemain(NonEmptyFindings::new(findings)?))
+    pub fn findings_remain(findings: Vec<ReviewerFinding>) -> Result<Self, VerdictError> {
+        Ok(Self::FindingsRemain(NonEmptyReviewerFindings::new(findings)?))
     }
 }
 
