@@ -1,0 +1,31 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The final self-review checklist in `verification.md` is still unchecked (`- [ ]` on five items). The briefing explicitly requires all checkboxes in this artifact to be `[x]`, so the verification record still says completion is pending in one section while claiming completion elsewhere.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 92,
+              "category": "design_contradiction"
+            },
+            {
+              "message": "`verification.md` gives two different status values for T013: the Scope Verified section uses the full `Accepted (Phase 1 complete: tddd-01-multilayer-2026-04-12 + tddd-02-usecase-wiring-2026-04-14)` string, but the Result table shortens it to `Accepted (Phase 1 complete)`. That is status drift inside the final verification artifact.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "line": 116,
+              "category": "design_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2381ff9808ec0f8289e55272e74f52d92e945c21898197705f1f4d1cb23f5d04",
+          "at": "2026-04-14T04:05:40Z"
+        }
+      ]
+    }
+  }
+}

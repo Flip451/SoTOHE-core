@@ -87,13 +87,13 @@ cargo make ci
 # 期待: 全チェック通過、exit 0
 ```
 
-### 6. Self-review チェックリスト (`/track:review` 前)
+### 6. Self-review チェックリスト (`/track:review` 前 — 実行済み)
 
-- [ ] CLI subcommand 名が旧名を参照していないか grep
-- [ ] cross-doc 参照 (`.claude/commands/`, `knowledge/`) が新 kind_tag / 新 variant 名に追従しているか
-- [ ] Timestamps が全て UTC (`Z` suffix) であるか
-- [ ] spec.json / plan.md / spec.md の signals 再計算済みか
-- [ ] Dependencies 非循環 (domain → usecase → infrastructure → cli のみ)
+- [x] CLI subcommand 名が旧名を参照していないか grep (`rg 'domain-type-signals' apps/cli` zero hits)
+- [x] cross-doc 参照 (`.claude/commands/`, `knowledge/`) が新 kind_tag / 新 variant 名に追従しているか (T011 で design.md 書き換え、T013 で ADR 0002 更新)
+- [x] Timestamps が全て UTC (`Z` suffix) であるか (metadata.json の created_at / updated_at 確認)
+- [x] spec.json / plan.md / spec.md の signals 再計算済みか (Blue=49 / Yellow=0 / Red=0, content_hash 更新済み)
+- [x] Dependencies 非循環 (domain → usecase → infrastructure → cli のみ、`cargo make check-layers` pass)
 
 ## Result
 
@@ -113,7 +113,7 @@ cargo make ci
 | T010 | `cba52fe` | `sotp track type-signals --layer usecase` → **blue=11 yellow=0 red=0 (全 Blue, first pass)** |
 | T011 | `15431ba` | `.claude/commands/track/design.md` multi-layer loop 書き換え (162 → ~225 行、12 variants + `--layer` optional + `<catalogue_file>`/`<baseline_file>`/`<rendered_file>` derivation + spec.json-gated Stage 2) |
 | T012 | `15431ba` | merge gate U27-U30 新規テスト (usecase-enablement 2-layer 組み合わせ、empty enabled_layers fail-closed、35/35 tests pass) |
-| T013 | `15431ba` | ADR 0002 "Phase 1 Completion Amendment" 追加 + Status `Accepted (Phase 1 complete)` 更新 + async→is_async 統一 + child ADR `2026-04-13-1813` Status `Accepted` 更新 |
+| T013 | `15431ba` | ADR 0002 "Phase 1 Completion Amendment" 追加 + Status `Accepted (Phase 1 complete: tddd-01-multilayer-2026-04-12 + tddd-02-usecase-wiring-2026-04-14, 2026-04-14)` 更新 + async→is_async 統一 + child ADR `2026-04-13-1813` Status `Accepted` 更新 |
 | T014 | `15431ba` | `cargo make ci` 全通過 (fmt + clippy -D warnings + test + deny + check-layers + verify-spec-states + verify-spec-coverage + verify-view-freshness + verify-arch-docs + verify-domain-purity + verify-usecase-purity) |
 
 ### Review cycles per commit

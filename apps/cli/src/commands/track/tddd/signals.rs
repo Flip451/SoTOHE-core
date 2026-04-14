@@ -145,12 +145,28 @@ fn execute_type_signals_for_layer(
     let mut doc = catalogue_codec::decode(&json)
         .map_err(|e| CliError::Message(format!("{catalogue_file} decode error: {e}")))?;
 
-    // Resolve the target crate for schema export from the binding.
-    let target_crate = binding.targets().first().ok_or_else(|| {
-        CliError::Message(format!(
-            "schema_export.targets is empty for layer '{layer_id}'; check architecture-rules.json"
-        ))
-    })?;
+    // Resolve the target crate for schema export from the binding. Multi-target
+    // layers are modeled in `architecture-rules.json` (`schema_export.targets`)
+    // but full merge of multiple per-crate schema exports is not yet
+    // implemented. Fail-closed when more than one target is configured so that
+    // the caller is not silently given baseline/signal data computed from only
+    // the first crate — that would drop types/traits from the remaining crates
+    // and produce false undeclared/Red results on later signal evaluation.
+    let target_crate = match binding.targets() {
+        [single] => single,
+        [] => {
+            return Err(CliError::Message(format!(
+                "schema_export.targets is empty for layer '{layer_id}'; check architecture-rules.json"
+            )));
+        }
+        multi => {
+            return Err(CliError::Message(format!(
+                "layer '{layer_id}' has {} schema_export.targets ({:?}), but multi-target export is not yet implemented. Use a single-target layer or wait for multi-target merge support.",
+                multi.len(),
+                multi
+            )));
+        }
+    };
 
     // Export the target crate's public API via rustdoc JSON.
     let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
