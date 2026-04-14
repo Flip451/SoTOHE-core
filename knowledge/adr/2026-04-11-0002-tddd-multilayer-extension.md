@@ -2,7 +2,65 @@
 
 ## Status
 
-Accepted (implemented in track tddd-01-multilayer-2026-04-12, 2026-04-13)
+Accepted (Phase 1 complete: tddd-01-multilayer-2026-04-12 + tddd-02-usecase-wiring-2026-04-14, 2026-04-14)
+
+See also: `knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md` (child ADR for `TypeDefinitionKind` 12-variant taxonomy; Accepted as of tddd-02-usecase-wiring-2026-04-14).
+
+## Phase 1 Completion Amendment (tddd-02-usecase-wiring-2026-04-14)
+
+Phase 1 was completed across two tracks:
+
+- **tddd-01-multilayer-2026-04-12** built the multilayer infrastructure (`MethodDeclaration` + L1 forward/reverse check, `parse_tddd_layers`, per-layer merge gate loop, `catalogue_codec` / `baseline_codec` schema v2, `architecture-rules.json` `tddd` block).
+- **tddd-02-usecase-wiring-2026-04-14** completed the CLI-side wiring and dogfooded the result on the usecase layer.
+
+### 1. CLI-side completion and usecase layer wiring
+
+tddd-01 intentionally left `apps/cli/src/commands/track/tddd/{baseline,signals}.rs` with a `"domain"` hardcode and a Phase 1 reject block for non-domain layers. tddd-02 removed all of this:
+
+- `signals.rs` Phase 1 reject block (`non_domain_enabled`, `skipped_enabled_layers`, `if filter != "domain"` arm) completely deleted.
+- `baseline.rs` `--layer usecase` reject, `enforce_domain_tddd_enabled`, `synthetic_domain_binding` deleted. Legacy fallback (no `architecture-rules.json`) folded into the shared `resolve_layers` (`pub(crate)` in signals.rs, reused by baseline.rs).
+- `exporter.export("domain")` hardcode at both call sites replaced with `exporter.export(binding.targets().first().ok_or_else(...)?)`.
+- `execute_type_signals_single` → `execute_type_signals_for_layer` renamed; `execute_baseline_capture` / `execute_type_signals` became pure loops over bindings.
+- `architecture-rules.json` `usecase.tddd.enabled = true` with `catalogue_file: "usecase-types.json"` and `schema_export.targets: ["usecase"]`.
+
+First real dogfood: `usecase-types.json` seeded with 11 entries across 4 kind variants (`application_service`: `HookHandler`; `secondary_port`: `TrackBlobReader`, `Reviewer`, `DiffGetter`, `ReviewHasher`; `error_type`: `ReviewerError`, `DiffGetError`, `ReviewHasherError`, `ReviewCycleError`; `use_case`: `SaveTrackUseCase`, `LoadTrackUseCase`). `sotp track type-signals --layer usecase` returned `blue=11 yellow=0 red=0` on first pass — the full CLI + domain + infrastructure path works end-to-end for the usecase layer.
+
+### 2. `TypeDefinitionKind` taxonomy expansion (7 new variants + `TraitPort` → `SecondaryPort` rename)
+
+The original tddd-01 taxonomy had 5 variants (`Typestate`, `Enum`, `ValueObject`, `ErrorType`, `TraitPort`) — adequate for a `domain`-only TDDD footprint but insufficient for application-layer patterns. tddd-02 added 7 new variants and renamed `TraitPort` → `SecondaryPort` per the child ADR `2026-04-13-1813-tddd-taxonomy-expansion.md`:
+
+- `ApplicationService { expected_methods }` — primary/driving port trait
+- `UseCase` — struct-only use case (trait-less pattern, current SoTOHE style)
+- `Interactor` — struct implementing an `ApplicationService` (Clean Architecture style)
+- `Dto` — pure data container crossing layer boundaries
+- `Command` / `Query` — CQRS data objects
+- `Factory` — aggregate / entity factory struct
+- `SecondaryPort` (renamed from `TraitPort`) — secondary/driven port trait, symmetrical to `ApplicationService`
+
+Rationale: SoTOHE is a template adopted by projects with different application-layer architectures (Clean Architecture, DDD Application Service, CQRS, struct-only use case, etc.). The 5-variant taxonomy forced all of them into `value_object` or `trait_port`, losing semantic expressiveness. The expanded 12-variant taxonomy covers all common patterns while preserving the enum-first principle from `.claude/rules/04-coding-principles.md`. See the child ADR for the full rationale, rejected alternatives, and consequences.
+
+`ApplicationService` and `SecondaryPort` share the L1 method signature check via the shared helper `evaluate_trait_methods` in `libs/domain/src/tddd/signals.rs`. The struct-only variants (`UseCase` / `Interactor` / `Dto` / `Command` / `Query` / `Factory`) all route to the same existence-check path (`ValueObject` semantics). Variant-specific validation is intentionally deferred until an adoption project requests it — premature rules would constrain template adopters.
+
+### 3. Deferred follow-ups from Phase 2 handoff §3
+
+The following sub-items from `tmp/handoff/tddd-phase2-handoff-2026-04-13.md` §3 were evaluated during tddd-02 planning and deferred:
+
+**§3.B — `domain::review_v2::Finding` same-name collision → Red signal promotion**: deferred to follow-up track `tddd-04 finding-taxonomy-cleanup`. Rationale:
+
+- The natural rename target `ReviewFinding` is already taken by `usecase::review_workflow::ReviewFinding` (a distinct type).
+- `domain::review_v2::Finding` is deeply embedded in `Verdict::FindingsRemain(NonEmptyFindings)`, `FindingError`, and associated types — a rename requires cascading updates across the entire review_v2 module.
+- Four distinct `Finding` types exist across the codebase (`domain::review_v2::Finding`, `domain::verify::Finding`, `usecase::review_workflow::ReviewFinding`, `usecase::pr_review::PrReviewFinding`) — a proper fix requires taxonomy-level redesign, not a simple rename.
+- Attempting a partial fix would destabilize the type system during tddd-02's code wiring. The decision is to defer and handle Finding taxonomy as a dedicated track after tddd-02 is merged.
+
+**§3.C — async-trait proc-macro `is_async` detection**: deferred until async traits actually enter the codebase. Current usecase traits are all synchronous (verified by the tddd-02 seed: all 5 declared traits have `"is_async": false`). The existing Consequences §C2 constraint (catalog authors must use `"is_async": false` for `async-trait`-decorated methods) is sufficient for now. When an adoption project introduces `async fn in trait` or `async-trait`, a follow-up track should evaluate heuristic detection or a catalogue field extension.
+
+**§3.E — CI rustdoc cache strategy**: deferred to a dedicated optimization track. Enabling additional TDDD layers linearly grows `cargo +nightly rustdoc` invocations (2 layers now, more in the future). Caching the rustdoc JSON artifacts is orthogonal to the tddd-02 scope and should be measured / implemented independently.
+
+### 4. No backward compatibility (precedent maintained)
+
+Following the tddd-01 precedent, `"trait_port"` is completely removed from `catalogue_codec` — incoming JSON using it is rejected with a clear error. This is confirmed by user guidance on 2026-04-13. Future taxonomy changes should follow the same no-alias / no-migration policy (existing tracks can be deleted and re-generated if needed; the track-level granularity of catalogue files makes this cheap).
+
+
 
 ## Context
 
@@ -103,7 +161,7 @@ TDDD はこの AST を再実装せず、**JSON スキーマ設計の参考** と
         { "name": "id", "ty": "UserId" }
       ],
       "returns": "Result<Option<User>, DomainError>",
-      "async": false
+      "is_async": false
     },
     {
       "name": "save",
@@ -112,7 +170,7 @@ TDDD はこの AST を再実装せず、**JSON スキーマ設計の参考** と
         { "name": "user", "ty": "User" }
       ],
       "returns": "Result<(), DomainError>",
-      "async": false
+      "is_async": false
     }
   ]
 }
@@ -127,7 +185,7 @@ TDDD はこの AST を再実装せず、**JSON スキーマ設計の参考** と
 | `params[].name` | `FnArg::Typed` → `PatType::pat` (Pat::Ident) | パターンは Ident のみ |
 | `params[].ty` | `FnArg::Typed` → `PatType::ty` → 型表現文字列 | モジュールパスは最終セグメント、ジェネリクス構造は完全保持 |
 | `returns` | `ReturnType::Type` → 型表現文字列。`Default` なら `"()"` | モジュールパスは最終セグメント、ジェネリクス構造は完全保持 |
-| `async` | `Signature::asyncness` | bool |
+| `is_async` | `Signature::asyncness` | bool |
 
 #### L1 の検証ロジック
 
@@ -180,7 +238,7 @@ L1 で不足する場合、`generics` フィールドを追加:
   "receiver": "&self",
   "params": [{ "name": "filter", "ty": "F" }],
   "returns": "Vec<User>",
-  "async": false,
+  "is_async": false,
   "generics": {
     "type_params": [{ "name": "F", "bounds": ["Fn(&User) -> bool"] }]
   }
@@ -233,7 +291,7 @@ usecase カタログでこの port を宣言すると:
     "receiver": "&self",
     "params": [{ "name": "id", "ty": "UserId" }],
     "returns": "Result<Option<User>, DomainError>",
-    "async": false
+    "is_async": false
   }]
 }
 ```
@@ -418,9 +476,9 @@ Rust の `async fn in traits` は native 対応と `async-trait` proc-macro の 
 
 結果として:
 
-- 開発者が catalogue に `"async": true` と宣言し、実装を `async-trait` で書いた場合、L1 forward check は「`is_async` 不一致」で Yellow を返す
-- 運用ルール: `async-trait` 実装の trait port は catalogue 側でも `"async": false` と宣言する
-- 将来 `native async fn in traits` が stable になり `async-trait` から移行した時点で、catalogue を `"async": true` に更新する
+- 開発者が catalogue に `"is_async": true` と宣言し、実装を `async-trait` で書いた場合、L1 forward check は「`is_async` 不一致」で Yellow を返す
+- 運用ルール: `async-trait` 実装の trait port は catalogue 側でも `"is_async": false` と宣言する
+- 将来 `native async fn in traits` が stable になり `async-trait` から移行した時点で、catalogue を `"is_async": true` に更新する
 
 この制約は L1 (rustdoc JSON ベース) の構造的限界であり、syn ベース評価器を導入しない限り解消できない (D6 の「rustdoc JSON を唯一の基盤とする」方針に従う)。
 

@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:798eca772a45a81cd43d724912bddd29bb904c6eb87bc77c4f2b1d957ea8c012",
-          "at": "2026-04-14T00:58:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:798eca772a45a81cd43d724912bddd29bb904c6eb87bc77c4f2b1d957ea8c012",
-          "at": "2026-04-14T00:59:43Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -389,6 +371,107 @@
           "findings": [],
           "hash": "rvw1:sha256:a895c09a5d676b282dfdf128e01c97893e2f86662bb5e6f31d028356af4aa941",
           "at": "2026-04-14T02:14:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be70d7ecdcd08e8f49da900b603cbf591cac1f2cdc632647314fdb818593a34b",
+          "at": "2026-04-14T02:17:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be70d7ecdcd08e8f49da900b603cbf591cac1f2cdc632647314fdb818593a34b",
+          "at": "2026-04-14T02:18:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:feb77d9a545473f63e14249dad4fb41a7d9e26179cafa01563d8e6a3f18bf2fd",
+          "at": "2026-04-14T02:39:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:feb77d9a545473f63e14249dad4fb41a7d9e26179cafa01563d8e6a3f18bf2fd",
+          "at": "2026-04-14T02:40:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` has already flipped the T011-T014 block to `done`, but this review stage still expects those tasks to remain `in_progress` until approval. That leaves the track in an illegal intermediate state, and the `done` tasks also lack the commit-hash bookkeeping that the completed tasks in this file use elsewhere.",
+              "severity": "P1",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/metadata.json",
+              "line": 92,
+              "category": "status drift"
+            }
+          ],
+          "hash": "rvw1:sha256:c564a5212691b837270b4b727dd450420b2e8ea3e361f694b81950b07d749d47",
+          "at": "2026-04-14T03:43:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c564a5212691b837270b4b727dd450420b2e8ea3e361f694b81950b07d749d47",
+          "at": "2026-04-14T03:44:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new accepted Phase 1 amendment points readers to `2026-04-13-1813-tddd-taxonomy-expansion.md` as the child ADR for the implemented 12-variant taxonomy, but that referenced ADR still has Status `Proposed`. That leaves the accepted parent ADR anchored to an unaccepted child decision, which is ADR status drift in the design record chain.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+              "line": 7,
+              "category": "design"
+            },
+            {
+              "message": "The amendment now says the seed and Consequences §C2 use the catalogue key `\"is_async\"`, but ADR 0002's normative schema/examples and C2 rule still define that field as `\"async\"`. This makes the accepted ADR internally inconsistent about the JSON contract authors should write, so future catalogue updates can legitimately follow either spelling and diverge from the documented design.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+              "line": 55,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:c564a5212691b837270b4b727dd450420b2e8ea3e361f694b81950b07d749d47",
+          "at": "2026-04-14T03:47:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR states that `knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md` is already accepted, but that referenced ADR still has `Proposed` as its status. This is a status drift between the parent ADR and the child ADR it points to.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+              "line": 7,
+              "category": "status drift"
+            }
+          ],
+          "hash": "rvw1:sha256:05ea71719272a1ed2b02f21e906c505878c15dd0d054495ffe19ad128607c912",
+          "at": "2026-04-14T03:50:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e723727dbc216744d5b4d388c531fc61a05c9d6c9cc0f605e4d325ae8bf711af",
+          "at": "2026-04-14T03:51:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e723727dbc216744d5b4d388c531fc61a05c9d6c9cc0f605e4d325ae8bf711af",
+          "at": "2026-04-14T03:53:04Z"
         }
       ]
     },
@@ -521,6 +604,24 @@
         }
       ]
     },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:798eca772a45a81cd43d724912bddd29bb904c6eb87bc77c4f2b1d957ea8c012",
+          "at": "2026-04-14T00:58:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:798eca772a45a81cd43d724912bddd29bb904c6eb87bc77c4f2b1d957ea8c012",
+          "at": "2026-04-14T00:59:43Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -566,6 +667,272 @@
           "findings": [],
           "hash": "rvw1:sha256:a9b0a89058ea2363df0494bafde61436213c4a5351044dacf9a90d73889d1241",
           "at": "2026-04-14T01:09:14Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26f7208b4b02468ba7d23632ee65509a1dbdd343e4e210860d15995f3d6e3887",
+          "at": "2026-04-14T02:38:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_u27_usecase_blue_domain_not_found_passes` does not actually verify the claimed loop-order/role-swap behavior. With `enabled_layers = [\"domain\", \"usecase\"]` and `MultiLayerMock` returning `NotFound` for the omitted `domain` catalogue, the test still passes even if `check_strict_merge_gate` incorrectly stops after the first `NotFound` and never reads `usecase`. That makes U27 effectively duplicate U22's \"one Blue + one NotFound passes\" coverage instead of adding a distinct regression check for early-layer opt-out handling.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 921,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:26f7208b4b02468ba7d23632ee65509a1dbdd343e4e210860d15995f3d6e3887",
+          "at": "2026-04-14T02:40:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26f7208b4b02468ba7d23632ee65509a1dbdd343e4e210860d15995f3d6e3887",
+          "at": "2026-04-14T02:41:08Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 tells users to run `sotp verify spec-states` without the required `spec_path` argument. The CLI entrypoint for `spec-states` requires a path, so this instruction cannot be followed as written.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 188,
+              "category": "correctness"
+            },
+            {
+              "message": "The multi-layer summary is underspecified: Step 4 says to print a per-layer summary, but it never requires the layer identifier to appear in the summary text. In a multi-layer run that makes the output ambiguous and does not satisfy the layer-aware contract.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 179,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:19f858a60d88f7d4a23073e72d838464a60c4baad532f37212c8bc1732a4e920",
+          "at": "2026-04-14T02:39:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 treats `architecture-rules.json` as mandatory for layer resolution, but the CLI intentionally falls back to a synthetic `domain` binding when that file is absent. On legacy tracks this doc would incorrectly suggest the command cannot resolve layers, even though `baseline-capture` and `type-signals` still work with the fallback.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 35,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:01c74ebf942358be766bfc69ecbe9c4f97e5775eb720295b79e5af81d32474a3",
+          "at": "2026-04-14T02:47:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The no-`--layer` path never defines what happens when `architecture-rules.json` has zero enabled layers, but the CLI actually fails closed with an error (`no tddd.enabled layers found...`) instead of succeeding with an empty loop. As written, the spec reads like a no-op in that case.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 41,
+              "category": "behavior"
+            },
+            {
+              "message": "Step 4 requires each summary block to start with the layer identifier, but the current `type-signals` implementation prints a generic `[OK] type-signals: ...` line and only mentions the catalogue file in the warning line. This summary format is not implemented and misstates the command output.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 181,
+              "category": "behavior"
+            },
+            {
+              "message": "Step 4 item 2 and Step 5 hardcode `{layer}-types.md` / `{layer}-types-baseline.json`, but the actual rendered and baseline filenames are derived from the configured `catalogue_file` stem. Any layer that overrides `tddd.catalogue_file` would be documented with the wrong artifact names.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 179,
+              "category": "behavior"
+            }
+          ],
+          "hash": "rvw1:sha256:d4c491a01240dcafb0909d7d31e260945f56929f21ed2167bb4fae49ee4ad71e",
+          "at": "2026-04-14T02:53:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 requires each `type-signals` run to print a per-layer summary block with the layer identifier in the heading, but the current CLI summary is still the generic `[OK] type-signals: ...` line and warning output. That makes the documented multi-layer output contract impossible to satisfy as written.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 183,
+              "category": "design-contract"
+            },
+            {
+              "message": "The post-design guidance says to commit only `{layer}-types.json` and `{layer}-types-baseline.json`, but Step 4 also generates `{rendered_file}` and the track plan already treats `{layer}-types.md` as part of the deliverable set. Omitting the rendered markdown from the commit guidance leaves a required artifact out of the workflow.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 204,
+              "category": "design-contract"
+            }
+          ],
+          "hash": "rvw1:sha256:316ae0c077f48ba4a37fca9ed37b6c064951105c10c28842a00e58b38b6e12c4",
+          "at": "2026-04-14T02:59:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 still hardcodes the serde/persistence rule as `domain: typestate, infra: serde enum DTO conversion`. That is leftover Phase 1 domain/infra language in a multilayer design command, and it leaves the new non-domain layers without matching guidance.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "line": 92,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:b75a6f7cfb5073639f7158de0bb1052c1033dda186d82d14636d858bba61fe15",
+          "at": "2026-04-14T03:03:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:355a06a4fc87451ab07e815b2be5e989cf6ac0653d57368e1ba72245afcc46f7",
+          "at": "2026-04-14T03:07:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 explicitly allows `/track:design` to run against `track/items/<id>/plan.md` when `spec.md` does not exist, but Step 4 hardcodes `sotp verify spec-states track/items/<id>/spec.md`. On planning-only / pre-spec tracks that path is absent, so the rewritten workflow contradicts its own earlier fallback and cannot be executed as documented. Step 4 should verify the same document path resolved in Step 0 (`spec.md` if present, otherwise `plan.md`).",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 197,
+              "category": "workflow_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:355a06a4fc87451ab07e815b2be5e989cf6ac0653d57368e1ba72245afcc46f7",
+          "at": "2026-04-14T03:09:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 now says that if `architecture-rules.json` is missing the command falls back to a synthetic `domain` layer so legacy tracks keep working, but Step 4 still unconditionally sends the flow through `sotp verify spec-states ...`. The verifier fails closed when `architecture-rules.json` is absent, so the documented legacy fallback still breaks during validation instead of completing as described.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 35,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:81f9f9863d39e564e2e632ca532463eb36480d163d76f030cbabbbd1f52073d7",
+          "at": "2026-04-14T03:13:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 says `sotp verify spec-states` should be run against the document resolved in Step 0, including `plan.md` when `spec.md` is absent. The verifier does not actually support `plan.md` as an equivalent input: it always looks for sibling `spec.json`, and without that it falls back to scanning the supplied markdown for a `## Domain States` section. On plan-only tracks that only have `plan.md`, this validation step will fail despite Step 0 explicitly treating that path as supported.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 197,
+              "category": "correctness"
+            },
+            {
+              "message": "The legacy-track note says to skip `verify spec-states` when `architecture-rules.json` is absent and rely on `cargo make ci` instead, but `cargo make ci` still runs `verify-spec-states-current-local` on track branches. Because `verify spec-states` itself now fails closed when `architecture-rules.json` is missing, this fallback does not work: the same legacy tracks will still fail in CI.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 202,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bdfd64ac35b41263e765b976e89a3420539fcc37d4d455190795155e869a067e",
+          "at": "2026-04-14T03:17:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 documents a legacy-track escape hatch that no longer matches the verifier: lines 197-202 say `/track:design` should skip `sotp verify spec-states` when `architecture-rules.json` is absent because that path 'produces no signal output', but `libs/infrastructure/src/verify/spec_states.rs` now fails closed in that case (`load_tddd_layers` returns an error when the file is missing). That leaves the command doc describing a green path the actual CI/merge gate rejects.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 197,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:0a5563ae83fdcf6567f35334a2dfb70547fcc6f8645386ee87c9093a31c58eca",
+          "at": "2026-04-14T03:21:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Step 4 guidance says `sotp verify spec-states track/items/<id>/spec.md` and to use `plan.md` when `spec.md` is absent, while also claiming this runs the Stage 2 per-layer catalogue loop. That does not match the implementation: `spec-states` only runs Stage 2 when the input has a sibling `spec.json`; otherwise it falls back to the legacy markdown scan. On a planning-only track with `plan.md`, following this instruction would skip TDDD signal validation entirely.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 197,
+              "category": "design_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9938e308b0bf7327da4e37fddb6168a71ac952361474446f8da715971621b530",
+          "at": "2026-04-14T03:24:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 says `sotp verify spec-states track/items/<id>/spec.md` will run the multilayer Stage 2 gate whenever `spec.md` and `architecture-rules.json` exist, but the implementation only enters that JSON-based multilayer path when a sibling `spec.json` is present; otherwise `verify spec-states` falls back to the legacy markdown scan and skips all layer catalogue checks. As written, this gives false confidence on spec-md-only tracks because the documented Red-signal gate never runs there.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 197,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ae96f77f445ece2dab31df8030f83b69712e816d8f22176007feff893fa8f75c",
+          "at": "2026-04-14T03:29:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 says `/track:design` can operate from `track/items/<id>/plan.md` when `spec.md` is absent, but Step 4 hardcodes `sotp verify spec-states track/items/<id>/spec.md`. On a planning-only track that only has `plan.md`, the validation step cannot be run as documented, so the rewritten workflow still contradicts its own plan.md fallback.",
+              "severity": "P1",
+              "file": ".claude/commands/track/design.md",
+              "line": 197,
+              "category": "design_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0b558ea5cd6cff3a0efd3d2f524161bc471199ba41e23c488d0d79780adbdb64",
+          "at": "2026-04-14T03:33:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c3121fdb9db8c2a4b616749299e91961dcdfd8d54feb9fecef0f7a95def97fa",
+          "at": "2026-04-14T03:40:50Z"
         }
       ]
     }

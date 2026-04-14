@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed (track tddd-02-usecase-wiring-2026-04-14 で実装予定)
+Accepted (implemented by track tddd-02-usecase-wiring-2026-04-14, 2026-04-14)
 
 ## Context
 
