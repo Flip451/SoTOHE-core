@@ -18,9 +18,9 @@ pub enum VerdictError {
     EmptyFindings,
 }
 
-/// Errors from `Finding::new` construction.
+/// Errors from `ReviewerFinding::new` construction.
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
-pub enum FindingError {
+pub enum ReviewerFindingError {
     #[error("finding message must not be empty or whitespace-only")]
     EmptyMessage,
 }

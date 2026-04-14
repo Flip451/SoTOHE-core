@@ -1,18 +1,20 @@
 use rstest::rstest;
 
-use super::error::{FilePathError, FindingError, ReviewHashError, ScopeNameError, VerdictError};
+use super::error::{
+    FilePathError, ReviewHashError, ReviewerFindingError, ScopeNameError, VerdictError,
+};
 use super::scope_config::ReviewScopeConfig;
 use super::types::*;
 use crate::TrackId;
 
 // ── helpers ───────────────────────────────────────────────────────────
 
-fn finding(msg: &str) -> Finding {
-    Finding::new(msg, None, None, None, None).unwrap()
+fn finding(msg: &str) -> ReviewerFinding {
+    ReviewerFinding::new(msg, None, None, None, None).unwrap()
 }
 
-fn finding_full() -> Finding {
-    Finding::new(
+fn finding_full() -> ReviewerFinding {
+    ReviewerFinding::new(
         "null pointer dereference",
         Some("P1".to_owned()),
         Some("src/lib.rs".to_owned()),
@@ -201,7 +203,7 @@ fn test_review_hash_computed_rejects_invalid_format() {
     assert!(ReviewHash::computed("not-a-hash").is_err());
 }
 
-// ── Finding ───────────────────────────────────────────────────────────
+// ── ReviewerFinding ───────────────────────────────────────────────────────────
 
 #[test]
 fn test_finding_with_valid_message_succeeds() {
@@ -225,33 +227,36 @@ fn test_finding_with_all_fields() {
 
 #[test]
 fn test_finding_with_empty_message_returns_error() {
-    assert!(matches!(Finding::new("", None, None, None, None), Err(FindingError::EmptyMessage)));
+    assert!(matches!(
+        ReviewerFinding::new("", None, None, None, None),
+        Err(ReviewerFindingError::EmptyMessage)
+    ));
 }
 
 #[test]
 fn test_finding_with_whitespace_only_message_returns_error() {
     assert!(matches!(
-        Finding::new("   \t\n", None, None, None, None),
-        Err(FindingError::EmptyMessage)
+        ReviewerFinding::new("   \t\n", None, None, None, None),
+        Err(ReviewerFindingError::EmptyMessage)
     ));
 }
 
-// ── NonEmptyFindings ──────────────────────────────────────────────────
+// ── NonEmptyReviewerFindings ──────────────────────────────────────────────────
 
 #[test]
 fn test_non_empty_findings_with_findings_succeeds() {
-    let nef = NonEmptyFindings::new(vec![finding("bug")]).unwrap();
+    let nef = NonEmptyReviewerFindings::new(vec![finding("bug")]).unwrap();
     assert_eq!(nef.as_slice().len(), 1);
 }
 
 #[test]
 fn test_non_empty_findings_with_empty_vec_returns_error() {
-    assert!(matches!(NonEmptyFindings::new(vec![]), Err(VerdictError::EmptyFindings)));
+    assert!(matches!(NonEmptyReviewerFindings::new(vec![]), Err(VerdictError::EmptyFindings)));
 }
 
 #[test]
 fn test_non_empty_findings_into_vec() {
-    let nef = NonEmptyFindings::new(vec![finding("a"), finding("b")]).unwrap();
+    let nef = NonEmptyReviewerFindings::new(vec![finding("a"), finding("b")]).unwrap();
     let v = nef.into_vec();
     assert_eq!(v.len(), 2);
 }

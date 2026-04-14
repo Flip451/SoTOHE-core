@@ -2,9 +2,9 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 
 use domain::review_v2::{
-    FastVerdict, FilePath, Finding, LogInfo, MainScopeName, NotRequiredReason, RequiredReason,
-    ReviewHash, ReviewOutcome, ReviewReader, ReviewReaderError, ReviewScopeConfig, ReviewState,
-    ScopeName, Verdict,
+    FastVerdict, FilePath, LogInfo, MainScopeName, NotRequiredReason, RequiredReason, ReviewHash,
+    ReviewOutcome, ReviewReader, ReviewReaderError, ReviewScopeConfig, ReviewState,
+    ReviewerFinding, ScopeName, Verdict,
 };
 use domain::{CommitHash, TrackId};
 
@@ -28,7 +28,8 @@ impl MockReviewer {
     }
 
     fn with_findings() -> Self {
-        let finding = Finding::new("bug found", Some("P1".to_owned()), None, None, None).unwrap();
+        let finding =
+            ReviewerFinding::new("bug found", Some("P1".to_owned()), None, None, None).unwrap();
         Self {
             verdict: RefCell::new(Some(Verdict::findings_remain(vec![finding.clone()]).unwrap())),
             fast_verdict: RefCell::new(Some(FastVerdict::findings_remain(vec![finding]).unwrap())),

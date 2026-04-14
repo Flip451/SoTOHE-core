@@ -7,7 +7,9 @@ use std::process::{Child, Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-use domain::review_v2::{FastVerdict, Finding, LogInfo, ReviewTarget, Verdict, VerdictError};
+use domain::review_v2::{
+    FastVerdict, LogInfo, ReviewTarget, ReviewerFinding, Verdict, VerdictError,
+};
 use usecase::review_v2::{ReviewerError, ports::Reviewer};
 use usecase::review_workflow::{
     REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewPayloadVerdict, ReviewVerdict,
@@ -221,15 +223,21 @@ fn require_successful_payload(
     }
 }
 
-/// Converts `usecase::review_workflow::ReviewFinding` slice to domain `Finding` vec.
+/// Converts `usecase::review_workflow::ReviewFinding` slice to domain `ReviewerFinding` vec.
 fn convert_findings_to_domain(
     findings: &[usecase::review_workflow::ReviewFinding],
-) -> Vec<Finding> {
+) -> Vec<ReviewerFinding> {
     findings
         .iter()
         .filter_map(|f| {
-            Finding::new(&f.message, f.severity.clone(), f.file.clone(), f.line, f.category.clone())
-                .ok()
+            ReviewerFinding::new(
+                &f.message,
+                f.severity.clone(),
+                f.file.clone(),
+                f.line,
+                f.category.clone(),
+            )
+            .ok()
         })
         .collect()
 }
@@ -521,7 +529,7 @@ mod tests {
 
     #[test]
     fn test_convert_findings_to_domain_skips_empty_message() {
-        // FindingError::EmptyMessage causes filter_map to skip the item
+        // ReviewerFindingError::EmptyMessage causes filter_map to skip the item
         let findings = vec![usecase::review_workflow::ReviewFinding {
             message: "  ".to_owned(), // whitespace-only → empty after trim
             severity: None,
