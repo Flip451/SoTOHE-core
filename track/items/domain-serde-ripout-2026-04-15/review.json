@@ -1,0 +1,515 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D9’s commit-size budget for T005 does not match the rest of the planning artifacts. This ADR budgets Commit 5 at ~15 lines, but the generated task artifacts describe the same T005 scope as README index + verification.md handoff work at ~33 lines (`metadata.json`/`plan.md` summary and `spec.json` T005). If the 5-commit split is meant to be internally consistent, these estimates need to be aligned.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 251,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:de4eab7e12ecde3eeb0d67ecbc823c06c3650871f29c4df4a1635e78b462a91c",
+          "at": "2026-04-15T00:03:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "§D8 says `TypeKindDto` is excluded from the catalogue and that the track seeds 8 total entries as 7 `dto` kinds + 1 `error_type`, but §D3, the generated spec, and the T003 task description still count `TypeKindDto` as part of the 8 DTOs. Those requirements are incompatible: the track cannot both exclude and include `TypeKindDto` while keeping the 8-entry seed count.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 239,
+              "category": "design"
+            },
+            {
+              "message": "`§2.1` is not a real subsection in this ADR. The document has `§1`-`§6` and `D1`-`D11`, but no `§2.1`, so this dead-code rationale is pointing at a non-existent section. The reference should be updated to an existing section such as `§2`.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 129,
+              "category": "reference"
+            }
+          ],
+          "hash": "rvw1:sha256:de4eab7e12ecde3eeb0d67ecbc823c06c3650871f29c4df4a1635e78b462a91c",
+          "at": "2026-04-15T00:06:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 under-specifies the conversion set: it says only 7 `From<&domain::T> for TDto` impls will be added, but the same spec later requires all 8 DTOs to have `From` impls, and the planner canonical block already includes `From<&TypeKind> for TypeKindDto`. As written, `TypeKindDto` has no conversion path, so the acceptance criterion cannot be satisfied.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/domain-serde-ripout-2026-04-15/spec.md",
+              "line": 24,
+              "category": "plan inconsistency"
+            },
+            {
+              "message": "The T003 unit-test description says to convert `From<&SchemaExport>` and then call `encode(&dto, false)`, but the same task defines `encode(schema: &SchemaExport, pretty: bool)`. That test shape cannot compile under the stated API; it needs to call `encode(&schema, false)` (or split the `From` assertion from the encode assertion).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "line": 98,
+              "category": "plan inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:a2c0e291e5e13fb1f2b1ed03ea97dbc63bc865de63948056f032f9913b7f99bb",
+          "at": "2026-04-15T00:10:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "この節は旧 4-commit 案のままで、`baseline-capture` を T001 に置き、ADR 作成を T004 に置いています。しかし最終化された `metadata.json` / `ADR` は `T001`-`T005` の 5 task に分割し、baseline-capture は T002、ADR は T005 で扱う前提です。planner artifact が現行の task graph と食い違っています。",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-14-1510-planner-domain-serde-ripout.md",
+              "line": 149,
+              "category": "plan"
+            },
+            {
+              "message": "D9 の T005 行数見積もりが `~15 行` になっていますが、同じ track の `metadata.json` と `plan.md` は T005 を `~33 行` と見積もっています。commit-size の row-count が一致しておらず、planning artifacts 間で数値が揃っていません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 247,
+              "category": "plan"
+            }
+          ],
+          "hash": "rvw1:sha256:04f73a3d4b0d61aed770799eedf3320073f6913374f369af743f79530e8daccd",
+          "at": "2026-04-15T00:14:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The source reference to `knowledge/research/2026-04-14-1510-researcher-domain-serde-ripout.md §1.2` is broken: that researcher file does not contain a `§1.2` section, so this acceptance criterion cannot be traced to a valid source. The same bad citation is mirrored in `spec.md`.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 228,
+              "category": "source-attribution"
+            },
+            {
+              "message": "`D11` says the README index補完 happens in `T004`, but `D9` and the track spec/metadata assign that work to `T005`. This makes the ADR internally inconsistent with the task split.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 284,
+              "category": "task-sequencing"
+            }
+          ],
+          "hash": "rvw1:sha256:d300fff94c0148d447857a2c6f62e1bd332905b98d74c160a7d83ec0e6c2b187",
+          "at": "2026-04-15T00:17:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T001 rustdoc audit command is malformed: `--target-dir` is a cargo option, but here it is placed after `--` so rustdoc receives it instead. As written the audit step will not run as intended; the same invocation is repeated in `plan.md` and `verification.md`.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "line": 9,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:aa72158df5c69f383be36b6aa7d2d19aa168905949ae2274a9fe70b02cf71399",
+          "at": "2026-04-15T00:22:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:044a44fcf80eb2777599d0f303d903eecd49b42687eb590d499c56003903c22c",
+          "at": "2026-04-15T00:26:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` undercounts T003's required conversions: it says the codec should contain `7 From` implementations, but the finalized plan/spec/ADR consistently require 8 (`From<&TypeKind> for TypeKindDto` is part of the agreed DTO set). As written, the verification checklist could pass an implementation that omits one planned conversion.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/verification.md",
+              "line": 10,
+              "category": "consistency"
+            },
+            {
+              "message": "The ADR's Consequences section still carries the old task/commit numbering: it says the 5 Track 2 handoff items are written in `T004` and that the minimal rollback unit is `Commit 3 (~36 lines)`, but D9/D10 and the track metadata place those at `T005` and `Commit 4` respectively. That leaves the ADR internally inconsistent about task ownership and rollback sequencing.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 318,
+              "category": "consistency"
+            },
+            {
+              "message": "The ADR's trade-off list mentions a `SchemaMethodDto`, but D3 explicitly decides that no method-specific DTO is introduced for this track and the finalized type list uses `FunctionInfoDto` instead. This stale name contradicts the agreed DTO inventory and can mislead T003 implementation/catalogue work.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 327,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:044a44fcf80eb2777599d0f303d903eecd49b42687eb590d499c56003903c22c",
+          "at": "2026-04-15T00:34:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR §D7 assigns the BRIDGE-01 JSON compatibility diff to T003, but T003 only adds `schema_export_codec.rs`; `cargo make export-schema` still goes through `apps/cli/src/commands/domain.rs` and does not switch to `schema_export_codec::encode(...)` until T004. This makes the D7 verification step impossible at the stated task boundary and contradicts the T004 sequencing used in the plan/spec/verification docs.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 211,
+              "category": "design_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:044a44fcf80eb2777599d0f303d903eecd49b42687eb590d499c56003903c22c",
+          "at": "2026-04-15T00:38:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` under-specifies T003 as having only `7 From` implementations, but the ADR/spec/plan all require 8 (`SchemaExport`, `TypeKind`, `TypeInfo`, `MemberDeclaration`, `ParamDeclaration`, `FunctionInfo`, `TraitInfo`, `ImplInfo`). This makes the T003 verification target inconsistent with the accepted design.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/verification.md",
+              "line": 10,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:1758195a78c7e843b78125315a3938232fdc31385e66be3ddd82e30a3d9100f2",
+          "at": "2026-04-15T00:42:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR Consequences says the 5 Track 2 handoff items are written in T004, but D10, the D9 task table, `metadata.json`, `plan.md`, `spec.json`, and `verification.md` all assign that work to T005. This leaves the ADR internally inconsistent about which task owns the handoff deliverable.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 318,
+              "category": "consistency"
+            },
+            {
+              "message": "ADR Consequences says 'Commit 3' is the minimal ~36-line rollback-friendly change, but D9 defines Commit 3/T003 as the ~150-line codec implementation and Commit 4/T004 as the ~36-line serde-removal commit. The commit-number/size mapping is inconsistent inside the ADR.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 320,
+              "category": "consistency"
+            },
+            {
+              "message": "The ADR's trade-off list cites a `SchemaMethodDto`, but D3 explicitly decides no method-specific DTO is introduced for this track and the planned/code DTO inventory uses `FunctionInfoDto` instead. This stale type name contradicts the agreed DTO set and can misdirect T003 implementation/catalogue work.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 327,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:2bd5ff61379bc1fd1be73555c89b2090b1c4d2a099c6acdea4e748169a85334b",
+          "at": "2026-04-15T00:47:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T002 `/track:design --layer infrastructure` scope/acceptance text says the SKILL auto-generates `infrastructure-types-baseline.json`, runs `type-signals`, and renders `infrastructure-types.md`, but the cited sources (`2026-04-14-1531` §D8 and `2026-04-08-1800` §5) do not document those Step 4 behaviors. The actual authority is `.claude/commands/track/design.md`, so the current source attribution is broken.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 25,
+              "category": "source_attribution"
+            },
+            {
+              "message": "The acceptance criterion for flipping `architecture-rules.json` cites only ADR `2026-04-11-0002` §D1, but that section’s example still shows `infrastructure.tddd.enabled: false`. The criterion itself may be correct for this track, but its sole source contradicts the claimed `enabled: true` target, so the reference is misleading.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 374,
+              "category": "source_attribution"
+            }
+          ],
+          "hash": "rvw1:sha256:75b468099851e645adfd422718228da94cdc7f4c4ad27a431e3d1b21a77ef41b",
+          "at": "2026-04-15T00:52:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's failure path reuses the `tddd-05` slot for a rustdoc-fix prereq track (`tddd-05-infra-rustdoc-fix-prereq`), but the ADR/spec elsewhere already reserve Track 2 as `tddd-05-infra-wiring-YYYY-MM-DD`. If the audit fails, the follow-up numbering becomes ambiguous and the Track 2 handoff references no longer identify a unique next track.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "line": 10,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:75b468099851e645adfd422718228da94cdc7f4c4ad27a431e3d1b21a77ef41b",
+          "at": "2026-04-15T00:58:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The researcher artifact still publishes a 4-task execution order where `T002` is the codec work, `T003` is serde removal, and `T004` is infrastructure-types/ADR work. That reuses the same `T00N` IDs with different meanings than the accepted 5-task split in `metadata.json`, `spec.json`, and ADR D9, so the planning artifacts are internally inconsistent.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-14-1510-researcher-domain-serde-ripout.md",
+              "line": 280,
+              "category": "plan_consistency"
+            },
+            {
+              "message": "The canonical code block references `knowledge/adr/2026-04-15-XXXX-domain-serde-ripout.md`, but that ADR path does not exist; the accepted ADR for this track is `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`. This leaves a broken reference in an implementation-source artifact.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-14-1510-planner-domain-serde-ripout.md",
+              "line": 266,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:75b468099851e645adfd422718228da94cdc7f4c4ad27a431e3d1b21a77ef41b",
+          "at": "2026-04-15T01:04:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T002 `/track:design --layer infrastructure` requirement says the command auto-generates `infrastructure-types-baseline.json`, runs `type-signals`, and renders `infrastructure-types.md`, but its `sources` cite only ADR `2026-04-14-1531` §D8 and ADR `2026-04-08-1800` §5. Neither cited section documents those Step 4 behaviors; the authoritative source is `.claude/commands/track/design.md`, so the attribution is broken.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 25,
+              "category": "source_attribution"
+            },
+            {
+              "message": "The acceptance criterion requiring `architecture-rules.json` to end up with `infrastructure.tddd.enabled: true` cites only ADR `2026-04-11-0002` §D1, but that section's example still shows `infrastructure` as `enabled: false`. As written, the criterion points to a source that contradicts the claimed target state.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 374,
+              "category": "source_attribution"
+            },
+            {
+              "message": "The planner research file still recommends introducing `SchemaMethodDto`, even though the accepted ADR/spec for this track exclude any method-specific DTO because `MethodDeclaration::Serialize` is dead code. That leaves the planning artifacts inconsistent about the T003 DTO inventory.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-14-1510-planner-domain-serde-ripout.md",
+              "line": 101,
+              "category": "consistency"
+            },
+            {
+              "message": "T001's failure path suggests a prereq follow-up named `tddd-05-infra-rustdoc-fix-prereq`, while the rest of the artifacts already reserve Track 2 / `tddd-05` for `tddd-05-infra-wiring...`. If the rustdoc audit fails, two different next tracks claim the same numbering slot.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "line": 10,
+              "category": "consistency"
+            },
+            {
+              "message": "The planner's old T004 still references `knowledge/adr/2026-04-15-XXXX-domain-serde-ripout.md`, which does not exist; the accepted ADR path for this track is `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`. This leaves a broken reference in a scoped planning artifact.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-14-1510-planner-domain-serde-ripout.md",
+              "line": 193,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:18d889e0376237a5c2cb765c394646aad5a3e940504d18756432ee6fe4df5ae7",
+          "at": "2026-04-15T01:11:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Q2` still recommends introducing `SchemaMethodDto`, but the accepted design explicitly excludes any method DTO because `MethodDeclaration` is not on the `SchemaExport` serialization path. Since the ADR cites this planner output as a source for the Q1-Q7 design decisions, this stale recommendation contradicts the accepted ADR/spec/metadata split.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-14-1510-planner-domain-serde-ripout.md",
+              "line": 101,
+              "category": "design_contradiction"
+            },
+            {
+              "message": "This researcher note says the `schema_export_tests.rs` update is required in `T003`, but the accepted 5-task plan assigns that rewrite to `T004` together with the serde removal. Because the ADR references this file as a planning source, the stale task ID is now an incorrect task reference inside the planning artifacts.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-14-1510-researcher-domain-serde-ripout.md",
+              "line": 190,
+              "category": "incorrect_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:18d889e0376237a5c2cb765c394646aad5a3e940504d18756432ee6fe4df5ae7",
+          "at": "2026-04-15T01:15:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T003 design incorrectly requires `#[serde(skip_serializing_if = \"Option::is_none\")]` on the new DTO to 'preserve' the current BRIDGE-01 format. Today the CLI serializes the domain structs directly (`serde_json::to_string[_pretty](&schema)`), and those `Option<String>` fields in `libs/domain/src/schema.rs` have no `skip_serializing_if` attributes, so `None` currently serializes as `null`, not omission. Implementing the planned DTO this way would change the wire format and contradict the T004 acceptance criterion that the JSON remain structurally identical. The same incorrect instruction is duplicated in `metadata.json` and `spec.md`.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 55,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:c28e8e88dd3a6d570d401a4a9d2c8607fbdd3280aee97efe2fb91a3de7dd2a7e",
+          "at": "2026-04-15T01:20:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002/T003 assume the 7 catalogued DTOs will go `yellow=8 -> blue=8` under rustdoc-based `type-signals`, and T002 explicitly notes that private `TypeKindDto` is excluded because private items do not appear in rustdoc. But the plan never requires `SchemaExportDto` / `TypeInfoDto` / `FunctionInfoDto` / `TraitInfoDto` / `ImplInfoDto` / `MemberDeclarationDto` / `SchemaParamDto` to be `pub`, while ADR §3 says this codec should follow the existing codec pattern where DTOs are private. As written, an implementation that follows the stated codec pattern can never satisfy the advertised `blue=8` acceptance criteria.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "line": 93,
+              "category": "design_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:28d067eff18cd52088009886238efab1d9326c4c15ddf34e3cb69b4ccdf54ec1",
+          "at": "2026-04-15T01:30:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T002 `/track:design --layer infrastructure` requirement says the command auto-runs baseline capture, `type-signals`, and rendered-view generation, but its `sources` cite only ADR `2026-04-14-1531` §D8 and ADR `2026-04-08-1800` §5. Neither cited section documents those Step 4 behaviors; the authoritative source is `.claude/commands/track/design.md`, so the attribution is broken.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 25,
+              "category": "source_attribution"
+            },
+            {
+              "message": "The acceptance criterion requiring `architecture-rules.json` to end up with `infrastructure.tddd.enabled: true` cites only ADR `2026-04-11-0002` §D1, but that section's example still shows `infrastructure` as `enabled: false`. As written, the cited source contradicts the claimed target state.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 374,
+              "category": "source_attribution"
+            },
+            {
+              "message": "The ADR reserves Track 2 as `tddd-05-infra-wiring-YYYY-MM-DD`, but the T001 failure path redirects to a prereq track named `tddd-05-infra-rustdoc-fix-prereq`, reusing the same `tddd-05` slot for a different follow-up. If the rustdoc audit fails, the next-track numbering becomes ambiguous across the plan and handoff docs.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 263,
+              "category": "consistency"
+            },
+            {
+              "message": "The planner artifact still references `knowledge/adr/2026-04-15-XXXX-domain-serde-ripout.md`, but that path does not exist; the accepted ADR for this track is `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`. This leaves a broken reference in a scoped planning artifact.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-14-1510-planner-domain-serde-ripout.md",
+              "line": 198,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:28d067eff18cd52088009886238efab1d9326c4c15ddf34e3cb69b4ccdf54ec1",
+          "at": "2026-04-15T01:35:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` describes the infrastructure catalogue seed as \"8 DTO\" entries, but the same track definition elsewhere resolves it as 7 `dto` entries plus 1 `error_type` (`SchemaExportCodecError`). That ambiguity can send T002 down the wrong kind assignment for the error entry and breaks the 7+1 invariant called out in the plan/ADR.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 256,
+              "category": "design_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:b612e794136b305de215233f50145f1887d4c06664221c20d593edd58ff5fda3",
+          "at": "2026-04-15T01:42:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MemberDeclarationDto` is specified here as `#[serde(tag = \"kind\", rename_all = \"snake_case\")]` with `Variant { name } | Field { ... }`, but the current wire format comes from `domain::tddd::catalogue::MemberDeclaration`'s plain `Serialize` derive on `Variant(String) | Field { name, ty }`. That changes both the enum tagging style and the `Variant` payload shape, so the later acceptance criterion that `cargo make export-schema` remains structurally identical becomes unattainable.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 225,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:1de5492de2a4d8e1533e83f0fce839fd05b043729369f996a57950eb10731251",
+          "at": "2026-04-15T01:52:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T005 ADR-status check is broken as written: `rg 'Status\\s*\\n\\nAccepted' knowledge/adr/2026-04-14-1531-domain-serde-ripout.md` relies on a newline escape that ripgrep does not accept in its default single-line mode, so this verification step cannot succeed even when the ADR is correct.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/verification.md",
+              "line": 132,
+              "category": "plan_inconsistency"
+            },
+            {
+              "message": "The Track 2 handoff verification command cannot prove the stated result. `grep -A 2 \"Track 2 引継ぎ事項\" ...` only prints two lines after the section header, but the five required handoff items appear much later in the file, so this step cannot validate the T005 acceptance criterion that all five items are filled in.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/verification.md",
+              "line": 135,
+              "category": "plan_inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:1de5492de2a4d8e1533e83f0fce839fd05b043729369f996a57950eb10731251",
+          "at": "2026-04-15T01:53:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR §D3 says `MemberDeclarationDto` is an internally-tagged enum, but ADR §D7 and the T003 plan/spec require the default externally-tagged serde form to preserve the BRIDGE-01 JSON shape. That leaves the ADR internally contradictory on the codec format.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 134,
+              "category": "consistency"
+            },
+            {
+              "message": "The T003 codec acceptance criterion cites only ADR §D3 as its source, but §D3 covers DTO naming/non-reuse and does not define the public `encode(schema, pretty)` contract; that decision lives in ADR §D5. This is a broken source attribution for a core acceptance criterion.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 347,
+              "category": "source_attribution"
+            }
+          ],
+          "hash": "rvw1:sha256:463f7b4bae690d770af09b191215e2da80bd2ab4a9afeb879ee277851dede902",
+          "at": "2026-04-15T02:01:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D3 says `MemberDeclarationDto` is an \"internally-tagged Variant/Field enum\", but ADR D7 and the scoped plan/spec artifacts require the BRIDGE-01-preserving default externally-tagged form (`{\"Variant\": ...}` / `{\"Field\": ...}`). That leaves the ADR internally inconsistent about the wire format the implementation is supposed to produce.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 134,
+              "category": "design contradiction"
+            },
+            {
+              "message": "ADR D6 cites `libs/domain/src/schema.rs:353` as the `TypeNode` definition proving the type has no `Serialize` derive, but line 353 is `TypeGraph`; `TypeNode` starts around line 403. The dead-code rationale is probably still correct, but the cited evidence line is wrong.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 195,
+              "category": "incorrect reference"
+            }
+          ],
+          "hash": "rvw1:sha256:463f7b4bae690d770af09b191215e2da80bd2ab4a9afeb879ee277851dede902",
+          "at": "2026-04-15T02:05:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ea231393c939f172e310dcc9b035c4451f5b1204e61240624d2792acb9ddd95",
+          "at": "2026-04-15T02:09:51Z"
+        }
+      ]
+    }
+  }
+}

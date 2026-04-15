@@ -1,0 +1,479 @@
+{
+  "schema_version": 1,
+  "status": "approved",
+  "version": "1.0.0",
+  "title": "domain-serde-ripout: hexagonal 純粋性回復 + infrastructure 層 TDDD partial dogfood (Track 1 of 2)",
+  "goal": [
+    "2026-04-07 の bridge01 commit `a5e4c6b` (track `bridge01-export-schema-2026-04-06` の T005) で ADR を書かずに `libs/domain/Cargo.toml` に `serde = { version = \"1\", features = [\"derive\"] }` 依存が追加されたプロセス違反を回復し、`libs/domain/src/schema.rs` の 6 型 (SchemaExport / TypeKind / TypeInfo / FunctionInfo / TraitInfo / ImplInfo) と `libs/domain/src/tddd/catalogue.rs` の 3 型 (ParamDeclaration / MethodDeclaration / MemberDeclaration) に付与された `Serialize` derive を全削除し、domain crate を wire format に対する非依存 (hexagonal 純粋性) に戻す。",
+    "対応する DTO 群を `libs/infrastructure/src/schema_export_codec.rs` (新設) に Serialize-only で定義し、`From<&domain::T> for TDto` 変換を実装する。`apps/cli/src/commands/domain.rs::export_schema()` を `serde_json::to_string[_pretty](&schema)` の直接呼び出しから `infrastructure::schema_export_codec::encode(&schema, args.pretty)` 委譲に書き換え、CLI が serialization 知識を持たない hexagonal composition root 責務を遵守する。BRIDGE-01 の JSON wire format (SchemaExport の Rust struct field 名がそのまま JSON key になる de-facto 形式) は完全に維持する。",
+    "副次目的として infrastructure 層 TDDD の partial dogfood を開始する: `architecture-rules.json` の infrastructure tddd を `enabled: false` → `enabled: true` に flip し、`/track:design --layer infrastructure` 経由で本トラックで新設する DTO 群 (8 entries) を `infrastructure-types.json` に先行宣言する (T002 時点で Yellow=8、T003 の DTO 実装で Blue=8 に遷移)。domain / usecase layer は **per-layer opt-out** (`{layer}-types.json` を本 track 配下に作らない → `spec_states.rs::evaluate_layer_catalogue` が NotFound → skip を返す)。Adapter variant の TypeDefinitionKind 拡張、verify modules / review_v2 adapters / git wrappers / hook handlers などの完全な infrastructure catalogue 充実、CI rustdoc cache 戦略 (ADR 0002 §3.E) は本トラックの out_of_scope であり、後続の `tddd-05-infra-wiring` トラック (Track 2) に引き継ぐ。",
+    "新 ADR `2026-04-14-1531-domain-serde-ripout.md` で bridge01 commit a5e4c6b のプロセス違反を Resolved 状態として明示し、`knowledge/adr/2026-04-14-0625-finding-taxonomy-cleanup.md` D6 の \"domain crate 既に serde 依存あり、本 track 範囲外\" 記述に対する追補として cross-reference する。`knowledge/adr/README.md` の索引にも併せて新 ADR を追加し、未登録の 2 ADR (`2026-04-13-1813-tddd-taxonomy-expansion.md`, `2026-04-14-0625-finding-taxonomy-cleanup.md`) も同時に索引追加する。"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "infrastructure 層 rustdoc viability gating audit を実施 (`cargo +nightly rustdoc -p infrastructure --target-dir target/rustdoc-audit -- -Z unstable-options --output-format json`) し、成功/失敗・collision warning の有無・wall time を verification.md に記録する。失敗時は本トラックを停止して別の prereq track を立て直す判断ポイントとする。`architecture-rules.json` の infrastructure エントリの `tddd` ブロックを `enabled: false` → `enabled: true` に変更し、`catalogue_file: \"infrastructure-types.json\"` と `schema_export: { method: \"rustdoc\", targets: [\"infrastructure\"] }` を追加する。本 task では `baseline-capture` を実行しない (T002 の `/track:design --layer infrastructure` 内部で走る)",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D9",
+          "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md §D1"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "`/track:design --layer infrastructure` を起動し、TDDD Phase 1 (先行型宣言) を実施する。`designer` capability が SKILL.md (`.claude/commands/track/design.md`) の Step 2-4 を自動実施: (a) `track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json` を 8 entries で作成 (7 `dto` kind + 1 `error_type` kind、`action` は省略 = `add` default), (b) `sotp track baseline-capture --layer infrastructure` で `infrastructure-types-baseline.json` 生成, (c) `sotp track type-signals --layer infrastructure` で初期 signals 評価 (この時点で `blue=0 yellow=8 red=0`), (d) `infrastructure-types.md` rendered view 生成",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8",
+          "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md §5"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "`/track:design` の対象 layer は `--layer infrastructure` のみ明示指定する。domain / usecase layer は本トラックで **opt-out** とし、`track/items/domain-serde-ripout-2026-04-15/domain-types.json` / `usecase-types.json` を作らない。`spec_states.rs::evaluate_layer_catalogue` が NotFound → skip (PASS) を返すため、該当 layer の Stage 2 signal 評価は走らない",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8",
+          "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md §D2.1"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "`libs/infrastructure/src/schema_export_codec.rs` を新規作成し、8 個の Serialize-only DTO 型 (`SchemaExportDto` / `TypeKindDto` / `TypeInfoDto` / `MemberDeclarationDto` / `SchemaParamDto` / `FunctionInfoDto` / `TraitInfoDto` / `ImplInfoDto`) と `SchemaExportCodecError` (`Json(#[from] serde_json::Error)`) を定義する。catalogue に登録する 7 DTO (`SchemaExportDto` / `TypeInfoDto` / `FunctionInfoDto` / `TraitInfoDto` / `ImplInfoDto` / `MemberDeclarationDto` / `SchemaParamDto`) および `SchemaExportCodecError` は `pub` で定義すること — `type-signals` は rustdoc JSON の public surface のみを評価するため、private 型は Yellow のまま Blue に遷移できない。`TypeKindDto` は catalogue 除外のため private で可。8 個の `impl From<&domain::T> for TDto` を infallible に実装し (`From<&SchemaExport>`, `From<&TypeKind>`, `From<&TypeInfo>`, `From<&MemberDeclaration>`, `From<&ParamDeclaration>`, `From<&FunctionInfo>`, `From<&TraitInfo>`, `From<&ImplInfo>`)、`pub fn encode(schema: &SchemaExport, pretty: bool) -> Result<String, SchemaExportCodecError>` を提供する。`libs/infrastructure/src/lib.rs` に `pub mod schema_export_codec;` を追加する。実装完了後に `bin/sotp track type-signals --layer infrastructure` を再実行し、T002 で yellow=8 だった signals が **blue=8** に遷移していることを確認する",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D1",
+          "knowledge/conventions/hexagonal-architecture.md"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "DTO のフィールド名は domain 型のフィールド名と完全一致させ (`crate_name`, `types`, `functions`, `traits`, `impls`, `members`, `params` 等)、`#[serde(rename_all = ...)]` は使わない。`Option<String>` フィールドには `#[serde(skip_serializing_if = \"Option::is_none\")]` を付与しない — 現行 BRIDGE-01 フォーマットでは domain structs に `skip_serializing_if` が存在せず `None` は `null` として出力されるため、DTO 側で付与すると wire format が変わる。`MemberDeclarationDto` は現行 BRIDGE-01 フォーマットを維持するため `#[derive(Serialize)]` の default (externally-tagged) を使用する — `Variant(String)` は `{\"Variant\": \"name\"}` / `Field { name, ty }` は `{\"Field\": {\"name\": ..., \"ty\": ...}}` として出力 (`enum-first` 原則、内部表現は enum で可)",
+        "sources": [
+          ".claude/rules/04-coding-principles.md",
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D7"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      },
+      {
+        "text": "`libs/domain/src/schema.rs` から `use serde::Serialize;` (line 18) と 6 箇所の `Serialize` derive (`SchemaExport` / `TypeKind` / `TypeInfo` / `FunctionInfo` / `TraitInfo` / `ImplInfo`) を削除する。module doc comment の `Serialize is derived on the flat \\`SchemaExport\\` types for BRIDGE-01 JSON output` 言及を削除または「`SchemaExport` の wire format は `infrastructure::schema_export_codec` が担う」に更新する",
+        "sources": [
+          "knowledge/conventions/hexagonal-architecture.md",
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D1"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "`libs/domain/src/tddd/catalogue.rs` から `use serde::Serialize;` (line 23) と 3 箇所の `Serialize` derive (`ParamDeclaration` / `MethodDeclaration` / `MemberDeclaration`) を削除する。`MethodDeclaration::Serialize` は `TypeNode::methods` / `TraitNode::methods` (これらは Serialize なし) でしか参照されておらず dead code であり、削除しても caller 不在のためコンパイルエラーは発生しない",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D6",
+          "knowledge/research/2026-04-14-1510-researcher-domain-serde-ripout.md §3"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "`libs/domain/Cargo.toml` から `serde = { version = \"1\", features = [\"derive\"] }` 行 (line 14) を削除する。`[dev-dependencies]` 側に serde は元々ないため変更不要。nutype 0.6 は serde feature をオプトインしておらず、現在の SoTOHE-core では未有効化のため、domain crate から serde を完全除去できる",
+        "sources": [
+          "knowledge/research/2026-04-14-1510-researcher-domain-serde-ripout.md §6",
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §5"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "`apps/cli/src/commands/domain.rs::export_schema()` を C2 パターンに書き換え: `serde_json::to_string[_pretty](&schema)` を `infrastructure::schema_export_codec::encode(&schema, args.pretty)` 委譲に変更する。`libs/infrastructure/src/schema_export_tests.rs` の `serde_json::to_string(&schema)` 呼び出しも `schema_export_codec::encode(&schema, false)` 経由に書き換える (decode 側の roundtrip は不可能になるため、テストを encode-only に変更し JSON 構造の確認に絞る)",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D5",
+          "knowledge/conventions/hexagonal-architecture.md"
+        ],
+        "task_refs": [
+          "T004"
+        ]
+      },
+      {
+        "text": "`knowledge/adr/README.md` の索引 (信号機アーキテクチャ section) に本 ADR `2026-04-14-1531-domain-serde-ripout.md` を追加。同時に未登録の `2026-04-13-1813-tddd-taxonomy-expansion.md` と `2026-04-14-0625-finding-taxonomy-cleanup.md` も併せて索引追加する (既存 README の ADR maintenance gap の補完)",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D11",
+          "knowledge/adr/README.md"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "verification.md の Track 2 引継ぎ事項セクションに 5 項目を記載: (1) rustdoc viability audit 結果 (success/failure, JSON サイズ, wall time — T001 で記録), (2) infrastructure 内同名衝突 audit 結果, (3) infrastructure-types.json に seed した DTO 一覧, (4) CI rustdoc 実行時間の体感 (3 layer での wall time), (5) Adapter variant が必要そうな infra type の暫定リスト (`CodexReviewer` / `FsReviewStore` / `GitDiffGetter` / `Sha256ReviewHasher` 等)",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D10",
+          "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md §3.E"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      },
+      {
+        "text": "ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md` は /track:plan Phase 4 で日本語で事前作成済み (Status: Accepted)。Context (bridge01 a5e4c6b 経緯 + hexagonal violation + Two-track split), Decision (D1-D11), Rejected Alternatives (A1-A5), Consequences, Reassess When の全セクションが存在することを T005 で確認する。実装中に design 変更があれば該当 D セクションを in-place で更新する",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+          "knowledge/conventions/adr.md"
+        ],
+        "task_refs": [
+          "T005"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "Adapter / SecondaryPortAdapter variant の `TypeDefinitionKind` 拡張は対象外。infrastructure adapter (`CodexReviewer`, `FsReviewStore`, `GitDiffGetter`, `Sha256ReviewHasher` 等) を表現するための新 variant の設計と signal evaluator 拡張は Track 2 (`tddd-05-infra-wiring-YYYY-MM-DD`) で扱う。本トラックは serde 除去のための DTO seed のみ",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §6",
+          "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md"
+        ]
+      },
+      {
+        "text": "infrastructure 層全体の catalogue 充実 (verify modules / review_v2 adapters / git wrappers / hook handlers / 各種 store などの 40-80 entries) は対象外。本トラックは本 track で生まれた 8 DTO のみを seed する partial dogfood に限定する",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8",
+          ".claude/rules/10-guardrails.md"
+        ]
+      },
+      {
+        "text": "domain / usecase layer の TDDD catalogue 作成は対象外 (per-layer opt-out)。本トラックは domain の構造的変更 (`TypeNode::members` / `TypeNode::methods` / `TypeKind`) を起こさないため、`track/items/domain-serde-ripout-2026-04-15/domain-types.json` および `usecase-types.json` を作らない。`spec_states.rs::evaluate_layer_catalogue` が NotFound → skip を返すため、Stage 2 は該当 layer を PASS する",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8",
+          "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md §D2.1"
+        ]
+      },
+      {
+        "text": "CI rustdoc cache 戦略 (ADR 0002 §3.E で deferred とされた item) は対象外。本トラックで infrastructure rustdoc を有効化することで `cargo +nightly rustdoc` が domain + usecase + infrastructure の 3 layer で走るようになるが、cache 実装は別 track (`tddd-rustdoc-cache-YYYY-MM-DD`) で扱う。本トラックでは T001 で wall time を測定して Track 2 引継ぎ情報として記録する",
+        "sources": [
+          "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md §3.E",
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §6"
+        ]
+      },
+      {
+        "text": "infrastructure 内部の同名衝突解消は対象外。T001 で audit して collision warning が見つかった場合でも、本トラックでは型名と location を verification.md に記録するのみで rename しない。実際の rename cascade は Track 2 で実施する",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §6",
+          "knowledge/research/2026-04-14-1510-researcher-domain-serde-ripout.md §7"
+        ]
+      },
+      {
+        "text": "usecase 層 / cli 層への serde 依存ありなしの再評価は対象外。現状 usecase は serde を持っており、これは hexagonal pattern 上正当 (usecase が DTO を保持する Clean Architecture スタイル)。CLI も serde を保持するが composition root として serde 知識を持たない方針 (本トラックで `apps/cli/src/commands/domain.rs` から `serde_json::to_string` 直接呼び出しを除去する範囲のみ対応)",
+        "sources": [
+          "knowledge/conventions/hexagonal-architecture.md",
+          "knowledge/adr/2026-04-14-0625-finding-taxonomy-cleanup.md"
+        ]
+      },
+      {
+        "text": "他 ADR の retroactive な hexagonal compliance audit は対象外。本トラックは bridge01 commit a5e4c6b の domain serde 違反 1 件のみを対象とする。`spec-domain-types-v2-2026-04-07` 等の関連 track が他の hexagonal 違反を生んでいる可能性は別 audit で確認する",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §1",
+          "knowledge/conventions/hexagonal-architecture.md"
+        ]
+      },
+      {
+        "text": "BRIDGE-01 の JSON wire format 変更は対象外。`SchemaExport` から `Serialize` を剥がすが、新 DTO のフィールド名は domain 型のフィールド名と完全一致させ、`#[serde(rename_all)]` を使わず、`cargo make export-schema` の出力 JSON が変化しないことを T004 で diff 確認する",
+        "sources": [
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D7",
+          "knowledge/research/2026-04-14-1510-researcher-domain-serde-ripout.md §5"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "後方互換性 alias なし。`pub use ... = ...;` 等の deprecation shim は追加しない。tddd-01 / tddd-02 / tddd-04 precedent と 2026-04-13 user 確認に従う。domain 側の `Serialize` derive は完全削除する",
+      "sources": [
+        "knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md",
+        "knowledge/adr/2026-04-14-0625-finding-taxonomy-cleanup.md"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "DTO は Serialize-only で定義する (`Deserialize` は付与しない)。`sotp domain export-schema` は片方向のみ (domain → JSON) で decode 経路が存在しないため、Deserialize を付与すると不要な maintenance コストとなる。将来 decode が必要になった時点で別途追加する",
+      "sources": [
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D4"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "`From<&SchemaExport> for SchemaExportDto` (および各下位型の From 実装) は infallible / panic-free でなければならない。`unwrap()` / `expect()` / `panic!()` を本体に書かない。validated newtype を内包しないため `&str → String::to_owned()` と `iter().map()` のみで構成される",
+      "sources": [
+        ".claude/rules/04-coding-principles.md",
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D1"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "BRIDGE-01 JSON wire format を維持する。DTO のフィールド名は domain 型のフィールド名と 1:1 完全一致 (`crate_name` / `types` / `functions` / `traits` / `impls` / `name` / `kind` / `docs` / `members` / `module_path` / `params` / `returns` / `receiver` / `is_async` / `target_type` / `trait_name` / `methods`)。`#[serde(rename_all = ...)]` は使わない。`MemberDeclarationDto` は現行 BRIDGE-01 フォーマットを維持するため `#[derive(Serialize)]` の default (externally-tagged) を使用する — `baseline_codec` の `MemberDto` は internally-tagged でフォーマットが異なるため参照パターンとして採用しない",
+      "sources": [
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D7",
+        "knowledge/research/2026-04-14-1510-researcher-domain-serde-ripout.md §1"
+      ],
+      "task_refs": [
+        "T003",
+        "T004"
+      ]
+    },
+    {
+      "text": "CLI (`apps/cli`) は composition root として serialization 知識を持ってはならない。`apps/cli/src/commands/domain.rs::export_schema()` 内で `serde_json::to_string[_pretty](&schema)` を直接呼ぶのは hexagonal 違反であり、`infrastructure::schema_export_codec::encode(&schema, args.pretty)` 経由に書き換えて serde_json への参照を CLI から除去する (CLI 全体の serde_json 利用を禁止するわけではないが、domain 型を直接 serialize する箇所のみ対象)",
+      "sources": [
+        "knowledge/conventions/hexagonal-architecture.md",
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D5"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "`tddd/catalogue_codec.rs` の private DTO (`MethodDto` / `ParamDto` / `MemberDto`) と新規 `schema_export_codec.rs` の DTO (`SchemaParamDto` / `MemberDeclarationDto`) は共有しない。命名で明示的に区別する (`Schema` prefix / 独自命名)。理由: catalogue_codec の DTO は L1 enforcement (`::` チェック) と decode validation を持っており、schema_export の encode-only path に不要な制約を持ち込む",
+      "sources": [
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D3",
+        "knowledge/research/2026-04-14-1510-researcher-domain-serde-ripout.md §1"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "infrastructure 層 catalogue (`infrastructure-types.json`) の seed は本トラックで T002 が宣言する 7 `dto` + 1 `error_type` (計 8 entries) のみに限定する。verify modules / review_v2 adapters / git wrappers などの完全な catalogue 充実は Track 2 (`tddd-05-infra-wiring`) に明示的に分離する。本トラック内で catalogue を膨らませると review concern が混ざり <500 行 per commit guideline を破る",
+      "sources": [
+        ".claude/rules/10-guardrails.md",
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "domain / usecase layer は TDDD の per-layer opt-in model により **opt-out** する。本トラックは `/track:design --layer infrastructure` のみを実行し、domain / usecase layer に対する catalogue / baseline を track dir に作らない。`spec_states.rs::evaluate_layer_catalogue` が NotFound → skip (PASS) を返すため、Stage 2 は該当 layer を安全に skip する",
+      "sources": [
+        "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md §D2.1",
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "T001 (rustdoc viability audit) は本トラックの gating であり、`cargo +nightly rustdoc -p infrastructure` が失敗した場合は本トラックを停止して別の prereq track を立て直す。成功した場合のみ T002 以降に進む。collision warning が見つかった場合は記録のみで本トラックでは rename しない",
+      "sources": [
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D9",
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §4"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "T002 (`/track:design --layer infrastructure`) は T001 の architecture-rules.json flip 完了後にのみ実行可能。`parse_tddd_layers` が `infrastructure.tddd.enabled: true` をチェックするため、T001 が未完了だと `/track:design` が「該当 layer が enabled でない」エラーで失敗する",
+      "sources": [
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D9"
+      ],
+      "task_refs": [
+        "T001",
+        "T002"
+      ]
+    },
+    {
+      "text": "各 commit は <500 行 diff を遵守する。本トラックは 5 commits に分割: Commit 1 (T001 ~36 行), Commit 2 (T002 ~150 行 — catalogue + baseline + rendered md), Commit 3 (T003 ~150 行 — schema_export_codec.rs + unit test), Commit 4 (T004 ~36 行 — serde 削除 + CLI 書き換え + test 更新), Commit 5 (T005 ~33 行 — README 索引 + verification)。各 commit で workspace 全体が compile-clean であること",
+      "sources": [
+        ".claude/rules/10-guardrails.md",
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D9"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T005"
+      ]
+    },
+    {
+      "text": "`cargo make ci` (fmt-check + clippy -D warnings + test + deny + check-layers + verify-spec-states + verify-arch-docs) が全通過すること。各 task 内で `cargo test` / `cargo clippy` の部分実行を行い、T005 で総合 `cargo make ci` を確認する",
+      "sources": [
+        ".claude/rules/07-dev-environment.md"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T005"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "`libs/domain/Cargo.toml` から `serde` 依存が削除されていること (`grep 'serde' libs/domain/Cargo.toml` がゼロ件)",
+      "sources": [
+        "knowledge/research/2026-04-14-1510-researcher-domain-serde-ripout.md §3",
+        "knowledge/conventions/hexagonal-architecture.md"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "`libs/domain/src/` 配下に `Serialize` / `Deserialize` derive がゼロ件 (`rg 'derive.*Serialize|derive.*Deserialize' libs/domain/src/` 結果ゼロ行)、`use serde` がゼロ件 (`rg 'use serde' libs/domain/src/` 結果ゼロ行)",
+      "sources": [
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D1",
+        "knowledge/research/2026-04-14-1510-researcher-domain-serde-ripout.md §3"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "`libs/infrastructure/src/schema_export_codec.rs` が存在し、`pub fn encode(schema: &SchemaExport, pretty: bool) -> Result<String, SchemaExportCodecError>` が公開されていること。`SchemaExportDto` / `TypeInfoDto` / `FunctionInfoDto` / `TraitInfoDto` / `ImplInfoDto` / `TypeKindDto` / `MemberDeclarationDto` / `SchemaParamDto` の 8 DTO が定義され、それぞれに対応する `From<&domain::T> for TDto` 実装が存在すること",
+      "sources": [
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D3"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "`apps/cli/src/commands/domain.rs::export_schema()` 内で `serde_json::to_string[_pretty](&schema)` の直接呼び出しがゼロ件 (`rg 'serde_json::to_string.*&schema' apps/cli/src/commands/domain.rs` 結果ゼロ行)、代わりに `infrastructure::schema_export_codec::encode(&schema, args.pretty)` が呼ばれていること",
+      "sources": [
+        "knowledge/conventions/hexagonal-architecture.md",
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D5"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "`cargo make export-schema -- --crate domain --pretty` の出力 JSON が変更前と structural に同一 (フィールド名・型・順序が変わっていない) であること。BRIDGE-01 wire format の互換性維持を T004 で手動 diff 確認する",
+      "sources": [
+        "knowledge/research/2026-04-14-1510-researcher-domain-serde-ripout.md §5",
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D7"
+      ],
+      "task_refs": [
+        "T004"
+      ]
+    },
+    {
+      "text": "`architecture-rules.json` の `infrastructure` エントリの `tddd` ブロックが `enabled: true`、`catalogue_file: \"infrastructure-types.json\"`、`schema_export.targets: [\"infrastructure\"]` を含むこと",
+      "sources": [
+        "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md §D1"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "`track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json` が存在し、8 entries (7 dto + 1 error_type) が seed されていること。`track/items/domain-serde-ripout-2026-04-15/infrastructure-types-baseline.json` も存在すること (`/track:design --layer infrastructure` の Step 4.1 baseline-capture で生成)",
+      "sources": [
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8",
+        "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md §5"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "T002 完了直後 (DTO 未実装時点) に `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` の出力が `blue=0 yellow=8 red=0` であること (declared だが未実装 = Yellow を示す)",
+      "sources": [
+        "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md §3"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "T003 完了後に `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` の出力が `blue=8 yellow=0 red=0` に遷移していること (declared + 実装 = Blue)。さらに T004 完了後も blue=8 を維持していること (serde 削除による回帰なし — `build_type_graph` が trait impls を除外するため)",
+      "sources": [
+        "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md §3",
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8"
+      ],
+      "task_refs": [
+        "T003",
+        "T004"
+      ]
+    },
+    {
+      "text": "`track/items/domain-serde-ripout-2026-04-15/domain-types.json` / `usecase-types.json` が存在しないこと (per-layer opt-out)。`spec_states.rs::evaluate_layer_catalogue` が両 layer に対して NotFound → skip を返し、Stage 2 spec-states が PASS することを確認する",
+      "sources": [
+        "knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md §D2.1",
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md` が存在し、Status: Accepted、Context (bridge01 a5e4c6b 経緯 + Two-track split + per-layer opt-in semantics)、Decision (D1-D11)、Rejected Alternatives (A1-A5)、Consequences (Positive / Negative / Neutral)、Reassess When、References の全セクションを含むこと",
+      "sources": [
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+        "knowledge/conventions/adr.md"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "`knowledge/adr/README.md` の信号機アーキテクチャ section に新 ADR + 未登録の `2026-04-13-1813-tddd-taxonomy-expansion.md` + `2026-04-14-0625-finding-taxonomy-cleanup.md` が索引追加されていること",
+      "sources": [
+        "knowledge/adr/README.md",
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D11"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "verification.md の Track 2 引継ぎ事項セクションに 5 項目 (rustdoc viability 結果, infrastructure 内 collision audit 結果, seed DTO 一覧, CI rustdoc wall time, Adapter variant 必要型の暫定リスト) が記載されていること",
+      "sources": [
+        "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D10"
+      ],
+      "task_refs": [
+        "T005"
+      ]
+    },
+    {
+      "text": "`cargo make ci` (fmt-check + clippy -D warnings + test + deny + check-layers + verify-spec-states + verify-arch-docs) が全通過すること",
+      "sources": [
+        ".claude/rules/07-dev-environment.md"
+      ],
+      "task_refs": [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T005"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "knowledge/conventions/hexagonal-architecture.md",
+    "knowledge/conventions/source-attribution.md",
+    "knowledge/conventions/adr.md",
+    "knowledge/conventions/nightly-dev-tool.md",
+    "knowledge/conventions/prefer-type-safe-abstractions.md"
+  ],
+  "signals": {
+    "blue": 46,
+    "yellow": 0,
+    "red": 0
+  },
+  "approved_at": "2026-04-15T01:55:49Z",
+  "content_hash": "sha256:89a4875e5376f4acab6c11c101118c7d120875725ea90676e5e53a4c21c95b56"
+}
