@@ -160,7 +160,18 @@ cargo make ci
 - **architecture-rules.json flip**: `infrastructure.tddd` changed from `{"enabled": false}` to `{"enabled": true, "catalogue_file": "infrastructure-types.json", "schema_export": {"method": "rustdoc", "targets": ["infrastructure"]}}`.
 - **`cargo make ci` after flip**: PASS (Build Done in 16.73s). fmt-check / clippy -D warnings / nextest (1940 tests) / deny / check-layers / verify-spec-states / verify-* all PASSED. Warnings are pre-existing (module size, pub String fields) and not introduced by this task.
 
-(T002 以降は各 task 完了時に追記)
+### T002 (2026-04-14)
+
+- **`/track:design --layer infrastructure`** の Step 2-4 を順次実行:
+  - **Step 2 (type design)**: 8 entries designed — 7 × `dto` kind (`SchemaExportDto`, `TypeInfoDto`, `FunctionInfoDto`, `TraitInfoDto`, `ImplInfoDto`, `MemberDeclarationDto`, `SchemaParamDto`) + 1 × `error_type` kind (`SchemaExportCodecError` with `expected_variants: ["Json"]`). All `approved: true`, `action` omitted (= `add` default). `TypeKindDto` intentionally excluded (private enum).
+  - **Step 3 (write catalogue)**: `track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json` created with schema_version 2 + 8 entries.
+  - **Step 4.1 (baseline-capture)**: `bin/sotp track baseline-capture domain-serde-ripout-2026-04-15 --layer infrastructure --force` → wrote `infrastructure-types-baseline.json` containing **38 types + 2 traits**. No `same-name type collision for X` warning from `build_type_graph`.
+  - **Step 4.2 (type-signals)**: `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` → `blue=0 yellow=8 red=0 (total=8, undeclared=0, skipped=40)`. All 8 declared DTOs are Yellow because the code is not yet present (T003 will implement them). All 38 existing infrastructure types and 2 traits are in `B\A` and correctly classified as `skipped` (unchanged structure; 38 + 2 = 40 skipped total).
+- **Collision audit (deferred from T001)**: baseline-capture emitted no `same-name type collision` warnings on stderr. Infrastructure crate has no rustdoc-visible same-name type collisions as of this track.
+- **per-layer opt-out confirmed**: `track/items/domain-serde-ripout-2026-04-15/` contains no `domain-types.json` and no `usecase-types.json`. `spec_states.rs::evaluate_layer_catalogue` skips both layers at Stage 2. Stage 2 spec-states PASS.
+- **`cargo make ci`**: PASS (Build Done in 11.86s). `verify-spec-states` emits the expected interim warning listing the 8 Yellow types and noting "merge gate will block these until upgraded to Blue" — this is the intended TDDD WIP signal state and will clear in T003.
+
+(T003 以降は各 task 完了時に追記)
 
 ## Verified At
 

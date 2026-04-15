@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8cde6d89c553349c4680dcc90f373d214d74e0f5894a0c4b74f383420763e56",
+          "at": "2026-04-15T03:10:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8cde6d89c553349c4680dcc90f373d214d74e0f5894a0c4b74f383420763e56",
+          "at": "2026-04-15T03:12:13Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -603,24 +621,50 @@
           "findings": [],
           "hash": "rvw1:sha256:9df68d1d87ef3ab3a2dbca0c1e2670f7e9d6ef2df9bb0b5f0ee2942349e85801",
           "at": "2026-04-15T03:41:36Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a8cde6d89c553349c4680dcc90f373d214d74e0f5894a0c4b74f383420763e56",
-          "at": "2026-04-15T03:10:00Z"
+          "hash": "rvw1:sha256:a74b5387d971b0dffc0717419516a8fd9f9d75c4ab958396100a78332d00ed3e",
+          "at": "2026-04-15T03:54:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure-types.md` claims it was generated from `domain-types.json`, but this track explicitly opts out of domain catalogues and no such file exists under `track/items/domain-serde-ripout-2026-04-15/`. That broken source reference makes the rendered infrastructure view internally inconsistent with the T002 outputs and points readers/automation at the wrong SSoT.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/infrastructure-types.md",
+              "line": 1,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:a74b5387d971b0dffc0717419516a8fd9f9d75c4ab958396100a78332d00ed3e",
+          "at": "2026-04-15T03:57:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md`'s T002 result block says the baseline had `38 types + 2 traits` and the `type-signals` run reported `skipped=40`, but then explains that only the 38 existing infrastructure types were skipped. That drops the 2 baseline traits from the B\\A accounting, so the verification narrative is internally inconsistent with the recorded signal totals.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/verification.md",
+              "line": 169,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:a74b5387d971b0dffc0717419516a8fd9f9d75c4ab958396100a78332d00ed3e",
+          "at": "2026-04-15T04:00:57Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a8cde6d89c553349c4680dcc90f373d214d74e0f5894a0c4b74f383420763e56",
-          "at": "2026-04-15T03:12:13Z"
+          "hash": "rvw1:sha256:4415f20fe25d419ff8099155126d7f4a2502bfcef5390367229a93d0230b5565",
+          "at": "2026-04-15T04:03:07Z"
         }
       ]
     }
