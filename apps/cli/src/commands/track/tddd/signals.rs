@@ -14,7 +14,9 @@ use infrastructure::schema_export::RustdocSchemaExporter;
 use infrastructure::tddd::catalogue_codec;
 use infrastructure::track::atomic_write::atomic_write_file;
 use infrastructure::track::fs_store::read_track_metadata;
-use infrastructure::verify::tddd_layers::{TdddLayerBinding, parse_tddd_layers};
+use infrastructure::verify::tddd_layers::{
+    LoadTdddLayersError, TdddLayerBinding, load_tddd_layers_from_path,
+};
 
 use crate::CliError;
 
@@ -32,43 +34,19 @@ pub(crate) fn resolve_layers(
     layer_filter: Option<&str>,
 ) -> Result<Vec<TdddLayerBinding>, CliError> {
     let rules_path = workspace_root.join("architecture-rules.json");
-    // Distinguish "truly absent" from "broken symlink / other I/O error" by
-    // probing the path with `symlink_metadata` first. Only the former should
-    // trigger the legacy single-domain synthetic fallback; a broken symlink at
-    // `architecture-rules.json` is a misconfiguration and must fail-closed
-    // (otherwise the caller silently runs against the wrong layer set).
-    // `read_to_string` alone cannot distinguish these cases — it returns
-    // `NotFound` for both an absent path and a broken symlink whose target is
-    // missing. `symlink_metadata` does not follow symlinks and returns
-    // metadata for the link itself, so a broken symlink returns `Ok(meta)`
-    // here and the subsequent `read_to_string` surfaces the real error.
-    let bindings = match std::fs::symlink_metadata(&rules_path) {
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            // Legacy fallback: a single synthetic domain binding (path truly
-            // absent — no file, no symlink, nothing at the expected location).
-            parse_tddd_layers(
-                r#"{
-                  "layers": [
-                    { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
-                  ]
-                }"#,
-            )
-            .unwrap_or_default()
-        }
-        Err(e) => {
-            return Err(CliError::Message(format!("cannot stat {}: {e}", rules_path.display())));
-        }
-        Ok(_meta) => {
-            // Path exists as a file or symlink. Read it. A broken symlink
-            // surfaces as a read error here (not NotFound-fallback) so the
-            // misconfiguration is reported instead of masked.
-            let content = std::fs::read_to_string(&rules_path).map_err(|e| {
-                CliError::Message(format!("cannot read {}: {e}", rules_path.display()))
-            })?;
-            parse_tddd_layers(&content)
-                .map_err(|e| CliError::Message(format!("{}: {e}", rules_path.display())))?
-        }
-    };
+    // Delegate symlink handling + legacy-fallback policy to the shared
+    // infrastructure helper. CLI stays a thin composition layer; it only
+    // maps the infra error variants into `CliError` and applies the
+    // CLI-level layer filter.
+    let bindings =
+        load_tddd_layers_from_path(&rules_path, workspace_root).map_err(|e| match e {
+            LoadTdddLayersError::Io { path, source } => {
+                CliError::Message(format!("{}: {source}", path.display()))
+            }
+            LoadTdddLayersError::Parse(err) => {
+                CliError::Message(format!("{}: {err}", rules_path.display()))
+            }
+        })?;
 
     if let Some(filter) = layer_filter {
         let Some(binding) = bindings.iter().find(|b| b.layer_id() == filter) else {
