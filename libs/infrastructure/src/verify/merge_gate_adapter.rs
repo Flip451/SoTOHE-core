@@ -3,7 +3,7 @@
 //!
 //! This is the bridge between the pure usecase layer (`merge_gate` /
 //! `task_completion`) and the low-level git primitives in
-//! [`crate::git_cli::show`]. The adapter:
+//! `crate::git_cli::show`. The adapter:
 //!
 //! 1. Uses `fetch_blob_safe` to retrieve raw bytes from `origin/<branch>:<path>`
 //!    with symlink / submodule rejection baked in.

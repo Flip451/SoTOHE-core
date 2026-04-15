@@ -80,6 +80,9 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [TDDD-02: Baseline-Aware Reverse Signal Detection](2026-04-11-0001-baseline-reverse-signals.md) | Proposed | 2026-04-11 |
 | [TDDD-01: Multilayer Extension — 型カタログ多層化 + シグネチャ検証](2026-04-11-0002-tddd-multilayer-extension.md) | Proposed | 2026-04-11 |
 | [TDDD-03: 型アクション宣言 — add / modify / delete](2026-04-11-0003-type-action-declarations.md) | Proposed | 2026-04-11 |
+| [TDDD 型カタログ Taxonomy 拡張 — アプリケーション層パターンの幅を広げる](2026-04-13-1813-tddd-taxonomy-expansion.md) | Accepted | 2026-04-13 |
+| [Finding 型 Taxonomy クリーンアップ — 同名衝突の解消と hexagonal 分離の維持](2026-04-14-0625-finding-taxonomy-cleanup.md) | Accepted | 2026-04-14 |
+| [Domain serde 依存除去 — hexagonal 純粋性回復 + infrastructure 層 TDDD partial dogfood](2026-04-14-1531-domain-serde-ripout.md) | Accepted | 2026-04-14 |
 
 ### ADR 運用
 

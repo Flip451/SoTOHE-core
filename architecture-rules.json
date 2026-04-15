@@ -81,7 +81,12 @@
       ],
       "deny_reason": "Infrastructure implements usecase ports and domain ports; wired at composition root.",
       "tddd": {
-        "enabled": false
+        "enabled": true,
+        "catalogue_file": "infrastructure-types.json",
+        "schema_export": {
+          "method": "rustdoc",
+          "targets": ["infrastructure"]
+        }
       }
     },
     {

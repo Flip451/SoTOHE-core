@@ -4,11 +4,12 @@
 //! Run with: `cargo test --test '*' -- --ignored` or `cargo nextest run --run-ignored ignored-only`
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use domain::schema::{SchemaExporter, TypeKind};
 
     use crate::schema_export::RustdocSchemaExporter;
+    use crate::schema_export_codec;
 
     fn workspace_root() -> std::path::PathBuf {
         let output = std::process::Command::new("cargo")
@@ -71,14 +72,14 @@ mod tests {
 
     #[test]
     #[ignore = "requires nightly toolchain"]
-    fn export_schema_json_roundtrip() {
+    fn export_schema_encode_produces_parseable_json() {
         let exporter = RustdocSchemaExporter::new(workspace_root());
         let schema = exporter.export("domain").unwrap();
 
-        let json = serde_json::to_string(&schema).unwrap();
+        let json = schema_export_codec::encode(&schema, false).unwrap();
         assert!(!json.is_empty());
-        // Verify it's valid JSON by parsing back
-        let _: serde_json::Value = serde_json::from_str(&json).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed["crate_name"], "domain");
     }
 
     #[test]

@@ -266,7 +266,6 @@ dependencies = [
  "globset",
  "nutype",
  "rstest",
- "serde",
  "strum",
  "thiserror",
 ]

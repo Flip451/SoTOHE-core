@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "SchemaExportDto",
+      "description": "Infrastructure DTO for domain::schema::SchemaExport. Serialize-only wire format carrier for apps/cli/src/commands/domain.rs::export_schema to emit BRIDGE-01 JSON (CLI wired in T004 via schema_export_codec::encode). Owns crate_name + Vec of TypeInfoDto / FunctionInfoDto / TraitInfoDto / ImplInfoDto. Constructed via From<&SchemaExport>. No Deserialize / TryFrom — encode-only path. Recovers hexagonal purity from bridge01 commit a5e4c6b.",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "TypeInfoDto",
+      "description": "Infrastructure DTO for domain::schema::TypeInfo. Nested inside SchemaExportDto::types. Holds name + kind (TypeKindDto) + docs + members (Vec<MemberDeclarationDto>) + module_path. Mirrors the public fields of domain TypeInfo with 1:1 naming.",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "FunctionInfoDto",
+      "description": "Infrastructure DTO for domain::schema::FunctionInfo. Used in SchemaExportDto::functions and inside TraitInfoDto::methods / ImplInfoDto::methods. Holds name + docs + return_type_names + has_self_receiver + params (Vec<SchemaParamDto>) + returns + receiver + is_async. Preserves domain FunctionInfo field names for BRIDGE-01 wire-format compatibility.",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "TraitInfoDto",
+      "description": "Infrastructure DTO for domain::schema::TraitInfo. Nested in SchemaExportDto::traits. Holds name + docs + methods (Vec<FunctionInfoDto>). Represents a Rust trait definition as exposed by rustdoc JSON.",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "ImplInfoDto",
+      "description": "Infrastructure DTO for domain::schema::ImplInfo. Nested in SchemaExportDto::impls. Holds target_type + optional trait_name + methods (Vec<FunctionInfoDto>). Represents an impl block (inherent or trait impl) in the exported schema.",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "MemberDeclarationDto",
+      "description": "Infrastructure enum mirror of domain::tddd::catalogue::MemberDeclaration. Two variants — Variant(String) for enum variant members and Field { name, ty } for struct field members. Uses serde default externally-tagged form to match the current BRIDGE-01 wire format: emits {\"Variant\": \"Name\"} / {\"Field\": {\"name\": \"...\", \"ty\": \"...\"}}. Nested in TypeInfoDto::members. Declared as `enum` kind (not `dto`) because it is a Rust enum, not a struct; the TDDD evaluator classifies enum-shaped declarations via `expected_variants`.",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "Variant",
+        "Field"
+      ]
+    },
+    {
+      "name": "TypeKindDto",
+      "description": "Infrastructure enum mirror of domain::schema::TypeKind. Three unit variants (Struct / Enum / TypeAlias) using serde default (externally-tagged PascalCase) so JSON output is \"Struct\" / \"Enum\" / \"TypeAlias\", matching the current BRIDGE-01 wire format. Must be `pub` because it appears as a public field type in TypeInfoDto::kind (Rust E0446 prevents a private type in a public interface). Declared as `enum` kind with explicit expected variants.",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "Struct",
+        "Enum",
+        "TypeAlias"
+      ]
+    },
+    {
+      "name": "SchemaParamDto",
+      "description": "Infrastructure DTO for domain::tddd::catalogue::ParamDeclaration within the schema-export context. Schema prefix distinguishes from catalogue_codec.rs private ParamDto which carries L1 '::' enforcement for catalogue decode validation — schema_export_codec is encode-only and does not need that constraint. Holds name + ty.",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "SchemaExportCodecError",
+      "description": "Public error enum for infrastructure::schema_export_codec::encode(). Propagates serde_json failures via Json(#[from] serde_json::Error). Will be surfaced by apps/cli/src/commands/domain.rs::export_schema as CliError::Message after T004 CLI wiring.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "Json"
+      ]
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "SchemaExportDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeInfoDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FunctionInfoDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TraitInfoDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ImplInfoDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "MemberDeclarationDto",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Field",
+        "Variant"
+      ]
+    },
+    {
+      "type_name": "TypeKindDto",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Enum",
+        "Struct",
+        "TypeAlias"
+      ]
+    },
+    {
+      "type_name": "SchemaParamDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SchemaExportCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Json"
+      ]
+    }
+  ]
+}

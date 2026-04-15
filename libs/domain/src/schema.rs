@@ -2,9 +2,10 @@
 //! TDDD catalogue evaluator (`TypeGraph`).
 //!
 //! These types represent the public API surface of a Rust crate as extracted
-//! from rustdoc JSON. `Serialize` is derived on the flat `SchemaExport` types
-//! for BRIDGE-01 JSON output; `TypeGraph` / `TypeNode` / `TraitNode` are the
-//! pre-indexed query interface used by `tddd::signals` and `tddd::consistency`.
+//! from rustdoc JSON. The BRIDGE-01 JSON wire format is owned by
+//! `infrastructure::schema_export_codec`; `TypeGraph` / `TypeNode` /
+//! `TraitNode` are the pre-indexed query interface used by `tddd::signals`
+//! and `tddd::consistency`.
 //!
 //! T004 (TDDD-01 3c) extends these types with structured signature fields
 //! (`params` / `returns` / `receiver` / `is_async`), replaces `TypeInfo::members`
@@ -15,12 +16,10 @@
 
 use std::collections::{HashMap, HashSet};
 
-use serde::Serialize;
-
 use crate::tddd::catalogue::{MemberDeclaration, MethodDeclaration, ParamDeclaration};
 
 /// Top-level export result containing all public API elements of a crate.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct SchemaExport {
     crate_name: String,
     types: Vec<TypeInfo>,
@@ -68,7 +67,7 @@ impl SchemaExport {
 }
 
 /// Kind of a public type.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TypeKind {
     /// A struct (with named fields, tuple fields, or unit).
     Struct,
@@ -79,7 +78,7 @@ pub enum TypeKind {
 }
 
 /// Information about a public type (struct, enum, or type alias).
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct TypeInfo {
     name: String,
     kind: TypeKind,
@@ -147,7 +146,7 @@ impl TypeInfo {
 /// `MethodDeclaration` from `TypeNode::methods` / `TraitNode::methods` and
 /// call `MethodDeclaration::signature_string()`. This is a BRIDGE-01 JSON
 /// breaking change (ADR 0002 Consequences C1).
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct FunctionInfo {
     name: String,
     docs: Option<String>,
@@ -247,7 +246,7 @@ impl FunctionInfo {
 }
 
 /// Information about a public trait definition.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct TraitInfo {
     name: String,
     docs: Option<String>,
@@ -278,7 +277,7 @@ impl TraitInfo {
 }
 
 /// Information about an impl block.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct ImplInfo {
     /// The type being implemented for (e.g., `TrackStatus`).
     target_type: String,

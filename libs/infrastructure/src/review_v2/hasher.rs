@@ -12,7 +12,7 @@ use crate::git_cli::{GitRepository, SystemGitRepo};
 /// 1. Sort file paths alphabetically
 /// 2. For each file: open with O_NOFOLLOW, verify within repo root, hash content
 /// 3. Missing files → tombstone entry ("path\tDELETED\n")
-/// 4. Final manifest SHA256 → "rvw1:sha256:<hex>"
+/// 4. Final manifest SHA256 → `"rvw1:sha256:<hex>"`
 /// 5. Empty target → ReviewHash::Empty
 pub struct SystemReviewHasher;
 
