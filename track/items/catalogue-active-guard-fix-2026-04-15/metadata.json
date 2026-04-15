@@ -67,9 +67,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "9e54dddb7d2a566a84218d8f25caadf5ea9ad625",
       "description": ".claude/skills/track-plan/SKILL.md の古い記述 2 箇所を source-attribution.md SSoT (2026-04-12 strict-signal-gate-v2 ADR で feedback=Yellow に降格済) に整合させる。修正箇所: (a) line 165 の classification table で feedback を Blue 行から Yellow 行に移動、(b) line 283-284 の diff hearing update guidance で feedback 追加後の → Blue 昇格 を Yellow のまま + Blue 昇格には ADR/convention 永続化が必要な旨に書き換える (source-attribution.md §Upgrading Yellow to Blue を引用)。本 bug で Claude Code が誤って feedback=Blue と判断した直接原因であり structural fix として同 track で処理する。",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "ADR Accepted 移行 (T002 で作成した ADR の Status フィールド更新)。knowledge/adr/README.md の信号機アーキテクチャ section に本 ADR の索引追加。verification.md 全 checkbox 確認 + Result 記入 + Verified At 記入。cargo make ci (fmt-check + clippy -D warnings + nextest + deny + check-layers + verify-spec-states + verify-arch-docs) 全通過。最終 smoke test: cargo make track-sync-views を実行し、catalogue-active-guard-fix-2026-04-15/plan.md + 他 active tracks の domain-types.md / usecase-types.md / infrastructure-types.md が一括生成されることを確認する。",
@@ -78,5 +79,5 @@
     }
   ],
   "title": "catalogue active-track guard + rendered view source-file-name fix + sync_rendered_views multi-layer rollout",
-  "updated_at": "2026-04-15T14:23:17Z"
+  "updated_at": "2026-04-15T14:28:08Z"
 }

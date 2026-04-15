@@ -83,6 +83,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [TDDD 型カタログ Taxonomy 拡張 — アプリケーション層パターンの幅を広げる](2026-04-13-1813-tddd-taxonomy-expansion.md) | Accepted | 2026-04-13 |
 | [Finding 型 Taxonomy クリーンアップ — 同名衝突の解消と hexagonal 分離の維持](2026-04-14-0625-finding-taxonomy-cleanup.md) | Accepted | 2026-04-14 |
 | [Domain serde 依存除去 — hexagonal 純粋性回復 + infrastructure 層 TDDD partial dogfood](2026-04-14-1531-domain-serde-ripout.md) | Accepted | 2026-04-14 |
+| [Catalogue active-track guard + renderer source-file-name + sync_rendered_views multilayer](2026-04-15-1012-catalogue-active-guard-fix.md) | Accepted | 2026-04-15 |
 
 ### ADR 運用
 
