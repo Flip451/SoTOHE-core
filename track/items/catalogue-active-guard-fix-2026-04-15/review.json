@@ -1,6 +1,39 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_type_signals` only checks `TrackMetadata::status()`, but archived tracks are preserved in `DocumentMeta::original_status`. That means an archived `metadata.json` with unresolved tasks is classified as `planned`/`in_progress` and can still pass the new guard, so `type-signals` can run on a frozen track. The guard needs to consult the raw status from `read_track_metadata`, not just the derived domain status.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 133,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:599161411fa8aafcc6f9a039c1f22b7b271073a1c10a2a8f960c374221800b92",
+          "at": "2026-04-15T13:28:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d410da0ed539bde00669acd81eef9968cf884c57318a3bd0ed17801eccac57f",
+          "at": "2026-04-15T13:31:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d410da0ed539bde00669acd81eef9968cf884c57318a3bd0ed17801eccac57f",
+          "at": "2026-04-15T13:33:47Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -191,6 +224,20 @@
           "findings": [],
           "hash": "rvw1:sha256:99e82f77ff45b3470a8cbb076be6e822e22d376bf5ed9dc8b57cd851c9ebf84e",
           "at": "2026-04-15T13:02:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ece56089092a7530ffa559dd54db4c8dd5a1263a6df7f8ac7db0b6bc8349ccb",
+          "at": "2026-04-15T13:27:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ece56089092a7530ffa559dd54db4c8dd5a1263a6df7f8ac7db0b6bc8349ccb",
+          "at": "2026-04-15T13:33:29Z"
         }
       ]
     }
