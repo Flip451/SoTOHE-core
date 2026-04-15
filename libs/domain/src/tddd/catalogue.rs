@@ -20,8 +20,6 @@
 
 use std::collections::HashSet;
 
-use serde::Serialize;
-
 use crate::ConfidenceSignal;
 use crate::spec::SpecValidationError;
 
@@ -43,7 +41,7 @@ use crate::spec::SpecValidationError;
 /// // ...
 /// // params[0]: { name: "id", ty: "UserId" }
 /// ```
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ParamDeclaration {
     name: String,
     ty: String,
@@ -90,7 +88,7 @@ impl ParamDeclaration {
 ///
 /// See ADR `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` §D2
 /// for the L1 JSON schema and forward-check rules.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MethodDeclaration {
     name: String,
     /// Self-receiver form: `"&self"` / `"&mut self"` / `"self"` / `None`
@@ -193,7 +191,7 @@ impl MethodDeclaration {
 /// Type strings (on `Field`) follow the same L1 convention as
 /// `MethodDeclaration`: last-segment short names, generics preserved verbatim.
 /// Module paths containing `::` are rejected by codec validation.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MemberDeclaration {
     /// An enum variant: only a name is tracked at L1 (payload types are
     /// out of scope until L2).

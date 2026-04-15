@@ -7,6 +7,7 @@ use clap::{Args, Subcommand};
 
 use domain::schema::SchemaExporter;
 use infrastructure::schema_export::RustdocSchemaExporter;
+use infrastructure::schema_export_codec;
 
 use crate::CliError;
 
@@ -48,12 +49,8 @@ fn export_schema(args: &ExportSchemaArgs) -> Result<ExitCode, CliError> {
     let exporter = RustdocSchemaExporter::new(workspace_root);
     let schema = exporter.export(&args.crate_name).map_err(|e| CliError::Message(e.to_string()))?;
 
-    let json = if args.pretty {
-        serde_json::to_string_pretty(&schema)
-    } else {
-        serde_json::to_string(&schema)
-    }
-    .map_err(|e| CliError::Message(format!("JSON serialization failed: {e}")))?;
+    let json = schema_export_codec::encode(&schema, args.pretty)
+        .map_err(|e| CliError::Message(format!("JSON serialization failed: {e}")))?;
 
     if let Some(path) = &args.output {
         std::fs::write(path, &json)

@@ -1,123 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`/track:review` is labeled as an external-review step here, but the canonical workflow documents it as the local planning/implementation review command and uses `/track:pr-review` for external GitHub PR review. This misstates the command's role and sends users to the wrong path.",
-              "severity": "P1",
-              "file": "README.md",
-              "line": 90,
-              "category": "workflow"
-            },
-            {
-              "message": "The note saying `/track:ci` is auto-called from review/commit contradicts the documented workflow, which still treats `/track:ci` as an explicit gate between review and commit. Hiding it from the sequence can cause users to skip a required check.",
-              "severity": "P1",
-              "file": "README.md",
-              "line": 97,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
-          "at": "2026-04-15T05:35:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`/track:ci` is not universally auto-invoked here. The canonical `review` flow still tells users to run `cargo make ci` separately, while only the commit path wraps CI automatically. This quickstart note makes CI look optional after review and can mislead users into skipping an explicit gate.",
-              "severity": "P1",
-              "file": "README.md",
-              "line": 97,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
-          "at": "2026-04-15T05:38:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "README's agent table says the `implementer` role defaults to \"Claude Code ... Sonnet, Opus as needed\", but the referenced `.harness/config/agent-profiles.json` sets `capabilities.implementer.model` to `claude-opus-4-6`. That leaves the promoted README contradicting the active harness configuration about the default implementation lane.",
-              "severity": "P1",
-              "file": "README.md",
-              "line": 111,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
-          "at": "2026-04-15T05:42:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a12e6bfe9a51dd15a57dabd47ee30abc9277a26b7fcff6c7699e8732a887df8",
-          "at": "2026-04-15T05:52:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a12e6bfe9a51dd15a57dabd47ee30abc9277a26b7fcff6c7699e8732a887df8",
-          "at": "2026-04-15T05:54:57Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a8cde6d89c553349c4680dcc90f373d214d74e0f5894a0c4b74f383420763e56",
-          "at": "2026-04-15T03:10:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a8cde6d89c553349c4680dcc90f373d214d74e0f5894a0c4b74f383420763e56",
-          "at": "2026-04-15T03:12:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:466a9455d9b5e36658a9977e35d89e61be2be4f536867b9ff5f2d6ed997555eb",
-          "at": "2026-04-15T04:37:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`pub mod schema_export_codec;` is now referenced from `lib.rs`, but `git status` shows `libs/infrastructure/src/schema_export_codec.rs` is still untracked, so the actual Git patch does not include the module source. If this change is committed as-is, the crate will fail to compile in CI because Rust cannot load the declared module.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/lib.rs",
-              "line": 11,
-              "category": "build"
-            }
-          ],
-          "hash": "rvw1:sha256:466a9455d9b5e36658a9977e35d89e61be2be4f536867b9ff5f2d6ed997555eb",
-          "at": "2026-04-15T04:39:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:466a9455d9b5e36658a9977e35d89e61be2be4f536867b9ff5f2d6ed997555eb",
-          "at": "2026-04-15T04:41:21Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -1158,6 +1041,247 @@
           "findings": [],
           "hash": "rvw1:sha256:a1275ae5112fb8b4bc68e81f90d66ba1cc4ae6cc37fd5d3cd4bb89f54ea12683",
           "at": "2026-04-15T06:46:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rendered header points this view at `domain-types.json`, but the file is the infrastructure catalogue view and should attribute `infrastructure-types.json` as its source of truth. This is a factual source-attribution error in the generated artifact.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/infrastructure-types.md",
+              "line": 1,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:3cae40051fe502cc15745f84bcd1d78558fca0fc1716ae44f89fbab4bc1802f6",
+          "at": "2026-04-15T06:57:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure-types.md` now claims it was generated from `domain-types.json`, but this artifact is the infrastructure layer catalogue view and the track’s source of truth is `infrastructure-types.json`. The header points at the wrong source file, so the rendered view is factually inconsistent.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/infrastructure-types.md",
+              "line": 1,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:3cae40051fe502cc15745f84bcd1d78558fca0fc1716ae44f89fbab4bc1802f6",
+          "at": "2026-04-15T06:58:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ecdf24684c8f85959facbabb8bfacaed8404bf26f4200f061e849b4c7526f83",
+          "at": "2026-04-15T06:59:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is marked done and backfilled with commit `ad3aeae…`, but T004 itself was not transitioned out of `todo`. That leaves the source-of-truth metadata inconsistent with the intended T003->T004 handoff for this scope, and `plan.md` consequently still renders Phase D as `[ ]` instead of the next active step.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "line": 109,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:5ecdf24684c8f85959facbabb8bfacaed8404bf26f4200f061e849b4c7526f83",
+          "at": "2026-04-15T07:02:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ecdf24684c8f85959facbabb8bfacaed8404bf26f4200f061e849b4c7526f83",
+          "at": "2026-04-15T07:04:37Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b659c2600985595999c216e97118a7dde2ef742d7699444d37bce3353e9d1b10",
+          "at": "2026-04-15T06:55:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_export_codec::encode()` already returns `SchemaExportCodecError::Json` with the display text `JSON serialization failed: …`, so wrapping it again with `format!(\"JSON serialization failed: {e}\")` changes the CLI output to `JSON serialization failed: JSON serialization failed: …`. The previous implementation only emitted the prefix once, so this is a user-visible compatibility regression for consumers matching the existing error string.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/domain.rs",
+              "line": 53,
+              "category": "behavioral_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:b659c2600985595999c216e97118a7dde2ef742d7699444d37bce3353e9d1b10",
+          "at": "2026-04-15T06:56:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b659c2600985595999c216e97118a7dde2ef742d7699444d37bce3353e9d1b10",
+          "at": "2026-04-15T06:57:26Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d78178d89ff18cb222be23a4a6ce1251d62ba2b7d43804c0a526004943081aef",
+          "at": "2026-04-15T06:55:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d78178d89ff18cb222be23a4a6ce1251d62ba2b7d43804c0a526004943081aef",
+          "at": "2026-04-15T06:56:37Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8cde6d89c553349c4680dcc90f373d214d74e0f5894a0c4b74f383420763e56",
+          "at": "2026-04-15T03:10:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8cde6d89c553349c4680dcc90f373d214d74e0f5894a0c4b74f383420763e56",
+          "at": "2026-04-15T03:12:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:466a9455d9b5e36658a9977e35d89e61be2be4f536867b9ff5f2d6ed997555eb",
+          "at": "2026-04-15T04:37:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`pub mod schema_export_codec;` is now referenced from `lib.rs`, but `git status` shows `libs/infrastructure/src/schema_export_codec.rs` is still untracked, so the actual Git patch does not include the module source. If this change is committed as-is, the crate will fail to compile in CI because Rust cannot load the declared module.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 11,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:466a9455d9b5e36658a9977e35d89e61be2be4f536867b9ff5f2d6ed997555eb",
+          "at": "2026-04-15T04:39:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:466a9455d9b5e36658a9977e35d89e61be2be4f536867b9ff5f2d6ed997555eb",
+          "at": "2026-04-15T04:41:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65892fa989ad40837fa2ded2da10dbb21d9cfae4c011d78bef08dad3d5a8155c",
+          "at": "2026-04-15T06:55:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65892fa989ad40837fa2ded2da10dbb21d9cfae4c011d78bef08dad3d5a8155c",
+          "at": "2026-04-15T06:56:03Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:review` is labeled as an external-review step here, but the canonical workflow documents it as the local planning/implementation review command and uses `/track:pr-review` for external GitHub PR review. This misstates the command's role and sends users to the wrong path.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 90,
+              "category": "workflow"
+            },
+            {
+              "message": "The note saying `/track:ci` is auto-called from review/commit contradicts the documented workflow, which still treats `/track:ci` as an explicit gate between review and commit. Hiding it from the sequence can cause users to skip a required check.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 97,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
+          "at": "2026-04-15T05:35:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:ci` is not universally auto-invoked here. The canonical `review` flow still tells users to run `cargo make ci` separately, while only the commit path wraps CI automatically. This quickstart note makes CI look optional after review and can mislead users into skipping an explicit gate.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 97,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
+          "at": "2026-04-15T05:38:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "README's agent table says the `implementer` role defaults to \"Claude Code ... Sonnet, Opus as needed\", but the referenced `.harness/config/agent-profiles.json` sets `capabilities.implementer.model` to `claude-opus-4-6`. That leaves the promoted README contradicting the active harness configuration about the default implementation lane.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 111,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
+          "at": "2026-04-15T05:42:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a12e6bfe9a51dd15a57dabd47ee30abc9277a26b7fcff6c7699e8732a887df8",
+          "at": "2026-04-15T05:52:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a12e6bfe9a51dd15a57dabd47ee30abc9277a26b7fcff6c7699e8732a887df8",
+          "at": "2026-04-15T05:54:57Z"
         }
       ]
     }
