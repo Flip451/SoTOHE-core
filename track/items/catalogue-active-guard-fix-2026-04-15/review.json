@@ -126,6 +126,71 @@
           "findings": [],
           "hash": "rvw1:sha256:ef5c1bb6dc1c051f7c2ce5cb5fcaba59c05b90c783b3b606f60b801aa4f7ec0b",
           "at": "2026-04-15T12:08:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`D3`'s pseudocode still uses `.expect(\"builtin fallback must parse\")` for the synthetic fallback. If implemented as written, that reintroduces a panic path in library code, which this repo explicitly forbids outside tests. Replace the `expect` with normal error propagation (for example `map_err(...)?`) or construct the fallback binding without a fallible parse step.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+              "line": 147,
+              "category": "correctness"
+            },
+            {
+              "message": "The `T004` manual verification block is still written for the old design: it searches for `resolve_tddd_layer_bindings` and says to expect a helper to be newly added, even though the ADR/spec now require direct reuse of `parse_tddd_layers` with no new helper. The same block also says `rg 'render_type_catalogue\\(' ...` should return exactly 2 matches, but that command also matches the function definition and tests. Update these checks so reviewers can validate the intended implementation instead of failing on stale instructions.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/verification.md",
+              "line": 51,
+              "category": "consistency"
+            },
+            {
+              "message": "`metadata.json` was edited in this patch, but `updated_at` still says `2026-04-15T11:30:00Z`. That is already older than the corresponding `spec.json`/`spec.md` re-approval at `2026-04-15T12:30:01Z`, and this repo uses `updated_at` to resolve the latest active track on `main`. Leaving the stale timestamp here can make tooling rank this track incorrectly. Bump `updated_at` to the actual UTC edit time when changing the metadata.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/metadata.json",
+              "line": 8,
+              "category": "process"
+            }
+          ],
+          "hash": "rvw1:sha256:7e915773017ae7604356eda6497cd0c010d66ebdbde92bbbf3263ec4ecfe3fd5",
+          "at": "2026-04-15T12:34:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 is missing the required `> Note:` explaining that the ADR-first gate is recorded in `spec.json::constraints`, and the ADR ends without a `## References` section. Add both so the Nygard structure matches the review brief and the process/decision split stays explicit.",
+              "severity": "P2",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+              "line": 172,
+              "category": "documentation"
+            },
+            {
+              "message": "`Reassess When` stops after two items. The brief expects a fuller trigger list, including an explicit condition for revisiting B2 if cross-track mistakes increase. Add the missing triggers so future re-evaluation criteria are concrete.",
+              "severity": "P2",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+              "line": 257,
+              "category": "documentation"
+            }
+          ],
+          "hash": "rvw1:sha256:eba4cc08e870ef408d0fa422c47779911ef9b7124a7ab0b52f5e9b332d36e620",
+          "at": "2026-04-15T12:54:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:712e372f128d27f9dae6c63a6d376e0bde7b439a47080a10920ce05e1109221a",
+          "at": "2026-04-15T12:56:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99e82f77ff45b3470a8cbb076be6e822e22d376bf5ed9dc8b57cd851c9ebf84e",
+          "at": "2026-04-15T13:02:08Z"
         }
       ]
     }

@@ -9,7 +9,7 @@
 - [ ] T003: 将来 `TrackStatus` に新 variant が追加された場合、exhaustive `match` 文が compile error を発生させ、開発者に frozen/active 分類を強制する (fail-closed structural guarantee)
 - [ ] T004: `libs/infrastructure/src/type_catalogue_render.rs::render_type_catalogue` の signature が `(doc, source_file_name: &str)` に変更されている
 - [ ] T004: `libs/infrastructure/src/track/render.rs::sync_rendered_views` が `architecture-rules.json` の `tddd.enabled=true` 全 layer を iterate し、各 `<layer>-types.md` を生成するよう拡張されている (domain / usecase / infrastructure)
-- [ ] T004: `resolve_tddd_layer_bindings` (or 同等名) が `render.rs` 内の private helper として実装されている (apps/cli::resolve_layers は依存方向により reach 不可のため独立実装)
+- [ ] T004: `libs/infrastructure/src/track/render.rs::sync_rendered_views` が既存 `libs/infrastructure/src/verify/tddd_layers.rs::parse_tddd_layers` を `use crate::verify::tddd_layers::parse_tddd_layers;` で import して reuse している (新 helper は作成しない、apps/cli::resolve_layers と同じ resolver を共有)
 - [ ] T004: 呼び出し側 2 箇所が catalogue JSON ファイル名 (e.g. `infrastructure-types.json`) を `source_file_name` として渡している (rendered .md パスとは別)。`validate_and_write_catalogue` 側は `domain_types_path.file_name()` から catalogue ファイル名を導出 (`binding` はそのスコープに存在しない)、`sync_rendered_views` multi-layer loop 内では `binding.catalogue_file()` を使用
 - [ ] T004: 既存テスト `type_catalogue_render.rs:211` が signature 変更に追従し pass
 - [ ] T004: 既存テスト `sync_rendered_views_generates_domain_types_md_from_domain_types_json` が multi-layer loop 化後も pass (backward compat)
@@ -47,13 +47,14 @@ git status --short  # expect: no diff on the above files
 rg 'fn render_type_catalogue' libs/infrastructure/src/type_catalogue_render.rs
 # expect: pub fn render_type_catalogue(doc: &TypeCatalogueDocument, source_file_name: &str) -> String
 
-# sync_rendered_views が multi-layer loop 化されている
-rg -n 'resolve_tddd_layer_bindings|binding.catalogue_file|binding.rendered_file' libs/infrastructure/src/track/render.rs
-# expect: multiple matches (helper 新設 + loop 内での使用)
+# sync_rendered_views が multi-layer loop 化されている (parse_tddd_layers を直接 reuse、新 helper は作成しない)
+rg -n 'parse_tddd_layers|binding\.catalogue_file|binding\.rendered_file' libs/infrastructure/src/track/render.rs
+# expect: multiple matches (use crate::verify::tddd_layers::parse_tddd_layers import + loop 内での使用)
 
-# 呼び出し側 2 箇所が source_file_name を渡している (定義行 + テストコードを除く)
-rg 'render_type_catalogue\(' libs/infrastructure/src/track/render.rs apps/cli/src/commands/track/tddd/signals.rs
-# expect: 2 matches (sync_rendered_views loop 内 + validate_and_write_catalogue 内), どちらも 2 引数形式
+# 呼び出し側 2 箇所が source_file_name を渡している (production call sites のみ確認)
+rg -n 'render_type_catalogue\(' libs/infrastructure/src/track/render.rs apps/cli/src/commands/track/tddd/signals.rs
+# expect: 少なくとも 2 行が 2 引数形式 (sync_rendered_views loop 内 + validate_and_write_catalogue 内)
+# Note: 関数定義は type_catalogue_render.rs に存在するためこのコマンドでは含まれない
 
 # テスト: signature 変更 + 新規テストの確認 (特定テスト名を指定して6件確認)
 cargo nextest run -p infrastructure test_render_type_catalogue

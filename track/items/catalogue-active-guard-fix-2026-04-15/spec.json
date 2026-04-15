@@ -35,11 +35,12 @@
         ]
       },
       {
-        "text": "sync_rendered_views を multi-layer 対応に拡張する — architecture-rules.json の tddd.enabled=true 全 layer を iterate し、各 <layer>-types.md を一括生成する。resolve_tddd_layer_bindings を render.rs 内の private helper として新設 (apps/cli::resolve_layers は layer dependency direction により reach 不可)。既存 is_done_or_archived / rendered_matches / TypeCatalogueCodecError::Json warn-and-continue の 3 pattern は保持する。",
+        "text": "sync_rendered_views を multi-layer 対応に拡張する — architecture-rules.json の tddd.enabled=true 全 layer を iterate し、各 <layer>-types.md を一括生成する。既存 libs/infrastructure/src/verify/tddd_layers.rs::parse_tddd_layers (tddd-01 Phase 1 Task 7 で導入、apps/cli::resolve_layers が既に reuse している public resolver) を直接 reuse する — 新 helper は作成しない。既存 is_done_or_archived / rendered_matches / TypeCatalogueCodecError::Json warn-and-continue の 3 pattern は保持する。",
         "sources": [
           "libs/infrastructure/src/track/render.rs §sync_rendered_views line 568-606 (現状 domain-only loop)",
+          "libs/infrastructure/src/verify/tddd_layers.rs §parse_tddd_layers line 139 (既存 public resolver)",
+          "apps/cli/src/commands/track/tddd/signals.rs §line 15 §line 28 resolve_layers (既存 parse_tddd_layers reuse 箇所)",
           "architecture-rules.json §layers tddd.enabled",
-          "apps/cli/src/commands/track/tddd/signals.rs §resolve_layers (参考実装)",
           "feedback — ユーザー指摘: sync_rendered_views が domain_types.md だけをレンダーするのはバグ (2026-04-15)"
         ],
         "task_refs": [
@@ -101,9 +102,9 @@
         ]
       },
       {
-        "text": "resolve_tddd_layer_bindings を apps/cli::resolve_layers と共通化して shared module (例: infrastructure::verify::architecture_rules) に抽出する (本 track では render.rs 内の private helper として独立実装し、重複を許容する。共通化は 3 箇所目の resolver が必要になった時点で別 track で実施)",
+        "text": "parse_tddd_layers の 3 箇所目以降の caller のための追加共通化 (本 track の D3 で parse_tddd_layers は apps/cli::resolve_layers と sync_rendered_views loop の 2 箇所 caller で既に共通化されており、3 箇所目が必要になった時点で accessor 追加や error 型拡張など resolver 本体の evolution を別 track で検討)",
         "sources": [
-          "apps/cli/src/commands/track/tddd/signals.rs §resolve_layers",
+          "libs/infrastructure/src/verify/tddd_layers.rs §parse_tddd_layers (既存 public resolver, 2 caller)",
           "convention — .claude/rules/10-guardrails.md §Small task commits 原則"
         ]
       }
@@ -118,7 +119,7 @@
       ]
     },
     {
-      "text": "layer 依存方向を維持: signals.rs の guard は apps/cli 層で infrastructure の track metadata loader を呼ぶ。sync_rendered_views の multi-layer loop は libs/infrastructure 層で architecture-rules.json を直接 parse する (apps/cli からの import は依存方向違反のため不可)",
+      "text": "layer 依存方向を維持: signals.rs の guard は apps/cli 層で infrastructure の track metadata loader を呼ぶ (apps/cli → infrastructure の正しい方向)。sync_rendered_views の multi-layer loop は libs/infrastructure 層で既存 parse_tddd_layers (verify/tddd_layers.rs) を直接 reuse する。apps/cli::resolve_layers が既に parse_tddd_layers を import / call している事実がその依存方向の正当性を示す",
       "sources": [
         "architecture-rules.json",
         "knowledge/conventions/hexagonal-architecture.md"
@@ -283,6 +284,6 @@
     "yellow": 0,
     "red": 0
   },
-  "approved_at": "2026-04-15T12:01:00Z",
-  "content_hash": "sha256:14f93ee2f357ec278714b3957ad6d6b7efd2fd659d4241d6f157631540cd770c"
+  "approved_at": "2026-04-15T12:35:15Z",
+  "content_hash": "sha256:763a5a3549b03bc7a6c311d58e7477f45d7e1472cdab352d1e1462fee288dc45"
 }
