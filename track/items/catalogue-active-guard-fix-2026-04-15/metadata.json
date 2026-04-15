@@ -34,7 +34,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "commit_hash": "8e233788dc343a71d3fb4a6586aac5b471829f11",
@@ -73,11 +73,12 @@
       "status": "done"
     },
     {
+      "commit_hash": "fcba0196ea164343332371387ba4377c1c0c86e0",
       "description": "ADR Accepted 移行 (T002 で作成した ADR の Status フィールド更新)。knowledge/adr/README.md の信号機アーキテクチャ section に本 ADR の索引追加。verification.md 全 checkbox 確認 + Result 記入 + Verified At 記入。cargo make ci (fmt-check + clippy -D warnings + nextest + deny + check-layers + verify-spec-states + verify-arch-docs) 全通過。最終 smoke test: cargo make track-sync-views を実行し、catalogue-active-guard-fix-2026-04-15/plan.md + 他 active tracks の domain-types.md / usecase-types.md / infrastructure-types.md が一括生成されることを確認する。",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "catalogue active-track guard + rendered view source-file-name fix + sync_rendered_views multi-layer rollout",
-  "updated_at": "2026-04-15T14:28:08Z"
+  "updated_at": "2026-04-15T14:37:44Z"
 }
