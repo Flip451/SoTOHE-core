@@ -31,6 +31,35 @@
           "findings": [],
           "hash": "rvw1:sha256:1d410da0ed539bde00669acd81eef9968cf884c57318a3bd0ed17801eccac57f",
           "at": "2026-04-15T13:33:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8bddd37b5545e9cb9e07cf729cc6daeaab0decaa90879dad9553858dd4e03a7a",
+          "at": "2026-04-15T13:43:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The caller-side header fix is not covered by a regression test. In this file, the success-path tests only check that the rendered `.md` file exists, so a future change back to `render_type_catalogue(doc, rendered_file_stem)` would still pass while silently reintroducing headers like `Generated from usecase-types.md` for non-domain layers. Add a test that exercises a non-domain `domain_types_path`/`rendered_file_stem` pair and asserts the rendered header uses the `.json` catalogue filename.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 401,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:8bddd37b5545e9cb9e07cf729cc6daeaab0decaa90879dad9553858dd4e03a7a",
+          "at": "2026-04-15T13:51:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bba4864fb826db548a35ac9ac4248327d05248d01a22ba82ab28a28a84f26001",
+          "at": "2026-04-15T13:52:49Z"
         }
       ]
     },
@@ -238,6 +267,113 @@
           "findings": [],
           "hash": "rvw1:sha256:4ece56089092a7530ffa559dd54db4c8dd5a1263a6df7f8ac7db0b6bc8349ccb",
           "at": "2026-04-15T13:33:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec0389b8b4b639848698fb82dbe539ddd8f3387cc51fb2712d16f5487978f641",
+          "at": "2026-04-15T13:42:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec0389b8b4b639848698fb82dbe539ddd8f3387cc51fb2712d16f5487978f641",
+          "at": "2026-04-15T13:50:30Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Move `architecture-rules.json` loading behind the `is_done_or_archived` guard. Right now frozen tracks still parse the repo-level rules file, so a malformed or unreadable rules file will make `sync_rendered_views` fail even though the type-catalogue path should be a no-op for done/archived tracks.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "line": 579,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:0d2283b2514f0c15d39e04b5100dc8fb96b291821791f0082e21ff2c5f54db7e",
+          "at": "2026-04-15T13:44:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23a5370c0adc1d4067f16d921a591b8bbd24a6a4772755e22ea885bff9743050",
+          "at": "2026-04-15T13:48:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_catalogue` now interpolates `source_file_name` directly into the generated HTML comment header. In T004 that string comes from `architecture-rules.json` (`binding.catalogue_file()` in `sync_rendered_views`), but the existing validation only rejects path separators / `..` / `::`. A catalogue file name containing `-->` or a newline is therefore accepted and will break out of the comment, injecting arbitrary markdown into the rendered `*-types.md`. This needs escaping or stricter filename validation before writing the header.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 64,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:23a5370c0adc1d4067f16d921a591b8bbd24a6a4772755e22ea885bff9743050",
+          "at": "2026-04-15T13:52:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new multilayer loop writes each layer to `binding.rendered_file()` but never checks that those rendered paths are unique. `parse_tddd_layers` only rejects duplicate `catalogue_file` values, so configs like `catalogue_file: \"foo\"` and `catalogue_file: \"foo.json\"` are both accepted yet both resolve to `foo.md`; the later layer silently overwrites the earlier rendered view. Reject non-`.json` catalogue names or validate uniqueness on the derived markdown path before iterating.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 607,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e73ebe49f2520ae770f0b958ba000858e85b76da0da25b1601ff299d5814a45e",
+          "at": "2026-04-15T14:00:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rendered-path collision guard reserves `binding.rendered_file()` before checking whether that layer actually has a catalogue file. With a valid-but-colliding config such as `catalogue_file: \"foo\"` and `catalogue_file: \"foo.json\"`, if `track/foo` is absent but `track/foo.json` exists, the first layer is silently skipped by the per-layer opt-out and still marks `foo.md` as seen, so the second layer is also skipped and no rendered view is produced. This breaks the stated 'catalogue file absent -> skip that layer only' behavior and lets one layer's absence suppress another layer's render.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 605,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c31758998d7884a34e3f0d611e87ccdb5b796b97ed9ff22350b6ce9754132be2",
+          "at": "2026-04-15T14:05:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new multi-layer regression test does not cover the D3 guarantee that a malformed `*-types.json` in one enabled layer must not block rendering the other layers. `sync_rendered_views_generates_multiple_layer_types_md_independently` only exercises the all-valid case, so a future early-return regression in the per-layer `TypeCatalogueCodecError::Json` path would slip through without a failing test.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 2396,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:d96f46960ceaaf7047e0534fc6a2b3a0f8c888e57a5c492a9d5a8cde219baa77",
+          "at": "2026-04-15T14:08:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae9d1c747c59ba2de2030d36845d9bb520e98ccd439aa79dad3a44fc442f10a4",
+          "at": "2026-04-15T14:11:34Z"
         }
       ]
     }

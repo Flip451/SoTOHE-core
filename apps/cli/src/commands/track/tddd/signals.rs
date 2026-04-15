@@ -385,7 +385,20 @@ fn validate_and_write_catalogue(
     // The markdown filename is `<catalogue_stem>.md` where `<catalogue_stem>`
     // is derived from the binding's `catalogue_file`.
     let rendered_md_path = track_dir.join(rendered_file_stem);
-    let rendered = infrastructure::type_catalogue_render::render_type_catalogue(doc);
+    // Derive the catalogue JSON filename from the write path so the rendered view's
+    // `Generated from ...` header reflects the actual source file (e.g.
+    // `infrastructure-types.json`) — not the rendered `.md` path. `binding` is not
+    // in this scope; `domain_types_path` already holds the exact catalogue file path
+    // that was just written, so deriving from its file_name is authoritative.
+    let catalogue_file =
+        domain_types_path.file_name().and_then(|n| n.to_str()).ok_or_else(|| {
+            CliError::Message(format!(
+                "cannot derive catalogue file name from {}",
+                domain_types_path.display()
+            ))
+        })?;
+    let rendered =
+        infrastructure::type_catalogue_render::render_type_catalogue(doc, catalogue_file);
     atomic_write_file(&rendered_md_path, rendered.as_bytes()).map_err(|e| {
         CliError::Message(format!("cannot write {}: {e}", rendered_md_path.display()))
     })?;
@@ -832,6 +845,45 @@ mod tests {
         assert!(
             dir.path().join("domain-types.md").exists(),
             "domain-types.md must be written on success"
+        );
+    }
+
+    #[test]
+    fn test_validate_and_write_catalogue_rendered_header_uses_json_catalogue_filename() {
+        // Regression guard for the T004 caller-side header fix: the rendered `.md` file's
+        // `Generated from ...` header must reference the catalogue JSON filename, not the
+        // markdown output filename.  Using a non-domain path (`infrastructure-types.json`)
+        // makes the distinction explicit — if the derivation regresses back to passing
+        // `rendered_file_stem` the header would incorrectly say
+        // `Generated from infrastructure-types.md`.
+        let dir = tempfile::tempdir().unwrap();
+        let catalogue_path = dir.path().join("infrastructure-types.json");
+        let track_dir = dir.path().to_path_buf();
+
+        let doc = domain::TypeCatalogueDocument::new(1, vec![]);
+        let report = domain::check_consistency(&[], &empty_graph_d(), &empty_baseline_d());
+
+        assert!(report.delete_errors().is_empty(), "precondition: no delete errors");
+
+        let result = validate_and_write_catalogue(
+            &report,
+            &doc,
+            &catalogue_path,
+            &track_dir,
+            "infrastructure-types.md",
+        );
+
+        assert!(result.is_ok(), "clean report must succeed: {result:?}");
+
+        let rendered = std::fs::read_to_string(dir.path().join("infrastructure-types.md"))
+            .expect("rendered md must exist");
+        assert!(
+            rendered.contains("Generated from infrastructure-types.json"),
+            "rendered header must reference the JSON catalogue file, got:\n{rendered}"
+        );
+        assert!(
+            !rendered.contains("Generated from infrastructure-types.md"),
+            "rendered header must NOT reference the md output file, got:\n{rendered}"
         );
     }
 

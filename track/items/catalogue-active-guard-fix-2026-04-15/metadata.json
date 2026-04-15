@@ -49,9 +49,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "537e23f166eddfedd31a6a173cbd47b53125d07a",
       "description": "Fix A (TDD Red/Green): Add active-track guard to execute_type_signals at apps/cli/src/commands/track/tddd/signals.rs:96-128. Reject when metadata.json.status is Done or Archived via CliError::Message. Red test: test_execute_type_signals_rejects_done_track (and archived variant). Green: load metadata via infrastructure track adapter + exhaustive `match` on TrackStatus (all 6 variants explicitly enumerated: Done|Archived → fail-closed CliError::Message, Planned|InProgress|Blocked|Cancelled → proceed). MUST use `match` NOT `matches!` — the macro form is non-exhaustive and silently passes new variants through (fail-open), while exhaustive match produces a compile error on new variants forcing explicit classification. Mirror the intent of the existing is_done_or_archived pattern in libs/infrastructure/src/track/render.rs:573 (which uses string-based matches!) while upgrading to type-safe enum match on signals.rs side (render.rs upgrade is scope-deferred per ADR Consequences Neutral).",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Fix hardcoded header + sync_rendered_views multi-layer render (TDD Red/Green, atomic): (1) Change libs/infrastructure/src/type_catalogue_render.rs::render_type_catalogue signature from (doc) to (doc, source_file_name: &str) — format!(\"Generated from {source_file_name}\"). (2) Extend libs/infrastructure/src/track/render.rs::sync_rendered_views to iterate all tddd-enabled layers from architecture-rules.json and render each <layer>-types.md (previously domain-types.md only — user-reported bug). Reuse the existing public resolver `parse_tddd_layers` from `libs/infrastructure/src/verify/tddd_layers.rs` (introduced in tddd-01 Phase 1 Task 7, line 139; apps/cli::resolve_layers already calls it — this is pure reuse with no new helper required, `apps/cli → infrastructure` is the correct dependency direction). (3) Update apps/cli/src/commands/track/tddd/signals.rs::validate_and_write_catalogue (line 347) to pass the catalogue JSON filename as source_file_name — NOT rendered_file_stem (which holds the rendered .md path). In validate_and_write_catalogue, `binding` is not in scope; derive the catalogue filename from the already-available `domain_types_path.file_name()` (e.g. path ending in infrastructure-types.json → filename \"infrastructure-types.json\"). This mirrors the existing pattern in evaluate_and_write_signals (line ~304). (4) Tests: keep existing sync_rendered_views_generates_domain_types_md_from_domain_types_json; add sync_rendered_views_generates_usecase_types_md_from_usecase_types_json, sync_rendered_views_generates_infrastructure_types_md_from_infrastructure_types_json, and sync_rendered_views_generates_multiple_layer_types_md_independently (multi-layer track test); update type_catalogue_render.rs:211 header assertion for new signature.",
@@ -75,5 +76,5 @@
     }
   ],
   "title": "catalogue active-track guard + rendered view source-file-name fix + sync_rendered_views multi-layer rollout",
-  "updated_at": "2026-04-15T13:12:05Z"
+  "updated_at": "2026-04-15T13:36:08Z"
 }

@@ -58,10 +58,14 @@ const SECTIONS: &[Section] = &[
 /// defined by D7 of ADR `2026-04-13-1813-tddd-taxonomy-expansion.md`.
 /// Sections with no entries are omitted.
 #[must_use]
-pub fn render_type_catalogue(doc: &TypeCatalogueDocument) -> String {
+pub fn render_type_catalogue(doc: &TypeCatalogueDocument, source_file_name: &str) -> String {
     let mut out = String::new();
 
-    out.push_str("<!-- Generated from domain-types.json — DO NOT EDIT DIRECTLY -->\n");
+    // Sanitize source_file_name for safe HTML comment interpolation:
+    // - Strip newlines (a newline inside an HTML comment produces invalid markdown)
+    // - Replace `-->` with `-- >` to prevent premature comment close
+    let safe_name = source_file_name.replace(['\n', '\r'], "").replace("-->", "-- >");
+    out.push_str(&format!("<!-- Generated from {safe_name} — DO NOT EDIT DIRECTLY -->\n"));
 
     // Track consumed signal indices to handle delete+add pairs that share the same
     // (name, kind_tag) key. The first matching signal is consumed by the first entry;
@@ -206,10 +210,66 @@ mod tests {
     #[test]
     fn test_render_type_catalogue_includes_generated_header() {
         let doc = make_doc(vec![]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(
             output.contains("<!-- Generated from domain-types.json"),
             "missing generated header"
+        );
+    }
+
+    #[test]
+    fn test_render_type_catalogue_header_reflects_source_file_name_argument() {
+        // Regression test for T004 / D2: the generated header must reflect the
+        // `source_file_name` argument, not a hardcoded `domain-types.json` string.
+        // This ensures non-domain layer rendered views (e.g. `infrastructure-types.md`,
+        // `usecase-types.md`) correctly attribute their source.
+        let doc = make_doc(vec![]);
+
+        let infra_output = render_type_catalogue(&doc, "infrastructure-types.json");
+        assert!(
+            infra_output.contains("<!-- Generated from infrastructure-types.json"),
+            "header must contain 'infrastructure-types.json', got: {infra_output}"
+        );
+        assert!(
+            !infra_output.contains("<!-- Generated from domain-types.json"),
+            "header must NOT hardcode 'domain-types.json' for infrastructure layer"
+        );
+
+        let usecase_output = render_type_catalogue(&doc, "usecase-types.json");
+        assert!(
+            usecase_output.contains("<!-- Generated from usecase-types.json"),
+            "header must contain 'usecase-types.json', got: {usecase_output}"
+        );
+    }
+
+    #[test]
+    fn test_render_type_catalogue_header_sanitizes_comment_injection_sequences() {
+        // Security guard: source_file_name is interpolated into an HTML comment header.
+        // A name containing `-->` or a newline must be sanitized so it cannot close
+        // the comment prematurely or inject arbitrary markdown.
+        let doc = make_doc(vec![]);
+
+        // `-->` in the filename must be replaced with `-- >` so the name part of the
+        // comment cannot close the comment prematurely. The test checks that the
+        // rendered header contains the sanitized form `evil-- >suffix.json` rather
+        // than the raw `evil-->suffix.json` sequence.
+        let injection_output = render_type_catalogue(&doc, "evil-->suffix.json");
+        assert!(
+            injection_output.contains("evil-- >suffix.json"),
+            "sanitized name must appear as `-- >` replacement, got: {injection_output}"
+        );
+        assert!(
+            !injection_output.contains("evil-->"),
+            "unsanitized `-->` from filename must not appear, got: {injection_output}"
+        );
+
+        // A newline in the name must be stripped so the comment stays on one line.
+        // After stripping the `\n`, the name becomes `badname.json` with no embedded newline.
+        let newline_output = render_type_catalogue(&doc, "bad\nname.json");
+        let first_line = newline_output.lines().next().unwrap_or("");
+        assert!(
+            first_line.contains("badname.json"),
+            "newline in source_file_name must be stripped, first line got: {first_line}"
         );
     }
 
@@ -218,7 +278,7 @@ mod tests {
         // D7: the old flat "## Type Declarations" heading is replaced by per-kind
         // section headings.  An empty catalogue produces no section headings at all.
         let doc = make_doc(vec![]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(
             !output.contains("## Type Declarations"),
             "old flat heading must not appear after D7 rewrite"
@@ -228,7 +288,7 @@ mod tests {
     #[test]
     fn test_render_type_catalogue_table_header_present_when_entries_exist() {
         let doc = make_doc(vec![make_entry("Foo", TypeDefinitionKind::ValueObject)]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(
             output.contains("| Name | Kind | Action | Details | Signal |"),
             "missing table header"
@@ -246,7 +306,7 @@ mod tests {
             make_entry("Foo", TypeDefinitionKind::ValueObject),
             make_entry("Bar", TypeDefinitionKind::SecondaryPort { expected_methods: vec![] }),
         ]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("## Value Objects"), "missing ## Value Objects");
         assert!(output.contains("## Secondary Ports"), "missing ## Secondary Ports");
         // Other section headers must NOT appear when no entries exist for them
@@ -261,7 +321,7 @@ mod tests {
             "MyPort",
             TypeDefinitionKind::SecondaryPort { expected_methods: vec![] },
         )]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(!output.contains("## Trait Ports"), "old ## Trait Ports heading must not appear");
         assert!(output.contains("## Secondary Ports"), "## Secondary Ports must appear");
     }
@@ -279,7 +339,7 @@ mod tests {
             },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("| Draft | typestate |"), "missing typestate row");
         assert!(output.contains("\u{2192} Published"), "missing transition arrow");
     }
@@ -291,7 +351,7 @@ mod tests {
             TypeDefinitionKind::Typestate { transitions: TypestateTransitions::Terminal },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("\u{2205} (terminal)"), "missing terminal marker");
     }
 
@@ -302,7 +362,7 @@ mod tests {
             TypeDefinitionKind::Enum { expected_variants: vec!["Planned".into(), "Done".into()] },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("| TrackStatus | enum |"), "missing enum row");
         assert!(output.contains("Planned, Done"), "missing enum variants");
     }
@@ -311,7 +371,7 @@ mod tests {
     fn test_render_value_object_entry_row() {
         let entry = make_entry("TrackId", TypeDefinitionKind::ValueObject);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("| TrackId | value_object |"), "missing value_object row");
     }
 
@@ -322,7 +382,7 @@ mod tests {
             TypeDefinitionKind::ErrorType { expected_variants: vec!["NightlyNotFound".into()] },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("| SchemaExportError | error_type |"), "missing error_type row");
         assert!(output.contains("NightlyNotFound"), "missing error variant");
     }
@@ -342,7 +402,7 @@ mod tests {
             },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(
             output.contains("| SchemaExporter | secondary_port |"),
             "missing secondary_port row"
@@ -365,7 +425,7 @@ mod tests {
             },
         );
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(
             output.contains("| HookHandler | application_service |"),
             "missing application_service row"
@@ -377,7 +437,7 @@ mod tests {
     fn test_render_use_case_entry_row() {
         let entry = make_entry("SaveTrackUseCase", TypeDefinitionKind::UseCase);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("| SaveTrackUseCase | use_case |"), "missing use_case row");
     }
 
@@ -385,7 +445,7 @@ mod tests {
     fn test_render_interactor_entry_row() {
         let entry = make_entry("SaveTrackInteractor", TypeDefinitionKind::Interactor);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("| SaveTrackInteractor | interactor |"), "missing interactor row");
     }
 
@@ -393,7 +453,7 @@ mod tests {
     fn test_render_dto_entry_row() {
         let entry = make_entry("CreateUserDto", TypeDefinitionKind::Dto);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("| CreateUserDto | dto |"), "missing dto row");
     }
 
@@ -401,7 +461,7 @@ mod tests {
     fn test_render_command_entry_row() {
         let entry = make_entry("CreateUserCommand", TypeDefinitionKind::Command);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("| CreateUserCommand | command |"), "missing command row");
     }
 
@@ -409,7 +469,7 @@ mod tests {
     fn test_render_query_entry_row() {
         let entry = make_entry("GetUserQuery", TypeDefinitionKind::Query);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("| GetUserQuery | query |"), "missing query row");
     }
 
@@ -417,7 +477,7 @@ mod tests {
     fn test_render_factory_entry_row() {
         let entry = make_entry("UserFactory", TypeDefinitionKind::Factory);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("| UserFactory | factory |"), "missing factory row");
     }
 
@@ -474,7 +534,7 @@ mod tests {
             make_entry("AggFactory", TypeDefinitionKind::Factory),
         ];
         let doc = make_doc(entries);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
 
         // All 12 kind tags must appear in the output
         assert!(output.contains("typestate"), "missing typestate");
@@ -533,7 +593,7 @@ mod tests {
     fn test_render_signal_column_shows_dash_when_no_signals() {
         let entry = make_entry("Draft", TypeDefinitionKind::ValueObject);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("\u{2014}"), "missing em-dash for unevaluated signal");
     }
 
@@ -550,7 +610,7 @@ mod tests {
             vec![],
             vec![],
         )]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("\u{1f535}"), "missing blue circle for Blue signal");
     }
 
@@ -567,7 +627,7 @@ mod tests {
             vec![],
             vec![],
         )]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("\u{1f534}"), "missing red circle for Red signal");
     }
 
@@ -587,7 +647,7 @@ mod tests {
             make_entry("TrackId", TypeDefinitionKind::ValueObject),
         ];
         let doc = make_doc(entries);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("Draft"), "missing Draft");
         assert!(output.contains("TrackStatus"), "missing TrackStatus");
         assert!(output.contains("TrackId"), "missing TrackId");
@@ -601,7 +661,7 @@ mod tests {
     fn test_render_add_action_shows_dash() {
         let entry = make_entry("Foo", TypeDefinitionKind::ValueObject);
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         // Add action renders as em-dash
         assert!(output.contains("| \u{2014} |"), "Add action should show em-dash");
     }
@@ -617,14 +677,14 @@ mod tests {
         )
         .unwrap();
         let doc = make_doc(vec![entry]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.contains("| delete |"), "Delete action should show 'delete'");
     }
 
     #[test]
     fn test_render_output_ends_with_newline() {
         let doc = make_doc(vec![]);
-        let output = render_type_catalogue(&doc);
+        let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.ends_with('\n'), "output must end with trailing newline");
     }
 }

@@ -9,6 +9,7 @@ use super::codec::{self, DocumentMeta};
 use crate::spec;
 use crate::tddd::catalogue_codec;
 use crate::type_catalogue_render;
+use crate::verify::tddd_layers::parse_tddd_layers;
 
 const TRACK_ITEMS_DIR: &str = "track/items";
 const TRACK_ARCHIVE_DIR: &str = "track/archive";
@@ -565,45 +566,97 @@ pub fn sync_rendered_views(
             }
         }
 
-        // Render domain-types.md from domain-types.json if present. Same
-        // legacy-protection rationale as spec.md above: transitions into
-        // `done` do not modify domain-types.json, so re-rendering here would
-        // only surface renderer-version drift. Skip for done/archived.
-        let domain_types_json_path = track_dir.join("domain-types.json");
-        if !is_done_or_archived && domain_types_json_path.is_file() {
-            let domain_types_content = std::fs::read_to_string(&domain_types_json_path)?;
-            match catalogue_codec::decode(&domain_types_content) {
-                Ok(doc) => {
-                    let rendered = type_catalogue_render::render_type_catalogue(&doc);
-                    let domain_types_md_path = track_dir.join("domain-types.md");
-                    let old_md = match std::fs::read_to_string(&domain_types_md_path) {
-                        Ok(content) => Some(content),
-                        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
-                        Err(e) => return Err(RenderError::Io(e)),
-                    };
-                    if old_md
-                        .as_deref()
-                        .is_none_or(|existing| !rendered_matches(existing, &rendered))
-                    {
-                        atomic_write_file(&domain_types_md_path, rendered.as_bytes())?;
-                        changed.push(domain_types_md_path);
-                    }
+        // Render per-layer <layer>-types.md from each <layer>-types.json present.
+        // Iterates all tddd.enabled layers in architecture-rules.json via the
+        // existing `parse_tddd_layers` resolver (introduced in tddd-01 Phase 1 Task 7,
+        // already reused by `apps/cli::resolve_layers`). Preserves the 3 patterns
+        // from the original domain-only block:
+        //   - is_done_or_archived guard (skip frozen tracks entirely — architecture-rules.json
+        //     is not loaded for done/archived tracks so a malformed rules file cannot cause
+        //     failures on frozen tracks where type-catalogue rendering is a no-op)
+        //   - rendered_matches drift check (no-op if content unchanged)
+        //   - TypeCatalogueCodecError::Json warn-and-continue (file may be mid-edit)
+        // Legacy fallback: when architecture-rules.json is absent, a synthetic
+        // domain-only binding is used so pre-multilayer tracks continue to work.
+        if !is_done_or_archived {
+            let arch_rules_path = root.join("architecture-rules.json");
+            let bindings = match std::fs::read_to_string(&arch_rules_path) {
+            Ok(json) => parse_tddd_layers(&json).map_err(|e| {
+                RenderError::Io(std::io::Error::other(format!("architecture-rules.json: {e}")))
+            })?,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => parse_tddd_layers(
+                r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#,
+            )
+            .map_err(|e| {
+                RenderError::Io(std::io::Error::other(format!("builtin fallback: {e}")))
+            })?,
+            Err(e) => return Err(RenderError::Io(e)),
+        };
+
+            // Guard against duplicate rendered paths: `parse_tddd_layers` rejects
+            // duplicate `catalogue_file` values (exact string match), but two names
+            // like `"foo"` and `"foo.json"` both derive to `foo.md` via
+            // `.rendered_file()`. The duplicate check is placed AFTER the
+            // per-layer opt-out so that a layer whose catalogue file is absent
+            // does not consume the rendered-path slot and accidentally suppress
+            // a later layer whose catalogue file IS present.
+            let mut seen_rendered: std::collections::HashSet<String> =
+                std::collections::HashSet::new();
+            for binding in &bindings {
+                let catalogue_file = binding.catalogue_file();
+                let catalogue_path = track_dir.join(catalogue_file);
+                if !catalogue_path.is_file() {
+                    continue;
                 }
-                Err(catalogue_codec::TypeCatalogueCodecError::Json(_)) => {
-                    // Warn and continue only on JSON parse errors — file may be mid-edit.
+                // Only check/reserve the rendered path slot after confirming
+                // the catalogue file exists. This ensures an absent catalogue
+                // does not block a later layer that shares the same rendered name.
+                let rendered_name = binding.rendered_file();
+                if !seen_rendered.insert(rendered_name.clone()) {
                     eprintln!(
-                        "warning: skipping domain-types.md render for {} (malformed JSON)",
+                        "warning: skipping duplicate rendered path {} for {} (rendered path collision)",
+                        rendered_name,
                         track_dir.display()
                     );
+                    continue;
                 }
-                Err(e) => {
-                    return Err(RenderError::Io(std::io::Error::other(format!(
-                        "domain-types.json error at {}: {e}",
-                        track_dir.display()
-                    ))));
+                let catalogue_content = std::fs::read_to_string(&catalogue_path)?;
+                match catalogue_codec::decode(&catalogue_content) {
+                    Ok(doc) => {
+                        let rendered =
+                            type_catalogue_render::render_type_catalogue(&doc, catalogue_file);
+                        let rendered_md_path = track_dir.join(binding.rendered_file());
+                        let old_md = match std::fs::read_to_string(&rendered_md_path) {
+                            Ok(content) => Some(content),
+                            Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+                            Err(e) => return Err(RenderError::Io(e)),
+                        };
+                        if old_md
+                            .as_deref()
+                            .is_none_or(|existing| !rendered_matches(existing, &rendered))
+                        {
+                            atomic_write_file(&rendered_md_path, rendered.as_bytes())?;
+                            changed.push(rendered_md_path);
+                        }
+                    }
+                    Err(catalogue_codec::TypeCatalogueCodecError::Json(_)) => {
+                        // Warn and continue only on JSON parse errors — file may be mid-edit.
+                        eprintln!(
+                            "warning: skipping {} render for {} (malformed JSON)",
+                            binding.rendered_file(),
+                            track_dir.display()
+                        );
+                    }
+                    Err(e) => {
+                        return Err(RenderError::Io(std::io::Error::other(format!(
+                            "{} error at {}: {e}",
+                            catalogue_file,
+                            track_dir.display()
+                        ))));
+                    }
                 }
             }
-        }
+        } // end if !is_done_or_archived
     }
 
     if let Some(parent) = registry_path.parent() {
@@ -2230,5 +2283,232 @@ mod tests {
         assert_eq!(domain_types, "LEGACY_DOMAIN_TYPES_SENTINEL_PRESERVED");
         assert!(!changed.iter().any(|p| p.ends_with("domain-types.md")));
         assert!(changed.iter().any(|p| p.ends_with("track-done-domain/plan.md")));
+    }
+
+    // ---------------------------------------------------------------------------
+    // Multi-layer sync_rendered_views tests (T004 / D3)
+    // ---------------------------------------------------------------------------
+    //
+    // These tests verify that sync_rendered_views correctly iterates all
+    // tddd.enabled layers from architecture-rules.json and generates the
+    // corresponding <layer>-types.md for each layer whose <layer>-types.json
+    // is present in the track directory. The loop uses the existing
+    // `parse_tddd_layers` resolver (introduced in tddd-01 Phase 1 Task 7,
+    // already reused by `apps/cli::resolve_layers`).
+
+    const USECASE_TYPES_JSON_MINIMAL: &str = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "TrackReader", "kind": "value_object", "description": "Test usecase type", "approved": true }
+  ]
+}"#;
+
+    const INFRASTRUCTURE_TYPES_JSON_MINIMAL: &str = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "FsTrackStore", "kind": "value_object", "description": "Test infrastructure type", "approved": true }
+  ]
+}"#;
+
+    const MULTI_LAYER_ARCH_RULES: &str = r#"{
+      "layers": [
+        { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
+        { "crate": "usecase", "tddd": { "enabled": true, "catalogue_file": "usecase-types.json" } },
+        { "crate": "infrastructure", "tddd": { "enabled": true, "catalogue_file": "infrastructure-types.json" } }
+      ]
+    }"#;
+
+    #[test]
+    fn sync_rendered_views_generates_usecase_types_md_from_usecase_types_json() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(dir.path().join("architecture-rules.json"), MULTI_LAYER_ARCH_RULES).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("usecase-types.json"), USECASE_TYPES_JSON_MINIMAL).unwrap();
+
+        let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+
+        assert!(
+            changed.iter().any(|p| p.ends_with("usecase-types.md")),
+            "usecase-types.md should be reported as changed"
+        );
+
+        let md = std::fs::read_to_string(track_dir.join("usecase-types.md")).unwrap();
+        assert!(
+            md.contains("<!-- Generated from usecase-types.json"),
+            "must have usecase-types.json header (not domain-types.json), got: {md}"
+        );
+        assert!(md.contains("TrackReader"), "must include declared type name");
+    }
+
+    #[test]
+    fn sync_rendered_views_generates_infrastructure_types_md_from_infrastructure_types_json() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(dir.path().join("architecture-rules.json"), MULTI_LAYER_ARCH_RULES).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(
+            track_dir.join("infrastructure-types.json"),
+            INFRASTRUCTURE_TYPES_JSON_MINIMAL,
+        )
+        .unwrap();
+
+        let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+
+        assert!(
+            changed.iter().any(|p| p.ends_with("infrastructure-types.md")),
+            "infrastructure-types.md should be reported as changed"
+        );
+
+        let md = std::fs::read_to_string(track_dir.join("infrastructure-types.md")).unwrap();
+        assert!(
+            md.contains("<!-- Generated from infrastructure-types.json"),
+            "must have infrastructure-types.json header, got: {md}"
+        );
+        assert!(md.contains("FsTrackStore"), "must include declared type name");
+    }
+
+    #[test]
+    fn sync_rendered_views_generates_multiple_layer_types_md_independently() {
+        // Multi-layer track: domain + usecase + infrastructure catalogue files all
+        // present. The loop must render each <layer>-types.md independently (one
+        // layer's presence/absence must not affect another's rendering).
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(dir.path().join("architecture-rules.json"), MULTI_LAYER_ARCH_RULES).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+        std::fs::write(track_dir.join("usecase-types.json"), USECASE_TYPES_JSON_MINIMAL).unwrap();
+        std::fs::write(
+            track_dir.join("infrastructure-types.json"),
+            INFRASTRUCTURE_TYPES_JSON_MINIMAL,
+        )
+        .unwrap();
+
+        let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+
+        // All 3 layer rendered views must be reported as changed
+        assert!(
+            changed.iter().any(|p| p.ends_with("domain-types.md")),
+            "domain-types.md should be reported as changed"
+        );
+        assert!(
+            changed.iter().any(|p| p.ends_with("usecase-types.md")),
+            "usecase-types.md should be reported as changed"
+        );
+        assert!(
+            changed.iter().any(|p| p.ends_with("infrastructure-types.md")),
+            "infrastructure-types.md should be reported as changed"
+        );
+
+        // Each rendered view must carry its own source_file_name in the header
+        let domain_md = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
+        assert!(
+            domain_md.contains("<!-- Generated from domain-types.json"),
+            "domain-types.md must have its own header"
+        );
+
+        let usecase_md = std::fs::read_to_string(track_dir.join("usecase-types.md")).unwrap();
+        assert!(
+            usecase_md.contains("<!-- Generated from usecase-types.json"),
+            "usecase-types.md must have its own header (independent of domain-types.md)"
+        );
+
+        let infra_md = std::fs::read_to_string(track_dir.join("infrastructure-types.md")).unwrap();
+        assert!(
+            infra_md.contains("<!-- Generated from infrastructure-types.json"),
+            "infrastructure-types.md must have its own header"
+        );
+    }
+
+    #[test]
+    fn sync_rendered_views_malformed_layer_json_does_not_block_other_layers() {
+        // D3 guarantee: the per-layer `TypeCatalogueCodecError::Json` warn-and-continue
+        // path must be exercised in a multi-layer scenario. A malformed catalogue for
+        // one layer (usecase) must not prevent the other layers (domain, infrastructure)
+        // from rendering their views. This is the cross-layer error isolation guarantee.
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/track-a");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(dir.path().join("architecture-rules.json"), MULTI_LAYER_ARCH_RULES).unwrap();
+
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            sample_metadata_json(
+                "track-a",
+                "planned",
+                "2026-03-13T02:00:00Z",
+                r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+            ),
+        )
+        .unwrap();
+        // domain and infrastructure catalogue files are valid
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+        // usecase catalogue is malformed JSON — must warn and continue
+        std::fs::write(track_dir.join("usecase-types.json"), "{ not valid json }").unwrap();
+        std::fs::write(
+            track_dir.join("infrastructure-types.json"),
+            INFRASTRUCTURE_TYPES_JSON_MINIMAL,
+        )
+        .unwrap();
+
+        // Must succeed — malformed usecase JSON must not abort the sync
+        let result = sync_rendered_views(dir.path(), Some("track-a"));
+        assert!(result.is_ok(), "malformed usecase-types.json must not abort multi-layer sync");
+
+        let changed = result.unwrap();
+
+        // domain and infrastructure rendered views must still be generated
+        assert!(
+            changed.iter().any(|p| p.ends_with("domain-types.md")),
+            "domain-types.md must still render when usecase-types.json is malformed"
+        );
+        assert!(
+            changed.iter().any(|p| p.ends_with("infrastructure-types.md")),
+            "infrastructure-types.md must still render when usecase-types.json is malformed"
+        );
+
+        // usecase rendered view must NOT appear in changed list (malformed → skipped)
+        assert!(
+            !changed.iter().any(|p| p.ends_with("usecase-types.md")),
+            "usecase-types.md must NOT be rendered when usecase-types.json is malformed"
+        );
     }
 }
