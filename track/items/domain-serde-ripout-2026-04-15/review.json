@@ -1,6 +1,76 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:review` is labeled as an external-review step here, but the canonical workflow documents it as the local planning/implementation review command and uses `/track:pr-review` for external GitHub PR review. This misstates the command's role and sends users to the wrong path.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 90,
+              "category": "workflow"
+            },
+            {
+              "message": "The note saying `/track:ci` is auto-called from review/commit contradicts the documented workflow, which still treats `/track:ci` as an explicit gate between review and commit. Hiding it from the sequence can cause users to skip a required check.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 97,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
+          "at": "2026-04-15T05:35:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:ci` is not universally auto-invoked here. The canonical `review` flow still tells users to run `cargo make ci` separately, while only the commit path wraps CI automatically. This quickstart note makes CI look optional after review and can mislead users into skipping an explicit gate.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 97,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
+          "at": "2026-04-15T05:38:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "README's agent table says the `implementer` role defaults to \"Claude Code ... Sonnet, Opus as needed\", but the referenced `.harness/config/agent-profiles.json` sets `capabilities.implementer.model` to `claude-opus-4-6`. That leaves the promoted README contradicting the active harness configuration about the default implementation lane.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 111,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
+          "at": "2026-04-15T05:42:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a12e6bfe9a51dd15a57dabd47ee30abc9277a26b7fcff6c7699e8732a887df8",
+          "at": "2026-04-15T05:52:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a12e6bfe9a51dd15a57dabd47ee30abc9277a26b7fcff6c7699e8732a887df8",
+          "at": "2026-04-15T05:54:57Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -928,6 +998,166 @@
           "findings": [],
           "hash": "rvw1:sha256:38facebaec3fa05f0b489f856ae0a0a893456d49c39f58ba48ffc99c665c6952",
           "at": "2026-04-15T05:27:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63fd4ea80fbe4cdfe88e9b6157ab2650d9ebe6fe446ef33db8c417607b8a8b9b",
+          "at": "2026-04-15T05:38:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TODO-PLAN.md` says \"Phase 4 以降は v5 と変わらない\" here, but the same file later adds a new Phase 5 task (`WF-67`, lines 516-530) and counts Phase 5 as `(+1)` in the estimate table. That internal contradiction leaves the post-Phase-4 scope unclear.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO-PLAN.md",
+              "line": 630,
+              "category": "internal_consistency"
+            },
+            {
+              "message": "The archive destinations listed here do not exist in the repo. The surviving files are `tmp/archive-2026-04-13/TODO-PLAN-v4-draft.md` and `tmp/archive-2026-04-13/TODO-PLAN-v5-draft.md` without the date suffixes, so this adopted plan sends readers to dead paths when they try to find the superseded drafts.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO-PLAN.md",
+              "line": 682,
+              "category": "repo_state"
+            },
+            {
+              "message": "Section 3.6 explicitly says `SoT-Chain Driven Development` was removed from the naming candidates (line 380), but this review checklist item asks whether to add that same candidate to §3.6. The file is internally contradictory about the current naming shortlist.",
+              "severity": "P1",
+              "file": "knowledge/strategy/vision.md",
+              "line": 787,
+              "category": "internal_consistency"
+            },
+            {
+              "message": "Appendix E cites `knowledge/strategy/TODO-PLAN-v5-draft.md`, but that file is deleted in this change; the surviving archived copy is `tmp/archive-2026-04-13/TODO-PLAN-v5-draft.md`. Readers following this reference will be pointed at a path that no longer exists.",
+              "severity": "P1",
+              "file": "knowledge/strategy/vision.md",
+              "line": 616,
+              "category": "repo_state"
+            }
+          ],
+          "hash": "rvw1:sha256:63fd4ea80fbe4cdfe88e9b6157ab2650d9ebe6fe446ef33db8c417607b8a8b9b",
+          "at": "2026-04-15T05:42:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe0da245d2f7f17bc351b2091b05459ad31325a0cd2d2262808fd55b279717e8",
+          "at": "2026-04-15T05:54:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The file now declares itself an adopted document (`ステータス: 採用版` at line 8), but this section still frames it as a pre-promotion draft (`本 v6 draft を昇格する前に`) and instructs readers to replace `knowledge/strategy/vision.md` with the draft. That is an internal contradiction in the same file and a stale statement about the current repo state.",
+              "severity": "P1",
+              "file": "knowledge/strategy/vision.md",
+              "line": 776,
+              "category": "correctness"
+            },
+            {
+              "message": "The header says this plan was already adopted on 2026-04-15, but this section is still written as a future rollout checklist (`v6 採用時に更新が必要なファイル`) and lists the v4/v5 draft files as merely planned for archival even though this change has already promoted/deleted them. That leaves the canonical plan internally inconsistent and misleading about the repository's current state.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO-PLAN.md",
+              "line": 666,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fe0da245d2f7f17bc351b2091b05459ad31325a0cd2d2262808fd55b279717e8",
+          "at": "2026-04-15T05:57:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The file header marks `TODO-PLAN.md` as the adopted v6 plan, but this block still describes pre-promotion work such as replacing `knowledge/strategy/vision.md`/`TODO-PLAN.md` with drafts and archiving the v4/v5 drafts. Those steps have already happened in this change, so the canonical document now contains stale process instructions that misstate the repository's current state.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO-PLAN.md",
+              "line": 670,
+              "category": "documentation"
+            },
+            {
+              "message": "`vision.md` is now marked as an adopted document, but this section still says \"before promoting this v6 draft\" and lists follow-up actions to replace `vision.md`/`TODO-PLAN.md`/`README.md` and archive the v5 draft. Because those promotions and deletions are already reflected in the repo, this block contradicts the file's own adopted status and will mislead readers about what remains pending.",
+              "severity": "P1",
+              "file": "knowledge/strategy/vision.md",
+              "line": 776,
+              "category": "documentation"
+            }
+          ],
+          "hash": "rvw1:sha256:fe0da245d2f7f17bc351b2091b05459ad31325a0cd2d2262808fd55b279717e8",
+          "at": "2026-04-15T06:00:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61777dea57376c64c28b613ce99c8926d7ebbeb0a537f9f227d002262e4bee09",
+          "at": "2026-04-15T06:05:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The promoted docs now point readers at `tmp/archive-2026-04-13/...` as the preserved v3/v4/v5 strategy files (the same pattern also appears in `knowledge/strategy/vision.md`), but those archive files are not tracked in git: `git ls-files --error-unmatch tmp/archive-2026-04-13/TODO-PLAN-v4-draft.md tmp/archive-2026-04-13/TODO-PLAN-v5-draft.md tmp/archive-2026-04-13/vision-v3.md` fails. Because this change also deletes `knowledge/strategy/TODO-PLAN-v4-draft.md` and `knowledge/strategy/TODO-PLAN-v5-draft.md`, a checkout of the commit loses the only in-repo copies while the canonical docs still claim the archives exist.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO-PLAN.md",
+              "line": 5,
+              "category": "documentation"
+            }
+          ],
+          "hash": "rvw1:sha256:61777dea57376c64c28b613ce99c8926d7ebbeb0a537f9f227d002262e4bee09",
+          "at": "2026-04-15T06:08:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TODO-PLAN.md` and `vision.md` now point readers to `tmp/archive-2026-04-13/TODO-PLAN-v4-draft.md` / `...v5-draft.md` as the preserved copies, but those archive paths are not tracked by git (`git ls-files --error-unmatch tmp/archive-2026-04-13/TODO-PLAN-v4-draft.md tmp/archive-2026-04-13/TODO-PLAN-v5-draft.md` fails). This same change also stages deletion of `knowledge/strategy/TODO-PLAN-v4-draft.md` and `knowledge/strategy/TODO-PLAN-v5-draft.md`, so a clean checkout of the commit loses the only in-repo copies of the superseded drafts while the promoted docs still claim the archives exist.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO-PLAN.md",
+              "line": 684,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:61777dea57376c64c28b613ce99c8926d7ebbeb0a537f9f227d002262e4bee09",
+          "at": "2026-04-15T06:13:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The TDDD naming note points readers to §3.5, but the candidate list is actually in §3.6. Update the cross-reference so the document sends readers to the right section.",
+              "severity": "P1",
+              "file": "knowledge/strategy/vision.md",
+              "line": 16,
+              "category": "factual"
+            }
+          ],
+          "hash": "rvw1:sha256:af20499861cfd4795ac02aa22ad72e775bb9f9b3ec9b026d20b410797deeef07",
+          "at": "2026-04-15T06:39:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1275ae5112fb8b4bc68e81f90d66ba1cc4ae6cc37fd5d3cd4bb89f54ea12683",
+          "at": "2026-04-15T06:43:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1275ae5112fb8b4bc68e81f90d66ba1cc4ae6cc37fd5d3cd4bb89f54ea12683",
+          "at": "2026-04-15T06:46:16Z"
         }
       ]
     }
