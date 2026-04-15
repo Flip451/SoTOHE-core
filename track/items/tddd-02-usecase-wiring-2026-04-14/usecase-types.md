@@ -1,4 +1,4 @@
-<!-- Generated from domain-types.json — DO NOT EDIT DIRECTLY -->
+<!-- Generated from usecase-types.json — DO NOT EDIT DIRECTLY -->
 
 ## Error Types
 

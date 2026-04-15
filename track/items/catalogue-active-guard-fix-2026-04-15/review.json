@@ -1,68 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute_type_signals` only checks `TrackMetadata::status()`, but archived tracks are preserved in `DocumentMeta::original_status`. That means an archived `metadata.json` with unresolved tasks is classified as `planned`/`in_progress` and can still pass the new guard, so `type-signals` can run on a frozen track. The guard needs to consult the raw status from `read_track_metadata`, not just the derived domain status.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/signals.rs",
-              "line": 133,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:599161411fa8aafcc6f9a039c1f22b7b271073a1c10a2a8f960c374221800b92",
-          "at": "2026-04-15T13:28:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d410da0ed539bde00669acd81eef9968cf884c57318a3bd0ed17801eccac57f",
-          "at": "2026-04-15T13:31:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d410da0ed539bde00669acd81eef9968cf884c57318a3bd0ed17801eccac57f",
-          "at": "2026-04-15T13:33:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8bddd37b5545e9cb9e07cf729cc6daeaab0decaa90879dad9553858dd4e03a7a",
-          "at": "2026-04-15T13:43:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The caller-side header fix is not covered by a regression test. In this file, the success-path tests only check that the rendered `.md` file exists, so a future change back to `render_type_catalogue(doc, rendered_file_stem)` would still pass while silently reintroducing headers like `Generated from usecase-types.md` for non-domain layers. Add a test that exercises a non-domain `domain_types_path`/`rendered_file_stem` pair and asserts the rendered header uses the `.json` catalogue filename.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/signals.rs",
-              "line": 401,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:8bddd37b5545e9cb9e07cf729cc6daeaab0decaa90879dad9553858dd4e03a7a",
-          "at": "2026-04-15T13:51:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bba4864fb826db548a35ac9ac4248327d05248d01a22ba82ab28a28a84f26001",
-          "at": "2026-04-15T13:52:49Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -281,6 +219,82 @@
           "findings": [],
           "hash": "rvw1:sha256:ec0389b8b4b639848698fb82dbe539ddd8f3387cc51fb2712d16f5487978f641",
           "at": "2026-04-15T13:50:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7137a7f67b7d349312b99586c4c01f92cd48193818e4d0ed4a49890a4190627f",
+          "at": "2026-04-15T14:21:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7137a7f67b7d349312b99586c4c01f92cd48193818e4d0ed4a49890a4190627f",
+          "at": "2026-04-15T14:22:06Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_type_signals` only checks `TrackMetadata::status()`, but archived tracks are preserved in `DocumentMeta::original_status`. That means an archived `metadata.json` with unresolved tasks is classified as `planned`/`in_progress` and can still pass the new guard, so `type-signals` can run on a frozen track. The guard needs to consult the raw status from `read_track_metadata`, not just the derived domain status.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 133,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:599161411fa8aafcc6f9a039c1f22b7b271073a1c10a2a8f960c374221800b92",
+          "at": "2026-04-15T13:28:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d410da0ed539bde00669acd81eef9968cf884c57318a3bd0ed17801eccac57f",
+          "at": "2026-04-15T13:31:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d410da0ed539bde00669acd81eef9968cf884c57318a3bd0ed17801eccac57f",
+          "at": "2026-04-15T13:33:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8bddd37b5545e9cb9e07cf729cc6daeaab0decaa90879dad9553858dd4e03a7a",
+          "at": "2026-04-15T13:43:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The caller-side header fix is not covered by a regression test. In this file, the success-path tests only check that the rendered `.md` file exists, so a future change back to `render_type_catalogue(doc, rendered_file_stem)` would still pass while silently reintroducing headers like `Generated from usecase-types.md` for non-domain layers. Add a test that exercises a non-domain `domain_types_path`/`rendered_file_stem` pair and asserts the rendered header uses the `.json` catalogue filename.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 401,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:8bddd37b5545e9cb9e07cf729cc6daeaab0decaa90879dad9553858dd4e03a7a",
+          "at": "2026-04-15T13:51:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bba4864fb826db548a35ac9ac4248327d05248d01a22ba82ab28a28a84f26001",
+          "at": "2026-04-15T13:52:49Z"
         }
       ]
     },
