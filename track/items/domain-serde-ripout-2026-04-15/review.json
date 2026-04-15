@@ -1,6 +1,39 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b659c2600985595999c216e97118a7dde2ef742d7699444d37bce3353e9d1b10",
+          "at": "2026-04-15T06:55:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_export_codec::encode()` already returns `SchemaExportCodecError::Json` with the display text `JSON serialization failed: …`, so wrapping it again with `format!(\"JSON serialization failed: {e}\")` changes the CLI output to `JSON serialization failed: JSON serialization failed: …`. The previous implementation only emitted the prefix once, so this is a user-visible compatibility regression for consumers matching the existing error string.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/domain.rs",
+              "line": 53,
+              "category": "behavioral_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:b659c2600985595999c216e97118a7dde2ef742d7699444d37bce3353e9d1b10",
+          "at": "2026-04-15T06:56:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b659c2600985595999c216e97118a7dde2ef742d7699444d37bce3353e9d1b10",
+          "at": "2026-04-15T06:57:26Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -1100,39 +1133,202 @@
           "findings": [],
           "hash": "rvw1:sha256:5ecdf24684c8f85959facbabb8bfacaed8404bf26f4200f061e849b4c7526f83",
           "at": "2026-04-15T07:04:37Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` marks T005 complete, but the track state was not transitioned to done: `metadata.json` still has root `status: \"in_progress\"` and the T005 task remains `todo` (the generated `plan.md` still shows the final checklist item unchecked). Downstream tooling will keep treating this track as unfinished.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "line": 86,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:5804c9d3f150b8952e7754e0556a92b48ee4bb3268570c26d4bb9ecbaff98c6e",
+          "at": "2026-04-15T07:11:31Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b659c2600985595999c216e97118a7dde2ef742d7699444d37bce3353e9d1b10",
-          "at": "2026-04-15T06:55:04Z"
+          "hash": "rvw1:sha256:5804c9d3f150b8952e7754e0556a92b48ee4bb3268570c26d4bb9ecbaff98c6e",
+          "at": "2026-04-15T07:14:06Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`schema_export_codec::encode()` already returns `SchemaExportCodecError::Json` with the display text `JSON serialization failed: …`, so wrapping it again with `format!(\"JSON serialization failed: {e}\")` changes the CLI output to `JSON serialization failed: JSON serialization failed: …`. The previous implementation only emitted the prefix once, so this is a user-visible compatibility regression for consumers matching the existing error string.",
+              "message": "The new Track 2 handoff timing summary is factually inconsistent with the track's own commit records: it says `T003 commit 時: 11.86s` and `T001 commit 時: 16.73s`, but `800bddf` records 11.86s for T002, `ad3aeae` records 12.20s for T003, and `d51694e` records 11.95s for T001. That leaves downstream handoff data inaccurate.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/domain.rs",
-              "line": 53,
-              "category": "behavioral_regression"
+              "file": "track/items/domain-serde-ripout-2026-04-15/verification.md",
+              "line": 261,
+              "category": "consistency"
             }
           ],
-          "hash": "rvw1:sha256:b659c2600985595999c216e97118a7dde2ef742d7699444d37bce3353e9d1b10",
-          "at": "2026-04-15T06:56:30Z"
+          "hash": "rvw1:sha256:5804c9d3f150b8952e7754e0556a92b48ee4bb3268570c26d4bb9ecbaff98c6e",
+          "at": "2026-04-15T07:18:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` records two incompatible review histories for the fast review pass: it says the fast round converged in one round for all scopes, but the parenthetical immediately says the `other` scope needed a second round after a round-1 finding. One of those statements is false, so the T004 result currently misreports review status.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/verification.md",
+              "line": 214,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:5804c9d3f150b8952e7754e0556a92b48ee4bb3268570c26d4bb9ecbaff98c6e",
+          "at": "2026-04-15T07:21:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` says the scope checklist has been completed, but the T004 item for manually confirming `cargo make export-schema -- --crate domain --pretty` stayed unrepresented in `## Scope Verified` instead of being flipped to `[x]`. The evidence for that check is still documented later in the file under the T004 manual verification steps, so the top-level checklist is now incomplete/inconsistent with the stated completion state.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/verification.md",
+              "line": 19,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:4fdeafd4cc0afdbe64833f848be49a69f8b040a8b82b1ba123958454e2a98aa6",
+          "at": "2026-04-15T07:23:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The finalized Track 2 handoff still says the infrastructure collision audit is \"scheduled for T002\" and that Track 2 will handle a rename cascade, but this same file's T002 result already records that baseline-capture ran and found no `same-name type collision` warnings. That leaves the handoff internally contradictory and points follow-up work at a collision that this track says does not exist.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/verification.md",
+              "line": 247,
+              "category": "consistency"
+            },
+            {
+              "message": "Item 5 of the Track 2 handoff ends with a leftover placeholder note (`(T001 audit 後に追加候補を記録)`) even though T005 marks the handoff section as complete. This leaves the supposedly finalized handoff with an unresolved TODO rather than a finished candidate list.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/verification.md",
+              "line": 277,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:4f07ad9791658dded733ccf49d489447a9bc89006be621f59c2a6972ae8d1b9a",
+          "at": "2026-04-15T07:26:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Track 2 handoff timing summary is still inconsistent with this track's own commit records. It says `T003 commit 時: 11.86s` and `T001 commit 時: 16.73s`, but `800bddf` records 11.86s for T002, `ad3aeae` records 12.20s for T003, and `d51694e` records 11.95s for T001. That leaves downstream CI/rustdoc budgeting data inaccurate.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/verification.md",
+              "line": 262,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:371592df8026729f2257788d62e1cbafdca0b08cda145d54285c3211095ad1c6",
+          "at": "2026-04-15T07:29:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` now records T004's `cargo make ci` as `PASS (12.12s)` and reuses that number in Track 2 handoff item #4, but the checked-in T004 evidence does not contain that timing: commit `ad77e03` only says the command passed, and a repo-wide search finds `12.12s` only in this new T005 edit. Unless a measurement artifact is added, this is unsupported timing data presented as fact.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/verification.md",
+              "line": 211,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:59ea77e3a93ffef900f4e1690b5b4b62847692462d15d80970bc4de5dca301af",
+          "at": "2026-04-15T07:32:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b659c2600985595999c216e97118a7dde2ef742d7699444d37bce3353e9d1b10",
-          "at": "2026-04-15T06:57:26Z"
+          "hash": "rvw1:sha256:b8d292f5d091a8addd7942557506b5c537a539aa623ce078c05209b4c827bb79",
+          "at": "2026-04-15T07:36:30Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:review` is labeled as an external-review step here, but the canonical workflow documents it as the local planning/implementation review command and uses `/track:pr-review` for external GitHub PR review. This misstates the command's role and sends users to the wrong path.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 90,
+              "category": "workflow"
+            },
+            {
+              "message": "The note saying `/track:ci` is auto-called from review/commit contradicts the documented workflow, which still treats `/track:ci` as an explicit gate between review and commit. Hiding it from the sequence can cause users to skip a required check.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 97,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
+          "at": "2026-04-15T05:35:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:ci` is not universally auto-invoked here. The canonical `review` flow still tells users to run `cargo make ci` separately, while only the commit path wraps CI automatically. This quickstart note makes CI look optional after review and can mislead users into skipping an explicit gate.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 97,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
+          "at": "2026-04-15T05:38:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "README's agent table says the `implementer` role defaults to \"Claude Code ... Sonnet, Opus as needed\", but the referenced `.harness/config/agent-profiles.json` sets `capabilities.implementer.model` to `claude-opus-4-6`. That leaves the promoted README contradicting the active harness configuration about the default implementation lane.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 111,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
+          "at": "2026-04-15T05:42:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a12e6bfe9a51dd15a57dabd47ee30abc9277a26b7fcff6c7699e8732a887df8",
+          "at": "2026-04-15T05:52:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a12e6bfe9a51dd15a57dabd47ee30abc9277a26b7fcff6c7699e8732a887df8",
+          "at": "2026-04-15T05:54:57Z"
         }
       ]
     },
@@ -1212,76 +1408,6 @@
           "findings": [],
           "hash": "rvw1:sha256:65892fa989ad40837fa2ded2da10dbb21d9cfae4c011d78bef08dad3d5a8155c",
           "at": "2026-04-15T06:56:03Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`/track:review` is labeled as an external-review step here, but the canonical workflow documents it as the local planning/implementation review command and uses `/track:pr-review` for external GitHub PR review. This misstates the command's role and sends users to the wrong path.",
-              "severity": "P1",
-              "file": "README.md",
-              "line": 90,
-              "category": "workflow"
-            },
-            {
-              "message": "The note saying `/track:ci` is auto-called from review/commit contradicts the documented workflow, which still treats `/track:ci` as an explicit gate between review and commit. Hiding it from the sequence can cause users to skip a required check.",
-              "severity": "P1",
-              "file": "README.md",
-              "line": 97,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
-          "at": "2026-04-15T05:35:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`/track:ci` is not universally auto-invoked here. The canonical `review` flow still tells users to run `cargo make ci` separately, while only the commit path wraps CI automatically. This quickstart note makes CI look optional after review and can mislead users into skipping an explicit gate.",
-              "severity": "P1",
-              "file": "README.md",
-              "line": 97,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
-          "at": "2026-04-15T05:38:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "README's agent table says the `implementer` role defaults to \"Claude Code ... Sonnet, Opus as needed\", but the referenced `.harness/config/agent-profiles.json` sets `capabilities.implementer.model` to `claude-opus-4-6`. That leaves the promoted README contradicting the active harness configuration about the default implementation lane.",
-              "severity": "P1",
-              "file": "README.md",
-              "line": 111,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:55bfab7f1044cb61c4b28fe02bec0abb4ca1c236df0e9be8bd164bf700075df7",
-          "at": "2026-04-15T05:42:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a12e6bfe9a51dd15a57dabd47ee30abc9277a26b7fcff6c7699e8732a887df8",
-          "at": "2026-04-15T05:52:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3a12e6bfe9a51dd15a57dabd47ee30abc9277a26b7fcff6c7699e8732a887df8",
-          "at": "2026-04-15T05:54:57Z"
         }
       ]
     }

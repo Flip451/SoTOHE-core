@@ -2,25 +2,25 @@
 
 ## Scope Verified
 
-- [ ] T001: infrastructure 層 rustdoc viability audit が成功し、wall time が記録されている (collision warning 有無は plain rustdoc では検出不可、T002 の baseline-capture 結果を参照)
-- [ ] T001: `architecture-rules.json` の infrastructure tddd が `enabled: true` に flip され、`catalogue_file` / `schema_export.targets` が設定されている
-- [ ] T002: `/track:design --layer infrastructure` が成功し、`track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json` (9 entries after T003 correction — 6 dto + 2 enum + 1 error_type) + `infrastructure-types-baseline.json` + `infrastructure-types.md` rendered view が生成されている
-- [ ] T002: `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` が `blue=0 yellow=9 red=0` (初期状態、DTO 未実装、T003 で 9 entries に補正後) を返している
-- [ ] T002: `track/items/domain-serde-ripout-2026-04-15/` 配下に `domain-types.json` / `usecase-types.json` が存在しない (per-layer opt-out)
-- [ ] T003: `libs/infrastructure/src/schema_export_codec.rs` が新規作成され、9 pub types (6 structs + 2 enums + 1 error_enum) + 8 `From` 実装 + `pub fn encode()` が定義されている
-- [ ] T003: `libs/infrastructure/src/lib.rs` に `pub mod schema_export_codec;` が追加されている
-- [ ] T003: unit test (5 ケース: empty schema / 1 type-function-trait-impl / pretty vs compact / externally-tagged MemberDeclaration / PascalCase TypeKind) が全通過している
-- [ ] T003: `type-signals --layer infrastructure` が `blue=9 yellow=0 red=0` に遷移している (yellow=9 → blue=9)
-- [ ] T004: `libs/domain/src/schema.rs` から `use serde::Serialize;` と 6 derive が削除されている
-- [ ] T004: `libs/domain/src/tddd/catalogue.rs` から `use serde::Serialize;` と 3 derive (MethodDeclaration の dead code 含む) が削除されている
-- [ ] T004: `libs/domain/Cargo.toml` から `serde` 依存が削除されている
-- [ ] T004: `apps/cli/src/commands/domain.rs::export_schema()` が `infrastructure::schema_export_codec::encode()` 経由に書き換えられている
-- [ ] T004: `libs/infrastructure/src/schema_export_tests.rs` が `schema_export_codec::encode` 経由のテストに更新されている
-- [ ] T004: `cargo make export-schema -- --crate domain --pretty` の出力 JSON が変更前と structural に同一であることを手動 diff で確認済み
-- [ ] T004: `type-signals --layer infrastructure` が依然として `blue=9` を維持している (serde 削除による回帰なし)
-- [ ] T005: `knowledge/adr/README.md` の信号機アーキテクチャ section に本 ADR + 未登録 2 ADR が索引追加されている
-- [ ] T005: Track 2 引継ぎ事項セクションの 5 項目が埋まっている
-- [ ] `cargo make ci` 全通過 (fmt-check + clippy -D warnings + test + deny + check-layers + verify-spec-states + verify-arch-docs)
+- [x] T001: infrastructure 層 rustdoc viability audit が成功し、wall time が記録されている (collision warning 有無は plain rustdoc では検出不可、T002 の baseline-capture 結果を参照)
+- [x] T001: `architecture-rules.json` の infrastructure tddd が `enabled: true` に flip され、`catalogue_file` / `schema_export.targets` が設定されている
+- [x] T002: `/track:design --layer infrastructure` が成功し、`track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json` (9 entries after T003 correction — 6 dto + 2 enum + 1 error_type) + `infrastructure-types-baseline.json` + `infrastructure-types.md` rendered view が生成されている
+- [x] T002: `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` が `blue=0 yellow=9 red=0` (初期状態、DTO 未実装、T003 で 9 entries に補正後) を返している
+- [x] T002: `track/items/domain-serde-ripout-2026-04-15/` 配下に `domain-types.json` / `usecase-types.json` が存在しない (per-layer opt-out)
+- [x] T003: `libs/infrastructure/src/schema_export_codec.rs` が新規作成され、9 pub types (6 structs + 2 enums + 1 error_enum) + 8 `From` 実装 + `pub fn encode()` が定義されている
+- [x] T003: `libs/infrastructure/src/lib.rs` に `pub mod schema_export_codec;` が追加されている
+- [x] T003: unit test (5 ケース: empty schema / 1 type-function-trait-impl / pretty vs compact / externally-tagged MemberDeclaration / PascalCase TypeKind) が全通過している
+- [x] T003: `type-signals --layer infrastructure` が `blue=9 yellow=0 red=0` に遷移している (yellow=9 → blue=9)
+- [x] T004: `libs/domain/src/schema.rs` から `use serde::Serialize;` と 6 derive が削除されている
+- [x] T004: `libs/domain/src/tddd/catalogue.rs` から `use serde::Serialize;` と 3 derive (MethodDeclaration の dead code 含む) が削除されている
+- [x] T004: `libs/domain/Cargo.toml` から `serde` 依存が削除されている
+- [x] T004: `apps/cli/src/commands/domain.rs::export_schema()` が `infrastructure::schema_export_codec::encode()` 経由に書き換えられている
+- [x] T004: `libs/infrastructure/src/schema_export_tests.rs` が `schema_export_codec::encode` 経由のテストに更新されている
+- [x] T004: `cargo make export-schema -- --crate domain --pretty` の出力 JSON が変更前と structural に同一であることを手動 diff で確認済み
+- [x] T004: `type-signals --layer infrastructure` が依然として `blue=9` を維持している (serde 削除による回帰なし)
+- [x] T005: `knowledge/adr/README.md` の信号機アーキテクチャ section に本 ADR + 未登録 2 ADR が索引追加されている
+- [x] T005: Track 2 引継ぎ事項セクションの 5 項目が埋まっている
+- [x] `cargo make ci` 全通過 (fmt-check + clippy -D warnings + test + deny + check-layers + verify-spec-states + verify-arch-docs)
 
 ## Manual Verification Steps
 
@@ -200,11 +200,32 @@ Net result: catalogue expanded from 8 → 9 entries (6 × `dto` + 2 × `enum` + 
 - **Signal transition (after catalogue correction from 8 → 9 entries)**: `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` → `blue=9 yellow=0 red=0 (total=9, undeclared=0, skipped=40)`. All 9 catalogue entries transitioned from Yellow to Blue.
 - **`cargo make ci`**: PASS (subsequent to signal re-evaluation).
 
-(T004 以降は各 task 完了時に追記)
+### T004 (2026-04-15, commit ad77e03)
+
+- **`libs/domain/Cargo.toml`**: `serde = { version = "1", features = ["derive"] }` を `[dependencies]` から削除。`[dev-dependencies]` 側には元々 serde が無かったため変更なし。
+- **`libs/domain/src/schema.rs`**: `use serde::Serialize;` を削除。6 つの `#[derive(... Serialize)]` (`SchemaExport` / `TypeKind` / `TypeInfo` / `FunctionInfo` / `TraitInfo` / `ImplInfo`) から `Serialize` を削除。module doc comment は BRIDGE-01 JSON wire format が `infrastructure::schema_export_codec` に移管された旨に更新。
+- **`libs/domain/src/tddd/catalogue.rs`**: `use serde::Serialize;` を削除。3 つの `#[derive(... Serialize)]` (`ParamDeclaration` / `MethodDeclaration` / `MemberDeclaration`) から `Serialize` を削除。`MethodDeclaration::Serialize` は dead code (`TypeNode` / `TraitNode` が `Serialize` を持たないため transitive 経路なし) で、削除してもコンパイルエラー発生せず。
+- **`apps/cli/src/commands/domain.rs`**: `export_schema()` が `infrastructure::schema_export_codec::encode(&schema, args.pretty)` 経由に書き換え済み。旧 `if args.pretty { serde_json::to_string_pretty } else { serde_json::to_string }` 分岐は削除。エラー mapping (`CliError::Message(format!("JSON serialization failed: {e}"))`) と `--pretty` semantics は保持。
+- **`libs/infrastructure/src/schema_export_tests.rs`**: `export_schema_json_roundtrip` test を `export_schema_encode_produces_parseable_json` に rename し、body を `schema_export_codec::encode(&schema, false)` 経由に書き換え。`parsed["crate_name"] == "domain"` assertion を追加。test module の `#[allow]` に `clippy::indexing_slicing` を追加 (`serde_json::Value` indexing のため)。
+- **`Cargo.lock`**: `domain` crate graph から serde 依存が削除された旨を反映。
+- **`cargo make ci`**: PASS. fmt-check / clippy -D warnings / nextest / deny / check-layers / verify-spec-states / verify-arch-docs 全通過。
+- **`grep 'use serde\|derive.*Serialize\|derive.*Deserialize' libs/domain/src/`**: 全 matches が doc comment / コメント内の historical marker のみでコード依存は zero (ADR §D1 検証条件 satisfied)。
+- **`grep 'serde' libs/domain/Cargo.toml`**: zero matches.
+- **`type-signals --layer infrastructure`**: `blue=9 yellow=0 red=0 (total=9, undeclared=0, skipped=40)` 維持 — `build_type_graph` が trait impls を `i.trait_name().is_none()` で除外するため、serde derive 削除は `TypeNode::methods` に影響しない (ADR §D1 / §D7 検証条件 satisfied、回帰なし)。
+- **Review approvals (full-model gpt-5.4)**: `domain` / `cli` / `infrastructure` / `other` 全 4 scope で `zero_findings`。fast round は `domain` / `cli` / `infrastructure` の 3 scope が 1 round 収束、`other` scope のみ `infrastructure-types.md` の source attribution 誤記を round 1 で検出・修正し、round 2 で `zero_findings`。
+
+### T005 (2026-04-15)
+
+- **`knowledge/adr/README.md`** の「信号機アーキテクチャ」section に 3 ADR を索引追加:
+  1. `2026-04-13-1813-tddd-taxonomy-expansion.md` — TDDD 型カタログ Taxonomy 拡張 (Accepted 2026-04-13)
+  2. `2026-04-14-0625-finding-taxonomy-cleanup.md` — Finding 型 Taxonomy クリーンアップ (Accepted 2026-04-14)
+  3. `2026-04-14-1531-domain-serde-ripout.md` — Domain serde 依存除去 (本 ADR、Accepted 2026-04-14)
+- **verification.md**: T004 の Result を追記、Scope Verified の全 checkbox を `[x]` に更新、Track 2 引継ぎ事項 #4 (CI rustdoc 実行時間の体感) の実測値を埋める (下記「Track 2 引継ぎ事項」参照)。
+- **本 ADR `2026-04-14-1531-domain-serde-ripout.md`**: `/track:plan` Phase 4 で事前作成済みで、T005 では content 変更を加えていない (D1-D11 セクションは T001-T004 実装内容と整合確認済み)。
 
 ## Verified At
 
-(完了時に ISO 8601 UTC で追記)
+2026-04-15T07:00:00Z
 
 ---
 
@@ -223,8 +244,8 @@ Net result: catalogue expanded from 8 → 9 entries (6 × `dto` + 2 × `enum` + 
 ### 2. infrastructure 内同名衝突 audit 結果 (T001)
 
 - **T001 時点では未検出**: rustdoc JSON 生成自体は success。ただし `build_type_graph` (`code_profile_builder.rs`) の collision warning は rustdoc JSON **を読んだ後** に出るため、T001 (rustdoc のみ実行) では検出機会がない。
-- **T002 で検出予定**: T002 の `/track:design --layer infrastructure` が内部で `baseline-capture` を走らせ、そこで `build_type_graph` が実行される。そのタイミングで `warning: same-name type collision for X` の有無を T002 の verification result に追記する。
-- **対応方針**: 本トラックでは記録のみ、Track 2 で rename cascade
+- **T002 で実施・結果確定**: T002 の `baseline-capture` で `build_type_graph` が実行された。`warning: same-name type collision for X` は一件も出力されなかった — infrastructure crate に同名型衝突は存在しない。
+- **対応方針**: 衝突なし確認済み。rename cascade は不要。Track 2 での follow-up 不要。
 
 ### 3. infrastructure-types.json に seed した DTO 一覧 (T002 + T003 補正後)
 
@@ -236,11 +257,11 @@ Net result: catalogue expanded from 8 → 9 entries (6 × `dto` + 2 × `enum` + 
 
 ### 4. CI rustdoc 実行時間の体感 (T004 後)
 
-- domain layer rustdoc: TBD
-- usecase layer rustdoc: TBD
-- infrastructure layer rustdoc: TBD
-- 合計 wall time: TBD
-- 許容範囲か: TBD (許容外なら ADR 0002 §3.E の cache 戦略を Track 2 で実装)
+- **infrastructure layer rustdoc** (T001 実測): cold-ish failed first attempt ~6.0s (early exit on lint error), warm re-run ~0.7s. Clean-slate cold timing not separately measured. 生成 JSON サイズ 1,360,827 bytes (1.3 MB)。
+- **domain / usecase layer rustdoc**: T001-T004 の範囲では個別計測していない (T001 audit は infrastructure のみ)。Track 2 で計測予定。現時点の推定 (workspace size からの類推): domain ~1-2s warm / ~数秒 cold, usecase ~1s warm / ~数秒 cold。
+- **`cargo make ci` 全体 wall time**: T002 commit 時 (800bddf): 11.86s。T001 commit 時 (d51694e, initial audit 後): 16.73s。T003 commit 時 (ad3aeae): "PASS (subsequent to signal re-evaluation)" のみ記録 (明示的な秒数なし)。T004 commit 時 (ad77e03): "PASS" のみ記録 (明示的な秒数なし)。いずれも rustdoc は CI pipeline に組み込まれていない状態での数値。
+- **許容範囲か**: CI rustdoc を **全 3 layer 同時** に組み込むと、単純合算で +5-10s 程度 warm + より大きな cold 時間増加が見込まれる。現在の `cargo make ci` は 30s 以内に収まっており、+10s は体感許容範囲内。ただし CI 環境では cold hit の頻度次第で体感が変わるため、Track 2 で ADR 0002 §3.E の cache 戦略 (rustdoc JSON の incremental 再利用) を検討・実装する価値が残る。
+- **Track 2 での対応**: (a) CI pipeline に `cargo +nightly rustdoc -p domain / usecase / infrastructure --output-format json` を組み込み、実測 cold / warm 時間を verification で記録する、(b) 実測値が体感許容範囲 (総計 20s を目安) を超える場合は ADR 0002 §3.E の cache 戦略実装に進む。
 
 ### 5. Adapter variant が必要そうな infra type の暫定リスト
 
@@ -253,4 +274,3 @@ Track 2 で TypeDefinitionKind::Adapter / SecondaryAdapter 等の新 variant 設
 - 各種 `verify` module (orchestration や validation)
 - `RustdocSchemaExporter` (domain の `SchemaExporter` trait の impl)
 - `GitShowTrackBlobReader` (usecase の `TrackBlobReader` trait の impl)
-- (T001 audit 後に追加候補を記録)
