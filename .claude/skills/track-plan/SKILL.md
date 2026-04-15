@@ -162,8 +162,8 @@ ls track/items/
 
 | カテゴリ | 判定基準 | ヒアリング |
 |---------|---------|-----------|
-| 🔵 確定済み | 最高信頼度の source が document / feedback / convention → Blue signal | 不要（スキップ） |
-| 🟡 要確認 | 最高信頼度の source が inference / discussion → Yellow signal | 確認を推奨 |
+| 🔵 確定済み | 最高信頼度の source が document / convention → Blue signal | 不要（スキップ） |
+| 🟡 要確認 | 最高信頼度の source が feedback / inference / discussion → Yellow signal | 確認を推奨 |
 | 🔴 要議論 | source tag が空 or 根拠なし → Red signal (MissingSource) | 必須 |
 | ❌ 欠落 | spec.json に記載されていないが、機能に必要な情報 | 必須 |
 
@@ -280,9 +280,11 @@ Blue サマリーのみ表示して「変更がありますか？」と自由記
 ユーザーの回答後、以下の手順で `spec.json` を更新する：
 
 **既存項目（🟡🔴）の更新** — ユーザーの回答に基づいて `text` と `sources` を更新する：
-- ユーザーが内容を修正した場合 → `text` を修正内容に書き換え、`sources` に `feedback — {内容}` を追加（→ Blue に昇格）
-- ユーザーが現状を確認した場合 → `text` はそのまま、`sources` に `feedback — ユーザー確認` を追加（→ Blue に昇格）
-- ユーザーが「推定で良い」と承認した場合 → `text` はそのまま、`sources` に `discussion` を追加（→ Yellow に昇格）
+- ユーザーが内容を修正した場合 → `text` を修正内容に書き換え、`sources` に `feedback — {内容}` を追加（→ Yellow のまま。`feedback` は未永続化のため Blue には昇格しない）
+- ユーザーが現状を確認した場合 → `text` はそのまま、`sources` に `feedback — ユーザー確認` を追加（→ Yellow のまま）
+- ユーザーが「推定で良い」と承認した場合 → `text` はそのまま、`sources` に `discussion` を追加（→ Yellow のまま）
+
+Yellow → Blue 昇格は永続化ドキュメント（ADR / convention）が必要。詳細は `knowledge/conventions/source-attribution.md` §Upgrading Yellow to Blue を参照。
 （既存の source は保持し、上書きしない。signal 評価は最高信頼度のソースを使うため、追加で十分）
 
 **確定済み項目（🔵）の修正** — ユーザーが Blue 項目の変更を申告した場合：

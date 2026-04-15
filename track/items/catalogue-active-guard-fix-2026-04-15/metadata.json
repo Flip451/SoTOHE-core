@@ -61,9 +61,10 @@
       "status": "done"
     },
     {
+      "commit_hash": "56f5c448208dfaa65abd0daaa6991181b7474d6a",
       "description": "Data recovery: restore headers in existing rendered views that were previously corrupted by the hardcoded-header bug. Target files (both in status=done tracks, so sync_rendered_views cannot auto-recover them under the is_done_or_archived guard — manual Edit is required): track/items/tddd-02-usecase-wiring-2026-04-14/usecase-types.md (expected first line: <!-- Generated from usecase-types.json — DO NOT EDIT DIRECTLY -->), and verify track/items/domain-serde-ripout-2026-04-15/infrastructure-types.md stayed at <!-- Generated from infrastructure-types.json — DO NOT EDIT DIRECTLY --> after T001 revert + T004 fix. Add a one-time migration note in verification.md Result section explaining the bypass of done-track immutability for cosmetic header recovery.",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": ".claude/skills/track-plan/SKILL.md の古い記述 2 箇所を source-attribution.md SSoT (2026-04-12 strict-signal-gate-v2 ADR で feedback=Yellow に降格済) に整合させる。修正箇所: (a) line 165 の classification table で feedback を Blue 行から Yellow 行に移動、(b) line 283-284 の diff hearing update guidance で feedback 追加後の → Blue 昇格 を Yellow のまま + Blue 昇格には ADR/convention 永続化が必要な旨に書き換える (source-attribution.md §Upgrading Yellow to Blue を引用)。本 bug で Claude Code が誤って feedback=Blue と判断した直接原因であり structural fix として同 track で処理する。",
@@ -77,5 +78,5 @@
     }
   ],
   "title": "catalogue active-track guard + rendered view source-file-name fix + sync_rendered_views multi-layer rollout",
-  "updated_at": "2026-04-15T14:16:16Z"
+  "updated_at": "2026-04-15T14:23:17Z"
 }
