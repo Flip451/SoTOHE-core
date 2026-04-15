@@ -74,7 +74,7 @@ researcher capability 調査 (`knowledge/research/2026-04-14-1510-researcher-dom
 - Adapter / SecondaryPortAdapter variant の `TypeDefinitionKind` 拡張 (taxonomy ADR `2026-04-13-1813-tddd-taxonomy-expansion.md` の延長)
 - infrastructure 層全体の catalogue 充実 (verify modules / review_v2 adapters / git wrappers / hook handlers / 各種 store などの 40-80 entries)
 - CI rustdoc cache 戦略 (ADR `2026-04-11-0002-tddd-multilayer-extension.md` §3.E で deferred とされた item)
-- infrastructure 内同名衝突解消 (T001 で見つかった collision の rename cascade)
+- infrastructure 内同名衝突解消 (T002 baseline-capture で検出される collision の rename cascade — T001 の plain rustdoc では build_type_graph を実行しないため collision は検出不可)
 
 理由: 本トラックを膨らませると review concern が混ざり (hexagonal compliance vs taxonomy 設計 vs CI 最適化)、各トラック <500 行の guideline (`.claude/rules/10-guardrails.md`) を守れなくなる。Track 1 完了後の verification.md に Track 2 への 5 引継ぎ事項を記載することで継続性を担保する。
 
@@ -244,7 +244,7 @@ verify modules / review_v2 adapters / git wrappers / hook handlers などの 40-
 
 | Commit | Tasks | 推定変更行数 | コンパイル状態 |
 |---|---|---|---|
-| Commit 1 | T001: rustdoc viability audit + `architecture-rules.json` infrastructure tddd 有効化 | ~36 行 | Pass |
+| Commit 1 | T001: rustdoc viability audit + prereq doc fix (6 箇所: 2 × `invalid_html_tags` + 4 × `private_intra_doc_links`) + `architecture-rules.json` infrastructure tddd 有効化 | ~42 行 | Pass |
 | Commit 2 | T002: `/track:design --layer infrastructure` 実行 (`infrastructure-types.json` + `infrastructure-types-baseline.json` + rendered view 生成、yellow=8 初期状態) | ~150 行 (catalogue JSON + baseline JSON + rendered md) | Pass |
 | Commit 3 | T003: `libs/infrastructure/src/schema_export_codec.rs` 新設 (DTO + encode 関数) — yellow=8 → blue=8 遷移 | ~150 行 | Pass (domain serde はまだある) |
 | Commit 4 | T004: domain serde 除去 + CLI 書き換え + `schema_export_tests.rs` 更新 | ~36 行 | Pass (T003 完了が必須) |

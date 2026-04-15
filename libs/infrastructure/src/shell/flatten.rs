@@ -1,6 +1,6 @@
 //! conch-parser AST flattening, redirect helpers, and command substitution extraction.
 //!
-//! These are internal helpers used by [`super::conch`].
+//! These are internal helpers used by `super::conch`.
 //! Separated from `conch.rs` to stay within the 700-line module limit.
 
 use conch_parser::ast;

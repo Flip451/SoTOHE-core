@@ -39,7 +39,7 @@ use crate::git_cli::{GitRepository, SystemGitRepo};
 ///    ancestor.
 /// 3. `spec_path.parent()`: last resort, with an explicit symlink check.
 ///
-/// All paths returned are verified non-symlink via [`ensure_not_symlink_root`].
+/// All paths returned are verified non-symlink via `ensure_not_symlink_root`.
 ///
 /// # Errors
 ///

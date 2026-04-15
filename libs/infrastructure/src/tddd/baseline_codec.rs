@@ -6,7 +6,7 @@
 //! T005 (TDDD-01 Phase 1 Task 5): baseline schema v2 — members are captured
 //! as structured `MemberDeclaration` (enum variant or struct field with L1
 //! type string) and methods as structured `MethodDeclaration`
-//! (name/receiver/params/returns/is_async). Schema v1 (flat Vec<String>)
+//! (name/receiver/params/returns/is_async). Schema v1 (flat `Vec<String>`)
 //! baselines are rejected with a re-run hint.
 
 use std::collections::{BTreeMap, HashMap};

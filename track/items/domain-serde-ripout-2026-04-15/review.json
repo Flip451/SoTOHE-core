@@ -508,6 +508,119 @@
           "findings": [],
           "hash": "rvw1:sha256:2ea231393c939f172e310dcc9b035c4451f5b1204e61240624d2792acb9ddd95",
           "at": "2026-04-15T02:09:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69145b0227e90a860b33f88b0ea93d93f5d2c45f43c8c8b52bb5551e9b8c1518",
+          "at": "2026-04-15T03:11:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Phase A SSoT summary still says the T001 rustdoc audit records whether a collision warning occurs, but T001 only runs `cargo rustdoc`; it never executes `build_type_graph`, so collisions are not observable until T002 `baseline-capture`. That contradicts the corrected T001 task description and the recorded result in `verification.md` that explicitly defer collision detection to T002.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "line": 9,
+              "category": null
+            },
+            {
+              "message": "`spec.json` still describes collision warnings as something T001 can observe and merely record (`scope.in_scope[0]`, plus repeated statements later in the file), but the actual workflow now defers collision detection to T002 because plain rustdoc does not invoke `build_type_graph`. This leaves the spec's T001 scope factually inconsistent with `verification.md` and the updated metadata task description.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 15,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:69145b0227e90a860b33f88b0ea93d93f5d2c45f43c8c8b52bb5551e9b8c1518",
+          "at": "2026-04-15T03:15:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` still says T001 can observe and record collision warnings (`infrastructure 内部の同名衝突解消は対象外...` and `collision warning が見つかった場合は記録のみ...`). That contradicts the updated T001 design and `verification.md`, which now state plain rustdoc does not run `build_type_graph` and collision audit is deferred to T002.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 165,
+              "category": "plan_consistency"
+            },
+            {
+              "message": "`spec.json` still budgets Commit 1 / T001 as `~36 行`, but the approved T001 scope expansion added 6 prereq doc fixes and moved Commit 1 to `~42 行` everywhere else (`metadata.json`, `plan.md`, ADR §D9, `verification.md`). This leaves the spec SSoT inconsistent with the recorded 2→6 fix expansion.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 296,
+              "category": "plan_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:f1fdaa77fd3345fbf42154487ee794f2c540974344b701c8472a4c85ca95bb7b",
+          "at": "2026-04-15T03:22:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated collision-deferral text in `spec.json` now says collision warnings are only detectable during T002 `baseline-capture`, but the cited ADR sections do not support that claim. `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §6` still frames Track 2 as handling rename cascades for collisions \"found in T001\", and `§4` / `§D9` / ADR 0002 `§D1` only cover rustdoc viability or TDDD configuration. That leaves the new T001 scope/constraint/out-of-scope language without a supporting source trail.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 15,
+              "category": "source_attribution"
+            }
+          ],
+          "hash": "rvw1:sha256:3527ae225824c89a42e583b00ccf9c5a1c966415a12236d180f6ed3cb1921e68",
+          "at": "2026-04-15T03:28:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3527ae225824c89a42e583b00ccf9c5a1c966415a12236d180f6ed3cb1921e68",
+          "at": "2026-04-15T03:31:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T001 collision-deferral rewrite in `spec.json` still points at the wrong ADR sections. The in-scope T001 entry at line 15 cites only `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D9` and ADR 0002 `§D1`, and the later gating constraint (around line 276) cites `§D9` plus `§4`; none of those sections document that collision detection is deferred to T002's `baseline-capture`. That rationale now lives in `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §6`, so the approved spec has stale source attribution for a key T001/T002 boundary.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 15,
+              "category": "incorrect_source_attribution"
+            }
+          ],
+          "hash": "rvw1:sha256:ae5d1701e3dda0aa74739ccc53261452d8d8d7ad092362866b0077a2783eac15",
+          "at": "2026-04-15T03:36:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9df68d1d87ef3ab3a2dbca0c1e2670f7e9d6ef2df9bb0b5f0ee2942349e85801",
+          "at": "2026-04-15T03:41:36Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8cde6d89c553349c4680dcc90f373d214d74e0f5894a0c4b74f383420763e56",
+          "at": "2026-04-15T03:10:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8cde6d89c553349c4680dcc90f373d214d74e0f5894a0c4b74f383420763e56",
+          "at": "2026-04-15T03:12:13Z"
         }
       ]
     }

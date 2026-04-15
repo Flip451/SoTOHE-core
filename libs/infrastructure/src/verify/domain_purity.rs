@@ -1,7 +1,7 @@
 //! Verify that `libs/domain/src/` contains no forbidden patterns that violate
 //! hexagonal architecture purity.
 //!
-//! Delegates to the shared [`super::usecase_purity::check_layer_purity`] engine.
+//! Delegates to the shared `super::usecase_purity::check_layer_purity` engine.
 
 use std::path::Path;
 

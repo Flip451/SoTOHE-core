@@ -2,7 +2,7 @@
 
 ## Scope Verified
 
-- [ ] T001: infrastructure 層 rustdoc viability audit が成功し、wall time / collision warning 有無が記録されている
+- [ ] T001: infrastructure 層 rustdoc viability audit が成功し、wall time が記録されている (collision warning 有無は plain rustdoc では検出不可、T002 の baseline-capture 結果を参照)
 - [ ] T001: `architecture-rules.json` の infrastructure tddd が `enabled: true` に flip され、`catalogue_file` / `schema_export.targets` が設定されている
 - [ ] T002: `/track:design --layer infrastructure` が成功し、`track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json` (8 entries) + `infrastructure-types-baseline.json` + `infrastructure-types.md` rendered view が生成されている
 - [ ] T002: `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` が `blue=0 yellow=8 red=0` (初期状態、DTO 未実装) を返している
@@ -145,7 +145,22 @@ cargo make ci
 
 ## Result
 
-(各 task 完了時に追記)
+### T001 (2026-04-14)
+
+- **rustdoc viability audit**: success after 6 prereq doc fixes. `target/rustdoc-audit/doc/infrastructure.json` produced, size 1,360,827 bytes (1.3 MB).
+- **wall time**: initial failed audit took ~6.0s (errored out on first warning). Warm re-runs complete in ~0.7s once cached. Clean-slate cold rustdoc for infrastructure is expected to run in single-digit seconds (exact cold timing not measured in this audit because the docs target was warm from prior cargo runs).
+- **prereq doc fixes applied** (6 files, 1 line each):
+  1. `libs/infrastructure/src/review_v2/hasher.rs:15` — wrapped `"rvw1:sha256:<hex>"` in backticks (HTML tag false-positive fix).
+  2. `libs/infrastructure/src/tddd/baseline_codec.rs:9` — wrapped `Vec<String>` in backticks.
+  3. `libs/infrastructure/src/verify/merge_gate_adapter.rs:6` — `[`crate::git_cli::show`]` → `` `crate::git_cli::show` `` (private intra doc link → inline code).
+  4. `libs/infrastructure/src/verify/trusted_root.rs:42` — `[`ensure_not_symlink_root`]` → `` `ensure_not_symlink_root` ``.
+  5. `libs/infrastructure/src/verify/domain_purity.rs:4` — `[`super::usecase_purity::check_layer_purity`]` → `` `super::usecase_purity::check_layer_purity` ``.
+  6. `libs/infrastructure/src/shell/flatten.rs:3` — `[`super::conch`]` → `` `super::conch` ``.
+- **collision warning**: not checked in T001 (rustdoc JSON itself does not invoke `build_type_graph`). Collision detection is deferred to T002 where `/track:design --layer infrastructure` internally runs `baseline-capture` → `build_type_graph`.
+- **architecture-rules.json flip**: `infrastructure.tddd` changed from `{"enabled": false}` to `{"enabled": true, "catalogue_file": "infrastructure-types.json", "schema_export": {"method": "rustdoc", "targets": ["infrastructure"]}}`.
+- **`cargo make ci` after flip**: PASS (Build Done in 16.73s). fmt-check / clippy -D warnings / nextest (1940 tests) / deny / check-layers / verify-spec-states / verify-* all PASSED. Warnings are pre-existing (module size, pub String fields) and not introduced by this task.
+
+(T002 以降は各 task 完了時に追記)
 
 ## Verified At
 
@@ -159,15 +174,17 @@ cargo make ci
 
 ### 1. rustdoc viability audit 結果 (T001)
 
-- success / failure: TBD (T001 実施時)
-- JSON サイズ: TBD
-- wall time: TBD
-- 備考:
+- **success / failure**: success (after 6 prereq doc fixes)
+- **JSON サイズ**: 1,360,827 bytes (1.3 MB) — `target/rustdoc-audit/doc/infrastructure.json`
+- **wall time**: ~6.0s on failed first attempt (errored out early on warnings), ~0.7s on warm re-runs. Clean-slate cold timing not separately measured.
+- **prereq doc fixes**: 6 files (2 × `invalid_html_tags` + 4 × `private_intra_doc_links`) — see Result section T001 for details.
+- **備考**: Infrastructure rustdoc JSON has now been generated for the first time in the project's history (previously blocked by workspace `warnings = "deny"` lint policy catching pre-existing doc comment cruft). Track 2 should expect this to remain stable once these 6 fixes are preserved.
 
 ### 2. infrastructure 内同名衝突 audit 結果 (T001)
 
-- 検出された collision: TBD (T001 実施時)
-- 対応方針: 本トラックでは記録のみ、Track 2 で rename cascade
+- **T001 時点では未検出**: rustdoc JSON 生成自体は success。ただし `build_type_graph` (`code_profile_builder.rs`) の collision warning は rustdoc JSON **を読んだ後** に出るため、T001 (rustdoc のみ実行) では検出機会がない。
+- **T002 で検出予定**: T002 の `/track:design --layer infrastructure` が内部で `baseline-capture` を走らせ、そこで `build_type_graph` が実行される。そのタイミングで `warning: same-name type collision for X` の有無を T002 の verification result に追記する。
+- **対応方針**: 本トラックでは記録のみ、Track 2 で rename cascade
 
 ### 3. infrastructure-types.json に seed した DTO 一覧 (T002)
 
