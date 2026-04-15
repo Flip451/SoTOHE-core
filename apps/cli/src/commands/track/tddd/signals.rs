@@ -7,12 +7,16 @@
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
+use domain::TrackStatus;
 use domain::schema::{SchemaExportError, SchemaExporter};
 use infrastructure::code_profile_builder::build_type_graph;
 use infrastructure::schema_export::RustdocSchemaExporter;
 use infrastructure::tddd::catalogue_codec;
 use infrastructure::track::atomic_write::atomic_write_file;
-use infrastructure::verify::tddd_layers::{TdddLayerBinding, parse_tddd_layers};
+use infrastructure::track::fs_store::read_track_metadata;
+use infrastructure::verify::tddd_layers::{
+    LoadTdddLayersError, TdddLayerBinding, load_tddd_layers_from_path,
+};
 
 use crate::CliError;
 
@@ -30,43 +34,19 @@ pub(crate) fn resolve_layers(
     layer_filter: Option<&str>,
 ) -> Result<Vec<TdddLayerBinding>, CliError> {
     let rules_path = workspace_root.join("architecture-rules.json");
-    // Distinguish "truly absent" from "broken symlink / other I/O error" by
-    // probing the path with `symlink_metadata` first. Only the former should
-    // trigger the legacy single-domain synthetic fallback; a broken symlink at
-    // `architecture-rules.json` is a misconfiguration and must fail-closed
-    // (otherwise the caller silently runs against the wrong layer set).
-    // `read_to_string` alone cannot distinguish these cases — it returns
-    // `NotFound` for both an absent path and a broken symlink whose target is
-    // missing. `symlink_metadata` does not follow symlinks and returns
-    // metadata for the link itself, so a broken symlink returns `Ok(meta)`
-    // here and the subsequent `read_to_string` surfaces the real error.
-    let bindings = match std::fs::symlink_metadata(&rules_path) {
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            // Legacy fallback: a single synthetic domain binding (path truly
-            // absent — no file, no symlink, nothing at the expected location).
-            parse_tddd_layers(
-                r#"{
-                  "layers": [
-                    { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
-                  ]
-                }"#,
-            )
-            .unwrap_or_default()
-        }
-        Err(e) => {
-            return Err(CliError::Message(format!("cannot stat {}: {e}", rules_path.display())));
-        }
-        Ok(_meta) => {
-            // Path exists as a file or symlink. Read it. A broken symlink
-            // surfaces as a read error here (not NotFound-fallback) so the
-            // misconfiguration is reported instead of masked.
-            let content = std::fs::read_to_string(&rules_path).map_err(|e| {
-                CliError::Message(format!("cannot read {}: {e}", rules_path.display()))
-            })?;
-            parse_tddd_layers(&content)
-                .map_err(|e| CliError::Message(format!("{}: {e}", rules_path.display())))?
-        }
-    };
+    // Delegate symlink handling + legacy-fallback policy to the shared
+    // infrastructure helper. CLI stays a thin composition layer; it only
+    // maps the infra error variants into `CliError` and applies the
+    // CLI-level layer filter.
+    let bindings =
+        load_tddd_layers_from_path(&rules_path, workspace_root).map_err(|e| match e {
+            LoadTdddLayersError::Io { path, source } => {
+                CliError::Message(format!("{}: {source}", path.display()))
+            }
+            LoadTdddLayersError::Parse(err) => {
+                CliError::Message(format!("{}: {err}", rules_path.display()))
+            }
+        })?;
 
     if let Some(filter) = layer_filter {
         let Some(binding) = bindings.iter().find(|b| b.layer_id() == filter) else {
@@ -77,6 +57,30 @@ pub(crate) fn resolve_layers(
         Ok(vec![binding.clone()])
     } else {
         Ok(bindings)
+    }
+}
+
+/// Fail-closed active-track guard: rejects `Done` / `Archived` tracks.
+///
+/// Uses an exhaustive `match` on `TrackStatus` (6 variants) — adding a new variant
+/// triggers a compile error, forcing explicit classification (frozen vs active).
+/// This is the structural guarantee for fail-closed behavior; `matches!` would
+/// silently pass new variants through (fail-open).
+///
+/// Mirrors the intent of the existing `is_done_or_archived` guard in
+/// `libs/infrastructure/src/track/render.rs::sync_rendered_views` (which uses a
+/// string-based `matches!` and is scope-deferred per ADR
+/// `knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md` Consequences Neutral).
+fn ensure_active_track(status: TrackStatus, track_id: &str) -> Result<(), CliError> {
+    match status {
+        TrackStatus::Done | TrackStatus::Archived => Err(CliError::Message(format!(
+            "cannot run type-signals on '{track_id}' (status={status}). \
+             Completed tracks are frozen — run on an active track instead.",
+        ))),
+        TrackStatus::Planned
+        | TrackStatus::InProgress
+        | TrackStatus::Blocked
+        | TrackStatus::Cancelled => Ok(()),
     }
 }
 
@@ -100,8 +104,23 @@ pub fn execute_type_signals(
     layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
     // Validate track_id to prevent path traversal.
-    let _valid_id = domain::TrackId::try_new(&track_id)
+    let valid_id = domain::TrackId::try_new(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
+
+    // Active-track guard: reject type-signals on completed/archived tracks.
+    // `metadata.status()` is derived from task states and can never return
+    // `TrackStatus::Archived` (archived is a workflow-level state stored only in
+    // `DocumentMeta::original_status`). Check `original_status` first so that an
+    // archived track with unresolved tasks is not misclassified as `InProgress` and
+    // allowed through.
+    let (metadata, doc_meta) = read_track_metadata(&items_dir, &valid_id)
+        .map_err(|e| CliError::Message(format!("cannot load metadata for '{track_id}': {e}")))?;
+    let effective_status = if doc_meta.original_status.as_deref() == Some("archived") {
+        domain::TrackStatus::Archived
+    } else {
+        metadata.status()
+    };
+    ensure_active_track(effective_status, &track_id)?;
 
     // Resolve the set of TDDD-enabled layers to process. When
     // `architecture-rules.json` is absent we fall back to the legacy
@@ -344,7 +363,20 @@ fn validate_and_write_catalogue(
     // The markdown filename is `<catalogue_stem>.md` where `<catalogue_stem>`
     // is derived from the binding's `catalogue_file`.
     let rendered_md_path = track_dir.join(rendered_file_stem);
-    let rendered = infrastructure::type_catalogue_render::render_type_catalogue(doc);
+    // Derive the catalogue JSON filename from the write path so the rendered view's
+    // `Generated from ...` header reflects the actual source file (e.g.
+    // `infrastructure-types.json`) — not the rendered `.md` path. `binding` is not
+    // in this scope; `domain_types_path` already holds the exact catalogue file path
+    // that was just written, so deriving from its file_name is authoritative.
+    let catalogue_file =
+        domain_types_path.file_name().and_then(|n| n.to_str()).ok_or_else(|| {
+            CliError::Message(format!(
+                "cannot derive catalogue file name from {}",
+                domain_types_path.display()
+            ))
+        })?;
+    let rendered =
+        infrastructure::type_catalogue_render::render_type_catalogue(doc, catalogue_file);
     atomic_write_file(&rendered_md_path, rendered.as_bytes()).map_err(|e| {
         CliError::Message(format!("cannot write {}: {e}", rendered_md_path.display()))
     })?;
@@ -432,13 +464,50 @@ fn print_signal_summary(
 mod tests {
     use super::*;
 
-    /// Sets up a minimal track directory with the given `domain-types.json` content.
+    /// Minimal valid `metadata.json` for tests where the active-track guard should pass.
+    /// All tasks are `todo` → derived `TrackStatus::Planned`.
+    fn minimal_active_metadata_json(track_id: &str) -> String {
+        format!(
+            r#"{{
+  "schema_version": 3,
+  "id": "{track_id}",
+  "branch": "track/{track_id}",
+  "title": "Test Track",
+  "status": "planned",
+  "created_at": "2026-04-15T00:00:00Z",
+  "updated_at": "2026-04-15T00:00:00Z",
+  "tasks": [
+    {{
+      "id": "T001",
+      "description": "A task",
+      "status": "todo",
+      "commit_hash": null
+    }}
+  ],
+  "plan": {{
+    "summary": ["Test"],
+    "sections": [{{
+      "id": "S001",
+      "title": "Test",
+      "description": ["Test"],
+      "task_ids": ["T001"]
+    }}]
+  }}
+}}
+"#
+        )
+    }
+
+    /// Sets up a minimal track directory with the given `domain-types.json` content
+    /// and a valid `metadata.json` (status=planned) so the active-track guard passes.
     fn setup_track(dir: &std::path::Path, domain_types: &str) -> (PathBuf, String) {
         let items_dir = dir.join("track/items");
         let track_id = "test-track";
         let track_dir = items_dir.join(track_id);
         std::fs::create_dir_all(&track_dir).unwrap();
         std::fs::write(track_dir.join("domain-types.json"), domain_types).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json(track_id))
+            .unwrap();
         (items_dir, track_id.to_owned())
     }
 
@@ -457,7 +526,10 @@ mod tests {
     fn test_execute_type_signals_with_missing_domain_types_json_returns_error() {
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
-        std::fs::create_dir_all(items_dir.join("test-track")).unwrap();
+        let track_dir = items_dir.join("test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
+            .unwrap();
         let workspace_root = dir.path().to_path_buf();
 
         let result = execute_type_signals(items_dir, "test-track".to_owned(), workspace_root, None);
@@ -482,7 +554,10 @@ mod tests {
         // architecture-rules.json, the command must fail-closed with a clear error.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
-        std::fs::create_dir_all(items_dir.join("test-track")).unwrap();
+        let track_dir = items_dir.join("test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
+            .unwrap();
         let workspace_root = dir.path().to_path_buf();
 
         // No architecture-rules.json => fallback has only "domain"; "nonexistent" should fail.
@@ -511,6 +586,8 @@ mod tests {
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-track");
         std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
+            .unwrap();
 
         // Write architecture-rules.json with usecase enabled.
         let rules_json = r#"{
@@ -749,6 +826,45 @@ mod tests {
         );
     }
 
+    #[test]
+    fn test_validate_and_write_catalogue_rendered_header_uses_json_catalogue_filename() {
+        // Regression guard for the T004 caller-side header fix: the rendered `.md` file's
+        // `Generated from ...` header must reference the catalogue JSON filename, not the
+        // markdown output filename.  Using a non-domain path (`infrastructure-types.json`)
+        // makes the distinction explicit — if the derivation regresses back to passing
+        // `rendered_file_stem` the header would incorrectly say
+        // `Generated from infrastructure-types.md`.
+        let dir = tempfile::tempdir().unwrap();
+        let catalogue_path = dir.path().join("infrastructure-types.json");
+        let track_dir = dir.path().to_path_buf();
+
+        let doc = domain::TypeCatalogueDocument::new(1, vec![]);
+        let report = domain::check_consistency(&[], &empty_graph_d(), &empty_baseline_d());
+
+        assert!(report.delete_errors().is_empty(), "precondition: no delete errors");
+
+        let result = validate_and_write_catalogue(
+            &report,
+            &doc,
+            &catalogue_path,
+            &track_dir,
+            "infrastructure-types.md",
+        );
+
+        assert!(result.is_ok(), "clean report must succeed: {result:?}");
+
+        let rendered = std::fs::read_to_string(dir.path().join("infrastructure-types.md"))
+            .expect("rendered md must exist");
+        assert!(
+            rendered.contains("Generated from infrastructure-types.json"),
+            "rendered header must reference the JSON catalogue file, got:\n{rendered}"
+        );
+        assert!(
+            !rendered.contains("Generated from infrastructure-types.md"),
+            "rendered header must NOT reference the md output file, got:\n{rendered}"
+        );
+    }
+
     // --- evaluate_and_write_signals tests (core path, no nightly needed) ---
 
     #[test]
@@ -844,6 +960,8 @@ mod tests {
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-track");
         std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
+            .unwrap();
 
         let rules_json = r#"{
           "layers": [
@@ -935,5 +1053,161 @@ mod tests {
         // Verify domain-types.md was generated
         let md_path = items_dir.join(&track_id).join("domain-types.md");
         assert!(md_path.exists(), "domain-types.md must be generated");
+    }
+
+    // --- ensure_active_track unit tests (exhaustive TrackStatus variant coverage) ---
+
+    #[test]
+    fn test_ensure_active_track_rejects_done() {
+        let result = ensure_active_track(TrackStatus::Done, "test-track");
+        let err = result.unwrap_err();
+        let msg = format!("{err}");
+        assert!(msg.contains("status=done"), "msg should mention status=done: {msg}");
+        assert!(msg.contains("Completed tracks are frozen"), "msg: {msg}");
+        assert!(msg.contains("test-track"), "msg should mention track_id: {msg}");
+    }
+
+    #[test]
+    fn test_ensure_active_track_rejects_archived() {
+        let result = ensure_active_track(TrackStatus::Archived, "test-track");
+        let err = result.unwrap_err();
+        let msg = format!("{err}");
+        assert!(msg.contains("status=archived"), "msg should mention status=archived: {msg}");
+        assert!(msg.contains("Completed tracks are frozen"), "msg: {msg}");
+    }
+
+    #[test]
+    fn test_ensure_active_track_allows_planned() {
+        assert!(ensure_active_track(TrackStatus::Planned, "test-track").is_ok());
+    }
+
+    #[test]
+    fn test_ensure_active_track_allows_in_progress() {
+        assert!(ensure_active_track(TrackStatus::InProgress, "test-track").is_ok());
+    }
+
+    #[test]
+    fn test_ensure_active_track_allows_blocked() {
+        assert!(ensure_active_track(TrackStatus::Blocked, "test-track").is_ok());
+    }
+
+    #[test]
+    fn test_ensure_active_track_allows_cancelled() {
+        assert!(ensure_active_track(TrackStatus::Cancelled, "test-track").is_ok());
+    }
+
+    // --- Integration test: execute_type_signals rejects done track via full path ---
+
+    #[test]
+    fn test_execute_type_signals_rejects_done_track() {
+        // Integration: a track whose derived TrackStatus is Done (all tasks DoneTraced)
+        // must be rejected by execute_type_signals before reaching catalogue read,
+        // protecting merged-track data immutability.
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("track/items");
+        let track_dir = items_dir.join("test-done-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        let done_metadata = r#"{
+  "schema_version": 3,
+  "id": "test-done-track",
+  "branch": "track/test-done-track",
+  "title": "Test Done Track",
+  "status": "done",
+  "created_at": "2026-04-15T00:00:00Z",
+  "updated_at": "2026-04-15T00:00:00Z",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "A completed task",
+      "status": "done",
+      "commit_hash": "0000000000000000000000000000000000000000"
+    }
+  ],
+  "plan": {
+    "summary": ["Test"],
+    "sections": [{
+      "id": "S001",
+      "title": "Test",
+      "description": ["Test"],
+      "task_ids": ["T001"]
+    }]
+  }
+}"#;
+        std::fs::write(track_dir.join("metadata.json"), done_metadata).unwrap();
+
+        let result = execute_type_signals(
+            items_dir,
+            "test-done-track".to_owned(),
+            dir.path().to_path_buf(),
+            None,
+        );
+
+        let err = result.unwrap_err();
+        let msg = format!("{err}");
+        assert!(msg.contains("status=done"), "guard must mention status=done, got: {msg}");
+        assert!(
+            msg.contains("Completed tracks are frozen"),
+            "guard must mention 'Completed tracks are frozen', got: {msg}"
+        );
+        assert!(msg.contains("test-done-track"), "guard must mention the track_id, got: {msg}");
+    }
+
+    #[test]
+    fn test_execute_type_signals_rejects_archived_track_with_incomplete_tasks() {
+        // Regression guard: archived tracks with unresolved tasks must still be
+        // rejected. `metadata.status()` derives from task states and would return
+        // `InProgress` for such a track (which `ensure_active_track` allows). The
+        // guard must consult `DocumentMeta::original_status` to catch this case.
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("track/items");
+        let track_dir = items_dir.join("test-archived-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        // status="archived" in JSON, but task T001 is still "in_progress" →
+        // metadata.status() would return InProgress (not Archived).
+        let archived_incomplete_metadata = r#"{
+  "schema_version": 3,
+  "id": "test-archived-track",
+  "branch": "track/test-archived-track",
+  "title": "Test Archived Track",
+  "status": "archived",
+  "created_at": "2026-04-15T00:00:00Z",
+  "updated_at": "2026-04-15T00:00:00Z",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "An incomplete task",
+      "status": "in_progress",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": ["Test"],
+    "sections": [{
+      "id": "S001",
+      "title": "Test",
+      "description": ["Test"],
+      "task_ids": ["T001"]
+    }]
+  }
+}"#;
+        std::fs::write(track_dir.join("metadata.json"), archived_incomplete_metadata).unwrap();
+
+        let result = execute_type_signals(
+            items_dir,
+            "test-archived-track".to_owned(),
+            dir.path().to_path_buf(),
+            None,
+        );
+
+        let err = result.unwrap_err();
+        let msg = format!("{err}");
+        assert!(msg.contains("status=archived"), "guard must mention status=archived, got: {msg}");
+        assert!(
+            msg.contains("Completed tracks are frozen"),
+            "guard must mention 'Completed tracks are frozen', got: {msg}"
+        );
+        assert!(msg.contains("test-archived-track"), "guard must mention the track_id, got: {msg}");
     }
 }

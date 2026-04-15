@@ -14,6 +14,7 @@
 //! Reference: ADR `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` §D1.
 
 use std::collections::HashSet;
+use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
 
@@ -234,6 +235,68 @@ pub fn find_binding<'a>(
     bindings.iter().find(|b| b.layer_id == layer_id)
 }
 
+/// Error returned by [`load_tddd_layers_from_path`].
+#[derive(Debug, thiserror::Error)]
+pub enum LoadTdddLayersError {
+    #[error("I/O error for {}: {source}", path.display())]
+    Io {
+        path: PathBuf,
+        #[source]
+        source: std::io::Error,
+    },
+
+    #[error(transparent)]
+    Parse(#[from] TdddLayerParseError),
+}
+
+/// Loads TDDD layer bindings from `architecture-rules.json` at `path`.
+///
+/// Delegates symlink rejection to the shared I/O guard
+/// [`crate::track::symlink_guard::reject_symlinks_below`] so the symlink
+/// handling policy lives in a single place in the infrastructure layer. When
+/// the guard reports the path as genuinely absent, returns a synthetic
+/// domain-only binding (legacy fallback for pre-multilayer tracks). Any
+/// symlink at the leaf or an ancestor, or any other I/O error, is reported as
+/// a hard failure so the misconfiguration surfaces instead of being masked by
+/// the fallback.
+///
+/// Shared by `apps/cli::resolve_layers` and
+/// `libs/infrastructure::track::render::sync_rendered_views` so callers do not
+/// need to reimplement the symlink/legacy-fallback policy themselves.
+///
+/// `trusted_root` is passed through to `reject_symlinks_below` — only
+/// components below it are inspected.
+///
+/// # Errors
+///
+/// Returns [`LoadTdddLayersError::Io`] when the symlink guard rejects the
+/// path (symlink at leaf or ancestor, or stat/read failure), and
+/// [`LoadTdddLayersError::Parse`] when the JSON is invalid or violates any
+/// constraint enforced by [`parse_tddd_layers`].
+pub fn load_tddd_layers_from_path(
+    path: &Path,
+    trusted_root: &Path,
+) -> Result<Vec<TdddLayerBinding>, LoadTdddLayersError> {
+    match crate::track::symlink_guard::reject_symlinks_below(path, trusted_root) {
+        Ok(true) => {
+            // Path exists as a regular file (not a symlink). Read it.
+            let content = std::fs::read_to_string(path)
+                .map_err(|e| LoadTdddLayersError::Io { path: path.to_path_buf(), source: e })?;
+            parse_tddd_layers(&content).map_err(LoadTdddLayersError::Parse)
+        }
+        Ok(false) => {
+            // Path is truly absent (neither a file nor a symlink at the leaf).
+            // Legacy fallback: a single synthetic domain binding keeps
+            // pre-multilayer tracks working.
+            parse_tddd_layers(
+                r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#,
+            )
+            .map_err(LoadTdddLayersError::Parse)
+        }
+        Err(e) => Err(LoadTdddLayersError::Io { path: path.to_path_buf(), source: e }),
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
@@ -360,5 +423,87 @@ mod tests {
         ];
         assert_eq!(find_binding(&bindings, "usecase").unwrap().layer_id(), "usecase");
         assert!(find_binding(&bindings, "infrastructure").is_none());
+    }
+
+    #[test]
+    fn test_load_tddd_layers_from_path_regular_file_returns_parsed_bindings() {
+        let dir = tempfile::tempdir().unwrap();
+        let rules_path = dir.path().join("architecture-rules.json");
+        let json = r#"{
+          "layers": [
+            { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } },
+            { "crate": "usecase", "tddd": { "enabled": true, "catalogue_file": "usecase-types.json" } }
+          ]
+        }"#;
+        std::fs::write(&rules_path, json).unwrap();
+
+        let bindings = load_tddd_layers_from_path(&rules_path, dir.path()).unwrap();
+
+        assert_eq!(bindings.len(), 2);
+        assert_eq!(bindings[0].catalogue_file(), "domain-types.json");
+        assert_eq!(bindings[1].catalogue_file(), "usecase-types.json");
+    }
+
+    #[test]
+    fn test_load_tddd_layers_from_path_missing_file_returns_legacy_domain_fallback() {
+        // When architecture-rules.json is genuinely absent (not a broken symlink),
+        // callers must get the single synthetic domain binding so pre-multilayer
+        // tracks continue to work.
+        let dir = tempfile::tempdir().unwrap();
+        let rules_path = dir.path().join("architecture-rules.json");
+
+        let bindings = load_tddd_layers_from_path(&rules_path, dir.path()).unwrap();
+
+        assert_eq!(bindings.len(), 1);
+        assert_eq!(bindings[0].layer_id(), "domain");
+        assert_eq!(bindings[0].catalogue_file(), "domain-types.json");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_load_tddd_layers_from_path_broken_symlink_fails_closed_not_legacy_fallback() {
+        // Regression: a dangling `architecture-rules.json` symlink must NOT
+        // silently degrade to the legacy synthetic domain-only binding. That
+        // silent degradation would skip non-domain rendered view updates on
+        // misconfigured workspaces. `reject_symlinks_below` guarantees the
+        // symlink is rejected before any read is attempted.
+        let dir = tempfile::tempdir().unwrap();
+        let rules_path = dir.path().join("architecture-rules.json");
+        let missing_target = dir.path().join("does-not-exist.json");
+        std::os::unix::fs::symlink(&missing_target, &rules_path).unwrap();
+
+        let err = load_tddd_layers_from_path(&rules_path, dir.path()).unwrap_err();
+
+        match err {
+            LoadTdddLayersError::Io { .. } => {} // expected
+            other => panic!("expected Io error for broken symlink, got {other:?}"),
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_load_tddd_layers_from_path_valid_symlink_fails_closed() {
+        // Even a VALID symlink to a real architecture-rules.json must be
+        // rejected by `reject_symlinks_below`. The symlink-rejection policy
+        // is unconditional at the leaf path; consumers must resolve any
+        // intended indirection in the caller (e.g., via the trusted composition
+        // root) and pass a regular file to the helper.
+        let dir = tempfile::tempdir().unwrap();
+        let real = dir.path().join("real-rules.json");
+        let link = dir.path().join("architecture-rules.json");
+        let json = r#"{
+          "layers": [
+            { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
+          ]
+        }"#;
+        std::fs::write(&real, json).unwrap();
+        std::os::unix::fs::symlink(&real, &link).unwrap();
+
+        let err = load_tddd_layers_from_path(&link, dir.path()).unwrap_err();
+
+        match err {
+            LoadTdddLayersError::Io { .. } => {} // expected — symlink rejected
+            other => panic!("expected Io error for symlink leaf, got {other:?}"),
+        }
     }
 }

@@ -1,0 +1,438 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_type_signals` only checks `TrackMetadata::status()`, but archived tracks are preserved in `DocumentMeta::original_status`. That means an archived `metadata.json` with unresolved tasks is classified as `planned`/`in_progress` and can still pass the new guard, so `type-signals` can run on a frozen track. The guard needs to consult the raw status from `read_track_metadata`, not just the derived domain status.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 133,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:599161411fa8aafcc6f9a039c1f22b7b271073a1c10a2a8f960c374221800b92",
+          "at": "2026-04-15T13:28:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d410da0ed539bde00669acd81eef9968cf884c57318a3bd0ed17801eccac57f",
+          "at": "2026-04-15T13:31:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d410da0ed539bde00669acd81eef9968cf884c57318a3bd0ed17801eccac57f",
+          "at": "2026-04-15T13:33:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8bddd37b5545e9cb9e07cf729cc6daeaab0decaa90879dad9553858dd4e03a7a",
+          "at": "2026-04-15T13:43:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The caller-side header fix is not covered by a regression test. In this file, the success-path tests only check that the rendered `.md` file exists, so a future change back to `render_type_catalogue(doc, rendered_file_stem)` would still pass while silently reintroducing headers like `Generated from usecase-types.md` for non-domain layers. Add a test that exercises a non-domain `domain_types_path`/`rendered_file_stem` pair and asserts the rendered header uses the `.json` catalogue filename.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 401,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:8bddd37b5545e9cb9e07cf729cc6daeaab0decaa90879dad9553858dd4e03a7a",
+          "at": "2026-04-15T13:51:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bba4864fb826db548a35ac9ac4248327d05248d01a22ba82ab28a28a84f26001",
+          "at": "2026-04-15T13:52:49Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This grep will also match the `fn render_type_catalogue` definition in `type_catalogue_render.rs` (and any other incidental references), so the expected outcome of exactly 2 call sites with a second argument is not reliable. Narrow the search to actual call sites or exclude the definition.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/verification.md",
+              "line": 54,
+              "category": "verification"
+            },
+            {
+              "message": "The negative check is too broad: the intended fixed wording still contains both `feedback` and `Blue` in the phrase `Blue 昇格には ...`, so `rg 'feedback.*Blue'` will keep matching even after a correct D4 fix. Match the stale exact phrase instead of any `feedback` + `Blue` co-occurrence.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/verification.md",
+              "line": 80,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:1da77b23310fab14447a802c66ed61debfc8e58f3f031f0fea7210851cd78384",
+          "at": "2026-04-15T11:29:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1da77b23310fab14447a802c66ed61debfc8e58f3f031f0fea7210851cd78384",
+          "at": "2026-04-15T11:30:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 instructs the implementation to pass `rendered_file_stem` into `render_type_catalogue(..., source_file_name)`, and the same instruction is mirrored in `plan.md` and ADR D2. In the current CLI code, `rendered_file_stem` is the rendered markdown filename (`binding.rendered_file()`), not the catalogue JSON source, so following this plan would generate headers like `Generated from infrastructure-types.md` instead of the required `...types.json`. Update the plan/ADR wording to pass the catalogue filename (`binding.catalogue_file()` or the JSON path’s file name) and keep the markdown path separate.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/metadata.json",
+              "line": 30,
+              "category": "logic"
+            },
+            {
+              "message": "The D1 rationale says `matches!(metadata.status(), TrackStatus::Done | TrackStatus::Archived)` is an “exhaustive match” that will trigger a compile error if `TrackStatus` gains a new variant, but `matches!` is non-exhaustive and would silently ignore future variants. Either revise the ADR text to describe this as an explicit current-state check only, or specify a real exhaustive `match`/helper if compile-time coverage of future variants is part of the design intent.",
+              "severity": "P2",
+              "file": "knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+              "line": 82,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1da77b23310fab14447a802c66ed61debfc8e58f3f031f0fea7210851cd78384",
+          "at": "2026-04-15T11:38:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Reassess When §4 says a new `TrackStatus` variant would be caught automatically by an exhaustive-match compile error, but D1 now uses `matches!(..., Done | Archived)`, which is non-exhaustive and will silently treat new variants as active. This contradicts the ADR's own D1 rationale and weakens the future-review trigger for the fail-open case.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+              "line": 273,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9ab79e1ba2a02112f4dcbfe33f1330724d17d946f70a46a6f117c7d3113b2f0c",
+          "at": "2026-04-15T11:42:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bd82f35656102804d85eda449ae804ba9a921868d84d5a00f46e986a04948f8",
+          "at": "2026-04-15T11:45:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1’s pseudocode uses APIs that do not exist in the current codebase: `infrastructure::track::read_metadata(...)` is not available, and `TrackStatus` has no `as_str()` method. An implementer following this ADR literally will hit compile errors. Update the pseudocode to use the real read-only adapter (`infrastructure::track::fs_store::read_track_metadata(items_dir, &track_id)` or equivalent), destructure `(metadata, _)`, and format the status via `Display`/`to_string()`.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+              "line": 62,
+              "category": "correctness"
+            },
+            {
+              "message": "T004’s task text says `validate_and_write_catalogue` should pass `binding.catalogue_file()` at the current render call site, but `binding` is not in scope there today. As written, the implementation note is not executable. Clarify that the catalogue filename must either be threaded through `evaluate_and_write_signals`/`validate_and_write_catalogue` or derived from `domain_types_path.file_name()`, and mirror that correction in the rendered planning docs.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/metadata.json",
+              "line": 30,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7b726cbb78b5a617cd3d7296e9a93a86dedcc31bcdcd1a0d59fbbf79d67e5048",
+          "at": "2026-04-15T11:59:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T004 manual verification commands are too broad to validate the planned change reliably. `rg 'render_type_catalogue\\(' libs/infrastructure/src/ apps/cli/src/` also matches the function definition and many unit tests, and `cargo nextest run -p infrastructure type_catalogue_render` runs the whole renderer test module, so the documented expectation of only `2 matches` / `6 test pass` cannot be satisfied. Narrow these checks to the two production call sites and the specific updated/new tests.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/verification.md",
+              "line": 55,
+              "category": "verification"
+            },
+            {
+              "message": "The ADR-status verification command is incorrect. The ADR uses a `## Status` heading followed by `Accepted`, so `rg '^Status$' ...` returns no match and cannot prove acceptance; the expected output `Status: Accepted` is also inconsistent with the file format. Replace this with a check that matches the actual heading/body layout.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/verification.md",
+              "line": 99,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:fff5b3f63ddad7d1e46b4fcec6a6ba912581d8bfbcf7abe9a1958666cdb417df",
+          "at": "2026-04-15T12:05:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ef5c1bb6dc1c051f7c2ce5cb5fcaba59c05b90c783b3b606f60b801aa4f7ec0b",
+          "at": "2026-04-15T12:08:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`D3`'s pseudocode still uses `.expect(\"builtin fallback must parse\")` for the synthetic fallback. If implemented as written, that reintroduces a panic path in library code, which this repo explicitly forbids outside tests. Replace the `expect` with normal error propagation (for example `map_err(...)?`) or construct the fallback binding without a fallible parse step.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+              "line": 147,
+              "category": "correctness"
+            },
+            {
+              "message": "The `T004` manual verification block is still written for the old design: it searches for `resolve_tddd_layer_bindings` and says to expect a helper to be newly added, even though the ADR/spec now require direct reuse of `parse_tddd_layers` with no new helper. The same block also says `rg 'render_type_catalogue\\(' ...` should return exactly 2 matches, but that command also matches the function definition and tests. Update these checks so reviewers can validate the intended implementation instead of failing on stale instructions.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/verification.md",
+              "line": 51,
+              "category": "consistency"
+            },
+            {
+              "message": "`metadata.json` was edited in this patch, but `updated_at` still says `2026-04-15T11:30:00Z`. That is already older than the corresponding `spec.json`/`spec.md` re-approval at `2026-04-15T12:30:01Z`, and this repo uses `updated_at` to resolve the latest active track on `main`. Leaving the stale timestamp here can make tooling rank this track incorrectly. Bump `updated_at` to the actual UTC edit time when changing the metadata.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/metadata.json",
+              "line": 8,
+              "category": "process"
+            }
+          ],
+          "hash": "rvw1:sha256:7e915773017ae7604356eda6497cd0c010d66ebdbde92bbbf3263ec4ecfe3fd5",
+          "at": "2026-04-15T12:34:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 is missing the required `> Note:` explaining that the ADR-first gate is recorded in `spec.json::constraints`, and the ADR ends without a `## References` section. Add both so the Nygard structure matches the review brief and the process/decision split stays explicit.",
+              "severity": "P2",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+              "line": 172,
+              "category": "documentation"
+            },
+            {
+              "message": "`Reassess When` stops after two items. The brief expects a fuller trigger list, including an explicit condition for revisiting B2 if cross-track mistakes increase. Add the missing triggers so future re-evaluation criteria are concrete.",
+              "severity": "P2",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+              "line": 257,
+              "category": "documentation"
+            }
+          ],
+          "hash": "rvw1:sha256:eba4cc08e870ef408d0fa422c47779911ef9b7124a7ab0b52f5e9b332d36e620",
+          "at": "2026-04-15T12:54:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:712e372f128d27f9dae6c63a6d376e0bde7b439a47080a10920ce05e1109221a",
+          "at": "2026-04-15T12:56:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99e82f77ff45b3470a8cbb076be6e822e22d376bf5ed9dc8b57cd851c9ebf84e",
+          "at": "2026-04-15T13:02:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ece56089092a7530ffa559dd54db4c8dd5a1263a6df7f8ac7db0b6bc8349ccb",
+          "at": "2026-04-15T13:27:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ece56089092a7530ffa559dd54db4c8dd5a1263a6df7f8ac7db0b6bc8349ccb",
+          "at": "2026-04-15T13:33:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec0389b8b4b639848698fb82dbe539ddd8f3387cc51fb2712d16f5487978f641",
+          "at": "2026-04-15T13:42:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec0389b8b4b639848698fb82dbe539ddd8f3387cc51fb2712d16f5487978f641",
+          "at": "2026-04-15T13:50:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7137a7f67b7d349312b99586c4c01f92cd48193818e4d0ed4a49890a4190627f",
+          "at": "2026-04-15T14:21:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7137a7f67b7d349312b99586c4c01f92cd48193818e4d0ed4a49890a4190627f",
+          "at": "2026-04-15T14:22:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e7f10ad6f4a152bd3ba8a8a3a021c6cabb7639a11efa23119610f737e2b5297",
+          "at": "2026-04-15T14:26:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e7f10ad6f4a152bd3ba8a8a3a021c6cabb7639a11efa23119610f737e2b5297",
+          "at": "2026-04-15T14:27:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba11a3dc38719ba86084a6a5fef1f781b7dc53b787ae04fe19ee7e3c9a78ac74",
+          "at": "2026-04-15T14:32:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` marks T007 smoke-test verification as complete, but the same file later says the only observed run was a no-op on `catalogue-active-guard-fix-2026-04-15` and that there is no active multi-layer track to confirm per-layer generation on yet. That means the claimed manual confirmation that `track-sync-views` generated rendered views for \"all active tracks\" is not actually supported by the recorded verification and should not be checked off as written.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/verification.md",
+              "line": 22,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:ba11a3dc38719ba86084a6a5fef1f781b7dc53b787ae04fe19ee7e3c9a78ac74",
+          "at": "2026-04-15T14:33:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c828c17f979ce7047466f1cf586466da0282a62682b564358310488d0166a7c9",
+          "at": "2026-04-15T14:36:24Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Move `architecture-rules.json` loading behind the `is_done_or_archived` guard. Right now frozen tracks still parse the repo-level rules file, so a malformed or unreadable rules file will make `sync_rendered_views` fail even though the type-catalogue path should be a no-op for done/archived tracks.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "line": 579,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:0d2283b2514f0c15d39e04b5100dc8fb96b291821791f0082e21ff2c5f54db7e",
+          "at": "2026-04-15T13:44:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23a5370c0adc1d4067f16d921a591b8bbd24a6a4772755e22ea885bff9743050",
+          "at": "2026-04-15T13:48:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_catalogue` now interpolates `source_file_name` directly into the generated HTML comment header. In T004 that string comes from `architecture-rules.json` (`binding.catalogue_file()` in `sync_rendered_views`), but the existing validation only rejects path separators / `..` / `::`. A catalogue file name containing `-->` or a newline is therefore accepted and will break out of the comment, injecting arbitrary markdown into the rendered `*-types.md`. This needs escaping or stricter filename validation before writing the header.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 64,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:23a5370c0adc1d4067f16d921a591b8bbd24a6a4772755e22ea885bff9743050",
+          "at": "2026-04-15T13:52:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new multilayer loop writes each layer to `binding.rendered_file()` but never checks that those rendered paths are unique. `parse_tddd_layers` only rejects duplicate `catalogue_file` values, so configs like `catalogue_file: \"foo\"` and `catalogue_file: \"foo.json\"` are both accepted yet both resolve to `foo.md`; the later layer silently overwrites the earlier rendered view. Reject non-`.json` catalogue names or validate uniqueness on the derived markdown path before iterating.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 607,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e73ebe49f2520ae770f0b958ba000858e85b76da0da25b1601ff299d5814a45e",
+          "at": "2026-04-15T14:00:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rendered-path collision guard reserves `binding.rendered_file()` before checking whether that layer actually has a catalogue file. With a valid-but-colliding config such as `catalogue_file: \"foo\"` and `catalogue_file: \"foo.json\"`, if `track/foo` is absent but `track/foo.json` exists, the first layer is silently skipped by the per-layer opt-out and still marks `foo.md` as seen, so the second layer is also skipped and no rendered view is produced. This breaks the stated 'catalogue file absent -> skip that layer only' behavior and lets one layer's absence suppress another layer's render.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 605,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c31758998d7884a34e3f0d611e87ccdb5b796b97ed9ff22350b6ce9754132be2",
+          "at": "2026-04-15T14:05:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new multi-layer regression test does not cover the D3 guarantee that a malformed `*-types.json` in one enabled layer must not block rendering the other layers. `sync_rendered_views_generates_multiple_layer_types_md_independently` only exercises the all-valid case, so a future early-return regression in the per-layer `TypeCatalogueCodecError::Json` path would slip through without a failing test.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 2396,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:d96f46960ceaaf7047e0534fc6a2b3a0f8c888e57a5c492a9d5a8cde219baa77",
+          "at": "2026-04-15T14:08:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae9d1c747c59ba2de2030d36845d9bb520e98ccd439aa79dad3a44fc442f10a4",
+          "at": "2026-04-15T14:11:34Z"
+        }
+      ]
+    }
+  }
+}
