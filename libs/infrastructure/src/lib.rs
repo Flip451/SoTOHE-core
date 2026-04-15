@@ -8,6 +8,7 @@ pub mod git_cli;
 pub mod guides_codec;
 pub mod review_v2;
 pub mod schema_export;
+pub mod schema_export_codec;
 #[cfg(test)]
 mod schema_export_tests;
 pub mod shell;

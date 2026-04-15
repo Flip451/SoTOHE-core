@@ -6,7 +6,7 @@
   "goal": [
     "2026-04-07 の bridge01 commit `a5e4c6b` (track `bridge01-export-schema-2026-04-06` の T005) で ADR を書かずに `libs/domain/Cargo.toml` に `serde = { version = \"1\", features = [\"derive\"] }` 依存が追加されたプロセス違反を回復し、`libs/domain/src/schema.rs` の 6 型 (SchemaExport / TypeKind / TypeInfo / FunctionInfo / TraitInfo / ImplInfo) と `libs/domain/src/tddd/catalogue.rs` の 3 型 (ParamDeclaration / MethodDeclaration / MemberDeclaration) に付与された `Serialize` derive を全削除し、domain crate を wire format に対する非依存 (hexagonal 純粋性) に戻す。",
     "対応する DTO 群を `libs/infrastructure/src/schema_export_codec.rs` (新設) に Serialize-only で定義し、`From<&domain::T> for TDto` 変換を実装する。`apps/cli/src/commands/domain.rs::export_schema()` を `serde_json::to_string[_pretty](&schema)` の直接呼び出しから `infrastructure::schema_export_codec::encode(&schema, args.pretty)` 委譲に書き換え、CLI が serialization 知識を持たない hexagonal composition root 責務を遵守する。BRIDGE-01 の JSON wire format (SchemaExport の Rust struct field 名がそのまま JSON key になる de-facto 形式) は完全に維持する。",
-    "副次目的として infrastructure 層 TDDD の partial dogfood を開始する: `architecture-rules.json` の infrastructure tddd を `enabled: false` → `enabled: true` に flip し、`/track:design --layer infrastructure` 経由で本トラックで新設する DTO 群 (8 entries) を `infrastructure-types.json` に先行宣言する (T002 時点で Yellow=8、T003 の DTO 実装で Blue=8 に遷移)。domain / usecase layer は **per-layer opt-out** (`{layer}-types.json` を本 track 配下に作らない → `spec_states.rs::evaluate_layer_catalogue` が NotFound → skip を返す)。Adapter variant の TypeDefinitionKind 拡張、verify modules / review_v2 adapters / git wrappers / hook handlers などの完全な infrastructure catalogue 充実、CI rustdoc cache 戦略 (ADR 0002 §3.E) は本トラックの out_of_scope であり、後続の `tddd-05-infra-wiring` トラック (Track 2) に引き継ぐ。",
+    "副次目的として infrastructure 層 TDDD の partial dogfood を開始する: `architecture-rules.json` の infrastructure tddd を `enabled: false` → `enabled: true` に flip し、`/track:design --layer infrastructure` 経由で本トラックで新設する DTO 群 (9 entries: 6 dto + 2 enum + 1 error_type) を `infrastructure-types.json` に先行宣言する (T002 時点で当初 8 entries → T003 実装時点で 9 entries に補正; T003 完了後 Yellow=9 → Blue=9 に遷移)。domain / usecase layer は **per-layer opt-out** (`{layer}-types.json` を本 track 配下に作らない → `spec_states.rs::evaluate_layer_catalogue` が NotFound → skip を返す)。Adapter variant の TypeDefinitionKind 拡張、verify modules / review_v2 adapters / git wrappers / hook handlers などの完全な infrastructure catalogue 充実、CI rustdoc cache 戦略 (ADR 0002 §3.E) は本トラックの out_of_scope であり、後続の `tddd-05-infra-wiring` トラック (Track 2) に引き継ぐ。",
     "新 ADR `2026-04-14-1531-domain-serde-ripout.md` で bridge01 commit a5e4c6b のプロセス違反を Resolved 状態として明示し、`knowledge/adr/2026-04-14-0625-finding-taxonomy-cleanup.md` D6 の \"domain crate 既に serde 依存あり、本 track 範囲外\" 記述に対する追補として cross-reference する。`knowledge/adr/README.md` の索引にも併せて新 ADR を追加し、未登録の 2 ADR (`2026-04-13-1813-tddd-taxonomy-expansion.md`, `2026-04-14-0625-finding-taxonomy-cleanup.md`) も同時に索引追加する。"
   ],
   "scope": {
@@ -23,7 +23,7 @@
         ]
       },
       {
-        "text": "`/track:design --layer infrastructure` を起動し、TDDD Phase 1 (先行型宣言) を実施する。`designer` capability が SKILL.md (`.claude/commands/track/design.md`) の Step 2-4 を自動実施: (a) `track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json` を 8 entries で作成 (7 `dto` kind + 1 `error_type` kind、`action` は省略 = `add` default), (b) `sotp track baseline-capture --layer infrastructure` で `infrastructure-types-baseline.json` 生成, (c) `sotp track type-signals --layer infrastructure` で初期 signals 評価 (この時点で `blue=0 yellow=8 red=0`), (d) `infrastructure-types.md` rendered view 生成",
+        "text": "`/track:design --layer infrastructure` を起動し、TDDD Phase 1 (先行型宣言) を実施する。`designer` capability が SKILL.md (`.claude/commands/track/design.md`) の Step 2-4 を自動実施: (a) `track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json` を 9 entries で作成 — 6 × `dto` kind (struct DTO) + 2 × `enum` kind (`MemberDeclarationDto` with `expected_variants: [\"Variant\", \"Field\"]`, `TypeKindDto` with `expected_variants: [\"Struct\", \"Enum\", \"TypeAlias\"]`) + 1 × `error_type` kind (`SchemaExportCodecError`)。`action` は省略 = `add` default。**当初計画 (T002 実行時点) の \"8 entries\" は実装時点で補正された**: `MemberDeclarationDto` / `TypeKindDto` は Rust `enum` 型であり、`dto` kind は struct 前提のため `enum` kind に変更した。さらに `TypeKindDto` は `TypeInfoDto::kind` public field 型として使われるため Rust E0446 により `pub` 必須で、当初の \"private 除外\" 案は実装不可。補正は T003 実装時に catalogue を in-place で更新し、metadata/spec/ADR も追従する。(b) `sotp track baseline-capture --layer infrastructure` で `infrastructure-types-baseline.json` 生成, (c) `sotp track type-signals --layer infrastructure` で初期 signals 評価 (この時点で `blue=0 yellow=9 red=0`), (d) `infrastructure-types.md` rendered view 生成",
         "sources": [
           "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8",
           "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md §5"
@@ -43,9 +43,11 @@
         ]
       },
       {
-        "text": "`libs/infrastructure/src/schema_export_codec.rs` を新規作成し、8 個の Serialize-only DTO 型 (`SchemaExportDto` / `TypeKindDto` / `TypeInfoDto` / `MemberDeclarationDto` / `SchemaParamDto` / `FunctionInfoDto` / `TraitInfoDto` / `ImplInfoDto`) と `SchemaExportCodecError` (`Json(#[from] serde_json::Error)`) を定義する。catalogue に登録する 7 DTO (`SchemaExportDto` / `TypeInfoDto` / `FunctionInfoDto` / `TraitInfoDto` / `ImplInfoDto` / `MemberDeclarationDto` / `SchemaParamDto`) および `SchemaExportCodecError` は `pub` で定義すること — `type-signals` は rustdoc JSON の public surface のみを評価するため、private 型は Yellow のまま Blue に遷移できない。`TypeKindDto` は catalogue 除外のため private で可。8 個の `impl From<&domain::T> for TDto` を infallible に実装し (`From<&SchemaExport>`, `From<&TypeKind>`, `From<&TypeInfo>`, `From<&MemberDeclaration>`, `From<&ParamDeclaration>`, `From<&FunctionInfo>`, `From<&TraitInfo>`, `From<&ImplInfo>`)、`pub fn encode(schema: &SchemaExport, pretty: bool) -> Result<String, SchemaExportCodecError>` を提供する。`libs/infrastructure/src/lib.rs` に `pub mod schema_export_codec;` を追加する。実装完了後に `bin/sotp track type-signals --layer infrastructure` を再実行し、T002 で yellow=8 だった signals が **blue=8** に遷移していることを確認する",
+        "text": "`libs/infrastructure/src/schema_export_codec.rs` を新規作成し、9 個の Serialize-only 型 (6 structs: `SchemaExportDto` / `TypeInfoDto` / `FunctionInfoDto` / `TraitInfoDto` / `ImplInfoDto` / `SchemaParamDto` + 2 enums: `TypeKindDto` / `MemberDeclarationDto` + 1 error enum: `SchemaExportCodecError` with `Json(#[from] serde_json::Error)`) を定義する。全 9 型を `pub` で定義すること — `type-signals` は rustdoc JSON の public surface のみを評価するため private 型は Blue に遷移できない。`TypeKindDto` は `TypeInfoDto::kind` public field 型として使われるため Rust E0446 により `pub` 必須。8 個の `impl From<&domain::T> for TDto` を infallible に実装し (`From<&SchemaExport>`, `From<&TypeKind>`, `From<&TypeInfo>`, `From<&MemberDeclaration>`, `From<&ParamDeclaration>`, `From<&FunctionInfo>`, `From<&TraitInfo>`, `From<&ImplInfo>`)、`pub fn encode(schema: &SchemaExport, pretty: bool) -> Result<String, SchemaExportCodecError>` を提供する。`libs/infrastructure/src/lib.rs` に `pub mod schema_export_codec;` を追加する。実装完了後に `bin/sotp track type-signals --layer infrastructure` を再実行し、T002 で yellow=9 だった signals が **blue=9** に遷移していることを確認する",
         "sources": [
           "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D1",
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D3",
+          "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8",
           "knowledge/conventions/hexagonal-architecture.md"
         ],
         "task_refs": [
@@ -142,7 +144,7 @@
         ]
       },
       {
-        "text": "infrastructure 層全体の catalogue 充実 (verify modules / review_v2 adapters / git wrappers / hook handlers / 各種 store などの 40-80 entries) は対象外。本トラックは本 track で生まれた 8 DTO のみを seed する partial dogfood に限定する",
+        "text": "infrastructure 層全体の catalogue 充実 (verify modules / review_v2 adapters / git wrappers / hook handlers / 各種 store などの 40-80 entries) は対象外。本トラックは本 track で生まれた 9 types (6 dto + 2 enum + 1 error_type) のみを seed する partial dogfood に限定する",
         "sources": [
           "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8",
           ".claude/rules/10-guardrails.md"
@@ -254,7 +256,7 @@
       ]
     },
     {
-      "text": "infrastructure 層 catalogue (`infrastructure-types.json`) の seed は本トラックで T002 が宣言する 7 `dto` + 1 `error_type` (計 8 entries) のみに限定する。verify modules / review_v2 adapters / git wrappers などの完全な catalogue 充実は Track 2 (`tddd-05-infra-wiring`) に明示的に分離する。本トラック内で catalogue を膨らませると review concern が混ざり <500 行 per commit guideline を破る",
+      "text": "infrastructure 層 catalogue (`infrastructure-types.json`) の seed は本トラックで T002 が宣言する 6 `dto` + 2 `enum` + 1 `error_type` (計 9 entries) のみに限定する。verify modules / review_v2 adapters / git wrappers などの完全な catalogue 充実は Track 2 (`tddd-05-infra-wiring`) に明示的に分離する。本トラック内で catalogue を膨らませると review concern が混ざり <500 行 per commit guideline を破る",
       "sources": [
         ".claude/rules/10-guardrails.md",
         "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8"
@@ -295,7 +297,7 @@
       ]
     },
     {
-      "text": "各 commit は <500 行 diff を遵守する。本トラックは 5 commits に分割: Commit 1 (T001 ~42 行 — architecture-rules.json ~6 行 + 6 prereq doc fix ~6 行 + verification.md ~30 行), Commit 2 (T002 ~150 行 — catalogue + baseline + rendered md), Commit 3 (T003 ~150 行 — schema_export_codec.rs + unit test), Commit 4 (T004 ~36 行 — serde 削除 + CLI 書き換え + test 更新), Commit 5 (T005 ~33 行 — README 索引 + verification)。各 commit で workspace 全体が compile-clean であること",
+      "text": "各 commit は <500 行 diff を遵守する。本トラックは 5 commits に分割: Commit 1 (T001 ~42 行 — architecture-rules.json ~6 行 + 6 prereq doc fix ~6 行 + verification.md ~30 行), Commit 2 (T002 ~150 行 — catalogue + baseline + rendered md), Commit 3 (T003 ~356 行 — schema_export_codec.rs + 8 From impls + 5 unit tests + catalogue 9 entries 補正), Commit 4 (T004 ~36 行 — serde 削除 + CLI 書き換え + test 更新), Commit 5 (T005 ~33 行 — README 索引 + verification)。各 commit で workspace 全体が compile-clean であること",
       "sources": [
         ".claude/rules/10-guardrails.md",
         "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D9"
@@ -344,7 +346,7 @@
       ]
     },
     {
-      "text": "`libs/infrastructure/src/schema_export_codec.rs` が存在し、`pub fn encode(schema: &SchemaExport, pretty: bool) -> Result<String, SchemaExportCodecError>` が公開されていること。`SchemaExportDto` / `TypeInfoDto` / `FunctionInfoDto` / `TraitInfoDto` / `ImplInfoDto` / `TypeKindDto` / `MemberDeclarationDto` / `SchemaParamDto` の 8 DTO が定義され、それぞれに対応する `From<&domain::T> for TDto` 実装が存在すること",
+      "text": "`libs/infrastructure/src/schema_export_codec.rs` が存在し、`pub fn encode(schema: &SchemaExport, pretty: bool) -> Result<String, SchemaExportCodecError>` が公開されていること。`SchemaExportDto` / `TypeInfoDto` / `FunctionInfoDto` / `TraitInfoDto` / `ImplInfoDto` / `SchemaParamDto` (6 structs) + `TypeKindDto` / `MemberDeclarationDto` (2 enums) + `SchemaExportCodecError` (error_type) の 9 型が `pub` 可視性で定義され、8 個の `From<&domain::T> for TDto` 実装 (including `From<&TypeKind> for TypeKindDto`) が存在すること",
       "sources": [
         "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D3"
       ],
@@ -382,7 +384,7 @@
       ]
     },
     {
-      "text": "`track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json` が存在し、8 entries (7 dto + 1 error_type) が seed されていること。`track/items/domain-serde-ripout-2026-04-15/infrastructure-types-baseline.json` も存在すること (`/track:design --layer infrastructure` の Step 4.1 baseline-capture で生成)",
+      "text": "`track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json` が存在し、9 entries (6 dto + 2 enum + 1 error_type) が seed されていること。`track/items/domain-serde-ripout-2026-04-15/infrastructure-types-baseline.json` も存在すること (`/track:design --layer infrastructure` の Step 4.1 baseline-capture で生成)",
       "sources": [
         "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8",
         "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md §5"
@@ -392,7 +394,7 @@
       ]
     },
     {
-      "text": "T002 完了直後 (DTO 未実装時点) に `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` の出力が `blue=0 yellow=8 red=0` であること (declared だが未実装 = Yellow を示す)",
+      "text": "T002 完了直後 (DTO 未実装時点) に `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` の出力が `blue=0 yellow=9 red=0` であること (declared だが未実装 = Yellow を示す)。当初の T002 commit 時点では 8 entries で catalogue が作られ signal は `blue=0 yellow=8 red=0 (total=8)` であったが (全 8 entries が未実装のため Yellow)、T003 実装時点で `MemberDeclarationDto` / `TypeKindDto` を `enum` kind に補正して 9 entries に拡張し、この期待値を満たすようになった",
       "sources": [
         "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md §3"
       ],
@@ -401,7 +403,7 @@
       ]
     },
     {
-      "text": "T003 完了後に `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` の出力が `blue=8 yellow=0 red=0` に遷移していること (declared + 実装 = Blue)。さらに T004 完了後も blue=8 を維持していること (serde 削除による回帰なし — `build_type_graph` が trait impls を除外するため)",
+      "text": "T003 完了後に `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` の出力が `blue=9 yellow=0 red=0` に遷移していること (declared + 実装 = Blue)。さらに T004 完了後も blue=9 を維持していること (serde 削除による回帰なし — `build_type_graph` が trait impls を除外するため)",
       "sources": [
         "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md §3",
         "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D8"
@@ -476,6 +478,6 @@
     "yellow": 0,
     "red": 0
   },
-  "approved_at": "2026-04-15T03:37:30Z",
-  "content_hash": "sha256:96ce0a72d2ea41e1d0c03793e6a2306566bb7608707ba8fadb31d0f9d5bff894"
+  "approved_at": "2026-04-15T05:23:39Z",
+  "content_hash": "sha256:669c50448e7889a684b8bfba11ec643ccfa015308cdda2284bde72515a744d0f"
 }

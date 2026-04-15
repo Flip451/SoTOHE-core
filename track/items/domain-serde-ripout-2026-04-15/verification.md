@@ -4,20 +4,20 @@
 
 - [ ] T001: infrastructure 層 rustdoc viability audit が成功し、wall time が記録されている (collision warning 有無は plain rustdoc では検出不可、T002 の baseline-capture 結果を参照)
 - [ ] T001: `architecture-rules.json` の infrastructure tddd が `enabled: true` に flip され、`catalogue_file` / `schema_export.targets` が設定されている
-- [ ] T002: `/track:design --layer infrastructure` が成功し、`track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json` (8 entries) + `infrastructure-types-baseline.json` + `infrastructure-types.md` rendered view が生成されている
-- [ ] T002: `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` が `blue=0 yellow=8 red=0` (初期状態、DTO 未実装) を返している
+- [ ] T002: `/track:design --layer infrastructure` が成功し、`track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json` (9 entries after T003 correction — 6 dto + 2 enum + 1 error_type) + `infrastructure-types-baseline.json` + `infrastructure-types.md` rendered view が生成されている
+- [ ] T002: `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` が `blue=0 yellow=9 red=0` (初期状態、DTO 未実装、T003 で 9 entries に補正後) を返している
 - [ ] T002: `track/items/domain-serde-ripout-2026-04-15/` 配下に `domain-types.json` / `usecase-types.json` が存在しない (per-layer opt-out)
-- [ ] T003: `libs/infrastructure/src/schema_export_codec.rs` が新規作成され、8 DTO + `SchemaExportCodecError` + 8 `From` 実装 + `pub fn encode()` が定義されている
+- [ ] T003: `libs/infrastructure/src/schema_export_codec.rs` が新規作成され、9 pub types (6 structs + 2 enums + 1 error_enum) + 8 `From` 実装 + `pub fn encode()` が定義されている
 - [ ] T003: `libs/infrastructure/src/lib.rs` に `pub mod schema_export_codec;` が追加されている
-- [ ] T003: unit test (空 schema / 1 type/function/trait/impl / pretty vs compact) が全通過している
-- [ ] T003: `type-signals --layer infrastructure` が `blue=8 yellow=0 red=0` に遷移している (yellow=8 → blue=8)
+- [ ] T003: unit test (5 ケース: empty schema / 1 type-function-trait-impl / pretty vs compact / externally-tagged MemberDeclaration / PascalCase TypeKind) が全通過している
+- [ ] T003: `type-signals --layer infrastructure` が `blue=9 yellow=0 red=0` に遷移している (yellow=9 → blue=9)
 - [ ] T004: `libs/domain/src/schema.rs` から `use serde::Serialize;` と 6 derive が削除されている
 - [ ] T004: `libs/domain/src/tddd/catalogue.rs` から `use serde::Serialize;` と 3 derive (MethodDeclaration の dead code 含む) が削除されている
 - [ ] T004: `libs/domain/Cargo.toml` から `serde` 依存が削除されている
 - [ ] T004: `apps/cli/src/commands/domain.rs::export_schema()` が `infrastructure::schema_export_codec::encode()` 経由に書き換えられている
 - [ ] T004: `libs/infrastructure/src/schema_export_tests.rs` が `schema_export_codec::encode` 経由のテストに更新されている
 - [ ] T004: `cargo make export-schema -- --crate domain --pretty` の出力 JSON が変更前と structural に同一であることを手動 diff で確認済み
-- [ ] T004: `type-signals --layer infrastructure` が依然として `blue=8` を維持している (serde 削除による回帰なし)
+- [ ] T004: `type-signals --layer infrastructure` が依然として `blue=9` を維持している (serde 削除による回帰なし)
 - [ ] T005: `knowledge/adr/README.md` の信号機アーキテクチャ section に本 ADR + 未登録 2 ADR が索引追加されている
 - [ ] T005: Track 2 引継ぎ事項セクションの 5 項目が埋まっている
 - [ ] `cargo make ci` 全通過 (fmt-check + clippy -D warnings + test + deny + check-layers + verify-spec-states + verify-arch-docs)
@@ -51,7 +51,7 @@ ls track/items/domain-serde-ripout-2026-04-15/infrastructure-types-baseline.json
 ls track/items/domain-serde-ripout-2026-04-15/infrastructure-types.md
 
 # catalogue の entry 数
-jq '.type_definitions | length' track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json   # expect: 8
+jq '.type_definitions | length' track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json   # expect: 9 (after T003 catalogue correction from 8 → 9 entries)
 jq '.schema_version' track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json              # expect: 2
 
 # 全 entry が approved=true
@@ -60,14 +60,14 @@ jq '.type_definitions[] | select(.approved == false)' track/items/domain-serde-r
 
 # 初期 signal (DTO 未実装時点)
 bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure
-# expect: blue=0 yellow=8 red=0 (total=8)
+# expect: blue=0 yellow=9 red=0 (total=9) — after T003 catalogue correction from 8 → 9 entries
 
 # per-layer opt-out 確認
 ls track/items/domain-serde-ripout-2026-04-15/domain-types.json        # expect: not found
 ls track/items/domain-serde-ripout-2026-04-15/usecase-types.json       # expect: not found
 
 # Stage 2 spec-states は per-layer で NotFound → skip なので PASS
-cargo make ci    # expect: all pass (infrastructure が yellow=8 でも strict merge gate 前は interim allowed)
+cargo make ci    # expect: all pass (infrastructure が yellow=9 でも strict merge gate 前は interim allowed)
 ```
 
 ### 3. schema_export_codec 新設 (T003)
@@ -86,9 +86,9 @@ rg 'pub mod schema_export_codec' libs/infrastructure/src/lib.rs                 
 # unit test
 cargo test -p infrastructure --lib schema_export_codec                                       # expect: all pass
 
-# signal 遷移: yellow=8 → blue=8
+# signal 遷移: yellow=9 → blue=9 (after T003 catalogue correction 8 → 9 entries)
 bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure
-# expect: blue=8 yellow=0 red=0
+# expect: blue=9 yellow=0 red=0
 ```
 
 ### 4. domain serde 除去 (T004)
@@ -116,7 +116,7 @@ cargo make export-schema -- --crate domain --pretty > /tmp/after.json
 
 # 回帰確認: infrastructure signal 維持
 bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure
-# expect: blue=8 yellow=0 red=0 (serde 削除による回帰なし — build_type_graph が trait impls を除外)
+# expect: blue=9 yellow=0 red=0 (serde 削除による回帰なし — build_type_graph が trait impls を除外)
 ```
 
 ### 5. ADR README index + verification 完了 (T005)
@@ -160,18 +160,47 @@ cargo make ci
 - **architecture-rules.json flip**: `infrastructure.tddd` changed from `{"enabled": false}` to `{"enabled": true, "catalogue_file": "infrastructure-types.json", "schema_export": {"method": "rustdoc", "targets": ["infrastructure"]}}`.
 - **`cargo make ci` after flip**: PASS (Build Done in 16.73s). fmt-check / clippy -D warnings / nextest (1940 tests) / deny / check-layers / verify-spec-states / verify-* all PASSED. Warnings are pre-existing (module size, pub String fields) and not introduced by this task.
 
-### T002 (2026-04-14)
+### T002 (2026-04-14, commit 800bddf — initial; corrected during T003)
 
-- **`/track:design --layer infrastructure`** の Step 2-4 を順次実行:
-  - **Step 2 (type design)**: 8 entries designed — 7 × `dto` kind (`SchemaExportDto`, `TypeInfoDto`, `FunctionInfoDto`, `TraitInfoDto`, `ImplInfoDto`, `MemberDeclarationDto`, `SchemaParamDto`) + 1 × `error_type` kind (`SchemaExportCodecError` with `expected_variants: ["Json"]`). All `approved: true`, `action` omitted (= `add` default). `TypeKindDto` intentionally excluded (private enum).
-  - **Step 3 (write catalogue)**: `track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json` created with schema_version 2 + 8 entries.
+- **`/track:design --layer infrastructure`** の Step 2-4 を順次実行。初期カタログは 8 entries で commit したが、T003 実装時点で 9 entries に補正した (下記「T002 scope 補正ノート」参照)。
+  - **Step 2 (type design, as committed in 800bddf)**: 8 entries designed — 7 × `dto` kind (`SchemaExportDto`, `TypeInfoDto`, `FunctionInfoDto`, `TraitInfoDto`, `ImplInfoDto`, `MemberDeclarationDto`, `SchemaParamDto`) + 1 × `error_type` kind (`SchemaExportCodecError` with `expected_variants: ["Json"]`). All `approved: true`, `action` omitted (= `add` default). `TypeKindDto` intentionally excluded (planned to be private).
+  - **Step 3 (write catalogue)**: `track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json` created with schema_version 2 + 8 entries (initial).
   - **Step 4.1 (baseline-capture)**: `bin/sotp track baseline-capture domain-serde-ripout-2026-04-15 --layer infrastructure --force` → wrote `infrastructure-types-baseline.json` containing **38 types + 2 traits**. No `same-name type collision for X` warning from `build_type_graph`.
-  - **Step 4.2 (type-signals)**: `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` → `blue=0 yellow=8 red=0 (total=8, undeclared=0, skipped=40)`. All 8 declared DTOs are Yellow because the code is not yet present (T003 will implement them). All 38 existing infrastructure types and 2 traits are in `B\A` and correctly classified as `skipped` (unchanged structure; 38 + 2 = 40 skipped total).
+  - **Step 4.2 (type-signals, initial 8-entry state)**: `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` → `blue=0 yellow=8 red=0 (total=8, undeclared=0, skipped=40)`. All 8 declared DTOs are Yellow because the code is not yet present (T003 will implement them). All 38 existing infrastructure types and 2 traits are in `B\A` and correctly classified as `skipped` (unchanged structure; 38 + 2 = 40 skipped total).
 - **Collision audit (deferred from T001)**: baseline-capture emitted no `same-name type collision` warnings on stderr. Infrastructure crate has no rustdoc-visible same-name type collisions as of this track.
 - **per-layer opt-out confirmed**: `track/items/domain-serde-ripout-2026-04-15/` contains no `domain-types.json` and no `usecase-types.json`. `spec_states.rs::evaluate_layer_catalogue` skips both layers at Stage 2. Stage 2 spec-states PASS.
-- **`cargo make ci`**: PASS (Build Done in 11.86s). `verify-spec-states` emits the expected interim warning listing the 8 Yellow types and noting "merge gate will block these until upgraded to Blue" — this is the intended TDDD WIP signal state and will clear in T003.
+- **`cargo make ci` (T002 commit時)**: PASS (Build Done in 11.86s). `verify-spec-states` emits the expected interim warning listing the 8 Yellow types.
 
-(T003 以降は各 task 完了時に追記)
+#### T002 scope 補正ノート (T003 commit 時に判明)
+
+T003 実装時点で上記 8 entries のうち 2 点が catalogue の kind と不一致であることが type-signals の出力から判明した:
+
+1. **`MemberDeclarationDto` was Red (kind mismatch)**: T002 catalogue declared it as `kind: "dto"`, but the actual Rust type is an `enum` with two variants (`Variant(String)` and `Field { name, ty }`). The TDDD `dto` kind expects a Rust `struct` and emits Red for enum-shaped declarations. Fix: change to `kind: "enum"` with `expected_variants: ["Variant", "Field"]`.
+2. **`TypeKindDto` was undeclared Red**: T002 catalogue intentionally excluded `TypeKindDto` on the assumption it could stay private. However, `TypeKindDto` is used as the type of the public field `TypeInfoDto::kind`, and Rust E0446 (private type in public interface) forces it to be `pub`. As a result, it shows up in the rustdoc public surface as an undeclared type → Red. Fix: add a 9th catalogue entry with `kind: "enum"` and `expected_variants: ["Struct", "Enum", "TypeAlias"]`.
+
+Net result: catalogue expanded from 8 → 9 entries (6 × `dto` + 2 × `enum` + 1 × `error_type`). All 9 entries are declared `pub` in the Rust implementation, and `type-signals --layer infrastructure` transitions `yellow=9 → blue=9` after T003's implementation. The correction is persisted in `infrastructure-types.json`, metadata.json T002 plan description, spec.json, and ADR §D3 / §D8 in the T003 commit. The T002 commit itself (800bddf) is left unchanged — it represents the 8-entry state at that point in history.
+
+### T003 (2026-04-14)
+
+- **`libs/infrastructure/src/schema_export_codec.rs`** 新規作成 (~330 行 including unit tests).
+  - 9 pub types defined: 6 structs (`SchemaExportDto`, `TypeInfoDto`, `FunctionInfoDto`, `TraitInfoDto`, `ImplInfoDto`, `SchemaParamDto`) + 2 enums (`TypeKindDto`, `MemberDeclarationDto`) + 1 error enum (`SchemaExportCodecError`).
+  - 8 `impl From<&domain::T> for TDto` implementations (all infallible — `clone`/`iter().map()` only, no unwrap/expect/panic).
+  - `pub fn encode(schema: &SchemaExport, pretty: bool) -> Result<String, SchemaExportCodecError>`.
+  - All Option fields keep their domain-equivalent serialization (no `#[serde(skip_serializing_if)]` to preserve BRIDGE-01 wire format).
+  - `MemberDeclarationDto` uses serde default (externally-tagged) to match the current domain `MemberDeclaration` wire format: `{"Variant": "name"}` / `{"Field": {"name": "...", "ty": "..."}}`.
+  - `TypeKindDto` uses serde default (externally-tagged, PascalCase variant names): `"Struct"` / `"Enum"` / `"TypeAlias"`.
+- **`libs/infrastructure/src/lib.rs`**: added `pub mod schema_export_codec;`.
+- **Unit tests (5 cases)**:
+  1. `encode_empty_schema_produces_valid_json_with_crate_name` — empty schema encodes to valid JSON.
+  2. `encode_single_entries_each_category` — 1 type + 1 function + 1 trait + 1 impl assertions.
+  3. `encode_pretty_vs_compact` — pretty contains `\n`, compact does not.
+  4. `encode_member_declaration_variant_uses_externally_tagged_form` — externally-tagged verification.
+  5. `encode_type_kind_uses_pascal_case_variants` — `Struct`/`Enum`/`TypeAlias` verification.
+- **`cargo nextest run`**: 1945 tests pass (5 new schema_export_codec tests + 1940 existing).
+- **Signal transition (after catalogue correction from 8 → 9 entries)**: `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` → `blue=9 yellow=0 red=0 (total=9, undeclared=0, skipped=40)`. All 9 catalogue entries transitioned from Yellow to Blue.
+- **`cargo make ci`**: PASS (subsequent to signal re-evaluation).
+
+(T004 以降は各 task 完了時に追記)
 
 ## Verified At
 
@@ -197,11 +226,13 @@ cargo make ci
 - **T002 で検出予定**: T002 の `/track:design --layer infrastructure` が内部で `baseline-capture` を走らせ、そこで `build_type_graph` が実行される。そのタイミングで `warning: same-name type collision for X` の有無を T002 の verification result に追記する。
 - **対応方針**: 本トラックでは記録のみ、Track 2 で rename cascade
 
-### 3. infrastructure-types.json に seed した DTO 一覧 (T002)
+### 3. infrastructure-types.json に seed した DTO 一覧 (T002 + T003 補正後)
 
-- 7 `dto` kind entry: `SchemaExportDto` / `TypeInfoDto` / `FunctionInfoDto` / `TraitInfoDto` / `ImplInfoDto` / `MemberDeclarationDto` / `SchemaParamDto`
+- 6 `dto` kind entry: `SchemaExportDto` / `TypeInfoDto` / `FunctionInfoDto` / `TraitInfoDto` / `ImplInfoDto` / `SchemaParamDto`
+- 2 `enum` kind entry: `MemberDeclarationDto` (`expected_variants: ["Variant", "Field"]`) / `TypeKindDto` (`expected_variants: ["Struct", "Enum", "TypeAlias"]`)
 - 1 `error_type` kind entry: `SchemaExportCodecError` (`expected_variants: ["Json"]`)
-- `TypeKindDto` は private enum のため catalogue から除外
+- 合計 9 entries (6 dto + 2 enum + 1 error_type)
+- **T003 補正ノート**: T002 commit 時点は 8 entries (MemberDeclarationDto を `dto` kind、TypeKindDto を private 除外) だったが、T003 実装時点で補正。`MemberDeclarationDto` は Rust `enum` のため `enum` kind に変更、`TypeKindDto` は Rust E0446 により `pub` 必須のため 9th entry として追加。
 
 ### 4. CI rustdoc 実行時間の体感 (T004 後)
 

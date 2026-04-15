@@ -16,6 +16,35 @@
           "findings": [],
           "hash": "rvw1:sha256:a8cde6d89c553349c4680dcc90f373d214d74e0f5894a0c4b74f383420763e56",
           "at": "2026-04-15T03:12:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:466a9455d9b5e36658a9977e35d89e61be2be4f536867b9ff5f2d6ed997555eb",
+          "at": "2026-04-15T04:37:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`pub mod schema_export_codec;` is now referenced from `lib.rs`, but `git status` shows `libs/infrastructure/src/schema_export_codec.rs` is still untracked, so the actual Git patch does not include the module source. If this change is committed as-is, the crate will fail to compile in CI because Rust cannot load the declared module.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/lib.rs",
+              "line": 11,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:466a9455d9b5e36658a9977e35d89e61be2be4f536867b9ff5f2d6ed997555eb",
+          "at": "2026-04-15T04:39:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:466a9455d9b5e36658a9977e35d89e61be2be4f536867b9ff5f2d6ed997555eb",
+          "at": "2026-04-15T04:41:21Z"
         }
       ]
     },
@@ -665,6 +694,240 @@
           "findings": [],
           "hash": "rvw1:sha256:4415f20fe25d419ff8099155126d7f4a2502bfcef5390367229a93d0230b5565",
           "at": "2026-04-15T04:03:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan summary still describes T003 as `yellow=8 -> blue=8` and the track as an 8-entry seed, but the corrected T003 block below says `blue=9` and `infrastructure-types.json` now has 9 entries. That leaves the metadata/plan view internally inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "line": 80,
+              "category": "consistency"
+            },
+            {
+              "message": "The top-level goal still says the track seeds 8 entries and reaches `Blue=8`, but the same spec later requires 9 entries / `blue=9` in scope and acceptance criteria, and the rendered `spec.md` mirrors the stale 8-entry goal. The spec is therefore contradictory.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 9,
+              "category": "consistency"
+            },
+            {
+              "message": "§D8/D9 still carry the pre-correction 8-entry story: `TypeKindDto` is described as a private/excluded enum at line 253, and the commit split at lines 262-269 still says `yellow=8 -> blue=8`. That conflicts with the correction note earlier in §D8 (8 -> 9) and with the live 9-entry catalogue.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 253,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:def08870953e4bcef7e0dd1083870ad54590d9562c7de9facecef92211d0d6b4",
+          "at": "2026-04-15T04:39:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The top-level goal still describes the infrastructure seed as 8 entries and says T003 reaches blue=8, but the rest of this file has already been corrected to the 9-entry / blue=9 state. This makes the goal section internally inconsistent and stale.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 9,
+              "category": "consistency"
+            },
+            {
+              "message": "`plan.summary` still says the infrastructure seed is 8 entries and that T002/T003 are yellow=8 → blue=8. That conflicts with the corrected 9-entry catalogue and blue=9 state documented elsewhere in the metadata, so the summary is out of date.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "line": 78,
+              "category": "consistency"
+            },
+            {
+              "message": "The Track 2 handoff note for the seeded DTO list still says there are 7 dto entries and that `TypeKindDto` is a private exclusion. The current catalogue is 6 dto + 2 enum + 1 error_type, with `TypeKindDto` now public and included, so this handoff section is factually wrong.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/verification.md",
+              "line": 229,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:def08870953e4bcef7e0dd1083870ad54590d9562c7de9facecef92211d0d6b4",
+          "at": "2026-04-15T04:41:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa28d32039d866d3fff2e1ecda6f018a1f1d8616cdc61695690c5b3e1c585421",
+          "at": "2026-04-15T04:46:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Rendered view header attributes this file to `domain-types.json`, but the content is the infrastructure catalogue view and should point at `infrastructure-types.json`. The source attribution is wrong.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/domain-serde-ripout-2026-04-15/infrastructure-types.md",
+              "line": 1,
+              "category": "source_attribution"
+            }
+          ],
+          "hash": "rvw1:sha256:aa28d32039d866d3fff2e1ecda6f018a1f1d8616cdc61695690c5b3e1c585421",
+          "at": "2026-04-15T04:48:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T002 manual verification steps are internally inconsistent with the current catalogue state: this line still expects `jq '.type_definitions | length'` to return `8`, but `infrastructure-types.json` now has 9 entries and the next check already assumes the corrected `blue=0 yellow=9 red=0` state. The verification recipe should be updated to the 9-entry catalogue or explicitly marked as historical.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/verification.md",
+              "line": 55,
+              "category": "numerical mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:968bb7dbfc6a96d8adbb1b5746a411900dbdb8a98fd44650133f907ad7d30bfe",
+          "at": "2026-04-15T04:50:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e7768d48a14aec116dfba010e6f8f9f5d0f20ddaffa41b25b8552b700f09841",
+          "at": "2026-04-15T04:52:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` still leaves T002's task SSoT in the pre-correction 8-entry state: it says `/track:design` seeds only 7 `dto` + 1 `error_type`, excludes `TypeKindDto` as private, and expects `blue=0 yellow=8 red=0`. That now contradicts the actual on-disk catalogue (`infrastructure-types.json` has 9 entries including `TypeKindDto` and `MemberDeclarationDto` as `enum` kinds) and the corrected 9-entry narrative elsewhere in this review scope.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "line": 96,
+              "category": "consistency"
+            },
+            {
+              "message": "`metadata.json`'s T003 description records the historical T002 signal as `blue=7 yellow=0 red=2`, but the actual T002 artefact at commit `800bddf` shows an 8-entry catalogue with all 8 declarations still `yellow` and no `schema_export_codec` module yet. That makes the correction note numerically wrong against the repository history it is describing.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "line": 101,
+              "category": "consistency"
+            },
+            {
+              "message": "`spec.json` repeats the same false history for T002, claiming the 8-entry catalogue produced `7 blue + 2 red`. The committed T002 catalogue records `blue=0 yellow=8 red=0`, so this acceptance criterion now bakes an incorrect baseline into the spec.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 395,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:9e7768d48a14aec116dfba010e6f8f9f5d0f20ddaffa41b25b8552b700f09841",
+          "at": "2026-04-15T04:56:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` still states `Commit 3 (T003 ~150 行 — schema_export_codec.rs + unit test)`, but the current T003 scope on disk includes the 9-entry catalogue correction and is documented elsewhere in this track as `~356` lines. Leaving the accepted spec at `~150` makes the commit-size plan numerically inconsistent with the actual T003 scope.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 298,
+              "category": "consistency"
+            },
+            {
+              "message": "ADR D9's review-granularity rationale still says the largest commits are T002/T003 at `~150` lines, which now contradicts the same ADR's updated commit table (`T003 ... ~356 行`) and the on-disk T003 scope after the 8→9 catalogue correction. This leaves the ADR internally inconsistent about the final commit sizing.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 279,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:166c2b9fbac8c57a88769cab9ad6e17bda4daa9612e085038d72418bdc5c18c5",
+          "at": "2026-04-15T05:02:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` still leaves the T002 task entry in the pre-correction 8-entry state (`TypeKindDto` excluded as private, expected `blue=0 yellow=8 red=0`). The briefing requires the 8→9 correction to be reflected in the current T002 task description as well; otherwise any consumer of `tasks[].description` still sees a scope that contradicts the updated ADR/spec/catalogue.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "line": 96,
+              "category": "consistency"
+            },
+            {
+              "message": "`spec.json` updates the T003 in-scope requirement to the corrected 9-type / `TypeKindDto`-must-be-`pub` design, but its `sources` array still cites only ADR §D1. That section does not document the corrected 9-type catalogue or the E0446 visibility rationale; those details live in ADR §D3/§D8, so the changed requirement is now mis-attributed.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 46,
+              "category": "source_attribution"
+            }
+          ],
+          "hash": "rvw1:sha256:b35a1558c68a9d50244388f5e925f90413c157a72b9fc0a13008a6d7436f304d",
+          "at": "2026-04-15T05:07:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure-types.json` describes `SchemaExportDto` and `SchemaExportCodecError` as already being used by `apps/cli/src/commands/domain.rs::export_schema`, but the current code still calls `serde_json::to_string[_pretty](&schema)` directly (`apps/cli/src/commands/domain.rs:51-56`) and the ignored integration test still serializes the domain object directly (`libs/infrastructure/src/schema_export_tests.rs:78`). That makes the live catalogue factually ahead of the on-disk implementation; these descriptions should be phrased as planned/future use until T004 lands.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/infrastructure-types.json",
+              "line": 6,
+              "category": "plan-vs-code inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:29b971612cd49a83adb9b6fd9dbba29ee25d9f54fc05b3b5dfef4f77fadaa302",
+          "at": "2026-04-15T05:12:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` now contains multiple source attributions to non-existent sections of `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md` (`§6`, `§5`, `§4`, `§1`), but that ADR only defines `§D1` through `§D11`. These broken citations appear in the emitted `spec.md` as well, so several scope/constraint entries no longer have a resolvable source.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "line": 18,
+              "category": "source_attribution"
+            }
+          ],
+          "hash": "rvw1:sha256:1db730de3b83638ca808c884cc5f5e20659a9e488052db440c3ac011aa587075",
+          "at": "2026-04-15T05:16:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR still has stale pre-correction counts in D2/A5: it says this track adds \"8\" DTOs, but the current design and implementation define 9 public types total (8 DTOs plus `SchemaExportCodecError`). That contradicts the 8→9 correction documented elsewhere in the same ADR and in the track metadata/spec.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "line": 113,
+              "category": "consistency"
+            },
+            {
+              "message": "The rendered catalogue view claims it was generated from `domain-types.json`, but this file is the view for `infrastructure-types.json`. That is an incorrect source attribution in the checked-in artifact and points readers at the wrong source of truth.",
+              "severity": "P1",
+              "file": "track/items/domain-serde-ripout-2026-04-15/infrastructure-types.md",
+              "line": 1,
+              "category": "source_attribution"
+            }
+          ],
+          "hash": "rvw1:sha256:1db730de3b83638ca808c884cc5f5e20659a9e488052db440c3ac011aa587075",
+          "at": "2026-04-15T05:21:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38facebaec3fa05f0b489f856ae0a0a893456d49c39f58ba48ffc99c665c6952",
+          "at": "2026-04-15T05:27:30Z"
         }
       ]
     }

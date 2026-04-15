@@ -110,7 +110,7 @@ researcher capability 調査 (`knowledge/research/2026-04-14-1510-researcher-dom
 
 3. **`schema_export.rs` の肥大化を避ける (A3 却下)**: `schema_export.rs` は既に 725 行あり、`architecture-rules.json` の `module_limits.warn_lines: 400` を既に超過している (`max_lines: 700` も超過)。DTO + 変換ロジック (~150 行) を追加するとさらに肥大化し、module 分割が必須となる。A3 は最終的に A2 と同じ結論に到達するので最初から A2 を採用する方が一貫性がある。
 
-4. **`dto/` サブディレクトリは over-engineering (A1 却下)**: 本トラックで追加される DTO は 8 個 (7 DTO + 1 error_type) で、サブディレクトリを作ると module ナビゲーションコストが上がる。`catalogue_codec.rs` / `baseline_codec.rs` もそれぞれ 6-7 DTO を 1 ファイルに収めており、この規模で階層を分ける必要はない。Track 2 で DTO 数が 40+ に増えた段階で再評価する (Reassess When)。
+4. **`dto/` サブディレクトリは over-engineering (A1 却下)**: 本トラックで追加される pub 型は 9 個 (6 dto + 2 enum + 1 error_type — T003 実装時に 8 → 9 に補正) で、サブディレクトリを作ると module ナビゲーションコストが上がる。`catalogue_codec.rs` / `baseline_codec.rs` もそれぞれ 6-7 DTO を 1 ファイルに収めており、この規模で階層を分ける必要はない。Track 2 で DTO 数が 40+ に増えた段階で再評価する (Reassess When)。
 
 ### D3: 命名規則 — `SchemaParamDto` 等の独自命名で catalogue_codec の private DTO と区別
 
@@ -126,16 +126,23 @@ researcher capability 調査 (`knowledge/research/2026-04-14-1510-researcher-dom
 
 4. **DRY 違反は意味的に薄い**: `MethodDto` / `ParamDto` の struct 形状は似ているが、catalogue_codec 側は decode path (JSON → domain, validation あり) を担い、schema_export 側は encode path (domain → JSON, validation なし) を担う。同じ形状でも意味的に異なる型として別立てする方が、将来の仕様変更 (例: 片方だけ新フィールド追加) に柔軟。
 
-**採用案**: schema_export 専用に `SchemaParamDto` を別途定義する (`Schema` prefix で catalogue_codec の `ParamDto` と区別)。`MethodDto` 相当は schema_export 側では不要 (§D6 で述べた通り `MethodDeclaration::Serialize` は dead code で、SchemaExport の transitive serialize chain には含まれないため)。コード上の DTO 型一覧 (8 types、うち catalogue 登録は 7 `dto` + 1 `error_type` = 8 entries — `TypeKindDto` は private enum のため catalogue から除外、§D8 参照):
+**採用案**: schema_export 専用に `SchemaParamDto` を別途定義する (`Schema` prefix で catalogue_codec の `ParamDto` と区別)。`MethodDto` 相当は schema_export 側では不要 (§D6 で述べた通り `MethodDeclaration::Serialize` は dead code で、SchemaExport の transitive serialize chain には含まれないため)。コード上の 9 types 一覧 (6 structs + 3 enums — catalogue 登録も 9 entries。T003 実装時点で当初計画から補正された経緯は §D8 参照):
 
 ```
-SchemaExportDto, TypeInfoDto, FunctionInfoDto, TraitInfoDto, ImplInfoDto,
-TypeKindDto (snake_case enum — catalogue 除外、private のため rustdoc 対象外),
-MemberDeclarationDto (externally-tagged Variant/Field enum — BRIDGE-01 互換、see D7),
-SchemaParamDto
+// structs (kind: "dto")
+SchemaExportDto, TypeInfoDto, FunctionInfoDto, TraitInfoDto, ImplInfoDto, SchemaParamDto
+
+// enums (kind: "enum")
+TypeKindDto              (Struct / Enum / TypeAlias — PascalCase externally-tagged)
+MemberDeclarationDto     (Variant(String) / Field { name, ty } — externally-tagged)
+
+// error enum (kind: "error_type")
+SchemaExportCodecError   (Json variant wrapping serde_json::Error via #[from])
 ```
 
-`SchemaExportCodecError` を `Json(#[from] serde_json::Error)` variant 1 つで定義する。catalogue 登録エントリ: 上記 8 types から `TypeKindDto` を除いた 7 `dto` + `SchemaExportCodecError` (1 `error_type`) = 合計 8 entries (§D8)。
+`SchemaExportCodecError` は `Json(#[from] serde_json::Error)` variant 1 つで定義する。catalogue 登録エントリ: 6 × `dto` + 2 × `enum` + 1 × `error_type` = 合計 9 entries (§D8)。
+
+**9 types は全て `pub` 可視性が必須**: TDDD visibility constraint により、catalogue に登録して `blue` に遷移させるには rustdoc JSON の public surface に出現している必要がある。特に `TypeKindDto` は当初 private 想定だったが、`TypeInfoDto::kind: TypeKindDto` という public field の型として使われるため Rust E0446 (private type in public interface) により `pub` 必須 — 結果として rustdoc JSON に出るため catalogue 登録も必須となる。
 
 ### D4: encode-only DTO — `Deserialize` derive は付与しない
 
@@ -210,9 +217,16 @@ pub fn encode(schema: &SchemaExport, pretty: bool) -> Result<String, SchemaExpor
 
 T004 で `cargo make export-schema -- --crate domain --pretty` の出力を変更前と手動 diff し、structural に同一であることを確認する。
 
-### D8: infrastructure 層 TDDD partial dogfood — 8 DTO seed のみ + domain/usecase は opt-out
+### D8: infrastructure 層 TDDD partial dogfood — 9 entries seed + domain/usecase は opt-out
 
-副次目的として `architecture-rules.json` の infrastructure tddd を `enabled: false` → `enabled: true` に flip し、本トラックで新設した 8 DTO を `infrastructure-types.json` に seed する (`knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md` の `Dto` variant を活用)。
+副次目的として `architecture-rules.json` の infrastructure tddd を `enabled: false` → `enabled: true` に flip し、本トラックで新設した 9 types を `infrastructure-types.json` に seed する。内訳: 6 × `dto` kind + 2 × `enum` kind + 1 × `error_type` kind。`kind` の使い分けは `knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md` に従い、Rust `struct` は `dto` (存在チェックのみ)、Rust `enum` は `enum` (`expected_variants` でバリアント名検証) に分類する。
+
+**当初計画 (T002 実行時点) からの補正**: 初期 catalogue は 8 entries で作成され、`MemberDeclarationDto` は `dto` kind で、`TypeKindDto` は「private で catalogue 除外」する前提だった。しかし T003 実装時点で以下 2 点が判明し、9 entries に補正した:
+
+1. **`MemberDeclarationDto` は Rust `enum`**: `dto` kind は Rust struct 前提なので kind mismatch で Red になる。`enum` kind with `expected_variants: ["Variant", "Field"]` に変更。
+2. **`TypeKindDto` は `pub` 必須**: `TypeInfoDto::kind: TypeKindDto` という public field に使われるため Rust E0446 により `pub` 必須。pub enum は rustdoc JSON に出るため、catalogue 除外すると undeclared-red を emit する。`enum` kind with `expected_variants: ["Struct", "Enum", "TypeAlias"]` で catalogue 登録に変更。
+
+補正は infrastructure-types.json を in-place で更新し、metadata.json / spec.json / ADR も追従する。補正後の expected 初期 signal は `blue=0 yellow=9 red=0`、T003 実装完了後は `blue=9 yellow=0 red=0`。
 
 #### per-layer opt-in model の採用
 
@@ -222,7 +236,7 @@ TDDD の per-layer opt-in model (ADR `2026-04-12-1200-strict-spec-signal-gate-v2
 |---|---|---|---|
 | domain | **opt-out** | `track/items/domain-serde-ripout-2026-04-15/domain-types.json` を作らない | NotFound → skip (PASS) |
 | usecase | **opt-out** | 同上 `usecase-types.json` を作らない | NotFound → skip (PASS) |
-| infrastructure | **opt-in** | `infrastructure-types.json` を 8 entries で作成 | 評価対象 (T003 実装後 blue=8) |
+| infrastructure | **opt-in** | `infrastructure-types.json` を 9 entries で作成 (6 dto + 2 enum + 1 error_type) | 評価対象 (T003 実装後 blue=9) |
 
 opt-out 可能な根拠:
 
@@ -236,7 +250,7 @@ opt-out 可能な根拠:
 
 verify modules / review_v2 adapters / git wrappers / hook handlers などの 40-80 entries の充実は **Track 2** (`tddd-05-infra-wiring-YYYY-MM-DD`) で扱う (`.claude/rules/10-guardrails.md` §Small task commits 原則)。
 
-`TypeKindDto` は `pub` ではない private enum のため rustdoc JSON の export 対象に含まれず、catalogue に declare しても Yellow / Red どちらの signal にもならない。したがって catalogue から除外する (8 entries 中に含めない)。残る 8 entries は `SchemaExportDto` / `TypeInfoDto` / `FunctionInfoDto` / `TraitInfoDto` / `ImplInfoDto` / `MemberDeclarationDto` / `SchemaParamDto` (= 7 `dto` variant) + `SchemaExportCodecError` (= 1 `error_type` variant with `expected_variants: ["Json"]`)。
+**T003 実装時点での補正**: 当初 `TypeKindDto` は private enum として catalogue から除外し、残る 8 entries (`SchemaExportDto` / `TypeInfoDto` / `FunctionInfoDto` / `TraitInfoDto` / `ImplInfoDto` / `MemberDeclarationDto` / `SchemaParamDto` (= 7 `dto` variant) + `SchemaExportCodecError` (= 1 `error_type` variant)) を seed する計画だった。しかし T003 実装時に判明した 2 点の理由により 9 entries に補正した (詳細は§D8「当初計画からの補正」を参照): `TypeKindDto` は `TypeInfoDto::kind` の public field 型であり Rust E0446 により `pub` 必須 → catalogue 除外不可。また `MemberDeclarationDto` は Rust `enum` であり `dto` kind ではなく `enum` kind で登録する必要がある。補正後: 6 × `dto` + 2 × `enum` (`MemberDeclarationDto`, `TypeKindDto`) + 1 × `error_type` = 計 9 entries。
 
 ### D9: タスク分割 — 5 commits (T001-T005)
 
@@ -245,14 +259,14 @@ verify modules / review_v2 adapters / git wrappers / hook handlers などの 40-
 | Commit | Tasks | 推定変更行数 | コンパイル状態 |
 |---|---|---|---|
 | Commit 1 | T001: rustdoc viability audit + prereq doc fix (6 箇所: 2 × `invalid_html_tags` + 4 × `private_intra_doc_links`) + `architecture-rules.json` infrastructure tddd 有効化 | ~42 行 | Pass |
-| Commit 2 | T002: `/track:design --layer infrastructure` 実行 (`infrastructure-types.json` + `infrastructure-types-baseline.json` + rendered view 生成、yellow=8 初期状態) | ~150 行 (catalogue JSON + baseline JSON + rendered md) | Pass |
-| Commit 3 | T003: `libs/infrastructure/src/schema_export_codec.rs` 新設 (DTO + encode 関数) — yellow=8 → blue=8 遷移 | ~150 行 | Pass (domain serde はまだある) |
+| Commit 2 | T002: `/track:design --layer infrastructure` 実行 (`infrastructure-types.json` 当初 8 entries + `infrastructure-types-baseline.json` + rendered view 生成、yellow=8 初期状態) | ~150 行 (catalogue JSON + baseline JSON + rendered md) | Pass |
+| Commit 3 | T003: `libs/infrastructure/src/schema_export_codec.rs` 新設 (DTO + encode 関数) + catalogue 9 entries 補正 — yellow=9 → blue=9 遷移 | ~356 行 | Pass (domain serde はまだある) |
 | Commit 4 | T004: domain serde 除去 + CLI 書き換え + `schema_export_tests.rs` 更新 | ~36 行 | Pass (T003 完了が必須) |
 | Commit 5 | T005: `knowledge/adr/README.md` 索引追加 (本 ADR + 未登録 2 ADR) + verification.md 完了 + Track 2 引継ぎ事項記載 | ~33 行 (README.md ~3 行 + verification.md ~30 行) | Pass |
 
 **分割根拠**:
 
-1. **`/track:design` を独立 task として分離**: TDDD workflow は `/track:plan` → `/track:design` → `/track:implement` の順で型宣言を実装より先行させる設計 (`knowledge/adr/2026-04-08-1800-reverse-signal-integration.md` §5)。T002 で `infrastructure-types.json` と `infrastructure-types-baseline.json` を先に作ることで、T003 の DTO 実装時に yellow=8 → blue=8 への signal 遷移を明示的に観測できる。これは TDDD の「先に型宣言、後に実装」原則そのもの。T002 と T003 を 1 commit にまとめると、catalogue 宣言と実装が同時に出現し、signal の段階遷移が観測できなくなる (常に blue=8 で catalogue が書かれる)。
+1. **`/track:design` を独立 task として分離**: TDDD workflow は `/track:plan` → `/track:design` → `/track:implement` の順で型宣言を実装より先行させる設計 (`knowledge/adr/2026-04-08-1800-reverse-signal-integration.md` §5)。T002 で `infrastructure-types.json` と `infrastructure-types-baseline.json` を先に作ることで、T003 の DTO 実装時に yellow=9 → blue=9 への signal 遷移を明示的に観測できる (T002 commit 800bddf 時点では 8 entries / yellow=8 だったが、T003 で catalogue を 9 entries に補正した上で yellow=9 → blue=9 遷移を確認)。これは TDDD の「先に型宣言、後に実装」原則そのもの。T002 と T003 を 1 commit にまとめると、catalogue 宣言と実装が同時に出現し、signal の段階遷移が観測できなくなる (常に blue=9 で catalogue が書かれる)。
 
 2. **T001 は T002 の前提条件**: `/track:design --layer infrastructure` は `architecture-rules.json` で `infrastructure.tddd.enabled: true` になっていることを前提とする (`libs/infrastructure/src/verify/tddd_layers.rs::parse_tddd_layers` が enabled フラグをチェックし、disabled layer は `--layer` 引数で明示指定してもエラーとする)。T001 の flip を完了してからでないと T002 で `/track:design` を起動できない。したがって T001 → T002 は厳密な先行関係。
 
@@ -262,7 +276,7 @@ verify modules / review_v2 adapters / git wrappers / hook handlers などの 40-
 
 5. **T001 は gating ステップ**: `cargo +nightly rustdoc -p infrastructure -- -Z unstable-options --output-format json` が失敗した場合、本トラック全体を停止して別の prereq track (`tddd-05-infra-rustdoc-fix-prereq` 等) を立て直す判断を行う。T001 を独立 commit にすることで、この gating 結果が即座に track registry / verification.md に反映され、後続 task への進行可否が明確になる。T002 以降と統合すると、gating 失敗時に実装分も一緒に破棄することになり無駄が大きい。
 
-6. **review 粒度の明確化**: 各 commit が単一の concern にスコープされ (T001=設定変更, T002=catalogue 宣言 + baseline capture, T003=新規コード追加, T004=既存コード改変, T005=ドキュメント整理)、reviewer が各 commit を独立した単位で読める。`.claude/rules/10-guardrails.md` §Small task commits 原則の「diff < 500 行 / commit」にも全 commit が収まる (最大は T002 と T003 の ~150 行)。
+6. **review 粒度の明確化**: 各 commit が単一の concern にスコープされ (T001=設定変更, T002=catalogue 宣言 + baseline capture, T003=新規コード追加, T004=既存コード改変, T005=ドキュメント整理)、reviewer が各 commit を独立した単位で読める。`.claude/rules/10-guardrails.md` §Small task commits 原則の「diff < 500 行 / commit」にも全 commit が収まる (最大は T003 の ~356 行、T002 ~150 行)。
 
 ### D10: Track 2 への引継ぎ事項 — verification.md に 5 項目記載
 
@@ -306,14 +320,14 @@ verify modules / review_v2 adapters / git wrappers / hook handlers などの 40-
 
 ### A5: tddd/codec/dto/ サブディレクトリ案
 
-却下理由 (D2 と同じ): over-engineering。本トラックで追加される DTO は 8 個に限定され、サブディレクトリを作ると module 構造が複雑化する。Track 2 で DTO 数が大幅に増えた段階で再評価する。
+却下理由 (D2 と同じ): over-engineering。本トラックで追加される pub 型は 9 個に限定され (6 dto + 2 enum + 1 error_type — T003 実装時に 8 → 9 に補正)、サブディレクトリを作ると module 構造が複雑化する。Track 2 で DTO 数が大幅に増えた段階で再評価する。
 
 ## Consequences
 
 ### Positive
 
 - **hexagonal 純粋性回復**: domain crate が wire format に対する非依存に戻り、将来の同種違反を防ぐ structural incentive になる
-- **infrastructure 層 TDDD の partial dogfood 開始**: `infrastructure-types.json` に 8 entries が seed され、`bin/sotp track type-signals --layer infrastructure` が `blue=8 yellow=0 red=0` を返す状態が達成される
+- **infrastructure 層 TDDD の partial dogfood 開始**: `infrastructure-types.json` に 9 entries (6 dto + 2 enum + 1 error_type) が seed され、`bin/sotp track type-signals --layer infrastructure` が `blue=9 yellow=0 red=0` を返す状態が達成される
 - **ADR `2026-04-14-0625-finding-taxonomy-cleanup.md` D6 の追補**: tddd-04 で「本 track 範囲外」とされた domain serde 依存が正式に Resolved となる
 - **Track 2 への足場確立**: T005 verification.md に 5 引継ぎ事項が記載され、`tddd-05-infra-wiring-YYYY-MM-DD` がスムーズに着手できる
 - **既存 ADR 索引の補完**: handoff §F で指摘された未登録 ADR 2 件 (`2026-04-13-1813-tddd-taxonomy-expansion`, `2026-04-14-0625-finding-taxonomy-cleanup`) が併せて索引追加される
@@ -334,7 +348,7 @@ verify modules / review_v2 adapters / git wrappers / hook handlers などの 40-
 ## Reassess When
 
 - 将来 serde の代替 (postcard / bincode 等) を検討するとき
-- DTO 群が肥大化したとき (本トラックで 8 entries → 将来 100+ になったら module 分割を検討)
+- DTO 群が肥大化したとき (本トラックで 9 entries → 将来 100+ になったら module 分割を検討)
 - Track 2 で Adapter variant を追加するとき (catalogue 設計の追補が必要になる可能性)
 - CI rustdoc 時間が許容できなくなったとき (cache 戦略の実装トリガー)
 - infrastructure 内に新しい同名衝突が発生したとき (rename cascade の必要性を再評価)

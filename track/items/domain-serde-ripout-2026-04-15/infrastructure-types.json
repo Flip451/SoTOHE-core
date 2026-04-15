@@ -3,7 +3,7 @@
   "type_definitions": [
     {
       "name": "SchemaExportDto",
-      "description": "Infrastructure DTO for domain::schema::SchemaExport. Serialize-only wire format carrier used by apps/cli/src/commands/domain.rs::export_schema to emit BRIDGE-01 JSON. Owns crate_name + Vec of TypeInfoDto / FunctionInfoDto / TraitInfoDto / ImplInfoDto. Constructed via From<&SchemaExport>. No Deserialize / TryFrom — encode-only path. Recovers hexagonal purity from bridge01 commit a5e4c6b.",
+      "description": "Infrastructure DTO for domain::schema::SchemaExport. Serialize-only wire format carrier for apps/cli/src/commands/domain.rs::export_schema to emit BRIDGE-01 JSON (CLI wired in T004 via schema_export_codec::encode). Owns crate_name + Vec of TypeInfoDto / FunctionInfoDto / TraitInfoDto / ImplInfoDto. Constructed via From<&SchemaExport>. No Deserialize / TryFrom — encode-only path. Recovers hexagonal purity from bridge01 commit a5e4c6b.",
       "approved": true,
       "kind": "dto"
     },
@@ -33,9 +33,24 @@
     },
     {
       "name": "MemberDeclarationDto",
-      "description": "Infrastructure DTO for domain::tddd::catalogue::MemberDeclaration. Uses serde default externally-tagged form to match the current BRIDGE-01 MemberDeclaration wire format. Emits {\"Variant\": \"Name\"} for variants and {\"Field\": {\"name\": \"...\", \"ty\": \"...\"}} for struct fields. Nested in TypeInfoDto::members.",
+      "description": "Infrastructure enum mirror of domain::tddd::catalogue::MemberDeclaration. Two variants — Variant(String) for enum variant members and Field { name, ty } for struct field members. Uses serde default externally-tagged form to match the current BRIDGE-01 wire format: emits {\"Variant\": \"Name\"} / {\"Field\": {\"name\": \"...\", \"ty\": \"...\"}}. Nested in TypeInfoDto::members. Declared as `enum` kind (not `dto`) because it is a Rust enum, not a struct; the TDDD evaluator classifies enum-shaped declarations via `expected_variants`.",
       "approved": true,
-      "kind": "dto"
+      "kind": "enum",
+      "expected_variants": [
+        "Variant",
+        "Field"
+      ]
+    },
+    {
+      "name": "TypeKindDto",
+      "description": "Infrastructure enum mirror of domain::schema::TypeKind. Three unit variants (Struct / Enum / TypeAlias) using serde default (externally-tagged PascalCase) so JSON output is \"Struct\" / \"Enum\" / \"TypeAlias\", matching the current BRIDGE-01 wire format. Must be `pub` because it appears as a public field type in TypeInfoDto::kind (Rust E0446 prevents a private type in a public interface). Declared as `enum` kind with explicit expected variants.",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "Struct",
+        "Enum",
+        "TypeAlias"
+      ]
     },
     {
       "name": "SchemaParamDto",
@@ -45,7 +60,7 @@
     },
     {
       "name": "SchemaExportCodecError",
-      "description": "Public error enum for infrastructure::schema_export_codec::encode(). Propagates serde_json failures via Json(#[from] serde_json::Error). Used by apps/cli/src/commands/domain.rs::export_schema to surface serialization errors as CliError::Message.",
+      "description": "Public error enum for infrastructure::schema_export_codec::encode(). Propagates serde_json failures via Json(#[from] serde_json::Error). Will be surfaced by apps/cli/src/commands/domain.rs::export_schema as CliError::Message after T004 CLI wiring.",
       "approved": true,
       "kind": "error_type",
       "expected_variants": [
@@ -57,50 +72,68 @@
     {
       "type_name": "SchemaExportDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TypeInfoDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "FunctionInfoDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TraitInfoDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ImplInfoDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "MemberDeclarationDto",
-      "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Field",
+        "Variant"
+      ]
+    },
+    {
+      "type_name": "TypeKindDto",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Enum",
+        "Struct",
+        "TypeAlias"
+      ]
     },
     {
       "type_name": "SchemaParamDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "SchemaExportCodecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Json"
+      ]
     }
   ]
 }
