@@ -83,7 +83,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "commit_hash": "d51694e8cd880a663d290cc28bace906ddbc9c9c",
@@ -110,11 +110,12 @@
       "status": "done"
     },
     {
+      "commit_hash": "6032a779eba8ad440911fe57cd27d30f34528abe",
       "description": "ADR 索引補完 + verification.md 完了 + Track 2 引継ぎを atomic に実施: (1) `knowledge/adr/README.md` の索引 (信号機アーキテクチャ section) に本 ADR `2026-04-14-1531-domain-serde-ripout.md` を追加。同時に未登録の `2026-04-13-1813-tddd-taxonomy-expansion.md` と `2026-04-14-0625-finding-taxonomy-cleanup.md` も信号機アーキテクチャ section に追加する (既存 README の ADR maintenance gap の補完), (2) verification.md の Track 2 引継ぎ事項セクションに 5 項目を記載: (a) rustdoc viability audit 結果 (success/failure, JSON サイズ, wall time — T001 で記録済みを転記), (b) infrastructure 内同名衝突 audit 結果 (見つかった場合は型名と location — T001 audit 結果を転記), (c) infrastructure-types.json に seed した DTO 一覧 (T002 で作成済みを転記), (d) CI rustdoc 実行時間の体感 (domain + usecase + infrastructure 3 layer での wall time — T004 後の `cargo make ci` で計測), (e) Adapter variant が必要そうな infra type の暫定リスト (`CodexReviewer` / `FsReviewStore` / `GitDiffGetter` / `Sha256ReviewHasher` / 各種 verify module / `RustdocSchemaExporter` 等)。本 ADR `2026-04-14-1531-domain-serde-ripout.md` は `/track:plan` Phase 4 で事前作成済みのため、本 task では **新規作成しない**。内容が実装と整合していることを確認し、万一 design 変更があれば該当 D セクションを in-place で更新する。独立検証: `cargo make ci` 全通過, `rg 'domain-serde-ripout' knowledge/adr/README.md` が 1 match (本 ADR index 追加確認), `rg 'tddd-taxonomy-expansion' knowledge/adr/README.md` が 1 match, `rg 'finding-taxonomy-cleanup' knowledge/adr/README.md` が 1 match, verification.md の Track 2 引継ぎ事項 5 項目が埋まっている, `bin/sotp track type-signals domain-serde-ripout-2026-04-15 --layer infrastructure` が依然として blue=9 維持。想定 diff: README.md ~3 行 + verification.md ~30 行 = 合計 ~33 行",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "domain-serde-ripout: hexagonal 純粋性回復 + infrastructure 層 TDDD partial dogfood (Track 1 of 2)",
-  "updated_at": "2026-04-15T07:06:10Z"
+  "updated_at": "2026-04-15T07:37:47Z"
 }
