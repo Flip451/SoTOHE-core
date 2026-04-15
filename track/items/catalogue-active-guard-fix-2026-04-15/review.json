@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This grep will also match the `fn render_type_catalogue` definition in `type_catalogue_render.rs` (and any other incidental references), so the expected outcome of exactly 2 call sites with a second argument is not reliable. Narrow the search to actual call sites or exclude the definition.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/verification.md",
+              "line": 54,
+              "category": "verification"
+            },
+            {
+              "message": "The negative check is too broad: the intended fixed wording still contains both `feedback` and `Blue` in the phrase `Blue 昇格には ...`, so `rg 'feedback.*Blue'` will keep matching even after a correct D4 fix. Match the stale exact phrase instead of any `feedback` + `Blue` co-occurrence.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/verification.md",
+              "line": 80,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:1da77b23310fab14447a802c66ed61debfc8e58f3f031f0fea7210851cd78384",
+          "at": "2026-04-15T11:29:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1da77b23310fab14447a802c66ed61debfc8e58f3f031f0fea7210851cd78384",
+          "at": "2026-04-15T11:30:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 instructs the implementation to pass `rendered_file_stem` into `render_type_catalogue(..., source_file_name)`, and the same instruction is mirrored in `plan.md` and ADR D2. In the current CLI code, `rendered_file_stem` is the rendered markdown filename (`binding.rendered_file()`), not the catalogue JSON source, so following this plan would generate headers like `Generated from infrastructure-types.md` instead of the required `...types.json`. Update the plan/ADR wording to pass the catalogue filename (`binding.catalogue_file()` or the JSON path’s file name) and keep the markdown path separate.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/metadata.json",
+              "line": 30,
+              "category": "logic"
+            },
+            {
+              "message": "The D1 rationale says `matches!(metadata.status(), TrackStatus::Done | TrackStatus::Archived)` is an “exhaustive match” that will trigger a compile error if `TrackStatus` gains a new variant, but `matches!` is non-exhaustive and would silently ignore future variants. Either revise the ADR text to describe this as an explicit current-state check only, or specify a real exhaustive `match`/helper if compile-time coverage of future variants is part of the design intent.",
+              "severity": "P2",
+              "file": "knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+              "line": 82,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1da77b23310fab14447a802c66ed61debfc8e58f3f031f0fea7210851cd78384",
+          "at": "2026-04-15T11:38:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Reassess When §4 says a new `TrackStatus` variant would be caught automatically by an exhaustive-match compile error, but D1 now uses `matches!(..., Done | Archived)`, which is non-exhaustive and will silently treat new variants as active. This contradicts the ADR's own D1 rationale and weakens the future-review trigger for the fail-open case.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+              "line": 273,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9ab79e1ba2a02112f4dcbfe33f1330724d17d946f70a46a6f117c7d3113b2f0c",
+          "at": "2026-04-15T11:42:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bd82f35656102804d85eda449ae804ba9a921868d84d5a00f46e986a04948f8",
+          "at": "2026-04-15T11:45:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1’s pseudocode uses APIs that do not exist in the current codebase: `infrastructure::track::read_metadata(...)` is not available, and `TrackStatus` has no `as_str()` method. An implementer following this ADR literally will hit compile errors. Update the pseudocode to use the real read-only adapter (`infrastructure::track::fs_store::read_track_metadata(items_dir, &track_id)` or equivalent), destructure `(metadata, _)`, and format the status via `Display`/`to_string()`.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+              "line": 62,
+              "category": "correctness"
+            },
+            {
+              "message": "T004’s task text says `validate_and_write_catalogue` should pass `binding.catalogue_file()` at the current render call site, but `binding` is not in scope there today. As written, the implementation note is not executable. Clarify that the catalogue filename must either be threaded through `evaluate_and_write_signals`/`validate_and_write_catalogue` or derived from `domain_types_path.file_name()`, and mirror that correction in the rendered planning docs.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/metadata.json",
+              "line": 30,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7b726cbb78b5a617cd3d7296e9a93a86dedcc31bcdcd1a0d59fbbf79d67e5048",
+          "at": "2026-04-15T11:59:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T004 manual verification commands are too broad to validate the planned change reliably. `rg 'render_type_catalogue\\(' libs/infrastructure/src/ apps/cli/src/` also matches the function definition and many unit tests, and `cargo nextest run -p infrastructure type_catalogue_render` runs the whole renderer test module, so the documented expectation of only `2 matches` / `6 test pass` cannot be satisfied. Narrow these checks to the two production call sites and the specific updated/new tests.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/verification.md",
+              "line": 55,
+              "category": "verification"
+            },
+            {
+              "message": "The ADR-status verification command is incorrect. The ADR uses a `## Status` heading followed by `Accepted`, so `rg '^Status$' ...` returns no match and cannot prove acceptance; the expected output `Status: Accepted` is also inconsistent with the file format. Replace this with a check that matches the actual heading/body layout.",
+              "severity": "P1",
+              "file": "track/items/catalogue-active-guard-fix-2026-04-15/verification.md",
+              "line": 99,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:fff5b3f63ddad7d1e46b4fcec6a6ba912581d8bfbcf7abe9a1958666cdb417df",
+          "at": "2026-04-15T12:05:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ef5c1bb6dc1c051f7c2ce5cb5fcaba59c05b90c783b3b606f60b801aa4f7ec0b",
+          "at": "2026-04-15T12:08:47Z"
+        }
+      ]
+    }
+  }
+}
