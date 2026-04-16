@@ -1,0 +1,301 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 only assigns `libs/infrastructure/src/code_profile_builder.rs`, but the ADR's negative-impl guard belongs in `libs/infrastructure/src/schema_export.rs:158` if `is_negative` exists. As written, the task has no owner for the actual filter change, so the planned `is_negative` exclusion can be omitted.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/metadata.json",
+              "line": 30,
+              "category": null
+            },
+            {
+              "message": "The spec is internally inconsistent about scope: this `out_of_scope` item says domain/usecase catalogue expansion is out of scope, but the `in_scope` section includes T001/T003/T005, which are all domain-side catalogue/schema/evaluator changes. That contradiction can cause required domain work to be dropped.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 109,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:8ee676de7206457709defbcb2f8e2e6a9916cd5c858b502f6e00c04f963356c4",
+          "at": "2026-04-16T04:05:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 sets the catalogue to `>= 14` entries, but D2 explicitly collapses multiple trait impls for a single adapter into one `SecondaryAdapter` entry. After excluding the 2 infrastructure-internal traits, this track should produce about 10 adapter entries, so the `14` threshold is inconsistent with the design and is not verifiable as written.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 17,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:8ee676de7206457709defbcb2f8e2e6a9916cd5c858b502f6e00c04f963356c4",
+          "at": "2026-04-16T04:07:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` treats T006 as a 14-entry catalogue task, but the same track's spec/verification scope the deliverable to 10 unique `SecondaryAdapter` entries. The 14 figure is only the post-filter trait-impl row count, so the task cardinality is inconsistent and easy to implement wrong.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/metadata.json",
+              "line": 55,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:9a3ecfdc0276a1656ec6a2e68884e3832b1178262aa32bc0d6b7117806dba465",
+          "at": "2026-04-16T04:11:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The source tag `track/items/domain-serde-ripout-2026-04-15/verification.md §Track 1 T005 索引補完パターン` does not resolve to a heading in that file. The closest actual headings are `T005 (2026-04-15)` and `Track 2 引継ぎ事項`, so this reference is not usable.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 85,
+              "category": "reference"
+            },
+            {
+              "message": "Two ADR source tags in this file are not valid section references: `knowledge/adr/2026-04-15-1636-tddd-05-secondary-adapter.md §Bad (Consequences)` and `... §Neutral (Consequences)`. The ADR headings are `### Bad` and `### Neutral`, so the parenthetical suffix makes both refs non-resolvable.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 188,
+              "category": "reference"
+            },
+            {
+              "message": "The research note says `is_negative` is \"verified for version 0.57\" in the main field list, but the addendum later says it is unconfirmed and still needs validation. That contradiction should be resolved before the note is used as a source of truth.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-16-tddd-05-rustdoc-impl.md",
+              "line": 16,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:daa7f5965f74a4d06ea5fb76b5572f3088cc6a01350bb7254ba2f23bf82623bf",
+          "at": "2026-04-16T04:15:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Several `sources` entries in this spec use code-item labels instead of resolvable `file:line` citations, so the references cannot be verified reliably. Examples: `libs/domain/src/tddd/catalogue.rs §TypeDefinitionKind enum` and `libs/domain/src/schema.rs §TypeNode struct` / `§TypeGraph struct` in the T001/T003 source lists.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 21,
+              "category": "reference"
+            },
+            {
+              "message": "A couple of ADR citations point at non-stable anchors rather than exact headings, which makes the source references ambiguous. `§Reassess When 6` is a numbered list item, and `§Bad — delete アクションの意味論的な隙間` is not the ADR heading text; both should be rewritten to stable anchors.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 138,
+              "category": "reference"
+            }
+          ],
+          "hash": "rvw1:sha256:56b54db0fa655323d63a1fe41e49594ed4fbbdbcf78958dbc2d8246b65b1990a",
+          "at": "2026-04-16T04:20:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Track scope undercounts adapters: `SystemGitRepo` also implements the domain `WorktreeReader` port in `libs/infrastructure/src/git_cli/mod.rs:193`, so this track has 11 unique secondary adapters, not 10. The current 10-entry acceptance criteria and ADR consequence text leave `WorktreeReader` unaccounted for.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 75,
+              "category": "scope"
+            },
+            {
+              "message": "The T005 sources point at `libs/domain/src/tddd/signals.rs §evaluate_secondary_port` / `§evaluate_trait_methods`, but those are not valid anchors for a Rust source file. Replace them with file:line references to the actual helper definitions so the source attribution is resolvable.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 67,
+              "category": "reference"
+            }
+          ],
+          "hash": "rvw1:sha256:dd163115ec7ba4e5e9fb21df62c117e4f56b9d41103cc833afdbf3b23db9d7cd",
+          "at": "2026-04-16T04:23:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` line 78 cites a memory note (`feedback — メモリ feedback_no_design_in_tasks ...`) as a source. That is not a traceable ADR/convention/file:line reference, so the spec violates the source-attribution rule for `sources`.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 78,
+              "category": "source attribution"
+            },
+            {
+              "message": "`verification.md` line 14 requires confirming `is_negative` support in rustdoc-types 0.57.3, but the T004 manual verification steps do not include any executable check for that dependency/field. As written, this checklist item is not actually verifiable.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 14,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:210bd3b74f334901fe49cbd3a4d800c4ca695700e0dfb7f5d6fb08e0e9339f12",
+          "at": "2026-04-16T04:28:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b691bc2327b305e20072a9ea546fb219e0e4c7500c4a68f458500ee6f424f226",
+          "at": "2026-04-16T04:32:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `cli 層の TDDD 拡張` out-of-scope item is traced only to `knowledge/adr/2026-04-15-1636-tddd-05-secondary-adapter.md Context §2`, but that section only inventories current infrastructure adapter impls and never establishes the CLI deferral or `tddd-06-cli-wiring` boundary. This leaves one of the track's scope boundaries without a valid source-backed justification.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 105,
+              "category": "source-attribution"
+            },
+            {
+              "message": "The T006 acceptance criterion for `infrastructure-types.json >= 11` cites `Context §2 (16 trait impls 表)`, but the ADR's table actually contains 17 impl rows and there is no `16 trait impls` section. Because this count is the basis for the catalogue-size target, the source reference is broken as written.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 306,
+              "category": "source-attribution"
+            },
+            {
+              "message": "T001's manual verification command runs `test_consistency_partitions_secondary_adapter`, but the task definition in `metadata.json` names the required red→green test `test_consistency_partitions_secondary_adapter_as_type`. With two different expected test names across the planning artifacts, an implementation that follows the task spec will not be verifiable using this checklist as written.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 42,
+              "category": "verification"
+            },
+            {
+              "message": "T002's checklist never runs `test_is_method_bearing_excludes_secondary_adapter`, even though the task definition and Scope Verified section require a test proving that `is_method_bearing` still excludes `secondary_adapter`. As written, the verification steps only cover the `EXISTENCE_ONLY_KINDS` half of that acceptance criterion.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 60,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:ac8f1398a284d9e2b06e43566392fa5b7b67f755f4e03116899ff5f3cabab7e2",
+          "at": "2026-04-16T04:38:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's manual verification steps are inconsistent with the planned work: `rg \"TypeDefinitionKind::SecondaryAdapter\"` will not identify the enum variant definition in `catalogue.rs`, and the checklist invokes `test_consistency_partitions_secondary_adapter` even though the task/spec define `test_consistency_partitions_secondary_adapter_as_type`. An implementation that follows the track definition cannot be verified with this section as written.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 31,
+              "category": null
+            },
+            {
+              "message": "T002's checklist never runs `test_is_method_bearing_excludes_secondary_adapter`, even though the task definition and Scope Verified section require a passing test for that invariant. The `rg 'is_method_bearing'` step only inspects source text, so this verification path can miss the required regression test entirely.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 54,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:8c487084ef95420f118a7dd8fdcbc397da491ef9ba85e700ca1d9a73b5e066a3",
+          "at": "2026-04-16T04:43:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The out-of-scope item for the compound-key alternative cites `knowledge/adr/2026-04-15-1636-tddd-05-secondary-adapter.md §D (Rejected Alternatives)`, but that section does not exist. The ADR has `### D. Option D-1: ...` under `## Rejected Alternatives`, so this source currently fails the requirement that spec sources be valid references.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 161,
+              "category": "reference"
+            },
+            {
+              "message": "The acceptance criterion for `infrastructure-types.json` says its 11-entry math is sourced from `Context §2 (16 trait impls 表)`, but the ADR’s Context §2 now enumerates 17 impl rows and derives 15 after excluding 2 internal traits. Leaving the stale `16` count here makes the verification arithmetic self-contradictory.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 309,
+              "category": "consistency"
+            },
+            {
+              "message": "T006 documents `cargo make ci` as if it only covers `fmt-check + clippy -D warnings + nextest + deny + check-layers + verify-spec-states + verify-arch-docs`, but `Makefile.toml`’s actual `ci-local` gate runs many additional checks (`test-doc`, `python-lint`, `verify-track-metadata`, `verify-view-freshness`, etc.), and there is no `verify-spec-states` task name anymore (`verify-spec-states-current-local` is what CI uses). As written, the track can be marked complete while omitting real CI gates.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 346,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3d44019e1f419f8e95e51ab6cca07f0a113fe77f0cfc709d3f04f41faf95330a",
+          "at": "2026-04-16T04:50:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T006 manual verification step is written as a bash command (`/track:design --layer infrastructure --force`), but `/track:design` is only a Claude slash command (`.claude/commands/track/design.md`) and there is no shell executable to invoke. The checklist cannot be executed as written.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 118,
+              "category": "execution"
+            },
+            {
+              "message": "T006 requires rerunning `/track:design` to generate `secondary_adapter` entries, but the current design workflow still enumerates only 12 kinds and never defines `secondary_adapter` or its `implements` field (`.claude/commands/track/design.md:14-18,74-86,117-124`). As planned, the catalogue-generation step cannot produce the required adapter entries.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 307,
+              "category": "execution"
+            },
+            {
+              "message": "T005's prescribed test list ends with `test_evaluate_secondary_adapter_with_two_traits_partial_blue`, but this same task/spec says the aggregate signal must be Red whenever even one declared impl is missing. That contradictory expected result will misdirect the red→green loop toward the wrong behavior.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/metadata.json",
+              "line": 36,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:bde2746b9eaf1f82c0154224e8e4534ac802f982debfbfa982d14bbad2e478b1",
+          "at": "2026-04-16T05:08:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The out-of-scope item for `cli 層の TDDD 拡張 (→ tddd-06-cli-wiring)` is sourced only to `knowledge/adr/2026-04-15-1636-tddd-05-secondary-adapter.md Context §2`, but that ADR section only inventories infrastructure trait impls and does not mention CLI expansion or `tddd-06-cli-wiring`. This leaves the source attribution invalid for a Blue-planning item; point it at the ADR section that actually defers this follow-up track (for example D5 / Rejected Alternatives I / Reassess When).",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 108,
+              "category": "reference"
+            },
+            {
+              "message": "The T004 verification procedure only runs `test_build_type_graph_trait_impl_populated` and the existing outgoing regression, but the task definition also requires `test_build_type_graph_multiple_trait_impls_on_same_type`. That omission leaves the core multi-port adapter case from D2/S1 unverified: an implementation that records only the first trait impl on a type could still satisfy the listed checks. Add an explicit step for the multi-trait test (and ideally the new outgoing-specific test named in metadata) so T004 can actually verify the intended behavior.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 88,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:049bba2940b8b0e0cbf6b39872d72ec5b69c144dc70cad463d5f33e9f2230f3c",
+          "at": "2026-04-16T05:28:47Z"
+        }
+      ]
+    }
+  }
+}
