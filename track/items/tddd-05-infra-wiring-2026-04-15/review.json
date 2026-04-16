@@ -559,6 +559,20 @@
           "findings": [],
           "hash": "rvw1:sha256:b93ba77318df9fa0fc010a1bd30bcf729baa701ecd058d5637c310b294770046",
           "at": "2026-04-16T07:41:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fb08c259da3c05ddbe76cf331d57b2fdeb411b97f4128173fe8c0a4638ac84",
+          "at": "2026-04-16T07:52:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fb08c259da3c05ddbe76cf331d57b2fdeb411b97f4128173fe8c0a4638ac84",
+          "at": "2026-04-16T07:53:17Z"
         }
       ]
     },
@@ -657,6 +671,50 @@
           "findings": [],
           "hash": "rvw1:sha256:3c07656ba39c316a7b4156991f8dcf59d408c46f67847bfe2f70381cd900fd85",
           "at": "2026-04-16T07:32:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_secondary_adapter` only checks `profile.get_type(name)` and never verifies `TypeKind::Struct`. That means a same-named enum/alias/type-alias could be classified as a valid `SecondaryAdapter` if the adapter declarations match, which violates the struct-only contract that the rest of the evaluator enforces for other struct-like kinds.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "line": 350,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:714e0a2d43b71029c86f692897ed48a7b3f384c90482d999d026cc0aa5581ff0",
+          "at": "2026-04-16T07:52:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_secondary_adapter` treats any entry returned by `profile.get_type(name)` as a valid adapter and never verifies `TypeKind::Struct`. A same-named enum or type alias could therefore be marked Blue as soon as its trait impls match, even though `SecondaryAdapter` is supposed to model a struct-only adapter.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "line": 350,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:714e0a2d43b71029c86f692897ed48a7b3f384c90482d999d026cc0aa5581ff0",
+          "at": "2026-04-16T07:54:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ab5c116043dc1d79ec429257d69bbb92beaf02557d8b49f6275a306e95e109e",
+          "at": "2026-04-16T07:56:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ab5c116043dc1d79ec429257d69bbb92beaf02557d8b49f6275a306e95e109e",
+          "at": "2026-04-16T07:58:31Z"
         }
       ]
     }
