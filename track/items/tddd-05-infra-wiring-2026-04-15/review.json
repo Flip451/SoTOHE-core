@@ -1,153 +1,101 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This regression test is vacuous: with an empty `TypeGraph`, it will pass even if `SecondaryAdapter` is misclassified as a trait, because both `undeclared_traits()` and `undeclared_types()` stay empty. Add a case that makes the type/trait partition observable.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/consistency.rs",
+              "line": 1129,
+              "category": "test coverage"
+            },
+            {
+              "message": "The new `SecondaryAdapter` kind is not covered by the kind-tag uniqueness assertion: the test still hardcodes 12 kinds and omits the new variant, so a future `secondary_adapter` tag collision would slip through. Update the list and expected count to include the new kind.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 972,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:1e8ff7624e1342cc57d6897fcb094fbcb9ea81dc166abacd802689733c56a2fd",
+          "at": "2026-04-16T06:42:48Z"
+        },
+        {
+          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
-          "at": "2026-04-16T06:42:30Z"
+          "hash": "rvw1:sha256:e16bfd26edb7648df735eda6bb69f9e93115a1e5f0ac9d83f25b9e4542e887d7",
+          "at": "2026-04-16T06:45:52Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Adding `SecondaryAdapter` to `render_details` makes the renderer compile for that variant, but `render_type_catalogue` still has no `secondary_adapter` section in `SECTIONS`, so adapter entries are silently omitted from `*-types.md` instead of surfacing missing support. Any catalogue containing a secondary adapter will now produce an incomplete review artifact.",
+              "message": "`TraitImplDecl` is now part of the public catalogue model via `TypeDefinitionKind::SecondaryAdapter`, but it is not exposed through the crate-root re-export surface that this module tells consumers to use. Downstream code can only build non-empty `SecondaryAdapter` values by reaching into `domain::tddd::catalogue`, so the new API is only partially published.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/type_catalogue_render.rs",
-              "line": 182,
-              "category": "correctness"
-            },
-            {
-              "message": "`type_catalogue_entry_to_dto` now returns `InvalidEntry` for `TypeDefinitionKind::SecondaryAdapter`, which means `catalogue_codec::encode` fails for an otherwise valid `TypeCatalogueDocument`. Since the domain model already exposes this variant, callers can construct such documents today and lose encode/round-trip support as soon as an adapter entry is present.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 583,
-              "category": "correctness"
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 251,
+              "category": "public_api"
             }
           ],
-          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
-          "at": "2026-04-16T06:45:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Adding `SecondaryAdapter` to `render_details` makes this match exhaustive, but `render_type_catalogue` still renders only the hard-coded `SECTIONS` list, which has no `secondary_adapter` section. Any catalogue containing a secondary adapter will therefore omit that entry entirely from `*-types.md`, producing an incomplete rendered review artifact instead of surfacing the new kind.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/type_catalogue_render.rs",
-              "line": 182,
-              "category": "correctness"
-            },
-            {
-              "message": "`type_catalogue_entry_to_dto` now rejects `TypeDefinitionKind::SecondaryAdapter`, so `catalogue_codec::encode` fails for an otherwise valid `TypeCatalogueDocument` as soon as one adapter entry is present. The domain model already exposes this variant, so this breaks encode/write-back and round-trip behavior for callers that construct or receive such documents.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 583,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
-          "at": "2026-04-16T06:47:28Z"
+          "hash": "rvw1:sha256:e16bfd26edb7648df735eda6bb69f9e93115a1e5f0ac9d83f25b9e4542e887d7",
+          "at": "2026-04-16T06:49:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
-          "at": "2026-04-16T06:50:47Z"
+          "hash": "rvw1:sha256:e16bfd26edb7648df735eda6bb69f9e93115a1e5f0ac9d83f25b9e4542e887d7",
+          "at": "2026-04-16T06:50:06Z"
         },
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TraitImplDeclDto` accepts `trait_name` verbatim, so a `secondary_adapter` entry can contain an empty name or a module path like `crate::ReviewReader` and still decode/encode successfully. ADR D2 requires a last-segment short name without `::`; without validation here, malformed adapter declarations are accepted and later cannot match the rustdoc-derived trait name.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 177,
-              "category": "validation"
-            },
-            {
-              "message": "The manual stale-field guard only covers existence-only kinds. A `kind: secondary_adapter` entry can still carry stray top-level fields such as `expected_methods`, `expected_variants`, or `transitions_to`, and this codec will accept it because the flattened enum variant is not checked for unknown fields here. That silently drops invalid constraints instead of rejecting the JSON.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 225,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:cdbd789b4d6cf0590695b70a1c787c7c4af1d5a1014118e36527f3e2fcd20595",
-          "at": "2026-04-16T07:02:46Z"
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67381cc330ceb889c36f8a023b7336e69b0a0dcf5a504a9304bd704b84eec9a9",
+          "at": "2026-04-16T07:21:14Z"
         },
         {
-          "type": "fast",
+          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Phase 1.5 only blocks `expected_methods`/`expected_variants`/`transitions_to` on existence-only kinds, but it never rejects `implements`. A payload like `{\"kind\":\"use_case\",\"implements\":[...]}` will deserialize as `UseCase` and silently drop the adapter declarations instead of failing at the codec boundary.",
+              "message": "`TraitImplEntry` drops trait identity down to a last-segment `trait_name`, and `TypeGraph::get_impl()` matches on that string alone. Rust allows different modules to define traits with the same short name, so a type that implements both can be matched against the wrong impl here, producing false Blue/Red results in secondary-adapter evaluation. Preserve a fully qualified/module-qualified trait identifier (or another unambiguous key) instead of only the short name.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 245,
-              "category": "correctness"
-            },
-            {
-              "message": "`TraitImplDeclDto.trait_name` is never validated for the ADR's L1 rule (`::` must be rejected). Both `decode_trait_impl_list` and `encode_trait_impl_list` pass the string through unchanged, so malformed trait paths can round-trip through the codec and the encoder can emit JSON that should be invalid.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 496,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:cdbd789b4d6cf0590695b70a1c787c7c4af1d5a1014118e36527f3e2fcd20595",
-          "at": "2026-04-16T07:04:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new Phase 1.5 validation only rejects `implements` on existence-only kinds. For the non-existence-only variants, serde will still accept and silently drop stale fields, so inputs like `{\"kind\":\"secondary_port\",\"implements\":[...]}` or `{\"kind\":\"secondary_adapter\",\"expected_methods\":[...]}` decode successfully instead of failing. That is silent data loss at the codec boundary.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 225,
+              "file": "libs/domain/src/schema.rs",
+              "line": 491,
               "category": "logic"
             }
           ],
-          "hash": "rvw1:sha256:6979fda956c59f3332f64f9066f7186eaf8e927edabb3d42ec9ac41305664b8b",
-          "at": "2026-04-16T07:07:01Z"
+          "hash": "rvw1:sha256:67381cc330ceb889c36f8a023b7336e69b0a0dcf5a504a9304bd704b84eec9a9",
+          "at": "2026-04-16T07:24:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67381cc330ceb889c36f8a023b7336e69b0a0dcf5a504a9304bd704b84eec9a9",
+          "at": "2026-04-16T07:26:21Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:971648683a03e6845d3d6f49e95f4023114703ed105715056a996aa0a6ee5ced",
-          "at": "2026-04-16T07:09:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`decode` still silently drops the new `implements` field on other non-adapter kinds such as `typestate`, `enum`, and `error_type`. Phase 1.5 only rejects `implements` for existence-only kinds and rejects old fields on `secondary_adapter`, so a payload like `{ \"kind\": \"enum\", \"implements\": [...] }` is accepted and the adapter declaration is lost instead of failing fast.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
-              "line": 245,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:971648683a03e6845d3d6f49e95f4023114703ed105715056a996aa0a6ee5ced",
-          "at": "2026-04-16T07:12:39Z"
+          "hash": "rvw1:sha256:3c07656ba39c316a7b4156991f8dcf59d408c46f67847bfe2f70381cd900fd85",
+          "at": "2026-04-16T07:31:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:122da803b8b56aa5d4a0b1bf41a4bf257967158a38c2489659d2b2b5a010f312",
-          "at": "2026-04-16T07:15:25Z"
+          "hash": "rvw1:sha256:3c07656ba39c316a7b4156991f8dcf59d408c46f67847bfe2f70381cd900fd85",
+          "at": "2026-04-16T07:32:49Z"
         }
       ]
     },
@@ -509,61 +457,170 @@
           "findings": [],
           "hash": "rvw1:sha256:ffbaa418429b8b4cc2f6a31591f6986d62050f3f515ab039b799ff7b1dfb4cf5",
           "at": "2026-04-16T07:02:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:084fd11814c847c06900d8e2242a21412c45e1cf925e7729b68d3c37ccbf7f16",
+          "at": "2026-04-16T07:20:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:084fd11814c847c06900d8e2242a21412c45e1cf925e7729b68d3c37ccbf7f16",
+          "at": "2026-04-16T07:21:48Z"
         }
       ]
     },
-    "domain": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
+          "at": "2026-04-16T06:42:30Z"
+        },
+        {
+          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "This regression test is vacuous: with an empty `TypeGraph`, it will pass even if `SecondaryAdapter` is misclassified as a trait, because both `undeclared_traits()` and `undeclared_types()` stay empty. Add a case that makes the type/trait partition observable.",
+              "message": "Adding `SecondaryAdapter` to `render_details` makes the renderer compile for that variant, but `render_type_catalogue` still has no `secondary_adapter` section in `SECTIONS`, so adapter entries are silently omitted from `*-types.md` instead of surfacing missing support. Any catalogue containing a secondary adapter will now produce an incomplete review artifact.",
               "severity": "P1",
-              "file": "libs/domain/src/tddd/consistency.rs",
-              "line": 1129,
-              "category": "test coverage"
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 182,
+              "category": "correctness"
             },
             {
-              "message": "The new `SecondaryAdapter` kind is not covered by the kind-tag uniqueness assertion: the test still hardcodes 12 kinds and omits the new variant, so a future `secondary_adapter` tag collision would slip through. Update the list and expected count to include the new kind.",
+              "message": "`type_catalogue_entry_to_dto` now returns `InvalidEntry` for `TypeDefinitionKind::SecondaryAdapter`, which means `catalogue_codec::encode` fails for an otherwise valid `TypeCatalogueDocument`. Since the domain model already exposes this variant, callers can construct such documents today and lose encode/round-trip support as soon as an adapter entry is present.",
               "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 972,
-              "category": "test coverage"
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 583,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:1e8ff7624e1342cc57d6897fcb094fbcb9ea81dc166abacd802689733c56a2fd",
-          "at": "2026-04-16T06:42:48Z"
+          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
+          "at": "2026-04-16T06:45:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `SecondaryAdapter` to `render_details` makes this match exhaustive, but `render_type_catalogue` still renders only the hard-coded `SECTIONS` list, which has no `secondary_adapter` section. Any catalogue containing a secondary adapter will therefore omit that entry entirely from `*-types.md`, producing an incomplete rendered review artifact instead of surfacing the new kind.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 182,
+              "category": "correctness"
+            },
+            {
+              "message": "`type_catalogue_entry_to_dto` now rejects `TypeDefinitionKind::SecondaryAdapter`, so `catalogue_codec::encode` fails for an otherwise valid `TypeCatalogueDocument` as soon as one adapter entry is present. The domain model already exposes this variant, so this breaks encode/write-back and round-trip behavior for callers that construct or receive such documents.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 583,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
+          "at": "2026-04-16T06:47:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
+          "at": "2026-04-16T06:50:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitImplDeclDto` accepts `trait_name` verbatim, so a `secondary_adapter` entry can contain an empty name or a module path like `crate::ReviewReader` and still decode/encode successfully. ADR D2 requires a last-segment short name without `::`; without validation here, malformed adapter declarations are accepted and later cannot match the rustdoc-derived trait name.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 177,
+              "category": "validation"
+            },
+            {
+              "message": "The manual stale-field guard only covers existence-only kinds. A `kind: secondary_adapter` entry can still carry stray top-level fields such as `expected_methods`, `expected_variants`, or `transitions_to`, and this codec will accept it because the flattened enum variant is not checked for unknown fields here. That silently drops invalid constraints instead of rejecting the JSON.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 225,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:cdbd789b4d6cf0590695b70a1c787c7c4af1d5a1014118e36527f3e2fcd20595",
+          "at": "2026-04-16T07:02:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1.5 only blocks `expected_methods`/`expected_variants`/`transitions_to` on existence-only kinds, but it never rejects `implements`. A payload like `{\"kind\":\"use_case\",\"implements\":[...]}` will deserialize as `UseCase` and silently drop the adapter declarations instead of failing at the codec boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 245,
+              "category": "correctness"
+            },
+            {
+              "message": "`TraitImplDeclDto.trait_name` is never validated for the ADR's L1 rule (`::` must be rejected). Both `decode_trait_impl_list` and `encode_trait_impl_list` pass the string through unchanged, so malformed trait paths can round-trip through the codec and the encoder can emit JSON that should be invalid.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 496,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:cdbd789b4d6cf0590695b70a1c787c7c4af1d5a1014118e36527f3e2fcd20595",
+          "at": "2026-04-16T07:04:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Phase 1.5 validation only rejects `implements` on existence-only kinds. For the non-existence-only variants, serde will still accept and silently drop stale fields, so inputs like `{\"kind\":\"secondary_port\",\"implements\":[...]}` or `{\"kind\":\"secondary_adapter\",\"expected_methods\":[...]}` decode successfully instead of failing. That is silent data loss at the codec boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 225,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:6979fda956c59f3332f64f9066f7186eaf8e927edabb3d42ec9ac41305664b8b",
+          "at": "2026-04-16T07:07:01Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e16bfd26edb7648df735eda6bb69f9e93115a1e5f0ac9d83f25b9e4542e887d7",
-          "at": "2026-04-16T06:45:52Z"
+          "hash": "rvw1:sha256:971648683a03e6845d3d6f49e95f4023114703ed105715056a996aa0a6ee5ced",
+          "at": "2026-04-16T07:09:25Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`TraitImplDecl` is now part of the public catalogue model via `TypeDefinitionKind::SecondaryAdapter`, but it is not exposed through the crate-root re-export surface that this module tells consumers to use. Downstream code can only build non-empty `SecondaryAdapter` values by reaching into `domain::tddd::catalogue`, so the new API is only partially published.",
+              "message": "`decode` still silently drops the new `implements` field on other non-adapter kinds such as `typestate`, `enum`, and `error_type`. Phase 1.5 only rejects `implements` for existence-only kinds and rejects old fields on `secondary_adapter`, so a payload like `{ \"kind\": \"enum\", \"implements\": [...] }` is accepted and the adapter declaration is lost instead of failing fast.",
               "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue.rs",
-              "line": 251,
-              "category": "public_api"
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 245,
+              "category": null
             }
           ],
-          "hash": "rvw1:sha256:e16bfd26edb7648df735eda6bb69f9e93115a1e5f0ac9d83f25b9e4542e887d7",
-          "at": "2026-04-16T06:49:25Z"
+          "hash": "rvw1:sha256:971648683a03e6845d3d6f49e95f4023114703ed105715056a996aa0a6ee5ced",
+          "at": "2026-04-16T07:12:39Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e16bfd26edb7648df735eda6bb69f9e93115a1e5f0ac9d83f25b9e4542e887d7",
-          "at": "2026-04-16T06:50:06Z"
+          "hash": "rvw1:sha256:122da803b8b56aa5d4a0b1bf41a4bf257967158a38c2489659d2b2b5a010f312",
+          "at": "2026-04-16T07:15:25Z"
         }
       ]
     }
