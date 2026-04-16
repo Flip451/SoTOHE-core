@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "EdgeSet",
+      "description": "Selects which edge types to include in the mermaid type graph render",
+      "approved": true,
+      "kind": "enum",
+      "expected_variants": [
+        "Methods",
+        "Fields",
+        "Impls",
+        "All"
+      ]
+    },
+    {
+      "name": "TypeGraphRenderOptions",
+      "description": "Configuration options for the type graph mermaid renderer",
+      "approved": true,
+      "kind": "value_object"
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "EdgeSet",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeGraphRenderOptions",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}

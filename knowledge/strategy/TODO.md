@@ -938,3 +938,17 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 
 - [ ] **RV2-18** (MEDIUM): `sotp review codex-local` の verdict/findings stdout 出力改善 — 現在は Codex CLI の stdout 末尾に verdict JSON が埋もれており、review-fix-lead agent が `tail` で抽出している。`sotp review codex-local` が auto-record 完了後に findings のサマリーを整形して stdout に出力すれば、agent も orchestrator も exit code + stdout だけで判断完結する。review.json の Read が不要になり、レビューループの手間が減る
   - **追加日**: 2026-04-10
+
+### TDDD 不具合
+
+- [ ] **TDDD-BUG-01** (LOW): `check_type_signals` が空カタログを一律エラーにする — `consistency.rs:372-378` で `type_definitions: []` をエラーにしている。ファイル不在なら skip されるのに、存在 + 空はエラーになる非対称。guard entry パターン (変更しない層を baseline で監視する) が使えず、1 件の reference entry を入れるワークアラウンドが必要。修正案: baseline 存在時は空カタログを許容する
+  - **追加日**: 2026-04-16
+
+- [ ] **TDDD-BUG-02** (LOW): `check_type_signals` の error message が "domain-types.json" にハードコードされている — `consistency.rs:375` の文字列リテラルが全 layer 共通の関数で使われるため、usecase / infrastructure でエラーが出ても "domain-types.json" と表示される。修正案: カタログファイル名を引数に追加して動的に埋め込む
+  - **追加日**: 2026-04-16
+
+- [ ] **TDDD-Q01** (XS): `type_catalogue_render.rs` の SECTIONS が手動管理 — 新 variant 追加時に SECTIONS への追記漏れを検出するテストを追加する (`kind_tag` 全量と SECTIONS の kind_tag を比較)
+  - **追加日**: 2026-04-16
+
+- [ ] **TDDD-Q02** (XS): `catalogue_codec.rs` Phase 1.5: 既存 structured kinds (`secondary_port`, `application_service`) に `implements` の stale field guard が未設定 — TDDD-05 で `secondary_adapter` 側のみ修正、pre-existing code は対象外で見送り
+  - **追加日**: 2026-04-16

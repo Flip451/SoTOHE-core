@@ -85,6 +85,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Domain serde 依存除去 — hexagonal 純粋性回復 + infrastructure 層 TDDD partial dogfood](2026-04-14-1531-domain-serde-ripout.md) | Accepted | 2026-04-14 |
 | [Catalogue active-track guard + renderer source-file-name + sync_rendered_views multilayer](2026-04-15-1012-catalogue-active-guard-fix.md) | Accepted | 2026-04-15 |
 | [TDDD-05: Secondary Adapter variant の追加 — infrastructure 層における hexagonal port 実装の検証](2026-04-15-1636-tddd-05-secondary-adapter.md) | Accepted | 2026-04-15 |
+| [TDDD Type Graph View — TypeGraph から mermaid 図をレンダーして型間関係を可視化する](2026-04-16-2200-tddd-type-graph-view.md) | Accepted | 2026-04-16 |
 
 ### ADR 運用
 
