@@ -50,7 +50,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "commit_hash": "88f63f72937edb04d4d61a50b23d0739d360b325",
@@ -59,16 +59,17 @@
       "status": "done"
     },
     {
+      "commit_hash": "003f096176328e1bed8798cab87562c7f5f50bc3",
       "description": "graph.rs — CLI command sotp track type-graph + wiring. apps/cli/src/commands/track/tddd/graph.rs を新設。resolve_layers / ensure_active_track / RustdocSchemaExporter / build_type_graph / atomic_write_file を使い <layer>-graph.md を出力。2 箇所に登録: (1) apps/cli/src/commands/track/tddd/mod.rs に graph モジュールを追加、(2) apps/cli/src/commands/track/mod.rs の TrackCommand enum に TypeGraph variant を追加し execute() match arm を実装。TDD: invalid track / missing layer / dispatch テスト",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "CI gate + 生成物可読性検証。cargo make ci 全通過確認。domain-graph.md の生成物を目視確認 (integration test #[ignore])。verification.md に domain 層ノード数・可読性所感・Phase 2 判断材料を記録",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "TDDD Type Graph View Phase 1 — domain 層 mermaid 最小スパイク",
-  "updated_at": "2026-04-16T22:47:05Z"
+  "updated_at": "2026-04-16T23:30:00Z"
 }

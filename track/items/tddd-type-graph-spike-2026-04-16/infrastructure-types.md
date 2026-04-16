@@ -4,11 +4,11 @@
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| EdgeSet | enum | — | Methods, Fields, Impls, All | 🟡 |
+| EdgeSet | enum | — | Methods, Fields, Impls, All | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| TypeGraphRenderOptions | value_object | — | — | 🟡 |
+| TypeGraphRenderOptions | value_object | — | — | 🔵 |
 
