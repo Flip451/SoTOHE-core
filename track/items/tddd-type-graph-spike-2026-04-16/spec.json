@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "status": "approved",
+  "version": "1.0",
+  "title": "TDDD Type Graph View Phase 1 — domain 層 mermaid 最小スパイク",
+  "goal": [
+    "TypeGraph から mermaid 図を生成する最小レンダラーを実装し domain 層で可読性を検証する (ADR Phase 1 spike)",
+    "sotp track type-graph CLI コマンドを追加し domain 層に対して <layer>-graph.md を 1 枚出力する",
+    "mermaid のノード数限界を実測し Phase 2 (cluster + multi-layer) の設計判断に入力を提供する"
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "text": "libs/infrastructure/src/tddd/type_graph_render.rs を新設し TypeGraphRenderOptions / EdgeSet / render_type_graph_flat を実装する。TypeGraph から method edge (self-receiver の return type) を抽出し mermaid flowchart LR を生成する",
+        "sources": [
+          "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D1, §D2(a)",
+          "libs/domain/src/schema.rs §TypeGraph, §TypeNode"
+        ],
+        "task_refs": [
+          "T001"
+        ]
+      },
+      {
+        "text": "apps/cli/src/commands/track/tddd/graph.rs を新設し sotp track type-graph <track-id> --layer <layer_id> コマンドを実装する。signals.rs の execute_type_signals パターンを踏襲する",
+        "sources": [
+          "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D6",
+          "apps/cli/src/commands/track/tddd/signals.rs §execute_type_signals"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "CLI dispatch に type-graph サブコマンドを追加し 2 箇所に登録する: (1) apps/cli/src/commands/track/tddd/mod.rs に graph モジュールを追加、(2) apps/cli/src/commands/track/mod.rs の TrackCommand enum に TypeGraph variant を追加し execute() の match arm を実装する",
+        "sources": [
+          "apps/cli/src/commands/track/tddd/mod.rs",
+          "apps/cli/src/commands/track/mod.rs §TrackCommand, §execute"
+        ],
+        "task_refs": [
+          "T002"
+        ]
+      },
+      {
+        "text": "TDD red→green: unit tests (empty graph / single edge / multi-edge / enum shape) を先に追加し red 確認後に実装で green 化する",
+        "sources": [
+          "convention — .claude/rules/05-testing.md §Core Principles",
+          "inference — render function requires boundary cases covering empty/single/multi edges and enum node shapes to validate mermaid output correctness"
+        ],
+        "task_refs": [
+          "T001",
+          "T002"
+        ]
+      },
+      {
+        "text": "cargo make ci 全通過と domain-graph.md 生成物の可読性検証を実施する",
+        "sources": [
+          "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D7 Phase 1 Acceptance"
+        ],
+        "task_refs": [
+          "T003"
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "text": "クラスタリング (--cluster-depth) は Phase 2 で実装する",
+        "sources": [
+          "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D4, §D7 Phase 2"
+        ]
+      },
+      {
+        "text": "フィールド/variant エッジと trait impl 破線エッジは Phase 2 で実装する (TypeNode::trait_impls は tddd-05 merge 済みで既存; Phase 2 は実装スコープの選択として延期)",
+        "sources": [
+          "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D2(b), §D2(c)",
+          "libs/domain/src/schema.rs §TypeNode::trait_impls"
+        ]
+      },
+      {
+        "text": "Entry point 検出は Phase 2 で実装する",
+        "sources": [
+          "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D3"
+        ]
+      },
+      {
+        "text": "経路クエリ CLI (sotp track type-path) は Phase 3 で実装する",
+        "sources": [
+          "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D6, §D7 Phase 3"
+        ]
+      },
+      {
+        "text": "DRIFT-01/02 統合と TDDD-BUG-02/TDDD-Q01 修正は Phase 2 で実装する",
+        "sources": [
+          "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D8, §D9"
+        ]
+      },
+      {
+        "text": "sotp track type-signals からの自動レンダー統合は Phase 2 で実装する",
+        "sources": [
+          "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D6"
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "text": "TDDD 不変条件 (layer-agnostic / rustdoc-only / domain serde なし) を侵さない純粋な view 拡張であること",
+      "sources": [
+        "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §5",
+        "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md §D6"
+      ]
+    },
+    {
+      "text": "既存の TypeCatalogueDocument / TypeGraph の schema に変更を加えない",
+      "sources": [
+        "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D1"
+      ]
+    },
+    {
+      "text": "small task commits: 各 task の diff は 500 行未満を目標とする",
+      "sources": [
+        "convention — .claude/rules/10-guardrails.md §Small task commits"
+      ]
+    },
+    {
+      "text": "TDD red→green の順序を守る",
+      "sources": [
+        "convention — .claude/rules/05-testing.md §Core Principles"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "text": "libs/infrastructure/src/tddd/type_graph_render.rs が存在し render_type_graph_flat 関数が TypeGraph から mermaid flowchart LR を生成する",
+      "sources": [
+        "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D1"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "sotp track type-graph <id> --layer domain が <layer>-graph.md を書き出す",
+      "sources": [
+        "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D6, §D7 Phase 1"
+      ],
+      "task_refs": [
+        "T002"
+      ]
+    },
+    {
+      "text": "生成された mermaid 図で method edge (self→return type) が正しく表現されている",
+      "sources": [
+        "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D2(a)"
+      ],
+      "task_refs": [
+        "T001"
+      ]
+    },
+    {
+      "text": "cargo make ci (full suite: fmt-check + clippy + nextest + test-doc + deny + python-lint + scripts-selftest + check-layers + verify-canonical-modules + verify-arch-docs + verify-doc-links + verify-plan-progress + verify-track-metadata + verify-track-registry + verify-tech-stack + verify-orchestra + verify-latest-track + verify-module-size + verify-domain-strings + verify-domain-purity + verify-usecase-purity + verify-view-freshness + verify-spec-coverage + verify-spec-states-current) が全通過する",
+      "sources": [
+        "convention — .claude/rules/07-dev-environment.md §Pre-commit Checklist",
+        "inference — full ci-local task dependency list is defined in Makefile.toml [tasks.ci-local] and is the authoritative commit gate"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    },
+    {
+      "text": "domain 層の TypeGraph ノード数と mermaid 可読性の実測結果が verification.md に記録されている",
+      "sources": [
+        "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D7 Phase 1 Acceptance"
+      ],
+      "task_refs": [
+        "T003"
+      ]
+    }
+  ],
+  "related_conventions": [
+    "knowledge/conventions/source-attribution.md",
+    "knowledge/conventions/nightly-dev-tool.md",
+    "knowledge/conventions/hexagonal-architecture.md"
+  ],
+  "signals": {
+    "blue": 20,
+    "yellow": 0,
+    "red": 0
+  },
+  "approved_at": "2026-04-16T11:48:10Z",
+  "content_hash": "sha256:4118d93c75c3ec5f666d6887f999ce1b2412ee36c635724883e7be1c35fc1ec6"
+}

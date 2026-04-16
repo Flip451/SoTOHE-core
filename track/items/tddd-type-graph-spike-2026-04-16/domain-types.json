@@ -1,0 +1,46 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TypeGraph",
+      "description": "Pre-indexed view of a crate public API for type catalogue evaluation — guard against accidental modification during graph renderer implementation",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
+    },
+    {
+      "name": "TypeNode",
+      "description": "A public type in the crate as indexed for TDDD evaluation — guard against accidental modification",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
+    },
+    {
+      "name": "TraitNode",
+      "description": "A public trait in the crate as indexed for TDDD evaluation — guard against accidental modification",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "TypeGraph",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeNode",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TraitNode",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

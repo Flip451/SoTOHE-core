@@ -1,0 +1,20 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "SaveTrackUseCase",
+      "description": "Use case for saving track state — guard against accidental modification during graph renderer implementation",
+      "approved": true,
+      "action": "reference",
+      "kind": "use_case"
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "SaveTrackUseCase",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

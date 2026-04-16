@@ -1,0 +1,598 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f6986aec658ea1301936ff159a2244f6df99c90342221c8f3db1901ab1e5583",
+          "at": "2026-04-16T11:26:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D6 hard-codes the Phase 2 auto-render default to `--cluster-depth 2`, but the same ADR later says the Phase 2 default is still an open question between `1` and `2`. That internal contradiction leaves the implementation target ambiguous.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+              "line": 240,
+              "category": "consistency"
+            },
+            {
+              "message": "`spec.json` is marking inferred requirements as blue-sourced facts. The TDD item cites `.claude/rules/05-testing.md §Core Principles`, but that source only requires TDD in general and does not justify the specific `empty graph / single edge / multi-edge / enum shape` test matrix; likewise the CI acceptance text cites `§Pre-commit Checklist` for a narrower `cargo make ci` breakdown it does not define. Under `knowledge/conventions/source-attribution.md`, these items should use inference/discussion sources or cite a document that actually states them.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/spec.json",
+              "line": 43,
+              "category": "source_attribution"
+            }
+          ],
+          "hash": "rvw1:sha256:2f6986aec658ea1301936ff159a2244f6df99c90342221c8f3db1901ab1e5583",
+          "at": "2026-04-16T11:31:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 does not include the required wiring in `apps/cli/src/commands/track/mod.rs`, which is where `TrackCommand` and `execute()` dispatch are defined today. Following this scope literally would only add `graph.rs` and `tddd/mod.rs`, leaving `sotp track type-graph` unreachable and failing the Phase 1 acceptance criterion.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/spec.json",
+              "line": 34,
+              "category": "planning"
+            },
+            {
+              "message": "The T003 acceptance criterion still describes `cargo make ci` as only `fmt-check + clippy -D warnings + nextest + deny + check-layers`, but the current Makefile defines `ci` as the full `ci-local` suite and even `ci-rust` also runs `verify-canonical-modules-local`. This under-specifies the real gate, so the plan can mark verification complete while the actual CI command still fails.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/spec.json",
+              "line": 158,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:da4ecb6cb9d9c24b204b5c4cdb3051c4e512853d2a4304b3d3aa14d11e3a0aa7",
+          "at": "2026-04-16T11:36:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 still describes CLI dispatch as a single ambiguous `mod.rs` registration here, while `spec.json` now correctly requires wiring both `apps/cli/src/commands/track/tddd/mod.rs` and the top-level `apps/cli/src/commands/track/mod.rs`. Because `plan.md` is generated from this metadata, an implementer can still miss the `TrackCommand`/`execute()` wiring and end up with an unreachable `sotp track type-graph` command.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/metadata.json",
+              "line": 18,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:c97fc9443b88fc14a29b107f9a1824a7954d8093ab002e24bb9c39535e6b0df3",
+          "at": "2026-04-16T11:40:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan/spec still describe trait-impl edges as deferred because of a future `tddd-05` dependency, but `TypeNode::trait_impls` is already present in `libs/domain/src/schema.rs`. That makes the out-of-scope note factually wrong and can mislead Phase 2 planning by treating an already-satisfied prerequisite as a blocker.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/spec.json",
+              "line": 72,
+              "category": "factual contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:223d69d0b5ec4401243c9c46ed1cb50b6e62572e33ca2e6d5c479e88983255cc",
+          "at": "2026-04-16T11:46:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a73ef308cc3dde8cadb5aefa25659eeb59aa81523ef04faff64d35ceb05fc52",
+          "at": "2026-04-16T11:52:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55feb2a2e3514be7536a21119a27dd2cfe8b9ce953c727a0229957c1d8c9c37b",
+          "at": "2026-04-16T12:51:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` is earlier than `created_at` (`2026-04-16T12:47:17Z` vs `2026-04-16T22:30:00Z`), so this record claims it was last modified before it was created. Any sync or freshness logic that trusts these timestamps will misclassify the item.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/metadata.json",
+              "line": 73,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:55feb2a2e3514be7536a21119a27dd2cfe8b9ce953c727a0229957c1d8c9c37b",
+          "at": "2026-04-16T13:14:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b690ba3b33af3ad689b4c60024ebd64706229da73826c00c487809e3c5322315",
+          "at": "2026-04-16T13:15:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b690ba3b33af3ad689b4c60024ebd64706229da73826c00c487809e3c5322315",
+          "at": "2026-04-16T13:20:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` was left at the track creation timestamp even though this transition changes `metadata.json` from `planned` to `in_progress` and marks T001 done. The track workflow uses `updated_at` as the fallback for resolving the latest active track on non-`track/*` branches, so leaving it stale can misorder or skip this track in later commands. Bump it to the actual transition time when recording the T001 completion.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/metadata.json",
+              "line": 73,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b690ba3b33af3ad689b4c60024ebd64706229da73826c00c487809e3c5322315",
+          "at": "2026-04-16T13:24:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b690ba3b33af3ad689b4c60024ebd64706229da73826c00c487809e3c5322315",
+          "at": "2026-04-16T13:36:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` records the T001 transition to `done`, but `updated_at` is still the original creation timestamp (`2026-04-16T22:30:00Z`). Track mutations are expected to refresh `updated_at`, and downstream workflow/docs use this field to identify the latest track state; leaving it stale makes this transition factually inconsistent and can cause freshness/order bugs.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/metadata.json",
+              "line": 73,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:b690ba3b33af3ad689b4c60024ebd64706229da73826c00c487809e3c5322315",
+          "at": "2026-04-16T13:37:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` marks T001 as `done` and moves the track to `in_progress`, but `updated_at` is still the original creation timestamp. Latest-track resolution and freshness checks rank tracks by `metadata.json.updated_at`, so leaving it stale after this transition can misorder the track or make downstream tooling read an older state than the file now represents.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/metadata.json",
+              "line": 73,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:b690ba3b33af3ad689b4c60024ebd64706229da73826c00c487809e3c5322315",
+          "at": "2026-04-16T13:38:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` was changed to `2026-04-16T12:47:05Z`, but `created_at` is still `2026-04-16T22:30:00Z`, so the item now appears updated before it was created. This reintroduces a factual contradiction in the metadata and can break any ordering logic that assumes `updated_at >= created_at`.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/metadata.json",
+              "line": 73,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:7718df0fb1b28d145bd80cc71445742576c74587c58121d385726d84fae2fe50",
+          "at": "2026-04-16T13:40:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:97dc22d8d175886ca8fa69afa782116d785f1c526a21f54aa5b534835bd0d240",
+          "at": "2026-04-16T13:42:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:660590fccc2f5c329e361a1e85ef330d020620b00d34f8f7d758b8a0c02e3f26",
+          "at": "2026-04-16T13:51:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` records T003 as fully completed (`cargo make ci` passed, readability confirmed, and the result table marks `T003 | Done`), but `metadata.json` and the generated `plan.md` still leave T003 as `todo`. These scoped artifacts now disagree on whether the CI/readability work actually happened, which violates the briefing's no-contradictions requirement and can cause downstream tooling or reviewers to treat the track as fully verified when it is still in progress.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/verification.md",
+              "line": 29,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:660590fccc2f5c329e361a1e85ef330d020620b00d34f8f7d758b8a0c02e3f26",
+          "at": "2026-04-16T13:52:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` is still `2026-04-16T22:47:05Z` even though this patch also marks `T003` and the overall track `done`, and `verification.md` records that final completed state later at `2026-04-16T23:30:00Z`. On `main`, latest-track resolution falls back to `updated_at`, so leaving the timestamp stale can misorder track selection and misrepresent which track was updated most recently.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/metadata.json",
+              "line": 74,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a76de1581a92f0a6ec8b503c08f353476baf3422080b11d31f7a0725000ed9d7",
+          "at": "2026-04-16T13:56:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ee07097639fd92a22e07dc2b7076edddae90df72c64391210f3c917233b67e6",
+          "at": "2026-04-16T13:57:57Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `execute_type_graph` entry point only has negative-case tests. There is no coverage for the success path or the actual write path (`RustdocSchemaExporter` -> `build_type_graph` -> `render_type_graph_flat` -> `atomic_write_file`), so a regression in the newly added `type-graph` dispatch or `<layer>-graph.md` output would not be caught.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 133,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e0ed77c7b0536598fbd425e4cf82fb434e468d7853bc1bf1814655b0606c7d86",
+          "at": "2026-04-16T12:53:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_type_graph` writes `<layer>-graph.md` through `atomic_write_file` without the symlink guards that `baseline-capture` uses. A symlinked `items_dir` or `track/<id>` can redirect the write outside the track tree and overwrite an arbitrary file, so this new command is vulnerable to path-traversal-by-symlink.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 115,
+              "category": "security"
+            },
+            {
+              "message": "The new public `execute_type_graph` API has no happy-path test. The current tests only cover invalid track IDs, unknown layers, and frozen tracks, so regressions in the actual rustdoc export/render/write flow will not be caught.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 31,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:e0ed77c7b0536598fbd425e4cf82fb434e468d7853bc1bf1814655b0606c7d86",
+          "at": "2026-04-16T12:56:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_type_graph` only checks whether `items_dir` itself is a symlink, then reads `items_dir/<track_id>/metadata.json` directly. A symlinked track directory under a real items root will still be followed here, so the command can load metadata from outside the trusted tree before the active-track guard runs. The later output-path guard in `render_and_write_graph` does not protect this read path.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 60,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:2bf42ba2f738613cef26093f9bf7cdcdaece3492c241fcea63f00e2b7872f5ef",
+          "at": "2026-04-16T12:59:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This only rejects a symlink on the final `items_dir` component. If `--items-dir` is reached through a symlinked ancestor (for example `repo-link/track/items`), `reject_symlinks_below()` will still trust that anchor and the metadata read / atomic write can escape the intended workspace. Canonicalize or validate the full anchor path before treating `items_dir` as trusted.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 41,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:f54e1c49899bb3cbd88232ec017e04747b2a0f43f88a655fffb3089a99d1bc49",
+          "at": "2026-04-16T13:04:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6fb16fe96edfae5b16c690d84621bf663a8e2b3d2b2b2a1294744aa90f9ed0c0",
+          "at": "2026-04-16T13:10:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba03a757b73053f3142502ba54870b75cb6596e54b9e71d74be20a936a6b2f42",
+          "at": "2026-04-16T13:13:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:856be536672feec054fa9afbf6ee9d670de0de6d6081f1c41996ec80c2f2922a",
+          "at": "2026-04-16T13:21:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:856be536672feec054fa9afbf6ee9d670de0de6d6081f1c41996ec80c2f2922a",
+          "at": "2026-04-16T13:24:16Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_type_names` is too permissive: it treats every PascalCase token in the rendered return string as a target, so signatures like `impl Display`/`dyn Debug` and wrapper-heavy returns like `Result<Option<User>, DomainError>` can produce false edges to `Display`, `Debug`, `Result`, or `Option` whenever those names exist in the graph. That makes the diagram report dependencies that do not exist; reuse the structured return-type extraction logic instead of token-splitting the string.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 182,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7cc24320864ea8910a4cff2710e24c57ee7a52c99fa583cdfa57ce77a44a6090",
+          "at": "2026-04-16T12:04:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_type_names` is still too coarse for common Rust signatures: it will surface associated-type labels like `Item` and `Output` from returns such as `impl Iterator<Item = Foo>` / `impl Future<Output = Foo>`, and the new whitelist still misses other standard wrappers/traits like `IntoIterator`, `Clone`, `Copy`, and `Default`. If any of those names exist in the `TypeGraph`, the renderer will emit false edges.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 250,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:d24d8ff599d0ac0b0b669c3deeb859cd171b7c13bcd0b1da1e7dfe24769e0c37",
+          "at": "2026-04-16T12:08:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new assoc-type label filter is too broad: once a label name like `Item`/`Output` is collected, every matching token is dropped from the return string. That silently removes valid edges when a real type shares the same name, e.g. `impl Iterator<Item = Item>` or `impl Future<Output = Output>`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 301,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:707369b82d9cbbfb4926911a87c23c529ddc86c1f91534ed82089160085021f3",
+          "at": "2026-04-16T12:12:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`STDLIB_WRAPPER_TYPES` still omits common standard-library trait tokens such as `TryFrom` and `TryInto`. `extract_type_names()` will emit those names for signatures like `impl TryFrom<Foo>`, so if the graph ever contains a same-named node the renderer will still create a false edge, leaving this class of dependency-noise unresolved.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 32,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7b3e52d8f720198c826fe3e746c67053de60d4065b597895db67a0c2aaf50060",
+          "at": "2026-04-16T12:16:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`STDLIB_WRAPPER_TYPES` is still incomplete: common std wrappers such as `PhantomData` (and `Cow`) are not filtered, so a method returning `PhantomData<Foo>` can still produce a false edge whenever a `PhantomData` node exists in the graph. That defeats the new guard against wrapper-like return tokens becoming diagram edges.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 32,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:61b9bbe23c8427b1e3909cf920763e637de4e62ca6d2c2bc27a2ad036173c9a2",
+          "at": "2026-04-16T12:21:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`STDLIB_WRAPPER_TYPES` lists only the bare `NonZero` token here, but `extract_type_names()` emits concrete identifiers like `NonZeroU32` and `NonZeroI64` as single tokens. Those common stdlib wrappers will still pass the filter and can create false edges whenever a graph contains a same-named type.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 74,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dabe95f8a779527132e11aa90ede06cc91ab8f5d26b317222726f99e211914bd",
+          "at": "2026-04-16T12:24:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The stdlib-wrapper denylist is still incomplete for common single-token wrappers. Types like `Poll`, `ControlFlow`, and `Range*` are not filtered here, so a method returning `Poll<Published>` or `Range<User>` will still emit false edges whenever the graph contains those node names. That leaves the same false-positive bug this patch is meant to remove.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 37,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:50b2511f5f8dcbdc831dfe58f0573f1778a134ebefaf2a945b71c18dc50fea9a",
+          "at": "2026-04-16T12:27:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a019941453423a29ebc5d4aa9f34e22d82be0edf0e471d9403abda4b2256556",
+          "at": "2026-04-16T12:29:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_type_names` tokenizes return types only by separators, so common associated-type bindings like `impl Iterator<Item = Foo>` or `impl Future<Output = Bar>` will surface `Item`/`Output` as candidate types. If the workspace has a type with one of those names, the renderer adds a bogus edge; this needs label-aware parsing or reuse of the structured type-name extraction instead of raw token splitting.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 193,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:76f0869ae1cad61ab978366c8a0aac6bd9e597874424db4ddeb3f29441c4c140",
+          "at": "2026-04-16T12:35:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76f0869ae1cad61ab978366c8a0aac6bd9e597874424db4ddeb3f29441c4c140",
+          "at": "2026-04-16T12:38:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_flat` documents `EdgeSet::Fields`, `EdgeSet::Impls`, and `EdgeSet::All` as supported modes, but the implementation only ever collects method edges. A caller that selects `Fields` or `Impls` gets an empty diagram, and `All` still omits those edge classes entirely, so the public API cannot satisfy its own contract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 87,
+              "category": "logic"
+            },
+            {
+              "message": "The `max_nodes_per_diagram` truncation slices the alphabetically sorted connected-node set before filtering edges, so a small limit can drop every rendered edge and leave a diagram of isolated nodes even when the graph has relationships. For example, with edges `A -> Z` and `B -> C`, a limit of 2 keeps `A` and `B` but renders no edges at all. The truncation step needs to preserve an actual edge-induced subgraph, not an arbitrary node prefix.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 124,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:76f0869ae1cad61ab978366c8a0aac6bd9e597874424db4ddeb3f29441c4c140",
+          "at": "2026-04-16T12:40:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e2a43777bcd996f718fa3efda316dd089f2d89b8d9b9ce091d3c181e088faa5",
+          "at": "2026-04-16T12:45:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`layer_id` is interpolated directly into `graph_filename`, and the symlink guard does not normalize `..` segments. A caller that passes an unvalidated id like `../../escape` can make `graph_path` escape `track_dir` and write outside `trusted_root`. This helper needs its own filename validation or a validated type boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 244,
+              "category": "security"
+            },
+            {
+              "message": "This new public API has no tests covering the successful write path or the symlink-rejection/error path. That leaves the `reject_symlinks_below` + `atomic_write_file` integration unverified and violates the repo's public-API testing requirement.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 235,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:5d58135934d1a0e507c997da400924cea23a8ae21c3f36975030e4c129e153f6",
+          "at": "2026-04-16T13:21:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This test is unconditional but uses `std::os::unix::fs::symlink`, so `cargo test` will fail to compile on non-Unix targets. Gate the test with `#[cfg(unix)]` (or provide a cross-platform fallback) to keep the infrastructure crate buildable everywhere.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 545,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:a29bd7195c5c6db289b825efc2923b1ff17bedddc0f4bf02dfc8e3063a76e1c1",
+          "at": "2026-04-16T13:24:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This `layer_id` check is stricter than the existing TDDD layer-id contract. `parse_tddd_layers` only rejects path separators and `..`, but this code now rejects any id containing `.` or non-ASCII characters, so a configuration that the infrastructure already accepts can start failing here even though the filename would still be safe. Align the validation with the shared path-component rules or move to a validated `LayerId` type.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 247,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aa138015cee5d8bc1b9f7f0cf10d468166f559b9c31662405b972a8675f2d163",
+          "at": "2026-04-16T13:26:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c062fd91e1a04bd8769f93397017066defb57c906ad2196a36a8237c8475177",
+          "at": "2026-04-16T13:29:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: The new `layer_id` validation still allows a single `:` character, so on Windows inputs like `C:escape` pass the check and `track_dir.join(format!(\"{layer_id}-graph.md\"))` becomes a drive-prefixed path instead of a child of `track_dir`. That lets `write_type_graph_file` escape the intended output directory despite the traversal guard added here.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 247,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:8c062fd91e1a04bd8769f93397017066defb57c906ad2196a36a8237c8475177",
+          "at": "2026-04-16T13:31:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5c6b10508033ceba357c5af89c5483c73409d291b57e8973fecf9c72da0e82d7",
+          "at": "2026-04-16T13:34:36Z"
+        }
+      ]
+    }
+  }
+}
