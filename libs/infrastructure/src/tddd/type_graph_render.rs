@@ -22,8 +22,12 @@
 //!   types from the workspace crate's rustdoc export, not stdlib re-exports.
 
 use std::collections::HashSet;
+use std::path::Path;
 
 use domain::schema::{TypeGraph, TypeKind};
+
+use crate::track::atomic_write::atomic_write_file;
+use crate::track::symlink_guard::reject_symlinks_below;
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -215,6 +219,55 @@ pub fn render_type_graph_flat(
 }
 
 // ---------------------------------------------------------------------------
+// Write helper (symlink-checked)
+// ---------------------------------------------------------------------------
+
+/// Renders a mermaid type graph and writes it to `<layer_id>-graph.md` inside
+/// `track_dir`, with symlink protection relative to `trusted_root`.
+///
+/// Combines `render_type_graph_flat` + `reject_symlinks_below` + `atomic_write_file`
+/// so that the symlink guard stays in the infrastructure layer (not CLI).
+///
+/// # Errors
+///
+/// Returns `std::io::Error` if `layer_id` contains unsafe path characters (path
+/// separators `/` or `\`, `:`, or `..`), if the symlink guard rejects the output
+/// path, or if the atomic write fails.
+pub fn write_type_graph_file(
+    graph: &TypeGraph,
+    layer_id: &str,
+    track_dir: &Path,
+    trusted_root: &Path,
+    opts: &TypeGraphRenderOptions,
+) -> Result<String, std::io::Error> {
+    // Validate layer_id to prevent path traversal.  Uses the same rules as
+    // `is_safe_path_component` in `verify::tddd_layers`, plus a bare `:` check
+    // to prevent Windows drive-relative paths (e.g. `C:escape` → `C:escape-graph.md`
+    // which Path::join resolves relative to the drive root, not track_dir).
+    if layer_id.is_empty()
+        || layer_id.contains('/')
+        || layer_id.contains('\\')
+        || layer_id.contains(':')
+        || layer_id == ".."
+    {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("layer_id contains unsafe path characters: {layer_id:?}"),
+        ));
+    }
+
+    let rendered = render_type_graph_flat(graph, layer_id, opts);
+
+    let graph_filename = format!("{layer_id}-graph.md");
+    let graph_path = track_dir.join(&graph_filename);
+
+    reject_symlinks_below(&graph_path, trusted_root)?;
+    atomic_write_file(&graph_path, rendered.as_bytes())?;
+
+    Ok(graph_filename)
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
@@ -241,6 +294,7 @@ mod tests {
 
     use domain::schema::{TypeGraph, TypeKind, TypeNode};
     use domain::tddd::catalogue::{MemberDeclaration, MethodDeclaration};
+    use tempfile::TempDir;
 
     use super::*;
 
@@ -425,5 +479,107 @@ mod tests {
             !output.contains("Factory -->|create| Product"),
             "associated functions without self must not create edges"
         );
+    }
+
+    // --- write_type_graph_file ---
+
+    fn minimal_graph() -> TypeGraph {
+        let mut types = HashMap::new();
+        types.insert(
+            "Draft".to_string(),
+            struct_node(vec![method_returning("publish", "Published")]),
+        );
+        types.insert("Published".to_string(), struct_node(vec![]));
+        TypeGraph::new(types, HashMap::new())
+    }
+
+    #[test]
+    fn test_write_type_graph_file_success_path() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = tmp.path().join("track_dir");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        let graph = minimal_graph();
+        let opts = TypeGraphRenderOptions::default();
+
+        let result = write_type_graph_file(&graph, "domain", &track_dir, tmp.path(), &opts);
+
+        assert!(result.is_ok(), "write should succeed: {:?}", result);
+        let filename = result.unwrap();
+        assert_eq!(filename, "domain-graph.md");
+
+        let written = std::fs::read_to_string(track_dir.join(&filename)).unwrap();
+        assert!(written.contains("```mermaid"));
+        assert!(written.contains("Draft -->|publish| Published"));
+    }
+
+    #[test]
+    fn test_write_type_graph_file_rejects_path_traversal_layer_id() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = tmp.path().join("track_dir");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        let opts = TypeGraphRenderOptions::default();
+
+        let result = write_type_graph_file(&graph, "../../escape", &track_dir, tmp.path(), &opts);
+
+        assert!(result.is_err(), "path traversal in layer_id must be rejected");
+        let err = result.unwrap_err();
+        assert_eq!(err.kind(), std::io::ErrorKind::InvalidInput);
+    }
+
+    #[test]
+    fn test_write_type_graph_file_rejects_empty_layer_id() {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = tmp.path().join("track_dir");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        let opts = TypeGraphRenderOptions::default();
+
+        let result = write_type_graph_file(&graph, "", &track_dir, tmp.path(), &opts);
+
+        assert!(result.is_err(), "empty layer_id must be rejected");
+        let err = result.unwrap_err();
+        assert_eq!(err.kind(), std::io::ErrorKind::InvalidInput);
+    }
+
+    #[test]
+    fn test_write_type_graph_file_rejects_colon_in_layer_id() {
+        // Colon in layer_id could form a Windows drive-relative path (e.g. `C:escape`)
+        // where Path::join resolves to the drive root rather than track_dir.
+        let tmp = TempDir::new().unwrap();
+        let track_dir = tmp.path().join("track_dir");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        let opts = TypeGraphRenderOptions::default();
+
+        let result = write_type_graph_file(&graph, "C:escape", &track_dir, tmp.path(), &opts);
+
+        assert!(result.is_err(), "colon in layer_id must be rejected");
+        let err = result.unwrap_err();
+        assert_eq!(err.kind(), std::io::ErrorKind::InvalidInput);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_write_type_graph_file_rejects_symlink_in_track_dir() {
+        let tmp = TempDir::new().unwrap();
+        let real_dir = tmp.path().join("real");
+        std::fs::create_dir_all(&real_dir).unwrap();
+
+        let symlink_track = tmp.path().join("symlink_track");
+        std::os::unix::fs::symlink(&real_dir, &symlink_track).unwrap();
+
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        let opts = TypeGraphRenderOptions::default();
+
+        // symlink_track itself is a symlink under trusted_root (tmp.path()),
+        // so reject_symlinks_below should reject the output path.
+        let result = write_type_graph_file(&graph, "domain", &symlink_track, tmp.path(), &opts);
+
+        assert!(result.is_err(), "symlinked track_dir must be rejected by guard");
     }
 }

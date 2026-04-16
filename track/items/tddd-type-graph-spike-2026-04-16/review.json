@@ -165,6 +165,87 @@
           "findings": [],
           "hash": "rvw1:sha256:4e2a43777bcd996f718fa3efda316dd089f2d89b8d9b9ce091d3c181e088faa5",
           "at": "2026-04-16T12:45:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`layer_id` is interpolated directly into `graph_filename`, and the symlink guard does not normalize `..` segments. A caller that passes an unvalidated id like `../../escape` can make `graph_path` escape `track_dir` and write outside `trusted_root`. This helper needs its own filename validation or a validated type boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 244,
+              "category": "security"
+            },
+            {
+              "message": "This new public API has no tests covering the successful write path or the symlink-rejection/error path. That leaves the `reject_symlinks_below` + `atomic_write_file` integration unverified and violates the repo's public-API testing requirement.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 235,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:5d58135934d1a0e507c997da400924cea23a8ae21c3f36975030e4c129e153f6",
+          "at": "2026-04-16T13:21:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This test is unconditional but uses `std::os::unix::fs::symlink`, so `cargo test` will fail to compile on non-Unix targets. Gate the test with `#[cfg(unix)]` (or provide a cross-platform fallback) to keep the infrastructure crate buildable everywhere.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 545,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:a29bd7195c5c6db289b825efc2923b1ff17bedddc0f4bf02dfc8e3063a76e1c1",
+          "at": "2026-04-16T13:24:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This `layer_id` check is stricter than the existing TDDD layer-id contract. `parse_tddd_layers` only rejects path separators and `..`, but this code now rejects any id containing `.` or non-ASCII characters, so a configuration that the infrastructure already accepts can start failing here even though the filename would still be safe. Align the validation with the shared path-component rules or move to a validated `LayerId` type.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 247,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aa138015cee5d8bc1b9f7f0cf10d468166f559b9c31662405b972a8675f2d163",
+          "at": "2026-04-16T13:26:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c062fd91e1a04bd8769f93397017066defb57c906ad2196a36a8237c8475177",
+          "at": "2026-04-16T13:29:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P0: The new `layer_id` validation still allows a single `:` character, so on Windows inputs like `C:escape` pass the check and `track_dir.join(format!(\"{layer_id}-graph.md\"))` becomes a drive-prefixed path instead of a child of `track_dir`. That lets `write_type_graph_file` escape the intended output directory despite the traversal guard added here.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 247,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:8c062fd91e1a04bd8769f93397017066defb57c906ad2196a36a8237c8475177",
+          "at": "2026-04-16T13:31:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5c6b10508033ceba357c5af89c5483c73409d291b57e8973fecf9c72da0e82d7",
+          "at": "2026-04-16T13:34:36Z"
         }
       ]
     },
@@ -257,6 +338,215 @@
           "findings": [],
           "hash": "rvw1:sha256:2a73ef308cc3dde8cadb5aefa25659eeb59aa81523ef04faff64d35ceb05fc52",
           "at": "2026-04-16T11:52:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55feb2a2e3514be7536a21119a27dd2cfe8b9ce953c727a0229957c1d8c9c37b",
+          "at": "2026-04-16T12:51:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` is earlier than `created_at` (`2026-04-16T12:47:17Z` vs `2026-04-16T22:30:00Z`), so this record claims it was last modified before it was created. Any sync or freshness logic that trusts these timestamps will misclassify the item.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/metadata.json",
+              "line": 73,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:55feb2a2e3514be7536a21119a27dd2cfe8b9ce953c727a0229957c1d8c9c37b",
+          "at": "2026-04-16T13:14:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b690ba3b33af3ad689b4c60024ebd64706229da73826c00c487809e3c5322315",
+          "at": "2026-04-16T13:15:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b690ba3b33af3ad689b4c60024ebd64706229da73826c00c487809e3c5322315",
+          "at": "2026-04-16T13:20:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` was left at the track creation timestamp even though this transition changes `metadata.json` from `planned` to `in_progress` and marks T001 done. The track workflow uses `updated_at` as the fallback for resolving the latest active track on non-`track/*` branches, so leaving it stale can misorder or skip this track in later commands. Bump it to the actual transition time when recording the T001 completion.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/metadata.json",
+              "line": 73,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b690ba3b33af3ad689b4c60024ebd64706229da73826c00c487809e3c5322315",
+          "at": "2026-04-16T13:24:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b690ba3b33af3ad689b4c60024ebd64706229da73826c00c487809e3c5322315",
+          "at": "2026-04-16T13:36:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` records the T001 transition to `done`, but `updated_at` is still the original creation timestamp (`2026-04-16T22:30:00Z`). Track mutations are expected to refresh `updated_at`, and downstream workflow/docs use this field to identify the latest track state; leaving it stale makes this transition factually inconsistent and can cause freshness/order bugs.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/metadata.json",
+              "line": 73,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:b690ba3b33af3ad689b4c60024ebd64706229da73826c00c487809e3c5322315",
+          "at": "2026-04-16T13:37:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` marks T001 as `done` and moves the track to `in_progress`, but `updated_at` is still the original creation timestamp. Latest-track resolution and freshness checks rank tracks by `metadata.json.updated_at`, so leaving it stale after this transition can misorder the track or make downstream tooling read an older state than the file now represents.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/metadata.json",
+              "line": 73,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:b690ba3b33af3ad689b4c60024ebd64706229da73826c00c487809e3c5322315",
+          "at": "2026-04-16T13:38:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`updated_at` was changed to `2026-04-16T12:47:05Z`, but `created_at` is still `2026-04-16T22:30:00Z`, so the item now appears updated before it was created. This reintroduces a factual contradiction in the metadata and can break any ordering logic that assumes `updated_at >= created_at`.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-spike-2026-04-16/metadata.json",
+              "line": 73,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:7718df0fb1b28d145bd80cc71445742576c74587c58121d385726d84fae2fe50",
+          "at": "2026-04-16T13:40:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:97dc22d8d175886ca8fa69afa782116d785f1c526a21f54aa5b534835bd0d240",
+          "at": "2026-04-16T13:42:02Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `execute_type_graph` entry point only has negative-case tests. There is no coverage for the success path or the actual write path (`RustdocSchemaExporter` -> `build_type_graph` -> `render_type_graph_flat` -> `atomic_write_file`), so a regression in the newly added `type-graph` dispatch or `<layer>-graph.md` output would not be caught.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 133,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e0ed77c7b0536598fbd425e4cf82fb434e468d7853bc1bf1814655b0606c7d86",
+          "at": "2026-04-16T12:53:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_type_graph` writes `<layer>-graph.md` through `atomic_write_file` without the symlink guards that `baseline-capture` uses. A symlinked `items_dir` or `track/<id>` can redirect the write outside the track tree and overwrite an arbitrary file, so this new command is vulnerable to path-traversal-by-symlink.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 115,
+              "category": "security"
+            },
+            {
+              "message": "The new public `execute_type_graph` API has no happy-path test. The current tests only cover invalid track IDs, unknown layers, and frozen tracks, so regressions in the actual rustdoc export/render/write flow will not be caught.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 31,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:e0ed77c7b0536598fbd425e4cf82fb434e468d7853bc1bf1814655b0606c7d86",
+          "at": "2026-04-16T12:56:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_type_graph` only checks whether `items_dir` itself is a symlink, then reads `items_dir/<track_id>/metadata.json` directly. A symlinked track directory under a real items root will still be followed here, so the command can load metadata from outside the trusted tree before the active-track guard runs. The later output-path guard in `render_and_write_graph` does not protect this read path.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 60,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:2bf42ba2f738613cef26093f9bf7cdcdaece3492c241fcea63f00e2b7872f5ef",
+          "at": "2026-04-16T12:59:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This only rejects a symlink on the final `items_dir` component. If `--items-dir` is reached through a symlinked ancestor (for example `repo-link/track/items`), `reject_symlinks_below()` will still trust that anchor and the metadata read / atomic write can escape the intended workspace. Canonicalize or validate the full anchor path before treating `items_dir` as trusted.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 41,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:f54e1c49899bb3cbd88232ec017e04747b2a0f43f88a655fffb3089a99d1bc49",
+          "at": "2026-04-16T13:04:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6fb16fe96edfae5b16c690d84621bf663a8e2b3d2b2b2a1294744aa90f9ed0c0",
+          "at": "2026-04-16T13:10:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba03a757b73053f3142502ba54870b75cb6596e54b9e71d74be20a936a6b2f42",
+          "at": "2026-04-16T13:13:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:856be536672feec054fa9afbf6ee9d670de0de6d6081f1c41996ec80c2f2922a",
+          "at": "2026-04-16T13:21:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:856be536672feec054fa9afbf6ee9d670de0de6d6081f1c41996ec80c2f2922a",
+          "at": "2026-04-16T13:24:16Z"
         }
       ]
     }

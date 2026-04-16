@@ -192,6 +192,25 @@ pub enum TrackCommand {
         layer: Option<String>,
     },
 
+    /// Render a mermaid type graph from rustdoc schema export to `<layer>-graph.md`.
+    TypeGraph {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        track_id: String,
+
+        /// Workspace root directory (must contain `Cargo.toml`). Defaults to current directory.
+        #[arg(long, default_value = ".")]
+        workspace_root: PathBuf,
+
+        /// Optional layer id filter. When omitted all `tddd.enabled` layers
+        /// are processed in `architecture-rules.json` order.
+        #[arg(long)]
+        layer: Option<String>,
+    },
+
     /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
     BaselineCapture {
         /// Path to the track items root directory (e.g., `track/items`).
@@ -339,6 +358,9 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         }
         TrackCommand::TypeSignals { items_dir, track_id, workspace_root, layer } => {
             tddd::signals::execute_type_signals(items_dir, track_id, workspace_root, layer)
+        }
+        TrackCommand::TypeGraph { items_dir, track_id, workspace_root, layer } => {
+            tddd::graph::execute_type_graph(items_dir, track_id, workspace_root, layer)
         }
         TrackCommand::BaselineCapture { items_dir, track_id, workspace_root, force, layer } => {
             tddd::baseline::execute_baseline_capture(

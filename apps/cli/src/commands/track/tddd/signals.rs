@@ -71,7 +71,7 @@ pub(crate) fn resolve_layers(
 /// `libs/infrastructure/src/track/render.rs::sync_rendered_views` (which uses a
 /// string-based `matches!` and is scope-deferred per ADR
 /// `knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md` Consequences Neutral).
-fn ensure_active_track(status: TrackStatus, track_id: &str) -> Result<(), CliError> {
+pub(crate) fn ensure_active_track(status: TrackStatus, track_id: &str) -> Result<(), CliError> {
     match status {
         TrackStatus::Done | TrackStatus::Archived => Err(CliError::Message(format!(
             "cannot run type-signals on '{track_id}' (status={status}). \
