@@ -36,7 +36,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "commit_hash": "7a1b4d56b2925ff282ac1b62a3fb4ee1231eaf91",
@@ -69,11 +69,12 @@
       "status": "done"
     },
     {
+      "commit_hash": "b12c047afdb7117f77dcd0b4e52c8b78f387b199",
       "description": "track 完了化: knowledge/adr/README.md の「信号機アーキテクチャ」section に本 ADR 2026-04-15-1636-tddd-05-secondary-adapter.md の索引行を追加する (Track 1 T005 の補完パターンを踏襲)。track/items/tddd-05-infra-wiring-2026-04-15/verification.md の全 checkbox を [x] に更新し、Result 各 task の実測結果を記入し、Verified At に UTC タイムスタンプを記入し、最終セクションに「infrastructure TDDD full production 宣言」を追記する。最終 smoke test として cargo make ci (CI gate の全チェック項目) の全通過を確認する。bin/sotp track type-signals tddd-05-infra-wiring-2026-04-15 --layer infrastructure が blue=N (N>=11) yellow=0 red=0 を返すことを確認する。Files: knowledge/adr/README.md, track/items/tddd-05-infra-wiring-2026-04-15/verification.md.",
       "id": "T006",
-      "status": "in_progress"
+      "status": "done"
     }
   ],
   "title": "TDDD-05: Secondary Adapter variant の追加 — infrastructure 層における hexagonal port 実装の検証",
-  "updated_at": "2026-04-16T07:59:50Z"
+  "updated_at": "2026-04-16T08:39:38Z"
 }
