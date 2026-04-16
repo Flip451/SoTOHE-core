@@ -233,6 +233,47 @@ impl MemberDeclaration {
 }
 
 // ---------------------------------------------------------------------------
+// TraitImplDecl — trait implementation declaration for SecondaryAdapter
+// ---------------------------------------------------------------------------
+
+/// A single trait implementation declaration within a `SecondaryAdapter` entry.
+///
+/// Holds the trait name the adapter implements and an optional set of
+/// expected method signatures (L1 resolution). When `expected_methods` is
+/// empty the evaluator checks only for impl existence.
+///
+/// Type strings follow the same L1 convention as `MethodDeclaration`:
+/// last-segment short names, generics preserved verbatim. Module paths
+/// containing `::` are rejected by codec validation.
+///
+/// See ADR `knowledge/adr/2026-04-15-1636-tddd-05-secondary-adapter.md` §D2.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TraitImplDecl {
+    trait_name: String,
+    expected_methods: Vec<MethodDeclaration>,
+}
+
+impl TraitImplDecl {
+    /// Creates a new `TraitImplDecl`.
+    #[must_use]
+    pub fn new(trait_name: impl Into<String>, expected_methods: Vec<MethodDeclaration>) -> Self {
+        Self { trait_name: trait_name.into(), expected_methods }
+    }
+
+    /// Returns the trait name (L1 last-segment short name).
+    #[must_use]
+    pub fn trait_name(&self) -> &str {
+        &self.trait_name
+    }
+
+    /// Returns the expected method signatures (empty = existence check only).
+    #[must_use]
+    pub fn expected_methods(&self) -> &[MethodDeclaration] {
+        &self.expected_methods
+    }
+}
+
+// ---------------------------------------------------------------------------
 // TypeAction enum
 // ---------------------------------------------------------------------------
 
@@ -346,6 +387,15 @@ pub enum TypeDefinitionKind {
     Query,
     /// An aggregate or entity factory struct; evaluated by existence check only.
     Factory,
+    /// A struct that implements one or more hexagonal secondary (driven) port
+    /// traits.
+    ///
+    /// `implements` lists each trait the adapter is expected to implement.
+    /// An empty `implements` vec means existence-check only (the struct must
+    /// exist, no impl constraint is checked).
+    ///
+    /// See ADR `knowledge/adr/2026-04-15-1636-tddd-05-secondary-adapter.md` §D1.
+    SecondaryAdapter { implements: Vec<TraitImplDecl> },
 }
 
 impl TypeDefinitionKind {
@@ -365,6 +415,7 @@ impl TypeDefinitionKind {
             Self::Command => "command",
             Self::Query => "query",
             Self::Factory => "factory",
+            Self::SecondaryAdapter { .. } => "secondary_adapter",
         }
     }
 }
@@ -597,7 +648,7 @@ impl TypeCatalogueDocument {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
     use super::*;
 
@@ -918,7 +969,7 @@ mod tests {
     }
 
     #[test]
-    fn test_all_twelve_kind_tags_are_unique() {
+    fn test_all_thirteen_kind_tags_are_unique() {
         let tags = [
             TypeDefinitionKind::Typestate { transitions: TypestateTransitions::Terminal }
                 .kind_tag(),
@@ -933,9 +984,10 @@ mod tests {
             TypeDefinitionKind::Command.kind_tag(),
             TypeDefinitionKind::Query.kind_tag(),
             TypeDefinitionKind::Factory.kind_tag(),
+            TypeDefinitionKind::SecondaryAdapter { implements: vec![] }.kind_tag(),
         ];
         let unique: std::collections::HashSet<&str> = tags.iter().copied().collect();
-        assert_eq!(unique.len(), 12, "all 12 kind tags must be distinct");
+        assert_eq!(unique.len(), 13, "all 13 kind tags must be distinct");
     }
 
     #[test]
@@ -1081,5 +1133,44 @@ mod tests {
         assert_eq!(signal.found_items(), &["Active"]);
         assert_eq!(signal.missing_items(), &["Done"]);
         assert_eq!(signal.extra_items(), &["Legacy"]);
+    }
+
+    // --- TraitImplDecl ---
+
+    #[test]
+    fn test_trait_impl_decl_accessors() {
+        let methods =
+            vec![MethodDeclaration::new("find", Some("&self".into()), vec![], "()", false)];
+        let decl = TraitImplDecl::new("ReviewReader", methods.clone());
+        assert_eq!(decl.trait_name(), "ReviewReader");
+        assert_eq!(decl.expected_methods().len(), 1);
+        assert_eq!(decl.expected_methods()[0].name(), "find");
+    }
+
+    #[test]
+    fn test_trait_impl_decl_empty_methods() {
+        let decl = TraitImplDecl::new("TrackWriter", vec![]);
+        assert_eq!(decl.trait_name(), "TrackWriter");
+        assert!(decl.expected_methods().is_empty());
+    }
+
+    // --- SecondaryAdapter variant ---
+
+    #[test]
+    fn test_secondary_adapter_kind_tag() {
+        let kind = TypeDefinitionKind::SecondaryAdapter { implements: vec![] };
+        assert_eq!(kind.kind_tag(), "secondary_adapter");
+    }
+
+    #[test]
+    fn test_secondary_adapter_with_implements() {
+        let decl = TraitImplDecl::new("ReviewReader", vec![]);
+        let kind = TypeDefinitionKind::SecondaryAdapter { implements: vec![decl] };
+        if let TypeDefinitionKind::SecondaryAdapter { implements } = &kind {
+            assert_eq!(implements.len(), 1);
+            assert_eq!(implements[0].trait_name(), "ReviewReader");
+        } else {
+            panic!("expected SecondaryAdapter");
+        }
     }
 }

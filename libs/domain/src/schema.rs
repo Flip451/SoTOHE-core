@@ -380,6 +380,12 @@ impl TypeGraph {
         self.traits.get(name)
     }
 
+    /// Returns a `TraitImplEntry` for a specific type + trait combination, if present.
+    #[must_use]
+    pub fn get_impl(&self, type_name: &str, trait_name: &str) -> Option<&TraitImplEntry> {
+        self.types.get(type_name)?.trait_impls().iter().find(|i| i.trait_name() == trait_name)
+    }
+
     /// Returns an iterator over all type names in this graph.
     pub fn type_names(&self) -> impl Iterator<Item = &String> {
         self.types.keys()
@@ -406,6 +412,8 @@ pub struct TypeNode {
     members: Vec<MemberDeclaration>,
     /// Full L1 signatures of inherent impl methods on this type.
     methods: Vec<MethodDeclaration>,
+    /// Trait implementations on this type (e.g., `impl TraitName for Self`).
+    trait_impls: Vec<TraitImplEntry>,
     /// Outgoing typestate transitions.
     outgoing: HashSet<String>,
     /// Module path for disambiguation (e.g., `"domain::review"`). `None` if unknown.
@@ -424,7 +432,7 @@ impl TypeNode {
         methods: Vec<MethodDeclaration>,
         outgoing: HashSet<String>,
     ) -> Self {
-        Self { kind, members, methods, outgoing, module_path: None }
+        Self { kind, members, methods, trait_impls: Vec::new(), outgoing, module_path: None }
     }
 
     /// Sets the module path for disambiguation.
@@ -450,6 +458,17 @@ impl TypeNode {
         &self.methods
     }
 
+    /// Returns the trait implementations on this type.
+    #[must_use]
+    pub fn trait_impls(&self) -> &[TraitImplEntry] {
+        &self.trait_impls
+    }
+
+    /// Sets the trait implementations for this type.
+    pub fn set_trait_impls(&mut self, impls: Vec<TraitImplEntry>) {
+        self.trait_impls = impls;
+    }
+
     /// Returns the module path, if known.
     #[must_use]
     pub fn module_path(&self) -> Option<&str> {
@@ -460,6 +479,37 @@ impl TypeNode {
     #[must_use]
     pub fn outgoing(&self) -> &HashSet<String> {
         &self.outgoing
+    }
+}
+
+/// A trait implementation found on a type, as indexed for TDDD evaluation.
+///
+/// Represents one `impl TraitName for TypeName { ... }` block. The evaluator
+/// uses this to verify that a `SecondaryAdapter` entry's declared trait
+/// implementations actually exist in the crate profile.
+#[derive(Debug, Clone)]
+pub struct TraitImplEntry {
+    trait_name: String,
+    methods: Vec<MethodDeclaration>,
+}
+
+impl TraitImplEntry {
+    /// Creates a new `TraitImplEntry`.
+    #[must_use]
+    pub fn new(trait_name: impl Into<String>, methods: Vec<MethodDeclaration>) -> Self {
+        Self { trait_name: trait_name.into(), methods }
+    }
+
+    /// Returns the trait name (last-segment short name).
+    #[must_use]
+    pub fn trait_name(&self) -> &str {
+        &self.trait_name
+    }
+
+    /// Returns the methods implemented for this trait.
+    #[must_use]
+    pub fn methods(&self) -> &[MethodDeclaration] {
+        &self.methods
     }
 }
 
@@ -488,7 +538,7 @@ impl TraitNode {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use super::*;
 
@@ -579,6 +629,57 @@ mod tests {
         let mut node = TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new());
         node.set_module_path("domain::guard".to_string());
         assert_eq!(node.module_path(), Some("domain::guard"));
+    }
+
+    // --- T003 TDDD-05: TraitImplEntry + TypeNode::trait_impls + TypeGraph::get_impl ---
+
+    #[test]
+    fn test_trait_impl_entry_accessors() {
+        let methods = vec![MethodDeclaration::new(
+            "find",
+            Some("&self".into()),
+            vec![ParamDeclaration::new("id", "ReviewId")],
+            "Option<Review>",
+            false,
+        )];
+        let entry = TraitImplEntry::new("ReviewReader", methods);
+        assert_eq!(entry.trait_name(), "ReviewReader");
+        assert_eq!(entry.methods().len(), 1);
+        assert_eq!(entry.methods()[0].name(), "find");
+    }
+
+    #[test]
+    fn test_type_node_trait_impls_default_empty() {
+        let node = TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new());
+        assert!(node.trait_impls().is_empty());
+    }
+
+    #[test]
+    fn test_type_graph_get_impl_returns_entry() {
+        let mut node = TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new());
+        node.set_trait_impls(vec![TraitImplEntry::new("ReviewReader", vec![])]);
+        let mut types = HashMap::new();
+        types.insert("FsReviewStore".to_string(), node);
+        let graph = TypeGraph::new(types, HashMap::new());
+        let entry = graph.get_impl("FsReviewStore", "ReviewReader");
+        assert!(entry.is_some());
+        assert_eq!(entry.unwrap().trait_name(), "ReviewReader");
+    }
+
+    #[test]
+    fn test_type_graph_get_impl_returns_none_for_wrong_trait() {
+        let mut node = TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new());
+        node.set_trait_impls(vec![TraitImplEntry::new("ReviewReader", vec![])]);
+        let mut types = HashMap::new();
+        types.insert("FsReviewStore".to_string(), node);
+        let graph = TypeGraph::new(types, HashMap::new());
+        assert!(graph.get_impl("FsReviewStore", "ReviewWriter").is_none());
+    }
+
+    #[test]
+    fn test_type_graph_get_impl_returns_none_for_missing_type() {
+        let graph = TypeGraph::new(HashMap::new(), HashMap::new());
+        assert!(graph.get_impl("NonExistent", "ReviewReader").is_none());
     }
 
     #[test]

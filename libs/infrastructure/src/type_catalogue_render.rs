@@ -14,6 +14,7 @@
 //! - Typestate: `→ A, → B` (declared transitions)
 //! - Enum / ErrorType: `A | B | C` (expected variants)
 //! - SecondaryPort / ApplicationService: `fn a, fn b` (expected methods)
+//! - SecondaryAdapter: `impl Trait1, impl Trait2` (declared trait impls)
 //! - ValueObject / UseCase / Interactor / Dto / Command / Query / Factory: `—`
 //!
 //! T002: `TraitPort` removed; `SecondaryPort` and `ApplicationService` added
@@ -49,6 +50,7 @@ const SECTIONS: &[Section] = &[
     Section { heading: "## Commands", kind_tag: "command" },
     Section { heading: "## Queries", kind_tag: "query" },
     Section { heading: "## Factories", kind_tag: "factory" },
+    Section { heading: "## Secondary Adapters", kind_tag: "secondary_adapter" },
 ];
 
 /// Renders the full `domain-types.md` document for a `TypeCatalogueDocument`.
@@ -179,6 +181,17 @@ fn render_details(entry: &TypeCatalogueEntry) -> String {
         | TypeDefinitionKind::Command
         | TypeDefinitionKind::Query
         | TypeDefinitionKind::Factory => "\u{2014}".to_owned(),
+        TypeDefinitionKind::SecondaryAdapter { implements } => {
+            if implements.is_empty() {
+                "\u{2014}".to_owned()
+            } else {
+                implements
+                    .iter()
+                    .map(|d| format!("impl {}", d.trait_name()))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            }
+        }
     }
 }
 

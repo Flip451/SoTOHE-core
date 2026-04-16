@@ -1,0 +1,869 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 only assigns `libs/infrastructure/src/code_profile_builder.rs`, but the ADR's negative-impl guard belongs in `libs/infrastructure/src/schema_export.rs:158` if `is_negative` exists. As written, the task has no owner for the actual filter change, so the planned `is_negative` exclusion can be omitted.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/metadata.json",
+              "line": 30,
+              "category": null
+            },
+            {
+              "message": "The spec is internally inconsistent about scope: this `out_of_scope` item says domain/usecase catalogue expansion is out of scope, but the `in_scope` section includes T001/T003/T005, which are all domain-side catalogue/schema/evaluator changes. That contradiction can cause required domain work to be dropped.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 109,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:8ee676de7206457709defbcb2f8e2e6a9916cd5c858b502f6e00c04f963356c4",
+          "at": "2026-04-16T04:05:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 sets the catalogue to `>= 14` entries, but D2 explicitly collapses multiple trait impls for a single adapter into one `SecondaryAdapter` entry. After excluding the 2 infrastructure-internal traits, this track should produce about 10 adapter entries, so the `14` threshold is inconsistent with the design and is not verifiable as written.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 17,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:8ee676de7206457709defbcb2f8e2e6a9916cd5c858b502f6e00c04f963356c4",
+          "at": "2026-04-16T04:07:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` treats T006 as a 14-entry catalogue task, but the same track's spec/verification scope the deliverable to 10 unique `SecondaryAdapter` entries. The 14 figure is only the post-filter trait-impl row count, so the task cardinality is inconsistent and easy to implement wrong.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/metadata.json",
+              "line": 55,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:9a3ecfdc0276a1656ec6a2e68884e3832b1178262aa32bc0d6b7117806dba465",
+          "at": "2026-04-16T04:11:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The source tag `track/items/domain-serde-ripout-2026-04-15/verification.md §Track 1 T005 索引補完パターン` does not resolve to a heading in that file. The closest actual headings are `T005 (2026-04-15)` and `Track 2 引継ぎ事項`, so this reference is not usable.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 85,
+              "category": "reference"
+            },
+            {
+              "message": "Two ADR source tags in this file are not valid section references: `knowledge/adr/2026-04-15-1636-tddd-05-secondary-adapter.md §Bad (Consequences)` and `... §Neutral (Consequences)`. The ADR headings are `### Bad` and `### Neutral`, so the parenthetical suffix makes both refs non-resolvable.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 188,
+              "category": "reference"
+            },
+            {
+              "message": "The research note says `is_negative` is \"verified for version 0.57\" in the main field list, but the addendum later says it is unconfirmed and still needs validation. That contradiction should be resolved before the note is used as a source of truth.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-16-tddd-05-rustdoc-impl.md",
+              "line": 16,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:daa7f5965f74a4d06ea5fb76b5572f3088cc6a01350bb7254ba2f23bf82623bf",
+          "at": "2026-04-16T04:15:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Several `sources` entries in this spec use code-item labels instead of resolvable `file:line` citations, so the references cannot be verified reliably. Examples: `libs/domain/src/tddd/catalogue.rs §TypeDefinitionKind enum` and `libs/domain/src/schema.rs §TypeNode struct` / `§TypeGraph struct` in the T001/T003 source lists.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 21,
+              "category": "reference"
+            },
+            {
+              "message": "A couple of ADR citations point at non-stable anchors rather than exact headings, which makes the source references ambiguous. `§Reassess When 6` is a numbered list item, and `§Bad — delete アクションの意味論的な隙間` is not the ADR heading text; both should be rewritten to stable anchors.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 138,
+              "category": "reference"
+            }
+          ],
+          "hash": "rvw1:sha256:56b54db0fa655323d63a1fe41e49594ed4fbbdbcf78958dbc2d8246b65b1990a",
+          "at": "2026-04-16T04:20:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Track scope undercounts adapters: `SystemGitRepo` also implements the domain `WorktreeReader` port in `libs/infrastructure/src/git_cli/mod.rs:193`, so this track has 11 unique secondary adapters, not 10. The current 10-entry acceptance criteria and ADR consequence text leave `WorktreeReader` unaccounted for.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 75,
+              "category": "scope"
+            },
+            {
+              "message": "The T005 sources point at `libs/domain/src/tddd/signals.rs §evaluate_secondary_port` / `§evaluate_trait_methods`, but those are not valid anchors for a Rust source file. Replace them with file:line references to the actual helper definitions so the source attribution is resolvable.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 67,
+              "category": "reference"
+            }
+          ],
+          "hash": "rvw1:sha256:dd163115ec7ba4e5e9fb21df62c117e4f56b9d41103cc833afdbf3b23db9d7cd",
+          "at": "2026-04-16T04:23:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` line 78 cites a memory note (`feedback — メモリ feedback_no_design_in_tasks ...`) as a source. That is not a traceable ADR/convention/file:line reference, so the spec violates the source-attribution rule for `sources`.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 78,
+              "category": "source attribution"
+            },
+            {
+              "message": "`verification.md` line 14 requires confirming `is_negative` support in rustdoc-types 0.57.3, but the T004 manual verification steps do not include any executable check for that dependency/field. As written, this checklist item is not actually verifiable.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 14,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:210bd3b74f334901fe49cbd3a4d800c4ca695700e0dfb7f5d6fb08e0e9339f12",
+          "at": "2026-04-16T04:28:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b691bc2327b305e20072a9ea546fb219e0e4c7500c4a68f458500ee6f424f226",
+          "at": "2026-04-16T04:32:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `cli 層の TDDD 拡張` out-of-scope item is traced only to `knowledge/adr/2026-04-15-1636-tddd-05-secondary-adapter.md Context §2`, but that section only inventories current infrastructure adapter impls and never establishes the CLI deferral or `tddd-06-cli-wiring` boundary. This leaves one of the track's scope boundaries without a valid source-backed justification.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 105,
+              "category": "source-attribution"
+            },
+            {
+              "message": "The T006 acceptance criterion for `infrastructure-types.json >= 11` cites `Context §2 (16 trait impls 表)`, but the ADR's table actually contains 17 impl rows and there is no `16 trait impls` section. Because this count is the basis for the catalogue-size target, the source reference is broken as written.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 306,
+              "category": "source-attribution"
+            },
+            {
+              "message": "T001's manual verification command runs `test_consistency_partitions_secondary_adapter`, but the task definition in `metadata.json` names the required red→green test `test_consistency_partitions_secondary_adapter_as_type`. With two different expected test names across the planning artifacts, an implementation that follows the task spec will not be verifiable using this checklist as written.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 42,
+              "category": "verification"
+            },
+            {
+              "message": "T002's checklist never runs `test_is_method_bearing_excludes_secondary_adapter`, even though the task definition and Scope Verified section require a test proving that `is_method_bearing` still excludes `secondary_adapter`. As written, the verification steps only cover the `EXISTENCE_ONLY_KINDS` half of that acceptance criterion.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 60,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:ac8f1398a284d9e2b06e43566392fa5b7b67f755f4e03116899ff5f3cabab7e2",
+          "at": "2026-04-16T04:38:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's manual verification steps are inconsistent with the planned work: `rg \"TypeDefinitionKind::SecondaryAdapter\"` will not identify the enum variant definition in `catalogue.rs`, and the checklist invokes `test_consistency_partitions_secondary_adapter` even though the task/spec define `test_consistency_partitions_secondary_adapter_as_type`. An implementation that follows the track definition cannot be verified with this section as written.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 31,
+              "category": null
+            },
+            {
+              "message": "T002's checklist never runs `test_is_method_bearing_excludes_secondary_adapter`, even though the task definition and Scope Verified section require a passing test for that invariant. The `rg 'is_method_bearing'` step only inspects source text, so this verification path can miss the required regression test entirely.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 54,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:8c487084ef95420f118a7dd8fdcbc397da491ef9ba85e700ca1d9a73b5e066a3",
+          "at": "2026-04-16T04:43:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The out-of-scope item for the compound-key alternative cites `knowledge/adr/2026-04-15-1636-tddd-05-secondary-adapter.md §D (Rejected Alternatives)`, but that section does not exist. The ADR has `### D. Option D-1: ...` under `## Rejected Alternatives`, so this source currently fails the requirement that spec sources be valid references.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 161,
+              "category": "reference"
+            },
+            {
+              "message": "The acceptance criterion for `infrastructure-types.json` says its 11-entry math is sourced from `Context §2 (16 trait impls 表)`, but the ADR’s Context §2 now enumerates 17 impl rows and derives 15 after excluding 2 internal traits. Leaving the stale `16` count here makes the verification arithmetic self-contradictory.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 309,
+              "category": "consistency"
+            },
+            {
+              "message": "T006 documents `cargo make ci` as if it only covers `fmt-check + clippy -D warnings + nextest + deny + check-layers + verify-spec-states + verify-arch-docs`, but `Makefile.toml`’s actual `ci-local` gate runs many additional checks (`test-doc`, `python-lint`, `verify-track-metadata`, `verify-view-freshness`, etc.), and there is no `verify-spec-states` task name anymore (`verify-spec-states-current-local` is what CI uses). As written, the track can be marked complete while omitting real CI gates.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 346,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3d44019e1f419f8e95e51ab6cca07f0a113fe77f0cfc709d3f04f41faf95330a",
+          "at": "2026-04-16T04:50:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T006 manual verification step is written as a bash command (`/track:design --layer infrastructure --force`), but `/track:design` is only a Claude slash command (`.claude/commands/track/design.md`) and there is no shell executable to invoke. The checklist cannot be executed as written.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 118,
+              "category": "execution"
+            },
+            {
+              "message": "T006 requires rerunning `/track:design` to generate `secondary_adapter` entries, but the current design workflow still enumerates only 12 kinds and never defines `secondary_adapter` or its `implements` field (`.claude/commands/track/design.md:14-18,74-86,117-124`). As planned, the catalogue-generation step cannot produce the required adapter entries.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 307,
+              "category": "execution"
+            },
+            {
+              "message": "T005's prescribed test list ends with `test_evaluate_secondary_adapter_with_two_traits_partial_blue`, but this same task/spec says the aggregate signal must be Red whenever even one declared impl is missing. That contradictory expected result will misdirect the red→green loop toward the wrong behavior.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/metadata.json",
+              "line": 36,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:bde2746b9eaf1f82c0154224e8e4534ac802f982debfbfa982d14bbad2e478b1",
+          "at": "2026-04-16T05:08:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The out-of-scope item for `cli 層の TDDD 拡張 (→ tddd-06-cli-wiring)` is sourced only to `knowledge/adr/2026-04-15-1636-tddd-05-secondary-adapter.md Context §2`, but that ADR section only inventories infrastructure trait impls and does not mention CLI expansion or `tddd-06-cli-wiring`. This leaves the source attribution invalid for a Blue-planning item; point it at the ADR section that actually defers this follow-up track (for example D5 / Rejected Alternatives I / Reassess When).",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/spec.json",
+              "line": 108,
+              "category": "reference"
+            },
+            {
+              "message": "The T004 verification procedure only runs `test_build_type_graph_trait_impl_populated` and the existing outgoing regression, but the task definition also requires `test_build_type_graph_multiple_trait_impls_on_same_type`. That omission leaves the core multi-port adapter case from D2/S1 unverified: an implementation that records only the first trait impl on a type could still satisfy the listed checks. Add an explicit step for the multi-trait test (and ideally the new outgoing-specific test named in metadata) so T004 can actually verify the intended behavior.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 88,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:049bba2940b8b0e0cbf6b39872d72ec5b69c144dc70cad463d5f33e9f2230f3c",
+          "at": "2026-04-16T05:28:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:214679d687e0e907edf0c953c9783f95d51927c4fe0ee0a7e07303b098547ef7",
+          "at": "2026-04-16T05:33:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4857ce8d858dc4b02c0884a8b014bee46827fbed75d60b9d869f00071fad2ad8",
+          "at": "2026-04-16T06:43:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.md` is a rendered view for `usecase-types.json`, but line 1 still claims it was generated from `domain-types.json`. That leaves the committed read-only artifact inconsistent with its source and regresses the header invariant restored in the catalogue render fix track.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/usecase-types.md",
+              "line": 1,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:4857ce8d858dc4b02c0884a8b014bee46827fbed75d60b9d869f00071fad2ad8",
+          "at": "2026-04-16T06:48:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.md` regresses the accepted catalogue-header fix: its generated header still says `domain-types.json` even though this rendered view comes from `usecase-types.json`. That makes the artifact point reviewers and any header-based tooling at the wrong source catalogue, which is exactly the bug `catalogue-active-guard-fix-2026-04-15` was meant to eliminate.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/usecase-types.md",
+              "line": 1,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:4857ce8d858dc4b02c0884a8b014bee46827fbed75d60b9d869f00071fad2ad8",
+          "at": "2026-04-16T06:50:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb58a866ab45b1e356b1b4f2b3a996bdd321f6e26d9fc866c33beb0264f48a2a",
+          "at": "2026-04-16T06:53:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ffbaa418429b8b4cc2f6a31591f6986d62050f3f515ab039b799ff7b1dfb4cf5",
+          "at": "2026-04-16T07:01:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ffbaa418429b8b4cc2f6a31591f6986d62050f3f515ab039b799ff7b1dfb4cf5",
+          "at": "2026-04-16T07:02:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:084fd11814c847c06900d8e2242a21412c45e1cf925e7729b68d3c37ccbf7f16",
+          "at": "2026-04-16T07:20:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:084fd11814c847c06900d8e2242a21412c45e1cf925e7729b68d3c37ccbf7f16",
+          "at": "2026-04-16T07:21:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b93ba77318df9fa0fc010a1bd30bcf729baa701ecd058d5637c310b294770046",
+          "at": "2026-04-16T07:40:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b93ba77318df9fa0fc010a1bd30bcf729baa701ecd058d5637c310b294770046",
+          "at": "2026-04-16T07:41:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fb08c259da3c05ddbe76cf331d57b2fdeb411b97f4128173fe8c0a4638ac84",
+          "at": "2026-04-16T07:52:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18fb08c259da3c05ddbe76cf331d57b2fdeb411b97f4128173fe8c0a4638ac84",
+          "at": "2026-04-16T07:53:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` presents T006 as fully complete in the new production-declaration section, but the same file still leaves `cargo make ci` unchecked and explicitly says `CI: pending final run`. That makes the completion record internally inconsistent and can let downstream readers treat the track as finished before the required final smoke test has actually passed.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 193,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:82463ee2a542bfc4d2866dbc6ab1e6f871671e86e72252e087b48d94aba8eef3",
+          "at": "2026-04-16T08:05:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure-types.md` is only the generated-header stub, so the 11 `secondary_adapter` entries added in `infrastructure-types.json` are not rendered anywhere in the markdown view. That leaves the layer catalogue effectively blank for reviewers and any tooling that consumes the rendered file.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/infrastructure-types.md",
+              "line": 1,
+              "category": "rendering"
+            },
+            {
+              "message": "The `cargo make ci` checkbox is marked complete, but the evidence recorded here only says `cargo make ci-rust` passed and lists `fmt-check + clippy + nextest + deny + check-layers`. It does not show the `verify-spec-states` or `verify-arch-docs` steps that the checklist claims were covered, so this result does not substantiate the checkbox.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 183,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:0af4cfa696a91eb425fb34a6bf945de764b6f957f933401fd40d90ee397d83af",
+          "at": "2026-04-16T08:07:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa9478a32735cfee102d808357e60b400cbb49d154a7b152d3298a27c3a7377e",
+          "at": "2026-04-16T08:10:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo make ci` is checked as passed here, but the same staged verification record later says CI is still blocked on `verify-spec-states-current`, and `metadata.json` still keeps T006 `in_progress`. Leaving this checked makes the track look complete before its required CI gate has actually been satisfied.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 21,
+              "category": "verification"
+            },
+            {
+              "message": "The T006 result claims domain type-signals are still red because `TypeGraph` and `TypeNode` need modify declarations, but the staged `domain-types.json`/`domain-types.md` already add those declarations and mark both signals blue. This leaves the recorded verification result stale and inaccurate.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 181,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:52ee4e569d9a4a7e952b92a788a42281a24559e9f952898217e8f1dc0fa3d3ea",
+          "at": "2026-04-16T08:14:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure-types.json` now defines 11 `secondary_adapter` entries, but the generated Markdown companion is still completely empty, so the human-readable catalogue view drops every new infrastructure adapter from the track artifacts. This leaves the rendered spec incomplete until the Markdown generator/view is updated to emit a section for `secondary_adapter` entries.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/infrastructure-types.md",
+              "line": 1,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2c05b4cb20034e21537eba46a0189a3c4dca82393d25dcd971a87ac675bf266c",
+          "at": "2026-04-16T08:17:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` declares \"Track 2 ... completion\" / \"full production\" even though the same file still has the `@codex review` zero-findings checkbox unchecked and `metadata.json` keeps `T006` in progress. This marks the track as finished before the remaining review gate is satisfied.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 194,
+              "category": "correctness"
+            },
+            {
+              "message": "`infrastructure-types.md` is checked in as a generated view, but the current catalogue renderer has no `secondary_adapter` section at all, so rerunning `sync_rendered_views` will not reproduce the `## Secondary Adapters` table and will drop these rows. The generated artifact is already stale/non-reproducible.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/infrastructure-types.md",
+              "line": 3,
+              "category": "correctness"
+            },
+            {
+              "message": "The blue `secondary_adapter` signals omit `found_items` entirely, even for entries like `FsReviewStore` that declare multiple required impls. The current `evaluate_secondary_adapter` always records each confirmed trait name in `found_items`, so this snapshot cannot be the output of the current `sotp track type-signals` evaluation and makes the checked-off verification non-reproducible.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/infrastructure-types.json",
+              "line": 152,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:303edf30eb6e9168430a0e44b9df011138c771895b4d4f2c3257cd9a5c520d65",
+          "at": "2026-04-16T08:24:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure-types.md` is still effectively empty: it contains only the generated header even though `infrastructure-types.json` now declares 11 `secondary_adapter` entries. That means the human-readable rendered view never exposes the new adapter catalogue, so this track ships an incomplete spec artifact for the infrastructure layer.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/infrastructure-types.md",
+              "line": 1,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6643d632c442ba1180da3ca10256dd5fee110ff8070c3e6bec02fd588395e31c",
+          "at": "2026-04-16T08:30:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` marks the T006 CI check as complete for `verify-spec-states`, but `Makefile.toml` only wires `cargo make ci` through `verify-spec-states-current-local`. Because the checkbox and manual verification step still name the old gate, the completion evidence here is inaccurate and can claim success for a check that no longer exists.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/verification.md",
+              "line": 21,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:ca671b04903da4768b81d3df767f67c5d8d7d8874454e7225d6062e7d436fc24",
+          "at": "2026-04-16T08:34:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce8ff36a6bb9bdc6e260c92e64a175b84a21b6264bb08455fe186c04d824e030",
+          "at": "2026-04-16T08:38:24Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This regression test is vacuous: with an empty `TypeGraph`, it will pass even if `SecondaryAdapter` is misclassified as a trait, because both `undeclared_traits()` and `undeclared_types()` stay empty. Add a case that makes the type/trait partition observable.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/consistency.rs",
+              "line": 1129,
+              "category": "test coverage"
+            },
+            {
+              "message": "The new `SecondaryAdapter` kind is not covered by the kind-tag uniqueness assertion: the test still hardcodes 12 kinds and omits the new variant, so a future `secondary_adapter` tag collision would slip through. Update the list and expected count to include the new kind.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 972,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:1e8ff7624e1342cc57d6897fcb094fbcb9ea81dc166abacd802689733c56a2fd",
+          "at": "2026-04-16T06:42:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e16bfd26edb7648df735eda6bb69f9e93115a1e5f0ac9d83f25b9e4542e887d7",
+          "at": "2026-04-16T06:45:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitImplDecl` is now part of the public catalogue model via `TypeDefinitionKind::SecondaryAdapter`, but it is not exposed through the crate-root re-export surface that this module tells consumers to use. Downstream code can only build non-empty `SecondaryAdapter` values by reaching into `domain::tddd::catalogue`, so the new API is only partially published.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 251,
+              "category": "public_api"
+            }
+          ],
+          "hash": "rvw1:sha256:e16bfd26edb7648df735eda6bb69f9e93115a1e5f0ac9d83f25b9e4542e887d7",
+          "at": "2026-04-16T06:49:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e16bfd26edb7648df735eda6bb69f9e93115a1e5f0ac9d83f25b9e4542e887d7",
+          "at": "2026-04-16T06:50:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67381cc330ceb889c36f8a023b7336e69b0a0dcf5a504a9304bd704b84eec9a9",
+          "at": "2026-04-16T07:21:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitImplEntry` drops trait identity down to a last-segment `trait_name`, and `TypeGraph::get_impl()` matches on that string alone. Rust allows different modules to define traits with the same short name, so a type that implements both can be matched against the wrong impl here, producing false Blue/Red results in secondary-adapter evaluation. Preserve a fully qualified/module-qualified trait identifier (or another unambiguous key) instead of only the short name.",
+              "severity": "P1",
+              "file": "libs/domain/src/schema.rs",
+              "line": 491,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:67381cc330ceb889c36f8a023b7336e69b0a0dcf5a504a9304bd704b84eec9a9",
+          "at": "2026-04-16T07:24:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67381cc330ceb889c36f8a023b7336e69b0a0dcf5a504a9304bd704b84eec9a9",
+          "at": "2026-04-16T07:26:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c07656ba39c316a7b4156991f8dcf59d408c46f67847bfe2f70381cd900fd85",
+          "at": "2026-04-16T07:31:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c07656ba39c316a7b4156991f8dcf59d408c46f67847bfe2f70381cd900fd85",
+          "at": "2026-04-16T07:32:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_secondary_adapter` only checks `profile.get_type(name)` and never verifies `TypeKind::Struct`. That means a same-named enum/alias/type-alias could be classified as a valid `SecondaryAdapter` if the adapter declarations match, which violates the struct-only contract that the rest of the evaluator enforces for other struct-like kinds.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "line": 350,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:714e0a2d43b71029c86f692897ed48a7b3f384c90482d999d026cc0aa5581ff0",
+          "at": "2026-04-16T07:52:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`evaluate_secondary_adapter` treats any entry returned by `profile.get_type(name)` as a valid adapter and never verifies `TypeKind::Struct`. A same-named enum or type alias could therefore be marked Blue as soon as its trait impls match, even though `SecondaryAdapter` is supposed to model a struct-only adapter.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "line": 350,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:714e0a2d43b71029c86f692897ed48a7b3f384c90482d999d026cc0aa5581ff0",
+          "at": "2026-04-16T07:54:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ab5c116043dc1d79ec429257d69bbb92beaf02557d8b49f6275a306e95e109e",
+          "at": "2026-04-16T07:56:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ab5c116043dc1d79ec429257d69bbb92beaf02557d8b49f6275a306e95e109e",
+          "at": "2026-04-16T07:58:31Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
+          "at": "2026-04-16T06:42:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `SecondaryAdapter` to `render_details` makes the renderer compile for that variant, but `render_type_catalogue` still has no `secondary_adapter` section in `SECTIONS`, so adapter entries are silently omitted from `*-types.md` instead of surfacing missing support. Any catalogue containing a secondary adapter will now produce an incomplete review artifact.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 182,
+              "category": "correctness"
+            },
+            {
+              "message": "`type_catalogue_entry_to_dto` now returns `InvalidEntry` for `TypeDefinitionKind::SecondaryAdapter`, which means `catalogue_codec::encode` fails for an otherwise valid `TypeCatalogueDocument`. Since the domain model already exposes this variant, callers can construct such documents today and lose encode/round-trip support as soon as an adapter entry is present.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 583,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
+          "at": "2026-04-16T06:45:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `SecondaryAdapter` to `render_details` makes this match exhaustive, but `render_type_catalogue` still renders only the hard-coded `SECTIONS` list, which has no `secondary_adapter` section. Any catalogue containing a secondary adapter will therefore omit that entry entirely from `*-types.md`, producing an incomplete rendered review artifact instead of surfacing the new kind.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 182,
+              "category": "correctness"
+            },
+            {
+              "message": "`type_catalogue_entry_to_dto` now rejects `TypeDefinitionKind::SecondaryAdapter`, so `catalogue_codec::encode` fails for an otherwise valid `TypeCatalogueDocument` as soon as one adapter entry is present. The domain model already exposes this variant, so this breaks encode/write-back and round-trip behavior for callers that construct or receive such documents.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 583,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
+          "at": "2026-04-16T06:47:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
+          "at": "2026-04-16T06:50:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitImplDeclDto` accepts `trait_name` verbatim, so a `secondary_adapter` entry can contain an empty name or a module path like `crate::ReviewReader` and still decode/encode successfully. ADR D2 requires a last-segment short name without `::`; without validation here, malformed adapter declarations are accepted and later cannot match the rustdoc-derived trait name.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 177,
+              "category": "validation"
+            },
+            {
+              "message": "The manual stale-field guard only covers existence-only kinds. A `kind: secondary_adapter` entry can still carry stray top-level fields such as `expected_methods`, `expected_variants`, or `transitions_to`, and this codec will accept it because the flattened enum variant is not checked for unknown fields here. That silently drops invalid constraints instead of rejecting the JSON.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 225,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:cdbd789b4d6cf0590695b70a1c787c7c4af1d5a1014118e36527f3e2fcd20595",
+          "at": "2026-04-16T07:02:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1.5 only blocks `expected_methods`/`expected_variants`/`transitions_to` on existence-only kinds, but it never rejects `implements`. A payload like `{\"kind\":\"use_case\",\"implements\":[...]}` will deserialize as `UseCase` and silently drop the adapter declarations instead of failing at the codec boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 245,
+              "category": "correctness"
+            },
+            {
+              "message": "`TraitImplDeclDto.trait_name` is never validated for the ADR's L1 rule (`::` must be rejected). Both `decode_trait_impl_list` and `encode_trait_impl_list` pass the string through unchanged, so malformed trait paths can round-trip through the codec and the encoder can emit JSON that should be invalid.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 496,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:cdbd789b4d6cf0590695b70a1c787c7c4af1d5a1014118e36527f3e2fcd20595",
+          "at": "2026-04-16T07:04:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Phase 1.5 validation only rejects `implements` on existence-only kinds. For the non-existence-only variants, serde will still accept and silently drop stale fields, so inputs like `{\"kind\":\"secondary_port\",\"implements\":[...]}` or `{\"kind\":\"secondary_adapter\",\"expected_methods\":[...]}` decode successfully instead of failing. That is silent data loss at the codec boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 225,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:6979fda956c59f3332f64f9066f7186eaf8e927edabb3d42ec9ac41305664b8b",
+          "at": "2026-04-16T07:07:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:971648683a03e6845d3d6f49e95f4023114703ed105715056a996aa0a6ee5ced",
+          "at": "2026-04-16T07:09:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`decode` still silently drops the new `implements` field on other non-adapter kinds such as `typestate`, `enum`, and `error_type`. Phase 1.5 only rejects `implements` for existence-only kinds and rejects old fields on `secondary_adapter`, so a payload like `{ \"kind\": \"enum\", \"implements\": [...] }` is accepted and the adapter declaration is lost instead of failing fast.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 245,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:971648683a03e6845d3d6f49e95f4023114703ed105715056a996aa0a6ee5ced",
+          "at": "2026-04-16T07:12:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:122da803b8b56aa5d4a0b1bf41a4bf257967158a38c2489659d2b2b5a010f312",
+          "at": "2026-04-16T07:15:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitImplEntry::trait_name` is stored verbatim from rustdoc here, but rustdoc paths are used-path strings and can include `::`. Downstream `TypeGraph::get_impl` and the catalogue codec expect last-segment trait names, so qualified trait paths will cause trait-impl lookups/validation to fail for imported traits.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/code_profile_builder.rs",
+              "line": 67,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fa317a867165946608d5fde99ef90c5f3d33a25a59620bb8fc109dd0a2a9bd57",
+          "at": "2026-04-16T07:42:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8207a097f65ffaf4e9446449a7cbd1d4194b4d5c1fc565ffa1381f80c0263ff",
+          "at": "2026-04-16T07:47:12Z"
+        }
+      ]
+    }
+  }
+}

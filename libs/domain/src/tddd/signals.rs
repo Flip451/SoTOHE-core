@@ -14,7 +14,8 @@ use std::collections::HashSet;
 use crate::ConfidenceSignal;
 use crate::schema::{TypeGraph, TypeKind};
 use crate::tddd::catalogue::{
-    TypeAction, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal, TypestateTransitions,
+    TraitImplDecl, TypeAction, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal,
+    TypestateTransitions,
 };
 
 // ---------------------------------------------------------------------------
@@ -79,6 +80,9 @@ fn evaluate_single(
         | TypeDefinitionKind::Command
         | TypeDefinitionKind::Query
         | TypeDefinitionKind::Factory => evaluate_struct_only(name, &kind_tag, profile),
+        TypeDefinitionKind::SecondaryAdapter { implements } => {
+            evaluate_secondary_adapter(name, &kind_tag, implements, profile)
+        }
     }
 }
 
@@ -328,6 +332,87 @@ fn evaluate_struct_only(name: &str, kind_tag: &str, profile: &TypeGraph) -> Type
     evaluate_value_object(name, kind_tag, profile)
 }
 
+/// Evaluates a `SecondaryAdapter` entry: struct existence + trait impl presence + method matching.
+///
+/// - Step 1: `profile.get_type(name)` — Yellow if struct absent, Red if not a Struct kind.
+/// - Step 2: For each `TraitImplDecl` in `implements`, check `profile.get_impl(name, trait_name)`.
+///   - If the impl is absent, add trait_name to `missing_items`.
+///   - If present and `expected_methods` is non-empty, check method signatures via
+///     `method_structurally_matches`.
+/// - Step 3: Aggregate — all found → Blue, any missing → Red.
+///   Empty `implements` with struct present → Blue (existence-only).
+fn evaluate_secondary_adapter(
+    name: &str,
+    kind_tag: &str,
+    implements: &[TraitImplDecl],
+    profile: &TypeGraph,
+) -> TypeSignal {
+    let Some(code_type) = profile.get_type(name) else {
+        return yellow(name, kind_tag);
+    };
+
+    // SecondaryAdapter must be a Struct (not Enum or TypeAlias).
+    if *code_type.kind() != TypeKind::Struct {
+        return red(name, kind_tag, true);
+    }
+
+    // Empty implements = existence-only check (struct present → Blue)
+    if implements.is_empty() {
+        return blue(name, kind_tag);
+    }
+
+    let mut found_items = Vec::new();
+    let mut missing_items = Vec::new();
+
+    for decl in implements {
+        let trait_name = decl.trait_name();
+        match profile.get_impl(name, trait_name) {
+            Some(impl_entry) => {
+                if decl.expected_methods().is_empty() {
+                    // Existence-only for this trait — impl found is sufficient.
+                    found_items.push(trait_name.to_string());
+                } else {
+                    // L1 method matching for this trait impl
+                    let (trait_found, trait_missing) =
+                        evaluate_impl_methods(decl.expected_methods(), impl_entry.methods());
+                    found_items.extend(trait_found);
+                    missing_items.extend(trait_missing);
+                }
+            }
+            None => {
+                missing_items.push(format!("impl {trait_name}"));
+            }
+        }
+    }
+
+    let signal =
+        if missing_items.is_empty() { ConfidenceSignal::Blue } else { ConfidenceSignal::Red };
+    TypeSignal::new(name, kind_tag, signal, true, found_items, missing_items, vec![])
+}
+
+/// Compares declared expected methods against actual impl methods.
+///
+/// Returns `(found, missing)` where each entry is a signature string.
+fn evaluate_impl_methods(
+    expected: &[crate::tddd::catalogue::MethodDeclaration],
+    code_methods: &[crate::tddd::catalogue::MethodDeclaration],
+) -> (Vec<String>, Vec<String>) {
+    let mut found = Vec::new();
+    let mut missing = Vec::new();
+    for declared in expected {
+        let rendered = declared.signature_string();
+        match code_methods.iter().find(|c| c.name() == declared.name()) {
+            Some(code) if method_structurally_matches(declared, code) => {
+                found.push(rendered);
+            }
+            _ => {
+                missing.push(rendered);
+            }
+        }
+    }
+    (found, missing)
+}
+
 /// Shared L1 forward+reverse method check for both `SecondaryPort` and `ApplicationService`.
 ///
 /// Yellow when the trait does not exist, Blue when all methods match, Red otherwise.
@@ -462,8 +547,8 @@ mod tests {
     use std::collections::HashMap;
 
     use super::*;
-    use crate::schema::{TraitNode, TypeNode};
-    use crate::tddd::catalogue::{MemberDeclaration, MethodDeclaration};
+    use crate::schema::{TraitImplEntry, TraitNode, TypeNode};
+    use crate::tddd::catalogue::{MemberDeclaration, MethodDeclaration, TraitImplDecl};
 
     /// Build a `MethodDeclaration` that takes no args and returns unit.
     fn unit_method(name: &str) -> MethodDeclaration {
@@ -1155,6 +1240,153 @@ mod tests {
         assert_eq!(signals[0].kind_tag(), "undeclared_trait");
         assert_eq!(signals[0].signal(), ConfidenceSignal::Red);
         assert!(signals[0].found_type());
+    }
+
+    // --- TDDD-05 T005: SecondaryAdapter evaluator tests ---
+
+    /// Build a `TypeGraph` with a struct that has trait impls.
+    fn make_profile_with_adapter(type_name: &str, trait_impls: Vec<TraitImplEntry>) -> TypeGraph {
+        let mut types = HashMap::new();
+        let mut node = TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new());
+        node.set_trait_impls(trait_impls);
+        types.insert(type_name.to_string(), node);
+        TypeGraph::new(types, HashMap::new())
+    }
+
+    #[test]
+    fn test_evaluate_secondary_adapter_blue_all_impls_found() {
+        let entry = TypeCatalogueEntry::new(
+            "FsReviewStore",
+            "desc",
+            TypeDefinitionKind::SecondaryAdapter {
+                implements: vec![TraitImplDecl::new("ReviewReader", vec![])],
+            },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile_with_adapter(
+            "FsReviewStore",
+            vec![TraitImplEntry::new("ReviewReader", vec![])],
+        );
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Blue);
+        assert!(results[0].found_type());
+    }
+
+    #[test]
+    fn test_evaluate_secondary_adapter_yellow_struct_missing() {
+        let entry = TypeCatalogueEntry::new(
+            "FsReviewStore",
+            "desc",
+            TypeDefinitionKind::SecondaryAdapter {
+                implements: vec![TraitImplDecl::new("ReviewReader", vec![])],
+            },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&[]); // no types at all
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Yellow);
+        assert!(!results[0].found_type());
+    }
+
+    #[test]
+    fn test_evaluate_secondary_adapter_red_one_impl_missing() {
+        let entry = TypeCatalogueEntry::new(
+            "FsReviewStore",
+            "desc",
+            TypeDefinitionKind::SecondaryAdapter {
+                implements: vec![
+                    TraitImplDecl::new("ReviewReader", vec![]),
+                    TraitImplDecl::new("ReviewWriter", vec![]),
+                ],
+            },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        // Only ReviewReader is implemented, ReviewWriter is missing
+        let profile = make_profile_with_adapter(
+            "FsReviewStore",
+            vec![TraitImplEntry::new("ReviewReader", vec![])],
+        );
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Red);
+        assert!(results[0].missing_items().iter().any(|m| m.contains("ReviewWriter")));
+    }
+
+    #[test]
+    fn test_evaluate_secondary_adapter_red_method_signature_mismatch() {
+        let declared_method =
+            MethodDeclaration::new("find", Some("&self".into()), vec![], "Option<Review>", false);
+        let entry = TypeCatalogueEntry::new(
+            "FsReviewStore",
+            "desc",
+            TypeDefinitionKind::SecondaryAdapter {
+                implements: vec![TraitImplDecl::new("ReviewReader", vec![declared_method])],
+            },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        // Code has the method but with different return type
+        let code_method = MethodDeclaration::new(
+            "find",
+            Some("&self".into()),
+            vec![],
+            "Result<Review, Error>", // different returns
+            false,
+        );
+        let profile = make_profile_with_adapter(
+            "FsReviewStore",
+            vec![TraitImplEntry::new("ReviewReader", vec![code_method])],
+        );
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Red);
+        assert!(!results[0].missing_items().is_empty());
+    }
+
+    #[test]
+    fn test_evaluate_secondary_adapter_blue_with_empty_implements() {
+        let entry = TypeCatalogueEntry::new(
+            "FsReviewStore",
+            "desc",
+            TypeDefinitionKind::SecondaryAdapter { implements: vec![] },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let profile = make_profile(&["FsReviewStore"]); // struct exists
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Blue);
+    }
+
+    #[test]
+    fn test_evaluate_secondary_adapter_with_two_traits_one_missing_is_red() {
+        let entry = TypeCatalogueEntry::new(
+            "SystemGitRepo",
+            "desc",
+            TypeDefinitionKind::SecondaryAdapter {
+                implements: vec![
+                    TraitImplDecl::new("WorktreeReader", vec![]),
+                    TraitImplDecl::new("TrackWriter", vec![]),
+                ],
+            },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        // Only WorktreeReader is implemented
+        let profile = make_profile_with_adapter(
+            "SystemGitRepo",
+            vec![TraitImplEntry::new("WorktreeReader", vec![])],
+        );
+        let results = evaluate_type_signals(&[entry], &profile);
+        assert_eq!(results[0].signal(), ConfidenceSignal::Red);
+        assert!(results[0].found_items().iter().any(|f| f == "WorktreeReader"));
+        assert!(results[0].missing_items().iter().any(|m| m.contains("TrackWriter")));
     }
 
     #[test]

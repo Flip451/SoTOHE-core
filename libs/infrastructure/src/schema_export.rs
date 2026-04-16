@@ -155,11 +155,14 @@ fn build_schema_export(crate_name: &str, krate: &rustdoc_types::Crate) -> Schema
         }
 
         if let ItemEnum::Impl(i) = &item.inner {
-            if i.is_synthetic || i.blanket_impl.is_some() {
+            if i.is_synthetic || i.blanket_impl.is_some() || i.is_negative {
                 continue;
             }
             let target = format_type(&i.for_);
-            let trait_name = i.trait_.as_ref().map(|p| p.path.clone());
+            let trait_name = i
+                .trait_
+                .as_ref()
+                .map(|p| p.path.rsplit("::").next().unwrap_or(&p.path).to_string());
             let methods = extract_methods(&i.items, krate);
             if !methods.is_empty() || trait_name.is_some() {
                 impls.push(ImplInfo::new(target, trait_name, methods));

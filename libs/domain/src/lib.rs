@@ -31,7 +31,7 @@ pub use ids::{CommitHash, NonEmptyString, ReviewGroupName, TaskId, TrackBranch, 
 pub use plan::{PlanSection, PlanView};
 pub use repository::{TrackReader, TrackWriter, WorktreeReader};
 pub use review_v2::RoundType;
-pub use schema::{TraitNode, TypeGraph, TypeNode};
+pub use schema::{TraitImplEntry, TraitNode, TypeGraph, TypeNode};
 pub use signal::{
     ConfidenceSignal, SignalBasis, SignalCounts, classify_source_tag, evaluate_source_tag,
 };

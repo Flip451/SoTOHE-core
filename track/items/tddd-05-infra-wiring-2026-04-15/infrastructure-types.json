@@ -1,0 +1,217 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "SystemReviewHasher",
+      "description": "Adapter implementing ReviewHasher for computing review content hashes",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "ReviewHasher"
+        }
+      ]
+    },
+    {
+      "name": "CodexReviewer",
+      "description": "Adapter implementing Reviewer via Codex CLI for external code review",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "Reviewer"
+        }
+      ]
+    },
+    {
+      "name": "FsReviewStore",
+      "description": "Adapter implementing ReviewReader and ReviewWriter via filesystem persistence",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "ReviewReader"
+        },
+        {
+          "trait_name": "ReviewWriter"
+        }
+      ]
+    },
+    {
+      "name": "FsCommitHashStore",
+      "description": "Adapter implementing CommitHashReader and CommitHashWriter via filesystem persistence",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "CommitHashReader"
+        },
+        {
+          "trait_name": "CommitHashWriter"
+        }
+      ]
+    },
+    {
+      "name": "GitDiffGetter",
+      "description": "Adapter implementing DiffGetter via git CLI for computing file diffs",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "DiffGetter"
+        }
+      ]
+    },
+    {
+      "name": "InMemoryTrackStore",
+      "description": "Adapter implementing TrackReader and TrackWriter via in-memory storage (test/dev)",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "TrackReader"
+        },
+        {
+          "trait_name": "TrackWriter"
+        }
+      ]
+    },
+    {
+      "name": "FsTrackStore",
+      "description": "Adapter implementing TrackReader and TrackWriter via filesystem persistence",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "TrackReader"
+        },
+        {
+          "trait_name": "TrackWriter"
+        }
+      ]
+    },
+    {
+      "name": "GitShowTrackBlobReader",
+      "description": "Adapter implementing TrackBlobReader via git show for reading track blobs from git history",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "TrackBlobReader"
+        }
+      ]
+    },
+    {
+      "name": "RustdocSchemaExporter",
+      "description": "Adapter implementing SchemaExporter via rustdoc JSON generation and parsing",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "SchemaExporter"
+        }
+      ]
+    },
+    {
+      "name": "ConchShellParser",
+      "description": "Adapter implementing ShellParser via conch-parser for POSIX shell script analysis",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "ShellParser"
+        }
+      ]
+    },
+    {
+      "name": "SystemGitRepo",
+      "description": "Adapter implementing WorktreeReader via git CLI for reading worktree state",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "WorktreeReader"
+        }
+      ]
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "SystemReviewHasher",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": ["ReviewHasher"]
+    },
+    {
+      "type_name": "CodexReviewer",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": ["Reviewer"]
+    },
+    {
+      "type_name": "FsReviewStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": ["ReviewReader", "ReviewWriter"]
+    },
+    {
+      "type_name": "FsCommitHashStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": ["CommitHashReader", "CommitHashWriter"]
+    },
+    {
+      "type_name": "GitDiffGetter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": ["DiffGetter"]
+    },
+    {
+      "type_name": "InMemoryTrackStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": ["TrackReader", "TrackWriter"]
+    },
+    {
+      "type_name": "FsTrackStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": ["TrackReader", "TrackWriter"]
+    },
+    {
+      "type_name": "GitShowTrackBlobReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": ["TrackBlobReader"]
+    },
+    {
+      "type_name": "RustdocSchemaExporter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": ["SchemaExporter"]
+    },
+    {
+      "type_name": "ConchShellParser",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": ["ShellParser"]
+    },
+    {
+      "type_name": "SystemGitRepo",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": ["WorktreeReader"]
+    }
+  ]
+}

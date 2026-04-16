@@ -1,0 +1,20 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "SaveTrackUseCase",
+      "description": "Guard entry: detect unintended structural changes to usecase layer during infrastructure-focused Track 2",
+      "approved": true,
+      "action": "reference",
+      "kind": "use_case"
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "SaveTrackUseCase",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
