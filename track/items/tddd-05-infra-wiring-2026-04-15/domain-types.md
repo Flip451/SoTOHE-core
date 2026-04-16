@@ -11,5 +11,7 @@
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
 | TraitImplDecl | value_object | — | — | 🔵 |
-| TraitImplEntry | value_object | — | — | 🟡 |
+| TraitImplEntry | value_object | — | — | 🔵 |
+| TypeGraph | value_object | modify | — | 🔵 |
+| TypeNode | value_object | modify | — | 🔵 |
 

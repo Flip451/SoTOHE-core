@@ -63,16 +63,17 @@
       "status": "done"
     },
     {
+      "commit_hash": "84bb878de3b15561905efa7165b83b18c298208a",
       "description": "domain evaluator: libs/domain/src/tddd/signals.rs に evaluate_secondary_adapter 関数を追加する。シグネチャは fn evaluate_secondary_adapter(name: &str, kind_tag: &str, implements: &[TraitImplDecl], profile: &TypeGraph) -> TypeSignal。Step 1: profile.get_type(name) で struct 自体の存在確認 (不在なら Yellow)。Step 2: implements を loop で各 trait_decl について profile.get_impl(name, trait_decl.trait_name()) を確認し、found_items / missing_items に振り分ける。Step 3: trait_decl.expected_methods() が non-empty なら evaluate_impl_methods (新 helper) で method 一致を確認 (既存 method_structurally_matches を impl 側に流用)。集約 signal: missing_items が空 → Blue、1 つでも非空 → Red。evaluate_single の match arm に SecondaryAdapter variant を追加する。evaluate_delete の present 判定では SecondaryAdapter は struct 側 (get_type) で存在確認する (impl 単独削除の検出は本 track 対象外)。TDD red→green: test_evaluate_secondary_adapter_blue_all_impls_found, test_evaluate_secondary_adapter_yellow_struct_missing, test_evaluate_secondary_adapter_red_one_impl_missing, test_evaluate_secondary_adapter_red_method_signature_mismatch, test_evaluate_secondary_adapter_blue_with_empty_implements, test_evaluate_secondary_adapter_with_two_traits_one_missing_is_red。File: libs/domain/src/tddd/signals.rs. Expected diff: ~80 行。",
       "id": "T005",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "track 完了化: knowledge/adr/README.md の「信号機アーキテクチャ」section に本 ADR 2026-04-15-1636-tddd-05-secondary-adapter.md の索引行を追加する (Track 1 T005 の補完パターンを踏襲)。track/items/tddd-05-infra-wiring-2026-04-15/verification.md の全 checkbox を [x] に更新し、Result 各 task の実測結果を記入し、Verified At に UTC タイムスタンプを記入し、最終セクションに「infrastructure TDDD full production 宣言」を追記する。最終 smoke test として cargo make ci (CI gate の全チェック項目) の全通過を確認する。bin/sotp track type-signals tddd-05-infra-wiring-2026-04-15 --layer infrastructure が blue=N (N>=11) yellow=0 red=0 を返すことを確認する。Files: knowledge/adr/README.md, track/items/tddd-05-infra-wiring-2026-04-15/verification.md.",
       "id": "T006",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "title": "TDDD-05: Secondary Adapter variant の追加 — infrastructure 層における hexagonal port 実装の検証",
-  "updated_at": "2026-04-16T07:48:35Z"
+  "updated_at": "2026-04-16T07:59:50Z"
 }

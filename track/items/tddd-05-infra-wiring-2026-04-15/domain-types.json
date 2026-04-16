@@ -34,6 +34,20 @@
         "Factory",
         "SecondaryAdapter"
       ]
+    },
+    {
+      "name": "TypeGraph",
+      "description": "Pre-indexed query interface for type catalogue evaluation (T003: added get_impl accessor for trait impl lookup)",
+      "approved": true,
+      "action": "modify",
+      "kind": "value_object"
+    },
+    {
+      "name": "TypeNode",
+      "description": "Public type in crate as indexed for TDDD evaluation (T003: added trait_impls field + set_trait_impls setter)",
+      "approved": true,
+      "action": "modify",
+      "kind": "value_object"
     }
   ],
   "signals": [
@@ -46,8 +60,8 @@
     {
       "type_name": "TraitImplEntry",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TypeDefinitionKind",
@@ -69,6 +83,18 @@
         "UseCase",
         "ValueObject"
       ]
+    },
+    {
+      "type_name": "TypeGraph",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeNode",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }
