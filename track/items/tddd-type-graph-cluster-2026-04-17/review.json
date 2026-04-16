@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 undercounts the `check_type_signals` ripple. `libs/domain/src/tddd/consistency.rs` already has 8 dedicated `test_check_type_signals_*` cases plus `test_consistency_partitions_secondary_adapter_as_type`, so the documented “7 tests” misses real call sites and will leave at least the undeclared-yellow and secondary-adapter cases uncovered. The same undercount is repeated in `spec.json:76`.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "line": 11,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:b846cc9fc8e40f7c901fb5bea1cede3452b3bbe28d8e5ea5b62fca43cb599e4a",
+          "at": "2026-04-16T16:53:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 only enumerates the three production call sites and compresses the `consistency.rs` test ripple into `8 tests`; it does not list the seven existing `check_type_signals` test call sites required by the review brief, so the signature-change ripple is not fully specified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "line": 13,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:d2f5756d088bd46e5f78cac0a18ef82a8f4839823e22a5d4f81c6b9caf6870e7",
+          "at": "2026-04-16T16:57:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's verification checklist says there are 7 existing `check_type_signals` tests, but `metadata.json`/`spec.json` enumerate 8 existing tests and the current `libs/domain/src/tddd/consistency.rs` test block has 8 `test_check_type_signals_*` cases. The checklist undercounts the ripple and leaves one existing test case untracked.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 13,
+              "category": "consistency"
+            },
+            {
+              "message": "T003's acceptance text says there are 6 unit tests, but it only names five conditions; the sixth case from `metadata.json` (`single-cluster cross_edges empty`) is missing, and the same omission is echoed in `verification.md`. That leaves the ClusterPlan acceptance scope under-specified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "line": 236,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:13f4d3f4fd8c851dac94ba3a849898039690695a3fe6e2188a846c4c24bcaa01",
+          "at": "2026-04-16T17:00:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26b392faa7cd38bb0da171936a7c147b2e95f9c9c7535b8b5d99b3f470ca4bfa",
+          "at": "2026-04-16T17:01:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 still requires a `deduplicate_typestate_edges` default decision even though the final 6-task scope never includes that option in `spec.json`'s in-scope items or acceptance criteria. This leaves the SSoT task list with an orphan verification target copied from the older 8-task planner output, so implementers cannot tell whether that knob is actually part of Phase 2(K) or already deferred.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "line": 139,
+              "category": "consistency"
+            },
+            {
+              "message": "The T004 safety requirement is sourced to `.claude/rules/10-guardrails.md §Symlink safety`, but that section does not exist in the referenced file. Because this acceptance criterion relies on that citation as its convention source, the spec currently contains a broken reference for one of the symlink-deletion guard requirements.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "line": 297,
+              "category": "reference"
+            },
+            {
+              "message": "The archived planner notes T001 as a \"3 crates + 7 test sites\" change, but `libs/domain/src/tddd/consistency.rs` currently has 8 existing `test_check_type_signals_*` tests to update. That factual miscount understates the signature-ripple work in the research artifact by one existing test.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-17-1550-planner-tddd-type-graph-cluster.md",
+              "line": 66,
+              "category": "factual_error"
+            }
+          ],
+          "hash": "rvw1:sha256:26b392faa7cd38bb0da171936a7c147b2e95f9c9c7535b8b5d99b3f470ca4bfa",
+          "at": "2026-04-16T17:16:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Q3 rationale still cites `.claude/rules/10-guardrails.md` §symlink safety, but that section does not exist in the referenced file. This leaves the archived planner doc with a broken convention reference even though the final plan/spec already moved the symlink-safety source to `knowledge/conventions/security.md §Symlink Rejection in Infrastructure Adapters`.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-17-1550-planner-tddd-type-graph-cluster.md",
+              "line": 50,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:6bb2ee458e90e9769bb44aa478a5385cc2f28165367c68a03df25454f432e5f5",
+          "at": "2026-04-16T17:23:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The planner archive contradicts its own task table on execution order: line 22 says \"bug fix first, then edges, then clustering,\" but the summary on line 14 and the ordered tasks table place clustering work in T003-T004 before edges in T005. This leaves the planning artifact internally inconsistent about dependencies and rollout order.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-17-1550-planner-tddd-type-graph-cluster.md",
+              "line": 22,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:25f8b414a620c1ffdd9d8bb504071af0f070a5ce753c23f4250bc8a607d19dfc",
+          "at": "2026-04-16T17:26:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfe1103901f70e8f1fd2a0746fc1ce269c4672abc4a477606d8046c1df961fd8",
+          "at": "2026-04-16T17:30:53Z"
+        }
+      ]
+    }
+  }
+}
