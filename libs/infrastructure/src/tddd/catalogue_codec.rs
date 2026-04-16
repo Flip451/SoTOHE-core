@@ -580,6 +580,12 @@ fn type_catalogue_entry_to_dto(
         TypeDefinitionKind::Command => TypeDefinitionKindDto::Command {},
         TypeDefinitionKind::Query => TypeDefinitionKindDto::Query {},
         TypeDefinitionKind::Factory => TypeDefinitionKindDto::Factory {},
+        TypeDefinitionKind::SecondaryAdapter { .. } => {
+            return Err(TypeCatalogueCodecError::InvalidEntry {
+                name: entry.name().to_owned(),
+                reason: "SecondaryAdapter encode not yet implemented (see T002)".to_owned(),
+            });
+        }
     };
     Ok(TypeCatalogueEntryDto {
         name: entry.name().to_owned(),

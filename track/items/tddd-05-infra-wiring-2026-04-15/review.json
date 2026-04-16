@@ -1,6 +1,123 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This regression test is vacuous: with an empty `TypeGraph`, it will pass even if `SecondaryAdapter` is misclassified as a trait, because both `undeclared_traits()` and `undeclared_types()` stay empty. Add a case that makes the type/trait partition observable.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/consistency.rs",
+              "line": 1129,
+              "category": "test coverage"
+            },
+            {
+              "message": "The new `SecondaryAdapter` kind is not covered by the kind-tag uniqueness assertion: the test still hardcodes 12 kinds and omits the new variant, so a future `secondary_adapter` tag collision would slip through. Update the list and expected count to include the new kind.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 972,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:1e8ff7624e1342cc57d6897fcb094fbcb9ea81dc166abacd802689733c56a2fd",
+          "at": "2026-04-16T06:42:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e16bfd26edb7648df735eda6bb69f9e93115a1e5f0ac9d83f25b9e4542e887d7",
+          "at": "2026-04-16T06:45:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitImplDecl` is now part of the public catalogue model via `TypeDefinitionKind::SecondaryAdapter`, but it is not exposed through the crate-root re-export surface that this module tells consumers to use. Downstream code can only build non-empty `SecondaryAdapter` values by reaching into `domain::tddd::catalogue`, so the new API is only partially published.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue.rs",
+              "line": 251,
+              "category": "public_api"
+            }
+          ],
+          "hash": "rvw1:sha256:e16bfd26edb7648df735eda6bb69f9e93115a1e5f0ac9d83f25b9e4542e887d7",
+          "at": "2026-04-16T06:49:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e16bfd26edb7648df735eda6bb69f9e93115a1e5f0ac9d83f25b9e4542e887d7",
+          "at": "2026-04-16T06:50:06Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
+          "at": "2026-04-16T06:42:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `SecondaryAdapter` to `render_details` makes the renderer compile for that variant, but `render_type_catalogue` still has no `secondary_adapter` section in `SECTIONS`, so adapter entries are silently omitted from `*-types.md` instead of surfacing missing support. Any catalogue containing a secondary adapter will now produce an incomplete review artifact.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 182,
+              "category": "correctness"
+            },
+            {
+              "message": "`type_catalogue_entry_to_dto` now returns `InvalidEntry` for `TypeDefinitionKind::SecondaryAdapter`, which means `catalogue_codec::encode` fails for an otherwise valid `TypeCatalogueDocument`. Since the domain model already exposes this variant, callers can construct such documents today and lose encode/round-trip support as soon as an adapter entry is present.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 583,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
+          "at": "2026-04-16T06:45:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Adding `SecondaryAdapter` to `render_details` makes this match exhaustive, but `render_type_catalogue` still renders only the hard-coded `SECTIONS` list, which has no `secondary_adapter` section. Any catalogue containing a secondary adapter will therefore omit that entry entirely from `*-types.md`, producing an incomplete rendered review artifact instead of surfacing the new kind.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 182,
+              "category": "correctness"
+            },
+            {
+              "message": "`type_catalogue_entry_to_dto` now rejects `TypeDefinitionKind::SecondaryAdapter`, so `catalogue_codec::encode` fails for an otherwise valid `TypeCatalogueDocument` as soon as one adapter entry is present. The domain model already exposes this variant, so this breaks encode/write-back and round-trip behavior for callers that construct or receive such documents.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "line": 583,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
+          "at": "2026-04-16T06:47:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0cbcede021a175ae34d28973468419258f4e568a38dae7a3b9dcf9915594ee2",
+          "at": "2026-04-16T06:50:47Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -294,6 +411,57 @@
           ],
           "hash": "rvw1:sha256:049bba2940b8b0e0cbf6b39872d72ec5b69c144dc70cad463d5f33e9f2230f3c",
           "at": "2026-04-16T05:28:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:214679d687e0e907edf0c953c9783f95d51927c4fe0ee0a7e07303b098547ef7",
+          "at": "2026-04-16T05:33:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4857ce8d858dc4b02c0884a8b014bee46827fbed75d60b9d869f00071fad2ad8",
+          "at": "2026-04-16T06:43:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.md` is a rendered view for `usecase-types.json`, but line 1 still claims it was generated from `domain-types.json`. That leaves the committed read-only artifact inconsistent with its source and regresses the header invariant restored in the catalogue render fix track.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/usecase-types.md",
+              "line": 1,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:4857ce8d858dc4b02c0884a8b014bee46827fbed75d60b9d869f00071fad2ad8",
+          "at": "2026-04-16T06:48:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.md` regresses the accepted catalogue-header fix: its generated header still says `domain-types.json` even though this rendered view comes from `usecase-types.json`. That makes the artifact point reviewers and any header-based tooling at the wrong source catalogue, which is exactly the bug `catalogue-active-guard-fix-2026-04-15` was meant to eliminate.",
+              "severity": "P1",
+              "file": "track/items/tddd-05-infra-wiring-2026-04-15/usecase-types.md",
+              "line": 1,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:4857ce8d858dc4b02c0884a8b014bee46827fbed75d60b9d869f00071fad2ad8",
+          "at": "2026-04-16T06:50:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb58a866ab45b1e356b1b4f2b3a996bdd321f6e26d9fc866c33beb0264f48a2a",
+          "at": "2026-04-16T06:53:57Z"
         }
       ]
     }

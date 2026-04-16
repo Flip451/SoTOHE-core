@@ -178,7 +178,8 @@ fn render_details(entry: &TypeCatalogueEntry) -> String {
         | TypeDefinitionKind::Dto
         | TypeDefinitionKind::Command
         | TypeDefinitionKind::Query
-        | TypeDefinitionKind::Factory => "\u{2014}".to_owned(),
+        | TypeDefinitionKind::Factory
+        | TypeDefinitionKind::SecondaryAdapter { .. } => "\u{2014}".to_owned(),
     }
 }
 

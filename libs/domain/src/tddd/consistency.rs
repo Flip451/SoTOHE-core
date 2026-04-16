@@ -1124,4 +1124,54 @@ mod tests {
         );
         assert!(outcome_strict.findings().is_empty());
     }
+
+    #[test]
+    fn test_consistency_partitions_secondary_adapter_as_type() {
+        // The key observable: SecondaryAdapter must land in `declared_type_names`,
+        // not `declared_trait_names`. An empty TypeGraph makes the partition
+        // invisible (both undeclared lists stay empty regardless). Supply the
+        // adapter as a Struct-kinded TypeNode so that:
+        //   - If correctly classified as type: `declared_type_names` contains it
+        //     → forward check (not group 4) → `undeclared_types` stays empty.
+        //   - If wrongly classified as trait: `declared_type_names` does NOT contain
+        //     it → group 4 fires → `undeclared_types` would contain "FsReviewStore".
+        let entry = TypeCatalogueEntry::new(
+            "FsReviewStore",
+            "Adapter implementing ReviewReader",
+            TypeDefinitionKind::SecondaryAdapter { implements: vec![] },
+            TypeAction::Add,
+            true,
+        )
+        .unwrap();
+        let entries = vec![entry];
+
+        let mut types = std::collections::HashMap::new();
+        types.insert(
+            "FsReviewStore".to_string(),
+            crate::schema::TypeNode::new(
+                crate::schema::TypeKind::Struct,
+                vec![],
+                vec![],
+                std::collections::HashSet::new(),
+            ),
+        );
+        let graph = TypeGraph::new(types, std::collections::HashMap::new());
+
+        let baseline = TypeBaseline::new(
+            2,
+            crate::timestamp::Timestamp::new("2026-04-16T00:00:00Z").unwrap(),
+            std::collections::HashMap::new(),
+            std::collections::HashMap::new(),
+        );
+        let report = check_consistency(&entries, &graph, &baseline);
+        assert!(
+            report.undeclared_types().is_empty(),
+            "SecondaryAdapter declared in entries must not appear in undeclared_types \
+             (it should be absorbed by declared_type_names, not declared_trait_names)"
+        );
+        assert!(
+            report.undeclared_traits().is_empty(),
+            "SecondaryAdapter must not be classified as a trait"
+        );
+    }
 }

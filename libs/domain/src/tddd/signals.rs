@@ -78,7 +78,10 @@ fn evaluate_single(
         | TypeDefinitionKind::Dto
         | TypeDefinitionKind::Command
         | TypeDefinitionKind::Query
-        | TypeDefinitionKind::Factory => evaluate_struct_only(name, &kind_tag, profile),
+        | TypeDefinitionKind::Factory
+        | TypeDefinitionKind::SecondaryAdapter { .. } => {
+            evaluate_struct_only(name, &kind_tag, profile)
+        }
     }
 }
 
