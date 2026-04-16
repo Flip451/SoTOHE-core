@@ -12,7 +12,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use domain::schema::{FunctionInfo, SchemaExport, TraitNode, TypeGraph, TypeNode};
+use domain::schema::{FunctionInfo, SchemaExport, TraitImplEntry, TraitNode, TypeGraph, TypeNode};
 use domain::tddd::catalogue::MethodDeclaration;
 
 /// Builds a [`TypeGraph`] from a [`SchemaExport`].
@@ -58,12 +58,27 @@ pub fn build_type_graph(schema: &SchemaExport, typestate_names: &HashSet<String>
             );
         }
 
+        // Collect trait impls (separate path — outgoing stays inherent-only)
+        let trait_impl_entries: Vec<TraitImplEntry> = schema
+            .impls()
+            .iter()
+            .filter(|i| base_name(i.target_type()) == type_info.name())
+            .filter_map(|i| {
+                let trait_name = i.trait_name()?;
+                let methods = i.methods().iter().map(function_info_to_method_decl).collect();
+                Some(TraitImplEntry::new(trait_name, methods))
+            })
+            .collect();
+
         let mut node = TypeNode::new(
             type_info.kind().clone(),
             type_info.members().to_vec(),
             method_decls,
             outgoing,
         );
+        if !trait_impl_entries.is_empty() {
+            node.set_trait_impls(trait_impl_entries);
+        }
         if let Some(mp) = type_info.module_path() {
             node.set_module_path(mp.to_string());
         }
@@ -262,6 +277,69 @@ mod tests {
         let schema = SchemaExport::new("test".to_string(), vec![], vec![], vec![], vec![]);
         let profile = build_type_graph(&schema, &HashSet::new());
         assert!(profile.get_trait("NonExistent").is_none());
+    }
+
+    // --- T004 TDDD-05: trait impl collection ---
+
+    #[test]
+    fn test_build_type_graph_trait_impl_populated() {
+        let types = vec![TypeInfo::new("FsStore".to_string(), TypeKind::Struct, None, vec![])];
+        let impls = vec![ImplInfo::new(
+            "FsStore".to_string(),
+            Some("TrackReader".to_string()),
+            vec![method_returning("read", "()", true, Some("&self"))],
+        )];
+        let schema = SchemaExport::new("test".to_string(), types, vec![], vec![], impls);
+        let profile = build_type_graph(&schema, &HashSet::new());
+        let node = profile.get_type("FsStore").unwrap();
+        assert_eq!(node.trait_impls().len(), 1);
+        assert_eq!(node.trait_impls()[0].trait_name(), "TrackReader");
+        assert_eq!(node.trait_impls()[0].methods().len(), 1);
+        assert_eq!(node.trait_impls()[0].methods()[0].name(), "read");
+    }
+
+    #[test]
+    fn test_build_type_graph_outgoing_unaffected_by_trait_impl() {
+        // Trait impls must NOT pollute outgoing (inherent-only invariant)
+        let types = vec![
+            TypeInfo::new("FsStore".to_string(), TypeKind::Struct, None, vec![]),
+            TypeInfo::new("Published".to_string(), TypeKind::Struct, None, vec![]),
+        ];
+        let impls = vec![ImplInfo::new(
+            "FsStore".to_string(),
+            Some("TrackReader".to_string()),
+            vec![method_returning("read", "Published", true, Some("&self"))],
+        )];
+        let schema = SchemaExport::new("test".to_string(), types, vec![], vec![], impls);
+        let typestates = HashSet::from(["Published".to_string()]);
+        let profile = build_type_graph(&schema, &typestates);
+        let node = profile.get_type("FsStore").unwrap();
+        assert!(node.outgoing().is_empty(), "trait impl return types must not appear in outgoing");
+        assert_eq!(node.trait_impls().len(), 1, "trait impl must still be collected");
+    }
+
+    #[test]
+    fn test_build_type_graph_multiple_trait_impls_on_same_type() {
+        let types = vec![TypeInfo::new("FsStore".to_string(), TypeKind::Struct, None, vec![])];
+        let impls = vec![
+            ImplInfo::new(
+                "FsStore".to_string(),
+                Some("TrackReader".to_string()),
+                vec![method_returning("read", "()", true, Some("&self"))],
+            ),
+            ImplInfo::new(
+                "FsStore".to_string(),
+                Some("TrackWriter".to_string()),
+                vec![method_returning("write", "()", true, Some("&self"))],
+            ),
+        ];
+        let schema = SchemaExport::new("test".to_string(), types, vec![], vec![], impls);
+        let profile = build_type_graph(&schema, &HashSet::new());
+        let node = profile.get_type("FsStore").unwrap();
+        assert_eq!(node.trait_impls().len(), 2);
+        let trait_names: Vec<&str> = node.trait_impls().iter().map(|t| t.trait_name()).collect();
+        assert!(trait_names.contains(&"TrackReader"));
+        assert!(trait_names.contains(&"TrackWriter"));
     }
 
     #[test]
