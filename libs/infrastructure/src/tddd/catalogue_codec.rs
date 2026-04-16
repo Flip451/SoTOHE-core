@@ -18,7 +18,7 @@
 //! level — illegal field combinations are rejected by serde, not by manual
 //! validation.
 
-use domain::tddd::catalogue::{MethodDeclaration, ParamDeclaration};
+use domain::tddd::catalogue::{MethodDeclaration, ParamDeclaration, TraitImplDecl};
 use domain::{
     ConfidenceSignal, SpecValidationError, TypeAction, TypeCatalogueDocument, TypeCatalogueEntry,
     TypeDefinitionKind, TypeSignal, TypestateTransitions,
@@ -143,6 +143,11 @@ enum TypeDefinitionKindDto {
     Query {},
     /// Aggregate/entity factory struct; existence check only.
     Factory {},
+    /// Struct implementing one or more hexagonal secondary port traits.
+    SecondaryAdapter {
+        #[serde(default)]
+        implements: Vec<TraitImplDeclDto>,
+    },
 }
 
 /// T006 method signature DTO — mirrors `MethodDeclaration`.
@@ -164,6 +169,15 @@ struct MethodDto {
 struct ParamDto {
     name: String,
     ty: String,
+}
+
+/// DTO for a single trait implementation declaration within a `SecondaryAdapter`.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct TraitImplDeclDto {
+    trait_name: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    expected_methods: Vec<MethodDto>,
 }
 
 /// DTO for a per-type signal evaluation result.
@@ -208,7 +222,7 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
         return Err(TypeCatalogueCodecError::UnsupportedSchemaVersion(schema_version));
     }
 
-    // Phase 1.5: reject existence-only entries that carry stale kind-specific fields.
+    // Phase 1.5: reject entries that carry stale cross-kind fields.
     //
     // `#[serde(flatten)]` + internally-tagged enum means `deny_unknown_fields` on
     // `TypeCatalogueEntryDto` does not propagate to the individual variant struct
@@ -224,15 +238,14 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                 .and_then(|o| o.get("name"))
                 .and_then(|v| v.as_str())
                 .unwrap_or("<unnamed>");
-            // Existence-only kinds must not carry `expected_methods`, `expected_variants`,
-            // or `transitions_to` (those fields belong to other variants).
+            // Existence-only kinds must not carry any structural fields.
             const EXISTENCE_ONLY_KINDS: &[&str] =
                 &["use_case", "interactor", "dto", "command", "query", "factory", "value_object"];
-            const FORBIDDEN_FIELDS: &[&str] =
-                &["expected_methods", "expected_variants", "transitions_to"];
+            const FORBIDDEN_FIELDS_EXISTENCE_ONLY: &[&str] =
+                &["expected_methods", "expected_variants", "transitions_to", "implements"];
             if EXISTENCE_ONLY_KINDS.contains(&kind) {
                 if let Some(obj) = entry_obj {
-                    for forbidden in FORBIDDEN_FIELDS {
+                    for forbidden in FORBIDDEN_FIELDS_EXISTENCE_ONLY {
                         if obj.contains_key(*forbidden) {
                             return Err(TypeCatalogueCodecError::InvalidEntry {
                                 name: name.to_owned(),
@@ -243,6 +256,48 @@ pub fn decode(json: &str) -> Result<TypeCatalogueDocument, TypeCatalogueCodecErr
                                 ),
                             });
                         }
+                    }
+                }
+            }
+            // `secondary_adapter` carries `implements` but must not carry fields
+            // belonging to other structured variants (`expected_methods`,
+            // `expected_variants`, `transitions_to`).  Without this guard those
+            // fields would be silently dropped by serde.
+            if kind == "secondary_adapter" {
+                const FORBIDDEN_FIELDS_SECONDARY_ADAPTER: &[&str] =
+                    &["expected_methods", "expected_variants", "transitions_to"];
+                if let Some(obj) = entry_obj {
+                    for forbidden in FORBIDDEN_FIELDS_SECONDARY_ADAPTER {
+                        if obj.contains_key(*forbidden) {
+                            return Err(TypeCatalogueCodecError::InvalidEntry {
+                                name: name.to_owned(),
+                                reason: format!(
+                                    "kind 'secondary_adapter' does not support field '{}' — \
+                                     use 'implements' for per-trait method declarations",
+                                    forbidden
+                                ),
+                            });
+                        }
+                    }
+                }
+            }
+            // Structured non-existence-only kinds (`typestate`, `enum`, `error_type`,
+            // `secondary_port`, `application_service`) do not carry `implements`.
+            // Without this guard, a payload like `{"kind":"enum","implements":[...]}`
+            // would be silently accepted with the `implements` field dropped by serde.
+            const STRUCTURED_KINDS: &[&str] =
+                &["typestate", "enum", "error_type", "secondary_port", "application_service"];
+            if STRUCTURED_KINDS.contains(&kind) {
+                if let Some(obj) = entry_obj {
+                    if obj.contains_key("implements") {
+                        return Err(TypeCatalogueCodecError::InvalidEntry {
+                            name: name.to_owned(),
+                            reason: format!(
+                                "kind '{}' does not support field 'implements' — \
+                                 'implements' is only valid for 'secondary_adapter'",
+                                kind
+                            ),
+                        });
                     }
                 }
             }
@@ -448,6 +503,10 @@ fn type_definition_kind_from_dto(
         TypeDefinitionKindDto::Command {} => Ok(TypeDefinitionKind::Command),
         TypeDefinitionKindDto::Query {} => Ok(TypeDefinitionKind::Query),
         TypeDefinitionKindDto::Factory {} => Ok(TypeDefinitionKind::Factory),
+        TypeDefinitionKindDto::SecondaryAdapter { implements } => {
+            let decls = decode_trait_impl_list(entry_name, implements)?;
+            Ok(TypeDefinitionKind::SecondaryAdapter { implements: decls })
+        }
     }
 }
 
@@ -463,6 +522,30 @@ fn decode_method_list(
     let mut decls = Vec::with_capacity(dtos.len());
     for m in dtos {
         decls.push(method_from_dto(entry_name, m)?);
+    }
+    Ok(decls)
+}
+
+/// Decode a `Vec<TraitImplDeclDto>` into `Vec<TraitImplDecl>`.
+fn decode_trait_impl_list(
+    entry_name: &str,
+    dtos: &[TraitImplDeclDto],
+) -> Result<Vec<TraitImplDecl>, TypeCatalogueCodecError> {
+    let mut decls = Vec::with_capacity(dtos.len());
+    for dto in dtos {
+        // L1 enforcement: trait_name must not contain `::` (last-segment only).
+        if dto.trait_name.contains("::") {
+            return Err(TypeCatalogueCodecError::InvalidEntry {
+                name: entry_name.to_owned(),
+                reason: format!(
+                    "implements trait_name contains '::' — L1 catalogue entries must use \
+                     last-segment short names: '{}'",
+                    dto.trait_name
+                ),
+            });
+        }
+        let methods = decode_method_list(entry_name, &dto.expected_methods)?;
+        decls.push(TraitImplDecl::new(dto.trait_name.clone(), methods));
     }
     Ok(decls)
 }
@@ -580,11 +663,9 @@ fn type_catalogue_entry_to_dto(
         TypeDefinitionKind::Command => TypeDefinitionKindDto::Command {},
         TypeDefinitionKind::Query => TypeDefinitionKindDto::Query {},
         TypeDefinitionKind::Factory => TypeDefinitionKindDto::Factory {},
-        TypeDefinitionKind::SecondaryAdapter { .. } => {
-            return Err(TypeCatalogueCodecError::InvalidEntry {
-                name: entry.name().to_owned(),
-                reason: "SecondaryAdapter encode not yet implemented (see T002)".to_owned(),
-            });
+        TypeDefinitionKind::SecondaryAdapter { implements } => {
+            let dtos = encode_trait_impl_list(entry.name(), implements)?;
+            TypeDefinitionKindDto::SecondaryAdapter { implements: dtos }
         }
     };
     Ok(TypeCatalogueEntryDto {
@@ -605,6 +686,33 @@ fn encode_method_list(
     methods: &[MethodDeclaration],
 ) -> Result<Vec<MethodDto>, TypeCatalogueCodecError> {
     methods.iter().map(|m| method_to_dto(entry_name, m)).collect()
+}
+
+/// Encode a `Vec<TraitImplDecl>` into `Vec<TraitImplDeclDto>`.
+fn encode_trait_impl_list(
+    entry_name: &str,
+    decls: &[TraitImplDecl],
+) -> Result<Vec<TraitImplDeclDto>, TypeCatalogueCodecError> {
+    let mut dtos = Vec::with_capacity(decls.len());
+    for decl in decls {
+        // L1 enforcement at encode time: mirror the same check as decode_trait_impl_list.
+        if decl.trait_name().contains("::") {
+            return Err(TypeCatalogueCodecError::InvalidEntry {
+                name: entry_name.to_owned(),
+                reason: format!(
+                    "implements trait_name contains '::' — L1 catalogue entries must use \
+                     last-segment short names: '{}'",
+                    decl.trait_name()
+                ),
+            });
+        }
+        let methods = encode_method_list(entry_name, decl.expected_methods())?;
+        dtos.push(TraitImplDeclDto {
+            trait_name: decl.trait_name().to_owned(),
+            expected_methods: methods,
+        });
+    }
+    Ok(dtos)
 }
 
 fn method_to_dto(
@@ -1390,9 +1498,9 @@ mod tests {
     }
 
     #[test]
-    fn test_round_trip_all_12_variants() {
-        // Verifies that all 12 TypeDefinitionKind variants round-trip through
-        // JSON encode/decode correctly (replaces the old "5 variants" FULL_JSON test).
+    fn test_round_trip_all_13_variants() {
+        // Verifies that all 13 TypeDefinitionKind variants round-trip through
+        // JSON encode/decode correctly.
         let json = r#"{
   "schema_version": 2,
   "type_definitions": [
@@ -1422,14 +1530,20 @@ mod tests {
     { "name": "SaveDto", "kind": "dto", "description": "dto" },
     { "name": "SaveCommand", "kind": "command", "description": "command" },
     { "name": "GetQuery", "kind": "query", "description": "query" },
-    { "name": "AggFactory", "kind": "factory", "description": "factory" }
+    { "name": "AggFactory", "kind": "factory", "description": "factory" },
+    {
+      "name": "FsStore",
+      "kind": "secondary_adapter",
+      "description": "adapter",
+      "implements": [{ "trait_name": "TrackReader" }]
+    }
   ]
 }"#;
         let doc = decode(json).unwrap();
-        assert_eq!(doc.entries().len(), 13);
+        assert_eq!(doc.entries().len(), 14);
         let encoded = encode(&doc).unwrap();
         let doc2 = decode(&encoded).unwrap();
-        assert_eq!(doc2.entries().len(), 13);
+        assert_eq!(doc2.entries().len(), 14);
         for (a, b) in doc.entries().iter().zip(doc2.entries()) {
             assert_eq!(a.name(), b.name());
             assert_eq!(a.kind(), b.kind());
@@ -1502,6 +1616,250 @@ mod tests {
         assert!(
             matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
             "expected InvalidEntry for stale transitions_to on value_object, got: {:?}",
+            err
+        );
+    }
+
+    // --- TDDD-05 T002: SecondaryAdapter decode/encode tests ---
+
+    #[test]
+    fn test_decode_secondary_adapter_single_trait_no_methods() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "FsReviewStore",
+      "kind": "secondary_adapter",
+      "description": "Adapter implementing ReviewReader",
+      "implements": [
+        { "trait_name": "ReviewReader" }
+      ]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        let TypeDefinitionKind::SecondaryAdapter { implements } = kind else {
+            panic!("expected SecondaryAdapter kind, got {:?}", kind);
+        };
+        assert_eq!(implements.len(), 1);
+        assert_eq!(implements[0].trait_name(), "ReviewReader");
+        assert!(implements[0].expected_methods().is_empty());
+    }
+
+    #[test]
+    fn test_decode_secondary_adapter_two_traits_with_methods() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "SystemGitRepo",
+      "kind": "secondary_adapter",
+      "description": "Adapter implementing WorktreeReader and TrackWriter",
+      "implements": [
+        {
+          "trait_name": "WorktreeReader",
+          "expected_methods": [
+            { "name": "read_worktree", "receiver": "&self", "params": [], "returns": "Result<Worktree, DomainError>", "is_async": false }
+          ]
+        },
+        { "trait_name": "TrackWriter" }
+      ]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let kind = doc.entries()[0].kind();
+        let TypeDefinitionKind::SecondaryAdapter { implements } = kind else {
+            panic!("expected SecondaryAdapter kind, got {:?}", kind);
+        };
+        assert_eq!(implements.len(), 2);
+        assert_eq!(implements[0].trait_name(), "WorktreeReader");
+        assert_eq!(implements[0].expected_methods().len(), 1);
+        assert_eq!(implements[0].expected_methods()[0].name(), "read_worktree");
+        assert_eq!(implements[1].trait_name(), "TrackWriter");
+        assert!(implements[1].expected_methods().is_empty());
+    }
+
+    #[test]
+    fn test_encode_secondary_adapter_round_trip() {
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "FsReviewStore",
+      "kind": "secondary_adapter",
+      "description": "Adapter implementing ReviewReader",
+      "implements": [
+        {
+          "trait_name": "ReviewReader",
+          "expected_methods": [
+            { "name": "find", "receiver": "&self", "params": [{ "name": "id", "ty": "ReviewId" }], "returns": "Option<Review>", "is_async": false }
+          ]
+        }
+      ]
+    }
+  ]
+}"#;
+        let doc = decode(json).unwrap();
+        let encoded = encode(&doc).unwrap();
+        let doc2 = decode(&encoded).unwrap();
+        assert_eq!(doc2.entries()[0].kind(), doc.entries()[0].kind());
+        assert!(encoded.contains("\"secondary_adapter\""));
+        assert!(encoded.contains("\"implements\""));
+    }
+
+    #[test]
+    fn test_existence_only_kinds_excludes_secondary_adapter() {
+        // secondary_adapter carries `implements` field — it is NOT existence-only.
+        // Phase 1.5 must NOT reject secondary_adapter entries that carry `implements`.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "FsReviewStore",
+      "kind": "secondary_adapter",
+      "description": "Adapter",
+      "implements": [{ "trait_name": "ReviewReader" }]
+    }
+  ]
+}"#;
+        assert!(
+            decode(json).is_ok(),
+            "secondary_adapter with implements must not be rejected by Phase 1.5"
+        );
+    }
+
+    #[test]
+    fn test_is_method_bearing_excludes_secondary_adapter() {
+        // secondary_adapter is in the type (non-trait) partition.
+        // A delete+add pair where both are non-trait (value_object + secondary_adapter)
+        // must be rejected as same-partition.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    { "name": "FsStore", "kind": "value_object", "description": "old", "action": "delete" },
+    {
+      "name": "FsStore",
+      "kind": "secondary_adapter",
+      "description": "new",
+      "action": "add",
+      "implements": [{ "trait_name": "ReviewReader" }]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        match err {
+            TypeCatalogueCodecError::InvalidEntry { reason, .. } => {
+                assert!(
+                    reason.contains("same partition"),
+                    "expected same-partition error, got: {reason}"
+                );
+            }
+            other => panic!("expected InvalidEntry, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_decode_existence_only_kind_with_implements_rejected() {
+        // Phase 1.5: existence-only kinds (use_case, etc.) must not carry `implements`
+        // (which belongs to secondary_adapter). Without this guard, the field would be
+        // silently dropped by serde instead of triggering an error.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "SaveUseCase",
+      "kind": "use_case",
+      "description": "use case with stale implements field",
+      "implements": [{ "trait_name": "SomePort" }]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for stale implements on use_case, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_secondary_adapter_trait_name_with_double_colon_rejected() {
+        // L1 enforcement: trait_name in implements must not contain `::`.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "FsReviewStore",
+      "kind": "secondary_adapter",
+      "description": "Adapter",
+      "implements": [{ "trait_name": "domain::ports::ReviewReader" }]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        match err {
+            TypeCatalogueCodecError::InvalidEntry { reason, .. } => {
+                assert!(
+                    reason.contains("'::'"),
+                    "expected '::' rejection in trait_name, got: {reason}"
+                );
+            }
+            other => panic!("expected InvalidEntry, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_decode_secondary_adapter_with_stale_expected_methods_rejected() {
+        // Phase 1.5: secondary_adapter must not carry `expected_methods` (that field
+        // belongs to secondary_port / application_service). Without this guard, serde
+        // would silently drop the field and the data loss would be invisible.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "FsReviewStore",
+      "kind": "secondary_adapter",
+      "description": "Adapter with stale expected_methods",
+      "implements": [{ "trait_name": "ReviewReader" }],
+      "expected_methods": [
+        { "name": "find", "receiver": "&self", "params": [], "returns": "()", "is_async": false }
+      ]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for stale expected_methods on secondary_adapter, got: {:?}",
+            err
+        );
+    }
+
+    #[test]
+    fn test_decode_structured_kind_with_stale_implements_rejected() {
+        // Phase 1.5: structured non-existence-only kinds (`typestate`, `enum`,
+        // `error_type`, `secondary_port`, `application_service`) must not carry
+        // `implements` (which belongs only to `secondary_adapter`).  Without this
+        // guard, serde would silently accept the field and drop the adapter
+        // declarations instead of failing at the codec boundary.
+        let json = r#"{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TrackStatus",
+      "kind": "enum",
+      "description": "enum with stale implements field",
+      "expected_variants": ["Planned", "Done"],
+      "implements": [{ "trait_name": "SomePort" }]
+    }
+  ]
+}"#;
+        let err = decode(json).unwrap_err();
+        assert!(
+            matches!(err, TypeCatalogueCodecError::InvalidEntry { .. }),
+            "expected InvalidEntry for stale implements on enum, got: {:?}",
             err
         );
     }
