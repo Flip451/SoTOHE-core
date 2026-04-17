@@ -119,10 +119,10 @@
         ]
       },
       {
-        "text": "3 層で sotp track type-graph --cluster-depth {1,2} --edges all を実行し verification.md に層別 node/edge/cluster 数・可読性比較・trait impl 破線の hexagonal 可視化有効性を記録する。ADR 2026-04-16-2200 に DRIFT-01 / entry-point / auto-render を延期する note を追加する",
+        "text": "3 層で sotp track type-graph --cluster-depth {1,2} --edges all を実行し verification.md に層別 node/edge/cluster 数・可読性比較・trait impl 破線の hexagonal 可視化有効性を記録する。ADR 2026-04-16-2200 §Phase 2 Scope Update §S4/§S5 に実測データ (node/edge/cluster 数、dedup 結論、scope (K) 延期正当性) を補強追記する (§S1-§S5 の本体構造は planning 時に追加済み)",
         "sources": [
           "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D7 Phase 2 Acceptance, §D8",
-          "inference — enum-first codebase 実測 (typestate 0 件) に基づくスコープ縮小判断"
+          "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §Phase 2 Scope Update §S4"
         ],
         "task_refs": [
           "T006"
@@ -167,13 +167,13 @@
       {
         "text": "State machine view (stateDiagram-v2 で enum state machine を描画する機能) は TypeGraph とは別のデータソースを必要とするため本 track では扱わない。別 ADR 案件として将来的に検討する",
         "sources": [
-          "inference — 現 codebase は enum-first 設計で state 遷移は enum メソッド内部、TypeGraph (型と型の関係) では表現できない"
+          "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §Phase 2 Scope Update §S3.1"
         ]
       },
       {
         "text": "architecture-rules.json の module 粒度拡張 (例: domain::guard may_depend_on domain::shared) は別 ADR 案件として扱う",
         "sources": [
-          "inference — DRIFT-01 の真の価値を引き出す前提条件だが、スキーマ変更 + 既存 verify layers/deny.toml/check_layers との整合設計が必要"
+          "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §Phase 2 Scope Update §S3.2"
         ]
       }
     ]
@@ -213,9 +213,9 @@
       ]
     },
     {
-      "text": "Backward compat なし clean break (TDDD-BUG-02): feedback_no_backward_compat に従い check_type_signals の signature 変更は破壊的に行う",
+      "text": "Backward compat なし clean break (TDDD-BUG-02): check_type_signals の signature 変更は破壊的に行う (TDDD-BUG-02 の修正案として ADR §D9 に明記)",
       "sources": [
-        "feedback — user memory feedback_no_backward_compat.md"
+        "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §D9 TDDD-BUG-02"
       ]
     },
     {
@@ -310,18 +310,19 @@
       ]
     },
     {
-      "text": "verification.md に deduplicate_typestate_edges default の実測判断が記録されている (T004 実装中に生じた Open Question の解決を docs として残す)",
+      "text": "verification.md に deduplicate_typestate_edges default の実測判断が記録されている (ADR Open Questions §4 への実測解答)",
       "sources": [
-        "inference — T004 S004 Open Question として metadata.json に記載; verification.md チェックリストに対応項目あり"
+        "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §Open Questions §4",
+        "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §Phase 2 Scope Update §S4"
       ],
       "task_refs": [
         "T006"
       ]
     },
     {
-      "text": "ADR 2026-04-16-2200 に scope (K) 縮小と DRIFT-01 / entry-point / auto-render 延期を記録する note が追加されている",
+      "text": "ADR 2026-04-16-2200 の §Phase 2 Scope Update に scope (K) 縮小と DRIFT-01 / entry-point / auto-render / orphan 延期の根拠が記録されている (track T006 の acceptance として ADR を参照)",
       "sources": [
-        "inference — ADR との scope 齟齬を記録し将来の再評価に備える"
+        "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §Phase 2 Scope Update §S2"
       ],
       "task_refs": [
         "T006"
@@ -349,10 +350,10 @@
     "knowledge/conventions/nightly-dev-tool.md"
   ],
   "signals": {
-    "blue": 32,
-    "yellow": 5,
+    "blue": 37,
+    "yellow": 0,
     "red": 0
   },
-  "approved_at": "2026-04-16T17:19:43Z",
-  "content_hash": "sha256:6718e1bc8697b2ae5daffa0da2e83f9b0461249d54ce2c127f4b3f6f4ca7f06e"
+  "approved_at": "2026-04-17T00:32:18Z",
+  "content_hash": "sha256:a7893bf051cf492b92c67cb42ef02298a9eeaf9e7a16732bc4e3751f3c4e3144"
 }

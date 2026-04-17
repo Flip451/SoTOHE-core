@@ -50,15 +50,16 @@
 - [ ] flat と cluster 両方のパスで field / impl edges が描画される
 - [ ] 4 tests (field edges / impl dashed / All union / trait stadium) が pass
 
-### T006: Multi-layer readability verification + ADR note
+### T006: Multi-layer readability verification + ADR 実測補強
 
 - [ ] `sotp track type-graph <id> --cluster-depth 2 --edges all` を 3 層で実行完了
 - [ ] verification.md に以下を記録:
   - [ ] domain / usecase / infrastructure の node / edge / cluster 数
   - [ ] cluster_depth 1 vs 2 の可読性比較
   - [ ] trait impl 破線の hexagonal port/adapter 可視化有効性 (FsReviewStore -.-> ReviewReader 等の具体例)
-  - [ ] deduplicate_typestate_edges default 判断の実測結論
-- [ ] ADR 2026-04-16-2200 に DRIFT-01 / entry-point / auto-render 延期の note が追加された
+  - [ ] deduplicate_typestate_edges default 判断の実測結論 (ADR Open Questions §4 への実測解答)
+- [x] ADR 2026-04-16-2200 §Phase 2 Scope Update §S1-§S5 が存在する (planning 時に追加済み)
+- [ ] §Phase 2 Scope Update §S4 / §S5 に実測データ (node/edge/cluster 数、dedup 結論、scope (K) 延期正当性) を補強追記した
 
 ## Manual Verification Steps
 
@@ -66,9 +67,15 @@
 # 1. CI 全通過
 cargo make ci
 
-# 2. 3 層 cluster 生成
+# 2. 3 層 cluster 生成 (depth 2)
 cargo run --quiet -p cli -- track type-graph tddd-type-graph-cluster-2026-04-17 \
   --cluster-depth 2 --edges all
+
+# 2b. 可読性比較用: depth 1 でも生成して比較
+cargo run --quiet -p cli -- track type-graph tddd-type-graph-cluster-2026-04-17 \
+  --cluster-depth 1 --edges all --force
+# 期待: より粗い cluster 分割 (depth 1 は domain/usecase/infrastructure レベル)
+# depth 1 vs depth 2 の可読性を比較し、T006 checklist 「cluster_depth 1 vs 2 の可読性比較」を記録する
 
 # 3. 生成物確認
 ls track/items/tddd-type-graph-cluster-2026-04-17/
@@ -99,7 +106,7 @@ _To be completed after implementation._
 | T003 | Pending | ClusterPlan module |
 | T004 | Pending | write_type_graph_dir + stale cleanup |
 | T005 | Pending | Fields + Impls edges |
-| T006 | Pending | 可読性検証 + ADR note |
+| T006 | Pending | 可読性検証 + ADR 実測補強 |
 
 ## Open Issues
 
@@ -114,7 +121,7 @@ _To be populated as issues surface during implementation._
 - **延期**: Orphan type detection (ADR §D8) — DRIFT-01 と同トラック扱い
 - **延期**: Auto-render integration in sotp track type-signals (ADR §D6) — 可読性 ROI 未実証のため living document 化を先送り
 
-延期理由と再評価条件を ADR note として追記 (T006 で反映)。
+延期理由と再評価条件は ADR 2026-04-16-2200 §Phase 2 Scope Update §S1-§S5 に planning 時に追記済み。T006 では §S4/§S5 に実測データ (node/edge/cluster 数、dedup 結論) を補強追記する。
 
 ## Verified At
 

@@ -127,6 +127,153 @@
           "findings": [],
           "hash": "rvw1:sha256:cfe1103901f70e8f1fd2a0746fc1ce269c4672abc4a477606d8046c1df961fd8",
           "at": "2026-04-16T17:30:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93bba54c5510481a5cd97ec93645cc5bfc692fdf891acfe4597b0e833db8d9f9",
+          "at": "2026-04-17T00:22:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` still describes `T006` as adding a new ADR deferral note (`\"ADR 2026-04-16-2200 に ... note を追加する\"`), but `metadata.json` and `verification.md` were updated to say `§Phase 2 Scope Update §S1-§S5` already exists from planning and that T006 now only supplements `§S4/§S5` with empirical data. That leaves the authoritative spec out of sync with the task description/checklist for the same work item.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "line": 122,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:93bba54c5510481a5cd97ec93645cc5bfc692fdf891acfe4597b0e833db8d9f9",
+          "at": "2026-04-17T00:24:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 is still described here as adding the ADR note from scratch (`ADR 2026-04-16-2200 に ... note を追加する`), but `metadata.json` now says `§Phase 2 Scope Update §S1-§S5` was already added during planning and `verification.md` marks that existence check as done. That leaves the planning artifacts disagreeing about whether T006 still creates the addendum or only supplements `§S4/§S5` with empirical data.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "line": 122,
+              "category": "consistency"
+            },
+            {
+              "message": "The T006 checklist requires a `cluster_depth 1 vs 2` readability comparison, but the documented manual verification flow only runs `track type-graph` with `--cluster-depth 2`. As written, the verification procedure cannot produce the depth-1 output needed to satisfy the stated check.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 71,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:93bba54c5510481a5cd97ec93645cc5bfc692fdf891acfe4597b0e833db8d9f9",
+          "at": "2026-04-17T00:29:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 is only partially realigned. `spec.json` still defines the task as adding a new ADR note for DRIFT-01 / entry-point / auto-render deferrals, but the updated `metadata.json`, `plan.md`, and `verification.md` now treat `§Phase 2 Scope Update §S1-§S5` as already present and say the remaining work is only empirical reinforcement in `§S4/§S5`. Because `spec.md` is rendered from this stale source-of-truth entry, the track still tells implementers to do work that the verification checklist already marks as done, reintroducing the task/acceptance mismatch this round was meant to remove.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "line": 122,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:93bba54c5510481a5cd97ec93645cc5bfc692fdf891acfe4597b0e833db8d9f9",
+          "at": "2026-04-17T00:31:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "§S1 upgrades an unsupported policy claim into the ADR: it says `.claude/rules/04-coding-principles.md` allows the codebase to prefer `enum + fn transition(self, ...) -> Result<Self, E>` for small state machines, but that convention explicitly says any state transition should prefer typestate, and a repo-wide search in `libs/`/`apps/` does not show such transition APIs in the current codebase. Because this addendum is now cited as the Blue source for the scope reduction, the ADR is recording a rationale that the cited convention and the codebase do not substantiate.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+              "line": 466,
+              "category": "factual_error"
+            }
+          ],
+          "hash": "rvw1:sha256:faf76a3f116c8db5d3c62ad8962dda2ad72ee673a2a03ee34e4ea8231e97b7e5",
+          "at": "2026-04-17T00:36:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:faf76a3f116c8db5d3c62ad8962dda2ad72ee673a2a03ee34e4ea8231e97b7e5",
+          "at": "2026-04-17T00:38:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` still describes T006 as adding an “ADR note” and says the postponement rationale/re-evaluation conditions will be reflected by T006, but the updated metadata/spec now treat `§Phase 2 Scope Update §S1-§S5` as already added during planning and limit T006 to supplementing `§S4/§S5` with measurements. That leaves the verification artifact internally inconsistent about what work remains for T006.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 124,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:7ba530d3f22431bde61c27ee417c784b19163a0154ba0c1f60e3155c0b430bea",
+          "at": "2026-04-17T00:41:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new addendum shrinks Phase 2 to scope (K) and defers Entry/DRIFT-01/orphan/auto-render, but the unchanged `Phased Scope Summary` still says Phase 2 is `cluster+drift`, has `Entry` = `あり`, and adds `--check-drift`. That leaves the ADR with two conflicting definitions of Phase 2 scope, and future readers can easily pick the stale summary table instead of the new addendum.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+              "line": 529,
+              "category": "consistency"
+            },
+            {
+              "message": "Round 2 makes `deduplicate_typestate_edges` a documented T006 deliverable, but the track still never requires the option itself to be implemented. `§S4` says T004 will add `TypeGraphRenderOptions::deduplicate_typestate_edges: bool`, yet T004's task list remains unchanged and the acceptance here only asks for a recorded 'default judgment'. That means T006 can pass by documenting a default for a flag the track never had to ship.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "line": 313,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:581a91bc39492505b3769716a23ade8072428b9395d9d98be9d76fb3a7dd3353",
+          "at": "2026-04-17T00:45:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006's acceptance criteria no longer cover the task's stated remaining work. `metadata.json` and `verification.md` now say T006 must add empirical data to ADR `§S4/§S5`, but acceptance criterion 9 only checks that `§S2` already records the scope-K deferrals. Because that ADR content is already present from planning, T006 can satisfy the spec without doing the new `§S4/§S5` reinforcement at all.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "line": 323,
+              "category": "consistency"
+            },
+            {
+              "message": "The new depth-comparison verification flow overwrites the first render before it can be compared. Step 2 generates `--cluster-depth 2`, then step 2b reruns the command against the same track output with `--cluster-depth 1 --force`, so the depth-2 artifacts are gone by the time step 3 asks for a readability comparison. As written, reviewers cannot perform the required `depth 1 vs 2` side-by-side check.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 75,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:581a91bc39492505b3769716a23ade8072428b9395d9d98be9d76fb3a7dd3353",
+          "at": "2026-04-17T00:47:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c41ade5a198b2d54e7b8850f2650fde4bf394f0426d599810b7b30ee9fe7c437",
+          "at": "2026-04-17T00:50:28Z"
         }
       ]
     }
