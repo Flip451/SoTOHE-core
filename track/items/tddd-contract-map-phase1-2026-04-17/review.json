@@ -1,0 +1,412 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` defines two incompatible ownership models for `render_contract_map`: the in-scope item places it in `libs/domain/src/tddd/contract_map_render.rs` and returns `ContractMapContent`, but the constraints section says render must live in infrastructure. That leaves T003 with no single implementable layer/API target, and it also disagrees with the ADR text, which still points at an infrastructure `-> String` renderer.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/spec.json",
+              "line": 57,
+              "category": "architecture"
+            },
+            {
+              "message": "`metadata.json` drifts on the core workflow contract inside the same track. S004 describes FS-style ports with `track_dir: &Path`, `&str`, and `PathBuf`, while T004 switches those ports to `&TrackId` and `&ContractMapContent`. S005 then introduces a different output shape (`written_path`) and different error names in the plan section than the task section keeps. The port/usecase boundary is not stable enough to implement against.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 56,
+              "category": "api"
+            }
+          ],
+          "hash": "rvw1:sha256:1531976185ed36f7cbaf1d52f3df79b7fd60d39c88a3a7b262d614000c8b62bb",
+          "at": "2026-04-17T09:48:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This ADR is still self-contradictory: §2 and §D3 describe `TypeDefinitionKind` as 12 variants, and the D3 table still omits `SecondaryAdapter`, even though the track spec/metadata already assumes 13 kinds. Because the ADR is marked `Accepted`, implementers will follow the wrong taxonomy until T001 lands.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 38,
+              "category": "architecture"
+            },
+            {
+              "message": "`verification.md` adds `verify-doc-links / verify-arch-docs` for T001 and `verify-usecase-purity` for T005, but `spec.json` has no corresponding acceptance criteria. That breaks the stated 1:1 checklist mapping and leaves the review gate underspecified.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 16,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:1749b06280f447e4bf01ad6db5f9b71bc0be4892079f5ab79b56f5646f7be04d",
+          "at": "2026-04-17T09:53:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR still contains stale \"12 variants\" wording in the Consequences and Notes sections (for example here, and again at line 369), so the accepted document remains internally inconsistent with the corrected 13-variant taxonomy and T001 is not fully satisfied yet.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 282,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:e0d1ae045e6ea88983d955dd594ff6ac095bb54fba90a9b23f963a1de8731bf2",
+          "at": "2026-04-17T09:57:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T001` still includes the `cargo make ci` gate, but `spec.json`'s only CI acceptance criterion is mapped to `T002`-`T007` (`task_refs` on the last criterion). That leaves this checklist item without a matching acceptance criterion and breaks the intended 1:1 verification mapping.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 16,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:17848faa3461ec5465a18bc6165f8b24bd50f1adbeaf1fb40967fe6431fe2788",
+          "at": "2026-04-17T10:00:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR example still styles `PostgresUserRepository` with `secondary_port_impl`, but the updated taxonomy only defines `secondary_adapter`. That leaves the sample mermaid internally inconsistent and can mislead implementation of the renderer.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 172,
+              "category": "contract"
+            },
+            {
+              "message": "The approved spec does not accept two behaviors that the plan and verification still require: T002's `layer_order`/topo-sort guarantee and T003's empty-subgraph result when `kind_filter` filters everything out. A change could satisfy every acceptance criterion while still breaking those cases.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/spec.json",
+              "line": 286,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:dfe6d415955cd3266f5d8b07a40326439c7578825eee9f803446643c9953efef",
+          "at": "2026-04-17T10:05:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 keeps `extract_type_names` in `libs/infrastructure/src/tddd/type_graph_render.rs`, but T003 says the new domain `render_contract_map` will reuse it for method-edge extraction. That makes the domain module depend on infrastructure and violates the declared `domain <- usecase <- infrastructure` direction; move the helper into domain/common or pass the extracted names in from the caller.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/spec.json",
+              "line": 25,
+              "category": "architecture"
+            },
+            {
+              "message": "T004's acceptance/verification only cover the `CatalogueLoader` / `ContractMapWriter` traits and adapters. The declared value objects and error enums (`LayerId`, `ContractMapContent`, `ContractMapRenderOptions`, `CatalogueLoaderError`, `ContractMapWriterError`) are never asserted, so the track can pass while half of the documented domain API is missing or downgraded to aliases.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 39,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:eab03daf85b0cb20f858480e028d5d8555e40f52671694eabb5ddbee5e61bb02",
+          "at": "2026-04-17T10:08:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 in `verification.md` still expects `libs/infrastructure/src/tddd/contract_map_render.rs`, but the ADR/spec moved `render_contract_map` to `libs/domain/src/tddd/contract_map_render.rs`. As written, this checklist would fail a correct domain implementation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 29,
+              "category": "consistency"
+            },
+            {
+              "message": "T004 in `verification.md` incorrectly treats `ContractMapRenderOptions` as a newtype. The ADR/spec define it as a multi-field `value_object`; only `LayerId` and `ContractMapContent` are the newtypes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 39,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:ff727541c72b9448a211bdc9ada97046426e81956ca8481ec55f27c31cb40c53",
+          "at": "2026-04-17T10:11:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is not actionable as written: the target ADR already has a `§D7` section (`段階的実装`), so asking to \"add §D7 Reality View as drill-down to Contract Map\" would force duplicate section numbering or an untracked renumbering of later sections. Update the task to rewrite the existing D7 or choose a different section target.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 10,
+              "category": "planning"
+            }
+          ],
+          "hash": "rvw1:sha256:b8c142cfa2ebe7c5cec235d2c29d13e41b2525a8d5cc2009399615ff0324c26c",
+          "at": "2026-04-17T10:15:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is still not actionable as written: it says to add `§D7` to ADR 2026-04-16-2200, but this track has already standardized on `§D10` because `D7` is occupied. That leaves the source of truth and the rendered plan contradictory until this line is corrected.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 132,
+              "category": "planning"
+            }
+          ],
+          "hash": "rvw1:sha256:608b733a003fef93a0cf440c387fbfcf5646be0e3ab45eccdf0006f5181a60fd",
+          "at": "2026-04-17T10:19:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61a4aa87e2de5e4fee3ae9444d8490707f3304b66a75870b4326cc8e8c1afd9c",
+          "at": "2026-04-17T10:21:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR §D2’s mermaid examples introduce a dashed `depends` edge (`RegisterUser -.->|depends| UserRepository`, and again in the custom-architecture example), but §D4 and the Phase 1 scope only define method-return edges and secondary-adapter trait-impl edges. As written, the ADR is internally inconsistent about which edge kinds Contract Map must render, so an implementer could reasonably add an unsupported third edge type or reviewers could reject a correct Phase 1 implementation for omitting it.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 175,
+              "category": "correctness"
+            },
+            {
+              "message": "The §D2 example renders `User(User):::typestate`, which is Mermaid’s round-node syntax, while §D3 defines `typestate` as the stadium shape `([Name])`. This leaves the ADR inconsistent about the expected output for one of the 13 kind mappings and can mislead the snapshot/tests that T003 is supposed to derive from the ADR.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 166,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:61a4aa87e2de5e4fee3ae9444d8490707f3304b66a75870b4326cc8e8c1afd9c",
+          "at": "2026-04-17T10:25:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The planned interface drops the only source of layer topology. T002 computes/verifies `layer_order`, and T003 requires `render_contract_map(..., layer_order, ...)`, but `CatalogueLoader::load_all` is catalogued as returning only `Result<BTreeMap<LayerId, TypeCatalogueDocument>, CatalogueLoaderError>`. Because a `BTreeMap` reorders by key instead of `may_depend_on`, the T005 flow (`loader.load_all -> render_contract_map`) has no way to preserve the verified left-to-right layer order for non-alphabetical architectures. The contract needs to return the ordered layer list as well, or the plan/spec must introduce a separate port/helper that the usecase can call for ordering.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/domain-types.json",
+              "line": 37,
+              "category": "design"
+            },
+            {
+              "message": "ADR §Q6 still presents one option as adding `§D7: Reality View as drill-down to Contract Map` to ADR 2026-04-16-2200, even though the very next sentence says §D7 is already occupied and the new section must be §D10. That stale bullet leaves T001 internally inconsistent again and can send the follow-up ADR edit to the wrong section.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 341,
+              "category": "consistency"
+            },
+            {
+              "message": "ADR §D3 says enums use `{Name}` while calling that shape a hexagon. In Mermaid, and in the existing type-graph renderer, hexagons are written as `{{Name}}`; `{Name}` is the diamond/rhombus form. If T003 implements this table verbatim, enum nodes will render with the wrong shape and diverge from the stated 13-kind mapping.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 205,
+              "category": "design"
+            }
+          ],
+          "hash": "rvw1:sha256:f95fb93370265f48addbcf8900f9b5b4b75d41c46ad441382ad254fe14529488",
+          "at": "2026-04-17T10:30:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_all_catalogues` is still specified as returning only `BTreeMap<LayerId, TypeCatalogueDocument>` in the planning SSoT/rendered docs (`spec.json:36`, `metadata.json:138`, `plan.md:22`), but T004 and `domain-types.json:24-37` now require `CatalogueLoader::load_all` to return `(Vec<LayerId>, BTreeMap<...>)` so the topological `layer_order` survives. Because T004 says `FsCatalogueLoader` wraps the T002 helper, following the current T002 contract either loses ordering or forces an undocumented second topo-sort pass. The helper contract and verification should be updated to carry the `Vec<LayerId>` explicitly, or the docs need to say exactly where that order is derived.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/spec.json",
+              "line": 36,
+              "category": "consistency"
+            },
+            {
+              "message": "ADR D1 still says the caller `(CLI)` walks `tddd.enabled` layers and gathers the catalogues. That contradicts the accepted hexagonal split everywhere else in this track, where the CLI only dispatches to `RenderContractMapInteractor` and the usecase owns `loader.load_all` (`spec.json:107-118`). Leaving the ADR `Accepted` in this state points implementers back toward CLI-owned orchestration instead of the documented application-service flow.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 152,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:7a3266f7732b15a9a0108b2dd947560a78cb7cbe8df2b8bf3600edec2caa8e92",
+          "at": "2026-04-17T10:36:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`application_service` is labeled as `ドメインサービス` in the D3 mapping table, but this track consistently defines that kind as the primary-port trait in the usecase layer. That contradiction makes the ADR's kind semantics internally inconsistent and can lead reviewers or implementers to classify/render the node incorrectly.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 210,
+              "category": "consistency"
+            },
+            {
+              "message": "The S004 section still describes `CatalogueLoader::load_all` as returning only `BTreeMap<LayerId, TypeCatalogueDocument>`, while the task body and `spec.json` already require `(Vec<LayerId>, BTreeMap<...>)` so layer topology is preserved. Because `plan.md` is rendered from this field, the track currently has two conflicting port signatures in its own source of truth and can drive an implementation that drops render order.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 57,
+              "category": "consistency"
+            },
+            {
+              "message": "`metadata.json` says the track was created at `2026-04-17T15:30:00Z`, but `spec.json` records approval at `2026-04-17T10:37:31Z`, so this item appears approved nearly five hours before it existed. That impossible timeline can confuse tooling or reviewers that rely on monotonic track/spec timestamps for ordering and freshness checks.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 3,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:42bc5858375e34f330ef6398f60e4a8871218005be4971971f3627a1e483ec68",
+          "at": "2026-04-17T10:42:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueLoaderError` does not reserve any topology/order failure variant even though T002 requires `load_all_catalogues` / `layer_order` validation to return an explicit error when the `may_depend_on` graph is not topologically sortable. As catalogued, an implementation would have to misclassify cycle/order failures as `LayerDiscoveryFailed`/`IoError` or diverge from the declared API.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/domain-types.json",
+              "line": 71,
+              "category": "correctness"
+            },
+            {
+              "message": "ADR §D2 is internally inconsistent about layer direction: it says the topo order is rendered with '依存される側が右', but the example immediately below places `domain` (the depended-on layer in this repo's `may_depend_on` graph) on the left. Implementers following the sentence literally would reverse the intended left-to-right layer order and make valid edges look backward.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 158,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:40e605abdd0fe2afbe4e3d4e7352a70fba6dc74bc313afa0468d9261c1cc7998",
+          "at": "2026-04-17T10:47:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RenderContractMapError` is catalogued with `EmptyCatalogue` and `LayerNotFound`, but T005’s accepted behavior only requires five tests (`happy / loader_err / writer_err / kind_filter / 全除外`) and never defines when those two variants must be returned. That leaves the primary-port contract underspecified: an implementation could silently ignore unknown `layer_filter` values or collapse an empty layer selection to an empty render and still satisfy the track.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/spec.json",
+              "line": 358,
+              "category": "coverage"
+            },
+            {
+              "message": "T007 is supposed to prove the layer-agnostic invariant on custom architectures, but its acceptance criterion only checks subgraph count, labels, and foreign layer-name leakage. It no longer requires the rendered subgraph order to follow `may_depend_on` for the 2-layer / 3-layer / custom-name fixtures, so a renderer that ignores `layer_order` and emits alphabetical or hardcoded ordering would still pass.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/spec.json",
+              "line": 377,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:da3404e08dc6726dd5e5a06e498f5187ea886808217c0f2ade141c599de251d2",
+          "at": "2026-04-17T10:52:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` defines `RenderContractMap` as the usecase's application-service primary port in T005, but T006 still says the CLI should dispatch directly to `RenderContractMapInteractor`. That bypasses the primary-port boundary and leaves the plan internally inconsistent about whether apps/cli depends on the trait or the concrete interactor.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/spec.json",
+              "line": 118,
+              "category": "contradiction"
+            },
+            {
+              "message": "One of the 14 declared types is still uncovered by the acceptance gate. `usecase-types.json` requires the `RenderContractMap` application-service trait, but T005's acceptance criteria only require `RenderContractMapInteractor::execute` plus the command/output/error behavior. As written, the track can satisfy every documented acceptance criterion while omitting the primary-port trait entirely.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/spec.json",
+              "line": 358,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:390e879cfe67b324814591d813065d0af890f5f5e8f699a71c022a4ceb57444b",
+          "at": "2026-04-17T11:04:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/adr/2026-04-17-1528-tddd-contract-map.md` still says the CLI dispatches directly to `RenderContractMapInteractor`, and `metadata.json`/`plan.md` repeat the same concrete-dispatch wording. That contradicts `spec.json` T005/T006 and `usecase-types.json`, which require the CLI boundary to go through the `RenderContractMap` application-service trait instead of depending on the concrete interactor.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 152,
+              "category": "contradictions"
+            },
+            {
+              "message": "`verification.md` no longer covers all of T005's accepted requirements: it omits any checklist item for the `RenderContractMap` application-service trait and omits the explicit `EmptyCatalogue` / `LayerNotFound` trigger conditions, even though `spec.json` defines both as separate T005 acceptance criteria. As written, T005 can be marked verified without checking two accepted behaviors.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 52,
+              "category": "contradictions"
+            }
+          ],
+          "hash": "rvw1:sha256:7a27041d76d76e06fd324dc125fbc6f8827b71949de4473acf9673da91a1799a",
+          "at": "2026-04-17T11:11:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T002` and `T003` are planned before `T004`, but both earlier tasks already require `LayerId`, `ContractMapContent`, and/or `ContractMapRenderOptions` in their public signatures. Since `T004` is where this track says those domain types are introduced, the per-task red→green / small-commit plan cannot be executed in order without pulling `T004` work forward or splitting the type introduction into an earlier task.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 138,
+              "category": "infeasibility"
+            },
+            {
+              "message": "`S006` still says the CLI dispatch is `CLI -> RenderContractMapInteractor::execute`, but `T006`, `spec.json`, and `verification.md` all require the CLI to go through the `RenderContractMap` application-service trait and avoid a direct dependency on the concrete interactor. That leaves the SSoT internally contradictory about the boundary the CLI is supposed to respect.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/metadata.json",
+              "line": 90,
+              "category": "contradiction"
+            },
+            {
+              "message": "The 'do not change existing type-graph' policy is already covered in `scope.out_of_scope` with a concrete file source, but it is repeated here as an inference-only constraint. That duplicate inference is what keeps the approved spec at `yellow: 3`, so the provenance/signal accounting is internally inconsistent for the same policy.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/spec.json",
+              "line": 247,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:346cfd55de09109742312326be63ea94f4ef09f9cb48d61ccd39932b208b6066",
+          "at": "2026-04-17T11:16:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3f4f60251333a00a008453cae148566623b7a8078d83be9483426faf2697ae3",
+          "at": "2026-04-17T11:21:37Z"
+        }
+      ]
+    }
+  }
+}

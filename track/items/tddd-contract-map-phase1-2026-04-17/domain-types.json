@@ -1,0 +1,136 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "LayerId",
+      "description": "Newtype wrapper around an architecture-rules.json layer crate name; eliminates raw String at port and adapter boundaries",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "ContractMapContent",
+      "description": "Newtype wrapper around a rendered contract-map mermaid markdown string; distinguishes render output from arbitrary strings at writer boundary",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "ContractMapRenderOptions",
+      "description": "Render configuration carrying layers filter, kind_filter, signal_overlay, action_overlay, include_spec_source_edges; Phase 1 stubs the latter three fields for future phases",
+      "approved": true,
+      "kind": "value_object"
+    },
+    {
+      "name": "CatalogueLoader",
+      "description": "Secondary port bulk-loading per-layer type catalogues from a track directory; returns the topologically sorted layer order and one TypeCatalogueDocument per tddd.enabled layer so callers do not need to re-derive topology",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "load_all",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            }
+          ],
+          "returns": "Result<(Vec<LayerId>, BTreeMap<LayerId, TypeCatalogueDocument>), CatalogueLoaderError>",
+          "is_async": false
+        }
+      ]
+    },
+    {
+      "name": "ContractMapWriter",
+      "description": "Secondary port atomically writing rendered contract-map content into the track directory with symlink-safety guards",
+      "approved": true,
+      "kind": "secondary_port",
+      "expected_methods": [
+        {
+          "name": "write",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "content",
+              "ty": "&ContractMapContent"
+            }
+          ],
+          "returns": "Result<(), ContractMapWriterError>",
+          "is_async": false
+        }
+      ]
+    },
+    {
+      "name": "CatalogueLoaderError",
+      "description": "Error variants returned by CatalogueLoader implementations",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "CatalogueNotFound",
+        "LayerDiscoveryFailed",
+        "DecodeFailed",
+        "SymlinkRejected",
+        "IoError",
+        "TopologicalSortFailed"
+      ]
+    },
+    {
+      "name": "ContractMapWriterError",
+      "description": "Error variants returned by ContractMapWriter implementations",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "IoError",
+        "SymlinkRejected",
+        "TrackNotFound"
+      ]
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "LayerId",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ContractMapContent",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ContractMapRenderOptions",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueLoader",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ContractMapWriter",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueLoaderError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ContractMapWriterError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "RenderContractMap",
+      "description": "Primary port trait driving the contract-map render workflow; exposes execute(cmd) for CLI and future adapters",
+      "approved": true,
+      "kind": "application_service",
+      "expected_methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&RenderContractMapCommand"
+            }
+          ],
+          "returns": "Result<RenderContractMapOutput, RenderContractMapError>",
+          "is_async": false
+        }
+      ]
+    },
+    {
+      "name": "RenderContractMapCommand",
+      "description": "Command input carrying TrackId, optional kind_filter, and optional layer_filter",
+      "approved": true,
+      "kind": "command"
+    },
+    {
+      "name": "RenderContractMapOutput",
+      "description": "DTO reporting rendered_layer_count and total_entry_count after a successful render",
+      "approved": true,
+      "kind": "dto"
+    },
+    {
+      "name": "RenderContractMapError",
+      "description": "Error variants surfaced by the RenderContractMap primary port",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "CatalogueLoaderFailed",
+        "ContractMapWriterFailed",
+        "EmptyCatalogue",
+        "LayerNotFound"
+      ]
+    },
+    {
+      "name": "RenderContractMapInteractor",
+      "description": "Interactor implementing RenderContractMap by composing CatalogueLoader, domain render_contract_map free function, and ContractMapWriter",
+      "approved": true,
+      "kind": "interactor"
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "RenderContractMap",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RenderContractMapCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RenderContractMapOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RenderContractMapError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RenderContractMapInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}

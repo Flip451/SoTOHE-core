@@ -1,0 +1,41 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "FsCatalogueLoader",
+      "description": "Filesystem-backed CatalogueLoader: iterates tddd.enabled layers via load_tddd_layers_from_path and decodes each catalogue_file via catalogue_codec::decode with reject_symlinks_below guard",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "CatalogueLoader"
+        }
+      ]
+    },
+    {
+      "name": "FsContractMapWriter",
+      "description": "Filesystem-backed ContractMapWriter: atomic_write_file with reject_symlinks_below guard, writing to track/items/<id>/contract-map.md",
+      "approved": true,
+      "kind": "secondary_adapter",
+      "implements": [
+        {
+          "trait_name": "ContractMapWriter"
+        }
+      ]
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "FsCatalogueLoader",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "FsContractMapWriter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}
