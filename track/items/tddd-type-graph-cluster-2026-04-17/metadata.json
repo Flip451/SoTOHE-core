@@ -123,6 +123,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "4bcc65b5f36ab43c676630e0888d4fee20e06c4f",
       "description": "Cluster directory layout: libs/infrastructure/src/tddd/type_graph_render.rs に render_type_graph_clustered / render_type_graph_overview / write_type_graph_dir を追加。出力は <layer>-graph/index.md + <cluster>.md (cluster 名は :: を _ に置換)。TypeGraphRenderOptions::cluster_depth: usize (default=2) 追加。Stale file cleanup: flat→cluster で .md を削除、cluster→flat で remove_dir_all。削除前に reject_symlinks_below で二重ガード。CLI --cluster-depth N flag を追加し、>0 なら write_type_graph_dir、=0 なら既存 write_type_graph_file に dispatch。3 層 (domain/usecase/infrastructure) 全対応。6 tests 追加。",
       "id": "T004",
       "status": "done"
@@ -130,7 +131,7 @@
     {
       "description": "Fields + Impls edges: EdgeSet::Fields (TypeNode::members の Field/Variant から A --- B) と EdgeSet::Impls (TypeNode::trait_impls から A -.-> Trait 破線) を実装。Trait ノードは classDef traitNode (stadium shape)。EdgeSet::All は 3 種の union。CLI --edges methods|fields|impls|all flag 追加。flat + cluster 両パスで edge を描画。4 tests (field edges / impl dashed / All union / trait stadium shape)。tddd-05 で利用可能な TypeNode::trait_impls を消費する。",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Multi-layer readability verification + ADR 実測補強: 3 層 (domain/usecase/infrastructure) で sotp track type-graph --cluster-depth {1,2} --edges all を実行して生成物を目視確認。verification.md に (a) 層別 node/edge/cluster 数、(b) depth 1 vs 2 可読性比較、(c) trait impl 破線の hexagonal port/adapter 可視化の有効性、(d) deduplicate_typestate_edges default 判断 (ADR Open Questions §4 への実測解答) を記録。ADR 2026-04-16-2200 §Phase 2 Scope Update §S4 / §S5 に実測データ (具体的な node/edge/cluster 数、dedup 結論) を補強追記し、scope (K) 延期の正当性を実測で裏付ける。§Phase 2 Scope Update §S1-§S5 の構造は planning 時に既に追加済みなので、T006 の役割は実測 data による補強のみ。production code 変更なし、docs のみ。",
@@ -139,5 +140,5 @@
     }
   ],
   "title": "TDDD Type Graph View Phase 2 — cluster + port/adapter 可視化 + TDDD debt 返済",
-  "updated_at": "2026-04-17T04:01:56Z"
+  "updated_at": "2026-04-17T04:50:17Z"
 }

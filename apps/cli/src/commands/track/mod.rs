@@ -218,6 +218,11 @@ pub enum TrackCommand {
         /// directory.  Defaults to `TypeGraphRenderOptions::default()` (currently 2).
         #[arg(long, default_value_t = 2)]
         cluster_depth: usize,
+
+        /// Edge types to include.  Accepted values: methods, fields, impls, all.
+        /// Defaults to `methods`.
+        #[arg(long, default_value = "methods")]
+        edges: String,
     },
 
     /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
@@ -368,15 +373,21 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         TrackCommand::TypeSignals { items_dir, track_id, workspace_root, layer } => {
             tddd::signals::execute_type_signals(items_dir, track_id, workspace_root, layer)
         }
-        TrackCommand::TypeGraph { items_dir, track_id, workspace_root, layer, cluster_depth } => {
-            tddd::graph::execute_type_graph(
-                items_dir,
-                track_id,
-                workspace_root,
-                layer,
-                cluster_depth,
-            )
-        }
+        TrackCommand::TypeGraph {
+            items_dir,
+            track_id,
+            workspace_root,
+            layer,
+            cluster_depth,
+            edges,
+        } => tddd::graph::execute_type_graph(
+            items_dir,
+            track_id,
+            workspace_root,
+            layer,
+            cluster_depth,
+            edges,
+        ),
         TrackCommand::BaselineCapture { items_dir, track_id, workspace_root, force, layer } => {
             tddd::baseline::execute_baseline_capture(
                 items_dir,

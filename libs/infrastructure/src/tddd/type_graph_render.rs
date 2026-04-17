@@ -4,7 +4,7 @@
 //! flat rendering with method edges only. Produces a markdown file containing a
 //! fenced `mermaid` block with `flowchart LR`.
 //!
-//! Phase 2 (ADR §D4, §D9):
+//! Phase 2 (ADR §D4, §D9, Scope K):
 //! cluster directory layout — `write_type_graph_dir` produces an `index.md`
 //! (overview) plus one `<cluster>.md` per cluster. Cross-cluster references are
 //! rendered as `[→ other::Type]` ghost labels so each sub-diagram stays
@@ -15,19 +15,21 @@
 //! Types as nodes:
 //! - struct → `[Name]` (rectangle) with `structNode` class
 //! - enum → `{{Name}}` (hexagon) with `enumNode` class
+//! - trait → `([Name])` (stadium) with `traitNode` class (only when impl edges present)
 //!
-//! Edges (Phase 1, methods only):
-//! - For each inherent method with a self-receiver, extract PascalCase type names
-//!   from the `returns()` string and create `A -->|method_name| B` edges for each
-//!   return type that exists in the `TypeGraph`.
+//! Edge types (all controlled by `EdgeSet`):
+//! - Methods: `A -->|method_name| B`  solid arrow; inherent self-receiver methods
+//! - Fields:  `A ---|field_name| B`   solid no-arrow; struct fields whose type is in-graph
+//! - Impls:   `A -.->|impl| Trait`    dashed arrow; trait implementations
 //!
-//! **Known Phase 1 limitations** (acceptable for the readability spike):
+//! **Known limitations**:
 //! - Associated type binding labels (e.g. `Item` in `Iterator<Item = Foo>`) are
 //!   extracted as PascalCase tokens. If a workspace type coincidentally shares the
-//!   label name, a false edge may appear. Phase 2 can add label-aware filtering.
+//!   label name, a false edge may appear. Label-aware filtering is deferred.
 //! - Stdlib wrapper names (`Result`, `Option`, `Vec` …) are NOT explicitly
 //!   filtered — they are naturally excluded because `TypeGraph` only contains
 //!   types from the workspace crate's rustdoc export, not stdlib re-exports.
+//! - Enum variant payloads are not extracted at L1 (variant members carry name only).
 
 use std::collections::HashSet;
 use std::path::Path;
@@ -43,23 +45,29 @@ use crate::track::symlink_guard::reject_symlinks_below;
 // ---------------------------------------------------------------------------
 
 /// Selects which edge types to include in the mermaid type graph render.
-///
-/// Phase 1 implements only `Methods`. `Fields` and `Impls` are Phase 2 stubs
-/// that currently produce no edges (callers receive a method-only diagram or an
-/// empty diagram, respectively). `All` includes every implemented edge type,
-/// which in Phase 1 is the same as `Methods`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EdgeSet {
-    /// Only inherent method edges (self → return type). Fully implemented in Phase 1.
+    /// Only inherent method edges (self → return type).
+    ///
+    /// Mermaid symbol: `A -->|method_name| B` (solid arrow).
     Methods,
-    /// Only struct field / enum variant edges.
-    /// **Phase 2 stub** — currently produces no edges.
+    /// Only struct field edges.
+    ///
+    /// Each `MemberDeclaration::Field` whose type string contains a PascalCase
+    /// token that exists in the graph produces an edge. Enum variant members
+    /// carry no payload type at L1 and are skipped.
+    ///
+    /// Mermaid symbol: `A ---|field_name| B` (solid, no arrowhead).
     Fields,
     /// Only trait impl edges.
-    /// **Phase 2 stub** — currently produces no edges.
+    ///
+    /// Each `TraitImplEntry` on a type produces an edge to the trait node when
+    /// the trait name appears in `TypeGraph::trait_names()`. Trait nodes are
+    /// rendered with stadium shape `([TraitName])` and `traitNode` class.
+    ///
+    /// Mermaid symbol: `A -.->|impl| TraitName` (dashed arrow).
     Impls,
-    /// All edge types. In Phase 1 this is equivalent to `Methods`
-    /// (field and impl edges are Phase 2 stubs).
+    /// All edge types: methods + fields + impls (union, no deduplication).
     All,
 }
 
@@ -105,21 +113,33 @@ pub fn render_type_graph_flat(
     layer_name: &str,
     opts: &TypeGraphRenderOptions,
 ) -> String {
-    // Collect and deduplicate edges. Drop the edge_kind tag — flat rendering
-    // only needs (source, label, target).
+    // Collect edges with their kind tags so we can choose the correct mermaid
+    // edge symbol in the render step.
     let raw_edges = collect_edges(graph, opts.edge_set);
-    let mut edges: Vec<(String, String, String)> =
-        raw_edges.into_iter().map(|(s, l, t, _)| (s, l, t)).collect();
+    let mut edges: Vec<(String, String, String, &'static str)> = raw_edges;
 
     // Apply max_nodes guard by limiting edges first, then deriving nodes.
     // This ensures every rendered node participates in at least one rendered
     // edge, avoiding isolated nodes that appear when nodes are truncated
     // without regard for edge connectivity.
+    //
+    // Mermaid node IDs: type nodes use the bare short name; trait nodes use
+    // `_trait_{name}` to avoid collision with a type that shares the same
+    // short name (Rust type and trait namespaces are separate, but Mermaid
+    // IDs must be globally unique within a diagram).  The budget guard must
+    // count these as distinct nodes even when the short name is the same.
+    //
+    // Build the initial set of Mermaid node IDs present before truncation.
+    // Type nodes keep their short name; impl-edge targets use `_trait_{name}`.
     let total_nodes_connected = {
-        let mut set: HashSet<&str> = HashSet::new();
-        for (src, _, tgt) in &edges {
-            set.insert(src.as_str());
-            set.insert(tgt.as_str());
+        let mut set: HashSet<String> = HashSet::new();
+        for (src, _, tgt, kind) in &edges {
+            set.insert(src.clone()); // sources are always type nodes
+            if *kind == "impl" {
+                set.insert(trait_node_id(tgt));
+            } else {
+                set.insert(tgt.clone());
+            }
         }
         set.len()
     };
@@ -127,14 +147,17 @@ pub fn render_type_graph_flat(
     if truncated {
         // Keep only edges whose both endpoints fit within the node budget.
         // Greedily accept edges (already sorted) until the node set is full.
-        let mut kept_nodes: HashSet<String> = HashSet::new();
-        edges.retain(|(src, _, tgt)| {
-            let src_new = !kept_nodes.contains(src);
-            let tgt_new = !kept_nodes.contains(tgt);
+        // Node IDs use the same disambiguation as in the renderer.
+        let mut kept_ids: HashSet<String> = HashSet::new();
+        edges.retain(|(src, _, tgt, kind)| {
+            let src_id = src.clone();
+            let tgt_id = if *kind == "impl" { trait_node_id(tgt) } else { tgt.clone() };
+            let src_new = !kept_ids.contains(&src_id);
+            let tgt_new = !kept_ids.contains(&tgt_id);
             let would_add = src_new as usize + tgt_new as usize;
-            if kept_nodes.len() + would_add <= opts.max_nodes_per_diagram {
-                kept_nodes.insert(src.clone());
-                kept_nodes.insert(tgt.clone());
+            if kept_ids.len() + would_add <= opts.max_nodes_per_diagram {
+                kept_ids.insert(src_id);
+                kept_ids.insert(tgt_id);
                 true
             } else {
                 false
@@ -142,18 +165,52 @@ pub fn render_type_graph_flat(
         });
     }
 
-    // Collect connected node names from the (possibly truncated) edge set
-    let node_names: Vec<&str> = {
-        let mut set: HashSet<&str> = HashSet::new();
-        for (src, _, tgt) in &edges {
-            set.insert(src.as_str());
-            set.insert(tgt.as_str());
+    // Collect connected node names from the (possibly truncated) edge set.
+    // Separate struct/enum type nodes from trait nodes (impl edge targets).
+    let (type_node_names, trait_node_names): (Vec<&str>, Vec<&str>) = {
+        let mut type_set: HashSet<&str> = HashSet::new();
+        let mut trait_set: HashSet<&str> = HashSet::new();
+        for (src, _, tgt, kind) in &edges {
+            type_set.insert(src.as_str());
+            if *kind == "impl" {
+                // Trait nodes are rendered with stadium shape — keep them separate.
+                trait_set.insert(tgt.as_str());
+            } else {
+                type_set.insert(tgt.as_str());
+            }
         }
-        let mut names: Vec<&str> = set.into_iter().collect();
-        names.sort();
-        names
+        let mut type_names: Vec<&str> = type_set.into_iter().collect();
+        type_names.sort();
+        let mut trait_names: Vec<&str> = trait_set.into_iter().collect();
+        trait_names.sort();
+        (type_names, trait_names)
     };
-    let node_set: HashSet<&str> = node_names.iter().copied().collect();
+    // node_names is for header reporting. Count by unique Mermaid node IDs
+    // (type nodes use short name, trait nodes use `_trait_{name}`) so that
+    // a type and trait sharing a short name are counted as two separate nodes.
+    let node_count = {
+        let mut id_set: HashSet<String> = HashSet::new();
+        for name in &type_node_names {
+            id_set.insert((*name).to_owned());
+        }
+        for name in &trait_node_names {
+            id_set.insert(trait_node_id(name));
+        }
+        id_set.len()
+    };
+    // node_set: membership test for edge filtering (uses short names for both
+    // type and trait short names, since the edge list uses short names for tgt).
+    let node_set: HashSet<&str> = {
+        let mut s: HashSet<&str> = HashSet::new();
+        for name in &type_node_names {
+            s.insert(*name);
+        }
+        for name in &trait_node_names {
+            s.insert(*name);
+        }
+        s
+    };
+    let has_trait_nodes = !trait_node_names.is_empty();
 
     // Build output
     let mut out = String::new();
@@ -163,9 +220,11 @@ pub fn render_type_graph_flat(
     out.push_str(&format!("# {layer_name} Type Graph\n\n"));
 
     let total_types = graph.type_names().count();
+    // Report connected type nodes only (trait nodes from impl edges are a separate
+    // namespace and would make the `connected` count exceed `total` if included).
+    let connected_types = type_node_names.len();
     out.push_str(&format!(
-        "Types: {total_types} total, {} connected, {} edges",
-        node_names.len(),
+        "Types: {total_types} total, {connected_types} connected, {} edges",
         edges.len()
     ));
     if truncated {
@@ -175,10 +234,14 @@ pub fn render_type_graph_flat(
 
     out.push_str("```mermaid\nflowchart LR\n");
     out.push_str("    classDef structNode fill:#f3e5f5,stroke:#7b1fa2\n");
-    out.push_str("    classDef enumNode fill:#e1f5fe,stroke:#0288d1\n\n");
+    out.push_str("    classDef enumNode fill:#e1f5fe,stroke:#0288d1\n");
+    if has_trait_nodes {
+        out.push_str("    classDef traitNode fill:#e8f5e9,stroke:#388e3c\n");
+    }
+    out.push('\n');
 
-    // Emit nodes
-    for name in &node_names {
+    // Emit type (struct/enum) nodes
+    for name in &type_node_names {
         if let Some(node) = graph.get_type(name) {
             let shape = match node.kind() {
                 TypeKind::Enum => format!("    {name}{{{{{name}}}}}:::{}", "enumNode"),
@@ -188,15 +251,25 @@ pub fn render_type_graph_flat(
             out.push('\n');
         }
     }
+    // Emit trait nodes with disambiguated ID `_trait_{name}` and stadium shape.
+    // The `_trait_` prefix avoids Mermaid node ID collisions with type nodes
+    // that share the same short name (trait and type namespaces are separate in
+    // Rust but Mermaid IDs must be globally unique within a diagram).
+    for name in &trait_node_names {
+        let node_id = trait_node_id(name);
+        out.push_str(&format!("    {node_id}([{name}]):::traitNode\n"));
+    }
 
-    if !node_names.is_empty() && !edges.is_empty() {
+    if node_count > 0 && !edges.is_empty() {
         out.push('\n');
     }
 
-    // Emit edges (only between nodes in the node_set)
-    for (src, label, tgt) in &edges {
+    // Emit edges (only between nodes in the node_set), choosing the mermaid
+    // edge symbol based on the edge_kind.
+    for (src, label, tgt, kind) in &edges {
         if node_set.contains(src.as_str()) && node_set.contains(tgt.as_str()) {
-            out.push_str(&format!("    {src} -->|{label}| {tgt}\n"));
+            let edge_str = render_edge_symbol(src, label, tgt, kind);
+            out.push_str(&format!("    {edge_str}\n"));
         }
     }
 
@@ -267,11 +340,16 @@ pub fn write_type_graph_file(
 /// Builds a flat edge list from a `TypeGraph` for the given `EdgeSet`.
 ///
 /// Returns `(source, label, target, edge_kind)` tuples. Deduplicates and sorts.
+/// Edge kinds:
+/// - `"method"`: inherent method with self-receiver (solid arrow `-->|label|`)
+/// - `"field"`: struct field whose type is a workspace type (solid no-arrow `---|label|`)
+/// - `"impl"`: trait implementation (dashed arrow `-.->|impl|`)
 fn collect_edges(
     graph: &TypeGraph,
     edge_set: EdgeSet,
 ) -> Vec<(String, String, String, &'static str)> {
     let graph_type_names: HashSet<&str> = graph.type_names().map(|s| s.as_str()).collect();
+    let graph_trait_names: HashSet<&str> = graph.trait_names().map(|s| s.as_str()).collect();
     let mut edges: Vec<(String, String, String, &'static str)> = Vec::new();
 
     if matches!(edge_set, EdgeSet::Methods | EdgeSet::All) {
@@ -297,6 +375,58 @@ fn collect_edges(
         }
     }
 
+    if matches!(edge_set, EdgeSet::Fields | EdgeSet::All) {
+        use domain::tddd::catalogue::MemberDeclaration;
+        for source_name in graph.type_names() {
+            if let Some(node) = graph.get_type(source_name) {
+                for member in node.members() {
+                    match member {
+                        MemberDeclaration::Field { name: field_name, ty } => {
+                            // Extract PascalCase type tokens from the field type string.
+                            // Only include edges to types that exist in the graph
+                            // (same workspace-only filter as Methods).
+                            // Note: self-referential field edges (e.g. `Node { next: Node }`)
+                            // are intentionally kept — unlike method self-loops, a recursive
+                            // struct field is meaningful structural information to show.
+                            let targets = extract_type_names(ty);
+                            for target in targets {
+                                if graph_type_names.contains(target) {
+                                    edges.push((
+                                        source_name.clone(),
+                                        field_name.clone(),
+                                        target.to_string(),
+                                        "field",
+                                    ));
+                                }
+                            }
+                        }
+                        // Variants carry no payload type at L1 — skip them.
+                        MemberDeclaration::Variant(_) => {}
+                    }
+                }
+            }
+        }
+    }
+
+    if matches!(edge_set, EdgeSet::Impls | EdgeSet::All) {
+        for source_name in graph.type_names() {
+            if let Some(node) = graph.get_type(source_name) {
+                for trait_impl in node.trait_impls() {
+                    let trait_name = trait_impl.trait_name();
+                    // Only emit edges to traits that exist in the graph's trait map.
+                    if graph_trait_names.contains(trait_name) {
+                        edges.push((
+                            source_name.clone(),
+                            "impl".to_string(),
+                            trait_name.to_string(),
+                            "impl",
+                        ));
+                    }
+                }
+            }
+        }
+    }
+
     edges.sort();
     edges.dedup();
     edges
@@ -304,7 +434,10 @@ fn collect_edges(
 
 /// Renders a per-cluster mermaid block for a single cluster.
 ///
-/// Intra-cluster edges are rendered as normal `A -->|label| B` arrows.
+/// Intra-cluster edges are rendered with the appropriate symbol for their
+/// edge kind: solid arrow for methods, solid no-arrow for fields, dashed
+/// arrow for impl edges. Trait nodes from impl edges are rendered with
+/// stadium shape `([TraitName])` within the cluster diagram.
 /// Cross-cluster references appear as ghost nodes with label `[→ other::Type]`
 /// so the diagram remains self-contained.
 ///
@@ -332,36 +465,84 @@ pub fn render_type_graph_clustered(
 
     // Separate intra-cluster edges (both endpoints in this cluster) from
     // cross-cluster references (source in this cluster, target elsewhere).
-    let mut intra_edges: Vec<(&str, &str, &str)> = Vec::new();
-    let mut cross_targets: Vec<(&str, &str, &str)> = Vec::new(); // (source, label, target_type)
+    // For impl edges, the target is a trait node (not in cluster_types), so
+    // impl-edge targets are collected separately as intra-cluster trait nodes.
+    // Tuple: (source, label, target, edge_kind)
+    let mut intra_edges: Vec<(&str, &str, &str, &str)> = Vec::new();
+    let mut intra_trait_targets: Vec<&str> = Vec::new(); // trait node targets within this cluster
+    let mut cross_targets: Vec<(&str, &str, &str, &str)> = Vec::new(); // (source, label, target_type, edge_kind)
 
-    for (src, label, tgt, _) in &all_edges {
+    for (src, label, tgt, kind) in &all_edges {
         if !cluster_types.contains(src.as_str()) {
             continue;
         }
-        if cluster_types.contains(tgt.as_str()) {
-            intra_edges.push((src.as_str(), label.as_str(), tgt.as_str()));
+        if *kind == "impl" {
+            // Impl edges always point to traits — render within the cluster.
+            // Trait targets are not in cluster_types so we track them separately.
+            intra_edges.push((src.as_str(), label.as_str(), tgt.as_str(), kind));
+            intra_trait_targets.push(tgt.as_str());
+        } else if cluster_types.contains(tgt.as_str()) {
+            intra_edges.push((src.as_str(), label.as_str(), tgt.as_str(), kind));
         } else {
-            cross_targets.push((src.as_str(), label.as_str(), tgt.as_str()));
+            cross_targets.push((src.as_str(), label.as_str(), tgt.as_str(), kind));
         }
     }
+    intra_trait_targets.sort();
+    intra_trait_targets.dedup();
 
     // Collect cluster member nodes and apply max_nodes_per_diagram guard.
-    // Member nodes and cross-cluster ghost nodes share a single budget:
-    // member nodes are emitted first (they take priority), and ghost nodes
-    // fill the remaining slots.  This keeps the total mermaid node count
-    // at or below max_nodes_per_diagram.
+    // Member nodes, trait nodes, and cross-cluster ghost nodes all share a
+    // single budget: member nodes take priority, then trait nodes fill the
+    // next slots (in deduped order), and ghost nodes use whatever remains.
+    // This keeps the total mermaid node count at or below max_nodes_per_diagram.
     let mut sorted_nodes: Vec<&str> = cluster_types.iter().copied().collect();
     sorted_nodes.sort();
-    let truncated = sorted_nodes.len() > opts.max_nodes_per_diagram;
+    let mut truncated = sorted_nodes.len() > opts.max_nodes_per_diagram;
     if truncated {
         sorted_nodes.truncate(opts.max_nodes_per_diagram);
     }
     let kept_nodes: HashSet<&str> = sorted_nodes.iter().copied().collect();
 
     // After truncation, filter intra_edges and cross_targets to kept_nodes only.
-    intra_edges.retain(|(src, _, tgt)| kept_nodes.contains(*src) && kept_nodes.contains(*tgt));
-    cross_targets.retain(|(src, _, _)| kept_nodes.contains(*src));
+    intra_edges.retain(|(src, _, tgt, kind)| {
+        if *kind == "impl" {
+            // Impl edge source must be in kept_nodes; trait targets are always kept.
+            kept_nodes.contains(*src)
+        } else {
+            kept_nodes.contains(*src) && kept_nodes.contains(*tgt)
+        }
+    });
+    cross_targets.retain(|(src, _, _, _)| kept_nodes.contains(*src));
+
+    // Rebuild intra_trait_targets from retained impl edges so the list only
+    // contains traits referenced by the kept (non-truncated) member nodes.
+    // Then cap the list to fit within the remaining budget after member nodes
+    // so that the total rendered nodes never exceeds max_nodes_per_diagram.
+    let trait_budget = opts.max_nodes_per_diagram.saturating_sub(sorted_nodes.len());
+    let mut intra_trait_targets: Vec<&str> = {
+        let mut v: Vec<&str> = intra_edges
+            .iter()
+            .filter(|(_, _, _, kind)| *kind == "impl")
+            .map(|(_, _, tgt, _)| *tgt)
+            .collect();
+        v.sort();
+        v.dedup();
+        v
+    };
+    let trait_truncated = intra_trait_targets.len() > trait_budget;
+    if trait_truncated {
+        // Remove impl edges whose trait target will be dropped so the diagram
+        // does not emit edges pointing at non-existent nodes.
+        intra_trait_targets.truncate(trait_budget);
+        let kept_traits: HashSet<&str> = intra_trait_targets.iter().copied().collect();
+        intra_edges.retain(
+            |(_, _, tgt, kind)| {
+                if *kind == "impl" { kept_traits.contains(*tgt) } else { true }
+            },
+        );
+    }
+    let has_trait_nodes = !intra_trait_targets.is_empty();
+    truncated |= trait_truncated;
 
     // Build a type → cluster reverse lookup so ghost labels can carry the
     // target's cluster prefix (e.g. `→ usecase::publish::Draft`).
@@ -379,14 +560,15 @@ pub fn render_type_graph_clustered(
     // `[→ other::Type]` convention (cluster context visible at a glance).
     // The ghost_id incorporates the sanitized cluster key to remain unique
     // when the same short type name appears in multiple clusters.
-    let cross_ghost_ids: Vec<(String, &str, &str, &str, String)> = cross_targets
+    // Tuple: (ghost_id, source, label, target, display, edge_kind)
+    let cross_ghost_ids: Vec<(String, &str, &str, &str, String, &str)> = cross_targets
         .iter()
-        .map(|(src, label, tgt)| {
+        .map(|(src, label, tgt, kind)| {
             let tgt_cluster = type_to_cluster.get(*tgt).copied().unwrap_or("unresolved");
             let sanitized_cluster = sanitize_cluster_id(tgt_cluster);
             let ghost_id = format!("_xref_{sanitized_cluster}_{tgt}");
             let display = format!("{tgt_cluster}::{tgt}");
-            (ghost_id, *src, *label, *tgt, display)
+            (ghost_id, *src, *label, *tgt, display, *kind)
         })
         .collect();
 
@@ -401,17 +583,21 @@ pub fn render_type_graph_clustered(
         }
         seen.len()
     };
-    // Ghost nodes share the same budget as member nodes. After member nodes
-    // are placed, ghost nodes may use the remaining budget only (counted as
-    // unique ghost nodes, not raw edge references).
-    let ghost_budget = opts.max_nodes_per_diagram.saturating_sub(sorted_nodes.len());
+    // Ghost nodes share the same budget as member and trait nodes.  After
+    // member nodes and trait nodes are placed, ghost nodes may use the
+    // remaining budget only (counted as unique ghost nodes, not raw edge
+    // references).
+    let ghost_budget = opts
+        .max_nodes_per_diagram
+        .saturating_sub(sorted_nodes.len())
+        .saturating_sub(intra_trait_targets.len());
     let ghost_truncated = unique_ghost_count > ghost_budget;
 
     // When truncation is needed, keep only edges whose ghost node falls within
     // the budget.  Accept ghost nodes in first-seen order; edges to a ghost
     // node that is already accepted are always retained (they contribute an
     // edge in the diagram, not an extra node).
-    let cross_ghost_ids: Vec<(String, &str, &str, &str, String)> = if ghost_truncated {
+    let cross_ghost_ids: Vec<(String, &str, &str, &str, String, &str)> = if ghost_truncated {
         let mut accepted_ghosts: HashSet<String> = HashSet::new();
         cross_ghost_ids
             .into_iter()
@@ -432,7 +618,7 @@ pub fn render_type_graph_clustered(
     } else {
         cross_ghost_ids
     };
-    let truncated = truncated || ghost_truncated;
+    truncated |= ghost_truncated;
 
     let display_label = if cluster_key.is_empty() { "flat" } else { cluster_key };
 
@@ -458,7 +644,11 @@ pub fn render_type_graph_clustered(
     out.push_str("```mermaid\nflowchart LR\n");
     out.push_str("    classDef structNode fill:#f3e5f5,stroke:#7b1fa2\n");
     out.push_str("    classDef enumNode fill:#e1f5fe,stroke:#0288d1\n");
-    out.push_str("    classDef ghostNode fill:#f5f5f5,stroke:#9e9e9e,color:#757575\n\n");
+    out.push_str("    classDef ghostNode fill:#f5f5f5,stroke:#9e9e9e,color:#757575\n");
+    if has_trait_nodes {
+        out.push_str("    classDef traitNode fill:#e8f5e9,stroke:#388e3c\n");
+    }
+    out.push('\n');
 
     // Emit cluster-member nodes.
     for name in &sorted_nodes {
@@ -472,10 +662,17 @@ pub fn render_type_graph_clustered(
         }
     }
 
+    // Emit trait nodes with disambiguated ID `_trait_{name}` and stadium shape.
+    // See `trait_node_id` for the rationale behind the prefix.
+    for name in &intra_trait_targets {
+        let node_id = trait_node_id(name);
+        out.push_str(&format!("    {node_id}([{name}]):::traitNode\n"));
+    }
+
     // Emit ghost nodes for cross-cluster targets.
     // The display string carries the cluster prefix: `→ cluster::TypeName`.
     let mut ghost_ids_emitted: HashSet<String> = HashSet::new();
-    for (ghost_id, _src, _label, _tgt, display) in &cross_ghost_ids {
+    for (ghost_id, _src, _label, _tgt, display, _kind) in &cross_ghost_ids {
         if ghost_ids_emitted.insert(ghost_id.clone()) {
             out.push_str(&format!("    {ghost_id}[\"→ {display}\"]:::ghostNode\n"));
         }
@@ -485,14 +682,16 @@ pub fn render_type_graph_clustered(
         out.push('\n');
     }
 
-    // Emit intra-cluster edges.
-    for (src, label, tgt) in &intra_edges {
-        out.push_str(&format!("    {src} -->|{label}| {tgt}\n"));
+    // Emit intra-cluster edges using the correct mermaid symbol per edge_kind.
+    for (src, label, tgt, kind) in &intra_edges {
+        let edge_str = render_edge_symbol(src, label, tgt, kind);
+        out.push_str(&format!("    {edge_str}\n"));
     }
 
     // Emit cross-cluster ghost edges.
-    for (ghost_id, src, label, _tgt, _display) in &cross_ghost_ids {
-        out.push_str(&format!("    {src} -->|{label}| {ghost_id}\n"));
+    for (ghost_id, src, label, _tgt, _display, kind) in &cross_ghost_ids {
+        let edge_str = render_edge_symbol(src, label, ghost_id, kind);
+        out.push_str(&format!("    {edge_str}\n"));
     }
 
     out.push_str("```\n");
@@ -521,15 +720,23 @@ pub fn render_type_graph_overview(
 
     // Build cross-cluster edge set: (source_cluster, label_count, target_cluster).
     // We collapse multiple edges into one per (src_cluster, tgt_cluster) pair.
+    // Impl-kind edges are excluded here because trait targets are not cluster
+    // members — they are rendered as intra-cluster nodes within each cluster
+    // diagram.  Including impl cross-edges would add a spurious `unresolved`
+    // cluster node to the overview for every trait implementation.
     let mut overview_edges: std::collections::BTreeMap<(String, String), usize> =
         std::collections::BTreeMap::new();
     for edge in &plan.cross_edges {
+        if edge.edge_kind == "impl" {
+            continue; // trait impl targets rendered intra-cluster, not as cross-cluster
+        }
         let key = (edge.source_cluster.clone(), edge.target_cluster.clone());
         *overview_edges.entry(key).or_default() += 1;
     }
 
     // If the plan has no cross_edges recorded, compute them from the graph.
     // (This handles the case where classify_types was called without edges.)
+    // Impl-kind edges are excluded for the same reason as above.
     let computed_edges: Vec<(String, String, String, &'static str)>;
     let has_computed = plan.cross_edges.is_empty();
     if has_computed {
@@ -540,7 +747,10 @@ pub fn render_type_graph_overview(
             .iter()
             .flat_map(|(cluster, types)| types.iter().map(move |t| (t.as_str(), cluster.as_str())))
             .collect();
-        for (src, _label, tgt, _kind) in &computed_edges {
+        for (src, _label, tgt, kind) in &computed_edges {
+            if *kind == "impl" {
+                continue; // trait impl targets rendered intra-cluster
+            }
             let src_cluster = type_to_cluster.get(src.as_str()).copied().unwrap_or("unresolved");
             let tgt_cluster = type_to_cluster.get(tgt.as_str()).copied().unwrap_or("unresolved");
             if src_cluster != tgt_cluster {
@@ -833,6 +1043,39 @@ fn cluster_key_to_filename(cluster_key: &str) -> String {
 /// do not contain `__` by convention.
 fn sanitize_cluster_id(cluster_key: &str) -> String {
     if cluster_key.is_empty() { "_flat_".to_owned() } else { cluster_key.replace("::", "__") }
+}
+
+/// Returns the disambiguated Mermaid node ID for a trait node.
+///
+/// Prefixes the trait name with `_trait_` to avoid collision with type nodes
+/// that share the same short name.  `TypeGraph` stores types and traits
+/// separately, so a workspace can legitimately have both a struct `Foo` and a
+/// trait `Foo`; using bare names for both would collapse them into one Mermaid
+/// node.
+///
+/// The `_trait_` prefix starts with an underscore, which is never a valid
+/// leading character for a Rust type name (PascalCase), guaranteeing no
+/// collision with real type node IDs.
+fn trait_node_id(name: &str) -> String {
+    format!("_trait_{name}")
+}
+
+/// Selects the mermaid edge symbol for the given `edge_kind`.
+///
+/// - `"method"` → `A -->|label| B` (solid arrow — method call relationship)
+/// - `"field"` → `A ---|label| B` (solid, no arrowhead — containment/composition)
+/// - `"impl"` → `A -.->|label| _trait_B` (dashed arrow — interface implementation;
+///   trait node ID uses `_trait_` prefix to avoid collision with type nodes)
+/// - any other kind falls back to the method (solid arrow) symbol.
+fn render_edge_symbol(src: &str, label: &str, tgt: &str, kind: &str) -> String {
+    match kind {
+        "field" => format!("{src} ---|{label}| {tgt}"),
+        "impl" => {
+            let tgt_id = trait_node_id(tgt);
+            format!("{src} -.->|{label}| {tgt_id}")
+        }
+        _ => format!("{src} -->|{label}| {tgt}"),
+    }
 }
 
 /// Extracts PascalCase type names from a type string.
@@ -1336,6 +1579,185 @@ mod tests {
         assert!(
             !output.contains("Publisher -->"),
             "Publisher is not in domain::review cluster; must not appear as edge source: {output}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // T005: EdgeSet::Fields + EdgeSet::Impls + EdgeSet::All + traitNode
+    // -----------------------------------------------------------------------
+
+    /// Helper: builds a struct node with a list of struct fields.
+    fn struct_node_with_fields(
+        fields: Vec<MemberDeclaration>,
+        methods: Vec<MethodDeclaration>,
+    ) -> TypeNode {
+        TypeNode::new(TypeKind::Struct, fields, methods, HashSet::new())
+    }
+
+    /// Helper: builds a struct node with trait impls attached.
+    fn struct_node_with_impls(impls: Vec<domain::schema::TraitImplEntry>) -> TypeNode {
+        let mut node = TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new());
+        node.set_trait_impls(impls);
+        node
+    }
+
+    /// T005 test 1 — field edges: `EdgeSet::Fields` produces solid no-arrow edges
+    /// `A ---|field_name| B` when a struct field type exists in the graph.
+    #[test]
+    fn test_render_field_edges_uses_solid_no_arrow_syntax() {
+        let mut types = HashMap::new();
+        // Order has a field `item: Item` — both types are in the graph.
+        types.insert(
+            "Order".to_string(),
+            struct_node_with_fields(vec![MemberDeclaration::field("item", "Item")], vec![]),
+        );
+        types.insert("Item".to_string(), struct_node(vec![]));
+        let graph = TypeGraph::new(types, HashMap::new());
+
+        let opts = TypeGraphRenderOptions {
+            edge_set: EdgeSet::Fields,
+            cluster_depth: 0,
+            ..Default::default()
+        };
+        let output = render_type_graph_flat(&graph, "domain", &opts);
+
+        // Field edge must use `---|label|` (solid, no arrowhead).
+        assert!(
+            output.contains("Order ---|item| Item"),
+            "field edge must use solid no-arrow syntax, got: {output}"
+        );
+        // Must NOT produce a method arrow.
+        assert!(
+            !output.contains("Order -->|item| Item"),
+            "field edge must NOT use arrow syntax: {output}"
+        );
+    }
+
+    /// T005 test 2 — trait impl edges: `EdgeSet::Impls` produces dashed arrow edges
+    /// `A -.->|impl| TraitName` and renders trait nodes as stadium shape `([TraitName])`.
+    #[test]
+    fn test_render_impl_edges_uses_dashed_arrow_and_trait_node_stadium_shape() {
+        use domain::schema::TraitImplEntry;
+
+        let mut types = HashMap::new();
+        types.insert(
+            "FsStore".to_string(),
+            struct_node_with_impls(vec![TraitImplEntry::new("Repository", vec![])]),
+        );
+        let mut traits = HashMap::new();
+        traits.insert("Repository".to_string(), domain::schema::TraitNode::new(vec![]));
+        let graph = TypeGraph::new(types, traits);
+
+        let opts = TypeGraphRenderOptions {
+            edge_set: EdgeSet::Impls,
+            cluster_depth: 0,
+            ..Default::default()
+        };
+        let output = render_type_graph_flat(&graph, "domain", &opts);
+
+        // Impl edge must use `-.->|impl|` (dashed arrow) with disambiguated trait node ID.
+        assert!(
+            output.contains("FsStore -.->|impl| _trait_Repository"),
+            "impl edge must use dashed arrow syntax with _trait_ prefix, got: {output}"
+        );
+        // Trait node must use disambiguated ID `_trait_{name}` and stadium shape.
+        assert!(
+            output.contains("_trait_Repository([Repository]):::traitNode"),
+            "trait node must use disambiguated ID and stadium shape, got: {output}"
+        );
+        // classDef for traitNode must be emitted.
+        assert!(
+            output.contains("classDef traitNode"),
+            "traitNode classDef must be emitted, got: {output}"
+        );
+    }
+
+    /// T005 test 3 — `EdgeSet::All` is the union of methods + fields + impls.
+    #[test]
+    fn test_edge_set_all_is_union_of_methods_fields_and_impls() {
+        use domain::schema::TraitImplEntry;
+
+        let mut types = HashMap::new();
+        // Draft has a method edge → Published
+        // Draft has a field edge → Item
+        // Draft has an impl edge → DraftTrait
+        let mut draft = TypeNode::new(
+            TypeKind::Struct,
+            vec![MemberDeclaration::field("item", "Item")],
+            vec![method_returning("publish", "Published")],
+            HashSet::new(),
+        );
+        draft.set_trait_impls(vec![TraitImplEntry::new("DraftTrait", vec![])]);
+        types.insert("Draft".to_string(), draft);
+        types.insert("Published".to_string(), struct_node(vec![]));
+        types.insert("Item".to_string(), struct_node(vec![]));
+
+        let mut traits = HashMap::new();
+        traits.insert("DraftTrait".to_string(), domain::schema::TraitNode::new(vec![]));
+        let graph = TypeGraph::new(types, traits);
+
+        let opts = TypeGraphRenderOptions {
+            edge_set: EdgeSet::All,
+            cluster_depth: 0,
+            ..Default::default()
+        };
+        let output = render_type_graph_flat(&graph, "domain", &opts);
+
+        // Method edge must appear.
+        assert!(
+            output.contains("Draft -->|publish| Published"),
+            "method edge must appear in All, got: {output}"
+        );
+        // Field edge must appear.
+        assert!(
+            output.contains("Draft ---|item| Item"),
+            "field edge must appear in All, got: {output}"
+        );
+        // Impl edge must appear with disambiguated trait node ID.
+        assert!(
+            output.contains("Draft -.->|impl| _trait_DraftTrait"),
+            "impl edge must appear in All with _trait_ prefix, got: {output}"
+        );
+    }
+
+    /// T005 test 4 — trait node uses stadium shape `([TraitName])` in cluster mode.
+    ///
+    /// Verifies that trait nodes rendered inside a cluster diagram also use
+    /// the stadium shape with `traitNode` class (not the default rect/hexagon shapes).
+    #[test]
+    fn test_trait_node_stadium_shape_in_clustered_rendering() {
+        use domain::schema::TraitImplEntry;
+
+        let mut types = HashMap::new();
+        let mut adapter = TypeNode::new(TypeKind::Struct, vec![], vec![], HashSet::new());
+        adapter.set_module_path("infra::store".to_owned());
+        adapter.set_trait_impls(vec![TraitImplEntry::new("StorePort", vec![])]);
+        types.insert("FsAdapter".to_string(), adapter);
+
+        let mut traits = HashMap::new();
+        traits.insert("StorePort".to_string(), domain::schema::TraitNode::new(vec![]));
+        let graph = TypeGraph::new(types, traits);
+
+        let opts = TypeGraphRenderOptions {
+            edge_set: EdgeSet::Impls,
+            cluster_depth: 2,
+            ..Default::default()
+        };
+
+        let edges = collect_edges(&graph, opts.edge_set);
+        let plan = crate::tddd::type_graph_cluster::classify_types(&graph, 2, &edges);
+
+        let output = render_type_graph_clustered(&graph, "infra::store", &plan, &opts);
+
+        // Trait node in cluster diagram must use disambiguated ID and stadium shape.
+        assert!(
+            output.contains("_trait_StorePort([StorePort]):::traitNode"),
+            "trait node in cluster must use disambiguated ID and stadium shape, got: {output}"
+        );
+        // Impl edge must appear with dashed arrow and disambiguated trait node ID.
+        assert!(
+            output.contains("FsAdapter -.->|impl| _trait_StorePort"),
+            "impl edge must appear in cluster rendering with _trait_ prefix, got: {output}"
         );
     }
 }

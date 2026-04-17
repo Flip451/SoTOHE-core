@@ -46,7 +46,7 @@ CLI graph.rs に --cluster-depth N arg を追加し、cluster_depth>0 なら wri
 3 層 (domain/usecase/infrastructure) 全対応の統合テストを追加 (resolve_layers による既存 iteration)
 6 tests: dir 作成検証 / 片方向ガード / stale cleanup flat→cluster / stale cleanup cluster→flat / overview cluster nodes / clustered intra-cluster edges only
 
-- [x] Cluster directory layout: libs/infrastructure/src/tddd/type_graph_render.rs に render_type_graph_clustered / render_type_graph_overview / write_type_graph_dir を追加。出力は <layer>-graph/index.md + <cluster>.md (cluster 名は :: を _ に置換)。TypeGraphRenderOptions::cluster_depth: usize (default=2) 追加。Stale file cleanup: flat→cluster で .md を削除、cluster→flat で remove_dir_all。削除前に reject_symlinks_below で二重ガード。CLI --cluster-depth N flag を追加し、>0 なら write_type_graph_dir、=0 なら既存 write_type_graph_file に dispatch。3 層 (domain/usecase/infrastructure) 全対応。6 tests 追加。
+- [x] Cluster directory layout: libs/infrastructure/src/tddd/type_graph_render.rs に render_type_graph_clustered / render_type_graph_overview / write_type_graph_dir を追加。出力は <layer>-graph/index.md + <cluster>.md (cluster 名は :: を _ に置換)。TypeGraphRenderOptions::cluster_depth: usize (default=2) 追加。Stale file cleanup: flat→cluster で .md を削除、cluster→flat で remove_dir_all。削除前に reject_symlinks_below で二重ガード。CLI --cluster-depth N flag を追加し、>0 なら write_type_graph_dir、=0 なら既存 write_type_graph_file に dispatch。3 層 (domain/usecase/infrastructure) 全対応。6 tests 追加。 4bcc65b5f36ab43c676630e0888d4fee20e06c4f
 
 ## S005 — Fields + Impls edges (hexagonal port/adapter 可視化)
 
@@ -59,7 +59,7 @@ mermaid classDef 追加: traitNode fill:#e8f5e9,stroke:#388e3c
 既存 flat と cluster 両方のレンダリングパスで fields/impls を対応 (S004 の context で S005)
 4 tests: field edges 描画 / trait impl 破線描画 / All edge set の union / trait node stadium shape
 
-- [ ] Fields + Impls edges: EdgeSet::Fields (TypeNode::members の Field/Variant から A --- B) と EdgeSet::Impls (TypeNode::trait_impls から A -.-> Trait 破線) を実装。Trait ノードは classDef traitNode (stadium shape)。EdgeSet::All は 3 種の union。CLI --edges methods|fields|impls|all flag 追加。flat + cluster 両パスで edge を描画。4 tests (field edges / impl dashed / All union / trait stadium shape)。tddd-05 で利用可能な TypeNode::trait_impls を消費する。
+- [x] Fields + Impls edges: EdgeSet::Fields (TypeNode::members の Field/Variant から A --- B) と EdgeSet::Impls (TypeNode::trait_impls から A -.-> Trait 破線) を実装。Trait ノードは classDef traitNode (stadium shape)。EdgeSet::All は 3 種の union。CLI --edges methods|fields|impls|all flag 追加。flat + cluster 両パスで edge を描画。4 tests (field edges / impl dashed / All union / trait stadium shape)。tddd-05 で利用可能な TypeNode::trait_impls を消費する。
 
 ## S006 — Multi-layer readability verification + ADR 実測補強
 

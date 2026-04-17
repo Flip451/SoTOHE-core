@@ -101,24 +101,35 @@
           "findings": [],
           "hash": "rvw1:sha256:9ea7a888a100b71577869f7c929af48c544ebdca384178ccb3be3e92f4779865",
           "at": "2026-04-17T03:28:14Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
-          "at": "2026-04-17T01:24:29Z"
+          "hash": "rvw1:sha256:680c45704280240700bda9498053f0f64d9d255a1060d80d38ea147e2ed43a08",
+          "at": "2026-04-17T04:24:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_parse_edge_set_unknown_value_returns_error` only asserts that the error contains `\"unknown\"`, so it does not lock in the new CLI contract that invalid `--edges` values must list all accepted options (`methods, fields, impls, all`). A regression that drops that hint would still pass this suite.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 390,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:680c45704280240700bda9498053f0f64d9d255a1060d80d38ea147e2ed43a08",
+          "at": "2026-04-17T04:48:22Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
-          "at": "2026-04-17T01:25:14Z"
+          "hash": "rvw1:sha256:f40a614e81feb2ba68f702a0b883e731bf80071e4c8e5d5029e872292b7d252e",
+          "at": "2026-04-17T04:50:12Z"
         }
       ]
     },
@@ -636,6 +647,134 @@
           "findings": [],
           "hash": "rvw1:sha256:414dab3f57162ebeccef1d28d84ffd6a0e0ad874b9678ba27bdd1182ae3fdd6a",
           "at": "2026-04-17T04:01:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`max_nodes_per_diagram` is still enforced before trait nodes are emitted, so `EdgeSet::Impls` / `EdgeSet::All` can produce diagrams that exceed the configured node limit without setting the truncation flag. `intra_trait_targets` are appended after the budget check and are never counted in `sorted_nodes` or `ghost_budget`, so a type with many trait impls can render arbitrarily many extra nodes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 455,
+              "category": "correctness"
+            },
+            {
+              "message": "The cluster overview now inherits impl edges as cross-cluster edges to the synthetic `unresolved` cluster. Because `classify_types` has no cluster assignment for traits and `render_type_graph_overview` folds `plan.cross_edges` into `overview_edges` unchanged, `index.md` will show a phantom `unresolved` node and impl counts whenever `edge_set` includes `Impls` or `All`. That is misleading for valid trait implementations.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 651,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fce1c620f4aeb5ce3b2bc40d570bac811b0fa6f714593566e55e34940251e547",
+          "at": "2026-04-17T04:25:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`max_nodes_per_diagram` is not actually enforced for trait nodes in clustered rendering. `sorted_nodes` is truncated, but `intra_trait_targets` is never capped, so a cluster with many `impl` targets can emit far more than the configured limit and even skip the truncation note when there are no ghost nodes. The budget needs to include or truncate trait nodes before rendering them.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 454,
+              "category": "correctness"
+            },
+            {
+              "message": "Trait nodes reuse the same bare Mermaid node ID as type nodes (`{name}([...])`). Because `TypeGraph` stores types and traits separately, a valid graph can contain both a type and a trait with the same short name; this makes the diagram collapse them into one node and whichever declaration appears last wins the shape/class. Trait nodes need a disambiguated ID, and the clustered renderer has the same problem at its trait-node emission site.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 222,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4f653dec91570946dc1fa81c9eb98fb298ccaef2c9bff18c4a6df61cbfabcdc2",
+          "at": "2026-04-17T04:29:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_flat` still counts connected nodes by raw short name before trait nodes are disambiguated. If a trait and a type share the same name, `total_nodes_connected` and `node_names.len()` collapse them into one entry even though the renderer emits two Mermaid nodes (`Foo` and `_trait_Foo`), so `max_nodes_per_diagram` can be exceeded and the connected-node count in the header is wrong.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 125,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:afb5d274dc037569e367c3a71f635b07c809a89292de833aa46f7f12ba66e3e5",
+          "at": "2026-04-17T04:34:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5f5a647c9798e09f5ff9a1eef1ee42bb55d309a820dd7db6a86582840ac9430",
+          "at": "2026-04-17T04:36:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_flat` now counts trait nodes in `node_count`, but the summary line still uses `graph.type_names().count()` for the total. For `EdgeSet::Impls` or `EdgeSet::All`, this produces impossible output like `Types: 1 total, 2 connected` whenever a rendered impl edge introduces a trait node. That is a user-visible regression in the generated report header and makes truncation/accounting misleading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 222,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a5f5a647c9798e09f5ff9a1eef1ee42bb55d309a820dd7db6a86582840ac9430",
+          "at": "2026-04-17T04:38:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Fields` inherits the method self-edge filter (`target != source_name.as_str()`), so legitimate recursive/self-referential fields are dropped. A struct like `Node { next: Option<Node> }` will not produce a field edge, which means `EdgeSet::Fields` and `EdgeSet::All` silently miss an expected workspace edge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 390,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4ad5ce084f9ceaef3cca381cae97ebeb0d5df3a16ecd9326d76680104334b924",
+          "at": "2026-04-17T04:41:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c7c5e65dfa0702fecdd5b4a3c55b636040cba8480760938e4008d3928d5e604",
+          "at": "2026-04-17T04:44:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c7c5e65dfa0702fecdd5b4a3c55b636040cba8480760938e4008d3928d5e604",
+          "at": "2026-04-17T04:46:39Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
+          "at": "2026-04-17T01:24:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
+          "at": "2026-04-17T01:25:14Z"
         }
       ]
     },
@@ -1097,6 +1236,20 @@
           "findings": [],
           "hash": "rvw1:sha256:b87b5675ac422cd320c9ecdaba21fb5862dbc66880a080629ed7f7e5d1ab13d4",
           "at": "2026-04-17T04:04:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f523fdd2bac329d90963f56ffff31ee0354de51b204ab1439416fd658b306502",
+          "at": "2026-04-17T04:23:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f523fdd2bac329d90963f56ffff31ee0354de51b204ab1439416fd658b306502",
+          "at": "2026-04-17T04:24:02Z"
         }
       ]
     }

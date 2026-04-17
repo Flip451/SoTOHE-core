@@ -15,7 +15,7 @@ use domain::schema::{SchemaExportError, SchemaExporter};
 use infrastructure::code_profile_builder::build_type_graph;
 use infrastructure::schema_export::RustdocSchemaExporter;
 use infrastructure::tddd::type_graph_render::{
-    TypeGraphRenderOptions, write_type_graph_dir, write_type_graph_file,
+    EdgeSet, TypeGraphRenderOptions, write_type_graph_dir, write_type_graph_file,
 };
 use infrastructure::track::fs_store::read_track_metadata;
 use infrastructure::verify::tddd_layers::TdddLayerBinding;
@@ -23,6 +23,25 @@ use infrastructure::verify::tddd_layers::TdddLayerBinding;
 use crate::CliError;
 
 use super::signals::{ensure_active_track, resolve_layers};
+
+/// Parses the `--edges` CLI flag value into an `EdgeSet`.
+///
+/// Accepted values: `"methods"`, `"fields"`, `"impls"`, `"all"` (case-insensitive).
+///
+/// # Errors
+///
+/// Returns `CliError::Message` when the value is not one of the accepted tokens.
+fn parse_edge_set(value: &str) -> Result<EdgeSet, CliError> {
+    match value.to_lowercase().as_str() {
+        "methods" => Ok(EdgeSet::Methods),
+        "fields" => Ok(EdgeSet::Fields),
+        "impls" => Ok(EdgeSet::Impls),
+        "all" => Ok(EdgeSet::All),
+        other => Err(CliError::Message(format!(
+            "unknown --edges value '{other}'; expected one of: methods, fields, impls, all"
+        ))),
+    }
+}
 
 /// Render a mermaid type graph for each TDDD-enabled layer.
 ///
@@ -39,6 +58,7 @@ pub fn execute_type_graph(
     workspace_root: PathBuf,
     layer: Option<String>,
     cluster_depth: usize,
+    edges: String,
 ) -> Result<ExitCode, CliError> {
     let valid_id = domain::TrackId::try_new(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
@@ -54,6 +74,7 @@ pub fn execute_type_graph(
     };
     ensure_active_track(effective_status, &track_id)?;
 
+    let edge_set = parse_edge_set(&edges)?;
     let bindings = resolve_layers(&workspace_root, layer.as_deref())?;
 
     if bindings.is_empty() {
@@ -69,6 +90,7 @@ pub fn execute_type_graph(
             &workspace_root,
             binding,
             cluster_depth,
+            edge_set,
         )?;
     }
 
@@ -81,6 +103,7 @@ fn execute_type_graph_for_layer(
     workspace_root: &std::path::Path,
     binding: &TdddLayerBinding,
     cluster_depth: usize,
+    edge_set: EdgeSet,
 ) -> Result<ExitCode, CliError> {
     let layer_id = binding.layer_id();
     let track_dir = items_dir.join(track_id);
@@ -116,7 +139,8 @@ fn execute_type_graph_for_layer(
     let profile = build_type_graph(&schema, &typestate_names);
 
     // Render + symlink-checked write (infrastructure layer handles the guard).
-    let opts = TypeGraphRenderOptions { cluster_depth, ..TypeGraphRenderOptions::default() };
+    let opts =
+        TypeGraphRenderOptions { cluster_depth, edge_set, ..TypeGraphRenderOptions::default() };
 
     match select_write_mode(cluster_depth) {
         WriteMode::Flat => {
@@ -164,6 +188,8 @@ mod tests {
     // Default cluster_depth for CLI unit tests: use 0 (flat mode) to avoid
     // touching architecture-rules.json or nightly rustdoc in unit test context.
     const TEST_CLUSTER_DEPTH: usize = 0;
+    // Default edges value for CLI unit tests: "methods" (the default).
+    const TEST_EDGES: &str = "methods";
 
     #[test]
     fn test_execute_type_graph_with_invalid_track_id_returns_error() {
@@ -177,6 +203,7 @@ mod tests {
             dir.path().into(),
             None,
             TEST_CLUSTER_DEPTH,
+            TEST_EDGES.to_owned(),
         );
         assert!(result.is_err(), "path traversal track_id must be rejected");
     }
@@ -203,6 +230,7 @@ mod tests {
             dir.path().into(),
             Some("nonexistent".to_owned()),
             TEST_CLUSTER_DEPTH,
+            TEST_EDGES.to_owned(),
         );
         let err = result.unwrap_err();
         let msg = format!("{err}");
@@ -279,6 +307,7 @@ mod tests {
             workspace_root.clone(),
             Some("domain".to_owned()),
             2,
+            TEST_EDGES.to_owned(),
         );
         assert!(result.is_ok(), "cluster_depth=2 must succeed: {result:?}");
         let cluster_dir = track_dir.join("domain-graph");
@@ -292,6 +321,7 @@ mod tests {
             workspace_root,
             Some("domain".to_owned()),
             0,
+            TEST_EDGES.to_owned(),
         );
         assert!(result.is_ok(), "cluster_depth=0 must succeed: {result:?}");
         assert!(track_dir.join("domain-graph.md").is_file(), "flat mode must write .md file");
@@ -320,9 +350,54 @@ mod tests {
             dir.path().into(),
             None,
             TEST_CLUSTER_DEPTH,
+            TEST_EDGES.to_owned(),
         );
         let err = result.unwrap_err();
         let msg = format!("{err}");
         assert!(msg.contains("Completed tracks are frozen"), "must reject done track: {msg}");
+    }
+
+    // --- parse_edge_set ---
+
+    #[test]
+    fn test_parse_edge_set_methods_succeeds() {
+        assert_eq!(parse_edge_set("methods").unwrap(), EdgeSet::Methods);
+    }
+
+    #[test]
+    fn test_parse_edge_set_fields_succeeds() {
+        assert_eq!(parse_edge_set("fields").unwrap(), EdgeSet::Fields);
+    }
+
+    #[test]
+    fn test_parse_edge_set_impls_succeeds() {
+        assert_eq!(parse_edge_set("impls").unwrap(), EdgeSet::Impls);
+    }
+
+    #[test]
+    fn test_parse_edge_set_all_succeeds() {
+        assert_eq!(parse_edge_set("all").unwrap(), EdgeSet::All);
+    }
+
+    #[test]
+    fn test_parse_edge_set_case_insensitive() {
+        assert_eq!(parse_edge_set("METHODS").unwrap(), EdgeSet::Methods);
+        assert_eq!(parse_edge_set("Fields").unwrap(), EdgeSet::Fields);
+        assert_eq!(parse_edge_set("ALL").unwrap(), EdgeSet::All);
+    }
+
+    #[test]
+    fn test_parse_edge_set_unknown_value_returns_error() {
+        let result = parse_edge_set("unknown");
+        assert!(result.is_err(), "unknown value must return error");
+        let msg = format!("{}", result.unwrap_err());
+        assert!(msg.contains("unknown"), "error must mention the bad value: {msg}");
+        // Regression guard: error must list every accepted option so users know the full set.
+        for expected in ["methods", "fields", "impls", "all"] {
+            assert!(
+                msg.contains(expected),
+                "error must list '{expected}' as a valid option: {msg}"
+            );
+        }
     }
 }
