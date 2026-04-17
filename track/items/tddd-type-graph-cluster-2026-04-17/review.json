@@ -1,6 +1,127 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:24:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalogue_file` is rebuilt here as the default `<layer_id>-types.json`, but `TrackBlobReader::read_type_catalogue` can resolve an explicit `tddd.catalogue_file` override from `architecture-rules.json`. For a layer configured with a non-default file name, the merge gate will read the correct file yet report any Red/Yellow findings against a different, nonexistent filename, unlike the CI path which passes the resolved `binding.catalogue_file()`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:25:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `catalogue_file` is rebuilt as `format!(\"{layer_id}-types.json\")`, but `read_type_catalogue()` can read an explicit `tddd.catalogue_file` override from `architecture-rules.json`. When a layer uses a non-default catalogue filename, Stage 2 findings will point at the wrong file name, which breaks the new contract that `check_type_signals` diagnostics name the actual catalogue being validated.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:26:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
+          "at": "2026-04-17T01:33:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
+          "at": "2026-04-17T01:34:50Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c03b29558e90e73dbd4d9eca5f7b3c626abdc5514080e77c69450259bc4b8387",
+          "at": "2026-04-17T02:50:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new `cluster_depth` routing is untested. All three unit tests added here still fail before reaching the branch at `cluster_depth == 0` vs `>= 1`, so a regression in the actual CLI behavior (flat file vs cluster dir, or the default `2` path) would ship unnoticed even though this change materially changes the command's output mode.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 121,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c03b29558e90e73dbd4d9eca5f7b3c626abdc5514080e77c69450259bc4b8387",
+          "at": "2026-04-17T03:20:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `--cluster-depth` behavior is effectively untested in normal CI: all active tests force `TEST_CLUSTER_DEPTH = 0`, and the only test that exercises the new flat-vs-directory dispatch is marked `#[ignore]`. That leaves the default cluster mode (`--cluster-depth` omitted, default `2`) and the new CLI wiring unverified by the regular test suite, which is a P1 coverage gap for a public CLI change.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 200,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:30b52b79acd99fade68a81ee8ce21292fdb4b5b4ff4fff1d4500cafecf4187be",
+          "at": "2026-04-17T03:25:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ea7a888a100b71577869f7c929af48c544ebdca384178ccb3be3e92f4779865",
+          "at": "2026-04-17T03:28:14Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
+          "at": "2026-04-17T01:24:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
+          "at": "2026-04-17T01:25:14Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -177,79 +298,344 @@
           "findings": [],
           "hash": "rvw1:sha256:f97655ad94cfab4d706b9aab6eaca25d7ae96e9e829776951dd8334e63969c42",
           "at": "2026-04-17T02:28:15Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_clustered` and `render_type_graph_overview` never consult `opts.max_nodes_per_diagram`, so the existing scalability guard only applies to flat mode. With `cluster_depth` now defaulting to 2, a large cluster can emit an unbounded Mermaid diagram and break rendering/performance.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 315,
+              "category": "correctness"
+            },
+            {
+              "message": "`write_type_graph_dir` only removes the stale flat file before writing the cluster directory; it never prunes obsolete `<cluster>.md` files already present under `<layer_id>-graph/`. Re-running after cluster membership changes will leave stale cluster pages on disk, so the directory no longer matches the current graph.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 545,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a495edab0acdb5b32c471a77f8489738da577c2c3bb08307ed29f02986eba309",
+          "at": "2026-04-17T02:52:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Stale-output cleanup only runs after `exists() && is_file()/is_dir()`. Because `Path::exists()` is false for broken symlinks, a pre-existing symlink at `<layer>-graph.md` or `<layer>-graph/` bypasses `reject_symlinks_below` entirely and is left behind instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 249,
+              "category": "security"
+            },
+            {
+              "message": "Replacing `::` with `_` is not injective over valid module paths: `foo_bar::Baz` and `foo::bar_Baz` both become `foo_bar_Baz.md`. `write_type_graph_dir` can therefore overwrite one cluster page with another and its stale-file bookkeeping will misclassify the current file set.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 654,
+              "category": "correctness"
+            },
+            {
+              "message": "`sanitize_cluster_id` has the same collision problem for overview nodes: `a::b` and `a__b` both sanitize to `a__b`. Distinct clusters can merge into one Mermaid node, collapsing edges in `render_type_graph_overview`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 665,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:27eca501eb309709efff8d43167333de3a888045a89df01ac01ec8731fb36b3d",
+          "at": "2026-04-17T02:55:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cluster_key_to_filename` is using `replace(\"::\", \"-\")`, but the documented cluster-layout contract in the ADR/briefing is `:: -> _` (for example `domain::review_v2` should become `domain_review_v2.md`). As written, `write_type_graph_dir` will emit and later clean up the wrong on-disk paths, so any consumer following the documented filename convention will miss the generated files.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 659,
+              "category": "correctness"
+            },
+            {
+              "message": "`sanitize_cluster_id` is not injective: `replace(\"__\", \"_U_\").replace(\"::\", \"__\")` maps legitimate cluster keys like `domain::a__b` and `domain::a_U_b` to the same mermaid node id. That means `render_type_graph_overview` can collapse distinct clusters into one node and misroute cluster-to-cluster edges whenever module names contain consecutive underscores.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 675,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6a9a72799c57d9257c8caa98e41c520ae62de5f8b0ff7bf1b156fe165cf2a522",
+          "at": "2026-04-17T02:59:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Replacing `::` with `_` is not injective: distinct cluster keys can collapse to the same filename and Mermaid ID (for example `foo::bar_baz` and `foo_bar::baz` both become `foo_bar_baz`). That can overwrite one cluster file with another and merge unrelated clusters in the overview.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 654,
+              "category": "correctness"
+            },
+            {
+              "message": "`ghost_{tgt}` shares the same Mermaid node namespace as real type nodes. A real type named `ghost_Published` will collide with the synthetic ghost node for target `Published`, so the clustered diagram can silently merge a real node and a cross-cluster reference.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 366,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:72d9a80c68cb227f557e9cde46aa0f2118c01db9370fba1f854bf7ad46178111",
+          "at": "2026-04-17T03:04:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cluster_key_to_filename` is not injective and does not match the documented `:: -> _` filename contract. Distinct cluster keys such as `foo::a__b` and `foo::a::b` both map to `foo__a__b.md`, so `write_type_graph_dir` can overwrite one cluster page with another and its stale-file cleanup can misidentify the active file set.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 659,
+              "category": "correctness"
+            },
+            {
+              "message": "`sanitize_cluster_id` has the same collision class for Mermaid node IDs. Distinct cluster keys such as `a::b` and `a__b` both sanitize to `a__b`, so `render_type_graph_overview` can merge different clusters into one node and lose cluster-to-cluster edges.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 677,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c5f671898f3a03f6044a72d07637a8ca31a952287136600033666af6e51b0439",
+          "at": "2026-04-17T03:07:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Cluster overview drops unresolved nodes: `classify_types` can record `UNRESOLVED_CLUSTER` cross-edges for absent target types, but `render_type_graph_overview` only declares nodes from `plan.assignments`. That can produce mermaid edges to `unresolved` with no corresponding node in the diagram.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 454,
+              "category": "correctness"
+            },
+            {
+              "message": "Cluster filename sanitization is not injective: `cluster_key_to_filename` maps distinct cluster keys to the same `<cluster>.md` (for example `foo_bar::baz` and `foo::bar_baz` both become `foo_bar_baz.md`). `write_type_graph_dir` will silently overwrite one cluster's output and stale cleanup can target the wrong file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 662,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:706db0c1ababaaaa15550a71f4f796adc3ef081d97b80880804f625053ece7a5",
+          "at": "2026-04-17T03:11:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cluster_key_to_filename()` is not injective: distinct cluster keys can collapse to the same `.md` path after `:: -> _` replacement, so `write_type_graph_dir()` can silently overwrite one cluster file with another and leave stale cleanup unable to distinguish them. This is possible with valid Rust module paths such as `foo_bar::baz` and `foo::bar_baz`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 679,
+              "category": "correctness"
+            },
+            {
+              "message": "`sanitize_cluster_id()` is also not injective: distinct cluster keys can map to the same mermaid node ID, which can merge cluster nodes/edges in `render_type_graph_overview()` and `render_type_graph_clustered()`. For example, `a::b` and `a__b` both sanitize to `a__b`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 698,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:715f24df7877645e6169b1f4921b81877689ad4ab881740db62dd9f5374ccfa4",
+          "at": "2026-04-17T03:16:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_clustered()` builds ghost nodes from only the short target type name (`→ {tgt}` / `_xref_{tgt}`), so cross-cluster references lose their target-cluster context. That does not match the spec’s `[→ other::Type]` rendering and can be ambiguous if the same short name appears in more than one cluster.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 415,
+              "category": "correctness"
+            },
+            {
+              "message": "The stale-cluster cleanup deletes every `*.md` in `<layer>-graph/` that is not in the current assignment set. That is broader than removing the previous mode’s generated outputs and can silently delete unrelated markdown files that happen to live in the graph directory.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 619,
+              "category": "safety"
+            }
+          ],
+          "hash": "rvw1:sha256:715f24df7877645e6169b1f4921b81877689ad4ab881740db62dd9f5374ccfa4",
+          "at": "2026-04-17T03:21:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The stale-cluster cleanup still deletes any alphanumeric `.md` file inside `<layer>-graph/` that is not in `expected_cluster_files`. That includes ordinary user files like `README.md` or `notes.md`, so switching into cluster mode can silently remove unrelated markdown content. Restrict deletion to files that were actually generated by this renderer.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 624,
+              "category": "safety"
+            },
+            {
+              "message": "`computed_edges` is assigned in the `plan.cross_edges.is_empty()` fallback but never read afterward. That leaves an unused binding, which becomes a hard failure under the repo's `clippy -D warnings` gate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 484,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:25a88ec6638a62e710ca2651cc2cd32d1d578c08663c9a1db0aca3b602cd1028",
+          "at": "2026-04-17T03:26:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The stale cluster-file cleanup still treats any `^[A-Za-z0-9_]+\\.md$` file as tool-generated and deletes it if it is not in the current assignment set. That will silently remove unrelated markdown files such as `README.md` or `notes.md` placed in `<layer>-graph/`, so the cleanup is still broader than \"remove the previous mode's output only\".",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 643,
+              "category": "safety"
+            }
+          ],
+          "hash": "rvw1:sha256:25a88ec6638a62e710ca2651cc2cd32d1d578c08663c9a1db0aca3b602cd1028",
+          "at": "2026-04-17T03:27:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new cluster-mode renderers no longer honor the documented `max_nodes_per_diagram` scalability guard. `render_type_graph_clustered` truncates only the in-cluster member set, but then emits every ghost node for cross-cluster targets without counting them against the limit, and `render_type_graph_overview` emits every cluster node with no truncation at all. In the default `cluster_depth = 2` path, a large graph can still produce an arbitrarily large Mermaid block.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 346,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a16af52ad37e8247c48af8f1f47a5a7b20a880e57416e072e5bae614c98a117b",
+          "at": "2026-04-17T03:31:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_clustered` does not enforce `max_nodes_per_diagram` across the whole diagram. Member nodes are truncated first, then cross-cluster ghost nodes are truncated independently, so a cluster can still render up to `2 * max_nodes_per_diagram` nodes. For a large cluster with many external references, this defeats the documented per-diagram cap and can still produce oversized diagrams.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 346,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7137b3c1a05c0f452e9604f8bfa3a3c6792e4dda3df92fd45a31cf563fb0ea29",
+          "at": "2026-04-17T03:35:08Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
-          "at": "2026-04-17T01:24:25Z"
+          "hash": "rvw1:sha256:8cea01079ea8272e57da0af29af829d1ce382ff488f0a77227be46620592b249",
+          "at": "2026-04-17T03:38:59Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`catalogue_file` is rebuilt here as the default `<layer_id>-types.json`, but `TrackBlobReader::read_type_catalogue` can resolve an explicit `tddd.catalogue_file` override from `architecture-rules.json`. For a layer configured with a non-default file name, the merge gate will read the correct file yet report any Red/Yellow findings against a different, nonexistent filename, unlike the CI path which passes the resolved `binding.catalogue_file()`.",
+              "message": "The stale cluster-file cleanup only considers names matching `[a-z][a-z0-9_]*.md`, but `cluster_key_to_filename()` preserves the actual cluster key spelling. Legal Rust module paths can still yield generated files such as `_internal.md` or `HTTP.md`; those files will never match this filter, so when such a cluster disappears its old markdown survives indefinitely. That breaks the promised stale cleanup behavior for tool-generated outputs.",
               "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 220,
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 680,
+              "category": "correctness"
+            },
+            {
+              "message": "`ghost_budget` is enforced on the raw `cross_ghost_ids` list before duplicate `ghost_id`s are collapsed. If multiple cross-cluster edges point at the same external type, those duplicate tuples can consume the entire budget and cause later distinct ghost nodes to be truncated even though the rendered diagram would still be under `max_nodes_per_diagram`. The budget needs to be applied to unique ghost nodes, not raw edge references.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 392,
               "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
-          "at": "2026-04-17T01:25:35Z"
+          "hash": "rvw1:sha256:8cea01079ea8272e57da0af29af829d1ce382ff488f0a77227be46620592b249",
+          "at": "2026-04-17T03:41:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0240e8720de3e859d6eb8947c0bea752c98fc14681ad0f31b1d09f343999b49",
+          "at": "2026-04-17T03:46:44Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `catalogue_file` is rebuilt as `format!(\"{layer_id}-types.json\")`, but `read_type_catalogue()` can read an explicit `tddd.catalogue_file` override from `architecture-rules.json`. When a layer uses a non-default catalogue filename, Stage 2 findings will point at the wrong file name, which breaks the new contract that `check_type_signals` diagnostics name the actual catalogue being validated.",
+              "message": "`write_type_graph_dir` documents that it is only for `cluster_depth >= 1`, but it never enforces that precondition before calling `classify_types`. A direct caller can pass `TypeGraphRenderOptions { cluster_depth: 0, .. }` and silently get a `<layer>-graph/` directory with `index.md` and `flat.md` instead of the documented single `<layer>-graph.md` flat output, so the public API can produce the wrong on-disk layout for depth 0.",
               "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 220,
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 679,
               "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
-          "at": "2026-04-17T01:26:44Z"
+          "hash": "rvw1:sha256:e0240e8720de3e859d6eb8947c0bea752c98fc14681ad0f31b1d09f343999b49",
+          "at": "2026-04-17T03:49:00Z"
         },
         {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
-          "at": "2026-04-17T01:33:36Z"
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`write_type_graph_dir` now relies on the new `cluster_depth == 0` guard to prevent the old wrong-on-disk layout (`<layer>-graph/index.md` + `flat.md`), but the added tests never exercise that public error path. This is a required error-case test for a public API, and without it a regression in the precondition would slip through CI while silently reintroducing the depth-0 layout bug.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 661,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:dea344425fa27cb01af68acfeb30a1f8ecf7dc5a670a2184ff6f96e3fd6d1133",
+          "at": "2026-04-17T03:53:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`write_type_graph_file` only checks `reject_symlinks_below` on the top-level stale cluster directory before calling `remove_dir_all`. If `<layer>-graph/` contains a symlinked child, that child is never inspected and `remove_dir_all` will delete the symlink instead of failing closed, which violates the stated symlink-safety requirement for stale cluster→flat cleanup.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 250,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:d7f50278977c9b001fcf058ca38e777bcae08fc3c90dbbc03a3039a3d6172546",
+          "at": "2026-04-17T03:57:13Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
-          "at": "2026-04-17T01:34:50Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
-          "at": "2026-04-17T01:24:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
-          "at": "2026-04-17T01:25:14Z"
+          "hash": "rvw1:sha256:414dab3f57162ebeccef1d28d84ffd6a0e0ad874b9678ba27bdd1182ae3fdd6a",
+          "at": "2026-04-17T04:01:23Z"
         }
       ]
     },
@@ -653,6 +1039,64 @@
           "findings": [],
           "hash": "rvw1:sha256:6d4263a7f380574f7c8e62455c9bbd966e8f7ea00433b3f8d7e71f1fc4adf399",
           "at": "2026-04-17T02:32:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0a3eba75529475c4eb977c6e351fdd9bee6b323c3926491e730bdaba5c1fbc7",
+          "at": "2026-04-17T02:49:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The other-scope brief says the accepted metadata change here is only `T004` moving to `in_progress`, but this hunk also backfills `commit_hash` on the already-complete `T003` entry. That is an extra metadata mutation outside the accepted auto-generated set, and it is what drives the otherwise unrelated `plan.md` regeneration in this scope.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "line": 120,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:e0a3eba75529475c4eb977c6e351fdd9bee6b323c3926491e730bdaba5c1fbc7",
+          "at": "2026-04-17T03:29:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0a3eba75529475c4eb977c6e351fdd9bee6b323c3926491e730bdaba5c1fbc7",
+          "at": "2026-04-17T03:29:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b87b5675ac422cd320c9ecdaba21fb5862dbc66880a080629ed7f7e5d1ab13d4",
+          "at": "2026-04-17T04:02:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` marks `T004` as `done`, but the accepted auto-generated changes for this scope are only the `T003` commit-hash backfill plus the regenerated `T004 in_progress` view. Flipping `T004` to done is an unexpected edit, and it is what drives the matching `[x]` change in `plan.md` outside the allowed regenerated set.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "line": 128,
+              "category": "process"
+            }
+          ],
+          "hash": "rvw1:sha256:b87b5675ac422cd320c9ecdaba21fb5862dbc66880a080629ed7f7e5d1ab13d4",
+          "at": "2026-04-17T04:03:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b87b5675ac422cd320c9ecdaba21fb5862dbc66880a080629ed7f7e5d1ab13d4",
+          "at": "2026-04-17T04:04:15Z"
         }
       ]
     }

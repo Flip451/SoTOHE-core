@@ -33,7 +33,7 @@ CrossEdge { source_type, source_cluster, target_type, target_cluster, label, edg
 classify_types(graph, depth, edges) -> ClusterPlan 純粋関数: module_path prefix depth 段までで cluster 分類、module_path=None は UNRESOLVED_CLUSTER へ
 6 unit tests (I/O なし): depth 0/1/2 の分類、unresolved フォールバック、cross_edges 検出、単一 cluster 時の cross_edges 空検証
 
-- [x] ClusterPlan module: libs/infrastructure/src/tddd/type_graph_cluster.rs を新設。ClusterPlan struct (depth, assignments, cross_edges) + CrossEdge struct + UNRESOLVED_CLUSTER 定数 + classify_types pure function。module_path prefix depth 段で cluster 分類、None は UNRESOLVED_CLUSTER へ。I/O なし、6 unit tests (depth 0/1/2 分類、unresolved フォールバック、cross_edges 検出)。mod.rs に登録。
+- [x] ClusterPlan module: libs/infrastructure/src/tddd/type_graph_cluster.rs を新設。ClusterPlan struct (depth, assignments, cross_edges) + CrossEdge struct + UNRESOLVED_CLUSTER 定数 + classify_types pure function。module_path prefix depth 段で cluster 分類、None は UNRESOLVED_CLUSTER へ。I/O なし、6 unit tests (depth 0/1/2 分類、unresolved フォールバック、cross_edges 検出)。mod.rs に登録。 55d180b520247072348eb925d2f8ad1ad70ee0da
 
 ## S004 — Cluster directory layout + stale cleanup
 
@@ -46,7 +46,7 @@ CLI graph.rs に --cluster-depth N arg を追加し、cluster_depth>0 なら wri
 3 層 (domain/usecase/infrastructure) 全対応の統合テストを追加 (resolve_layers による既存 iteration)
 6 tests: dir 作成検証 / 片方向ガード / stale cleanup flat→cluster / stale cleanup cluster→flat / overview cluster nodes / clustered intra-cluster edges only
 
-- [ ] Cluster directory layout: libs/infrastructure/src/tddd/type_graph_render.rs に render_type_graph_clustered / render_type_graph_overview / write_type_graph_dir を追加。出力は <layer>-graph/index.md + <cluster>.md (cluster 名は :: を _ に置換)。TypeGraphRenderOptions::cluster_depth: usize (default=2) 追加。Stale file cleanup: flat→cluster で .md を削除、cluster→flat で remove_dir_all。削除前に reject_symlinks_below で二重ガード。CLI --cluster-depth N flag を追加し、>0 なら write_type_graph_dir、=0 なら既存 write_type_graph_file に dispatch。3 層 (domain/usecase/infrastructure) 全対応。6 tests 追加。
+- [x] Cluster directory layout: libs/infrastructure/src/tddd/type_graph_render.rs に render_type_graph_clustered / render_type_graph_overview / write_type_graph_dir を追加。出力は <layer>-graph/index.md + <cluster>.md (cluster 名は :: を _ に置換)。TypeGraphRenderOptions::cluster_depth: usize (default=2) 追加。Stale file cleanup: flat→cluster で .md を削除、cluster→flat で remove_dir_all。削除前に reject_symlinks_below で二重ガード。CLI --cluster-depth N flag を追加し、>0 なら write_type_graph_dir、=0 なら既存 write_type_graph_file に dispatch。3 層 (domain/usecase/infrastructure) 全対応。6 tests 追加。
 
 ## S005 — Fields + Impls edges (hexagonal port/adapter 可視化)
 

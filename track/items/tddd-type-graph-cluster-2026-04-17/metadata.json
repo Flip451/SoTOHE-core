@@ -117,6 +117,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "55d180b520247072348eb925d2f8ad1ad70ee0da",
       "description": "ClusterPlan module: libs/infrastructure/src/tddd/type_graph_cluster.rs を新設。ClusterPlan struct (depth, assignments, cross_edges) + CrossEdge struct + UNRESOLVED_CLUSTER 定数 + classify_types pure function。module_path prefix depth 段で cluster 分類、None は UNRESOLVED_CLUSTER へ。I/O なし、6 unit tests (depth 0/1/2 分類、unresolved フォールバック、cross_edges 検出)。mod.rs に登録。",
       "id": "T003",
       "status": "done"
@@ -124,7 +125,7 @@
     {
       "description": "Cluster directory layout: libs/infrastructure/src/tddd/type_graph_render.rs に render_type_graph_clustered / render_type_graph_overview / write_type_graph_dir を追加。出力は <layer>-graph/index.md + <cluster>.md (cluster 名は :: を _ に置換)。TypeGraphRenderOptions::cluster_depth: usize (default=2) 追加。Stale file cleanup: flat→cluster で .md を削除、cluster→flat で remove_dir_all。削除前に reject_symlinks_below で二重ガード。CLI --cluster-depth N flag を追加し、>0 なら write_type_graph_dir、=0 なら既存 write_type_graph_file に dispatch。3 層 (domain/usecase/infrastructure) 全対応。6 tests 追加。",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Fields + Impls edges: EdgeSet::Fields (TypeNode::members の Field/Variant から A --- B) と EdgeSet::Impls (TypeNode::trait_impls から A -.-> Trait 破線) を実装。Trait ノードは classDef traitNode (stadium shape)。EdgeSet::All は 3 種の union。CLI --edges methods|fields|impls|all flag 追加。flat + cluster 両パスで edge を描画。4 tests (field edges / impl dashed / All union / trait stadium shape)。tddd-05 で利用可能な TypeNode::trait_impls を消費する。",
@@ -138,5 +139,5 @@
     }
   ],
   "title": "TDDD Type Graph View Phase 2 — cluster + port/adapter 可視化 + TDDD debt 返済",
-  "updated_at": "2026-04-17T02:28:43Z"
+  "updated_at": "2026-04-17T04:01:56Z"
 }
