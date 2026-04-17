@@ -14,7 +14,7 @@ signature 変更: check_type_signals(doc, strict, catalogue_file: &str)
 merge_gate.rs は format!("{layer_id}-types.json") を渡す; spec_states.rs は binding.catalogue_file() を渡す
 エラー文言の catalogue_file 埋め込み検証テストを 2 件追加する
 
-- [x] TDDD-BUG-02: check_type_signals(doc, strict) に catalogue_file: &str 引数を追加。libs/domain/src/tddd/consistency.rs の定義と以下 8 tests を更新: test_check_type_signals_empty_entries_returns_error / test_check_type_signals_none_signals_returns_error / test_check_type_signals_coverage_gap_returns_error / test_check_type_signals_red_is_error_regardless_of_mode / test_check_type_signals_yellow_is_warning_in_interim_mode / test_check_type_signals_yellow_is_error_in_strict_mode / test_check_type_signals_all_blue_passes_in_both_modes / test_check_type_signals_undeclared_yellow_is_not_blocked。caller 2 箇所 (libs/usecase/src/merge_gate.rs:220 は format!("{layer_id}-types.json") を渡す、libs/infrastructure/src/verify/spec_states.rs:231 は binding.catalogue_file() を渡す) を更新。エラー文言内の catalogue_file 表示を検証する test を 2 件追加。backward compat なし clean break (feedback_no_backward_compat 準拠)。
+- [x] TDDD-BUG-02: check_type_signals(doc, strict) に catalogue_file: &str 引数を追加。libs/domain/src/tddd/consistency.rs の定義と以下 8 tests を更新: test_check_type_signals_empty_entries_returns_error / test_check_type_signals_none_signals_returns_error / test_check_type_signals_coverage_gap_returns_error / test_check_type_signals_red_is_error_regardless_of_mode / test_check_type_signals_yellow_is_warning_in_interim_mode / test_check_type_signals_yellow_is_error_in_strict_mode / test_check_type_signals_all_blue_passes_in_both_modes / test_check_type_signals_undeclared_yellow_is_not_blocked。caller 2 箇所 (libs/usecase/src/merge_gate.rs:220 は format!("{layer_id}-types.json") を渡す、libs/infrastructure/src/verify/spec_states.rs:231 は binding.catalogue_file() を渡す) を更新。エラー文言内の catalogue_file 表示を検証する test を 2 件追加。backward compat なし clean break (feedback_no_backward_compat 準拠)。 f49c9f8a35643cf198ccc7ee63e88e2b56801462
 
 ## S002 — TDDD-Q01: SECTIONS exhaustive coverage test
 
@@ -22,7 +22,7 @@ libs/infrastructure/src/type_catalogue_render.rs の SECTIONS が TypeDefinition
 test_sections_covers_all_kind_tags: HashSet<&str> of 13 variants vs SECTIONS.iter().map(|s| s.kind_tag) を assert_eq!
 将来の variant 追加時に SECTIONS への追記漏れをコンパイル時ではなく nextest 時に検出可能にする
 
-- [ ] TDDD-Q01: libs/infrastructure/src/type_catalogue_render.rs に test_sections_covers_all_kind_tags を追加する。TypeDefinitionKind::kind_tag() の全 13 variants の HashSet<&str> と SECTIONS.iter().map(|s| s.kind_tag).collect::<HashSet<_>>() を assert_eq! で比較。将来 variant 追加時の SECTIONS 更新漏れを nextest で検出する exhaustive test。
+- [x] TDDD-Q01: libs/infrastructure/src/type_catalogue_render.rs に test_sections_covers_all_kind_tags を追加する。TypeDefinitionKind::kind_tag() の全 13 variants の HashSet<&str> と SECTIONS.iter().map(|s| s.kind_tag).collect::<HashSet<_>>() を assert_eq! で比較。将来 variant 追加時の SECTIONS 更新漏れを nextest で検出する exhaustive test。
 
 ## S003 — ClusterPlan module (type_graph_cluster.rs)
 

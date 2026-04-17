@@ -700,4 +700,53 @@ mod tests {
         let output = render_type_catalogue(&doc, "domain-types.json");
         assert!(output.ends_with('\n'), "output must end with trailing newline");
     }
+
+    // ---------------------------------------------------------------------------
+    // SECTIONS coverage (TDDD-Q01)
+    // ---------------------------------------------------------------------------
+
+    #[test]
+    fn test_sections_covers_all_kind_tags() {
+        // Guards against SECTIONS being out of sync with TypeDefinitionKind.
+        //
+        // When a new variant is added to TypeDefinitionKind, the compiler
+        // forces TypeDefinitionKind::kind_tag() to handle it (exhaustive match).
+        // This test then verifies SECTIONS contains an entry for every
+        // kind_tag the enum can produce.
+        //
+        // Maintenance: adding a new TypeDefinitionKind variant requires:
+        //   1. Update TypeDefinitionKind::kind_tag() (compiler enforces)
+        //   2. Add a Section entry to SECTIONS (this test enforces)
+        //   3. Add a sample construction below so kind_tag() is exercised.
+        //
+        // Using constructed enum values (rather than a hardcoded &str list)
+        // couples this test to the real enum so a rename/removal surfaces as
+        // a compile error before the assertion is even reached.
+        use std::collections::HashSet;
+
+        let samples = vec![
+            TypeDefinitionKind::Typestate { transitions: TypestateTransitions::Terminal },
+            TypeDefinitionKind::Enum { expected_variants: Vec::new() },
+            TypeDefinitionKind::ValueObject,
+            TypeDefinitionKind::ErrorType { expected_variants: Vec::new() },
+            TypeDefinitionKind::SecondaryPort { expected_methods: Vec::new() },
+            TypeDefinitionKind::ApplicationService { expected_methods: Vec::new() },
+            TypeDefinitionKind::UseCase,
+            TypeDefinitionKind::Interactor,
+            TypeDefinitionKind::Dto,
+            TypeDefinitionKind::Command,
+            TypeDefinitionKind::Query,
+            TypeDefinitionKind::Factory,
+            TypeDefinitionKind::SecondaryAdapter { implements: Vec::new() },
+        ];
+        let all_kind_tags: HashSet<&str> = samples.iter().map(|k| k.kind_tag()).collect();
+
+        let section_kind_tags: HashSet<&str> = SECTIONS.iter().map(|s| s.kind_tag).collect();
+
+        assert_eq!(
+            all_kind_tags, section_kind_tags,
+            "SECTIONS must cover every TypeDefinitionKind::kind_tag() value \
+             (add a Section entry when adding a new variant)"
+        );
+    }
 }
