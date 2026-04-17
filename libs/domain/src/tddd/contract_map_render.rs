@@ -1,0 +1,553 @@
+//! Contract Map renderer — pure function that converts per-layer type
+//! catalogues into a single-file mermaid flowchart (ADR 2026-04-17-1528 §D1).
+//!
+//! Placement rationale: the function is I/O-free and is called directly
+//! from the usecase interactor (T005). Per ADR §D1 this belongs in the
+//! domain layer — rendering the catalogue is a pure transformation, not an
+//! infrastructure concern.
+//!
+//! Layer-agnostic invariant (ADR §4.5): the renderer never hard-codes
+//! layer names. Every subgraph label comes from the `LayerId` supplied in
+//! `layer_order`, and every edge is derived from the contents of
+//! `catalogues`. The function therefore works identically for 2-layer,
+//! 3-layer, or custom-layer architectures (verified by T007 fixtures).
+//!
+//! The module intentionally does **not** import `infrastructure::…` — a
+//! duplicate of `extract_type_names` lives here so the dependency
+//! direction `domain → infrastructure` is never formed. See
+//! `knowledge/conventions/hexagonal-architecture.md`.
+
+use std::collections::{BTreeMap, BTreeSet};
+use std::fmt::Write as _;
+
+use crate::tddd::LayerId;
+use crate::tddd::catalogue::{
+    MethodDeclaration, TraitImplDecl, TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind,
+};
+use crate::tddd::contract_map_content::ContractMapContent;
+use crate::tddd::contract_map_options::ContractMapRenderOptions;
+
+/// Render the full contract map for the given per-layer catalogues.
+///
+/// Returns a [`ContractMapContent`] containing a markdown block with an
+/// embedded mermaid `flowchart LR` diagram. One subgraph per surviving
+/// layer (after `opts.layers` filtering), containing one node per surviving
+/// entry (after `opts.kind_filter` filtering), plus:
+///
+/// * method-call edges (solid) when a method's `returns` string references
+///   another entry that survived both filters;
+/// * trait-impl edges (dashed) from `SecondaryAdapter` entries to the
+///   `SecondaryPort` entries they declare to implement.
+///
+/// When `opts.kind_filter = Some(vec![])` is supplied, every entry is
+/// filtered out and an empty-subgraph diagram is returned (not an error).
+/// This lets CLI callers surface a warning without failing the pipeline.
+#[must_use]
+pub fn render_contract_map(
+    catalogues: &BTreeMap<LayerId, TypeCatalogueDocument>,
+    layer_order: &[LayerId],
+    opts: &ContractMapRenderOptions,
+) -> ContractMapContent {
+    // 1. Layer filter — preserve topological order from `layer_order`.
+    let active_layers: Vec<&LayerId> = if opts.layers.is_empty() {
+        layer_order.iter().collect()
+    } else {
+        let allowed: BTreeSet<&LayerId> = opts.layers.iter().collect();
+        layer_order.iter().filter(|l| allowed.contains(*l)).collect()
+    };
+
+    // 2. Entry filter — apply kind_filter and collect (layer, entry) pairs
+    //    in active_layers order.
+    let filter_tags: Option<BTreeSet<&str>> = opts
+        .kind_filter
+        .as_ref()
+        .map(|kinds| kinds.iter().map(TypeDefinitionKind::kind_tag).collect());
+    let entries: Vec<(&LayerId, &TypeCatalogueEntry)> = active_layers
+        .iter()
+        .copied()
+        .flat_map(|layer| {
+            catalogues
+                .get(layer)
+                .map(|doc| doc.entries().iter().map(move |entry| (layer, entry)))
+                .into_iter()
+                .flatten()
+        })
+        .filter(|(_layer, entry)| match &filter_tags {
+            Some(tags) => tags.contains(entry.kind().kind_tag()),
+            None => true,
+        })
+        .collect();
+
+    // 3. Build lookup: type name → (layer, node_id) so edges can resolve
+    //    targets by last-segment type name.
+    //
+    //    `type_index`  — all surviving entries (used for method-call edges).
+    //    `port_index`  — only `SecondaryPort` entries (used for trait-impl
+    //                    edges so that `-.impl.->` never accidentally targets a
+    //                    same-named DTO/value-object).
+    let mut type_index: BTreeMap<String, (LayerId, String)> = BTreeMap::new();
+    let mut port_index: BTreeMap<String, String> = BTreeMap::new();
+    for (layer, entry) in &entries {
+        let id = node_id(layer, entry.name());
+        // Later duplicates in the same render are ignored — first-wins.
+        type_index.entry(entry.name().to_owned()).or_insert_with(|| ((*layer).clone(), id.clone()));
+        if matches!(entry.kind(), TypeDefinitionKind::SecondaryPort { .. }) {
+            port_index.entry(entry.name().to_owned()).or_insert(id);
+        }
+    }
+
+    // 4. Emit markdown.
+    let mut out = String::new();
+    out.push_str("```mermaid\n");
+    out.push_str("flowchart LR\n");
+    out.push_str("    classDef secondary_adapter fill:#fafafa,stroke:#999,stroke-dasharray: 4 4\n");
+    out.push_str("    classDef command fill:#e3f2fd,stroke:#1976d2\n");
+    out.push_str("    classDef query fill:#f3e5f5,stroke:#8e24aa\n");
+    out.push_str("    classDef factory fill:#fff8e1,stroke:#f9a825\n");
+
+    // 4a. Subgraphs.
+    for layer in &active_layers {
+        let label = sanitize_id(layer.as_ref());
+        let _ = writeln!(out, "    subgraph {label} [{raw}]", raw = layer.as_ref());
+        for (entry_layer, entry) in &entries {
+            if entry_layer == layer {
+                let _ = writeln!(out, "        {}", node_shape(layer, entry));
+            }
+        }
+        out.push_str("    end\n");
+    }
+
+    // 4b. Edges — collected into a BTreeSet so duplicates are dropped and
+    //     output order is deterministic.
+    let mut edges: BTreeSet<String> = BTreeSet::new();
+    for (src_layer, entry) in &entries {
+        let src_id = node_id(src_layer, entry.name());
+
+        for method in methods_of(entry.kind()) {
+            for token in extract_type_names(method.returns()) {
+                if token == entry.name() {
+                    continue;
+                }
+                if let Some((_dst_layer, dst_id)) = type_index.get(token) {
+                    edges.insert(format!(
+                        "    {src_id} -->|{label}| {dst_id}",
+                        label = escape_edge_label(method.name()),
+                    ));
+                }
+            }
+        }
+
+        if let TypeDefinitionKind::SecondaryAdapter { implements } = entry.kind() {
+            for impl_decl in implements {
+                // Use `port_index` (SecondaryPort entries only) so that
+                // `-.impl.->` is never drawn to a same-named non-port entry
+                // (ADR §D4: trait-impl edge targets secondary_port nodes only).
+                if let Some(port_id) = port_index.get(impl_decl.trait_name()) {
+                    edges.insert(format!("    {src_id} -.impl.-> {port_id}"));
+                }
+            }
+        }
+    }
+
+    for edge in &edges {
+        out.push_str(edge);
+        out.push('\n');
+    }
+
+    out.push_str("```\n");
+
+    // Renderer never produces an empty string — even an empty catalogue
+    // yields the `flowchart LR` scaffold. `ContractMapContent::new` is
+    // validation-free, so the call is infallible and panic-free.
+    ContractMapContent::new(out)
+}
+
+/// Rewrites an arbitrary string into a mermaid-safe identifier: only
+/// ASCII alphanumerics and `_` are kept; everything else is replaced with
+/// `_`. Empty input maps to `_`.
+fn sanitize_id(raw: &str) -> String {
+    if raw.is_empty() {
+        return "_".to_owned();
+    }
+    raw.chars().map(|c| if c.is_ascii_alphanumeric() || c == '_' { c } else { '_' }).collect()
+}
+
+/// Node identifier used in mermaid: `<layer-sanitized>_<name-sanitized>`.
+/// Layer prefix avoids collisions when two layers declare the same last-
+/// segment name.
+fn node_id(layer: &LayerId, name: &str) -> String {
+    format!("{}_{}", sanitize_id(layer.as_ref()), sanitize_id(name))
+}
+
+/// Escape pipe characters in edge labels so mermaid does not treat a `|`
+/// inside a method name as a label terminator. Everything else is left
+/// intact so PascalCase method names render verbatim.
+fn escape_edge_label(raw: &str) -> String {
+    raw.replace('|', "\\|")
+}
+
+/// Sanitize a catalogue entry name for safe embedding inside any mermaid
+/// node-shape label.
+///
+/// Shape delimiters (`]`, `)`, `}`, `/`, `\`) and the mermaid quoting
+/// character (`"`) are replaced with `_`. All other characters — including
+/// every character valid in a Rust type identifier — pass through unchanged,
+/// so for well-formed catalogues this function is always a no-op.
+///
+/// A Rust struct/enum name is `[A-Za-z][A-Za-z0-9_]*`, which cannot
+/// contain any of the replaced characters, so in normal usage the output
+/// equals the input. The sanitisation acts as a defensive guard against
+/// manually-crafted catalogue JSON that contains non-identifier names.
+fn sanitize_node_label(raw: &str) -> String {
+    raw.chars()
+        .map(|c| match c {
+            ']' | ')' | '}' | '/' | '\\' | '"' => '_',
+            other => other,
+        })
+        .collect()
+}
+
+/// Render the mermaid shape for an entry. Each variant of
+/// [`TypeDefinitionKind`] maps to one of 13 shapes defined in ADR
+/// 2026-04-17-1528 §D3.
+fn node_shape(layer: &LayerId, entry: &TypeCatalogueEntry) -> String {
+    let id = node_id(layer, entry.name());
+    let name = sanitize_node_label(entry.name());
+    match entry.kind() {
+        TypeDefinitionKind::Typestate { .. } => format!("{id}([{name}])"),
+        TypeDefinitionKind::Enum { .. } => format!("{id}{{{{{name}}}}}"),
+        TypeDefinitionKind::ValueObject => format!("{id}({name})"),
+        TypeDefinitionKind::ErrorType { .. } => format!("{id}>{name}]"),
+        TypeDefinitionKind::SecondaryPort { .. } => format!("{id}[[{name}]]"),
+        TypeDefinitionKind::SecondaryAdapter { .. } => {
+            format!("{id}[{name}]:::secondary_adapter")
+        }
+        TypeDefinitionKind::ApplicationService { .. } => format!("{id}[/{name}\\]"),
+        TypeDefinitionKind::UseCase => format!("{id}[/{name}/]"),
+        TypeDefinitionKind::Interactor => format!("{id}[\\{name}/]"),
+        TypeDefinitionKind::Dto => format!("{id}[{name}]"),
+        TypeDefinitionKind::Command => format!("{id}[{name}]:::command"),
+        TypeDefinitionKind::Query => format!("{id}[{name}]:::query"),
+        TypeDefinitionKind::Factory => format!("{id}[{name}]:::factory"),
+    }
+}
+
+/// Returns the method declarations associated with an entry kind (empty
+/// for kinds that carry none).
+fn methods_of(kind: &TypeDefinitionKind) -> Vec<&MethodDeclaration> {
+    match kind {
+        TypeDefinitionKind::SecondaryPort { expected_methods }
+        | TypeDefinitionKind::ApplicationService { expected_methods } => {
+            expected_methods.iter().collect()
+        }
+        TypeDefinitionKind::SecondaryAdapter { implements } => {
+            implements.iter().flat_map(TraitImplDecl::expected_methods).collect()
+        }
+        TypeDefinitionKind::Typestate { .. }
+        | TypeDefinitionKind::Enum { .. }
+        | TypeDefinitionKind::ValueObject
+        | TypeDefinitionKind::ErrorType { .. }
+        | TypeDefinitionKind::UseCase
+        | TypeDefinitionKind::Interactor
+        | TypeDefinitionKind::Dto
+        | TypeDefinitionKind::Command
+        | TypeDefinitionKind::Query
+        | TypeDefinitionKind::Factory => Vec::new(),
+    }
+}
+
+/// Extract PascalCase type-name tokens from a type-string. This is the
+/// domain-side twin of `infrastructure::tddd::type_graph_render::
+/// extract_type_names` — keeping an independent copy here preserves the
+/// `domain → infrastructure` no-dependency rule.
+fn extract_type_names(ty: &str) -> Vec<&str> {
+    ty.split(|c: char| !c.is_alphanumeric() && c != '_')
+        .filter(|s| !s.is_empty())
+        .filter(|s| s.starts_with(char::is_uppercase))
+        .collect()
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
+mod tests {
+    use super::*;
+    use crate::tddd::catalogue::{
+        MethodDeclaration, ParamDeclaration, TraitImplDecl, TypeAction, TypeCatalogueDocument,
+        TypeCatalogueEntry, TypeDefinitionKind, TypestateTransitions,
+    };
+
+    fn layer(name: &str) -> LayerId {
+        LayerId::try_new(name.to_owned()).unwrap()
+    }
+
+    fn entry(name: &str, kind: TypeDefinitionKind) -> TypeCatalogueEntry {
+        TypeCatalogueEntry::new(name, format!("{name} description"), kind, TypeAction::Add, true)
+            .unwrap()
+    }
+
+    fn doc(entries: Vec<TypeCatalogueEntry>) -> TypeCatalogueDocument {
+        TypeCatalogueDocument::new(2, entries)
+    }
+
+    fn simple_3layer_catalogues() -> (BTreeMap<LayerId, TypeCatalogueDocument>, Vec<LayerId>) {
+        let domain = layer("domain");
+        let usecase = layer("usecase");
+        let infra = layer("infrastructure");
+
+        let user_repository_methods = vec![MethodDeclaration::new(
+            "save",
+            Some("&self".to_owned()),
+            vec![ParamDeclaration::new("user", "User")],
+            "Result<(), DomainError>",
+            false,
+        )];
+
+        let register_user_methods = vec![MethodDeclaration::new(
+            "execute",
+            Some("&self".to_owned()),
+            vec![],
+            "Result<User, DomainError>",
+            false,
+        )];
+
+        let postgres_impl = TraitImplDecl::new("UserRepository", Vec::new());
+
+        let domain_doc = doc(vec![
+            entry(
+                "UserRepository",
+                TypeDefinitionKind::SecondaryPort { expected_methods: user_repository_methods },
+            ),
+            entry(
+                "User",
+                TypeDefinitionKind::Typestate {
+                    transitions: TypestateTransitions::To(vec!["VerifiedUser".to_owned()]),
+                },
+            ),
+            entry("DomainError", TypeDefinitionKind::ErrorType { expected_variants: vec![] }),
+        ]);
+        let usecase_doc = doc(vec![
+            entry(
+                "RegisterUser",
+                TypeDefinitionKind::ApplicationService { expected_methods: register_user_methods },
+            ),
+            entry("RegisterUserCommand", TypeDefinitionKind::Command),
+        ]);
+        let infra_doc = doc(vec![entry(
+            "PostgresUserRepository",
+            TypeDefinitionKind::SecondaryAdapter { implements: vec![postgres_impl] },
+        )]);
+
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        catalogues.insert(usecase.clone(), usecase_doc);
+        catalogues.insert(infra.clone(), infra_doc);
+        let layer_order = vec![domain, usecase, infra];
+        (catalogues, layer_order)
+    }
+
+    #[test]
+    fn test_render_contract_map_emits_fenced_mermaid_block() {
+        let (catalogues, order) = simple_3layer_catalogues();
+        let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+        let text = content.as_ref();
+        assert!(text.starts_with("```mermaid\n"), "output must start with mermaid fence");
+        assert!(text.trim_end().ends_with("```"), "output must end with closing fence");
+        assert!(text.contains("flowchart LR"));
+    }
+
+    #[test]
+    fn test_render_contract_map_produces_subgraph_per_layer_in_order() {
+        let (catalogues, order) = simple_3layer_catalogues();
+        let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+        let text = content.as_ref();
+        let domain_pos = text.find("subgraph domain [domain]").unwrap();
+        let usecase_pos = text.find("subgraph usecase [usecase]").unwrap();
+        let infra_pos = text.find("subgraph infrastructure [infrastructure]").unwrap();
+        assert!(domain_pos < usecase_pos);
+        assert!(usecase_pos < infra_pos);
+    }
+
+    #[test]
+    fn test_render_contract_map_emits_13_shape_variants_correctly() {
+        let l = layer("sample");
+        let entries = vec![
+            entry(
+                "TState",
+                TypeDefinitionKind::Typestate { transitions: TypestateTransitions::Terminal },
+            ),
+            entry("EKind", TypeDefinitionKind::Enum { expected_variants: vec![] }),
+            entry("Vo", TypeDefinitionKind::ValueObject),
+            entry("Err", TypeDefinitionKind::ErrorType { expected_variants: vec![] }),
+            entry("SPort", TypeDefinitionKind::SecondaryPort { expected_methods: vec![] }),
+            entry("SAdap", TypeDefinitionKind::SecondaryAdapter { implements: vec![] }),
+            entry("AppSvc", TypeDefinitionKind::ApplicationService { expected_methods: vec![] }),
+            entry("UCase", TypeDefinitionKind::UseCase),
+            entry("Intc", TypeDefinitionKind::Interactor),
+            entry("DtoK", TypeDefinitionKind::Dto),
+            entry("CmdK", TypeDefinitionKind::Command),
+            entry("QryK", TypeDefinitionKind::Query),
+            entry("FactK", TypeDefinitionKind::Factory),
+        ];
+
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(l.clone(), doc(entries));
+
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&l),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+
+        assert!(text.contains("sample_TState([TState])"), "typestate stadium shape");
+        assert!(text.contains("sample_EKind{{EKind}}"), "enum hexagon shape");
+        assert!(text.contains("sample_Vo(Vo)"), "value_object round shape");
+        assert!(text.contains("sample_Err>Err]"), "error_type flag shape");
+        assert!(text.contains("sample_SPort[[SPort]]"), "secondary_port subroutine shape");
+        assert!(
+            text.contains("sample_SAdap[SAdap]:::secondary_adapter"),
+            "secondary_adapter rect + classDef"
+        );
+        assert!(text.contains("sample_AppSvc[/AppSvc\\]"), "application_service parallelogram");
+        assert!(text.contains("sample_UCase[/UCase/]"), "use_case parallelogram-alt");
+        assert!(text.contains("sample_Intc[\\Intc/]"), "interactor trapezoid-alt");
+        assert!(text.contains("sample_DtoK[DtoK]"), "dto rect");
+        assert!(text.contains("sample_CmdK[CmdK]:::command"), "command rect + classDef");
+        assert!(text.contains("sample_QryK[QryK]:::query"), "query rect + classDef");
+        assert!(text.contains("sample_FactK[FactK]:::factory"), "factory rect + classDef");
+    }
+
+    #[test]
+    fn test_render_contract_map_draws_method_call_edges_across_layers() {
+        let (catalogues, order) = simple_3layer_catalogues();
+        let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+        let text = content.as_ref();
+        // `UserRepository.save(&self, user: User) -> Result<(), DomainError>`
+        // should yield edges to `DomainError` (User excluded because it is
+        // the same layer receiver — the extractor keeps it, but the edge
+        // still goes through: assert on DomainError only, which is
+        // unambiguous.)
+        assert!(
+            text.contains("domain_UserRepository -->|save| domain_DomainError"),
+            "method edge to DomainError must appear; output was:\n{text}"
+        );
+        // `RegisterUser.execute() -> Result<User, DomainError>` spans
+        // usecase → domain.
+        assert!(
+            text.contains("usecase_RegisterUser -->|execute| domain_User"),
+            "cross-layer method edge to User must appear; output was:\n{text}"
+        );
+        assert!(
+            text.contains("usecase_RegisterUser -->|execute| domain_DomainError"),
+            "cross-layer method edge to DomainError must appear"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_draws_trait_impl_edges_as_dashed() {
+        let (catalogues, order) = simple_3layer_catalogues();
+        let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+        let text = content.as_ref();
+        assert!(
+            text.contains("infrastructure_PostgresUserRepository -.impl.-> domain_UserRepository"),
+            "trait impl edge must appear; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_respects_kind_filter() {
+        let (catalogues, order) = simple_3layer_catalogues();
+        let opts = ContractMapRenderOptions {
+            kind_filter: Some(vec![TypeDefinitionKind::SecondaryPort { expected_methods: vec![] }]),
+            ..ContractMapRenderOptions::default()
+        };
+        let content = render_contract_map(&catalogues, &order, &opts);
+        let text = content.as_ref();
+        assert!(text.contains("domain_UserRepository[[UserRepository]]"));
+        // Use shape-specific substrings so `domain_UserRepository` does not
+        // accidentally satisfy a `domain_User` prefix match.
+        assert!(!text.contains("domain_User([User])"), "User should be filtered out");
+        assert!(
+            !text.contains("domain_DomainError>DomainError]"),
+            "DomainError should be filtered out"
+        );
+        assert!(
+            !text.contains("usecase_RegisterUser[/RegisterUser\\]"),
+            "RegisterUser should be filtered out"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_kind_filter_empty_vec_returns_empty_subgraphs() {
+        let (catalogues, order) = simple_3layer_catalogues();
+        let opts = ContractMapRenderOptions {
+            kind_filter: Some(Vec::new()),
+            ..ContractMapRenderOptions::default()
+        };
+        let content = render_contract_map(&catalogues, &order, &opts);
+        let text = content.as_ref();
+        // Subgraphs are still emitted (one per layer) but carry no nodes.
+        assert!(text.contains("subgraph domain [domain]"));
+        assert!(text.contains("    end"));
+        assert!(!text.contains("UserRepository"), "no entries should be rendered");
+    }
+
+    #[test]
+    fn test_render_contract_map_respects_layers_subset() {
+        let (catalogues, order) = simple_3layer_catalogues();
+        let opts = ContractMapRenderOptions {
+            layers: vec![layer("domain")],
+            ..ContractMapRenderOptions::default()
+        };
+        let content = render_contract_map(&catalogues, &order, &opts);
+        let text = content.as_ref();
+        assert!(text.contains("subgraph domain [domain]"));
+        assert!(!text.contains("subgraph usecase"));
+        assert!(!text.contains("subgraph infrastructure"));
+    }
+
+    #[test]
+    fn test_render_contract_map_phase_2_3_stub_fields_do_not_alter_output() {
+        let (catalogues, order) = simple_3layer_catalogues();
+        let baseline = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+        let overlays_on = ContractMapRenderOptions {
+            signal_overlay: true,
+            action_overlay: true,
+            include_spec_source_edges: true,
+            ..ContractMapRenderOptions::default()
+        };
+        let with_overlays = render_contract_map(&catalogues, &order, &overlays_on);
+        assert_eq!(
+            baseline.as_ref(),
+            with_overlays.as_ref(),
+            "Phase 1 must treat the 3 overlay flags as inert stubs"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_hyphenated_layer_id_sanitized_in_ids() {
+        // layer-id with hyphen ("my-gateway") must render into mermaid IDs
+        // that use `_` (hyphen is illegal in mermaid node ids).
+        let gateway = layer("my-gateway");
+        let d = doc(vec![entry("Foo", TypeDefinitionKind::ValueObject)]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(gateway.clone(), d);
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&gateway),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        // Label preserves original hyphen, id replaces it with underscore.
+        assert!(text.contains("subgraph my_gateway [my-gateway]"));
+        assert!(text.contains("my_gateway_Foo(Foo)"));
+    }
+
+    #[test]
+    fn test_render_contract_map_is_pure_and_deterministic() {
+        let (catalogues, order) = simple_3layer_catalogues();
+        let a = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+        let b = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+        assert_eq!(a.as_ref(), b.as_ref(), "render must be deterministic");
+    }
+}

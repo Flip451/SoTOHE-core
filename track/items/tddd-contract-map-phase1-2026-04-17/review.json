@@ -16,6 +16,186 @@
           "findings": [],
           "hash": "rvw1:sha256:2cbf4c8ceb17dbdbdb02bb170dea50282bf7197ee1555f807d861c460f58363f",
           "at": "2026-04-17T13:41:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sanitize_id` is not injective over the allowed `LayerId` space: valid ids such as `my-gateway` and `my_gateway` both collapse to `my_gateway`, so `subgraph`/node IDs can collide and unrelated layers can merge in the Mermaid output.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
+              "line": 156,
+              "category": "correctness"
+            },
+            {
+              "message": "Edges are resolved by bare short name (`type_index: BTreeMap<String, ...>`) with first-wins semantics, so when the same type/trait name exists in multiple layers the renderer can point a method/impl edge at the wrong node or skip a legitimate cross-layer edge as a self-edge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
+              "line": 83,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
+          "at": "2026-04-17T14:29:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
+          "at": "2026-04-17T14:33:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`node_shape` injects `entry.name()` directly into Mermaid shape syntax (`[{name}]`, `({name})`, `[/.../]`, etc.) without escaping. A catalogue entry name containing Mermaid delimiters like `]`, `(`, `/`, or `\\` will therefore produce invalid Mermaid text (for example `Foo]` becomes `id[Foo]]`). This is reachable because the domain entry type only rejects empty names, so the renderer currently violates the Phase 1 requirement that special characters must not break output.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 182,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
+          "at": "2026-04-17T14:36:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`node_id` derives Mermaid IDs by passing the entry name through `sanitize_id`, which replaces every non-ASCII-alnum character with `_`. Because `TypeCatalogueEntry::new` only rejects empty names and the codec feeds JSON names through unchanged, distinct non-ASCII or punctuation-heavy type names in the same layer can collapse to the same node ID (for example two different 2-character Unicode names both become `domain__`). Mermaid will merge those nodes and attach edges to the wrong target, so the renderer is still not safe for the `unicode / 特殊文字` cases called out in the Phase 1 checklist.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 166,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ded820072f11b554644374a6d504ecbe041a045876bf87efce7ccf2ce1decb82",
+          "at": "2026-04-17T14:43:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The doc comment links to `crate::tddd::catalogue_ports::ContractMapWriter`, but that module/type does not exist yet. This introduces an unresolved intra-doc link, which violates the briefing's broken-reference bar as soon as rustdoc resolves links for this crate.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_content.rs",
+              "line": 4,
+              "category": "broken reference"
+            },
+            {
+              "message": "Trait-impl edges are resolved by name through `type_index` without checking that the matched entry is actually `TypeDefinitionKind::SecondaryPort`. If a same-named DTO/value object/etc. is present, the renderer will emit `-.impl.->` to a non-port node, which contradicts ADR D4 / the review checklist's requirement that these edges target secondary-port nodes only.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 133,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ded820072f11b554644374a6d504ecbe041a045876bf87efce7ccf2ce1decb82",
+          "at": "2026-04-17T14:47:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9963f937fc2b91e094328c74e1726443e2eda9977137ebf81a3fe521f7a95579",
+          "at": "2026-04-17T14:51:29Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This file still says the default Claude Code subagent model is `claude-sonnet-4-6`; the 4-7 upgrade called for in the briefing was not applied here, so fallback subagents will keep using the old Sonnet model.",
+              "severity": "P1",
+              "file": ".claude/rules/11-subagent-model.md",
+              "line": 3,
+              "category": "factual error"
+            },
+            {
+              "message": "The action-rules section points readers to `.claude/skills/track-design/SKILL.md`, but that skill file does not exist in the repo, so this cross-reference is broken.",
+              "severity": "P1",
+              "file": ".claude/agents/designer.md",
+              "line": 99,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:2f2abda88f28de410f1ff113576a4c95d6d499a811e4249f8a64a2aad481d579",
+          "at": "2026-04-17T12:08:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Broken reference: `.claude/skills/track-design/SKILL.md` does not exist in this repo, so this link cannot be followed.",
+              "severity": "P1",
+              "file": ".claude/agents/designer.md",
+              "line": 99,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:2f2abda88f28de410f1ff113576a4c95d6d499a811e4249f8a64a2aad481d579",
+          "at": "2026-04-17T12:13:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This sentence refers to a `reviewer-loop` capability in `.harness/config/agent-profiles.json`, but the JSON only defines `reviewer`; `reviewer-loop` is not a real capability name, so the reference is broken.",
+              "severity": "P1",
+              "file": ".claude/rules/11-subagent-model.md",
+              "line": 12,
+              "category": "broken reference"
+            },
+            {
+              "message": "The Codex-heavy planner wrapper is documented as `cargo make track-local-plan --model {model} --briefing-file ...`, but the task invocation used elsewhere in this repo requires the `--` separator before task args (`cargo make track-local-plan -- --model ...`). As written, this command will be parsed incorrectly.",
+              "severity": "P1",
+              "file": ".claude/rules/11-subagent-model.md",
+              "line": 13,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:af21b7b6275745b05684bcf60aa9971e10d4514521312e79e37f1fa3be3a3004",
+          "at": "2026-04-17T12:17:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a5abffddf25c1a47c6975d5d23be147e97055078d795f6152d82fcc18fc2c47",
+          "at": "2026-04-17T12:20:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a5abffddf25c1a47c6975d5d23be147e97055078d795f6152d82fcc18fc2c47",
+          "at": "2026-04-17T12:22:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This ordering conflicts with the formal task-completion flow in `knowledge/conventions/task-completion-flow.md`: that flow does `implement -> review -> commit` first, then transitions tasks to `done` and backfills `commit_hash` afterward. Here the new guidance says the `done` transition must happen before `/track:review`, so the docs disagree on when task state is updated relative to review.",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 34,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c68502f3ad72de9c45870d7ef39c07fb1c79bd30e5665d29a67d8e4993088e57",
+          "at": "2026-04-17T13:02:40Z"
         }
       ]
     },
@@ -523,6 +703,72 @@
           "findings": [],
           "hash": "rvw1:sha256:6324420e65c46b51c858471b481d94b81517cde663688247cb42b75a6f595432",
           "at": "2026-04-17T13:44:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T003 test-count summary is off by one. `libs/domain/src/tddd/contract_map_render.rs` currently contains 11 `#[test]` functions, so the total added tests is 16, not 15.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 46,
+              "category": "factual error"
+            },
+            {
+              "message": "The result table has two T003 rows with conflicting states: one says `Implemented (pre-commit, in_progress)` and the next says `Pending`. As written, the table contradicts itself and leaves T003 in two states.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 124,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:524c5ab397d5cdf3ae0b3630814054e8f4bc025e37494edcf78b6fff478618bc",
+          "at": "2026-04-17T14:28:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cb1df5de0380d4b178cf9d805105bb1a97c5259bdd1823562d3da31784e220c",
+          "at": "2026-04-17T14:29:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is marked verified here based on `test_render_contract_map_emits_13_shape_variants_correctly`, but `track/items/tddd-contract-map-phase1-2026-04-17/spec.md:62` explicitly requires snapshot tests and there is no snapshot test under `libs/domain/src/tddd`. This checkbox overstates completion relative to the spec.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 35,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6cb1df5de0380d4b178cf9d805105bb1a97c5259bdd1823562d3da31784e220c",
+          "at": "2026-04-17T14:32:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` marks the T003 shape-mapping criterion complete by treating inline substring assertions as equivalent to the spec's required snapshot tests, but `spec.md:62` explicitly says \"snapshot tests が pass する\" and there is no snapshot/`insta` test under `libs/domain/src/tddd`. This overstates completion relative to the spec.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 35,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1b57f07b811c7d331d0dc5470b985eb8097f169dd1364525895bc363c128c2b7",
+          "at": "2026-04-17T14:35:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6d21d09001f4b7258e164b2bcbd73c63fb6d1be0439e350f1c59c8601d79b69",
+          "at": "2026-04-17T14:38:13Z"
         }
       ]
     },
@@ -768,98 +1014,6 @@
           "findings": [],
           "hash": "rvw1:sha256:44e11607c5d7f6938ab0225102297435d28a4ecda5e140e925ac574acd374c50",
           "at": "2026-04-17T14:15:56Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This file still says the default Claude Code subagent model is `claude-sonnet-4-6`; the 4-7 upgrade called for in the briefing was not applied here, so fallback subagents will keep using the old Sonnet model.",
-              "severity": "P1",
-              "file": ".claude/rules/11-subagent-model.md",
-              "line": 3,
-              "category": "factual error"
-            },
-            {
-              "message": "The action-rules section points readers to `.claude/skills/track-design/SKILL.md`, but that skill file does not exist in the repo, so this cross-reference is broken.",
-              "severity": "P1",
-              "file": ".claude/agents/designer.md",
-              "line": 99,
-              "category": "broken reference"
-            }
-          ],
-          "hash": "rvw1:sha256:2f2abda88f28de410f1ff113576a4c95d6d499a811e4249f8a64a2aad481d579",
-          "at": "2026-04-17T12:08:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Broken reference: `.claude/skills/track-design/SKILL.md` does not exist in this repo, so this link cannot be followed.",
-              "severity": "P1",
-              "file": ".claude/agents/designer.md",
-              "line": 99,
-              "category": "broken reference"
-            }
-          ],
-          "hash": "rvw1:sha256:2f2abda88f28de410f1ff113576a4c95d6d499a811e4249f8a64a2aad481d579",
-          "at": "2026-04-17T12:13:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This sentence refers to a `reviewer-loop` capability in `.harness/config/agent-profiles.json`, but the JSON only defines `reviewer`; `reviewer-loop` is not a real capability name, so the reference is broken.",
-              "severity": "P1",
-              "file": ".claude/rules/11-subagent-model.md",
-              "line": 12,
-              "category": "broken reference"
-            },
-            {
-              "message": "The Codex-heavy planner wrapper is documented as `cargo make track-local-plan --model {model} --briefing-file ...`, but the task invocation used elsewhere in this repo requires the `--` separator before task args (`cargo make track-local-plan -- --model ...`). As written, this command will be parsed incorrectly.",
-              "severity": "P1",
-              "file": ".claude/rules/11-subagent-model.md",
-              "line": 13,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:af21b7b6275745b05684bcf60aa9971e10d4514521312e79e37f1fa3be3a3004",
-          "at": "2026-04-17T12:17:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8a5abffddf25c1a47c6975d5d23be147e97055078d795f6152d82fcc18fc2c47",
-          "at": "2026-04-17T12:20:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8a5abffddf25c1a47c6975d5d23be147e97055078d795f6152d82fcc18fc2c47",
-          "at": "2026-04-17T12:22:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This ordering conflicts with the formal task-completion flow in `knowledge/conventions/task-completion-flow.md`: that flow does `implement -> review -> commit` first, then transitions tasks to `done` and backfills `commit_hash` afterward. Here the new guidance says the `done` transition must happen before `/track:review`, so the docs disagree on when task state is updated relative to review.",
-              "severity": "P1",
-              "file": ".claude/commands/track/implement.md",
-              "line": 34,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:c68502f3ad72de9c45870d7ef39c07fb1c79bd30e5665d29a67d8e4993088e57",
-          "at": "2026-04-17T13:02:40Z"
         }
       ]
     }
