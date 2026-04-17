@@ -47,16 +47,17 @@
 
 ### T004: Domain ports + Infrastructure adapters
 
-- [ ] `LayerId` / `ContractMapContent` が `libs/domain/src/tddd/` に newtype (単一フィールド wrapper) として定義されている (生 String を排除)
-- [ ] `ContractMapRenderOptions` が `libs/domain/src/tddd/` に multi-field value_object として定義されている (5 フィールド: layers / kind_filter / signal_overlay / action_overlay / include_spec_source_edges)
-- [ ] `CatalogueLoaderError` / `ContractMapWriterError` が `libs/domain/src/tddd/` に error_type として定義されている
-- [ ] これらの型が `domain-types.json` の宣言と一致している
-- [ ] `libs/domain/src/tddd/catalogue_ports.rs` が存在し `CatalogueLoader` / `ContractMapWriter` trait が定義されている
-- [ ] domain 側の port 定義は serde 非依存である (ADR 2026-04-14-1531 準拠)
-- [ ] `libs/infrastructure/src/tddd/contract_map_adapter.rs` が存在し `FsCatalogueLoader` / `FsContractMapWriter` が port 契約を実装している
-- [ ] 書き出しパスが `track_dir/contract-map.md` になっている
-- [ ] atomic_write_file + reject_symlinks_below が全ての write パスで使われている
-- [ ] adapter tests (port 契約充足 / atomic 書き出し / symlink 拒否) が pass
+- [x] `LayerId` / `ContractMapContent` が `libs/domain/src/tddd/` に newtype (単一フィールド wrapper) として定義されている (生 String を排除) — T002/T003 で先行導入、本 task では `CatalogueLoader::load_all` 戻り値 / `ContractMapWriter::write` 引数で実際に使用
+- [x] `ContractMapRenderOptions` が `libs/domain/src/tddd/` に multi-field value_object として定義されている (5 フィールド) — T003 で先行導入済み
+- [x] `CatalogueLoaderError` / `ContractMapWriterError` が `libs/domain/src/tddd/catalogue_ports.rs` に error_type (`thiserror::Error`) として定義されている。variant inventory: `CatalogueLoaderError` = CatalogueNotFound / LayerDiscoveryFailed / DecodeFailed / SymlinkRejected / IoError / TopologicalSortFailed (6); `ContractMapWriterError` = IoError / SymlinkRejected / TrackNotFound (3)
+- [x] これらの型が `domain-types.json` の宣言と一致している (variants / methods / kinds すべて対応)
+- [x] `libs/domain/src/tddd/catalogue_ports.rs` が存在し `CatalogueLoader` / `ContractMapWriter` trait (両方 `Send + Sync`、load_all/write methods) が定義されている
+- [x] domain 側の port 定義は serde 非依存である (ADR 2026-04-14-1531 準拠、新規 `use` に `serde::` / `serde_json::` なし、derive に `Serialize`/`Deserialize` なし)
+- [x] `libs/infrastructure/src/tddd/contract_map_adapter.rs` が存在し `FsCatalogueLoader` (T002 `load_all_catalogues` をラップ) / `FsContractMapWriter` (atomic_write_file + reject_symlinks_below) が port 契約を実装している
+- [x] 書き出しパスが `track_root/<track_id>/contract-map.md` になっている (`FsContractMapWriter::write` + `contract_map_path` helper で検証)
+- [x] `atomic_write_file` + `reject_symlinks_below` が書き込み経路で使われている。`FsCatalogueLoader` 側は `track_dir` 自体の symlink を adapter-level で先行 check してから `catalogue_bulk_loader::load_all_catalogues` (内部でも symlink guard) に委譲
+- [x] adapter tests 8 件が pass: happy path / missing catalogue → `CatalogueNotFound` / symlinked track_dir → `SymlinkRejected` / writer happy / missing track_dir → `TrackNotFound` / symlinked target → `SymlinkRejected` / overwrite existing non-symlink file / `contract_map_path` helper path formatting (`#[cfg(unix)]` gating on symlink tests)
+- [x] nextest 2086 tests all pass、clippy `-D warnings` pass
 
 ### T005: usecase interactor
 
@@ -120,8 +121,8 @@ cargo run --quiet -p cli -- track type-graph tddd-contract-map-phase1-2026-04-17
 |------|--------|--------|-------|
 | T001 | Done | `9a69df07bd5d98adb3c8d9de935e9527010e9758` | ADR 2026-04-16-2200 §D10 新設 + ADR 2026-04-17-1528 §Q6 Resolved 注記。§D3 表は計画時点で既に整合済みだった。verify-arch-docs / verify-doc-links pass |
 | T002 | Done (in_progress until batch transition) | `7741e7a1a673fcc0ff640415b80103b46bf15d52` | `libs/domain/src/tddd/layer_id.rs` (LayerId nutype) + `libs/infrastructure/src/tddd/catalogue_bulk_loader.rs` (load_all_catalogues + topological_sort + parse_may_depend_on) + `extract_type_names` pub(crate) 昇格。clippy / nextest (2062 tests) pass。state は batch flow (task-completion-flow.md 正式フロー) 準拠で T007 後に一括 done 遷移予定 |
-| T003 | Implemented (pre-commit, in_progress) |  | `libs/domain/src/tddd/contract_map_render.rs` (pure function, 13 kind shape + method/trait edge) + `contract_map_content.rs` (validation-free newtype) + `contract_map_options.rs` (5-field options with 3 Phase 2/3 stubs)。T004 acceptance criterion 2 件 (`ContractMapContent`/`ContractMapRenderOptions`) を戻り値・引数の型要件上先行導入。clippy / nextest (2078 tests) pass |
-| T004 | Pending |  |  |
+| T003 | Done (in_progress until batch transition) | `e65f8f30c849ad981c53ff61d4ac397188095031` | `libs/domain/src/tddd/contract_map_render.rs` (pure function, 13 kind shape + method/trait edge) + `contract_map_content.rs` (validation-free newtype) + `contract_map_options.rs` (5-field options with 3 Phase 2/3 stubs)。T004 acceptance criterion 2 件 (`ContractMapContent`/`ContractMapRenderOptions`) を戻り値・引数の型要件上先行導入。clippy / nextest (2078 tests) pass |
+| T004 | Implemented (pre-commit, in_progress) |  | `libs/domain/src/tddd/catalogue_ports.rs` (CatalogueLoader / ContractMapWriter traits + 2 error enums) + `libs/infrastructure/src/tddd/contract_map_adapter.rs` (FsCatalogueLoader wraps `load_all_catalogues`, FsContractMapWriter uses atomic_write_file + reject_symlinks_below) + 8 adapter tests。nextest 2086 tests all pass |
 | T005 | Pending |  |  |
 | T006 | Pending |  |  |
 | T007 | Pending |  |  |

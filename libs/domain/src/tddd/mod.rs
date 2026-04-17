@@ -12,6 +12,7 @@
 
 pub mod baseline;
 pub mod catalogue;
+pub mod catalogue_ports;
 pub mod consistency;
 pub mod contract_map_content;
 pub mod contract_map_options;
@@ -19,6 +20,9 @@ pub mod contract_map_render;
 pub mod layer_id;
 pub mod signals;
 
+pub use catalogue_ports::{
+    CatalogueLoader, CatalogueLoaderError, ContractMapWriter, ContractMapWriterError,
+};
 pub use contract_map_content::ContractMapContent;
 pub use contract_map_options::ContractMapRenderOptions;
 pub use contract_map_render::render_contract_map;

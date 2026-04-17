@@ -1,112 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2cbf4c8ceb17dbdbdb02bb170dea50282bf7197ee1555f807d861c460f58363f",
-          "at": "2026-04-17T13:38:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2cbf4c8ceb17dbdbdb02bb170dea50282bf7197ee1555f807d861c460f58363f",
-          "at": "2026-04-17T13:41:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`sanitize_id` is not injective over the allowed `LayerId` space: valid ids such as `my-gateway` and `my_gateway` both collapse to `my_gateway`, so `subgraph`/node IDs can collide and unrelated layers can merge in the Mermaid output.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
-              "line": 156,
-              "category": "correctness"
-            },
-            {
-              "message": "Edges are resolved by bare short name (`type_index: BTreeMap<String, ...>`) with first-wins semantics, so when the same type/trait name exists in multiple layers the renderer can point a method/impl edge at the wrong node or skip a legitimate cross-layer edge as a self-edge.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
-              "line": 83,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
-          "at": "2026-04-17T14:29:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
-          "at": "2026-04-17T14:33:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`node_shape` injects `entry.name()` directly into Mermaid shape syntax (`[{name}]`, `({name})`, `[/.../]`, etc.) without escaping. A catalogue entry name containing Mermaid delimiters like `]`, `(`, `/`, or `\\` will therefore produce invalid Mermaid text (for example `Foo]` becomes `id[Foo]]`). This is reachable because the domain entry type only rejects empty names, so the renderer currently violates the Phase 1 requirement that special characters must not break output.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 182,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
-          "at": "2026-04-17T14:36:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`node_id` derives Mermaid IDs by passing the entry name through `sanitize_id`, which replaces every non-ASCII-alnum character with `_`. Because `TypeCatalogueEntry::new` only rejects empty names and the codec feeds JSON names through unchanged, distinct non-ASCII or punctuation-heavy type names in the same layer can collapse to the same node ID (for example two different 2-character Unicode names both become `domain__`). Mermaid will merge those nodes and attach edges to the wrong target, so the renderer is still not safe for the `unicode / 特殊文字` cases called out in the Phase 1 checklist.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 166,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ded820072f11b554644374a6d504ecbe041a045876bf87efce7ccf2ce1decb82",
-          "at": "2026-04-17T14:43:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The doc comment links to `crate::tddd::catalogue_ports::ContractMapWriter`, but that module/type does not exist yet. This introduces an unresolved intra-doc link, which violates the briefing's broken-reference bar as soon as rustdoc resolves links for this crate.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_content.rs",
-              "line": 4,
-              "category": "broken reference"
-            },
-            {
-              "message": "Trait-impl edges are resolved by name through `type_index` without checking that the matched entry is actually `TypeDefinitionKind::SecondaryPort`. If a same-named DTO/value object/etc. is present, the renderer will emit `-.impl.->` to a non-port node, which contradicts ADR D4 / the review checklist's requirement that these edges target secondary-port nodes only.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_render.rs",
-              "line": 133,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:ded820072f11b554644374a6d504ecbe041a045876bf87efce7ccf2ce1decb82",
-          "at": "2026-04-17T14:47:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9963f937fc2b91e094328c74e1726443e2eda9977137ebf81a3fe521f7a95579",
-          "at": "2026-04-17T14:51:29Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -769,6 +663,35 @@
           "findings": [],
           "hash": "rvw1:sha256:d6d21d09001f4b7258e164b2bcbd73c63fb6d1be0439e350f1c59c8601d79b69",
           "at": "2026-04-17T14:38:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30465a7b26349e1f2207d84b6417ad8f36e0fbcbc3567a062558d6b3e8d2c752",
+          "at": "2026-04-17T15:00:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T003 result row now says `Done (in_progress until batch transition)`, which records mutually exclusive states in the same cell. This leaves the verification table contradictory even after adding the finalized commit hash `e65f8f30c849ad981c53ff61d4ac397188095031`.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 124,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:30465a7b26349e1f2207d84b6417ad8f36e0fbcbc3567a062558d6b3e8d2c752",
+          "at": "2026-04-17T15:02:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30465a7b26349e1f2207d84b6417ad8f36e0fbcbc3567a062558d6b3e8d2c752",
+          "at": "2026-04-17T15:04:25Z"
         }
       ]
     },
@@ -1014,6 +937,199 @@
           "findings": [],
           "hash": "rvw1:sha256:44e11607c5d7f6938ab0225102297435d28a4ecda5e140e925ac574acd374c50",
           "at": "2026-04-17T14:15:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsContractMapWriter::write` checks `track_dir.exists()` before running the symlink guard, so a broken symlink or any other stat failure on `track_root/<track_id>` is collapsed into `TrackNotFound`. That bypasses the required fail-closed path classification for the track directory and can misreport a symlinked track dir as merely missing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_adapter.rs",
+              "line": 146,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3b733e8a55eda179e1fec9f319852de222aa5d9a87c788aa1b1d01e5fcb2f1e7",
+          "at": "2026-04-17T15:01:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c87622db9337ae92d7e74f8a6b6e8ccf6d5fd5878ae835edf34f358f03985891",
+          "at": "2026-04-17T15:04:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`map_loader_error()` collapses every `LoadAllCataloguesError::LayerBindings` into `CatalogueLoaderError::LayerDiscoveryFailed`. That means a symlink or other I/O failure while loading `architecture-rules.json` from `load_tddd_layers_from_path()` can never surface as `SymlinkRejected`/`IoError`, even though the T004 briefing explicitly requires the adapter to preserve that classification via `ErrorKind::InvalidInput`. Callers will see the wrong domain error variant for rules-file symlink rejections.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_adapter.rs",
+              "line": 82,
+              "category": "error handling"
+            },
+            {
+              "message": "The new `FsContractMapWriter` test set never exercises the `IoError` branch of `write()`. The briefing's checklist requires coverage for all three writer error paths (`TrackNotFound`, `SymlinkRejected`, and `IoError`), but the current tests only cover the first two plus overwrite/happy-path cases. A regression in the `atomic_write_file` error mapping would pass this suite unnoticed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_adapter.rs",
+              "line": 310,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:c87622db9337ae92d7e74f8a6b6e8ccf6d5fd5878ae835edf34f358f03985891",
+          "at": "2026-04-17T15:07:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f776ec87cd7915c5c1155b68fff195d6e6998c8291ea34652c6d353f3e084aac",
+          "at": "2026-04-17T15:11:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f776ec87cd7915c5c1155b68fff195d6e6998c8291ea34652c6d353f3e084aac",
+          "at": "2026-04-17T15:13:06Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cbf4c8ceb17dbdbdb02bb170dea50282bf7197ee1555f807d861c460f58363f",
+          "at": "2026-04-17T13:38:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cbf4c8ceb17dbdbdb02bb170dea50282bf7197ee1555f807d861c460f58363f",
+          "at": "2026-04-17T13:41:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sanitize_id` is not injective over the allowed `LayerId` space: valid ids such as `my-gateway` and `my_gateway` both collapse to `my_gateway`, so `subgraph`/node IDs can collide and unrelated layers can merge in the Mermaid output.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
+              "line": 156,
+              "category": "correctness"
+            },
+            {
+              "message": "Edges are resolved by bare short name (`type_index: BTreeMap<String, ...>`) with first-wins semantics, so when the same type/trait name exists in multiple layers the renderer can point a method/impl edge at the wrong node or skip a legitimate cross-layer edge as a self-edge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
+              "line": 83,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
+          "at": "2026-04-17T14:29:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
+          "at": "2026-04-17T14:33:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`node_shape` injects `entry.name()` directly into Mermaid shape syntax (`[{name}]`, `({name})`, `[/.../]`, etc.) without escaping. A catalogue entry name containing Mermaid delimiters like `]`, `(`, `/`, or `\\` will therefore produce invalid Mermaid text (for example `Foo]` becomes `id[Foo]]`). This is reachable because the domain entry type only rejects empty names, so the renderer currently violates the Phase 1 requirement that special characters must not break output.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 182,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:4a4d3673550fb6bc24435b6fb68a928081186678b9ca940aba60743a191d898a",
+          "at": "2026-04-17T14:36:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`node_id` derives Mermaid IDs by passing the entry name through `sanitize_id`, which replaces every non-ASCII-alnum character with `_`. Because `TypeCatalogueEntry::new` only rejects empty names and the codec feeds JSON names through unchanged, distinct non-ASCII or punctuation-heavy type names in the same layer can collapse to the same node ID (for example two different 2-character Unicode names both become `domain__`). Mermaid will merge those nodes and attach edges to the wrong target, so the renderer is still not safe for the `unicode / 特殊文字` cases called out in the Phase 1 checklist.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 166,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ded820072f11b554644374a6d504ecbe041a045876bf87efce7ccf2ce1decb82",
+          "at": "2026-04-17T14:43:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The doc comment links to `crate::tddd::catalogue_ports::ContractMapWriter`, but that module/type does not exist yet. This introduces an unresolved intra-doc link, which violates the briefing's broken-reference bar as soon as rustdoc resolves links for this crate.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_content.rs",
+              "line": 4,
+              "category": "broken reference"
+            },
+            {
+              "message": "Trait-impl edges are resolved by name through `type_index` without checking that the matched entry is actually `TypeDefinitionKind::SecondaryPort`. If a same-named DTO/value object/etc. is present, the renderer will emit `-.impl.->` to a non-port node, which contradicts ADR D4 / the review checklist's requirement that these edges target secondary-port nodes only.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
+              "line": 133,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ded820072f11b554644374a6d504ecbe041a045876bf87efce7ccf2ce1decb82",
+          "at": "2026-04-17T14:47:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9963f937fc2b91e094328c74e1726443e2eda9977137ebf81a3fe521f7a95579",
+          "at": "2026-04-17T14:51:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TrackId` is imported from the private `crate::ids` module instead of the public `crate::TrackId` re-export. The briefing explicitly requires the domain port to depend on the re-export, so this violates the domain layering contract.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_ports.rs",
+              "line": 20,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:48b844b9aa0b5ab478b02c3a3b8160dde01490bb5617beb3a347de1a4140a1bb",
+          "at": "2026-04-17T15:00:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0976e7ac112f793bed15ac1cebee1b5fca7761f3dc61be0c01d08be93f2d7f8c",
+          "at": "2026-04-17T15:02:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0976e7ac112f793bed15ac1cebee1b5fca7761f3dc61be0c01d08be93f2d7f8c",
+          "at": "2026-04-17T15:03:11Z"
         }
       ]
     }
