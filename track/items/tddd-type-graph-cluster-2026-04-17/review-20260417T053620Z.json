@@ -1,0 +1,1417 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:24:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalogue_file` is rebuilt here as the default `<layer_id>-types.json`, but `TrackBlobReader::read_type_catalogue` can resolve an explicit `tddd.catalogue_file` override from `architecture-rules.json`. For a layer configured with a non-default file name, the merge gate will read the correct file yet report any Red/Yellow findings against a different, nonexistent filename, unlike the CI path which passes the resolved `binding.catalogue_file()`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:25:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `catalogue_file` is rebuilt as `format!(\"{layer_id}-types.json\")`, but `read_type_catalogue()` can read an explicit `tddd.catalogue_file` override from `architecture-rules.json`. When a layer uses a non-default catalogue filename, Stage 2 findings will point at the wrong file name, which breaks the new contract that `check_type_signals` diagnostics name the actual catalogue being validated.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:26:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
+          "at": "2026-04-17T01:33:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
+          "at": "2026-04-17T01:34:50Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c03b29558e90e73dbd4d9eca5f7b3c626abdc5514080e77c69450259bc4b8387",
+          "at": "2026-04-17T02:50:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new `cluster_depth` routing is untested. All three unit tests added here still fail before reaching the branch at `cluster_depth == 0` vs `>= 1`, so a regression in the actual CLI behavior (flat file vs cluster dir, or the default `2` path) would ship unnoticed even though this change materially changes the command's output mode.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 121,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c03b29558e90e73dbd4d9eca5f7b3c626abdc5514080e77c69450259bc4b8387",
+          "at": "2026-04-17T03:20:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `--cluster-depth` behavior is effectively untested in normal CI: all active tests force `TEST_CLUSTER_DEPTH = 0`, and the only test that exercises the new flat-vs-directory dispatch is marked `#[ignore]`. That leaves the default cluster mode (`--cluster-depth` omitted, default `2`) and the new CLI wiring unverified by the regular test suite, which is a P1 coverage gap for a public CLI change.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 200,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:30b52b79acd99fade68a81ee8ce21292fdb4b5b4ff4fff1d4500cafecf4187be",
+          "at": "2026-04-17T03:25:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ea7a888a100b71577869f7c929af48c544ebdca384178ccb3be3e92f4779865",
+          "at": "2026-04-17T03:28:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:680c45704280240700bda9498053f0f64d9d255a1060d80d38ea147e2ed43a08",
+          "at": "2026-04-17T04:24:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_parse_edge_set_unknown_value_returns_error` only asserts that the error contains `\"unknown\"`, so it does not lock in the new CLI contract that invalid `--edges` values must list all accepted options (`methods, fields, impls, all`). A regression that drops that hint would still pass this suite.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/graph.rs",
+              "line": 390,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:680c45704280240700bda9498053f0f64d9d255a1060d80d38ea147e2ed43a08",
+          "at": "2026-04-17T04:48:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f40a614e81feb2ba68f702a0b883e731bf80071e4c8e5d5029e872292b7d252e",
+          "at": "2026-04-17T04:50:12Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
+          "at": "2026-04-17T01:24:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
+          "at": "2026-04-17T01:25:14Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cd827433e7fdf87d7051e65f6402aa8940ce8d4c9f476d896ebf1fb7f1c5e68",
+          "at": "2026-04-17T01:24:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cd827433e7fdf87d7051e65f6402aa8940ce8d4c9f476d896ebf1fb7f1c5e68",
+          "at": "2026-04-17T01:25:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdca9de43ab09d9c40c1c191b4582ed30269c8fa5fcb941f79a08ee41dbe9973",
+          "at": "2026-04-17T01:33:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_read_type_catalogue_found` only exercises the legacy default filename (`domain-types.json`). The behavior added in this round is returning the resolved filename from `architecture-rules.json`; if `read_type_catalogue` regressed to always returning `<layer_id>-types.json` after successfully reading an override file, this test would still pass. Add a case with a non-default `tddd.catalogue_file` (and ideally a rules-file parse/fetch failure case) so the new adapter contract is actually covered.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 362,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:bdca9de43ab09d9c40c1c191b4582ed30269c8fa5fcb941f79a08ee41dbe9973",
+          "at": "2026-04-17T01:35:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated `test_read_type_catalogue_found` still exercises only the default `domain-types.json` path. This round’s behavioral change is specifically about honoring `tddd.catalogue_file` overrides and returning the resolved filename in `Found((doc, filename))`, so an implementation that always returned `{layer_id}-types.json` would still pass. Add a fixture with `architecture-rules.json` pointing at a non-default catalogue filename and assert that `read_type_catalogue()` returns that override.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 362,
+              "category": "tests"
+            },
+            {
+              "message": "All `verify_from_spec_json` fixtures still hard-code `catalogue_file: \"domain-types.json\"`. Because `evaluate_layer_catalogue()` now forwards `binding.catalogue_file()` into `check_type_signals`, the CI path has no regression test for a non-default override; a bug that fell back to the default filename in diagnostics would still pass here. Add a Stage 2 fixture that uses a non-default catalogue file (for example `usecase-types.json`) and assert the finding mentions that configured filename.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 612,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:bdca9de43ab09d9c40c1c191b4582ed30269c8fa5fcb941f79a08ee41dbe9973",
+          "at": "2026-04-17T01:38:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93ac59868a4b73820f49fdc3ecef0e661c9a47785bbd95d76e4d562a52db4147",
+          "at": "2026-04-17T01:43:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93ac59868a4b73820f49fdc3ecef0e661c9a47785bbd95d76e4d562a52db4147",
+          "at": "2026-04-17T01:44:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e3456e383c78e7e3e5ae839696444d608dbcef10bc168b54bc64d60121faf06",
+          "at": "2026-04-17T01:50:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e3456e383c78e7e3e5ae839696444d608dbcef10bc168b54bc64d60121faf06",
+          "at": "2026-04-17T01:50:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b600566278d6f197b3cd8e252031da625b46130b8d64ed42fc9824d2849ab354",
+          "at": "2026-04-17T02:01:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`classify_types` violates the documented `depth == 0` semantics when an input edge references a type that is absent from `graph`: the missing endpoint is mapped to `UNRESOLVED_CLUSTER`, so the function records a cross-edge between `\"\"` and `\"unresolved\"` instead of returning an always-empty `cross_edges` list for the single flat cluster. Any caller passing a dangling edge will therefore get a spurious clustered result at depth 0.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_graph_cluster.rs",
+              "line": 130,
+              "category": "logic error"
+            }
+          ],
+          "hash": "rvw1:sha256:b600566278d6f197b3cd8e252031da625b46130b8d64ed42fc9824d2849ab354",
+          "at": "2026-04-17T02:08:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`depth == 0` is documented as a single flat cluster with `cross_edges` always empty, but this loop still maps graph-missing endpoints to `UNRESOLVED_CLUSTER`. An edge like `(Missing, ..., Known, ...)` therefore produces a cross-cluster edge from `\"unresolved\"` to `\"\"` instead of being suppressed, violating the depth-0 semantics in the briefing.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_graph_cluster.rs",
+              "line": 130,
+              "category": "logic_error"
+            }
+          ],
+          "hash": "rvw1:sha256:b600566278d6f197b3cd8e252031da625b46130b8d64ed42fc9824d2849ab354",
+          "at": "2026-04-17T02:12:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`classify_types` does not uphold its own depth-0 invariant for an empty `TypeGraph`: when there are no types, `assignments` stays empty and the function returns `{}` instead of the documented single empty-string cluster. Any caller that relies on `depth == 0` always yielding one flat cluster will see a different shape for empty layers.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_cluster.rs",
+              "line": 110,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:1fe1e1ed47fe4bed9bba4ef070ec8b947d4bb56445ae3a2f3c3f041617868beb",
+          "at": "2026-04-17T02:18:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ClusterKey` is declared `pub(crate)` but is still used in public fields (`ClusterPlan::assignments`, `CrossEdge::source_cluster`, `CrossEdge::target_cluster`). That triggers Rust's `private_interfaces` lint, and this workspace denies warnings, so the new module will not compile as written. Use plain `String` in the public fields or make the alias public.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_graph_cluster.rs",
+              "line": 43,
+              "category": "compile"
+            }
+          ],
+          "hash": "rvw1:sha256:3277c01a55688c2d425ceb19c8d15bbb53b7255133d565c5595ea8ebea8f593a",
+          "at": "2026-04-17T02:21:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`classify_types` documents that edges whose endpoints are absent from `graph` should map to `UNRESOLVED_CLUSTER`, but the added tests only cover missing endpoints under `depth == 0`, where the early return skips this cross-edge path entirely. That leaves the documented `depth >= 1` behavior unverified, so a regression here would violate the public API contract without any test failing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_cluster.rs",
+              "line": 140,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:3277c01a55688c2d425ceb19c8d15bbb53b7255133d565c5595ea8ebea8f593a",
+          "at": "2026-04-17T02:25:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f97655ad94cfab4d706b9aab6eaca25d7ae96e9e829776951dd8334e63969c42",
+          "at": "2026-04-17T02:28:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_clustered` and `render_type_graph_overview` never consult `opts.max_nodes_per_diagram`, so the existing scalability guard only applies to flat mode. With `cluster_depth` now defaulting to 2, a large cluster can emit an unbounded Mermaid diagram and break rendering/performance.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 315,
+              "category": "correctness"
+            },
+            {
+              "message": "`write_type_graph_dir` only removes the stale flat file before writing the cluster directory; it never prunes obsolete `<cluster>.md` files already present under `<layer_id>-graph/`. Re-running after cluster membership changes will leave stale cluster pages on disk, so the directory no longer matches the current graph.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 545,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a495edab0acdb5b32c471a77f8489738da577c2c3bb08307ed29f02986eba309",
+          "at": "2026-04-17T02:52:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Stale-output cleanup only runs after `exists() && is_file()/is_dir()`. Because `Path::exists()` is false for broken symlinks, a pre-existing symlink at `<layer>-graph.md` or `<layer>-graph/` bypasses `reject_symlinks_below` entirely and is left behind instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 249,
+              "category": "security"
+            },
+            {
+              "message": "Replacing `::` with `_` is not injective over valid module paths: `foo_bar::Baz` and `foo::bar_Baz` both become `foo_bar_Baz.md`. `write_type_graph_dir` can therefore overwrite one cluster page with another and its stale-file bookkeeping will misclassify the current file set.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 654,
+              "category": "correctness"
+            },
+            {
+              "message": "`sanitize_cluster_id` has the same collision problem for overview nodes: `a::b` and `a__b` both sanitize to `a__b`. Distinct clusters can merge into one Mermaid node, collapsing edges in `render_type_graph_overview`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 665,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:27eca501eb309709efff8d43167333de3a888045a89df01ac01ec8731fb36b3d",
+          "at": "2026-04-17T02:55:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cluster_key_to_filename` is using `replace(\"::\", \"-\")`, but the documented cluster-layout contract in the ADR/briefing is `:: -> _` (for example `domain::review_v2` should become `domain_review_v2.md`). As written, `write_type_graph_dir` will emit and later clean up the wrong on-disk paths, so any consumer following the documented filename convention will miss the generated files.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 659,
+              "category": "correctness"
+            },
+            {
+              "message": "`sanitize_cluster_id` is not injective: `replace(\"__\", \"_U_\").replace(\"::\", \"__\")` maps legitimate cluster keys like `domain::a__b` and `domain::a_U_b` to the same mermaid node id. That means `render_type_graph_overview` can collapse distinct clusters into one node and misroute cluster-to-cluster edges whenever module names contain consecutive underscores.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 675,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6a9a72799c57d9257c8caa98e41c520ae62de5f8b0ff7bf1b156fe165cf2a522",
+          "at": "2026-04-17T02:59:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Replacing `::` with `_` is not injective: distinct cluster keys can collapse to the same filename and Mermaid ID (for example `foo::bar_baz` and `foo_bar::baz` both become `foo_bar_baz`). That can overwrite one cluster file with another and merge unrelated clusters in the overview.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 654,
+              "category": "correctness"
+            },
+            {
+              "message": "`ghost_{tgt}` shares the same Mermaid node namespace as real type nodes. A real type named `ghost_Published` will collide with the synthetic ghost node for target `Published`, so the clustered diagram can silently merge a real node and a cross-cluster reference.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 366,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:72d9a80c68cb227f557e9cde46aa0f2118c01db9370fba1f854bf7ad46178111",
+          "at": "2026-04-17T03:04:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cluster_key_to_filename` is not injective and does not match the documented `:: -> _` filename contract. Distinct cluster keys such as `foo::a__b` and `foo::a::b` both map to `foo__a__b.md`, so `write_type_graph_dir` can overwrite one cluster page with another and its stale-file cleanup can misidentify the active file set.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 659,
+              "category": "correctness"
+            },
+            {
+              "message": "`sanitize_cluster_id` has the same collision class for Mermaid node IDs. Distinct cluster keys such as `a::b` and `a__b` both sanitize to `a__b`, so `render_type_graph_overview` can merge different clusters into one node and lose cluster-to-cluster edges.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 677,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c5f671898f3a03f6044a72d07637a8ca31a952287136600033666af6e51b0439",
+          "at": "2026-04-17T03:07:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Cluster overview drops unresolved nodes: `classify_types` can record `UNRESOLVED_CLUSTER` cross-edges for absent target types, but `render_type_graph_overview` only declares nodes from `plan.assignments`. That can produce mermaid edges to `unresolved` with no corresponding node in the diagram.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 454,
+              "category": "correctness"
+            },
+            {
+              "message": "Cluster filename sanitization is not injective: `cluster_key_to_filename` maps distinct cluster keys to the same `<cluster>.md` (for example `foo_bar::baz` and `foo::bar_baz` both become `foo_bar_baz.md`). `write_type_graph_dir` will silently overwrite one cluster's output and stale cleanup can target the wrong file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 662,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:706db0c1ababaaaa15550a71f4f796adc3ef081d97b80880804f625053ece7a5",
+          "at": "2026-04-17T03:11:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cluster_key_to_filename()` is not injective: distinct cluster keys can collapse to the same `.md` path after `:: -> _` replacement, so `write_type_graph_dir()` can silently overwrite one cluster file with another and leave stale cleanup unable to distinguish them. This is possible with valid Rust module paths such as `foo_bar::baz` and `foo::bar_baz`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 679,
+              "category": "correctness"
+            },
+            {
+              "message": "`sanitize_cluster_id()` is also not injective: distinct cluster keys can map to the same mermaid node ID, which can merge cluster nodes/edges in `render_type_graph_overview()` and `render_type_graph_clustered()`. For example, `a::b` and `a__b` both sanitize to `a__b`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 698,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:715f24df7877645e6169b1f4921b81877689ad4ab881740db62dd9f5374ccfa4",
+          "at": "2026-04-17T03:16:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_clustered()` builds ghost nodes from only the short target type name (`→ {tgt}` / `_xref_{tgt}`), so cross-cluster references lose their target-cluster context. That does not match the spec’s `[→ other::Type]` rendering and can be ambiguous if the same short name appears in more than one cluster.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 415,
+              "category": "correctness"
+            },
+            {
+              "message": "The stale-cluster cleanup deletes every `*.md` in `<layer>-graph/` that is not in the current assignment set. That is broader than removing the previous mode’s generated outputs and can silently delete unrelated markdown files that happen to live in the graph directory.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 619,
+              "category": "safety"
+            }
+          ],
+          "hash": "rvw1:sha256:715f24df7877645e6169b1f4921b81877689ad4ab881740db62dd9f5374ccfa4",
+          "at": "2026-04-17T03:21:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The stale-cluster cleanup still deletes any alphanumeric `.md` file inside `<layer>-graph/` that is not in `expected_cluster_files`. That includes ordinary user files like `README.md` or `notes.md`, so switching into cluster mode can silently remove unrelated markdown content. Restrict deletion to files that were actually generated by this renderer.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 624,
+              "category": "safety"
+            },
+            {
+              "message": "`computed_edges` is assigned in the `plan.cross_edges.is_empty()` fallback but never read afterward. That leaves an unused binding, which becomes a hard failure under the repo's `clippy -D warnings` gate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 484,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:25a88ec6638a62e710ca2651cc2cd32d1d578c08663c9a1db0aca3b602cd1028",
+          "at": "2026-04-17T03:26:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The stale cluster-file cleanup still treats any `^[A-Za-z0-9_]+\\.md$` file as tool-generated and deletes it if it is not in the current assignment set. That will silently remove unrelated markdown files such as `README.md` or `notes.md` placed in `<layer>-graph/`, so the cleanup is still broader than \"remove the previous mode's output only\".",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 643,
+              "category": "safety"
+            }
+          ],
+          "hash": "rvw1:sha256:25a88ec6638a62e710ca2651cc2cd32d1d578c08663c9a1db0aca3b602cd1028",
+          "at": "2026-04-17T03:27:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new cluster-mode renderers no longer honor the documented `max_nodes_per_diagram` scalability guard. `render_type_graph_clustered` truncates only the in-cluster member set, but then emits every ghost node for cross-cluster targets without counting them against the limit, and `render_type_graph_overview` emits every cluster node with no truncation at all. In the default `cluster_depth = 2` path, a large graph can still produce an arbitrarily large Mermaid block.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 346,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a16af52ad37e8247c48af8f1f47a5a7b20a880e57416e072e5bae614c98a117b",
+          "at": "2026-04-17T03:31:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_clustered` does not enforce `max_nodes_per_diagram` across the whole diagram. Member nodes are truncated first, then cross-cluster ghost nodes are truncated independently, so a cluster can still render up to `2 * max_nodes_per_diagram` nodes. For a large cluster with many external references, this defeats the documented per-diagram cap and can still produce oversized diagrams.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 346,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7137b3c1a05c0f452e9604f8bfa3a3c6792e4dda3df92fd45a31cf563fb0ea29",
+          "at": "2026-04-17T03:35:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8cea01079ea8272e57da0af29af829d1ce382ff488f0a77227be46620592b249",
+          "at": "2026-04-17T03:38:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The stale cluster-file cleanup only considers names matching `[a-z][a-z0-9_]*.md`, but `cluster_key_to_filename()` preserves the actual cluster key spelling. Legal Rust module paths can still yield generated files such as `_internal.md` or `HTTP.md`; those files will never match this filter, so when such a cluster disappears its old markdown survives indefinitely. That breaks the promised stale cleanup behavior for tool-generated outputs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 680,
+              "category": "correctness"
+            },
+            {
+              "message": "`ghost_budget` is enforced on the raw `cross_ghost_ids` list before duplicate `ghost_id`s are collapsed. If multiple cross-cluster edges point at the same external type, those duplicate tuples can consume the entire budget and cause later distinct ghost nodes to be truncated even though the rendered diagram would still be under `max_nodes_per_diagram`. The budget needs to be applied to unique ghost nodes, not raw edge references.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 392,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8cea01079ea8272e57da0af29af829d1ce382ff488f0a77227be46620592b249",
+          "at": "2026-04-17T03:41:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0240e8720de3e859d6eb8947c0bea752c98fc14681ad0f31b1d09f343999b49",
+          "at": "2026-04-17T03:46:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`write_type_graph_dir` documents that it is only for `cluster_depth >= 1`, but it never enforces that precondition before calling `classify_types`. A direct caller can pass `TypeGraphRenderOptions { cluster_depth: 0, .. }` and silently get a `<layer>-graph/` directory with `index.md` and `flat.md` instead of the documented single `<layer>-graph.md` flat output, so the public API can produce the wrong on-disk layout for depth 0.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 679,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e0240e8720de3e859d6eb8947c0bea752c98fc14681ad0f31b1d09f343999b49",
+          "at": "2026-04-17T03:49:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`write_type_graph_dir` now relies on the new `cluster_depth == 0` guard to prevent the old wrong-on-disk layout (`<layer>-graph/index.md` + `flat.md`), but the added tests never exercise that public error path. This is a required error-case test for a public API, and without it a regression in the precondition would slip through CI while silently reintroducing the depth-0 layout bug.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 661,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:dea344425fa27cb01af68acfeb30a1f8ecf7dc5a670a2184ff6f96e3fd6d1133",
+          "at": "2026-04-17T03:53:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`write_type_graph_file` only checks `reject_symlinks_below` on the top-level stale cluster directory before calling `remove_dir_all`. If `<layer>-graph/` contains a symlinked child, that child is never inspected and `remove_dir_all` will delete the symlink instead of failing closed, which violates the stated symlink-safety requirement for stale cluster→flat cleanup.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 250,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:d7f50278977c9b001fcf058ca38e777bcae08fc3c90dbbc03a3039a3d6172546",
+          "at": "2026-04-17T03:57:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:414dab3f57162ebeccef1d28d84ffd6a0e0ad874b9678ba27bdd1182ae3fdd6a",
+          "at": "2026-04-17T04:01:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`max_nodes_per_diagram` is still enforced before trait nodes are emitted, so `EdgeSet::Impls` / `EdgeSet::All` can produce diagrams that exceed the configured node limit without setting the truncation flag. `intra_trait_targets` are appended after the budget check and are never counted in `sorted_nodes` or `ghost_budget`, so a type with many trait impls can render arbitrarily many extra nodes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 455,
+              "category": "correctness"
+            },
+            {
+              "message": "The cluster overview now inherits impl edges as cross-cluster edges to the synthetic `unresolved` cluster. Because `classify_types` has no cluster assignment for traits and `render_type_graph_overview` folds `plan.cross_edges` into `overview_edges` unchanged, `index.md` will show a phantom `unresolved` node and impl counts whenever `edge_set` includes `Impls` or `All`. That is misleading for valid trait implementations.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 651,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fce1c620f4aeb5ce3b2bc40d570bac811b0fa6f714593566e55e34940251e547",
+          "at": "2026-04-17T04:25:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`max_nodes_per_diagram` is not actually enforced for trait nodes in clustered rendering. `sorted_nodes` is truncated, but `intra_trait_targets` is never capped, so a cluster with many `impl` targets can emit far more than the configured limit and even skip the truncation note when there are no ghost nodes. The budget needs to include or truncate trait nodes before rendering them.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 454,
+              "category": "correctness"
+            },
+            {
+              "message": "Trait nodes reuse the same bare Mermaid node ID as type nodes (`{name}([...])`). Because `TypeGraph` stores types and traits separately, a valid graph can contain both a type and a trait with the same short name; this makes the diagram collapse them into one node and whichever declaration appears last wins the shape/class. Trait nodes need a disambiguated ID, and the clustered renderer has the same problem at its trait-node emission site.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 222,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4f653dec91570946dc1fa81c9eb98fb298ccaef2c9bff18c4a6df61cbfabcdc2",
+          "at": "2026-04-17T04:29:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_flat` still counts connected nodes by raw short name before trait nodes are disambiguated. If a trait and a type share the same name, `total_nodes_connected` and `node_names.len()` collapse them into one entry even though the renderer emits two Mermaid nodes (`Foo` and `_trait_Foo`), so `max_nodes_per_diagram` can be exceeded and the connected-node count in the header is wrong.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 125,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:afb5d274dc037569e367c3a71f635b07c809a89292de833aa46f7f12ba66e3e5",
+          "at": "2026-04-17T04:34:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5f5a647c9798e09f5ff9a1eef1ee42bb55d309a820dd7db6a86582840ac9430",
+          "at": "2026-04-17T04:36:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_type_graph_flat` now counts trait nodes in `node_count`, but the summary line still uses `graph.type_names().count()` for the total. For `EdgeSet::Impls` or `EdgeSet::All`, this produces impossible output like `Types: 1 total, 2 connected` whenever a rendered impl edge introduces a trait node. That is a user-visible regression in the generated report header and makes truncation/accounting misleading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 222,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a5f5a647c9798e09f5ff9a1eef1ee42bb55d309a820dd7db6a86582840ac9430",
+          "at": "2026-04-17T04:38:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Fields` inherits the method self-edge filter (`target != source_name.as_str()`), so legitimate recursive/self-referential fields are dropped. A struct like `Node { next: Option<Node> }` will not produce a field edge, which means `EdgeSet::Fields` and `EdgeSet::All` silently miss an expected workspace edge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "line": 390,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4ad5ce084f9ceaef3cca381cae97ebeb0d5df3a16ecd9326d76680104334b924",
+          "at": "2026-04-17T04:41:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c7c5e65dfa0702fecdd5b4a3c55b636040cba8480760938e4008d3928d5e604",
+          "at": "2026-04-17T04:44:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c7c5e65dfa0702fecdd5b4a3c55b636040cba8480760938e4008d3928d5e604",
+          "at": "2026-04-17T04:46:39Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 undercounts the `check_type_signals` ripple. `libs/domain/src/tddd/consistency.rs` already has 8 dedicated `test_check_type_signals_*` cases plus `test_consistency_partitions_secondary_adapter_as_type`, so the documented “7 tests” misses real call sites and will leave at least the undeclared-yellow and secondary-adapter cases uncovered. The same undercount is repeated in `spec.json:76`.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "line": 11,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:b846cc9fc8e40f7c901fb5bea1cede3452b3bbe28d8e5ea5b62fca43cb599e4a",
+          "at": "2026-04-16T16:53:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 only enumerates the three production call sites and compresses the `consistency.rs` test ripple into `8 tests`; it does not list the seven existing `check_type_signals` test call sites required by the review brief, so the signature-change ripple is not fully specified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "line": 13,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:d2f5756d088bd46e5f78cac0a18ef82a8f4839823e22a5d4f81c6b9caf6870e7",
+          "at": "2026-04-16T16:57:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's verification checklist says there are 7 existing `check_type_signals` tests, but `metadata.json`/`spec.json` enumerate 8 existing tests and the current `libs/domain/src/tddd/consistency.rs` test block has 8 `test_check_type_signals_*` cases. The checklist undercounts the ripple and leaves one existing test case untracked.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 13,
+              "category": "consistency"
+            },
+            {
+              "message": "T003's acceptance text says there are 6 unit tests, but it only names five conditions; the sixth case from `metadata.json` (`single-cluster cross_edges empty`) is missing, and the same omission is echoed in `verification.md`. That leaves the ClusterPlan acceptance scope under-specified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "line": 236,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:13f4d3f4fd8c851dac94ba3a849898039690695a3fe6e2188a846c4c24bcaa01",
+          "at": "2026-04-16T17:00:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26b392faa7cd38bb0da171936a7c147b2e95f9c9c7535b8b5d99b3f470ca4bfa",
+          "at": "2026-04-16T17:01:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 still requires a `deduplicate_typestate_edges` default decision even though the final 6-task scope never includes that option in `spec.json`'s in-scope items or acceptance criteria. This leaves the SSoT task list with an orphan verification target copied from the older 8-task planner output, so implementers cannot tell whether that knob is actually part of Phase 2(K) or already deferred.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "line": 139,
+              "category": "consistency"
+            },
+            {
+              "message": "The T004 safety requirement is sourced to `.claude/rules/10-guardrails.md §Symlink safety`, but that section does not exist in the referenced file. Because this acceptance criterion relies on that citation as its convention source, the spec currently contains a broken reference for one of the symlink-deletion guard requirements.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "line": 297,
+              "category": "reference"
+            },
+            {
+              "message": "The archived planner notes T001 as a \"3 crates + 7 test sites\" change, but `libs/domain/src/tddd/consistency.rs` currently has 8 existing `test_check_type_signals_*` tests to update. That factual miscount understates the signature-ripple work in the research artifact by one existing test.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-17-1550-planner-tddd-type-graph-cluster.md",
+              "line": 66,
+              "category": "factual_error"
+            }
+          ],
+          "hash": "rvw1:sha256:26b392faa7cd38bb0da171936a7c147b2e95f9c9c7535b8b5d99b3f470ca4bfa",
+          "at": "2026-04-16T17:16:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Q3 rationale still cites `.claude/rules/10-guardrails.md` §symlink safety, but that section does not exist in the referenced file. This leaves the archived planner doc with a broken convention reference even though the final plan/spec already moved the symlink-safety source to `knowledge/conventions/security.md §Symlink Rejection in Infrastructure Adapters`.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-17-1550-planner-tddd-type-graph-cluster.md",
+              "line": 50,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:6bb2ee458e90e9769bb44aa478a5385cc2f28165367c68a03df25454f432e5f5",
+          "at": "2026-04-16T17:23:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The planner archive contradicts its own task table on execution order: line 22 says \"bug fix first, then edges, then clustering,\" but the summary on line 14 and the ordered tasks table place clustering work in T003-T004 before edges in T005. This leaves the planning artifact internally inconsistent about dependencies and rollout order.",
+              "severity": "P1",
+              "file": "knowledge/research/2026-04-17-1550-planner-tddd-type-graph-cluster.md",
+              "line": 22,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:25f8b414a620c1ffdd9d8bb504071af0f070a5ce753c23f4250bc8a607d19dfc",
+          "at": "2026-04-16T17:26:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfe1103901f70e8f1fd2a0746fc1ce269c4672abc4a477606d8046c1df961fd8",
+          "at": "2026-04-16T17:30:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93bba54c5510481a5cd97ec93645cc5bfc692fdf891acfe4597b0e833db8d9f9",
+          "at": "2026-04-17T00:22:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`spec.json` still describes `T006` as adding a new ADR deferral note (`\"ADR 2026-04-16-2200 に ... note を追加する\"`), but `metadata.json` and `verification.md` were updated to say `§Phase 2 Scope Update §S1-§S5` already exists from planning and that T006 now only supplements `§S4/§S5` with empirical data. That leaves the authoritative spec out of sync with the task description/checklist for the same work item.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "line": 122,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:93bba54c5510481a5cd97ec93645cc5bfc692fdf891acfe4597b0e833db8d9f9",
+          "at": "2026-04-17T00:24:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 is still described here as adding the ADR note from scratch (`ADR 2026-04-16-2200 に ... note を追加する`), but `metadata.json` now says `§Phase 2 Scope Update §S1-§S5` was already added during planning and `verification.md` marks that existence check as done. That leaves the planning artifacts disagreeing about whether T006 still creates the addendum or only supplements `§S4/§S5` with empirical data.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "line": 122,
+              "category": "consistency"
+            },
+            {
+              "message": "The T006 checklist requires a `cluster_depth 1 vs 2` readability comparison, but the documented manual verification flow only runs `track type-graph` with `--cluster-depth 2`. As written, the verification procedure cannot produce the depth-1 output needed to satisfy the stated check.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 71,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:93bba54c5510481a5cd97ec93645cc5bfc692fdf891acfe4597b0e833db8d9f9",
+          "at": "2026-04-17T00:29:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 is only partially realigned. `spec.json` still defines the task as adding a new ADR note for DRIFT-01 / entry-point / auto-render deferrals, but the updated `metadata.json`, `plan.md`, and `verification.md` now treat `§Phase 2 Scope Update §S1-§S5` as already present and say the remaining work is only empirical reinforcement in `§S4/§S5`. Because `spec.md` is rendered from this stale source-of-truth entry, the track still tells implementers to do work that the verification checklist already marks as done, reintroducing the task/acceptance mismatch this round was meant to remove.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "line": 122,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:93bba54c5510481a5cd97ec93645cc5bfc692fdf891acfe4597b0e833db8d9f9",
+          "at": "2026-04-17T00:31:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "§S1 upgrades an unsupported policy claim into the ADR: it says `.claude/rules/04-coding-principles.md` allows the codebase to prefer `enum + fn transition(self, ...) -> Result<Self, E>` for small state machines, but that convention explicitly says any state transition should prefer typestate, and a repo-wide search in `libs/`/`apps/` does not show such transition APIs in the current codebase. Because this addendum is now cited as the Blue source for the scope reduction, the ADR is recording a rationale that the cited convention and the codebase do not substantiate.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+              "line": 466,
+              "category": "factual_error"
+            }
+          ],
+          "hash": "rvw1:sha256:faf76a3f116c8db5d3c62ad8962dda2ad72ee673a2a03ee34e4ea8231e97b7e5",
+          "at": "2026-04-17T00:36:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:faf76a3f116c8db5d3c62ad8962dda2ad72ee673a2a03ee34e4ea8231e97b7e5",
+          "at": "2026-04-17T00:38:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` still describes T006 as adding an “ADR note” and says the postponement rationale/re-evaluation conditions will be reflected by T006, but the updated metadata/spec now treat `§Phase 2 Scope Update §S1-§S5` as already added during planning and limit T006 to supplementing `§S4/§S5` with measurements. That leaves the verification artifact internally inconsistent about what work remains for T006.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 124,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:7ba530d3f22431bde61c27ee417c784b19163a0154ba0c1f60e3155c0b430bea",
+          "at": "2026-04-17T00:41:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new addendum shrinks Phase 2 to scope (K) and defers Entry/DRIFT-01/orphan/auto-render, but the unchanged `Phased Scope Summary` still says Phase 2 is `cluster+drift`, has `Entry` = `あり`, and adds `--check-drift`. That leaves the ADR with two conflicting definitions of Phase 2 scope, and future readers can easily pick the stale summary table instead of the new addendum.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+              "line": 529,
+              "category": "consistency"
+            },
+            {
+              "message": "Round 2 makes `deduplicate_typestate_edges` a documented T006 deliverable, but the track still never requires the option itself to be implemented. `§S4` says T004 will add `TypeGraphRenderOptions::deduplicate_typestate_edges: bool`, yet T004's task list remains unchanged and the acceptance here only asks for a recorded 'default judgment'. That means T006 can pass by documenting a default for a flag the track never had to ship.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "line": 313,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:581a91bc39492505b3769716a23ade8072428b9395d9d98be9d76fb3a7dd3353",
+          "at": "2026-04-17T00:45:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006's acceptance criteria no longer cover the task's stated remaining work. `metadata.json` and `verification.md` now say T006 must add empirical data to ADR `§S4/§S5`, but acceptance criterion 9 only checks that `§S2` already records the scope-K deferrals. Because that ADR content is already present from planning, T006 can satisfy the spec without doing the new `§S4/§S5` reinforcement at all.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "line": 323,
+              "category": "consistency"
+            },
+            {
+              "message": "The new depth-comparison verification flow overwrites the first render before it can be compared. Step 2 generates `--cluster-depth 2`, then step 2b reruns the command against the same track output with `--cluster-depth 1 --force`, so the depth-2 artifacts are gone by the time step 3 asks for a readability comparison. As written, reviewers cannot perform the required `depth 1 vs 2` side-by-side check.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 75,
+              "category": "verification"
+            }
+          ],
+          "hash": "rvw1:sha256:581a91bc39492505b3769716a23ade8072428b9395d9d98be9d76fb3a7dd3353",
+          "at": "2026-04-17T00:47:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c41ade5a198b2d54e7b8850f2650fde4bf394f0426d599810b7b30ee9fe7c437",
+          "at": "2026-04-17T00:50:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cf0445f5b6b630334bd07ba05b0c5a9db3afab92750f37eaec6736289f2c90b",
+          "at": "2026-04-17T01:12:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cf0445f5b6b630334bd07ba05b0c5a9db3afab92750f37eaec6736289f2c90b",
+          "at": "2026-04-17T01:14:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47369ea5c801dce37b3909dc64f50839a8f98f20306ad6b4865fa3ccda7b0d0a",
+          "at": "2026-04-17T01:18:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47369ea5c801dce37b3909dc64f50839a8f98f20306ad6b4865fa3ccda7b0d0a",
+          "at": "2026-04-17T01:19:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4de93afe75fb1caeadbd00bbeaface221848186127e79a6b2f8f66e929828d9",
+          "at": "2026-04-17T01:24:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4de93afe75fb1caeadbd00bbeaface221848186127e79a6b2f8f66e929828d9",
+          "at": "2026-04-17T01:25:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:346aa163cc499ffd196423cf414dd3edd354f4df1b74e64f8fb3788489695c5a",
+          "at": "2026-04-17T01:46:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:346aa163cc499ffd196423cf414dd3edd354f4df1b74e64f8fb3788489695c5a",
+          "at": "2026-04-17T01:46:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7360bc8c63fa3a1f6d5dfd0821790bbb3de8e6f482d6a01ea65500776cef1e11",
+          "at": "2026-04-17T01:50:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7360bc8c63fa3a1f6d5dfd0821790bbb3de8e6f482d6a01ea65500776cef1e11",
+          "at": "2026-04-17T01:50:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c646b199e6e6324e9ae2023a9da244678320b3047b75192a7fc7e254363f3ee5",
+          "at": "2026-04-17T01:51:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c646b199e6e6324e9ae2023a9da244678320b3047b75192a7fc7e254363f3ee5",
+          "at": "2026-04-17T01:52:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe3c88cab171e9c84b2ab19844fe2cbe8cab64dd30fd85af2ac9831ff7dc6989",
+          "at": "2026-04-17T01:59:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe3c88cab171e9c84b2ab19844fe2cbe8cab64dd30fd85af2ac9831ff7dc6989",
+          "at": "2026-04-17T02:00:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d4263a7f380574f7c8e62455c9bbd966e8f7ea00433b3f8d7e71f1fc4adf399",
+          "at": "2026-04-17T02:29:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` marks `T003` as `done`, which is outside the expected auto-generated `other`-scope changes described in the briefing. That status also propagates into `plan.md` as a checked-off task, so downstream tooling can now treat T003 as completed even though the implementation is still only staged and there is no recorded `commit_hash` for T003 yet.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "line": 122,
+              "category": "metadata"
+            }
+          ],
+          "hash": "rvw1:sha256:6d4263a7f380574f7c8e62455c9bbd966e8f7ea00433b3f8d7e71f1fc4adf399",
+          "at": "2026-04-17T02:31:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d4263a7f380574f7c8e62455c9bbd966e8f7ea00433b3f8d7e71f1fc4adf399",
+          "at": "2026-04-17T02:32:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0a3eba75529475c4eb977c6e351fdd9bee6b323c3926491e730bdaba5c1fbc7",
+          "at": "2026-04-17T02:49:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The other-scope brief says the accepted metadata change here is only `T004` moving to `in_progress`, but this hunk also backfills `commit_hash` on the already-complete `T003` entry. That is an extra metadata mutation outside the accepted auto-generated set, and it is what drives the otherwise unrelated `plan.md` regeneration in this scope.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "line": 120,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:e0a3eba75529475c4eb977c6e351fdd9bee6b323c3926491e730bdaba5c1fbc7",
+          "at": "2026-04-17T03:29:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0a3eba75529475c4eb977c6e351fdd9bee6b323c3926491e730bdaba5c1fbc7",
+          "at": "2026-04-17T03:29:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b87b5675ac422cd320c9ecdaba21fb5862dbc66880a080629ed7f7e5d1ab13d4",
+          "at": "2026-04-17T04:02:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` marks `T004` as `done`, but the accepted auto-generated changes for this scope are only the `T003` commit-hash backfill plus the regenerated `T004 in_progress` view. Flipping `T004` to done is an unexpected edit, and it is what drives the matching `[x]` change in `plan.md` outside the allowed regenerated set.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "line": 128,
+              "category": "process"
+            }
+          ],
+          "hash": "rvw1:sha256:b87b5675ac422cd320c9ecdaba21fb5862dbc66880a080629ed7f7e5d1ab13d4",
+          "at": "2026-04-17T04:03:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b87b5675ac422cd320c9ecdaba21fb5862dbc66880a080629ed7f7e5d1ab13d4",
+          "at": "2026-04-17T04:04:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f523fdd2bac329d90963f56ffff31ee0354de51b204ab1439416fd658b306502",
+          "at": "2026-04-17T04:23:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f523fdd2bac329d90963f56ffff31ee0354de51b204ab1439416fd658b306502",
+          "at": "2026-04-17T04:24:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13f1e9b2cc95dfa8922c53b7768fe59069fc0a98eb3d3f5bddfb90ad7041e5bf",
+          "at": "2026-04-17T04:50:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13f1e9b2cc95dfa8922c53b7768fe59069fc0a98eb3d3f5bddfb90ad7041e5bf",
+          "at": "2026-04-17T04:52:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The infrastructure row in `verification.md` is off: the 13 `infrastructure-graph/*.md` cluster files sum to 52 types, not 50, so the derived `~3.8 types/cluster` is also wrong (it is closer to 4.0).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 117,
+              "category": "correctness"
+            },
+            {
+              "message": "§S5.1 in the ADR repeats the same infrastructure miscount: it states `50` total types and `~3.8` types/cluster, but the generated cluster files add up to 52 types.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+              "line": 525,
+              "category": "correctness"
+            },
+            {
+              "message": "T006 is still marked `in_progress` in `metadata.json`, which conflicts with the updated verification table marking the task done and leaves the track state inconsistent for downstream automation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "line": 140,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:cb5c0b10526e55d9918bcf095611af26ef194cc9381377620732ca4e0a3e5e75",
+          "at": "2026-04-17T04:58:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c05f471910eecb621dcb55ef03c30c3a466b7101d451a52b7c223338f1ea20b",
+          "at": "2026-04-17T05:00:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ADR summary says depth=2 yields \"10-30 types/cluster\", but the generated cluster artifacts in this change show a much smaller distribution: domain clusters range from 1 to 26 types, usecase from 1 to 6, and infrastructure from 1 to 10. That makes the empirical claim inaccurate and it should be rewritten to match the measured headers in the generated `*-graph/*.md` files.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+              "line": 529,
+              "category": "correctness"
+            },
+            {
+              "message": "The depth=2 readability table claims the per-cluster markdowns stay around \"~20-30 node\", but the generated files in this patch do not support that: most clusters are single-digit sizes and the largest cluster is 26 types. This is a factual mismatch in the recorded measurement section.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 124,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8c05f471910eecb621dcb55ef03c30c3a466b7101d451a52b7c223338f1ea20b",
+          "at": "2026-04-17T05:02:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:147fdb5dd8796c688302f61baff1825a1c37351887c8599663f7afacbc8de20f",
+          "at": "2026-04-17T05:06:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` overstates T003 coverage: the result table says \"ClusterPlan module + 7 tests\", but the task spec in `metadata.json` and `plan.md` says this module should have 6 unit tests. Please make the verification record match the actual test count.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 104,
+              "category": "factual"
+            }
+          ],
+          "hash": "rvw1:sha256:b40f4fe70095ffcd26b7140a5f35a771a10867628d44576fdb1d9c386c168a65",
+          "at": "2026-04-17T05:08:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b40f4fe70095ffcd26b7140a5f35a771a10867628d44576fdb1d9c386c168a65",
+          "at": "2026-04-17T05:09:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is undercounted in the audit trail. `libs/infrastructure/src/tddd/type_graph_cluster.rs` has 9 `#[test]` functions, including `test_classify_types_depth_zero_cross_edges_always_empty`, `test_classify_types_depth_zero_empty_graph_still_yields_single_cluster`, and `test_cross_edges_absent_type_maps_to_unresolved_at_depth_one`, but the docs still describe the task as `6 spec'd tests + 1 RFL-added guard` and `metadata.json:121` / `plan.md:34-36` say `6 unit tests`. That makes the verification record factually stale.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 104,
+              "category": "factual_error"
+            }
+          ],
+          "hash": "rvw1:sha256:2a8da5fa26225887bf3cbd2ddd1e136f42f0cfdc54415d8c29108e6d0c800743",
+          "at": "2026-04-17T05:12:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T006 measurement table is labeled as reporting `node / edge / cluster` counts, but the fourth column records only grouped cross-cluster links (`10 groups`, `0 groups`, `0 groups`) rather than actual edge totals. That materially understates the generated graphs: the committed artifacts show 68 intra-cluster + 24 cross-cluster edges for `domain`, 11 edges for `usecase`, and 21 for `infrastructure`. As written, this section does not satisfy the stated `edge`-count requirement and records incorrect measurements.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 113,
+              "category": "measurement"
+            }
+          ],
+          "hash": "rvw1:sha256:2a8da5fa26225887bf3cbd2ddd1e136f42f0cfdc54415d8c29108e6d0c800743",
+          "at": "2026-04-17T05:15:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f5b12e5bc813d7b8804bc973f7661c0a4c54fbff2f9b258818da2ff56f3da16",
+          "at": "2026-04-17T05:18:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T006 measurement table no longer records per-layer edge counts even though the section is titled `node / edge / cluster 数`. The new column at line 113 is only `Cross-cluster edge groups (overview)`, which is a different metric: for example, the generated `domain-graph/*.md` files sum to 92 concrete edges (68 intra-cluster + 24 cross-cluster references), while the table reports only `10 groups`. This leaves the required empirical edge-count measurement missing/misrepresented.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 113,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8f5b12e5bc813d7b8804bc973f7661c0a4c54fbff2f9b258818da2ff56f3da16",
+          "at": "2026-04-17T05:22:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dcf1bd014966f49f2a9efa4191a633eeb47ac135ca6bfeed522e59badbf9b0a",
+          "at": "2026-04-17T05:24:13Z"
+        }
+      ]
+    }
+  }
+}

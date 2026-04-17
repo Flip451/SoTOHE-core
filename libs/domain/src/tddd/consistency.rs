@@ -369,19 +369,21 @@ pub fn check_consistency(
 ///
 /// Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md` §D2, §D8.6.
 #[must_use]
-pub fn check_type_signals(doc: &TypeCatalogueDocument, strict: bool) -> VerifyOutcome {
+pub fn check_type_signals(
+    doc: &TypeCatalogueDocument,
+    strict: bool,
+    catalogue_file: &str,
+) -> VerifyOutcome {
     if doc.entries().is_empty() {
-        return VerifyOutcome::from_findings(vec![VerifyFinding::error(
-            "domain-types.json has no entries — add at least one domain type declaration"
-                .to_owned(),
-        )]);
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "{catalogue_file} has no entries — add at least one type declaration",
+        ))]);
     }
 
     let Some(signals) = doc.signals() else {
-        return VerifyOutcome::from_findings(vec![VerifyFinding::error(
-            "domain type signals not yet evaluated — run `sotp track type-signals` first"
-                .to_owned(),
-        )]);
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "{catalogue_file}: type signals not yet evaluated — run `sotp track type-signals` first",
+        ))]);
     };
 
     // Signal coverage: every entry must have a matching (name, kind_tag) signal.
@@ -395,7 +397,7 @@ pub fn check_type_signals(doc: &TypeCatalogueDocument, strict: bool) -> VerifyOu
         .collect();
     if !uncovered.is_empty() {
         return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "{} domain type(s) have no signal evaluation: {} — re-run `sotp track type-signals`",
+            "{catalogue_file}: {} type(s) have no signal evaluation: {} — re-run `sotp track type-signals`",
             uncovered.len(),
             uncovered.join(", ")
         ))]);
@@ -409,7 +411,7 @@ pub fn check_type_signals(doc: &TypeCatalogueDocument, strict: bool) -> VerifyOu
         .collect();
     if !all_red.is_empty() {
         return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "{} domain type(s) have Red signal (TDDD violation — run /track:design): {}",
+            "{catalogue_file}: {} type(s) have Red signal (TDDD violation — run /track:design): {}",
             all_red.len(),
             all_red.join(", ")
         ))]);
@@ -427,7 +429,7 @@ pub fn check_type_signals(doc: &TypeCatalogueDocument, strict: bool) -> VerifyOu
 
     if !yellow_entries.is_empty() {
         let message = format!(
-            "domain-types.json: {} declared type(s) have Yellow signal: {} — merge gate will block these until upgraded to Blue. Resolve each type (implement or remove per its declared action) and re-run `sotp track type-signals`.",
+            "{catalogue_file}: {} declared type(s) have Yellow signal: {} — merge gate will block these until upgraded to Blue. Resolve each type (implement or remove per its declared action) and re-run `sotp track type-signals`.",
             yellow_entries.len(),
             yellow_entries.join(", ")
         );
@@ -1006,7 +1008,7 @@ mod tests {
     fn test_check_type_signals_empty_entries_returns_error() {
         // D7: entries=[] → BLOCKED
         let doc = TypeCatalogueDocument::new(1, Vec::new());
-        let outcome = check_type_signals(&doc, false);
+        let outcome = check_type_signals(&doc, false, "domain-types.json");
         assert!(outcome.has_errors(), "empty entries must be an error");
         assert!(outcome.findings()[0].message().contains("no entries"));
     }
@@ -1015,7 +1017,7 @@ mod tests {
     fn test_check_type_signals_none_signals_returns_error() {
         // D8: signals=None → BLOCKED (unevaluated)
         let doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
-        let outcome = check_type_signals(&doc, false);
+        let outcome = check_type_signals(&doc, false, "domain-types.json");
         assert!(outcome.has_errors(), "None signals must be an error");
         assert!(outcome.findings()[0].message().contains("not yet evaluated"));
     }
@@ -1027,7 +1029,7 @@ mod tests {
             TypeCatalogueDocument::new(1, vec![make_entry("TrackId"), make_entry("ReviewState")]);
         // Only TrackId has a signal; ReviewState is uncovered
         doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Blue)]);
-        let outcome = check_type_signals(&doc, false);
+        let outcome = check_type_signals(&doc, false, "domain-types.json");
         assert!(outcome.has_errors());
         let msg = outcome.findings()[0].message();
         assert!(msg.contains("no signal evaluation"), "message: {msg}");
@@ -1039,9 +1041,9 @@ mod tests {
         // D10: Red signal → BLOCKED in both modes
         let mut doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
         doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Red)]);
-        let outcome_interim = check_type_signals(&doc, false);
+        let outcome_interim = check_type_signals(&doc, false, "domain-types.json");
         assert!(outcome_interim.has_errors(), "red in interim must be an error");
-        let outcome_strict = check_type_signals(&doc, true);
+        let outcome_strict = check_type_signals(&doc, true, "domain-types.json");
         assert!(outcome_strict.has_errors(), "red in strict must be an error");
     }
 
@@ -1054,7 +1056,7 @@ mod tests {
             make_signal("TrackId", ConfidenceSignal::Blue),
             make_signal("ReviewState", ConfidenceSignal::Yellow),
         ]);
-        let outcome = check_type_signals(&doc, false);
+        let outcome = check_type_signals(&doc, false, "domain-types.json");
         assert!(!outcome.has_errors(), "yellow in interim must not be an error");
         let findings = outcome.findings();
         assert_eq!(findings.len(), 1);
@@ -1070,7 +1072,7 @@ mod tests {
         // D12: declared Yellow, strict=true → BLOCKED
         let mut doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
         doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Yellow)]);
-        let outcome = check_type_signals(&doc, true);
+        let outcome = check_type_signals(&doc, true, "domain-types.json");
         assert!(outcome.has_errors());
         let findings = outcome.findings();
         assert_eq!(findings.len(), 1);
@@ -1088,11 +1090,11 @@ mod tests {
             make_signal("ReviewState", ConfidenceSignal::Blue),
         ]);
 
-        let outcome_interim = check_type_signals(&doc, false);
+        let outcome_interim = check_type_signals(&doc, false, "domain-types.json");
         assert!(!outcome_interim.has_errors());
         assert!(outcome_interim.findings().is_empty());
 
-        let outcome_strict = check_type_signals(&doc, true);
+        let outcome_strict = check_type_signals(&doc, true, "domain-types.json");
         assert!(!outcome_strict.has_errors());
         assert!(outcome_strict.findings().is_empty());
     }
@@ -1117,12 +1119,37 @@ mod tests {
             ),
         ]);
 
-        let outcome_strict = check_type_signals(&doc, true);
+        let outcome_strict = check_type_signals(&doc, true, "domain-types.json");
         assert!(
             !outcome_strict.has_errors(),
             "undeclared Yellow must not block even in strict mode: {outcome_strict:?}"
         );
         assert!(outcome_strict.findings().is_empty());
+    }
+
+    #[test]
+    fn test_check_type_signals_empty_entries_error_mentions_catalogue_file() {
+        // TDDD-BUG-02 regression guard: the catalogue_file argument must appear
+        // in the error message instead of a hardcoded "domain-types.json".
+        let doc = TypeCatalogueDocument::new(1, Vec::new());
+        let outcome = check_type_signals(&doc, false, "usecase-types.json");
+        assert!(outcome.has_errors());
+        let msg = outcome.findings()[0].message();
+        assert!(msg.contains("usecase-types.json"), "must mention caller file: {msg}");
+        assert!(!msg.contains("domain-types.json"), "must NOT hardcode domain-types.json: {msg}");
+    }
+
+    #[test]
+    fn test_check_type_signals_yellow_error_mentions_catalogue_file() {
+        // TDDD-BUG-02 regression guard: the Yellow-mode error (strict) must use
+        // the catalogue_file argument, not a hardcoded layer name.
+        let mut doc = TypeCatalogueDocument::new(1, vec![make_entry("TrackId")]);
+        doc.set_signals(vec![make_signal("TrackId", ConfidenceSignal::Yellow)]);
+        let outcome = check_type_signals(&doc, true, "infrastructure-types.json");
+        assert!(outcome.has_errors());
+        let msg = outcome.findings()[0].message();
+        assert!(msg.contains("infrastructure-types.json"), "must mention caller file: {msg}");
+        assert!(!msg.contains("domain-types.json"), "must NOT hardcode domain-types.json: {msg}");
     }
 
     #[test]

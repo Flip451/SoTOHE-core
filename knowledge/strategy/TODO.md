@@ -946,9 +946,14 @@ Lease/LeaseId モデル、daemon/client 分離、UDS 通信、接続断自動 re
 
 - [ ] **TDDD-BUG-02** (LOW): `check_type_signals` の error message が "domain-types.json" にハードコードされている — `consistency.rs:375` の文字列リテラルが全 layer 共通の関数で使われるため、usecase / infrastructure でエラーが出ても "domain-types.json" と表示される。修正案: カタログファイル名を引数に追加して動的に埋め込む
   - **追加日**: 2026-04-16
+  - **対応中**: `tddd-type-graph-cluster-2026-04-17` T001 で修正
+
+- [ ] **TDDD-BUG-03** (MEDIUM): struct kinds (`value_object` / `use_case` / `dto` / `command` / `query` / `factory` / `interactor`) の `action: modify` が **存在チェックのみで Blue** になる L1 semantic gap — `add` は実装前 Yellow だが `modify` は Blue になり対称性が崩れる。merge gate strict モードで Yellow ブロックできても Blue を通すため「宣言済みだが未変更」状態が silently 通過する。例: `tddd-type-graph-cluster-2026-04-17` で `TypeGraphRenderOptions` (modify + cluster_depth field 追加予定) が実装前 Blue。修正案: (a) catalogue に `expected_fields` / `expected_structural_hash` 追加 (schema 拡張)、(b) baseline の rustdoc structural signature を hash 化して比較。まずは (b) 優先 (schema 変更最小)。ADR 2026-04-13-1813 §D3「struct variants は存在チェックのみ」の自然な帰結なので設計時に意図された挙動ではあるが、modify action と整合しない
+  - **追加日**: 2026-04-17
 
 - [ ] **TDDD-Q01** (XS): `type_catalogue_render.rs` の SECTIONS が手動管理 — 新 variant 追加時に SECTIONS への追記漏れを検出するテストを追加する (`kind_tag` 全量と SECTIONS の kind_tag を比較)
   - **追加日**: 2026-04-16
+  - **対応中**: `tddd-type-graph-cluster-2026-04-17` T002 で修正
 
 - [ ] **TDDD-Q02** (XS): `catalogue_codec.rs` Phase 1.5: 既存 structured kinds (`secondary_port`, `application_service`) に `implements` の stale field guard が未設定 — TDDD-05 で `secondary_adapter` 側のみ修正、pre-existing code は対象外で見送り
   - **追加日**: 2026-04-16

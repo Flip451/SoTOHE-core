@@ -228,7 +228,7 @@ fn evaluate_layer_catalogue(
         }
     };
 
-    check_type_signals(&doc, strict)
+    check_type_signals(&doc, strict, binding.catalogue_file())
 }
 
 /// Verifies that `spec.md` contains a `## Domain States` section with a markdown table
@@ -877,6 +877,46 @@ mod tests {
         std::fs::write(dir.path().join("domain-types.json"), "not valid json").unwrap();
         let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
         assert!(outcome.has_errors(), "invalid JSON must be an error: {outcome:?}");
+    }
+
+    #[test]
+    fn test_verify_from_spec_json_with_custom_catalogue_override_mentions_override_in_findings() {
+        // Verify that when `architecture-rules.json` uses a non-default
+        // `tddd.catalogue_file` override (here: "custom-types.json"), the
+        // error message produced by Stage 2 mentions that overridden filename
+        // rather than the layer-id derived default ("domain-types.json").
+        //
+        // A regression in this code path would silently forward
+        // `binding.catalogue_file()` as the wrong name, producing diagnostics
+        // that point at a file the developer never sees.
+        let dir = tempfile::tempdir().unwrap();
+        // Write arch rules with a custom catalogue_file override.
+        let arch_rules_custom = r#"{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "custom-types.json"
+      }
+    }
+  ]
+}"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), arch_rules_custom).unwrap();
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        // Write the catalogue under the override name with a Red signal so Stage 2 fails.
+        std::fs::write(dir.path().join("custom-types.json"), DOMAIN_TYPES_WITH_RED_SIGNAL).unwrap();
+        let outcome = verify_from_spec_json(&spec_json_path, false, dir.path());
+        assert!(outcome.has_errors(), "red signal must be an error: {outcome:?}");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("custom-types.json")),
+            "finding must mention the override filename 'custom-types.json': {outcome:?}"
+        );
     }
 
     // --- verify() delegation tests ---

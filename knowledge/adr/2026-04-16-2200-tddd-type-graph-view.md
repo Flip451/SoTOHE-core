@@ -448,6 +448,100 @@ fn test_sections_covers_all_kind_tags() {
 - **render コードが 1000+ 行 / 5+ ファイルに達した場合**: `libs/render` crate への分離を具体的に検討する
 - **DRIFT-01 の要件が本 ADR のスコープを超えた場合**: 例えば「crate レベルではなく module レベルの依存違反を検出」など、graph view とは独立した DRIFT ADR を新設する
 
+## Phase 2 Scope Update (2026-04-17)
+
+Phase 2 計画時 (`tddd-type-graph-cluster-2026-04-17`) に追加の実測を行い、本 ADR の Phase 2 フルスコープを scope (K) に縮小する。本節はその縮小判断と、本 ADR のスコープ境界を明確化するためのアディエンダム (addendum) である。
+
+### §S1 計画時の実測結果: 現 codebase は enum-first 設計
+
+Phase 2 計画中に `libs/domain/src/` に対して次の測定を行った:
+
+| 指標 | 結果 |
+|---|---|
+| `struct Foo<State>` typestate パターン | **0** |
+| `PhantomData` 使用箇所 | **0** |
+| 消費型 self を取り新しい型を返すメソッド (typestate 遷移) | **1** (`NonEmptyReviewerFindings::into_vec` — collection unwrap であり typestate 遷移ではない) |
+| `TypeDefinitionKind::Typestate` を declare した全 track の catalogue entries | **0** |
+
+実測上 typestate パターンが 0 件であることは、codebase が typestate を不要とする設計を選択していることを示す。消費型 self の 1 件 (`NonEmptyReviewerFindings::into_vec`) はコレクション unwrap であり typestate 遷移ではない。TDDD catalogue にも `TypeDefinitionKind::Typestate` を declare したエントリが存在しないため、現時点での entry-point + typestate 可視化には評価対象が存在しない。これは設計方針として正当であり、TDDD debt ではない。
+
+### §S2 Scope (K) 縮小: Phase 2 の 8 task を 6 task に
+
+Phase 2 の ADR 本文 §D7 / §D8 / §D9 が定める 8 項目のうち、以下 4 項目を **Phase 2 では延期** する。trackレベルでは `tddd-type-graph-cluster-2026-04-17` で明示的に out_of_scope / 延期項目として記録している。
+
+| 延期項目 | 本 ADR での元の記述 | 延期理由 |
+|---|---|---|
+| Entry point 検出 + `classDef entry` marking | §D3 | 現 codebase に typestate が 0 件で、entry point を強調しても navigation 価値の実証が困難 (§S1)。wrapper 型処理 (Open Questions §5) も未解決 |
+| DRIFT-01 基盤 (`--check-drift` / `DriftReport` / may_depend_on 違反検出) | §D8 | 現 `architecture-rules.json` は crate 粒度の `may_depend_on` しか持たず、DRIFT-01 を crate 粒度で実装しても既存の `libs/infrastructure/src/verify/layers.rs` (`cargo make check-layers`) と redundant。§S3 参照 |
+| Orphan type 検出 + `:::orphan` marking | §D8 | DRIFT-01 と同じ `architecture-rules.json` 解析基盤を使うため、DRIFT-01 と同時延期 |
+| `sotp track type-signals` 自動レンダー統合 | §D6 | Phase 2 (K) 実装後の multi-layer 可読性検証 (track T006) で graph view の living document 化が ROI を正当化するかを判断してから、別 track で追加する |
+
+### §S3 本 ADR のスコープ境界の明確化
+
+本 ADR の view renderer は **TypeGraph (型と型の関係) を mermaid に描画する** という前提に立つ。次の 2 つの拡張は本 ADR のスコープ外であり、それぞれ別 ADR で扱う。
+
+#### §S3.1 State machine view は本 ADR のスコープ外
+
+「enum バリアント間の遷移を `stateDiagram-v2` で描画する」機能は、`TypeGraph` とは別のデータソース (enum のメソッド本体解析または宣言的アノテーション) を必要とする。ADR 0002 §D6 の rustdoc JSON 唯一基盤原則により、本 ADR の実装では enum 本体解析を導入できない。
+
+この機能を実現するには:
+- 宣言的な `#[state_transitions(from = "A", to = ["B", "C"])]` マクロ、または
+- `TypeCatalogueDocument` に state transition を手書き declare する新フィールド
+
+のいずれかを導入する新 ADR が必要である。本 ADR では扱わない。
+
+#### §S3.2 `architecture-rules.json` module 粒度拡張は別 ADR 案件
+
+DRIFT-01 の真の価値 (既存 verify layers と差別化できる range) は、`architecture-rules.json` を crate 粒度から module 粒度 (例: `domain::guard may_depend_on domain::shared`) に拡張した後に生じる。本 ADR は view renderer であり、`architecture-rules.json` の schema 拡張は扱わない。次のような別 ADR が必要:
+
+- `architecture-rules.json` の schema 拡張 (module 粒度ルール)
+- `verify layers` / `check_layers` / `deny.toml` との整合設計
+- module 粒度ルールを満たすかの programmatic assertion (DRIFT-01 本体)
+
+### §S4 Open Questions §4 (deduplicate_typestate_edges) への対応
+
+Open Questions §4 (`TypeGraph::outgoing` と methods edge の重複) は、track T006 で実測判断済み:
+
+- 現 domain catalogue の `typestate` 宣言: **0 件** (§S1 と一致)
+- `TypeNode::outgoing` が populate されるのは typestate 宣言がある場合のみ — 空のため method edge との重複は **事実上発生しない**
+- **結論**: Phase 2 (K) では `deduplicate_typestate_edges` フィールドそのものの導入を見送り (scope 縮小)。将来 typestate を catalogue 宣言するタイミングで再評価する。フィールド名と semantics は本 ADR §D2(a) + track verification.md に記録済み。
+
+### §S5 Scope (K) の再評価条件 — 実測裏付け
+
+次の条件が満たされた場合、本 ADR の Phase 2 フルスコープに戻す (または新 ADR で拡張する):
+
+- codebase に typestate 型が 5+ 追加され、entry point / state machine 可視化の ROI が具体化する
+- `architecture-rules.json` の module 粒度拡張 ADR が Accepted になり、DRIFT-01 の非冗長価値が成立する
+- Phase 2 (K) の可読性検証 (track T006) で living document 化の価値が定量的に示される
+
+#### §S5.1 Phase 2 (K) 実装時点の実測 (track T006 — tddd-type-graph-cluster-2026-04-17)
+
+`sotp track type-graph --cluster-depth 2 --edges all` を 3 層で実行した結果:
+
+| Layer | Total types | Clusters (depth=2) | Avg types/cluster | Max cluster size | Cross-cluster edges |
+|---|---|---|---|---|---|
+| domain | 110 | 17 | ~6.5 | 26 (`domain::review_v2`) | 10 groups |
+| usecase | 35 | 11 | ~3.2 | — | 0 groups |
+| infrastructure | 52 | 13 | ~4.0 | — | 0 groups |
+
+**cluster_depth 比較** (depth=1 vs 2):
+- depth=1: 3 層すべて 1 cluster に集約 (実質 flat、Phase 1 と同等で不読)
+- depth=2: cluster size range は domain 1-26 / usecase 1-6 / infrastructure 1-10 に分散、mermaid で可読
+
+→ **Default=2 の ADR 決定は正当** (depth=1 は実用性なし、depth=2 は domain の最大 cluster でも 26 node で 50 node limit 余裕あり、他 2 層は大半が単桁)
+
+#### §S5.2 trait impl edge の有効性 (T005)
+
+- Phase 2 の `--edges all` で trait impl 破線エッジ (`FsReviewStore -.-> ReviewReader`) が描画可能になった
+- **制約**: 現 catalogue に `SecondaryPort` / `SecondaryAdapter` 宣言が限定的 (Phase 2 K の 7 entries は主に infra renderer 型)。hexagonal 可視化の実益を引き出すには catalogue 成長が前提
+- T005 のテストで描画機構そのものは検証済み。実益 ROI は catalogue-based 新 track (project memory `project_catalogue_filter_track`) で再評価予定
+
+#### §S5.3 未解決項目 (Phase 2 では deferred)
+
+- Entry point detection: 現 catalogue 密度では navigation 価値を実証できず、見送り継続 (§S2)
+- DRIFT-01: crate-level では verify layers と redundant (§S3.2) — catalogue-based cross-layer graph で value 復活の可能性あり、別 ADR 案件
+- Auto-render integration: 手動実行で十分機能、living document 化の価値は catalogue-based 新 track で再定義
+
 ## Open Questions
 
 Phase 1 スパイク前 or 実施中に決定すべき論点:
@@ -461,12 +555,16 @@ Phase 1 スパイク前 or 実施中に決定すべき論点:
 
 ## Phased Scope Summary
 
+> **Note (2026-04-17)**: Phase 2 の実装スコープは `§Phase 2 Scope Update (2026-04-17)` で scope (K) に縮小された。Entry 検出 / DRIFT-01 / orphan / auto-render は延期。下表の Phase 2 行は元の ADR フルスコープを参照値として保持するが、実際の実装対象は §Phase 2 Scope Update §S2 および track `tddd-type-graph-cluster-2026-04-17` の spec を参照のこと。
+
 | Phase | 目標 | 対象層 | クラスタ | エッジ | Entry | 追加 CLI | Merge 条件 |
 |---|---|---|---|---|---|---|---|
 | 1 (spike) | 可読性検証 | domain のみ | なし | methods | なし | `sotp track type-graph` | tddd-05 前でも可 |
-| 2 (cluster+drift) | 本番運用化 + drift 基盤 | 3 層全て | `--cluster-depth` | methods + fields + impls | あり | 同上 + `--check-drift` | Phase 1 完了後 (tddd-05 は PR #101 で merge 済み) |
+| 2 (cluster+drift) ※ | 本番運用化 + drift 基盤 (フルスコープ参照値) | 3 層全て | `--cluster-depth` | methods + fields + impls | あり | 同上 + `--check-drift` | Phase 1 完了後 (tddd-05 は PR #101 で merge 済み) |
 | 2 (bug fix) | 技術的負債返済 | 全層 | — | — | — | — | Phase 2 と同時 |
 | 3 (path query) | archaeology | 層横断 | - | 選択可能 | - | `sotp track type-path` | Phase 2 完了後 |
+
+※ Phase 2 のフルスコープは 2026-04-17 の計画時実測で scope (K) に縮小 (§Phase 2 Scope Update 参照)。
 
 各 Phase の completion gate で acceptance criteria を満たすこと、および次 Phase の open question を実測で解決してから着手すること。
 

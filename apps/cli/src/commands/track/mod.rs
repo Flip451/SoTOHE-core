@@ -192,7 +192,11 @@ pub enum TrackCommand {
         layer: Option<String>,
     },
 
-    /// Render a mermaid type graph from rustdoc schema export to `<layer>-graph.md`.
+    /// Render a mermaid type graph from rustdoc schema export.
+    ///
+    /// When `--cluster-depth 0` writes a single flat `<layer>-graph.md` file.
+    /// When `--cluster-depth N` (N ≥ 1, default 2) writes a cluster directory
+    /// `<layer>-graph/` with `index.md` plus one file per cluster.
     TypeGraph {
         /// Path to the track items root directory (e.g., `track/items`).
         #[arg(long, default_value = "track/items")]
@@ -209,6 +213,16 @@ pub enum TrackCommand {
         /// are processed in `architecture-rules.json` order.
         #[arg(long)]
         layer: Option<String>,
+
+        /// Cluster depth for directory layout.  0 = single flat file; ≥ 1 = cluster
+        /// directory.  Defaults to `TypeGraphRenderOptions::default()` (currently 2).
+        #[arg(long, default_value_t = 2)]
+        cluster_depth: usize,
+
+        /// Edge types to include.  Accepted values: methods, fields, impls, all.
+        /// Defaults to `methods`.
+        #[arg(long, default_value = "methods")]
+        edges: String,
     },
 
     /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
@@ -359,9 +373,21 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         TrackCommand::TypeSignals { items_dir, track_id, workspace_root, layer } => {
             tddd::signals::execute_type_signals(items_dir, track_id, workspace_root, layer)
         }
-        TrackCommand::TypeGraph { items_dir, track_id, workspace_root, layer } => {
-            tddd::graph::execute_type_graph(items_dir, track_id, workspace_root, layer)
-        }
+        TrackCommand::TypeGraph {
+            items_dir,
+            track_id,
+            workspace_root,
+            layer,
+            cluster_depth,
+            edges,
+        } => tddd::graph::execute_type_graph(
+            items_dir,
+            track_id,
+            workspace_root,
+            layer,
+            cluster_depth,
+            edges,
+        ),
         TrackCommand::BaselineCapture { items_dir, track_id, workspace_root, force, layer } => {
             tddd::baseline::execute_baseline_capture(
                 items_dir,
