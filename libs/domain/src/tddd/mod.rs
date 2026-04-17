@@ -13,4 +13,7 @@
 pub mod baseline;
 pub mod catalogue;
 pub mod consistency;
+pub mod layer_id;
 pub mod signals;
+
+pub use layer_id::LayerId;

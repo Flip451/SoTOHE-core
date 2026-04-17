@@ -1,163 +1,21 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This file still says the default Claude Code subagent model is `claude-sonnet-4-6`; the 4-7 upgrade called for in the briefing was not applied here, so fallback subagents will keep using the old Sonnet model.",
-              "severity": "P1",
-              "file": ".claude/rules/11-subagent-model.md",
-              "line": 3,
-              "category": "factual error"
-            },
-            {
-              "message": "The action-rules section points readers to `.claude/skills/track-design/SKILL.md`, but that skill file does not exist in the repo, so this cross-reference is broken.",
-              "severity": "P1",
-              "file": ".claude/agents/designer.md",
-              "line": 99,
-              "category": "broken reference"
-            }
-          ],
-          "hash": "rvw1:sha256:2f2abda88f28de410f1ff113576a4c95d6d499a811e4249f8a64a2aad481d579",
-          "at": "2026-04-17T12:08:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Broken reference: `.claude/skills/track-design/SKILL.md` does not exist in this repo, so this link cannot be followed.",
-              "severity": "P1",
-              "file": ".claude/agents/designer.md",
-              "line": 99,
-              "category": "broken reference"
-            }
-          ],
-          "hash": "rvw1:sha256:2f2abda88f28de410f1ff113576a4c95d6d499a811e4249f8a64a2aad481d579",
-          "at": "2026-04-17T12:13:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This sentence refers to a `reviewer-loop` capability in `.harness/config/agent-profiles.json`, but the JSON only defines `reviewer`; `reviewer-loop` is not a real capability name, so the reference is broken.",
-              "severity": "P1",
-              "file": ".claude/rules/11-subagent-model.md",
-              "line": 12,
-              "category": "broken reference"
-            },
-            {
-              "message": "The Codex-heavy planner wrapper is documented as `cargo make track-local-plan --model {model} --briefing-file ...`, but the task invocation used elsewhere in this repo requires the `--` separator before task args (`cargo make track-local-plan -- --model ...`). As written, this command will be parsed incorrectly.",
-              "severity": "P1",
-              "file": ".claude/rules/11-subagent-model.md",
-              "line": 13,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:af21b7b6275745b05684bcf60aa9971e10d4514521312e79e37f1fa3be3a3004",
-          "at": "2026-04-17T12:17:17Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8a5abffddf25c1a47c6975d5d23be147e97055078d795f6152d82fcc18fc2c47",
-          "at": "2026-04-17T12:20:10Z"
+          "hash": "rvw1:sha256:2cbf4c8ceb17dbdbdb02bb170dea50282bf7197ee1555f807d861c460f58363f",
+          "at": "2026-04-17T13:38:41Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8a5abffddf25c1a47c6975d5d23be147e97055078d795f6152d82fcc18fc2c47",
-          "at": "2026-04-17T12:22:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This ordering conflicts with the formal task-completion flow in `knowledge/conventions/task-completion-flow.md`: that flow does `implement -> review -> commit` first, then transitions tasks to `done` and backfills `commit_hash` afterward. Here the new guidance says the `done` transition must happen before `/track:review`, so the docs disagree on when task state is updated relative to review.",
-              "severity": "P1",
-              "file": ".claude/commands/track/implement.md",
-              "line": 34,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:c68502f3ad72de9c45870d7ef39c07fb1c79bd30e5665d29a67d8e4993088e57",
-          "at": "2026-04-17T13:02:40Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SUBAGENT_MODEL_ALLOWLIST` still includes `claude-sonnet-4-6` instead of the intended `claude-sonnet-4-7`, so `verify_env` will reject the new `CLAUDE_CODE_SUBAGENT_MODEL` value from `.claude/settings.json`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 296,
-              "category": "broken reference"
-            },
-            {
-              "message": "The `verify_env` test fixtures at lines 1230 and 1242 still hardcode `claude-sonnet-4-6`, so this scope does not actually exercise the 4-7 cutover and leaves the validation path untested against the new setting.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 1230,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
-          "at": "2026-04-17T12:07:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
-          "at": "2026-04-17T12:08:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
-          "at": "2026-04-17T12:09:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2dd384aa51c03424eafcf16e9806147608d61dbbefcd381aca4dcd07b95cb63d",
-          "at": "2026-04-17T12:25:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2dd384aa51c03424eafcf16e9806147608d61dbbefcd381aca4dcd07b95cb63d",
-          "at": "2026-04-17T12:26:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b162462854e2294b48dba564275d6c550ad4699337e0b64288d0c4acd9ce1f22",
-          "at": "2026-04-17T12:28:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b162462854e2294b48dba564275d6c550ad4699337e0b64288d0c4acd9ce1f22",
-          "at": "2026-04-17T12:29:46Z"
+          "hash": "rvw1:sha256:2cbf4c8ceb17dbdbdb02bb170dea50282bf7197ee1555f807d861c460f58363f",
+          "at": "2026-04-17T13:41:13Z"
         }
       ]
     },
@@ -621,6 +479,387 @@
           "findings": [],
           "hash": "rvw1:sha256:4c575886b9dfbdf0ac60fe56d2a443c0bef92221e2fc759a8e848c2efc961a5b",
           "at": "2026-04-17T13:01:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`unit tests (...) 合計 8 tests` overstates the evidence in this file: the checklist names seven checks, and `libs/infrastructure/src/tddd/catalogue_bulk_loader.rs` currently contains seven relevant tests on Unix (six on non-Unix). Update the count or name the missing eighth test explicitly.",
+              "severity": "P1",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 27,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:4e2f1b2db51346b8481cc3d6a8cf921fa5c6378eb528c548fdb74bd0684ba822",
+          "at": "2026-04-17T13:39:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 の要約で「合計 8 tests が pass」としていますが、同じ差分で追加されている `libs/infrastructure/src/tddd/catalogue_bulk_loader.rs` のテストは 7 個しかありません（happy path / missing catalogue / symlink reject / cycle detect / deps-outside-enabled / tie-order / visibility）。件数が 1 つ多く、実際の検証内容と食い違っています。",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "line": 27,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:4e2f1b2db51346b8481cc3d6a8cf921fa5c6378eb528c548fdb74bd0684ba822",
+          "at": "2026-04-17T13:41:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6324420e65c46b51c858471b481d94b81517cde663688247cb42b75a6f595432",
+          "at": "2026-04-17T13:41:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6324420e65c46b51c858471b481d94b81517cde663688247cb42b75a6f595432",
+          "at": "2026-04-17T13:44:16Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SUBAGENT_MODEL_ALLOWLIST` still includes `claude-sonnet-4-6` instead of the intended `claude-sonnet-4-7`, so `verify_env` will reject the new `CLAUDE_CODE_SUBAGENT_MODEL` value from `.claude/settings.json`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 296,
+              "category": "broken reference"
+            },
+            {
+              "message": "The `verify_env` test fixtures at lines 1230 and 1242 still hardcode `claude-sonnet-4-6`, so this scope does not actually exercise the 4-7 cutover and leaves the validation path untested against the new setting.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 1230,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
+          "at": "2026-04-17T12:07:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
+          "at": "2026-04-17T12:08:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
+          "at": "2026-04-17T12:09:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dd384aa51c03424eafcf16e9806147608d61dbbefcd381aca4dcd07b95cb63d",
+          "at": "2026-04-17T12:25:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dd384aa51c03424eafcf16e9806147608d61dbbefcd381aca4dcd07b95cb63d",
+          "at": "2026-04-17T12:26:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b162462854e2294b48dba564275d6c550ad4699337e0b64288d0c4acd9ce1f22",
+          "at": "2026-04-17T12:28:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b162462854e2294b48dba564275d6c550ad4699337e0b64288d0c4acd9ce1f22",
+          "at": "2026-04-17T12:29:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_may_depend_on()` rereads `architecture-rules.json` with plain `read_to_string` instead of going back through `reject_symlinks_below`, so the file is only symlink-checked once. That violates the module's \"all reads are guarded\" invariant and leaves a TOCTOU window between the binding load and the dependency parse.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 172,
+              "category": "security"
+            },
+            {
+              "message": "`topological_sort()` drops every dependency that is not in `enabled_ids`, but `load_all_catalogues()` documents that an unknown `may_depend_on` target must fail. As written, a typo or missing crate in `may_depend_on` is treated the same as a dependency on a disabled layer, so bad rules files can slip through and the layer order is computed from incomplete graph data.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 239,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dd63d4c3b429b7f69eee9ef782e0c91e2255803345be992f3123696b6a7aec49",
+          "at": "2026-04-17T13:40:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_may_depend_on()` reopens `architecture-rules.json` with plain `read_to_string()` after the initial guarded load. That second read is outside `reject_symlinks_below`, so a swapped-in symlink can bypass the fail-closed symlink policy on the rules file.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 172,
+              "category": "security"
+            },
+            {
+              "message": "The topological sort counts every `may_depend_on` entry when building `in_degree`, but later collapses duplicate neighbors with `dedup()`. If a layer lists the same dependency twice, its in-degree is decremented only once and the loader will incorrectly report a cycle.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 267,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:dd63d4c3b429b7f69eee9ef782e0c91e2255803345be992f3123696b6a7aec49",
+          "at": "2026-04-17T13:43:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`topological_sort()` treats any dependency that is not present in `enabled_ids` as if it were a disabled layer and drops it. That means a typo or missing crate in `may_depend_on` is accepted instead of failing closed, even though `load_all_catalogues()` documents unknown targets as an error. The loader can therefore compute an order from incomplete graph data and hide bad `architecture-rules.json` input.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 241,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1ab3b5c42ed55536d287befb6e58c123f7ce67e3e26cb6e503c98f3dcc631179",
+          "at": "2026-04-17T13:48:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On a genuine miss for `architecture-rules.json`, this turns the existing legacy fallback into `Io(NotFound)`, so `load_all_catalogues()` now fails on pre-multilayer tracks even though `load_tddd_layers_from_path()` intentionally returns the synthetic domain binding for the same case.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 178,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:65ef5fb8509f37414034a1f40d1c5f8b2bc87b23f2ecaf0d8d2f2c0497666452",
+          "at": "2026-04-17T13:51:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`topological_sort()` does not preserve input order for all ties. Nodes that become ready from different predecessors are appended in predecessor-processing order, so a valid DAG like `enabled_ids = [\"B\", \"A\", \"C\", \"D\"]` with deps `B -> D` and `A -> C` is emitted as `[\"B\", \"A\", \"D\", \"C\"]`. That violates the documented stable tie-order guarantee and can reorder dependency groups in the rendered map.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 291,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aa45748087bacbb4101036a42bb6168e4a39e93b629e445145d7ade4e91b2aac",
+          "at": "2026-04-17T13:54:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_may_depend_on` accepts malformed `architecture-rules.json` entries instead of failing closed: it overwrites duplicate `crate` keys with `BTreeMap::insert` and does not reject empty dependency strings. Because `load_all_catalogues` uses this map to compute ordering, a bad rules file can silently change the returned layer order instead of surfacing an `ArchRulesParse` error, which diverges from the stricter validation already enforced by the existing architecture-rules parser.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 206,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:01d47cc2c7965ee55c198f604ae0f618dac67aabc0e159cee9b4b3e801058e4b",
+          "at": "2026-04-17T13:58:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`topological_sort()` treats every dependency outside `enabled_ids` as ignorable, so a misspelled or missing `may_depend_on` target is silently dropped instead of failing closed. That means `load_all_catalogues()` can return a layer order computed from incomplete graph data, which is inconsistent with `verify/architecture_rules.rs` rejecting unknown dependencies.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 279,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ec8541de24f7f81b372055b10469918c715e759e71d966cf0c8260dc0b2c485d",
+          "at": "2026-04-17T14:02:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Reading the catalogue with `reject_symlinks_below` followed by a separate `std::fs::read_to_string` leaves a TOCTOU window: an attacker can swap the file for a symlink after the check and before the open, bypassing the guard. Use an atomic no-follow open/read path instead.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 159,
+              "category": "security"
+            },
+            {
+              "message": "`parse_may_depend_on` accepts any non-empty `crate` string without validating it, so a malformed disabled layer entry can be added to `all_known` and let an otherwise unknown `may_depend_on` dependency pass as \"known\" instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 229,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:980762e99e3f7cdafa4cf5f01dcd21f841afe81f6a231e317b45ab8a3a66c3ad",
+          "at": "2026-04-17T14:06:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:980762e99e3f7cdafa4cf5f01dcd21f841afe81f6a231e317b45ab8a3a66c3ad",
+          "at": "2026-04-17T14:09:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_may_depend_on()` accepts an empty `layers[].crate` because it only checks `as_str()` here. That malformed layer name is then treated as a known crate, so an enabled layer can list `\"\"` in `may_depend_on` and `load_all_catalogues()` will accept the rules file and silently ignore that dependency during topo sort instead of failing closed, unlike the existing architecture-rules parsers.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "line": 229,
+              "category": "schema_validation"
+            }
+          ],
+          "hash": "rvw1:sha256:980762e99e3f7cdafa4cf5f01dcd21f841afe81f6a231e317b45ab8a3a66c3ad",
+          "at": "2026-04-17T14:11:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44e11607c5d7f6938ab0225102297435d28a4ecda5e140e925ac574acd374c50",
+          "at": "2026-04-17T14:13:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44e11607c5d7f6938ab0225102297435d28a4ecda5e140e925ac574acd374c50",
+          "at": "2026-04-17T14:15:56Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This file still says the default Claude Code subagent model is `claude-sonnet-4-6`; the 4-7 upgrade called for in the briefing was not applied here, so fallback subagents will keep using the old Sonnet model.",
+              "severity": "P1",
+              "file": ".claude/rules/11-subagent-model.md",
+              "line": 3,
+              "category": "factual error"
+            },
+            {
+              "message": "The action-rules section points readers to `.claude/skills/track-design/SKILL.md`, but that skill file does not exist in the repo, so this cross-reference is broken.",
+              "severity": "P1",
+              "file": ".claude/agents/designer.md",
+              "line": 99,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:2f2abda88f28de410f1ff113576a4c95d6d499a811e4249f8a64a2aad481d579",
+          "at": "2026-04-17T12:08:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Broken reference: `.claude/skills/track-design/SKILL.md` does not exist in this repo, so this link cannot be followed.",
+              "severity": "P1",
+              "file": ".claude/agents/designer.md",
+              "line": 99,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:2f2abda88f28de410f1ff113576a4c95d6d499a811e4249f8a64a2aad481d579",
+          "at": "2026-04-17T12:13:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This sentence refers to a `reviewer-loop` capability in `.harness/config/agent-profiles.json`, but the JSON only defines `reviewer`; `reviewer-loop` is not a real capability name, so the reference is broken.",
+              "severity": "P1",
+              "file": ".claude/rules/11-subagent-model.md",
+              "line": 12,
+              "category": "broken reference"
+            },
+            {
+              "message": "The Codex-heavy planner wrapper is documented as `cargo make track-local-plan --model {model} --briefing-file ...`, but the task invocation used elsewhere in this repo requires the `--` separator before task args (`cargo make track-local-plan -- --model ...`). As written, this command will be parsed incorrectly.",
+              "severity": "P1",
+              "file": ".claude/rules/11-subagent-model.md",
+              "line": 13,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:af21b7b6275745b05684bcf60aa9971e10d4514521312e79e37f1fa3be3a3004",
+          "at": "2026-04-17T12:17:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a5abffddf25c1a47c6975d5d23be147e97055078d795f6152d82fcc18fc2c47",
+          "at": "2026-04-17T12:20:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a5abffddf25c1a47c6975d5d23be147e97055078d795f6152d82fcc18fc2c47",
+          "at": "2026-04-17T12:22:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This ordering conflicts with the formal task-completion flow in `knowledge/conventions/task-completion-flow.md`: that flow does `implement -> review -> commit` first, then transitions tasks to `done` and backfills `commit_hash` afterward. Here the new guidance says the `done` transition must happen before `/track:review`, so the docs disagree on when task state is updated relative to review.",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 34,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c68502f3ad72de9c45870d7ef39c07fb1c79bd30e5665d29a67d8e4993088e57",
+          "at": "2026-04-17T13:02:40Z"
         }
       ]
     }

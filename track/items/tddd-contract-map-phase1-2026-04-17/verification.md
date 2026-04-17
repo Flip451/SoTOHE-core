@@ -19,12 +19,15 @@
 
 ### T002: Infrastructure helpers
 
-- [ ] `libs/infrastructure/src/tddd/catalogue_bulk_loader.rs` が存在し `load_all_catalogues` 関数が提供されている
-- [ ] 不在カタログに対して明示エラー variant が返される
-- [ ] symlink injection が fail-closed で拒否される (test で確認)
-- [ ] `extract_type_names` が pub 昇格されている
-- [ ] layer_order が `may_depend_on` のトポロジカル順 (依存なし層が左端) であることが assert される
-- [ ] unit tests (正常 load / 不在エラー / symlink 拒否 / topo_sort / visibility) が pass
+- [x] `libs/infrastructure/src/tddd/catalogue_bulk_loader.rs` が存在し `load_all_catalogues(track_dir, rules_path, trusted_root) -> Result<(Vec<LayerId>, BTreeMap<LayerId, TypeCatalogueDocument>), LoadAllCataloguesError>` が提供されている
+- [x] 不在カタログに対して `LoadAllCataloguesError::CatalogueNotFound { layer_id, path }` が返される (`test_load_all_catalogues_missing_catalogue_returns_error_not_skip`)
+- [x] symlink injection が fail-closed で拒否される (`test_load_all_catalogues_rejects_symlink_catalogue`, `#[cfg(unix)]`)
+- [x] `extract_type_names` が `pub(crate)` 昇格されている (infrastructure 内の他モジュール / tests から参照可能。`test_extract_type_names_is_reusable_from_this_module` で visibility を確認)
+- [x] layer_order が `may_depend_on` のトポロジカル順 (依存なし層が左端) であることが assert される (`test_load_all_catalogues_happy_path_sorts_topologically` — fixture は `infrastructure → usecase → domain` の逆順で並べ、`load_all_catalogues` が `[domain, usecase, infrastructure]` を返すことを確認)
+- [x] unit tests (正常 load / 不在エラー / symlink 拒否 / topo_sort / visibility + cycle 検出 / tie-order / deps-outside-enabled) 合計 7 tests が pass
+- [x] `LayerId` nutype VO が `libs/domain/src/tddd/layer_id.rs` に追加された (T004 acceptance criterion の一部を本 task で先行導入 — `Vec<LayerId>` 戻り値の型要件ため。残りの VOs (`ContractMapContent` / `ContractMapRenderOptions`) + port traits は T004 で追加)
+- [x] domain `ValidationError` に `InvalidLayerId(String)` variant を追加
+- [x] Dead code として設計段階に書いた `LoadAllCataloguesError::UnknownDependency` variant は実装レビュー時に削除 (topological_sort が enabled set 外の deps を silently ignore するため到達不能)
 
 ### T003: Contract Map pure render module
 
@@ -109,8 +112,8 @@ cargo run --quiet -p cli -- track type-graph tddd-contract-map-phase1-2026-04-17
 
 | Task | Status | Commit | Notes |
 |------|--------|--------|-------|
-| T001 | Implemented (pre-commit) |  | ADR 2026-04-16-2200 §D10 新設 + ADR 2026-04-17-1528 §Q6 Resolved 注記。§D3 表は計画時点で既に整合済みだった。verify-arch-docs / verify-doc-links pass |
-| T002 | Pending |  |  |
+| T001 | Done | `9a69df07bd5d98adb3c8d9de935e9527010e9758` | ADR 2026-04-16-2200 §D10 新設 + ADR 2026-04-17-1528 §Q6 Resolved 注記。§D3 表は計画時点で既に整合済みだった。verify-arch-docs / verify-doc-links pass |
+| T002 | Implemented (pre-commit, in_progress) |  | `libs/domain/src/tddd/layer_id.rs` (LayerId nutype) + `libs/infrastructure/src/tddd/catalogue_bulk_loader.rs` (load_all_catalogues + topological_sort + parse_may_depend_on) + `extract_type_names` pub(crate) 昇格。clippy / nextest (2062 tests) pass。done 遷移は一括フロー準拠で全 task 完了後に実施 (task-completion-flow.md 正式フロー) |
 | T003 | Pending |  |  |
 | T004 | Pending |  |  |
 | T005 | Pending |  |  |
