@@ -14,19 +14,19 @@
   "capabilities": {
     "orchestrator": {
       "provider": "claude",
-      "model": "claude-opus-4-6"
+      "model": "claude-opus-4-7"
     },
     "planner": {
       "provider": "claude",
-      "model": "claude-opus-4-6"
+      "model": "claude-opus-4-7"
     },
     "designer": {
       "provider": "claude",
-      "model": "claude-opus-4-6"
+      "model": "claude-opus-4-7"
     },
     "implementer": {
       "provider": "claude",
-      "model": "claude-opus-4-6"
+      "model": "claude-opus-4-7"
     },
     "reviewer": {
       "provider": "codex",
