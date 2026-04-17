@@ -19,7 +19,7 @@ const SETTINGS_LOCAL_PATH: &str = ".claude/settings.local.json";
 const PERMISSION_EXTENSIONS_PATH: &str = ".claude/permission-extensions.json";
 const AGENTS_DIR: &str = ".claude/agents";
 
-const REQUIRED_AGENT_FILES: &[&str] = &["orchestrator.md", "rust-implementation-lead.md"];
+const REQUIRED_AGENT_FILES: &[&str] = &["review-fix-lead.md", "planner.md", "designer.md"];
 
 // ---------------------------------------------------------------------------
 // Static regexes (known-valid patterns compiled once)
@@ -293,7 +293,7 @@ const EXPECTED_DENY: &[(&str, &str)] = &[
 // ---------------------------------------------------------------------------
 
 const SUBAGENT_MODEL_ALLOWLIST: &[&str] =
-    &["claude-sonnet-4-6", "claude-opus-4-6", "claude-haiku-4-5-20251001"];
+    &["claude-sonnet-4-6", "claude-opus-4-7", "claude-haiku-4-5-20251001"];
 
 // ---------------------------------------------------------------------------
 // Constants: allowed extra git subcommands in permission-extensions.json
