@@ -1,6 +1,61 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:24:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalogue_file` is rebuilt here as the default `<layer_id>-types.json`, but `TrackBlobReader::read_type_catalogue` can resolve an explicit `tddd.catalogue_file` override from `architecture-rules.json`. For a layer configured with a non-default file name, the merge gate will read the correct file yet report any Red/Yellow findings against a different, nonexistent filename, unlike the CI path which passes the resolved `binding.catalogue_file()`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:25:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `catalogue_file` is rebuilt as `format!(\"{layer_id}-types.json\")`, but `read_type_catalogue()` can read an explicit `tddd.catalogue_file` override from `architecture-rules.json`. When a layer uses a non-default catalogue filename, Stage 2 findings will point at the wrong file name, which breaks the new contract that `check_type_signals` diagnostics name the actual catalogue being validated.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:26:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
+          "at": "2026-04-17T01:33:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
+          "at": "2026-04-17T01:34:50Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -75,6 +130,24 @@
           "findings": [],
           "hash": "rvw1:sha256:f40a614e81feb2ba68f702a0b883e731bf80071e4c8e5d5029e872292b7d252e",
           "at": "2026-04-17T04:50:12Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
+          "at": "2026-04-17T01:24:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
+          "at": "2026-04-17T01:25:14Z"
         }
       ]
     },
@@ -705,24 +778,6 @@
         }
       ]
     },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
-          "at": "2026-04-17T01:24:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
-          "at": "2026-04-17T01:25:14Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -1274,61 +1329,87 @@
           "findings": [],
           "hash": "rvw1:sha256:147fdb5dd8796c688302f61baff1825a1c37351887c8599663f7afacbc8de20f",
           "at": "2026-04-17T05:06:16Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` overstates T003 coverage: the result table says \"ClusterPlan module + 7 tests\", but the task spec in `metadata.json` and `plan.md` says this module should have 6 unit tests. Please make the verification record match the actual test count.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 104,
+              "category": "factual"
+            }
+          ],
+          "hash": "rvw1:sha256:b40f4fe70095ffcd26b7140a5f35a771a10867628d44576fdb1d9c386c168a65",
+          "at": "2026-04-17T05:08:09Z"
+        },
+        {
+          "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
-          "at": "2026-04-17T01:24:25Z"
+          "hash": "rvw1:sha256:b40f4fe70095ffcd26b7140a5f35a771a10867628d44576fdb1d9c386c168a65",
+          "at": "2026-04-17T05:09:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is undercounted in the audit trail. `libs/infrastructure/src/tddd/type_graph_cluster.rs` has 9 `#[test]` functions, including `test_classify_types_depth_zero_cross_edges_always_empty`, `test_classify_types_depth_zero_empty_graph_still_yields_single_cluster`, and `test_cross_edges_absent_type_maps_to_unresolved_at_depth_one`, but the docs still describe the task as `6 spec'd tests + 1 RFL-added guard` and `metadata.json:121` / `plan.md:34-36` say `6 unit tests`. That makes the verification record factually stale.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 104,
+              "category": "factual_error"
+            }
+          ],
+          "hash": "rvw1:sha256:2a8da5fa26225887bf3cbd2ddd1e136f42f0cfdc54415d8c29108e6d0c800743",
+          "at": "2026-04-17T05:12:36Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`catalogue_file` is rebuilt here as the default `<layer_id>-types.json`, but `TrackBlobReader::read_type_catalogue` can resolve an explicit `tddd.catalogue_file` override from `architecture-rules.json`. For a layer configured with a non-default file name, the merge gate will read the correct file yet report any Red/Yellow findings against a different, nonexistent filename, unlike the CI path which passes the resolved `binding.catalogue_file()`.",
+              "message": "The T006 measurement table is labeled as reporting `node / edge / cluster` counts, but the fourth column records only grouped cross-cluster links (`10 groups`, `0 groups`, `0 groups`) rather than actual edge totals. That materially understates the generated graphs: the committed artifacts show 68 intra-cluster + 24 cross-cluster edges for `domain`, 11 edges for `usecase`, and 21 for `infrastructure`. As written, this section does not satisfy the stated `edge`-count requirement and records incorrect measurements.",
               "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 220,
-              "category": "correctness"
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 113,
+              "category": "measurement"
             }
           ],
-          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
-          "at": "2026-04-17T01:25:35Z"
+          "hash": "rvw1:sha256:2a8da5fa26225887bf3cbd2ddd1e136f42f0cfdc54415d8c29108e6d0c800743",
+          "at": "2026-04-17T05:15:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f5b12e5bc813d7b8804bc973f7661c0a4c54fbff2f9b258818da2ff56f3da16",
+          "at": "2026-04-17T05:18:38Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `catalogue_file` is rebuilt as `format!(\"{layer_id}-types.json\")`, but `read_type_catalogue()` can read an explicit `tddd.catalogue_file` override from `architecture-rules.json`. When a layer uses a non-default catalogue filename, Stage 2 findings will point at the wrong file name, which breaks the new contract that `check_type_signals` diagnostics name the actual catalogue being validated.",
+              "message": "The T006 measurement table no longer records per-layer edge counts even though the section is titled `node / edge / cluster 数`. The new column at line 113 is only `Cross-cluster edge groups (overview)`, which is a different metric: for example, the generated `domain-graph/*.md` files sum to 92 concrete edges (68 intra-cluster + 24 cross-cluster references), while the table reports only `10 groups`. This leaves the required empirical edge-count measurement missing/misrepresented.",
               "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 220,
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 113,
               "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
-          "at": "2026-04-17T01:26:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
-          "at": "2026-04-17T01:33:36Z"
+          "hash": "rvw1:sha256:8f5b12e5bc813d7b8804bc973f7661c0a4c54fbff2f9b258818da2ff56f3da16",
+          "at": "2026-04-17T05:22:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
-          "at": "2026-04-17T01:34:50Z"
+          "hash": "rvw1:sha256:3dcf1bd014966f49f2a9efa4191a633eeb47ac135ca6bfeed522e59badbf9b0a",
+          "at": "2026-04-17T05:24:13Z"
         }
       ]
     }

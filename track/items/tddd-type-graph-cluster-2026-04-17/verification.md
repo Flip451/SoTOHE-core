@@ -101,20 +101,27 @@ cargo run --quiet -p cli -- track type-signals <task> --layer usecase
 |------|--------|--------|-------|
 | T001 | Done | `f49c9f8` | TDDD-BUG-02 — catalogue_file 引数追加 + port sig change ripple |
 | T002 | Done | `76e8ad1` | TDDD-Q01 — SECTIONS 網羅テスト (exhaustive 13 variants) |
-| T003 | Done | `55d180b` | ClusterPlan module + 7 tests; 5-round review cycle |
+| T003 | Done | `55d180b` | ClusterPlan module + 9 tests total (6 spec'd + 3 RFL-added: depth-0 cross-edges, depth-0 empty-graph, absent-type→unresolved); 5-round review cycle |
 | T004 | Done | `4bcc65b` | write_type_graph_dir + stale cleanup + 9 P1 fixes |
 | T005 | Done | `9b57621` | Fields + Impls edges; 6 P1 fixes; trait stadium nodes |
-| T006 | Done (this task) | _— (about to commit)_ | verification.md + ADR 実測補強 |
+| T006 | Done | `a354410` | verification.md + ADR 実測補強 + 44 generated cluster mermaid files |
 
 ## Empirical Measurement (T006, 2026-04-17)
 
 ### 3 層 node / edge / cluster 数 (cluster_depth=2, edges=all)
 
-| Layer | Total types | Clusters | Cross-cluster edges | Notes |
-|---|---|---|---|---|
-| domain | 110 | **17** (depth 2) | 10 groups | `domain::review_v2` cluster: 26 types, 7 intra-cluster edges |
-| usecase | 35 | **11** (depth 2) | 0 groups | 各 cluster が独立 (traits/impls 分離で cross-edge 少ない) |
-| infrastructure | 52 | **13** (depth 2) | 0 groups | 同上 (adapter が外向き依存のみ) |
+| Layer | Types | Clusters (depth 2) | Intra-edges (sum) | Cross-cluster refs (sum) | Overview edge groups | Notes |
+|---|---|---|---|---|---|---|
+| domain | 110 | 17 | 68 | 24 | 10 | `domain::review_v2` 最大 cluster (26 types); `domain::spec` 最密 (11 types / 15 intra / 5 cross); `domain::tddd` 17 intra / 3 cross |
+| usecase | 35 | 11 | 11 | 0 | 0 | 各 usecase サブモジュールが独立 (外向き依存のみ) |
+| infrastructure | 52 | 13 | 21 | 0 | 0 | `infrastructure::schema_export_codec` が最密 (9 types / 9 intra); impl edges は overview 対象外 per T005 spec |
+
+注: 列の意味:
+- **Intra-edges (sum)** = 各 cluster 個別 .md の `N intra-cluster edges` の総和 (method + field + impl 全種含む)
+- **Cross-cluster refs (sum)** = 各 cluster 個別 .md の `N cross-cluster references` の総和 (ghost ノードとして外向き言及)
+- **Overview edge groups** = `index.md` に表示される cluster 間 aggregate 数 (`source_cluster→target_cluster` で grouping 後の種類数)
+
+Impl edges は overview から除外 (trait は cluster メンバーでないため、T005 `render_type_graph_overview` の設計決定)。usecase/infrastructure の overview edge groups が 0 なのは、これらの層の cluster 間依存が存在しないわけではなく、**impl edges を除外した後の aggregate が 0** という意味。
 
 ### cluster_depth 1 vs 2 可読性比較
 
@@ -162,4 +169,4 @@ cargo run --quiet -p cli -- track type-signals <task> --layer usecase
 
 ## Verified At
 
-_To be filled after completion._
+2026-04-17 (T006 実測 + ADR §S4/§S5 補強完了、Phase 2 (K) scope 全 6 tasks 完了)
