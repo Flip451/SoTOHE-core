@@ -102,45 +102,39 @@
     ]
   },
   "schema_version": 3,
-  "status": "planned",
+  "status": "in_progress",
   "tasks": [
     {
-      "commit_hash": null,
       "description": "TDDD-BUG-02: check_type_signals(doc, strict) に catalogue_file: &str 引数を追加。libs/domain/src/tddd/consistency.rs の定義と以下 8 tests を更新: test_check_type_signals_empty_entries_returns_error / test_check_type_signals_none_signals_returns_error / test_check_type_signals_coverage_gap_returns_error / test_check_type_signals_red_is_error_regardless_of_mode / test_check_type_signals_yellow_is_warning_in_interim_mode / test_check_type_signals_yellow_is_error_in_strict_mode / test_check_type_signals_all_blue_passes_in_both_modes / test_check_type_signals_undeclared_yellow_is_not_blocked。caller 2 箇所 (libs/usecase/src/merge_gate.rs:220 は format!(\"{layer_id}-types.json\") を渡す、libs/infrastructure/src/verify/spec_states.rs:231 は binding.catalogue_file() を渡す) を更新。エラー文言内の catalogue_file 表示を検証する test を 2 件追加。backward compat なし clean break (feedback_no_backward_compat 準拠)。",
       "id": "T001",
-      "status": "todo"
+      "status": "done"
     },
     {
-      "commit_hash": null,
       "description": "TDDD-Q01: libs/infrastructure/src/type_catalogue_render.rs に test_sections_covers_all_kind_tags を追加する。TypeDefinitionKind::kind_tag() の全 13 variants の HashSet<&str> と SECTIONS.iter().map(|s| s.kind_tag).collect::<HashSet<_>>() を assert_eq! で比較。将来 variant 追加時の SECTIONS 更新漏れを nextest で検出する exhaustive test。",
       "id": "T002",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "ClusterPlan module: libs/infrastructure/src/tddd/type_graph_cluster.rs を新設。ClusterPlan struct (depth, assignments, cross_edges) + CrossEdge struct + UNRESOLVED_CLUSTER 定数 + classify_types pure function。module_path prefix depth 段で cluster 分類、None は UNRESOLVED_CLUSTER へ。I/O なし、6 unit tests (depth 0/1/2 分類、unresolved フォールバック、cross_edges 検出)。mod.rs に登録。",
       "id": "T003",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "Cluster directory layout: libs/infrastructure/src/tddd/type_graph_render.rs に render_type_graph_clustered / render_type_graph_overview / write_type_graph_dir を追加。出力は <layer>-graph/index.md + <cluster>.md (cluster 名は :: を _ に置換)。TypeGraphRenderOptions::cluster_depth: usize (default=2) 追加。Stale file cleanup: flat→cluster で .md を削除、cluster→flat で remove_dir_all。削除前に reject_symlinks_below で二重ガード。CLI --cluster-depth N flag を追加し、>0 なら write_type_graph_dir、=0 なら既存 write_type_graph_file に dispatch。3 層 (domain/usecase/infrastructure) 全対応。6 tests 追加。",
       "id": "T004",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "Fields + Impls edges: EdgeSet::Fields (TypeNode::members の Field/Variant から A --- B) と EdgeSet::Impls (TypeNode::trait_impls から A -.-> Trait 破線) を実装。Trait ノードは classDef traitNode (stadium shape)。EdgeSet::All は 3 種の union。CLI --edges methods|fields|impls|all flag 追加。flat + cluster 両パスで edge を描画。4 tests (field edges / impl dashed / All union / trait stadium shape)。tddd-05 で利用可能な TypeNode::trait_impls を消費する。",
       "id": "T005",
       "status": "todo"
     },
     {
-      "commit_hash": null,
       "description": "Multi-layer readability verification + ADR 実測補強: 3 層 (domain/usecase/infrastructure) で sotp track type-graph --cluster-depth {1,2} --edges all を実行して生成物を目視確認。verification.md に (a) 層別 node/edge/cluster 数、(b) depth 1 vs 2 可読性比較、(c) trait impl 破線の hexagonal port/adapter 可視化の有効性、(d) deduplicate_typestate_edges default 判断 (ADR Open Questions §4 への実測解答) を記録。ADR 2026-04-16-2200 §Phase 2 Scope Update §S4 / §S5 に実測データ (具体的な node/edge/cluster 数、dedup 結論) を補強追記し、scope (K) 延期の正当性を実測で裏付ける。§Phase 2 Scope Update §S1-§S5 の構造は planning 時に既に追加済みなので、T006 の役割は実測 data による補強のみ。production code 変更なし、docs のみ。",
       "id": "T006",
       "status": "todo"
     }
   ],
   "title": "TDDD Type Graph View Phase 2 — cluster + port/adapter 可視化 + TDDD debt 返済",
-  "updated_at": "2026-04-16T16:41:25Z"
+  "updated_at": "2026-04-17T01:45:27Z"
 }

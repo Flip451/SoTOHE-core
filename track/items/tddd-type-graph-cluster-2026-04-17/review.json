@@ -1,6 +1,79 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:24:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalogue_file` is rebuilt here as the default `<layer_id>-types.json`, but `TrackBlobReader::read_type_catalogue` can resolve an explicit `tddd.catalogue_file` override from `architecture-rules.json`. For a layer configured with a non-default file name, the merge gate will read the correct file yet report any Red/Yellow findings against a different, nonexistent filename, unlike the CI path which passes the resolved `binding.catalogue_file()`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:25:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `catalogue_file` is rebuilt as `format!(\"{layer_id}-types.json\")`, but `read_type_catalogue()` can read an explicit `tddd.catalogue_file` override from `architecture-rules.json`. When a layer uses a non-default catalogue filename, Stage 2 findings will point at the wrong file name, which breaks the new contract that `check_type_signals` diagnostics name the actual catalogue being validated.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:26:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
+          "at": "2026-04-17T01:33:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
+          "at": "2026-04-17T01:34:50Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
+          "at": "2026-04-17T01:24:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
+          "at": "2026-04-17T01:25:14Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -288,6 +361,124 @@
           "findings": [],
           "hash": "rvw1:sha256:9cf0445f5b6b630334bd07ba05b0c5a9db3afab92750f37eaec6736289f2c90b",
           "at": "2026-04-17T01:14:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47369ea5c801dce37b3909dc64f50839a8f98f20306ad6b4865fa3ccda7b0d0a",
+          "at": "2026-04-17T01:18:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47369ea5c801dce37b3909dc64f50839a8f98f20306ad6b4865fa3ccda7b0d0a",
+          "at": "2026-04-17T01:19:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4de93afe75fb1caeadbd00bbeaface221848186127e79a6b2f8f66e929828d9",
+          "at": "2026-04-17T01:24:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4de93afe75fb1caeadbd00bbeaface221848186127e79a6b2f8f66e929828d9",
+          "at": "2026-04-17T01:25:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:346aa163cc499ffd196423cf414dd3edd354f4df1b74e64f8fb3788489695c5a",
+          "at": "2026-04-17T01:46:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:346aa163cc499ffd196423cf414dd3edd354f4df1b74e64f8fb3788489695c5a",
+          "at": "2026-04-17T01:46:49Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cd827433e7fdf87d7051e65f6402aa8940ce8d4c9f476d896ebf1fb7f1c5e68",
+          "at": "2026-04-17T01:24:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cd827433e7fdf87d7051e65f6402aa8940ce8d4c9f476d896ebf1fb7f1c5e68",
+          "at": "2026-04-17T01:25:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdca9de43ab09d9c40c1c191b4582ed30269c8fa5fcb941f79a08ee41dbe9973",
+          "at": "2026-04-17T01:33:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_read_type_catalogue_found` only exercises the legacy default filename (`domain-types.json`). The behavior added in this round is returning the resolved filename from `architecture-rules.json`; if `read_type_catalogue` regressed to always returning `<layer_id>-types.json` after successfully reading an override file, this test would still pass. Add a case with a non-default `tddd.catalogue_file` (and ideally a rules-file parse/fetch failure case) so the new adapter contract is actually covered.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 362,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:bdca9de43ab09d9c40c1c191b4582ed30269c8fa5fcb941f79a08ee41dbe9973",
+          "at": "2026-04-17T01:35:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated `test_read_type_catalogue_found` still exercises only the default `domain-types.json` path. This round’s behavioral change is specifically about honoring `tddd.catalogue_file` overrides and returning the resolved filename in `Found((doc, filename))`, so an implementation that always returned `{layer_id}-types.json` would still pass. Add a fixture with `architecture-rules.json` pointing at a non-default catalogue filename and assert that `read_type_catalogue()` returns that override.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 362,
+              "category": "tests"
+            },
+            {
+              "message": "All `verify_from_spec_json` fixtures still hard-code `catalogue_file: \"domain-types.json\"`. Because `evaluate_layer_catalogue()` now forwards `binding.catalogue_file()` into `check_type_signals`, the CI path has no regression test for a non-default override; a bug that fell back to the default filename in diagnostics would still pass here. Add a Stage 2 fixture that uses a non-default catalogue file (for example `usecase-types.json`) and assert the finding mentions that configured filename.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 612,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:bdca9de43ab09d9c40c1c191b4582ed30269c8fa5fcb941f79a08ee41dbe9973",
+          "at": "2026-04-17T01:38:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93ac59868a4b73820f49fdc3ecef0e661c9a47785bbd95d76e4d562a52db4147",
+          "at": "2026-04-17T01:43:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93ac59868a4b73820f49fdc3ecef0e661c9a47785bbd95d76e4d562a52db4147",
+          "at": "2026-04-17T01:44:56Z"
         }
       ]
     }

@@ -63,12 +63,19 @@ pub trait TrackBlobReader {
     /// `usecase-types.json`, …). Returns `NotFound` when the file does not
     /// exist on the target ref — this corresponds to "TDDD not active for
     /// this layer" per ADR §D2.1.
+    ///
+    /// The `Found` variant returns `(doc, catalogue_file)` where
+    /// `catalogue_file` is the resolved filename the adapter actually read
+    /// (honoring `architecture-rules.json` `tddd.catalogue_file` overrides).
+    /// Downstream diagnostics (e.g. `check_type_signals`) must use this
+    /// resolved name, not a layer-id derived default, so error messages
+    /// point at the real file on disk.
     fn read_type_catalogue(
         &self,
         branch: &str,
         track_id: &str,
         layer_id: &str,
-    ) -> BlobFetchResult<TypeCatalogueDocument>;
+    ) -> BlobFetchResult<(TypeCatalogueDocument, String)>;
 
     /// Reads and decodes `track/items/<track_id>/metadata.json` into a
     /// [`TrackMetadata`] aggregate.
@@ -216,8 +223,8 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
                     "failed to read {layer_id}-types.json on origin/{branch}: {msg}"
                 ))]));
             }
-            BlobFetchResult::Found(dt_doc) => {
-                outcome.merge(check_type_signals(&dt_doc, /* strict */ true));
+            BlobFetchResult::Found((dt_doc, catalogue_file)) => {
+                outcome.merge(check_type_signals(&dt_doc, /* strict */ true, &catalogue_file));
             }
         }
     }
@@ -279,12 +286,18 @@ mod tests {
             &self,
             _branch: &str,
             _track_id: &str,
-            _layer_id: &str,
-        ) -> BlobFetchResult<TypeCatalogueDocument> {
+            layer_id: &str,
+        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
             if self.dt_unreachable {
                 panic!("Stage 2 must not be reached: read_type_catalogue was called unexpectedly");
             }
-            self.dt.borrow_mut().take().expect("dt read called twice")
+            match self.dt.borrow_mut().take().expect("dt read called twice") {
+                BlobFetchResult::Found(doc) => {
+                    BlobFetchResult::Found((doc, format!("{layer_id}-types.json")))
+                }
+                BlobFetchResult::NotFound => BlobFetchResult::NotFound,
+                BlobFetchResult::FetchError(msg) => BlobFetchResult::FetchError(msg),
+            }
         }
 
         fn read_track_metadata(
@@ -338,7 +351,7 @@ mod tests {
             branch: &str,
             track_id: &str,
             _layer_id: &str,
-        ) -> BlobFetchResult<TypeCatalogueDocument> {
+        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
             *self.recorded_dt_branch.borrow_mut() = Some(branch.to_owned());
             *self.recorded_dt_track_id.borrow_mut() = Some(track_id.to_owned());
             BlobFetchResult::NotFound
@@ -761,8 +774,14 @@ mod tests {
             _branch: &str,
             _track_id: &str,
             layer_id: &str,
-        ) -> BlobFetchResult<TypeCatalogueDocument> {
-            self.catalogues.get(layer_id).cloned().unwrap_or(BlobFetchResult::NotFound)
+        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+            match self.catalogues.get(layer_id).cloned().unwrap_or(BlobFetchResult::NotFound) {
+                BlobFetchResult::Found(doc) => {
+                    BlobFetchResult::Found((doc, format!("{layer_id}-types.json")))
+                }
+                BlobFetchResult::NotFound => BlobFetchResult::NotFound,
+                BlobFetchResult::FetchError(msg) => BlobFetchResult::FetchError(msg),
+            }
         }
 
         fn read_track_metadata(
