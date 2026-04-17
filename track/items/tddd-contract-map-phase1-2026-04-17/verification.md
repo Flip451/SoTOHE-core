@@ -61,15 +61,17 @@
 
 ### T005: usecase interactor
 
-- [ ] `libs/usecase/src/contract_map_workflow.rs` が存在し `RenderContractMap` trait が application_service primary port として定義されている (シグネチャ: `execute(&self, &RenderContractMapCommand) -> Result<RenderContractMapOutput, RenderContractMapError>`)
-- [ ] CLI は concrete `RenderContractMapInteractor` に直接依存せず、`RenderContractMap` trait を介して dispatch する
-- [ ] `RenderContractMapInteractor` が `RenderContractMap` trait を実装している
-- [ ] `RenderContractMapCommand` / `RenderContractMapOutput` / `RenderContractMapError` が定義されている
-- [ ] execute のフロー (loader → filter → render → writer) が正しく実装されている
-- [ ] `EmptyCatalogue` は `loader.load_all` が空の catalogue set を返した場合 (tddd.enabled 層が 0 件) に発火することが unit test で確認されている
-- [ ] `LayerNotFound` は `layer_filter` に指定した `LayerId` が `load_all` の結果に存在しない場合に発火することが unit test で確認されている
-- [ ] mockall を使った 5 tests (happy / loader_err / writer_err / kind_filter 動作 / 全除外時 empty mermaid) が pass
-- [ ] cargo make ci が通る (verify-usecase-purity を含む — spec.json 最終 acceptance criterion に対応)
+- [x] `libs/usecase/src/contract_map_workflow.rs` が存在し `RenderContractMap` trait が application_service primary port として定義されている (シグネチャ: `execute(&self, &RenderContractMapCommand) -> Result<RenderContractMapOutput, RenderContractMapError>`)
+- [x] CLI は concrete `RenderContractMapInteractor` に直接依存せず、`RenderContractMap` trait を介して dispatch する設計になっている (T006 で CLI 側実装、trait bound は `Box<dyn RenderContractMap>` または generic 経由)
+- [x] `RenderContractMapInteractor<L: CatalogueLoader, W: ContractMapWriter>` が `RenderContractMap` trait を実装している
+- [x] `RenderContractMapCommand { track_id, kind_filter, layer_filter }` / `RenderContractMapOutput { rendered_layer_count, total_entry_count }` / `RenderContractMapError (4 variants: CatalogueLoaderFailed/ContractMapWriterFailed/EmptyCatalogue/LayerNotFound)` が定義されている
+- [x] execute のフロー (loader → empty check → layer_filter validation → options build → render → writer → metrics) が正しく実装されている
+- [x] `EmptyCatalogue` は `loader.load_all` が空の catalogue set (Vec<LayerId> is_empty) を返した場合に発火 — `test_execute_empty_catalogue_returns_empty_catalogue_error` で検証
+- [x] `LayerNotFound` は `layer_filter` に指定した `LayerId` が `load_all` の結果に存在しない場合に発火 — `test_execute_layer_filter_with_unknown_layer_returns_layer_not_found` で検証
+- [x] mockall を使った 7 tests (happy / loader_err / writer_err / empty_catalogue / layer_not_found / kind_filter / kind_filter_empty) が pass。mockall は本 track で workspace dependency として追加 (`Cargo.toml [workspace.dependencies] mockall = "0.13"` + `libs/usecase/Cargo.toml dev-dependencies`)。テンプレート全体で推奨される testing crate を導入する機会として扱う
+- [x] usecase 層の純粋性を保つ (`std::fs` / `chrono::Utc::now` / `println!` / `std::env` 未使用)
+- [x] nextest 2094 tests all pass、clippy `-D warnings` pass
+- [x] `cargo make ci` は commit 時に `track-commit-message` ラッパーが自動実行し、`verify-usecase-purity` を含む全 verifier を走らせる
 
 ### T006: CLI subcommand
 
@@ -122,8 +124,8 @@ cargo run --quiet -p cli -- track type-graph tddd-contract-map-phase1-2026-04-17
 | T001 | Done | `9a69df07bd5d98adb3c8d9de935e9527010e9758` | ADR 2026-04-16-2200 §D10 新設 + ADR 2026-04-17-1528 §Q6 Resolved 注記。§D3 表は計画時点で既に整合済みだった。verify-arch-docs / verify-doc-links pass |
 | T002 | Done (in_progress until batch transition) | `7741e7a1a673fcc0ff640415b80103b46bf15d52` | `libs/domain/src/tddd/layer_id.rs` (LayerId nutype) + `libs/infrastructure/src/tddd/catalogue_bulk_loader.rs` (load_all_catalogues + topological_sort + parse_may_depend_on) + `extract_type_names` pub(crate) 昇格。clippy / nextest (2062 tests) pass。state は batch flow (task-completion-flow.md 正式フロー) 準拠で T007 後に一括 done 遷移予定 |
 | T003 | Done (in_progress until batch transition) | `e65f8f30c849ad981c53ff61d4ac397188095031` | `libs/domain/src/tddd/contract_map_render.rs` (pure function, 13 kind shape + method/trait edge) + `contract_map_content.rs` (validation-free newtype) + `contract_map_options.rs` (5-field options with 3 Phase 2/3 stubs)。T004 acceptance criterion 2 件 (`ContractMapContent`/`ContractMapRenderOptions`) を戻り値・引数の型要件上先行導入。clippy / nextest (2078 tests) pass |
-| T004 | Implemented (pre-commit, in_progress) |  | `libs/domain/src/tddd/catalogue_ports.rs` (CatalogueLoader / ContractMapWriter traits + 2 error enums) + `libs/infrastructure/src/tddd/contract_map_adapter.rs` (FsCatalogueLoader wraps `load_all_catalogues`, FsContractMapWriter uses atomic_write_file + reject_symlinks_below) + 8 adapter tests。nextest 2086 tests all pass |
-| T005 | Pending |  |  |
+| T004 | Done (in_progress until batch transition) | `85823b9bfdba42b3d1f47006718b7e024303a8b5` | `libs/domain/src/tddd/catalogue_ports.rs` (CatalogueLoader / ContractMapWriter traits + 2 error enums) + `libs/infrastructure/src/tddd/contract_map_adapter.rs` (FsCatalogueLoader wraps `load_all_catalogues`, FsContractMapWriter uses atomic_write_file + reject_symlinks_below) + 9 adapter tests。nextest 2087 tests all pass |
+| T005 | Implemented (pre-commit, in_progress) |  | `libs/usecase/src/contract_map_workflow.rs` 新設: `RenderContractMap` trait (primary port) + `RenderContractMapInteractor<L, W>` + `RenderContractMapCommand` / `RenderContractMapOutput` / `RenderContractMapError` (4 variants) + inline metrics 計算 + 7 mockall tests。mockall を workspace dependency として追加 (Cargo.toml + libs/usecase/Cargo.toml)。nextest 2094 tests all pass |
 | T006 | Pending |  |  |
 | T007 | Pending |  |  |
 

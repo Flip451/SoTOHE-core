@@ -17,5 +17,6 @@ serde_json = "1.0.149"
 thiserror = { workspace = true }
 
 [dev-dependencies]
+mockall = { workspace = true }
 rstest = { workspace = true }
 tempfile = "3.27.0"
