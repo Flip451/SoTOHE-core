@@ -75,11 +75,14 @@
 
 ### T006: CLI subcommand
 
-- [ ] `apps/cli/src/commands/track/tddd/contract_map.rs` が存在する
-- [ ] `sotp track contract-map <track-id> [--kind-filter k1,k2] [--layers l1,l2]` が動作する
-- [ ] `apps/cli/src/commands/track/tddd/mod.rs` および `apps/cli/src/commands/track/mod.rs` にサブコマンドが登録されている
-- [ ] 既存 type-graph の動作に影響がない (既存 tests が pass)
-- [ ] --help 出力が spec / ADR と一致する
+- [x] `apps/cli/src/commands/track/tddd/contract_map.rs` が存在する
+- [x] `sotp track contract-map <track-id> [--kind-filter k1,k2] [--layers l1,l2] [--items-dir PATH] [--workspace-root PATH]` が動作する (clap `ContractMap { items_dir, track_id, workspace_root, kind_filter, layers }` variant + dispatch)
+- [x] `apps/cli/src/commands/track/tddd/mod.rs` (pub(crate) mod contract_map) および `apps/cli/src/commands/track/mod.rs` (TrackCommand::ContractMap variant + execute dispatch) にサブコマンドが登録されている
+- [x] 既存 type-graph の動作に影響なし (type-graph tests 全て pass、nextest 2108 tests all green)
+- [x] CLI は composition root で `RenderContractMapInteractor` を構築し、`RenderContractMap` primary port trait 経由で dispatch する (`let renderer: &dyn RenderContractMap = &interactor;`)
+- [x] 13 kind_tag + layer id パース: `parse_kind_filter` 7 tests (round-trip / trim / case-insensitive / unknown-rejection / empty) / `parse_layer_filter` 4 tests (single / multiple / trim / invalid) で検証
+- [x] Active-track guard (`ensure_active_track`) + track metadata 読み出し (`read_track_metadata`) を type-graph / type-signals と同じ順序で実行
+- [x] clippy `-D warnings` pass、nextest 2108 tests all pass (T006 新規 14 tests 追加)
 
 ### T007: Layer-agnostic fixture tests
 
@@ -125,8 +128,8 @@ cargo run --quiet -p cli -- track type-graph tddd-contract-map-phase1-2026-04-17
 | T002 | Done (in_progress until batch transition) | `7741e7a1a673fcc0ff640415b80103b46bf15d52` | `libs/domain/src/tddd/layer_id.rs` (LayerId nutype) + `libs/infrastructure/src/tddd/catalogue_bulk_loader.rs` (load_all_catalogues + topological_sort + parse_may_depend_on) + `extract_type_names` pub(crate) 昇格。clippy / nextest (2062 tests) pass。state は batch flow (task-completion-flow.md 正式フロー) 準拠で T007 後に一括 done 遷移予定 |
 | T003 | Done (in_progress until batch transition) | `e65f8f30c849ad981c53ff61d4ac397188095031` | `libs/domain/src/tddd/contract_map_render.rs` (pure function, 13 kind shape + method/trait edge) + `contract_map_content.rs` (validation-free newtype) + `contract_map_options.rs` (5-field options with 3 Phase 2/3 stubs)。T004 acceptance criterion 2 件 (`ContractMapContent`/`ContractMapRenderOptions`) を戻り値・引数の型要件上先行導入。clippy / nextest (2078 tests) pass |
 | T004 | Done (in_progress until batch transition) | `85823b9bfdba42b3d1f47006718b7e024303a8b5` | `libs/domain/src/tddd/catalogue_ports.rs` (CatalogueLoader / ContractMapWriter traits + 2 error enums) + `libs/infrastructure/src/tddd/contract_map_adapter.rs` (FsCatalogueLoader wraps `load_all_catalogues`, FsContractMapWriter uses atomic_write_file + reject_symlinks_below) + 9 adapter tests。nextest 2087 tests all pass |
-| T005 | Implemented (pre-commit, in_progress) |  | `libs/usecase/src/contract_map_workflow.rs` 新設: `RenderContractMap` trait (primary port) + `RenderContractMapInteractor<L, W>` + `RenderContractMapCommand` / `RenderContractMapOutput` / `RenderContractMapError` (4 variants) + inline metrics 計算 + 7 mockall tests。mockall を workspace dependency として追加 (Cargo.toml + libs/usecase/Cargo.toml)。nextest 2094 tests all pass |
-| T006 | Pending |  |  |
+| T005 | Done (in_progress until batch transition) | `0a3a540a318f47e9a0b14e6c8be976bf43460552` | `libs/usecase/src/contract_map_workflow.rs` 新設: `RenderContractMap` trait (primary port) + `RenderContractMapInteractor<L, W>` + `RenderContractMapCommand` / `RenderContractMapOutput` / `RenderContractMapError` (4 variants) + inline metrics 計算 + 7 mockall tests。mockall を workspace dependency として追加 (Cargo.toml + libs/usecase/Cargo.toml)。nextest 2094 tests all pass |
+| T006 | Implemented (pre-commit, in_progress) |  | `apps/cli/src/commands/track/tddd/contract_map.rs` (execute_contract_map + parse_kind_filter + parse_layer_filter + 14 tests) + `tddd/mod.rs` (pub(crate) mod 登録) + `track/mod.rs` (TrackCommand::ContractMap variant + dispatch)。CLI → RenderContractMap primary port trait 経由 dispatch。nextest 2108 tests all pass |
 | T007 | Pending |  |  |
 
 ## Open Issues
