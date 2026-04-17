@@ -1,61 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
-          "at": "2026-04-17T01:24:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`catalogue_file` is rebuilt here as the default `<layer_id>-types.json`, but `TrackBlobReader::read_type_catalogue` can resolve an explicit `tddd.catalogue_file` override from `architecture-rules.json`. For a layer configured with a non-default file name, the merge gate will read the correct file yet report any Red/Yellow findings against a different, nonexistent filename, unlike the CI path which passes the resolved `binding.catalogue_file()`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 220,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
-          "at": "2026-04-17T01:25:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `catalogue_file` is rebuilt as `format!(\"{layer_id}-types.json\")`, but `read_type_catalogue()` can read an explicit `tddd.catalogue_file` override from `architecture-rules.json`. When a layer uses a non-default catalogue filename, Stage 2 findings will point at the wrong file name, which breaks the new contract that `check_type_signals` diagnostics name the actual catalogue being validated.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 220,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
-          "at": "2026-04-17T01:26:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
-          "at": "2026-04-17T01:33:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
-          "at": "2026-04-17T01:34:50Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -1250,6 +1195,140 @@
           "findings": [],
           "hash": "rvw1:sha256:f523fdd2bac329d90963f56ffff31ee0354de51b204ab1439416fd658b306502",
           "at": "2026-04-17T04:24:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13f1e9b2cc95dfa8922c53b7768fe59069fc0a98eb3d3f5bddfb90ad7041e5bf",
+          "at": "2026-04-17T04:50:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13f1e9b2cc95dfa8922c53b7768fe59069fc0a98eb3d3f5bddfb90ad7041e5bf",
+          "at": "2026-04-17T04:52:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The infrastructure row in `verification.md` is off: the 13 `infrastructure-graph/*.md` cluster files sum to 52 types, not 50, so the derived `~3.8 types/cluster` is also wrong (it is closer to 4.0).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 117,
+              "category": "correctness"
+            },
+            {
+              "message": "§S5.1 in the ADR repeats the same infrastructure miscount: it states `50` total types and `~3.8` types/cluster, but the generated cluster files add up to 52 types.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+              "line": 525,
+              "category": "correctness"
+            },
+            {
+              "message": "T006 is still marked `in_progress` in `metadata.json`, which conflicts with the updated verification table marking the task done and leaves the track state inconsistent for downstream automation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "line": 140,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:cb5c0b10526e55d9918bcf095611af26ef194cc9381377620732ca4e0a3e5e75",
+          "at": "2026-04-17T04:58:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c05f471910eecb621dcb55ef03c30c3a466b7101d451a52b7c223338f1ea20b",
+          "at": "2026-04-17T05:00:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ADR summary says depth=2 yields \"10-30 types/cluster\", but the generated cluster artifacts in this change show a much smaller distribution: domain clusters range from 1 to 26 types, usecase from 1 to 6, and infrastructure from 1 to 10. That makes the empirical claim inaccurate and it should be rewritten to match the measured headers in the generated `*-graph/*.md` files.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+              "line": 529,
+              "category": "correctness"
+            },
+            {
+              "message": "The depth=2 readability table claims the per-cluster markdowns stay around \"~20-30 node\", but the generated files in this patch do not support that: most clusters are single-digit sizes and the largest cluster is 26 types. This is a factual mismatch in the recorded measurement section.",
+              "severity": "P1",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "line": 124,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8c05f471910eecb621dcb55ef03c30c3a466b7101d451a52b7c223338f1ea20b",
+          "at": "2026-04-17T05:02:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:147fdb5dd8796c688302f61baff1825a1c37351887c8599663f7afacbc8de20f",
+          "at": "2026-04-17T05:06:16Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:24:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalogue_file` is rebuilt here as the default `<layer_id>-types.json`, but `TrackBlobReader::read_type_catalogue` can resolve an explicit `tddd.catalogue_file` override from `architecture-rules.json`. For a layer configured with a non-default file name, the merge gate will read the correct file yet report any Red/Yellow findings against a different, nonexistent filename, unlike the CI path which passes the resolved `binding.catalogue_file()`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:25:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `catalogue_file` is rebuilt as `format!(\"{layer_id}-types.json\")`, but `read_type_catalogue()` can read an explicit `tddd.catalogue_file` override from `architecture-rules.json`. When a layer uses a non-default catalogue filename, Stage 2 findings will point at the wrong file name, which breaks the new contract that `check_type_signals` diagnostics name the actual catalogue being validated.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:26:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
+          "at": "2026-04-17T01:33:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
+          "at": "2026-04-17T01:34:50Z"
         }
       ]
     }

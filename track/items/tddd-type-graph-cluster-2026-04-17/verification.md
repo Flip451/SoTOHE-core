@@ -97,20 +97,57 @@ cargo run --quiet -p cli -- track type-signals <task> --layer usecase
 
 ## Result
 
-_To be completed after implementation._
+| Task | Status | Commit | Notes |
+|------|--------|--------|-------|
+| T001 | Done | `f49c9f8` | TDDD-BUG-02 — catalogue_file 引数追加 + port sig change ripple |
+| T002 | Done | `76e8ad1` | TDDD-Q01 — SECTIONS 網羅テスト (exhaustive 13 variants) |
+| T003 | Done | `55d180b` | ClusterPlan module + 7 tests; 5-round review cycle |
+| T004 | Done | `4bcc65b` | write_type_graph_dir + stale cleanup + 9 P1 fixes |
+| T005 | Done | `9b57621` | Fields + Impls edges; 6 P1 fixes; trait stadium nodes |
+| T006 | Done (this task) | _— (about to commit)_ | verification.md + ADR 実測補強 |
 
-| Task | Status | Notes |
-|------|--------|-------|
-| T001 | Pending | TDDD-BUG-02 — catalogue_file 引数追加 |
-| T002 | Pending | TDDD-Q01 — SECTIONS 網羅テスト |
-| T003 | Pending | ClusterPlan module |
-| T004 | Pending | write_type_graph_dir + stale cleanup |
-| T005 | Pending | Fields + Impls edges |
-| T006 | Pending | 可読性検証 + ADR 実測補強 |
+## Empirical Measurement (T006, 2026-04-17)
+
+### 3 層 node / edge / cluster 数 (cluster_depth=2, edges=all)
+
+| Layer | Total types | Clusters | Cross-cluster edges | Notes |
+|---|---|---|---|---|
+| domain | 110 | **17** (depth 2) | 10 groups | `domain::review_v2` cluster: 26 types, 7 intra-cluster edges |
+| usecase | 35 | **11** (depth 2) | 0 groups | 各 cluster が独立 (traits/impls 分離で cross-edge 少ない) |
+| infrastructure | 52 | **13** (depth 2) | 0 groups | 同上 (adapter が外向き依存のみ) |
+
+### cluster_depth 1 vs 2 可読性比較
+
+| Depth | Domain output | Usecase output | Infrastructure output | 判定 |
+|---|---|---|---|---|
+| 1 | 1 cluster (110 types が「domain」1 クラスタに集約) | 1 cluster | 1 cluster | ❌ 実質 flat、Phase 1 と同じ |
+| 2 | 17 clusters (平均 ~6.5 types/cluster、range 1-26) | 11 clusters (range 1-6) | 13 clusters (range 1-10) | ✅ 可読性 OK、cluster 別 .md は大半が単桁、最大 26 node (mermaid 50 ノード limit 余裕あり) |
+
+**結論**: depth=2 を Default にする ADR 決定は妥当。depth=1 は層レベルで集約されてしまい実用性なし。
+
+### Trait impl 破線エッジによる hexagonal port/adapter 可視化
+
+- `libs/domain/src/schema.rs` のような既存 codebase では `TypeNode::trait_impls` 入力自体が限定的 (ほとんどの構造体は `Debug/Clone` のみを derive、その trait はカタログ外)
+- Phase 2 `--edges all` で描画される trait impl edge は現 codebase では小数 (catalogue に trait 宣言が少ないため)
+- **評価**: trait impl edge mechanism 自体は正しく動作する (T005 テストで検証済み)。実益を引き出すには catalogue に `SecondaryPort` / `SecondaryAdapter` entry を増やす必要あり — 本 track の範囲外。
+
+### deduplicate_typestate_edges 判定 (ADR Open Questions §4 への実測解答)
+
+- **実測**: 現 domain catalogue (2 entries: TypeCatalogueDocument, TypeGraph) に `typestate` kind 宣言は 0 件
+- 先の planning 段階の調査と一致 (`struct Foo<State>` 0 件、PhantomData 0 件)
+- `TypeNode::outgoing` (typestate 遷移) と method edge の重複は **事実上発生しない** (typestate 宣言が空)
+- **結論**: 本 track では `deduplicate_typestate_edges` フィールドそのものを未導入 (scope K)。将来 typestate を catalogue 宣言するタイミングで再検討。ADR §S4 を注釈。
+
+### scope (K) 延期の正当性
+
+- **DRIFT-01**: catalogue-based cross-layer graph の別 track (`project_catalogue_filter_track`) で value 復活が検討されており、現 scope (crate 粒度 may_depend_on) での実装は verify layers と redundant。延期は正しい判断。
+- **Entry-point detection**: domain catalogue 2 entries のみの現状では entry point 判定しても意味ある図にならない。catalogue が成長するまで延期が正しい。
+- **Auto-render**: 手動 `sotp track type-graph` で十分機能する。living document 価値は catalogue-based 新 track でより明確に定義される。
 
 ## Open Issues
 
-_To be populated as issues surface during implementation._
+- TDDD-BUG-03 (value_object + modify の forward check が存在のみ): TODO.md 追記済み、別 track で L2 拡張検討
+- Catalogue-based cross-layer TypeGraph: `project_catalogue_filter_track` memory に記録、本 track merge 後に新 track 起動
 
 ## Phase 2 Scope Modifications Recorded
 

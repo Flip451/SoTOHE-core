@@ -59,7 +59,7 @@ mermaid classDef 追加: traitNode fill:#e8f5e9,stroke:#388e3c
 既存 flat と cluster 両方のレンダリングパスで fields/impls を対応 (S004 の context で S005)
 4 tests: field edges 描画 / trait impl 破線描画 / All edge set の union / trait node stadium shape
 
-- [x] Fields + Impls edges: EdgeSet::Fields (TypeNode::members の Field/Variant から A --- B) と EdgeSet::Impls (TypeNode::trait_impls から A -.-> Trait 破線) を実装。Trait ノードは classDef traitNode (stadium shape)。EdgeSet::All は 3 種の union。CLI --edges methods|fields|impls|all flag 追加。flat + cluster 両パスで edge を描画。4 tests (field edges / impl dashed / All union / trait stadium shape)。tddd-05 で利用可能な TypeNode::trait_impls を消費する。
+- [x] Fields + Impls edges: EdgeSet::Fields (TypeNode::members の Field/Variant から A --- B) と EdgeSet::Impls (TypeNode::trait_impls から A -.-> Trait 破線) を実装。Trait ノードは classDef traitNode (stadium shape)。EdgeSet::All は 3 種の union。CLI --edges methods|fields|impls|all flag 追加。flat + cluster 両パスで edge を描画。4 tests (field edges / impl dashed / All union / trait stadium shape)。tddd-05 で利用可能な TypeNode::trait_impls を消費する。 9b576215d37c3bf04fbe63d2ff30d3542f650dd5
 
 ## S006 — Multi-layer readability verification + ADR 実測補強
 
@@ -69,4 +69,4 @@ S004 Open Question (deduplicate_typestate_edges default) の実測判断を ADR 
 ADR 2026-04-16-2200 §Phase 2 Scope Update §S4 / §S5 に実測データを補強追記する (具体的な node/edge/cluster 数、dedup 結論、scope (K) 延期の正当性の裏付け)。§S1-§S5 の本体構造は planning 時に追加済み
 このタスクは production code 変更なし、verification.md + ADR 補強追記の docs のみ
 
-- [ ] Multi-layer readability verification + ADR 実測補強: 3 層 (domain/usecase/infrastructure) で sotp track type-graph --cluster-depth {1,2} --edges all を実行して生成物を目視確認。verification.md に (a) 層別 node/edge/cluster 数、(b) depth 1 vs 2 可読性比較、(c) trait impl 破線の hexagonal port/adapter 可視化の有効性、(d) deduplicate_typestate_edges default 判断 (ADR Open Questions §4 への実測解答) を記録。ADR 2026-04-16-2200 §Phase 2 Scope Update §S4 / §S5 に実測データ (具体的な node/edge/cluster 数、dedup 結論) を補強追記し、scope (K) 延期の正当性を実測で裏付ける。§Phase 2 Scope Update §S1-§S5 の構造は planning 時に既に追加済みなので、T006 の役割は実測 data による補強のみ。production code 変更なし、docs のみ。
+- [x] Multi-layer readability verification + ADR 実測補強: 3 層 (domain/usecase/infrastructure) で sotp track type-graph --cluster-depth {1,2} --edges all を実行して生成物を目視確認。verification.md に (a) 層別 node/edge/cluster 数、(b) depth 1 vs 2 可読性比較、(c) trait impl 破線の hexagonal port/adapter 可視化の有効性、(d) deduplicate_typestate_edges default 判断 (ADR Open Questions §4 への実測解答) を記録。ADR 2026-04-16-2200 §Phase 2 Scope Update §S4 / §S5 に実測データ (具体的な node/edge/cluster 数、dedup 結論) を補強追記し、scope (K) 延期の正当性を実測で裏付ける。§Phase 2 Scope Update §S1-§S5 の構造は planning 時に既に追加済みなので、T006 の役割は実測 data による補強のみ。production code 変更なし、docs のみ。
