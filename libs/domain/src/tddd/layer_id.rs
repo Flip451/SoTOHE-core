@@ -1,23 +1,63 @@
 //! Validated architecture layer identifier.
 //!
 //! Wraps a `layers[].crate` value from `architecture-rules.json` as a
-//! `nutype`-validated newtype. Used across the TDDD contract-map pipeline to
+//! validated newtype. Used across the TDDD contract-map pipeline to
 //! eliminate raw `String` at port and adapter boundaries (ADR
 //! 2026-04-17-1528 §D1; layer-agnostic invariant §4.5).
 //!
 //! Validation rules: non-empty, first character is ASCII alphabetic, remaining
 //! characters are ASCII alphanumeric / `_` / `-`. This covers both Rust crate
 //! names (`snake_case`) and hyphenated template identifiers (`my-gateway`).
+//!
+//! **Why a hand-written newtype instead of `nutype`?** The current
+//! `schema_export` + rustdoc JSON pipeline does not resolve `pub use`
+//! aliases that point into `#[doc(hidden)]` modules, which is how
+//! `nutype` publishes its generated structs. As a result every
+//! `nutype`-wrapped type silently disappears from the rustdoc schema and
+//! the TDDD forward check classifies them as Yellow
+//! (`found_type = false`) even when they exist in the codebase. Using a
+//! plain `pub struct` here keeps `LayerId` visible to the current
+//! schema-export path and lets the catalogue entry for the type reach
+//! Blue. Properly teaching `schema_export` to follow `pub use` aliases is
+//! tracked separately — see `knowledge/strategy/TODO.md`
+//! "harness-hardening-nutype-rustdoc-support".
 
-use nutype::nutype;
+use std::fmt;
 
 use crate::ValidationError;
 
-fn validate_layer_id(value: &str) -> Result<(), ValidationError> {
-    if is_valid_layer_id(value) {
-        Ok(())
-    } else {
-        Err(ValidationError::InvalidLayerId(value.to_owned()))
+/// A validated architecture layer identifier (e.g. `domain`, `usecase`,
+/// `my-gateway`).
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct LayerId(String);
+
+impl LayerId {
+    /// Validate and wrap `value` as a [`LayerId`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ValidationError::InvalidLayerId`] when `value` is
+    /// empty, starts with a non-ASCII-alphabetic character, or contains
+    /// characters outside `[A-Za-z0-9_-]`.
+    pub fn try_new(value: impl Into<String>) -> Result<Self, ValidationError> {
+        let value = value.into();
+        if is_valid_layer_id(&value) {
+            Ok(Self(value))
+        } else {
+            Err(ValidationError::InvalidLayerId(value))
+        }
+    }
+}
+
+impl AsRef<str> for LayerId {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
+impl fmt::Display for LayerId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.0)
     }
 }
 
@@ -29,14 +69,6 @@ fn is_valid_layer_id(value: &str) -> bool {
     }
     chars.all(|ch| ch.is_ascii_alphanumeric() || ch == '_' || ch == '-')
 }
-
-/// A validated architecture layer identifier (e.g. `domain`, `usecase`,
-/// `my-gateway`).
-#[nutype(
-    validate(with = validate_layer_id, error = ValidationError),
-    derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Display, AsRef)
-)]
-pub struct LayerId(String);
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::panic)]

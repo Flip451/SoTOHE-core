@@ -4,29 +4,29 @@
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| RenderContractMapError | error_type | — | CatalogueLoaderFailed, ContractMapWriterFailed, EmptyCatalogue, LayerNotFound | 🟡 |
+| RenderContractMapError | error_type | — | CatalogueLoaderFailed, ContractMapWriterFailed, EmptyCatalogue, LayerNotFound | 🔵 |
 
 ## Application Services
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| RenderContractMap | application_service | — | fn execute(&self, cmd: &RenderContractMapCommand) -> Result<RenderContractMapOutput, RenderContractMapError> | 🟡 |
+| RenderContractMap | application_service | — | fn execute(&self, cmd: &RenderContractMapCommand) -> Result<RenderContractMapOutput, RenderContractMapError> | 🔵 |
 
 ## Interactors
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| RenderContractMapInteractor | interactor | — | — | 🟡 |
+| RenderContractMapInteractor | interactor | — | — | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| RenderContractMapOutput | dto | — | — | 🟡 |
+| RenderContractMapOutput | dto | — | — | 🔵 |
 
 ## Commands
 
 | Name | Kind | Action | Details | Signal |
 |------|------|--------|---------|--------|
-| RenderContractMapCommand | command | — | — | 🟡 |
+| RenderContractMapCommand | command | — | — | 🔵 |
 

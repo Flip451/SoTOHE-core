@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "port",
+      "path": "libs/port",
+      "may_depend_on": [],
+      "deny_reason": "no reverse dep",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "port-types.json",
+        "schema_export": {"method": "rustdoc", "targets": ["port"]}
+      }
+    },
+    {
+      "crate": "application",
+      "path": "libs/application",
+      "may_depend_on": ["port"],
+      "deny_reason": "no reverse dep",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "application-types.json",
+        "schema_export": {"method": "rustdoc", "targets": ["application"]}
+      }
+    },
+    {
+      "crate": "gateway",
+      "path": "libs/gateway",
+      "may_depend_on": ["port", "application"],
+      "deny_reason": "no reverse dep",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "gateway-types.json",
+        "schema_export": {"method": "rustdoc", "targets": ["gateway"]}
+      }
+    }
+  ]
+}

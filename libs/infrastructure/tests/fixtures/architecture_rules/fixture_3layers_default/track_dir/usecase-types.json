@@ -1,0 +1,11 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "UsecaseInteractor",
+      "kind": "use_case",
+      "description": "usecase-layer struct-only use case",
+      "approved": true
+    }
+  ]
+}

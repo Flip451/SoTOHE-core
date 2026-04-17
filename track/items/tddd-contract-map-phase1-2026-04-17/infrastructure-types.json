@@ -22,20 +22,56 @@
           "trait_name": "ContractMapWriter"
         }
       ]
+    },
+    {
+      "name": "LoadAllCataloguesError",
+      "description": "Error variants returned by catalogue_bulk_loader::load_all_catalogues (T002). Covers layer-binding failure, architecture-rules parse, per-catalogue I/O, decode errors, symlink rejection (fail-closed), missing catalogue files, topological sort cycles, and invalid layer ids.",
+      "approved": true,
+      "kind": "error_type",
+      "expected_variants": [
+        "LayerBindings",
+        "ArchRulesParse",
+        "Io",
+        "CatalogueNotFound",
+        "Decode",
+        "TopologicalSortFailed",
+        "InvalidLayerId"
+      ]
     }
   ],
   "signals": [
     {
       "type_name": "FsCatalogueLoader",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueLoader"
+      ]
     },
     {
       "type_name": "FsContractMapWriter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ContractMapWriter"
+      ]
+    },
+    {
+      "type_name": "LoadAllCataloguesError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "LayerBindings",
+        "ArchRulesParse",
+        "Io",
+        "CatalogueNotFound",
+        "Decode",
+        "TopologicalSortFailed",
+        "InvalidLayerId"
+      ]
     }
   ]
 }

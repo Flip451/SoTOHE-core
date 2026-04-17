@@ -87,50 +87,136 @@
         "SymlinkRejected",
         "TrackNotFound"
       ]
+    },
+    {
+      "name": "ValidationError",
+      "description": "Existing domain validation error enum; this track adds the `InvalidLayerId(String)` variant (T002) to support `LayerId` newtype validation. Declared here with action=modify so the TDDD reverse check recognises the intended structural change against baseline.",
+      "approved": true,
+      "action": "modify",
+      "kind": "error_type",
+      "expected_variants": [
+        "EmptyString",
+        "InvalidTrackId",
+        "InvalidTaskId",
+        "InvalidCommitHash",
+        "InvalidTimestamp",
+        "InvalidTrackBranch",
+        "EmptyTrackTitle",
+        "EmptyTaskDescription",
+        "EmptyPlanSectionId",
+        "EmptyPlanSectionTitle",
+        "DuplicateTaskId",
+        "DuplicatePlanSectionId",
+        "UnknownTaskReference",
+        "DuplicateTaskReference",
+        "UnreferencedTask",
+        "OverrideIncompatibleWithResolvedTasks",
+        "TrackActivationRequiresPlanningOnly",
+        "TrackActivationRequiresSchemaV3",
+        "TrackAlreadyMaterialized",
+        "UnsupportedTargetStatus",
+        "SectionNotFound",
+        "NoSectionsAvailable",
+        "TaskDescriptionMutated",
+        "TaskRemoved",
+        "InvalidLayerId"
+      ]
     }
   ],
   "signals": [
     {
       "type_name": "LayerId",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ContractMapContent",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ContractMapRenderOptions",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CatalogueLoader",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn load_all(&self, track_id: &TrackId) -> Result<(Vec<LayerId>, BTreeMap<LayerId, TypeCatalogueDocument>), CatalogueLoaderError>"
+      ]
     },
     {
       "type_name": "ContractMapWriter",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn write(&self, track_id: &TrackId, content: &ContractMapContent) -> Result<(), ContractMapWriterError>"
+      ]
     },
     {
       "type_name": "CatalogueLoaderError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueNotFound",
+        "LayerDiscoveryFailed",
+        "DecodeFailed",
+        "SymlinkRejected",
+        "IoError",
+        "TopologicalSortFailed"
+      ]
     },
     {
       "type_name": "ContractMapWriterError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "IoError",
+        "SymlinkRejected",
+        "TrackNotFound"
+      ]
+    },
+    {
+      "type_name": "ValidationError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "EmptyString",
+        "InvalidTrackId",
+        "InvalidTaskId",
+        "InvalidCommitHash",
+        "InvalidTimestamp",
+        "InvalidTrackBranch",
+        "EmptyTrackTitle",
+        "EmptyTaskDescription",
+        "EmptyPlanSectionId",
+        "EmptyPlanSectionTitle",
+        "DuplicateTaskId",
+        "DuplicatePlanSectionId",
+        "UnknownTaskReference",
+        "DuplicateTaskReference",
+        "UnreferencedTask",
+        "OverrideIncompatibleWithResolvedTasks",
+        "TrackActivationRequiresPlanningOnly",
+        "TrackActivationRequiresSchemaV3",
+        "TrackAlreadyMaterialized",
+        "UnsupportedTargetStatus",
+        "SectionNotFound",
+        "NoSectionsAvailable",
+        "TaskDescriptionMutated",
+        "TaskRemoved",
+        "InvalidLayerId"
+      ]
     }
   ]
 }

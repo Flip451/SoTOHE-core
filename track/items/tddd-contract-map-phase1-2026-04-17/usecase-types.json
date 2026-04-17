@@ -56,32 +56,41 @@
     {
       "type_name": "RenderContractMap",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "fn execute(&self, cmd: &RenderContractMapCommand) -> Result<RenderContractMapOutput, RenderContractMapError>"
+      ]
     },
     {
       "type_name": "RenderContractMapCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "RenderContractMapOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "RenderContractMapError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueLoaderFailed",
+        "ContractMapWriterFailed",
+        "EmptyCatalogue",
+        "LayerNotFound"
+      ]
     },
     {
       "type_name": "RenderContractMapInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

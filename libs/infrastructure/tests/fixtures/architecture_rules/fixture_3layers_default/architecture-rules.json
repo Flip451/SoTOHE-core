@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "no reverse dep",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "domain-types.json",
+        "schema_export": {"method": "rustdoc", "targets": ["domain"]}
+      }
+    },
+    {
+      "crate": "usecase",
+      "path": "libs/usecase",
+      "may_depend_on": ["domain"],
+      "deny_reason": "no reverse dep",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "usecase-types.json",
+        "schema_export": {"method": "rustdoc", "targets": ["usecase"]}
+      }
+    },
+    {
+      "crate": "infrastructure",
+      "path": "libs/infrastructure",
+      "may_depend_on": ["domain", "usecase"],
+      "deny_reason": "no reverse dep",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "infrastructure-types.json",
+        "schema_export": {"method": "rustdoc", "targets": ["infrastructure"]}
+      }
+    }
+  ]
+}

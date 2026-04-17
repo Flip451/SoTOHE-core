@@ -1,0 +1,11 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "AppInteractor",
+      "kind": "use_case",
+      "description": "application-layer use case",
+      "approved": true
+    }
+  ]
+}

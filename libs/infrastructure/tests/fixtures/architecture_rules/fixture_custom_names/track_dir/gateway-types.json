@@ -1,0 +1,12 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "GatewayAdapter",
+      "kind": "secondary_adapter",
+      "description": "gateway-layer adapter",
+      "approved": true,
+      "implements": []
+    }
+  ]
+}
