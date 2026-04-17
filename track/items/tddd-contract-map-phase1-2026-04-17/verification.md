@@ -10,10 +10,12 @@
 
 ### T001: ADR 整合性訂正
 
-- [ ] ADR 2026-04-17-1528 §D3 shape mapping 表に SecondaryAdapter 行が追加されている
-- [ ] ADR 2026-04-17-1528 本文の \"12 variants\" が \"13 variants\" に訂正されている
-- [ ] ADR 2026-04-16-2200 に §D10 \"Reality View as drill-down to Contract Map\" が新設されている (D7 は既存の「段階的実装」節が使用済みのため D10 を使用)
-- [ ] cargo make ci が通る (verify-doc-links / verify-arch-docs を含む — spec.json 最終 acceptance criterion に対応)
+- [x] ADR 2026-04-17-1528 §D3 shape mapping 表に SecondaryAdapter 行が追加されている (計画時点で既に 13 行整合済み。本 task 実行時に追加編集は不要だったことを確認)
+- [x] ADR 2026-04-17-1528 本文の \"12 variants\" が \"13 variants\" に訂正されている (line 11 / line 200 の「12 → 13 variants」変遷注記以外に \"12 variants\" 表記は残存せず、既に整合。本 task ではさらに §Q6 を "Resolved (2026-04-17)" に更新)
+- [x] ADR 2026-04-16-2200 に §D10 \"Reality View as drill-down to Contract Map\" が新設されている (D7 は既存の「段階的実装」節が使用済みのため D10 を使用)。§D9 の末尾と \"## Rejected Alternatives\" の間に挿入。Contract Map を primary artifact、Reality View を drill-down と位置付け、役割分担表 / Phase 計画への影響 / Open Q6 解消を記載
+- [x] `cargo make verify-arch-docs` が通る (docs 整合性確認)
+- [x] `cargo make verify-doc-links` が通る (ADR 間相互リンク確認)
+- [ ] `cargo make ci` が通る (commit 時に `track-commit-message` ラッパーが自動実行)
 
 ### T002: Infrastructure helpers
 
@@ -107,7 +109,7 @@ cargo run --quiet -p cli -- track type-graph tddd-contract-map-phase1-2026-04-17
 
 | Task | Status | Commit | Notes |
 |------|--------|--------|-------|
-| T001 | Pending |  |  |
+| T001 | Implemented (pre-commit) |  | ADR 2026-04-16-2200 §D10 新設 + ADR 2026-04-17-1528 §Q6 Resolved 注記。§D3 表は計画時点で既に整合済みだった。verify-arch-docs / verify-doc-links pass |
 | T002 | Pending |  |  |
 | T003 | Pending |  |  |
 | T004 | Pending |  |  |

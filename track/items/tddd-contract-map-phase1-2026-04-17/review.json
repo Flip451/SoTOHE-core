@@ -1,6 +1,74 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SUBAGENT_MODEL_ALLOWLIST` still includes `claude-sonnet-4-6` instead of the intended `claude-sonnet-4-7`, so `verify_env` will reject the new `CLAUDE_CODE_SUBAGENT_MODEL` value from `.claude/settings.json`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 296,
+              "category": "broken reference"
+            },
+            {
+              "message": "The `verify_env` test fixtures at lines 1230 and 1242 still hardcode `claude-sonnet-4-6`, so this scope does not actually exercise the 4-7 cutover and leaves the validation path untested against the new setting.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 1230,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
+          "at": "2026-04-17T12:07:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
+          "at": "2026-04-17T12:08:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
+          "at": "2026-04-17T12:09:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dd384aa51c03424eafcf16e9806147608d61dbbefcd381aca4dcd07b95cb63d",
+          "at": "2026-04-17T12:25:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dd384aa51c03424eafcf16e9806147608d61dbbefcd381aca4dcd07b95cb63d",
+          "at": "2026-04-17T12:26:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b162462854e2294b48dba564275d6c550ad4699337e0b64288d0c4acd9ce1f22",
+          "at": "2026-04-17T12:28:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b162462854e2294b48dba564275d6c550ad4699337e0b64288d0c4acd9ce1f22",
+          "at": "2026-04-17T12:29:46Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -419,6 +487,34 @@
           "findings": [],
           "hash": "rvw1:sha256:61839e48de963e86d748744c0c1049cf246012ed1318e46172ee3afb1e9fa534",
           "at": "2026-04-17T12:06:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0fdd2d69c0d356c540ad50dcb8896c842dde9a14436def8c1f532a5580f49a2",
+          "at": "2026-04-17T12:45:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0fdd2d69c0d356c540ad50dcb8896c842dde9a14436def8c1f532a5580f49a2",
+          "at": "2026-04-17T12:47:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47a49465192a500e208b4e20d629319f08edccc150483630862f51c29c542f04",
+          "at": "2026-04-17T12:51:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47a49465192a500e208b4e20d629319f08edccc150483630862f51c29c542f04",
+          "at": "2026-04-17T12:53:06Z"
         }
       ]
     },
@@ -496,60 +592,6 @@
           "findings": [],
           "hash": "rvw1:sha256:8a5abffddf25c1a47c6975d5d23be147e97055078d795f6152d82fcc18fc2c47",
           "at": "2026-04-17T12:22:00Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SUBAGENT_MODEL_ALLOWLIST` still includes `claude-sonnet-4-6` instead of the intended `claude-sonnet-4-7`, so `verify_env` will reject the new `CLAUDE_CODE_SUBAGENT_MODEL` value from `.claude/settings.json`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 296,
-              "category": "broken reference"
-            },
-            {
-              "message": "The `verify_env` test fixtures at lines 1230 and 1242 still hardcode `claude-sonnet-4-6`, so this scope does not actually exercise the 4-7 cutover and leaves the validation path untested against the new setting.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 1230,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
-          "at": "2026-04-17T12:07:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
-          "at": "2026-04-17T12:08:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82567a87dfdd79d82cfaf5029ce3ab7f9f3d0f6b7d4865a6a0f0a9e1934a0f60",
-          "at": "2026-04-17T12:09:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2dd384aa51c03424eafcf16e9806147608d61dbbefcd381aca4dcd07b95cb63d",
-          "at": "2026-04-17T12:25:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2dd384aa51c03424eafcf16e9806147608d61dbbefcd381aca4dcd07b95cb63d",
-          "at": "2026-04-17T12:26:28Z"
         }
       ]
     }

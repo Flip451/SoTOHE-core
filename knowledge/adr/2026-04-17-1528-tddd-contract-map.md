@@ -334,14 +334,13 @@ spec セクション名は長文 (`## Domain States > UserRepository`) になり
 
 「Contract Map」を仮称として採用したが、命名は後続 track で正式確定する。vision.md の "SoT chain" 命名とも整合を取る。
 
-### §Q6: 既存 Phase 2 の位置付け修正
+### §Q6: 既存 Phase 2 の位置付け修正 — Resolved (2026-04-17)
 
-ADR 2026-04-16-2200 の Decision 節には「primary view」のような表現はないが、実装計画 (plan.md) は単独で主 artifact である前提で組まれている。本 ADR 採用時に:
+**Resolved by**: ADR `knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md` §D10 "Reality View as drill-down to Contract Map" (本 track `tddd-contract-map-phase1-2026-04-17` T001 で追加)。
 
-- ADR 2026-04-16-2200 に「§D10: Reality View as drill-down to Contract Map」補記を追加するか (§D7 は既存の「段階的実装」節が使用済みのため §D10 を使用)
-- 本 ADR 側でのみ役割分担を明記するか
+ADR 2026-04-16-2200 側に §D10 補記を追加することで、両 ADR の整合が追跡可能になった。Reality View は Contract Map の drill-down として位置付けられ、Contract Map (本 ADR) が設計意図の俯瞰 (primary artifact)、Reality View が実装状態の検証ドリルダウンという役割分担が両 ADR 間で文書化されている。
 
-前者 (ADR 2026-04-16-2200 への §D10 補記) を推奨する。両 ADR の整合が追跡可能になる。
+(§D7 は ADR 2026-04-16-2200 の既存の「段階的実装」節として使用済みのため §D10 を使用した。)
 
 ## Implementation Phases
 
