@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "type_definitions": [
+    {
+      "name": "TypeCatalogueDocument",
+      "description": "Document structure holding type catalogue entries and signals — first argument of check_type_signals; guard against accidental domain modification during signature change (T001)",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
+    },
+    {
+      "name": "TypeGraph",
+      "description": "Pre-indexed view of a crate public API for type catalogue evaluation — consumed by render_type_graph_* / write_type_graph_dir in infrastructure layer (T003/T004/T005); guard against accidental modification",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
+    }
+  ],
+  "signals": [
+    {
+      "type_name": "TypeCatalogueDocument",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeGraph",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

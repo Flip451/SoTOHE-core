@@ -1,0 +1,4621 @@
+{
+  "schema_version": 2,
+  "captured_at": "2026-04-17T01:05:11Z",
+  "types": {
+    "ActionContradiction": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "action",
+          "receiver": "&self",
+          "params": [],
+          "returns": "TypeAction",
+          "is_async": false
+        },
+        {
+          "name": "kind",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&ActionContradictionKind",
+          "is_async": false
+        },
+        {
+          "name": "name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "name",
+              "ty": "impl Into"
+            },
+            {
+              "name": "action",
+              "ty": "TypeAction"
+            },
+            {
+              "name": "kind",
+              "ty": "ActionContradictionKind"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "ActionContradictionKind": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "AddButAlreadyInBaseline"
+        },
+        {
+          "kind": "variant",
+          "name": "ModifyButNotInBaseline"
+        },
+        {
+          "kind": "variant",
+          "name": "ReferenceButNotBlue"
+        },
+        {
+          "kind": "variant",
+          "name": "ReferenceButNotInBaseline"
+        }
+      ],
+      "methods": []
+    },
+    "AutoPhase": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "CodeReview"
+        },
+        {
+          "kind": "variant",
+          "name": "Committed"
+        },
+        {
+          "kind": "variant",
+          "name": "Escalated"
+        },
+        {
+          "kind": "variant",
+          "name": "Implement"
+        },
+        {
+          "kind": "variant",
+          "name": "Plan"
+        },
+        {
+          "kind": "variant",
+          "name": "PlanReview"
+        },
+        {
+          "kind": "variant",
+          "name": "TypeDesign"
+        },
+        {
+          "kind": "variant",
+          "name": "TypeReview"
+        }
+      ],
+      "methods": []
+    },
+    "AutoPhaseError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "InvalidRollback"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidTransition"
+        },
+        {
+          "kind": "variant",
+          "name": "NotEscalated"
+        }
+      ],
+      "methods": []
+    },
+    "AutoPhaseTransition": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Advance"
+        },
+        {
+          "kind": "variant",
+          "name": "Escalate"
+        },
+        {
+          "kind": "variant",
+          "name": "Resume"
+        },
+        {
+          "kind": "variant",
+          "name": "Rollback"
+        }
+      ],
+      "methods": []
+    },
+    "CommitHashError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Format"
+        },
+        {
+          "kind": "variant",
+          "name": "Io"
+        },
+        {
+          "kind": "variant",
+          "name": "SymlinkDetected"
+        }
+      ],
+      "methods": []
+    },
+    "ComplianceContext": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "guide_matches",
+          "ty": "Vec<GuideMatch>"
+        },
+        {
+          "kind": "field",
+          "name": "skill_match",
+          "ty": "Option<SkillMatch>"
+        }
+      ],
+      "methods": [
+        {
+          "name": "is_empty",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "render",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<String>",
+          "is_async": false
+        }
+      ]
+    },
+    "ConfidenceSignal": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Blue"
+        },
+        {
+          "kind": "variant",
+          "name": "Red"
+        },
+        {
+          "kind": "variant",
+          "name": "Yellow"
+        }
+      ],
+      "methods": []
+    },
+    "ConsistencyReport": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "baseline_red_traits",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        },
+        {
+          "name": "baseline_red_types",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        },
+        {
+          "name": "contradictions",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[ActionContradiction]",
+          "is_async": false
+        },
+        {
+          "name": "delete_errors",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        },
+        {
+          "name": "forward_signals",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[TypeSignal]",
+          "is_async": false
+        },
+        {
+          "name": "skipped_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false
+        },
+        {
+          "name": "undeclared_traits",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        },
+        {
+          "name": "undeclared_types",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        }
+      ]
+    },
+    "CoverageResult": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "covered",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false
+        },
+        {
+          "name": "invalid_refs",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        },
+        {
+          "name": "is_fully_covered",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "covered",
+              "ty": "u32"
+            },
+            {
+              "name": "uncovered",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "invalid_refs",
+              "ty": "Vec<String>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "total",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false
+        },
+        {
+          "name": "uncovered",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        }
+      ]
+    },
+    "Decision": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Allow"
+        },
+        {
+          "kind": "variant",
+          "name": "Block"
+        }
+      ],
+      "methods": []
+    },
+    "DomainError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Transition"
+        },
+        {
+          "kind": "variant",
+          "name": "Validation"
+        }
+      ],
+      "methods": []
+    },
+    "FastVerdict": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "FindingsRemain"
+        },
+        {
+          "kind": "variant",
+          "name": "ZeroFindings"
+        }
+      ],
+      "methods": [
+        {
+          "name": "findings_remain",
+          "params": [
+            {
+              "name": "findings",
+              "ty": "Vec<ReviewerFinding>"
+            }
+          ],
+          "returns": "Result<Self, VerdictError>",
+          "is_async": false
+        }
+      ]
+    },
+    "FilePath": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "s",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Result<Self, FilePathError>",
+          "is_async": false
+        }
+      ]
+    },
+    "FilePathError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Absolute"
+        },
+        {
+          "kind": "variant",
+          "name": "Empty"
+        },
+        {
+          "kind": "variant",
+          "name": "Traversal"
+        }
+      ],
+      "methods": []
+    },
+    "FindingSeverity": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "P1"
+        },
+        {
+          "kind": "variant",
+          "name": "P2"
+        },
+        {
+          "kind": "variant",
+          "name": "P3"
+        }
+      ],
+      "methods": []
+    },
+    "FunctionInfo": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "docs",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "has_self_receiver",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "is_async",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "name",
+              "ty": "String"
+            },
+            {
+              "name": "docs",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "return_type_names",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "_has_self_receiver",
+              "ty": "bool"
+            },
+            {
+              "name": "params",
+              "ty": "Vec<ParamDeclaration>"
+            },
+            {
+              "name": "returns",
+              "ty": "String"
+            },
+            {
+              "name": "receiver",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "is_async",
+              "ty": "bool"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "params",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[ParamDeclaration]",
+          "is_async": false
+        },
+        {
+          "name": "receiver",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "return_type_names",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        },
+        {
+          "name": "returns",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        }
+      ]
+    },
+    "GuardVerdict": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "decision",
+          "ty": "Decision"
+        },
+        {
+          "kind": "field",
+          "name": "reason",
+          "ty": "String"
+        }
+      ],
+      "methods": [
+        {
+          "name": "allow",
+          "params": [],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "block",
+          "params": [
+            {
+              "name": "reason",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "is_blocked",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        }
+      ]
+    },
+    "GuideEntry": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "cache_path",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "project_usage",
+          "ty": "Vec<String>"
+        },
+        {
+          "kind": "field",
+          "name": "summary",
+          "ty": "Vec<String>"
+        },
+        {
+          "kind": "field",
+          "name": "trigger_keywords",
+          "ty": "Vec<String>"
+        }
+      ],
+      "methods": []
+    },
+    "GuideMatch": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "cache_path",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "id",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "project_usage",
+          "ty": "Vec<String>"
+        },
+        {
+          "kind": "field",
+          "name": "summary",
+          "ty": "Vec<String>"
+        },
+        {
+          "kind": "field",
+          "name": "trigger",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "HearingMode": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Focused"
+        },
+        {
+          "kind": "variant",
+          "name": "Full"
+        },
+        {
+          "kind": "variant",
+          "name": "Quick"
+        }
+      ],
+      "methods": [
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        }
+      ]
+    },
+    "HearingRecord": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "date",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&Timestamp",
+          "is_async": false
+        },
+        {
+          "name": "items_added",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false
+        },
+        {
+          "name": "items_modified",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false
+        },
+        {
+          "name": "mode",
+          "receiver": "&self",
+          "params": [],
+          "returns": "HearingMode",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "date",
+              "ty": "Timestamp"
+            },
+            {
+              "name": "mode",
+              "ty": "HearingMode"
+            },
+            {
+              "name": "signal_delta",
+              "ty": "HearingSignalDelta"
+            },
+            {
+              "name": "questions_asked",
+              "ty": "u32"
+            },
+            {
+              "name": "items_added",
+              "ty": "u32"
+            },
+            {
+              "name": "items_modified",
+              "ty": "u32"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "questions_asked",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false
+        },
+        {
+          "name": "signal_delta",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&HearingSignalDelta",
+          "is_async": false
+        }
+      ]
+    },
+    "HearingSignalDelta": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "after",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&HearingSignalSnapshot",
+          "is_async": false
+        },
+        {
+          "name": "before",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&HearingSignalSnapshot",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "before",
+              "ty": "HearingSignalSnapshot"
+            },
+            {
+              "name": "after",
+              "ty": "HearingSignalSnapshot"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "HearingSignalSnapshot": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "blue",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "blue",
+              "ty": "u32"
+            },
+            {
+              "name": "yellow",
+              "ty": "u32"
+            },
+            {
+              "name": "red",
+              "ty": "u32"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "red",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false
+        },
+        {
+          "name": "yellow",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false
+        }
+      ]
+    },
+    "HookContext": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "project_dir",
+          "ty": "Option<PathBuf>"
+        }
+      ],
+      "methods": []
+    },
+    "HookError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Guard"
+        },
+        {
+          "kind": "variant",
+          "name": "Input"
+        },
+        {
+          "kind": "variant",
+          "name": "Unsupported"
+        }
+      ],
+      "methods": []
+    },
+    "HookInput": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "command",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "content",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "file_path",
+          "ty": "Option<PathBuf>"
+        },
+        {
+          "kind": "field",
+          "name": "tool_name",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "HookName": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "BlockDirectGitOps"
+        },
+        {
+          "kind": "variant",
+          "name": "BlockTestFileDeletion"
+        }
+      ],
+      "methods": []
+    },
+    "HookVerdict": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "additional_context",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "decision",
+          "ty": "Decision"
+        },
+        {
+          "kind": "field",
+          "name": "reason",
+          "ty": "Option<String>"
+        }
+      ],
+      "methods": [
+        {
+          "name": "allow",
+          "params": [],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "block",
+          "params": [
+            {
+              "name": "reason",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "is_blocked",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        }
+      ]
+    },
+    "ImplInfo": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "methods",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[FunctionInfo]",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "target_type",
+              "ty": "String"
+            },
+            {
+              "name": "trait_name",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "methods",
+              "ty": "Vec<FunctionInfo>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "target_type",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "trait_name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        }
+      ]
+    },
+    "LogInfo": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "s",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "MainScopeName": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "s",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Result<Self, ScopeNameError>",
+          "is_async": false
+        }
+      ]
+    },
+    "MemberDeclaration": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Field"
+        },
+        {
+          "kind": "variant",
+          "name": "Variant"
+        }
+      ],
+      "methods": [
+        {
+          "name": "field",
+          "params": [
+            {
+              "name": "name",
+              "ty": "impl Into"
+            },
+            {
+              "name": "ty",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "ty",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "variant",
+          "params": [
+            {
+              "name": "name",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "MethodDeclaration": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "is_async",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "name",
+              "ty": "impl Into"
+            },
+            {
+              "name": "receiver",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "params",
+              "ty": "Vec<ParamDeclaration>"
+            },
+            {
+              "name": "returns",
+              "ty": "impl Into"
+            },
+            {
+              "name": "is_async",
+              "ty": "bool"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "params",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[ParamDeclaration]",
+          "is_async": false
+        },
+        {
+          "name": "receiver",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "returns",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "signature_string",
+          "receiver": "&self",
+          "params": [],
+          "returns": "String",
+          "is_async": false
+        }
+      ]
+    },
+    "NextCommand": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "ActivateTrack"
+        },
+        {
+          "kind": "variant",
+          "name": "Done"
+        },
+        {
+          "kind": "variant",
+          "name": "Implement"
+        },
+        {
+          "kind": "variant",
+          "name": "PlanNewFeature"
+        },
+        {
+          "kind": "variant",
+          "name": "Status"
+        }
+      ],
+      "methods": []
+    },
+    "NonEmptyReviewerFindings": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "as_slice",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[ReviewerFinding]",
+          "is_async": false
+        },
+        {
+          "name": "into_vec",
+          "receiver": "self",
+          "params": [],
+          "returns": "Vec<ReviewerFinding>",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "findings",
+              "ty": "Vec<ReviewerFinding>"
+            }
+          ],
+          "returns": "Result<Self, VerdictError>",
+          "is_async": false
+        }
+      ]
+    },
+    "NotRequiredReason": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Empty"
+        },
+        {
+          "kind": "variant",
+          "name": "ZeroFindings"
+        }
+      ],
+      "methods": []
+    },
+    "ParamDeclaration": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "name",
+              "ty": "impl Into"
+            },
+            {
+              "name": "ty",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "ty",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        }
+      ]
+    },
+    "ParseError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "NestingDepthExceeded"
+        },
+        {
+          "kind": "variant",
+          "name": "UnmatchedQuote"
+        }
+      ],
+      "methods": []
+    },
+    "PlanSection": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "description",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        },
+        {
+          "name": "id",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "id",
+              "ty": "impl Into"
+            },
+            {
+              "name": "title",
+              "ty": "impl Into"
+            },
+            {
+              "name": "description",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "task_ids",
+              "ty": "Vec<TaskId>"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>",
+          "is_async": false
+        },
+        {
+          "name": "task_ids",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[TaskId]",
+          "is_async": false
+        },
+        {
+          "name": "title",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        }
+      ]
+    },
+    "PlanView": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "summary",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "sections",
+              "ty": "Vec<PlanSection>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "sections",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[PlanSection]",
+          "is_async": false
+        },
+        {
+          "name": "summary",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        }
+      ]
+    },
+    "RefValidationError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "DisallowedCharacter"
+        },
+        {
+          "kind": "variant",
+          "name": "Empty"
+        }
+      ],
+      "methods": []
+    },
+    "RepositoryError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Message"
+        },
+        {
+          "kind": "variant",
+          "name": "TrackNotFound"
+        }
+      ],
+      "methods": []
+    },
+    "RequiredReason": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "FindingsRemain"
+        },
+        {
+          "kind": "variant",
+          "name": "NotStarted"
+        },
+        {
+          "kind": "variant",
+          "name": "StaleHash"
+        }
+      ],
+      "methods": []
+    },
+    "ReviewHash": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Computed"
+        },
+        {
+          "kind": "variant",
+          "name": "Empty"
+        }
+      ],
+      "methods": [
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "computed",
+          "params": [
+            {
+              "name": "s",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Result<Self, ReviewHashError>",
+          "is_async": false
+        },
+        {
+          "name": "is_empty",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        }
+      ]
+    },
+    "ReviewHashError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "InvalidFormat"
+        }
+      ],
+      "methods": []
+    },
+    "ReviewHashValue": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "s",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Result<Self, ReviewHashError>",
+          "is_async": false
+        }
+      ]
+    },
+    "ReviewOutcome": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Reviewed"
+        },
+        {
+          "kind": "variant",
+          "name": "Skipped"
+        }
+      ],
+      "methods": []
+    },
+    "ReviewReaderError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Codec"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidData"
+        },
+        {
+          "kind": "variant",
+          "name": "Io"
+        },
+        {
+          "kind": "variant",
+          "name": "SymlinkDetected"
+        }
+      ],
+      "methods": []
+    },
+    "ReviewScopeConfig": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "all_scope_names",
+          "receiver": "&self",
+          "params": [],
+          "returns": "HashSet<ScopeName>",
+          "is_async": false
+        },
+        {
+          "name": "classify",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "files",
+              "ty": "&[FilePath]"
+            }
+          ],
+          "returns": "HashMap<ScopeName, Vec<FilePath>>",
+          "is_async": false
+        },
+        {
+          "name": "contains_scope",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "&ScopeName"
+            }
+          ],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "get_scope_names",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "files",
+              "ty": "&[FilePath]"
+            }
+          ],
+          "returns": "HashSet<ScopeName>",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "entries",
+              "ty": "Vec<(String, Vec<String>)>"
+            },
+            {
+              "name": "operational",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "other_track",
+              "ty": "Vec<String>"
+            }
+          ],
+          "returns": "Result<Self, ScopeConfigError>",
+          "is_async": false
+        }
+      ]
+    },
+    "ReviewState": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "NotRequired"
+        },
+        {
+          "kind": "variant",
+          "name": "Required"
+        }
+      ],
+      "methods": [
+        {
+          "name": "is_approved",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        }
+      ]
+    },
+    "ReviewTarget": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "files",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[FilePath]",
+          "is_async": false
+        },
+        {
+          "name": "is_empty",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "files",
+              "ty": "Vec<FilePath>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "ReviewWriterError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Codec"
+        },
+        {
+          "kind": "variant",
+          "name": "IncompatibleSchema"
+        },
+        {
+          "kind": "variant",
+          "name": "Io"
+        },
+        {
+          "kind": "variant",
+          "name": "SymlinkDetected"
+        }
+      ],
+      "methods": []
+    },
+    "ReviewerFinding": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "category",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "file",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "line",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<u64>",
+          "is_async": false
+        },
+        {
+          "name": "message",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "message",
+              "ty": "impl Into"
+            },
+            {
+              "name": "severity",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "file",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "line",
+              "ty": "Option<u64>"
+            },
+            {
+              "name": "category",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Result<Self, ReviewerFindingError>",
+          "is_async": false
+        },
+        {
+          "name": "severity",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        }
+      ]
+    },
+    "ReviewerFindingError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "EmptyMessage"
+        }
+      ],
+      "methods": []
+    },
+    "RollbackTarget": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Implement"
+        },
+        {
+          "kind": "variant",
+          "name": "Plan"
+        },
+        {
+          "kind": "variant",
+          "name": "TypeDesign"
+        }
+      ],
+      "methods": []
+    },
+    "RoundType": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Fast"
+        },
+        {
+          "kind": "variant",
+          "name": "Final"
+        }
+      ],
+      "methods": []
+    },
+    "SchemaExport": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "crate_name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "functions",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[FunctionInfo]",
+          "is_async": false
+        },
+        {
+          "name": "impls",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[ImplInfo]",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "String"
+            },
+            {
+              "name": "types",
+              "ty": "Vec<TypeInfo>"
+            },
+            {
+              "name": "functions",
+              "ty": "Vec<FunctionInfo>"
+            },
+            {
+              "name": "traits",
+              "ty": "Vec<TraitInfo>"
+            },
+            {
+              "name": "impls",
+              "ty": "Vec<ImplInfo>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "traits",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[TraitInfo]",
+          "is_async": false
+        },
+        {
+          "name": "types",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[TypeInfo]",
+          "is_async": false
+        }
+      ]
+    },
+    "SchemaExportError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "CrateNotFound"
+        },
+        {
+          "kind": "variant",
+          "name": "NightlyNotFound"
+        },
+        {
+          "kind": "variant",
+          "name": "ParseFailed"
+        },
+        {
+          "kind": "variant",
+          "name": "RustdocFailed"
+        }
+      ],
+      "methods": []
+    },
+    "ScopeConfigError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "InvalidOperationalPattern"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidOtherTrackPattern"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidPattern"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidScopeName"
+        }
+      ],
+      "methods": []
+    },
+    "ScopeName": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Main"
+        },
+        {
+          "kind": "variant",
+          "name": "Other"
+        }
+      ],
+      "methods": []
+    },
+    "ScopeNameError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Empty"
+        },
+        {
+          "kind": "variant",
+          "name": "NotAscii"
+        },
+        {
+          "kind": "variant",
+          "name": "Reserved"
+        }
+      ],
+      "methods": []
+    },
+    "Severity": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Error"
+        },
+        {
+          "kind": "variant",
+          "name": "Info"
+        },
+        {
+          "kind": "variant",
+          "name": "Warning"
+        }
+      ],
+      "methods": []
+    },
+    "SignalBasis": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Convention"
+        },
+        {
+          "kind": "variant",
+          "name": "Discussion"
+        },
+        {
+          "kind": "variant",
+          "name": "Document"
+        },
+        {
+          "kind": "variant",
+          "name": "Feedback"
+        },
+        {
+          "kind": "variant",
+          "name": "Inference"
+        },
+        {
+          "kind": "variant",
+          "name": "MissingSource"
+        }
+      ],
+      "methods": [
+        {
+          "name": "signal",
+          "receiver": "&self",
+          "params": [],
+          "returns": "ConfidenceSignal",
+          "is_async": false
+        }
+      ]
+    },
+    "SignalCounts": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "blue",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false
+        },
+        {
+          "name": "has_red",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "blue",
+              "ty": "u32"
+            },
+            {
+              "name": "yellow",
+              "ty": "u32"
+            },
+            {
+              "name": "red",
+              "ty": "u32"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "red",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false
+        },
+        {
+          "name": "total",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false
+        },
+        {
+          "name": "yellow",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false
+        }
+      ]
+    },
+    "SimpleCommand": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "argv",
+          "ty": "Vec<String>"
+        },
+        {
+          "kind": "field",
+          "name": "has_output_redirect",
+          "ty": "bool"
+        },
+        {
+          "kind": "field",
+          "name": "redirect_texts",
+          "ty": "Vec<String>"
+        }
+      ],
+      "methods": []
+    },
+    "SkillMatch": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "command",
+          "ty": "String"
+        },
+        {
+          "kind": "field",
+          "name": "reminders",
+          "ty": "Vec<String>"
+        }
+      ],
+      "methods": []
+    },
+    "SpecDocument": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "acceptance_criteria",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[SpecRequirement]",
+          "is_async": false
+        },
+        {
+          "name": "additional_sections",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[SpecSection]",
+          "is_async": false
+        },
+        {
+          "name": "append_hearing_record",
+          "receiver": "&mut self",
+          "params": [
+            {
+              "name": "record",
+              "ty": "HearingRecord"
+            }
+          ],
+          "returns": "()",
+          "is_async": false
+        },
+        {
+          "name": "approve",
+          "receiver": "&mut self",
+          "params": [
+            {
+              "name": "timestamp",
+              "ty": "Timestamp"
+            },
+            {
+              "name": "content_hash",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<(), SpecValidationError>",
+          "is_async": false
+        },
+        {
+          "name": "approved_at",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&Timestamp>",
+          "is_async": false
+        },
+        {
+          "name": "constraints",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[SpecRequirement]",
+          "is_async": false
+        },
+        {
+          "name": "content_hash",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "demote",
+          "receiver": "&mut self",
+          "params": [],
+          "returns": "()",
+          "is_async": false
+        },
+        {
+          "name": "effective_status",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "current_hash",
+              "ty": "&str"
+            }
+          ],
+          "returns": "SpecStatus",
+          "is_async": false
+        },
+        {
+          "name": "evaluate_coverage",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "valid_task_ids",
+              "ty": "&HashSet<TaskId>"
+            }
+          ],
+          "returns": "CoverageResult",
+          "is_async": false
+        },
+        {
+          "name": "evaluate_signals",
+          "receiver": "&self",
+          "params": [],
+          "returns": "SignalCounts",
+          "is_async": false
+        },
+        {
+          "name": "goal",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        },
+        {
+          "name": "hearing_history",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[HearingRecord]",
+          "is_async": false
+        },
+        {
+          "name": "is_approval_valid",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "current_hash",
+              "ty": "&str"
+            }
+          ],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "title",
+              "ty": "impl Into"
+            },
+            {
+              "name": "status",
+              "ty": "SpecStatus"
+            },
+            {
+              "name": "version",
+              "ty": "impl Into"
+            },
+            {
+              "name": "goal",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "scope",
+              "ty": "SpecScope"
+            },
+            {
+              "name": "constraints",
+              "ty": "Vec<SpecRequirement>"
+            },
+            {
+              "name": "acceptance_criteria",
+              "ty": "Vec<SpecRequirement>"
+            },
+            {
+              "name": "additional_sections",
+              "ty": "Vec<SpecSection>"
+            },
+            {
+              "name": "related_conventions",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "signals",
+              "ty": "Option<SignalCounts>"
+            },
+            {
+              "name": "approved_at",
+              "ty": "Option<Timestamp>"
+            },
+            {
+              "name": "content_hash",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Result<Self, SpecValidationError>",
+          "is_async": false
+        },
+        {
+          "name": "related_conventions",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        },
+        {
+          "name": "scope",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&SpecScope",
+          "is_async": false
+        },
+        {
+          "name": "set_signals",
+          "receiver": "&mut self",
+          "params": [
+            {
+              "name": "signals",
+              "ty": "SignalCounts"
+            }
+          ],
+          "returns": "()",
+          "is_async": false
+        },
+        {
+          "name": "signals",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&SignalCounts>",
+          "is_async": false
+        },
+        {
+          "name": "status",
+          "receiver": "&self",
+          "params": [],
+          "returns": "SpecStatus",
+          "is_async": false
+        },
+        {
+          "name": "title",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "validate_all_task_refs",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "valid_task_ids",
+              "ty": "&HashSet<TaskId>"
+            }
+          ],
+          "returns": "Vec<String>",
+          "is_async": false
+        },
+        {
+          "name": "version",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        }
+      ]
+    },
+    "SpecRequirement": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "text",
+              "ty": "impl Into"
+            },
+            {
+              "name": "sources",
+              "ty": "Vec<String>"
+            }
+          ],
+          "returns": "Result<Self, SpecValidationError>",
+          "is_async": false
+        },
+        {
+          "name": "signal",
+          "receiver": "&self",
+          "params": [],
+          "returns": "ConfidenceSignal",
+          "is_async": false
+        },
+        {
+          "name": "sources",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        },
+        {
+          "name": "task_refs",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[TaskId]",
+          "is_async": false
+        },
+        {
+          "name": "text",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "with_task_refs",
+          "params": [
+            {
+              "name": "text",
+              "ty": "impl Into"
+            },
+            {
+              "name": "sources",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "task_refs",
+              "ty": "Vec<TaskId>"
+            }
+          ],
+          "returns": "Result<Self, SpecValidationError>",
+          "is_async": false
+        }
+      ]
+    },
+    "SpecScope": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "in_scope",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[SpecRequirement]",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "in_scope",
+              "ty": "Vec<SpecRequirement>"
+            },
+            {
+              "name": "out_of_scope",
+              "ty": "Vec<SpecRequirement>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "out_of_scope",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[SpecRequirement]",
+          "is_async": false
+        }
+      ]
+    },
+    "SpecSection": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "content",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "title",
+              "ty": "impl Into"
+            },
+            {
+              "name": "content",
+              "ty": "Vec<String>"
+            }
+          ],
+          "returns": "Result<Self, SpecValidationError>",
+          "is_async": false
+        },
+        {
+          "name": "title",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        }
+      ]
+    },
+    "SpecStatus": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Approved"
+        },
+        {
+          "kind": "variant",
+          "name": "Draft"
+        }
+      ],
+      "methods": [
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        }
+      ]
+    },
+    "SpecValidationError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "ApprovalMetadataMissing"
+        },
+        {
+          "kind": "variant",
+          "name": "EmptyDomainStateName"
+        },
+        {
+          "kind": "variant",
+          "name": "EmptyRequirementText"
+        },
+        {
+          "kind": "variant",
+          "name": "EmptySectionTitle"
+        },
+        {
+          "kind": "variant",
+          "name": "EmptyTitle"
+        },
+        {
+          "kind": "variant",
+          "name": "EmptyVersion"
+        }
+      ],
+      "methods": []
+    },
+    "StatusOverride": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "blocked",
+          "params": [
+            {
+              "name": "reason",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>",
+          "is_async": false
+        },
+        {
+          "name": "cancelled",
+          "params": [
+            {
+              "name": "reason",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>",
+          "is_async": false
+        },
+        {
+          "name": "from_parts",
+          "params": [
+            {
+              "name": "kind",
+              "ty": "StatusOverrideKind"
+            },
+            {
+              "name": "reason",
+              "ty": "NonEmptyString"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "kind",
+          "receiver": "&self",
+          "params": [],
+          "returns": "StatusOverrideKind",
+          "is_async": false
+        },
+        {
+          "name": "reason",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "track_status",
+          "receiver": "&self",
+          "params": [],
+          "returns": "TrackStatus",
+          "is_async": false
+        }
+      ]
+    },
+    "StatusOverrideKind": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Blocked"
+        },
+        {
+          "kind": "variant",
+          "name": "Cancelled"
+        }
+      ],
+      "methods": []
+    },
+    "TaskStatus": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "DonePending"
+        },
+        {
+          "kind": "variant",
+          "name": "DoneTraced"
+        },
+        {
+          "kind": "variant",
+          "name": "InProgress"
+        },
+        {
+          "kind": "variant",
+          "name": "Skipped"
+        },
+        {
+          "kind": "variant",
+          "name": "Todo"
+        }
+      ],
+      "methods": [
+        {
+          "name": "is_resolved",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "kind",
+          "receiver": "&self",
+          "params": [],
+          "returns": "TaskStatusKind",
+          "is_async": false
+        }
+      ]
+    },
+    "TaskStatusKind": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Done"
+        },
+        {
+          "kind": "variant",
+          "name": "InProgress"
+        },
+        {
+          "kind": "variant",
+          "name": "Skipped"
+        },
+        {
+          "kind": "variant",
+          "name": "Todo"
+        }
+      ],
+      "methods": []
+    },
+    "TaskTransition": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "BackfillHash"
+        },
+        {
+          "kind": "variant",
+          "name": "Complete"
+        },
+        {
+          "kind": "variant",
+          "name": "Reopen"
+        },
+        {
+          "kind": "variant",
+          "name": "ResetToTodo"
+        },
+        {
+          "kind": "variant",
+          "name": "Skip"
+        },
+        {
+          "kind": "variant",
+          "name": "Start"
+        }
+      ],
+      "methods": [
+        {
+          "name": "target_kind",
+          "receiver": "&self",
+          "params": [],
+          "returns": "TaskStatusKind",
+          "is_async": false
+        }
+      ]
+    },
+    "Timestamp": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "as_datetime",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DateTime<Utc>",
+          "is_async": false
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>",
+          "is_async": false
+        }
+      ]
+    },
+    "TrackMetadata": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "add_task",
+          "receiver": "&mut self",
+          "params": [
+            {
+              "name": "description",
+              "ty": "impl Into"
+            },
+            {
+              "name": "section_id",
+              "ty": "Option<&str>"
+            },
+            {
+              "name": "after_task_id",
+              "ty": "Option<&TaskId>"
+            }
+          ],
+          "returns": "Result<TaskId, DomainError>",
+          "is_async": false
+        },
+        {
+          "name": "all_tasks_resolved",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "branch",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&TrackBranch>",
+          "is_async": false
+        },
+        {
+          "name": "id",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TrackId",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "id",
+              "ty": "TrackId"
+            },
+            {
+              "name": "title",
+              "ty": "impl Into"
+            },
+            {
+              "name": "tasks",
+              "ty": "Vec<TrackTask>"
+            },
+            {
+              "name": "plan",
+              "ty": "PlanView"
+            },
+            {
+              "name": "status_override",
+              "ty": "Option<StatusOverride>"
+            }
+          ],
+          "returns": "Result<Self, DomainError>",
+          "is_async": false
+        },
+        {
+          "name": "next_open_task",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&TrackTask>",
+          "is_async": false
+        },
+        {
+          "name": "next_task_id",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<TaskId, ValidationError>",
+          "is_async": false
+        },
+        {
+          "name": "plan",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&PlanView",
+          "is_async": false
+        },
+        {
+          "name": "set_branch",
+          "receiver": "&mut self",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "Option<TrackBranch>"
+            }
+          ],
+          "returns": "()",
+          "is_async": false
+        },
+        {
+          "name": "set_status_override",
+          "receiver": "&mut self",
+          "params": [
+            {
+              "name": "status_override",
+              "ty": "Option<StatusOverride>"
+            }
+          ],
+          "returns": "Result<(), DomainError>",
+          "is_async": false
+        },
+        {
+          "name": "status",
+          "receiver": "&self",
+          "params": [],
+          "returns": "TrackStatus",
+          "is_async": false
+        },
+        {
+          "name": "status_override",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&StatusOverride>",
+          "is_async": false
+        },
+        {
+          "name": "tasks",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[TrackTask]",
+          "is_async": false
+        },
+        {
+          "name": "title",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "transition_task",
+          "receiver": "&mut self",
+          "params": [
+            {
+              "name": "task_id",
+              "ty": "&TaskId"
+            },
+            {
+              "name": "transition",
+              "ty": "TaskTransition"
+            }
+          ],
+          "returns": "Result<(), DomainError>",
+          "is_async": false
+        },
+        {
+          "name": "validate_descriptions_unchanged",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "previous",
+              "ty": "&TrackMetadata"
+            }
+          ],
+          "returns": "Result<(), ValidationError>",
+          "is_async": false
+        },
+        {
+          "name": "validate_no_tasks_removed",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "previous",
+              "ty": "&TrackMetadata"
+            }
+          ],
+          "returns": "Result<(), ValidationError>",
+          "is_async": false
+        },
+        {
+          "name": "with_branch",
+          "params": [
+            {
+              "name": "id",
+              "ty": "TrackId"
+            },
+            {
+              "name": "branch",
+              "ty": "Option<TrackBranch>"
+            },
+            {
+              "name": "title",
+              "ty": "impl Into"
+            },
+            {
+              "name": "tasks",
+              "ty": "Vec<TrackTask>"
+            },
+            {
+              "name": "plan",
+              "ty": "PlanView"
+            },
+            {
+              "name": "status_override",
+              "ty": "Option<StatusOverride>"
+            }
+          ],
+          "returns": "Result<Self, DomainError>",
+          "is_async": false
+        }
+      ]
+    },
+    "TrackPhase": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Archived"
+        },
+        {
+          "kind": "variant",
+          "name": "Blocked"
+        },
+        {
+          "kind": "variant",
+          "name": "Cancelled"
+        },
+        {
+          "kind": "variant",
+          "name": "InProgress"
+        },
+        {
+          "kind": "variant",
+          "name": "Planning"
+        },
+        {
+          "kind": "variant",
+          "name": "ReadyToActivate"
+        },
+        {
+          "kind": "variant",
+          "name": "ReadyToShip"
+        }
+      ],
+      "methods": []
+    },
+    "TrackPhaseInfo": {
+      "kind": "struct",
+      "members": [
+        {
+          "kind": "field",
+          "name": "blocker",
+          "ty": "Option<String>"
+        },
+        {
+          "kind": "field",
+          "name": "next_command",
+          "ty": "NextCommand"
+        },
+        {
+          "kind": "field",
+          "name": "phase",
+          "ty": "TrackPhase"
+        },
+        {
+          "kind": "field",
+          "name": "reason",
+          "ty": "String"
+        }
+      ],
+      "methods": []
+    },
+    "TrackReadError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Repository"
+        }
+      ],
+      "methods": []
+    },
+    "TrackStatus": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Archived"
+        },
+        {
+          "kind": "variant",
+          "name": "Blocked"
+        },
+        {
+          "kind": "variant",
+          "name": "Cancelled"
+        },
+        {
+          "kind": "variant",
+          "name": "Done"
+        },
+        {
+          "kind": "variant",
+          "name": "InProgress"
+        },
+        {
+          "kind": "variant",
+          "name": "Planned"
+        }
+      ],
+      "methods": []
+    },
+    "TrackTask": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "description",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "id",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TaskId",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "id",
+              "ty": "TaskId"
+            },
+            {
+              "name": "description",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>",
+          "is_async": false
+        },
+        {
+          "name": "status",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TaskStatus",
+          "is_async": false
+        },
+        {
+          "name": "transition",
+          "receiver": "&mut self",
+          "params": [
+            {
+              "name": "transition",
+              "ty": "TaskTransition"
+            }
+          ],
+          "returns": "Result<(), TransitionError>",
+          "is_async": false
+        },
+        {
+          "name": "with_status",
+          "params": [
+            {
+              "name": "id",
+              "ty": "TaskId"
+            },
+            {
+              "name": "description",
+              "ty": "impl Into"
+            },
+            {
+              "name": "status",
+              "ty": "TaskStatus"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>",
+          "is_async": false
+        }
+      ]
+    },
+    "TrackWriteError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Domain"
+        },
+        {
+          "kind": "variant",
+          "name": "Repository"
+        }
+      ],
+      "methods": []
+    },
+    "TraitBaselineEntry": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "methods",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[MethodDeclaration]",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "methods",
+              "ty": "Vec<MethodDeclaration>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "structurally_equal",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "other",
+              "ty": "&Self"
+            }
+          ],
+          "returns": "bool",
+          "is_async": false
+        }
+      ]
+    },
+    "TraitImplDecl": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "expected_methods",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[MethodDeclaration]",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "trait_name",
+              "ty": "impl Into"
+            },
+            {
+              "name": "expected_methods",
+              "ty": "Vec<MethodDeclaration>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "trait_name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        }
+      ]
+    },
+    "TraitImplEntry": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "methods",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[MethodDeclaration]",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "trait_name",
+              "ty": "impl Into"
+            },
+            {
+              "name": "methods",
+              "ty": "Vec<MethodDeclaration>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "trait_name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        }
+      ]
+    },
+    "TraitInfo": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "docs",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "methods",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[FunctionInfo]",
+          "is_async": false
+        },
+        {
+          "name": "name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "name",
+              "ty": "String"
+            },
+            {
+              "name": "docs",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "methods",
+              "ty": "Vec<FunctionInfo>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "TraitNode": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "methods",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[MethodDeclaration]",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "methods",
+              "ty": "Vec<MethodDeclaration>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "TransitionError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "InvalidTaskTransition"
+        },
+        {
+          "kind": "variant",
+          "name": "TaskNotFound"
+        }
+      ],
+      "methods": []
+    },
+    "TypeAction": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Add"
+        },
+        {
+          "kind": "variant",
+          "name": "Delete"
+        },
+        {
+          "kind": "variant",
+          "name": "Modify"
+        },
+        {
+          "kind": "variant",
+          "name": "Reference"
+        }
+      ],
+      "methods": [
+        {
+          "name": "action_tag",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "is_default",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        }
+      ]
+    },
+    "TypeBaseline": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "captured_at",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&Timestamp",
+          "is_async": false
+        },
+        {
+          "name": "get_trait",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "name",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Option<&TraitBaselineEntry>",
+          "is_async": false
+        },
+        {
+          "name": "get_type",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "name",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Option<&TypeBaselineEntry>",
+          "is_async": false
+        },
+        {
+          "name": "has_trait",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "name",
+              "ty": "&str"
+            }
+          ],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "has_type",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "name",
+              "ty": "&str"
+            }
+          ],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "schema_version",
+              "ty": "u32"
+            },
+            {
+              "name": "captured_at",
+              "ty": "Timestamp"
+            },
+            {
+              "name": "types",
+              "ty": "HashMap<String, TypeBaselineEntry>"
+            },
+            {
+              "name": "traits",
+              "ty": "HashMap<String, TraitBaselineEntry>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "schema_version",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false
+        },
+        {
+          "name": "traits",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&HashMap<String, TraitBaselineEntry>",
+          "is_async": false
+        },
+        {
+          "name": "types",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&HashMap<String, TypeBaselineEntry>",
+          "is_async": false
+        }
+      ]
+    },
+    "TypeBaselineEntry": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "kind",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TypeKind",
+          "is_async": false
+        },
+        {
+          "name": "members",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[MemberDeclaration]",
+          "is_async": false
+        },
+        {
+          "name": "methods",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[MethodDeclaration]",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "kind",
+              "ty": "TypeKind"
+            },
+            {
+              "name": "members",
+              "ty": "Vec<MemberDeclaration>"
+            },
+            {
+              "name": "methods",
+              "ty": "Vec<MethodDeclaration>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "structurally_equal",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "other",
+              "ty": "&Self"
+            }
+          ],
+          "returns": "bool",
+          "is_async": false
+        }
+      ]
+    },
+    "TypeCatalogueDocument": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "entries",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[TypeCatalogueEntry]",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "schema_version",
+              "ty": "u32"
+            },
+            {
+              "name": "entries",
+              "ty": "Vec<TypeCatalogueEntry>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "schema_version",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false
+        },
+        {
+          "name": "set_signals",
+          "receiver": "&mut self",
+          "params": [
+            {
+              "name": "signals",
+              "ty": "Vec<TypeSignal>"
+            }
+          ],
+          "returns": "()",
+          "is_async": false
+        },
+        {
+          "name": "signals",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&[TypeSignal]>",
+          "is_async": false
+        },
+        {
+          "name": "typestate_names",
+          "receiver": "&self",
+          "params": [],
+          "returns": "HashSet<String>",
+          "is_async": false
+        }
+      ]
+    },
+    "TypeCatalogueEntry": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "action",
+          "receiver": "&self",
+          "params": [],
+          "returns": "TypeAction",
+          "is_async": false
+        },
+        {
+          "name": "approved",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "description",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "kind",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TypeDefinitionKind",
+          "is_async": false
+        },
+        {
+          "name": "name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "name",
+              "ty": "impl Into"
+            },
+            {
+              "name": "description",
+              "ty": "impl Into"
+            },
+            {
+              "name": "kind",
+              "ty": "TypeDefinitionKind"
+            },
+            {
+              "name": "action",
+              "ty": "TypeAction"
+            },
+            {
+              "name": "approved",
+              "ty": "bool"
+            }
+          ],
+          "returns": "Result<Self, SpecValidationError>",
+          "is_async": false
+        }
+      ]
+    },
+    "TypeDefinitionKind": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "ApplicationService"
+        },
+        {
+          "kind": "variant",
+          "name": "Command"
+        },
+        {
+          "kind": "variant",
+          "name": "Dto"
+        },
+        {
+          "kind": "variant",
+          "name": "Enum"
+        },
+        {
+          "kind": "variant",
+          "name": "ErrorType"
+        },
+        {
+          "kind": "variant",
+          "name": "Factory"
+        },
+        {
+          "kind": "variant",
+          "name": "Interactor"
+        },
+        {
+          "kind": "variant",
+          "name": "Query"
+        },
+        {
+          "kind": "variant",
+          "name": "SecondaryAdapter"
+        },
+        {
+          "kind": "variant",
+          "name": "SecondaryPort"
+        },
+        {
+          "kind": "variant",
+          "name": "Typestate"
+        },
+        {
+          "kind": "variant",
+          "name": "UseCase"
+        },
+        {
+          "kind": "variant",
+          "name": "ValueObject"
+        }
+      ],
+      "methods": [
+        {
+          "name": "kind_tag",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        }
+      ]
+    },
+    "TypeGraph": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "get_impl",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "type_name",
+              "ty": "&str"
+            },
+            {
+              "name": "trait_name",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Option<&TraitImplEntry>",
+          "is_async": false
+        },
+        {
+          "name": "get_trait",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "name",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Option<&TraitNode>",
+          "is_async": false
+        },
+        {
+          "name": "get_type",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "name",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Option<&TypeNode>",
+          "is_async": false
+        },
+        {
+          "name": "has_type",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "name",
+              "ty": "&str"
+            }
+          ],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "types",
+              "ty": "HashMap<String, TypeNode>"
+            },
+            {
+              "name": "traits",
+              "ty": "HashMap<String, TraitNode>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "trait_names",
+          "receiver": "&self",
+          "params": [],
+          "returns": "impl Iterator",
+          "is_async": false
+        },
+        {
+          "name": "type_names",
+          "receiver": "&self",
+          "params": [],
+          "returns": "impl Iterator",
+          "is_async": false
+        }
+      ]
+    },
+    "TypeInfo": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "docs",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "kind",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TypeKind",
+          "is_async": false
+        },
+        {
+          "name": "members",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[MemberDeclaration]",
+          "is_async": false
+        },
+        {
+          "name": "module_path",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "name",
+              "ty": "String"
+            },
+            {
+              "name": "kind",
+              "ty": "TypeKind"
+            },
+            {
+              "name": "docs",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "members",
+              "ty": "Vec<MemberDeclaration>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "with_module_path",
+          "params": [
+            {
+              "name": "name",
+              "ty": "String"
+            },
+            {
+              "name": "kind",
+              "ty": "TypeKind"
+            },
+            {
+              "name": "docs",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "members",
+              "ty": "Vec<MemberDeclaration>"
+            },
+            {
+              "name": "module_path",
+              "ty": "String"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "TypeKind": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Enum"
+        },
+        {
+          "kind": "variant",
+          "name": "Struct"
+        },
+        {
+          "kind": "variant",
+          "name": "TypeAlias"
+        }
+      ],
+      "methods": []
+    },
+    "TypeNode": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "kind",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TypeKind",
+          "is_async": false
+        },
+        {
+          "name": "members",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[MemberDeclaration]",
+          "is_async": false
+        },
+        {
+          "name": "methods",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[MethodDeclaration]",
+          "is_async": false
+        },
+        {
+          "name": "module_path",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "kind",
+              "ty": "TypeKind"
+            },
+            {
+              "name": "members",
+              "ty": "Vec<MemberDeclaration>"
+            },
+            {
+              "name": "methods",
+              "ty": "Vec<MethodDeclaration>"
+            },
+            {
+              "name": "outgoing",
+              "ty": "HashSet<String>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "outgoing",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&HashSet<String>",
+          "is_async": false
+        },
+        {
+          "name": "set_module_path",
+          "receiver": "&mut self",
+          "params": [
+            {
+              "name": "path",
+              "ty": "String"
+            }
+          ],
+          "returns": "()",
+          "is_async": false
+        },
+        {
+          "name": "set_trait_impls",
+          "receiver": "&mut self",
+          "params": [
+            {
+              "name": "impls",
+              "ty": "Vec<TraitImplEntry>"
+            }
+          ],
+          "returns": "()",
+          "is_async": false
+        },
+        {
+          "name": "trait_impls",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[TraitImplEntry]",
+          "is_async": false
+        }
+      ]
+    },
+    "TypeSignal": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "extra_items",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        },
+        {
+          "name": "found_items",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        },
+        {
+          "name": "found_type",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "kind_tag",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "missing_items",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[String]",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "type_name",
+              "ty": "impl Into"
+            },
+            {
+              "name": "kind_tag",
+              "ty": "impl Into"
+            },
+            {
+              "name": "signal",
+              "ty": "ConfidenceSignal"
+            },
+            {
+              "name": "found_type",
+              "ty": "bool"
+            },
+            {
+              "name": "found_items",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "missing_items",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "extra_items",
+              "ty": "Vec<String>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "signal",
+          "receiver": "&self",
+          "params": [],
+          "returns": "ConfidenceSignal",
+          "is_async": false
+        },
+        {
+          "name": "type_name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        }
+      ]
+    },
+    "TypestateTransitions": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "Terminal"
+        },
+        {
+          "kind": "variant",
+          "name": "To"
+        }
+      ],
+      "methods": []
+    },
+    "ValidationError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "DuplicatePlanSectionId"
+        },
+        {
+          "kind": "variant",
+          "name": "DuplicateTaskId"
+        },
+        {
+          "kind": "variant",
+          "name": "DuplicateTaskReference"
+        },
+        {
+          "kind": "variant",
+          "name": "EmptyPlanSectionId"
+        },
+        {
+          "kind": "variant",
+          "name": "EmptyPlanSectionTitle"
+        },
+        {
+          "kind": "variant",
+          "name": "EmptyString"
+        },
+        {
+          "kind": "variant",
+          "name": "EmptyTaskDescription"
+        },
+        {
+          "kind": "variant",
+          "name": "EmptyTrackTitle"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidCommitHash"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidTaskId"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidTimestamp"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidTrackBranch"
+        },
+        {
+          "kind": "variant",
+          "name": "InvalidTrackId"
+        },
+        {
+          "kind": "variant",
+          "name": "NoSectionsAvailable"
+        },
+        {
+          "kind": "variant",
+          "name": "OverrideIncompatibleWithResolvedTasks"
+        },
+        {
+          "kind": "variant",
+          "name": "SectionNotFound"
+        },
+        {
+          "kind": "variant",
+          "name": "TaskDescriptionMutated"
+        },
+        {
+          "kind": "variant",
+          "name": "TaskRemoved"
+        },
+        {
+          "kind": "variant",
+          "name": "TrackActivationRequiresPlanningOnly"
+        },
+        {
+          "kind": "variant",
+          "name": "TrackActivationRequiresSchemaV3"
+        },
+        {
+          "kind": "variant",
+          "name": "TrackAlreadyMaterialized"
+        },
+        {
+          "kind": "variant",
+          "name": "UnknownTaskReference"
+        },
+        {
+          "kind": "variant",
+          "name": "UnreferencedTask"
+        },
+        {
+          "kind": "variant",
+          "name": "UnsupportedTargetStatus"
+        }
+      ],
+      "methods": []
+    },
+    "Verdict": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "FindingsRemain"
+        },
+        {
+          "kind": "variant",
+          "name": "ZeroFindings"
+        }
+      ],
+      "methods": [
+        {
+          "name": "findings_remain",
+          "params": [
+            {
+              "name": "findings",
+              "ty": "Vec<ReviewerFinding>"
+            }
+          ],
+          "returns": "Result<Self, VerdictError>",
+          "is_async": false
+        }
+      ]
+    },
+    "VerdictError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "EmptyFindings"
+        }
+      ],
+      "methods": []
+    },
+    "VerifyFinding": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "error",
+          "params": [
+            {
+              "name": "message",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "message",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false
+        },
+        {
+          "name": "new",
+          "params": [
+            {
+              "name": "severity",
+              "ty": "Severity"
+            },
+            {
+              "name": "message",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "severity",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Severity",
+          "is_async": false
+        },
+        {
+          "name": "warning",
+          "params": [
+            {
+              "name": "message",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "VerifyOutcome": {
+      "kind": "struct",
+      "members": [],
+      "methods": [
+        {
+          "name": "add",
+          "receiver": "&mut self",
+          "params": [
+            {
+              "name": "finding",
+              "ty": "VerifyFinding"
+            }
+          ],
+          "returns": "()",
+          "is_async": false
+        },
+        {
+          "name": "error_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false
+        },
+        {
+          "name": "findings",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[VerifyFinding]",
+          "is_async": false
+        },
+        {
+          "name": "from_findings",
+          "params": [
+            {
+              "name": "findings",
+              "ty": "Vec<VerifyFinding>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false
+        },
+        {
+          "name": "has_errors",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "is_ok",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false
+        },
+        {
+          "name": "merge",
+          "receiver": "&mut self",
+          "params": [
+            {
+              "name": "other",
+              "ty": "Self"
+            }
+          ],
+          "returns": "()",
+          "is_async": false
+        },
+        {
+          "name": "pass",
+          "params": [],
+          "returns": "Self",
+          "is_async": false
+        }
+      ]
+    },
+    "WorktreeError": {
+      "kind": "enum",
+      "members": [
+        {
+          "kind": "variant",
+          "name": "StatusFailed"
+        }
+      ],
+      "methods": []
+    }
+  },
+  "traits": {
+    "CommitHashReader": {
+      "methods": [
+        {
+          "name": "read",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<Option<CommitHash>, CommitHashError>",
+          "is_async": false
+        }
+      ]
+    },
+    "CommitHashWriter": {
+      "methods": [
+        {
+          "name": "clear",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<(), CommitHashError>",
+          "is_async": false
+        },
+        {
+          "name": "write",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "hash",
+              "ty": "&CommitHash"
+            }
+          ],
+          "returns": "Result<(), CommitHashError>",
+          "is_async": false
+        }
+      ]
+    },
+    "ReviewReader": {
+      "methods": [
+        {
+          "name": "read_latest_finals",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<HashMap<ScopeName, (Verdict, ReviewHash)>, ReviewReaderError>",
+          "is_async": false
+        }
+      ]
+    },
+    "ReviewWriter": {
+      "methods": [
+        {
+          "name": "init",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<(), ReviewWriterError>",
+          "is_async": false
+        },
+        {
+          "name": "reset",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<(), ReviewWriterError>",
+          "is_async": false
+        },
+        {
+          "name": "write_fast_verdict",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "&ScopeName"
+            },
+            {
+              "name": "verdict",
+              "ty": "&FastVerdict"
+            },
+            {
+              "name": "hash",
+              "ty": "&ReviewHash"
+            }
+          ],
+          "returns": "Result<(), ReviewWriterError>",
+          "is_async": false
+        },
+        {
+          "name": "write_verdict",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "&ScopeName"
+            },
+            {
+              "name": "verdict",
+              "ty": "&Verdict"
+            },
+            {
+              "name": "hash",
+              "ty": "&ReviewHash"
+            }
+          ],
+          "returns": "Result<(), ReviewWriterError>",
+          "is_async": false
+        }
+      ]
+    },
+    "SchemaExporter": {
+      "methods": [
+        {
+          "name": "export",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<SchemaExport, SchemaExportError>",
+          "is_async": false
+        }
+      ]
+    },
+    "ShellParser": {
+      "methods": [
+        {
+          "name": "split_shell",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "input",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<Vec<SimpleCommand>, ParseError>",
+          "is_async": false
+        }
+      ]
+    },
+    "TrackReader": {
+      "methods": [
+        {
+          "name": "find",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "id",
+              "ty": "&TrackId"
+            }
+          ],
+          "returns": "Result<Option<TrackMetadata>, TrackReadError>",
+          "is_async": false
+        }
+      ]
+    },
+    "TrackWriter": {
+      "methods": [
+        {
+          "name": "save",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "track",
+              "ty": "&TrackMetadata"
+            }
+          ],
+          "returns": "Result<(), TrackWriteError>",
+          "is_async": false
+        },
+        {
+          "name": "update",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "mutate",
+              "ty": "F"
+            }
+          ],
+          "returns": "Result<TrackMetadata, TrackWriteError>",
+          "is_async": false
+        }
+      ]
+    },
+    "WorktreeReader": {
+      "methods": [
+        {
+          "name": "porcelain_status",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<String, WorktreeError>",
+          "is_async": false
+        }
+      ]
+    }
+  }
+}
