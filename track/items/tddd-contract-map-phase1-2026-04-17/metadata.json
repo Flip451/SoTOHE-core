@@ -128,6 +128,7 @@
   "status": "in_progress",
   "tasks": [
     {
+      "commit_hash": "9a69df07bd5d98adb3c8d9de935e9527010e9758",
       "description": "ADR 整合性訂正: ADR 2026-04-17-1528 の D3 shape mapping 表に SecondaryAdapter (13 番目) を追加し、12 variants 表記を 13 に訂正する。ADR 2026-04-16-2200 に §D10 \"Reality View as drill-down to Contract Map\" を新設して Reality View を Contract Map の drill-down と位置付け直す (Open Q6 対応。D7 は既存の「段階的実装」節が使用済みのため D10 を使用)。Docs のみ、production code 変更なし。",
       "id": "T001",
       "status": "done"
@@ -164,5 +165,5 @@
     }
   ],
   "title": "TDDD Contract Map Phase 1 (MVP) — 全層カタログ入力統合 mermaid view",
-  "updated_at": "2026-04-17T12:48:31Z"
+  "updated_at": "2026-04-17T12:53:53Z"
 }

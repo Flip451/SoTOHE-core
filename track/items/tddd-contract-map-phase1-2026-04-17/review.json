@@ -1,6 +1,98 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This file still says the default Claude Code subagent model is `claude-sonnet-4-6`; the 4-7 upgrade called for in the briefing was not applied here, so fallback subagents will keep using the old Sonnet model.",
+              "severity": "P1",
+              "file": ".claude/rules/11-subagent-model.md",
+              "line": 3,
+              "category": "factual error"
+            },
+            {
+              "message": "The action-rules section points readers to `.claude/skills/track-design/SKILL.md`, but that skill file does not exist in the repo, so this cross-reference is broken.",
+              "severity": "P1",
+              "file": ".claude/agents/designer.md",
+              "line": 99,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:2f2abda88f28de410f1ff113576a4c95d6d499a811e4249f8a64a2aad481d579",
+          "at": "2026-04-17T12:08:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Broken reference: `.claude/skills/track-design/SKILL.md` does not exist in this repo, so this link cannot be followed.",
+              "severity": "P1",
+              "file": ".claude/agents/designer.md",
+              "line": 99,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:2f2abda88f28de410f1ff113576a4c95d6d499a811e4249f8a64a2aad481d579",
+          "at": "2026-04-17T12:13:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This sentence refers to a `reviewer-loop` capability in `.harness/config/agent-profiles.json`, but the JSON only defines `reviewer`; `reviewer-loop` is not a real capability name, so the reference is broken.",
+              "severity": "P1",
+              "file": ".claude/rules/11-subagent-model.md",
+              "line": 12,
+              "category": "broken reference"
+            },
+            {
+              "message": "The Codex-heavy planner wrapper is documented as `cargo make track-local-plan --model {model} --briefing-file ...`, but the task invocation used elsewhere in this repo requires the `--` separator before task args (`cargo make track-local-plan -- --model ...`). As written, this command will be parsed incorrectly.",
+              "severity": "P1",
+              "file": ".claude/rules/11-subagent-model.md",
+              "line": 13,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:af21b7b6275745b05684bcf60aa9971e10d4514521312e79e37f1fa3be3a3004",
+          "at": "2026-04-17T12:17:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a5abffddf25c1a47c6975d5d23be147e97055078d795f6152d82fcc18fc2c47",
+          "at": "2026-04-17T12:20:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a5abffddf25c1a47c6975d5d23be147e97055078d795f6152d82fcc18fc2c47",
+          "at": "2026-04-17T12:22:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This ordering conflicts with the formal task-completion flow in `knowledge/conventions/task-completion-flow.md`: that flow does `implement -> review -> commit` first, then transitions tasks to `done` and backfills `commit_hash` afterward. Here the new guidance says the `done` transition must happen before `/track:review`, so the docs disagree on when task state is updated relative to review.",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 34,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c68502f3ad72de9c45870d7ef39c07fb1c79bd30e5665d29a67d8e4993088e57",
+          "at": "2026-04-17T13:02:40Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -515,83 +607,20 @@
           "findings": [],
           "hash": "rvw1:sha256:47a49465192a500e208b4e20d629319f08edccc150483630862f51c29c542f04",
           "at": "2026-04-17T12:53:06Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This file still says the default Claude Code subagent model is `claude-sonnet-4-6`; the 4-7 upgrade called for in the briefing was not applied here, so fallback subagents will keep using the old Sonnet model.",
-              "severity": "P1",
-              "file": ".claude/rules/11-subagent-model.md",
-              "line": 3,
-              "category": "factual error"
-            },
-            {
-              "message": "The action-rules section points readers to `.claude/skills/track-design/SKILL.md`, but that skill file does not exist in the repo, so this cross-reference is broken.",
-              "severity": "P1",
-              "file": ".claude/agents/designer.md",
-              "line": 99,
-              "category": "broken reference"
-            }
-          ],
-          "hash": "rvw1:sha256:2f2abda88f28de410f1ff113576a4c95d6d499a811e4249f8a64a2aad481d579",
-          "at": "2026-04-17T12:08:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Broken reference: `.claude/skills/track-design/SKILL.md` does not exist in this repo, so this link cannot be followed.",
-              "severity": "P1",
-              "file": ".claude/agents/designer.md",
-              "line": 99,
-              "category": "broken reference"
-            }
-          ],
-          "hash": "rvw1:sha256:2f2abda88f28de410f1ff113576a4c95d6d499a811e4249f8a64a2aad481d579",
-          "at": "2026-04-17T12:13:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This sentence refers to a `reviewer-loop` capability in `.harness/config/agent-profiles.json`, but the JSON only defines `reviewer`; `reviewer-loop` is not a real capability name, so the reference is broken.",
-              "severity": "P1",
-              "file": ".claude/rules/11-subagent-model.md",
-              "line": 12,
-              "category": "broken reference"
-            },
-            {
-              "message": "The Codex-heavy planner wrapper is documented as `cargo make track-local-plan --model {model} --briefing-file ...`, but the task invocation used elsewhere in this repo requires the `--` separator before task args (`cargo make track-local-plan -- --model ...`). As written, this command will be parsed incorrectly.",
-              "severity": "P1",
-              "file": ".claude/rules/11-subagent-model.md",
-              "line": 13,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:af21b7b6275745b05684bcf60aa9971e10d4514521312e79e37f1fa3be3a3004",
-          "at": "2026-04-17T12:17:17Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8a5abffddf25c1a47c6975d5d23be147e97055078d795f6152d82fcc18fc2c47",
-          "at": "2026-04-17T12:20:10Z"
+          "hash": "rvw1:sha256:4c575886b9dfbdf0ac60fe56d2a443c0bef92221e2fc759a8e848c2efc961a5b",
+          "at": "2026-04-17T13:01:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8a5abffddf25c1a47c6975d5d23be147e97055078d795f6152d82fcc18fc2c47",
-          "at": "2026-04-17T12:22:00Z"
+          "hash": "rvw1:sha256:4c575886b9dfbdf0ac60fe56d2a443c0bef92221e2fc759a8e848c2efc961a5b",
+          "at": "2026-04-17T13:01:49Z"
         }
       ]
     }
