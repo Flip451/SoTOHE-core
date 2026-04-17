@@ -1,6 +1,258 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cd827433e7fdf87d7051e65f6402aa8940ce8d4c9f476d896ebf1fb7f1c5e68",
+          "at": "2026-04-17T01:24:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cd827433e7fdf87d7051e65f6402aa8940ce8d4c9f476d896ebf1fb7f1c5e68",
+          "at": "2026-04-17T01:25:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdca9de43ab09d9c40c1c191b4582ed30269c8fa5fcb941f79a08ee41dbe9973",
+          "at": "2026-04-17T01:33:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_read_type_catalogue_found` only exercises the legacy default filename (`domain-types.json`). The behavior added in this round is returning the resolved filename from `architecture-rules.json`; if `read_type_catalogue` regressed to always returning `<layer_id>-types.json` after successfully reading an override file, this test would still pass. Add a case with a non-default `tddd.catalogue_file` (and ideally a rules-file parse/fetch failure case) so the new adapter contract is actually covered.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 362,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:bdca9de43ab09d9c40c1c191b4582ed30269c8fa5fcb941f79a08ee41dbe9973",
+          "at": "2026-04-17T01:35:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated `test_read_type_catalogue_found` still exercises only the default `domain-types.json` path. This round’s behavioral change is specifically about honoring `tddd.catalogue_file` overrides and returning the resolved filename in `Found((doc, filename))`, so an implementation that always returned `{layer_id}-types.json` would still pass. Add a fixture with `architecture-rules.json` pointing at a non-default catalogue filename and assert that `read_type_catalogue()` returns that override.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 362,
+              "category": "tests"
+            },
+            {
+              "message": "All `verify_from_spec_json` fixtures still hard-code `catalogue_file: \"domain-types.json\"`. Because `evaluate_layer_catalogue()` now forwards `binding.catalogue_file()` into `check_type_signals`, the CI path has no regression test for a non-default override; a bug that fell back to the default filename in diagnostics would still pass here. Add a Stage 2 fixture that uses a non-default catalogue file (for example `usecase-types.json`) and assert the finding mentions that configured filename.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 612,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:bdca9de43ab09d9c40c1c191b4582ed30269c8fa5fcb941f79a08ee41dbe9973",
+          "at": "2026-04-17T01:38:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93ac59868a4b73820f49fdc3ecef0e661c9a47785bbd95d76e4d562a52db4147",
+          "at": "2026-04-17T01:43:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93ac59868a4b73820f49fdc3ecef0e661c9a47785bbd95d76e4d562a52db4147",
+          "at": "2026-04-17T01:44:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e3456e383c78e7e3e5ae839696444d608dbcef10bc168b54bc64d60121faf06",
+          "at": "2026-04-17T01:50:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e3456e383c78e7e3e5ae839696444d608dbcef10bc168b54bc64d60121faf06",
+          "at": "2026-04-17T01:50:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b600566278d6f197b3cd8e252031da625b46130b8d64ed42fc9824d2849ab354",
+          "at": "2026-04-17T02:01:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`classify_types` violates the documented `depth == 0` semantics when an input edge references a type that is absent from `graph`: the missing endpoint is mapped to `UNRESOLVED_CLUSTER`, so the function records a cross-edge between `\"\"` and `\"unresolved\"` instead of returning an always-empty `cross_edges` list for the single flat cluster. Any caller passing a dangling edge will therefore get a spurious clustered result at depth 0.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_graph_cluster.rs",
+              "line": 130,
+              "category": "logic error"
+            }
+          ],
+          "hash": "rvw1:sha256:b600566278d6f197b3cd8e252031da625b46130b8d64ed42fc9824d2849ab354",
+          "at": "2026-04-17T02:08:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`depth == 0` is documented as a single flat cluster with `cross_edges` always empty, but this loop still maps graph-missing endpoints to `UNRESOLVED_CLUSTER`. An edge like `(Missing, ..., Known, ...)` therefore produces a cross-cluster edge from `\"unresolved\"` to `\"\"` instead of being suppressed, violating the depth-0 semantics in the briefing.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_graph_cluster.rs",
+              "line": 130,
+              "category": "logic_error"
+            }
+          ],
+          "hash": "rvw1:sha256:b600566278d6f197b3cd8e252031da625b46130b8d64ed42fc9824d2849ab354",
+          "at": "2026-04-17T02:12:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`classify_types` does not uphold its own depth-0 invariant for an empty `TypeGraph`: when there are no types, `assignments` stays empty and the function returns `{}` instead of the documented single empty-string cluster. Any caller that relies on `depth == 0` always yielding one flat cluster will see a different shape for empty layers.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_cluster.rs",
+              "line": 110,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:1fe1e1ed47fe4bed9bba4ef070ec8b947d4bb56445ae3a2f3c3f041617868beb",
+          "at": "2026-04-17T02:18:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ClusterKey` is declared `pub(crate)` but is still used in public fields (`ClusterPlan::assignments`, `CrossEdge::source_cluster`, `CrossEdge::target_cluster`). That triggers Rust's `private_interfaces` lint, and this workspace denies warnings, so the new module will not compile as written. Use plain `String` in the public fields or make the alias public.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_graph_cluster.rs",
+              "line": 43,
+              "category": "compile"
+            }
+          ],
+          "hash": "rvw1:sha256:3277c01a55688c2d425ceb19c8d15bbb53b7255133d565c5595ea8ebea8f593a",
+          "at": "2026-04-17T02:21:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`classify_types` documents that edges whose endpoints are absent from `graph` should map to `UNRESOLVED_CLUSTER`, but the added tests only cover missing endpoints under `depth == 0`, where the early return skips this cross-edge path entirely. That leaves the documented `depth >= 1` behavior unverified, so a regression here would violate the public API contract without any test failing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_graph_cluster.rs",
+              "line": 140,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:3277c01a55688c2d425ceb19c8d15bbb53b7255133d565c5595ea8ebea8f593a",
+          "at": "2026-04-17T02:25:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f97655ad94cfab4d706b9aab6eaca25d7ae96e9e829776951dd8334e63969c42",
+          "at": "2026-04-17T02:28:15Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:24:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalogue_file` is rebuilt here as the default `<layer_id>-types.json`, but `TrackBlobReader::read_type_catalogue` can resolve an explicit `tddd.catalogue_file` override from `architecture-rules.json`. For a layer configured with a non-default file name, the merge gate will read the correct file yet report any Red/Yellow findings against a different, nonexistent filename, unlike the CI path which passes the resolved `binding.catalogue_file()`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:25:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `catalogue_file` is rebuilt as `format!(\"{layer_id}-types.json\")`, but `read_type_catalogue()` can read an explicit `tddd.catalogue_file` override from `architecture-rules.json`. When a layer uses a non-default catalogue filename, Stage 2 findings will point at the wrong file name, which breaks the new contract that `check_type_signals` diagnostics name the actual catalogue being validated.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
+          "at": "2026-04-17T01:26:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
+          "at": "2026-04-17T01:33:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
+          "at": "2026-04-17T01:34:50Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
+          "at": "2026-04-17T01:24:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
+          "at": "2026-04-17T01:25:14Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -358,169 +610,49 @@
           "findings": [],
           "hash": "rvw1:sha256:c646b199e6e6324e9ae2023a9da244678320b3047b75192a7fc7e254363f3ee5",
           "at": "2026-04-17T01:52:37Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0cd827433e7fdf87d7051e65f6402aa8940ce8d4c9f476d896ebf1fb7f1c5e68",
-          "at": "2026-04-17T01:24:54Z"
+          "hash": "rvw1:sha256:fe3c88cab171e9c84b2ab19844fe2cbe8cab64dd30fd85af2ac9831ff7dc6989",
+          "at": "2026-04-17T01:59:29Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0cd827433e7fdf87d7051e65f6402aa8940ce8d4c9f476d896ebf1fb7f1c5e68",
-          "at": "2026-04-17T01:25:45Z"
+          "hash": "rvw1:sha256:fe3c88cab171e9c84b2ab19844fe2cbe8cab64dd30fd85af2ac9831ff7dc6989",
+          "at": "2026-04-17T02:00:46Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bdca9de43ab09d9c40c1c191b4582ed30269c8fa5fcb941f79a08ee41dbe9973",
-          "at": "2026-04-17T01:33:38Z"
+          "hash": "rvw1:sha256:6d4263a7f380574f7c8e62455c9bbd966e8f7ea00433b3f8d7e71f1fc4adf399",
+          "at": "2026-04-17T02:29:46Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`test_read_type_catalogue_found` only exercises the legacy default filename (`domain-types.json`). The behavior added in this round is returning the resolved filename from `architecture-rules.json`; if `read_type_catalogue` regressed to always returning `<layer_id>-types.json` after successfully reading an override file, this test would still pass. Add a case with a non-default `tddd.catalogue_file` (and ideally a rules-file parse/fetch failure case) so the new adapter contract is actually covered.",
+              "message": "`metadata.json` marks `T003` as `done`, which is outside the expected auto-generated `other`-scope changes described in the briefing. That status also propagates into `plan.md` as a checked-off task, so downstream tooling can now treat T003 as completed even though the implementation is still only staged and there is no recorded `commit_hash` for T003 yet.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
-              "line": 362,
-              "category": "tests"
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "line": 122,
+              "category": "metadata"
             }
           ],
-          "hash": "rvw1:sha256:bdca9de43ab09d9c40c1c191b4582ed30269c8fa5fcb941f79a08ee41dbe9973",
-          "at": "2026-04-17T01:35:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The updated `test_read_type_catalogue_found` still exercises only the default `domain-types.json` path. This round’s behavioral change is specifically about honoring `tddd.catalogue_file` overrides and returning the resolved filename in `Found((doc, filename))`, so an implementation that always returned `{layer_id}-types.json` would still pass. Add a fixture with `architecture-rules.json` pointing at a non-default catalogue filename and assert that `read_type_catalogue()` returns that override.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
-              "line": 362,
-              "category": "tests"
-            },
-            {
-              "message": "All `verify_from_spec_json` fixtures still hard-code `catalogue_file: \"domain-types.json\"`. Because `evaluate_layer_catalogue()` now forwards `binding.catalogue_file()` into `check_type_signals`, the CI path has no regression test for a non-default override; a bug that fell back to the default filename in diagnostics would still pass here. Add a Stage 2 fixture that uses a non-default catalogue file (for example `usecase-types.json`) and assert the finding mentions that configured filename.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/spec_states.rs",
-              "line": 612,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:bdca9de43ab09d9c40c1c191b4582ed30269c8fa5fcb941f79a08ee41dbe9973",
-          "at": "2026-04-17T01:38:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93ac59868a4b73820f49fdc3ecef0e661c9a47785bbd95d76e4d562a52db4147",
-          "at": "2026-04-17T01:43:19Z"
+          "hash": "rvw1:sha256:6d4263a7f380574f7c8e62455c9bbd966e8f7ea00433b3f8d7e71f1fc4adf399",
+          "at": "2026-04-17T02:31:03Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:93ac59868a4b73820f49fdc3ecef0e661c9a47785bbd95d76e4d562a52db4147",
-          "at": "2026-04-17T01:44:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3e3456e383c78e7e3e5ae839696444d608dbcef10bc168b54bc64d60121faf06",
-          "at": "2026-04-17T01:50:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3e3456e383c78e7e3e5ae839696444d608dbcef10bc168b54bc64d60121faf06",
-          "at": "2026-04-17T01:50:47Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
-          "at": "2026-04-17T01:24:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`catalogue_file` is rebuilt here as the default `<layer_id>-types.json`, but `TrackBlobReader::read_type_catalogue` can resolve an explicit `tddd.catalogue_file` override from `architecture-rules.json`. For a layer configured with a non-default file name, the merge gate will read the correct file yet report any Red/Yellow findings against a different, nonexistent filename, unlike the CI path which passes the resolved `binding.catalogue_file()`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 220,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
-          "at": "2026-04-17T01:25:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `catalogue_file` is rebuilt as `format!(\"{layer_id}-types.json\")`, but `read_type_catalogue()` can read an explicit `tddd.catalogue_file` override from `architecture-rules.json`. When a layer uses a non-default catalogue filename, Stage 2 findings will point at the wrong file name, which breaks the new contract that `check_type_signals` diagnostics name the actual catalogue being validated.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 220,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1ceab7ba8e1226a10aebea671e8800038510c88a52cb413c855394bb0d943c29",
-          "at": "2026-04-17T01:26:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
-          "at": "2026-04-17T01:33:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2cc44be52bd581a9f46c68301a918f01c2c24cad9375512f3c834d6d7306eb42",
-          "at": "2026-04-17T01:34:50Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
-          "at": "2026-04-17T01:24:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9403a0990a067486f8b13708b11a75d5878b9892bc5d1aba2b9e8979a22a0bd4",
-          "at": "2026-04-17T01:25:14Z"
+          "hash": "rvw1:sha256:6d4263a7f380574f7c8e62455c9bbd966e8f7ea00433b3f8d7e71f1fc4adf399",
+          "at": "2026-04-17T02:32:02Z"
         }
       ]
     }

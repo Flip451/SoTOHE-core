@@ -22,7 +22,7 @@ libs/infrastructure/src/type_catalogue_render.rs の SECTIONS が TypeDefinition
 test_sections_covers_all_kind_tags: HashSet<&str> of 13 variants vs SECTIONS.iter().map(|s| s.kind_tag) を assert_eq!
 将来の variant 追加時に SECTIONS への追記漏れをコンパイル時ではなく nextest 時に検出可能にする
 
-- [x] TDDD-Q01: libs/infrastructure/src/type_catalogue_render.rs に test_sections_covers_all_kind_tags を追加する。TypeDefinitionKind::kind_tag() の全 13 variants の HashSet<&str> と SECTIONS.iter().map(|s| s.kind_tag).collect::<HashSet<_>>() を assert_eq! で比較。将来 variant 追加時の SECTIONS 更新漏れを nextest で検出する exhaustive test。
+- [x] TDDD-Q01: libs/infrastructure/src/type_catalogue_render.rs に test_sections_covers_all_kind_tags を追加する。TypeDefinitionKind::kind_tag() の全 13 variants の HashSet<&str> と SECTIONS.iter().map(|s| s.kind_tag).collect::<HashSet<_>>() を assert_eq! で比較。将来 variant 追加時の SECTIONS 更新漏れを nextest で検出する exhaustive test。 76e8ad11b7979faf2a1404310990ffe79f550095
 
 ## S003 — ClusterPlan module (type_graph_cluster.rs)
 
@@ -33,7 +33,7 @@ CrossEdge { source_type, source_cluster, target_type, target_cluster, label, edg
 classify_types(graph, depth, edges) -> ClusterPlan 純粋関数: module_path prefix depth 段までで cluster 分類、module_path=None は UNRESOLVED_CLUSTER へ
 6 unit tests (I/O なし): depth 0/1/2 の分類、unresolved フォールバック、cross_edges 検出、単一 cluster 時の cross_edges 空検証
 
-- [ ] ClusterPlan module: libs/infrastructure/src/tddd/type_graph_cluster.rs を新設。ClusterPlan struct (depth, assignments, cross_edges) + CrossEdge struct + UNRESOLVED_CLUSTER 定数 + classify_types pure function。module_path prefix depth 段で cluster 分類、None は UNRESOLVED_CLUSTER へ。I/O なし、6 unit tests (depth 0/1/2 分類、unresolved フォールバック、cross_edges 検出)。mod.rs に登録。
+- [x] ClusterPlan module: libs/infrastructure/src/tddd/type_graph_cluster.rs を新設。ClusterPlan struct (depth, assignments, cross_edges) + CrossEdge struct + UNRESOLVED_CLUSTER 定数 + classify_types pure function。module_path prefix depth 段で cluster 分類、None は UNRESOLVED_CLUSTER へ。I/O なし、6 unit tests (depth 0/1/2 分類、unresolved フォールバック、cross_edges 検出)。mod.rs に登録。
 
 ## S004 — Cluster directory layout + stale cleanup
 

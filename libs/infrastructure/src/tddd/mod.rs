@@ -3,4 +3,5 @@
 pub mod baseline_builder;
 pub mod baseline_codec;
 pub mod catalogue_codec;
+pub mod type_graph_cluster;
 pub mod type_graph_render;

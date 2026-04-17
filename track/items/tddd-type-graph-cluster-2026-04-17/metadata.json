@@ -111,6 +111,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "76e8ad11b7979faf2a1404310990ffe79f550095",
       "description": "TDDD-Q01: libs/infrastructure/src/type_catalogue_render.rs に test_sections_covers_all_kind_tags を追加する。TypeDefinitionKind::kind_tag() の全 13 variants の HashSet<&str> と SECTIONS.iter().map(|s| s.kind_tag).collect::<HashSet<_>>() を assert_eq! で比較。将来 variant 追加時の SECTIONS 更新漏れを nextest で検出する exhaustive test。",
       "id": "T002",
       "status": "done"
@@ -118,7 +119,7 @@
     {
       "description": "ClusterPlan module: libs/infrastructure/src/tddd/type_graph_cluster.rs を新設。ClusterPlan struct (depth, assignments, cross_edges) + CrossEdge struct + UNRESOLVED_CLUSTER 定数 + classify_types pure function。module_path prefix depth 段で cluster 分類、None は UNRESOLVED_CLUSTER へ。I/O なし、6 unit tests (depth 0/1/2 分類、unresolved フォールバック、cross_edges 検出)。mod.rs に登録。",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Cluster directory layout: libs/infrastructure/src/tddd/type_graph_render.rs に render_type_graph_clustered / render_type_graph_overview / write_type_graph_dir を追加。出力は <layer>-graph/index.md + <cluster>.md (cluster 名は :: を _ に置換)。TypeGraphRenderOptions::cluster_depth: usize (default=2) 追加。Stale file cleanup: flat→cluster で .md を削除、cluster→flat で remove_dir_all。削除前に reject_symlinks_below で二重ガード。CLI --cluster-depth N flag を追加し、>0 なら write_type_graph_dir、=0 なら既存 write_type_graph_file に dispatch。3 層 (domain/usecase/infrastructure) 全対応。6 tests 追加。",
@@ -137,5 +138,5 @@
     }
   ],
   "title": "TDDD Type Graph View Phase 2 — cluster + port/adapter 可視化 + TDDD debt 返済",
-  "updated_at": "2026-04-17T01:51:06Z"
+  "updated_at": "2026-04-17T02:28:43Z"
 }
