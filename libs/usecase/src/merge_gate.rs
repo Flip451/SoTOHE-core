@@ -219,8 +219,16 @@ pub fn check_strict_merge_gate(branch: &str, reader: &impl TrackBlobReader) -> V
                 // TDDD opt-out for this layer — skip silently.
             }
             BlobFetchResult::FetchError(msg) => {
+                // Diagnostic uses the layer_id rather than a hardcoded
+                // `{layer_id}-types.json` filename: when a layer overrides its
+                // `tddd.catalogue_file` (e.g. `custom-types.json`) the
+                // FetchError variant does not return the resolved filename, so
+                // the adapter's `msg` already carries the actual path. Prefixing
+                // with `{layer_id}-types.json` here would point maintainers at a
+                // file that does not exist. See `knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md`
+                // §D9 TDDD-BUG-02 for the broader catalogue-filename contract.
                 outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                    "failed to read {layer_id}-types.json on origin/{branch}: {msg}"
+                    "failed to read catalogue for layer '{layer_id}' on origin/{branch}: {msg}"
                 ))]));
             }
             BlobFetchResult::Found((dt_doc, catalogue_file)) => {
@@ -522,7 +530,14 @@ mod tests {
         );
         let outcome = check_strict_merge_gate("track/foo", &reader);
         assert!(outcome.has_errors());
-        assert!(outcome.findings().iter().any(|f| f.message().contains("domain-types.json")));
+        // FetchError message identifies the layer by id, not a hardcoded filename —
+        // the adapter's msg already carries the resolved path.
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|f| f.message().contains("failed to read catalogue for layer 'domain'"))
+        );
     }
 
     #[test]
@@ -883,7 +898,7 @@ mod tests {
             outcome
                 .findings()
                 .iter()
-                .any(|f| f.message().contains("failed to read usecase-types.json")),
+                .any(|f| f.message().contains("failed to read catalogue for layer 'usecase'")),
             "error message must mention the failing layer: {outcome:?}"
         );
     }
