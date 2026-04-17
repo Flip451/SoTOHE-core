@@ -89,6 +89,13 @@
       ]
     },
     {
+      "name": "TypeCatalogueDocument",
+      "description": "Existing domain type used as a value (not defined or modified by this track). Declared with action=reference so the contract-map renderer can emit a method-call edge `CatalogueLoader -->|load_all| TypeCatalogueDocument` against this type. Both types reside in the domain layer; the edge is domain-internal. Reference declarations enrich the Contract Map visual without changing the type or the baseline.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
+    },
+    {
       "name": "ValidationError",
       "description": "Existing domain validation error enum; this track adds the `InvalidLayerId(String)` variant (T002) to support `LayerId` newtype validation. Declared here with action=modify so the TDDD reverse check recognises the intended structural change against baseline.",
       "approved": true,
@@ -184,6 +191,12 @@
         "SymlinkRejected",
         "TrackNotFound"
       ]
+    },
+    {
+      "type_name": "TypeCatalogueDocument",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ValidationError",

@@ -7,6 +7,7 @@
 | LayerId | value_object | — | — | 🔵 |
 | ContractMapContent | value_object | — | — | 🔵 |
 | ContractMapRenderOptions | value_object | — | — | 🔵 |
+| TypeCatalogueDocument | value_object | reference | — | 🔵 |
 
 ## Error Types
 

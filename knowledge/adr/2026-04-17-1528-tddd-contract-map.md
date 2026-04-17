@@ -151,6 +151,17 @@ pub fn render_contract_map(
 - `layer_order` は `may_depend_on` から算出するため、**層名・層数・依存方向のいずれにも依存しない**
 - `catalogues` のキーも `LayerId` のみ。CatalogueLoader port (hexagonal secondary port) が `tddd.enabled` 層を走査して集める。CLI は RenderContractMap application-service trait (primary port) への dispatch のみを担い、concrete RenderContractMapInteractor に直接依存しない (hexagonal 分離)
 
+#### `RenderContractMap::execute` の失敗条件
+
+`RenderContractMap::execute(&RenderContractMapCommand) -> Result<RenderContractMapOutput, RenderContractMapError>` は以下の失敗経路を持つ:
+
+- `CatalogueLoaderFailed` — secondary port `CatalogueLoader::load_all` 実装が失敗した場合 (I/O / decode / symlink 拒否 / topological sort 失敗など、`CatalogueLoaderError` を transparent に包む)
+- `ContractMapWriterFailed` — secondary port `ContractMapWriter::write` 実装が失敗した場合 (I/O / symlink 拒否 / track 未存在など、`ContractMapWriterError` を transparent に包む)
+- **`EmptyCatalogue { track_id }`** — `loader.load_all` が空の layer set (`Vec<LayerId>::is_empty()`) を返した場合、つまり対象 track に `tddd.enabled` な layer が 1 つも無い場合に発火する fail-closed エラー。空 Contract Map を silently 生成するよりも、`architecture-rules.json` の `tddd` block 欠落として明示報告する方が運用安全
+- **`LayerNotFound { track_id, layer_id }`** — CLI の `--layers` 指定 (`RenderContractMapCommand::layer_filter`) に含まれる `LayerId` が `loader.load_all` の結果 (= `tddd.enabled` な層集合) に存在しない場合に発火。CLI の typo / disabled layer の指定を silently 無視せず、どの layer id が未知かをメッセージで明示する
+
+この明示は、spec 層の acceptance criterion として検証対象に含まれ、usecase 層で unit test (`RenderContractMapInteractor` の mockall tests) で fail-closed 挙動が固定されている。
+
 出力先: `track/items/<id>/contract-map.md` (1 track = 1 ファイル)。
 
 ### D2: レイヤーを `subgraph` で可視化し、依存方向を配置で表現する
@@ -361,12 +372,13 @@ ADR 2026-04-16-2200 側に §D10 補記を追加することで、両 ADR の整
 - spec_source edge (D4 の 3 番目)
 - baseline diff view (Q4)
 - `/track:review` / `/track:plan` briefing への自動添付
+- **Living document auto-render** — `sotp track type-signals` 成功時に contract-map を自動再生成する統合。type-signals が走るタイミングで catalogue 最新化 + Contract Map artifact 最新化を同期させ、手動で `sotp track contract-map` を再実行する手数を排除する。Reality View (ADR 2026-04-16-2200 §D6) の auto-render 戦略と整合させ、Phase 2 (K) の type-graph 実装結果の ROI 評価 (`project_catalogue_filter_track` 等) と連動してタイミング判断する。Phase 1 MVP では**手動実行で十分**と判断 (ADR 2026-04-16-2200 §Phase 2 Scope Update §S5.3 と同じ判断基準)
 
 ## Notes for track planning
 
 本 ADR を採用する場合、次の track 計画で以下を考慮する:
 
-1. 既存 Phase 2 track (`tddd-type-graph-cluster-2026-04-17`) との干渉 — 本 ADR は Phase 2 完了を前提として次 track で着手するのが自然
+1. 既存 Phase 2 track (`tddd-type-graph-cluster-2026-04-17`) との干渉 — 本 ADR は Phase 2 完了を前提として次 track で着手するのが自然。**加えて、既存 type-graph CLI (ADR 2026-04-16-2200 Phase 2 実装) は CLI → infrastructure 直接パターンで構成されており、本 ADR の CLI → usecase interactor → 2 secondary ports という hexagonal 構造と非対称になる。非破壊変更として Contract Map のみ先に正しい構造で導入し、type-graph の usecase 層介在リファクタは本 track の scope から意図的に切り離す (scope 爆発防止)。extract_type_names の infrastructure 内 pub 昇格のみ例外的に本 track で実施**
 2. `TypeCatalogueDocument` の一括ロード helper が infrastructure に必要 (複数層 JSON を `BTreeMap<LayerId, _>` で読み込む、`tddd.enabled` 層のみ対象)
 3. `architecture-rules.json` から layer discovery + topological sort を行う既存経路 (ADR 2026-04-15-1012 関連 / `resolve_layers`) の再利用。**新規の層ハードコード経路を作らない**
 4. mermaid 13 kind shape mapping の意匠決定 — 別途 proposal 文書化を推奨

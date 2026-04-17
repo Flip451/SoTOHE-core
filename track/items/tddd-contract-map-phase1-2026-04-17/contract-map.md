@@ -12,6 +12,7 @@ flowchart LR
         domain_ContractMapWriter[[ContractMapWriter]]
         domain_CatalogueLoaderError>CatalogueLoaderError]
         domain_ContractMapWriterError>ContractMapWriterError]
+        domain_TypeCatalogueDocument(TypeCatalogueDocument)
         domain_ValidationError>ValidationError]
     end
     subgraph usecase [usecase]
@@ -28,6 +29,7 @@ flowchart LR
     end
     domain_CatalogueLoader -->|load_all| domain_CatalogueLoaderError
     domain_CatalogueLoader -->|load_all| domain_LayerId
+    domain_CatalogueLoader -->|load_all| domain_TypeCatalogueDocument
     domain_ContractMapWriter -->|write| domain_ContractMapWriterError
     infrastructure_FsCatalogueLoader -.impl.-> domain_CatalogueLoader
     infrastructure_FsContractMapWriter -.impl.-> domain_ContractMapWriter

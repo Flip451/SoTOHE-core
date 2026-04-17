@@ -191,7 +191,8 @@
       {
         "text": "Contract Map の living document 化 (sotp track type-signals 成功時の auto-render 統合) は本 track では扱わない。手動 sotp track contract-map 実行で十分",
         "sources": [
-          "inference — Reality View の auto-render も Phase 2 (tddd-type-graph-cluster) 実測で ROI 未確定のまま延期。Contract Map でも同様の判断"
+          "knowledge/adr/2026-04-17-1528-tddd-contract-map.md §Implementation Phases Phase 3",
+          "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §Phase 2 Scope Update §S5.3"
         ]
       }
     ]
@@ -246,7 +247,7 @@
     {
       "text": "既存 type-graph 実装 (ADR 2026-04-16-2200 Phase 2) は変更しない。extract_type_names の pub 昇格のみ例外 (非破壊変更)",
       "sources": [
-        "inference — scope 爆発防止。type-graph の usecase 層リファクタは別 track で扱う"
+        "knowledge/adr/2026-04-17-1528-tddd-contract-map.md §Notes for track planning §1"
       ]
     },
     {
@@ -378,7 +379,7 @@
     {
       "text": "RenderContractMapError の EmptyCatalogue と LayerNotFound の発火条件が明確に定義されていること: EmptyCatalogue は loader.load_all が空の catalogue set を返した場合 (tddd.enabled 層が 0 件)、LayerNotFound は layer_filter に指定した LayerId が load_all の結果に存在しない場合。それぞれ unit test で検証される",
       "sources": [
-        "inference — EmptyCatalogue/LayerNotFound の発火条件は usecase 层のビジネスロジックとして明示定義が必要"
+        "knowledge/adr/2026-04-17-1528-tddd-contract-map.md §D1 RenderContractMap::execute の失敗条件"
       ],
       "task_refs": [
         "T005"
@@ -424,10 +425,10 @@
     "knowledge/conventions/security.md"
   ],
   "signals": {
-    "blue": 42,
-    "yellow": 3,
+    "blue": 45,
+    "yellow": 0,
     "red": 0
   },
-  "approved_at": "2026-04-17T11:07:29Z",
-  "content_hash": "sha256:b49ae31eb260ceedda518b1a28d37c7a8be6ac2b329b1ab593acf05115dd3028"
+  "approved_at": "2026-04-17T17:05:10Z",
+  "content_hash": "sha256:bd25bc0c741cfdcd2e8abda15bde9600bfc2d3e729d55cbb20bd71c0688dfcf8"
 }

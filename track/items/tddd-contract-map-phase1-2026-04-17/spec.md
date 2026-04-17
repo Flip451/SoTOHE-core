@@ -1,9 +1,9 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 status: approved
-approved_at: "2026-04-17T11:07:29Z"
+approved_at: "2026-04-17T17:05:10Z"
 version: "1.0"
-signals: { blue: 42, yellow: 3, red: 0 }
+signals: { blue: 45, yellow: 0, red: 0 }
 ---
 
 # TDDD Contract Map Phase 1 (MVP) — 全層カタログ入力統合 mermaid view
@@ -40,7 +40,7 @@ Phase 2 (signal / action overlay) および Phase 3 (spec_source edge / baseline
 - Baseline diff view (4 グループ差分の色分け) は Phase 3 に送る。現 track では「現在のカタログ」のみを対象とする [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §Open Questions §Q4, §Implementation Phases Phase 3]
 - /track:review / /track:plan briefing への自動添付は Phase 3 に送る [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §Implementation Phases Phase 3]
 - 既存 type-graph CLI (ADR 2026-04-16-2200 Phase 2 実装) の usecase 層介在へのリファクタは本 track では扱わない。Contract Map だけが usecase 経由で、type-graph は現状の CLI 直結パターンのまま。非対称は別 track 扱い [source: apps/cli/src/commands/track/tddd/graph.rs, inference — 既存 type-graph は CLI → infrastructure 直接。本 track では Contract Map のみ usecase 層を介し、type-graph のリファクタは scope 爆発を避けるため切り離す]
-- Contract Map の living document 化 (sotp track type-signals 成功時の auto-render 統合) は本 track では扱わない。手動 sotp track contract-map 実行で十分 [source: inference — Reality View の auto-render も Phase 2 (tddd-type-graph-cluster) 実測で ROI 未確定のまま延期。Contract Map でも同様の判断]
+- Contract Map の living document 化 (sotp track type-signals 成功時の auto-render 統合) は本 track では扱わない。手動 sotp track contract-map 実行で十分 [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §Implementation Phases Phase 3, knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md §Phase 2 Scope Update §S5.3]
 
 ## Constraints
 - layer-agnostic 不変条件: 層名 (domain/usecase/infrastructure 等) を一切ハードコードしない。層リスト・描画順序・catalogue_file はすべて architecture-rules.json 駆動 [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §4.5, knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md §D6]
@@ -50,7 +50,7 @@ Phase 2 (signal / action overlay) および Phase 3 (spec_source edge / baseline
 - 小さい task commits: 各 task の diff は 500 LOC 未満を目標とする [source: convention — .claude/rules/10-guardrails.md §Small task commits]
 - TDD red→green の順序を守る。各 task で unit tests を先に書き red 確認後に実装する [source: convention — .claude/rules/05-testing.md §Core Principles]
 - enum-first を維持する (typestate は不要)。ContractMapRenderOptions の Phase 2/3 用スタブフィールドは bool、kind_filter は Option<Vec<TypeDefinitionKind>> [source: convention — .claude/rules/04-coding-principles.md §Enum-first]
-- 既存 type-graph 実装 (ADR 2026-04-16-2200 Phase 2) は変更しない。extract_type_names の pub 昇格のみ例外 (非破壊変更) [source: inference — scope 爆発防止。type-graph の usecase 層リファクタは別 track で扱う]
+- 既存 type-graph 実装 (ADR 2026-04-16-2200 Phase 2) は変更しない。extract_type_names の pub 昇格のみ例外 (非破壊変更) [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §Notes for track planning §1]
 - mermaid 出力は GitHub の mermaid renderer で正常に描画可能な記法のみ使用する。shape は mermaid 公式サポート内に限定する [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §D3, inference — GitHub レンダラー互換性を保たないと contract-map.md が PR で見えなくなる]
 
 ## Acceptance Criteria
@@ -66,7 +66,7 @@ Phase 2 (signal / action overlay) および Phase 3 (spec_source edge / baseline
 - [ ] CatalogueLoader / ContractMapWriter trait が libs/domain/src/tddd/catalogue_ports.rs に定義され、serde 依存を持たない。FsCatalogueLoader / FsContractMapWriter が port 契約を実装し unit test で契約充足が検証される [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §D1, knowledge/adr/2026-04-14-1531-domain-serde-ripout.md §D1] [tasks: T004]
 - [ ] RenderContractMap trait が libs/usecase/src/contract_map_workflow.rs に application_service primary port として定義されている。シグネチャ: execute(&self, &RenderContractMapCommand) -> Result<RenderContractMapOutput, RenderContractMapError>。CLI は concrete RenderContractMapInteractor に直接依存せず、この trait を介して dispatch する [source: track/items/tddd-contract-map-phase1-2026-04-17/usecase-types.json, knowledge/adr/2026-04-17-1528-tddd-contract-map.md §D1, convention — knowledge/conventions/hexagonal-architecture.md] [tasks: T005]
 - [ ] RenderContractMapInteractor::execute が Command を受け取り Output または Error を返す。loader / writer / render の失敗が対応する Error variant に正しく伝播する。mockall を使った 5 tests (happy / loader_err / writer_err / kind_filter / 全除外) が pass する [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §D1, convention — knowledge/conventions/hexagonal-architecture.md] [tasks: T005]
-- [ ] RenderContractMapError の EmptyCatalogue と LayerNotFound の発火条件が明確に定義されていること: EmptyCatalogue は loader.load_all が空の catalogue set を返した場合 (tddd.enabled 層が 0 件)、LayerNotFound は layer_filter に指定した LayerId が load_all の結果に存在しない場合。それぞれ unit test で検証される [source: inference — EmptyCatalogue/LayerNotFound の発火条件は usecase 层のビジネスロジックとして明示定義が必要] [tasks: T005]
+- [ ] RenderContractMapError の EmptyCatalogue と LayerNotFound の発火条件が明確に定義されていること: EmptyCatalogue は loader.load_all が空の catalogue set を返した場合 (tddd.enabled 層が 0 件)、LayerNotFound は layer_filter に指定した LayerId が load_all の結果に存在しない場合。それぞれ unit test で検証される [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §D1 RenderContractMap::execute の失敗条件] [tasks: T005]
 - [ ] sotp track contract-map <track-id> が track/items/<id>/contract-map.md を生成する。--kind-filter / --layers が反映される。--help が spec と一致する [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §Implementation Phases Phase 1] [tasks: T006]
 - [ ] 3 fixture (2層 / 3層デフォルト / 独自層名) に対して render が成功する。subgraph 数と subgraph ラベルが fixture に一致する。subgraph の出現順序が fixture の may_depend_on から算出したトポロジカル順 (may_depend_on なし層が先頭) に一致することを assert する。他 fixture の層名 (例: custom_names の出力に domain が混入) が出現しないことが assert される [source: knowledge/adr/2026-04-17-1528-tddd-contract-map.md §4.5] [tasks: T007]
 - [ ] cargo make ci が全通過する (fmt-check + clippy + nextest + test-doc + deny + python-lint + scripts-selftest + check-layers + verify-* 一式)。T001 については verify-doc-links / verify-arch-docs の通過が特に重要 [source: convention — .claude/rules/07-dev-environment.md §Pre-commit Checklist] [tasks: T001, T002, T003, T004, T005, T006, T007]
@@ -79,5 +79,5 @@ Phase 2 (signal / action overlay) および Phase 3 (spec_source edge / baseline
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 42  🟡 3  🔴 0
+🔵 45  🟡 0  🔴 0
 

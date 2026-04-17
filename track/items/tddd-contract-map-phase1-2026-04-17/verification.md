@@ -162,24 +162,38 @@ cargo run --quiet -p cli -- track type-graph tddd-contract-map-phase1-2026-04-17
 - ADR 2026-04-17-1528 §D1 / §D3 / §D4 / §4.5 の Phase 1 MVP スコープを完全実装
 - Phase 2/3 (action overlay / signal overlay / spec_source edge / baseline diff / AI briefing 自動添付) は spec 通り out_of_scope で延期
 
-### Stage 2 type-signals (dogfooding)
+### Stage 1 spec signals (dogfooding, post spec/ADR refinement commit)
+
+🔵 45 / 🟡 0 / 🔴 0 (`sotp track signals <track-id>` で全 blue 達成)。初期 3 yellow (`inference —` source のみの items: `scope.out_of_scope#6 living document`, `constraints#7 type-graph 非変更`, `acceptance_criteria#12 EmptyCatalogue/LayerNotFound 発火条件`) を ADR 2026-04-17-1528 への 3 箇所追記 (§D1 発火条件節 / §Implementation Phases Phase 3 "living document auto-render" / §Notes for track planning §1 type-graph 非対称の明文化) と spec.json sources 差し替えで blue 化 (本改修は T007 split commit 2 で追加、strict merge gate 通過の前提条件)。
+
+### Stage 2 type-signals (dogfooding, post TypeCatalogueDocument reference commit)
 
 | Layer | Declared | Blue | Yellow | Red | Undeclared |
 |---|---|---|---|---|---|
-| domain | 8 (incl. ValidationError modify) | 8 | 0 | 0 | 0 |
+| domain | 9 (incl. ValidationError modify + TypeCatalogueDocument reference) | 9 | 0 | 0 | 0 |
 | usecase | 5 | 5 | 0 | 0 | 0 |
 | infrastructure | 3 (incl. LoadAllCataloguesError) | 3 | 0 | 0 | 0 |
 
-**所感**: 全 16 entries Blue、Stage 2 merge gate 通過条件を満たす。Stage 1 spec signals の yellow 解消 + `TypeCatalogueDocument` reference 追加による追加 edge 可視化は本 track の別 commit で対応。
+**所感**: 全 17 entries Blue。Stage 1 / Stage 2 両方で merge gate (strict) 通過条件を満たす。`TypeCatalogueDocument` は本 track で定義・変更しない既存型だが、`CatalogueLoader.load_all` の return 型に現れるため `action: "reference"` で declare 追加、Contract Map 描画の `type_index` に取り込むことで `CatalogueLoader -->|load_all| TypeCatalogueDocument` の domain-internal edge を可視化した (両型とも domain 層に配置。本改修も T007 split commit 2)。
 
 ### Contract Map dogfooding (`sotp track contract-map tddd-contract-map-phase1-2026-04-17`)
 
 生成先: `track/items/tddd-contract-map-phase1-2026-04-17/contract-map.md`
 
 - 3 subgraphs (domain / usecase / infrastructure) が `may_depend_on` トポロジカル順で配置
-- 16 entries が 8 kind shape (value_object / secondary_port / error_type / application_service / command / dto / interactor / secondary_adapter) で描画
-- Method edges: `CatalogueLoader -->|load_all| LayerId`, `CatalogueLoader -->|load_all| CatalogueLoaderError`, `ContractMapWriter -->|write| ContractMapWriterError`, `RenderContractMap -->|execute| RenderContractMapError`, `RenderContractMap -->|execute| RenderContractMapOutput`
-- Trait impl edges (dashed): `FsCatalogueLoader -.impl.-> CatalogueLoader`, `FsContractMapWriter -.impl.-> ContractMapWriter`
+- **17 entries** が 8 kind shape (value_object / secondary_port / error_type / application_service / command / dto / interactor / secondary_adapter) で描画 (TypeCatalogueDocument reference で +1)
+- Method edges (ADR §D4 (1)、returns 由来): `CatalogueLoader -->|load_all| LayerId`, **`CatalogueLoader -->|load_all| TypeCatalogueDocument`** (reference 宣言による domain-internal edge; 両型とも domain 層に配置), `CatalogueLoader -->|load_all| CatalogueLoaderError`, `ContractMapWriter -->|write| ContractMapWriterError`, `RenderContractMap -->|execute| RenderContractMapError`, `RenderContractMap -->|execute| RenderContractMapOutput`
+- Trait impl edges (dashed、ADR §D4 (2)、`SecondaryAdapter.implements` 由来): `FsCatalogueLoader -.impl.-> CatalogueLoader`, `FsContractMapWriter -.impl.-> ContractMapWriter`
+- **Phase 1 で描画されない** (設計上の Phase 2+ scope): 引数参照 (`ContractMapContent` / `RenderContractMapCommand` / `TrackId` 等 method 引数に登場する型)、field edge (`RenderContractMapInteractor<L, W>` の generic 抱合)。ADR §D4 初期スコープから除外
+
+### Commit split rationale
+
+本 track では T007 review zero_findings 達成後に追加改善 (Stage 1 yellow 解消 + TypeCatalogueDocument reference) を加えるアンチパターンを再発させたため、改修後に原状復帰 (checkout HEAD + 手動 revert + sotp track type-signals / contract-map 再実行) して 2 commit に分割:
+
+- **commit 1 (`5592301b4f46a926b8e5e2b4e7494f2268e34818`)**: T007 実装 (layer-agnostic fixtures + integration tests + LayerId plain struct + ValidationError modify + LoadAllCataloguesError + TODO entry + Stage 2 Blue)
+- **commit 2 (本 commit 予定)**: spec/ADR 補強 + TypeCatalogueDocument reference + Stage 1 Blue 化
+
+将来再発防止の rule: **review zero_findings 後は即 commit、追加改善は別 commit**。
 
 ### Implementation deviation: LayerId を素 struct に書き換え
 
