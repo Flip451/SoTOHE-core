@@ -125,6 +125,185 @@
           "findings": [],
           "hash": "rvw1:sha256:522432f903ee4dfcf3ace6362d2adad492ae1a13c0ae0bfbef0827d370058d12",
           "at": "2026-04-18T19:27:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:136f0b813468d277b29976be6542668960586c0741193db5d83d2252f4383dce",
+          "at": "2026-04-18T19:47:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:136f0b813468d277b29976be6542668960586c0741193db5d83d2252f4383dce",
+          "at": "2026-04-18T19:49:41Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f87a6da38ad404daca988c346c7175e92a69a6627ecb01889c1e246300277f48",
+          "at": "2026-04-18T19:08:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f87a6da38ad404daca988c346c7175e92a69a6627ecb01889c1e246300277f48",
+          "at": "2026-04-18T19:10:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db8ee6b2a97285089dd19b97bbabe6f266dd6279bd0934da75afcb630c0c4ce8",
+          "at": "2026-04-18T19:24:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db8ee6b2a97285089dd19b97bbabe6f266dd6279bd0934da75afcb630c0c4ce8",
+          "at": "2026-04-18T19:25:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Re-reading `architecture-rules.json` here makes the pre-commit gate fail-open: `load_tddd_layers_from_path()` falls back to the synthetic `domain` binding if the file disappears between the initial existence check and this reload, and the loop then silently `continue`s when a layer's signal file is missing. Either race lets red layers be skipped and the commit proceed instead of blocking.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 644,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:905e13828cc859e5b84d68ae195f7ce7b19b36d23e7c03ec658e2ecfbb04b703",
+          "at": "2026-04-18T19:47:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_pre_commit_type_signals()` reads `architecture-rules.json` and then delegates to `execute_type_signals()`, which re-opens the file and still falls back to the synthetic `domain` binding if the rules file disappears or is swapped in the TOCTOU window. That reintroduces the legacy fail-open path the ADR says to reject, and the wrapper can then skip the bindings it just parsed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 651,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:3c830ea6a8312a67bb186034a56d0bb4730f2c9ea3a5e0b768a8e505330fa9e4",
+          "at": "2026-04-18T19:50:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This pre-commit path reads `architecture-rules.json` twice through different code paths: once here with `parse_tddd_layers`, and again inside `execute_type_signals`. If the file changes between those reads, the recomputation and the post-check loop can see different layer sets, so a newly enabled Red layer can be recomputed but never inspected. That makes the gate TOCTOU-prone.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 620,
+              "category": "correctness"
+            },
+            {
+              "message": "The generated signal file is read with `read_to_string` after only `is_file()`, so a symlink swap after recomputation will be followed and the gate will classify attacker-chosen content. Other loaders in this repo reject symlinks before reading; this path should do the same to avoid bypassing or spuriously blocking the commit gate.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 691,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:073d8626a66326708e450a0e42345521a3b50adfeac05b5bcf682acfac9ee875",
+          "at": "2026-04-18T19:54:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new pre-commit recomputation mutates the tracked catalogue/signal files in the working tree, but the later `git commit-from-file` call still commits the existing index without re-staging those changes. As a result, the regenerated type-signal artifacts can be left out of the commit, so CI may validate a different tree than the one that gets recorded.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 563,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b45367b1eb5bf4bc55687dab976c728e9eb2877595b2d26c6d54535a59fc3a55",
+          "at": "2026-04-18T19:57:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_pre_commit_type_signals()` snapshots `architecture-rules.json` into `bindings` before calling `execute_type_signals()`, but `execute_type_signals()` re-reads the file. If the rules file changes in between, the recomputation can write a different layer set while the staging/classification loop still inspects the stale snapshot, so a newly enabled layer with Red signals is never checked and the commit can be allowed incorrectly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "line": 620,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:a7b5fddb6207155281aa7783b220215a163499bb08660ac6e6f00cc6b73aaa2e",
+          "at": "2026-04-18T20:01:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_type_signals()` still re-reads `architecture-rules.json` on its own, so the preflight snapshot here is not the one that drives recomputation and staging. If the file changes between the preflight and the delegate call, a newly enabled Red layer can be recomputed without being inspected here, or the hook can stage the wrong layer set. This leaves the pre-commit gate TOCTOU-prone instead of fail-closed.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 655,
+              "category": "correctness"
+            },
+            {
+              "message": "The symlink check on the generated signal file is not atomic with the later `read_to_string()`. A symlink swap after `reject_symlinks_below()` but before the read will still be followed, so the gate can classify attacker-chosen content instead of the file that was just validated.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 761,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:2529eac108969d14af129c1cad7084e3fe62f7249b454758572f4bab2fdf5f31",
+          "at": "2026-04-18T20:04:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2529eac108969d14af129c1cad7084e3fe62f7249b454758572f4bab2fdf5f31",
+          "at": "2026-04-18T20:08:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new pre-commit path delegates normal `/track:commit` execution to `execute_type_signals`, but that command rejects tracks whose working-tree metadata derives `status=done` via its active-track guard. The documented completion flow marks all tasks `done` and then runs `/track:commit` to commit the metadata transition and optional hash backfills, so as soon as the last task is marked done this hook will block the completion commit before CI/review can run, making finished TDDD tracks uncommittable. The commit-path recomputation needs a path that still permits the pre-merge done-state metadata commit, or it needs to skip/handle frozen tracks in a way that does not break the normal completion workflow.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 655,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:2529eac108969d14af129c1cad7084e3fe62f7249b454758572f4bab2fdf5f31",
+          "at": "2026-04-18T20:11:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99ae58aabb02778b687a6056dba1bf92f9a62c6b6fa3edf24cef8526bbc56446",
+          "at": "2026-04-18T20:16:01Z"
         }
       ]
     },
@@ -157,6 +336,24 @@
           "findings": [],
           "hash": "rvw1:sha256:f9b4f4fe586c0ac18c498d9447e63e4bdc03be1e0b6e871cb4fc252cb8cdcd19",
           "at": "2026-04-18T19:33:06Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bece133f0b5838a4af37fad4399cf4bd7b7df38deecda85c3f00269c0b19a606",
+          "at": "2026-04-18T19:32:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bece133f0b5838a4af37fad4399cf4bd7b7df38deecda85c3f00269c0b19a606",
+          "at": "2026-04-18T19:34:02Z"
         }
       ]
     },
@@ -924,56 +1121,20 @@
           "findings": [],
           "hash": "rvw1:sha256:f25764442eeacbb65c13ab26f89cb49c23a746e158aa352353ff216d910f2037",
           "at": "2026-04-18T19:33:15Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f87a6da38ad404daca988c346c7175e92a69a6627ecb01889c1e246300277f48",
-          "at": "2026-04-18T19:08:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f87a6da38ad404daca988c346c7175e92a69a6627ecb01889c1e246300277f48",
-          "at": "2026-04-18T19:10:55Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:db8ee6b2a97285089dd19b97bbabe6f266dd6279bd0934da75afcb630c0c4ce8",
-          "at": "2026-04-18T19:24:12Z"
+          "hash": "rvw1:sha256:88403e86a5a8b023a81661e771b6b0e8bd64534e7236639c72b3b92763d9e790",
+          "at": "2026-04-18T19:45:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:db8ee6b2a97285089dd19b97bbabe6f266dd6279bd0934da75afcb630c0c4ce8",
-          "at": "2026-04-18T19:25:44Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bece133f0b5838a4af37fad4399cf4bd7b7df38deecda85c3f00269c0b19a606",
-          "at": "2026-04-18T19:32:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bece133f0b5838a4af37fad4399cf4bd7b7df38deecda85c3f00269c0b19a606",
-          "at": "2026-04-18T19:34:02Z"
+          "hash": "rvw1:sha256:88403e86a5a8b023a81661e771b6b0e8bd64534e7236639c72b3b92763d9e790",
+          "at": "2026-04-18T19:48:27Z"
         }
       ]
     }

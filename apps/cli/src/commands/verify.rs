@@ -831,22 +831,23 @@ mod tests {
     }
 
     /// Writes `<dir>/<signal_name>` with a matching `declaration_hash` so the
-    /// ADR 2026-04-18-1400 §D5 signal-file evaluation path accepts it. `signals`
-    /// is copied from whatever the declaration file decodes to (empty if the
-    /// declaration has no inline signals). Shared by the Stage 2 CLI tests
-    /// below.
+    /// ADR 2026-04-18-1400 §D5 signal-file evaluation path accepts it.
+    /// `signals` is copied verbatim from the declaration file's legacy
+    /// inline `signals` array (raw JSON). This bypasses `catalogue_codec`
+    /// which, after T007, drops inline signals during decode.
     fn write_matching_signal_file(dir: &std::path::Path, catalogue_name: &str, signal_name: &str) {
         let decl_bytes = std::fs::read(dir.join(catalogue_name)).unwrap();
-        let decl_str = std::str::from_utf8(&decl_bytes).unwrap();
-        let doc = infrastructure::tddd::catalogue_codec::decode(decl_str).unwrap();
-        let signals = doc.signals().map(<[domain::TypeSignal]>::to_vec).unwrap_or_default();
+        let value: serde_json::Value = serde_json::from_slice(&decl_bytes).unwrap();
+        let signals_array =
+            value.get("signals").and_then(|v| v.as_array()).cloned().unwrap_or_default();
         let hash = infrastructure::tddd::type_signals_codec::declaration_hash(&decl_bytes);
-        let signals_doc = domain::TypeSignalsDocument::new(
-            domain::Timestamp::new("2026-04-18T12:00:00Z").unwrap(),
-            hash,
-            signals,
-        );
-        let encoded = infrastructure::tddd::type_signals_codec::encode(&signals_doc).unwrap();
+        let signal_file = serde_json::json!({
+            "schema_version": 1,
+            "generated_at": "2026-04-18T12:00:00Z",
+            "declaration_hash": hash,
+            "signals": signals_array,
+        });
+        let encoded = serde_json::to_string_pretty(&signal_file).unwrap();
         std::fs::write(dir.join(signal_name), encoded).unwrap();
     }
 

@@ -13,18 +13,5 @@
         "FetchError"
       ]
     }
-  ],
-  "signals": [
-    {
-      "type_name": "BlobFetchResult",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "FetchError",
-        "Found",
-        "NotFound"
-      ]
-    }
   ]
 }

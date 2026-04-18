@@ -18,7 +18,7 @@ mod activate;
 mod resolve;
 mod signals;
 mod state_ops;
-mod tddd;
+pub(crate) mod tddd;
 mod transition;
 mod views;
 

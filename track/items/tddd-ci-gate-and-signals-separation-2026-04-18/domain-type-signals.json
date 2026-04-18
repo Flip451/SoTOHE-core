@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-18T19:21:03Z",
-  "declaration_hash": "c104686df0fe8755aea0617ac231e97d5ac02c285212344b4d347ce221229b18",
+  "generated_at": "2026-04-18T19:41:20Z",
+  "declaration_hash": "b4d1449d3f281731f967f22a805008dc5ce3d253306f3ae89b8052497ef36b37",
   "signals": [
     {
       "type_name": "TypeSignalsDocument",

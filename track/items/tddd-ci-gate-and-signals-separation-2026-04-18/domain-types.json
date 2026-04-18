@@ -18,24 +18,5 @@
         "Missing"
       ]
     }
-  ],
-  "signals": [
-    {
-      "type_name": "TypeSignalsDocument",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "TypeSignalsLoadResult",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Current",
-        "Missing",
-        "Stale"
-      ]
-    }
   ]
 }

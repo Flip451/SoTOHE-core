@@ -504,22 +504,25 @@ mod tests {
 
     // Helper: write a `<layer>-type-signals.json` (schema_version 1) whose
     // `declaration_hash` matches the on-disk bytes of the companion
-    // `<layer>-types.json` file. The `signals` field is copied from whatever
-    // the declaration file decodes to (empty when the declaration has no
-    // inline signals). Used by Stage 2 tests that exercise the ADR
-    // 2026-04-18-1400 §D5 signal-file path.
+    // `<layer>-types.json` file. The `signals` field is copied verbatim from
+    // the declaration file's legacy `signals` array (raw JSON) — this is
+    // independent of `catalogue_codec::decode`, which after T007 silently
+    // drops the legacy inline signals. Tests that write fixture declaration
+    // files with inline signals still exercise the intended Blue/Yellow/Red
+    // paths in `check_type_signals` via the signal file.
     fn write_matching_signal_file(track_dir: &Path, catalogue_name: &str, signal_name: &str) {
         let decl_bytes = std::fs::read(track_dir.join(catalogue_name)).unwrap();
-        let decl_str = std::str::from_utf8(&decl_bytes).unwrap();
-        let doc = crate::tddd::catalogue_codec::decode(decl_str).unwrap();
-        let signals = doc.signals().map(<[domain::TypeSignal]>::to_vec).unwrap_or_default();
+        let value: serde_json::Value = serde_json::from_slice(&decl_bytes).unwrap();
+        let signals_array =
+            value.get("signals").and_then(|v| v.as_array()).cloned().unwrap_or_default();
         let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
-        let signals_doc = domain::TypeSignalsDocument::new(
-            domain::Timestamp::new("2026-04-18T12:00:00Z").unwrap(),
-            hash,
-            signals,
-        );
-        let encoded = crate::tddd::type_signals_codec::encode(&signals_doc).unwrap();
+        let signal_file = serde_json::json!({
+            "schema_version": 1,
+            "generated_at": "2026-04-18T12:00:00Z",
+            "declaration_hash": hash,
+            "signals": signals_array,
+        });
+        let encoded = serde_json::to_string_pretty(&signal_file).unwrap();
         std::fs::write(track_dir.join(signal_name), encoded).unwrap();
     }
 

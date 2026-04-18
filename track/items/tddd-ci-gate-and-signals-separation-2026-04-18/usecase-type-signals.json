@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-18T19:21:04Z",
-  "declaration_hash": "9862ee6d78effafc8a33ee6c5a810f89307eaf877b178f135a1010e9df3857ee",
+  "generated_at": "2026-04-18T19:41:20Z",
+  "declaration_hash": "ef9223f3e041532c394abcf5a79c9c078a1125185a03262166aaa0ea91faff07",
   "signals": [
     {
       "type_name": "BlobFetchResult",

@@ -19,24 +19,5 @@
       "action": "modify",
       "kind": "value_object"
     }
-  ],
-  "signals": [
-    {
-      "type_name": "TypeSignalsCodecError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Json",
-        "UnsupportedSchemaVersion",
-        "InvalidTimestamp"
-      ]
-    },
-    {
-      "type_name": "TdddLayerBinding",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true
-    }
   ]
 }

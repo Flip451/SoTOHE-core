@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-18T19:21:05Z",
-  "declaration_hash": "a9d537f55c9f8b8c3332ec03809a87f8ccc70a8ac3bc34c6a5991f2821e23787",
+  "generated_at": "2026-04-18T19:41:21Z",
+  "declaration_hash": "5e6e3cafeef3e41acad3a0298ec9c8c3f0fc94b0768c7b2a7cc2977051501ddf",
   "signals": [
     {
       "type_name": "TypeSignalsCodecError",
