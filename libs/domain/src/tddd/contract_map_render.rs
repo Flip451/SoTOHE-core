@@ -241,11 +241,20 @@ fn sanitize_id(raw: &str) -> String {
     out
 }
 
-/// Node identifier used in mermaid: `<layer-sanitized>_<name-sanitized>`.
-/// Layer prefix avoids collisions when two layers declare the same last-
-/// segment name.
+/// Node identifier used in mermaid. Format: `L<layer_sanitized_len>_<sanitized_layer>_<sanitized_name>`.
+///
+/// A bare `<layer>_<name>` concatenation is not injective even with an
+/// injective [`sanitize_id`], because escaped components can start or end
+/// with `_`. For example `layer = "a_"` + `name = "b"` and
+/// `layer = "a"` + `name = "_b"` both collapse to `a___b` with a plain
+/// `_` separator. Length-prefixing the layer component makes the split
+/// unambiguous: the first `<layer_sanitized_len>` characters after the
+/// `L<N>_` prefix form the sanitized layer, and everything after the
+/// trailing `_` is the sanitized name.
 fn node_id(layer: &LayerId, name: &str) -> String {
-    format!("{}_{}", sanitize_id(layer.as_ref()), sanitize_id(name))
+    let l = sanitize_id(layer.as_ref());
+    let n = sanitize_id(name);
+    format!("L{}_{}_{}", l.len(), l, n)
 }
 
 /// Wrap an edge label in double quotes so mermaid does not misinterpret
@@ -476,22 +485,22 @@ mod tests {
         );
         let text = content.as_ref();
 
-        assert!(text.contains("sample_TState([TState])"), "typestate stadium shape");
-        assert!(text.contains("sample_EKind{{EKind}}"), "enum hexagon shape");
-        assert!(text.contains("sample_Vo(Vo)"), "value_object round shape");
-        assert!(text.contains("sample_Err>Err]"), "error_type flag shape");
-        assert!(text.contains("sample_SPort[[SPort]]"), "secondary_port subroutine shape");
+        assert!(text.contains("L6_sample_TState([TState])"), "typestate stadium shape");
+        assert!(text.contains("L6_sample_EKind{{EKind}}"), "enum hexagon shape");
+        assert!(text.contains("L6_sample_Vo(Vo)"), "value_object round shape");
+        assert!(text.contains("L6_sample_Err>Err]"), "error_type flag shape");
+        assert!(text.contains("L6_sample_SPort[[SPort]]"), "secondary_port subroutine shape");
         assert!(
-            text.contains("sample_SAdap[SAdap]:::secondary_adapter"),
+            text.contains("L6_sample_SAdap[SAdap]:::secondary_adapter"),
             "secondary_adapter rect + classDef"
         );
-        assert!(text.contains("sample_AppSvc[/AppSvc\\]"), "application_service parallelogram");
-        assert!(text.contains("sample_UCase[/UCase/]"), "use_case parallelogram-alt");
-        assert!(text.contains("sample_Intc[\\Intc/]"), "interactor trapezoid-alt");
-        assert!(text.contains("sample_DtoK[DtoK]"), "dto rect");
-        assert!(text.contains("sample_CmdK[CmdK]:::command"), "command rect + classDef");
-        assert!(text.contains("sample_QryK[QryK]:::query"), "query rect + classDef");
-        assert!(text.contains("sample_FactK[FactK]:::factory"), "factory rect + classDef");
+        assert!(text.contains("L6_sample_AppSvc[/AppSvc\\]"), "application_service parallelogram");
+        assert!(text.contains("L6_sample_UCase[/UCase/]"), "use_case parallelogram-alt");
+        assert!(text.contains("L6_sample_Intc[\\Intc/]"), "interactor trapezoid-alt");
+        assert!(text.contains("L6_sample_DtoK[DtoK]"), "dto rect");
+        assert!(text.contains("L6_sample_CmdK[CmdK]:::command"), "command rect + classDef");
+        assert!(text.contains("L6_sample_QryK[QryK]:::query"), "query rect + classDef");
+        assert!(text.contains("L6_sample_FactK[FactK]:::factory"), "factory rect + classDef");
     }
 
     #[test]
@@ -505,17 +514,17 @@ mod tests {
         // still goes through: assert on DomainError only, which is
         // unambiguous.)
         assert!(
-            text.contains("domain_UserRepository -->|\"save\"| domain_DomainError"),
+            text.contains("L6_domain_UserRepository -->|\"save\"| L6_domain_DomainError"),
             "method edge to DomainError must appear; output was:\n{text}"
         );
         // `RegisterUser.execute() -> Result<User, DomainError>` spans
         // usecase → domain.
         assert!(
-            text.contains("usecase_RegisterUser -->|\"execute\"| domain_User"),
+            text.contains("L7_usecase_RegisterUser -->|\"execute\"| L6_domain_User"),
             "cross-layer method edge to User must appear; output was:\n{text}"
         );
         assert!(
-            text.contains("usecase_RegisterUser -->|\"execute\"| domain_DomainError"),
+            text.contains("L7_usecase_RegisterUser -->|\"execute\"| L6_domain_DomainError"),
             "cross-layer method edge to DomainError must appear"
         );
     }
@@ -526,7 +535,9 @@ mod tests {
         let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
         let text = content.as_ref();
         assert!(
-            text.contains("infrastructure_PostgresUserRepository -.impl.-> domain_UserRepository"),
+            text.contains(
+                "L14_infrastructure_PostgresUserRepository -.impl.-> L6_domain_UserRepository"
+            ),
             "trait impl edge must appear; output was:\n{text}"
         );
     }
@@ -540,16 +551,16 @@ mod tests {
         };
         let content = render_contract_map(&catalogues, &order, &opts);
         let text = content.as_ref();
-        assert!(text.contains("domain_UserRepository[[UserRepository]]"));
-        // Use shape-specific substrings so `domain_UserRepository` does not
-        // accidentally satisfy a `domain_User` prefix match.
-        assert!(!text.contains("domain_User([User])"), "User should be filtered out");
+        assert!(text.contains("L6_domain_UserRepository[[UserRepository]]"));
+        // Use shape-specific substrings so `L6_domain_UserRepository` does not
+        // accidentally satisfy a `L6_domain_User` prefix match.
+        assert!(!text.contains("L6_domain_User([User])"), "User should be filtered out");
         assert!(
-            !text.contains("domain_DomainError>DomainError]"),
+            !text.contains("L6_domain_DomainError>DomainError]"),
             "DomainError should be filtered out"
         );
         assert!(
-            !text.contains("usecase_RegisterUser[/RegisterUser\\]"),
+            !text.contains("L7_usecase_RegisterUser[/RegisterUser\\]"),
             "RegisterUser should be filtered out"
         );
     }
@@ -620,7 +631,7 @@ mod tests {
         let text = content.as_ref();
         // Label preserves original hyphen; id encodes `-` as `_2d_`.
         assert!(text.contains("subgraph my_2d_gateway [my-gateway]"));
-        assert!(text.contains("my_2d_gateway_Foo(Foo)"));
+        assert!(text.contains("L13_my_2d_gateway_Foo(Foo)"));
     }
 
     #[test]
@@ -651,11 +662,11 @@ mod tests {
             "underscore layer subgraph id must be `my__gateway`; output was:\n{text}"
         );
         assert!(
-            text.contains("my_2d_gateway_Foo(Foo)"),
+            text.contains("L13_my_2d_gateway_Foo(Foo)"),
             "Foo node id must be prefixed with hyphen-encoded layer id"
         );
         assert!(
-            text.contains("my__gateway_Bar(Bar)"),
+            text.contains("L11_my__gateway_Bar(Bar)"),
             "Bar node id must be prefixed with underscore-encoded layer id"
         );
     }
@@ -679,7 +690,7 @@ mod tests {
         let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
         let text = content.as_ref();
         assert!(
-            text.contains("domain_UserRepository -->|\"save(user)\"| domain_User"),
+            text.contains("L6_domain_UserRepository -->|\"save(user)\"| L6_domain_User"),
             "param edge to User must appear; output was:\n{text}"
         );
     }
@@ -714,7 +725,7 @@ mod tests {
         let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
         let text = content.as_ref();
         assert!(
-            text.contains("usecase_Greeter -->|\"execute(subject)\"| domain_Subject"),
+            text.contains("L7_usecase_Greeter -->|\"execute(subject)\"| L6_domain_Subject"),
             "cross-layer param edge to Subject must appear; output was:\n{text}"
         );
     }
@@ -780,13 +791,13 @@ mod tests {
         // double-quote fence that isolates shape-delimiter characters
         // from mermaid's flowchart parser.
         assert!(
-            text.contains("domain_App -->|\"configure(settings)\"| domain_Settings"),
+            text.contains("L6_domain_App -->|\"configure(settings)\"| L6_domain_Settings"),
             "label must be quoted 'configure(settings)'; output was:\n{text}"
         );
         // Absent: bare `configure` (would indicate edge was keyed from
         // returns, not params).
         assert!(
-            !text.contains("domain_App -->|\"configure\"| domain_Settings"),
+            !text.contains("L6_domain_App -->|\"configure\"| L6_domain_Settings"),
             "bare label must not appear for params-only edge; output was:\n{text}"
         );
     }
@@ -828,12 +839,12 @@ mod tests {
         let text = content.as_ref();
 
         assert!(
-            text.contains("domain_Caller -->|\"run\"| domain_Error"),
-            "edge to domain_Error must appear; output was:\n{text}"
+            text.contains("L6_domain_Caller -->|\"run\"| L6_domain_Error"),
+            "edge to L6_domain_Error must appear; output was:\n{text}"
         );
         assert!(
-            text.contains("domain_Caller -->|\"run\"| infrastructure_Error"),
-            "edge to infrastructure_Error must appear (shadowing must not drop declarations); output was:\n{text}"
+            text.contains("L6_domain_Caller -->|\"run\"| L14_infrastructure_Error"),
+            "edge to L14_infrastructure_Error must appear (shadowing must not drop declarations); output was:\n{text}"
         );
     }
 
@@ -869,12 +880,12 @@ mod tests {
         let text = content.as_ref();
 
         assert!(
-            text.contains("infrastructure_Adapter -.impl.-> domain_Port"),
-            "trait-impl edge to domain_Port must appear; output was:\n{text}"
+            text.contains("L14_infrastructure_Adapter -.impl.-> L6_domain_Port"),
+            "trait-impl edge to L6_domain_Port must appear; output was:\n{text}"
         );
         assert!(
-            text.contains("infrastructure_Adapter -.impl.-> infrastructure_Port"),
-            "trait-impl edge to infrastructure_Port must appear; output was:\n{text}"
+            text.contains("L14_infrastructure_Adapter -.impl.-> L14_infrastructure_Port"),
+            "trait-impl edge to L14_infrastructure_Port must appear; output was:\n{text}"
         );
     }
 
