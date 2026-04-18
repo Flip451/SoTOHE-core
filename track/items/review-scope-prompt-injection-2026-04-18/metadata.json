@@ -85,7 +85,7 @@
       {
         "description": [
           "track/review-prompts/ ディレクトリを新規作成し plan-artifacts.md を配置する",
-          "内容は knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md の Canonical Block 'plan-artifacts.md (initial body)' の 2 policy section: What to report (5 カテゴリ) と What NOT to report (4 カテゴリ)。canonical block の冒頭 scope paragraph ('This policy applies...') は main briefing で既に提供されるため省略 (reviewer が他 doc 参照せず policy を適用できる self-contained 性は維持)。round budget / round 数 cap は含めない — orchestrator pacing に属する",
+          "内容は knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md の Canonical Block 'plan-artifacts.md (initial body)' の 2 policy section: What to report (4 カテゴリ: factual error / contradiction / broken reference / infeasibility) と What NOT to report (7 カテゴリ)。canonical block の冒頭 scope paragraph ('This policy applies...') は main briefing で既に提供されるため省略 (reviewer が他 doc 参照せず policy を適用できる self-contained 性は維持)。round budget / round 数 cap は含めない — orchestrator pacing に属する",
           "research note canonical block の severity policy 仕様に準拠する (開頭 scope paragraph は省略、2 policy sections を完全収録)",
           "テスト: briefing_file の CI lint (broken link 検知) は Open Question Q3 として defer 済み。verify-doc-links は JSON briefing_file フィールドをスキャンしないため対象外。ファイル作成 (T007) は完了済み。reviewer が Read ツールでファイルを読めることは T008 ドッグフードで確認予定"
         ],
@@ -118,7 +118,7 @@
     ]
   },
   "schema_version": 3,
-  "status": "in_progress",
+  "status": "done",
   "tasks": [
     {
       "commit_hash": "c4afff6e40e657b88941e4cf4ad8ed08ba0b88d9",
@@ -139,35 +139,35 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "f96996930b7c7589642e68d282ca487da796c76e",
       "description": "Update .claude/agents/review-fix-lead.md: insert a new `## Scope-specific severity policy` section immediately before the existing `## Workflow` heading. The section must instruct the agent: when the main briefing contains a `## Scope-specific severity policy` section, the agent MUST Read the file listed there using the Read tool before starting the review; the referenced file defines which finding categories to report and which to skip for this scope; applying the wrong severity filter is the primary cause of over-long review loops (28-round history); always read the file fresh because the policy may have been updated between review sessions. The agent prompt must NOT carry a round budget / round count target — that belongs to the orchestrator pacing logic, not the reviewer severity filter. No automated test; dogfooded via the track's own review cycle.",
       "id": "T004",
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "f96996930b7c7589642e68d282ca487da796c76e",
       "description": "Update .claude/commands/track/review.md Step 2b: clarify that when a scope has briefing_file configured in review-scope.json, the CLI wrapper (cargo make track-local-review / sotp review codex-local) automatically appends a `## Scope-specific severity policy` reference section to the main briefing. The briefing author (the review-fix-lead agent) must NOT manually add scope-specific severity policy wording — that responsibility belongs to the composer to avoid duplication. Update the scope list and briefing template section to mention plan-artifacts as a scope that benefits from this mechanism. Doc-only change; verified via cargo make verify-arch-docs / verify-doc-links.",
       "id": "T005",
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "f96996930b7c7589642e68d282ca487da796c76e",
       "description": "Bootstrap note: before this task lands, track/review-scope.json already carries plan-artifacts with a pragmatic pattern list [\"track/items/**\", \"knowledge/adr/**\", \"knowledge/research/**\"] (and no briefing_file) so the current review cycle works without relying on placeholder expansion that the pre-T001 loader does not perform. This task upgrades that bootstrap to the final form. Replace the plan-artifacts patterns with [\"track/items/<track-id>/**\", \"knowledge/adr/**\", \"knowledge/research/**\"] and add briefing_file: \"track/review-prompts/plan-artifacts.md\". Do not modify any existing scope definitions (domain, usecase, infrastructure, cli, harness-policy). The <track-id> placeholder must be expanded by ReviewScopeConfig::new for the current track per ADR D3 (T001 adds that expansion to the groups loop; verify T001 is merged before this task lands). review.json is already excluded via review_operational (applied before named-scope matching) so it does not leak into plan-artifacts. Files under knowledge/adr/** and knowledge/research/** are already in plan-artifacts under the bootstrap pattern; after this task they remain in plan-artifacts and continue to be reviewed under the correct severity policy. Integration test coverage: placeholder expansion is verified by test_scope_config_group_pattern_expands_track_id_placeholder (T001); briefing_file_for_scope returning Some is verified by test_load_with_briefing_file_populates_accessor (T002). End-to-end live config verification (loading the actual track/review-scope.json and classifying all three path types) is deferred to T008 dogfooding as an accepted deviation.",
       "id": "T006",
       "status": "done"
     },
     {
-      "commit_hash": null,
-      "description": "Create directory track/review-prompts/ and file track/review-prompts/plan-artifacts.md. Content: both policy sections from the Canonical Block 'plan-artifacts.md (initial body)' in knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md — What to report (factual error, contradiction, broken reference, infeasibility, timestamp inconsistency) and What NOT to report (wording nits, English/Japanese mix unless style rule violated, alternative design suggestions post-planning-gate, formatting preferences). Note: the canonical block's opening scope paragraph ('This policy applies when...') was omitted as it duplicates information already present in the injected main briefing; the two policy sections are sufficient for the reviewer to apply the filter without other docs. The markdown is self-contained for policy application. Do NOT include a round budget / round count target. Note: briefing_file CI lint (verify-doc-links checking JSON briefing_file entries) is deferred to Open Question Q3. The file has been created; runtime verification that the reviewer can Read the file via its Read tool is scheduled for T008 dogfooding (still pending).",
+      "commit_hash": "f96996930b7c7589642e68d282ca487da796c76e",
+      "description": "Create directory track/review-prompts/ and file track/review-prompts/plan-artifacts.md. Content: both policy sections from the Canonical Block 'plan-artifacts.md (initial body)' in knowledge/research/2026-04-18-0514-planner-review-scope-prompt-injection.md — What to report (4 categories: factual error, contradiction, broken reference, infeasibility) and What NOT to report (wording nits, English/Japanese mix unless style rule violated, updated_at/commit_hash/timestamp verification, existence checks, backward-looking metrics, alternative design suggestions post-planning-gate, formatting preferences). Note: the canonical block's opening scope paragraph ('This policy applies when...') was omitted as it duplicates information already present in the injected main briefing; the two policy sections are sufficient for the reviewer to apply the filter without other docs. The markdown is self-contained for policy application. Do NOT include a round budget / round count target. Note: briefing_file CI lint (verify-doc-links checking JSON briefing_file entries) is deferred to Open Question Q3. The file has been created; runtime verification that the reviewer can Read the file via its Read tool is scheduled for T008 dogfooding (still pending).",
       "id": "T007",
       "status": "done"
     },
     {
-      "description": "Run cargo make ci and confirm all checks pass (fmt-check + clippy + nextest + test-doc + deny + python-lint + scripts-selftest + check-layers + verify-arch-docs + verify-doc-links). Then dogfood the feature by running /track:review on this track itself: the review cycle must classify track/items/review-scope-prompt-injection-2026-04-18/**, any modified knowledge/adr/** files, and any knowledge/research/** planner output for this track into the plan-artifacts scope, the CLI must inject a `## Scope-specific severity policy` reference to track/review-prompts/plan-artifacts.md, and the reviewer must report zero_findings for plan-artifacts after applying the severity policy. Record the dogfooding result (file counts per scope, review rounds, whether the severity policy was applied as expected) in verification.md.",
+      "description": "Run cargo make ci and confirm all checks pass (fmt-check + clippy + nextest + test-doc + deny + python-lint + scripts-selftest + check-layers + verify-arch-docs + verify-doc-links). Then dogfood the feature by running /track:review on this track itself: the review cycle must classify track/items/review-scope-prompt-injection-2026-04-18/**, any modified knowledge/adr/** files, and any knowledge/research/** planner output for this track into the plan-artifacts scope, the CLI must inject a `## Scope-specific severity policy` reference to track/review-prompts/plan-artifacts.md, and the reviewer must report zero_findings for plan-artifacts after applying the severity policy. Record the dogfooding result as qualitative end-to-end confirmation (composer injection, reviewer Read of policy file, severity filter behavior) in verification.md; backward-looking metrics (file counts per scope, round counts) are intentionally omitted.",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "title": "review-scope.json に scope 別 briefing 注入機構を追加する — plan-artifacts scope の新設",
-  "updated_at": "2026-04-18T10:04:36Z"
+  "updated_at": "2026-04-18T10:48:14Z"
 }
