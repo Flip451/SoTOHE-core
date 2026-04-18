@@ -85,14 +85,21 @@ pub fn render_contract_map(
     //    `port_index`  — only `SecondaryPort` entries (used for trait-impl
     //                    edges so that `-.impl.->` never accidentally targets a
     //                    same-named DTO/value-object).
-    let mut type_index: BTreeMap<String, (LayerId, String)> = BTreeMap::new();
-    let mut port_index: BTreeMap<String, String> = BTreeMap::new();
+    //
+    //    Per-layer catalogues may legitimately declare the same short name in
+    //    different layers (e.g. `Error` or `Command` as layer-local types).
+    //    Index values are therefore `Vec` so every matching declaration
+    //    participates in edge resolution; a method whose signature references
+    //    the shared short name fans out to all matching targets, keeping the
+    //    ambiguity visible rather than silently dropping shadowed
+    //    declarations.
+    let mut type_index: BTreeMap<String, Vec<(LayerId, String)>> = BTreeMap::new();
+    let mut port_index: BTreeMap<String, Vec<String>> = BTreeMap::new();
     for (layer, entry) in &entries {
         let id = node_id(layer, entry.name());
-        // Later duplicates in the same render are ignored — first-wins.
-        type_index.entry(entry.name().to_owned()).or_insert_with(|| ((*layer).clone(), id.clone()));
+        type_index.entry(entry.name().to_owned()).or_default().push(((*layer).clone(), id.clone()));
         if matches!(entry.kind(), TypeDefinitionKind::SecondaryPort { .. }) {
-            port_index.entry(entry.name().to_owned()).or_insert(id);
+            port_index.entry(entry.name().to_owned()).or_default().push(id);
         }
     }
 
@@ -135,29 +142,36 @@ pub fn render_contract_map(
         for method in methods_of(entry.kind()) {
             // Returns-derived edges (Phase 1 baseline).
             for token in extract_type_names(method.returns()) {
-                if token == entry.name() {
-                    continue;
-                }
-                if let Some((_dst_layer, dst_id)) = type_index.get(token) {
-                    edges.insert(format!(
-                        "    {src_id} -->|{label}| {dst_id}",
-                        label = escape_edge_label(method.name()),
-                    ));
+                if let Some(dsts) = type_index.get(token) {
+                    for (_dst_layer, dst_id) in dsts {
+                        if dst_id == &src_id {
+                            continue;
+                        }
+                        edges.insert(format!(
+                            "    {src_id} -->|{label}| {dst_id}",
+                            label = escape_edge_label(method.name()),
+                        ));
+                    }
                 }
             }
 
             // Params-derived edges (Phase 1.5 extension, ADR §D4 (1)).
             for param in method.params() {
                 for token in extract_type_names(param.ty()) {
-                    if token == entry.name() {
-                        continue;
-                    }
-                    if let Some((_dst_layer, dst_id)) = type_index.get(token) {
-                        edges.insert(format!(
-                            "    {src_id} -->|{label}| {dst_id}",
-                            label =
-                                escape_edge_label(&format!("{}({})", method.name(), param.name())),
-                        ));
+                    if let Some(dsts) = type_index.get(token) {
+                        for (_dst_layer, dst_id) in dsts {
+                            if dst_id == &src_id {
+                                continue;
+                            }
+                            edges.insert(format!(
+                                "    {src_id} -->|{label}| {dst_id}",
+                                label = escape_edge_label(&format!(
+                                    "{}({})",
+                                    method.name(),
+                                    param.name()
+                                )),
+                            ));
+                        }
                     }
                 }
             }
@@ -168,8 +182,10 @@ pub fn render_contract_map(
                 // Use `port_index` (SecondaryPort entries only) so that
                 // `-.impl.->` is never drawn to a same-named non-port entry
                 // (ADR §D4: trait-impl edge targets secondary_port nodes only).
-                if let Some(port_id) = port_index.get(impl_decl.trait_name()) {
-                    edges.insert(format!("    {src_id} -.impl.-> {port_id}"));
+                if let Some(port_ids) = port_index.get(impl_decl.trait_name()) {
+                    for port_id in port_ids {
+                        edges.insert(format!("    {src_id} -.impl.-> {port_id}"));
+                    }
                 }
             }
         }
@@ -705,6 +721,93 @@ mod tests {
         assert!(
             !text.contains("domain_App -->|\"configure\"| domain_Settings"),
             "bare label must not appear for params-only edge; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_fans_out_edges_when_short_name_shadowed_across_layers() {
+        // Regression: earlier the `type_index` was keyed by short name with
+        // first-wins semantics, so a method returning `Error` (when both
+        // `domain::Error` and `infrastructure::Error` were declared) only
+        // reached the first-declared layer and silently dropped the other.
+        // After the fix, both declarations participate in edge resolution.
+        let domain = layer("domain");
+        let infra = layer("infrastructure");
+
+        let caller_methods = vec![MethodDeclaration::new(
+            "run",
+            Some("&self".to_owned()),
+            vec![],
+            "Result<(), Error>",
+            false,
+        )];
+
+        let domain_doc = doc(vec![
+            entry(
+                "Caller",
+                TypeDefinitionKind::ApplicationService { expected_methods: caller_methods },
+            ),
+            entry("Error", TypeDefinitionKind::ErrorType { expected_variants: vec![] }),
+        ]);
+        let infra_doc =
+            doc(vec![entry("Error", TypeDefinitionKind::ErrorType { expected_variants: vec![] })]);
+
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        catalogues.insert(infra.clone(), infra_doc);
+        let order = vec![domain, infra];
+
+        let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+        let text = content.as_ref();
+
+        assert!(
+            text.contains("domain_Caller -->|\"run\"| domain_Error"),
+            "edge to domain_Error must appear; output was:\n{text}"
+        );
+        assert!(
+            text.contains("domain_Caller -->|\"run\"| infrastructure_Error"),
+            "edge to infrastructure_Error must appear (shadowing must not drop declarations); output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_fans_out_trait_impl_when_port_name_shadowed() {
+        // Same shadowing concern for `port_index`: if two layers declare a
+        // `SecondaryPort` with the same short name, a `SecondaryAdapter`
+        // whose `implements[].trait_name` matches must generate an
+        // `-.impl.->` edge to each declaration.
+        let domain = layer("domain");
+        let infra = layer("infrastructure");
+
+        let adapter_impl = TraitImplDecl::new("Port", Vec::new());
+
+        let domain_doc = doc(vec![entry(
+            "Port",
+            TypeDefinitionKind::SecondaryPort { expected_methods: vec![] },
+        )]);
+        let infra_doc = doc(vec![
+            entry("Port", TypeDefinitionKind::SecondaryPort { expected_methods: vec![] }),
+            entry(
+                "Adapter",
+                TypeDefinitionKind::SecondaryAdapter { implements: vec![adapter_impl] },
+            ),
+        ]);
+
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        catalogues.insert(infra.clone(), infra_doc);
+        let order = vec![domain, infra];
+
+        let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+        let text = content.as_ref();
+
+        assert!(
+            text.contains("infrastructure_Adapter -.impl.-> domain_Port"),
+            "trait-impl edge to domain_Port must appear; output was:\n{text}"
+        );
+        assert!(
+            text.contains("infrastructure_Adapter -.impl.-> infrastructure_Port"),
+            "trait-impl edge to infrastructure_Port must appear; output was:\n{text}"
         );
     }
 
