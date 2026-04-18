@@ -204,14 +204,41 @@ pub fn render_contract_map(
     ContractMapContent::new(out)
 }
 
-/// Rewrites an arbitrary string into a mermaid-safe identifier: only
-/// ASCII alphanumerics and `_` are kept; everything else is replaced with
-/// `_`. Empty input maps to `_`.
+/// Rewrite an arbitrary string into a mermaid-safe, **injective**
+/// identifier.
+///
+/// Mermaid node / subgraph identifiers must be `[A-Za-z0-9_]+`. To stay
+/// injective (so that distinct inputs always map to distinct IDs — a
+/// requirement for edge resolution to never alias unrelated nodes), the
+/// encoding is:
+///
+/// - ASCII alphanumerics pass through verbatim.
+/// - `_` is escaped as `__` (double underscore).
+/// - Any other code point is escaped as `_<hex>_` where `<hex>` is the
+///   lowercase hexadecimal representation of the Unicode scalar value.
+///
+/// The scheme is a bijection from `String` onto a subset of
+/// `[A-Za-z0-9_]+`: the `_` prefix followed by either another `_` (for the
+/// underscore escape) or a hex digit terminated by `_` (for any other
+/// character) disambiguates every escape from every literal alnum run.
+/// Empty input maps to `_` (a valid mermaid identifier that cannot be
+/// produced by the encoding rules above, keeping injectivity intact even
+/// for the empty string).
 fn sanitize_id(raw: &str) -> String {
     if raw.is_empty() {
         return "_".to_owned();
     }
-    raw.chars().map(|c| if c.is_ascii_alphanumeric() || c == '_' { c } else { '_' }).collect()
+    let mut out = String::with_capacity(raw.len());
+    for ch in raw.chars() {
+        if ch.is_ascii_alphanumeric() {
+            out.push(ch);
+        } else if ch == '_' {
+            out.push_str("__");
+        } else {
+            let _ = write!(out, "_{:x}_", ch as u32);
+        }
+    }
+    out
 }
 
 /// Node identifier used in mermaid: `<layer-sanitized>_<name-sanitized>`.
@@ -577,7 +604,10 @@ mod tests {
     #[test]
     fn test_render_contract_map_hyphenated_layer_id_sanitized_in_ids() {
         // layer-id with hyphen ("my-gateway") must render into mermaid IDs
-        // that use `_` (hyphen is illegal in mermaid node ids).
+        // that are distinct from an identically-spelled underscore variant
+        // ("my_gateway"). The injective `sanitize_id` encodes `-` (U+002D)
+        // as `_2d_` and `_` (U+005F) as `__`, so the two inputs are
+        // guaranteed to yield different node prefixes.
         let gateway = layer("my-gateway");
         let d = doc(vec![entry("Foo", TypeDefinitionKind::ValueObject)]);
         let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
@@ -588,9 +618,46 @@ mod tests {
             &ContractMapRenderOptions::empty(),
         );
         let text = content.as_ref();
-        // Label preserves original hyphen, id replaces it with underscore.
-        assert!(text.contains("subgraph my_gateway [my-gateway]"));
-        assert!(text.contains("my_gateway_Foo(Foo)"));
+        // Label preserves original hyphen; id encodes `-` as `_2d_`.
+        assert!(text.contains("subgraph my_2d_gateway [my-gateway]"));
+        assert!(text.contains("my_2d_gateway_Foo(Foo)"));
+    }
+
+    #[test]
+    fn test_render_contract_map_sanitize_id_is_injective_for_hyphen_vs_underscore() {
+        // Regression: before the injective encoding, layer ids `my-gateway`
+        // and `my_gateway` both collapsed to `my_gateway` and produced
+        // undistinguishable subgraphs. After the fix the hyphen form
+        // becomes `my_2d_gateway` and the underscore form becomes
+        // `my__gateway`, so the two render targets can never alias.
+        let hyphen = layer("my-gateway");
+        let underscore = layer("my_gateway");
+        let d_hyphen = doc(vec![entry("Foo", TypeDefinitionKind::ValueObject)]);
+        let d_underscore = doc(vec![entry("Bar", TypeDefinitionKind::ValueObject)]);
+
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(hyphen.clone(), d_hyphen);
+        catalogues.insert(underscore.clone(), d_underscore);
+        let order = vec![hyphen, underscore];
+
+        let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+        let text = content.as_ref();
+        assert!(
+            text.contains("subgraph my_2d_gateway [my-gateway]"),
+            "hyphen layer subgraph id must be `my_2d_gateway`; output was:\n{text}"
+        );
+        assert!(
+            text.contains("subgraph my__gateway [my_gateway]"),
+            "underscore layer subgraph id must be `my__gateway`; output was:\n{text}"
+        );
+        assert!(
+            text.contains("my_2d_gateway_Foo(Foo)"),
+            "Foo node id must be prefixed with hyphen-encoded layer id"
+        );
+        assert!(
+            text.contains("my__gateway_Bar(Bar)"),
+            "Bar node id must be prefixed with underscore-encoded layer id"
+        );
     }
 
     #[test]
