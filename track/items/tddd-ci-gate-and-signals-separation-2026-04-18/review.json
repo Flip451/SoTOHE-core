@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bece133f0b5838a4af37fad4399cf4bd7b7df38deecda85c3f00269c0b19a606",
+          "at": "2026-04-18T19:32:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bece133f0b5838a4af37fad4399cf4bd7b7df38deecda85c3f00269c0b19a606",
+          "at": "2026-04-18T19:34:02Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -336,24 +354,6 @@
           "findings": [],
           "hash": "rvw1:sha256:f9b4f4fe586c0ac18c498d9447e63e4bdc03be1e0b6e871cb4fc252cb8cdcd19",
           "at": "2026-04-18T19:33:06Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bece133f0b5838a4af37fad4399cf4bd7b7df38deecda85c3f00269c0b19a606",
-          "at": "2026-04-18T19:32:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bece133f0b5838a4af37fad4399cf4bd7b7df38deecda85c3f00269c0b19a606",
-          "at": "2026-04-18T19:34:02Z"
         }
       ]
     },
@@ -1135,6 +1135,72 @@
           "findings": [],
           "hash": "rvw1:sha256:88403e86a5a8b023a81661e771b6b0e8bd64534e7236639c72b3b92763d9e790",
           "at": "2026-04-18T19:48:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Scope Verified` says ADR D1–D7 is already complete and the ADR has been promoted to `Accepted`, but the tracked state still leaves T009 todo in `metadata.json`, and the ADR itself remains `Proposed`. That makes the verification report overstate completion.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/verification.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f5861554df224ef21f8e86cae5b1e10259ad43529c9618e9e77561f42f4138fa",
+          "at": "2026-04-18T20:22:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5861554df224ef21f8e86cae5b1e10259ad43529c9618e9e77561f42f4138fa",
+          "at": "2026-04-18T20:24:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The truth-table verification maps the \"TDDD not active\" case to a missing declaration file and a pass/skip outcome (`declaration file absent -> VerifyOutcome::pass()`), but `spec.md` defines TDDD-not-active as `tddd.enabled = false` and explicitly says a `tddd.enabled = true` layer with a missing `<layer>-types.json` belongs to the blocked Missing case. As written, this PASS evidence would allow an enabled layer with no declaration file to be treated as verified skip instead of a fail-closed error.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/verification.md",
+              "line": 108,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f5861554df224ef21f8e86cae5b1e10259ad43529c9618e9e77561f42f4138fa",
+          "at": "2026-04-18T20:27:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new V1 result says T008 successfully migrated this track's own domain/usecase/infrastructure `<layer>-types.json` files, but the same verification document still says this track has no per-track TDDD declaration files and that V1-V6 must be run against another track. Those statements cannot both be true, so the artifact is unclear about what was actually verified for T008 self-migration.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/verification.md",
+              "line": 64,
+              "category": "contradiction"
+            },
+            {
+              "message": "The truth-table mapping describes `TDDD not active` as a missing declaration-file case and even cites `if !signal_path.is_file()`, but spec.md defines `TDDD not active` as a `tddd.enabled = false` layer; a missing evaluation file is the separate `Missing` row and must fail closed for enabled layers. This misclassifies one of the 24 behavior-table cells in the verification result.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/verification.md",
+              "line": 108,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:f5861554df224ef21f8e86cae5b1e10259ad43529c9618e9e77561f42f4138fa",
+          "at": "2026-04-18T20:33:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd8dd5a59770789a76f54e0d6bb4348ab25ccb2d03eff25c76077f09c6d6c97e",
+          "at": "2026-04-18T20:35:20Z"
         }
       ]
     }

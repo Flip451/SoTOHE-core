@@ -115,6 +115,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "df18d2bc5c5efb07fe2a4875c50dcbfc21af0acd",
       "description": "cli + infrastructure (同一 commit): (a) `dispatch_track_commit_message()` (apps/cli/src/commands/make.rs) に pre-commit 自動再計算を配線。順序は 再計算→CI→review guard→commit。Red 検出で commit ブロック (commit-message.txt 保持)、Yellow で warning + 続行、書き込み前に `reject_symlinks_below` 適用。(b) 宣言ファイルコーデック `catalogue_codec.rs` から signals フィールドを除去 (encode / decode 両方向、schema_version は 2 維持)。ADR Migration §5 の「5a と 5b は同一 commit」制約に従う。+ unit tests。",
       "id": "T007",
       "status": "done"
@@ -122,7 +123,7 @@
     {
       "description": "build: `cargo make build-sotp` で新仕様 sotp を bin/sotp に配置。初回 `sotp track type-signals tddd-ci-gate-and-signals-separation-2026-04-18` を実行して本 track 自身の catalogue を新仕様 (signals 分離) に自動 migration。`cargo make ci` が通過することを確認。Behavior Truth Table の全セル (3 経路 × 8 状態) の振る舞いを手動検証し verification.md に記録。",
       "id": "T008",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "docs: ADR `knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md` の Status を Proposed → Accepted に更新。関連 ADR から本 ADR へのリンクが必要なら追加 (Referenced By セクション等)。",
@@ -131,5 +132,5 @@
     }
   ],
   "title": "TDDD 信号機評価の CI ゲート接続と宣言/評価結果ファイル分離",
-  "updated_at": "2026-04-18T19:43:01Z"
+  "updated_at": "2026-04-18T20:20:10Z"
 }
