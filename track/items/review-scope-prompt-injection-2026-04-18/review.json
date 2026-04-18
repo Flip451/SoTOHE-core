@@ -37,25 +37,6 @@
         }
       ]
     },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`metadata.json` contradicts itself about `plan-artifacts` scope coverage: T006 defines the new scope with patterns `track/items/<track-id>/**` and `knowledge/adr/**`, but T008 says this track's `knowledge/research/**` planner output must also be classified into `plan-artifacts`. As written, the task leaves the intended scope boundary ambiguous and can cause the implementation/checklists to omit research notes or route them inconsistently.",
-              "severity": "P1",
-              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
-              "line": 155,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:2ae9b1fe239f180efe08dfbbcbab23a6c67c2d85a1decf093aca8420d7bd7b44",
-          "at": "2026-04-18T05:48:56Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -118,6 +99,87 @@
           "findings": [],
           "hash": "rvw1:sha256:40ab219259ad7479b867518d513c7bc522d2ea48060d37b43605845d6f4c38ac",
           "at": "2026-04-18T09:34:45Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a430b72a83e5b97f2b68e303e81311eec78b51777db87cf746f2cdc95ea5d3b",
+          "at": "2026-04-18T09:43:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`append_scope_briefing_reference` injects `briefing_file` from `review-scope.json` straight into the reviewer prompt without any escaping or validation. Because that JSON is loaded from the working tree under review, a crafted value containing backticks/newlines can break out of the `- ` bullet and append arbitrary instructions, letting a PR author steer or suppress the review before any `Read` tool call happens. The new path-only injection flow needs to reject control characters / non-path syntax or otherwise safely quote the path before formatting it into the prompt.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 133,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:8a430b72a83e5b97f2b68e303e81311eec78b51777db87cf746f2cdc95ea5d3b",
+          "at": "2026-04-18T09:47:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e784a484fe7f22fb0ae67a35605c544ab59c4211944655fa8cafd4fac21204f2",
+          "at": "2026-04-18T09:51:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`append_scope_briefing_reference` is supposed to be the pure string-composition helper introduced by T003, but the unsafe-path branch now calls `eprintln!()`. Because `briefing_file` is repo-controlled data from `review-scope.json`, malformed config can cause otherwise-successful reviews to emit stderr from inside this helper, violating the ADR D4/no-I/O contract and making callers that assume pure prompt construction non-deterministic. Move the warning to the CLI boundary or return a status instead of logging here.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 140,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:e784a484fe7f22fb0ae67a35605c544ab59c4211944655fa8cafd4fac21204f2",
+          "at": "2026-04-18T09:54:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2d8a178de1ef41c1499bd83fdb1b8bc11cd5857ee21e00ab2305e0aca9d0af6",
+          "at": "2026-04-18T09:57:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2d8a178de1ef41c1499bd83fdb1b8bc11cd5857ee21e00ab2305e0aca9d0af6",
+          "at": "2026-04-18T09:59:48Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`metadata.json` contradicts itself about `plan-artifacts` scope coverage: T006 defines the new scope with patterns `track/items/<track-id>/**` and `knowledge/adr/**`, but T008 says this track's `knowledge/research/**` planner output must also be classified into `plan-artifacts`. As written, the task leaves the intended scope boundary ambiguous and can cause the implementation/checklists to omit research notes or route them inconsistently.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 155,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2ae9b1fe239f180efe08dfbbcbab23a6c67c2d85a1decf093aca8420d7bd7b44",
+          "at": "2026-04-18T05:48:56Z"
         }
       ]
     },
@@ -770,6 +832,80 @@
           "findings": [],
           "hash": "rvw1:sha256:7cb8bad3f963dbb92c54d32b7550c1bec85b3d9c716e5d1cf81e47d24513a6bc",
           "at": "2026-04-18T09:35:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:647ebb1e3cba048b4ef8ecca612dd5a68a73b73857fdbd05d771a5bfb63bcf77",
+          "at": "2026-04-18T09:43:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` marks T003 complete and records option B in `§Implementation Notes`, but `Open Q-IMPL-01` still says the A/B/C choice will be decided during T003 implementation. That leaves the artifact self-contradictory and misses the review checklist requirement to mark Q-IMPL-01 resolved once T003 is done.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/verification.md",
+              "line": 102,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:647ebb1e3cba048b4ef8ecca612dd5a68a73b73857fdbd05d771a5bfb63bcf77",
+          "at": "2026-04-18T09:44:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` still lists `Open Q-IMPL-01` and `Open Q-IMPL-02` as unresolved under `## Open Issues`, but T003 is already marked done and the Implementation Notes above record the final decisions (option B selected; no `ReviewScopeConfig: Clone`/builder path needed). That leaves the track artifacts internally contradictory about whether these implementation questions are still open.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/verification.md",
+              "line": 102,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:647ebb1e3cba048b4ef8ecca612dd5a68a73b73857fdbd05d771a5bfb63bcf77",
+          "at": "2026-04-18T09:46:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` says `load_scope_config_only(...)` was introduced by extracting the `scope_json_path`/`load_v2_scope_config`/`items_dir` normalization logic out of `build_v2_shared`, but `apps/cli/src/commands/review/compose_v2.rs` still contains that logic in `build_v2_shared` and duplicates it in the new helper. The Implementation Notes should describe this as duplicated/preloaded logic, not an extraction, to avoid a factual mismatch about what T003 changed.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/verification.md",
+              "line": 44,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:d2afdce38ba8860e156e1485b5c4a0da0d0fd91a08e4c9bc8ab37ac235014566",
+          "at": "2026-04-18T09:49:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verification.md` records T003 CI as `2154 tests passed, T003 で +4 件追加`, but the actual T003 diff adds 7 new tests in `apps/cli/src/commands/review/tests.rs` (4 functional cases plus 3 prompt-injection-guard cases). From the prior T002 baseline of 2150 tests, this count cannot be correct as written.",
+              "severity": "P1",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/verification.md",
+              "line": 40,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:3c3004c4537c3f28d88fce2b058bf8b4781d966ea26424a42b89c44b7e362283",
+          "at": "2026-04-18T09:51:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:805c123921ce8e330757ef5401d2b911a7caf743bc95f2ea002dd6f33d5c4842",
+          "at": "2026-04-18T09:53:58Z"
         }
       ]
     }

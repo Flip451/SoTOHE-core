@@ -127,6 +127,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "65c9deaa435a85b7e68cca3d509f3b032b883730",
       "description": "Add briefing_file: Option<String> field to GroupEntry in libs/infrastructure/src/review_v2/scope_config_loader.rs with #[serde(default)] so absence is equivalent to None. Update the entries assembly in load_v2_scope_config to produce (name, entry.patterns, entry.briefing_file) 3-tuples, matching the new ReviewScopeConfig::new signature from T001. Preserve deny_unknown_fields at the ReviewScopeJsonV2 top level and at GroupEntry. Unit tests: (1) loading a review-scope.json with a briefing_file entry produces a ReviewScopeConfig where briefing_file_for_scope returns Some(path) for that scope; (2) loading the existing review-scope.json without briefing_file continues to work (backward compatibility); (3) a typo field like briefng_file in a GroupEntry is rejected with a Parse error (deny_unknown_fields regression guard).",
       "id": "T002",
       "status": "done"
@@ -134,7 +135,7 @@
     {
       "description": "Add append_scope_briefing_reference(prompt: &mut String, scope: &ScopeName, scope_config: &ReviewScopeConfig) pure function to apps/cli/src/commands/review/codex_local.rs. When scope_config.briefing_file_for_scope(scope) returns Some(path), append a `## Scope-specific severity policy` section to prompt that instructs the reviewer to Read the file at path before selecting findings. The appended format must match the example block in ADR D4 (knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md §D4): heading `## Scope-specific severity policy` + Japanese instruction line + bulleted path reference. When None, the function is a no-op. Solve the ordering problem in run_execute_codex_local where base_prompt is currently built in Step 2 before ReviewScopeConfig is loaded in Step 3 (inside build_review_v2_with_reviewer). Implementation options (pick during implementation): (A) add CodexReviewer::with_scope_briefing(briefing_path) builder and chain after composition; (B) pre-load scope_config via a new helper so base_prompt can be augmented before CodexReviewer::new; (C) have ReviewV2CompositionWithCodex retain scope_config and mutate reviewer post-construction via a builder. Record the chosen approach in verification.md. Unit tests: append_scope_briefing_reference with briefing_file Some appends the expected section; with None prompt is unchanged; with ScopeName::Other prompt is unchanged regardless of config; output format exactly matches the ADR D4 example block.",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Update .claude/agents/review-fix-lead.md: insert a new `## Scope-specific severity policy` section immediately before the existing `## Workflow` heading. The section must instruct the agent: when the main briefing contains a `## Scope-specific severity policy` section, the agent MUST Read the file listed there using the Read tool before starting the review; the referenced file defines which finding categories to report and which to skip for this scope; applying the wrong severity filter is the primary cause of over-long review loops (28-round history); always read the file fresh because the policy may have been updated between review sessions. The agent prompt must NOT carry a round budget / round count target — that belongs to the orchestrator pacing logic, not the reviewer severity filter. No automated test; dogfooded via the track's own review cycle.",
@@ -163,5 +164,5 @@
     }
   ],
   "title": "review-scope.json に scope 別 briefing 注入機構を追加する — plan-artifacts scope の新設",
-  "updated_at": "2026-04-18T09:32:15Z"
+  "updated_at": "2026-04-18T09:40:17Z"
 }

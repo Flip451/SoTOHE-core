@@ -4,7 +4,7 @@ use std::io::{self, Write};
 use std::process::ExitCode;
 use std::time::Duration;
 
-use domain::review_v2::{ReviewOutcome, ReviewWriter};
+use domain::review_v2::{ReviewOutcome, ReviewScopeConfig, ReviewWriter, ScopeName};
 use infrastructure::review_v2::CodexReviewer;
 use usecase::review_workflow::{ReviewFinalPayload, ReviewPayloadVerdict, render_review_payload};
 
@@ -24,13 +24,41 @@ fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, String> {
     // Step 1: Validate record args before building composition (fail fast).
     let validated = validate_auto_record_args(args)?;
 
-    // Step 2: Build base prompt. The scope file list is appended by
-    // CodexReviewer::build_full_prompt when it receives the ReviewTarget.
-    let base_prompt = build_base_prompt(args)?;
-
-    // Step 3: Build v2 composition with real CodexReviewer.
+    // Step 2: Resolve track id and map --group to ScopeName (both needed early so
+    // the scope config can be loaded and the base prompt augmented before the
+    // reviewer is constructed).
     let track_id = domain::TrackId::try_new(validated.track_id.as_ref())
         .map_err(|e| format!("[ERROR] invalid track id: {e}"))?;
+    let scope = map_group_to_scope(validated.group_name.as_ref())?;
+
+    // Step 3: Pre-load the scope config so we can inject a scope-specific
+    // briefing reference into the base prompt (ADR 2026-04-18-1354 §D4).
+    // build_review_v2_with_reviewer reloads the same config later; that
+    // second pass is pure (no side effects beyond glob compilation).
+    let scope_config = super::compose_v2::load_scope_config_only(&track_id, &validated.items_dir)?;
+
+    // Step 4: Build base prompt and append the scope-specific severity policy
+    // reference (a no-op when the scope has no briefing_file configured or is
+    // ScopeName::Other). The scope file list is appended later by
+    // CodexReviewer::build_full_prompt when it receives the ReviewTarget.
+    //
+    // Prompt injection guard: if the configured briefing_file path is unsafe
+    // (contains control characters or backticks), log a warning here at the CLI
+    // boundary before calling the pure `append_scope_briefing_reference` helper.
+    // The helper itself performs no I/O — it simply skips injection on unsafe paths.
+    if let Some(path) = scope_config.briefing_file_for_scope(&scope) {
+        if !is_safe_briefing_path(path) {
+            eprintln!(
+                "[WARN] briefing_file for scope '{}' contains unsafe characters — \
+                 scope-specific severity policy injection skipped",
+                scope
+            );
+        }
+    }
+    let mut base_prompt = build_base_prompt(args)?;
+    append_scope_briefing_reference(&mut base_prompt, &scope, &scope_config);
+
+    // Step 5: Build v2 composition with real CodexReviewer.
     let timeout = Duration::from_secs(args.timeout_seconds);
     let reviewer = CodexReviewer::new(&args.model, timeout, base_prompt)
         .with_scope_label(validated.group_name.as_ref());
@@ -38,10 +66,7 @@ fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, String> {
         super::compose_v2::build_review_v2_with_reviewer(&track_id, &validated.items_dir, reviewer)
             .map_err(|e| format!("[ERROR] v2 composition failed: {e}"))?;
 
-    // Step 4: Map --group to ScopeName.
-    let scope = map_group_to_scope(validated.group_name.as_ref())?;
-
-    // Step 5: Run review via ReviewCycle (hash_before → Codex → hash_after).
+    // Step 6: Run review via ReviewCycle (hash_before → Codex → hash_after).
     // Note: v2 writes verdicts directly to review.json via ReviewWriter.
     // v1 escalation (record_round → concerns → metadata.json) is intentionally
     // NOT preserved — it will be re-designed in v2 terms in a future track.
@@ -98,6 +123,67 @@ pub(super) fn build_base_prompt(args: &CodexLocalArgs) -> Result<String, String>
 /// Alias for test compatibility — tests.rs imports `build_prompt` by this name.
 #[cfg(test)]
 pub(super) use build_base_prompt as build_prompt;
+
+/// Appends a scope-specific severity policy reference section to `prompt`
+/// when the given scope has a `briefing_file` configured and the path is safe
+/// to inject.
+///
+/// The reference instructs the reviewer to Read the file via its own Read
+/// tool. No file I/O is performed here — only string manipulation. This
+/// implements ADR 2026-04-18-1354 §D4 (path-only injection; the reviewer
+/// sandbox fetches the content).
+///
+/// Becomes a no-op when:
+/// - the scope has no briefing configured, or
+/// - `scope` is `ScopeName::Other` (the reserved scope is intentionally
+///   exempt — ADR D5), or
+/// - the configured path fails `is_safe_briefing_path` (prompt injection guard).
+///
+/// **Pure function**: no I/O, no logging, no side effects beyond mutating `prompt`.
+/// Callers that need to warn on unsafe paths should call `is_safe_briefing_path`
+/// against `scope_config.briefing_file_for_scope(scope)` before (or after) this
+/// call and emit diagnostics at the CLI boundary.
+pub(super) fn append_scope_briefing_reference(
+    prompt: &mut String,
+    scope: &ScopeName,
+    scope_config: &ReviewScopeConfig,
+) {
+    let Some(briefing_path) = scope_config.briefing_file_for_scope(scope) else {
+        return;
+    };
+    // Prompt injection guard: reject paths that contain control characters
+    // (including newlines) or backtick characters that could break out of the
+    // markdown `` `path` `` context and inject arbitrary reviewer instructions.
+    // review-scope.json is loaded from the working tree under review, so a
+    // crafted briefing_file value must not be able to alter the prompt structure.
+    if !is_safe_briefing_path(briefing_path) {
+        return;
+    }
+    prompt.push_str("\n\n## Scope-specific severity policy\n\n");
+    prompt.push_str(&format!(
+        "このレビューの scope は `{scope}` である。\
+         以下の scope 固有 severity policy を **必ず先に Read ツールで読み込み**、\
+         その方針に従って findings を選別すること:\n\n\
+         - `{briefing_path}`",
+    ));
+}
+
+/// Returns `true` if `path` is safe to inject into the markdown prompt as a
+/// backtick-quoted path bullet.
+///
+/// Rejects strings that contain:
+/// - ASCII control characters (0x00–0x1F, including `\n`, `\r`, `\t`)
+/// - DEL (0x7F)
+/// - Backtick (`` ` ``) — would break out of the `` `path` `` markdown context
+///
+/// Empty paths are also rejected (a misconfigured empty `briefing_file` field
+/// has no meaningful interpretation).
+pub(super) fn is_safe_briefing_path(path: &str) -> bool {
+    if path.is_empty() {
+        return false;
+    }
+    !path.chars().any(|c| c == '`' || c.is_ascii_control())
+}
 
 /// Maps a group name string to a `ScopeName`.
 fn map_group_to_scope(group: &str) -> Result<domain::review_v2::ScopeName, String> {

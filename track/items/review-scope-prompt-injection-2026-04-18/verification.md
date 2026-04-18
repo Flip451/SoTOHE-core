@@ -33,14 +33,15 @@
 
 ### T003: briefing composer に scope briefing 参照行 append (cli)
 
-- [ ] `apps/cli/src/commands/review/codex_local.rs` に `append_scope_briefing_reference` pure 関数が追加されている
-- [ ] 出力 format が ADR D4 Canonical Block (`## Scope-specific severity policy` 見出し + Read 指示 + path) に完全一致
-- [ ] `briefing_file` が Some / None / Other の 3 ケースで append / noop が期待通り動作する unit test が全 pass
-- [ ] `run_execute_codex_local` の実行フロー順序問題が解決されている (採用した選択肢 A/B/C を本ファイル §Implementation Notes に記録)
+- [x] `apps/cli/src/commands/review/codex_local.rs` に `append_scope_briefing_reference` pure 関数が追加されている
+- [x] 出力 format が ADR D4 Canonical Block (`## Scope-specific severity policy` 見出し + Read 指示 + path) に完全一致
+- [x] `briefing_file` が Some / None / Other / unknown-main の 4 ケースで append / noop が期待通り動作する unit test + prompt injection guard (path に改行・バッククォート・空文字) の 3 件 = 計 7 件の unit test が全 pass
+- [x] `run_execute_codex_local` の実行フロー順序問題が解決されている (option B 採用、下記 §Implementation Notes 参照)
+- [x] `cargo make ci` 全 green (2157 tests passed, T003 で +7 件追加)
 
 #### Implementation Notes
 
-- [ ] 採用した順序改修アプローチ: (A) `CodexReviewer::with_scope_briefing` builder / (B) scope_config pre-load / (C) composition 保持 → 実装時に記入
+- [x] 採用した順序改修アプローチ: **option B** — `apps/cli/src/commands/review/compose_v2.rs` に `load_scope_config_only(track_id, items_dir) -> Result<ReviewScopeConfig, String>` を新設 (scope_json_path 作成 + `load_v2_scope_config` 呼び出し + items_dir 正規化を独立実装。`build_v2_shared` は引き続き同等のロジックを内部で実行するため、scope_config の読み込みは 2 回発生するが、pure な glob コンパイルのみで副作用がないため許容)。`run_execute_codex_local` を以下の 6 ステップに再編: validate → track_id + map_group → load_scope_config_only → build_base_prompt + append_scope_briefing_reference → CodexReviewer::new → build_review_v2_with_reviewer。`ReviewScopeConfig: Clone` / `CodexReviewer::with_scope_briefing` builder (option A/C) を追加せずに済み、domain / infrastructure / 既存 composition 構造に破壊的変更なし
 
 ### T004: review-fix-lead agent prompt 更新
 
@@ -98,8 +99,8 @@ _TBD — will be recorded after T008 dogfooding succeeds_
 
 ## Open Issues
 
-- **Open Q-IMPL-01**: `CodexReviewer::base_prompt` は private。注入方法の最終選択 (A/B/C) は T003 実装時に決定し、本ファイル Implementation Notes に記録する
-- **Open Q-IMPL-02**: `ReviewScopeConfig` の `Clone` derive 追加の是非は T001 / T003 実装時に決定する (`GlobMatcher` が Clone 可能なことは globset crate で確認済み)。T001 完了時点では `#[derive(Clone)]` は未追加。呼び出し側 (`compose_v2.rs`) で `scope_config` を clone していないため T001 時点では不要と判断した。T003 で `append_scope_briefing_reference` を実装する際に Clone が必要になれば追加する
+- **Open Q-IMPL-01**: ~~`CodexReviewer::base_prompt` は private。注入方法の最終選択 (A/B/C) は T003 実装時に決定し、本ファイル Implementation Notes に記録する~~ **T003 完了により解決済み**: option B を採用 (`load_scope_config_only` を pre-load して `base_prompt` 生成前に注入)。Implementation Notes に詳細記録済み
+- **Open Q-IMPL-02**: ~~`ReviewScopeConfig` の `Clone` derive 追加の是非は T001 / T003 実装時に決定する~~ **T003 完了により解決済み**: option B 採用により `Clone` は不要と確定。`load_scope_config_only` で `build_review_v2_with_reviewer` が内部で再読み込みするため clone なし。`ReviewScopeConfig: Clone` / `CodexReviewer::with_scope_briefing` builder は追加しなかった
 - **副作用**: 既存 track の `review.json` で `other` scope hash が plan-artifacts 追加後 StaleHash となる (正常挙動、新 scope 境界の再計算)
 - **commit 分類**: 本 track の commit は `track/review-scope.json` 変更により `harness-policy` scope と、`track/items/` / `knowledge/adr/` / `knowledge/research/` 変更により `plan-artifacts` scope で review される (bootstrap 適用済み)
 - **Bootstrap 状態**: T001 完了済み (loader が group pattern で `<track-id>` を展開する `expand_track_id` 追加済み)。現在の plan-artifacts patterns は `["track/items/**", "knowledge/adr/**", "knowledge/research/**"]` (literal `**`) を使用している。T006 で `track/items/<track-id>/**` へ切り替える前提
