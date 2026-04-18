@@ -19,7 +19,11 @@
           "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D6"
         ],
         "task_refs": [
-          "T000"
+          "T001",
+          "T002",
+          "T003",
+          "T004",
+          "T007"
         ]
       },
       {
@@ -28,7 +32,7 @@
           "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D2"
         ],
         "task_refs": [
-          "T000"
+          "T007"
         ]
       },
       {
@@ -37,7 +41,7 @@
           "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D3"
         ],
         "task_refs": [
-          "T000"
+          "T007"
         ]
       },
       {
@@ -46,7 +50,7 @@
           "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D4"
         ],
         "task_refs": [
-          "T000"
+          "T006"
         ]
       },
       {
@@ -55,7 +59,7 @@
           "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5"
         ],
         "task_refs": [
-          "T000"
+          "T005"
         ]
       },
       {
@@ -64,7 +68,9 @@
           "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D7"
         ],
         "task_refs": [
-          "T000"
+          "T004",
+          "T005",
+          "T007"
         ]
       },
       {
@@ -74,7 +80,7 @@
           "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D6"
         ],
         "task_refs": [
-          "T000"
+          "T007"
         ]
       },
       {
@@ -84,7 +90,8 @@
           "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D2"
         ],
         "task_refs": [
-          "T000"
+          "T004",
+          "T007"
         ]
       },
       {
@@ -95,7 +102,9 @@
           "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D7"
         ],
         "task_refs": [
-          "T000"
+          "T005",
+          "T007",
+          "T008"
         ]
       },
       {
@@ -104,7 +113,7 @@
           "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md"
         ],
         "task_refs": [
-          "T000"
+          "T009"
         ]
       }
     ],
@@ -116,7 +125,7 @@
         ]
       },
       {
-        "text": "既存 active track に対するマイグレーションコマンドの提供は対象外とする。`<layer>-types.json` は track ごとに `track/items/<track-id>/` 以下に格納される per-track ファイルである。本 track は実装前段階であり `track/items/tddd-ci-gate-and-signals-separation-2026-04-18/` 以下に per-track の `<layer>-types.json` はまだ存在しない。現在 active な track はこの 1 件のみ (ADR §D6 参照) であるため、旧形式から新形式へのマイグレーションを必要とする per-track `<layer>-types.json` は存在せず、マイグレーション需要が存在しない。なお現在のシステム全体では `<layer>-types.json` に signals が埋め込まれているが、その変更はコーデック変更 (Migration 手順 5b) で行う。",
+        "text": "既存 active track に対するマイグレーションコマンドの提供は対象外とする。`<layer>-types.json` は track ごとに `track/items/<track-id>/` 以下に格納される per-track ファイルである。現在 active な track はこの 1 件のみ (ADR §D6 参照) であり、本 track 自身の catalogue ファイルは `/track:design` 実行時点で現行仕様 (signals 同居) で作成され、Migration §5 + build-sotp + 初回 type-signals 実行で自動的に新仕様に切り替わる。したがって旧形式から新形式への per-track ファイルに対する手動マイグレーションコマンドは不要。",
         "sources": [
           "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D6"
         ]
@@ -207,7 +216,7 @@
         "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D6"
       ],
       "task_refs": [
-        "T000"
+        "T007"
       ]
     },
     {
@@ -217,17 +226,20 @@
         "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5"
       ],
       "task_refs": [
-        "T000"
+        "T001",
+        "T002"
       ]
     },
     {
-      "text": "`sotp track type-signals <track-id>` 実行後、宣言ファイルには signals が書き込まれず、評価結果ファイルにのみ signals が書き込まれること。`declaration_hash` が宣言ファイルのエンコード後バイト列の SHA-256 と一致すること。",
+      "text": "`sotp track type-signals <track-id>` 実行後 (build-sotp 後の新仕様)、宣言ファイルには signals が書き込まれず、評価結果ファイルにのみ signals が書き込まれること。`declaration_hash` が宣言ファイルのエンコード後バイト列の SHA-256 と一致すること。",
       "sources": [
         "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D1",
         "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5"
       ],
       "task_refs": [
-        "T000"
+        "T004",
+        "T007",
+        "T008"
       ]
     },
     {
@@ -236,7 +248,7 @@
         "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5"
       ],
       "task_refs": [
-        "T000"
+        "T005"
       ]
     },
     {
@@ -245,7 +257,7 @@
         "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D5"
       ],
       "task_refs": [
-        "T000"
+        "T005"
       ]
     },
     {
@@ -254,7 +266,9 @@
         "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D7"
       ],
       "task_refs": [
-        "T000"
+        "T004",
+        "T005",
+        "T007"
       ]
     },
     {
@@ -264,7 +278,7 @@
         "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D3"
       ],
       "task_refs": [
-        "T000"
+        "T007"
       ]
     },
     {
@@ -273,7 +287,7 @@
         "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D4"
       ],
       "task_refs": [
-        "T000"
+        "T006"
       ]
     },
     {
@@ -283,7 +297,9 @@
         "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §Migration"
       ],
       "task_refs": [
-        "T000"
+        "T005",
+        "T007",
+        "T008"
       ]
     },
     {
@@ -294,7 +310,9 @@
         "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md §D7"
       ],
       "task_refs": [
-        "T000"
+        "T005",
+        "T007",
+        "T008"
       ]
     },
     {
@@ -303,7 +321,7 @@
         "knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md"
       ],
       "task_refs": [
-        "T000"
+        "T009"
       ]
     }
   ],
@@ -347,6 +365,6 @@
     "yellow": 0,
     "red": 0
   },
-  "approved_at": "2026-04-18T17:05:59Z",
-  "content_hash": "sha256:43d7d11e2410d31402c6ab09d288dbd1892ff81d490731dc18a27c63fff328c6"
+  "approved_at": "2026-04-18T18:02:11Z",
+  "content_hash": "sha256:183d09a74b80b07445c02d59fd5c6786d113145298843bf0a313399684aac5a7"
 }

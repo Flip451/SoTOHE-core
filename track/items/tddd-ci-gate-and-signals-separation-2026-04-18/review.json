@@ -489,6 +489,123 @@
           "findings": [],
           "hash": "rvw1:sha256:d8b71a6a7ab4075f64f0017be5091d1104da06898cba33b1b96934a4b0d65674",
           "at": "2026-04-18T17:40:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:edd74d86f91ba7a88f650d29f90f3dfa52ba3559dea62c9b03683ad028a156cd",
+          "at": "2026-04-18T17:49:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003's filename rule is self-contradictory: it says `signal_file()` should use `<catalogue-stem>-signals.json`, but the example and every scoped requirement use `<layer>-type-signals.json`. For `domain-types.json`, the written rule would produce `domain-types-signals.json`, not the required `domain-type-signals.json`, so this task currently points implementers at the wrong target filename.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/metadata.json",
+              "line": 24,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:edd74d86f91ba7a88f650d29f90f3dfa52ba3559dea62c9b03683ad028a156cd",
+          "at": "2026-04-18T17:51:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`[tasks: T007, T008]` does not cover the full requirement here: `T004` is the task that actually makes `sotp track type-signals` write `<layer>-type-signals.json`. Without `T004`, this acceptance criterion cannot be satisfied even if the build/self-migration pieces land.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.md",
+              "line": 53,
+              "category": "logic gap"
+            }
+          ],
+          "hash": "rvw1:sha256:951c4247e842f4d746ba5848ec72fed6e227ae789af30f8ebe066565ed21331f",
+          "at": "2026-04-18T17:54:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:951c4247e842f4d746ba5848ec72fed6e227ae789af30f8ebe066565ed21331f",
+          "at": "2026-04-18T17:55:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` is scheduled before the first self-migration run in `T008`, but ADR Migration step 3 explicitly says the CI reader must only land after step 2 has already generated `<layer>-type-signals.json`. As written, the `T005` commit would make the current active track fail on Missing signal files until `T008` lands, so this task order is not executable as a per-task rollout.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/plan.md",
+              "line": 31,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The acceptance criterion for '`cargo make ci` passes with the new file structure' is mapped only to `T007`/`T008`, but the gate named in that criterion (`verify-spec-states-current-local`) is actually updated in `T005`. With the current `task_refs`, the spec under-assigns CI readiness and suggests the criterion can be satisfied without the task that teaches CI to read `*-type-signals.json`.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 293,
+              "category": "logic_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:951c4247e842f4d746ba5848ec72fed6e227ae789af30f8ebe066565ed21331f",
+          "at": "2026-04-18T17:58:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:913d02afe449030f9ad5a6be14edb8b569a071c5ee905bfccdae2ef276476eb1",
+          "at": "2026-04-18T18:00:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The acceptance criterion for final `sotp track type-signals` behavior is under-assigned: it only references `T007`/`T008`, but the actual writer behavior it asserts (`<layer>-type-signals.json` output plus `declaration_hash` emission) is introduced in `T004`. `T007` only performs the cutover/removal of legacy embedded `signals`, and `T008` is build/self-migration verification, so the requirement is no longer fully traceable to the task that implements it.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/spec.json",
+              "line": 233,
+              "category": "logic gap"
+            }
+          ],
+          "hash": "rvw1:sha256:913d02afe449030f9ad5a6be14edb8b569a071c5ee905bfccdae2ef276476eb1",
+          "at": "2026-04-18T18:01:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 is internally inconsistent about the required atomicity: the surrounding plan text says the pre-commit wiring and codec removal must land in the same commit, but the task body only requires them to be in the same PR. That weakens the commit-level constraint the rest of the plan depends on.",
+              "severity": "P1",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/metadata.json",
+              "line": 48,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:508d6471e6efd6799f2472e05277049d355d0a72d13c1cae4be8085f308006ab",
+          "at": "2026-04-18T18:03:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f68da3a73df5b80e9e3d91f291774c60608adf0891165d2932bd08de19dfc7b4",
+          "at": "2026-04-18T18:05:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f68da3a73df5b80e9e3d91f291774c60608adf0891165d2932bd08de19dfc7b4",
+          "at": "2026-04-18T18:07:18Z"
         }
       ]
     }
