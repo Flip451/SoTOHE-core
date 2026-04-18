@@ -163,11 +163,12 @@
       "status": "done"
     },
     {
+      "commit_hash": "97c34c3ebd2f6cc9d6f6101bc22adf22d41e730f",
       "description": "Run cargo make ci and confirm all checks pass (fmt-check + clippy + nextest + test-doc + deny + python-lint + scripts-selftest + check-layers + verify-arch-docs + verify-doc-links). Then dogfood the feature by running /track:review on this track itself: the review cycle must classify track/items/review-scope-prompt-injection-2026-04-18/**, any modified knowledge/adr/** files, and any knowledge/research/** planner output for this track into the plan-artifacts scope, the CLI must inject a `## Scope-specific severity policy` reference to track/review-prompts/plan-artifacts.md, and the reviewer must report zero_findings for plan-artifacts after applying the severity policy. Record the dogfooding result as qualitative end-to-end confirmation (composer injection, reviewer Read of policy file, severity filter behavior) in verification.md; backward-looking metrics (file counts per scope, round counts) are intentionally omitted.",
       "id": "T008",
       "status": "done"
     }
   ],
   "title": "review-scope.json に scope 別 briefing 注入機構を追加する — plan-artifacts scope の新設",
-  "updated_at": "2026-04-18T10:48:14Z"
+  "updated_at": "2026-04-18T11:30:37Z"
 }

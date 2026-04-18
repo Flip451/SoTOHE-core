@@ -7,11 +7,24 @@
       "approved": true,
       "action": "reference",
       "kind": "value_object"
+    },
+    {
+      "name": "ReviewScopeConfig",
+      "description": "Domain value object for per-scope classification + briefing lookup. T001 changes its internal shape (inner HashMap switches from Vec<GlobMatcher> to the crate-private ScopeEntry struct so each scope can carry an optional briefing_file path) and widens the public API with briefing_file_for_scope(&ScopeName) -> Option<&str>. The constructor ::new also moves to a 3-tuple entries form (name, patterns, briefing_file) and applies expand_track_id to group patterns. No I/O is added — path validation and content fetch remain outside the domain (ADR 2026-04-18-1354 §D4).",
+      "approved": true,
+      "action": "modify",
+      "kind": "value_object"
     }
   ],
   "signals": [
     {
       "type_name": "MainScopeName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewScopeConfig",
       "kind_tag": "value_object",
       "signal": "blue",
       "found_type": true

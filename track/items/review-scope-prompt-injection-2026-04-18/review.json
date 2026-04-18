@@ -1,123 +1,35 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:92870836d124d2ae2773f5ffa51de269cea824a6aaf6eb46d3de44994d7fe350",
-          "at": "2026-04-18T09:08:16Z"
+          "hash": "rvw1:sha256:f36266551afee9b1b6f8e0f17397e9d486a379a5890d8e877626f594f21a8e9d",
+          "at": "2026-04-18T09:08:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:92870836d124d2ae2773f5ffa51de269cea824a6aaf6eb46d3de44994d7fe350",
-          "at": "2026-04-18T09:08:54Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`metadata.json` contradicts itself about `plan-artifacts` scope coverage: T006 defines the new scope with patterns `track/items/<track-id>/**` and `knowledge/adr/**`, but T008 says this track's `knowledge/research/**` planner output must also be classified into `plan-artifacts`. As written, the task leaves the intended scope boundary ambiguous and can cause the implementation/checklists to omit research notes or route them inconsistently.",
-              "severity": "P1",
-              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
-              "line": 155,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:2ae9b1fe239f180efe08dfbbcbab23a6c67c2d85a1decf093aca8420d7bd7b44",
-          "at": "2026-04-18T05:48:56Z"
+          "hash": "rvw1:sha256:f36266551afee9b1b6f8e0f17397e9d486a379a5890d8e877626f594f21a8e9d",
+          "at": "2026-04-18T09:09:02Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d76603085dbdf5ee5ac471eb6cad2faaaf9082848f34f06e685652839afda33b",
-          "at": "2026-04-18T10:07:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Lines 3-7 add a scope preamble that enumerates other directories/files, but the design for this prompt requires exactly two sections (`What to report` and `What NOT to report`) and no other-doc references. Keeping scope metadata here makes the reviewer-facing policy non-self-contained and can drift from the actual orchestrator-defined scope.",
-              "severity": "P1",
-              "file": "track/review-prompts/plan-artifacts.md",
-              "line": 3,
-              "category": null
-            },
-            {
-              "message": "The `broken reference` bullet reintroduces `[source: ...]`, `[tasks: ...]`, and cross-document link references, even though this severity-policy file is explicitly supposed to avoid link/source-reference concepts. That breaks the intended self-contained format for the reviewer prompt.",
-              "severity": "P1",
-              "file": "track/review-prompts/plan-artifacts.md",
-              "line": 17,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:d76603085dbdf5ee5ac471eb6cad2faaaf9082848f34f06e685652839afda33b",
-          "at": "2026-04-18T10:08:20Z"
+          "hash": "rvw1:sha256:40ab219259ad7479b867518d513c7bc522d2ea48060d37b43605845d6f4c38ac",
+          "at": "2026-04-18T09:33:50Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ed0e1dafb472cdd9213984a0d7497b84c512097c903337ae2e9f396b3918292d",
-          "at": "2026-04-18T10:09:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9eed0fe92497cc63e2b3157946d380009b10d557522ad402c6752bb1fc480fa0",
-          "at": "2026-04-18T11:19:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The policy preamble moves file/path existence checks to CI, but the `broken reference` category still tells reviewers to report when a source or cross-document target \"does not exist in the repository.\" That reintroduces the same mechanical existence verification this revision is supposed to prohibit, so the reviewer/CI responsibility split is still internally inconsistent.",
-              "severity": "P1",
-              "file": "track/review-prompts/plan-artifacts.md",
-              "line": 21,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:9eed0fe92497cc63e2b3157946d380009b10d557522ad402c6752bb1fc480fa0",
-          "at": "2026-04-18T11:19:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:676614bb21237a21fa8d35de07d207d1781ab36d88f75f79e846774ed084143c",
-          "at": "2026-04-18T11:20:42Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:edca1c26b75ea8e66d5b4b126e7ebae64421e583f00462c9cf3baed63923180f",
-          "at": "2026-04-18T09:10:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:edca1c26b75ea8e66d5b4b126e7ebae64421e583f00462c9cf3baed63923180f",
-          "at": "2026-04-18T09:11:05Z"
+          "hash": "rvw1:sha256:40ab219259ad7479b867518d513c7bc522d2ea48060d37b43605845d6f4c38ac",
+          "at": "2026-04-18T09:34:45Z"
         }
       ]
     },
@@ -168,35 +80,83 @@
         }
       ]
     },
-    "infrastructure": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f36266551afee9b1b6f8e0f17397e9d486a379a5890d8e877626f594f21a8e9d",
-          "at": "2026-04-18T09:08:25Z"
+          "hash": "rvw1:sha256:92870836d124d2ae2773f5ffa51de269cea824a6aaf6eb46d3de44994d7fe350",
+          "at": "2026-04-18T09:08:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f36266551afee9b1b6f8e0f17397e9d486a379a5890d8e877626f594f21a8e9d",
-          "at": "2026-04-18T09:09:02Z"
+          "hash": "rvw1:sha256:92870836d124d2ae2773f5ffa51de269cea824a6aaf6eb46d3de44994d7fe350",
+          "at": "2026-04-18T09:08:54Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a430b72a83e5b97f2b68e303e81311eec78b51777db87cf746f2cdc95ea5d3b",
+          "at": "2026-04-18T09:43:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`append_scope_briefing_reference` injects `briefing_file` from `review-scope.json` straight into the reviewer prompt without any escaping or validation. Because that JSON is loaded from the working tree under review, a crafted value containing backticks/newlines can break out of the `- ` bullet and append arbitrary instructions, letting a PR author steer or suppress the review before any `Read` tool call happens. The new path-only injection flow needs to reject control characters / non-path syntax or otherwise safely quote the path before formatting it into the prompt.",
+              "severity": "P0",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 133,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:8a430b72a83e5b97f2b68e303e81311eec78b51777db87cf746f2cdc95ea5d3b",
+          "at": "2026-04-18T09:47:15Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:40ab219259ad7479b867518d513c7bc522d2ea48060d37b43605845d6f4c38ac",
-          "at": "2026-04-18T09:33:50Z"
+          "hash": "rvw1:sha256:e784a484fe7f22fb0ae67a35605c544ab59c4211944655fa8cafd4fac21204f2",
+          "at": "2026-04-18T09:51:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`append_scope_briefing_reference` is supposed to be the pure string-composition helper introduced by T003, but the unsafe-path branch now calls `eprintln!()`. Because `briefing_file` is repo-controlled data from `review-scope.json`, malformed config can cause otherwise-successful reviews to emit stderr from inside this helper, violating the ADR D4/no-I/O contract and making callers that assume pure prompt construction non-deterministic. Move the warning to the CLI boundary or return a status instead of logging here.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/codex_local.rs",
+              "line": 140,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:e784a484fe7f22fb0ae67a35605c544ab59c4211944655fa8cafd4fac21204f2",
+          "at": "2026-04-18T09:54:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2d8a178de1ef41c1499bd83fdb1b8bc11cd5857ee21e00ab2305e0aca9d0af6",
+          "at": "2026-04-18T09:57:47Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:40ab219259ad7479b867518d513c7bc522d2ea48060d37b43605845d6f4c38ac",
-          "at": "2026-04-18T09:34:45Z"
+          "hash": "rvw1:sha256:b2d8a178de1ef41c1499bd83fdb1b8bc11cd5857ee21e00ab2305e0aca9d0af6",
+          "at": "2026-04-18T09:59:48Z"
         }
       ]
     },
@@ -1410,68 +1370,122 @@
           "findings": [],
           "hash": "rvw1:sha256:49fd016f31f451c8cc8e5ad158bc31cd8accaff3b399b1ede0aa1b2033af689f",
           "at": "2026-04-18T11:29:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba34bea5544babef48c4b6d2ee78096e17fabffc3d5eceb99abf5cde541c303e",
+          "at": "2026-04-18T11:41:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba34bea5544babef48c4b6d2ee78096e17fabffc3d5eceb99abf5cde541c303e",
+          "at": "2026-04-18T11:42:01Z"
         }
       ]
     },
-    "cli": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8a430b72a83e5b97f2b68e303e81311eec78b51777db87cf746f2cdc95ea5d3b",
-          "at": "2026-04-18T09:43:31Z"
+          "hash": "rvw1:sha256:edca1c26b75ea8e66d5b4b126e7ebae64421e583f00462c9cf3baed63923180f",
+          "at": "2026-04-18T09:10:02Z"
         },
         {
           "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`append_scope_briefing_reference` injects `briefing_file` from `review-scope.json` straight into the reviewer prompt without any escaping or validation. Because that JSON is loaded from the working tree under review, a crafted value containing backticks/newlines can break out of the `- ` bullet and append arbitrary instructions, letting a PR author steer or suppress the review before any `Read` tool call happens. The new path-only injection flow needs to reject control characters / non-path syntax or otherwise safely quote the path before formatting it into the prompt.",
-              "severity": "P0",
-              "file": "apps/cli/src/commands/review/codex_local.rs",
-              "line": 133,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:8a430b72a83e5b97f2b68e303e81311eec78b51777db87cf746f2cdc95ea5d3b",
-          "at": "2026-04-18T09:47:15Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e784a484fe7f22fb0ae67a35605c544ab59c4211944655fa8cafd4fac21204f2",
-          "at": "2026-04-18T09:51:37Z"
-        },
+          "hash": "rvw1:sha256:edca1c26b75ea8e66d5b4b126e7ebae64421e583f00462c9cf3baed63923180f",
+          "at": "2026-04-18T09:11:05Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
         {
-          "type": "final",
+          "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`append_scope_briefing_reference` is supposed to be the pure string-composition helper introduced by T003, but the unsafe-path branch now calls `eprintln!()`. Because `briefing_file` is repo-controlled data from `review-scope.json`, malformed config can cause otherwise-successful reviews to emit stderr from inside this helper, violating the ADR D4/no-I/O contract and making callers that assume pure prompt construction non-deterministic. Move the warning to the CLI boundary or return a status instead of logging here.",
+              "message": "`metadata.json` contradicts itself about `plan-artifacts` scope coverage: T006 defines the new scope with patterns `track/items/<track-id>/**` and `knowledge/adr/**`, but T008 says this track's `knowledge/research/**` planner output must also be classified into `plan-artifacts`. As written, the task leaves the intended scope boundary ambiguous and can cause the implementation/checklists to omit research notes or route them inconsistently.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/review/codex_local.rs",
-              "line": 140,
-              "category": "architecture"
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "line": 155,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:e784a484fe7f22fb0ae67a35605c544ab59c4211944655fa8cafd4fac21204f2",
-          "at": "2026-04-18T09:54:03Z"
+          "hash": "rvw1:sha256:2ae9b1fe239f180efe08dfbbcbab23a6c67c2d85a1decf093aca8420d7bd7b44",
+          "at": "2026-04-18T05:48:56Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b2d8a178de1ef41c1499bd83fdb1b8bc11cd5857ee21e00ab2305e0aca9d0af6",
-          "at": "2026-04-18T09:57:47Z"
+          "hash": "rvw1:sha256:d76603085dbdf5ee5ac471eb6cad2faaaf9082848f34f06e685652839afda33b",
+          "at": "2026-04-18T10:07:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Lines 3-7 add a scope preamble that enumerates other directories/files, but the design for this prompt requires exactly two sections (`What to report` and `What NOT to report`) and no other-doc references. Keeping scope metadata here makes the reviewer-facing policy non-self-contained and can drift from the actual orchestrator-defined scope.",
+              "severity": "P1",
+              "file": "track/review-prompts/plan-artifacts.md",
+              "line": 3,
+              "category": null
+            },
+            {
+              "message": "The `broken reference` bullet reintroduces `[source: ...]`, `[tasks: ...]`, and cross-document link references, even though this severity-policy file is explicitly supposed to avoid link/source-reference concepts. That breaks the intended self-contained format for the reviewer prompt.",
+              "severity": "P1",
+              "file": "track/review-prompts/plan-artifacts.md",
+              "line": 17,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:d76603085dbdf5ee5ac471eb6cad2faaaf9082848f34f06e685652839afda33b",
+          "at": "2026-04-18T10:08:20Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b2d8a178de1ef41c1499bd83fdb1b8bc11cd5857ee21e00ab2305e0aca9d0af6",
-          "at": "2026-04-18T09:59:48Z"
+          "hash": "rvw1:sha256:ed0e1dafb472cdd9213984a0d7497b84c512097c903337ae2e9f396b3918292d",
+          "at": "2026-04-18T10:09:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9eed0fe92497cc63e2b3157946d380009b10d557522ad402c6752bb1fc480fa0",
+          "at": "2026-04-18T11:19:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The policy preamble moves file/path existence checks to CI, but the `broken reference` category still tells reviewers to report when a source or cross-document target \"does not exist in the repository.\" That reintroduces the same mechanical existence verification this revision is supposed to prohibit, so the reviewer/CI responsibility split is still internally inconsistent.",
+              "severity": "P1",
+              "file": "track/review-prompts/plan-artifacts.md",
+              "line": 21,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9eed0fe92497cc63e2b3157946d380009b10d557522ad402c6752bb1fc480fa0",
+          "at": "2026-04-18T11:19:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:676614bb21237a21fa8d35de07d207d1781ab36d88f75f79e846774ed084143c",
+          "at": "2026-04-18T11:20:42Z"
         }
       ]
     }
