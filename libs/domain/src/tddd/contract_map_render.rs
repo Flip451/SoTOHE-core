@@ -119,11 +119,21 @@ pub fn render_contract_map(
 
     // 4b. Edges — collected into a BTreeSet so duplicates are dropped and
     //     output order is deterministic.
+    //
+    //     Per ADR 2026-04-17-1528 §D4 (1) (Phase 1.5 extension), method-call
+    //     edges are derived from BOTH `method.returns()` AND
+    //     `method.params()`. Returns-derived edges keep the simple
+    //     `method` label; params-derived edges use `method(arg_name)` so
+    //     the Contract Map reader can distinguish them and see which
+    //     parameter introduced the dependency. Only declared types
+    //     (present in `type_index`) become edge targets — references to
+    //     external types (e.g. `String`, `Result`) are ignored.
     let mut edges: BTreeSet<String> = BTreeSet::new();
     for (src_layer, entry) in &entries {
         let src_id = node_id(src_layer, entry.name());
 
         for method in methods_of(entry.kind()) {
+            // Returns-derived edges (Phase 1 baseline).
             for token in extract_type_names(method.returns()) {
                 if token == entry.name() {
                     continue;
@@ -133,6 +143,22 @@ pub fn render_contract_map(
                         "    {src_id} -->|{label}| {dst_id}",
                         label = escape_edge_label(method.name()),
                     ));
+                }
+            }
+
+            // Params-derived edges (Phase 1.5 extension, ADR §D4 (1)).
+            for param in method.params() {
+                for token in extract_type_names(param.ty()) {
+                    if token == entry.name() {
+                        continue;
+                    }
+                    if let Some((_dst_layer, dst_id)) = type_index.get(token) {
+                        edges.insert(format!(
+                            "    {src_id} -->|{label}| {dst_id}",
+                            label =
+                                escape_edge_label(&format!("{}({})", method.name(), param.name())),
+                        ));
+                    }
                 }
             }
         }
@@ -549,5 +575,126 @@ mod tests {
         let a = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
         let b = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
         assert_eq!(a.as_ref(), b.as_ref(), "render must be deterministic");
+    }
+
+    // --- Phase 1.5: param-derived method-edges (ADR §D4 (1) extended) ---
+
+    #[test]
+    fn test_render_contract_map_emits_param_edge_within_layer() {
+        // `UserRepository.save(&self, user: User) -> Result<(), DomainError>`
+        // must emit a same-layer edge to `User` labelled `save(user)` in
+        // addition to the returns-derived edge to `DomainError`.
+        let (catalogues, order) = simple_3layer_catalogues();
+        let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+        let text = content.as_ref();
+        assert!(
+            text.contains("domain_UserRepository -->|save(user)| domain_User"),
+            "param edge to User must appear; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_emits_param_edge_across_layers() {
+        // Add a usecase-layer application_service whose execute method
+        // takes a domain value-object parameter. The edge must span
+        // usecase → domain.
+        let domain = layer("domain");
+        let usecase = layer("usecase");
+
+        let exec_method = vec![MethodDeclaration::new(
+            "execute",
+            Some("&self".to_owned()),
+            vec![ParamDeclaration::new("subject", "Subject")],
+            "()",
+            false,
+        )];
+
+        let domain_doc = doc(vec![entry("Subject", TypeDefinitionKind::ValueObject)]);
+        let usecase_doc = doc(vec![entry(
+            "Greeter",
+            TypeDefinitionKind::ApplicationService { expected_methods: exec_method },
+        )]);
+
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        catalogues.insert(usecase.clone(), usecase_doc);
+        let order = vec![domain, usecase];
+
+        let content = render_contract_map(&catalogues, &order, &ContractMapRenderOptions::empty());
+        let text = content.as_ref();
+        assert!(
+            text.contains("usecase_Greeter -->|execute(subject)| domain_Subject"),
+            "cross-layer param edge to Subject must appear; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_ignores_param_referencing_undeclared_type() {
+        // Param ty that references an external / undeclared type must NOT
+        // produce an edge (external type is absent from the type_index).
+        let domain = layer("domain");
+        let exec_method = vec![MethodDeclaration::new(
+            "take",
+            Some("&self".to_owned()),
+            vec![ParamDeclaration::new("path", "std::path::PathBuf")],
+            "()",
+            false,
+        )];
+        let domain_doc = doc(vec![entry(
+            "Service",
+            TypeDefinitionKind::ApplicationService { expected_methods: exec_method },
+        )]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&domain),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        assert!(
+            !text.contains("-->|take(path)|"),
+            "no edge should be emitted for undeclared type 'PathBuf'; output was:\n{text}"
+        );
+    }
+
+    #[test]
+    fn test_render_contract_map_param_edge_label_format_is_method_arg() {
+        // Label format must be exactly `method(arg_name)` — verifies we
+        // do not accidentally emit `method` (collision with returns edge)
+        // or `method(Type)` (leaking the param type) for params.
+        let domain = layer("domain");
+
+        let ctor = vec![MethodDeclaration::new(
+            "configure",
+            Some("&self".to_owned()),
+            vec![ParamDeclaration::new("settings", "Settings")],
+            "()",
+            false,
+        )];
+        let domain_doc = doc(vec![
+            entry("App", TypeDefinitionKind::ApplicationService { expected_methods: ctor }),
+            entry("Settings", TypeDefinitionKind::ValueObject),
+        ]);
+        let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+        catalogues.insert(domain.clone(), domain_doc);
+
+        let content = render_contract_map(
+            &catalogues,
+            std::slice::from_ref(&domain),
+            &ContractMapRenderOptions::empty(),
+        );
+        let text = content.as_ref();
+        // Present: exact `configure(settings)` label.
+        assert!(
+            text.contains("domain_App -->|configure(settings)| domain_Settings"),
+            "label must be 'configure(settings)'; output was:\n{text}"
+        );
+        // Absent: bare `configure` (would indicate edge was keyed from
+        // returns, not params).
+        assert!(
+            !text.contains("domain_App -->|configure| domain_Settings"),
+            "bare label must not appear for params-only edge; output was:\n{text}"
+        );
     }
 }

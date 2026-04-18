@@ -128,6 +128,48 @@
         "TaskRemoved",
         "InvalidLayerId"
       ]
+    },
+    {
+      "name": "TrackId",
+      "description": "Existing domain identifier (validated lowercase slug). T008 rewrote it from nutype to a plain struct, keeping the `try_new(impl Into<String>) -> Result<Self, ValidationError>` / `AsRef<str>` / `Display` API. Declared here with action=reference so the Contract Map renderer can emit param-derived edges (e.g. `CatalogueLoader -->|load_all(track_id)| TrackId`) against it without adding to baseline.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
+    },
+    {
+      "name": "TaskId",
+      "description": "Existing domain identifier (format `T<digits>`). T008 rewrote it from nutype to a plain struct with the same API. Declared here with action=reference so the Contract Map renderer can represent its usage as a method parameter or return type when it appears in future port signatures.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
+    },
+    {
+      "name": "CommitHash",
+      "description": "Existing domain identifier (7-40 lowercase hex chars). T008 rewrote it from nutype to a plain struct with the same API. Declared with action=reference to enable Contract Map visualisation of commit-hash dependencies in future port signatures.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
+    },
+    {
+      "name": "TrackBranch",
+      "description": "Existing domain identifier (`track/<valid-track-id>` form). T008 rewrote it from nutype to a plain struct with the same API. Declared with action=reference for Contract Map visualisation.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
+    },
+    {
+      "name": "NonEmptyString",
+      "description": "Existing domain identifier (trimmed non-empty string). T008 rewrote it from nutype (sanitize(trim) + validate) to a plain struct that preserves both behaviours in `try_new`. Declared with action=reference for Contract Map visualisation.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
+    },
+    {
+      "name": "ReviewGroupName",
+      "description": "Existing domain identifier for review group names (trimmed non-empty string). T008 rewrote it from nutype (sanitize(trim) + validate) to a plain struct that preserves both behaviours in `try_new`. Declared with action=reference for Contract Map visualisation.",
+      "approved": true,
+      "action": "reference",
+      "kind": "value_object"
     }
   ],
   "signals": [
@@ -230,6 +272,42 @@
         "TaskRemoved",
         "InvalidLayerId"
       ]
+    },
+    {
+      "type_name": "TrackId",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskId",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CommitHash",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackBranch",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "NonEmptyString",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewGroupName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

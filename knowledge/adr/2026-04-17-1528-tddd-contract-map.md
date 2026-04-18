@@ -232,11 +232,15 @@ render 実装は `layers` の数・名前・順序すべて入力から駆動さ
 
 以下 3 種類を対象とする (層名ハードコードなし、kind ベースで定義):
 
-1. **Method call edge** (実線矢印): `A.method() -> B` の戻り値型が宣言型 B を参照 → `A -->|method| B`
+1. **Method call edge** (実線矢印): `A.method()` の**戻り値型または引数型**が宣言型 B を参照 → edge を描画
+   - 戻り値由来 (Phase 1): `A.method() -> B` → `A -->|method| B`
+   - 引数由来 (**Phase 1.5 拡張**): `A.method(arg: B, ...)` → `A -->|method(arg)| B`。ラベルに引数名を含めることで戻り値 edge と区別し、どの引数が依存を生んだかを視認可能にする。外部型 (`String` / `Result` 等、カタログ未宣言の型) は `type_index` に存在しないため edge 対象外。
 2. **Trait impl edge** (破線矢印): `secondary_port` kind の trait を別の宣言型が impl → `Impl -.impl.-> Trait`。**どの層の impl がどの層の port を実装しているかは描画対象ではなく描画結果として現れる** (層横断 edge が自然に描かれる)
 3. **spec_source edge** (細い実線、optional): ノード → spec セクション。`opts.include_spec_source_edges=true` 時のみ
 
 field edge (struct field 参照) は初期スコープから除外する (ノイズになりやすい、Phase 2 で実測してから判断)。
+
+**Phase 1.5 拡張の背景**: Phase 1 の初回ドッグフーディングで、本 track の contract-map.md が 17 nodes / 8 edges と edge 数が想定より少なく、method 引数に現れる型参照 (例: `ContractMapWriter.write(content: ContractMapContent)` の `ContractMapContent` 依存、`RenderContractMap.execute(cmd: RenderContractMapCommand)` の command dependency) が可視化できていない課題が露出した。§D4 (1) を返値のみから返値 + 引数に拡張することで、contract-map.md の情報密度を上げ、SoT chain の俯瞰価値を回復する (本ルール変更は T009 に紐付けて実装)。
 
 ### D5: action / signal オーバーレイ
 

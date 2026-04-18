@@ -8,6 +8,12 @@
 | ContractMapContent | value_object | — | — | 🔵 |
 | ContractMapRenderOptions | value_object | — | — | 🔵 |
 | TypeCatalogueDocument | value_object | reference | — | 🔵 |
+| TrackId | value_object | reference | — | 🔵 |
+| TaskId | value_object | reference | — | 🔵 |
+| CommitHash | value_object | reference | — | 🔵 |
+| TrackBranch | value_object | reference | — | 🔵 |
+| NonEmptyString | value_object | reference | — | 🔵 |
+| ReviewGroupName | value_object | reference | — | 🔵 |
 
 ## Error Types
 

@@ -153,14 +153,14 @@ cargo run --quiet -p cli -- track type-graph tddd-contract-map-phase1-2026-04-17
 
 ### T009: Contract Map edges extension (params + 6 ids reference declare)
 
-- [ ] ADR 2026-04-17-1528 §D4 (1) が 'returns only' から 'returns + params' に拡張され、Phase 1.5 拡張注記が記載されている
-- [ ] `libs/domain/src/tddd/contract_map_render.rs` の method-edge 生成ループが method.params() を iterate する
-- [ ] declared 型 (type_index 内) の param に対してのみ edge を emit する (外部型には edge を出さない)
-- [ ] edge label が `A -->|method(arg_name)| B` 形式である
-- [ ] 新規 unit tests 4 件 (同層 param edge / 層跨ぎ param edge / declared 型のみ / label 形式) が追加され pass する
-- [ ] `domain-types.json` に 6 plain-struct ids が action=reference で declare 追加されている
-- [ ] `sotp track type-signals` で 6 型が全 Blue (found_type=true)
-- [ ] `sotp track signals` で spec 全項目が Blue を維持 (strict merge gate 通過)
+- [x] ADR 2026-04-17-1528 §D4 (1) が 'returns only' から 'returns + params' に拡張され、Phase 1.5 拡張注記が記載されている (§D4 リスト 1. を 2 sub-bullets に分割、Phase 1.5 背景節を末尾に追加)
+- [x] `libs/domain/src/tddd/contract_map_render.rs` の method-edge 生成ループが method.params() を iterate する (Phase 1 の returns ループ直後に params ループを追加、type_index 参照は共有)
+- [x] declared 型 (type_index 内) の param に対してのみ edge を emit する (外部型には edge を出さない — `test_render_contract_map_ignores_param_referencing_undeclared_type` で検証)
+- [x] edge label が `A -->|method(arg_name)| B` 形式である (`test_render_contract_map_param_edge_label_format_is_method_arg` で形式検証)
+- [x] 新規 unit tests 4 件 (同層 param edge / 層跨ぎ param edge / declared 型のみ / label 形式) が追加され pass する (nextest delta 2134 → 2138)
+- [x] `domain-types.json` に 6 plain-struct ids が action=reference で declare 追加されている (TrackId / TaskId / CommitHash / TrackBranch / NonEmptyString / ReviewGroupName、計 15 domain entries)
+- [x] `sotp track type-signals` で 6 型が全 Blue (found_type=true) — domain layer: blue=15 / yellow=0 / red=0 (undeclared=0)
+- [x] `sotp track signals` で spec 全項目が Blue を維持 (strict merge gate 通過): blue=52 / yellow=0 / red=0
 
 ### T010: Phase 1.5 verification + dogfooding regeneration
 
